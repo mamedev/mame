@@ -127,15 +127,15 @@ protected:
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_READ8_MEMBER(mc6845_r);
-	DECLARE_WRITE8_MEMBER(mc6845_w);
-	DECLARE_WRITE8_MEMBER(output_a_w);
-	DECLARE_WRITE8_MEMBER(output_b_w);
-	DECLARE_WRITE8_MEMBER(output_c_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(lpt_status_r);
-	DECLARE_WRITE8_MEMBER(lpt_data_w);
-	DECLARE_WRITE8_MEMBER(rtc_control_w);
+	uint8_t mc6845_r(offs_t offset);
+	void mc6845_w(offs_t offset, uint8_t data);
+	void output_a_w(uint8_t data);
+	void output_b_w(uint8_t data);
+	void output_c_w(uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t lpt_status_r();
+	void lpt_data_w(uint8_t data);
+	void rtc_control_w(uint8_t data);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 	void amusco_palette(palette_device &palette) const;
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 	if (BIT(code, 15) && !m_blink_state)
 		code = 0;
 
-	SET_TILE_INFO_MEMBER(
+	tileinfo.set(
 							0 /* bank */,
 							code & 0x3ff,
 							color,
@@ -216,7 +216,7 @@ void amusco_state::mem_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
-READ8_MEMBER( amusco_state::mc6845_r)
+uint8_t amusco_state::mc6845_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_crtc->register_r();
@@ -224,7 +224,7 @@ READ8_MEMBER( amusco_state::mc6845_r)
 	return m_crtc->status_r(); // not a plain 6845, requests update bit here ...
 }
 
-WRITE8_MEMBER( amusco_state::mc6845_w)
+void amusco_state::mc6845_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 	{
@@ -241,7 +241,7 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::output_a_w)
+void amusco_state::output_a_w(uint8_t data)
 {
 /* Lamps from port A
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER(amusco_state::output_a_w)
 //  logerror("Writing %02Xh to PPI output A\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::output_b_w)
+void amusco_state::output_b_w(uint8_t data)
 {
 /* Lamps and counters from port B
 
@@ -283,7 +283,7 @@ WRITE8_MEMBER(amusco_state::output_b_w)
 //  logerror("Writing %02Xh to PPI output B\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::output_c_w)
+void amusco_state::output_c_w(uint8_t data)
 {
 /* Lamps and counters from port C
 
@@ -304,14 +304,14 @@ WRITE8_MEMBER(amusco_state::output_c_w)
 //  logerror("Writing %02Xh to PPI output C\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::vram_w)
+void amusco_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[m_video_update_address * 2 + offset] = data;
 	m_bg_tilemap->mark_tile_dirty(m_video_update_address);
 //  printf("%04x %04x\n",m_video_update_address,data);
 }
 
-READ8_MEMBER(amusco_state::lpt_status_r)
+uint8_t amusco_state::lpt_status_r()
 {
 	// Bit 0 = busy
 	// Bit 1 = paper jam (active low)
@@ -320,7 +320,7 @@ READ8_MEMBER(amusco_state::lpt_status_r)
 	return 2;
 }
 
-WRITE8_MEMBER(amusco_state::lpt_data_w)
+void amusco_state::lpt_data_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -357,7 +357,7 @@ WRITE8_MEMBER(amusco_state::lpt_data_w)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::rtc_control_w)
+void amusco_state::rtc_control_w(uint8_t data)
 {
 	m_rtc->address_w(data & 0x0f);
 	m_rtc->cs_w(BIT(data, 6));

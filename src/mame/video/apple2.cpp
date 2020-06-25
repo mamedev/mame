@@ -833,6 +833,37 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 	}
 }
 
+void a2_video_device::text_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col;
+	uint32_t start_address = m_page2 ? 0x800 : 0x400;
+	uint32_t address;
+	int fg = 0;
+	int bg = 0;
+
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
+
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: fg = WHITE; break;
+		case 1: fg = WHITE; break;
+		case 2: fg = GREEN; break;
+		case 3: fg = ORANGE; break;
+	}
+
+	for (row = beginrow; row <= endrow; row += 8)
+	{
+		for (col = 0; col < 40; col++)
+		{
+			/* calculate address */
+			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+			plot_text_character_orig(bitmap, col * 14, row, 2, m_ram_ptr[address],
+				m_char_ptr, m_char_size, bg, fg);
+		}
+	}
+}
+
 void a2_video_device::text_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
@@ -1195,6 +1226,12 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int page = m_page2 ? 0x4000 : 0x2000;
 	int mon_type = m_sysconfig & 0x03;
 
+	// IIgs force-monochrome-DHR setting
+	if (m_newvideo & 0x20)
+	{
+		mon_type = 1;
+	}
+
 	/* sanity checks */
 	if (beginrow < cliprect.top())
 		beginrow = cliprect.top();
@@ -1245,7 +1282,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 1:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1255,7 +1292,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 2:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1265,7 +1302,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 3:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1372,6 +1409,15 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 			}
 			else        // 320 mode
 			{
+				// the low 5 bits of the SCB determine the initial fillmode color
+				// for the scanline (hardware testing by John Brooks)
+				static const uint32_t fillmode_init[32] =
+				{
+					2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+				};
+
+				last_pixel = fillmode_init[scb & 0x1f];
 				for (col = 0; col < 160; col++)
 				{
 					b = vram[col];

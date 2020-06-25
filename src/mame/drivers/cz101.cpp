@@ -7,8 +7,6 @@
     Digital Synthesizer
 
     TODO:
-    - To get the display to show something, our uPD7810 core needs to
-      output the full port value even if the port is set as input (port a).
     - Currently seems to hang while processing the serial ports (midi). Our
       uPD7810 core is lacking the externally clocked serial mode.
 
@@ -59,17 +57,14 @@ private:
 
 	void maincpu_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
+	void port_b_w(uint8_t data);
+	void port_c_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(led_1_w);
-	DECLARE_WRITE8_MEMBER(led_2_w);
-	DECLARE_WRITE8_MEMBER(led_3_w);
-	DECLARE_WRITE8_MEMBER(led_4_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void led_1_w(uint8_t data);
+	void led_2_w(uint8_t data);
+	void led_3_w(uint8_t data);
+	void led_4_w(uint8_t data);
+	uint8_t keys_r();
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
@@ -267,7 +262,7 @@ HD44780_PIXEL_UPDATE( cz101_state::lcd_pixel_update )
 		bitmap.pix16(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
-WRITE8_MEMBER( cz101_state::led_4_w )
+void cz101_state::led_4_w(uint8_t data)
 {
 	output().set_value("led_0", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_1", BIT(data, 6) ? 0 : 1);
@@ -279,7 +274,7 @@ WRITE8_MEMBER( cz101_state::led_4_w )
 	output().set_value("led_7", BIT(data, 0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( cz101_state::led_3_w )
+void cz101_state::led_3_w(uint8_t data)
 {
 	output().set_value("led_8", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_9", BIT(data, 6) ? 0 : 1);
@@ -291,7 +286,7 @@ WRITE8_MEMBER( cz101_state::led_3_w )
 	output().set_value("led_15", BIT(data, 0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( cz101_state::led_2_w )
+void cz101_state::led_2_w(uint8_t data)
 {
 	output().set_value("led_16", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_17", BIT(data, 6) ? 0 : 1);
@@ -303,7 +298,7 @@ WRITE8_MEMBER( cz101_state::led_2_w )
 	output().set_value("led_23", BIT(data, 0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( cz101_state::led_1_w )
+void cz101_state::led_1_w(uint8_t data)
 {
 	output().set_value("led_24", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_25", BIT(data, 6) ? 0 : 1);
@@ -315,25 +310,9 @@ WRITE8_MEMBER( cz101_state::led_1_w )
 	output().set_value("led_31", BIT(data, 0) ? 0 : 1);
 }
 
-READ8_MEMBER( cz101_state::keys_r )
+uint8_t cz101_state::keys_r()
 {
 	return m_keys[m_port_b & 0x0f]->read();
-}
-
-// 76543210  lcd data bus
-
-READ8_MEMBER( cz101_state::port_a_r )
-{
-	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 1))
-		return m_hd44780->read(BIT(m_port_c, 5));
-
-	return 0xff;
-}
-
-WRITE8_MEMBER( cz101_state::port_a_w )
-{
-	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 0))
-		m_hd44780->write(BIT(m_port_c, 5), data);
 }
 
 // 7-------  nmi output
@@ -342,7 +321,7 @@ WRITE8_MEMBER( cz101_state::port_a_w )
 // ---4----  music lsi irq input
 // ----3210  key select output
 
-WRITE8_MEMBER( cz101_state::port_b_w )
+void cz101_state::port_b_w(uint8_t data)
 {
 	LOG("port_b_w: %02x\n", data);
 
@@ -358,11 +337,14 @@ WRITE8_MEMBER( cz101_state::port_b_w )
 // ------1-  midi input
 // -------0  midi output
 
-WRITE8_MEMBER( cz101_state::port_c_w )
+void cz101_state::port_c_w(uint8_t data)
 {
 	LOG("port_c_w: %02x\n", data);
 
 	m_port_c = data;
+	m_hd44780->e_w(!BIT(data, 7));
+	m_hd44780->rw_w(BIT(data, 6));
+	m_hd44780->rs_w(BIT(data, 5));
 }
 
 void cz101_state::machine_start()
@@ -385,10 +367,11 @@ void cz101_state::cz101(machine_config &config)
 {
 	UPD7810(config, m_maincpu, 10_MHz_XTAL); // actually 7811, but internal ROM disabled
 	m_maincpu->set_addrmap(AS_PROGRAM, &cz101_state::maincpu_map);
-	m_maincpu->pa_in_cb().set(FUNC(cz101_state::port_a_r));
-	m_maincpu->pa_out_cb().set(FUNC(cz101_state::port_a_w));
+	m_maincpu->pa_in_cb().set(m_hd44780, FUNC(hd44780_device::db_r));
+	m_maincpu->pa_out_cb().set(m_hd44780, FUNC(hd44780_device::db_w));
 	m_maincpu->pb_out_cb().set(FUNC(cz101_state::port_b_w));
 	m_maincpu->pc_out_cb().set(FUNC(cz101_state::port_c_w));
+	m_maincpu->set_pc_pullups(0x03);
 
 	CLOCK(config, "midi_clock", 2_MHz_XTAL)/*.signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w))*/; // not supported yet
 
@@ -408,6 +391,8 @@ void cz101_state::cz101(machine_config &config)
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));
 
 	config.set_default_layout(layout_cz101);
+
+	//UPD933(config, "music", 8.96_MHz_XTAL / 2);
 }
 
 

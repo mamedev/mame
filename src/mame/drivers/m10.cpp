@@ -201,7 +201,7 @@ MACHINE_RESET_MEMBER(m10_state,m10)
  *              0x06: SAUCER HIT
  */
 
-WRITE8_MEMBER(m10_state::m10_ctrl_w)
+void m10_state::m10_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0x40)
@@ -276,7 +276,7 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m11_ctrl_w)
+void m10_state::m11_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0x4c)
@@ -307,7 +307,7 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m15_ctrl_w)
+void m10_state::m15_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0xf0)
@@ -333,7 +333,7 @@ WRITE8_MEMBER(m10_state::m15_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m10_a500_w)
+void m10_state::m10_a500_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0xfc)
@@ -341,7 +341,7 @@ WRITE8_MEMBER(m10_state::m10_a500_w)
 #endif
 }
 
-WRITE8_MEMBER(m10_state::m11_a100_w)
+void m10_state::m11_a100_w(uint8_t data)
 {
 	int raising_bits = data & ~m_last;
 	//int falling_bits = ~data & m_last;
@@ -375,7 +375,7 @@ WRITE8_MEMBER(m10_state::m11_a100_w)
 
 }
 
-WRITE8_MEMBER(m10_state::m15_a100_w)
+void m10_state::m15_a100_w(uint8_t data)
 {
 	//int raising_bits = data & ~m_last;
 	int falling_bits = ~data & m_last;
@@ -432,7 +432,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 	m_last = data;
 }
 
-READ8_MEMBER(m10_state::m10_a700_r)
+uint8_t m10_state::m10_a700_r()
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
@@ -441,7 +441,7 @@ READ8_MEMBER(m10_state::m10_a700_r)
 	return 0x00;
 }
 
-READ8_MEMBER(m10_state::m11_a700_r)
+uint8_t m10_state::m11_a700_r()
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -772,7 +772,7 @@ static INPUT_PORTS_START( greenber )
 	PORT_START("DSW")
 	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING (  0x03, "2" )
-//	PORT_DIPSETTING (  0x02, "3" ) // dupe
+//  PORT_DIPSETTING (  0x02, "3" ) // dupe
 	PORT_DIPSETTING (  0x01, "3" )
 	PORT_DIPSETTING (  0x00, "4" )
 	PORT_DIPNAME(0x08, 0x00, "Replay" )
@@ -964,23 +964,6 @@ void m10_state::init_ipminva1()
 
 ***************************************************************************/
 
-ROM_START( andromed )//Jumps to an unmapped sub-routine at $2fc9
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
-	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
-	ROM_LOAD( "am3",  0x1800, 0x0400, CRC(f983f35c) SHA1(1bfee6cf7d18b56594831f2efa7dcc53b47d7e30) )
-	ROM_LOAD( "am4",  0x1c00, 0x0400, CRC(09f20717) SHA1(c54c9b7d16b40a7ab49eac255906b43b03939d2b) )
-	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
-	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
-	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
-	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
-	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
-
-	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
-	ROM_LOAD( "am10", 0x0400, 0x0400, CRC(be2de8f3) SHA1(7eb3d1eb88b4481b0dcb7d001207f516a5db32b3) )
-ROM_END
-
 ROM_START( ipminvad )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1r",  0x1000, 0x0400, CRC(f9a7eb9b) SHA1(93ac65d3ac725d3e4c2fb769816ee808ab609911) )
@@ -1011,6 +994,23 @@ ROM_START( ipminvad1 )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "b9",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
 	ROM_LOAD( "b10", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
+ROM_END
+
+ROM_START( andromed ) // Jumps to an unmapped sub-routine at $2fc9
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
+	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
+	ROM_LOAD( "am3",  0x1800, 0x0400, CRC(f983f35c) SHA1(1bfee6cf7d18b56594831f2efa7dcc53b47d7e30) )
+	ROM_LOAD( "am4",  0x1c00, 0x0400, CRC(09f20717) SHA1(c54c9b7d16b40a7ab49eac255906b43b03939d2b) )
+	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
+	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
+	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
+	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
+	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
+	ROM_LOAD( "am10", 0x0400, 0x0400, CRC(be2de8f3) SHA1(7eb3d1eb88b4481b0dcb7d001207f516a5db32b3) )
 ROM_END
 
 ROM_START( skychut )
@@ -1066,10 +1066,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) )
 ROM_END
 
-GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, init_andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, init_ipminva1, ROT270, "IPM",  "IPM Invader (Incomplete Dump)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, init_ipminva1, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1980, andromed,  0,        m11,     skychut,  m10_state, init_andromed, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump, export version known as simply "Andromeda"
 GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
 GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
 GAME( 1980, greenber,  0,        m15,     greenber, m10_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

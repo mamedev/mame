@@ -51,14 +51,14 @@ private:
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_char_rom;
 
-	DECLARE_READ16_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(b16_pcg_w);
-	DECLARE_WRITE8_MEMBER(b16_6845_address_w);
-	DECLARE_WRITE8_MEMBER(b16_6845_data_w);
-	DECLARE_READ8_MEMBER(unk_dev_r);
-	DECLARE_WRITE8_MEMBER(unk_dev_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint16_t vblank_r();
+	void b16_pcg_w(offs_t offset, uint8_t data);
+	void b16_6845_address_w(uint8_t data);
+	void b16_6845_data_w(uint8_t data);
+	uint8_t unk_dev_r(offs_t offset);
+	void unk_dev_w(offs_t offset, uint8_t data);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,7 +117,7 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER( b16_state::b16_pcg_w )
+void b16_state::b16_pcg_w(offs_t offset, uint8_t data)
 {
 	m_char_rom[offset] = data;
 
@@ -134,18 +134,18 @@ void b16_state::b16_map(address_map &map)
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
-READ16_MEMBER( b16_state::vblank_r )
+uint16_t b16_state::vblank_r()
 {
 	return ioport("SYSTEM")->read();
 }
 
-WRITE8_MEMBER( b16_state::b16_6845_address_w )
+void b16_state::b16_6845_address_w(uint8_t data)
 {
 	m_crtc_index = data;
 	m_mc6845->address_w(data);
 }
 
-WRITE8_MEMBER( b16_state::b16_6845_data_w )
+void b16_state::b16_6845_data_w(uint8_t data)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_mc6845->register_w(data);
@@ -197,7 +197,7 @@ b6 (0e) W
 05 (06) W
 */
 
-READ8_MEMBER( b16_state::unk_dev_r )
+uint8_t b16_state::unk_dev_r(offs_t offset)
 {
 	static int test;
 
@@ -212,7 +212,7 @@ READ8_MEMBER( b16_state::unk_dev_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( b16_state::unk_dev_w )
+void b16_state::unk_dev_w(offs_t offset, uint8_t data)
 {
 	printf("%02x (%02x) W\n",data,offset << 1);
 
@@ -253,13 +253,13 @@ static GFXDECODE_START( gfx_b16 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(b16_state::memory_read_byte)
+uint8_t b16_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(b16_state::memory_write_byte)
+void b16_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);

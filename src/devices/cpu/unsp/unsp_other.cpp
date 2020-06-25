@@ -41,23 +41,22 @@ void unsp_device::execute_remaining(const uint16_t op)
 		if (op == 0x9a98) // reti
 		{
 			m_core->m_icount -= 8;
+			if (m_core->m_ine)
+			{
+				set_fr(pop(&m_core->m_r[REG_SP]));
+			}
+
 			m_core->m_r[REG_SR] = pop(&m_core->m_r[REG_SP]);
 			m_core->m_r[REG_PC] = pop(&m_core->m_r[REG_SP]);
 
 			if (m_core->m_fiq)
 			{
 				m_core->m_fiq = 0;
-				m_core->m_saved_sb[2] = m_core->m_sb;
-				m_core->m_sb = m_core->m_saved_sb[m_core->m_irq ? 1 : 0];
 			}
 			else if (m_core->m_irq)
 			{
 				m_core->m_irq = 0;
-				m_core->m_saved_sb[1] = m_core->m_sb;
-				m_core->m_sb = m_core->m_saved_sb[0];
 			}
-			m_core->m_curirq = 0;
-			check_irqs();
 			return;
 		}
 		else // pop
@@ -257,7 +256,7 @@ void unsp_device::execute_remaining(const uint16_t op)
 		break;
 	}
 
-	case 0x07: // Direct 8
+	case 0x07: // Direct 6
 		m_core->m_icount -= (opa == 7 ? 6 : 5);
 		r2 = op & 0x3f;
 		r1 = read16(r2);

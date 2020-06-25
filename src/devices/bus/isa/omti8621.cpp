@@ -249,12 +249,12 @@ void omti8621_device::device_add_mconfig(machine_config &config)
 	OMTI_DISK(config, OMTI_DISK0_TAG, 0);
 	OMTI_DISK(config, OMTI_DISK1_TAG, 0);
 
-	pc_fdc_at_device &pc_fdc_at(PC_FDC_AT(config, m_fdc, 0));
-	pc_fdc_at.intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));
-	pc_fdc_at.drq_wr_callback().set(FUNC(omti8621_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
+	UPD765A(config, m_fdc, 48_MHz_XTAL / 6, false, false); // clocked through FDC9239BT
+	m_fdc->intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(omti8621_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy[0], pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
 // Apollo workstations never have more then 1 floppy drive
-//  FLOPPY_CONNECTOR(config, OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
+//  FLOPPY_CONNECTOR(config, m_floppy[1], pc_hd_floppies, nullptr, omti8621_device::floppy_formats);
 }
 
 const tiny_rom_entry *omti8621_device::device_rom_region() const
@@ -310,16 +310,16 @@ void omti8621_device::device_reset()
 		int esdi_base = io_bases[m_iobase->read() & 7];
 
 		// install the ESDI ports
-		m_isa->install16_device(esdi_base, esdi_base + 7, read16_delegate(*this, FUNC(omti8621_device::read)), write16_delegate(*this, FUNC(omti8621_device::write)));
+		m_isa->install16_device(esdi_base, esdi_base + 7, read16s_delegate(*this, FUNC(omti8621_device::read)), write16s_delegate(*this, FUNC(omti8621_device::write)));
 
 		// and the onboard AT FDC ports
 		if (m_iobase->read() & 8)
 		{
-			m_isa->install_device(0x0370, 0x0377, *m_fdc, &pc_fdc_interface::map);
+			m_isa->install_device(0x0370, 0x0377, *this, &omti8621_device::fdc_map);
 		}
 		else
 		{
-			m_isa->install_device(0x03f0, 0x03f7, *m_fdc, &pc_fdc_interface::map);
+			m_isa->install_device(0x03f0, 0x03f7, *this, &omti8621_device::fdc_map);
 		}
 
 		m_isa->set_dma_channel(2, this, true);
@@ -362,6 +362,10 @@ void omti8621_device::device_reset()
 	diskaddr_format_bad_track = 0;
 	alternate_track_address[0] = 0;
 	alternate_track_address[1] = 0;
+
+	fd_moten_w(0);
+	fd_rate_w(0);
+	fd_extra_w(0);
 }
 
 DEFINE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device, "omti8621isa", "OMTI 8621 ESDI/floppy controller (ISA)")
@@ -387,10 +391,11 @@ omti8621_device::omti8621_device(
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_fdc(*this, OMTI_FDC_TAG)
+	, m_floppy(*this, OMTI_FDC_TAG":%u", 0U)
 	, m_iobase(*this, "IO_BASE")
 	, m_biosopts(*this, "BIOS_OPTS")
 	, jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr)
-	, data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_installed(false)
+	, data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_moten(0), m_installed(false)
 {
 }
 
@@ -1028,16 +1033,16 @@ void omti8621_device::set_data(uint16_t data)
  OMTI8621 Disk Controller-AT Registers
 ***************************************************************************/
 
-WRITE16_MEMBER(omti8621_device::write)
+void omti8621_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			write8(space, offset*2, data, mem_mask);
+			write8(offset*2, data);
 			break;
 
 		case 0xff00:
-			write8(space, offset*2+1, data>>8, mem_mask>>8);
+			write8(offset*2+1, data>>8);
 			break;
 
 		default:
@@ -1046,7 +1051,7 @@ WRITE16_MEMBER(omti8621_device::write)
 	}
 }
 
-WRITE8_MEMBER(omti8621_device::write8)
+void omti8621_device::write8(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1140,20 +1145,20 @@ WRITE8_MEMBER(omti8621_device::write8)
 	}
 }
 
-READ16_MEMBER(omti8621_device::read)
+uint16_t omti8621_device::read(offs_t offset, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			return read8(space, offset*2, mem_mask);
+			return read8(offset*2);
 		case 0xff00:
-			return read8(space, offset*2+1, mem_mask >> 8) << 8;
+			return read8(offset*2+1) << 8;
 		default:
 			return get_data();
 	}
 }
 
-READ8_MEMBER(omti8621_device::read8)
+uint8_t omti8621_device::read8(offs_t offset)
 {
 	uint8_t data = 0xff;
 	static uint8_t last_data = 0xff;
@@ -1268,12 +1273,14 @@ void omti8621_device::set_jumper(uint16_t disk_type)
 // FDC uses the standard IRQ 6 / DMA 2, doesn't appear to be configurable
 WRITE_LINE_MEMBER( omti8621_device::fdc_irq_w )
 {
-	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
+	if (BIT(m_moten, 3))
+		m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( omti8621_device::fdc_drq_w )
 {
-	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
+	if (BIT(m_moten, 3))
+		m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t omti8621_device::dack_r(int line)
@@ -1294,6 +1301,70 @@ void omti8621_device::dack_line_w(int line, int state)
 void omti8621_device::eop_w(int state)
 {
 	m_fdc->tc_w(state == ASSERT_LINE);
+}
+
+void omti8621_device::fdc_map(address_map &map)
+{
+	map(2, 2).w(FUNC(omti8621_device::fd_moten_w));
+	map(4, 5).m(m_fdc, FUNC(upd765a_device::map));
+	map(6, 6).w(FUNC(omti8621_device::fd_extra_w));
+	map(7, 7).rw(FUNC(omti8621_device::fd_disk_chg_r), FUNC(omti8621_device::fd_rate_w));
+}
+
+void omti8621_device::fd_moten_w(uint8_t data)
+{
+	if (BIT(data, 3) && !BIT(m_moten, 3))
+	{
+		m_isa->irq6_w(m_fdc->get_irq() ? ASSERT_LINE : CLEAR_LINE);
+		m_isa->drq2_w(m_fdc->get_drq() ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else if (!BIT(data, 3) && BIT(m_moten, 3))
+	{
+		m_isa->irq6_w(CLEAR_LINE);
+		m_isa->drq2_w(CLEAR_LINE);
+	}
+
+	m_moten = data;
+
+	if (!BIT(data, 2))
+		m_fdc->soft_reset();
+
+	for (int i = 0; i < 2; i++)
+	{
+		floppy_image_device *floppy = m_floppy[i].found() ? m_floppy[i]->get_device() : nullptr;
+		if (floppy != nullptr)
+			floppy->mon_w(!BIT(data, i + 4));
+
+		if (i == (data & 0x01))
+			m_fdc->set_floppy(BIT(data, i + 4) ? floppy : nullptr);
+	}
+}
+
+void omti8621_device::fd_rate_w(uint8_t data)
+{
+	// Bit 1 = FD_MINI (TODO)
+	// Bit 0 = FD_RATE (TODO)
+}
+
+void omti8621_device::fd_extra_w(uint8_t data)
+{
+	// Bit 7 = FD_EXTRA-2 (NC)
+	// Bit 6 = FD_EXTRA-1 (NC)
+	// Bit 5 = FD_PIN_6 (TODO)
+	// Bit 4 = FD_IUSE_HLD (TODO)
+	// Bit 3 = FD_DEN_SEL (TODO)
+	// Bit 2 = FD_PRE-2 (TODO)
+	// Bit 1 = FD_PRE-1 (TODO)
+	// Bit 0 = FD_PRE-0 (TODO)
+}
+
+uint8_t omti8621_device::fd_disk_chg_r()
+{
+	floppy_image_device *floppy = m_floppy[m_moten & 0x01].found() ? m_floppy[m_moten & 0x01]->get_device() : nullptr;
+	if (floppy == nullptr || floppy->dskchg_r())
+		return 0x00;
+	else
+		return 0x80;
 }
 
 //##########################################################################

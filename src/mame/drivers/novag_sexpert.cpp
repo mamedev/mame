@@ -6,11 +6,11 @@
 Novag Super Expert (model 878/886/887/902) / Novag Super Forte
 
 Hardware notes (Super Expert)
-- 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
+- R65C02P4 or W65C802P-6 @ 5MHz/6MHz (10MHz/12MHz XTAL)
 - 8KB RAM battery-backed, 3*32KB ROM
 - HD44780 LCD controller (16x1)
 - beeper(32KHz/32), IRQ(32KHz/128) via MC14060
-- optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C?)
+- optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C)
 - printer port, magnetic sensors, 8*8 chessboard leds
 
 I/O via TTL, hardware design was very awkward.
@@ -23,8 +23,13 @@ To distinguish between versions, press the Set Level button.
 - version B: default selectivity 3
 - version C: default selectivity 5
 
-Note that the H8 option doesn't appear to work with sexperta1, but when doing a
+Note that the H8 option doesn't appear to work with sexperta2, but when doing a
 hex compare with sexperta, the program differences are minor.
+
+TODO:
+- use W65C802 device for version B/C? it works ok but this cpu core emulation is
+  not as accurate, and the program doesn't enable extended mode (in other words,
+  it always runs in W65C02 emulation mode)
 
 ******************************************************************************/
 
@@ -72,6 +77,7 @@ public:
 
 	// machine configs
 	void sexpert(machine_config &config);
+	void sexpertb(machine_config &config);
 
 	void init_sexpert();
 
@@ -105,12 +111,12 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	virtual DECLARE_WRITE8_MEMBER(lcd_control_w);
-	virtual DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	virtual void lcd_control_w(u8 data);
+	virtual void lcd_data_w(u8 data);
+	void leds_w(u8 data);
+	void mux_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
@@ -164,6 +170,7 @@ public:
 
 	// machine configs
 	void sforte(machine_config &config);
+	void sforteb(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -173,8 +180,8 @@ private:
 	void sforte_map(address_map &map);
 
 	// I/O handlers
-	virtual DECLARE_WRITE8_MEMBER(lcd_control_w) override;
-	virtual DECLARE_WRITE8_MEMBER(lcd_data_w) override;
+	virtual void lcd_control_w(u8 data) override;
+	virtual void lcd_data_w(u8 data) override;
 
 	TIMER_CALLBACK_MEMBER(beep) { m_beeper->set_state(param); }
 	emu_timer *m_beeptimer;
@@ -196,9 +203,9 @@ void sforte_state::machine_start()
 
 void sexpert_state::lcd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // background
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xe8, 0xe8, 0xe8)); // lcd pixel off
 }
 
 HD44780_PIXEL_UPDATE(sexpert_state::lcd_pixel_update)
@@ -223,7 +230,7 @@ void sexpert_state::update_display()
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(sexpert_state::lcd_control_w)
+void sexpert_state::lcd_control_w(u8 data)
 {
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
@@ -233,20 +240,20 @@ WRITE8_MEMBER(sexpert_state::lcd_control_w)
 	m_lcd_control = data & 7;
 }
 
-WRITE8_MEMBER(sexpert_state::lcd_data_w)
+void sexpert_state::lcd_data_w(u8 data)
 {
 	// d0-d7: HD44780 data
 	m_lcd_data = data;
 }
 
-WRITE8_MEMBER(sexpert_state::leds_w)
+void sexpert_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
 	update_display();
 }
 
-WRITE8_MEMBER(sexpert_state::mux_w)
+void sexpert_state::mux_w(u8 data)
 {
 	// d0: rom bankswitch
 	m_rombank->set_entry(data & 1);
@@ -259,7 +266,7 @@ WRITE8_MEMBER(sexpert_state::mux_w)
 	update_display();
 }
 
-READ8_MEMBER(sexpert_state::input1_r)
+u8 sexpert_state::input1_r()
 {
 	u8 data = 0;
 
@@ -271,7 +278,7 @@ READ8_MEMBER(sexpert_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(sexpert_state::input2_r)
+u8 sexpert_state::input2_r()
 {
 	u8 data = 0;
 
@@ -288,17 +295,17 @@ READ8_MEMBER(sexpert_state::input2_r)
 
 // sforte-specific
 
-WRITE8_MEMBER(sforte_state::lcd_control_w)
+void sforte_state::lcd_control_w(u8 data)
 {
 	// d3: rom bankswitch
 	m_rombank->set_entry(data >> 3 & 1);
 
 	// LCD pins: same as sexpert
-	sexpert_state::lcd_control_w(space, offset, data);
-	lcd_data_w(space, 0, m_lcd_data); // refresh inp mux
+	sexpert_state::lcd_control_w(data);
+	lcd_data_w(m_lcd_data); // refresh inp mux
 }
 
-WRITE8_MEMBER(sforte_state::lcd_data_w)
+void sforte_state::lcd_data_w(u8 data)
 {
 	// d0-d2: 74145 to input mux/led select
 	// 74145 D from lcd control d2 (HD44780 E)
@@ -315,7 +322,7 @@ WRITE8_MEMBER(sforte_state::lcd_data_w)
 		m_beeptimer->adjust(attotime::from_msec(1), param);
 
 	// LCD pins: same as sexpert
-	sexpert_state::lcd_data_w(space, offset, data);
+	sexpert_state::lcd_data_w(data);
 }
 
 
@@ -402,6 +409,15 @@ static INPUT_PORTS_START( sexpert )
 	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sexpertb )
+	PORT_INCLUDE( sexpert )
+
+	PORT_MODIFY("FAKE") // default CPU for B/C is W65C802P-6 @ 6MHz
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "5MHz" )
+	PORT_CONFSETTING(    0x01, "6MHz" )
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
@@ -411,7 +427,7 @@ INPUT_PORTS_END
 void sexpert_state::sexpert(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2
+	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2, also seen with R65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sexpert_map);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
@@ -419,21 +435,12 @@ void sexpert_state::sexpert(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(21500)); // active for 21.5us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
-	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
-	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
-	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -457,6 +464,23 @@ void sexpert_state::sexpert(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	/* uart (configure after video) */
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
+	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
+}
+
+void sexpert_state::sexpertb(machine_config &config)
+{
+	sexpert(config);
+	m_maincpu->set_clock(12_MHz_XTAL/2);
 }
 
 void sforte_state::sforte(machine_config &config)
@@ -466,9 +490,16 @@ void sforte_state::sforte(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sforte_state::sforte_map);
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(10)); // tlow measured between 8us and 12us (unstable)
+
 	m_board->set_type(sensorboard_device::BUTTONS);
 
 	config.set_default_layout(layout_novag_sforte);
+}
+
+void sforte_state::sforteb(machine_config &config)
+{
+	sforte(config);
+	m_maincpu->set_clock(12_MHz_XTAL/2);
 }
 
 
@@ -486,6 +517,13 @@ ROM_END
 
 ROM_START( sexperta1 ) // from model 878
 	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("se_202_l.u3", 0x0000, 0x8000, CRC(d51fed16) SHA1(01aaddab36a721a4b9efde94979256d397cd1953) ) // NEC D27C256AD-12
+	ROM_LOAD("se_202_h1.u1", 0x8000, 0x8000, CRC(933eafa8) SHA1(293f63a5bc7d760ad675522c98f9f0a49e61aef5) ) // "
+	ROM_LOAD("se_c22_h0.u2", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) ) // "
+ROM_END
+
+ROM_START( sexperta2 ) // from model 878
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("se_lo_b15.u3", 0x0000, 0x8000, CRC(6cc9527c) SHA1(29bab809399f2863a88a9c41535ecec0a4fd65ea) )
 	ROM_LOAD("se_hi1_b15.u1", 0x8000, 0x8000, CRC(6e57f0c0) SHA1(ea44769a6f54721fd4543366bda932e86e497d43) )
 	ROM_LOAD("se_sf_hi0_a23.u2", 0x10000, 0x8000, CRC(7d4e1528) SHA1(53c7d458a5571afae402f00ae3d0f5066634b068) )
@@ -498,18 +536,18 @@ ROM_START( sexpertb ) // from model 887
 	ROM_LOAD("se_f_hi0_605.u2", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
 ROM_END
 
-ROM_START( sexpertc )
+ROM_START( sexpertc ) // ID = E3.6
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("se_lo_v3.6.u3", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7) )
 	ROM_LOAD("se_hi1.u1", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
 	ROM_LOAD("se_hi0.u2", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
 ROM_END
 
-ROM_START( sexpertc1 )
+ROM_START( sexpertc1 ) // from model 902, ID = E3.0
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_lo_v1.2.u3", 0x0000, 0x8000, CRC(43ed7a9e) SHA1(273c485e5be6b107b6c5c448003ba7686d4a6d06) )
-	ROM_LOAD("se_hi1.u1", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
-	ROM_LOAD("se_hi0.u2", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
+	ROM_LOAD("se_c24_l.u3", 0x0000, 0x8000, CRC(43ed7a9e) SHA1(273c485e5be6b107b6c5c448003ba7686d4a6d06) )
+	ROM_LOAD("se_c23_h1.u1", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
+	ROM_LOAD("se_c22_h0.u2", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
 ROM_END
 
 
@@ -541,7 +579,7 @@ ROM_START( sforteb )
 	ROM_LOAD("forte_b_hi0.u2", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
 ROM_END
 
-ROM_START( sfortec )
+ROM_START( sfortec ) // ID = F1.2
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("sfl_c_iii.u3", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
 	ROM_LOAD("sfh_c_iii.u1", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
@@ -556,15 +594,16 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE  INPUT    STATE          INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1988, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sexperta1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A, older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sexpertc,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sexpertc1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE          INIT          COMPANY, FULLNAME, FLAGS
+CONS( 1988, sexperta,  0,        0, sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 886
+CONS( 1987, sexperta1, sexperta, 0, sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
+CONS( 1987, sexperta2, sexperta, 0, sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
+CONS( 1988, sexpertb,  sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
+CONS( 1990, sexpertc,  sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sexpertc1, sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
 
-CONS( 1987, sfortea,   0,        0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sfortea1,  sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sfortea2,  sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sforteb,   sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sfortec,   sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea,   0,        0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea1,  sfortea,  0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea2,  sfortea,  0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sforteb,   sfortea,  0, sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sfortec,   sfortea,  0, sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

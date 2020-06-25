@@ -2,10 +2,6 @@
 // copyright-holders:Couriersud
 #include "netlist/devices/net_lib.h"
 
-#ifdef NLBASE_H_
-#error Somehow nl_base.h made it into the include chain.
-#endif
-
 /*
  * M51516L pins:
  *
@@ -24,6 +20,8 @@
  * and then to the right of that "ASO protection, surge protection, heat barrier"
  *
  */
+
+//NL_CONTAINS konami2x konami1x
 
 static NETLIST_START(filter)
 	CD4066_GATE(G1)

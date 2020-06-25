@@ -75,7 +75,7 @@ Notes:
 #include "gotcha.lh"
 
 
-WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
+void gotcha_state::gotcha_lamps_w(uint16_t data)
 {
 	for (int p = 0; p < 3; p++)
 	{
@@ -86,7 +86,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 	}
 }
 
-WRITE8_MEMBER(gotcha_state::gotcha_oki_bank_w)
+void gotcha_state::gotcha_oki_bank_w(uint8_t data)
 {
 	m_oki->set_rom_bank(!BIT(data, 0));
 }

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pico" description="Sega Pico cartridges">
 
 <!--
@@ -1249,7 +1252,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<info name="alt_title" value="ドライブピコ さあしゅっぱつだ! ケンちゃんとペペのわんぱくドライブ"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="saashuppatsuda! ken-chan to pepe no wanpaku drive (japan).bin" size="1048576" crc="1eb9b7f6" sha1="bed4ce255b139f0e71eb3197a058075e0c051aa1" offset="0" loadflag="load16_word_swap" />
+				<rom name="saashuppatsuda ken-chan to pepe no wanpaku drive (japan).bin" size="1048576" crc="1eb9b7f6" sha1="bed4ce255b139f0e71eb3197a058075e0c051aa1" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1432,7 +1435,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ecco jr. und die grosse schatzsuche im ozean! (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
+				<rom name="ecco jr. und die grosse schatzsuche im ozean (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1513,7 +1516,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<info name="alt_title" value="マルチドライブ エキサイティング! はたらくのりものたち"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="exciting! hataraku norimono-tachi (j).bin" size="1048576" crc="eaf2b204" sha1="3d572469af1e38b748452894a55566ac23892523" offset="000000" loadflag="load16_word_swap" />
+				<rom name="exciting hataraku norimono-tachi (j).bin" size="1048576" crc="eaf2b204" sha1="3d572469af1e38b748452894a55566ac23892523" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1717,7 +1720,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<info name="alt_title" value="ゲームをしながら覚えよう! かんたん わくわく キーボード"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="game wo shinagara oboe you! kantan wakuwaku keyboard (japan).bin" size="1048576" crc="57e973f7" sha1="ffd6289f41a95ed04cb04ef40041fa9fcc4f1661" offset="0" loadflag="load16_word_swap" />
+				<rom name="game wo shinagara oboe you kantan wakuwaku keyboard (japan).bin" size="1048576" crc="57e973f7" sha1="ffd6289f41a95ed04cb04ef40041fa9fcc4f1661" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2297,7 +2300,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="shichida makoto kanshuu unou image training hiragana katakana casino de moja vegas dream! best selection (j).bin" size="2097152" crc="f7dc86dc" sha1="d3ff8969d9262688a92ee51c8cd3fc9d48f027c9" offset="0" loadflag="load16_word_swap" />
+				<rom name="shichida makoto kanshuu unou image training hiragana katakana casino de moja vegas dream best selection (j).bin" size="2097152" crc="f7dc86dc" sha1="d3ff8969d9262688a92ee51c8cd3fc9d48f027c9" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3821,7 +3824,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="ポケットモンスター アドバンスジェネレーション みんなでピコ ポケモンわいわいバトル!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="pocket monsters advance generation minna de pico pokemon waiwai battle! (japan).bin" size="2097152" crc="c3b77d13" sha1="97b88d0b09376b108d611e036e415c37d67bb943" offset="000000" loadflag="load16_word_swap" />
+				<rom name="pocket monsters advance generation minna de pico pokemon waiwai battle (japan).bin" size="2097152" crc="c3b77d13" sha1="97b88d0b09376b108d611e036e415c37d67bb943" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3959,7 +3962,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="レースにでようよ! ケンちゃんとペペ ぼくのクルマで大ぼうけん"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="race ni deyou yo! ken-chan to pepe boku no kuruma de daibouken (japan).bin" size="1048576" crc="466c69db" sha1="af6dde5231081e91e88235765ab3d340d783ddd3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="race ni deyou yo ken-chan to pepe boku no kuruma de daibouken (japan).bin" size="1048576" crc="466c69db" sha1="af6dde5231081e91e88235765ab3d340d783ddd3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4291,7 +4294,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="しまじろうと ゆめのくにへ だいぼうけん!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="shima shima tora no shimajirou - shimajirou to yume no kuni e daibouken (j) [!p].bin" size="4194304" crc="9782b08f" sha1="d95bdc33fa3108e6e60a9b4bccf6d53c7b36329d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="shima shima tora no shimajirou - shimajirou to yume no kuni e daibouken (j).bin" size="4194304" crc="9782b08f" sha1="d95bdc33fa3108e6e60a9b4bccf6d53c7b36329d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4442,7 +4445,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="そだててまなぶ どうぶつ王国!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sodatete manabu doubutsu oukoku! (japan).bin" size="524288" crc="40d9252e" sha1="6783a8a25bf1f71ceb7b109ddce89c94e5f492b7" offset="000000" loadflag="load16_word_swap" />
+				<rom name="sodatete manabu doubutsu oukoku (japan).bin" size="524288" crc="40d9252e" sha1="6783a8a25bf1f71ceb7b109ddce89c94e5f492b7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4456,7 +4459,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="それいけ!アンパンマン アンパンマンとでんわであそぼう!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="anpanman no moshimoshi pico set with soreike! anpanman anpanman to denwa de asobou! (japan).bin" size="2097152" crc="f2e1d899" sha1="b5b06d19a41c677afa046e47ad674242c765de06" offset="000000" loadflag="load16_word_swap" />
+				<rom name="anpanman no moshimoshi pico set with soreike anpanman anpanman to denwa de asobou (japan).bin" size="2097152" crc="f2e1d899" sha1="b5b06d19a41c677afa046e47ad674242c765de06" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4625,7 +4628,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="それいけ!アンパンマンのメダリンピックワールド2"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="soreike! anpanman no medalympic world 2 (j).bin" size="524288" crc="3c57e47d" sha1="4335e65d238c46a286e2d0ce8d821d35799ab76a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="soreike anpanman no medalympic world 2 (j).bin" size="524288" crc="3c57e47d" sha1="4335e65d238c46a286e2d0ce8d821d35799ab76a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4640,7 +4643,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-20107-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="soreike! anpanman no minna de kyousou anpanman! (j).bin" size="524288" crc="3822c958" sha1="23cc8f96fe41b45a666e87959297eee7d6e26ddb" offset="000000" loadflag="load16_word_swap" />
+				<rom name="soreike anpanman no minna de kyousou anpanman (j).bin" size="524288" crc="3822c958" sha1="23cc8f96fe41b45a666e87959297eee7d6e26ddb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4817,7 +4820,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="楽しく遊んで能力アップ!!たのしい幼稚園"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tanoshi ku asonde nouryoku appu!! tanoshii youchien (japan).bin" size="524288" crc="ae02801d" sha1="19c061ba15c32ac4a9ee321263e36a87bb48157d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="tanoshi ku asonde nouryoku appu tanoshii youchien (japan).bin" size="524288" crc="ae02801d" sha1="19c061ba15c32ac4a9ee321263e36a87bb48157d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6346,7 +6349,7 @@ Remaining hoarded / unavailable dumps
         <publisher>Sega?</publisher>
         <part name="cart" interface="pico_cart">
             <dataarea name="rom" size="????">
-                <rom name="Hello Kitty to McDonald de Asobo! (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+                <rom name="Hello Kitty to McDonald de Asobo (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
             </dataarea>
         </part>
     </software>

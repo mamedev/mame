@@ -40,8 +40,8 @@ private:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( i8355_a_r );
-	DECLARE_WRITE8_MEMBER( i8355_a_w );
+	uint8_t i8355_a_r();
+	void i8355_a_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( sid_r );
 	DECLARE_WRITE_LINE_MEMBER( sod_w );
 

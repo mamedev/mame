@@ -24,20 +24,20 @@ public:
 	// construction/destruction
 	inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(megaphx_sound_sent_r);
-	DECLARE_READ8_MEMBER(megaphx_sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(megaphx_sound_to_68k_w);
+	uint8_t megaphx_sound_sent_r();
+	uint8_t megaphx_sound_cmd_r();
+	void megaphx_sound_to_68k_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(dac0_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac1_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac2_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
+	void dac0_rombank_write(uint8_t data);
+	void dac1_rombank_write(uint8_t data);
+	void dac2_rombank_write(uint8_t data);
+	void dac3_rombank_write(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vec_bankswitch_r);
+	uint8_t vec_bankswitch_r(offs_t offset);
 
 
-	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
-	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
+	uint16_t megaphx_0x050002_r(offs_t offset, uint16_t mem_mask = ~0);
+	void megaphx_0x050000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);

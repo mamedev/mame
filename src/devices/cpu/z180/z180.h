@@ -169,16 +169,12 @@ private:
 	uint8_t   m_asci_stat[2];                   // ASCI status register 0-1
 	uint8_t   m_asci_tdr[2];                    // ASCI transmit data register 0-1
 	uint8_t   m_asci_rdr[2];                    // ASCI receive data register 0-1
-	uint8_t   m_asci_ext[2];                    // (Z8S180/Z8L180) ASCI extension control register 0-1
-	PAIR16    m_asci_tc[2];                     // (Z8S180/Z8L180) ASCI time constant ch 0-1
 	uint8_t   m_csio_cntr;                      // CSI/O control/status register
 	uint8_t   m_csio_trdr;                      // CSI/O transmit/receive register
 	PAIR16    m_tmdr[2];                        // TIMER data register ch 0-1
 	PAIR16    m_rldr[2];                        // TIMER reload register ch 0-1
 	uint8_t   m_tcr;                            // TIMER control register
 	uint8_t   m_frc;                            // free running counter
-	uint8_t   m_cmr;                            // (Z8S180/Z8L180) clock multiplier
-	uint8_t   m_ccr;                            // (Z8S180/Z8L180) chip control register
 	PAIR      m_dma_sar0;                       // DMA source address register ch 0
 	PAIR      m_dma_dar0;                       // DMA destination address register ch 0
 	PAIR16    m_dma_bcr[2];                     // DMA byte register ch 0-1
@@ -207,11 +203,9 @@ private:
 	uint8_t   m_timer_cnt;                      // timer counter / divide by 20
 	uint8_t   m_dma0_cnt;                       // DMA0 counter / divide by 20
 	uint8_t   m_dma1_cnt;                       // DMA1 counter / divide by 20
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_oprogram;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ocache;
-	address_space *m_iospace;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_copcodes;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint8_t   m_rtemp;
 	uint32_t  m_ioltemp;
 	int m_icount;
@@ -1817,9 +1811,29 @@ class z8s180_device : public z180_device
 public:
 	// construction/destruction
 	z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return BIT(m_cmr, 7) ? (clocks * 2) : BIT(m_ccr, 7) ? clocks : (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return BIT(m_cmr, 7) ? (cycles + 2 - 1) / 2 : BIT(m_ccr, 7) ? cycles : (cycles * 2); }
+
+	virtual uint8_t z180_internal_port_read(uint8_t port) override;
+	virtual void z180_internal_port_write(uint8_t port, uint8_t data) override;
+
+private:
+	uint8_t   m_asci_ext[2];                    // ASCI extension control register 0-1
+	PAIR16    m_asci_tc[2];                     // ASCI time constant ch 0-1
+	uint8_t   m_cmr;                            // clock multiplier
+	uint8_t   m_ccr;                            // chip control register
 };
 
-class z80182_device : public z180_device
+class z80182_device : public z8s180_device
 {
 public:
 	// construction/destruction

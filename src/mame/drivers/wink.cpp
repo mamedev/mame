@@ -52,18 +52,18 @@ private:
 
 	bool m_nmi_enable;
 
-	DECLARE_WRITE8_MEMBER(bgram_w);
+	void bgram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(player_mux_w);
 	DECLARE_WRITE_LINE_MEMBER(tile_banking_w);
 	template<int Player> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_READ8_MEMBER(analog_port_r);
-	DECLARE_READ8_MEMBER(player_inputs_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(prot_r);
-	DECLARE_WRITE8_MEMBER(prot_w);
-	DECLARE_READ8_MEMBER(sound_r);
+	uint8_t analog_port_r();
+	uint8_t player_inputs_r();
+	void sound_irq_w(uint8_t data);
+	uint8_t prot_r();
+	void prot_w(uint8_t data);
+	uint8_t sound_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 		code |= 0x100;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void wink_state::video_start()
@@ -107,10 +107,9 @@ uint32_t wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(wink_state::bgram_w)
+void wink_state::bgram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -145,17 +144,17 @@ WRITE_LINE_MEMBER(wink_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(Player, state);
 }
 
-READ8_MEMBER(wink_state::analog_port_r)
+uint8_t wink_state::analog_port_r()
 {
 	return ioport(/* player_mux ? "DIAL2" : */ "DIAL1")->read();
 }
 
-READ8_MEMBER(wink_state::player_inputs_r)
+uint8_t wink_state::player_inputs_r()
 {
 	return ioport(/* player_mux ? "INPUTS2" : */ "INPUTS1")->read();
 }
 
-WRITE8_MEMBER(wink_state::sound_irq_w)
+void wink_state::sound_irq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
@@ -171,7 +170,7 @@ void wink_state::wink_map(address_map &map)
 }
 
 
-READ8_MEMBER(wink_state::prot_r)
+uint8_t wink_state::prot_r()
 {
 	//take a0-a7 and do some math using the variable created from the upper address-lines,
 	//put the result onto the databus.
@@ -191,7 +190,7 @@ the 8bit result is placed on the databus.
 	return 0x20; //hack to pass the jump calculated using this value
 }
 
-WRITE8_MEMBER(wink_state::prot_w)
+void wink_state::prot_w(uint8_t data)
 {
 	//take a9-a15 and stuff them in a variable for later use.
 }
@@ -361,7 +360,7 @@ static GFXDECODE_START( gfx_wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
-READ8_MEMBER(wink_state::sound_r)
+uint8_t wink_state::sound_r()
 {
 	return m_sound_flag;
 }

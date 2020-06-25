@@ -213,7 +213,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
        ------11 4 bit Shift Addition
 */
 
-WRITE8_MEMBER( c6280_device::c6280_w )
+void c6280_device::c6280_w(offs_t offset, uint8_t data)
 {
 	channel *chan = &m_channel[m_select];
 

@@ -28,6 +28,9 @@ public:
 	// Tap into fetched opcodes
 	auto opcode_cb() { return m_opcode_func.bind(); }
 
+	// Interrupt vector fetch (INTACK: /LMA = /RD = /WR = all 0)
+	auto intack_cb() { return m_intack_in.bind(); }
+
 protected:
 	// device_t overrides
 	virtual void device_start() override;
@@ -54,8 +57,8 @@ protected:
 
 private:
 	address_space_config m_program_config;
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	int m_icount;
 
@@ -74,6 +77,7 @@ private:
 
 	devcb_write8 m_opcode_func;
 	devcb_write_line m_lma_out;
+	devcb_read8 m_intack_in;
 
 	// Effective Addresses
 	// When b17 = 0, b15..b0 hold 16-bit memory address

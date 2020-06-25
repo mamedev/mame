@@ -45,12 +45,12 @@ Has word-wide registers as follows:
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
 
 
-READ16_MEMBER(konamigx_state::K055550_word_r)
+uint16_t konamigx_state::K055550_word_r(offs_t offset)
 {
 	return(m_prot_data[offset]);
 }
 
-WRITE16_MEMBER(konamigx_state::K055550_word_w)
+void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t adr, bsize, count, i, lim;
@@ -176,7 +176,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 	}
 }
 
-WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
+void konamigx_state::K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	int src_addr, src_count, src_skip;
@@ -471,11 +471,11 @@ void konamigx_state::fantjour_dma_install()
 {
 	save_item(NAME(m_fantjour_dma));
 	save_item(NAME(m_prot_data));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(*this, FUNC(konamigx_state::fantjour_dma_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32s_delegate(*this, FUNC(konamigx_state::fantjour_dma_w)));
 	memset(m_fantjour_dma, 0, sizeof(m_fantjour_dma));
 }
 
-WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
+void konamigx_state::fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	COMBINE_DATA(m_fantjour_dma + offset);

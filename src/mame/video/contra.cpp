@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fg_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 	// 2009-12 FP: TO BE VERIFIED - old code used ctrl4 from chip 0?!?
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bg_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 			((attr >> (bit2    )) & 0x08) |
 			((attr >> (bit3 - 1)) & 0x10);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_tx_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
@@ -168,43 +168,43 @@ void contra_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(contra_state::contra_fg_vram_w)
+void contra_state::contra_fg_vram_w(offs_t offset, uint8_t data)
 {
 	m_fg_vram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(contra_state::contra_fg_cram_w)
+void contra_state::contra_fg_cram_w(offs_t offset, uint8_t data)
 {
 	m_fg_cram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(contra_state::contra_bg_vram_w)
+void contra_state::contra_bg_vram_w(offs_t offset, uint8_t data)
 {
 	m_bg_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(contra_state::contra_bg_cram_w)
+void contra_state::contra_bg_cram_w(offs_t offset, uint8_t data)
 {
 	m_bg_cram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(contra_state::contra_text_vram_w)
+void contra_state::contra_text_vram_w(offs_t offset, uint8_t data)
 {
 	m_tx_vram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(contra_state::contra_text_cram_w)
+void contra_state::contra_text_cram_w(offs_t offset, uint8_t data)
 {
 	m_tx_cram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
+void contra_state::contra_K007121_ctrl_0_w(offs_t offset, uint8_t data)
 {
 	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(6);
 
@@ -225,10 +225,10 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 	if (offset == 7)
 		m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_k007121_1->ctrl_w(space, offset, data);
+	m_k007121_1->ctrl_w(offset, data);
 }
 
-WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
+void contra_state::contra_K007121_ctrl_1_w(offs_t offset, uint8_t data)
 {
 	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(6);
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 	if (offset == 7)
 		m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_k007121_2->ctrl_w(space, offset, data);
+	m_k007121_2->ctrl_w(offset, data);
 }
 
 

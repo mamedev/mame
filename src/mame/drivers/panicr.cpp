@@ -113,12 +113,12 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;
 
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(t5182shared_r);
-	DECLARE_WRITE8_MEMBER(t5182shared_w);
+	uint8_t collision_r(offs_t offset);
+	void scrollx_lo_w(uint8_t data);
+	void scrollx_hi_w(uint8_t data);
+	void output_w(uint8_t data);
+	uint8_t t5182shared_r(offs_t offset);
+	void t5182shared_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
@@ -196,7 +196,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 	code=memregion("user1")->base()[tile_index];
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		code,
 		(attr & 0xf0) >> 4,
 		0);
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 	code=memregion("user1")->base()[tile_index];
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 		code,
 		0,
 		0);
@@ -228,7 +228,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code + ((attr & 8) << 5),
 		color,
 		0);
@@ -341,7 +341,7 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-READ8_MEMBER(panicr_state::collision_r)
+uint8_t panicr_state::collision_r(offs_t offset)
 {
 	// re-render the collision data here
 	// collisions are based on 2 bits from the tile data, relative to a page of tiles
@@ -384,19 +384,19 @@ READ8_MEMBER(panicr_state::collision_r)
 }
 
 
-WRITE8_MEMBER(panicr_state::scrollx_lo_w)
+void panicr_state::scrollx_lo_w(uint8_t data)
 {
 	logerror("scrollx_lo_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff00) | (data << 1 & 0xfe) | (data >> 7 & 0x01);
 }
 
-WRITE8_MEMBER(panicr_state::scrollx_hi_w)
+void panicr_state::scrollx_hi_w(uint8_t data)
 {
 	logerror("scrollx_hi_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff) | ((data &0xf0) << 4) | ((data & 0x0f) << 12);
 }
 
-WRITE8_MEMBER(panicr_state::output_w)
+void panicr_state::output_w(uint8_t data)
 {
 	// d6, d7: play counter? (it only triggers on 1st coin)
 	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0);
@@ -407,18 +407,18 @@ WRITE8_MEMBER(panicr_state::output_w)
 	// other bits: ?
 }
 
-READ8_MEMBER(panicr_state::t5182shared_r)
+uint8_t panicr_state::t5182shared_r(offs_t offset)
 {
 	if ((offset & 1) == 0)
-		return m_t5182->sharedram_r(space, offset/2);
+		return m_t5182->sharedram_r(offset/2);
 	else
 		return 0;
 }
 
-WRITE8_MEMBER(panicr_state::t5182shared_w)
+void panicr_state::t5182shared_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 1) == 0)
-		m_t5182->sharedram_w(space, offset/2, data);
+		m_t5182->sharedram_w(offset/2, data);
 }
 
 

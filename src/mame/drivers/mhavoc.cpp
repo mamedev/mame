@@ -192,6 +192,7 @@
 #include "video/avgdvg.h"
 #include "video/vector.h"
 #include "machine/eeprompar.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
@@ -206,7 +207,7 @@ Address: 543210
          |\----- pokey chip number MSB
          \------ pokey A3
 */
-READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
+uint8_t mhavoc_state::quad_pokeyn_r(offs_t offset)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -215,7 +216,7 @@ READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
 	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
-WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
+void mhavoc_state::quad_pokeyn_w(offs_t offset, uint8_t data)
 {
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
@@ -238,7 +239,7 @@ Address: 43210
          |\---- pokey chip number
          \----- pokey A3
 */
-READ8_MEMBER(mhavoc_state::dual_pokey_r)
+uint8_t mhavoc_state::dual_pokey_r(offs_t offset)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
@@ -248,7 +249,7 @@ READ8_MEMBER(mhavoc_state::dual_pokey_r)
 }
 
 
-WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
+void mhavoc_state::dual_pokey_w(offs_t offset, uint8_t data)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;

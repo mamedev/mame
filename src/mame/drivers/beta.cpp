@@ -69,10 +69,10 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( riot_pa_r );
-	DECLARE_WRITE8_MEMBER( riot_pa_w );
-	DECLARE_READ8_MEMBER( riot_pb_r );
-	DECLARE_WRITE8_MEMBER( riot_pb_w );
+	uint8_t riot_pa_r();
+	void riot_pa_w(uint8_t data);
+	uint8_t riot_pb_r();
+	void riot_pb_w(uint8_t data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_beta_eprom);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_beta_eprom);
@@ -166,7 +166,7 @@ TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 		m_digits[m_ls145_p] = m_segment;
 }
 
-READ8_MEMBER( beta_state::riot_pa_r )
+uint8_t beta_state::riot_pa_r()
 {
 	/*
 
@@ -204,7 +204,7 @@ READ8_MEMBER( beta_state::riot_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( beta_state::riot_pa_w )
+void beta_state::riot_pa_w(uint8_t data)
 {
 	/*
 
@@ -231,12 +231,12 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 	m_eprom_data = data;
 }
 
-READ8_MEMBER( beta_state::riot_pb_r )
+uint8_t beta_state::riot_pb_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( beta_state::riot_pb_w )
+void beta_state::riot_pb_w(uint8_t data)
 {
 	/*
 

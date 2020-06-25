@@ -37,18 +37,18 @@ public:
 	void pecom64(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(pecom_cdp1869_charram_r);
-	DECLARE_WRITE8_MEMBER(pecom_cdp1869_charram_w);
-	DECLARE_READ8_MEMBER(pecom_cdp1869_pageram_r);
-	DECLARE_WRITE8_MEMBER(pecom_cdp1869_pageram_w);
-	DECLARE_WRITE8_MEMBER(pecom_bank_w);
-	DECLARE_READ8_MEMBER(pecom_keyboard_r);
-	DECLARE_WRITE8_MEMBER(pecom_cdp1869_w);
+	uint8_t pecom_cdp1869_charram_r(offs_t offset);
+	void pecom_cdp1869_charram_w(offs_t offset, uint8_t data);
+	uint8_t pecom_cdp1869_pageram_r(offs_t offset);
+	void pecom_cdp1869_pageram_w(offs_t offset, uint8_t data);
+	void pecom_bank_w(uint8_t data);
+	uint8_t pecom_keyboard_r();
+	void pecom_cdp1869_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(reset_tick);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef2_r);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE8_MEMBER( sc_w );
+	void sc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
 	CDP1869_CHAR_RAM_READ_MEMBER(pecom_char_ram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_char_ram_w);

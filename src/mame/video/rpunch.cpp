@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-  video/rpunch.c
+  video/rpunch.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -10,11 +10,6 @@
 
 #include "emu.h"
 #include "includes/rpunch.h"
-
-
-#define BITMAP_WIDTH    304
-#define BITMAP_HEIGHT   224
-#define BITMAP_XOFFSET  4
 
 
 /*************************************
@@ -25,13 +20,12 @@
 
 TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 {
-	uint16_t *videoram = m_videoram;
-	int data = videoram[tile_index];
+	const u16 data = m_videoram[tile_index];
 	int code;
 	if (m_videoflags & 0x0400)  code = (data & 0x0fff) | 0x2000;
 	else                        code = (data & 0x1fff);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			((m_videoflags & 0x0010) >> 1) | ((data >> 13) & 7),
 			0);
@@ -39,13 +33,12 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 
 TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
 {
-	uint16_t *videoram = m_videoram;
-	int data = videoram[0x2000 / 2 + tile_index];
+	const u16 data = m_videoram[0x1000 | tile_index];
 	int code;
 	if (m_videoflags & 0x0800)  code = (data & 0x0fff) | 0x2000;
 	else                        code = (data & 0x1fff);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			((m_videoflags & 0x0020) >> 2) | ((data >> 13) & 7),
 			0);
@@ -68,6 +61,7 @@ TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 
 VIDEO_START_MEMBER(rpunch_state,rpunch)
 {
+	m_videoflags = 0;
 	m_sprite_xoffs = 0;
 
 	/* allocate tilemaps for the backgrounds */
@@ -77,11 +71,15 @@ VIDEO_START_MEMBER(rpunch_state,rpunch)
 	/* configure the tilemaps */
 	m_background[1]->set_transparent_pen(15);
 
-	if (m_bitmapram)
-		memset(m_bitmapram, 0xff, m_bitmapram.bytes());
+	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);
+
+	const rectangle pixmap_rect(0,511,0,255);
+	m_pixmap->fill(0xf, pixmap_rect);
 
 	/* reset the timer */
 	m_crtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rpunch_state::crtc_interrupt_gen),this));
+
+	save_item(NAME(*m_pixmap));
 }
 
 
@@ -93,28 +91,41 @@ VIDEO_START_MEMBER(rpunch_state,svolley)
 }
 
 
-
-
-
 /*************************************
  *
  *  Write handlers
  *
  *************************************/
 
-WRITE16_MEMBER(rpunch_state::rpunch_videoram_w)
+u8 rpunch_state::pixmap_r(offs_t offset)
 {
-	uint16_t *videoram = m_videoram;
-	int tmap = offset >> 12;
-	int tile_index = offset & 0xfff;
-	COMBINE_DATA(&videoram[offset]);
+	const int sy = offset >> 8;
+	const int sx = (offset & 0xff) << 1;
+
+	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
+}
+
+void rpunch_state::pixmap_w(offs_t offset, u8 data)
+{
+	const int sy = offset >> 8;
+	const int sx = (offset & 0xff) << 1;
+
+	m_pixmap->pix16(sy & 0xff, sx & ~1) = ((data & 0xf0) >> 4);
+	m_pixmap->pix16(sy & 0xff, sx |  1) = (data & 0x0f);
+}
+
+void rpunch_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const int tmap = offset >> 12;
+	const int tile_index = offset & 0xfff;
+	COMBINE_DATA(&m_videoram[offset]);
 	m_background[tmap]->mark_tile_dirty(tile_index);
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_videoreg_w)
+void rpunch_state::videoreg_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int oldword = m_videoflags;
+	const int oldword = m_videoflags;
 	COMBINE_DATA(&m_videoflags);
 
 	if (m_videoflags != oldword)
@@ -128,7 +139,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_videoreg_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
+void rpunch_state::scrollreg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (offset)
@@ -152,13 +163,13 @@ WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
 }
 
 
-WRITE8_MEMBER(rpunch_state::rpunch_gga_w)
+void rpunch_state::gga_w(offs_t offset, u8 data)
 {
-	m_gga->write(space, offset >> 5, data & 0xff);
+	m_gga->write(offset >> 5, data & 0xff);
 }
 
 
-WRITE8_MEMBER(rpunch_state::rpunch_gga_data_w)
+void rpunch_state::gga_data_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -174,20 +185,17 @@ WRITE8_MEMBER(rpunch_state::rpunch_gga_data_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_ins_w)
+void rpunch_state::sprite_ctrl_w(offs_t offset, u8 data)
 {
-	if (ACCESSING_BITS_0_7)
+	if (offset == 0)
 	{
-		if (offset == 0)
-		{
-			m_gins = data & 0x3f;
-			logerror("GINS = %02X\n", data & 0x3f);
-		}
-		else
-		{
-			m_bins = data & 0x3f;
-			logerror("BINS = %02X\n", data & 0x3f);
-		}
+		m_sprite_num = data & 0x3f;
+		logerror("Number of sprites = %02X\n", data & 0x3f);
+	}
+	else
+	{
+		m_sprite_pri = data & 0x3f;
+		logerror("Sprite priority point = %02X\n", data & 0x3f);
 	}
 }
 
@@ -198,33 +206,36 @@ WRITE16_MEMBER(rpunch_state::rpunch_ins_w)
  *
  *************************************/
 
-void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop)
+void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *spriteram16 = m_spriteram;
-	int offs;
-
-	start *= 4;
-	stop *= 4;
-
 	/* draw the sprites */
-	for (offs = start; offs < stop; offs += 4)
+	int offs = m_sprite_num;
+	while (offs > 0)
 	{
-		int data1 = spriteram16[offs + 1];
-		int code = data1 & 0x7ff;
+		offs--;
+		const u32 ram = offs << 2;
+		u32 pri = 0; // above everything except direct mapped bitmap
+		/* this seems like the most plausible explanation */
+		if (offs < m_sprite_pri)
+			pri |= GFX_PMASK_2; // behind foreground
 
-		int data0 = spriteram16[offs + 0];
-		int data2 = spriteram16[offs + 2];
+		const u16 data1 = m_spriteram[ram + 1];
+		const u32 code = data1 & 0x7ff;
+
+		const u16 data0 = m_spriteram[ram + 0];
+		const u16 data2 = m_spriteram[ram + 2];
 		int x = (data2 & 0x1ff) + 8;
 		int y = 513 - (data0 & 0x1ff);
-		int xflip = data1 & 0x1000;
-		int yflip = data1 & 0x0800;
-		int color = ((data1 >> 13) & 7) | ((m_videoflags & 0x0040) >> 3);
+		const bool xflip = data1 & 0x1000;
+		const bool yflip = data1 & 0x0800;
+		const u32 color = ((data1 >> 13) & 7) | ((m_videoflags & 0x0040) >> 3);
 
-		if (x >= BITMAP_WIDTH) x -= 512;
-		if (y >= BITMAP_HEIGHT) y -= 512;
+		if (x > cliprect.max_x) x -= 512;
+		if (y > cliprect.max_y) y -= 512;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-				code, color + (m_sprite_palette / 16), xflip, yflip, x+m_sprite_xoffs, y, 15);
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap,cliprect,
+				code, color + (m_sprite_palette / 16), xflip, yflip, x + m_sprite_xoffs, y,
+				m_screen->priority(), pri, 15);
 	}
 }
 
@@ -237,25 +248,17 @@ void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int colourbase;
-	int xxx=512/4;
-	int yyy=256;
-	int x,y,count;
+	const u32 colourbase = 512 + ((m_videoflags & 0x000f) << 4);
 
-	colourbase = 512 + ((m_videoflags & 15) * 16);
-
-	count = 0;
-
-	for (y=0;y<yyy;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for(x=0;x<xxx;x++)
+		const u16 *src = &m_pixmap->pix16(y & 0xff);
+		u16 *dst = &bitmap.pix16(y);
+		for(int x = cliprect.min_x / 4; x <= cliprect.max_x; x++)
 		{
-			int coldat;
-			coldat = (m_bitmapram[count]>>12)&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+0)-4)&0x1ff) = coldat+colourbase;
-			coldat = (m_bitmapram[count]>>8 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
-			coldat = (m_bitmapram[count]>>4 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
-			coldat = (m_bitmapram[count]>>0 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
-			count++;
+			const u16 pix = src[(x + 4) & 0x1ff];
+			if ((pix & 0xf) != 0xf)
+				dst[x] = colourbase + pix;
 		}
 	}
 }
@@ -267,18 +270,12 @@ void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
  *
  *************************************/
 
-uint32_t rpunch_state::screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 rpunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int effbins;
-
-	/* this seems like the most plausible explanation */
-	effbins = (m_bins > m_gins) ? m_gins : m_bins;
-
-	m_background[0]->draw(screen, bitmap, cliprect, 0,0);
-	draw_sprites(bitmap, cliprect, 0, effbins);
-	m_background[1]->draw(screen, bitmap, cliprect, 0,0);
-	draw_sprites(bitmap, cliprect, effbins, m_gins);
-	if (m_bitmapram)
-		draw_bitmap(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_background[0]->draw(screen, bitmap, cliprect, 0,1);
+	m_background[1]->draw(screen, bitmap, cliprect, 0,2);
+	draw_sprites(bitmap, cliprect);
+	draw_bitmap(bitmap, cliprect);
 	return 0;
 }

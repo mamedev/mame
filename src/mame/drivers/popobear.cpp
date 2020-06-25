@@ -125,9 +125,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 
-	DECLARE_READ8_MEMBER(_620000_r);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint8_t _620000_r();
+	void irq_ack_w(uint8_t data);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -140,7 +140,7 @@ private:
 };
 
 
-WRITE16_MEMBER(popobear_state::vram_w)
+void popobear_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg0_tile_info)
 	int base = m_tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
@@ -195,7 +195,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
 	int base = m_tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
 	int base = m_tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_bg3_tile_info)
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg3_tile_info)
 	int base = m_tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -461,16 +461,14 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 /* ??? */
-READ8_MEMBER(popobear_state::_620000_r)
+uint8_t popobear_state::_620000_r()
 {
 	return 9;
 }
 
-WRITE8_MEMBER(popobear_state::irq_ack_w)
+void popobear_state::irq_ack_w(uint8_t data)
 {
-	int i;
-
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 	{
 		if(data & 1 << i)
 			m_maincpu->set_input_line(i, CLEAR_LINE);

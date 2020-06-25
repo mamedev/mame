@@ -310,7 +310,7 @@ void nbmj8891_state::hanaoji_map(address_map &map)
 	map(0xf800, 0xffff).ram().share("nvram");
 }
 
-READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
+uint8_t nbmj8891_state::taiwanmb_unk_r()
 {
 	return 0x00;                                                    // MCU or 1413M3 STATUS?
 }

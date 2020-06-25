@@ -922,6 +922,7 @@ public:
 	render_layer_config layer_config() const { return m_layerconfig; }
 	layout_view *current_view() const { return m_curview; }
 	int view() const { return view_index(*m_curview); }
+	bool external_artwork() const { return m_external_artwork; }
 	bool hidden() const { return ((m_flags & RENDER_CREATE_HIDDEN) != 0); }
 	bool is_ui_target() const;
 	int index() const;
@@ -1038,6 +1039,7 @@ private:
 	s32                     m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 	bool                    m_transform_container;      // determines whether the screen container is transformed by the core renderer,
 														// otherwise the respective render API will handle the transformation (scale, offset)
+	bool                    m_external_artwork;         // external artwork was loaded (driver file or override)
 };
 
 

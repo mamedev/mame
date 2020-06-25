@@ -97,9 +97,11 @@ protected:
 	};
 
 	// opcode tables
-	static op_handler_table s_hmos_ops;
-	static op_handler_table s_cmos_ops;
-	static op_handler_table s_hc_ops;
+	static op_handler_table s_hmos_s_ops;
+	static op_handler_table s_hmos_b_ops;
+	static op_handler_table s_cmos_b_ops;
+	static op_handler_table s_hc_s_ops;
+	static op_handler_table s_hc_b_ops;
 	static cycle_count_table s_hmos_cycles;
 	static cycle_count_table s_cmos_cycles;
 	static cycle_count_table s_hc_cycles;
@@ -163,111 +165,111 @@ protected:
 	void set_nzc8(u16 a)                    { set_nz8(a); set_c8(a); }
 	void set_hnzc8(u8 a, u8 b, u16 r)       { set_h(a, b, r); set_nzc8(r); }
 
-	unsigned    rdmem(u32 addr)             { return unsigned(m_program->read_byte(addr)); }
-	void        wrmem(u32 addr, u8 value)   { m_program->write_byte(addr, value); }
-	unsigned    rdop(u32 addr)              { return unsigned(m_cache->read_byte(addr)); }
-	unsigned    rdop_arg(u32 addr)          { return unsigned(m_cache->read_byte(addr)); }
+	template <bool big> unsigned    rdmem(u32 addr)             { return big ? m_program16.read_byte(addr) : m_program13.read_byte(addr); }
+	template <bool big> void        wrmem(u32 addr, u8 value)   { if(big) m_program16.write_byte(addr, value); else m_program13.write_byte(addr, value); }
+	template <bool big> unsigned    rdop(u32 addr)              { return big ? m_cprogram16.read_byte(addr) : m_cprogram13.read_byte(addr); }
+	template <bool big> unsigned    rdop_arg(u32 addr)          { return big ? m_cprogram16.read_byte(addr) : m_cprogram13.read_byte(addr); }
 
-	unsigned    rm(u32 addr)                { return rdmem(addr); }
-	void        rm16(u32 addr, PAIR &p);
-	void        wm(u32 addr, u8 value)      { wrmem(addr, value); }
+	template <bool big> unsigned    rm(u32 addr)                { return rdmem<big>(addr); }
+	template <bool big> void        rm16(u32 addr, PAIR &p);
+	template <bool big> void        wm(u32 addr, u8 value)      { wrmem<big>(addr, value); }
 
-	void        pushbyte(u8 b);
-	void        pushword(PAIR const &p);
-	void        pullbyte(u8 &b);
-	void        pullword(PAIR &p);
+	template <bool big> void        pushbyte(u8 b);
+	template <bool big> void        pushword(PAIR const &p);
+	template <bool big> void        pullbyte(u8 &b);
+	template <bool big> void        pullword(PAIR &p);
 
-	template <typename T> void immbyte(T &b);
-	void immword(PAIR &w);
-	void skipbyte();
+	template <bool big, typename T> void immbyte(T &b);
+	template <bool big> void immword(PAIR &w);
+	template <bool big> void skipbyte();
 
-	template <unsigned B> void brset();
-	template <unsigned B> void brclr();
-	template <unsigned B> void bset();
-	template <unsigned B> void bclr();
+	template <bool big, unsigned B> void brset();
+	template <bool big, unsigned B> void brclr();
+	template <bool big, unsigned B> void bset();
+	template <bool big, unsigned B> void bclr();
 
-	template <bool C> void bra();
-	template <bool C> void bhi();
-	template <bool C> void bcc();
-	template <bool C> void bne();
-	template <bool C> void bhcc();
-	template <bool C> void bpl();
-	template <bool C> void bmc();
-	template <bool C> void bil();
-	void bsr();
+	template <bool big, bool C> void bra();
+	template <bool big, bool C> void bhi();
+	template <bool big, bool C> void bcc();
+	template <bool big, bool C> void bne();
+	template <bool big, bool C> void bhcc();
+	template <bool big, bool C> void bpl();
+	template <bool big, bool C> void bmc();
+	template <bool big, bool C> void bil();
+	template <bool big> void bsr();
 
-	template <addr_mode M> void neg();
-	template <addr_mode M> void com();
-	template <addr_mode M> void lsr();
-	template <addr_mode M> void ror();
-	template <addr_mode M> void asr();
-	template <addr_mode M> void lsl();
-	template <addr_mode M> void rol();
-	template <addr_mode M> void dec();
-	template <addr_mode M> void inc();
-	template <addr_mode M> void tst();
-	template <addr_mode M> void clr();
+	template <bool big, addr_mode M> void neg();
+	template <bool big, addr_mode M> void com();
+	template <bool big, addr_mode M> void lsr();
+	template <bool big, addr_mode M> void ror();
+	template <bool big, addr_mode M> void asr();
+	template <bool big, addr_mode M> void lsl();
+	template <bool big, addr_mode M> void rol();
+	template <bool big, addr_mode M> void dec();
+	template <bool big, addr_mode M> void inc();
+	template <bool big, addr_mode M> void tst();
+	template <bool big, addr_mode M> void clr();
 
-	void nega();
-	void mul();
-	void coma();
-	void lsra();
-	void rora();
-	void asra();
-	void lsla();
-	void rola();
-	void deca();
-	void inca();
-	void tsta();
-	void clra();
+	template <bool big> void nega();
+	template <bool big> void mul();
+	template <bool big> void coma();
+	template <bool big> void lsra();
+	template <bool big> void rora();
+	template <bool big> void asra();
+	template <bool big> void lsla();
+	template <bool big> void rola();
+	template <bool big> void deca();
+	template <bool big> void inca();
+	template <bool big> void tsta();
+	template <bool big> void clra();
 
-	void negx();
-	void comx();
-	void lsrx();
-	void rorx();
-	void asrx();
-	void lslx();
-	void rolx();
-	void decx();
-	void incx();
-	void tstx();
-	void clrx();
+	template <bool big> void negx();
+	template <bool big> void comx();
+	template <bool big> void lsrx();
+	template <bool big> void rorx();
+	template <bool big> void asrx();
+	template <bool big> void lslx();
+	template <bool big> void rolx();
+	template <bool big> void decx();
+	template <bool big> void incx();
+	template <bool big> void tstx();
+	template <bool big> void clrx();
 
-	void rti();
-	void rts();
-	void swi();
-	void stop();
-	void wait();
+	template <bool big> void rti();
+	template <bool big> void rts();
+	template <bool big> void swi();
+	template <bool big> void stop();
+	template <bool big> void wait();
 
-	void tax();
-	void txa();
+	template <bool big> void tax();
+	template <bool big> void txa();
 
-	void clc();
-	void sec();
-	void cli();
-	void sei();
+	template <bool big> void clc();
+	template <bool big> void sec();
+	template <bool big> void cli();
+	template <bool big> void sei();
 
-	void rsp();
-	void nop();
+	template <bool big> void rsp();
+	template <bool big> void nop();
 
-	template <addr_mode M> void suba();
-	template <addr_mode M> void cmpa();
-	template <addr_mode M> void sbca();
-	template <addr_mode M> void cpx();
-	template <addr_mode M> void anda();
-	template <addr_mode M> void bita();
-	template <addr_mode M> void lda();
-	template <addr_mode M> void sta();
-	template <addr_mode M> void eora();
-	template <addr_mode M> void adca();
-	template <addr_mode M> void ora();
-	template <addr_mode M> void adda();
-	template <addr_mode M> void jmp();
-	template <addr_mode M> void jsr();
-	template <addr_mode M> void ldx();
-	template <addr_mode M> void stx();
+	template <bool big, addr_mode M> void suba();
+	template <bool big, addr_mode M> void cmpa();
+	template <bool big, addr_mode M> void sbca();
+	template <bool big, addr_mode M> void cpx();
+	template <bool big, addr_mode M> void anda();
+	template <bool big, addr_mode M> void bita();
+	template <bool big, addr_mode M> void lda();
+	template <bool big, addr_mode M> void sta();
+	template <bool big, addr_mode M> void eora();
+	template <bool big, addr_mode M> void adca();
+	template <bool big, addr_mode M> void ora();
+	template <bool big, addr_mode M> void adda();
+	template <bool big, addr_mode M> void jmp();
+	template <bool big, addr_mode M> void jsr();
+	template <bool big, addr_mode M> void ldx();
+	template <bool big, addr_mode M> void stx();
 
-	void illegal();
+	template <bool big> void illegal();
 
 	virtual void interrupt();
 	virtual void interrupt_vector();
@@ -298,8 +300,10 @@ protected:
 	int     m_icount;
 
 	// address spaces
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram16;
+	memory_access<13, 0, 0, ENDIANNESS_BIG>::cache m_cprogram13;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program16;
+	memory_access<13, 0, 0, ENDIANNESS_BIG>::specific m_program13;
 };
 
 

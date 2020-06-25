@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((color & 0xc0) << 2),
 			color & 0x0f,
 			TILE_FLIPYX((color & 0x30) >> 4));
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((color & 0xe0) << 3),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x18) >> 3));
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
 	code += (color & 0xe0)<<3;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			m_bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
 			((color & 0x10) ? TILE_FLIPX : 0));
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
 	code = rom[tile_index];
 	color = rom[tile_index + 1];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code + ((color & 0x80) << 1),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x30) >> 4));
@@ -119,37 +119,37 @@ VIDEO_START_MEMBER(lwings_state,avengersb)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(lwings_state::lwings_fgvideoram_w)
+void lwings_state::lwings_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bg1videoram_w)
+void lwings_state::lwings_bg1videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(lwings_state::lwings_bg1_scrollx_w)
+void lwings_state::lwings_bg1_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scroll_x[offset] = data;
 	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bg1_scrolly_w)
+void lwings_state::lwings_bg1_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scroll_y[offset] = data;
 	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_MEMBER(lwings_state::trojan_bg2_scrollx_w)
+void lwings_state::trojan_bg2_scrollx_w(uint8_t data)
 {
 	m_bg2_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(lwings_state::trojan_bg2_image_w)
+void lwings_state::trojan_bg2_image_w(uint8_t data)
 {
 	if (m_bg2_image != data)
 	{

@@ -64,10 +64,10 @@ private:
 	u8 m_inp_mux;
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bank_w);
-	template<int Psen> DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void bank_w(u8 data);
+	template<int Psen> u8 bank_r(offs_t offset);
+	void input_w(u8 data);
+	u8 input_r();
 };
 
 void talkingfb_state::machine_start()
@@ -87,7 +87,7 @@ void talkingfb_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(talkingfb_state::bank_w)
+void talkingfb_state::bank_w(u8 data)
 {
 	// d0-d2: upper rom bank
 	// d3-d5: upper rom enable (bus conflict possible)
@@ -96,7 +96,7 @@ WRITE8_MEMBER(talkingfb_state::bank_w)
 }
 
 template<int Psen>
-READ8_MEMBER(talkingfb_state::bank_r)
+u8 talkingfb_state::bank_r(offs_t offset)
 {
 	u32 hi = (m_bank & 7) << 15;
 	u8 data = (m_bank & 0x20) ? 0xff : m_rom[offset | hi];
@@ -107,13 +107,13 @@ READ8_MEMBER(talkingfb_state::bank_r)
 	return data;
 }
 
-WRITE8_MEMBER(talkingfb_state::input_w)
+void talkingfb_state::input_w(u8 data)
 {
 	// d3-d7: input mux
 	m_inp_mux = data >> 3;
 }
 
-READ8_MEMBER(talkingfb_state::input_r)
+u8 talkingfb_state::input_r()
 {
 	u8 data = 0;
 

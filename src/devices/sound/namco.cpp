@@ -245,7 +245,7 @@ uint32_t namco_audio_device::namco_update_one(stream_sample_t *buffer, int lengt
 }
 
 
-WRITE_LINE_MEMBER(namco_audio_device::sound_enable_w)
+void namco_audio_device::sound_enable_w(int state)
 {
 	m_sound_enable = state;
 }
@@ -269,7 +269,7 @@ WRITE_LINE_MEMBER(namco_audio_device::sound_enable_w)
     0x1f:       ch 2    volume
 */
 
-WRITE8_MEMBER( namco_device::pacman_sound_w )
+void namco_device::pacman_sound_w(offs_t offset, uint8_t data)
 {
 	sound_channel *voice;
 	int ch;
@@ -322,7 +322,7 @@ WRITE8_MEMBER( namco_device::pacman_sound_w )
 	}
 }
 
-WRITE8_MEMBER( namco_cus30_device::pacman_sound_w )
+void namco_cus30_device::pacman_sound_w(offs_t offset, uint8_t data)
 {
 	sound_channel *voice;
 	int ch;
@@ -411,12 +411,12 @@ it select the 54XX/52XX outputs on those channels
     0x3f        ch 7
 */
 
-READ8_MEMBER( namco_device::polepos_sound_r )
+uint8_t namco_device::polepos_sound_r(offs_t offset)
 {
 	return m_soundregs[offset];
 }
 
-WRITE8_MEMBER( namco_device::polepos_sound_w )
+void namco_device::polepos_sound_w(offs_t offset, uint8_t data)
 {
 	sound_channel *voice;
 	int ch;
@@ -487,7 +487,7 @@ WRITE8_MEMBER( namco_device::polepos_sound_w )
     0x3e        ch 7    waveform select & frequency
 */
 
-WRITE8_MEMBER(namco_15xx_device::namco_15xx_w)
+void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
 {
 	sound_channel *voice;
 	int ch;
@@ -552,7 +552,7 @@ WRITE8_MEMBER(namco_15xx_device::namco_15xx_w)
     0x3c        ch 0    noise sw
 */
 
-	WRITE8_MEMBER(namco_cus30_device::namcos1_sound_w)
+void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 {
 	sound_channel *voice;
 	int ch;
@@ -610,7 +610,7 @@ WRITE8_MEMBER(namco_15xx_device::namco_15xx_w)
 	}
 }
 
-WRITE8_MEMBER( namco_cus30_device::namcos1_cus30_w )
+void namco_cus30_device::namcos1_cus30_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x100)
 	{
@@ -626,25 +626,25 @@ WRITE8_MEMBER( namco_cus30_device::namcos1_cus30_w )
 		}
 	}
 	else if (offset < 0x140)
-		namcos1_sound_w(space, offset - 0x100,data);
+		namcos1_sound_w(offset - 0x100,data);
 	else
 		m_wavedata[offset] = data;
 }
 
-READ8_MEMBER( namco_cus30_device::namcos1_cus30_r )
+uint8_t namco_cus30_device::namcos1_cus30_r(offs_t offset)
 {
 	return m_wavedata[offset];
 }
 
-READ8_MEMBER( namco_15xx_device::sharedram_r )
+uint8_t namco_15xx_device::sharedram_r(offs_t offset)
 {
 	return m_soundregs[offset];
 }
 
-WRITE8_MEMBER( namco_15xx_device::sharedram_w )
+void namco_15xx_device::sharedram_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x40)
-		namco_15xx_w(space, offset, data);
+		namco_15xx_w(offset, data);
 	else
 	{
 		m_soundregs[offset] = data;

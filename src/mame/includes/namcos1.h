@@ -76,7 +76,7 @@ private:
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;
 	required_device<mc6809e_device> m_audiocpu;
-	required_device<hd63701_cpu_device> m_mcu;
+	required_device<hd63701v0_cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
 	required_device<namco_c123tmap_device> m_c123tmap;
@@ -119,7 +119,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(subres_w);
 	void audiocpu_irq_ack_w(u8 data);
 	void mcu_irq_ack_w(u8 data);
-	DECLARE_READ8_MEMBER(dsw_r);
+	u8 dsw_r(offs_t offset);
 	void coin_w(u8 data);
 	void dac_gain_w(u8 data);
 	void sound_bankswitch_w(u8 data);

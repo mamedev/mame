@@ -5,6 +5,7 @@
     emucore.h
 
     General core utilities and macros used throughout the emulator.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_EMUCORE_H
@@ -72,6 +73,7 @@ using osd::s64;
 // useful utility functions
 using util::underlying_value;
 using util::enum_value;
+using util::make_bitmask;
 using util::BIT;
 using util::bitswap;
 using util::iabs;

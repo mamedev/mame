@@ -206,20 +206,20 @@ void pacland_state::machine_start()
 	save_item(NAME(m_mcu_irq_mask));
 }
 
-WRITE8_MEMBER(pacland_state::subreset_w)
+void pacland_state::subreset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::flipscreen_w)
+void pacland_state::flipscreen_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	flip_screen_set(bit);
 }
 
 
-READ8_MEMBER(pacland_state::input_r)
+uint8_t pacland_state::input_r(offs_t offset)
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
@@ -230,20 +230,20 @@ READ8_MEMBER(pacland_state::input_r)
 	return r;
 }
 
-WRITE8_MEMBER(pacland_state::coin_w)
+void pacland_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	machine().bookkeeping().coin_counter_w(0, ~data & 2);
 	machine().bookkeeping().coin_counter_w(1, ~data & 4);
 }
 
-WRITE8_MEMBER(pacland_state::led_w)
+void pacland_state::led_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 3);
 	m_leds[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
+void pacland_state::irq_1_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
@@ -251,7 +251,7 @@ WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
+void pacland_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;
@@ -280,7 +280,7 @@ void pacland_state::main_map(address_map &map)
 
 void pacland_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_mcu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
@@ -419,7 +419,7 @@ void pacland_state::pacland(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); /* 1.536 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacland_state::main_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* 6.144 MHz? */
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8); /* 6.144 MHz? */
 	m_mcu->set_addrmap(AS_PROGRAM, &pacland_state::mcu_map);
 	m_mcu->in_p1_cb().set_ioport("IN2");
 	m_mcu->out_p1_cb().set(FUNC(pacland_state::coin_w));

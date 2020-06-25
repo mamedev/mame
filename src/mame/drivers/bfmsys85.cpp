@@ -119,20 +119,20 @@ private:
 	output_finder<256> m_lamps;
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_READ8_MEMBER(irqlatch_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_READ8_MEMBER(mmtr_r);
-	DECLARE_WRITE8_MEMBER(vfd_w);
-	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
-	DECLARE_READ8_MEMBER(mux_ctrl_r);
-	DECLARE_WRITE8_MEMBER(mux_data_w);
-	DECLARE_READ8_MEMBER(mux_data_r);
-	DECLARE_WRITE8_MEMBER(mux_enable_w);
-	DECLARE_WRITE8_MEMBER(triac_w);
-	DECLARE_READ8_MEMBER(triac_r);
+	void watchdog_w(uint8_t data);
+	uint8_t irqlatch_r();
+	void reel12_w(uint8_t data);
+	void reel34_w(uint8_t data);
+	void mmtr_w(uint8_t data);
+	uint8_t mmtr_r();
+	void vfd_w(uint8_t data);
+	void mux_ctrl_w(uint8_t data);
+	uint8_t mux_ctrl_r();
+	void mux_data_w(uint8_t data);
+	uint8_t mux_data_r();
+	void mux_enable_w(uint8_t data);
+	void triac_w(uint8_t data);
+	uint8_t triac_r();
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	int b85_find_project_string();
@@ -181,7 +181,7 @@ void bfmsys85_state::machine_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::watchdog_w)
+void bfmsys85_state::watchdog_w(uint8_t data)
 {
 }
 
@@ -198,7 +198,7 @@ INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::irqlatch_r)
+uint8_t bfmsys85_state::irqlatch_r()
 {
 	int result = m_irq_status | 0x02;
 
@@ -209,7 +209,7 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel12_w)
+void bfmsys85_state::reel12_w(uint8_t data)
 {
 	m_reel[0]->update((data>>4)&0x0f);
 	m_reel[1]->update( data    &0x0f);
@@ -220,7 +220,7 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel34_w)
+void bfmsys85_state::reel34_w(uint8_t data)
 {
 	m_reel[2]->update((data>>4)&0x0f);
 	m_reel[3]->update( data    &0x0f);
@@ -233,7 +233,7 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mmtr_w)
+void bfmsys85_state::mmtr_w(uint8_t data)
 {
 	int  changed = m_mmtr_latch ^ data;
 
@@ -247,13 +247,13 @@ WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::mmtr_r)
+uint8_t bfmsys85_state::mmtr_r()
 {
 	return m_mmtr_latch;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::vfd_w)
+void bfmsys85_state::vfd_w(uint8_t data)
 {
 //reset 0x20, clock 0x80, data 0x40
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(bfmsys85_state::vfd_w)
 // input / output multiplexers ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
+void bfmsys85_state::mux_ctrl_w(uint8_t data)
 {
 	switch ( data & 0xF0 )
 	{
@@ -301,14 +301,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
+uint8_t bfmsys85_state::mux_ctrl_r()
 {
 	// software waits for bit7 to become low
 
 	return 0;
 }
 
-WRITE8_MEMBER(bfmsys85_state::mux_data_w)
+void bfmsys85_state::mux_data_w(uint8_t data)
 {
 	int off = m_mux_output_strobe<<4;
 
@@ -319,14 +319,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_data_r)
+uint8_t bfmsys85_state::mux_data_r()
 {
 	return m_mux_input;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
+void bfmsys85_state::mux_enable_w(uint8_t data)
 {
 }
 
@@ -334,14 +334,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
 // payslide triacs ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::triac_w)
+void bfmsys85_state::triac_w(uint8_t data)
 {
 	m_triac_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::triac_r)
+uint8_t bfmsys85_state::triac_r()
 {
 	return m_triac_latch;
 }

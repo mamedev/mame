@@ -135,7 +135,7 @@ void mrdo_state::mrdo_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bgvideoram[tile_index + 0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -179,25 +179,25 @@ void mrdo_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mrdo_state::mrdo_bgvideoram_w)
+void mrdo_state::mrdo_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(mrdo_state::mrdo_fgvideoram_w)
+void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(mrdo_state::mrdo_scrollx_w)
+void mrdo_state::mrdo_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
+void mrdo_state::mrdo_scrolly_w(uint8_t data)
 {
 	/* This is NOT affected by flipscreen (so stop it happening) */
 	if (m_flipscreen)
@@ -207,7 +207,7 @@ WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
 }
 
 
-WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
+void mrdo_state::mrdo_flipscreen_w(uint8_t data)
 {
 	/* bits 1-3 control the playfield priority, but they are not used by */
 	/* Mr. Do! so we don't emulate them */

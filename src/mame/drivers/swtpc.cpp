@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,68bit
+// copyright-holders:68bit
 /***************************************************************************
 
         SWTPC 6800 Computer System

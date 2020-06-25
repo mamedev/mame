@@ -51,7 +51,7 @@ via the PC 16 Terminal, operates independently after programming), connects to t
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "video/ef9345.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "machine/ram.h"
@@ -93,16 +93,16 @@ private:
 	void apc16_z80_map(address_map &map);
 	void ef9345(address_map &map);
 
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(host_scsi_r);
-	DECLARE_WRITE8_MEMBER(host_scsi_w);
-	DECLARE_READ8_MEMBER(flop_scsi_r);
-	DECLARE_WRITE8_MEMBER(flop_scsi_w);
-	DECLARE_READ8_MEMBER(p00_r);
-	DECLARE_WRITE8_MEMBER(p40_w);
+	u8 p1_r();
+	void p1_w(u8 data);
+	u8 p2_r();
+	void p2_w(u8 data);
+	u8 host_scsi_r(offs_t offset);
+	void host_scsi_w(offs_t offset, u8 data);
+	u8 flop_scsi_r(offs_t offset);
+	void flop_scsi_w(offs_t offs_t, u8 data);
+	u8 p00_r();
+	void p40_w(u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
@@ -127,26 +127,26 @@ void alphatpc16_state::machine_start()
 	m_wdfdc->set_floppy(m_flop0->get_device());
 }
 
-WRITE8_MEMBER(alphatpc16_state::p1_w)
+void alphatpc16_state::p1_w(u8 data)
 {
 	if((data == 0xff) && !BIT(m_p2, 7))
 		m_p2 &= ~3; //??
 	m_p1 = data;
 }
 
-READ8_MEMBER(alphatpc16_state::p1_r)
+u8 alphatpc16_state::p1_r()
 {
 	return m_p1;
 }
 
-WRITE8_MEMBER(alphatpc16_state::p2_w)
+void alphatpc16_state::p2_w(u8 data)
 {
 	m_beep->set_state(!BIT(data, 3));
 	m_pic8259->ir0_w(BIT(data, 5));
 	m_p2 = data;
 }
 
-READ8_MEMBER(alphatpc16_state::p2_r)
+u8 alphatpc16_state::p2_r()
 {
 	bool key = false;
 	if(m_p1 < 0x80)
@@ -154,7 +154,7 @@ READ8_MEMBER(alphatpc16_state::p2_r)
 	return (m_p2 | 0x40) & ~(key ? (m_p1 < 0x40 ? 2 : 1) : 0);
 }
 
-READ8_MEMBER(alphatpc16_state::p00_r)
+u8 alphatpc16_state::p00_r()
 {
 	u8 ret = 0;
 	switch(m_p40 & 0xf0)
@@ -175,7 +175,7 @@ READ8_MEMBER(alphatpc16_state::p00_r)
 	return ret;
 }
 
-WRITE8_MEMBER(alphatpc16_state::p40_w)
+void alphatpc16_state::p40_w(u8 data)
 {
 	switch(data & 0xf0)
 	{
@@ -200,7 +200,7 @@ WRITE8_MEMBER(alphatpc16_state::p40_w)
 }
 
 // this scsi emulation is an unrealistic mess
-WRITE8_MEMBER(alphatpc16_state::host_scsi_w)
+void alphatpc16_state::host_scsi_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -235,7 +235,7 @@ WRITE8_MEMBER(alphatpc16_state::host_scsi_w)
 	logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
 }
 
-READ8_MEMBER(alphatpc16_state::host_scsi_r)
+u8 alphatpc16_state::host_scsi_r(offs_t offset)
 {
 	u8 ret = 0;
 	switch(offset)
@@ -259,7 +259,7 @@ READ8_MEMBER(alphatpc16_state::host_scsi_r)
 	return ret;
 }
 
-WRITE8_MEMBER(alphatpc16_state::flop_scsi_w)
+void alphatpc16_state::flop_scsi_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -279,7 +279,7 @@ WRITE8_MEMBER(alphatpc16_state::flop_scsi_w)
 	logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
 }
 
-READ8_MEMBER(alphatpc16_state::flop_scsi_r)
+u8 alphatpc16_state::flop_scsi_r(offs_t offset)
 {
 	u8 ret = 0;
 	switch(offset)

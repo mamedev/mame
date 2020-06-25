@@ -110,10 +110,10 @@ protected:
 	emu_timer *m_kbd_timer;
 	z80ne_cass_data_t m_cass_data;
 
-	DECLARE_READ8_MEMBER(lx383_r);
-	DECLARE_WRITE8_MEMBER(lx383_w);
-	DECLARE_READ8_MEMBER(lx385_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
+	uint8_t lx383_r();
+	void lx383_w(offs_t offset, uint8_t data);
+	uint8_t lx385_ctrl_r();
+	void lx385_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
 
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
@@ -172,9 +172,9 @@ protected:
 
 	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
-	DECLARE_READ8_MEMBER(lx387_data_r);
-	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
-	DECLARE_READ8_MEMBER(lx388_read_field_sync);
+	uint8_t lx387_data_r();
+	uint8_t lx388_mc6847_videoram_r(offs_t offset);
+	uint8_t lx388_read_field_sync();
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<mc6847_base_device> m_vdg;
@@ -238,10 +238,10 @@ private:
 	void main_mem(address_map &map);
 	void main_io(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(lx390_motor_w);
-	DECLARE_READ8_MEMBER(lx390_reset_bank);
-	DECLARE_READ8_MEMBER(lx390_fdc_r);
-	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
+	void lx390_motor_w(uint8_t data);
+	uint8_t lx390_reset_bank();
+	uint8_t lx390_fdc_r(offs_t offset);
+	void lx390_fdc_w(offs_t offset, uint8_t data);
 
 	void reset_lx390_banking();
 

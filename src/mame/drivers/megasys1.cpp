@@ -264,14 +264,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
 
  in that order.         */
 
-READ16_MEMBER(megasys1_state::ip_select_r) // FROM MCU
+u16 megasys1_state::ip_select_r() // FROM MCU
 {
 	return m_ip_latched;
 }
 
 
 
-WRITE16_MEMBER(megasys1_state::ip_select_w) // TO MCU
+void megasys1_state::ip_select_w(u16 data) // TO MCU
 {
 	int i;
 
@@ -362,7 +362,7 @@ void megasys1_state::megasys1B_monkelf_map(address_map &map)
 #define INTERRUPT_NUM_C INTERRUPT_NUM_B
 #define interrupt_C     interrupt_B
 
-WRITE16_MEMBER(megasys1_state::ram_w)
+void megasys1_state::ram_w(offs_t offset, u16 data)
 {
 	// DON'T use COMBINE_DATA
 	// byte writes end up mirroring in both bytes of the word like nmk16.cpp
@@ -496,7 +496,7 @@ WRITE_LINE_MEMBER(megasys1_state::sound_irq)
 }
 
 template<int Chip>
-READ8_MEMBER(megasys1_state::oki_status_r)
+u8 megasys1_state::oki_status_r()
 {
 	if (m_ignore_oki_status == 1)
 		return 0;
@@ -508,7 +508,7 @@ void megasys1_state::p47b_adpcm_w(offs_t offset, u8 data)
 {
 	// bit 6 is always set
 	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
-	m_p47b_adpcm[offset]->write_data(data & 0x0f);
+	m_p47b_adpcm[offset]->data_w(data & 0x0f);
 	m_p47b_adpcm[offset]->vclk_w(1);
 	m_p47b_adpcm[offset]->vclk_w(0);
 }
@@ -1639,7 +1639,7 @@ INPUT_PORTS_END
 
 
 /* Read the input ports, through a protection device */
-READ16_MEMBER(megasys1_state::protection_peekaboo_r)
+u16 megasys1_state::protection_peekaboo_r()
 {
 	switch (m_protection_val)
 	{
@@ -1650,7 +1650,7 @@ READ16_MEMBER(megasys1_state::protection_peekaboo_r)
 	}
 }
 
-WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
+void megasys1_state::protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_protection_val);
 
@@ -3435,8 +3435,11 @@ ROM_START( kickoffb )
 	ROM_REGION( 0x010000, "oki1", 0 )       /* Samples */
 	ROM_LOAD( "k-1.1h", 0x000000, 0x010000, CRC(4e09f403) SHA1(5d2ec598333e968b3a9ac797e93e4d3830436d26) )
 
-	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "kick.bin",    0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASEFF ) // this bootleg has no PROMs
+
+	ROM_REGION( 0x208, "plds", 0 ) // protected
+	ROM_LOAD( "pal16l8b-2cn.12k", 0x000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8b-2cn.12p", 0x104, 0x0104, NO_DUMP )
 ROM_END
 
 /***************************************************************************
@@ -4641,7 +4644,7 @@ void megasys1_state::init_64street()
 	save_item(NAME(m_sprite_bank));
 }
 
-READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
+u16 megasys1_state::megasys1A_mcu_hs_r(offs_t offset, u16 mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4654,7 +4657,7 @@ READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 	return m_rom_maincpu[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
+void megasys1_state::megasys1A_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// following is hachoo, other games differs slightly
 	// R 0x5f0, if bit 0 == 0 then skips hs seq (debug?)
@@ -4680,8 +4683,8 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 void megasys1_state::init_astyanax()
 {
 	astyanax_rom_decode(machine(), "maincpu");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4788,7 +4791,7 @@ void megasys1_state::init_hayaosi1()
 	save_item(NAME(m_ip_latched));
 }
 
-READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
+u16 megasys1_state::iganinju_mcu_hs_r(offs_t offset, u16 mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4801,7 +4804,7 @@ READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 	return m_rom_maincpu[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
+void megasys1_state::iganinju_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// [0/2]: 0x0000
 	// [2/2]: 0x0055
@@ -4825,8 +4828,8 @@ void megasys1_state::init_iganinju()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16s_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_w)));
 
 	//m_rom_maincpu[0x00006e/2] = 0x0420; // the only game that does
 										// not like lev 3 interrupts
@@ -4844,8 +4847,8 @@ void megasys1_state::init_jitsupro()
 
 	jitsupro_gfx_unmangle("scroll0");   // Gfx
 	jitsupro_gfx_unmangle("sprites");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4861,7 +4864,8 @@ void megasys1_state::init_peekaboo()
 	m_okibank->configure_entry(7, &ROM[0x20000]);
 	m_okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(*this, FUNC(megasys1_state::protection_peekaboo_r)), write16_delegate(*this, FUNC(megasys1_state::protection_peekaboo_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100001, read16smo_delegate(*this, FUNC(megasys1_state::protection_peekaboo_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16s_delegate(*this, FUNC(megasys1_state::protection_peekaboo_w)));
 
 	save_item(NAME(m_protection_val));
 }
@@ -4898,12 +4902,12 @@ void megasys1_state::init_rittam()
 	astyanax_rom_decode(machine(), "maincpu");
 }
 
-READ16_MEMBER(megasys1_state::soldamj_spriteram16_r)
+u16 megasys1_state::soldamj_spriteram16_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::soldamj_spriteram16_w)
+void megasys1_state::soldamj_spriteram16_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset < 0x800/2)   COMBINE_DATA(&m_spriteram[offset]);
 }
@@ -4912,18 +4916,20 @@ void megasys1_state::init_soldamj()
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)), write16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c000, 0x8cfff, read16sm_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8c000, 0x8cfff, write16s_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
 }
 
 void megasys1_state::init_soldam()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)), write16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c000, 0x8cfff, read16sm_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8c000, 0x8cfff, write16s_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
 }
 
 
-READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
+u16 megasys1_state::stdragon_mcu_hs_r(offs_t offset, u16 mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4936,7 +4942,7 @@ READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 	return m_rom_maincpu[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
+void megasys1_state::stdragon_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_mcu_hs_ram[offset]);
 
@@ -4953,8 +4959,8 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 void megasys1_state::init_stdragon()
 {
 	phantasm_rom_decode(machine(), "maincpu");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4970,8 +4976,8 @@ void megasys1_state::init_stdragona()
 	stdragona_gfx_unmangle("scroll0");
 	stdragona_gfx_unmangle("sprites");
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -5017,8 +5023,8 @@ GAME( 1988, p47,      0,        system_A,          p47,      megasys1_state, emp
 GAME( 1988, p47j,     p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47je,    p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47b,     p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
+GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )

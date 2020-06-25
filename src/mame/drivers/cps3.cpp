@@ -1326,12 +1326,12 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
           0x8000 - 0xffff tile character definitions
 */
 
-READ8_MEMBER(cps3_state::ssram_r)
+u8 cps3_state::ssram_r(offs_t offset)
 {
 	return m_ss_ram[offset];
 }
 
-WRITE8_MEMBER(cps3_state::ssram_w)
+void cps3_state::ssram_w(offs_t offset, u8 data)
 {
 	if (offset >= 0x4000)
 		m_gfxdecode->gfx(0)->mark_dirty((offset - 0x4000)/32);
@@ -1339,14 +1339,14 @@ WRITE8_MEMBER(cps3_state::ssram_w)
 	m_ss_ram[offset] = data;
 }
 
-WRITE32_MEMBER(cps3_state::sh2cache_ram_w)
+void cps3_state::sh2cache_ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA( &m_sh2cache_ram[offset] );
 	// store a decrypted copy
 	m_sh2cache_ram_decrypted[offset] = m_sh2cache_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
 }
 
-WRITE32_MEMBER(cps3_state::cram_bank_w)
+void cps3_state::cram_bank_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1375,14 +1375,14 @@ WRITE32_MEMBER(cps3_state::cram_bank_w)
 	}
 }
 
-READ32_MEMBER(cps3_state::cram_data_r)
+u32 cps3_state::cram_data_r(offs_t offset)
 {
 	u32 fulloffset = (((m_cram_bank & 0x7)*0x100000)/4) + offset;
 
 	return little_endianize_int32(m_char_ram[fulloffset]);
 }
 
-WRITE32_MEMBER(cps3_state::cram_data_w)
+void cps3_state::cram_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 fulloffset = (((m_cram_bank & 0x7)*0x100000)/4) + offset;
 	mem_mask = little_endianize_int32(mem_mask);
@@ -1391,7 +1391,7 @@ WRITE32_MEMBER(cps3_state::cram_data_w)
 	m_gfxdecode->gfx(1)->mark_dirty(fulloffset/0x40);
 }
 
-WRITE16_MEMBER(cps3_state::spritedma_w)
+void cps3_state::spritedma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 prev = m_spritelist_dma;
 	COMBINE_DATA(&m_spritelist_dma);
@@ -1418,7 +1418,7 @@ WRITE16_MEMBER(cps3_state::spritedma_w)
 
 /* FLASH ROM ACCESS */
 
-READ32_MEMBER(cps3_state::gfxflash_r)
+u32 cps3_state::gfxflash_r(offs_t offset, u32 mem_mask)
 {
 	u32 result = 0;
 	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
@@ -1456,7 +1456,7 @@ READ32_MEMBER(cps3_state::gfxflash_r)
 	return result;
 }
 
-WRITE32_MEMBER(cps3_state::gfxflash_w)
+void cps3_state::gfxflash_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	int command;
 	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
@@ -1547,7 +1547,7 @@ u32 cps3_state::flashmain_r(int which, u32 offset, u32 mem_mask)
 
 
 
-READ32_MEMBER(cps3_state::flash1_r)
+u32 cps3_state::flash1_r(offs_t offset, u32 mem_mask)
 {
 	u32 retvalue = flashmain_r(0, offset, mem_mask);
 
@@ -1557,7 +1557,7 @@ READ32_MEMBER(cps3_state::flash1_r)
 	return retvalue;
 }
 
-READ32_MEMBER(cps3_state::flash2_r)
+u32 cps3_state::flash2_r(offs_t offset, u32 mem_mask)
 {
 	u32 retvalue = flashmain_r(1, offset, mem_mask);
 
@@ -1625,17 +1625,17 @@ void cps3_state::flashmain_w(int which, u32 offset, u32 data, u32 mem_mask)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::flash1_w)
+void cps3_state::flash1_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	flashmain_w(0,offset,data,mem_mask);
 }
 
-WRITE32_MEMBER(cps3_state::flash2_w)
+void cps3_state::flash2_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	flashmain_w(1,offset,data,mem_mask);
 }
 
-WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
+void cps3_state::cram_gfxflash_bank_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1691,12 +1691,12 @@ WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
 	}
 }
 
-READ16_MEMBER(cps3_state::dma_status_r)
+u16 cps3_state::dma_status_r()
 {
 	return m_dma_status;
 }
 
-READ16_MEMBER(cps3_state::dev_dipsw_r)
+u16 cps3_state::dev_dipsw_r()
 {
 	// presumably these data came from serial interface populated on early boards
 	// inverted words from 5000a00-5000a0f area ANDed with inverted words from 5000a10-5000a1f. perhaps one return DIPSW in 8 high bits, while other in 8 low bits.
@@ -1707,7 +1707,7 @@ READ16_MEMBER(cps3_state::dev_dipsw_r)
 /* EEPROM access is a little odd, I think it accesses eeprom through some kind of
    additional interface, as these writes aren't normal for the type of eeprom we have */
 
-READ32_MEMBER(cps3_state::eeprom_r)
+u32 cps3_state::eeprom_r(offs_t offset, u32 mem_mask)
 {
 	int addr = offset*4;
 
@@ -1735,7 +1735,7 @@ READ32_MEMBER(cps3_state::eeprom_r)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::eeprom_w)
+void cps3_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	int addr = offset*4;
 
@@ -1757,7 +1757,7 @@ WRITE32_MEMBER(cps3_state::eeprom_w)
 
 }
 
-WRITE16_MEMBER(cps3_state::outport_w)
+void cps3_state::outport_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1769,7 +1769,7 @@ WRITE16_MEMBER(cps3_state::outport_w)
 	// bits 14 and 15 some LEDs ?
 }
 
-WRITE8_MEMBER(cps3_state::ssregs_w)
+void cps3_state::ssregs_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1800,7 +1800,7 @@ WRITE8_MEMBER(cps3_state::ssregs_w)
 //<ElSemi> (a word each)
 
 
-WRITE32_MEMBER(cps3_state::palettedma_w)
+void cps3_state::palettedma_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (offset==0)
 	{
@@ -2071,7 +2071,7 @@ void cps3_state::process_character_dma(u32 address)
 	m_dma_timer->adjust(attotime::from_usec(100)); // delay time is a hack, what is actual DMA speed?
 }
 
-WRITE32_MEMBER(cps3_state::characterdma_w)
+void cps3_state::characterdma_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (DEBUG_PRINTF) logerror("chardma_w %08x %08x %08x\n", offset, data, mem_mask);
 
@@ -2116,12 +2116,12 @@ WRITE32_MEMBER(cps3_state::characterdma_w)
 	}
 }
 
-READ16_MEMBER(cps3_state::colourram_r)
+u16 cps3_state::colourram_r(offs_t offset)
 {
 	return m_colourram[offset];
 }
 
-WRITE16_MEMBER(cps3_state::colourram_w)
+void cps3_state::colourram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_colourram[offset]);
 
@@ -2150,7 +2150,7 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x040c0094, 0x040c009b).w(FUNC(cps3_state::characterdma_w));
 	map(0x040c00a0, 0x040c00af).w(FUNC(cps3_state::palettedma_w));
 
-	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::cps3_sound_r), FUNC(cps3_sound_device::cps3_sound_w));
+	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::sound_r), FUNC(cps3_sound_device::sound_w));
 
 	map(0x04100000, 0x041fffff).rw(FUNC(cps3_state::cram_data_r), FUNC(cps3_state::cram_data_w));
 	map(0x04200000, 0x043fffff).rw(FUNC(cps3_state::gfxflash_r), FUNC(cps3_state::gfxflash_w)); // GFX Flash ROMS

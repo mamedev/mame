@@ -26,50 +26,51 @@ dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, const char
 {
 }
 
-WRITE16_MEMBER(dectalk_isa_device::status_w)
+void dectalk_isa_device::status_w(uint16_t data)
 {
 	m_stat = data;
 }
 
-READ16_MEMBER(dectalk_isa_device::cmd_r)
+uint16_t dectalk_isa_device::cmd_r()
 {
 	return m_cmd;
 }
 
-WRITE16_MEMBER(dectalk_isa_device::data_w)
+void dectalk_isa_device::data_w(uint16_t data)
 {
 	m_data = data;
 }
 
-READ16_MEMBER(dectalk_isa_device::data_r)
+uint16_t dectalk_isa_device::data_r()
 {
 	return m_data;
 }
 
-READ16_MEMBER(dectalk_isa_device::host_irq_r)
+uint16_t dectalk_isa_device::host_irq_r()
 {
 	//m_isa->ir?_w(1);
 	return 0;
 }
 
-READ8_MEMBER(dectalk_isa_device::dma_r)
+uint8_t dectalk_isa_device::dma_r()
 {
-	m_cpu->drq1_w(0);
+	if (!machine().side_effects_disabled())
+		m_cpu->drq1_w(0);
 	return m_dma;
 }
 
-WRITE8_MEMBER(dectalk_isa_device::dma_w)
+void dectalk_isa_device::dma_w(uint8_t data)
 {
 	m_cpu->drq1_w(0);
 	m_dma = data;
 }
 
-WRITE16_MEMBER(dectalk_isa_device::dac_w)
+void dectalk_isa_device::dac_w(uint16_t data)
 {
 	m_dac->write(data >> 4);
 }
 
-WRITE16_MEMBER(dectalk_isa_device::output_ctl_w)
+void dectalk_isa_device::output_ctl_w(uint16_t data)
 {
 	// X9C503P potentiometer, 8-CS, 4-U/D, 2-INC
 	if(!(data & 8) && !(m_ctl & 2) && (data & 2))
@@ -85,14 +86,14 @@ WRITE16_MEMBER(dectalk_isa_device::output_ctl_w)
 	m_ctl = data;
 }
 
-READ16_MEMBER(dectalk_isa_device::dsp_dma_r)
+uint16_t dectalk_isa_device::dsp_dma_r()
 {
 	m_bio = ASSERT_LINE;
 	m_cpu->drq1_w(0);
 	return m_dsp_dma;
 }
 
-WRITE16_MEMBER(dectalk_isa_device::dsp_dma_w)
+void dectalk_isa_device::dsp_dma_w(uint16_t data)
 {
 	m_bio = CLEAR_LINE;
 	m_dsp_dma = data;
@@ -106,7 +107,7 @@ READ_LINE_MEMBER(dectalk_isa_device::bio_line_r)
 	return m_bio;
 }
 
-WRITE16_MEMBER(dectalk_isa_device::irq_line_w)
+void dectalk_isa_device::irq_line_w(uint16_t data)
 {
 	m_cpu->int1_w(0);
 }
@@ -176,7 +177,7 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-WRITE8_MEMBER(dectalk_isa_device::write)
+void dectalk_isa_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -202,7 +203,7 @@ WRITE8_MEMBER(dectalk_isa_device::write)
 	}
 }
 
-READ8_MEMBER(dectalk_isa_device::read)
+uint8_t dectalk_isa_device::read(offs_t offset)
 {
 	switch(offset)
 	{
@@ -215,7 +216,8 @@ READ8_MEMBER(dectalk_isa_device::read)
 		case 3:
 			return m_data >> 8;
 		case 4:
-			m_cpu->drq1_w(1);
+			if (!machine().side_effects_disabled())
+				m_cpu->drq1_w(1);
 			return m_dma;
 	}
 	return 0;
@@ -224,7 +226,7 @@ READ8_MEMBER(dectalk_isa_device::read)
 void dectalk_isa_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0250, 0x0257, read8_delegate(*this, FUNC(dectalk_isa_device::read)), write8_delegate(*this, FUNC(dectalk_isa_device::write)));
+	m_isa->install_device(0x0250, 0x0257, read8sm_delegate(*this, FUNC(dectalk_isa_device::read)), write8sm_delegate(*this, FUNC(dectalk_isa_device::write)));
 }
 
 void dectalk_isa_device::device_reset()

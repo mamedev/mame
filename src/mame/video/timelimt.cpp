@@ -69,12 +69,12 @@ void timelimt_state::timelimt_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bg_videoram[tile_index], 0, 0);
+	tileinfo.set(1, m_bg_videoram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 void timelimt_state::video_start()
@@ -93,31 +93,31 @@ void timelimt_state::video_start()
 
 /***************************************************************************/
 
-WRITE8_MEMBER(timelimt_state::videoram_w)
+void timelimt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::bg_videoram_w)
+void timelimt_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_x_lsb_w)
+void timelimt_state::scroll_x_lsb_w(uint8_t data)
 {
 	m_scrollx &= 0x100;
 	m_scrollx |= data & 0xff;
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_x_msb_w)
+void timelimt_state::scroll_x_msb_w(uint8_t data)
 {
 	m_scrollx &= 0xff;
 	m_scrollx |= ( data & 1 ) << 8;
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_y_w)
+void timelimt_state::scroll_y_w(uint8_t data)
 {
 	m_scrolly = data;
 }

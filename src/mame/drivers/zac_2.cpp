@@ -28,10 +28,9 @@ public:
 	void zac_2(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t ctrl_r();
+	void ctrl_w(uint8_t data);
+	void data_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
@@ -71,7 +70,7 @@ void zac_2_state::zac_2_io(address_map &map)
 void zac_2_state::zac_2_data(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).portr("DSW").w(FUNC(zac_2_state::data_w));
 }
 
 static INPUT_PORTS_START( zac_2 )
@@ -149,7 +148,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-READ8_MEMBER( zac_2_state::ctrl_r )
+uint8_t zac_2_state::ctrl_r()
 {
 	if (m_input_line < 6)
 		return m_row[m_input_line]->read();
@@ -157,17 +156,12 @@ READ8_MEMBER( zac_2_state::ctrl_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( zac_2_state::ctrl_w )
+void zac_2_state::ctrl_w(uint8_t data)
 {
 	m_input_line = data & 7;
 }
 
-READ8_MEMBER( zac_2_state::data_r )
-{
-	return ioport("DSW")->read();
-}
-
-WRITE8_MEMBER( zac_2_state::data_w )
+void zac_2_state::data_w(uint8_t data)
 {
 // writes to lines HS0-7, no idea what they do
 }
@@ -192,7 +186,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
 	if (m_t_c > 0x80)
-		m_maincpu->pulse_input_line_and_vector(INPUT_LINE_IRQ0, 0xbf, 2 * m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, 2 * m_maincpu->minimum_quantum_time());
 	else
 		m_t_c++;
 }
@@ -220,6 +214,8 @@ void zac_2_state::zac_2(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &zac_2_state::zac_2_data);
 	m_maincpu->sense_handler().set(FUNC(zac_2_state::serial_r));
 	m_maincpu->flag_handler().set(FUNC(zac_2_state::serial_w));
+	m_maincpu->intack_handler().set_constant(0xbf);
+
 	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
 	TIMER(config, "zac_2_inttimer").configure_periodic(FUNC(zac_2_state::zac_2_inttimer), attotime::from_hz(200));

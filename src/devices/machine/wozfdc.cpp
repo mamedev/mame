@@ -217,7 +217,7 @@ void wozfdc_device::write(offs_t offset, uint8_t data)
 	last_6502_write = data;
 }
 
-WRITE8_MEMBER(wozfdc_device::set_phase)
+void wozfdc_device::set_phase(uint8_t data)
 {
 	if (floppy && active)
 		floppy->seek_phase_w(data);

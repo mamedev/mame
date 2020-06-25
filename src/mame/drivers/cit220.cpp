@@ -15,7 +15,7 @@ and the SCN2674 video timing parameters appear to be identical.
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "cpu/mcs48/mcs48.h"
+#include "machine/cit220_kbd.h"
 //#include "machine/eeprompar.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
@@ -52,8 +52,6 @@ private:
 	void vp122_io_map(address_map &map);
 	void char_map(address_map &map);
 	void attr_map(address_map &map);
-	void keyboard_map(address_map &map);
-	void kbd_io_map(address_map &map);
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -130,6 +128,10 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 
 	if (BIT(dots, 2))
 		dots |= 3;
+	if (BIT(attrcode, 2))
+		dots = ~dots;
+	if (cursor)
+		dots = ~dots;
 
 	for (int i = 0; i < width; i++)
 	{
@@ -146,15 +148,6 @@ void cit220_state::char_map(address_map &map)
 void cit220_state::attr_map(address_map &map)
 {
 	map(0x0000, 0x2fff).ram();
-}
-
-void cit220_state::keyboard_map(address_map &map)
-{
-	map(0x000, 0xfff).rom().region("keyboard", 0);
-}
-
-void cit220_state::kbd_io_map(address_map &map)
-{
 }
 
 
@@ -184,15 +177,15 @@ void cit220_state::cit220p(machine_config &config)
 
 	scn2681_device &duart(SCN2681(config, "duart", 3'686'400));
 	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
-	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3); // 9600 baud?
+	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 	duart.outport_cb().append(FUNC(cit220_state::cols_w)).bit(7);
 
-	I8251(config, "usart", 4'000'000);
+	i8251_device &usart(I8251(config, "usart", 4'000'000));
+	usart.txd_handler().set("keyboard", FUNC(cit220p_keyboard_device::write_rxd));
 
-	mcs48_cpu_device &kbdmcu(I8035(config, "kbdmcu", 4'608'000));
-	kbdmcu.set_addrmap(AS_PROGRAM, &cit220_state::keyboard_map);
-	kbdmcu.set_addrmap(AS_IO, &cit220_state::kbd_io_map);
+	cit220p_keyboard_device &keyboard(CIT220P_KEYBOARD(config, "keyboard"));
+	keyboard.txd_callback().set("usart", FUNC(i8251_device::write_rxd));
 }
 
 void cit220_state::vp122(machine_config &config)
@@ -224,7 +217,7 @@ void cit220_state::vp122(machine_config &config)
 
 	I8251(config, "usart", 8_MHz_XTAL / 2);
 
-	PIT8253(config, "pit", 0);
+	PIT8253(config, "pit");
 	// Input clocks are video-related and should differ for 80-column and 132-column modes
 }
 
@@ -239,9 +232,6 @@ ROM_START( cit220p )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "v20_cg.ic17",   0x0000, 0x1000, CRC(76ef7ca9) SHA1(6e7799ca0a41350fbc369bbbd4ab581150f37b10) )
-
-	ROM_REGION(0x1000, "keyboard", 0)
-	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
 ROM_END
 
 /**************************************************************************************************************
@@ -262,5 +252,5 @@ ROM_START( vp122 )
 	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
 ROM_END
 
-COMP(1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 COMP(1985, vp122, 0, 0, vp122, cit220p, cit220_state, empty_init, "ADDS", "Viewpoint 122", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

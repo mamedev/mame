@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pc98_cd" description="NEC PC-9801 CD-ROMs">
 
 	<!--
@@ -2179,7 +2182,7 @@
 		<info name="release" value="199607xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="hanafuda de pon!" sha1="e6c9322b57da82c08ac7a7d91e50771214820806" />
+				<disk name="hanafuda de pon" sha1="e6c9322b57da82c08ac7a7d91e50771214820806" />
 			</diskarea>
 		</part>
 	</software>
@@ -2199,7 +2202,7 @@
 		<info name="release" value="199503xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="heart de ron!!" sha1="1c95cf153e055068b71f8fd6fffe760d1ddd2ac0" />
+				<disk name="heart de ron" sha1="1c95cf153e055068b71f8fd6fffe760d1ddd2ac0" />
 			</diskarea>
 		</part>
 	</software>
@@ -2751,7 +2754,7 @@
 		<info name="release" value="199404xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="mahjong de pon!" sha1="58c4ae95a830294baa1a448c328d53c1d0a6002b" />
+				<disk name="mahjong de pon" sha1="58c4ae95a830294baa1a448c328d53c1d0a6002b" />
 			</diskarea>
 		</part>
 	</software>
@@ -3004,7 +3007,7 @@
 		<info name="release" value="19960920" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="oh! kitsune-sama" sha1="344195412be77a1953d6a2a79db5c8a9e8a56b41" />
+				<disk name="oh kitsune-sama" sha1="344195412be77a1953d6a2a79db5c8a9e8a56b41" />
 			</diskarea>
 		</part>
 	</software>
@@ -3496,7 +3499,7 @@
 		<info name="release" value="199506xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ring out!!" sha1="2b50d05b278824e36a1b2fdf500a5ec4c9daeb3b" />
+				<disk name="ring out" sha1="2b50d05b278824e36a1b2fdf500a5ec4c9daeb3b" />
 			</diskarea>
 		</part>
 	</software>
@@ -4144,7 +4147,7 @@
 		<info name="release" value="199501xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="takamizawa kyosuke - nekketsu!! kyouiku kenshuu" sha1="ce13831f3094f9ab53c392480ece497c9b3c7997" />
+				<disk name="takamizawa kyosuke - nekketsu kyouiku kenshuu" sha1="ce13831f3094f9ab53c392480ece497c9b3c7997" />
 			</diskarea>
 		</part>
 	</software>
@@ -4235,7 +4238,7 @@
 		<info name="usage" value="Requires the original manual to pass the protection check"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="tokyo 2 - kaitaku imin boshuuchuu! (japan)" sha1="009ad8945385a51fd2e0bd1960a872297052396b" />
+				<disk name="tokyo 2 - kaitaku imin boshuuchuu (japan)" sha1="009ad8945385a51fd2e0bd1960a872297052396b" />
 			</diskarea>
 		</part>
 	</software>

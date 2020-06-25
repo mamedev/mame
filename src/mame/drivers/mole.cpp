@@ -80,11 +80,11 @@ private:
 	/* memory */
 	uint16_t m_tileram[0x400];
 
-	DECLARE_WRITE8_MEMBER(mole_tileram_w);
-	DECLARE_WRITE8_MEMBER(mole_tilebank_w);
-	DECLARE_WRITE8_MEMBER(mole_irqack_w);
-	DECLARE_WRITE8_MEMBER(mole_flipscreen_w);
-	DECLARE_READ8_MEMBER(mole_protection_r);
+	void mole_tileram_w(offs_t offset, uint8_t data);
+	void mole_tilebank_w(uint8_t data);
+	void mole_irqack_w(uint8_t data);
+	void mole_flipscreen_w(uint8_t data);
+	uint8_t mole_protection_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
 	uint16_t code = m_tileram[tile_index];
 
-	SET_TILE_INFO_MEMBER((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
+	tileinfo.set((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
 }
 
 void mole_state::video_start()
@@ -115,23 +115,23 @@ void mole_state::video_start()
 	save_item(NAME(m_tileram));
 }
 
-WRITE8_MEMBER(mole_state::mole_tileram_w)
+void mole_state::mole_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data | (m_tile_bank << 8);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mole_state::mole_tilebank_w)
+void mole_state::mole_tilebank_w(uint8_t data)
 {
 	m_tile_bank = data;
 }
 
-WRITE8_MEMBER(mole_state::mole_irqack_w)
+void mole_state::mole_irqack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mole_state::mole_flipscreen_w)
+void mole_state::mole_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -150,7 +150,7 @@ uint32_t mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bit
  *
  *************************************/
 
-READ8_MEMBER(mole_state::mole_protection_r)
+uint8_t mole_state::mole_protection_r(offs_t offset)
 {
 	/*  Following are all known examples of Mole Attack
 	**  code reading from the protection circuitry:

@@ -5,6 +5,7 @@
     crsshair.h
 
     Crosshair handling.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_CRSSHAIR_H

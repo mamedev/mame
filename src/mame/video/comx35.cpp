@@ -11,30 +11,30 @@
 #include "screen.h"
 #include "speaker.h"
 
-WRITE8_MEMBER( comx35_state::cdp1869_w )
+void comx35_state::cdp1869_w(offs_t offset, uint8_t data)
 {
 	uint16_t ma = m_maincpu->get_memory_address();
 
 	switch (offset)
 	{
 	case 3:
-		m_vis->out3_w(space, ma, data);
+		m_vis->out3_w(data);
 		break;
 
 	case 4:
-		m_vis->out4_w(space, ma, data);
+		m_vis->out4_w(ma);
 		break;
 
 	case 5:
-		m_vis->out5_w(space, ma, data);
+		m_vis->out5_w(ma);
 		break;
 
 	case 6:
-		m_vis->out6_w(space, ma, data);
+		m_vis->out6_w(ma);
 		break;
 
 	case 7:
-		m_vis->out7_w(space, ma, data);
+		m_vis->out7_w(ma);
 		break;
 	}
 }

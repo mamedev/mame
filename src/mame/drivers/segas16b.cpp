@@ -970,7 +970,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 }
 
 
-WRITE16_MEMBER( segas16b_state::sound_w16 )
+void segas16b_state::sound_w16(uint16_t data)
 {
 	if (m_soundlatch != nullptr)
 		m_soundlatch->write(data & 0xff);
@@ -987,7 +987,7 @@ WRITE16_MEMBER( segas16b_state::sound_w16 )
 //  selection
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
+void segas16b_state::rom_5704_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_segaic16vid->tilemap_set_bank(0, offset & 1, data & 7);
@@ -999,7 +999,7 @@ WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
 //  math chip reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
+uint16_t segas16b_state::rom_5797_bank_math_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1021,7 +1021,7 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 //  math chip writes, plus tile bank selection
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
+void segas16b_state::rom_5797_bank_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1049,7 +1049,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 //  for now treat as a second compare/timer chip
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::unknown_rgn2_r )
+uint16_t segas16b_state::unknown_rgn2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
 	return m_cmptimer_2->read(offset);
@@ -1061,7 +1061,7 @@ READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 //  for now treat as a second compare/timer chip
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
+void segas16b_state::unknown_rgn2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
 	m_cmptimer_2->write(offset, data, mem_mask);
@@ -1072,7 +1072,7 @@ WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
 //  standard_io_r - default I/O handler for reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::standard_io_r )
+uint16_t segas16b_state::standard_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1095,7 +1095,7 @@ READ16_MEMBER( segas16b_state::standard_io_r )
 //  standard_io_w - default I/O handler for writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16b_state::standard_io_w )
+void segas16b_state::standard_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1131,7 +1131,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 //  YM2413 directly from the main CPU
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
+void segas16b_state::atomicp_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ym2413->write(offset, data >> 8);
 }
@@ -1147,7 +1147,7 @@ WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 //  uPD7759 control register
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16b_state::upd7759_control_w )
+void segas16b_state::upd7759_control_w(uint8_t data)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 	if (size > 0)
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 //  bit in the top bit
 //-------------------------------------------------
 
-READ8_MEMBER( segas16b_state::upd7759_status_r )
+uint8_t segas16b_state::upd7759_status_r()
 {
 	return m_upd7759->busy_r() << 7;
 }
@@ -1351,7 +1351,7 @@ void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoff
 	uint16_t temp = m_workram[soundoffs];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		m_mapper->write(space, 0x03, temp >> 8);
+		m_mapper->write(0x03, temp >> 8);
 		m_workram[soundoffs] = temp & 0x00ff;
 	}
 
@@ -1381,8 +1381,7 @@ void segas16b_state::tturf_i8751_sim()
 	temp = m_workram[0x01d0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		m_mapper->write(space, 0x03, temp);
+		m_mapper->write(0x03, temp);
 		m_workram[0x01d0/2] = temp & 0x00ff;
 	}
 
@@ -1407,8 +1406,7 @@ void segas16b_state::wb3_i8751_sim()
 	uint16_t temp = m_workram[0x0008/2];
 	if ((temp & 0x00ff) != 0x0000)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		m_mapper->write(space, 0x03, temp >> 8);
+		m_mapper->write(0x03, temp >> 8);
 		m_workram[0x0008/2] = temp & 0xff00;
 	}
 }
@@ -1424,7 +1422,7 @@ void segas16b_state::wb3_i8751_sim()
 //  for Ace Attacker
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
+uint16_t segas16b_state::aceattac_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1446,7 +1444,7 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 
 		case 0x3000/2:
 			if (BIT(offset, 4))
-				return m_cxdio->read(space, offset & 0x0f);
+				return m_cxdio->read(offset & 0x0f);
 			else // TODO: use uPD4701A device
 			switch (offset & 0x1b)
 			{
@@ -1466,14 +1464,14 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 	return standard_io_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER( segas16b_state::aceattac_custom_io_w )
+void segas16b_state::aceattac_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			if (BIT(offset, 4))
 			{
-				m_cxdio->write(space, offset & 0x0f, data);
+				m_cxdio->write(offset & 0x0f, data);
 				return;
 			}
 			break;
@@ -1487,7 +1485,7 @@ WRITE16_MEMBER( segas16b_state::aceattac_custom_io_w )
 //  for Dunk Shot
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::dunkshot_custom_io_r )
+uint16_t segas16b_state::dunkshot_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1514,7 +1512,7 @@ READ16_MEMBER( segas16b_state::dunkshot_custom_io_r )
 //  handlers for Heavyweight Champ
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
+uint16_t segas16b_state::hwchamp_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result;
 
@@ -1530,15 +1528,15 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 					return result;
 				case 0x30/2: // c43035
 					/*
-						Signals, affects blocking and stance (both fists down, both fists up, up/down or down/up)
-						According to service mode:
-						---- --00 no status for right trigger
-						---- --01 down
-						---- --10 up
-						---- --11 both (signals) in red, mustn't occur most likely
-						---- xx-- same applied to left trigger
-						According to the flyer, cabinet has two sticks that can be moved up/down and/or towards the cabinet,
-						simulating punch motions.
+					    Signals, affects blocking and stance (both fists down, both fists up, up/down or down/up)
+					    According to service mode:
+					    ---- --00 no status for right trigger
+					    ---- --01 down
+					    ---- --10 up
+					    ---- --11 both (signals) in red, mustn't occur most likely
+					    ---- xx-- same applied to left trigger
+					    According to the flyer, cabinet has two sticks that can be moved up/down and/or towards the cabinet,
+					    simulating punch motions.
 					*/
 					u8 left = m_hwc_left_limit->read();
 					u8 right = m_hwc_right_limit->read();
@@ -1553,7 +1551,7 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 						result |= 1 << 1;
 					if (right > 0xc0)
 						result |= 1 << 0;
-										
+
 					return result;
 			}
 			break;
@@ -1561,7 +1559,7 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 	return standard_io_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
+void segas16b_state::hwchamp_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1574,7 +1572,7 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 						case 0:
 							m_hwc_input_value = m_hwc_monitor->read();
 							break;
-						
+
 						// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 						case 1:
 							m_hwc_input_value = m_hwc_right->read();
@@ -1610,7 +1608,7 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 //  for Passing Shot
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::passshtj_custom_io_r )
+uint16_t segas16b_state::passshtj_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1633,7 +1631,7 @@ READ16_MEMBER( segas16b_state::passshtj_custom_io_r )
 //  for SDI
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::sdi_custom_io_r )
+uint16_t segas16b_state::sdi_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1656,7 +1654,7 @@ READ16_MEMBER( segas16b_state::sdi_custom_io_r )
 //  handlers for Sukeban Jansi Ryuko
 //-------------------------------------------------
 
-READ16_MEMBER( segas16b_state::sjryuko_custom_io_r )
+uint16_t segas16b_state::sjryuko_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1676,7 +1674,7 @@ READ16_MEMBER( segas16b_state::sjryuko_custom_io_r )
 	return standard_io_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER( segas16b_state::sjryuko_custom_io_w )
+void segas16b_state::sjryuko_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1852,14 +1850,14 @@ void segas16b_state::fpointbl_sound_map(address_map &map)
 }
 
 
-READ16_MEMBER(segas16b_state::bootleg_custom_io_r)
+uint16_t segas16b_state::bootleg_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_custom_io_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER(segas16b_state::bootleg_custom_io_w)
+void segas16b_state::bootleg_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_custom_io_w(space, offset, data,mem_mask);
+	m_custom_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -1912,7 +1910,7 @@ void segas16b_state::bootleg_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-WRITE8_MEMBER(dfjail_state::sound_control_w)
+void dfjail_state::sound_control_w(uint8_t data)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 
@@ -1932,7 +1930,7 @@ WRITE8_MEMBER(dfjail_state::sound_control_w)
 	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 }
 
-WRITE8_MEMBER(dfjail_state::dac_data_w)
+void dfjail_state::dac_data_w(uint8_t data)
 {
 	// TODO: understand how this is hooked up
 	#if 0
@@ -1986,7 +1984,7 @@ void segas16b_state::lockonph_sound_iomap(address_map &map)
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-WRITE8_MEMBER(segas16b_state::spin_68k_w)
+void segas16b_state::spin_68k_w(uint8_t data)
 {
 	// this is probably a hack but otherwise the 68k and i8751 end up fighting
 	// on 'goldnaxe' causing hangs in various places.  maybe the interrupts
@@ -2874,7 +2872,7 @@ static INPUT_PORTS_START( hwchamp )
 
 	PORT_START("RIGHT_LIMIT")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_NAME("Right Y Limit")
-	
+
 	PORT_START("LEFT_LIMIT")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_NAME("Left Y Limit")
 INPUT_PORTS_END
@@ -9819,26 +9817,26 @@ removed.
 
 
 
-WRITE16_MEMBER( isgsm_state::cart_addr_high_w )
+void isgsm_state::cart_addr_high_w(uint16_t data)
 {
 	m_cart_addrlatch = data;
 }
 
-WRITE16_MEMBER( isgsm_state::cart_addr_low_w )
+void isgsm_state::cart_addr_low_w(uint16_t data)
 {
 	m_cart_addr = data | (m_cart_addrlatch << 16);
 }
 
 // the cart can be read here 8-bits at a time.
 // when reading from this port the data is xored by a fixed value depending on the cart
-READ16_MEMBER( isgsm_state::cart_data_r )
+uint16_t isgsm_state::cart_data_r()
 {
 	int size = memregion("gamecart_rgn")->bytes();
 	uint8_t *rgn = memregion("gamecart_rgn")->base();
 	return rgn[(++m_cart_addr & (size - 1)) ^ 1] ^ m_read_xor;
 }
 
-WRITE16_MEMBER( isgsm_state::data_w )
+void isgsm_state::data_w(uint16_t data)
 {
 	uint8_t *dest = nullptr;
 
@@ -9981,19 +9979,19 @@ WRITE16_MEMBER( isgsm_state::data_w )
 }
 
 
-WRITE16_MEMBER( isgsm_state::datatype_w )
+void isgsm_state::datatype_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("type set to %04x %04x\n", data, mem_mask);
 	m_data_type = data;
 }
 
-WRITE16_MEMBER( isgsm_state::addr_high_w )
+void isgsm_state::addr_high_w(uint16_t data)
 {
 	// this is latched, doesn't get applied until low part is written.
 	m_addr_latch = data;
 }
 
-WRITE16_MEMBER( isgsm_state::addr_low_w )
+void isgsm_state::addr_low_w(uint16_t data)
 {
 	// update the address and mode
 	m_data_mode = (m_addr_latch & 0xf000) >> 12;
@@ -10005,7 +10003,7 @@ WRITE16_MEMBER( isgsm_state::addr_low_w )
 	m_rle_latched = false;
 }
 
-WRITE16_MEMBER( isgsm_state::cart_security_high_w )
+void isgsm_state::cart_security_high_w(uint16_t data)
 {
 	// this is latched, doesn't get applied until low part is written.
 	m_security_latch = data;
@@ -10024,7 +10022,7 @@ uint32_t isgsm_state::tetrbx_security(uint32_t input)
 
 
 
-WRITE16_MEMBER( isgsm_state::cart_security_low_w )
+void isgsm_state::cart_security_low_w(uint16_t data)
 {
 	m_security_value = data | m_security_latch << 16;
 	// come up with security answer
@@ -10032,17 +10030,17 @@ WRITE16_MEMBER( isgsm_state::cart_security_low_w )
 	m_security_value = m_security_callback(m_security_value);
 }
 
-READ16_MEMBER( isgsm_state::cart_security_low_r )
+uint16_t isgsm_state::cart_security_low_r()
 {
 	return m_security_value & 0xffff;
 }
 
-READ16_MEMBER( isgsm_state::cart_security_high_r )
+uint16_t isgsm_state::cart_security_high_r()
 {
 	return (m_security_value >> 16) & 0xffff;
 }
 
-WRITE16_MEMBER( isgsm_state::sound_reset_w )
+void isgsm_state::sound_reset_w(uint16_t data)
 {
 	if (data == 0)
 	{
@@ -10056,7 +10054,7 @@ WRITE16_MEMBER( isgsm_state::sound_reset_w )
 	}
 }
 
-WRITE16_MEMBER( isgsm_state::main_bank_change_w )
+void isgsm_state::main_bank_change_w(uint16_t data)
 {
 	// other values on real hw have strange results, change memory mapping etc??
 	if (data !=0 )

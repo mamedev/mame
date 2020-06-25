@@ -149,7 +149,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "speaker.h"
 
 
-WRITE16_MEMBER(shadfrce_state::flip_screen)
+void shadfrce_state::flip_screen(uint16_t data)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -234,7 +234,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 */
 
 
-READ16_MEMBER(shadfrce_state::input_ports_r)
+uint16_t shadfrce_state::input_ports_r(offs_t offset)
 {
 	uint16_t data = 0xffff;
 
@@ -258,7 +258,7 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 }
 
 
-WRITE8_MEMBER(shadfrce_state::screen_brt_w)
+void shadfrce_state::screen_brt_w(uint8_t data)
 {
 	double brt = (data & 0xff) / 255.0;
 
@@ -266,12 +266,12 @@ WRITE8_MEMBER(shadfrce_state::screen_brt_w)
 		m_palette->set_pen_contrast(i, brt);
 }
 
-WRITE16_MEMBER(shadfrce_state::irq_ack_w)
+void shadfrce_state::irq_ack_w(offs_t offset, uint16_t data)
 {
 	m_maincpu->set_input_line(offset ^ 3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(shadfrce_state::irq_w)
+void shadfrce_state::irq_w(uint16_t data)
 {
 	m_irqs_enable = data & 1;   /* maybe, it's set/unset inside every trap instruction which is executed */
 	m_video_enable = data & 8;  /* probably */
@@ -291,7 +291,7 @@ WRITE16_MEMBER(shadfrce_state::irq_w)
 	m_prev_value = data;
 }
 
-WRITE16_MEMBER(shadfrce_state::scanline_w)
+void shadfrce_state::scanline_w(uint16_t data)
 {
 	m_raster_scanline = data;   /* guess, 0 is always written */
 }
@@ -382,7 +382,7 @@ void shadfrce_state::shadfrce_map(address_map &map)
 
 /* and the sound cpu */
 
-WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
+void shadfrce_state::oki_bankswitch_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -445,51 +445,53 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")  /*DSW1, not mapped directly  */
-	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) )           PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Continue_Price ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Continue_Price ) )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )       PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                      PORT_DIPLOCATION("SW1:8")
 
 	PORT_START("DSW2")  /* DSW2, not mapped directly */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )                  /* "Advanced" */
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )               /* "Expert" */
-	PORT_DIPNAME( 0x0c, 0x0c, "Stage Clear Energy Regain" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )                  // "Advanced" in manual
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )               // "Expert" in manual
+	PORT_DIPNAME( 0x0c, 0x0c, "Stage Clear Energy Regain" )  PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x04, "50%" )
 	PORT_DIPSETTING(    0x0c, "25%" )
 	PORT_DIPSETTING(    0x08, "10%" )
 	PORT_DIPSETTING(    0x00, "0%" )
-	PORT_DIPNAME( 0x10, 0x10, "Unused DIP 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unused DIP 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unused DIP 2-7" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unused DIP 2-8" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PCB has 3rd DIP switch "SW3" listed in manual as 1:OFF & 2:OFF & 3:OFF (ALL "NOT USED"), 4:ON & 5:ON (ALL "DON'T TOUCH"), 6:OFF, 7:OFF, 8:OFF (ALL "NOT USED")
 INPUT_PORTS_END
 
 /* Graphic Decoding */

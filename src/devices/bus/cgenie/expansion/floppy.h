@@ -43,9 +43,9 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 
-	DECLARE_READ8_MEMBER(irq_r);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_WRITE8_MEMBER(command_w);
+	uint8_t irq_r();
+	void select_w(uint8_t data);
+	void command_w(uint8_t data);
 
 	void mmio(address_map &map);
 

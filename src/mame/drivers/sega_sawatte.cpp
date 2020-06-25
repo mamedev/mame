@@ -5,7 +5,8 @@
 
 a sound-only Pico type system (one of the boards even says S-PICO)
 
-CPU is unknown (I can't see one?! MCU with internal ROM?) cartridge dumps have been tested as working using a flash cart.
+CPU is unknown (I can't see one?! MCU with internal ROM?) cartridge dumps contain 6502 code
+and have been tested as working using a flash cart.
 driver does nothing except allow the softlist to be connected to the -romident commands etc.
 
 

@@ -76,35 +76,35 @@ private:
 	optional_shared_ptr<uint16_t> m_intvkbd_dualport_ram;
 	optional_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_READ16_MEMBER(intv_stic_r);
-	DECLARE_WRITE16_MEMBER(intv_stic_w);
-	DECLARE_READ16_MEMBER(intv_gram_r);
-	DECLARE_WRITE16_MEMBER(intv_gram_w);
-	DECLARE_READ16_MEMBER(intv_ram8_r);
-	DECLARE_WRITE16_MEMBER(intv_ram8_w);
-	DECLARE_READ16_MEMBER(intv_ram16_r);
-	DECLARE_WRITE16_MEMBER(intv_ram16_w);
-	DECLARE_READ8_MEMBER(intvkb_iocart_r);
-
-	DECLARE_READ8_MEMBER(intv_right_control_r);
-	DECLARE_READ8_MEMBER(intv_left_control_r);
+	uint16_t intv_stic_r(offs_t offset);
+	void intv_stic_w(offs_t offset, uint16_t data);
+	uint16_t intv_gram_r(offs_t offset);
+	void intv_gram_w(offs_t offset, uint16_t data);
+	uint16_t intv_ram8_r(offs_t offset);
+	void intv_ram8_w(offs_t offset, uint16_t data);
+	uint16_t intv_ram16_r(offs_t offset);
+	void intv_ram16_w(offs_t offset, uint16_t data);
+	uint8_t intvkb_iocart_r(offs_t offset);
 
 	uint8_t m_bus_copy_mode;
 	uint8_t m_backtab_row;
 	uint16_t m_ram16[0x160];
 	int m_sr1_int_pending;
 	uint8_t m_ram8[256];
+	bool m_maincpu_reset;
 
 	// Keyboard Component
-	DECLARE_WRITE16_MEMBER(intvkbd_dualport16_w);
-	DECLARE_READ8_MEMBER(intvkbd_dualport8_lsb_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_lsb_w);
-	DECLARE_READ8_MEMBER(intvkbd_dualport8_msb_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_msb_w);
-	DECLARE_READ8_MEMBER(intvkbd_io_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_io_w);
-	DECLARE_READ8_MEMBER(intvkbd_periph_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_periph_w);
+	void intvkbd_dualport16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t intvkbd_dualport8_lsb_r(offs_t offset);
+	void intvkbd_dualport8_lsb_w(offs_t offset, uint8_t data);
+	uint8_t intvkbd_dualport8_msb_r(offs_t offset);
+	void intvkbd_dualport8_msb_w(offs_t offset, uint8_t data);
+	uint8_t intvkbd_io_r(offs_t offset);
+	void intvkbd_io_w(offs_t offset, uint8_t data);
+	uint8_t intvkbd_periph_r(offs_t offset);
+	void intvkbd_periph_w(offs_t offset, uint8_t data);
+
+	uint16_t iab_r();
 
 	bool m_printer_not_busy;        // printer state
 	bool m_printer_no_paper;        // printer state

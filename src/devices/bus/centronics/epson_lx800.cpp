@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /**********************************************************************
 
@@ -232,7 +232,7 @@ void epson_lx800_device::device_reset()
  * PA6             not used
  * PA7  R   P/S    P/S signal from the optional interface
  */
-READ8_MEMBER( epson_lx800_device::porta_r )
+uint8_t epson_lx800_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -247,7 +247,7 @@ READ8_MEMBER( epson_lx800_device::porta_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_device::porta_w )
+void epson_lx800_device::porta_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: lx800_porta_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
@@ -262,7 +262,7 @@ WRITE8_MEMBER( epson_lx800_device::porta_w )
  * PC6   W  FIRE       drive pulse width signal
  * PC7   W  BUZZER     buzzer signal
  */
-READ8_MEMBER( epson_lx800_device::portc_r )
+uint8_t epson_lx800_device::portc_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -273,7 +273,7 @@ READ8_MEMBER( epson_lx800_device::portc_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_device::portc_w )
+void epson_lx800_device::portc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
@@ -317,7 +317,7 @@ READ_LINE_MEMBER( epson_lx800_device::an5_r )
     GATE ARRAY
 ***************************************************************************/
 
-READ8_MEMBER( epson_lx800_device::centronics_data_r )
+uint8_t epson_lx800_device::centronics_data_r()
 {
 	logerror("centronics: data read\n");
 	return 0x55;

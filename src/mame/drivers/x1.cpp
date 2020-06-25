@@ -443,7 +443,7 @@ uint8_t x1_state::get_game_key(uint8_t port)
 	return ret;
 }
 
-READ8_MEMBER( x1_state::x1_sub_io_r )
+uint8_t x1_state::x1_sub_io_r()
 {
 	uint8_t ret,bus_res;
 
@@ -565,7 +565,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1_sub_io_w )
+void x1_state::x1_sub_io_w(uint8_t data)
 {
 	/* sub-routine at $10e sends to these sub-routines when a keyboard input is triggered:
 	 $17a -> floppy
@@ -695,7 +695,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
  *************************************/
 
 
-READ8_MEMBER( x1_state::x1_rom_r )
+uint8_t x1_state::x1_rom_r()
 {
 //  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
@@ -704,17 +704,17 @@ READ8_MEMBER( x1_state::x1_rom_r )
 		return 0;
 }
 
-WRITE8_MEMBER( x1_state::x1_rom_w )
+void x1_state::x1_rom_w(offs_t offset, uint8_t data)
 {
 	m_rom_index[offset] = data;
 }
 
-WRITE8_MEMBER( x1_state::x1_rom_bank_0_w )
+void x1_state::x1_rom_bank_0_w(uint8_t data)
 {
 	m_ram_bank = 0x10;
 }
 
-WRITE8_MEMBER( x1_state::x1_rom_bank_1_w )
+void x1_state::x1_rom_bank_1_w(uint8_t data)
 {
 	m_ram_bank = 0x00;
 }
@@ -725,7 +725,7 @@ WRITE8_MEMBER( x1_state::x1_rom_bank_1_w )
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_fdc_r )
+uint8_t x1_state::x1_fdc_r(offs_t offset)
 {
 	//uint8_t ret = 0;
 
@@ -756,7 +756,7 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	return 0x00;
 }
 
-WRITE8_MEMBER( x1_state::x1_fdc_w )
+void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -844,7 +844,7 @@ uint16_t x1_state::get_pcg_addr( uint16_t width, uint8_t y_char_size )
 	return pcg_offset;
 }
 
-READ8_MEMBER( x1_state::x1_pcg_r )
+uint8_t x1_state::x1_pcg_r(offs_t offset)
 {
 	int addr;
 	int pcg_offset;
@@ -880,7 +880,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 	return res;
 }
 
-WRITE8_MEMBER( x1_state::x1_pcg_w )
+void x1_state::x1_pcg_w(offs_t offset, uint8_t data)
 {
 	int addr,pcg_offset;
 
@@ -951,25 +951,25 @@ void x1_state::set_current_palette()
 
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
          In 4096 color mode, it's used for reading the value back. */
-WRITE8_MEMBER( x1_state::x1_pal_r_w )
+void x1_state::x1_pal_r_w(uint8_t data)
 {
 	m_x_r = data;
 	set_current_palette();
 }
 
-WRITE8_MEMBER( x1_state::x1_pal_g_w )
+void x1_state::x1_pal_g_w(uint8_t data)
 {
 	m_x_g = data;
 	set_current_palette();
 }
 
-WRITE8_MEMBER( x1_state::x1_pal_b_w )
+void x1_state::x1_pal_b_w(uint8_t data)
 {
 	m_x_b = data;
 	set_current_palette();
 }
 
-WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
+void x1_state::x1turboz_4096_palette_w(offs_t offset, uint8_t data)
 {
 	if (m_turbo_reg.pal & 0x80) // AEN bit, Turbo Z
 	{
@@ -1005,19 +1005,19 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 		switch (offset & 0x0300)
 		{
 		case 0x0000:
-			x1_pal_b_w(space, offset & 0x00ff, data);
+			x1_pal_b_w(data);
 			break;
 		case 0x0100:
-			x1_pal_r_w(space, offset & 0x00ff, data);
+			x1_pal_r_w(data);
 			break;
 		case 0x0200:
-			x1_pal_g_w(space, offset & 0x00ff, data);
+			x1_pal_g_w(data);
 			break;
 		}
 	}
 }
 
-READ8_MEMBER( x1_state::x1_ex_gfxram_r )
+uint8_t x1_state::x1_ex_gfxram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -1030,7 +1030,7 @@ READ8_MEMBER( x1_state::x1_ex_gfxram_r )
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
+void x1_state::x1_ex_gfxram_w(offs_t offset, uint8_t data)
 {
 	uint8_t ex_mask;
 
@@ -1057,7 +1057,7 @@ WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
     d6(40) = 0:8-raster graphics      1:16-raster graphics
     d7(80) = 0:don't display          1:display  <- underline (when 1, graphics are not displayed)
 */
-WRITE8_MEMBER( x1_state::x1_scrn_w )
+void x1_state::x1_scrn_w(uint8_t data)
 {
 	m_scrn_reg.pcg_mode = BIT(data, 5);
 	m_bitmapbank->set_entry(BIT(data, 4));
@@ -1071,13 +1071,13 @@ WRITE8_MEMBER( x1_state::x1_scrn_w )
 		logerror("SCRN sets true 400 lines mode\n");
 }
 
-WRITE8_MEMBER( x1_state::x1_pri_w )
+void x1_state::x1_pri_w(uint8_t data)
 {
 	m_scrn_reg.pri = data;
 //  logerror("PRI = %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_6845_w )
+void x1_state::x1_6845_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -1091,13 +1091,13 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	}
 }
 
-READ8_MEMBER( x1_state::x1turboz_blackclip_r )
+uint8_t x1_state::x1turboz_blackclip_r()
 {
 	/*  TODO: this returns only on x1turboz */
 	return m_scrn_reg.blackclip;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_blackclip_w )
+void x1_state::x1turbo_blackclip_w(uint8_t data)
 {
 	/*
 	-x-- ---- replace blanking duration with black
@@ -1111,33 +1111,33 @@ WRITE8_MEMBER( x1_state::x1turbo_blackclip_w )
 		logerror("Blackclip data access %02x\n",data);
 }
 
-READ8_MEMBER( x1_state::x1turbo_pal_r )
+uint8_t x1_state::x1turbo_pal_r()
 {
 	return m_turbo_reg.pal;
 }
 
-READ8_MEMBER( x1_state::x1turbo_txpal_r )
+uint8_t x1_state::x1turbo_txpal_r(offs_t offset)
 {
 	return m_turbo_reg.txt_pal[offset];
 }
 
-READ8_MEMBER( x1_state::x1turbo_txdisp_r )
+uint8_t x1_state::x1turbo_txdisp_r()
 {
 	return m_turbo_reg.txt_disp;
 }
 
-READ8_MEMBER( x1_state::x1turbo_gfxpal_r )
+uint8_t x1_state::x1turbo_gfxpal_r()
 {
 	return m_turbo_reg.gfx_pal;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_pal_w )
+void x1_state::x1turbo_pal_w(uint8_t data)
 {
 	logerror("TURBO PAL %02x\n",data);
 	m_turbo_reg.pal = data;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
+void x1_state::x1turbo_txpal_w(offs_t offset, uint8_t data)
 {
 	int r,g,b;
 
@@ -1154,13 +1154,13 @@ WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_txdisp_w )
+void x1_state::x1turbo_txdisp_w(uint8_t data)
 {
 	logerror("TURBO TEXT DISPLAY %02x\n",data);
 	m_turbo_reg.txt_disp = data;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_gfxpal_w )
+void x1_state::x1turbo_gfxpal_w(uint8_t data)
 {
 	logerror("TURBO GFX PAL %02x\n",data);
 	m_turbo_reg.gfx_pal = data;
@@ -1186,7 +1186,7 @@ uint16_t x1_state::jis_convert(int kanji_addr)
 	return 0x0000;
 }
 
-READ8_MEMBER( x1_state::x1_kanji_r )
+uint8_t x1_state::x1_kanji_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -1198,7 +1198,7 @@ READ8_MEMBER( x1_state::x1_kanji_r )
 	return res;
 }
 
-WRITE8_MEMBER( x1_state::x1_kanji_w )
+void x1_state::x1_kanji_w(offs_t offset, uint8_t data)
 {
 //  if(offset < 2)
 
@@ -1228,7 +1228,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 	}
 }
 
-READ8_MEMBER( x1_state::x1_emm_r )
+uint8_t x1_state::x1_emm_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -1252,7 +1252,7 @@ READ8_MEMBER( x1_state::x1_emm_r )
 	return res;
 }
 
-WRITE8_MEMBER( x1_state::x1_emm_w )
+void x1_state::x1_emm_w(offs_t offset, uint8_t data)
 {
 	if(offset & ~3)
 	{
@@ -1275,13 +1275,13 @@ WRITE8_MEMBER( x1_state::x1_emm_w )
 /*
     CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
 */
-READ8_MEMBER( x1_state::x1turbo_bank_r )
+uint8_t x1_state::x1turbo_bank_r()
 {
 //  logerror("BANK access read\n");
 	return m_ex_bank & 0x3f;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_bank_w )
+void x1_state::x1turbo_bank_w(uint8_t data)
 {
 	//uint8_t *RAM = memregion("x1_cpu")->base();
 	/*
@@ -1295,7 +1295,7 @@ WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 }
 
 /* TODO: waitstate penalties */
-READ8_MEMBER( x1_state::x1_mem_r )
+uint8_t x1_state::x1_mem_r(offs_t offset)
 {
 	if((offset & 0x8000) == 0 && (m_ram_bank == 0))
 	{
@@ -1305,25 +1305,25 @@ READ8_MEMBER( x1_state::x1_mem_r )
 	return m_work_ram[offset]; //RAM
 }
 
-WRITE8_MEMBER( x1_state::x1_mem_w )
+void x1_state::x1_mem_w(offs_t offset, uint8_t data)
 {
 	m_work_ram[offset] = data; //RAM
 }
 
-READ8_MEMBER( x1_state::x1turbo_mem_r )
+uint8_t x1_state::x1turbo_mem_r(offs_t offset)
 {
 	if((m_ex_bank & 0x10) == 0)
 		return m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)];
 
-	return x1_mem_r(space,offset);
+	return x1_mem_r(offset);
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_mem_w )
+void x1_state::x1turbo_mem_w(offs_t offset, uint8_t data)
 {
 	if((m_ex_bank & 0x10) == 0)
 		m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
 	else
-		x1_mem_w(space,offset,data);
+		x1_mem_w(offset,data);
 }
 
 /*************************************
@@ -1403,7 +1403,7 @@ void x1_state::x1turbo_io_banks(address_map &map)
 
 	map(0x1000, 0x12ff).w(FUNC(x1_state::x1turboz_4096_palette_w));
 
-	map(0x1f80, 0x1f80).mirror(0x000f).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x1f80, 0x1f80).mirror(0x000f).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x1f90, 0x1f93).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x1f98, 0x1f9f).rw(FUNC(x1_state::ext_sio_ctc_r), FUNC(x1_state::ext_sio_ctc_w));
 	map(0x1fb0, 0x1fb0).rw(FUNC(x1_state::x1turbo_pal_r), FUNC(x1_state::x1turbo_pal_w));       // Z only!
@@ -1445,14 +1445,14 @@ void x1_state::x1_io(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_porta_r )
+uint8_t x1_state::x1_porta_r()
 {
 	logerror("PPI Port A read\n");
 	return 0xff;
 }
 
 /* this port is system related */
-READ8_MEMBER( x1_state::x1_portb_r )
+uint8_t x1_state::x1_portb_r()
 {
 	//logerror("PPI Port B read\n");
 	/*
@@ -1495,7 +1495,7 @@ READ8_MEMBER( x1_state::x1_portb_r )
 }
 
 /* I/O system port */
-READ8_MEMBER( x1_state::x1_portc_r )
+uint8_t x1_state::x1_portc_r()
 {
 	//logerror("PPI Port C read\n");
 	/*
@@ -1508,17 +1508,17 @@ READ8_MEMBER( x1_state::x1_portc_r )
 	return (m_io_sys & 0x9f) | m_hres_320 | ~m_io_switch;
 }
 
-WRITE8_MEMBER( x1_state::x1_porta_w )
+void x1_state::x1_porta_w(uint8_t data)
 {
 	//logerror("PPI Port A write %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_portb_w )
+void x1_state::x1_portb_w(uint8_t data)
 {
 	//logerror("PPI Port B write %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_portc_w )
+void x1_state::x1_portc_w(uint8_t data)
 {
 	m_hres_320 = data & 0x40;
 
@@ -1534,31 +1534,31 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
-READ8_MEMBER(x1_state::memory_read_byte)
+uint8_t x1_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(x1_state::memory_write_byte)
+void x1_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(x1_state::io_read_byte)
+uint8_t x1_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(x1_state::io_write_byte)
+void x1_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(x1_state::ym_r)
+uint8_t x1_state::ym_r(offs_t offset)
 {
 	uint8_t result = m_ym->read(offset);
 	if (!BIT(offset, 0))
@@ -1572,99 +1572,99 @@ READ8_MEMBER(x1_state::ym_r)
  *
  *************************************/
 
-READ8_MEMBER(x1_state::color_board_r)
+uint8_t x1_state::color_board_r(address_space &space)
 {
 	logerror("Color image board read\n");
 	return space.unmap();
 }
 
-WRITE8_MEMBER(x1_state::color_board_w)
+void x1_state::color_board_w(uint8_t data)
 {
 	logerror("Color image board write %02x\n", data);
 }
 
-READ8_MEMBER(x1_state::color_board_2_r)
+uint8_t x1_state::color_board_2_r(address_space &space)
 {
 	logerror("Color image board 2 read\n");
 	return space.unmap();
 }
 
-WRITE8_MEMBER(x1_state::color_board_2_w)
+void x1_state::color_board_2_w(uint8_t data)
 {
 	logerror("Color image board 2 write %02x\n", data);
 }
 
-READ8_MEMBER(x1_state::stereo_board_r)
+uint8_t x1_state::stereo_board_r(address_space &space, offs_t offset)
 {
 	logerror("Stereoscopic board read %04x\n", offset);
 	return space.unmap();
 }
 
-WRITE8_MEMBER(x1_state::stereo_board_w)
+void x1_state::stereo_board_w(offs_t offset, uint8_t data)
 {
 	logerror("Stereoscopic board write %04x %02x\n", offset, data);
 }
 
-READ8_MEMBER(x1_state::rs232_r)
+uint8_t x1_state::rs232_r(offs_t offset)
 {
 	logerror("RS-232C read %04x\n", offset);
 	return 0;
 }
 
-WRITE8_MEMBER(x1_state::rs232_w)
+void x1_state::rs232_w(offs_t offset, uint8_t data)
 {
 	logerror("RS-232C write %04x %02x\n", offset, data);
 }
 
-READ8_MEMBER(x1_state::sasi_r)
+uint8_t x1_state::sasi_r(address_space &space, offs_t offset)
 {
 	//logerror("SASI HDD read %04x\n",offset);
 	return space.unmap();
 }
 
-WRITE8_MEMBER(x1_state::sasi_w)
+void x1_state::sasi_w(offs_t offset, uint8_t data)
 {
 	logerror("SASI HDD write %04x %02x\n", offset, data);
 }
 
-READ8_MEMBER(x1_state::fdd8_r)
+uint8_t x1_state::fdd8_r(address_space &space, offs_t offset)
 {
 	logerror("8-inch FD read %04x\n", offset);
 	return space.unmap();
 }
 
-WRITE8_MEMBER(x1_state::fdd8_w)
+void x1_state::fdd8_w(offs_t offset, uint8_t data)
 {
 	logerror("8-inch FD write %04x %02x\n", offset, data);
 }
 
-READ8_MEMBER(x1_state::ext_sio_ctc_r)
+uint8_t x1_state::ext_sio_ctc_r(address_space &space, offs_t offset)
 {
 	logerror("Extended SIO/CTC read %04x\n", offset);
 	return space.unmap();
 }
 
-WRITE8_MEMBER(x1_state::ext_sio_ctc_w)
+void x1_state::ext_sio_ctc_w(offs_t offset, uint8_t data)
 {
 	logerror("Extended SIO/CTC write %04x %02x\n", offset, data);
 }
 
-WRITE8_MEMBER(x1_state::z_img_cap_w)
+void x1_state::z_img_cap_w(uint8_t data)
 {
 	logerror("Z image capturing access %02x\n", data);
 }
 
-WRITE8_MEMBER(x1_state::z_mosaic_w)
+void x1_state::z_mosaic_w(uint8_t data)
 {
 	logerror("Z mosaic effect access %02x\n", data);
 }
 
-WRITE8_MEMBER(x1_state::z_chroma_key_w)
+void x1_state::z_chroma_key_w(uint8_t data)
 {
 	logerror("Z Chroma key access %02x\n", data);
 }
 
-WRITE8_MEMBER(x1_state::z_extra_scroll_w)
+void x1_state::z_extra_scroll_w(uint8_t data)
 {
 	logerror("Z Extra scroll config access %02x\n", data);
 }
@@ -2049,7 +2049,6 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t key1 = ioport("key1")->read();
 	uint32_t key2 = ioport("key2")->read();
 	uint32_t key3 = ioport("key3")->read();
@@ -2064,7 +2063,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3) || (key4 != m_old_key4) || (f_key != m_old_fkey))
 		{
 			// generate keyboard IRQ
-			x1_sub_io_w(space,0,0xe6);
+			x1_sub_io_w(0xe6);
 			m_irq_vector = m_key_irq_vector;
 			m_key_irq_flag = 1;
 			m_maincpu->set_input_line(0,ASSERT_LINE);

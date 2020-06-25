@@ -103,14 +103,14 @@ public:
 	void imds2(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ipc_mem_read);
-	DECLARE_WRITE8_MEMBER(ipc_mem_write);
-	DECLARE_WRITE8_MEMBER(ipc_control_w);
+	uint8_t ipc_mem_read(offs_t offset);
+	void ipc_mem_write(offs_t offset, uint8_t data);
+	void ipc_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ipc_intr_w);
-	DECLARE_READ8_MEMBER(ipcsyspic_r);
-	DECLARE_READ8_MEMBER(ipclocpic_r);
-	DECLARE_WRITE8_MEMBER(ipcsyspic_w);
-	DECLARE_WRITE8_MEMBER(ipclocpic_w);
+	uint8_t ipcsyspic_r(offs_t offset);
+	uint8_t ipclocpic_r(offs_t offset);
+	void ipcsyspic_w(offs_t offset, uint8_t data);
+	void ipclocpic_w(offs_t offset, uint8_t data);
 
 	virtual void driver_start() override;
 
@@ -168,7 +168,7 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 {
 }
 
-READ8_MEMBER(imds2_state::ipc_mem_read)
+uint8_t imds2_state::ipc_mem_read(offs_t offset)
 {
 	if (in_ipc_rom(offset)) {
 		return m_ipc_rom[ (offset & 0x07ff) | ((offset & 0x1000) >> 1) ];
@@ -177,14 +177,14 @@ READ8_MEMBER(imds2_state::ipc_mem_read)
 	}
 }
 
-WRITE8_MEMBER(imds2_state::ipc_mem_write)
+void imds2_state::ipc_mem_write(offs_t offset, uint8_t data)
 {
 	if (!in_ipc_rom(offset)) {
 		m_ipc_ram[ offset ] = data;
 	}
 }
 
-WRITE8_MEMBER(imds2_state::ipc_control_w)
+void imds2_state::ipc_control_w(uint8_t data)
 {
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
@@ -197,22 +197,22 @@ WRITE_LINE_MEMBER(imds2_state::ipc_intr_w)
 	m_ipccpu->set_input_line(I8085_INTR_LINE, (state != 0) && m_ipcctrl->q2_r());
 }
 
-READ8_MEMBER(imds2_state::ipcsyspic_r)
+uint8_t imds2_state::ipcsyspic_r(offs_t offset)
 {
 	return m_ipcsyspic->read(!BIT(offset, 0));
 }
 
-READ8_MEMBER(imds2_state::ipclocpic_r)
+uint8_t imds2_state::ipclocpic_r(offs_t offset)
 {
 	return m_ipclocpic->read(!BIT(offset, 0));
 }
 
-WRITE8_MEMBER(imds2_state::ipcsyspic_w)
+void imds2_state::ipcsyspic_w(offs_t offset, uint8_t data)
 {
 	m_ipcsyspic->write(!BIT(offset, 0), data);
 }
 
-WRITE8_MEMBER(imds2_state::ipclocpic_w)
+void imds2_state::ipclocpic_w(offs_t offset, uint8_t data)
 {
 	m_ipclocpic->write(!BIT(offset, 0), data);
 }
@@ -258,7 +258,7 @@ void imds2_state::imds2(machine_config &config)
 	I8085A(config, m_ipccpu, IPC_XTAL_Y2);  // CLK OUT = 4 MHz
 	m_ipccpu->set_addrmap(AS_PROGRAM, &imds2_state::ipc_mem_map);
 	m_ipccpu->set_addrmap(AS_IO, &imds2_state::ipc_io_map);
-	m_ipccpu->set_irq_acknowledge_callback("ipcsyspic", FUNC(pic8259_device::inta_cb));
+	m_ipccpu->in_inta_func().set("ipcsyspic", FUNC(pic8259_device::acknowledge));
 	//config.set_maximum_quantum(attotime::from_hz(100));
 
 	PIC8259(config, m_ipcsyspic, 0);
@@ -267,7 +267,7 @@ void imds2_state::imds2(machine_config &config)
 
 	PIC8259(config, m_ipclocpic, 0);
 	m_ipclocpic->out_int_callback().set(m_ipcsyspic, FUNC(pic8259_device::ir7_w));
-	m_ipclocpic->in_sp_callback().set_constant(1);
+	m_ipclocpic->in_sp_callback().set_constant(0);
 
 	PIT8253(config, m_ipctimer, 0);
 	m_ipctimer->set_clk<0>(IPC_XTAL_Y1 / 16);

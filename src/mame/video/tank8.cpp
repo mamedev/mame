@@ -58,7 +58,7 @@ void tank8_state::set_pens()
 }
 
 
-WRITE8_MEMBER(tank8_state::video_ram_w)
+void tank8_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
 			color |= 4;
 	}
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	tileinfo.set(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 

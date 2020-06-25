@@ -9,6 +9,7 @@
 #include "audio/cage.h"
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "video/atarirle.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -51,6 +52,9 @@ public:
 	optional_ioport m_coin_io;
 	optional_ioport m_fake_io;
 
+	bool            m_scanline_int_state;
+	bool            m_video_int_state;
+
 	bitmap_ind16    m_pf_bitmap;
 	bitmap_ind16    m_an_bitmap;
 
@@ -73,22 +77,24 @@ public:
 	uint16_t          m_protresult;
 	std::unique_ptr<uint8_t[]> m_protdata;
 
-	virtual void update_interrupts() override;
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ32_MEMBER(special_port2_r);
-	DECLARE_READ32_MEMBER(special_port3_r);
-	DECLARE_READ8_MEMBER(analog_port_r);
-	DECLARE_WRITE32_MEMBER(latch_w);
-	DECLARE_WRITE32_MEMBER(mo_command_w);
-	DECLARE_WRITE32_MEMBER(led_w);
-	DECLARE_READ32_MEMBER(sound_data_r);
-	DECLARE_WRITE32_MEMBER(sound_data_w);
-	DECLARE_READ32_MEMBER(colorram_protection_r);
-	DECLARE_WRITE32_MEMBER(colorram_protection_w);
-	DECLARE_WRITE32_MEMBER(tmek_pf_w);
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void scanline_int_ack_w(uint32_t data = 0);
+	void video_int_ack_w(uint32_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	uint32_t special_port2_r();
+	uint32_t special_port3_r();
+	uint8_t analog_port_r(offs_t offset);
+	void latch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void led_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sound_data_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tmek_pf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_callback);
+	void cage_irq_callback(uint8_t data);
 
 	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
 	uint16_t atarigt_colorram_r(offs_t address);
@@ -97,8 +103,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigt_playfield_scan);
-	DECLARE_MACHINE_START(atarigt);
-	DECLARE_MACHINE_RESET(atarigt);
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(atarigt);
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void atarigt(machine_config &config);

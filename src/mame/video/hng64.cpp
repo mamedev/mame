@@ -46,22 +46,22 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 	{                                                                           \
 		if (tilemapinfo&0x400)                                                  \
 		{                                                                       \
-			SET_TILE_INFO_MEMBER(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));         \
+			tileinfo.set(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));                 \
 		}                                                                       \
 		else                                                                    \
 		{                                                                       \
-			SET_TILE_INFO_MEMBER(0,tileno, pal,TILE_FLIPYX(flip));              \
+			tileinfo.set(0,tileno, pal,TILE_FLIPYX(flip));                      \
 		}                                                                       \
 	}                                                                           \
 	else                                                                        \
 	{                                                                           \
 		if (tilemapinfo&0x400)                                                  \
 		{                                                                       \
-			SET_TILE_INFO_MEMBER(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));         \
+			tileinfo.set(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));                 \
 		}                                                                       \
 		else                                                                    \
 		{                                                                       \
-			SET_TILE_INFO_MEMBER(2,tileno>>2, pal,TILE_FLIPYX(flip));           \
+			tileinfo.set(2,tileno>>2, pal,TILE_FLIPYX(flip));                   \
 		}                                                                       \
 	}                                                                           \
 }
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_16x16_info)
 }
 
 
-WRITE32_MEMBER(hng64_state::hng64_videoram_w)
+void hng64_state::hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const int realoff = (offset * 4);
 	COMBINE_DATA(&m_videoram[offset]);
@@ -230,11 +230,11 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)                                                 \
 do {                                                                                    \
 	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                       \
-		*(uint32_t *)dest = clut[INPUT_VAL];                                              \
+		*(uint32_t *)dest = clut[INPUT_VAL];                                            \
 	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                                \
-		*(uint32_t *)dest = add_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL]);  \
+		*(uint32_t *)dest = add_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL]);          \
 	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                                   \
-		*(uint32_t *)dest = alpha_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha);     \
+		*(uint32_t *)dest = alpha_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha); \
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
@@ -1131,7 +1131,7 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  */
 
 // Transition Control memory.
-WRITE32_MEMBER(hng64_state::tcram_w)
+void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *hng64_tcram = m_tcram;
 
@@ -1160,7 +1160,7 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 	}
 }
 
-READ32_MEMBER(hng64_state::tcram_r)
+uint32_t hng64_state::tcram_r(offs_t offset)
 {
 	/* is this really a port? this seems treated like RAM otherwise, check if there's code anywhere
 	   to write the desired value here instead */

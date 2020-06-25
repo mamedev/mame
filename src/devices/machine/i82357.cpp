@@ -46,12 +46,12 @@ void i82357_device::device_add_mconfig(machine_config &config)
 	PIC8259(config, m_pic[0], 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(
-		[this](offs_t offset)
+		[this](offs_t offset) -> u8
 		{
 			if (offset == 2)
 				return m_pic[1]->acknowledge();
 
-			return u32(0);
+			return 0;
 		});
 
 	PIC8259(config, m_pic[1], 0);

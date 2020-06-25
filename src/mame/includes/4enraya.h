@@ -31,13 +31,13 @@ public:
 
 	void _4enraya(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER(fenraya_videoram_w);
+	void fenraya_videoram_w(offs_t offset, uint8_t data);
 
 protected:
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_READ8_MEMBER(fenraya_custom_map_r);
-	DECLARE_WRITE8_MEMBER(fenraya_custom_map_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	void sound_data_w(uint8_t data);
+	uint8_t fenraya_custom_map_r(offs_t offset);
+	void fenraya_custom_map_w(offs_t offset, uint8_t data);
+	void sound_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

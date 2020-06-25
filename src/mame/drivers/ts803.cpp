@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Gabriele D'Antona, Robbbert
+// copyright-holders: Gabriele D'Antona
 /*************************************************************************************************
 
 TeleVideo TS-803(H)
@@ -52,7 +52,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
@@ -79,15 +79,15 @@ public:
 	void init_ts803();
 
 private:
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_READ8_MEMBER(porta0_r);
-	DECLARE_WRITE8_MEMBER(porta0_w);
-	DECLARE_WRITE8_MEMBER(disk_0_control_w);
-	DECLARE_READ8_MEMBER(disk_0_control_r);
+	uint8_t port10_r(offs_t offset);
+	void port10_w(offs_t offset, uint8_t data);
+	uint8_t porta0_r(offs_t offset);
+	void porta0_w(offs_t offset, uint8_t data);
+	void disk_0_control_w(uint8_t data);
+	uint8_t disk_0_control_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
-	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
+	void crtc_controlreg_w(uint8_t data);
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ts803_io(address_map &map);
@@ -193,7 +193,7 @@ static void ts803_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-WRITE8_MEMBER( ts803_state::disk_0_control_w )
+void ts803_state::disk_0_control_w(uint8_t data)
 {
 /*
 d0 ready
@@ -223,13 +223,13 @@ d7 Drive select 3 (active low)
 	m_fdc->dden_w(BIT(data, 3));
 }
 
-READ8_MEMBER( ts803_state::disk_0_control_r )
+uint8_t ts803_state::disk_0_control_r()
 {
 	printf("Disk0 control register read\n");
 	return 0xff;
 }
 
-READ8_MEMBER( ts803_state::porta0_r)
+uint8_t ts803_state::porta0_r(offs_t offset)
 {
 	offset += 0xa0;
 	switch(offset)
@@ -259,7 +259,7 @@ READ8_MEMBER( ts803_state::porta0_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER( ts803_state::porta0_w )
+void ts803_state::porta0_w(offs_t offset, uint8_t data)
 {
 	offset += 0xa0;
 	switch (offset)
@@ -273,7 +273,7 @@ WRITE8_MEMBER( ts803_state::porta0_w )
 	}
 }
 
-READ8_MEMBER( ts803_state::port10_r )
+uint8_t ts803_state::port10_r(offs_t offset)
 {
 	offset += 0x10;
 	printf("Port read [%x]\n",offset);
@@ -281,7 +281,7 @@ READ8_MEMBER( ts803_state::port10_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( ts803_state::port10_w )
+void ts803_state::port10_w(offs_t offset, uint8_t data)
 {
 	offset += 0x10;
 	switch (offset)
@@ -360,7 +360,7 @@ MC6845_UPDATE_ROW( ts803_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( ts803_state::crtc_controlreg_w )
+void ts803_state::crtc_controlreg_w(uint8_t data)
 {
 /*
 Bit 0 = 0 alpha mode

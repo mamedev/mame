@@ -53,7 +53,7 @@ void ikki_state::ikki_palette(palette_device &palette)
 	}
 }
 
-WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
+void ikki_state::ikki_scrn_ctrl_w(uint8_t data)
 {
 	m_flipscreen = BIT(data, 2);
 }

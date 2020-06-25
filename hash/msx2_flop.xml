@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="msx2_flop" description="MSX2 disk images">
 
 <!--
@@ -243,7 +246,7 @@ The following floppies came with the machines.
 		<year>1985</year>
 		<publisher>Sony</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="73720">
+			<dataarea name="flop" size="737280">
 				<rom name="700sdsk1.dsk" size="737280" crc="cc7c0972" sha1="b9cbe7decaf796b8cde9a70de50d634b5e2b2a2b"/>
 			</dataarea>
 		</part>
@@ -3571,22 +3574,22 @@ The following floppies came with the machines.
 		<publisher>Alicesoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 1 of 4).dsk" size="737280" crc="3066da9b" sha1="f36527f37ee23d8bd771fd5f6c76fc725806f4d8"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 1 of 4).dsk" size="737280" crc="3066da9b" sha1="f36527f37ee23d8bd771fd5f6c76fc725806f4d8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 2 of 4).dsk" size="737280" crc="1f485a78" sha1="fa0bc2615923939beb9016a281935e2cae59e106"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 2 of 4).dsk" size="737280" crc="1f485a78" sha1="fa0bc2615923939beb9016a281935e2cae59e106"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 3 of 4).dsk" size="737280" crc="6264bc87" sha1="f9c54b9c4158909d64ad39ba5030029a186fa177"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 3 of 4).dsk" size="737280" crc="6264bc87" sha1="f9c54b9c4158909d64ad39ba5030029a186fa177"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 4 of 4).dsk" size="737280" crc="c71017a3" sha1="6d169c908ddda75bf182dab5b998f92093eb2493"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 4 of 4).dsk" size="737280" crc="c71017a3" sha1="6d169c908ddda75bf182dab5b998f92093eb2493"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3597,22 +3600,22 @@ The following floppies came with the machines.
 		<publisher>Alicesoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 1 of 4)[a].dsk" size="737280" crc="b7291f4f" sha1="a53962ac1fba473ca5264e07ac94e9e1a0e5c69e"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 1 of 4)[a].dsk" size="737280" crc="b7291f4f" sha1="a53962ac1fba473ca5264e07ac94e9e1a0e5c69e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 2 of 4)[a].dsk" size="737280" crc="ca875522" sha1="4baefb42195f5199b1e919c48192a5605db9f2ae"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 2 of 4)[a].dsk" size="737280" crc="ca875522" sha1="4baefb42195f5199b1e919c48192a5605db9f2ae"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 3 of 4)[a].dsk" size="737280" crc="2492588d" sha1="9f5d6fd72c1018500b77cf131ebae757cc003104"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 3 of 4)[a].dsk" size="737280" crc="2492588d" sha1="9f5d6fd72c1018500b77cf131ebae757cc003104"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dr. stop! (1990)(alice soft)(jp)(disk 4 of 4)[a].dsk" size="737280" crc="dfe1c34a" sha1="4a7f3f77bde8fcdff71735fcf2505c82ffe1073b"/>
+				<rom name="dr. stop (1990)(alice soft)(jp)(disk 4 of 4)[a].dsk" size="737280" crc="dfe1c34a" sha1="4a7f3f77bde8fcdff71735fcf2505c82ffe1073b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11960,27 +11963,27 @@ The following floppies came with the machines.
 		<publisher>Fairytale</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="watasiwo golfni tsuretette! play the golf with me (1991)(fairytale)(jp)(disk 1 of 5).dsk" size="737280" crc="001ae0ec" sha1="28d41e4ab279e2419e94c708b7d146f5083c18f6"/>
+				<rom name="watasiwo golfni tsuretette play the golf with me (1991)(fairytale)(jp)(disk 1 of 5).dsk" size="737280" crc="001ae0ec" sha1="28d41e4ab279e2419e94c708b7d146f5083c18f6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="watasiwo golfni tsuretette! play the golf with me (1991)(fairytale)(jp)(disk 2 of 5).dsk" size="737280" crc="6d245420" sha1="9766b119b66b770f6137619cf75ccb485844d3a6"/>
+				<rom name="watasiwo golfni tsuretette play the golf with me (1991)(fairytale)(jp)(disk 2 of 5).dsk" size="737280" crc="6d245420" sha1="9766b119b66b770f6137619cf75ccb485844d3a6"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="watasiwo golfni tsuretette! play the golf with me (1991)(fairytale)(jp)(disk 3 of 5).dsk" size="737280" crc="f33b9d1c" sha1="328c4323932a3868d7a0d02a21340878679f13bf"/>
+				<rom name="watasiwo golfni tsuretette play the golf with me (1991)(fairytale)(jp)(disk 3 of 5).dsk" size="737280" crc="f33b9d1c" sha1="328c4323932a3868d7a0d02a21340878679f13bf"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="watasiwo golfni tsuretette! play the golf with me (1991)(fairytale)(jp)(disk 4 of 5).dsk" size="737280" crc="66f297c2" sha1="f50e05255eb760131f62847112f20ab0e053babe"/>
+				<rom name="watasiwo golfni tsuretette play the golf with me (1991)(fairytale)(jp)(disk 4 of 5).dsk" size="737280" crc="66f297c2" sha1="f50e05255eb760131f62847112f20ab0e053babe"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="watasiwo golfni tsuretette! play the golf with me (1991)(fairytale)(jp)(disk 5 of 5).dsk" size="737280" crc="d60735b2" sha1="2ca4838f7ad7e6fa6c7b5bdcf2651f23d3dc2e62"/>
+				<rom name="watasiwo golfni tsuretette play the golf with me (1991)(fairytale)(jp)(disk 5 of 5).dsk" size="737280" crc="d60735b2" sha1="2ca4838f7ad7e6fa6c7b5bdcf2651f23d3dc2e62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14808,7 +14811,7 @@ HOMEBREW
 		<info name="developer" value="Flying Bytes" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="not again! (1994)(flying bytes)(nl).dsk" size="737280" crc="640924db" sha1="375d4867494b1be17c4bc15a86c36dc973113327"/>
+				<rom name="not again (1994)(flying bytes)(nl).dsk" size="737280" crc="640924db" sha1="375d4867494b1be17c4bc15a86c36dc973113327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14820,7 +14823,7 @@ HOMEBREW
 		<info name="developer" value="Flying Bytes" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="not again! (1994)(flying bytes).dsk" size="737280" crc="df07be54" sha1="5589779588b6fe156029b50e278b53c41d531af3"/>
+				<rom name="not again (1994)(flying bytes).dsk" size="737280" crc="df07be54" sha1="5589779588b6fe156029b50e278b53c41d531af3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15408,7 +15411,7 @@ HOMEBREW
 		<info name="developer" value="Gigamix" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="quiz! atatchatte 25% (1996)(gigamix)(jp).dsk" size="737280" crc="32ac02ac" sha1="bcceda42a85ce1945d9168e1fb75b9a2c9f7cee4"/>
+				<rom name="quiz atatchatte 25 (1996)(gigamix)(jp).dsk" size="737280" crc="32ac02ac" sha1="bcceda42a85ce1945d9168e1fb75b9a2c9f7cee4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15420,7 +15423,7 @@ HOMEBREW
 		<info name="developer" value="Gigamix" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="quiz! atatchatte 25% (1996)(gigamix)(jp)[a].dsk" size="737280" crc="d81ac5b9" sha1="928b3ddca88b92ac5a94aa608c1acc94711a4402"/>
+				<rom name="quiz atatchatte 25 (1996)(gigamix)(jp)[a].dsk" size="737280" crc="d81ac5b9" sha1="928b3ddca88b92ac5a94aa608c1acc94711a4402"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15432,7 +15435,7 @@ HOMEBREW
 		<info name="developer" value="Gigamix" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="quiz! atatchatte 25% - additional questions (1996)(gigamix)(jp).dsk" size="737280" crc="deb3c7a3" sha1="0768f7b618cc93376f3d64d5ccb9b959232d699d"/>
+				<rom name="quiz atatchatte 25 - additional questions (1996)(gigamix)(jp).dsk" size="737280" crc="deb3c7a3" sha1="0768f7b618cc93376f3d64d5ccb9b959232d699d"/>
 			</dataarea>
 		</part>
 	</software>

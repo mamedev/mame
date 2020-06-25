@@ -24,7 +24,7 @@
 TILE_GET_INFO_MEMBER(bloodbro_state::get_bg_tile_info)
 {
 	int code = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0xfff,
 			(code >> 12),
 			0);
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(bloodbro_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(bloodbro_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			(code & 0xfff)+0x1000,
 			(code >> 12),
 			0);
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(bloodbro_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(bloodbro_state::get_tx_tile_info)
 {
 	int code = m_txvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0xfff,
 			code >> 12,
 			0);
@@ -77,19 +77,19 @@ void bloodbro_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(bloodbro_state::bgvideoram_w)
+void bloodbro_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bloodbro_state::fgvideoram_w)
+void bloodbro_state::fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bloodbro_state::txvideoram_w)
+void bloodbro_state::txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);

@@ -57,7 +57,7 @@ private:
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	DECLARE_WRITE16_MEMBER(control_w)
+	void control_w(uint16_t data)
 	{
 		m_control = data & 0xff;
 
@@ -71,9 +71,9 @@ private:
 			m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 		}
 	}
-	DECLARE_WRITE16_MEMBER(control2_w) { m_control2 = data & 0xff; }
+	void control2_w(uint16_t data) { m_control2 = data & 0xff; }
 
-	DECLARE_READ16_MEMBER(vrom_r)
+	uint16_t vrom_r(offs_t offset)
 	{
 		if (m_control2 & 0x10)
 		{
@@ -83,7 +83,7 @@ private:
 		return m_k056832->piratesh_rom_r(offset);
 	}
 
-	DECLARE_READ16_MEMBER(vrom_koropens_r)
+	uint16_t vrom_koropens_r(offs_t offset)
 	{
 		if (m_control2 & 0x10)
 		{

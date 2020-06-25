@@ -74,12 +74,12 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_READ8_MEMBER(read_b);
-	DECLARE_READ8_MEMBER(read_c);
-	DECLARE_WRITE8_MEMBER(write_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	uint8_t read_a();
+	uint8_t read_b();
+	uint8_t read_c();
+	void write_a(uint8_t data);
+	void write_b(uint8_t data);
+	void write_c(uint8_t data);
 };
 
 
@@ -164,18 +164,18 @@ public:
 	void fifo_full_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
-	DECLARE_READ16_MEMBER(fifo_r);
-	DECLARE_READ16_MEMBER(fifo_status_r);
+	uint16_t fifo_r();
+	uint16_t fifo_status_r(address_space &space);
 
 	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( packed_r );
-	DECLARE_WRITE32_MEMBER( packed_w );
+	uint32_t read(address_space &space, offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t packed_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void packed_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_handler);
+	void cage_irq_handler(uint8_t data);
 
 	void serial_rx_w(u8 data);
 

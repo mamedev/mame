@@ -340,7 +340,7 @@ void zaxxon_state::machine_start()
  *
  *************************************/
 
-READ8_MEMBER(zaxxon_state::razmataz_counter_r)
+uint8_t zaxxon_state::razmataz_counter_r()
 {
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
@@ -381,13 +381,13 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_control_w)
+void zaxxon_state::zaxxon_control_w(offs_t offset, uint8_t data)
 {
 	// address decode for E0F8/E0F9 (74LS138 @ U57) has its G2B enable input in common with this latch
 	bool a3 = BIT(offset, 3);
 	m_mainlatch[1]->write_bit((a3 ? 4 : 0) | (offset & 3), BIT(data, 0));
 	if (a3 && !BIT(offset, 1))
-		bg_position_w(space, offset & 1, data);
+		bg_position_w(offset & 1, data);
 }
 
 
@@ -1584,7 +1584,7 @@ void zaxxon_state::init_razmataz()
 	pgmspace.install_read_port(0xc00c, 0xc00c, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(*this, FUNC(zaxxon_state::razmataz_counter_r)));
+	pgmspace.install_read_handler(0xc80a, 0xc80a, read8smo_delegate(*this, FUNC(zaxxon_state::razmataz_counter_r)));
 
 	/* additional state saving */
 	save_item(NAME(m_razmataz_dial_pos));

@@ -198,8 +198,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(supercrd_videoram_w);
-	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
+	void supercrd_videoram_w(offs_t offset, uint8_t data);
+	void supercrd_colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void supercrd_palette(palette_device &palette) const;
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -249,13 +249,13 @@ void supercrd_state::supercrd_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(supercrd_state::supercrd_videoram_w)
+void supercrd_state::supercrd_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(supercrd_state::supercrd_colorram_w)
+void supercrd_state::supercrd_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -274,7 +274,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 	int code = attr & 0xfff;
 	int color = m_colorram[offs] >> 4;  // 4 bits for color.
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

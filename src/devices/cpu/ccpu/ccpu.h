@@ -49,7 +49,7 @@ public:
 
 	template <typename... T> void set_vector_func(T &&... args) { m_vector_callback.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( read_jmi );
+	uint8_t read_jmi();
 	void wdt_timer_trigger();
 
 protected:
@@ -100,10 +100,10 @@ protected:
 
 	int                 m_icount;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<15, 0,  0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<15, 0,  0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<32, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 5, 0,  0, ENDIANNESS_BIG>::specific m_io;
 
 	uint16_t m_flags;
 };

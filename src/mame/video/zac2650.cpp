@@ -16,30 +16,30 @@
 /* once it's workings are fully understood.                   */
 /**************************************************************/
 
-WRITE8_MEMBER(zac2650_state::tinvader_videoram_w)
+void zac2650_state::tinvader_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(zac2650_state::zac_s2636_r)
+uint8_t zac2650_state::zac_s2636_r(offs_t offset)
 {
 	if(offset!=0xCB) return m_s2636_0_ram[offset];
 	else return m_CollisionSprite;
 }
 
-WRITE8_MEMBER(zac2650_state::zac_s2636_w)
+void zac2650_state::zac_s2636_w(offs_t offset, uint8_t data)
 {
 	m_s2636_0_ram[offset] = data;
 	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
 	m_gfxdecode->gfx(2)->mark_dirty(offset/8);
 	if (offset == 0xc7)
 	{
-		m_s2636->write_data(space, offset, data);
+		m_s2636->write_data(offset, data);
 	}
 }
 
-READ8_MEMBER(zac2650_state::tinvader_port_0_r)
+uint8_t zac2650_state::tinvader_port_0_r()
 {
 	return ioport("1E80")->read() - m_CollisionBackground;
 }
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void zac2650_state::video_start()

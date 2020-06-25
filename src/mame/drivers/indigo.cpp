@@ -49,10 +49,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(int_r);
-	DECLARE_WRITE32_MEMBER(int_w);
-	DECLARE_READ32_MEMBER(dsp_ram_r);
-	DECLARE_WRITE32_MEMBER(dsp_ram_w);
+	uint32_t int_r(offs_t offset, uint32_t mem_mask = ~0);
+	void int_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dsp_ram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void indigo_map(address_map &map);
 
@@ -98,7 +98,7 @@ protected:
 
 	void mem_map(address_map &map);
 
-	DECLARE_WRITE64_MEMBER(write_ram);
+	void write_ram(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	required_device<r4000_device> m_maincpu;
 	required_device<sgi_mc_device> m_mem_ctrl;
@@ -123,24 +123,24 @@ void indigo4k_state::machine_reset()
 	membank("bank1")->set_base(m_share1);
 }
 
-READ32_MEMBER(indigo_state::int_r)
+uint32_t indigo_state::int_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INT, "%s: INT Read: %08x & %08x\n", machine().describe_context(), 0x1fbd9000 + offset*4, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(indigo_state::int_w)
+void indigo_state::int_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INT, "%s: INT Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd9000 + offset*4, data, mem_mask);
 }
 
-READ32_MEMBER(indigo_state::dsp_ram_r)
+uint32_t indigo_state::dsp_ram_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_DSP, "%s: DSP RAM Read: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, m_dsp_ram[offset], mem_mask);
 	return m_dsp_ram[offset];
 }
 
-WRITE32_MEMBER(indigo_state::dsp_ram_w)
+void indigo_state::dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_DSP, "%s: DSP RAM Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, data, mem_mask);
 	m_dsp_ram[offset] = data;
@@ -161,7 +161,7 @@ void indigo3k_state::mem_map(address_map &map)
 	map(0x1fc00000, 0x1fc3ffff).rom().share("share10").region("user1", 0);
 }
 
-WRITE64_MEMBER(indigo4k_state::write_ram)
+void indigo4k_state::write_ram(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
 	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)

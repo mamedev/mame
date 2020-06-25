@@ -139,7 +139,7 @@ void tms0980_cpu_device::device_reset()
 			m_fixed_decode[op] = (op & 0x80) ? F_CALL: F_BR;
 
 		// 6 output bits select a microinstruction index
-		m_micro_decode[op] = decode_micro(m_ipla->read(op) & 0x3f);
+		m_micro_decode[op] = m_decode_micro.isnull() ? decode_micro(m_ipla->read(op) & 0x3f) : m_decode_micro(op);
 
 		// the other ipla terms each select a fixed instruction
 		m_fixed_decode[op] |= decode_fixed(op);
@@ -151,7 +151,7 @@ void tms0980_cpu_device::device_reset()
 	memset(&m_micro_decode[0], 0, 0x40*sizeof(u32));
 
 	for (int op = 0; op < 0x40; op++)
-		m_micro_direct[op] = decode_micro(op);
+		m_micro_direct[op] = m_decode_micro.isnull() ? decode_micro(op) : m_decode_micro(op + 0x200);
 }
 
 

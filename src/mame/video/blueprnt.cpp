@@ -45,13 +45,13 @@ void blueprnt_state::blueprnt_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_videoram_w)
+void blueprnt_state::blueprnt_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
+void blueprnt_state::blueprnt_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -67,7 +67,7 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
+void blueprnt_state::blueprnt_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x02);
 
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
 	if (bank) code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

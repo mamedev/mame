@@ -87,6 +87,9 @@ public:
 	// Tap into fetched opcodes
 	auto opcode_cb() { return m_opcode_func.bind(); }
 
+	// Acknowledge interrupts
+	auto int_cb() { return m_int_func.bind(); }
+
 protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 
@@ -159,6 +162,7 @@ protected:
 	uint8_t m_last_pa;
 	devcb_write16 m_opcode_func;
 	devcb_write8 m_stm_func;
+	devcb_read8 m_int_func;
 
 	int m_icount;
 	uint32_t m_addr_mask;
@@ -194,14 +198,14 @@ protected:
 	uint16_t m_reg_r26;   // R26 register
 	uint16_t m_reg_r27;   // R27 register
 
-	address_space *m_program;
+	memory_access<22, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 6, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
 
 	uint32_t get_ea(uint16_t opcode);
 	void do_add(uint16_t& addend1 , uint16_t addend2);

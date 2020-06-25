@@ -57,23 +57,23 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
-	DECLARE_WRITE8_MEMBER(stfight_io_w);
-	DECLARE_READ8_MEMBER(stfight_coin_r);
-	DECLARE_WRITE8_MEMBER(stfight_coin_w);
-	DECLARE_WRITE8_MEMBER(stfight_fm_w);
-	DECLARE_WRITE8_MEMBER(stfight_mcu_w);
+	void stfight_io_w(uint8_t data);
+	uint8_t stfight_coin_r();
+	void stfight_coin_w(uint8_t data);
+	void stfight_fm_w(uint8_t data);
+	void stfight_mcu_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(stfight_bank_w);
+	void stfight_bank_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(stfight_fm_r);
+	uint8_t stfight_fm_r();
 
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
 
 	// MCU specifics
-	DECLARE_READ8_MEMBER(stfight_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
+	uint8_t stfight_68705_port_b_r();
+	void stfight_68705_port_a_w(uint8_t data);
+	void stfight_68705_port_b_w(uint8_t data);
+	void stfight_68705_port_c_w(uint8_t data);
 
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);

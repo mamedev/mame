@@ -238,7 +238,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 	}
 
 	const u32 color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);
@@ -719,7 +719,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				else       sy = sy_base + dim_y;
 				for (int dim_x = 0; dim_x < sprite_sizex; dim_x += 8)
 				{
-					clk += 64; // 64? cycle per each tile
+					clk += 32; // 32? cycle per each tile; TODO: verify from real hardware
 					if (clk > clk_max)
 						return;
 

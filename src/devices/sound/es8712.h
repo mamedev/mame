@@ -9,6 +9,7 @@
 
 #include "machine/74157.h"
 #include "sound/msm5205.h"
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -17,7 +18,7 @@
 
 // ======================> es8712_device
 
-class es8712_device : public device_t, public device_rom_interface
+class es8712_device : public device_t, public device_rom_interface<20> // TODO : 20 address bits?
 {
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -27,10 +28,10 @@ public:
 	auto reset_handler() { return m_reset_handler.bind(); }
 	auto msm_write_handler() { return m_msm_write_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(msm_w);
-	DECLARE_WRITE_LINE_MEMBER(msm_int);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void msm_w(offs_t offset, uint8_t data);
+	void msm_int(int state);
 
 	void play();
 

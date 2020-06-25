@@ -123,6 +123,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void tile_callback(u32 &tile, u32 &colour, int layer, bool is_8x8);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
@@ -145,7 +146,7 @@ public:
 
 private:
 	required_ioport_array<2> m_io_in;
-//  DECLARE_WRITE32_MEMBER(sound_w);
+//  void sound_w(u32 data);
 	u32 unk_status_r();
 
 	virtual void video_start() override;
@@ -153,6 +154,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(fghthist_pri_callback);
 
 	void fghthist_map(address_map &map);
 	void fghthsta_memmap(address_map &map);
@@ -178,21 +180,27 @@ public:
 private:
 	required_device<deco_ace_device> m_deco_ace;
 
+	void tilemap_color_bank_w(u8 data);
+	void sprite1_color_bank_w(u8 data);
+	void sprite2_color_bank_w(u8 data);
 	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
 	u16 nslasher_debug_r();
 
 	virtual void video_start() override;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u16 port_b_tattass();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	u16 mix_callback(u16 p, u16 p2);
 
 	void nslasher_map(address_map &map);
 	void tattass_map(address_map &map);
 
-	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
 

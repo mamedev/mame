@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-Compiled by K1W1 and Cowering (from GoodCoCo)
--->
+license:CC0
 
-<!--
+Compiled by K1W1 and Cowering (from GoodCoCo)
+
   * Nearly all of the cartridges on this Dragon softwarelist will also run on the CoCo 2/3, CP400.
 
   * These ROMs appear to have been dumped from RAM and have been marked as "Bad Dumps"
@@ -403,8 +403,8 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="usage" value="Disable Cart Auto-Start, EXEC 49152" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="test de conduccion 1 (1982)(belrampa servicios, sa)[!].rom" size="8192" crc="65d3153d" sha1="c44277f3d7ec615947465d20674b0771bdd44867" offset="0x0000" />
-				<rom name="test de conduccion 2 (1982)(belrampa servicios, sa)[!].rom" size="8192" crc="477921ca" sha1="a3d23148842fd7eb3b4f04d63a701a88573cbfb5" offset="0x2000" />
+				<rom name="test de conduccion 1 (1982)(belrampa servicios, sa).rom" size="8192" crc="65d3153d" sha1="c44277f3d7ec615947465d20674b0771bdd44867" offset="0x0000" />
+				<rom name="test de conduccion 2 (1982)(belrampa servicios, sa).rom" size="8192" crc="477921ca" sha1="a3d23148842fd7eb3b4f04d63a701a88573cbfb5" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -416,7 +416,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="author" value="S.J Purdy" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="toolkit (1983) (premier microsystems) [!].rom" size="8192" crc="82ef981a" sha1="b9c0d29382ae1d685f196ab4b53fb75156e12404"/>
+				<rom name="toolkit (1983) (premier microsystems).rom" size="8192" crc="82ef981a" sha1="b9c0d29382ae1d685f196ab4b53fb75156e12404"/>
 			</dataarea>
 		</part>
 	</software>

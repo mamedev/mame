@@ -14,13 +14,13 @@
 #include "screen.h"
 
 
-WRITE16_MEMBER(prehisle_state::fg_vram_w)
+void prehisle_state::fg_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_vram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(prehisle_state::tx_vram_w)
+void prehisle_state::tx_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
 	int const color = attr >> 12;
 	int const flags = (attr & 0x800) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 /* tile layout
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 	int const color = attr >> 12;
 	int const flags = (attr & 0x800) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 /* tile layout
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_tx_tile_info)
 	int const code = attr & 0xfff;
 	int const color = attr >> 12;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void prehisle_state::video_start()

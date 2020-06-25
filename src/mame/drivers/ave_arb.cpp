@@ -100,14 +100,14 @@ private:
 
 	// cartridge
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	DECLARE_READ8_MEMBER(cartridge_r);
+	u8 cartridge_r(offs_t offset);
 	u32 m_cart_mask;
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void leds_w(u8 data);
+	void control_w(u8 data);
+	u8 input_r();
 
 	u16 m_inp_mux;
 	u16 m_led_select;
@@ -156,7 +156,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 	return image_init_result::PASS;
 }
 
-READ8_MEMBER(arb_state::cartridge_r)
+u8 arb_state::cartridge_r(offs_t offset)
 {
 	return m_cart->read_rom(offset & m_cart_mask);
 }
@@ -175,14 +175,14 @@ void arb_state::update_display()
 	m_display->matrix(m_led_select | 0x200, m_led_data);
 }
 
-WRITE8_MEMBER(arb_state::leds_w)
+void arb_state::leds_w(u8 data)
 {
 	// PA0-PA7: led latch input
 	m_led_latch = ~data & 0xff;
 	update_display();
 }
 
-WRITE8_MEMBER(arb_state::control_w)
+void arb_state::control_w(u8 data)
 {
 	// PB0-PB3: 74145 A-D
 	// 74145 0-8: input mux, led row select
@@ -197,7 +197,7 @@ WRITE8_MEMBER(arb_state::control_w)
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(arb_state::input_r)
+u8 arb_state::input_r()
 {
 	u8 data = 0;
 
@@ -298,7 +298,7 @@ void arb_state::arb(machine_config &config)
 	m_via->set_clock(4_MHz_XTAL/4); // R6522P
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb", "bin");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");
 	m_cart->set_device_load(FUNC(arb_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 

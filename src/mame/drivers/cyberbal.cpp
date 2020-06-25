@@ -38,39 +38,39 @@
  *
  *************************************/
 
-void cyberbal2p_state::update_interrupts()
+WRITE_LINE_MEMBER(cyberbal2p_state::video_int_write_line)
 {
-	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
-void cyberbal_state::update_interrupts()
+WRITE_LINE_MEMBER(cyberbal_state::video_int_write_line)
 {
-	m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+		m_extracpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+
+void cyberbal2p_state::video_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
+void cyberbal_state::video_int_ack_w(uint16_t data)
+{
+	m_extracpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
 void cyberbal_state::machine_start()
 {
 	cyberbal_base_state::machine_start();
-
-	save_item(NAME(m_fast_68k_int));
-	save_item(NAME(m_io_68k_int));
-	save_item(NAME(m_sound_data_from_68k));
-	save_item(NAME(m_sound_data_from_6502));
-	save_item(NAME(m_sound_data_from_68k_ready));
-	save_item(NAME(m_sound_data_from_6502_ready));
-
-	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x1000);
 }
 
 
 void cyberbal_state::machine_reset()
 {
-
 	cyberbal_base_state::machine_reset();
-	scanline_timer_reset(*m_lscreen, 8);
-
-	cyberbal_sound_reset();
 
 	/* Extra CPU (second M68k) doesn't run until reset */
 	m_extracpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -80,7 +80,6 @@ void cyberbal_state::machine_reset()
 void cyberbal2p_state::machine_reset()
 {
 	cyberbal_base_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
 }
 
 
@@ -91,7 +90,7 @@ void cyberbal2p_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(cyberbal2p_state::sound_state_r)
+uint16_t cyberbal2p_state::sound_state_r()
 {
 	int temp = 0xffff;
 	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
@@ -106,7 +105,7 @@ READ16_MEMBER(cyberbal2p_state::sound_state_r)
  *
  *************************************/
 
-WRITE16_MEMBER(cyberbal_state::p2_reset_w)
+void cyberbal_state::p2_reset_w(uint16_t data)
 {
 	m_extracpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
@@ -123,12 +122,12 @@ void cyberbal_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0xfc0000, 0xfc0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0xfc8000, 0xfcffff).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r)).umask16(0xff00);
+	map(0xfc8000, 0xfcffff).r(m_sac, FUNC(atari_sac_device::main_response_r)).umask16(0xff00);
 	map(0xfd0000, 0xfd1fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0xfd2000, 0xfd3fff).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0xfd2000, 0xfd3fff).w(m_sac, FUNC(atari_sac_device::sound_reset_w));
 	map(0xfd4000, 0xfd5fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xfd6000, 0xfd7fff).w(FUNC(cyberbal_state::p2_reset_w));
-	map(0xfd8000, 0xfd9fff).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)).umask16(0xff00);
+	map(0xfd8000, 0xfd9fff).w(m_sac, FUNC(atari_sac_device::main_command_w)).umask16(0xff00);
 	map(0xfe0000, 0xfe0fff).portr("IN0");
 	map(0xfe1000, 0xfe1fff).portr("IN1");
 	map(0xfe8000, 0xfe8fff).ram().w("rpalette", FUNC(palette_device::write16)).share("rpalette");
@@ -177,48 +176,6 @@ void cyberbal_state::extra_map(address_map &map)
 
 /*************************************
  *
- *  Sound CPU memory handlers
- *
- *************************************/
-
-void cyberbal_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2001).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2801).w(FUNC(cyberbal_state::sound_68k_6502_w));
-	map(0x2802, 0x2803).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));
-	map(0x2804, 0x2805).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
-	map(0x2806, 0x2807).w(FUNC(cyberbal_state::sound_bank_select_w));
-	map(0x2c00, 0x2c01).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
-	map(0x2c02, 0x2c03).r(FUNC(cyberbal_state::special_port3_r));
-	map(0x2c04, 0x2c05).r(FUNC(cyberbal_state::sound_68k_6502_r));
-	map(0x2c06, 0x2c07).r(FUNC(cyberbal_state::sound_6502_stat_r));
-	map(0x3000, 0x3fff).bankr("soundbank");
-	map(0x4000, 0xffff).rom();
-}
-
-
-
-/*************************************
- *
- *  68000 Sound CPU memory handlers
- *
- *************************************/
-
-void cyberbal_state::sound_68k_map(address_map &map)
-{
-	map(0x000000, 0x03ffff).rom();
-	map(0xff8000, 0xff87ff).r(FUNC(cyberbal_state::sound_68k_r));
-	map(0xff8800, 0xff8fff).w(FUNC(cyberbal_state::sound_68k_w));
-	map(0xff9000, 0xff97ff).w(FUNC(cyberbal_state::io_68k_irq_ack_w));
-	map(0xff9800, 0xff9fff).w(FUNC(cyberbal_state::sound_68k_dac_w));
-	map(0xfff000, 0xffffff).ram();
-}
-
-
-
-/*************************************
- *
  *  2-player main CPU memory handlers
  *
  *************************************/
@@ -261,7 +218,7 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("sac")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
@@ -290,17 +247,6 @@ static INPUT_PORTS_START( cyberbal )
 
 	PORT_START("IN2")       /* fake port for screen switching */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* 2008-06 FP: I tag this as JSAII (even if it's not) to simplify cyberbal_special_port3_r */
-	PORT_START("jsa:JSAII")     /* audio board port */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN4 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* output buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    /* input buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 INPUT_PORTS_END
 
 
@@ -395,21 +341,15 @@ GFXDECODE_END
 void cyberbal_state::cyberbal_base(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::main_map);
 
-	M6502(config, m_audiocpu, ATARI_CLOCK_14MHz/8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cyberbal_state::sound_map);
-	m_audiocpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(ATARI_CLOCK_14MHz/4/4/16/16/14));
-
-	M68000(config, m_extracpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_extracpu, 14.318181_MHz_XTAL/2);
 	m_extracpu->set_addrmap(AS_PROGRAM, &cyberbal_state::extra_map);
 
-	M68000(config, m_daccpu, ATARI_CLOCK_14MHz/2);
-	m_daccpu->set_addrmap(AS_PROGRAM, &cyberbal_state::sound_68k_map);
-	m_daccpu->set_periodic_int(FUNC(cyberbal_state::sound_68k_irq_gen), attotime::from_hz(10000));
-
 	config.set_maximum_quantum(attotime::from_hz(600));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(cyberbal_state::scanline_update), m_lscreen, 0, 8);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -439,7 +379,7 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_lscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_lscreen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_lscreen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_lscreen->set_screen_update(FUNC(cyberbal_state::screen_update_cyberbal_left));
 	m_lscreen->set_palette("lpalette");
 	m_lscreen->screen_vblank().set(FUNC(cyberbal_state::video_int_write_line)); /* or is it "right?" har, har! */
@@ -448,28 +388,19 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_rscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_rscreen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_rscreen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_rscreen->set_screen_update(FUNC(cyberbal_state::screen_update_cyberbal_right));
 	m_rscreen->set_palette("rpalette");
 
 	/* sound hardware */
-	ATARI_SOUND_COMM(config, m_soundcomm, "audiocpu")
-		.int_callback().set_inputline("maincpu", M68K_IRQ_1);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, m_ymsnd, ATARI_CLOCK_14MHz/4);
-	m_ymsnd->irq_handler().set("soundcomm", FUNC(atari_sound_comm_device::ym2151_irq_gen));
-	m_ymsnd->add_route(0, "lspeaker", 0.60);
-	m_ymsnd->add_route(1, "rspeaker", 0.60);
-
-	AM6012(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // AM6012.6j
-	AM6012(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // AM6012.6j
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	ATARI_SAC(config, m_sac);
+	m_sac->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_1);
+	m_sac->test_read_cb().set_ioport("IN0").bit(15);
+	m_sac->add_route(0, "lspeaker", 1.0);
+	m_sac->add_route(1, "rspeaker", 1.0);
 }
 
 void cyberbal_state::cyberbal(machine_config &config)
@@ -484,16 +415,18 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	cyberbal_base(config);
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	SLAPSTIC(config, "slapstic", 116, true);
+	SLAPSTIC(config, m_slapstic, 116, true);
 }
 
 void cyberbal2p_state::cyberbal2p(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal2p_state::cyberbal2p_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(cyberbal2p_state::scanline_update), m_screen, 0, 8);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -513,7 +446,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(cyberbal2p_state::screen_update_cyberbal2p));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(cyberbal2p_state::video_int_write_line));
@@ -540,7 +473,7 @@ ROM_START( cyberbal )
 	ROM_LOAD16_BYTE( "136064-4123.1m",  0x000000, 0x010000, CRC(fb872740) SHA1(15e6721d466fe56d7c97c6801e214b32803a0a0d) )
 	ROM_LOAD16_BYTE( "136064-4124.1kl", 0x000001, 0x010000, CRC(87babad9) SHA1(acdc6b5976445e203de19eb03697e307fe6da77d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "sac:cpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136064-2131.2f",  0x000000, 0x010000, CRC(bd7e3d84) SHA1(f87878042fc79fa3883136b31ac15ddc22c6023c) )
 
 	ROM_REGION( 0x40000, "extra", 0 )   /* 4*64k for 68000 code */
@@ -549,7 +482,7 @@ ROM_START( cyberbal )
 	ROM_LOAD16_BYTE( "136064-1129.1cd", 0x020000, 0x010000, CRC(db11d2f0) SHA1(da9f49af533cbc732b17699040c7930070a90644) )
 	ROM_LOAD16_BYTE( "136064-1130.3b",  0x020001, 0x010000, CRC(fd86b8aa) SHA1(46310efed762632ed176a08aaec41e48aad41cc1) )
 
-	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_REGION16_BE( 0x40000, "sac:dac", 0 )    /* 256k for 68000 sound code */
 	ROM_LOAD16_BYTE( "136064-1132.3cd", 0x000000, 0x010000, CRC(ca5ce8d8) SHA1(69dc83d43d8c9dc7ce3207e70f48fcfc5ddda0cc) )
 	ROM_LOAD16_BYTE( "136064-1133.1b",  0x000001, 0x010000, CRC(ffeb8746) SHA1(0d8d28b2d997ff3cf01b4ef25b75fa5a69754af4) )
 	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
@@ -600,7 +533,7 @@ ROM_START( cyberbal2 )
 	ROM_LOAD16_BYTE( "136064-2123.1m",  0x000000, 0x010000, CRC(502676e8) SHA1(c0f1f1ce50d3df21cb81244268faef6c303cdfab) )
 	ROM_LOAD16_BYTE( "136064-2124.1kl", 0x000001, 0x010000, CRC(30f55915) SHA1(ab93ec46f282ab9a0cd47c989537a7e036975e3f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "sac:cpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136064-2131.2f",  0x000000, 0x010000, CRC(bd7e3d84) SHA1(f87878042fc79fa3883136b31ac15ddc22c6023c) )
 
 	ROM_REGION( 0x40000, "extra", 0 )   /* 4*64k for 68000 code */
@@ -609,7 +542,7 @@ ROM_START( cyberbal2 )
 	ROM_LOAD16_BYTE( "136064-1129.1cd", 0x020000, 0x010000, CRC(db11d2f0) SHA1(da9f49af533cbc732b17699040c7930070a90644) )
 	ROM_LOAD16_BYTE( "136064-1130.3b",  0x020001, 0x010000, CRC(fd86b8aa) SHA1(46310efed762632ed176a08aaec41e48aad41cc1) )
 
-	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_REGION16_BE( 0x40000, "sac:dac", 0 )    /* 256k for 68000 sound code */
 	ROM_LOAD16_BYTE( "136064-1132.3cd", 0x000000, 0x010000, CRC(ca5ce8d8) SHA1(69dc83d43d8c9dc7ce3207e70f48fcfc5ddda0cc) )
 	ROM_LOAD16_BYTE( "136064-1133.1b",  0x000001, 0x010000, CRC(ffeb8746) SHA1(0d8d28b2d997ff3cf01b4ef25b75fa5a69754af4) )
 	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
@@ -653,7 +586,7 @@ ROM_START( cyberbal1 ) /* loose chips from upgrade, cannot verify any rev 2 grap
 	ROM_LOAD16_BYTE( "136064-1123.1m",  0x000000, 0x010000, CRC(ba01fcdc) SHA1(d0283d68450cb758942df20762e12442687eab78) )
 	ROM_LOAD16_BYTE( "136064-1124.1kl", 0x000001, 0x010000, CRC(d0617f65) SHA1(7c641a2c709ecf40f6977abd94f6320e13faf61b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "sac:cpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136064-2131.2f",  0x000000, 0x010000, CRC(bd7e3d84) SHA1(f87878042fc79fa3883136b31ac15ddc22c6023c) ) /* this rev 2 chip was among the loose rev 1 chips */
 
 	ROM_REGION( 0x40000, "extra", 0 )   /* 4*64k for 68000 code */
@@ -662,7 +595,7 @@ ROM_START( cyberbal1 ) /* loose chips from upgrade, cannot verify any rev 2 grap
 	ROM_LOAD16_BYTE( "136064-1129.1cd", 0x020000, 0x010000, CRC(db11d2f0) SHA1(da9f49af533cbc732b17699040c7930070a90644) )
 	ROM_LOAD16_BYTE( "136064-1130.3b",  0x020001, 0x010000, CRC(fd86b8aa) SHA1(46310efed762632ed176a08aaec41e48aad41cc1) )
 
-	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_REGION16_BE( 0x40000, "sac:dac", 0 )    /* 256k for 68000 sound code */
 	ROM_LOAD16_BYTE( "136064-1132.3cd", 0x000000, 0x010000, CRC(ca5ce8d8) SHA1(69dc83d43d8c9dc7ce3207e70f48fcfc5ddda0cc) )
 	ROM_LOAD16_BYTE( "136064-1133.1b",  0x000001, 0x010000, CRC(ffeb8746) SHA1(0d8d28b2d997ff3cf01b4ef25b75fa5a69754af4) )
 	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
@@ -706,7 +639,7 @@ ROM_START( cyberbalp )
 	ROM_LOAD16_BYTE( "136064-0123.1m",  0x000000, 0x010000, CRC(59bac810) SHA1(d4742b2b554c2ad62a2ea7152db3f06a06cddd67) )
 	ROM_LOAD16_BYTE( "136064-0124.1kl", 0x000001, 0x010000, CRC(e48e6dd3) SHA1(4d45bc66c0a3eb1174db7f19c5dee54dabad68f3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "sac:cpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136064-0131.2f",  0x000000, 0x010000, CRC(c72b71ce) SHA1(6d3d8f437cf55ccaaa4490daa69f402902944686) )
 
 	ROM_REGION( 0x40000, "extra", 0 )   /* 4*64k for 68000 code */
@@ -715,7 +648,7 @@ ROM_START( cyberbalp )
 	ROM_LOAD16_BYTE( "136064-1129.1cd", 0x020000, 0x010000, CRC(db11d2f0) SHA1(da9f49af533cbc732b17699040c7930070a90644) )
 	ROM_LOAD16_BYTE( "136064-1130.3b",  0x020001, 0x010000, CRC(fd86b8aa) SHA1(46310efed762632ed176a08aaec41e48aad41cc1) )
 
-	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_REGION16_BE( 0x40000, "sac:dac", 0 )    /* 256k for 68000 sound code */
 	ROM_LOAD16_BYTE( "136064-0132.3cd", 0x000000, 0x010000, CRC(392a442c) SHA1(e108456167f433808b452edb3351d283b5cf7a50) )
 	ROM_LOAD16_BYTE( "136064-0133.1b",  0x000001, 0x010000, CRC(a0a11cf9) SHA1(b28a379cb49d051b6ccff877255409e1231d3030) )
 	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
@@ -957,7 +890,7 @@ ROM_START( cyberbalt )
 	ROM_LOAD16_BYTE( "136073-2009.3m",  0x020000, 0x010000, CRC(88bfc6dd) SHA1(ac2a67c8b4dbae62497236d624d333992195c218) )
 	ROM_LOAD16_BYTE( "136073-2010.3kl", 0x020001, 0x010000, CRC(3a121f29) SHA1(ebd088187abb863f2a632812811479dca7e31802) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "sac:cpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136073-1029.2f",  0x000000, 0x010000, CRC(afee87e1) SHA1(da5e91167c68eecd2cb4436ac64cda14e5f6eae7) )
 
 	ROM_REGION( 0x40000, "extra", 0 )
@@ -966,7 +899,7 @@ ROM_START( cyberbalt )
 	ROM_LOAD16_BYTE( "136073-1013.1cd", 0x020000, 0x010000, CRC(11d287c9) SHA1(a25095ab29a7103f2bf02d656414d9dab0b79215) )
 	ROM_LOAD16_BYTE( "136073-1014.3b",  0x020001, 0x010000, CRC(be15db42) SHA1(f3b1a676106e9956f62d3f36fbb1f849695ff771) )
 
-	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_REGION16_BE( 0x40000, "sac:dac", 0 )    /* 256k for 68000 sound code */
 	ROM_LOAD16_BYTE( "136064-1132.3cd", 0x000000, 0x010000, CRC(ca5ce8d8) SHA1(69dc83d43d8c9dc7ce3207e70f48fcfc5ddda0cc) )
 	ROM_LOAD16_BYTE( "136064-1133.1b",  0x000001, 0x010000, CRC(ffeb8746) SHA1(0d8d28b2d997ff3cf01b4ef25b75fa5a69754af4) )
 	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
@@ -1008,7 +941,7 @@ ROM_START( cyberbalt1 )
 	ROM_LOAD16_BYTE( "136073-1009.3m",  0x020000, 0x010000, CRC(3933e089) SHA1(4bd453bddabeafd07d193a1bc8ac0792e7aa99c3) )
 	ROM_LOAD16_BYTE( "136073-1010.3kl", 0x020001, 0x010000, CRC(e7a7cae8) SHA1(91e0c6a1b0c138a0e6a599011518fe10df44e76e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "sac:cpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136073-1029.2f",  0x000000, 0x010000, CRC(afee87e1) SHA1(da5e91167c68eecd2cb4436ac64cda14e5f6eae7) )
 
 	ROM_REGION( 0x40000, "extra", 0 )
@@ -1017,7 +950,7 @@ ROM_START( cyberbalt1 )
 	ROM_LOAD16_BYTE( "136073-1013.1cd", 0x020000, 0x010000, CRC(11d287c9) SHA1(a25095ab29a7103f2bf02d656414d9dab0b79215) )
 	ROM_LOAD16_BYTE( "136073-1014.3b",  0x020001, 0x010000, CRC(be15db42) SHA1(f3b1a676106e9956f62d3f36fbb1f849695ff771) )
 
-	ROM_REGION16_BE( 0x40000, "dac", 0 )    /* 256k for 68000 sound code */
+	ROM_REGION16_BE( 0x40000, "sac:dac", 0 )    /* 256k for 68000 sound code */
 	ROM_LOAD16_BYTE( "136064-1132.3cd", 0x000000, 0x010000, CRC(ca5ce8d8) SHA1(69dc83d43d8c9dc7ce3207e70f48fcfc5ddda0cc) )
 	ROM_LOAD16_BYTE( "136064-1133.1b",  0x000001, 0x010000, CRC(ffeb8746) SHA1(0d8d28b2d997ff3cf01b4ef25b75fa5a69754af4) )
 	ROM_LOAD16_BYTE( "136064-1134.1cd", 0x020000, 0x010000, CRC(bcbd4c00) SHA1(f0bfcdf0b5491e15872b543e99b834ae384cbf18) )
@@ -1061,7 +994,7 @@ ROM_END
 
 void cyberbal_state::init_cyberbalt()
 {
-	slapstic_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }
 
 

@@ -93,11 +93,11 @@ void ra17xx_device::device_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( ra17xx_device::io_w )
+void ra17xx_device::io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	assert(offset < 16);
 
-	m_bl = m_cpu->address_bus_r(space, 0) & 63;
+	m_bl = m_cpu->address_bus_r(space) & 63;
 
 	if (offset & 1)
 	{
@@ -138,7 +138,7 @@ WRITE8_MEMBER( ra17xx_device::io_w )
 }
 
 
-READ8_MEMBER( ra17xx_device::io_r )
+uint8_t ra17xx_device::io_r(offs_t offset)
 {
 	assert(offset < 16);
 	return (m_bl >= 16 || (m_iord(m_bl) & 1)) ? 0x0f : 0x07;

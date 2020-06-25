@@ -16,7 +16,7 @@ Sound Chips  :  OKI M5205 + YM3812
 Year + Game         Board#
 ---------------------------------------------------------------------------
 95  Cannon Ball      YS-ROCK-970712 or 940712?
-95  Magix / Rock     YS-ROCK-970712
+95  Magix / Rock     YS-ROCK-940712
 94? Rock Tris        YS-ROCK-940712
 ---------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ Notes:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(yunsung8_state::bankswitch_w)
+void yunsung8_state::bankswitch_w(uint8_t data)
 {
 	m_layers_ctrl = data & 0x30;    // Layers enable
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 		logerror("CPU #0 - PC %04X: Bank %02X\n", m_maincpu->pc(), data);
 }
 
-WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
+void yunsung8_state::main_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -102,7 +102,7 @@ void yunsung8_state::port_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
+void yunsung8_state::sound_bankswitch_w(uint8_t data)
 {
 	m_msm->reset_w(data & 0x20);
 
@@ -395,10 +395,11 @@ void yunsung8_state::yunsung8(machine_config &config)
 Magix
 Yun Sung, 1995
 
-YS-ROCK-970712
+YS-ROCK-940712
 +-------------------------------------+
 |VOL YM3014      6116               04|
 |     M5205 400KHz                  03|
+|                09                   |
 |     Z80A      CXK5118PN-15L       02|
 |      08       GM76C28-10          01|
 |    MCM2018AN45                      |
@@ -411,7 +412,7 @@ YS-ROCK-970712
 | U66         +--------+            06|
 |    HM6264                         05|
 |     07     HM6264                   |
-|    Z80B    YM3812           16MHz   |
+|    Z80B    YM3812   10      16MHz   |
 +-------------------------------------+
 
  Main CPU: Z80B
@@ -442,6 +443,10 @@ ROM_START( magix )
 	ROM_REGION( 0x40000, "text", 0 )    /* Text */
 	ROM_LOAD( "yunsung8.05", 0x00000, 0x20000, CRC(862d378c) SHA1(a4e2cf14b5b25c6b8725dd285ddea65ce9ee257a) )   // only first $8000 bytes != 0
 	ROM_LOAD( "yunsung8.06", 0x20000, 0x20000, CRC(8b2ab901) SHA1(1a5c05dd0cf830b645357a62d8e6e876b44c6b7f) )   // only first $8000 bytes != 0
+
+	ROM_REGION( 0x0002, "plds", 0 ) /* PAL's and GAL's */
+	ROM_LOAD( "palce20v8h.09", 0x0000, 0x0001, NO_DUMP ) /* PALCE20V8H-25PC/4 - security fuse blown */
+	ROM_LOAD( "palce20v8h.10", 0x0000, 0x0001, NO_DUMP ) /* PALCE20V8H-25PC/4 - security fuse blown */
 ROM_END
 
 /***************************************************************************
@@ -470,6 +475,10 @@ ROM_START( magixb )
 	ROM_REGION( 0x40000, "text", 0 )    /* Text */
 	ROM_LOAD( "5.bin", 0x00000, 0x20000, CRC(11b99819) SHA1(4b20feea227cefd2e905601d934538a13ba6685b) ) // only first $8000 bytes != 0
 	ROM_LOAD( "6.bin", 0x20000, 0x20000, CRC(361a864c) SHA1(e0bb78b49fc3d461d6ac46ad97a9d04112783132) ) // only first $8000 bytes != 0
+
+	ROM_REGION( 0x0002, "plds", 0 ) /* PAL's and GAL's */
+	ROM_LOAD( "palce20v8h.09", 0x0000, 0x0001, NO_DUMP ) /* PALCE20V8H-25PC/4 - security fuse blown */
+	ROM_LOAD( "palce20v8h.10", 0x0000, 0x0001, NO_DUMP ) /* PALCE20V8H-25PC/4 - security fuse blown */
 ROM_END
 
 

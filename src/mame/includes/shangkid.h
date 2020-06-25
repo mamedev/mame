@@ -59,17 +59,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_1_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_2_w);
-	DECLARE_WRITE8_MEMBER(nmiq_1_w);
-	DECLARE_WRITE8_MEMBER(nmiq_2_w);
+	void nmiq_1_w(uint8_t data);
+	void nmiq_2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	uint8_t soundlatch_r();
+	void videoram_w(offs_t offset, uint8_t data);
+	void ay8910_portb_w(uint8_t data);
 
 	// game specific
-	DECLARE_WRITE8_MEMBER(chinhero_ay8910_porta_w);
-	DECLARE_WRITE8_MEMBER(shangkid_ay8910_porta_w);
+	void chinhero_ay8910_porta_w(uint8_t data);
+	void shangkid_ay8910_porta_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

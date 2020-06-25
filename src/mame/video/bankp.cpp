@@ -79,36 +79,36 @@ void bankp_state::bankp_palette(palette_device &palette) const
 	// the bottom half of the PROM seems to be not used
 }
 
-WRITE8_MEMBER(bankp_state::scroll_w)
+void bankp_state::scroll_w(uint8_t data)
 {
 	m_scroll_x = data;
 }
 
-WRITE8_MEMBER(bankp_state::videoram_w)
+void bankp_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::colorram_w)
+void bankp_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::videoram2_w)
+void bankp_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::colorram2_w)
+void bankp_state::colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::out_w)
+void bankp_state::out_w(uint8_t data)
 {
 	/* bits 0-1 are playfield priority */
 	/* TODO: understand how this works */
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
 	int color = m_colorram2[tile_index] >> 4;
 	int flags = (m_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.group = color;
 }
 
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
 	int color = m_colorram[tile_index] >> 3;
 	int flags = (m_colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 	tileinfo.group = color;
 }
 

@@ -178,13 +178,13 @@ public:
 
 private:
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
-	DECLARE_READ8_MEMBER(keypad_key_r);
-	DECLARE_WRITE8_MEMBER(led_digit_w);
-	DECLARE_WRITE8_MEMBER(led_segment_w);
+	uint8_t keypad_key_r();
+	void led_digit_w(uint8_t data);
+	void led_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(led_update);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_WRITE8_MEMBER(trace_timer_w);
-	DECLARE_READ8_MEMBER(trace_timer_r);
+	void page_w(uint8_t data);
+	void trace_timer_w(uint8_t data);
+	uint8_t trace_timer_r();
 
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -230,7 +230,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(acia_cas_clock300_w);
 	DECLARE_WRITE_LINE_MEMBER(acia_cas_clock1200_w);
-	DECLARE_READ8_MEMBER(pia_io2a_r);
+	uint8_t pia_io2a_r();
 
 	required_device<pia6821_device> m_pia_io1;
 	required_device<pia6821_device> m_pia_io2;
@@ -249,8 +249,8 @@ private:
 
 	// MEK68R2
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(r2_pia_pa_r);
-	DECLARE_READ8_MEMBER(r2_pia_pb_r);
+	uint8_t r2_pia_pa_r();
+	uint8_t r2_pia_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(r2_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(r2_vsync_changed);
 	DECLARE_READ_LINE_MEMBER(r2_pia_cb1_r);
@@ -456,7 +456,7 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-WRITE8_MEMBER(mekd3_state::page_w)
+void mekd3_state::page_w(uint8_t data)
 {
 	m_rom_page = data & 0x07;
 	// TODO switch the ROM bank entry.
@@ -470,13 +470,13 @@ WRITE8_MEMBER(mekd3_state::page_w)
 
 ************************************************************/
 
-WRITE8_MEMBER(mekd3_state::trace_timer_w)
+void mekd3_state::trace_timer_w(uint8_t data)
 {
 	m_trace = data;
 	m_kpd_pia->ca1_w(data);
 }
 
-READ8_MEMBER(mekd3_state::trace_timer_r)
+uint8_t mekd3_state::trace_timer_r()
 {
 	return m_trace;
 }
@@ -529,7 +529,7 @@ READ_LINE_MEMBER(mekd3_state::keypad_cb1_r)
 	return mekd3_state::keypad_key_pressed();
 }
 
-READ8_MEMBER(mekd3_state::keypad_key_r)
+uint8_t mekd3_state::keypad_key_r()
 {
 	uint8_t mux = (m_digit & 0xc0) >> 6;
 	uint8_t i = (m_keypad_columns[mux]->read() & m_digit) ? 0 : 0x80;
@@ -544,14 +544,14 @@ READ8_MEMBER(mekd3_state::keypad_key_r)
 ************************************************************/
 
 // PA
-WRITE8_MEMBER(mekd3_state::led_segment_w)
+void mekd3_state::led_segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 	m_display->matrix(m_digit, m_segment);
 }
 
 // PB
-WRITE8_MEMBER(mekd3_state::led_digit_w)
+void mekd3_state::led_digit_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(m_digit, m_segment);
@@ -749,7 +749,7 @@ WRITE_LINE_MEMBER(mekd3_state::acia_cas_clock1200_w)
 	m_acia_cas->write_rxc(state);
 }
 
-READ8_MEMBER(mekd3_state::pia_io2a_r)
+uint8_t mekd3_state::pia_io2a_r()
 {
 	uint32_t console_enable = m_console_enable->read();
 
@@ -786,7 +786,7 @@ void mekd3_state::kbd_put(uint8_t data)
 
 // PA0 to PA6 - Keyboard data.
 // PA7 - Display nationality, 0 USA, 1 Europe.
-READ8_MEMBER(mekd3_state::r2_pia_pa_r)
+uint8_t mekd3_state::r2_pia_pa_r()
 {
 	uint8_t ret = m_term_data;
 	int8_t display_nationality = m_r2_display_nationality->read();
@@ -803,7 +803,7 @@ READ8_MEMBER(mekd3_state::r2_pia_pa_r)
 //       01 - 16 lines of 64 characters.
 //       10 - 20 lines of 80 characters.
 //       11 - User defined.
-READ8_MEMBER(mekd3_state::r2_pia_pb_r)
+uint8_t mekd3_state::r2_pia_pb_r()
 {
 	int8_t display_format = m_r2_display_format->read();
 	int8_t mode = m_r2_mode->read();

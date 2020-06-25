@@ -22,8 +22,8 @@ class pc_keyboard_device : public device_t
 public:
 	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE_LINE_MEMBER(enable);
+	uint8_t read();
+	void enable(int state);
 
 	auto keypress() { return m_out_keypress_func.bind(); }
 
@@ -84,7 +84,7 @@ public:
 
 	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(uint8_t data);
 
 	void set_type(KEYBOARD_TYPE type, int default_set) { m_scan_code_set = default_set; m_type = type; }
 

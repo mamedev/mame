@@ -35,7 +35,8 @@ note: XTAL goes to 4020, 4020 /2 goes to CPU clock, and other dividers to
 IRQ and beeper. On A0, IRQ is active for ~31.2us.
 
 P(A1) + M(A0) (Princhess)
-- dual-module, each module has its own 6502
+- dual-module, each module has its own 6502 - need verification, more likely
+  2nd module has no CPU
 - ?
 
 T8 (Plymate Amsterdam)
@@ -101,9 +102,9 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	u8 input_r();
+	void leds_w(offs_t offset, u8 data);
+	void sound_w(u8 data);
 
 	u8 m_inp_mux = 0;
 };
@@ -119,7 +120,7 @@ void conchess_state::machine_start()
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(conchess_state::input_r)
+u8 conchess_state::input_r()
 {
 	u8 data = 0;
 
@@ -134,7 +135,7 @@ READ8_MEMBER(conchess_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(conchess_state::leds_w)
+void conchess_state::leds_w(offs_t offset, u8 data)
 {
 	// a0-a3: CD4028B to led select/input mux
 	m_inp_mux = offset;
@@ -145,7 +146,7 @@ WRITE8_MEMBER(conchess_state::leds_w)
 	m_display->matrix(1 << m_inp_mux, data);
 }
 
-WRITE8_MEMBER(conchess_state::sound_w)
+void conchess_state::sound_w(u8 data)
 {
 	// d7: enable beeper
 	m_beeper->set_state(BIT(data, 7));

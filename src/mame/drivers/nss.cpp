@@ -337,28 +337,26 @@ private:
 	uint8_t m_cart_sel;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_wp_r);
-	DECLARE_WRITE8_MEMBER(ram_wp_w);
-	DECLARE_READ8_MEMBER(nss_prot_r);
-	DECLARE_WRITE8_MEMBER(nss_prot_w);
+	uint8_t ram_wp_r(offs_t offset);
+	void ram_wp_w(offs_t offset, uint8_t data);
+	uint8_t nss_prot_r();
+	void nss_prot_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(port_00_r);
-	DECLARE_WRITE8_MEMBER(port_00_w);
-	DECLARE_WRITE8_MEMBER(port_01_w);
-	DECLARE_WRITE8_MEMBER(port_02_w);
-	DECLARE_WRITE8_MEMBER(port_03_w);
-	DECLARE_WRITE8_MEMBER(port_04_w);
-	DECLARE_WRITE8_MEMBER(port_07_w);
+	uint8_t port_00_r();
+	void port_00_w(uint8_t data);
+	void port_01_w(uint8_t data);
+	void port_02_w(uint8_t data);
+	void port_03_w(uint8_t data);
+	void port_04_w(uint8_t data);
+	void port_07_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
-	DECLARE_READ8_MEMBER(spc_ram_100_r);
-	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void snes_map(address_map &map);
-	void spc_mem(address_map &map);
+	void spc_map(address_map &map);
 };
 
 
@@ -374,25 +372,13 @@ uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, 
 void nss_state::snes_map(address_map &map)
 {
 	map(0x000000, 0x7dffff).rw(FUNC(nss_state::snes_r_bank1), FUNC(nss_state::snes_w_bank1));
-	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x7e0000, 0x7fffff).ram().share("wram");                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 	map(0x800000, 0xffffff).rw(FUNC(nss_state::snes_r_bank2), FUNC(nss_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
-READ8_MEMBER(nss_state::spc_ram_100_r)
+void nss_state::spc_map(address_map &map)
 {
-	return m_spc700->spc_ram_r(offset + 0x100);
-}
-
-WRITE8_MEMBER(nss_state::spc_ram_100_w)
-{
-	m_spc700->spc_ram_w(offset + 0x100, data);
-}
-
-void nss_state::spc_mem(address_map &map)
-{
-	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
-	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(FUNC(nss_state::spc_ram_100_r), FUNC(nss_state::spc_ram_100_w));
+	map(0x0000, 0xffff).ram().share("aram");
 }
 
 /* NSS specific */
@@ -474,19 +460,19 @@ SNES part:
 
 */
 
-READ8_MEMBER(nss_state::ram_wp_r)
+uint8_t nss_state::ram_wp_r(offs_t offset)
 {
 	return m_wram[offset];
 }
 
-WRITE8_MEMBER(nss_state::ram_wp_w)
+void nss_state::ram_wp_w(offs_t offset, uint8_t data)
 {
 	if(m_wram_wp_flag)
 		m_wram[offset] = data;
 }
 
 
-READ8_MEMBER(nss_state::nss_prot_r)
+uint8_t nss_state::nss_prot_r()
 {
 	int data = 0xe7;
 
@@ -499,7 +485,7 @@ READ8_MEMBER(nss_state::nss_prot_r)
 	return data;
 }
 
-WRITE8_MEMBER(nss_state::nss_prot_w)
+void nss_state::nss_prot_w(uint8_t data)
 {
 	if (m_cart_sel == 0)
 	{
@@ -522,7 +508,7 @@ void nss_state::bios_map(address_map &map)
 	map(0xe000, 0xffff).rw(FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
 }
 
-READ8_MEMBER(nss_state::port_00_r)
+uint8_t nss_state::port_00_r()
 {
 /*
     x--- ----   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
@@ -549,7 +535,7 @@ READ8_MEMBER(nss_state::port_00_r)
 	return res;
 }
 
-WRITE8_MEMBER(nss_state::port_00_w)
+void nss_state::port_00_w(uint8_t data)
 {
 /*
     xxxx ---- Unknown/unused      (should be always 0)
@@ -565,7 +551,7 @@ WRITE8_MEMBER(nss_state::port_00_w)
 
 }
 
-WRITE8_MEMBER(nss_state::port_01_w)
+void nss_state::port_01_w(uint8_t data)
 {
 /*
     x--- ---- Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
@@ -577,7 +563,7 @@ WRITE8_MEMBER(nss_state::port_01_w)
     ---- ---x Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
 */
 	m_input_disabled = BIT(data, 7) ^ 1;
-	m_spc700->set_volume((data & 0x20) ? 0.0 : 100.0);
+	m_s_dsp->set_volume((data & 0x20) ? 0.0 : 100.0);
 
 	m_cart_sel = (data & 0xc) >> 2;
 
@@ -587,10 +573,10 @@ WRITE8_MEMBER(nss_state::port_01_w)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	/* also reset the device */
 	if (!(data & 1))
-		m_spc700->reset();
+		m_s_dsp->reset();
 }
 
-WRITE8_MEMBER(nss_state::port_02_w)
+void nss_state::port_02_w(uint8_t data)
 {
 /*
     x--- ----  OSD Clock ?       (usually same as Bit6)  ;\Chip Select when Bit6=Bit7 ?
@@ -606,7 +592,7 @@ WRITE8_MEMBER(nss_state::port_02_w)
 	ioport("RTC_OSD")->write(data, 0xff);
 }
 
-WRITE8_MEMBER(nss_state::port_03_w)
+void nss_state::port_03_w(uint8_t data)
 {
 /*
     x--- ----     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
@@ -621,13 +607,13 @@ WRITE8_MEMBER(nss_state::port_03_w)
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(nss_state::port_04_w)
+void nss_state::port_04_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
-WRITE8_MEMBER(nss_state::port_07_w)
+void nss_state::port_07_w(uint8_t data)
 {
 	m_joy_flag = 1;
 }
@@ -839,8 +825,10 @@ void nss_state::nss(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nss_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &nss_state::spc_mem);
+	S_SMP(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_DATA, &nss_state::spc_map);
+	m_soundcpu->dsp_io_read_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_r));
+	m_soundcpu->dsp_io_write_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_w));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -857,9 +845,11 @@ void nss_state::nss(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
-	m_spc700->add_route(0, "lspeaker", 1.00);
-	m_spc700->add_route(1, "rspeaker", 1.00);
+
+	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	m_s_dsp->set_addrmap(0, &nss_state::spc_map);
+	m_s_dsp->add_route(0, "lspeaker", 1.00);
+	m_s_dsp->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
@@ -892,8 +882,6 @@ void nss_state::nss(machine_config &config)
 ***************************************************************************/
 
 #define NSS_BIOS \
-	ROM_REGION(0x100,           "sound_ipl", 0)     /* IPL ROM */ \
-	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION(0x8000,         "bios",  0)      /* Bios CPU */ \
 	ROM_SYSTEM_BIOS( 0, "single", "Nintendo Super System (Single Cart BIOS)" ) \
 	ROMX_LOAD("nss-ic14.02.ic14", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(0) )   /* bios */ \

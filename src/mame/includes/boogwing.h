@@ -48,17 +48,18 @@ public:
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	uint16_t m_priority;
+	bitmap_ind16 m_temp_bitmap;
 	bitmap_ind16 m_alpha_tmap_bitmap;
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(priority_w);
+	void sound_bankswitch_w(uint8_t data);
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void init_boogwing();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );
+	uint16_t boogwing_protection_region_0_104_r(offs_t offset);
+	void boogwing_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);

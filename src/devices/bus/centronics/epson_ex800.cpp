@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /******************************************************************************
 
@@ -372,25 +372,25 @@ void epson_ex800_device::device_reset()
 }
 
 
-READ8_MEMBER(epson_ex800_device::porta_r)
+uint8_t epson_ex800_device::porta_r()
 {
 	logerror("PA R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
-READ8_MEMBER(epson_ex800_device::portb_r)
+uint8_t epson_ex800_device::portb_r()
 {
 	logerror("PB R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
-READ8_MEMBER(epson_ex800_device::portc_r)
+uint8_t epson_ex800_device::portc_r()
 {
 	logerror("PC R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::porta_w)
+void epson_ex800_device::porta_w(uint8_t data)
 {
 	if (PA6) logerror("BNK0 selected.\n");
 	if (PA7) logerror("BNK1 selected.\n");
@@ -398,7 +398,7 @@ WRITE8_MEMBER(epson_ex800_device::porta_w)
 	logerror("PA W %x %s\n", data, machine().describe_context());
 }
 
-WRITE8_MEMBER(epson_ex800_device::portb_w)
+void epson_ex800_device::portb_w(uint8_t data)
 {
 	if (data & 3)
 		logerror("PB0/1 Line feed %s\n", machine().describe_context());
@@ -422,7 +422,7 @@ WRITE8_MEMBER(epson_ex800_device::portb_w)
 //  logerror("PB W %x %s\n", data, machine().describe_context());
 }
 
-WRITE8_MEMBER(epson_ex800_device::portc_w)
+void epson_ex800_device::portc_w(uint8_t data)
 {
 	if (data & 0x80)
 		m_beeper->set_state(0);
@@ -435,46 +435,46 @@ WRITE8_MEMBER(epson_ex800_device::portc_w)
 
 /* Memory mapped I/O access */
 
-READ8_MEMBER(epson_ex800_device::devsel_r)
+uint8_t epson_ex800_device::devsel_r(offs_t offset)
 {
 	logerror("DEVSEL R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::devsel_w)
+void epson_ex800_device::devsel_w(offs_t offset, uint8_t data)
 {
 	logerror("DEVSEL W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
-READ8_MEMBER(epson_ex800_device::gate5a_r)
+uint8_t epson_ex800_device::gate5a_r(offs_t offset)
 {
 	logerror("GATE5A R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::gate5a_w)
+void epson_ex800_device::gate5a_w(offs_t offset, uint8_t data)
 {
 	logerror("GATE5A W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
-READ8_MEMBER(epson_ex800_device::iosel_r)
+uint8_t epson_ex800_device::iosel_r(offs_t offset)
 {
 	logerror("IOSEL R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::iosel_w)
+void epson_ex800_device::iosel_w(offs_t offset, uint8_t data)
 {
 	logerror("IOSEL W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
-READ8_MEMBER(epson_ex800_device::gate7a_r)
+uint8_t epson_ex800_device::gate7a_r(offs_t offset)
 {
 	logerror("GATE7A R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::gate7a_w)
+void epson_ex800_device::gate7a_w(offs_t offset, uint8_t data)
 {
 	logerror("GATE7A W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }

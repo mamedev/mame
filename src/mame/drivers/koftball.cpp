@@ -70,11 +70,11 @@ private:
 	tilemap_t *m_tilemap_2;
 	uint16_t m_prot_data;
 
-	DECLARE_READ16_MEMBER(random_number_r);
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
-	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
+	uint16_t random_number_r();
+	uint16_t prot_r();
+	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bmc_1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bmc_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
@@ -88,7 +88,7 @@ private:
 TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
 {
 	int data = m_bmc_1_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data,
 			0,
 			0);
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
 TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 {
 	int data = m_bmc_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data,
 			0,
 			0);
@@ -118,13 +118,13 @@ uint32_t koftball_state::screen_update_koftball(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ16_MEMBER(koftball_state::random_number_r)
+uint16_t koftball_state::random_number_r()
 {
 	return machine().rand();
 }
 
 
-READ16_MEMBER(koftball_state::prot_r)
+uint16_t koftball_state::prot_r()
 {
 	switch(m_prot_data)
 	{
@@ -138,18 +138,18 @@ READ16_MEMBER(koftball_state::prot_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(koftball_state::prot_w)
+void koftball_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_data);
 }
 
-WRITE16_MEMBER(koftball_state::bmc_1_videoram_w)
+void koftball_state::bmc_1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bmc_1_videoram[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
+void koftball_state::bmc_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bmc_2_videoram[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);

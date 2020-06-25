@@ -29,14 +29,14 @@ public:
 	virtual ~device_vsmile_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(bank0_r) { return 0; }
-	virtual DECLARE_READ16_MEMBER(bank1_r) { return 0; }
-	virtual DECLARE_READ16_MEMBER(bank2_r) { return 0; }
-	virtual DECLARE_READ16_MEMBER(bank3_r) { return 0; }
-	virtual DECLARE_WRITE16_MEMBER(bank0_w) { }
-	virtual DECLARE_WRITE16_MEMBER(bank1_w) { }
-	virtual DECLARE_WRITE16_MEMBER(bank2_w) { }
-	virtual DECLARE_WRITE16_MEMBER(bank3_w) { }
+	virtual uint16_t bank0_r(offs_t offset) { return 0; }
+	virtual uint16_t bank1_r(offs_t offset) { return 0; }
+	virtual uint16_t bank2_r(offs_t offset) { return 0; }
+	virtual uint16_t bank3_r(offs_t offset) { return 0; }
+	virtual void bank0_w(offs_t offset, uint16_t data) { }
+	virtual void bank1_w(offs_t offset, uint16_t data) { }
+	virtual void bank2_w(offs_t offset, uint16_t data) { }
+	virtual void bank3_w(offs_t offset, uint16_t data) { }
 
 	// banking
 	virtual void set_cs2(bool cs2) = 0;
@@ -101,14 +101,14 @@ public:
 	uint32_t get_rom_size() { return m_cart ? m_cart->get_rom_size() : 0; }
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(bank0_r);
-	virtual DECLARE_READ16_MEMBER(bank1_r);
-	virtual DECLARE_READ16_MEMBER(bank2_r);
-	virtual DECLARE_READ16_MEMBER(bank3_r);
-	virtual DECLARE_WRITE16_MEMBER(bank0_w);
-	virtual DECLARE_WRITE16_MEMBER(bank1_w);
-	virtual DECLARE_WRITE16_MEMBER(bank2_w);
-	virtual DECLARE_WRITE16_MEMBER(bank3_w);
+	uint16_t bank0_r(offs_t offset);
+	uint16_t bank1_r(offs_t offset);
+	uint16_t bank2_r(offs_t offset);
+	uint16_t bank3_r(offs_t offset);
+	void bank0_w(offs_t offset, uint16_t data);
+	void bank1_w(offs_t offset, uint16_t data);
+	void bank2_w(offs_t offset, uint16_t data);
+	void bank3_w(offs_t offset, uint16_t data);
 
 	// banking
 	void set_cs2(bool cs2);

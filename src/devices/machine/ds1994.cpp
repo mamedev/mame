@@ -53,6 +53,7 @@ ds1994_device::ds1994_device(const machine_config &mconfig, const char *tag, dev
 	, m_rx(false)
 	, m_tx(false)
 	, m_state_ptr(0)
+	, m_offs_ro(false)
 {
 	memset(m_ram, 0, sizeof(m_ram));
 }

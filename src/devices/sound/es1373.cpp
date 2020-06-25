@@ -426,7 +426,7 @@ uint32_t es1373_device::calc_size(const uint8_t &format)
 	return 0;
 }
 
-READ32_MEMBER (es1373_device::reg_r)
+uint32_t es1373_device::reg_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_es_regs[offset];
 	switch (offset) {
@@ -489,7 +489,7 @@ READ32_MEMBER (es1373_device::reg_r)
 	return result;
 }
 
-WRITE32_MEMBER(es1373_device::reg_w)
+void es1373_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_es_regs[offset]);
 	switch (offset) {

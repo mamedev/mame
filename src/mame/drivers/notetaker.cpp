@@ -163,25 +163,25 @@ private:
 	// screen
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
-	DECLARE_WRITE16_MEMBER(IPConReg_w);
-	DECLARE_WRITE16_MEMBER(EPConReg_w);
-	DECLARE_WRITE16_MEMBER(FIFOReg_w);
-	DECLARE_WRITE16_MEMBER(FIFOBus_w);
-	DECLARE_WRITE16_MEMBER(DiskReg_w);
-	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
+	void IPConReg_w(uint16_t data);
+	void EPConReg_w(uint16_t data);
+	void FIFOReg_w(uint16_t data);
+	void FIFOBus_w(uint16_t data);
+	void DiskReg_w(uint16_t data);
+	void LoadDispAddr_w(uint16_t data);
 
 	// uarts
-	DECLARE_READ16_MEMBER(ReadOPStatus_r);
-	DECLARE_WRITE16_MEMBER(LoadKeyCtlReg_w);
-	DECLARE_WRITE16_MEMBER(KeyDataReset_w);
-	DECLARE_WRITE16_MEMBER(KeyChipReset_w);
-	DECLARE_READ16_MEMBER(ReadEIAStatus_r);
-	DECLARE_WRITE16_MEMBER(LoadEIACtlReg_w);
-	DECLARE_WRITE16_MEMBER(EIADataReset_w);
-	DECLARE_WRITE16_MEMBER(EIAChipReset_w);
+	uint16_t ReadOPStatus_r();
+	void LoadKeyCtlReg_w(uint16_t data);
+	void KeyDataReset_w(uint16_t data);
+	void KeyChipReset_w(uint16_t data);
+	uint16_t ReadEIAStatus_r();
+	void LoadEIACtlReg_w(uint16_t data);
+	void EIADataReset_w(uint16_t data);
+	void EIAChipReset_w(uint16_t data);
 	// mem map stuff
-	DECLARE_READ16_MEMBER(iop_r);
-	DECLARE_WRITE16_MEMBER(iop_w);
+	uint16_t iop_r(offs_t offset);
+	void iop_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ep_mainram_r(offs_t offset, uint16_t mem_mask);
 	void ep_mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	//variables
@@ -310,7 +310,7 @@ uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE16_MEMBER(notetaker_state::IPConReg_w)
+void notetaker_state::IPConReg_w(uint16_t data)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
 	m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
@@ -325,7 +325,7 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 
 /* handlers for the two system hd6402s (ay-5-1013 equivalent) */
 /* * Keyboard hd6402 */
-READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
+uint16_t notetaker_state::ReadOPStatus_r() // 74ls368 hex inverter at #l7 provides 4 bits, inverted
 {
 	uint16_t data = 0xFFF0;
 	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
@@ -339,7 +339,7 @@ READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 
 	return data;
 }
 
-WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
+void notetaker_state::LoadKeyCtlReg_w(uint16_t data)
 {
 	m_kbduart->write_cs(0);
 	m_kbduart->write_np(BIT(data, 4)); // PI - pin 35
@@ -350,20 +350,20 @@ WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
 	m_kbduart->write_cs(1);
 }
 
-WRITE16_MEMBER( notetaker_state::KeyDataReset_w )
+void notetaker_state::KeyDataReset_w(uint16_t data)
 {
 	m_kbduart->write_rdav(0); // DDR - pin 18
 	m_kbduart->write_rdav(1); // ''
 }
 
-WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
+void notetaker_state::KeyChipReset_w(uint16_t data)
 {
 	m_kbduart->write_xr(0); // MR - pin 21
 	m_kbduart->write_xr(1); // ''
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
-WRITE16_MEMBER(notetaker_state::FIFOReg_w)
+void notetaker_state::FIFOReg_w(uint16_t data)
 {
 	m_SetSH = (data&0x8000)?1:0;
 	m_SHConA = (data&0x4000)?1:0;
@@ -382,7 +382,7 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, ((((960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
-WRITE16_MEMBER(notetaker_state::FIFOBus_w)
+void notetaker_state::FIFOBus_w(uint16_t data)
 {
 	if (m_outfifo_count == 16)
 	{
@@ -397,7 +397,7 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 	m_outfifo_head_ptr&=0xF;
 }
 
-WRITE16_MEMBER( notetaker_state::DiskReg_w )
+void notetaker_state::DiskReg_w(uint16_t data)
 {
 	/* See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf
 	   but note that bit 12 (called bit 3 in documentation) was changed between
@@ -451,14 +451,14 @@ WRITE16_MEMBER( notetaker_state::DiskReg_w )
 	//TODO
 }
 
-WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
+void notetaker_state::LoadDispAddr_w(uint16_t data)
 {
 	m_DispAddr = data;
 	// for future low level emulation: clear the current counter position here as well, as well as empty/reset the display fifo, and the setmemrq state.
 }
 
 /* EIA hd6402 */
-READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
+uint16_t notetaker_state::ReadEIAStatus_r() // 74ls368 hex inverter at #f1 provides 2 bits, inverted
 {
 	uint16_t data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
@@ -467,7 +467,7 @@ READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1
 	return data;
 }
 
-WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
+void notetaker_state::LoadEIACtlReg_w(uint16_t data)
 {
 	m_eiauart->write_cs(0);
 	m_eiauart->write_np(BIT(data, 4)); // PI - pin 35
@@ -478,13 +478,13 @@ WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
 	m_eiauart->write_cs(1);
 }
 
-WRITE16_MEMBER( notetaker_state::EIADataReset_w )
+void notetaker_state::EIADataReset_w(uint16_t data)
 {
 	m_eiauart->write_rdav(0); // DDR - pin 18
 	m_eiauart->write_rdav(1); // ''
 }
 
-WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
+void notetaker_state::EIAChipReset_w(uint16_t data)
 {
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
@@ -492,7 +492,7 @@ WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 
 
 /* These next two members are memory map related for the iop */
-READ16_MEMBER(notetaker_state::iop_r)
+uint16_t notetaker_state::iop_r(offs_t offset)
 {
 	uint16_t *rom = (uint16_t *)(memregion("iop")->base());
 	rom += 0x7f800;
@@ -511,7 +511,7 @@ READ16_MEMBER(notetaker_state::iop_r)
 	}
 }
 
-WRITE16_MEMBER(notetaker_state::iop_w)
+void notetaker_state::iop_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//uint16_t tempword;
 	uint16_t *ram = m_mainram.get();
@@ -680,7 +680,7 @@ read from 0x44 (byte wide) to check input fifo status
 
 /* Emulator CPU */
 
-WRITE16_MEMBER(notetaker_state::EPConReg_w)
+void notetaker_state::EPConReg_w(uint16_t data)
 {
 	/*m_EP_LED1 = m_EP_ParityError; // if parity checking is enabled AND the last access was to the low 8k AND there was a parity error, the parity error latch is latched here. It triggers an interrupt.
 	m_EP_LED2 = (data&0x40)?1:0;
@@ -793,14 +793,14 @@ void notetaker_state::iop_reset()
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg ls273 latch at #f1
-	IPConReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	IPConReg_w(0x0000);
 	// Clear the DAC FIFO
 	for (int i=0; i<16; i++) m_outfifo[i] = 0;
 	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	// reset the FIFOReg latch at #h9
-	FIFOReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	FIFOReg_w(0x0000);
 	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
-	DiskReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	DiskReg_w(0x0000);
 	// reset the framebuffer display address counter:
 	m_DispAddr = 0;
 }

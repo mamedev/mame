@@ -168,12 +168,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_READ8_MEMBER( pia1_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia1_kbA_w );
-	DECLARE_READ8_MEMBER( pia1_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia1_kbB_w );
+	uint8_t pia_r(offs_t offset);
+	void pia_w(offs_t offset, uint8_t data);
+	uint8_t pia1_kbA_r();
+	void pia1_kbA_w(uint8_t data);
+	uint8_t pia1_kbB_r();
+	void pia1_kbB_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( pia1_ca1_r );
 	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
@@ -248,7 +248,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 /* PIA write - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-WRITE8_MEMBER( e100_state::pia_w )
+void e100_state::pia_w(offs_t offset, uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 	if ((offset & 0x08) == 0x08)
@@ -272,7 +272,7 @@ WRITE8_MEMBER( e100_state::pia_w )
 }
 
 /* PIA read  - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-READ8_MEMBER( e100_state::pia_r )
+uint8_t e100_state::pia_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -301,12 +301,12 @@ READ8_MEMBER( e100_state::pia_r )
 	return data;
 }
 
-WRITE8_MEMBER( e100_state::pia1_kbA_w )
+void e100_state::pia1_kbA_w(uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
-READ8_MEMBER( e100_state::pia1_kbA_r )
+uint8_t e100_state::pia1_kbA_r()
 {
 	int ls145;
 	uint8_t pa = 0x00;
@@ -365,7 +365,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
 #define SERIAL_IN  0x20
 #define CASS_OUT   0x40
 #define CASS_IN    0x80
-WRITE8_MEMBER( e100_state::pia1_kbB_w )
+void e100_state::pia1_kbB_w(uint8_t data)
 {
 	uint8_t col;
 
@@ -382,7 +382,7 @@ WRITE8_MEMBER( e100_state::pia1_kbB_w )
 	m_rs232->write_txd(data & SERIAL_OUT ? 0 : 1);
 }
 
-READ8_MEMBER( e100_state::pia1_kbB_r )
+uint8_t e100_state::pia1_kbB_r()
 {
 	m_pia1_B &= ~(CASS_IN|SERIAL_IN);
 

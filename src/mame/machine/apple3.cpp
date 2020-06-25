@@ -814,12 +814,8 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 		{
 			rv = m_bank9[offset - 0xc100];
 		}
-		else
+		else if (!machine().side_effects_disabled())
 		{
-			if (machine().side_effects_disabled())
-			{
-				return 0xff;
-			}
 			/* now identify the device */
 			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card((offset>>8) & 0x7);
 
@@ -852,15 +848,15 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 				{
 					m_cnxx_slot = -1;
 				}
+			}
 
-				if (m_cnxx_slot != -1)
+			if (m_cnxx_slot != -1)
+			{
+				device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
+
+				if (slotdevice != nullptr)
 				{
-					device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
-
-					if (slotdevice != nullptr)
-					{
-						rv = slotdevice->read_c800(offset&0x7ff);
-					}
+					rv = slotdevice->read_c800(offset&0x7ff);
 				}
 			}
 		}

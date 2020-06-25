@@ -135,38 +135,38 @@ void s32comm_device::device_reset()
 	m_fg = 0;
 }
 
-READ8_MEMBER(s32comm_device::zfg_r)
+uint8_t s32comm_device::zfg_r(offs_t offset)
 {
 	uint8_t result = m_zfg | 0xFE;
 	LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(s32comm_device::zfg_w)
+void s32comm_device::zfg_w(uint8_t data)
 {
 	LOG("s32comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
-READ8_MEMBER(s32comm_device::share_r)
+uint8_t s32comm_device::share_r(offs_t offset)
 {
 	uint8_t result = m_shared[offset];
 	LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(s32comm_device::share_w)
+void s32comm_device::share_w(offs_t offset, uint8_t data)
 {
 	LOG("s32comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(s32comm_device::cn_r)
+uint8_t s32comm_device::cn_r()
 {
 	return m_cn | 0xFE;
 }
 
-WRITE8_MEMBER(s32comm_device::cn_w)
+void s32comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -195,12 +195,12 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 #endif
 }
 
-READ8_MEMBER(s32comm_device::fg_r)
+uint8_t s32comm_device::fg_r()
 {
 	return m_fg | (~m_zfg << 7) | 0x7E;
 }
 
-WRITE8_MEMBER(s32comm_device::fg_w)
+void s32comm_device::fg_w(uint8_t data)
 {
 	if (!m_cn)
 		return;

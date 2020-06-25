@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
 	code = m_videoram_pg[m_videoram_pg_index][tile_index];
 	col = (code >> 5);
 	col = col | 0x08 | (m_palette_bank << 4);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			col,
 			0);
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 	code = m_videoram_pg[m_videoram_pg_index][tile_index + 0x800];
 	col = (code >> 5);
 	col = col | 0x00 | (m_palette_bank << 4);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			col,
 			0);
@@ -211,7 +211,7 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
+void phoenix_state::phoenix_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 }
 
 
-WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
+void phoenix_state::phoenix_videoreg_w(uint8_t data)
 {
 	if (m_videoram_pg_index != (data & 1))
 	{
@@ -253,7 +253,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 	}
 }
 
-WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
+void phoenix_state::pleiads_videoreg_w(uint8_t data)
 {
 	if (m_videoram_pg_index != (data & 1))
 	{
@@ -284,11 +284,11 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 	m_pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	m_pleiads_custom->control_c_w(space, offset, data);
+	m_pleiads_custom->control_c_w(data);
 }
 
 
-WRITE8_MEMBER(phoenix_state::phoenix_scroll_w)
+void phoenix_state::phoenix_scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0,data);
 }
@@ -350,7 +350,7 @@ READ_LINE_MEMBER(phoenix_state::pleiads_protection_r)
 */
 
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
-READ8_MEMBER(phoenix_state::survival_input_port_0_r)
+uint8_t phoenix_state::survival_input_port_0_r()
 {
 	uint8_t ret;
 
@@ -419,7 +419,7 @@ READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 	return m_survival_input_latches[0];
 }
 
-READ8_MEMBER(phoenix_state::survival_protection_r)
+uint8_t phoenix_state::survival_protection_r()
 {
 	return m_survival_protection_value;
 }

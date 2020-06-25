@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "includes/goal92.h"
 
-READ16_MEMBER(goal92_state::goal92_fg_bank_r)
+uint16_t goal92_state::goal92_fg_bank_r()
 {
 	return m_fg_bank;
 }
 
-WRITE16_MEMBER(goal92_state::goal92_fg_bank_w)
+void goal92_state::goal92_fg_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_bank);
 
@@ -24,19 +24,19 @@ WRITE16_MEMBER(goal92_state::goal92_fg_bank_w)
 	}
 }
 
-WRITE16_MEMBER(goal92_state::goal92_text_w)
+void goal92_state::goal92_text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_data[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(goal92_state::goal92_background_w)
+void goal92_state::goal92_background_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_data[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(goal92_state::goal92_foreground_w)
+void goal92_state::goal92_foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_data[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_text_tile_info)
 
 	tile |= 0xc000;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
 		tile |= 0x2000;
 	}
 
-	SET_TILE_INFO_MEMBER(region, tile, color, 0);
+	tileinfo.set(region, tile, color, 0);
 }
 
 void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )

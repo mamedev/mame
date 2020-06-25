@@ -39,9 +39,9 @@ public:
 	virtual ~device_vectrex_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
-	virtual DECLARE_WRITE8_MEMBER(write_bank) { }
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) { }
+	virtual void write_bank(uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -87,9 +87,9 @@ public:
 	int get_vec3d() { return m_vec3d; }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	uint8_t read_rom(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
+	void write_bank(uint8_t data);
 
 protected:
 	// device-level overrides

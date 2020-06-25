@@ -15,7 +15,7 @@
         SCSI: MB89352
         LCD: LC7981
         Quad-UART: TE7774
-        Panel controller CPU: NEC uPD7810 @ 12 MHz
+        Panel controller CPU: NEC uPD78C10AGQ @ 12 MHz
         Sound DSP: L7A1045-L6048
             DSP's wavedata bus is 16 bits wide and has 24 address bits
 
@@ -105,10 +105,10 @@ private:
 	void mpc3000_io_map(address_map &map);
 	void mpc3000_sub_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
-	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
-	DECLARE_READ16_MEMBER(dma_memr_cb);
-	DECLARE_WRITE16_MEMBER(dma_memw_cb);
+	uint16_t dsp_0008_hack_r();
+	void dsp_0008_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dma_memr_cb(offs_t offset);
+	void dma_memw_cb(offs_t offset, uint16_t data);
 	void mpc3000_palette(palette_device &palette) const;
 };
 
@@ -127,16 +127,16 @@ void mpc3000_state::mpc3000_map(address_map &map)
 	map(0x500000, 0x500fff).ram(); // actually 8-bit battery-backed RAM
 }
 
-WRITE16_MEMBER(mpc3000_state::dsp_0008_hack_w)
+void mpc3000_state::dsp_0008_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is related to the DSP's DMA capability.  The DSP
 	// connects to the V53's DMA3 channel on both the MPCs and HNG64.
 	m_maincpu->dreq_w<3>(data&0x1);
-	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
+	m_dsp->l7a1045_sound_w(8/2,data,mem_mask);
 }
 
 
-READ16_MEMBER(mpc3000_state::dsp_0008_hack_r)
+uint16_t mpc3000_state::dsp_0008_hack_r()
 {
 	// read in irq5
 	return 0;
@@ -161,13 +161,13 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-READ16_MEMBER(mpc3000_state::dma_memr_cb)
+uint16_t mpc3000_state::dma_memr_cb(offs_t offset)
 {
 	//logerror("dma_memr_cb: offset %x\n", offset);
 	return m_maincpu->space(AS_PROGRAM).read_word(offset);
 }
 
-WRITE16_MEMBER(mpc3000_state::dma_memw_cb)
+void mpc3000_state::dma_memw_cb(offs_t offset, uint16_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
 }
@@ -215,7 +215,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
 	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
 
-	UPD7810(config, m_subcpu, 12_MHz_XTAL);
+	UPD78C10(config, m_subcpu, 12_MHz_XTAL);
 	m_subcpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_sub_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

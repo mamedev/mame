@@ -25,7 +25,6 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-//#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
@@ -63,14 +62,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
 //  DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
-	DECLARE_WRITE8_MEMBER(upperen_w);
-	DECLARE_READ16_MEMBER(bioslo_r);
-	DECLARE_WRITE16_MEMBER(bioslo_w);
+	uint8_t get_slave_ack(offs_t offset);
+	void ppi_c_w(uint8_t data);
+	void upperen_w(uint8_t data);
+	uint16_t bioslo_r(offs_t offset);
+	void bioslo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(edge_intr_clear_w);
-	DECLARE_WRITE8_MEMBER(status_register_w);
+	void edge_intr_clear_w(uint8_t data);
+	void status_register_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out2_w);
@@ -238,7 +237,7 @@ WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
 	m_uart8251->write_txc(state);
 }
 
-READ8_MEMBER( isbc_state::get_slave_ack )
+uint8_t isbc_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -260,7 +259,7 @@ WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
 		m_pic_1->ir7_w(1);
 }
 
-WRITE8_MEMBER( isbc_state::ppi_c_w )
+void isbc_state::ppi_c_w(uint8_t data)
 {
 	m_centronics->write_strobe(data & 1);
 
@@ -268,12 +267,12 @@ WRITE8_MEMBER( isbc_state::ppi_c_w )
 		m_pic_1->ir7_w(0);
 }
 
-WRITE8_MEMBER(isbc_state::upperen_w)
+void isbc_state::upperen_w(uint8_t data)
 {
 	m_upperen = true;
 }
 
-READ16_MEMBER(isbc_state::bioslo_r)
+uint16_t isbc_state::bioslo_r(offs_t offset)
 {
 	if(m_upperen)
 		return m_biosram[offset];
@@ -282,7 +281,7 @@ READ16_MEMBER(isbc_state::bioslo_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(isbc_state::bioslo_w)
+void isbc_state::bioslo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_upperen)
 		COMBINE_DATA(&m_biosram[offset]);
@@ -296,12 +295,12 @@ WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 }
 #endif
 
-WRITE8_MEMBER(isbc_state::edge_intr_clear_w)
+void isbc_state::edge_intr_clear_w(uint8_t data)
 {
 	// reset U32 flipflop
 }
 
-WRITE8_MEMBER(isbc_state::status_register_w)
+void isbc_state::status_register_w(uint8_t data)
 {
 	m_megabyte_page = (data & 0xf0) << 16;
 	m_statuslatch->write_bit(data & 0x07, BIT(data, 3));
@@ -449,14 +448,13 @@ void isbc_state::isbc286(machine_config &config)
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(22'118'400)/18);
-//  pit.out_handler<1>().set(m_uart8274, FUNC(z80dart_device::rxtxcb_w));
 	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_device::rxtxcb_w));
 	pit.set_clk<2>(XTAL(22'118'400)/18);
 	pit.out_handler<2>().set(FUNC(isbc_state::isbc286_tmr2_w));
 
 	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::bus_r));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
+	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::read));
 	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -491,26 +489,14 @@ void isbc_state::isbc286(machine_config &config)
 #endif
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-#if 0
-	rs232a.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsa_w));
-#else
 	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
 	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
 	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
-#endif
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
-#if 0
-	rs232b.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsb_w));
-#else
 	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxb_w));
 	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
 	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
-#endif
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
 	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);

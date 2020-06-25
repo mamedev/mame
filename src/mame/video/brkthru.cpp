@@ -84,10 +84,10 @@ TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
 	int region = 1 + (code >> 7);
 	int colour = m_bgbasecolor + ((m_videoram[tile_index * 2 + 1] & 0x04) >> 2);
 
-	SET_TILE_INFO_MEMBER(region, code & 0x7f, colour,0);
+	tileinfo.set(region, code & 0x7f, colour,0);
 }
 
-WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
+void brkthru_state::brkthru_bgram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -97,10 +97,10 @@ WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
 TILE_GET_INFO_MEMBER(brkthru_state::get_fg_tile_info)
 {
 	uint8_t code = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
-WRITE8_MEMBER(brkthru_state::brkthru_fgram_w)
+void brkthru_state::brkthru_fgram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -116,7 +116,7 @@ void brkthru_state::video_start()
 }
 
 
-WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
+void brkthru_state::brkthru_1800_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)    /* low 8 bits of scroll */
 		m_bgscroll = (m_bgscroll & 0x100) | data;

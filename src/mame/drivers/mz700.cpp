@@ -457,7 +457,7 @@ void mz_state::mz800(machine_config &config)
 	pio.out_int_callback().set(FUNC(mz_state::mz800_z80pio_irq));
 	pio.in_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_r));
 	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
-	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 

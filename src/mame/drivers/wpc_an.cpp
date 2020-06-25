@@ -2,6 +2,19 @@
 // copyright-holders:Olivier Galibert, Miodrag Milanovic
 /*
     Williams WPC (Alpha Numeric)
+
+    Note: It is possible to get funhouse (fh_l3 at least) in-game by coining it up, then holding the following keys,
+        and pressing the start button, or else you get "PINBALL MISSING":
+    W (right ball shooter, c6 r2)
+    E (right trough, c6 r3)
+    [ (dummy jaw opto, c5 r1)
+    ] (right outlane, c5 r2)
+    \ (right slingshot kicker, c5 r3)
+    It's possible not all of these are strictly necessary to make it work.
+
+    TODO: replace the 8x8 pinball input matrix keymap by some sort of common interface for the williams system 6, 9, 10, 11 and wpc_an;
+    while the actual purpose of the switches differ per machine (and some machines like wpc_an have one switch permanently closed as a test switch),
+    the entire matrix should be mapped to keyboard keys, there are more than enough keys on a 104 key keyboard to do it, even avoiding MAME's reserved keys.
 */
 
 
@@ -55,17 +68,17 @@ private:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
-	DECLARE_READ8_MEMBER(wpc_sound_ctrl_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
-	DECLARE_READ8_MEMBER(wpc_sound_data_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
-	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
-	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
+	uint8_t wpc_sound_ctrl_r();
+	void wpc_sound_ctrl_w(uint8_t data);
+	uint8_t wpc_sound_data_r();
+	void wpc_sound_data_w(uint8_t data);
+	void wpc_sound_s11_w(uint8_t data);
+	void wpc_rombank_w(uint8_t data);
 
 	uint16_t m_vblank_count;
 	uint32_t m_irq_count;
@@ -221,7 +234,7 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_rombank_w)
+void wpc_an_state::wpc_rombank_w(uint8_t data)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
@@ -242,14 +255,14 @@ WRITE_LINE_MEMBER(wpc_an_state::wpc_firq_w)
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
 
-READ8_MEMBER(wpc_an_state::wpc_sound_ctrl_r)
+uint8_t wpc_an_state::wpc_sound_ctrl_r()
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->ctrl_r();  // ack FIRQ?
 	return 0;
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
+void wpc_an_state::wpc_sound_ctrl_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -260,14 +273,14 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
 		m_wpcsnd->ctrl_w(data);
 }
 
-READ8_MEMBER(wpc_an_state::wpc_sound_data_r)
+uint8_t wpc_an_state::wpc_sound_data_r()
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->data_r();
 	return 0;
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
+void wpc_an_state::wpc_sound_data_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -278,7 +291,7 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
 		m_wpcsnd->data_w(data);
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_s11_w)
+void wpc_an_state::wpc_sound_s11_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -288,12 +301,12 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_s11_w)
 	}
 }
 
-READ8_MEMBER(wpc_an_state::ram_r)
+uint8_t wpc_an_state::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(wpc_an_state::ram_w)
+void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 {
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;

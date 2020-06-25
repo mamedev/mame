@@ -224,14 +224,14 @@ uint8_t a2bus_mouse_device::read_cnxx(uint8_t offset)
 	return m_rom[offset+m_rom_bank];
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::pia_out_a)
+void a2bus_mouse_device::pia_out_a(uint8_t data)
 {
 	m_port_a_in = data;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::pia_out_b)
+void a2bus_mouse_device::pia_out_b(uint8_t data)
 {
-	m_mcu->pc_w(space, 0, 0xf0 | ((data >> 4) & 0x0f));
+	m_mcu->pc_w(0xf0 | ((data >> 4) & 0x0f));
 
 	m_rom_bank = (data & 0xe) << 7;
 }
@@ -244,17 +244,17 @@ WRITE_LINE_MEMBER(a2bus_mouse_device::pia_irqb_w)
 {
 }
 
-READ8_MEMBER(a2bus_mouse_device::mcu_port_a_r)
+uint8_t a2bus_mouse_device::mcu_port_a_r()
 {
 	return m_port_a_in;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_port_a_w)
+void a2bus_mouse_device::mcu_port_a_w(uint8_t data)
 {
 	m_pia->set_a_input(data);
 }
 
-READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)
+uint8_t a2bus_mouse_device::mcu_port_b_r()
 {
 	enum { XAXIS, YAXIS };
 	constexpr u8 BUTTON = 0x80;
@@ -280,7 +280,7 @@ READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)
 	return m_port_b_in;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
+void a2bus_mouse_device::mcu_port_b_w(uint8_t data)
 {
 	if (!BIT(data, 6))
 	{
@@ -292,9 +292,9 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
 	}
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_port_c_w)
+void a2bus_mouse_device::mcu_port_c_w(uint8_t data)
 {
-	m_pia->write_portb(data << 4);
+	m_pia->portb_w(data << 4);
 }
 
 template <unsigned AXIS, u8 DIR, u8 CLK> void a2bus_mouse_device::update_axis()

@@ -83,8 +83,8 @@ enum
 /* Registers - used by m37710_set_reg() and m37710_get_reg() */
 enum
 {
-	M37710_PC=1, M37710_S, M37710_P, M37710_A, M37710_B, M37710_X, M37710_Y,
-	M37710_PB, M37710_DB, M37710_D, M37710_E,
+	M37710_PC=1, M37710_S, M37710_PS, M37710_A, M37710_B, M37710_X, M37710_Y,
+	M37710_PG, M37710_DT, M37710_DPR, M37710_E,
 	M37710_NMI_STATE, M37710_IRQ_STATE
 };
 
@@ -247,9 +247,9 @@ private:
 	uint32_t m_s;         /* Stack Pointer */
 	uint32_t m_pc;        /* Program Counter */
 	uint32_t m_ppc;       /* Previous Program Counter */
-	uint32_t m_pb;        /* Program Bank (shifted left 16) */
-	uint32_t m_db;        /* Data Bank (shifted left 16) */
-	uint32_t m_d;         /* Direct Register */
+	uint32_t m_pg;        /* Program Bank (shifted left 16) */
+	uint32_t m_dt;        /* Data Bank (shifted left 16) */
+	uint32_t m_dpr;       /* Direct Page Register */
 	uint32_t m_flag_e;        /* Emulation Mode Flag */
 	uint32_t m_flag_m;        /* Memory/Accumulator Select Flag */
 	uint32_t m_flag_x;        /* Index Select Flag */
@@ -270,8 +270,8 @@ private:
 	int m_ICount;     /* cycle count */
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
-	address_space *m_program;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_program;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
 	// ports
@@ -308,19 +308,16 @@ private:
 	uint16_t m_dmac_control;
 
 	// DMA
-	uint32_t m_dma0_src, m_dma0_dst, m_dma0_cnt, m_dma0_mode;
-	uint32_t m_dma1_src, m_dma1_dst, m_dma1_cnt, m_dma1_mode;
-	uint32_t m_dma2_src, m_dma2_dst, m_dma2_cnt, m_dma2_mode;
-	uint32_t m_dma3_src, m_dma3_dst, m_dma3_cnt, m_dma3_mode;
+	uint32_t m_dma_src[4], m_dma_dst[4], m_dma_cnt[4], m_dma_mode[4];
 
 	// interrupt controller
 	uint8_t m_int_control[M37710_MASKABLE_INTERRUPTS];
 
 	// for debugger
 	uint32_t m_debugger_pc;
-	uint32_t m_debugger_pb;
-	uint32_t m_debugger_db;
-	uint32_t m_debugger_p;
+	uint32_t m_debugger_pg;
+	uint32_t m_debugger_dt;
+	uint32_t m_debugger_ps;
 	uint32_t m_debugger_a;
 	uint32_t m_debugger_b;
 
@@ -407,17 +404,17 @@ private:
 	void m37710i_jump_24(uint32_t address);
 	void m37710i_branch_8(uint32_t offset);
 	void m37710i_branch_16(uint32_t offset);
-	uint32_t m37710i_get_reg_p();
+	uint32_t m37710i_get_reg_ps();
 	void m37710i_set_reg_ipl(uint32_t value);
 	void m37710i_interrupt_software(uint32_t vector);
 	void m37710i_set_flag_m0x0(uint32_t value);
 	void m37710i_set_flag_m0x1(uint32_t value);
 	void m37710i_set_flag_m1x0(uint32_t value);
 	void m37710i_set_flag_m1x1(uint32_t value);
-	void m37710i_set_reg_p_m0x0(uint32_t value);
-	void m37710i_set_reg_p_m0x1(uint32_t value);
-	void m37710i_set_reg_p_m1x0(uint32_t value);
-	void m37710i_set_reg_p_m1x1(uint32_t value);
+	void m37710i_set_reg_ps_m0x0(uint32_t value);
+	void m37710i_set_reg_ps_m0x1(uint32_t value);
+	void m37710i_set_reg_ps_m1x0(uint32_t value);
+	void m37710i_set_reg_ps_m1x1(uint32_t value);
 	uint32_t EA_IMM8();
 	uint32_t EA_IMM16();
 	uint32_t EA_IMM24();

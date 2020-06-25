@@ -78,27 +78,27 @@ Notes:
 // TODO: not sure if the OMV bios actually detects the presence of a cart,
 // or if the cart data simply overwrites the internal bios...
 // for the moment let assume the latter!
-READ8_MEMBER( sg1000_state::omv_r )
+uint8_t sg1000_state::omv_r(offs_t offset)
 {
 	if (m_cart && m_cart->exists())
-		return m_cart->read_cart(space, offset);
+		return m_cart->read_cart(offset);
 	else
 		return m_rom->base()[offset];
 }
 
-WRITE8_MEMBER( sg1000_state::omv_w )
+void sg1000_state::omv_w(offs_t offset, uint8_t data)
 {
 	if (m_cart && m_cart->exists())
-		m_cart->write_cart(space, offset, data);
+		m_cart->write_cart(offset, data);
 }
 
-READ8_MEMBER( sg1000_state::peripheral_r )
+uint8_t sg1000_state::peripheral_r(offs_t offset)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
 	if (joy_ports_disabled)
 	{
-		return m_sgexpslot->read(space, offset);
+		return m_sgexpslot->read(offset);
 	}
 	else
 	{
@@ -109,13 +109,13 @@ READ8_MEMBER( sg1000_state::peripheral_r )
 	}
 }
 
-WRITE8_MEMBER( sg1000_state::peripheral_w )
+void sg1000_state::peripheral_w(offs_t offset, uint8_t data)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
 	if (joy_ports_disabled)
 	{
-		m_sgexpslot->write(space, offset, data);
+		m_sgexpslot->write(offset, data);
 	}
 }
 
@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( sf7000_state::ppi_pa_r )
+uint8_t sf7000_state::ppi_pa_r()
 {
 	/*
 	    Signal  Description
@@ -399,7 +399,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( sf7000_state::ppi_pc_w )
+void sf7000_state::ppi_pc_w(uint8_t data)
 {
 	/*
 	    Signal  Description
@@ -463,8 +463,8 @@ void sg1000_state::machine_start()
 {
 	if (m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB)
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8sm_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
 	}
 
 	if (m_cart)
@@ -484,8 +484,8 @@ void sc3000_state::machine_start()
 								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB
 								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8sm_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
 	}
 
 	if (m_cart)
@@ -635,7 +635,7 @@ void sf7000_state::sf7000(machine_config &config)
 	/* devices */
 	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
 	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
-	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
 	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));

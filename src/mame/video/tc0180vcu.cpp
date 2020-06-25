@@ -240,7 +240,7 @@ void tc0180vcu_device::video_control( uint8_t data )
 	machine().tilemap().set_flip_all((m_video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
 }
 
-WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
+void tc0180vcu_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldword = m_ctrl[offset];
 
@@ -280,7 +280,7 @@ WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
 	}
 }
 
-READ16_MEMBER(tc0180vcu_device::framebuffer_word_r)
+uint16_t tc0180vcu_device::framebuffer_word_r(offs_t offset)
 {
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
@@ -288,7 +288,7 @@ READ16_MEMBER(tc0180vcu_device::framebuffer_word_r)
 	return (m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
 }
 
-WRITE16_MEMBER(tc0180vcu_device::framebuffer_word_w)
+void tc0180vcu_device::framebuffer_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
@@ -304,7 +304,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 	int tile  = m_vram[tile_index + m_bg_rambank[0]];
 	int color = m_vram[tile_index + m_bg_rambank[1]];
 
-	SET_TILE_INFO_MEMBER(1, tile,
+	tileinfo.set(1, tile,
 		m_bg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
@@ -314,7 +314,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 	int tile  = m_vram[tile_index + m_fg_rambank[0]];
 	int color = m_vram[tile_index + m_fg_rambank[1]];
 
-	SET_TILE_INFO_MEMBER(1, tile,
+	tileinfo.set(1, tile,
 		m_fg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
@@ -323,13 +323,13 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 {
 	int tile = m_vram[tile_index + m_tx_rambank];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		(tile & 0x07ff) | ((m_ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
 		m_tx_color_base + ((tile >> 12) & 0x0f),
 		0);
 }
 
-WRITE16_MEMBER( tc0180vcu_device::word_w )
+void tc0180vcu_device::word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 

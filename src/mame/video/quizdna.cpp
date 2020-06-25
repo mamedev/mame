@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 	if (code>0x7fff)
 		code &= 0x83ff;
 
-	SET_TILE_INFO_MEMBER(1, code, col, 0);
+	tileinfo.set(1, code, col, 0);
 }
 
 TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
-	SET_TILE_INFO_MEMBER(0, code, col, 0);
+	tileinfo.set(0, code, col, 0);
 }
 
 
@@ -68,7 +68,7 @@ void quizdna_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-WRITE8_MEMBER(quizdna_state::bg_ram_w)
+void quizdna_state::bg_ram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bg_ram[offset] = data;
@@ -77,7 +77,7 @@ WRITE8_MEMBER(quizdna_state::bg_ram_w)
 	m_bg_tilemap->mark_tile_dirty((offset & 0xfff) / 2 );
 }
 
-WRITE8_MEMBER(quizdna_state::fg_ram_w)
+void quizdna_state::fg_ram_w(offs_t offset, uint8_t data)
 {
 	int i;
 	int offs = offset & 0xfff;
@@ -91,12 +91,12 @@ WRITE8_MEMBER(quizdna_state::fg_ram_w)
 		m_fg_tilemap->mark_tile_dirty(((offs/2) & 0x1f) + i*0x20 );
 }
 
-WRITE8_MEMBER(quizdna_state::bg_yscroll_w)
+void quizdna_state::bg_yscroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolldy(255-data, 255-data+1 );
 }
 
-WRITE8_MEMBER(quizdna_state::bg_xscroll_w)
+void quizdna_state::bg_xscroll_w(offs_t offset, uint8_t data)
 {
 	int x;
 	m_bg_xscroll[offset] = data;
@@ -105,7 +105,7 @@ WRITE8_MEMBER(quizdna_state::bg_xscroll_w)
 	m_bg_tilemap->set_scrolldx(x+64, x-64+10 );
 }
 
-WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
+void quizdna_state::screen_ctrl_w(uint8_t data)
 {
 	int tmp = (data & 0x10) >> 4;
 	m_video_enable = data & 0x20;
@@ -121,7 +121,7 @@ WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
 	m_fg_tilemap->set_scrolldx(64, -64 +16);
 }
 
-WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
+void quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w(offs_t offset, uint8_t data)
 {
 	int r,g,b,d0,d1;
 	int offs = offset & ~1;

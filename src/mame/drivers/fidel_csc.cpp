@@ -10,7 +10,7 @@ Fidelity CSC(and derived) hardware
 - Reversi Sensory Challenger
 
 TODO:
-- verify csce original roms (current set came from an overclock mod)
+- dump/add original csce
 - hook up csce I/O properly, it doesn't have PIAs
 
 *******************************************************************************
@@ -270,18 +270,18 @@ protected:
 	u16 read_inputs();
 	void update_display();
 	void update_sound();
-	DECLARE_READ8_MEMBER(speech_r);
+	u8 speech_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(pia0_pb_w);
-	DECLARE_READ8_MEMBER(pia0_pa_r);
+	void pia0_pa_w(u8 data);
+	void pia0_pb_w(u8 data);
+	u8 pia0_pa_r();
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_READ_LINE_MEMBER(pia0_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia0_cb1_r);
-	DECLARE_WRITE8_MEMBER(pia1_pa_w);
-	DECLARE_WRITE8_MEMBER(pia1_pb_w);
-	DECLARE_READ8_MEMBER(pia1_pb_r);
+	void pia1_pa_w(u8 data);
+	void pia1_pb_w(u8 data);
+	u8 pia1_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 
 	u8 m_led_data;
@@ -398,7 +398,7 @@ void csc_state::update_sound()
 	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
-READ8_MEMBER(csc_state::speech_r)
+u8 csc_state::speech_r(offs_t offset)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -406,13 +406,13 @@ READ8_MEMBER(csc_state::speech_r)
 
 // 6821 PIA 0
 
-READ8_MEMBER(csc_state::pia0_pa_r)
+u8 csc_state::pia0_pa_r()
 {
 	// d0-d5: button row 0-5
 	return (read_inputs() & 0x3f) | 0xc0;
 }
 
-WRITE8_MEMBER(csc_state::pia0_pa_w)
+void csc_state::pia0_pa_w(u8 data)
 {
 	// d6,d7: 7442 A0,A1
 	m_inp_mux = (m_inp_mux & ~3) | (data >> 6 & 3);
@@ -420,7 +420,7 @@ WRITE8_MEMBER(csc_state::pia0_pa_w)
 	update_sound();
 }
 
-WRITE8_MEMBER(csc_state::pia0_pb_w)
+void csc_state::pia0_pb_w(u8 data)
 {
 	// d0-d7: led row data
 	m_led_data = data;
@@ -458,17 +458,17 @@ WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 
 // 6821 PIA 1
 
-WRITE8_MEMBER(csc_state::pia1_pa_w)
+void csc_state::pia1_pa_w(u8 data)
 {
 	// d0-d5: TSI C0-C5
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
 	m_7seg_data = bitswap<8>(data,0,1,5,6,7,2,3,4);
 	update_display();
 }
 
-WRITE8_MEMBER(csc_state::pia1_pb_w)
+void csc_state::pia1_pb_w(u8 data)
 {
 	// d0: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -481,7 +481,7 @@ WRITE8_MEMBER(csc_state::pia1_pb_w)
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.25 : 1.0);
 }
 
-READ8_MEMBER(csc_state::pia1_pb_r)
+u8 csc_state::pia1_pb_r()
 {
 	// d2: printer?
 	u8 data = 0x04;
@@ -663,7 +663,7 @@ void csc_state::csce(machine_config &config)
 	csc(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(4_MHz_XTAL);
+	m_maincpu->set_clock(5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
 }
 
@@ -718,11 +718,11 @@ void csc_state::rsc(machine_config &config)
 
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
-	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
-	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
-	ROM_LOAD("74s474",    0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
+	ROM_LOAD("101-64019",   0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-1025a03", 0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
+	ROM_LOAD("101-1025a02", 0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
+	ROM_LOAD("101-1025a01", 0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
+	ROM_LOAD("74s474",      0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -822,8 +822,8 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger (Travemuende version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super 9 Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1981, reversic, 0,      0, rsc,      rsc,  csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

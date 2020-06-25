@@ -9,7 +9,7 @@
 
 /* FG 'SCREEN' LAYER */
 
-WRITE16_MEMBER(suprslam_state::suprslam_screen_videoram_w)
+void suprslam_state::suprslam_screen_videoram_w(offs_t offset, uint16_t data)
 {
 	m_screen_videoram[offset] = data;
 	m_screen_tilemap->mark_tile_dirty(offset);
@@ -24,12 +24,12 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_tile_info)
 	tileno += m_screen_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 }
 
 
 /* BG LAYER */
-WRITE16_MEMBER(suprslam_state::suprslam_bg_videoram_w)
+void suprslam_state::suprslam_bg_videoram_w(offs_t offset, uint16_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 	tileno += m_bg_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	tileinfo.set(2, tileno, colour, 0);
 }
 
 
@@ -64,7 +64,7 @@ void suprslam_state::video_start()
 	m_screen_tilemap->set_transparent_pen(15);
 }
 
-WRITE8_MEMBER(suprslam_state::spr_ctrl_w)
+void suprslam_state::spr_ctrl_w(uint8_t data)
 {
 	m_spr_ctrl = data;
 }
@@ -83,7 +83,7 @@ uint32_t suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE16_MEMBER(suprslam_state::suprslam_bank_w)
+void suprslam_state::suprslam_bank_w(uint16_t data)
 {
 	uint16_t old_screen_bank, old_bg_bank;
 	old_screen_bank = m_screen_bank;

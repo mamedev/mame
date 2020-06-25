@@ -127,7 +127,7 @@ public:
 	void k3(machine_config &config);
 
 private:
-	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vram_buffer(bool newval);
 	void scrollx_w(u16 data);
 	void scrolly_w(u16 data);
 	void k3_soundbanks_w(u16 data);
@@ -153,6 +153,9 @@ private:
 	required_shared_ptr<u16> m_bgram;
 
 	/* video-related */
+	std::unique_ptr<u16[]> m_spriteram_buffer[2];
+	std::unique_ptr<u16[]> m_bgram_buffer;
+	bool m_refresh = false;
 	tilemap_t  *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -161,21 +164,26 @@ private:
 };
 
 
-void k3_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_bgram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
 TILE_GET_INFO_MEMBER(k3_state::get_tile_info)
 {
-	int tileno = m_bgram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	int tileno = m_bgram_buffer[tile_index];
+	tileinfo.set(1, tileno, 0, 0);
 }
 
 void k3_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k3_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	for (int i = 0; i < 2; i++)
+	{
+		const u32 size = m_spriteram[i].bytes() / 2;
+		m_spriteram_buffer[i] = make_unique_clear<u16[]>(size);
+		save_pointer(NAME(m_spriteram_buffer[i]), size, i);
+	}
+	const u32 size = m_bgram.bytes() / 2;
+	m_bgram_buffer = make_unique_clear<u16[]>(size);
+	save_pointer(NAME(m_bgram_buffer), size);
+
+	save_item(NAME(m_refresh));
 }
 
 void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
@@ -250,15 +258,23 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 	}
 }
 
+// sprite limitation reference : https://www.youtube.com/watch?v=_7V_SrEQwSY
+// TODO : measure values from real hardware
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const u32 max_cycle = m_screen->width() * m_screen->height(); // max usable cycle for sprites, TODO : related to whole screen?
+	u32 cycle = 0;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	u16 *source = m_spriteram[0];
-	u16 *source2 = m_spriteram[1];
-	u16 *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
+	u16 *source = m_spriteram_buffer[0].get();
+	u16 *source2 = m_spriteram_buffer[1].get();
+	u16 *finish = source + (m_spriteram[0].bytes() / 2);
 
 	while (source < finish)
 	{
+		cycle += 4 + 128; // 4 cycle per reading RAM, 128? cycle per each tiles
+		if (cycle > max_cycle)
+			break;
+
 		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
 		int ypos = (source[0] & 0x00ff) >> 0;
 		u32 tileno = (source2[0] & 0x7ffe) >> 1;
@@ -281,6 +297,25 @@ u32 k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 	return 0;
 }
 
+void k3_state::vram_buffer(bool newval)
+{
+	const bool oldval = m_refresh;
+	if (!oldval && newval)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			const u32 size = m_spriteram[j].bytes() / 2;
+			for (int i = 0; i < size; i++)
+				m_spriteram_buffer[j][i] = m_spriteram[j][i];
+		}
+		const u32 size = m_bgram.bytes() / 2;
+		for (int i = 0; i < size; i++)
+			m_bgram_buffer[i] = m_bgram[i];
+
+		m_bg_tilemap->mark_all_dirty();
+	}
+	m_refresh = newval;
+}
 
 void k3_state::scrollx_w(u16 data)
 {
@@ -294,6 +329,13 @@ void k3_state::scrolly_w(u16 data)
 
 void k3_state::k3_soundbanks_w(u16 data)
 {
+	/*
+	    ---- ---- ---x ---- Unknown
+	    ---- ---- ---- -x-- OKI1 Bank
+	    ---- ---- ---- --x- OKI0 Bank
+	    ---- ---- ---- ---x VRAM access flip-flop
+	*/
+	vram_buffer(BIT(data, 0)); // rising edge
 	m_oki[1]->set_rom_bank(BIT(data, 2));
 	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
@@ -307,12 +349,13 @@ void k3_state::flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask)
 
 	// 0x80 - ?
 	// 0x40 - ?
-	// 0x20 - toggles, might trigger vram -> buffer transfer?
+	// 0x20 - VRAM access flip-flop
 	// 0x10 - unknown, always on?
 	// 0x08 - ?
 	// 0x06 - oki bank
 	// 0x01 - ?
 
+	vram_buffer(BIT(~data, 5)); // falling edge
 	if (data & 0xfcc9)
 		popmessage("unk control %04x", data & 0xfcc9);
 
@@ -331,7 +374,7 @@ void k3_state::k3_base_map(address_map &map)
 	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240000, 0x240fff).ram().share(m_spriteram[0]);
 	map(0x280000, 0x280fff).ram().share(m_spriteram[1]);
-	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share(m_bgram);
+	map(0x2c0000, 0x2c07ff).ram().share(m_bgram);
 	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
 	map(0x340000, 0x340001).w(FUNC(k3_state::scrollx_w));
 	map(0x380000, 0x380001).w(FUNC(k3_state::scrolly_w));
@@ -454,9 +497,9 @@ static INPUT_PORTS_START( k3old )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_1C ) )	// 5C_1C in newer versions
-	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_1C ) )	// 4C_1C in newer versions
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )	// 1C_3C in newer versions
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_1C ) )    // 5C_1C in newer versions
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_1C ) )    // 4C_1C in newer versions
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )    // 1C_3C in newer versions
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4,5")
@@ -470,8 +513,8 @@ static INPUT_PORTS_START( k3old )
 	PORT_DIPSETTING(      0x0020, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )	// In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always OFF here!
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )	// In newer 1945K-III sets this is Allow_Continue - Always Continue
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always OFF here!
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K-III sets this is Allow_Continue - Always Continue
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -522,11 +565,11 @@ static INPUT_PORTS_START( solite )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )	// In 1945K-III sets 6&7 are Lives
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )	// In 1945K-III sets 6&7 are Lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )   // In 1945K-III sets 6&7 are Lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )   // In 1945K-III sets 6&7 are Lives
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )	// In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always ON here!
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )	// In newer 1945K-III sets this is Allow_Continue - Always Continue
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always ON here!
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K-III sets this is Allow_Continue - Always Continue
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -626,10 +669,7 @@ void k3_state::flagrall(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 315, 0, 240); // ~49.61Hz, reference : https://www.youtube.com/watch?v=CuGrTiQs4ww
 	m_screen->set_screen_update(FUNC(k3_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -651,15 +691,15 @@ void k3_state::k3(machine_config &config)
 	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 262, 0, 224); // ~60Hz
 }
 
 
 
 ROM_START( 1945kiii )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x40000, CRC(c4bbae5d) SHA1(a326fad902150c6b64c39618dda2c58baf12ae98) )
-//	ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x40000, CRC(092abf2e) SHA1(be42c54c3051d4efe76858e4bc85dfadc2d0cc1a) )
+//  ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x40000, CRC(c4bbae5d) SHA1(a326fad902150c6b64c39618dda2c58baf12ae98) )
+//  ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x40000, CRC(092abf2e) SHA1(be42c54c3051d4efe76858e4bc85dfadc2d0cc1a) )
 	ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x80000, CRC(6b345f27) SHA1(60867fa0e2ea7ebdd4b8046315ee0c83e5cf0d74) ) /* identical halves */
 	ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x80000, CRC(ce09b98c) SHA1(a06bb712b9cf2249cc535de4055b14a21c68e0c5) ) /* identical halves */
 
@@ -679,8 +719,8 @@ ROM_END
 
 ROM_START( 1945kiiin )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "u34", 0x00001, 0x40000, CRC(234a55a5) SHA1(df0464793531251ac64cee54e474314e5e5f05ab) )
-//	ROM_LOAD16_BYTE( "u35", 0x00000, 0x40000, CRC(1e6e23a5) SHA1(c0e3f8b34be77ff34f6dfbe1f966ca05db285e76) )
+//  ROM_LOAD16_BYTE( "u34", 0x00001, 0x40000, CRC(234a55a5) SHA1(df0464793531251ac64cee54e474314e5e5f05ab) )
+//  ROM_LOAD16_BYTE( "u35", 0x00000, 0x40000, CRC(1e6e23a5) SHA1(c0e3f8b34be77ff34f6dfbe1f966ca05db285e76) )
 	ROM_LOAD16_BYTE( "u34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label - identical halves */
 	ROM_LOAD16_BYTE( "u35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label - identical halves */
 
@@ -710,8 +750,8 @@ ROM_END
 
 ROM_START( 1945kiiio )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x40000, CRC(bcfb8b84) SHA1(7126463231cfaf4d6baf4d2efba88079c6c4c399) )
-//	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x40000, CRC(ec1234a5) SHA1(36cf7a48236acd75365eefbba81024c343bb0124) )
+//  ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x40000, CRC(bcfb8b84) SHA1(7126463231cfaf4d6baf4d2efba88079c6c4c399) )
+//  ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x40000, CRC(ec1234a5) SHA1(36cf7a48236acd75365eefbba81024c343bb0124) )
 	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) ) /* 0x40000 to 0x7FFFF 0x00 padded */
 	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) ) /* 0x40000 to 0x7FFFF 0x00 padded */
 

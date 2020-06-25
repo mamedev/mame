@@ -53,9 +53,9 @@ private:
 	void mastboyo_map(address_map &map);
 	void mastboyo_portmap(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(fgram2_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void fgram_w(offs_t offset, uint8_t data);
+	void fgram2_w(offs_t offset, uint8_t data);
+	void rombank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mastboyo_palette(palette_device &palette) const;
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(mastboyo_state::get_fg_tile_info)
 {
 	int code = m_fgram[tile_index];
 	int attr = m_fgram2[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x0f,
 			0);
@@ -83,13 +83,13 @@ uint32_t mastboyo_state::screen_update_mastboyo(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(mastboyo_state::fgram_w)
+void mastboyo_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mastboyo_state::fgram2_w)
+void mastboyo_state::fgram2_w(offs_t offset, uint8_t data)
 {
 	m_fgram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -109,7 +109,7 @@ void mastboyo_state::mastboyo_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(mastboyo_state::rombank_w)
+void mastboyo_state::rombank_w(uint8_t data)
 {
 	m_bank1->set_entry(data & 0x0f);
 }

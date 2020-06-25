@@ -73,8 +73,9 @@ public:
 	micral_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		//, m_beep(*this, "beeper")
-		, m_p_videoram(*this, "vram")
 		, m_p_chargen(*this, "chargen")
 		, m_uart(*this, "uart")
 		, m_crtc(*this, "crtc")
@@ -82,15 +83,14 @@ public:
 
 	void micral(machine_config &config);
 
-	void init_micral();
-
 private:
-	DECLARE_MACHINE_RESET(micral);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	u8 keyin_r();
+	u8 status_r();
+	u8 unk_r();
+	u8 video_r(offs_t offset);
+	void video_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_kbd(address_map &map);
@@ -100,41 +100,44 @@ private:
 	u16 s_curpos;
 	u8 s_command;
 	u8 s_data;
+	std::unique_ptr<u8[]> m_vram;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	//required_device<beep_device> m_beep;
-	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<ay31015_device> m_uart;
 	required_device<crt5037_device> m_crtc;
 };
 
-READ8_MEMBER( micral_state::status_r )
+u8 micral_state::status_r()
 {
 	return m_uart->dav_r() | 4;
 }
 
-READ8_MEMBER( micral_state::unk_r )
+u8 micral_state::unk_r()
 {
 	return 0x96;
 }
 
-READ8_MEMBER( micral_state::keyin_r )
+u8 micral_state::keyin_r()
 {
 	m_uart->write_rdav(0);
-	u8 result = m_uart->get_received_data();
+	u8 result = m_uart->receive();
 	m_uart->write_rdav(1);
 	return result;
 }
 
-READ8_MEMBER( micral_state::video_r )
+u8 micral_state::video_r(offs_t offset)
 {
 	if (offset)
 		return 0x07;
 	else
-		return m_p_videoram[s_curpos];
+		return m_vram[s_curpos];
 }
 
-WRITE8_MEMBER( micral_state::video_w )
+void micral_state::video_w(offs_t offset, u8 data)
 {
 	if (offset)
 	{
@@ -146,10 +149,10 @@ WRITE8_MEMBER( micral_state::video_w )
 			s_curpos = (s_curpos & 0xff) | ((s_data & 0x1f) << 8);
 		else
 		if (s_command == 0xa0)
-			m_p_videoram[s_curpos] = s_data;
+			m_vram[s_curpos] = s_data;
 
 		//if (s_command < 0x10)
-			//m_crtc->write(space, s_command, s_data);
+			//m_crtc->write(s_command, s_data);
 	}
 	else
 	{
@@ -161,9 +164,8 @@ WRITE8_MEMBER( micral_state::video_w )
 void micral_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xf7ff).ram();
-	map(0xf800, 0xfeff).rom();
-	map(0xff00, 0xffef).ram();
+	map(0x0000, 0xffef).ram().share("mainram");
+	map(0xf800, 0xfeff).rom().region("maincpu", 0);
 	map(0xfff6, 0xfff7); // .nopw(); // unknown ports
 	map(0xfff8, 0xfff9).rw(FUNC(micral_state::video_r), FUNC(micral_state::video_w));
 	map(0xfffa, 0xfffa).r(FUNC(micral_state::keyin_r));
@@ -335,7 +337,7 @@ uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_p_videoram[x+ma];
+					chr = m_vram[x+ma];
 					gfx = m_p_chargen[(chr<<4) | ra ];
 					if (((s_curpos & 0xff)==x) && ((s_curpos >> 8)==y))
 						gfx ^= 0xff;
@@ -356,21 +358,8 @@ uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void micral_state::init_micral()
+void micral_state::machine_reset()
 {
-	//uint8_t *main = memregion("maincpu")->base();
-
-	//membank("bankr0")->configure_entry(1, &main[0xf800]);
-	//membank("bankr0")->configure_entry(0, &main[0x10000]);
-	//membank("bankw0")->configure_entry(0, &main[0xf800]);
-}
-
-MACHINE_RESET_MEMBER( micral_state, micral )
-{
-	//membank("bankr0")->set_entry(0); // point at rom
-	//membank("bankw0")->set_entry(0); // always write to ram
-	m_maincpu->set_state_int(Z80_PC, 0xf800);
-
 	// no idea if these are hard-coded, or programmable
 	m_uart->write_xr(0);
 	m_uart->write_xr(1);
@@ -382,6 +371,32 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_uart->write_eps(1);
 	m_uart->write_cs(1);
 	m_uart->write_cs(0);
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+}
+
+void micral_state::machine_start()
+{
+	m_vram = make_unique_clear<u8[]>(0x2000);
+	save_pointer(NAME(m_vram), 0x2000);
+	save_item(NAME(s_curpos));
+	save_item(NAME(s_command));
+	save_item(NAME(s_data));
 }
 
 void micral_state::micral(machine_config &config)
@@ -393,8 +408,6 @@ void micral_state::micral(machine_config &config)
 	z80_device &keyboard(Z80(config, "keyboard", XTAL(1'000'000))); // freq unknown
 	keyboard.set_addrmap(AS_PROGRAM, &micral_state::mem_kbd);
 	keyboard.set_addrmap(AS_IO, &micral_state::io_kbd);
-
-	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -428,13 +441,11 @@ void micral_state::micral(machine_config &config)
 }
 
 ROM_START( micral )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "8022g.rom", 0xf800, 0x0800, CRC(882732a9) SHA1(3f37b82c450a54aedec209bd46fcbcf131c86313) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "8022g.rom",    0x0000, 0x0800, CRC(882732a9) SHA1(3f37b82c450a54aedec209bd46fcbcf131c86313) )
 
-	ROM_REGION( 0x400, "keyboard", 0 )
-	ROM_LOAD( "2010221.rom", 0x000, 0x400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
-
-	ROM_REGION( 0x2000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "keyboard", 0 )
+	ROM_LOAD( "2010221.rom",  0x0000, 0x0400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
 
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
@@ -442,14 +453,12 @@ ROM_START( micral )
 ROM_END
 
 ROM_START( questarm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "qm_547_1.rom", 0xf800, 0x0800, CRC(8e6dc953) SHA1(b31375af8c6769578d2000fff3e751e94e7ae4d4) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "qm_547_1.rom", 0x0000, 0x0800, CRC(8e6dc953) SHA1(b31375af8c6769578d2000fff3e751e94e7ae4d4) )
 
 	// using the keyboard ROM from 'micral' for now
-	ROM_REGION( 0x400, "keyboard", 0 )
-	ROM_LOAD( "2010221.rom", 0x000, 0x400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
-
-	ROM_REGION( 0x2000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "keyboard", 0 )
+	ROM_LOAD( "2010221.rom",  0x0000, 0x0400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
 
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
@@ -459,5 +468,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME         FLAGS
-COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, init_micral, "Bull R2E",       "Micral 80-22G", MACHINE_IS_SKELETON )
-COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, init_micral, "Honeywell Bull", "Questar/M",     MACHINE_IS_SKELETON )
+COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, empty_init, "Bull R2E",       "Micral 80-22G", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, empty_init, "Honeywell Bull", "Questar/M",     MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

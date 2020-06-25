@@ -16,7 +16,7 @@ public:
 		RX01_R8, RX01_R9, RX01_R10, RX01_R11, RX01_R12, RX01_R13, RX01_R14, RX01_R15,
 		RX01_BAR,
 		RX01_CRC,
-		RX01_UNIT, RX01_LDHD
+		RX01_UNIT, RX01_LDHD, RX01_INDEX
 	};
 
 	enum : u16 {
@@ -54,22 +54,24 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
-	void scratchpad_map(address_map &map);
-
 	// internal helpers
 	u8 mux_out();
+	bool data_in();
 	bool sep_data();
+	bool sep_clk();
 	bool missing_clk();
 	bool drv_sel_trk0();
+	bool sec_buf_in();
 	bool test_condition();
+	void set_bar(u16 bar);
 	void shift_crc(bool data);
 	void set_flag(bool j, bool k);
 
 	// address spaces
 	address_space_config m_inst_config;
-	address_space_config m_sp_config;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_inst_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_sp_cache;
+	address_space_config m_data_config;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_inst_cache;
+	memory_access<10, 0, 0, ENDIANNESS_LITTLE>::cache m_data_cache;
 
 	// internal state
 	u16 m_pc;
@@ -81,11 +83,13 @@ private:
 	u8 m_cntr;
 	u8 m_sr;
 	u8 m_spar;
+	u8 m_sp[16];
 	u16 m_bar;
 	u16 m_crc;
 	u16 m_flags;
 	bool m_unit;
 	bool m_load_head;
+	bool m_syn_index;
 	s32 m_icount;
 };
 

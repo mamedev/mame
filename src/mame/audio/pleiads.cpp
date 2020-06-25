@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "audio/pleiads.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #define VMIN    0
 #define VMAX    32767
 
@@ -570,18 +573,18 @@ inline int pleiads_sound_device::noise(int samplerate)
 	return sum / 2;
 }
 
-WRITE8_MEMBER( pleiads_sound_device::control_a_w )
+void pleiads_sound_device::control_a_w(uint8_t data)
 {
 	if (data == m_sound_latch_a)
 		return;
 
-	logerror("pleiads_sound_control_b_w $%02x\n", data);
+	LOG("pleiads_sound_control_a_w $%02x\n", data);
 
 	m_channel->update();
 	m_sound_latch_a = data;
 }
 
-WRITE8_MEMBER( pleiads_sound_device::control_b_w )
+void pleiads_sound_device::control_b_w(uint8_t data)
 {
 	/*
 	 * pitch selects one of 4 possible clock inputs
@@ -594,7 +597,7 @@ WRITE8_MEMBER( pleiads_sound_device::control_b_w )
 	if (data == m_sound_latch_b)
 		return;
 
-	logerror("pleiads_sound_control_b_w $%02x\n", data);
+	LOG("pleiads_sound_control_b_w $%02x\n", data);
 
 	if (pitch == 3)
 		pitch = 2;  /* 2 and 3 are the same */
@@ -606,12 +609,12 @@ WRITE8_MEMBER( pleiads_sound_device::control_b_w )
 }
 
 /* two bits (4 + 5) from the videoreg_w latch go here */
-WRITE8_MEMBER( pleiads_sound_device::control_c_w )
+void pleiads_sound_device::control_c_w(uint8_t data)
 {
 	if (data == m_sound_latch_c)
 		return;
 
-	logerror("pleiads_sound_control_c_w $%02x\n", data);
+	LOG("pleiads_sound_control_c_w $%02x\n", data);
 	m_channel->update();
 	m_sound_latch_c = data;
 }

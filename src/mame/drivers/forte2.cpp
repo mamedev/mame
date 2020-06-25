@@ -55,14 +55,16 @@ public:
 	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(ay8910_read_input);
-	DECLARE_WRITE8_MEMBER(ay8910_set_input_mask);
+	uint8_t ay8910_read_input();
+	void ay8910_set_input_mask(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -101,12 +103,12 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(forte2_state::ay8910_read_input)
+uint8_t forte2_state::ay8910_read_input()
 {
 	return ioport("IN0")->read() | (m_input_mask & 0x3f);
 }
 
-WRITE8_MEMBER(forte2_state::ay8910_set_input_mask)
+void forte2_state::ay8910_set_input_mask(uint8_t data)
 {
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
 	m_input_mask = data;
@@ -171,4 +173,4 @@ ROM_START( pesadelo )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 
-GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games)", "Pesadelo (bootleg of Konami Knightmare)", MACHINE_SUPPORTS_SAVE )

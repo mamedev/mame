@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/142354502350/the-konami-picno-%E3%83%94%E3%82%AF%E3%83%8E-1992-a-drawing-tablet:
 (* denotes dumped)
    RX101 Save Card / セーブカード
@@ -21,9 +23,9 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
   *RX116 Kanji Club / 漢字俱楽部
    RX117 Picno de Kuku / ピクノで九九
   *RX118 Shirayuki-hime Monogatari / しらゆきひめ物語
-   RX119 Nontan to Issho Anime Stamp / ノンタンといっしょ アニメスタンプ
+  *RX119 Nontan to Issho Anime Stamp / ノンタンといっしょ アニメスタンプ
    RX120 Manfī no Fushigi na Bōken / マンフィーのふしぎなぼうけん
-   RX121 ???
+   RX121 Hello Kitty no Eikawa / ハローキティの英会話
   *RX122 Son Gokū no Bōken / そんごくうの冒険
    RX123 Sen'yō Card Soft / 専用カードソフト
    RX124 Chibimaruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
@@ -108,6 +110,19 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="262144">
 				<rom name="rx102.bin" size="262144" crc="014b1da5" sha1="718000598da119fde15899e0b746e0d1b3c9b038" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anistamp" supported="no">
+		<description>Nontan to Issho Anime Stamp</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX119"/>
+		<info name="alt_title" value="ノンタンといっしょ アニメスタンプ"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx119.bin" size="524288" crc="1e4a8b5c" sha1="d5f67f2249f6662ba6209a8c6a91b882ddfd84a0" />
 			</dataarea>
 		</part>
 	</software>

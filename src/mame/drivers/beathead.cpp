@@ -187,7 +187,7 @@ void beathead_state::update_interrupts()
 }
 
 
-WRITE32_MEMBER( beathead_state::interrupt_control_w )
+void beathead_state::interrupt_control_w(offs_t offset, uint32_t data)
 {
 	int irq = offset & 3;
 	int control = (offset >> 2) & 1;
@@ -205,7 +205,7 @@ WRITE32_MEMBER( beathead_state::interrupt_control_w )
 }
 
 
-READ32_MEMBER( beathead_state::interrupt_control_r )
+uint32_t beathead_state::interrupt_control_r()
 {
 	/* return the enables as a bitfield */
 	return (m_irq_enable[0]) | (m_irq_enable[1] << 1) | (m_irq_enable[2] << 2);
@@ -219,7 +219,7 @@ READ32_MEMBER( beathead_state::interrupt_control_r )
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::sound_reset_w )
+void beathead_state::sound_reset_w(offs_t offset, uint32_t data)
 {
 	logerror("Sound reset = %d\n", !offset);
 	m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
@@ -233,7 +233,7 @@ WRITE32_MEMBER( beathead_state::sound_reset_w )
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::coin_count_w )
+void beathead_state::coin_count_w(offs_t offset, uint32_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, !offset);
 }
@@ -336,7 +336,7 @@ INPUT_PORTS_END
 void beathead_state::beathead(machine_config &config)
 {
 	/* basic machine hardware */
-	ASAP(config, m_maincpu, ATARI_CLOCK_14MHz);
+	ASAP(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &beathead_state::main_map);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);

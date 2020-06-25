@@ -126,13 +126,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
+void mermaid_state::mermaid_ay8910_write_port_w(uint8_t data)
 {
 	if (m_ay8910_enable[0]) m_ay8910[0]->data_w(data);
 	if (m_ay8910_enable[1]) m_ay8910[1]->data_w(data);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
+void mermaid_state::mermaid_ay8910_control_port_w(uint8_t data)
 {
 	if (m_ay8910_enable[0]) m_ay8910[0]->address_w(data);
 	if (m_ay8910_enable[1]) m_ay8910[1]->address_w(data);
@@ -397,10 +397,10 @@ void mermaid_state::machine_reset()
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-WRITE8_MEMBER(mermaid_state::adpcm_data_w)
+void mermaid_state::adpcm_data_w(uint8_t data)
 {
 	m_adpcm_data = data;
-	m_adpcm->write_data(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
+	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
@@ -409,7 +409,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 		return;
 
 	m_adpcm_trigger ^= 1;
-	m_adpcm->write_data(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
+	m_adpcm->data_w(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
 	m_adpcm_counter->clock_w(m_adpcm_trigger);
 	if (m_adpcm_trigger == 0 && m_adpcm_counter->count() == 0)
 	{

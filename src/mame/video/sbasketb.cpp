@@ -90,13 +90,13 @@ void sbasketb_state::sbasketb_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_videoram_w)
+void sbasketb_state::sbasketb_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
+void sbasketb_state::sbasketb_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(sbasketb_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void sbasketb_state::video_start()

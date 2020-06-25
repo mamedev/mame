@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="sol20_cass" description="PTC SOL-20 cassettes">
 
 <!--
-These programs were .svt (Solace Virtual Tape) files, currently only partially supported in MESS emulator and therefore marked as unsupported.
+These programs were .svt (Solace Virtual Tape) files, currently only partially supported in Mame emulator and therefore marked as unsupported.
 Downloaded from http://www.sol20.org (Note: .svt files: pilot, space and strategy, for which exist recreated .wav version, were rejected.)
 -->
 
@@ -128,8 +131,8 @@ Owner's Manual at http://primepuzzle.com/tc/tiny_c_docs_8080_PDP11.zip
 
 
 <!--
-These programs were downloaded as ASCII text format files (.bs5, .ecb, .ent) and using MESS emu text paste option recreated into .wav tape files.
-NOTE: ALL RECREATED FILES HAVE BEEN TESTED TO WORK FINE WITH MESS EMULATOR ... THE COMPATIBILITY WITH A REAL SOL-20 SYSTEM IS UNKNOWN/UNTESTED!
+These programs were downloaded as ASCII text format files (.bs5, .ecb, .ent) and using Mame emu text paste option recreated into .wav tape files.
+NOTE: ALL RECREATED FILES HAVE BEEN TESTED TO WORK FINE WITH MAME EMULATOR ... THE COMPATIBILITY WITH A REAL SOL-20 SYSTEM IS UNKNOWN/UNTESTED!
 http://www.sol20.org/programs.html (Note: On the same link exist manuals for most programs, and some are necessary in order to know how to use.)
 -->
 
@@ -435,7 +438,7 @@ Music System by Software Technology Corp., a division of Processor Technology
 In SOLOS monitor "XEQ MUSIC" to load/autorun or "GET MUSIC" and then "EXEC 0".
 
 HOW TO USE THE MUSIC SYSTEM - see manual p.22
-THE MUSIC SYSTEM CIRCUIT BOARD - see manual p.3 (schematic p.7) (Note: Seems Solance emu support it but MESS dont!?)
+THE MUSIC SYSTEM CIRCUIT BOARD - see manual p.3 (schematic p.7)
 
 User Manual at http://www.sol20.org/manuals/music.pdf
 -->
@@ -501,7 +504,7 @@ User Manual at http://www.sol20.org/manuals/img/pilot-img.pdf
 Space Games from Creative Computing Software
 
     ASTER   3000 0901           ;asteroids; not to be confused with arcade game
-    LUNAR C 3C20 1FFC   (Ext BASIC) ;lunar lander (Note: a problem with keyboard not responding in MESS emu!)
+    LUNAR C 3C20 1FFC   (Ext BASIC) ;lunar lander (Note: a problem with keyboard not responding in Mame emu!)
     STRWR C 3C20 144D   (Ext BASIC) ;star wars
     ROMLN C 3C20 13F4   (Ext BASIC) ;romulan
 
@@ -626,7 +629,7 @@ Various games written by Ray White
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
 
-Note: If in some of games a screen starts blinking, then in MESS select in "Deep Swithches" Cursor Type "Solid"!
+Note: If in some games the screen starts blinking, then in Mame select in "Dip Switches" Cursor Type "Solid".
 -->
 	<software name="various1">
 		<description>Various games written by Ray White</description>
@@ -695,7 +698,7 @@ Standalone software of various origins
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
 
-Note: If in some of games a screen starts blinking, then in MESS emu select in "Deep Swithches" Cursor Type "Solid"!
+Note: If in some games the screen starts blinking, then in Mame select in "Dip Switches" Cursor Type "Solid".
 
 Note for #5: Moves are entered using decimal coordinates, using this grid:
 
@@ -817,7 +820,7 @@ How to load BASIC/5 programs:
 
 Note that BASIC/5 assumes your computer has 8KB of memory. If you need to work with programs larger than that,
 you must give a command "SET M=49000" (or whateer you want the top of memory to be) before running the program.
-Note if you using basic5_48K.wav instead od basic5_orig.wav, there is no need for this.
+Note if you using basic5_48K.wav instead of basic5_orig.wav, there is no need for this.
 -->
 	<software name="bs5_coll">
 		<description>Collection of selected BASIC/5 programs</description>

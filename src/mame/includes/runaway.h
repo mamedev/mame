@@ -28,15 +28,15 @@ public:
 	void runaway(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(runaway_input_r);
-	DECLARE_WRITE8_MEMBER(runaway_irq_ack_w);
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
-	DECLARE_WRITE8_MEMBER(runaway_paletteram_w);
-	DECLARE_WRITE8_MEMBER(runaway_video_ram_w);
+	uint8_t runaway_input_r(offs_t offset);
+	void runaway_irq_ack_w(uint8_t data);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
+	void runaway_paletteram_w(offs_t offset, uint8_t data);
+	void runaway_video_ram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tile_bank_w);
-	DECLARE_READ8_MEMBER(runaway_pot_r);
+	uint8_t runaway_pot_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(runaway_get_tile_info);
 	TILE_GET_INFO_MEMBER(qwak_get_tile_info);
 	DECLARE_VIDEO_START(qwak);

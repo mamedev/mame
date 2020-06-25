@@ -424,12 +424,12 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 	}
 }
 
-READ8_MEMBER( multipcm_device::read )
+uint8_t multipcm_device::read()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( multipcm_device::write )
+void multipcm_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -453,7 +453,7 @@ DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MULTIPCM, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
+		device_rom_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_slots(nullptr),
 		m_cur_slot(0),

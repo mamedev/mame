@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 /* NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor */
 
 /* There are two modes for the uPD7759, selected through the !MD pin.
@@ -15,7 +17,7 @@
 
 class upd775x_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface
+	public device_rom_interface<17>
 {
 public:
 	enum : u32 { STANDARD_CLOCK = 640'000 };
@@ -23,6 +25,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	virtual void port_w(u8 data);
+	void set_start_delay(uint32_t data) { m_start_delay = data; };
 
 protected:
 	// chip states
@@ -89,6 +92,7 @@ protected:
 	uint8_t       m_first_valid_header;         /* did we get our first valid header yet? */
 	uint32_t      m_offset;                     /* current ROM offset */
 	uint32_t      m_repeat_offset;              /* current ROM repeat offset */
+	uint32_t      m_start_delay;
 
 	/* ADPCM processing */
 	int8_t        m_adpcm_state;                /* ADPCM state index */

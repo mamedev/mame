@@ -94,21 +94,21 @@ protected:
 
 private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
-	DECLARE_WRITE16_MEMBER(tms34061_w);
-	DECLARE_READ16_MEMBER(tms34061_r);
+	void tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t tms34061_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_WRITE8_MEMBER(output3_w);
-	DECLARE_WRITE8_MEMBER(output4_w);
-	DECLARE_WRITE8_MEMBER(output5_w);
-	DECLARE_WRITE8_MEMBER(output6_w);
-	DECLARE_READ8_MEMBER(sn76489_ready_r);
-	DECLARE_WRITE8_MEMBER(sn76489_buffer_w);
-	DECLARE_WRITE8_MEMBER(system_w);
-	DECLARE_READ8_MEMBER(watchdog_r);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
+	void output1_w(uint8_t data);
+	void output2_w(uint8_t data);
+	void output3_w(uint8_t data);
+	void output4_w(uint8_t data);
+	void output5_w(uint8_t data);
+	void output6_w(uint8_t data);
+	uint8_t sn76489_ready_r();
+	void sn76489_buffer_w(uint8_t data);
+	void system_w(uint8_t data);
+	uint8_t watchdog_r();
+	void watchdog_w(uint8_t data);
 
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -233,7 +233,7 @@ EF9369_COLOR_UPDATE( guab_state::ef9369_color_update )
 	m_palette->set_pen_color(entry, pal4bit(ca), pal4bit(cb), pal4bit(cc));
 }
 
-WRITE16_MEMBER( guab_state::tms34061_w )
+void guab_state::tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
@@ -251,7 +251,7 @@ WRITE16_MEMBER( guab_state::tms34061_w )
 		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
-READ16_MEMBER( guab_state::tms34061_r )
+uint16_t guab_state::tms34061_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
@@ -313,20 +313,20 @@ void guab_state::machine_start()
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 
-READ8_MEMBER( guab_state::watchdog_r )
+uint8_t guab_state::watchdog_r()
 {
 	// only read after writing the sequence below
 	return 0xff;
 }
 
-WRITE8_MEMBER( guab_state::watchdog_w )
+void guab_state::watchdog_w(uint8_t data)
 {
 	// watchdog?
 	// writes b 3 1 5 d a 2 0 4 0 8   b 3 1 5 d a 2 0 4 0 8
 	// then later toggles between 0 and f
 }
 
-WRITE8_MEMBER( guab_state::system_w )
+void guab_state::system_w(uint8_t data)
 {
 	// bit 0, sound latch
 	if (m_sound_latch != bool(BIT(data, 0)))
@@ -363,7 +363,7 @@ INPUT_CHANGED_MEMBER( guab_state::coin_inserted )
 	}
 }
 
-WRITE8_MEMBER( guab_state::output1_w )
+void guab_state::output1_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0); // cash in (ten up: cash in)
 	m_leds[1] = BIT(data, 1); // cash out (ten up: cash out)
@@ -375,7 +375,7 @@ WRITE8_MEMBER( guab_state::output1_w )
 	m_leds[7] = BIT(data, 7);
 }
 
-WRITE8_MEMBER( guab_state::output2_w )
+void guab_state::output2_w(uint8_t data)
 {
 	m_leds[8] = BIT(data, 0);
 	m_leds[9] = BIT(data, 1);
@@ -387,7 +387,7 @@ WRITE8_MEMBER( guab_state::output2_w )
 	m_leds[15] = BIT(data, 7); // lamp b (ten up: pass)
 }
 
-WRITE8_MEMBER( guab_state::output3_w )
+void guab_state::output3_w(uint8_t data)
 {
 	m_leds[16] = BIT(data, 0); // select (ten up: collect)
 	m_leds[17] = BIT(data, 1); // (ten up: feature 14)
@@ -399,7 +399,7 @@ WRITE8_MEMBER( guab_state::output3_w )
 	m_leds[23] = BIT(data, 7);
 }
 
-WRITE8_MEMBER( guab_state::output4_w )
+void guab_state::output4_w(uint8_t data)
 {
 	m_leds[24] = BIT(data, 0); // feature 1 (ten up: feature 1)
 	m_leds[25] = BIT(data, 1); // feature 2 (ten up: feature 10)
@@ -411,7 +411,7 @@ WRITE8_MEMBER( guab_state::output4_w )
 	m_leds[31] = BIT(data, 7); // feature 8 (ten up: feature 5)
 }
 
-WRITE8_MEMBER( guab_state::output5_w )
+void guab_state::output5_w(uint8_t data)
 {
 	m_leds[32] = BIT(data, 0);
 	m_leds[33] = BIT(data, 1);
@@ -423,7 +423,7 @@ WRITE8_MEMBER( guab_state::output5_w )
 	m_leds[39] = BIT(data, 7); // mech lamp (ten up: mech lamp)
 }
 
-WRITE8_MEMBER( guab_state::output6_w )
+void guab_state::output6_w(uint8_t data)
 {
 	m_leds[40] = BIT(data, 0);
 	m_leds[41] = BIT(data, 1);
@@ -449,13 +449,13 @@ DEVICE_INPUT_DEFAULTS_END
 //  AUDIO
 //**************************************************************************
 
-READ8_MEMBER( guab_state::sn76489_ready_r )
+uint8_t guab_state::sn76489_ready_r()
 {
 	// bit 7 connected to sn76489 ready output (0 = ready)
 	return ~(m_sn->ready_r() << 7);
 }
 
-WRITE8_MEMBER( guab_state::sn76489_buffer_w )
+void guab_state::sn76489_buffer_w(uint8_t data)
 {
 	m_sound_buffer = data;
 }

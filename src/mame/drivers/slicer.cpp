@@ -28,7 +28,7 @@ public:
 	void slicer(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(sio_out_w);
+	void sio_out_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(drive_size_w);
 	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
 
@@ -39,7 +39,7 @@ private:
 	required_device<scsi_port_device> m_sasi;
 };
 
-WRITE8_MEMBER(slicer_state::sio_out_w)
+void slicer_state::sio_out_w(uint8_t data)
 {
 	floppy_image_device *floppy;
 	int state = (data & 0x80) ? 0 : 1;
@@ -86,10 +86,10 @@ void slicer_state::slicer_io(address_map &map)
 	map(0x0080, 0x00ff).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); //PCS1
 	map(0x0100, 0x010f).mirror(0x0070).w("drivelatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); //PCS2
 	// TODO: 0x180 sets ack
-	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::bus_r)).w("sasi_data_out", FUNC(output_latch_device::bus_w)).umask16(0x00ff); //PCS3
-	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
-	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::bus_r)).w("sasi_data_out", FUNC(output_latch_device::bus_w)).umask16(0x00ff);
-	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff); //PCS3
+	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff);
+	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
 }
 
 static void slicer_floppies(device_slot_interface &device)
@@ -100,7 +100,7 @@ static void slicer_floppies(device_slot_interface &device)
 
 void slicer_state::slicer(machine_config &config)
 {
-	i80186_cpu_device &maincpu(I80186(config, "maincpu", 16_MHz_XTAL / 2));
+	i80186_cpu_device &maincpu(I80186(config, "maincpu", 16_MHz_XTAL)); // 8 MHz clock output
 	maincpu.set_addrmap(AS_PROGRAM, &slicer_state::slicer_map);
 	maincpu.set_addrmap(AS_IO, &slicer_state::slicer_io);
 

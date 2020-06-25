@@ -167,7 +167,7 @@ ROM_END
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QS1000, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
+		device_rom_interface(mconfig, *this),
 		m_external_rom(false),
 		m_in_p1_cb(*this),
 		m_in_p2_cb(*this),
@@ -259,6 +259,9 @@ void qs1000_device::device_start()
 		save_item(NAME(m_channels[i].m_regs), i);
 		save_item(NAME(m_channels[i].m_adpcm.m_signal), i);
 		save_item(NAME(m_channels[i].m_adpcm.m_step), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_loop_signal), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_loop_step), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_saved), i);
 	}
 }
 
@@ -279,7 +282,7 @@ void qs1000_device::serial_in(uint8_t data)
 //-------------------------------------------------
 //  set_irq - interrupt the internal CPU
 //-------------------------------------------------
-WRITE_LINE_MEMBER(qs1000_device::set_irq)
+void qs1000_device::set_irq(int state)
 {
 	// Signal to the CPU that data is available
 	m_cpu->set_input_line(MCS51_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -290,7 +293,7 @@ WRITE_LINE_MEMBER(qs1000_device::set_irq)
 //  data_to_i8052 - called by the 8052 core to
 //  receive serial data
 //-------------------------------------------------
-READ8_MEMBER(qs1000_device::data_to_i8052)
+uint8_t qs1000_device::data_to_i8052()
 {
 	return m_serial_data_in;
 }
@@ -320,7 +323,7 @@ void qs1000_device::device_timer(emu_timer &timer, device_timer_id id, int param
 //-------------------------------------------------
 //  p0_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p0_r )
+uint8_t  qs1000_device::p0_r()
 {
 	return 0xff;
 }
@@ -329,7 +332,7 @@ READ8_MEMBER( qs1000_device::p0_r )
 //-------------------------------------------------
 //  p1_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p1_r )
+uint8_t  qs1000_device::p1_r()
 {
 	return m_in_p1_cb(0);
 }
@@ -338,7 +341,7 @@ READ8_MEMBER( qs1000_device::p1_r )
 //-------------------------------------------------
 //  p2_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p2_r )
+uint8_t  qs1000_device::p2_r()
 {
 	return m_in_p2_cb(0);
 }
@@ -347,7 +350,7 @@ READ8_MEMBER( qs1000_device::p2_r )
 //-------------------------------------------------
 //  p3_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p3_r )
+uint8_t qs1000_device::p3_r()
 {
 	return m_in_p3_cb(0);
 }
@@ -356,7 +359,7 @@ READ8_MEMBER( qs1000_device::p3_r )
 //-------------------------------------------------
 //  p0_w
 //-------------------------------------------------
-WRITE8_MEMBER( qs1000_device::p0_w )
+void qs1000_device::p0_w(uint8_t data)
 {
 }
 
@@ -365,7 +368,7 @@ WRITE8_MEMBER( qs1000_device::p0_w )
 //  p1_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::p1_w )
+void qs1000_device::p1_w(uint8_t data)
 {
 	m_out_p1_cb((offs_t)0, data);
 }
@@ -375,7 +378,7 @@ WRITE8_MEMBER( qs1000_device::p1_w )
 //  p2_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::p2_w )
+void qs1000_device::p2_w(uint8_t data)
 {
 	m_out_p2_cb((offs_t)0, data);
 }
@@ -385,7 +388,7 @@ WRITE8_MEMBER( qs1000_device::p2_w )
 //  p3_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::p3_w )
+void qs1000_device::p3_w(uint8_t data)
 {
 	m_out_p3_cb((offs_t)0, data);
 }
@@ -395,7 +398,7 @@ WRITE8_MEMBER( qs1000_device::p3_w )
 //  wave_w - process writes to wavetable engine
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::wave_w )
+void qs1000_device::wave_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -504,8 +507,17 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					{
 						chan.m_adpcm_addr++;
 
-						if (chan.m_start + chan.m_adpcm_addr >=  chan.m_loop_end)
+						if (chan.m_start + chan.m_adpcm_addr >= chan.m_loop_end)
+						{
 							chan.m_adpcm_addr = chan.m_loop_start - chan.m_start;
+#if 0 // Looping disabled until envelopes work
+							chan.m_adpcm.restore();
+						}
+						if (chan.m_start + chan.m_adpcm_addr == chan.m_loop_start)
+						{
+							chan.m_adpcm.save();
+#endif
+						}
 
 						uint8_t data = read_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
 						uint8_t nibble = (chan.m_adpcm_addr & 1 ? data : data >> 4) & 0xf;

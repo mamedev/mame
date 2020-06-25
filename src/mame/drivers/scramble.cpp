@@ -62,12 +62,12 @@ void scramble_state::scramble_map(address_map &map)
 	map(0x8200, 0x8203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-READ8_MEMBER(scramble_state::scramble_soundram_r)
+uint8_t scramble_state::scramble_soundram_r(offs_t offset)
 {
 	return m_soundram[offset & 0x03ff];
 }
 
-WRITE8_MEMBER(scramble_state::scramble_soundram_w)
+void scramble_state::scramble_soundram_w(offs_t offset, uint8_t data)
 {
 	m_soundram[offset & 0x03ff] = data;
 }
@@ -109,22 +109,22 @@ void scramble_state::ckongs_map(address_map &map)
 
 
 
-READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
+uint8_t scramble_state::mars_ppi8255_0_r(offs_t offset)
 {
 	return m_ppi8255_0->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
-READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
+uint8_t scramble_state::mars_ppi8255_1_r(offs_t offset)
 {
 	return m_ppi8255_1->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
-WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
+void scramble_state::mars_ppi8255_0_w(offs_t offset, uint8_t data)
 {
 	m_ppi8255_0->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
-WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
+void scramble_state::mars_ppi8255_1_w(offs_t offset, uint8_t data)
 {
 	m_ppi8255_1->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
@@ -341,7 +341,7 @@ void scramble_state::hotshock_sound_io_map(address_map &map)
 
 
 
-READ8_MEMBER(scramble_state::hncholms_prot_r)
+uint8_t scramble_state::hncholms_prot_r()
 {
 	if(m_maincpu->pc() == 0x2b || m_maincpu->pc() == 0xa27)
 		return 1;
@@ -1538,6 +1538,7 @@ void scramble_state::hunchbks(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
 	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.intack_handler().set_constant(0x03);
 	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));

@@ -124,7 +124,7 @@ void a1bus_device::set_nmi_line(int state)
 	m_out_nmi_cb(state);
 }
 
-void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void a1bus_device::install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	m_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
@@ -190,7 +190,7 @@ void device_a1bus_card_interface::interface_pre_start()
 	m_a1bus->add_a1bus_card(this);
 }
 
-void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }

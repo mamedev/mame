@@ -31,6 +31,8 @@ enum
 	HANDSET
 };
 
+#define TI_JOYPORT_TAG     "joyport"
+
 class joyport_device;
 
 /********************************************************************

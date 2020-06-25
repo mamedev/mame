@@ -91,11 +91,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	READ8_MEMBER( ram_r );
-	WRITE8_MEMBER( ram_w );
-	READ8_MEMBER( io_r );
-	WRITE8_MEMBER( io_w );
-	READ8_MEMBER( io2_r );
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io2_r(offs_t offset);
 
 	void laser3k_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -249,12 +249,12 @@ void laser3k_state::machine_reset()
 	rom[0x4607] = 0;
 }
 
-READ8_MEMBER( laser3k_state::ram_r )
+uint8_t laser3k_state::ram_r(offs_t offset)
 {
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER( laser3k_state::ram_w )
+void laser3k_state::ram_w(offs_t offset, uint8_t data)
 {
 	m_ram->write(offset, data);
 }
@@ -397,7 +397,7 @@ void laser3k_state::do_io(int offset)
 	}
 }
 
-READ8_MEMBER( laser3k_state::io_r )
+uint8_t laser3k_state::io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -431,7 +431,7 @@ READ8_MEMBER( laser3k_state::io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( laser3k_state::io_w )
+void laser3k_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -472,7 +472,7 @@ WRITE8_MEMBER( laser3k_state::io_w )
 	}
 }
 
-READ8_MEMBER( laser3k_state::io2_r )
+uint8_t laser3k_state::io2_r(offs_t offset)
 {
 	switch (offset)
 	{

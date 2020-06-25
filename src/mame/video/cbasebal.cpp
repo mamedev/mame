@@ -13,7 +13,7 @@
 TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 {
 	uint8_t attr = m_scrollram[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_scrollram[2 * tile_index] + ((attr & 0x07) << 8) + 0x800 * m_tilebank,
 			(attr & 0xf0) >> 4,
 			(attr & 0x08) ? TILE_FLIPX : 0);
@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(cbasebal_state::get_fg_tile_info)
 {
 	uint8_t attr = m_textram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_textram[tile_index] + ((attr & 0xf0) << 4),
 			attr & 0x07,
 			(attr & 0x08) ? TILE_FLIPX : 0);
@@ -58,29 +58,29 @@ void cbasebal_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_textram_w)
+void cbasebal_state::cbasebal_textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(cbasebal_state::cbasebal_textram_r)
+uint8_t cbasebal_state::cbasebal_textram_r(offs_t offset)
 {
 	return m_textram[offset];
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_scrollram_w)
+void cbasebal_state::cbasebal_scrollram_w(offs_t offset, uint8_t data)
 {
 	m_scrollram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_MEMBER(cbasebal_state::cbasebal_scrollram_r)
+uint8_t cbasebal_state::cbasebal_scrollram_r(offs_t offset)
 {
 	return m_scrollram[offset];
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
+void cbasebal_state::cbasebal_gfxctrl_w(uint8_t data)
 {
 	/* bit 0 is unknown - toggles continuously */
 
@@ -110,13 +110,13 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
 	/* other bits unknown, but used */
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_scrollx_w)
+void cbasebal_state::cbasebal_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scroll_x[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] + 256 * m_scroll_x[1]);
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_scrolly_w)
+void cbasebal_state::cbasebal_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scroll_y[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] + 256 * m_scroll_y[1]);

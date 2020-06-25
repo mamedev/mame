@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:
 /***************************************************************************
 
 2013-09-10 Skeleton driver for Televideo TS816
@@ -41,12 +41,12 @@ public:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(port68_w);
-	DECLARE_WRITE8_MEMBER(port78_w);
-	DECLARE_WRITE8_MEMBER(porte0_w);
-	DECLARE_WRITE8_MEMBER(portf0_w);
+	uint8_t keyin_r();
+	uint8_t status_r();
+	void port68_w(uint8_t data);
+	void port78_w(uint8_t data);
+	void porte0_w(uint8_t data);
+	void portf0_w(uint8_t data);
 
 	void ts816_io(address_map &map);
 	void ts816_mem(address_map &map);
@@ -95,7 +95,7 @@ void ts816_state::ts816_io(address_map &map)
 	map(0x68, 0x68).w(FUNC(ts816_state::port68_w)); // set 2nd bank latch
 	map(0x70, 0x78).w(FUNC(ts816_state::port78_w)); // reset 2nd bank latch (manual can't decide between 70 and 78, so we take both)
 	map(0x80, 0x83).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // CTC 1 (ch 0 baud A)
-	map(0x90, 0x93).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // DMA
+	map(0x90, 0x93).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // DMA
 	map(0xA0, 0xA0); // WDC status / command
 	map(0xA1, 0xA1); // WDC data
 	map(0xB0, 0xB0).noprw(); // undocumented, written to at @0707 and @0710
@@ -124,14 +124,14 @@ static INPUT_PORTS_START( ts816 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( ts816_state::keyin_r )
+uint8_t ts816_state::keyin_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( ts816_state::status_r )
+uint8_t ts816_state::status_r()
 {
 	if (m_status)
 	{
@@ -142,25 +142,25 @@ READ8_MEMBER( ts816_state::status_r )
 		return 4;
 }
 
-WRITE8_MEMBER( ts816_state::port68_w )
+void ts816_state::port68_w(uint8_t data)
 {
 	m_2ndbank = 1;
 	set_banks();
 }
 
-WRITE8_MEMBER( ts816_state::port78_w )
+void ts816_state::port78_w(uint8_t data)
 {
 	m_2ndbank = 0;
 	set_banks();
 }
 
-WRITE8_MEMBER( ts816_state::porte0_w )
+void ts816_state::porte0_w(uint8_t data)
 {
 	m_endram = 1;
 	set_banks();
 }
 
-WRITE8_MEMBER( ts816_state::portf0_w )
+void ts816_state::portf0_w(uint8_t data)
 {
 	m_endram = 0;
 	set_banks();

@@ -40,8 +40,8 @@ public:
 	sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sg1000_expansion_slot_device();
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	bool is_readable(uint8_t offset);
 	bool is_writeable(uint8_t offset);
 
@@ -63,8 +63,8 @@ public:
 	// construction/destruction
 	virtual ~device_sg1000_expansion_slot_interface();
 
-	virtual DECLARE_READ8_MEMBER(peripheral_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(peripheral_w) { }
+	virtual uint8_t peripheral_r(offs_t offset) { return 0xff; }
+	virtual void peripheral_w(offs_t offset, uint8_t data) { }
 
 	virtual bool is_readable(uint8_t offset) { return true; }
 	virtual bool is_writeable(uint8_t offset) { return true; }

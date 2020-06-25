@@ -124,12 +124,12 @@ void segam1audio_device::device_reset()
 	m_uart->write_cts(0);
 }
 
-WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk1_w)
+void segam1audio_device::m1_snd_mpcm_bnk1_w(uint16_t data)
 {
 	m_mpcmbank1->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk2_w)
+void segam1audio_device::m1_snd_mpcm_bnk2_w(uint16_t data)
 {
 	m_mpcmbank2->set_entry(data & 3);
 }

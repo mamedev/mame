@@ -40,7 +40,7 @@ void cheekyms_state::cheekyms_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(cheekyms_state::port_40_w)
+void cheekyms_state::port_40_w(uint8_t data)
 {
 	m_sound_board->music_w(BIT(data, 7));
 	m_sound_board->cheese_w(BIT(data, 6));
@@ -52,7 +52,7 @@ WRITE8_MEMBER(cheekyms_state::port_40_w)
 }
 
 
-WRITE8_MEMBER(cheekyms_state::port_80_w)
+void cheekyms_state::port_80_w(uint8_t data)
 {
 	m_sound_board->coin_extra_w(BIT(data, 1));
 	m_sound_board->mute_w(BIT(data, 0));
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(cheekyms_state::get_tile_info)
 			color = palette | (x >> 1);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void cheekyms_state::video_start()

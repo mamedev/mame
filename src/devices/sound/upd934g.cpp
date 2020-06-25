@@ -115,7 +115,7 @@ void upd934g_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  INTERFACE
 //**************************************************************************
 
-WRITE8_MEMBER( upd934g_device::write )
+void upd934g_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

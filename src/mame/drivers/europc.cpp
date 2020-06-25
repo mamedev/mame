@@ -5,26 +5,26 @@
 *
 * Schneider Rundfunkwerke AG Euro PC and Euro PC II driver
 *
-* Manuals and BIOS files: ftp://ftp.cpcszene.de/pub/Computer/Schneider_PC/EuroPC_XT/
+* Manuals and BIOS files: ftp://ftp.cpcszene.de/pub/Computer/Schneider_PC/EuroPC_XT/ (down), mirror at https://lanowski.de/mirrors/
 *
 * Euro PC: Computer and floppy drive integrated into the keyboard, 8088, 512K RAM, there was an upgrade card for the ISA slot that took it to 640K, single ISA slot
            FD360 external 360K 5.25" DS DD floppy, FD720 external 720K 3,5" DS DD floppy, HD-20 external harddisk, internal graphics card is CGA or Hercules, 64KB VRAM
 * Euro PC II: like Euro PC, socket for 8087, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
-* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XT-IDE 20MB harddisk, connector for FD360 and FD720 was retained
+* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XTA (XT-IDE) 20MB harddisk, connector for FD360 and FD720 was retained
 *
-* Only BIOS versions >2.06 are supported so far because of changes in the memory management, according to https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/
-* Versions 2.04 and 2.05 only show a single dash on the top left of the screen.
+* https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/ claims Versions BIOS >=2.06 have a change in memory management.
+* Versions 2.04 and 2.05 only show a single dash on the top left of the screen, set slot 1 to from AGA to CGA or Hercules to get them to display.
 *
 * To get rid of the BIOS error messages when you first start the system, enter the BIOS with Ctrl-Alt-Esc, match the RAM size to your settings in MAME, set the CPU speed to 9.54MHz
-* and the graphics adapter to Color/Graphics 80, internal graphics off
+* and the graphics adapter to Color/Graphics 80 or Special Adapter, internal graphics off
 *
-* To-Do: * An external 20MB harddisk (Schneider HD20) can be added to the PC and PC II. This is a XT IDE drive. The BIOSs contain their own copy of the WD XT IDE BIOS that can be activated from the BIOS setup menu.
+* To-Do: * An external 20MB harddisk (Schneider HD20) can be added to the PC and PC II. This is a XTA (8-bit IDE) drive. The BIOSs contain their own copy of the WD XT IDE BIOS that can be activated from the BIOS setup menu.
 *          (load debug, then g=f000:a000 to enter formatter routine)
 *        * emulate internal graphics, but AGA is not quite the correct choice for the standard graphics adapter (it's a Commodore standard), as the Schneiders are only capable of switching between Hercules and CGA modes.
 *        * The PC 2 and XT have 768K of memory that can be configured from the BIOS setup as 640K, 640K+128K EMS and 512K+256K EMS. The EMS options are not visible in our emulation and loading the EMS driver fails.
 *          See http://forum.classic-computing.de/index.php?page=Thread&threadID=8380 for screenshots.
 *        * use correct AT style keyboard for XT
-*        * make BIOS versions v2.04 and v2.05 work
+*
 *
 *****************************************************************************************************/
 
@@ -34,7 +34,7 @@
 #include "bus/isa/aga.h"
 #include "bus/isa/fdc.h"
 #include "machine/genpc.h"
-#include "machine/nvram.h"
+#include "machine/m3002.h"
 #include "machine/pckeybrd.h"
 #include "machine/ram.h"
 
@@ -50,6 +50,7 @@ public:
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
 		m_ram(*this, RAM_TAG),
+		m_rtc(*this, "rtc"),
 		m_jim_state(0),
 		m_port61(0)
 	{ }
@@ -65,34 +66,20 @@ private:
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<ram_device> m_ram;
+	required_device<m3002_device> m_rtc;
 
-	DECLARE_WRITE8_MEMBER( europc_pio_w );
-	DECLARE_READ8_MEMBER( europc_pio_r );
+	void europc_pio_w(offs_t offset, uint8_t data);
+	uint8_t europc_pio_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( europc_jim_w );
-	DECLARE_READ8_MEMBER ( europc_jim_r );
-	DECLARE_READ8_MEMBER ( europc_jim2_r );
-
-	DECLARE_READ8_MEMBER( europc_rtc_r );
-	DECLARE_WRITE8_MEMBER( europc_rtc_w );
-
-	void europc_rtc_set_time();
+	void europc_jim_w(offs_t offset, uint8_t data);
+	uint8_t europc_jim_r(offs_t offset);
+	uint8_t europc_jim2_r();
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
 	isa8_aga_device::mode_t m_jim_mode;
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
-	uint8_t m_rtc_data[0x10];
-	int m_rtc_reg;
-	int m_rtc_state;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	emu_timer* m_rtc_timer;
-
-	enum
-	{
-		TIMER_RTC
-	};
 	void europc_io(address_map &map);
 	void europc_map(address_map &map);
 };
@@ -177,7 +164,7 @@ private:
 
 */
 
-WRITE8_MEMBER( europc_pc_state::europc_jim_w )
+void europc_pc_state::europc_jim_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -208,26 +195,26 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 		}
 		break;
 	case 0xa:
-		europc_rtc_w(space, 0, data);
+		m_rtc->write(data);
 		return;
 	}
 	logerror("jim write %.2x %.2x\n", offset, data);
 	m_jim_data[offset] = data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim_r )
+uint8_t europc_pc_state::europc_jim_r(offs_t offset)
 {
 	int data = 0;
 	switch(offset)
 	{
 	case 4: case 5: case 6: case 7: data = m_jim_data[offset]; break;
 	case 0: case 1: case 2: case 3: data = 0; break;
-	case 0xa: return europc_rtc_r(space, 0);
+	case 0xa: return m_rtc->read();
 	}
 	return data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim2_r )
+uint8_t europc_pc_state::europc_jim2_r()
 {
 	switch (m_jim_state)
 	{
@@ -271,99 +258,6 @@ READ8_MEMBER( europc_pc_state::europc_jim2_r )
    reg 0f: 01 status ok, when not 01 written
 */
 
-void europc_pc_state::europc_rtc_set_time()
-{
-	system_time systime;
-
-	/* get the current date/time from the core */
-	machine().current_datetime(systime);
-
-	m_rtc_data[0] = dec_2_bcd(systime.utc_time.second);
-	m_rtc_data[1] = dec_2_bcd(systime.utc_time.minute);
-	m_rtc_data[2] = dec_2_bcd(systime.utc_time.hour);
-
-	m_rtc_data[3] = dec_2_bcd(systime.utc_time.mday);
-	m_rtc_data[4] = dec_2_bcd(systime.utc_time.month + 1);
-	m_rtc_data[5] = dec_2_bcd(systime.utc_time.year % 100);
-}
-
-void europc_pc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	int month, year;
-
-	switch(id)
-	{
-		case TIMER_RTC:
-			m_rtc_data[0]=bcd_adjust(m_rtc_data[0]+1);
-			if (m_rtc_data[0]>=0x60)
-			{
-				m_rtc_data[0]=0;
-				m_rtc_data[1]=bcd_adjust(m_rtc_data[1]+1);
-				if (m_rtc_data[1]>=0x60)
-				{
-					m_rtc_data[1]=0;
-					m_rtc_data[2]=bcd_adjust(m_rtc_data[2]+1);
-					if (m_rtc_data[2]>=0x24)
-					{
-						m_rtc_data[2]=0;
-						m_rtc_data[3]=bcd_adjust(m_rtc_data[3]+1);
-						month=bcd_2_dec(m_rtc_data[4]);
-						year=bcd_2_dec(m_rtc_data[5])+2000; // save for julian_days_in_month_calculation
-						if (m_rtc_data[3]> gregorian_days_in_month(month, year))
-						{
-							m_rtc_data[3]=1;
-							m_rtc_data[4]=bcd_adjust(m_rtc_data[4]+1);
-							if (m_rtc_data[4]>0x12)
-							{
-								m_rtc_data[4]=1;
-								m_rtc_data[5]=bcd_adjust(m_rtc_data[5]+1)&0xff;
-							}
-						}
-					}
-				}
-			}
-			break;
-	}
-}
-
-READ8_MEMBER( europc_pc_state::europc_rtc_r )
-{
-	int data=0;
-	switch (m_rtc_state)
-	{
-	case 1:
-		data=(m_rtc_data[m_rtc_reg]&0xf0)>>4;
-		m_rtc_state++;
-		break;
-	case 2:
-		data=m_rtc_data[m_rtc_reg]&0xf;
-		m_rtc_state=0;
-//      logerror("rtc read %x %.2x\n",m_rtc_reg, m_rtc_data[m_rtc_reg]);
-		break;
-	}
-	return data;
-}
-
-WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
-{
-	switch (m_rtc_state)
-	{
-	case 0:
-		m_rtc_reg=data;
-		m_rtc_state=1;
-		break;
-	case 1:
-		m_rtc_data[m_rtc_reg]=(m_rtc_data[m_rtc_reg]&~0xf0)|((data&0xf)<<4);
-		m_rtc_state++;
-		break;
-	case 2:
-		m_rtc_data[m_rtc_reg]=(m_rtc_data[m_rtc_reg]&~0xf)|(data&0xf);
-		m_rtc_state=0;
-//      logerror("rtc written %x %.2x\n",m_rtc_reg, m_rtc_data[m_rtc_reg]);
-		break;
-	}
-}
-
 void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
@@ -380,20 +274,9 @@ void europc_pc_state::init_europc()
 			a += rom[i];
 		rom[0xffff] = 256 - a;
 	}
-
-	memset(&m_rtc_data,0,sizeof(m_rtc_data));
-	m_rtc_reg = 0;
-	m_rtc_state = 0;
-	m_rtc_data[0xf]=1;
-
-	m_rtc_timer = timer_alloc();
-	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
-	//  europc_rtc_set_time();
-
-	subdevice<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
 }
 
-WRITE8_MEMBER( europc_pc_state::europc_pio_w )
+void europc_pc_state::europc_pio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -411,13 +294,13 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 }
 
 
-READ8_MEMBER( europc_pc_state::europc_pio_r )
+uint8_t europc_pc_state::europc_pio_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
 	{
 	case 0:
-		data = m_keyboard->read(space, 0);
+		data = m_keyboard->read();
 		break;
 	case 1:
 		data = m_port61;
@@ -522,6 +405,10 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	void map(address_map &map);
 };
 
 DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
@@ -539,12 +426,26 @@ static void pc_dd_floppies(device_slot_interface &device)
 
 void europc_fdc_device::device_add_mconfig(machine_config &config)
 {
-	wd37c65c_device &fdc(WD37C65C(config, m_fdc, 16_MHz_XTAL));
-	fdc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
-	fdc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	WD37C65C(config, m_fdc, 16_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(europc_fdc_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(europc_fdc_device::drq_w));
 	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
+}
+
+void europc_fdc_device::device_start()
+{
+	set_isa_device();
+	m_isa->install_device(0x03f0, 0x03f7, *this, &europc_fdc_device::map);
+	m_isa->set_dma_channel(2, this, true);
+}
+
+void europc_fdc_device::map(address_map &map)
+{
+	map(2, 2).w(m_fdc, FUNC(wd37c65c_device::dor_w));
+	map(4, 5).m(m_fdc, FUNC(wd37c65c_device::map));
+	// TODO: DCR also decoded by JIM/BIGJIM
 }
 
 static void europc_fdc(device_slot_interface &device)
@@ -573,7 +474,7 @@ void europc_pc_state::europc(machine_config &config)
 	PC_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);;
+	M3002(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* internal ram */
 	// Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
@@ -645,6 +546,12 @@ ROM_START( euroxt )
 	ROMX_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v1.02", "EuroXT v1.02" )
 	ROMX_LOAD("euro_xt_bios_id.nr.51463_v1.02.bin", 0x8000, 0x8000, CRC(c36de60e) SHA1(c668cc9c5f3325233f30eac654678e1b8b7a7847), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "v1.04", "EuroXT v1.04" ) // no display
+	ROMX_LOAD("euro_xt_bios_v1.04_cs8b00_5.12.89_21_25.bin", 0x8000, 0x8000, CRC(24033a62) SHA1(9d1d89cb8b99569b6c0aaa7c6aceb355dc20b2fd), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "v1.05", "EuroXT v1.05" ) // no display
+	ROMX_LOAD("euro-xt_bios_id.nr.51463_v1.05.bin", 0x8000, 0x8000, CRC(e3d2591d) SHA1(710cdbafeb913f2e436b64eedd7a1794c589a48a), ROM_BIOS(3))
+
+	// BIOS ROM versions 1.02, 1.04 and 1.05 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
 ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS

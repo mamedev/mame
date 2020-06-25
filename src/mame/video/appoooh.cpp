@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index] + 256 * ((m_fg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			m_fg_colorram[tile_index] & 0x0f,
 			(m_fg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index] + 256 * ((m_bg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			m_bg_colorram[tile_index] & 0x0f,
 			(m_bg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
@@ -135,37 +135,37 @@ void appoooh_state::video_start()
 	save_item(NAME(m_priority));
 }
 
-WRITE8_MEMBER(appoooh_state::scroll_w)
+void appoooh_state::scroll_w(uint8_t data)
 {
 	m_scroll_x = data;
 }
 
 
-WRITE8_MEMBER(appoooh_state::fg_videoram_w)
+void appoooh_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::fg_colorram_w)
+void appoooh_state::fg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::bg_videoram_w)
+void appoooh_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::bg_colorram_w)
+void appoooh_state::bg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::out_w)
+void appoooh_state::out_w(uint8_t data)
 {
 	/* bit 0 controls NMI */
 	m_nmi_mask = data & 1;

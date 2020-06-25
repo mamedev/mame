@@ -63,11 +63,11 @@ public:
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( key_strobe_w ) { m_key_strobe_handler(state); }
-	DECLARE_WRITE8_MEMBER( key_data_w ) { m_key_data = data; }
+	void key_data_w(uint8_t data) { m_key_data = data; }
 
 	// called from host
 	DECLARE_WRITE_LINE_MEMBER( tx_w );
-	DECLARE_READ8_MEMBER( key_data_r ) { return m_key_data; }
+	uint8_t key_data_r() { return m_key_data; }
 
 protected:
 	// device-level overrides

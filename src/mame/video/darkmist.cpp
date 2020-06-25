@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 	code+=(attr&3)<<8;
 	pal=(attr>>4) & 0xf;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		code,
 		pal,
 		0);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 	code+=(attr&3)<<8;
 	pal=(attr>>4) & 0xf;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 		code,
 		pal,
 		0);
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 	code+=(attr&1)<<8;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		pal & 0xf,
 		0);
@@ -194,7 +194,7 @@ uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER(darkmist_state::tx_vram_w)
+void darkmist_state::tx_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_txtilemap->mark_tile_dirty(offset & 0x3ff);

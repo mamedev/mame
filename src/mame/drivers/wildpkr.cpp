@@ -213,17 +213,17 @@ private:
 	u16 m_clock_rate;
 
 	void wildpkr_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(unknown_read8);
-	DECLARE_WRITE8_MEMBER(unknown_write8);
-	DECLARE_WRITE16_MEMBER(nvram_w);
-	DECLARE_READ16_MEMBER(id_serial_r);
-	DECLARE_WRITE16_MEMBER(id_serial_w);
-	DECLARE_WRITE16_MEMBER(out0_w);
-	DECLARE_WRITE16_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_WRITE16_MEMBER(clock_start_w);
-	DECLARE_WRITE16_MEMBER(clock_rate_w);
-	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
+	u8 unknown_read8();
+	void unknown_write8(u8 data);
+	void nvram_w(offs_t offset, u16 data);
+	u16 id_serial_r();
+	void id_serial_w(u16 data);
+	void out0_w(u16 data);
+	void out1_w(u16 data);
+	void dac_w(u8 data);
+	void clock_start_w(u16 data);
+	void clock_rate_w(u16 data);
+	void unknown_trigger_w(u16 data);
 	u16 tabpkr_irq_ack(offs_t offset);
 	void cpu_space_map(address_map &map);
 	void hd63484_map(address_map &map);
@@ -255,44 +255,44 @@ void wildpkr_state::wildpkr_palette(palette_device &palette) const
 *      Misc Handlers     *
 *************************/
 
-READ8_MEMBER(wildpkr_state::unknown_read8)
+u8 wildpkr_state::unknown_read8()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(wildpkr_state::unknown_write8)
+void wildpkr_state::unknown_write8(u8 data)
 {
 }
 
-WRITE16_MEMBER(wildpkr_state::nvram_w)
+void wildpkr_state::nvram_w(offs_t offset, u16 data)
 {
 	m_nvram[offset] = data | 0xff00;
 }
 
-READ16_MEMBER(wildpkr_state::id_serial_r)
+u16 wildpkr_state::id_serial_r()
 {
 	return m_id->read();
 }
 
-WRITE16_MEMBER(wildpkr_state::id_serial_w)
+void wildpkr_state::id_serial_w(u16 data)
 {
 	m_id->write(data & 1);
 }
 
-WRITE16_MEMBER(wildpkr_state::out0_w)
+void wildpkr_state::out0_w(u16 data)
 {
 }
 
-WRITE16_MEMBER(wildpkr_state::out1_w)
+void wildpkr_state::out1_w(u16 data)
 {
 }
 
-WRITE8_MEMBER(wildpkr_state::dac_w)
+void wildpkr_state::dac_w(u8 data)
 {
 	m_dac->write(data);
 }
 
-WRITE16_MEMBER(wildpkr_state::clock_start_w)
+void wildpkr_state::clock_start_w(u16 data)
 {
 	if (data != 0 && m_clock_rate != 0)
 		m_dac_clock->set_clock_scale(1.0 / m_clock_rate);
@@ -300,12 +300,12 @@ WRITE16_MEMBER(wildpkr_state::clock_start_w)
 		m_dac_clock->set_clock_scale(0.0);
 }
 
-WRITE16_MEMBER(wildpkr_state::clock_rate_w)
+void wildpkr_state::clock_rate_w(u16 data)
 {
 	m_clock_rate = data;
 }
 
-WRITE16_MEMBER(wildpkr_state::unknown_trigger_w)
+void wildpkr_state::unknown_trigger_w(u16 data)
 {
 }
 
@@ -317,8 +317,7 @@ void wildpkr_state::wildpkr_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x113fff).ram();
-	map(0x800000, 0x800001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x800002, 0x800003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800000, 0x800003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x800080, 0x80009f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x800180, 0x800180).r(FUNC(wildpkr_state::unknown_read8));
 	map(0x800181, 0x800181).w(FUNC(wildpkr_state::unknown_write8));
@@ -336,8 +335,7 @@ void wildpkr_state::tabpkr_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();
 	map(0x300000, 0x303fff).ram();
 	map(0x400000, 0x400fff).ram().w(FUNC(wildpkr_state::nvram_w)).share("nvram");
-	map(0x500000, 0x500001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x500002, 0x500003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x500000, 0x500003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x500021, 0x500021).rw("ramdac", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
 	map(0x500023, 0x500023).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x500025, 0x500025).rw("ramdac", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));

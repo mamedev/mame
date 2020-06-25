@@ -425,18 +425,18 @@ public:
 	void init_mcircus();
 
 private:
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(_2800_r);
-	DECLARE_READ8_MEMBER(_2801_r);
-	DECLARE_READ8_MEMBER(_2c00_r);
-	DECLARE_READ8_MEMBER(_2c01_r);
-	DECLARE_READ8_MEMBER(_3800_r);
-	DECLARE_WRITE8_MEMBER(_1800_w);
-	DECLARE_WRITE8_MEMBER(_3800_w);
-	DECLARE_WRITE8_MEMBER(_3000_w);
-	DECLARE_WRITE8_MEMBER(_2801_w);
-	DECLARE_WRITE8_MEMBER(_2c01_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void bank_w(uint8_t data);
+	uint8_t _2800_r();
+	uint8_t _2801_r();
+	uint8_t _2c00_r();
+	uint8_t _2c01_r();
+	uint8_t _3800_r();
+	void _1800_w(offs_t offset, uint8_t data);
+	void _3800_w(offs_t offset, uint8_t data);
+	void _3000_w(offs_t offset, uint8_t data);
+	void _2801_w(offs_t offset, uint8_t data);
+	void _2c01_w(offs_t offset, uint8_t data);
 
 	void sfbonus_bitswap(uint8_t xor0, uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03, uint8_t b04, uint8_t b05, uint8_t b06,uint8_t b07,
 						uint8_t xor1, uint8_t b10, uint8_t b11, uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15, uint8_t b16,uint8_t b17,
@@ -804,7 +804,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_tile_info)
 	int flipx = (m_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = (m_tilemap_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			0,
 			TILE_FLIPYX(flipx | flipy));
@@ -819,13 +819,13 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_reel_tile_info)
 
 	int priority = (m_reel_ram[Reel][(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
-WRITE8_MEMBER(sfbonus_state::videoram_w)
+void sfbonus_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
@@ -1156,59 +1156,59 @@ void sfbonus_state::sfbonus_map(address_map &map)
 	map(0xf000, 0xffff).ram().share("nvram");
 }
 
-WRITE8_MEMBER(sfbonus_state::bank_w)
+void sfbonus_state::bank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 7);
 }
 
-READ8_MEMBER(sfbonus_state::_2800_r)
+uint8_t sfbonus_state::_2800_r()
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::_2801_r)
+uint8_t sfbonus_state::_2801_r()
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::_2c00_r)
+uint8_t sfbonus_state::_2c00_r()
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::_2c01_r)
+uint8_t sfbonus_state::_2c01_r()
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::_3800_r)
+uint8_t sfbonus_state::_3800_r()
 {
 	return 0xff;
 }
 
 
 // lamps and coin counters
-WRITE8_MEMBER(sfbonus_state::_1800_w)
+void sfbonus_state::_1800_w(offs_t offset, uint8_t data)
 {
 	m_1800_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::_3800_w)
+void sfbonus_state::_3800_w(offs_t offset, uint8_t data)
 {
 	m_3800_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::_3000_w)
+void sfbonus_state::_3000_w(offs_t offset, uint8_t data)
 {
 	m_3000_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::_2801_w)
+void sfbonus_state::_2801_w(offs_t offset, uint8_t data)
 {
 	m_2801_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::_2c01_w)
+void sfbonus_state::_2c01_w(offs_t offset, uint8_t data)
 {
 	m_2c01_regs[offset] = data;
 }

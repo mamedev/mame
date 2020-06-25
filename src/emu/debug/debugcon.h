@@ -107,16 +107,24 @@ public:
 		vprintf_wrap(wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	device_t *get_visible_cpu() { return m_visiblecpu; }
+	void set_visible_cpu(device_t *visiblecpu) { m_visiblecpu = visiblecpu; }
+	symbol_table &visible_symtable();
+
 	static std::string cmderr_to_string(CMDERR error);
 
 private:
 	void exit();
 
 	void execute_help_custom(int ref, const std::vector<std::string> &params);
+	void execute_condump(int ref, const std::vector<std::string>& params);
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
+
+	void print_core(const char *text);                   // core text output
+	void print_core_wrap(const char *text, int wrapcol); // core text output
 
 	struct debug_command
 	{
@@ -134,12 +142,16 @@ private:
 
 	running_machine &m_machine;
 
+	// visible CPU device (the one that commands should apply to)
+	device_t        *m_visiblecpu;
+
 	text_buffer     *m_console_textbuf;
 	text_buffer     *m_errorlog_textbuf;
 
 	std::forward_list<debug_command> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
+	std::unique_ptr<emu_file> m_logfile;                // logfile for debug console output
 };
 
 #endif // MAME_EMU_DEBUG_DEBUGCON_H

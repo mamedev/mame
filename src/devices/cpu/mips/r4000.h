@@ -9,6 +9,7 @@
 DECLARE_DEVICE_TYPE(R4000, r4000_device)
 DECLARE_DEVICE_TYPE(R4400, r4400_device)
 DECLARE_DEVICE_TYPE(R4600, r4600_device)
+DECLARE_DEVICE_TYPE(R5000, r5000_device)
 
 class r4000_base_device : public cpu_device
 {
@@ -326,6 +327,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// cpu implementation
+	virtual void handle_reserved_instruction(u32 const op);
 	void cpu_execute(u32 const op);
 	void cpu_exception(u32 exception, u16 const vector = 0x180);
 	void cpu_lwl(u32 const op);
@@ -354,8 +356,11 @@ protected:
 	// cp1 implementation
 	void cp1_unimplemented();
 	template <typename T> bool cp1_op(T op);
-	void cp1_execute(u32 const op);
+	virtual void cp1_execute(u32 const op);
+	virtual void cp1x_execute(u32 const op);
 	template <typename T> void cp1_set(unsigned const reg, T const data);
+	void cp1_mov_s(u32 const op);
+	void cp1_mov_d(u32 const op);
 
 	// cp2 implementation
 	void cp2_execute(u32 const op);
@@ -469,5 +474,24 @@ public:
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
 	}
+};
+
+class r5000_device : public r4000_base_device
+{
+public:
+	r5000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: r4000_base_device(mconfig, R5000, tag, owner, clock, 0x2320, 0x2320, CACHE_32K, CACHE_32K)
+	{
+		// no secondary cache
+		m_cp0[CP0_Config] |= CONFIG_SC;
+	}
+
+private:
+	virtual void handle_reserved_instruction(u32 const op) override;
+	virtual void cp1_execute(u32 const op) override;
+	virtual void cp1x_execute(u32 const op) override;
+
+	static u32 const s_fcc_masks[8];
+	static u32 const s_fcc_shifts[8];
 };
 #endif // MAME_CPU_MIPS_R4000_H

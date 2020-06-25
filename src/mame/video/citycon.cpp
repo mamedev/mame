@@ -26,7 +26,7 @@ TILEMAP_MAPPER_MEMBER(citycon_state::citycon_scan)
 
 TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index],
 			(tile_index & 0x03e0) >> 5, /* color depends on scanline only */
 			0);
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(citycon_state::get_bg_tile_info)
 {
 	uint8_t *rom = memregion("gfx4")->base();
 	int code = rom[0x1000 * m_bg_image + tile_index];
-	SET_TILE_INFO_MEMBER(3 + m_bg_image,
+	tileinfo.set(3 + m_bg_image,
 			code,
 			rom[0xc000 + 0x100 * m_bg_image + code],
 			0);
@@ -67,20 +67,20 @@ void citycon_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(citycon_state::citycon_videoram_w)
+void citycon_state::citycon_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(citycon_state::citycon_linecolor_w)
+void citycon_state::citycon_linecolor_w(offs_t offset, uint8_t data)
 {
 	m_linecolor[offset] = data;
 }
 
 
-WRITE8_MEMBER(citycon_state::citycon_background_w)
+void citycon_state::citycon_background_w(uint8_t data)
 {
 	/* bits 4-7 control the background image */
 	if (m_bg_image != (data >> 4))

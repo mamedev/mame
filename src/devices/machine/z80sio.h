@@ -3,6 +3,7 @@
 /***************************************************************************
 
     Z80-SIO Serial Input/Output
+    Z80-DART Dual Asynchronous Receiver/Transmitter
     Intel 8274 Multi-Protocol Serial Controller
     NEC µPD7201 Multiprotocol Serial Communications Controller
 
@@ -51,6 +52,28 @@
           R S S D K S D S S R D                  R S S D K S D S S R C
           A A A A   E B B B B B                  A A A A   E B B B B
                     T                                      T
+                                 _____   _____
+                         D1   1 |*    \_/     | 40  D0
+                         D3   2 |             | 39  D2
+                         D5   3 |             | 38  D4
+                         D7   4 |             | 37  D6
+                       _INT   5 |             | 36  _IORQ
+                        IEI   6 |             | 35  _CE
+                        IEO   7 |             | 34  B/_A
+                        _M1   8 |             | 33  C/_D
+                        Vdd   9 |             | 32  _RD
+                    _W/RDYA  10 |   Z80-DART  | 31  GND
+                       _RIA  11 |    Z8470    | 30  _W/RDYB
+                       RxDA  12 |             | 29  _RIB
+                      _RxCA  13 |             | 28  RxDB
+                      _TxCA  14 |             | 27  _RxTxCB
+                       TxDA  15 |             | 26  TxDB
+                      _DTRA  16 |             | 25  _DTRB
+                      _RTSA  17 |             | 24  _RTSB
+                      _CTSA  18 |             | 23  _CTSB
+                      _DCDA  19 |             | 22  _DCDB
+                        CLK  20 |_____________| 21  _RESET
+
                                  _____   _____
                         CLK   1 |*    \_/     | 40  Vcc
                      _RESET   2 |             | 39  _CTSA
@@ -149,6 +172,7 @@ class z80sio_device;
 class z80sio_channel : public device_t
 {
 	friend class z80sio_device;
+	friend class z80dart_device;
 	friend class i8274_device;
 	friend class upd7201_device;
 	friend class mk68564_device;
@@ -294,7 +318,7 @@ protected:
 	bool m_rx_crc_en;   // rx CRC enabled
 	bool m_rx_parity;   // accumulated parity
 
-	int m_rx_first;     // first character received
+	bool m_rx_first;    // first character received
 
 	int m_rxd;
 
@@ -319,8 +343,8 @@ protected:
 	int m_rts;          // request to send
 
 	// external/status monitoring
-	int m_ext_latched;  // changed data lines
-	int m_brk_latched;  // break status latched
+	bool m_ext_latched; // changed data lines
+	bool m_brk_latched; // break status latched
 	int m_cts;          // clear to send line state
 	int m_dcd;          // data carrier detect line state
 	int m_sync;         // sync line state
@@ -340,9 +364,9 @@ protected:
 	virtual bool transmit_allowed() const;
 
 	void receive_enabled();
-	void enter_hunt_mode();
-	void sync_receive();
-	void sdlc_receive();
+	virtual void enter_hunt_mode();
+	virtual void sync_receive();
+	virtual void sdlc_receive();
 	void receive_data();
 	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
@@ -352,18 +376,36 @@ protected:
 	void transmit_enable();
 	void transmit_complete();
 	void async_tx_setup();
-	void sync_tx_sr_empty();
+	virtual void sync_tx_sr_empty();
 	void tx_setup(uint16_t data, int bits, bool framing, bool crc_tx, bool abort_tx);
-	void tx_setup_idle();
+	virtual void tx_setup_idle();
 	bool get_tx_empty() const;
 	void set_tx_empty(bool prev_state, bool new_state);
 	void update_crc(uint16_t& crc , bool bit);
 
+	virtual void sync_save_state();
 	void reset_ext_status();
 	void read_ext();
 	void trigger_ext_int();
 
 	uint8_t const m_rr1_auto_reset;
+};
+
+
+// ======================> z80dart_channel
+
+class z80dart_channel : public z80sio_channel
+{
+public:
+	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void enter_hunt_mode() override;
+	virtual void sync_receive() override;
+	virtual void sdlc_receive() override;
+	virtual void sync_tx_sr_empty() override;
+	virtual void tx_setup_idle() override;
+	virtual void sync_save_state() override;
 };
 
 
@@ -534,6 +576,19 @@ protected:
 	int m_int_source[8]; // interrupt source
 };
 
+class z80dart_device : public z80sio_device
+{
+public:
+	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->sync_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->sync_w(state); }
+
+protected:
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
 class i8274_device : public z80sio_device
 {
 public:
@@ -582,6 +637,7 @@ private:
 
 // device type declaration
 DECLARE_DEVICE_TYPE(Z80SIO,         z80sio_device)
+DECLARE_DEVICE_TYPE(Z80DART,        z80dart_device)
 DECLARE_DEVICE_TYPE(I8274,          i8274_device)
 DECLARE_DEVICE_TYPE(UPD7201,        upd7201_device)
 DECLARE_DEVICE_TYPE(MK68564,        mk68564_device)

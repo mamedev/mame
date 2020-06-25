@@ -28,11 +28,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
+		, m_pio(*this, "pio")
 	{ }
 
-	void xavix2(machine_config &config);
+	virtual void config(machine_config &config);
 
-private:
+protected:
 	enum {
 		IRQ_TIMER =  7,
 		IRQ_DMA   = 12
@@ -40,17 +41,17 @@ private:
 
 	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<i2c_24c08_device> m_i2cmem;
+	optional_device<i2cmem_device> m_i2cmem;
+	required_ioport m_pio;
 
 	u32 m_dma_src;
 	u16 m_dma_dst;
 	u16 m_dma_count;
 	emu_timer *m_dma_timer;
 
-	u16 m_port0_ddr;
-	u32 m_port0_full;
-	u8  m_port0_dataw, m_port0_data;
-	u8  m_port0_maskw, m_port0_maskr;
+	u32 m_pio_mode[2];
+	u32 m_pio_dataw;
+	u32 m_pio_mask_out;
 
 	u16 m_gpu0_adr,  m_gpu0_count,  m_gpu1_adr,  m_gpu1_count;
 	u16 m_gpu0b_adr, m_gpu0b_count, m_gpu1b_adr, m_gpu1b_count;
@@ -89,7 +90,7 @@ private:
 	u16 gpu0b_count_r();
 	void gpu0b_count_w(u16 data);
 	void gpu0_trigger_w(u8 data);
-  
+
 	void gpu1_adr_w(u16 data);
 	u16 gpu1b_adr_r();
 	void gpu1b_adr_w(u16 data);
@@ -99,7 +100,7 @@ private:
 	void gpu1_trigger_w(u8 data);
 
 	void gpu_update(u16 count, u16 adr);
-  
+
 	void gpu_descsize_w(u16 data);
 	void gpu_descdata_w(u16 data);
 	void gpu_adr_w(u16 data);
@@ -119,13 +120,11 @@ private:
 	u8 debug_port_r();
 	u8 debug_port_status_r();
 
-	void port0_ddr_w(u16 data);
-	u16 port0_ddr_r();
-	void port0_update();
-	void port0_w(u32 data);
-	void port0_w8(u8 data);
-	u32 port0_r();
-	u8 port0_r8();
+	void pio_mode_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pio_mode_r(offs_t offset);
+	virtual void pio_update() = 0;
+	void pio_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pio_r();
 
 	void crtc_w(offs_t reg, u16 data);
 
@@ -135,6 +134,26 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void mem(address_map &map);
+};
+
+class naruto_state : public xavix2_state
+{
+public:
+	using xavix2_state::xavix2_state;
+	virtual void config(machine_config& config) override;
+
+protected:
+	virtual void pio_update() override;
+};
+
+class domyos_state : public xavix2_state
+{
+public:
+	using xavix2_state::xavix2_state;
+	virtual void config(machine_config& config) override;
+
+protected:
+	virtual void pio_update() override;
 };
 
 u32 xavix2_state::rgb555_888(u16 color)
@@ -294,12 +313,12 @@ void xavix2_state::gpu1_trigger_w(u8 data)
 
 void xavix2_state::gpu_update(u16 count, u16 adr)
 {
-	int list[count];
+	std::unique_ptr<int []> list(new int[count]);
 	for(u32 i=0; i != count; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*i);
 		list[i] = (command & 0x1fe00000) | i;
 	}
-	std::sort(list, list + count, std::greater<int>());
+	std::sort(list.get(), list.get() + count, std::greater<int>());
 	for(u32 i=0; i != count; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*(list[i] & 0xffff));
 		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x s=%02x w=%02x h=%02x c=%04x %s\n",
@@ -444,61 +463,48 @@ u8 xavix2_state::debug_port_status_r()
 	return 1<<1;
 }
 
-void xavix2_state::port0_ddr_w(u16 data)
+void xavix2_state::pio_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	//	logerror("%s: port0 ddr %04x -> %04x\n", machine().describe_context(), m_port0_ddr, data);
-	m_port0_ddr = data;
-	m_port0_maskr = m_port0_maskw = 0;
-	for (u32 i=0; i<8; i++) {
-		m_port0_maskr |= ((data & 3) == 0) ? 1 << i : 0;
-		m_port0_maskw |= ((data & 3) == 3) ? 1 << i : 0;
-		data >>= 2;
+	COMBINE_DATA(&m_pio_mode[offset]);
+	//  logerror("%s: pio mode%d %08x %08x -> %08x\n", machine().describe_context(), offset, data, mem_mask, m_pio_mode[offset]);
+	m_pio_mask_out = 0;
+	for (u32 i=0; i<32; i++) {
+		m_pio_mask_out |= (((m_pio_mode[i / 16] >> ((i % 16) * 2)) & 3) == 3) ? 1 << i : 0;
 	}
-	//	logerror("%s: port0 maskr %04x, maskw %04x\n", machine().describe_context(), m_port0_maskr, m_port0_maskw);
-	port0_update();
+	//  logerror("%s: pio mode in0 %08x, out %08x\n", machine().describe_context(), m_pio_mask_out);
+	pio_update();
 }
 
-u16 xavix2_state::port0_ddr_r()
+u32 xavix2_state::pio_mode_r(offs_t offset)
 {
-	return m_port0_ddr;
+	return m_pio_mode[offset];
 }
 
-void xavix2_state::port0_update()
+void naruto_state::pio_update()
 {
-	u8 old = m_port0_data;
-	m_port0_data &= ~m_port0_maskw;
-	m_port0_data |= (m_port0_dataw & m_port0_maskw);
-//	logerror("%s: port0 %04x -> %04x (%04x)\n", machine().describe_context(), old, m_port0_data, m_port0_dataw);
-	if (m_port0_maskw & 0x20)
-		m_i2cmem->write_sda((m_port0_dataw >> 5) & 0x1);
-	if (m_port0_maskw & 0x10)
-		m_i2cmem->write_scl((m_port0_dataw >> 4) & 0x1);
-	if ((old ^ m_port0_dataw) & 0x30) {
-		m_port0_data &= ~m_port0_maskr;
-		m_port0_data |= ((m_i2cmem->read_sda() << 5) & m_port0_maskr);
-	}
+	if (BIT(m_pio_mask_out, 21))
+		m_i2cmem->write_sda(BIT(m_pio_dataw, 21));
+	if (BIT(m_pio_mask_out, 20))
+		m_i2cmem->write_scl(BIT(m_pio_dataw, 20));
 }
 
-void xavix2_state::port0_w(u32 data)
+void domyos_state::pio_update()
 {
-	m_port0_full = data;
-	port0_w8(data >> 16);
+	if (BIT(m_pio_mask_out, 16))
+		m_i2cmem->write_sda(BIT(m_pio_dataw, 16));
+	if (BIT(m_pio_mask_out, 17))
+		m_i2cmem->write_scl(BIT(m_pio_dataw, 17));
 }
 
-void xavix2_state::port0_w8(u8 data)
+void xavix2_state::pio_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_port0_dataw = data;
-	port0_update();
+	COMBINE_DATA(&m_pio_dataw);
+	pio_update();
 }
 
-u32 xavix2_state::port0_r()
+u32 xavix2_state::pio_r()
 {
-	return (m_port0_full & 0xff00ffff) | (port0_r8() << 16);
-}
-u8 xavix2_state::port0_r8()
-{
-	u8 data = (m_port0_dataw & m_port0_maskw) | (m_port0_data & m_port0_maskr);
-	return data;
+	return (m_pio->read() & ~m_pio_mask_out) | (m_pio_dataw & m_pio_mask_out);
 }
 
 /*
@@ -553,8 +559,8 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe00c, 0xffffe00c).w(FUNC(xavix2_state::dma_control_w));
 	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
 
-	map(0xffffe204, 0xffffe205).rw(FUNC(xavix2_state::port0_ddr_r), FUNC(xavix2_state::port0_ddr_w));
-	map(0xffffe208, 0xffffe20b).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
+	map(0xffffe200, 0xffffe207).rw(FUNC(xavix2_state::pio_mode_r), FUNC(xavix2_state::pio_mode_w));
+	map(0xffffe208, 0xffffe20b).rw(FUNC(xavix2_state::pio_r), FUNC(xavix2_state::pio_w));
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
@@ -587,11 +593,11 @@ void xavix2_state::mem(address_map &map)
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-  if(machine().input().code_pressed_once(KEYCODE_8))
-    irq_raise(8);
-  if(machine().input().code_pressed_once(KEYCODE_0))
-    irq_raise(10);
-  
+	if(machine().input().code_pressed_once(KEYCODE_8))
+		irq_raise(8);
+	if(machine().input().code_pressed_once(KEYCODE_0))
+		irq_raise(10);
+
 	constexpr int dx = 0x400 - 320;
 	constexpr int dy = 0x200 - 200;
 
@@ -616,10 +622,79 @@ void xavix2_state::machine_reset()
 	m_bg_color = 0;
 }
 
-static INPUT_PORTS_START( xavix2 )
+static INPUT_PORTS_START( naruto )
+	PORT_START("pio")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON7)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON8)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON9)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON10)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON11)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON12)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON13)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON14)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON15)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON16)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("B/Execute")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("D/Cancel")
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM) // i2c clock
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_PLAYER(2)
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_PLAYER(2)
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_PLAYER(2)
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_PLAYER(2)
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_PLAYER(2)
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-void xavix2_state::xavix2(machine_config &config)
+static INPUT_PORTS_START(domyos)
+	PORT_START("pio")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON7)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON8)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON9)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON10)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON11)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON12)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON13)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON14)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON15)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_BUTTON16)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_CUSTOM) // i2c clock
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_PLAYER(2)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_PLAYER(2)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_PLAYER(2)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_PLAYER(2)
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_PLAYER(2)
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_PLAYER(2)
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_PLAYER(2)
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_PLAYER(2)
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON15) PORT_PLAYER(2)
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON16) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+void xavix2_state::config(machine_config &config)
 {
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
 	XAVIX2(config, m_maincpu, 98'000'000);
@@ -633,8 +708,6 @@ void xavix2_state::xavix2(machine_config &config)
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 639, 0, 399);
 
-	I2C_24C08(config, m_i2cmem);
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -642,6 +715,19 @@ void xavix2_state::xavix2(machine_config &config)
 	// unknown sound hardware
 }
 
+void naruto_state::config(machine_config& config)
+{
+	xavix2_state::config(config);
+
+	I2C_24C08(config, m_i2cmem);
+}
+
+void domyos_state::config(machine_config& config)
+{
+	xavix2_state::config(config);
+
+	I2C_24C64(config, m_i2cmem);
+}
 
 ROM_START( ltv_naru )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -659,13 +745,13 @@ ROM_START( dombikec )
 ROM_END
 
 
-CONS( 2006, ltv_naru, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
-CONS( 2008, domfitad, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, dombikec, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitad, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, dombikec, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 

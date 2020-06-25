@@ -73,12 +73,12 @@ public:
 	void do_dma(address_space& curr_space);
 	void set_dma_regs(int offset, uint16_t wordValue);
 
-	DECLARE_READ16_MEMBER(memcard_r);
-	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_READ16_MEMBER(control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(transfer_r);
-	DECLARE_WRITE8_MEMBER(transfer_w);
+	uint16_t memcard_r(offs_t offset);
+	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t control_r(offs_t offset);
+	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t transfer_r(offs_t offset);
+	void transfer_w(offs_t offset, uint8_t data);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
@@ -153,13 +153,13 @@ protected:
 
 
 /* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
-READ16_MEMBER(ngcd_state::memcard_r)
+uint16_t ngcd_state::memcard_r(offs_t offset)
 {
 	return m_meminternal_data[offset] | 0xff00;
 }
 
 
-WRITE16_MEMBER(ngcd_state::memcard_w)
+void ngcd_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -174,7 +174,7 @@ WRITE16_MEMBER(ngcd_state::memcard_w)
  *
  *************************************/
 
-READ16_MEMBER(ngcd_state::control_r)
+uint16_t ngcd_state::control_r(offs_t offset)
 {
 	uint32_t sekAddress = 0xff0000+ (offset*2);
 
@@ -184,7 +184,7 @@ READ16_MEMBER(ngcd_state::control_r)
 
 		// LC8951 registers
 		case 0x0100:
-			return m_tempcdc->segacd_cdc_mode_address_r(space, 0, 0xffff);
+			return m_tempcdc->segacd_cdc_mode_address_r();
 		case 0x0102:
 			return m_tempcdc->CDC_Reg_r();
 
@@ -203,7 +203,7 @@ READ16_MEMBER(ngcd_state::control_r)
 }
 
 
-WRITE16_MEMBER(ngcd_state::control_w)
+void ngcd_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t sekAddress = 0xff0000+ (offset*2);
 	uint16_t wordValue = data;
@@ -260,7 +260,7 @@ WRITE16_MEMBER(ngcd_state::control_w)
 
 		// LC8951 registers
 		case 0x0100:
-			m_tempcdc->segacd_cdc_mode_address_w(space, 0, byteValue, 0xffff);
+			m_tempcdc->segacd_cdc_mode_address_w(0, byteValue, 0xffff);
 			break;
 		case 0x0102:
 			m_tempcdc->CDC_Reg_w(byteValue);
@@ -402,7 +402,7 @@ WRITE16_MEMBER(ngcd_state::control_w)
  */
 
 
-READ8_MEMBER(ngcd_state::transfer_r)
+uint8_t ngcd_state::transfer_r(offs_t offset)
 {
 	uint32_t sekAddress = 0xe00000+ (offset);
 	int address;
@@ -432,7 +432,7 @@ READ8_MEMBER(ngcd_state::transfer_r)
 
 }
 
-WRITE8_MEMBER(ngcd_state::transfer_w)
+void ngcd_state::transfer_w(offs_t offset, uint8_t data)
 {
 	uint8_t byteValue = data;
 	uint32_t sekAddress = 0xe00000+ (offset);
@@ -1085,7 +1085,9 @@ ROM_START( neocd )
 	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
 	ROMX_LOAD("front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
-	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
+	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
@@ -1099,7 +1101,9 @@ ROM_START( neocdz )
 	ROM_SYSTEM_BIOS( 0, "official",   "Official BIOS" )
 	ROMX_LOAD("neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
-	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
+	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */

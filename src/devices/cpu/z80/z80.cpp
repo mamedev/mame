@@ -426,7 +426,7 @@ inline void z80_device::leave_halt()
  ***************************************************************/
 inline uint8_t z80_device::in(uint16_t port)
 {
-	return m_io->read_byte(port);
+	return m_io.read_byte(port);
 }
 
 /***************************************************************
@@ -434,7 +434,7 @@ inline uint8_t z80_device::in(uint16_t port)
  ***************************************************************/
 inline void z80_device::out(uint16_t port, uint8_t value)
 {
-	m_io->write_byte(port, value);
+	m_io.write_byte(port, value);
 }
 
 /***************************************************************
@@ -442,7 +442,7 @@ inline void z80_device::out(uint16_t port, uint8_t value)
  ***************************************************************/
 inline uint8_t z80_device::rm(uint16_t addr)
 {
-	return m_program->read_byte(addr);
+	return m_data.read_byte(addr);
 }
 
 /***************************************************************
@@ -459,7 +459,7 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
  ***************************************************************/
 inline void z80_device::wm(uint16_t addr, uint8_t value)
 {
-	m_program->write_byte(addr, value);
+	m_data.write_byte(addr, value);
 }
 
 /***************************************************************
@@ -480,7 +480,7 @@ inline uint8_t z80_device::rop()
 {
 	unsigned pc = PCD;
 	PC++;
-	uint8_t res = m_opcodes_cache->read_byte(pc);
+	uint8_t res = m_opcodes.read_byte(pc);
 	m_icount -= 2;
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
@@ -497,14 +497,14 @@ inline uint8_t z80_device::arg()
 {
 	unsigned pc = PCD;
 	PC++;
-	return m_cache->read_byte(pc);
+	return m_args.read_byte(pc);
 }
 
 inline uint16_t z80_device::arg16()
 {
 	unsigned pc = PCD;
 	PC += 2;
-	return m_cache->read_byte(pc) | (m_cache->read_byte((pc+1)&0xffff) << 8);
+	return m_args.read_word(pc);
 }
 
 /***************************************************************
@@ -1956,7 +1956,7 @@ OP(xycb,ff) { A = set(7, rm(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 ill. opcode $%02x $%02x ($%04x)\n",
-			m_opcodes_cache->read_byte((PCD-1)&0xffff), m_opcodes_cache->read_byte(PCD), PCD-1);
+			m_opcodes.read_byte((PCD-1)&0xffff), m_opcodes.read_byte(PCD), PCD-1);
 }
 
 /**********************************************************
@@ -2544,7 +2544,7 @@ OP(fd,ff) { illegal_1(); op_ff();                            } /* DB   FD       
 OP(illegal,2)
 {
 	logerror("Z80 ill. opcode $ed $%02x\n",
-			m_opcodes_cache->read_byte((PCD-1)&0xffff));
+			m_opcodes.read_byte((PCD-1)&0xffff));
 }
 
 /**********************************************************
@@ -3406,11 +3406,10 @@ void z80_device::device_start()
 	m_after_ldair = 0;
 	m_ea = 0;
 
-	m_program = &space(AS_PROGRAM);
-	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_opcodes_cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_args);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcodes);
+	space(AS_PROGRAM).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;           /* Zero flag is set */

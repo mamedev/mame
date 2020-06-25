@@ -19,6 +19,7 @@
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "imagedev/floppy.h"
+#include "bus/rs232/rs232.h"
 
 #include "bus/coco/dragon_amtor.h"
 #include "bus/coco/dragon_fdc.h"
@@ -27,20 +28,52 @@
 #include "bus/coco/dragon_sprites.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
+#include "bus/coco/coco_ram.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_gmc.h"
+#include "bus/coco/coco_psg.h"
 
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-//-------------------------------------------------
-//  ADDRESS_MAP( dragon_mem )
-//-------------------------------------------------
-
 void dragon_state::dragon_mem(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
+}
+
+
+void dragon64_state::d64_rom0(address_map &map)
+{
+	// $8000-$9FFF
+	map(0x0000, 0x1fff).bankr("rombank0");
+}
+
+void dragon64_state::d64_rom1(address_map &map)
+{
+	// $A000-$BFFF
+	map(0x0000, 0x1fff).bankr("rombank1");
+}
+
+void dragon64_state::d64_io0(address_map &map)
+{
+	// $FF00-$FF1F
+	map(0x00, 0x03).mirror(0x18).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x04, 0x07).mirror(0x18).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+}
+
+
+void dragon_alpha_state::dgnalpha_io1(address_map &map)
+{
+	// $FF20-$FF3F
+	map(0x00, 0x03).mirror(0x10).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x04, 0x07).mirror(0x10).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x08, 0x0b).mirror(0x10).rw(FUNC(dragon_alpha_state::modem_r), FUNC(dragon_alpha_state::modem_w));
+	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
+	map(0x0d, 0x0d).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::sector_r), FUNC(wd2797_device::sector_w));
+	map(0x0e, 0x0e).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::track_r), FUNC(wd2797_device::track_w));
+	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::cmd_w));
 }
 
 
@@ -176,9 +209,11 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
+	device.option_add("ccpsg", COCO_PSG);
 	device.option_add_internal("amtor", DRAGON_AMTOR);
 }
 
@@ -241,7 +276,14 @@ void dragon_state::dragon_base(machine_config &config)
 	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
-	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
+	m_sam->set_addrmap(0, &dragon_state::coco_ram);
+	m_sam->set_addrmap(1, &dragon_state::coco_rom0);
+	m_sam->set_addrmap(2, &dragon_state::coco_rom1);
+	m_sam->set_addrmap(3, &dragon_state::coco_rom2);
+	m_sam->set_addrmap(4, &dragon_state::coco_io0);
+	m_sam->set_addrmap(5, &dragon_state::coco_io1);
+	m_sam->set_addrmap(6, &dragon_state::coco_io2);
+	m_sam->set_addrmap(7, &dragon_state::coco_ff60);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
@@ -257,7 +299,7 @@ void dragon_state::dragon_base(machine_config &config)
 	m_vdg->set_screen(SCREEN_TAG);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
-	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
+	m_vdg->input_callback().set(FUNC(dragon_state::sam_read));
 
 	// sound hardware
 	coco_sound(config);
@@ -291,6 +333,10 @@ void dragon64_state::dragon64(machine_config &config)
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
 
+	sam().set_addrmap(1, &dragon64_state::d64_rom0);
+	sam().set_addrmap(2, &dragon64_state::d64_rom1);
+	sam().set_addrmap(4, &dragon64_state::d64_io0);
+
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
@@ -300,10 +346,23 @@ void dragon64_state::dragon64(machine_config &config)
 	// acia
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set(FUNC(dragon64_state::acia_irq));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(acia, FUNC(mos6551_device::write_cts));
 
 	// software lists
 	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
 	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
+}
+
+WRITE_LINE_MEMBER( dragon64_state::acia_irq )
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dragon64_state::dragon64h(machine_config &config)
@@ -347,6 +406,11 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	dragon_base(config);
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
+
+	sam().set_addrmap(1, &dragon_alpha_state::d64_rom0);
+	sam().set_addrmap(2, &dragon_alpha_state::d64_rom1);
+	sam().set_addrmap(4, &dragon_alpha_state::d64_io0);
+	sam().set_addrmap(5, &dragon_alpha_state::dgnalpha_io1);
 
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
@@ -398,7 +462,7 @@ void dragon64_state::tanodr64(machine_config &config)
 	m_vdg->set_screen(SCREEN_TAG);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
-	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
+	m_vdg->input_callback().set(FUNC(dragon_state::sam_read));
 
 	// cartridge
 	subdevice<cococart_slot_device>(CARTRIDGE_TAG)->set_default_option("sdtandy_fdc");

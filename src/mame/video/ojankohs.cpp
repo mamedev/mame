@@ -52,7 +52,7 @@ void ojankohs_state::ojankoy_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_palette_w)
+void ojankohs_state::ojankohs_palette_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
 
@@ -65,7 +65,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_palette_w)
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
+void ojankohs_state::ccasino_palette_w(offs_t offset, uint8_t data)
 {
 	offset = bitswap<11>(offset, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 
@@ -80,7 +80,7 @@ WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoc_palette_w)
+void ojankohs_state::ojankoc_palette_w(offs_t offset, uint8_t data)
 {
 	if (m_paletteram[offset] != data)
 	{
@@ -104,19 +104,19 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_palette_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_videoram_w)
+void ojankohs_state::ojankohs_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_colorram_w)
+void ojankohs_state::ojankohs_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
+void ojankohs_state::ojankohs_gfxreg_w(uint8_t data)
 {
 	if (m_gfxreg != data)
 	{
@@ -125,7 +125,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
 	}
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_flipscreen_w)
+void ojankohs_state::ojankohs_flipscreen_w(uint8_t data)
 {
 	if (m_flipscreen != BIT(data, 0))
 	{
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
 		color |= (m_gfxreg & 0xe0) >> 2;
 	}
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
@@ -167,7 +167,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 	int flipx = ((m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
 	int flipy = ((m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, (flipx | flipy));
+	tileinfo.set(0, tile, color, (flipx | flipy));
 }
 
 
@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 
 ******************************************************************************/
 
-void ojankohs_state::ojankoc_flipscreen( address_space &space, int data )
+void ojankohs_state::ojankoc_flipscreen(int data)
 {
 	int x, y;
 	uint8_t color1, color2;
@@ -193,20 +193,20 @@ void ojankohs_state::ojankoc_flipscreen( address_space &space, int data )
 		{
 			color1 = m_videoram[0x0000 + ((y * 256) + x)];
 			color2 = m_videoram[0x3fff - ((y * 256) + x)];
-			ojankoc_videoram_w(space, 0x0000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(space, 0x3fff - ((y * 256) + x), color1);
+			ojankoc_videoram_w(0x0000 + ((y * 256) + x), color2);
+			ojankoc_videoram_w(0x3fff - ((y * 256) + x), color1);
 
 			color1 = m_videoram[0x4000 + ((y * 256) + x)];
 			color2 = m_videoram[0x7fff - ((y * 256) + x)];
-			ojankoc_videoram_w(space, 0x4000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(space, 0x7fff - ((y * 256) + x), color1);
+			ojankoc_videoram_w(0x4000 + ((y * 256) + x), color2);
+			ojankoc_videoram_w(0x7fff - ((y * 256) + x), color1);
 		}
 	}
 
 	m_flipscreen_old = m_flipscreen;
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)
+void ojankohs_state::ojankoc_videoram_w(offs_t offset, uint8_t data)
 {
 	int i;
 	uint8_t x, y, xx, px, py ;
@@ -301,12 +301,10 @@ uint32_t ojankohs_state::screen_update_ojankoc(screen_device &screen, bitmap_ind
 
 	if (m_screen_refresh)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			ojankoc_videoram_w(space, offs, m_videoram[offs]);
+			ojankoc_videoram_w(offs, m_videoram[offs]);
 		}
 		m_screen_refresh = 0;
 	}

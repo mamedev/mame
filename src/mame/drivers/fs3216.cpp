@@ -18,7 +18,7 @@
 #include "machine/upd765.h"
 #include "machine/x2212.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/mc6845.h"
 #include "screen.h"
 

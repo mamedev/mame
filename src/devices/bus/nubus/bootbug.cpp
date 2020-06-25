@@ -102,7 +102,7 @@ void nubus_bootbug_device::device_start()
 
 	slotspace = get_slotspace();
 
-	nubus().install_device(slotspace, slotspace+0xff, read32_delegate(*this, FUNC(nubus_bootbug_device::dev_r)), write32_delegate(*this, FUNC(nubus_bootbug_device::dev_w)));
+	nubus().install_device(slotspace, slotspace+0xff, read32sm_delegate(*this, FUNC(nubus_bootbug_device::dev_r)), write32sm_delegate(*this, FUNC(nubus_bootbug_device::dev_w)));
 }
 
 //-------------------------------------------------
@@ -113,12 +113,12 @@ void nubus_bootbug_device::device_reset()
 {
 }
 
-WRITE32_MEMBER( nubus_bootbug_device::dev_w )
+void nubus_bootbug_device::dev_w(offs_t offset, uint32_t data)
 {
 	m_uart->ins8250_w(offset, data & 0xff);
 }
 
-READ32_MEMBER( nubus_bootbug_device::dev_r )
+uint32_t nubus_bootbug_device::dev_r(offs_t offset)
 {
 	return m_uart->ins8250_r(offset);
 }

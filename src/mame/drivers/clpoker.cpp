@@ -58,11 +58,11 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(output_a_w);
-	DECLARE_WRITE8_MEMBER(output_b_w);
-	DECLARE_WRITE8_MEMBER(output_c_w);
+	void output_a_w(u8 data);
+	void output_b_w(u8 data);
+	void output_c_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -111,7 +111,7 @@ void clpoker_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-WRITE8_MEMBER(clpoker_state::output_a_w)
+void clpoker_state::output_a_w(u8 data)
 {
 	if (data != 0xff)
 	{
@@ -120,11 +120,11 @@ WRITE8_MEMBER(clpoker_state::output_a_w)
 	}
 }
 
-WRITE8_MEMBER(clpoker_state::output_b_w)
+void clpoker_state::output_b_w(u8 data)
 {
 }
 
-WRITE8_MEMBER(clpoker_state::output_c_w)
+void clpoker_state::output_c_w(u8 data)
 {
 	m_nmi_enable = BIT(data, 1);
 	if (!m_nmi_enable)
@@ -203,16 +203,16 @@ INPUT_PORTS_END
 TILE_GET_INFO_MEMBER(clpoker_state::get_bg_tile_info)
 {
 	u16 tileno = (m_videoram[tile_index] << 8) | m_videoram[tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(clpoker_state::get_fg_tile_info)
 {
 	u16 tileno = (m_videoram[tile_index + 0x1000] << 8) | m_videoram[tile_index + 0x1800];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
-WRITE8_MEMBER(clpoker_state::videoram_w)
+void clpoker_state::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	(BIT(offset, 12) ? m_fg_tilemap : m_bg_tilemap)->mark_tile_dirty(offset & 0x07ff);

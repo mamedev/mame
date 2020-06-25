@@ -36,12 +36,12 @@ void tc0150rod_device::device_start()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_MEMBER( tc0150rod_device::word_r )
+uint16_t tc0150rod_device::word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0150rod_device::word_w )
+void tc0150rod_device::word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }

@@ -96,4 +96,4 @@ WRITE_LINE_MEMBER( cpc_expansion_slot_device::irq_w ) { m_out_irq_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::nmi_w ) { m_out_nmi_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::reset_w ) { m_out_reset_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::romdis_w ) { m_out_romdis_cb(state); }
-WRITE8_MEMBER( cpc_expansion_slot_device::rom_select ) { m_out_rom_select(data); }
+void cpc_expansion_slot_device::rom_select(uint8_t data) { m_out_rom_select(data); }

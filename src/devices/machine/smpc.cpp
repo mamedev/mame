@@ -203,25 +203,25 @@ void smpc_hle_device::smpc_regs(address_map &map)
 //-------------------------------------------------
 
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this)),
-	m_mini_nvram(*this, "smem"),
-	m_mshres(*this),
-	m_mshnmi(*this),
-	m_sshres(*this),
-	m_sndres(*this),
-	m_sysres(*this),
-	m_syshalt(*this),
-	m_dotsel(*this),
-	m_pdr1_read(*this),
-	m_pdr2_read(*this),
-	m_pdr1_write(*this),
-	m_pdr2_write(*this),
-	m_irq_line(*this),
-	m_ctrl1(*this, finder_base::DUMMY_TAG),
-	m_ctrl2(*this, finder_base::DUMMY_TAG),
-	m_screen(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, SMPC_HLE, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this))
+	, m_mini_nvram(*this, "smem")
+	, m_mshres(*this)
+	, m_mshnmi(*this)
+	, m_sshres(*this)
+	, m_sndres(*this)
+	, m_sysres(*this)
+	, m_syshalt(*this)
+	, m_dotsel(*this)
+	, m_pdr1_read(*this)
+	, m_pdr2_read(*this)
+	, m_pdr1_write(*this)
+	, m_pdr2_write(*this)
+	, m_irq_line(*this)
+	, m_ctrl1(*this, finder_base::DUMMY_TAG)
+	, m_ctrl2(*this, finder_base::DUMMY_TAG)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 {
 	m_has_ctrl_ports = false;
 }
@@ -340,7 +340,7 @@ device_memory_interface::space_config_vector smpc_hle_device::memory_space_confi
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( smpc_hle_device::ireg_w )
+void smpc_hle_device::ireg_w(offs_t offset, uint8_t data)
 {
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
@@ -371,7 +371,7 @@ WRITE8_MEMBER( smpc_hle_device::ireg_w )
 	}
 }
 
-READ8_MEMBER( smpc_hle_device::oreg_r )
+uint8_t smpc_hle_device::oreg_r(offs_t offset)
 {
 	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
 		return 0x00;
@@ -379,38 +379,38 @@ READ8_MEMBER( smpc_hle_device::oreg_r )
 	return m_oreg[offset >> 1];
 }
 
-READ8_MEMBER( smpc_hle_device::status_register_r )
+uint8_t smpc_hle_device::status_register_r()
 {
 	return m_sr;
 }
 
-READ8_MEMBER( smpc_hle_device::status_flag_r )
+uint8_t smpc_hle_device::status_flag_r()
 {
 	// bit 3: CD enable related?
 	return (m_sf<<0) | (m_cd_sf<<3);
 }
 
-WRITE8_MEMBER( smpc_hle_device::status_flag_w )
+void smpc_hle_device::status_flag_w(uint8_t data)
 {
 	m_sf = BIT(data,0);
 	m_cd_sf = false;
 }
 
-READ8_MEMBER( smpc_hle_device::pdr1_r )
+uint8_t smpc_hle_device::pdr1_r()
 {
 	uint8_t res = (m_pdr1_read() & ~m_ddr1) | m_pdr1_readback;
 
 	return res;
 }
 
-READ8_MEMBER( smpc_hle_device::pdr2_r )
+uint8_t smpc_hle_device::pdr2_r()
 {
 	uint8_t res = (m_pdr2_read() & ~m_ddr2) | m_pdr2_readback;
 
 	return res;
 }
 
-WRITE8_MEMBER( smpc_hle_device::pdr1_w )
+void smpc_hle_device::pdr1_w(uint8_t data)
 {
 //  pins defined as output returns in input
 	m_pdr1_readback = (data & m_ddr1);
@@ -420,7 +420,7 @@ WRITE8_MEMBER( smpc_hle_device::pdr1_w )
 	m_pdr1_readback |= data & 0x80;
 }
 
-WRITE8_MEMBER( smpc_hle_device::pdr2_w )
+void smpc_hle_device::pdr2_w(uint8_t data)
 {
 //  pins defined as output returns in input
 	m_pdr2_readback = (data & m_ddr2);
@@ -430,23 +430,23 @@ WRITE8_MEMBER( smpc_hle_device::pdr2_w )
 	m_pdr2_readback |= data & 0x80;
 }
 
-WRITE8_MEMBER( smpc_hle_device::ddr1_w )
+void smpc_hle_device::ddr1_w(uint8_t data)
 {
 	m_ddr1 = data & 0x7f;
 }
 
-WRITE8_MEMBER( smpc_hle_device::ddr2_w )
+void smpc_hle_device::ddr2_w(uint8_t data)
 {
 	m_ddr2 = data & 0x7f;
 }
 
-WRITE8_MEMBER( smpc_hle_device::iosel_w )
+void smpc_hle_device::iosel_w(uint8_t data)
 {
 	m_iosel1 = BIT(data,0);
 	m_iosel2 = BIT(data,1);
 }
 
-WRITE8_MEMBER( smpc_hle_device::exle_w )
+void smpc_hle_device::exle_w(uint8_t data)
 {
 	m_exle1 = BIT(data,0);
 	m_exle2 = BIT(data,1);
@@ -499,12 +499,12 @@ inline void smpc_hle_device::irq_request()
 
 // TODO: trampolines that needs to go away
 
-READ8_MEMBER( smpc_hle_device::read )
+uint8_t smpc_hle_device::read(offs_t offset)
 {
 	return this->space().read_byte(offset);
 }
 
-WRITE8_MEMBER( smpc_hle_device::write )
+void smpc_hle_device::write(offs_t offset, uint8_t data)
 {
 	this->space().write_byte(offset,data);
 }
@@ -513,7 +513,7 @@ WRITE8_MEMBER( smpc_hle_device::write )
 //  Command simulation
 //**************************************************************************
 
-WRITE8_MEMBER( smpc_hle_device::command_register_w )
+void smpc_hle_device::command_register_w(uint8_t data)
 {
 //  don't send a command if previous one is still in progress
 //  ST-V tries to send a sysres command if OREG31 doesn't return the ack command

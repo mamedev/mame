@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 
@@ -31,9 +31,9 @@ public:
 	template <typename T> void set_chargen(T &&tag) { m_char_rom.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ_LINE_MEMBER(lba7_r);
-	DECLARE_WRITE8_MEMBER(dc012_w);
-	DECLARE_WRITE8_MEMBER(dc011_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	void dc012_w(offs_t offset, uint8_t data);
+	void dc011_w(uint8_t data);
+	void brightness_w(uint8_t data);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

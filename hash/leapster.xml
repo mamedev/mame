@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but not dumped yet:
 
 |  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE |
@@ -123,9 +124,9 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
 | 500-14492-A |ENG| The Disney-Pixar Collection                               | LEAPSTER       |
 
--->
 
-<!-- Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end -->
+Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end
+-->
 
 <softwarelist name="leapster" description="LeapFrog Leapster cartridges">
 
@@ -904,7 +905,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-14005-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-14005-A - Scooby Doo! (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" />
+				<rom name="500-14005-A - Scooby Doo (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" />
 			</dataarea>
 		</part>
 	</software>
@@ -916,7 +917,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12160-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12160-A - Scooby Doo! - Spooky Snacks! (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" />
+				<rom name="500-12160-A - Scooby Doo - Spooky Snacks (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" />
 			</dataarea>
 		</part>
 	</software>
@@ -1109,7 +1110,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11204-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11204-A - Thomas and Friends - Calling all Engines! (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" />
+				<rom name="500-11204-A - Thomas and Friends - Calling all Engines (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" />
 			</dataarea>
 		</part>
 	</software>

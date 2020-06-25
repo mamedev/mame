@@ -16,7 +16,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER(spacefb_state::audio_p2_r)
+uint8_t spacefb_state::audio_p2_r()
 {
 	return (m_sound_latch & 0x18) << 1;
 }
@@ -34,7 +34,7 @@ READ_LINE_MEMBER(spacefb_state::audio_t1_r)
 }
 
 
-WRITE8_MEMBER(spacefb_state::port_1_w)
+void spacefb_state::port_1_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 

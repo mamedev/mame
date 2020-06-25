@@ -212,7 +212,7 @@ void nb1412m2_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( nb1412m2_device::rom_op_w )
+void nb1412m2_device::rom_op_w(uint8_t data)
 {
 //  data == 2 starts DAC playback
 	if(data == 2)
@@ -229,7 +229,7 @@ WRITE8_MEMBER( nb1412m2_device::rom_op_w )
 	m_rom_op = data;
 }
 
-WRITE8_MEMBER( nb1412m2_device::rom_address_w )
+void nb1412m2_device::rom_address_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0) // rom hi address
 	{
@@ -243,7 +243,7 @@ WRITE8_MEMBER( nb1412m2_device::rom_address_w )
 	}
 }
 
-WRITE8_MEMBER( nb1412m2_device::rom_adjust_w )
+void nb1412m2_device::rom_adjust_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0) // rom hi address
 	{
@@ -258,7 +258,7 @@ WRITE8_MEMBER( nb1412m2_device::rom_adjust_w )
 }
 
 // readback from ROM data
-READ8_MEMBER( nb1412m2_device::rom_decrypt_r )
+uint8_t nb1412m2_device::rom_decrypt_r()
 {
 	uint8_t prot_adj;
 
@@ -277,12 +277,12 @@ READ8_MEMBER( nb1412m2_device::rom_decrypt_r )
 }
 
 // Mighty Guy specifics
-READ8_MEMBER( nb1412m2_device::timer_r )
+uint8_t nb1412m2_device::timer_r()
 {
 	return m_timer_reg == true;
 }
 
-WRITE8_MEMBER( nb1412m2_device::timer_w )
+void nb1412m2_device::timer_w(uint8_t data)
 {
 	if(data != 1)
 		logerror("nb1412m2: timer_w with data == %02x\n",data);
@@ -291,13 +291,13 @@ WRITE8_MEMBER( nb1412m2_device::timer_w )
 	m_timer->adjust(attotime::from_hz(960));
 }
 
-WRITE8_MEMBER( nb1412m2_device::timer_ack_w )
+void nb1412m2_device::timer_ack_w(uint8_t data)
 {
 	m_timer_reg = false;
 	m_timer->adjust(attotime::never);
 }
 
-WRITE8_MEMBER( nb1412m2_device::dac_address_w )
+void nb1412m2_device::dac_address_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0) // dac hi address
 	{
@@ -313,7 +313,7 @@ WRITE8_MEMBER( nb1412m2_device::dac_address_w )
 
 // seems directly correlated to the DAC timer frequency
 // 0xd0 - 0xe0 - 0xf0 are the settings used
-WRITE8_MEMBER( nb1412m2_device::dac_timer_w )
+void nb1412m2_device::dac_timer_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 	// TODO: unknown algo, 0xe0*18 gives 4032 Hz which seems close enough for sample 36
@@ -321,29 +321,29 @@ WRITE8_MEMBER( nb1412m2_device::dac_timer_w )
 }
 
 // controls music tempo
-READ8_MEMBER( nb1412m2_device::const90_r )
+uint8_t nb1412m2_device::const90_r()
 {
 	// TODO: likely wrong
 	return m_const90;
 }
 
-WRITE8_MEMBER( nb1412m2_device::const90_w )
+void nb1412m2_device::const90_w(uint8_t data)
 {
 	m_const90 = data;
 }
 
 // public accessors
-READ8_MEMBER( nb1412m2_device::data_r )
+uint8_t nb1412m2_device::data_r()
 {
 	return this->space().read_byte(m_command);
 }
 
-WRITE8_MEMBER( nb1412m2_device::data_w )
+void nb1412m2_device::data_w(uint8_t data)
 {
 	this->space().write_byte(m_command, data);
 }
 
-WRITE8_MEMBER( nb1412m2_device::command_w )
+void nb1412m2_device::command_w(uint8_t data)
 {
 	m_command = data;
 }

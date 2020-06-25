@@ -36,25 +36,25 @@ void bogeyman_state::bogeyman_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(bogeyman_state::videoram_w)
+void bogeyman_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::colorram_w)
+void bogeyman_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::videoram2_w)
+void bogeyman_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::colorram2_w)
+void bogeyman_state::colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] & 0x7f;
 	int color = (attr >> 1) & 0x07;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	tileinfo.set(gfxbank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
 	int gfxbank = tile / 0x200;
 	int code = tile & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, m_colbank, 0);
+	tileinfo.set(gfxbank, code, m_colbank, 0);
 }
 
 void bogeyman_state::video_start()

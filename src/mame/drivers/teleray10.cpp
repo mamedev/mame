@@ -11,7 +11,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "screen.h"
@@ -70,7 +70,7 @@ private:
 	required_device<ls259_device> m_outreg;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_bell;
-	required_device<mc2661_device> m_pci;
+	required_device<scn2651_device> m_pci;
 	required_device<rs232_port_device> m_serialio;
 	required_device<rs232_port_device> m_peripheral;
 	required_shared_ptr<u8> m_scratchpad;
@@ -92,6 +92,9 @@ void teleray10_state::machine_start()
 
 	m_topr = 0;
 	m_timer_expired = false;
+
+	// HACK: force continuous CTS
+	subdevice<input_merger_device>("cts")->in_w<2>(0);
 
 	save_item(NAME(m_topr));
 	save_item(NAME(m_timer_expired));
@@ -393,55 +396,55 @@ static INPUT_PORTS_START(teleray10)
 	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_WRITE_LINE_MEMBER(teleray10_state, key_interrupt_w)
 
 	PORT_START("SW1A")
-	PORT_DIPNAME(0x01, 0x01, "Xmit ETX") PORT_DIPLOCATION("7A:3")
-	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Xmit CSR") PORT_DIPLOCATION("7A:2")
-	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, "Character Bits") PORT_DIPLOCATION("6A:8")
-	PORT_DIPSETTING(0x04, "7")
-	PORT_DIPSETTING(0x00, "8")
+	PORT_DIPNAME(0x01, 0x00, "Xmit ETX") PORT_DIPLOCATION("7A:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x00, "Xmit CSR") PORT_DIPLOCATION("7A:2")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, "Character Bits") PORT_DIPLOCATION("6A:8")
+	PORT_DIPSETTING(0x00, "7")
+	PORT_DIPSETTING(0x04, "8")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN) // "Reserved" jumper
-	PORT_DIPNAME(0x30, 0x00, "Parity") PORT_DIPLOCATION("6A:6,5")
-	PORT_DIPSETTING(0x30, "Even")
-	PORT_DIPSETTING(0x20, "Odd")
-	PORT_DIPSETTING(0x00, "None/High")
+	PORT_DIPNAME(0x30, 0x30, "Parity") PORT_DIPLOCATION("6A:6,5")
+	PORT_DIPSETTING(0x00, "Even")
+	PORT_DIPSETTING(0x10, "Odd")
+	PORT_DIPSETTING(0x30, "None/High")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(teleray10_state, timer_expired_r)
-	PORT_DIPNAME(0x80, 0x80, "Stop Bits") PORT_DIPLOCATION("6A:7")
-	PORT_DIPSETTING(0x80, "1")
-	PORT_DIPSETTING(0x00, "2")
+	PORT_DIPNAME(0x80, 0x00, "Stop Bits") PORT_DIPLOCATION("6A:7")
+	PORT_DIPSETTING(0x00, "1")
+	PORT_DIPSETTING(0x80, "2")
 
 	PORT_START("SW1B")
-	PORT_DIPNAME(0x0f, 0x01, "Baud Rate") PORT_DIPLOCATION("6A:4,3,2,1")
-	PORT_DIPSETTING(0x0f, "50")
-	PORT_DIPSETTING(0x0e, "75")
-	PORT_DIPSETTING(0x0d, "110")
-	PORT_DIPSETTING(0x0c, "134.5")
-	PORT_DIPSETTING(0x0b, "150")
-	PORT_DIPSETTING(0x0a, "300")
-	PORT_DIPSETTING(0x09, "600")
-	PORT_DIPSETTING(0x08, "1200")
-	PORT_DIPSETTING(0x07, "1800")
-	PORT_DIPSETTING(0x06, "2000")
-	PORT_DIPSETTING(0x05, "2400")
-	PORT_DIPSETTING(0x04, "3600")
-	PORT_DIPSETTING(0x03, "4800")
-	PORT_DIPSETTING(0x02, "7200")
-	PORT_DIPSETTING(0x01, "9600")
-	PORT_DIPSETTING(0x00, "Reserved")
+	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate") PORT_DIPLOCATION("6A:4,3,2,1")
+	PORT_DIPSETTING(0x00, "50")
+	PORT_DIPSETTING(0x01, "75")
+	PORT_DIPSETTING(0x02, "110")
+	PORT_DIPSETTING(0x03, "134.5")
+	PORT_DIPSETTING(0x04, "150")
+	PORT_DIPSETTING(0x05, "300")
+	PORT_DIPSETTING(0x06, "600")
+	PORT_DIPSETTING(0x07, "1200")
+	PORT_DIPSETTING(0x08, "1800")
+	PORT_DIPSETTING(0x09, "2000")
+	PORT_DIPSETTING(0x0a, "2400")
+	PORT_DIPSETTING(0x0b, "3600")
+	PORT_DIPSETTING(0x0c, "4800")
+	PORT_DIPSETTING(0x0d, "7200")
+	PORT_DIPSETTING(0x0e, "9600")
+	PORT_DIPSETTING(0x0f, "Reserved")
 	PORT_DIPNAME(0x10, 0x10, "Half/Full Duplex") PORT_DIPLOCATION("7A:4")
-	PORT_DIPSETTING(0x10, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x20, 0x20, "Right Margin Wrap") PORT_DIPLOCATION("7A:5")
-	PORT_DIPSETTING(0x20, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x40, 0x40, "LF NL/CR NL") PORT_DIPLOCATION("7A:7")
-	PORT_DIPSETTING(0x40, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x80, 0x80, "New Line") PORT_DIPLOCATION("7A:6")
-	PORT_DIPSETTING(0x80, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x10, DEF_STR(On))
+	PORT_DIPNAME(0x20, 0x00, "Right Margin Wrap") PORT_DIPLOCATION("7A:5")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x20, DEF_STR(On))
+	PORT_DIPNAME(0x40, 0x00, "LF NL/CR NL") PORT_DIPLOCATION("7A:7")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x00, "New Line") PORT_DIPLOCATION("7A:6")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x80, DEF_STR(On))
 
 	PORT_START("SW2A")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -491,22 +494,22 @@ void teleray10_state::teleray10(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_bell).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MC2661(config, m_pci, 5.0688_MHz_XTAL); // Signetics 2651 or equivalent
+	SCN2651(config, m_pci, 5.0688_MHz_XTAL); // Signetics 2651 or equivalent
 	m_pci->rxrdy_handler().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 	m_pci->txd_handler().set("xmitser", FUNC(input_merger_device::in_w<1>));
 	m_pci->txd_handler().append("xmitperiph", FUNC(input_merger_device::in_w<0>));
 	m_pci->rts_handler().set(m_serialio, FUNC(rs232_port_device::write_rts));
 
 	RS232_PORT(config, m_serialio, default_rs232_devices, nullptr);
-	m_serialio->rxd_handler().set(m_pci, FUNC(mc2661_device::rx_w));
+	m_serialio->rxd_handler().set(m_pci, FUNC(scn2651_device::rxd_w));
 	m_serialio->cts_handler().set("cts", FUNC(input_merger_device::in_w<1>));
-	m_serialio->dcd_handler().set(m_pci, FUNC(mc2661_device::dcd_w));
+	m_serialio->dcd_handler().set(m_pci, FUNC(scn2651_device::dcd_w));
 
 	RS232_PORT(config, m_peripheral, default_rs232_devices, nullptr);
 
 	INPUT_MERGER_ANY_HIGH(config, "xmitser").output_handler().set(m_serialio, FUNC(rs232_port_device::write_txd));
 	INPUT_MERGER_ANY_HIGH(config, "xmitperiph").output_handler().set(m_peripheral, FUNC(rs232_port_device::write_txd));
-	INPUT_MERGER_ALL_HIGH(config, "cts").output_handler().set(m_pci, FUNC(mc2661_device::cts_w));
+	INPUT_MERGER_ALL_HIGH(config, "cts").output_handler().set(m_pci, FUNC(scn2651_device::cts_w));
 }
 
 

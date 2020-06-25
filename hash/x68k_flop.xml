@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
+TODO compatibility notes:
+- identify/translate all "loading Abort" causes;
+- verify doujinshi bugs that are really bugs and not bad coding or even bad dumps;
 
 Image formats:
 
@@ -44,9 +48,7 @@ Not sure if there are others whose protection has been cracked...
 
 TODO: check the first byte in the 1.44MB images below!!
 
--->
 
-<!--
 Missing dumps
 
 Arkham Products
@@ -383,10 +385,7 @@ Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.1 Lost Virgin
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.2 Temptation
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.3 Ecstasy
 
--->
 
-
-<!--
 Most info on release dates and Jpn titles come from the following (wonderful) resources
  * http://www.8-bits.info/
  * http://mercenaryforce.web.fc2.com/x68k/x68000.html
@@ -465,7 +464,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="4thunit">
+	<!-- boot OK -->
+	<software name="4thunit" supported="yes">
 		<description>The 4th Unit</description>
 		<year>1988</year>
 		<publisher>データウエスト (Data West)</publisher>
@@ -485,7 +485,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="4thunit2">
+	<!-- boot OK -->
+	<software name="4thunit2" supported="yes">
 		<description>The 4th Unit 2</description>
 		<year>1988</year>
 		<publisher>データウエスト (Data West)</publisher>
@@ -799,7 +800,9 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="ajax" supported="no">
+	<!-- boot OK, sometimes a line of garbage appear on background during gameplay (happened after continue on stage 3, hard to repro?) -->
+	<!-- old note: has video glitches on first stage, Ajax title logo on background (cannot repro) -->
+	<software name="ajax" supported="partial">
 		<description>Ajax</description>
 		<year>1989</year>
 		<publisher>コナミ (Konami)</publisher>
@@ -1011,7 +1014,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="abart1">
+	<!-- boot OK -->
+	<software name="abart1" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 1</description>
 		<year>1992</year>
 		<publisher>アーカムプロダクツ (Arkham Products)</publisher>
@@ -1023,7 +1027,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="abart2">
+	<!-- boot OK -->
+	<software name="abart2" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 2</description>
 		<year>1993</year>
 		<publisher>アーカムプロダクツ (Arkham Products)</publisher>
@@ -1035,7 +1040,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="abart3">
+	<!-- boot OK -->
+	<software name="abart3" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 3</description>
 		<year>1993</year>
 		<publisher>アーカムプロダクツ (Arkham Products)</publisher>
@@ -1047,7 +1053,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="abart4">
+	<!-- boot OK -->
+	<software name="abart4" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 4</description>
 		<year>1993</year>
 		<publisher>アーカムプロダクツ (Arkham Products)</publisher>
@@ -1147,7 +1154,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="animjv3">
+	<!-- boot OK, ADPCM scratches at gal intro, tiles aren't shown on gameplay -->
+	<software name="animjv3" supported="no">
 		<description>Animahjong V3</description>
 		<year>1993</year>
 		<publisher>ソニア (Sogna)</publisher>
@@ -1262,7 +1270,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aquales">
+	<!-- boot OK, weapon menu has random horizontal lines -->
+	<software name="aquales" supported="partial">
 		<description>Aquales</description>
 		<year>1991</year>
 		<publisher>エグザクト (Exact)</publisher>
@@ -1372,7 +1381,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="arcus2">
+	<!-- boot OK -->
+	<software name="arcus2" supported="yes">
 		<description>Arcus II - Silent Symphony</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
@@ -1469,7 +1479,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="artemis">
+	<!-- boot OK -->
+	<software name="artemis" supported="yes">
 		<description>Artemis</description>
 		<year>1991</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -1495,7 +1506,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="atomrobo">
+	<!-- boot OK, has huge layer alignment issues in-game -->
+	<software name="atomrobo" supported="no">
 		<description>Atomic Robo-Kid</description>
 		<year>1990</year>
 		<publisher>システムサコム (System Sacom)</publisher>
@@ -1649,7 +1661,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="btlchess">
+	<!-- boot OK -->
+	<software name="btlchess" supported="yes">
 		<description>Battle Chess</description>
 		<year>1989</year>
 		<publisher>パックインビデオ (Pack-in Video)</publisher>
@@ -1695,7 +1708,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="beast">
+	<!-- boot OK -->
+	<software name="beast" supported="yes">
 		<description>Beast Injuu no Yakata</description>
 		<year>1991</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -2311,7 +2325,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="bretscen">
+	<!-- boot OK -->
+	<software name="bretscen" supported="yes">
 		<description>Bretonne Lais Scenario Editor</description>
 		<year>1991</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -2344,7 +2359,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="butasan">
+	<!-- boot OK, gameplay/game over screens have transparen pen issues -->
+	<software name="butasan" supported="partial">
 		<description>Video Game Anthology Vol. 6 - Butasan</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -2575,8 +2591,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-<!-- issues with interlaced title screen, but is fine in-game -->
-	<software name="carat">
+	<!-- boot OK, misaligned intro/title screens (interlace), fine in-game -->
+	<software name="carat" supported="partial">
 		<description>Carat</description>
 		<year>1993</year>
 		<publisher>サイバーテックカスタム (Cybertech Custom)</publisher>
@@ -2596,7 +2612,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="caroll">
+	<!-- boot OK -->
+	<software name="caroll" supported="yes">
 		<description>Caroll</description>
 		<year>1991</year>
 		<publisher>システムハウスオー (System House Oh!)</publisher>
@@ -2604,7 +2621,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<info name="release" value="199102xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="caroll (1990)(system house oh!).dim" size="1261824" crc="f7b58871" sha1="f106562ba33d086e9bf2dbca42b0b0b70fa45a83" offset="000000" />
+				<rom name="caroll (1990)(system house oh).dim" size="1261824" crc="f7b58871" sha1="f106562ba33d086e9bf2dbca42b0b0b70fa45a83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2629,7 +2646,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="castles">
+	<!-- boot OK -->
+	<software name="castles" supported="yes">
 		<description>Castles</description>
 		<year>1992</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -2688,8 +2706,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- rather flickery, and time limit seems short... -->
-	<software name="chasehq">
+	<!-- boot OK, slightly misaligned raster effects -->
+	<software name="chasehq" supported="partial">
 		<description>Chase H.Q.</description>
 		<year>1992</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -2749,18 +2767,19 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="choubangai seifuku zukan + (1989)(system house oh!)(disk 1 of 2)(disk a).dim" size="1261824" crc="d1de0419" sha1="4a0e1c127b654d670c512faf85386b9eb367cfb9" offset="000000" />
+				<rom name="choubangai seifuku zukan + (1989)(system house oh)(disk 1 of 2)(disk a).dim" size="1261824" crc="d1de0419" sha1="4a0e1c127b654d670c512faf85386b9eb367cfb9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="choubangai seifuku zukan + (1989)(system house oh!)(disk 2 of 2)(disk b).dim" size="1261824" crc="71877552" sha1="bfd51dc67aca666eeb805937d5b3f7e4e0717982" offset="000000" />
+				<rom name="choubangai seifuku zukan + (1989)(system house oh)(disk 2 of 2)(disk b).dim" size="1261824" crc="71877552" sha1="bfd51dc67aca666eeb805937d5b3f7e4e0717982" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="choujin">
+	<!-- Dies after initial X logo -->
+	<software name="choujin" supported="no">
 		<description>Choujin</description>
 		<year>1992</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -2833,7 +2852,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="codezero">
+	<!-- boot OK, Title screen has wrong scroll effect, no "get ready" ADPCM at first life/first stage? -->
+	<software name="codezero" supported="partial">
 		<description>Code-Zero</description>
 		<year>1991</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -2995,13 +3015,13 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Crazy Climber", Set drive 1 to boot "Crazy Climber 2". -->
 	<software name="cclimber" supported="no">
 		<description>Video Game Anthology Vol. 5 - Crazy Climber / Crazy Climber 2</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="19930827" />
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.5 - クレイジークライマー / クレイジークライマー2" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Crazy Climber, on DF1 to boot Crazy Climber 2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="crazy climber i &amp; ii (1993)(dempa).dim" size="1261824" crc="3b64d206" sha1="fc7001ac394277ccdb417a47528ed26c9a05a487" offset="000000" />
@@ -3151,7 +3171,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="dreturn">
+	<!-- boot OK -->
+	<software name="dreturn" supported="yes">
 		<description>D-Return</description>
 		<year>1989</year>
 		<publisher>日本コンピュータクラブ連盟企画 (Nihon Computer Club Renmei Kikaku)</publisher>
@@ -3191,7 +3212,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="daimakai" supported="no">
+	<!-- boot OK, setting mode 2 causes no sprites (offset?), stage 3-2 has slight priority issue with moving platforms -->
+	<software name="daimakai" supported="partial">
 		<description>Dai Makaimura</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
@@ -3440,7 +3462,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="dashyar">
+	<!-- boot OK -->
+	<software name="dashyar" supported="yes">
 		<description>Dash Yarou</description>
 		<year>1991</year>
 		<publisher>Sharp</publisher>
@@ -3467,7 +3490,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="alt_title" value="堕天使KYOUKO" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="datenshi kyouko part i (19xx)(system house oh!).dim" size="1261824" crc="586a9186" sha1="5b69d23298e50b7d4e4f84753578e1bbec30e5ef" offset="000000" />
+				<rom name="datenshi kyouko part i (19xx)(system house oh).dim" size="1261824" crc="586a9186" sha1="5b69d23298e50b7d4e4f84753578e1bbec30e5ef" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3599,7 +3622,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="deflektr">
+	<!-- boot OK -->
+	<software name="deflektr" supported="yes">
 		<description>Deflektor</description>
 		<year>1991</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -3657,13 +3681,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="detana! twin bee (1991)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="533a8631" sha1="707473abd5433f8ef70481b46dee29f255f8bf0c" offset="000000" />
+				<rom name="detana twin bee (1991)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="533a8631" sha1="707473abd5433f8ef70481b46dee29f255f8bf0c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="detana! twin bee (1991)(konami)(disk 2 of 2)(disk b).dim" size="1261824" crc="3ddc210b" sha1="7237a1ef5b7df7cbccc410e3ff0747345679acdf" offset="000000" />
+				<rom name="detana twin bee (1991)(konami)(disk 2 of 2)(disk b).dim" size="1261824" crc="3ddc210b" sha1="7237a1ef5b7df7cbccc410e3ff0747345679acdf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3674,7 +3698,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<publisher>コナミ (Konami)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="detana! twin bee (demo) (1991)(konami).dim" size="1261824" crc="0f1ae0e4" sha1="c255bc812369e2943d7ac228fe9c15d6c197cafc" offset="000000" />
+				<rom name="detana twin bee (demo) (1991)(konami).dim" size="1261824" crc="0f1ae0e4" sha1="c255bc812369e2943d7ac228fe9c15d6c197cafc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3723,13 +3747,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Dig Dug", Set drive 1 to boot "Dig Dug II". -->
 	<software name="digdug">
 		<description>Video Game Anthology vol. 12 - Dig Dug / Dig Dug II</description>
 		<year>1995</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.12 - ディグダグ / ディグダグII" />
 		<info name="release" value="19950224" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Dig Dug, on DF1 to boot Dig Dug II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="dig dug i &amp; ii (1995)(dempa).dim" size="1261824" crc="9a6ea5d4" sha1="724bcc24d739b693f70708ade3f4cc89fadb2856" offset="000000" />
@@ -3756,11 +3780,11 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- Make user disk is needed to play this game. -->
 	<software name="dios">
 		<description>Dios</description>
 		<year>1990</year>
 		<publisher>ザインソフト (Zain Soft)</publisher>
+		<info name="usage" value="Make user disk is needed to play this game." />
 		<info name="alt_title" value="ディオス" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -3795,7 +3819,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="dokicard">
+	<!-- boot OK -->
+	<software name="dokicard" supported="yes">
 		<description>Doki Doki Card League</description>
 		<year>1990</year>
 		<publisher>グレイト (Great)</publisher>
@@ -4197,7 +4222,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="drachaku">
+	<!-- boot OK -->
+	<software name="drachaku" supported="yes">
 		<description>Dracula Hakushaku</description>
 		<year>1992</year>
 		<publisher>アイデス (Ides)</publisher>
@@ -4242,7 +4268,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="dbuster">
+	<!-- boot OK, vertically misaligned sprites -->
+	<software name="dbuster" supported="partial">
 		<description>Video Game Anthology vol. 7 - Dragon Buster</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -4403,7 +4430,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="dknight4">
+	<!--2 bus errors, eventually fails loading at Elf logo-->
+	<software name="dknight4" supported="no">
 		<description>Dragon Knight 4</description>
 		<year>1994</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -4621,7 +4649,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="dynduke">
+	<!-- Misaligned main sprite, no stage 1 backgrounds (regressed?) -->
+	<software name="dynduke" supported="no">
 		<description>Dynamite Duke</description>
 		<year>1990</year>
 		<publisher>ヘルツ (Hertz)</publisher>
@@ -4705,7 +4734,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="emerald">
+	<!-- disk swap causes Abort Retry Fail -->
+	<software name="emerald" supported="no">
 		<description>Emerald Densetsu</description>
 		<year>1990</year>
 		<publisher>システムハウスオー (System House Oh!)</publisher>
@@ -4713,13 +4743,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="emerald densetsu (1990)(system house oh!)(disk 1 of 2)(opening).dim" size="1261824" crc="4cf97f18" sha1="3965cee399717daa13f5016e796ce24c61a2b43a" offset="0" />
+				<rom name="emerald densetsu (1990)(system house oh)(disk 1 of 2)(opening).dim" size="1261824" crc="4cf97f18" sha1="3965cee399717daa13f5016e796ce24c61a2b43a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Game Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="emerald densetsu (1990)(system house oh!)(disk 2 of 2)(game1).dim" size="1261824" crc="27ef0197" sha1="b5c7c857a098cd97fbaeab8f9928fd296af6994a" offset="0" />
+				<rom name="emerald densetsu (1990)(system house oh)(disk 2 of 2)(game1).dim" size="1261824" crc="27ef0197" sha1="b5c7c857a098cd97fbaeab8f9928fd296af6994a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4794,7 +4824,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="entfuhr">
+	<!-- boot OK -->
+	<software name="entfuhr" supported="yes">
 		<description>Entführer</description>
 		<year>1989</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
@@ -4833,7 +4864,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="eurosens">
+	<!-- loading Abort after selecting generals and first text -->
+	<software name="eurosens" supported="no">
 		<description>Europa Sensen</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -4883,11 +4915,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Exciting Hour", Set drive 1 to boot "Syusse Oozumou". -->
-	<software name="excthour">
+	<!-- Exciting Hour: minor sprite-sprite priority issue when doing jump throw -->
+	<!-- Syusse Oozumou: boot OK -->
+	<software name="excthour" supported="partial">
 		<description>Video Game Anthology Vol. 8 - Exciting Hour / Syusse Oozumou</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Exciting Hour, on DF1 to boot Syusse Oozumou" />
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.8 - エキサイティングアワー / 出世大相撲" />
 		<info name="release" value="19940225" />
 		<part name="flop1" interface="floppy_5_25">
@@ -5147,7 +5181,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="fss">
+	<!-- boot OK -->
+	<software name="fss" supported="yes">
 		<description>FSS Fantasy Saga System</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -5196,13 +5231,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="fushigi no kabe (1988)(system house oh!)(disk 1 of 2).dim" size="1261824" crc="6c6073f5" sha1="6b1982c0d51fe2097370d47888907264cd9982e5" offset="000000" />
+				<rom name="fushigi no kabe (1988)(system house oh)(disk 1 of 2).dim" size="1261824" crc="6c6073f5" sha1="6b1982c0d51fe2097370d47888907264cd9982e5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="fushigi no kabe (1988)(system house oh!)(disk 2 of 2).dim" size="1261824" crc="8cdf8d9b" sha1="9f2472f9832554c3d347e9405d3cdf61e1e8ea20" offset="000000" />
+				<rom name="fushigi no kabe (1988)(system house oh)(disk 2 of 2).dim" size="1261824" crc="8cdf8d9b" sha1="9f2472f9832554c3d347e9405d3cdf61e1e8ea20" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5294,7 +5329,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="fzsenki">
+	<!-- boot OK, misaligned window for intro and briefing map -->
+	<software name="fzsenki" supported="partial">
 		<description>FZ Senki Axis</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
@@ -5666,7 +5702,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="genocid2">
+	<!-- boot OK -->
+	<software name="genocid2" supported="yes">
 		<description>Genocide 2</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
@@ -5733,7 +5770,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="geoseal">
+	<!-- boot OK -->
+	<software name="geoseal" supported="yes">
 		<description>Geograph Seal</description>
 		<year>1994</year>
 		<publisher>エグザクト (Exact)</publisher>
@@ -5792,6 +5830,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 	</software>
 
 	<software name="gingaed2">
+		<!-- How to create user disk? -->
 		<description>Ginga Eiyuu Densetsu II</description>
 		<year>1990</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -5903,13 +5942,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="giza! xix (1991)(fairytale)(disk 1 of 2)(disk a).dim" size="1261824" crc="d86f814c" sha1="0f42850e0a1d41695bbdc79ec688696cda1583bf" offset="000000" />
+				<rom name="giza xix (1991)(fairytale)(disk 1 of 2)(disk a).dim" size="1261824" crc="d86f814c" sha1="0f42850e0a1d41695bbdc79ec688696cda1583bf" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="giza! xix (1991)(fairytale)(disk 2 of 2)(disk b).dim" size="1261824" crc="23902ddd" sha1="930c9deb8596261ea6be5c9c636c19463f6f2556" offset="000000" />
+				<rom name="giza xix (1991)(fairytale)(disk 2 of 2)(disk b).dim" size="1261824" crc="23902ddd" sha1="930c9deb8596261ea6be5c9c636c19463f6f2556" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6018,7 +6057,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="granada">
+	<!-- boot OK -->
+	<software name="granada" supported="yes">
 		<description>Granada</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
@@ -6135,7 +6175,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="gunship">
+	<!-- boot OK, has manual copy protection after title screen but game still advances even if it fails (cracked?) -->
+	<software name="gunship" supported="yes">
 		<description>Gunship</description>
 		<year>1990</year>
 		<publisher>マイクロプローズ (MicroProse)</publisher>
@@ -6283,7 +6324,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="haresawa">
+	<!-- boot OK -->
+	<software name="haresawa" supported="yes">
 		<description>Hare Nochi Oosawagi!</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
@@ -6316,7 +6358,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="himihana">
+	<!-- boot OK -->
+	<software name="himihana" supported="yes">
 		<description>Himitsu no Hanazono</description>
 		<year>1992</year>
 		<publisher>GAMEテクノポリス (Game Technopolis)</publisher>
@@ -6342,7 +6385,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="fshark">
+	<!-- boot OK -->
+	<software name="fshark" supported="yes">
 		<description>Hishouzame - Flying Shark</description>
 		<year>1991</year>
 		<publisher>カネコ (Kaneko)</publisher>
@@ -6419,7 +6463,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="hoshisu2">
+	<!-- boot OK -->
+	<software name="hoshisu2" supported="yes">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
 		<publisher>ディー・オー (D.O.)</publisher>
@@ -6715,7 +6760,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="image">
+	<!-- boot OK -->
+	<software name="image" supported="yes">
 		<description>Image</description>
 		<year>1992</year>
 		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
@@ -6995,7 +7041,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="janjaka">
+	<!-- boot OK -->
+	<software name="janjaka" supported="yes">
 		<description>Jan Jaka Jan</description>
 		<year>1992</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -7041,7 +7088,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19910214" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="jane (1990)(system house oh!).dim" size="1261824" crc="11665467" sha1="c89731c50d9905d44cad5c0056ac3cfd6f380b6f" offset="000000" />
+				<rom name="jane (1990)(system house oh).dim" size="1261824" crc="11665467" sha1="c89731c50d9905d44cad5c0056ac3cfd6f380b6f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7323,6 +7370,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 	</software>
 
 	<software name="kareinar">
+		<!-- Has manual copy protection -->
 		<description>Karei Naru Jinsei Minasan no Okagedesu</description>
 		<year>1992</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -7554,7 +7602,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="chicago">
+	<!-- boot OK -->
+	<software name="chicago" supported="yes">
 		<description>The King of Chicago</description>
 		<year>1988</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -7593,7 +7642,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="kiwame">
+	<!-- boot OK -->
+	<software name="kiwame" supported="yes">
 		<description>Kiwame</description>
 		<year>1993</year>
 		<publisher>ログ (Log)</publisher>
@@ -7651,7 +7701,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="kohakuir">
+	<!-- boot OK, wrong GFX transitions for intro -->
+	<software name="kohakuir" supported="partial">
 		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
@@ -7748,7 +7799,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="alt_title" value="媚少女NORIKO" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="bishoujo noriko (19xx)(system house oh!).dim" size="1261824" crc="6694c68b" sha1="fd7af7ffeb894beaadb68462e55577ec619bfd9d" offset="000000" />
+				<rom name="bishoujo noriko (19xx)(system house oh).dim" size="1261824" crc="6694c68b" sha1="fd7af7ffeb894beaadb68462e55577ec619bfd9d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7822,7 +7873,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="ku2fr">
+	<!-- Prints in Japanese "an error occurred, please reset" -->
+	<software name="ku2fr" supported="no">
 		<description>Ku² Front Row</description>
 		<year>1992</year>
 		<publisher>パンサーソフトウェア (Panther Software)</publisher>
@@ -7841,7 +7893,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="kurukaji">
+	<!-- boot OK -->
+	<software name="kurukaji" supported="yes">
 		<description>Kurutta Kajitsu</description>
 		<year>1992</year>
 		<publisher>アイデス (Ides)</publisher>
@@ -8891,7 +8944,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="kumiko">
+	<!-- boot OK, "NEW SYSTEM HOUSE OH" ADPCM has some garbage, title screen/gameplay sports a minor horizontal black line GFX glitches -->
+	<software name="kumiko" supported="partial">
 		<description>Makenshi Kumiko</description>
 		<year>1989</year>
 		<publisher>システムハウスオー (System House Oh!)</publisher>
@@ -8899,7 +8953,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19890120" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="makenshi kumiko (19xx)(system house oh!).dim" size="1261824" crc="0c1bd9b7" sha1="d8e4f33302a6550a8fa97d9ab8ae25a24463ebe0" offset="000000" />
+				<rom name="makenshi kumiko (19xx)(system house oh).dim" size="1261824" crc="0c1bd9b7" sha1="d8e4f33302a6550a8fa97d9ab8ae25a24463ebe0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9137,7 +9191,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="metaleye">
+	<!-- loading Abort during Human68k autoexec sequence -->
+	<software name="metaleye" supported="no">
 		<description>Metal Eye</description>
 		<year>1993</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -9312,19 +9367,19 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="milk time (1991)(system house oh!)(disk 1 of 3).dim" size="1261824" crc="6100fefb" sha1="f2fa67d3f88e0b16a8532ac778cfa11ad6514bb9" offset="000000" />
+				<rom name="milk time (1991)(system house oh)(disk 1 of 3).dim" size="1261824" crc="6100fefb" sha1="f2fa67d3f88e0b16a8532ac778cfa11ad6514bb9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="milk time (1991)(system house oh!)(disk 2 of 3).dim" size="1261824" crc="e04c8ce2" sha1="172146769e4956166f011610ea2ec748cc0ca4de" offset="000000" />
+				<rom name="milk time (1991)(system house oh)(disk 2 of 3).dim" size="1261824" crc="e04c8ce2" sha1="172146769e4956166f011610ea2ec748cc0ca4de" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="milk time (1991)(system house oh!)(disk 3 of 3).dim" size="1261824" crc="653d9b5e" sha1="fde894b58312a82c0dd258b95f69e802348f5401" offset="000000" />
+				<rom name="milk time (1991)(system house oh)(disk 3 of 3).dim" size="1261824" crc="653d9b5e" sha1="fde894b58312a82c0dd258b95f69e802348f5401" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9367,7 +9422,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="misty1">
+	<!-- boot OK -->
+	<software name="misty1" supported="yes">
 		<description>Misty 68K Vol. 1 - Kikai na Zenra Shitai</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
@@ -9580,7 +9636,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="motos">
+	<!-- boot OK, using screen mode 384x256 causes misaligned sprites and layers, works fine in 256x256 (default) -->
+	<software name="motos" supported="partial">
 		<description>Motos</description>
 		<year>1989</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -9593,16 +9650,16 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Mr. Do!", Set drive 1 to boot "Mr. Do! vs Unicorns". -->
 	<software name="mrdo">
 		<description>Video Game Anthology vol. 10 - Mr. Do! / Mr. Do! vs Unicorns</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.10 - ミスター・ドゥ / ミスター・ドゥ対ユニコーン" />
 		<info name="release" value="19940702" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Mr. Do!, on DF1 to boot Mr. Do! vs Unicorns" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="mr. do! &amp; mr. do! vs unicorns (1994)(dempa).dim" size="1261824" crc="0c1684cb" sha1="fddbae4756b0a89a714136329b2d92dfb1a6e186" offset="000000" />
+				<rom name="mr. do &amp; mr. do vs unicorns (1994)(dempa).dim" size="1261824" crc="0c1684cb" sha1="fddbae4756b0a89a714136329b2d92dfb1a6e186" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9664,8 +9721,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- Disk 1 & 2 have been recently redumped! These are believed to be OK -->
 	<software name="myeyes">
+		<!-- Disk 1 & 2 have been recently redumped! These are believed to be OK -->
 		<description>My Eyes!</description>
 		<year>1992</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -9867,7 +9924,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="nemesis" supported="no">
+	<!-- boot OK, raster effect are one line off (overscan on top/bottom) -->
+	<software name="nemesis" supported="partial">
 		<description>Nemesis '90 Kai</description>
 		<year>1993</year>
 		<publisher>SPS</publisher>
@@ -9992,12 +10050,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="199011xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="nicoll (1990)(system house oh!).dim" size="1261824" crc="8400f85c" sha1="1e14aef379b6d10e5b4308b12b43b6cd4edc5037" offset="000000" />
+				<rom name="nicoll (1990)(system house oh).dim" size="1261824" crc="8400f85c" sha1="1e14aef379b6d10e5b4308b12b43b6cd4edc5037" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="nikoniko">
+	<!-- boot OK -->
+	<software name="nikoniko" supported="yes">
 		<description>Niko²</description>
 		<year>1991</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
@@ -10193,31 +10252,31 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 1 of 5)(disk a).dim" size="1261824" crc="bbd60b0d" sha1="7795f5300a88161ef2236b30873b775e8e4e7ef5" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 1 of 5)(disk a).dim" size="1261824" crc="bbd60b0d" sha1="7795f5300a88161ef2236b30873b775e8e4e7ef5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 2 of 5)(disk b).dim" size="1261824" crc="d87dac91" sha1="56436555503461c6356e9c734de3153c3c24975c" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 2 of 5)(disk b).dim" size="1261824" crc="d87dac91" sha1="56436555503461c6356e9c734de3153c3c24975c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 3 of 5)(disk c).dim" size="1261824" crc="1c2562a9" sha1="c08dc8e9ec56a5cc7eb182677a269ac3e94fa031" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 3 of 5)(disk c).dim" size="1261824" crc="1c2562a9" sha1="c08dc8e9ec56a5cc7eb182677a269ac3e94fa031" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 4 of 5)(disk d).dim" size="1261824" crc="196d5221" sha1="5f5e3c792a5312afe806d737d6a8c6c7bb803584" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 4 of 5)(disk d).dim" size="1261824" crc="196d5221" sha1="5f5e3c792a5312afe806d737d6a8c6c7bb803584" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 5 of 5)(disk e).dim" size="1261824" crc="97297914" sha1="2d6c3089ea34fd0f65a0a8fee1cef1e257db79b3" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 5 of 5)(disk e).dim" size="1261824" crc="97297914" sha1="2d6c3089ea34fd0f65a0a8fee1cef1e257db79b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10289,7 +10348,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19890929" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="orange iro no biyaku (1989)(system house oh!).dim" size="1261824" crc="15d4324d" sha1="d8c3ac5cd97dffc615ac5ae6c1264813b1ed3390" offset="000000" />
+				<rom name="orange iro no biyaku (1989)(system house oh).dim" size="1261824" crc="15d4324d" sha1="d8c3ac5cd97dffc615ac5ae6c1264813b1ed3390" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10393,7 +10452,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="pacman">
+	<!-- boot OK -->
+	<software name="pacman" supported="yes">
 		<description>Pac-Man (Boot change from Pac-Mania)</description>
 		<year>1988</year>
 		<publisher>Sharp</publisher>
@@ -10428,13 +10488,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="parodius da! (1991)(konami)(disk 1 of 2).dim" size="1261824" crc="534d190b" sha1="47d81801ef4531f7ea7af14b2f6b206341d178be" offset="000000" />
+				<rom name="parodius da (1991)(konami)(disk 1 of 2).dim" size="1261824" crc="534d190b" sha1="47d81801ef4531f7ea7af14b2f6b206341d178be" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="parodius da! (1991)(konami)(disk 2 of 2).dim" size="1261824" crc="c060b794" sha1="30e84ccfac606ab7a7958b3f23864fb759ee11f1" offset="000000" />
+				<rom name="parodius da (1991)(konami)(disk 2 of 2).dim" size="1261824" crc="c060b794" sha1="30e84ccfac606ab7a7958b3f23864fb759ee11f1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10446,7 +10506,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="alt_title" value="パロディウスだ! (デモディスク)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="parodius da! (demo) (1991)(konami).dim" size="1261824" crc="5fc8522c" sha1="ce978ee718d09d63df796ca27404d29d7aaefee3" offset="000000" />
+				<rom name="parodius da (demo) (1991)(konami).dim" size="1261824" crc="5fc8522c" sha1="ce978ee718d09d63df796ca27404d29d7aaefee3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10507,7 +10567,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="purupuru">
+	<!-- boot OK -->
+	<software name="purupuru" supported="yes">
 		<description>Pasocomic PuruPuru Paradise - Santa Claus Tokushuu</description>
 		<year>1994</year>
 		<publisher>バビロン (Babylon)</publisher>
@@ -10544,7 +10605,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="phalanx">
+	<!-- boot OK, has one line of garbage on bottom of screen -->
+	<software name="phalanx" supported="partial">
 		<description>Phalanx</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
@@ -10658,7 +10720,12 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="pbpinbal">
+	<!-- boot OK -->
+	<software name="pbpinbal" supported="yes">
+		<!-- left bumper: Z -->
+		<!-- right bumper: tenkey minus (!) -->
+		<!-- ball shoot: left/right shift -->
+		<!-- tilt: space -->
 		<description>Pinball Pinball</description>
 		<year>1990</year>
 		<publisher>日本ソフテック (Nihon Softek)</publisher>
@@ -10679,25 +10746,25 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 1 of 4).dim" size="1261824" crc="cb0c19e5" sha1="4403b126bba00d75159401724df661299bf4f96d" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 1 of 4).dim" size="1261824" crc="cb0c19e5" sha1="4403b126bba00d75159401724df661299bf4f96d" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 2 of 4).dim" size="1261824" crc="56f5d5d2" sha1="64ff546ac307f8008b45308458f71a0d082c9ca6" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 2 of 4).dim" size="1261824" crc="56f5d5d2" sha1="64ff546ac307f8008b45308458f71a0d082c9ca6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 3 of 4).dim" size="1261824" crc="4e10fba9" sha1="a43f4c6d535ef351536957bc897640d529715892" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 3 of 4).dim" size="1261824" crc="4e10fba9" sha1="a43f4c6d535ef351536957bc897640d529715892" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 4 of 4).dim" size="1261824" crc="03e7b75f" sha1="b35fe9fba58f738aaa082d479d278999eaf0ade7" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 4 of 4).dim" size="1261824" crc="03e7b75f" sha1="b35fe9fba58f738aaa082d479d278999eaf0ade7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10741,7 +10808,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="pipedrem">
+	<!-- boot OK -->
+	<software name="pipedrem" supported="yes">
 		<description>Pipe Dream</description>
 		<year>1992</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -10794,7 +10862,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="ponyon">
+	<!-- boot OK, various GFX offsets during in-game and option menu, sports garbage when ranking scrolls -->
+	<software name="ponyon" supported="partial">
 		<description>Ponyon</description>
 		<year>1992</year>
 		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
@@ -10872,7 +10941,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="pleague">
+	<!-- boot OK -->
+	<software name="pleague" supported="yes">
 		<description>Power League</description>
 		<year>1988</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -11028,19 +11098,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh!)(disk 1 of 3).dim" size="1261824" crc="65d34713" sha1="c6e78274231f19225632a1e6657eee8cd4120542" offset="000000" />
+				<rom name="pretty doll (1991)(system house oh)(disk 1 of 3).dim" size="1261824" crc="65d34713" sha1="c6e78274231f19225632a1e6657eee8cd4120542" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh!)(disk 2 of 3).dim" size="1261824" crc="0624a794" sha1="2d08d95804530874798aeafc0698353fd78a388f" offset="000000" />
+				<rom name="pretty doll (1991)(system house oh)(disk 2 of 3).dim" size="1261824" crc="0624a794" sha1="2d08d95804530874798aeafc0698353fd78a388f" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh!)(disk 3 of 3).dim" size="1261824" crc="f53d16f2" sha1="124fe85889282d5a663b6fde9bd332e930eae9ff" offset="000000" />
+				<rom name="pretty doll (1991)(system house oh)(disk 3 of 3).dim" size="1261824" crc="f53d16f2" sha1="124fe85889282d5a663b6fde9bd332e930eae9ff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11187,7 +11257,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="prodmang">
+	<!-- boot OK -->
+	<software name="prodmang" supported="yes">
 		<description>Production Manager</description>
 		<year>1989</year>
 		<publisher>コムパック (Compac)</publisher>
@@ -11420,7 +11491,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="rcrobotc">
+	<!-- boot OK -->
+	<software name="rcrobotc" supported="yes">
 		<description>R.C. Robot Construction</description>
 		<year>1993</year>
 		<publisher>エレクトリックシープ (Electric Sheep)</publisher>
@@ -11646,7 +11718,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="rtishtar">
+	<!-- boot OK, Ki hair is transparent instead of black -->
+	<software name="rtishtar" supported="partial">
 		<description>The Return of Ishtar</description>
 		<year>1988</year>
 		<publisher>SPS</publisher>
@@ -11659,6 +11732,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="ringmst">
+		<!-- TODO: describe steps to create a new game -->
 		<description>Ring Master</description>
 		<year>1989</year>
 		<publisher>ホビージャパン (Hobby Japan)</publisher>
@@ -11891,7 +11965,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="sabnack">
+	<!-- boot OK -->
+	<software name="sabnack" supported="yes">
 		<description>Sabnack</description>
 		<year>1991</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -12089,13 +12164,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="sekai de ichiban kimi ga suki! (1990)(cocktail soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="7ba671be" sha1="4400735d1a89d33ed8ea653c0277bb3a653394c7" offset="000000" />
+				<rom name="sekai de ichiban kimi ga suki (1990)(cocktail soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="7ba671be" sha1="4400735d1a89d33ed8ea653c0277bb3a653394c7" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="sekai de ichiban kimi ga suki! (1990)(cocktail soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="ffc4ebea" sha1="d67d7ebbf99f064e065cbec5196ba6465e6f8acc" offset="000000" />
+				<rom name="sekai de ichiban kimi ga suki (1990)(cocktail soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="ffc4ebea" sha1="d67d7ebbf99f064e065cbec5196ba6465e6f8acc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12126,7 +12201,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="shangh2">
+	<!-- loading Abort on boot -->
+	<software name="shangh2" supported="no">
 		<description>Shanghai II</description>
 		<year>1989</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -12150,7 +12226,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="shangrli">
+	<!-- boot OK -->
+	<software name="shangrli" supported="yes">
 		<description>Shangrlia</description>
 		<year>1991</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -12321,7 +12398,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="alt_title" value="少女伝説 PART-II ~ Shoujo Densetsu Part 2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="shoujo densetsu (1989)(system house oh!).dim" size="1261824" crc="5139d6ae" sha1="9f8a2a9564085134b379f22a792bd10b075aea52" offset="0" />
+				<rom name="shoujo densetsu (1989)(system house oh).dim" size="1261824" crc="5139d6ae" sha1="9f8a2a9564085134b379f22a792bd10b075aea52" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12842,7 +12919,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="starfrce">
+	<!-- boot OK -->
+	<software name="starfrce" supported="yes">
 		<description>Video Game Anthology Vol. 3 - Star Force</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -13009,7 +13087,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="strider">
+	<!-- boot OK, throws "cannot read file" error when asked to disc swap on end of stage 4 -->
+	<software name="strider" supported="no">
 		<description>Strider Hiryuu</description>
 		<year>1992</year>
 		<publisher>カプコン (Capcom)</publisher>
@@ -13340,7 +13419,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="ssf2">
+	<!-- boot OK, serious sound hiccups -->
+	<software name="ssf2" supported="partial">
 		<description>Super Street Fighter II - The New Challengers</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
@@ -13506,7 +13586,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="taikoris">
+	<!-- boot OK -->
+	<software name="taikoris" supported="yes">
 		<description>Taikou Risshiden</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -13571,7 +13652,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="tenkatou">
+	<!-- boot OK -->
+	<software name="tenkatou" supported="yes">
 		<description>Tenka Touitsu</description>
 		<year>1990</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -13610,7 +13692,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="tenkyuh">
+	<!-- boot OK -->
+	<software name="tenkyuh" supported="yes">
 		<description>Tenkyuuhai</description>
 		<year>1989</year>
 		<publisher>スタジオパンサー (Studio Panther)</publisher>
@@ -13771,13 +13854,14 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Terra Cresta", Set drive 1 to boot "Moon Cresta". -->
 	<software name="terracre">
 		<description>Video Game Anthology Vol. 1 - Terra Cresta / Moon Cresta</description>
 		<year>1992</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.1 - テラクレスタ / ムーンクレスタ" />
 		<info name="release" value="19921120" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Terra Cresta, on DF1 to boot Moon Cresta" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="terra cresta &amp; moon cresta (1992)(dempa).dim" size="1261824" crc="1e7c5847" sha1="aea8ae183e2bac3d5e0e6dfddcc2ca1655f07c24" offset="000000" />
@@ -13829,7 +13913,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="tetris">
+	<!-- boot OK -->
+	<software name="tetris" supported="yes">
 		<description>Tetris</description>
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -13901,7 +13986,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="tf2">
+	<!-- boot OK -->
+	<software name="tf2" supported="yes">
 		<description>Thunder Force II</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
@@ -13961,19 +14047,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="75eb3759" sha1="807a7f4959e2e55f2285d8fd1397c10e1ac6019b" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh)(disk 1 of 3)(system).dim" size="1261824" crc="75eb3759" sha1="807a7f4959e2e55f2285d8fd1397c10e1ac6019b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="18590d6e" sha1="4104752de9d8cdc04d30d8f1ecf0de9661223a1d" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh)(disk 2 of 3)(disk 1).dim" size="1261824" crc="18590d6e" sha1="4104752de9d8cdc04d30d8f1ecf0de9661223a1d" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="7a8994f3" sha1="a578c2c1cf11aa7d663cd8f4284d0cb30ff4bc16" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh)(disk 3 of 3)(disk 2).dim" size="1261824" crc="7a8994f3" sha1="a578c2c1cf11aa7d663cd8f4284d0cb30ff4bc16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13986,19 +14072,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="ca258d85" sha1="768c124448338482682cd90c49e9a6e11f9f0bf9" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh)(disk 1 of 3)(system).dim" size="1261824" crc="ca258d85" sha1="768c124448338482682cd90c49e9a6e11f9f0bf9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="5e353cd3" sha1="b4d46aabbf36f944c6078a9eed6f9fec01ebf9f6" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh)(disk 2 of 3)(disk 1).dim" size="1261824" crc="5e353cd3" sha1="b4d46aabbf36f944c6078a9eed6f9fec01ebf9f6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="4904d2d8" sha1="7d7f43333ff3730f8472c239f9ef15c2a4d3cddb" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh)(disk 3 of 3)(disk 2).dim" size="1261824" crc="4904d2d8" sha1="7d7f43333ff3730f8472c239f9ef15c2a4d3cddb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14012,13 +14098,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street (1993)(jast)(disk 1 of 2)(disk a).dim" size="1261824" crc="036683ad" sha1="1d4f88969568b1747d1c7fb79bf0efd06f0cafad" offset="000000" />
+				<rom name="totsugeki bakkon street (1993)(jast)(disk 1 of 2)(disk a).dim" size="1261824" crc="036683ad" sha1="1d4f88969568b1747d1c7fb79bf0efd06f0cafad" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street (1993)(jast)(disk 2 of 2)(disk b).dim" size="1261824" crc="6e64c6fe" sha1="654e6bb50c65ec31b23751740ba57d33b5d7b52c" offset="000000" />
+				<rom name="totsugeki bakkon street (1993)(jast)(disk 2 of 2)(disk b).dim" size="1261824" crc="6e64c6fe" sha1="654e6bb50c65ec31b23751740ba57d33b5d7b52c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14031,24 +14117,25 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street ii hunting roulette (199x)(jast)(disk 1 of 3)(disk a).dim" size="1261824" crc="92c5074f" sha1="b2215512044ba8a3451e74c1a96ec8793fdcc072" offset="000000" />
+				<rom name="totsugeki bakkon street ii hunting roulette (199x)(jast)(disk 1 of 3)(disk a).dim" size="1261824" crc="92c5074f" sha1="b2215512044ba8a3451e74c1a96ec8793fdcc072" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street ii hunting roulette (199x)(jast)(disk 2 of 3)(disk b).dim" size="1261824" crc="3b28f392" sha1="17c428b7a217944cf8c8730b1f3b14dd15a5675e" offset="000000" />
+				<rom name="totsugeki bakkon street ii hunting roulette (199x)(jast)(disk 2 of 3)(disk b).dim" size="1261824" crc="3b28f392" sha1="17c428b7a217944cf8c8730b1f3b14dd15a5675e" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street ii hunting roulette (199x)(jast)(disk 3 of 3)(disk c).dim" size="1261824" crc="b45c1d56" sha1="a214e872a4716e5694d1eba1f179ec18d183635d" offset="000000" />
+				<rom name="totsugeki bakkon street ii hunting roulette (199x)(jast)(disk 3 of 3)(disk c).dim" size="1261824" crc="b45c1d56" sha1="a214e872a4716e5694d1eba1f179ec18d183635d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="toshinto">
+	<!-- boot OK -->
+	<software name="toshinto" supported="yes">
 		<description>Toushin Toshi</description>
 		<year>1991</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -14527,12 +14614,14 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="versnag">
+	<!-- hangs during in-game loading, asking Disk C in DF0 (huh?) -->
+	<software name="versnag" supported="no">
 		<description>War Torn Versnag</description>
 		<year>1993</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="ヴェルスナーグ戦乱 ~ Versnag Senran" />
 		<info name="release" value="19930428" />
+		<info name="usage" value="Disk A is just Opening. To in-game insert discs B and C" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -14616,7 +14705,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="viperv8t">
+	<!-- Locks up on title screen -->
+	<software name="viperv8t" supported="no">
 		<description>Viper-V8 Twin Turbo</description>
 		<year>1994</year>
 		<publisher>ソニア (Sogna)</publisher>
@@ -14673,7 +14763,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="warning">
+	<!-- boot OK -->
+	<software name="warning" supported="yes">
 		<description>Warning Type 68</description>
 		<year>1988</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
@@ -14693,7 +14784,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="wings">
+	<!-- boot OK -->
+	<software name="wings" supported="yes">
 		<description>Wings</description>
 		<year>1989</year>
 		<publisher>ブローダーバンドジャパン (Brøderbund Japan)</publisher>
@@ -14902,7 +14994,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="wangsp">
+	<!-- boot OK -->
+	<software name="wangsp" supported="yes">
 		<description>Wrestle Angels Special - Mouhitori no Top Eventer</description>
 		<year>1994</year>
 		<publisher>エクシング (Xing)</publisher>
@@ -15008,7 +15101,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="xenon2">
+	<!-- boot OK -->
+	<software name="xenon2" supported="yes">
 		<description>Xenon 2 Megablast</description>
 		<year>1991</year>
 		<publisher>EPICソニー (EPIC Sony)</publisher>
@@ -15182,7 +15276,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="yaritai1">
+	<!-- boot OK -->
+	<software name="yaritai1" supported="yes">
 		<description>Yaritai Houdai</description>
 		<year>1988</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
@@ -15216,7 +15311,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="19901015" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="yesterday (1990)(system house oh!).dim" size="1261824" crc="b1724d5c" sha1="afef8ba07b1e670c8aa18570fe4ed78e645c64f7" offset="000000" />
+				<rom name="yesterday (1990)(system house oh).dim" size="1261824" crc="b1724d5c" sha1="afef8ba07b1e670c8aa18570fe4ed78e645c64f7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16373,7 +16468,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="cdrom">
+	<!-- Driver disk for unemulated CD-ROM -->
+	<software name="cdrom" supported="no">
 		<description>CD-ROM Driver v2.00</description>
 		<year>1994</year>
 		<publisher>First Class Technology</publisher>
@@ -16700,7 +16796,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="filemst">
+	<!-- boot OK -->
+	<software name="filemst" supported="yes">
 		<description>The File Master v1.13</description>
 		<year>1990</year>
 		<publisher>Kyouto Media</publisher>
@@ -16800,13 +16897,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="g68k easy graphic tool (1988)(oh! business)(disk 1 of 2)(disk a).dim" size="1261824" crc="aac299c4" sha1="4a26c51c74905f447eaa986574adebc3da20e594" offset="000000" />
+				<rom name="g68k easy graphic tool (1988)(oh business)(disk 1 of 2)(disk a).dim" size="1261824" crc="aac299c4" sha1="4a26c51c74905f447eaa986574adebc3da20e594" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="g68k easy graphic tool (1988)(oh! business)(disk 2 of 2)(disk b).dim" size="1261824" crc="74b45277" sha1="9fabf2dabb5d08b6fd9ed79f8c740aaf7681f0fe" offset="000000" />
+				<rom name="g68k easy graphic tool (1988)(oh business)(disk 2 of 2)(disk b).dim" size="1261824" crc="74b45277" sha1="9fabf2dabb5d08b6fd9ed79f8c740aaf7681f0fe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17074,7 +17171,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="matier">
+	<!-- boot OK -->
+	<software name="matier" supported="yes">
 		<description>Matier v2.11B</description>
 		<year>1995</year>
 		<publisher>Meteor Art Technology</publisher>
@@ -17323,7 +17421,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="polyphon">
+	<!-- Damaged dump? Doesn't autoboot, launching "polyphon.x" from Human68k shows a title screen then back to prompt -->
+	<software name="polyphon" supported="no">
 		<description>Polyphon</description>
 		<year>1992</year>
 		<publisher>Etou Hiroshi</publisher>
@@ -17398,7 +17497,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Oh! Business</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="sprite editor e68k (1988)(oh! business).dim" size="1261824" crc="705f545f" sha1="03b53a8db0212186d3b6da49ded030bdd12066d1" offset="000000" />
+				<rom name="sprite editor e68k (1988)(oh business).dim" size="1261824" crc="705f545f" sha1="03b53a8db0212186d3b6da49ded030bdd12066d1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18411,7 +18510,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="dennoc06">
+	<!-- boot OK -->
+	<software name="dennoc06" supported="yes">
 		<description>Dennou Club Vol. 06</description>
 		<year>1988</year>
 		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
@@ -20664,7 +20764,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Elrin Da!</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="elrin da! magazine vol. 1 uchuu tai sakusen (1993)(elrin da!).dim" size="1261824" crc="957ab735" sha1="0227dd52e8837e3ea24595eae99c178025dc3476" offset="000000" />
+				<rom name="elrin da magazine vol. 1 uchuu tai sakusen (1993)(elrin da).dim" size="1261824" crc="957ab735" sha1="0227dd52e8837e3ea24595eae99c178025dc3476" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20734,19 +20834,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 01 z-music v1.0 (1991)(oh! x)(disk 1 of 3).dim" size="1261824" crc="055826b4" sha1="07849b314d705587b4a0315ea1ae313469eefe84" offset="0" />
+				<rom name="bessatsu oh x music system 01 z-music v1.0 (1991)(oh x)(disk 1 of 3).dim" size="1261824" crc="055826b4" sha1="07849b314d705587b4a0315ea1ae313469eefe84" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 01 z-music v1.0 (1991)(oh! x)(disk 2 of 3).dim" size="1261824" crc="8d932780" sha1="8a5289a5294818efe3cffb3a700601ca67e1f13f" offset="0" />
+				<rom name="bessatsu oh x music system 01 z-music v1.0 (1991)(oh x)(disk 2 of 3).dim" size="1261824" crc="8d932780" sha1="8a5289a5294818efe3cffb3a700601ca67e1f13f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 01 z-music v1.0 (1991)(oh! x)(disk 3 of 3).dim" size="1261824" crc="c944dabc" sha1="a245988cc7de00f8cecf7e7b11fc0d220e17e9d8" offset="0" />
+				<rom name="bessatsu oh x music system 01 z-music v1.0 (1991)(oh x)(disk 3 of 3).dim" size="1261824" crc="c944dabc" sha1="a245988cc7de00f8cecf7e7b11fc0d220e17e9d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20801,37 +20901,37 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 1 of 6)(system).dim" size="1261824" crc="150886a2" sha1="20acf7af0803516525ad6199b9106a20e21753fe" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 1 of 6)(system).dim" size="1261824" crc="150886a2" sha1="20acf7af0803516525ad6199b9106a20e21753fe" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 2 of 6)(disk 1).dim" size="1261824" crc="9ef2f798" sha1="7653dc0003870dec5a488e3430caba0d6b4a702a" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 2 of 6)(disk 1).dim" size="1261824" crc="9ef2f798" sha1="7653dc0003870dec5a488e3430caba0d6b4a702a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 3 of 6)(disk 2).dim" size="1261824" crc="cd10a708" sha1="a5598cb54c58839a21203314e13b1fb6b891d47d" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 3 of 6)(disk 2).dim" size="1261824" crc="cd10a708" sha1="a5598cb54c58839a21203314e13b1fb6b891d47d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 4 of 6)(disk 3).dim" size="1261824" crc="53c562c0" sha1="0fd961213fdbc9cd8715f7dbd58926245d079534" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 4 of 6)(disk 3).dim" size="1261824" crc="53c562c0" sha1="0fd961213fdbc9cd8715f7dbd58926245d079534" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 5 of 6)(disk 4).dim" size="1261824" crc="15dc2a7a" sha1="f1608fa679caaba46ca91eafe1695c6786d1c22c" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 5 of 6)(disk 4).dim" size="1261824" crc="15dc2a7a" sha1="f1608fa679caaba46ca91eafe1695c6786d1c22c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 6 of 6)(disk 5).dim" size="1261824" crc="f9e721a4" sha1="85f7d4c8c4b97847c5ebe1c899b6c8d3d5b44d34" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 6 of 6)(disk 5).dim" size="1261824" crc="f9e721a4" sha1="85f7d4c8c4b97847c5ebe1c899b6c8d3d5b44d34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20842,7 +20942,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x soukan 10 shuunen kinen pro-68k sono 4 sion 2 (1992)(soft bank).dim" size="1261824" crc="76bbf14e" sha1="35aa2a42a85af361e397d1a40b90b5a86f2fc098" offset="0" />
+				<rom name="oh x soukan 10 shuunen kinen pro-68k sono 4 sion 2 (1992)(soft bank).dim" size="1261824" crc="76bbf14e" sha1="35aa2a42a85af361e397d1a40b90b5a86f2fc098" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20865,7 +20965,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1990.06 soukan 8 shuunen kinen pro-68k (1990)(soft bank).dim" size="1261824" crc="f74a44c8" sha1="06096e3fcfd1f1e33a255b28c2beaef1cea419f3" offset="0" />
+				<rom name="oh x 1990.06 soukan 8 shuunen kinen pro-68k (1990)(soft bank).dim" size="1261824" crc="f74a44c8" sha1="06096e3fcfd1f1e33a255b28c2beaef1cea419f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20888,7 +20988,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1991.05 ougou shuukan pro-68k (1991)(soft bank).dim" size="1261824" crc="8cb03c87" sha1="dce2135fedbfb751368bae0fcb6ea7ac81792d15" offset="0" />
+				<rom name="oh x 1991.05 ougou shuukan pro-68k (1991)(soft bank).dim" size="1261824" crc="8cb03c87" sha1="dce2135fedbfb751368bae0fcb6ea7ac81792d15" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20924,7 +21024,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1992.06 soukan x shuunen kinen pro-68k (1992)(soft bank).dim" size="1261824" crc="52a80f0a" sha1="49bb89e5c9e531f710ac542c7f91b0f81d9fac69" offset="0" />
+				<rom name="oh x 1992.06 soukan x shuunen kinen pro-68k (1992)(soft bank).dim" size="1261824" crc="52a80f0a" sha1="49bb89e5c9e531f710ac542c7f91b0f81d9fac69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20935,7 +21035,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
-				<rom name="oh! x 1992.07 doga cga system v2.50 (1992)(soft bank).dim" size="1474816" crc="f47374da" sha1="803bdbb9fa3c7f1106993df33a6726fa53879162" offset="0" />
+				<rom name="oh x 1992.07 doga cga system v2.50 (1992)(soft bank).dim" size="1474816" crc="f47374da" sha1="803bdbb9fa3c7f1106993df33a6726fa53879162" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20946,7 +21046,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
-				<rom name="oh! x 1993.10 aki matsuri pro-68k (1993)(soft bank).dim" size="1474816" crc="49bb290a" sha1="c4d7d4615b382024aa07a138a015f36ca82b53c9" offset="0" />
+				<rom name="oh x 1993.10 aki matsuri pro-68k (1993)(soft bank).dim" size="1474816" crc="49bb290a" sha1="c4d7d4615b382024aa07a138a015f36ca82b53c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20957,7 +21057,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.03 hinamatsuri pro-68k (1994)(soft bank).dim" size="1261824" crc="df0a437b" sha1="e1f8c758cf1d03360b10f1c8b36b0d12a93a8d9a" offset="0" />
+				<rom name="oh x 1994.03 hinamatsuri pro-68k (1994)(soft bank).dim" size="1261824" crc="df0a437b" sha1="e1f8c758cf1d03360b10f1c8b36b0d12a93a8d9a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20968,7 +21068,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.05 koi no bori pro-68k (1994)(soft bank).dim" size="1261824" crc="b2f80d35" sha1="d0b2b62c80b33f4b0213b2e6b47408f8db1626e8" offset="0" />
+				<rom name="oh x 1994.05 koi no bori pro-68k (1994)(soft bank).dim" size="1261824" crc="b2f80d35" sha1="d0b2b62c80b33f4b0213b2e6b47408f8db1626e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20979,7 +21079,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.07 cga nyuumon kit genie (1994)(soft bank).dim" size="1261824" crc="e7196476" sha1="2ef826740ce9d5257bdd6a8064ccc10cb185b7c2" offset="0" />
+				<rom name="oh x 1994.07 cga nyuumon kit genie (1994)(soft bank).dim" size="1261824" crc="e7196476" sha1="2ef826740ce9d5257bdd6a8064ccc10cb185b7c2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21002,7 +21102,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.10 momiji gari pro-68k (1994)(soft bank).dim" size="1261824" crc="e0b3575f" sha1="0b012396a08f21e49dfbb828de3838ab7b4a3c4a" offset="0" />
+				<rom name="oh x 1994.10 momiji gari pro-68k (1994)(soft bank).dim" size="1261824" crc="e0b3575f" sha1="0b012396a08f21e49dfbb828de3838ab7b4a3c4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21025,7 +21125,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.12 xl image + alpha (1994)(soft bank).dim" size="1261824" crc="e95647b8" sha1="8e11cfa23ee9686c6469f2a44fadb9d3f6bb0c31" offset="0" />
+				<rom name="oh x 1994.12 xl image + alpha (1994)(soft bank).dim" size="1261824" crc="e95647b8" sha1="8e11cfa23ee9686c6469f2a44fadb9d3f6bb0c31" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21036,7 +21136,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.05 oh! dennou club (1995)(soft bank).dim" size="1261824" crc="9867e7d4" sha1="7faadd752dbfe791436bff00e9d6999f9f04d300" offset="0" />
+				<rom name="oh x 1995.05 oh dennou club (1995)(soft bank).dim" size="1261824" crc="9867e7d4" sha1="7faadd752dbfe791436bff00e9d6999f9f04d300" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21047,7 +21147,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.08 shochuu mimai pro-68k (1995)(soft bank).dim" size="1261824" crc="0ef7e907" sha1="6ff2746efb769b150c15d37fe6d7be4e088a806b" offset="0" />
+				<rom name="oh x 1995.08 shochuu mimai pro-68k (1995)(soft bank).dim" size="1261824" crc="0ef7e907" sha1="6ff2746efb769b150c15d37fe6d7be4e088a806b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21059,13 +21159,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 1 of 2).dim" size="1261824" crc="96da918c" sha1="41f7c4e13698269622444903f061b824731a9251" offset="0" />
+				<rom name="oh x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 1 of 2).dim" size="1261824" crc="96da918c" sha1="41f7c4e13698269622444903f061b824731a9251" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 2 of 2).dim" size="1261824" crc="dce4043c" sha1="895fb111e0f5bd716a7df8e1ece9286a5eae6252" offset="0" />
+				<rom name="oh x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 2 of 2).dim" size="1261824" crc="dce4043c" sha1="895fb111e0f5bd716a7df8e1ece9286a5eae6252" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21092,7 +21192,9 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="tokkan3">
+	<!-- dshell3: trails when text scrolling occurs. -->
+	<!-- gfe.bat: sports missing layer clearances for character select-->
+	<software name="tokkan3" supported="partial">
 		<description>Tokkan Biwa Freeks Dai 3 Gou</description>
 		<year>1993</year>
 		<publisher>DCS</publisher>
@@ -21354,7 +21456,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="cuarto">
+	<!-- boot OK -->
+	<software name="cuarto" supported="yes">
 		<description>Cuarto</description>
 		<year>1991</year>
 		<publisher>Login</publisher>
@@ -21769,8 +21872,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- It isn't takeru (sofcon) version -->
-	<software name="sekaiss">
+	<!-- boot OK -->
+	<software name="sekaiss" supported="yes">
+		<!-- It isn't takeru (sofcon) version -->
 		<description>Sekai Seifuku Set (Web Release Ver.)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -21857,11 +21961,9 @@ sold through Takeru vending machines -->
 	</software>
 
 
-
-<!-- Distributed with Magazine Book from "The World of X68000". There are winner of a
- "The first all japan X68000 art festival (第1回全日本X68000芸術祭)" among programmers. -->
-
 	<software name="formulaxa" cloneof="formulax">
+		<!-- Distributed with Magazine Book from "The World of X68000". There are winner of a
+		 "The first all japan X68000 art festival (第1回全日本X68000芸術祭)" among programmers. -->
 		<description>The World of X68000 - Formula X</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -21874,13 +21976,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Fortress Attack", Set drive 1 to boot "GJ". -->
 	<software name="fortatgj">
 		<description>The World of X68000 - Fortress Attack &amp; GJ</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ザ・ワールド・オブ・X68000 - フォートレスアタック &amp; GJ" />
 		<info name="release" value="19930820" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Fortress Attack, on DF1 to boot GJ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="the world of x68000 (disk 1 of 3) - fortress attack &amp; gj.dim" size="1261824" crc="373b5d62" sha1="b0e9d5304c33546bee2ffc3e6380b8fe2f3d3e95" offset="000000" />
@@ -21888,16 +21990,16 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Logic Rush", Set drive 1 to boot "Ah! Ohimesama!". -->
 	<software name="lcmyprin" supported="no">
 		<description>The World of X68000 - Logic Rush &amp; Ah! Ohimesama!</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ザ・ワールド・オブ・X68000 - ロジックラッシュ &amp; ああっ! お姫さまっ!" />
 		<info name="release" value="19930820" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Logic Rush, on DF1 to boot Ah! Ohimesama!" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="the world of x68000 (disk 2 of 3) - logic rush &amp; ah! ohimesama!.dim" size="1261824" crc="235f83ca" sha1="a40470d9fab4c7d13184b5300eb16aa52db2d39e" offset="000000" />
+				<rom name="the world of x68000 (disk 2 of 3) - logic rush &amp; ah ohimesama.dim" size="1261824" crc="235f83ca" sha1="a40470d9fab4c7d13184b5300eb16aa52db2d39e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21928,16 +22030,16 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Rush!", Set drive 1 to boot "Useful". -->
 	<software name="rushusfl">
 		<description>The World of X68000 II - Rush! &amp; Useful</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ザ・ワールド・オブ・X68000 II - ラッシュ! &amp; ユースフル" />
 		<info name="release" value="19940720" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Rush!, on DF1 to boot Useful" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="the world of x68000 ii (disk 3 of 4) - rush! &amp; useful.dim" size="1261824" crc="f60f3b1b" sha1="a4ff175494a9438ed4444e533816bac8303a6e4c" offset="000000" />
+				<rom name="the world of x68000 ii (disk 3 of 4) - rush &amp; useful.dim" size="1261824" crc="f60f3b1b" sha1="a4ff175494a9438ed4444e533816bac8303a6e4c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21968,8 +22070,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- This boot disk is copied file from "The World of X68000" -->
-	<software name="aahime">
+	<!-- boot OK -->
+	<software name="aahime" supported="yes">
+		<!-- This boot disk is copied file from "The World of X68000" -->
 		<description>Aa! O-Hime-sama! (Ripped from The World of X68000)</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -21977,7 +22080,7 @@ sold through Takeru vending machines -->
 		<info name="release" value="19940720" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="aa! o-hime-sama!.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
+				<rom name="aa o-hime-sama.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21988,7 +22091,8 @@ sold through Takeru vending machines -->
 
 
 
-	<software name="177">
+	<!-- boot OK -->
+	<software name="177" supported="yes">
 		<description>177</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22047,8 +22151,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- appears to be some garbage on the background, but otherwise playable -->
-	<software name="accheat">
+	<!-- boot OK, corrupted background layer -->
+	<software name="accheat" supported="partial">
 		<description>Access Heat</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22060,7 +22164,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Some projectiles don't seem to want to move...  -->
+	<!-- boot OK -->
+	<!-- some projectiles don't move (cannot repro) -->
 	<software name="actshoot">
 		<description>Active Shoot</description>
 		<year>1999</year>
@@ -22085,7 +22190,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="advland2">
+	<!-- boot OK -->
+	<software name="advland2" supported="yes">
 		<description>Adventure Land 2 (v0.99)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22121,7 +22227,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="airhork">
+	<!-- boot OK -->
+	<software name="airhork" supported="yes">
 		<description>Air Hork</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22145,8 +22252,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- same content as the PC98 disk! -->
 	<software name="akazucc" supported="no">
+		<!-- same content as the PC98 disk! -->
 		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22169,7 +22276,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="alfarne">
+	<!-- boot OK, no BGM for bosses? -->
+	<software name="alfarne" supported="yes">
 		<description>Alfarne</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22193,8 +22301,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Text remains on screen during gameplay -->
-	<software name="amegame">
+	<!-- boot OK, doesn't clear text on gameplay screen (btanb?) -->
+	<software name="amegame" supported="partial">
 		<description>Ame Game (v0.90)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22206,7 +22314,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="amheroes">
+	<!-- boot OK -->
+	<software name="amheroes" supported="yes">
 		<description>American Heroes - BF92 Extra Version</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22218,7 +22327,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="amheroesa" cloneof="amheroes">
+	<!-- boot OK -->
+	<software name="amheroesa" cloneof="amheroes" supported="yes">
 		<description>American Heroes - BF92 Extra Version (Alt?)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22274,7 +22384,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Pussy Cat" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="anzu fly! (1991)(pussy cat).dim" size="1261824" crc="1bea6961" sha1="3bef9fa8168ae3e5cb6acc9862c1cd8ab4707796" offset="000000" />
+				<rom name="anzu fly (1991)(pussy cat).dim" size="1261824" crc="1bea6961" sha1="3bef9fa8168ae3e5cb6acc9862c1cd8ab4707796" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22406,7 +22516,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="atennis">
+	<!-- boot OK -->
+	<software name="atennis" supported="yes">
 		<description>Alien Tennis Chikyuu no Kiki</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22474,7 +22585,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="babel">
+	<!-- boot OK -->
+	<software name="babel" supported="yes">
 		<description>Babel</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22592,7 +22704,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="baribar3">
+	<!-- boot OK -->
+	<software name="baribar3" supported="yes">
 		<description>Bari Bari Attack 3 - Erice</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22616,7 +22729,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="batlcity">
+	<!-- inputs doesn't work on main menu -->
+	<software name="batlcity" supported="no">
 		<description>Battle City (Doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22639,8 +22753,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Untested, needs 1.44MB disk support for Human68k -->
 	<software name="btlmania">
+		<!-- Untested, needs 1.44MB disk support for Human68k -->
 		<description>Battle Mania'</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22676,7 +22790,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
+	<!-- boot OK, sound farts -->
 	<software name="bslfght000" cloneof="bslfght">
 		<description>Bishoujo Senshi Lady Fighter (v0.00)</description>
 		<year>1993</year>
@@ -22689,8 +22803,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
-	<software name="bslfght">
+	<!-- boot OK, sound farts -->
+	<software name="bslfght" supported="partial">
 		<description>Bishoujo Senshi Lady Fighter (v1.00)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22702,8 +22816,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
-	<software name="bsmnfght210" cloneof="bsmnfght">
+	<!-- boot OK, sound farts -->
+	<software name="bsmnfght210" cloneof="bsmnfght" supported="partial">
 		<description>Bishoujo Senshi Moon Fighter (v2.10)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22715,8 +22829,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
-	<software name="bsmnfght">
+	<!-- boot OK, sound farts -->
+	<software name="bsmnfght" supported="partial">
 		<description>Bishoujo Senshi Moon Fighter (v2.11)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22728,7 +22842,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="slrmnkdk">
+	<!-- boot OK -->
+	<software name="slrmnkdk" supported="yes">
 		<description>Bishoujo Senshi Sailor Moon Kessen Dark Kingdom</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22758,8 +22873,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- does not startup after loading -->
-	<software name="bssmnfgt">
+	<!-- Prints "An error occurred. Please reset." in Japanese (tries to access all four drives!?) -->
+	<software name="bssmnfgt" supported="no">
 		<description>Bishoujo Senshi Super Moon Fighter (v1.02)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22771,7 +22886,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="bssmnfgx">
+	<!-- boot OK -->
+	<software name="bssmnfgx" supported="yes">
 		<description>Bishoujo Senshi Super Moon Fighter X</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22790,8 +22906,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrv3p">
+	<!-- boot OK, loading Abort on gameplay with scratchy ADPCM -->
+	<software name="sailrv3p" supported="no">
 		<description>Bishoujo Senshi Sailor V (3 players)</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22803,8 +22919,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrv5p" cloneof="sailrv3p">
+	<!-- boot OK, loading Abort on gameplay with scratchy ADPCM -->
+	<software name="sailrv5p" cloneof="sailrv3p" supported="no">
 		<description>Bishoujo Senshi Sailor V (5 players)</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22816,8 +22932,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrvf3">
+	<!-- boot OK, black screen after character select with scratchy ADPCM -->
+	<software name="sailrvf3" supported="no">
 		<description>Bishoujo Senshi Sailor V Final v3</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22836,8 +22952,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrv2">
+	<!-- boot OK, hardlock after character select with scratchy ADPCM -->
+	<software name="sailrv2" supported="no">
 		<description>Bishoujo Senshi Sailor V v2</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22892,7 +23008,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="biyoyonc">
+	<!-- boot OK -->
+	<software name="biyoyonc" supported="yes">
 		<description>Biyoyon Car Game</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22928,8 +23045,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Doesn't start, locks up waiting for MIDI, which should trigger a bus error, but doesn't for some odd reason -->
-	<software name="blindspt">
+	<!-- Hangs at title screen, locks up waiting for MIDI (should trigger a bus error and it doesn't) -->
+	<software name="blindspt" supported="no">
 		<description>Blind Spot</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22965,7 +23082,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="blocksto">
+	<!-- boot OK -->
+	<software name="blocksto" supported="yes">
 		<description>Block Stocker (v2.00)</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22989,8 +23107,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Locks up in-game -->
-	<software name="bluwing2">
+	<!-- boot OK -->
+	<!-- old note: Locks up in-game (cannot repro) -->
+	<software name="bluwing2" supported="yes">
 		<description>Blue Wings 2 - Blue Knights</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23028,8 +23147,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
-	<software name="bodhidh2">
+	<!-- boot OK, no SFXs -->
+	<!-- old note: Menu remains on screen during gameplay, should be cleared, but isn't (cannot repro) -->
+	<software name="bodhidh2" supported="partial">
 		<description>Bodhidharma Mark 2 (v0.01)</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23041,8 +23161,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
-	<software name="bodhidha030" cloneof="bodhidha">
+	<!-- boot OK, has SFXs unlike the brother sets (all prints IF ERRORLEVEL 1 GOTO non_pcm8 on autoexec boot) -->
+	<!-- old note: Menu remains on screen during gameplay, should be cleared, but isn't (cannot repro) -->
+	<software name="bodhidha030" cloneof="bodhidha" supported="yes">
 		<description>Bodhidharma (v0.30)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23054,8 +23175,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
-	<software name="bodhidha">
+	<!-- boot OK, no SFXs -->
+	<!-- old note: Menu remains on screen during gameplay, should be cleared, but isn't (cannot repro) -->
+	<software name="bodhidha" supported="partial">
 		<description>Bodhidharma (v1.01) Hehebereke</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23078,8 +23200,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Displays "Disk Read Error" -->
-	<software name="bonnou2">
+	<!-- Returns to Human68k with "DISK READ ERROR" after initial screen -->
+	<software name="bonnou2" supported="no">
 		<description>Bonnou 2</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23098,8 +23220,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Displays "Disk Read Error" -->
-	<software name="bonnou2d">
+	<!-- Returns to Human68k with "DISK READ ERROR" after initial screen -->
+	<software name="bonnou2d" supported="no">
 		<description>Bonnou 2 Das</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23145,8 +23267,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- 1.44MB image -->
 	<software name="boyoyon">
+		<!-- 1.44MB image -->
 		<description>Boyoyon (v3.31)</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23189,7 +23311,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="butarian">
+	<!-- boot OK -->
+	<software name="butarian" supported="yes">
 		<description>Butarian</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23201,8 +23324,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Game area is black.  Probably priority or layer masking issues. -->
-	<software name="butasanq">
+	<!-- boot OK -->
+	<!-- old note: Game area is black.  Probably priority or layer masking issues. (cannot repro) -->
+	<software name="butasanq" supported="yes">
 		<description>Butasan Quest</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23277,7 +23401,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="celiad">
+	<!-- boot OK -->
+	<software name="celiad" supported="yes">
 		<description>Celia (demo)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23339,7 +23464,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="chaosang">
+	<!-- boot OK -->
+	<software name="chaosang" supported="yes">
 		<description>Chaos Angels</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23395,13 +23521,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="chotto local rule na mine sweeper hun de oshimai!! (199x)(mpu)(disk 1 of 2)(disk a).dim" size="1261824" crc="7f2c5df7" sha1="6f246f68dd42a35d470157e8ea85810852cce5b5" offset="000000" />
+				<rom name="chotto local rule na mine sweeper hun de oshimai (199x)(mpu)(disk 1 of 2)(disk a).dim" size="1261824" crc="7f2c5df7" sha1="6f246f68dd42a35d470157e8ea85810852cce5b5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="chotto local rule na mine sweeper hun de oshimai!! (199x)(mpu)(disk 2 of 2)(disk b).dim" size="1261824" crc="57858b38" sha1="26ba37e916f06f3fce3ccd2407593c8f41380f32" offset="000000" />
+				<rom name="chotto local rule na mine sweeper hun de oshimai (199x)(mpu)(disk 2 of 2)(disk b).dim" size="1261824" crc="57858b38" sha1="26ba37e916f06f3fce3ccd2407593c8f41380f32" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23495,7 +23621,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="citycon">
+	<!-- Doesn't have autoexec.bat (bad dump?), can't start a play, city_.x sports flickering scroll, wrong colors? -->
+	<software name="citycon" supported="no">
 		<description>City Connection (Doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23506,7 +23633,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="clayshot">
+	<!-- boot OK -->
+	<software name="clayshot" supported="yes">
 		<description>Clay Shooting</description>
 		<year>1988</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23518,7 +23646,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="clearlap">
+	<!-- boot OK -->
+	<software name="clearlap" supported="yes">
 		<description>Clear Lap</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23613,7 +23742,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="cryoku">
+	<!-- boot OK -->
+	<software name="cryoku" supported="yes">
 		<description>C Ryokukensa V3 (Newer?)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23644,7 +23774,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="crystwr">
+	<!-- boot OK -->
+	<software name="crystwr" supported="yes">
 		<description>Crystal Tower</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23656,7 +23787,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="cubegrd3">
+	<!-- boot OK -->
+	<software name="cubegrd3" supported="yes">
 		<description>Gradius 3 Cube Simulation</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23680,7 +23812,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="cybrfld">
+	<!-- boot OK -->
+	<software name="cybrfld" supported="yes">
 		<description>Cyber Field</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23692,7 +23825,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="cybrrpg">
+	<!-- boot OK -->
+	<software name="cybrrpg" supported="yes">
 		<description>Cyber RPG Pemo Pemo Pro-68k</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23806,8 +23940,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- clearly not an official port -->
-	<software name="darius">
+	<!-- no sprites, black screen by pressing fire -->
+	<software name="darius" supported="no">
+		<!-- clearly not an official port -->
 		<description>Darius</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23830,8 +23965,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- this one isn't official, either, boss fights only -->
-	<software name="dariuse">
+	<!-- boot OK -->
+	<software name="dariuse" supported="yes">
+		<!-- this one isn't official, either, boss fights only -->
 		<description>Darius Extra Version</description>
 		<year>198?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23862,7 +23998,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="M' Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="dastard!! ankoku no hakai kami (19xx)(m' soft).dim" size="1261824" crc="0cdd992a" sha1="2749e327ee2ce9dd726f857a31d8bd9a2db7848a" offset="000000" />
+				<rom name="dastard ankoku no hakai kami (19xx)(m' soft).dim" size="1261824" crc="0cdd992a" sha1="2749e327ee2ce9dd726f857a31d8bd9a2db7848a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23982,7 +24118,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="demslay3">
+	<!-- boot OK -->
+	<software name="demslay3" supported="yes">
 		<description>Demon Slayer 3</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24209,7 +24346,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="disk9fmv">
+	<!-- boot OK (very poor audiovideo "codec") -->
+	<software name="disk9fmv" supported="yes">
 		<description>Disk9 FMV - Honou no Tenkousei</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24232,7 +24370,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="diveon">
+	<!--boot OK, no sound in intro (btanb?) -->
+	<software name="diveon" supported="partial">
 		<description>Dive On</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24268,8 +24407,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Disk full of Moria data? -->
 	<software name="dofmoria">
+		<!-- Disk full of Moria data? -->
 		<description>D of Moria Data Shuu</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24288,7 +24427,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Biwahosi Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="dog fight! (1992)(biwahosi software).dim" size="1261824" crc="00eb4b74" sha1="b6fd0ffff8a3e089542a5c4a05aee791a16cace6" offset="000000" />
+				<rom name="dog fight (1992)(biwahosi software).dim" size="1261824" crc="00eb4b74" sha1="b6fd0ffff8a3e089542a5c4a05aee791a16cace6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24328,7 +24467,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="dorix">
+	<!-- boot OK -->
+	<!-- old note: Doesn't clear title screen, can be barely seen during gameplay (cannot repro) -->
+	<software name="dorix" supported="yes">
 		<description>Dorix</description>
 		<year>1998</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24352,7 +24493,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="drasan">
+	<!-- boot OK -->
+	<software name="drasan" supported="yes">
 		<description>Dr. A San Kyoudai Series Tomomichan no Dobon</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24375,7 +24517,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="dslayer">
+	<!-- boot OK, no sound (btanb?) -->
+	<software name="dslayer" supported="partial">
 		<description>Dragon Slayer (L1.1)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24472,8 +24615,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- HD install only? -->
 	<software name="duelfgh2">
+		<!-- HD install only? -->
 		<description>Duel Fighter 2</description>
 		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24528,7 +24671,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="dynamics">
+	<!-- boot OK, no SFXs in-game -->
+	<software name="dynamics" supported="partial">
 		<description>Dynamic Fomesion Soccer</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24589,7 +24733,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Elrin Da!" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="elrin da! magazine vol. 2 quiz uchuu tai sakusen (1993)(elrin da!).dim" size="1261824" crc="95cad303" sha1="4ba703175767ee404dd7571926c5bf0b51aca6bb" offset="000000" />
+				<rom name="elrin da magazine vol. 2 quiz uchuu tai sakusen (1993)(elrin da).dim" size="1261824" crc="95cad303" sha1="4ba703175767ee404dd7571926c5bf0b51aca6bb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24629,7 +24773,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="fastlap">
+	<!-- boot OK -->
+	<software name="fastlap" supported="yes">
 		<description>F-1 Fastest Lap</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24802,7 +24947,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="fcrisis">
+	<!-- boot OK -->
+	<software name="fcrisis" supported="yes">
 		<description>First Crisis ma Jin no Toubou</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24826,7 +24972,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="fmission">
+	<!-- boot OK, sprite layer boundaries are way bigger than visible area -->
+	<software name="fmission" supported="no">
 		<description>First Mission</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24857,7 +25004,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="flmwing">
+	<!-- boot OK -->
+	<software name="flmwing" supported="yes">
 		<description>Flame Wing (v1.02)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24881,7 +25029,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="flipflop">
+	<!-- boot OK -->
+	<software name="flipflop" supported="yes">
 		<description>Flip Flop</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24917,7 +25066,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="formulax">
+	<!-- boot OK -->
+	<software name="formulax" supported="yes">
 		<description>Formula X</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24964,7 +25114,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="fourfall">
+	<!-- boot OK -->
+	<software name="fourfall" supported="yes">
 		<description>Four'll Fall</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24988,7 +25139,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="frapull">
+	<!-- boot OK -->
+	<software name="frapull" supported="yes">
 		<description>Frapull</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25199,7 +25351,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="gamex">
+	<!-- boot OK -->
+	<software name="gamex" supported="yes">
 		<description>Game.X</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25218,12 +25371,13 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Daba" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ganbare! paichan (1994)(daba).dim" size="1261824" crc="8cfbcf3a" sha1="096506173c25332b722357c70b7e7b30aa69e386" offset="000000" />
+				<rom name="ganbare paichan (1994)(daba).dim" size="1261824" crc="8cfbcf3a" sha1="096506173c25332b722357c70b7e7b30aa69e386" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="gardislg">
+	<!-- boot OK -->
+	<software name="gardislg" supported="yes">
 		<description>Gardis Light (v2.10)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25266,7 +25420,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="To$hi" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ga-war games (19xx)(to$hi).dim" size="1261824" crc="e98d5245" sha1="f7bce4cc75d49f9e1ce552b7cf3520334396223f" offset="000000" />
+				<rom name="ga-war games (19xx)(toshi).dim" size="1261824" crc="e98d5245" sha1="f7bce4cc75d49f9e1ce552b7cf3520334396223f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25290,7 +25444,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="gedouret">
+	<!-- boot OK, no sound, has wrong raster effect for playfield -->
+	<software name="gedouret" supported="partial">
 		<description>Gedou Retsuden</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25321,7 +25476,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="gemdrop">
+	<!-- boot OK, BGM randomly hangs during gameplay on later stages (resumes at stage clear)-->
+	<software name="gemdrop" supported="partial">
 		<description>Gemdrop</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25333,7 +25489,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="getready">
+	<!-- boot OK -->
+	<software name="getready" supported="yes">
 		<description>Get Ready</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25357,7 +25514,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="gigafght">
+	<!-- boot OK, no sound (btanb?) -->
+	<software name="gigafght" supported="partial">
 		<description>Giga Fight 68k</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25490,7 +25648,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="halfmind">
+	<!-- boot OK, text layer doesn't clear (btanb?), no sound (btanb?) -->
+	<software name="halfmind" supported="partial">
 		<description>Half Mind</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25524,7 +25683,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="hanaiko">
+	<!-- boot OK -->
+	<software name="hanaiko" supported="yes">
 		<description>Hanaikoku Pro Uso-68k</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25555,8 +25715,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- sold through Takeru vending machines -->
 	<software name="hazard">
+		<!-- sold through Takeru vending machines -->
 		<description>Hazard</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25659,7 +25819,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="heroher4">
+	<!-- boot OK -->
+	<software name="heroher4" supported="yes">
 		<description>Hero Hero Disk 4 Indojin no Yabou</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25695,8 +25856,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- screen doesn't clear after updating each frame -->
-	<software name="hetzer">
+	<!-- boot OK, in-game doesn't sport any GFX but text layer -->
+	<!-- old note: doesn't clear after updating each frame (?) -->
+	<software name="hetzer" supported="no">
 		<description>Hetzer</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25720,14 +25882,15 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="heysay">
+	<!-- boot OK -->
+	<software name="heysay" supported="yes">
 		<description>Hey! Say! Education Committee (v0.12)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Taka-P" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="hey! say! education committee v0.12 (1993)(taka-p).dim" size="1261824" crc="0ec31ba9" sha1="725b07e0f60c770869cf9dc4a550f4fd5386cc76" offset="000000" />
+				<rom name="hey say education committee v0.12 (1993)(taka-p).dim" size="1261824" crc="0ec31ba9" sha1="725b07e0f60c770869cf9dc4a550f4fd5386cc76" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25739,7 +25902,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Taka-P" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="hey! say! education committee v0.10 (1993)(taka-p).dim" size="1261824" crc="4b414e14" sha1="ae45bc7175787009a698ec9639b46d6142ad3527" offset="000000" />
+				<rom name="hey say education committee v0.10 (1993)(taka-p).dim" size="1261824" crc="4b414e14" sha1="ae45bc7175787009a698ec9639b46d6142ad3527" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25780,7 +25943,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="himegas">
+	<!-- boot OK -->
+	<software name="himegas" supported="yes">
 		<description>Hi Mega Sister</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25799,7 +25963,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="hiroshi">
+	<!-- boot OK -->
+	<software name="hiroshi" supported="yes">
 		<description>Hiroshi</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25835,9 +26000,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- confirmed as good by pete_j -->
-	<!-- sold through Takeru vending machines -->
 	<software name="hitomiza">
+		<!-- confirmed as good by pete_j -->
+		<!-- sold through Takeru vending machines -->
 		<description>Hitomi Zaka</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25899,7 +26064,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="horiume">
+	<!-- boot OK -->
+	<software name="horiume" supported="yes">
 		<description>Hori Hori Ume Ume</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25930,7 +26096,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="hotjump">
+	<!-- Needs p1 button 2 to be pressed twice at Human68k boot (First message is "Multi-tap is not connected.") -->
+	<software name="hotjump" supported="partial">
 		<description>Hot Jump</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25966,7 +26133,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="hvrcraft">
+	<!-- boot OK -->
+	<software name="hvrcraft" supported="yes">
 		<description>Hover Craft 68k</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26037,7 +26205,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="imazoman">
+	<!-- boot OK -->
+	<software name="imazoman" supported="yes">
 		<description>Imazoman v1.00</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26079,7 +26248,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="intropro">
+	<!-- boot OK -->
+	<software name="intropro" supported="yes">
 		<description>Intro Pro 68K v2.10+</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26238,7 +26408,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="junkerpr">
+	<!-- boot OK -->
+	<software name="junkerpr" supported="yes">
 		<description>Junker Pro-68K</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26269,7 +26440,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Project Team Interrupt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="kaisen game daa! (1990)(project team interrupt).dim" size="1261824" crc="fab410a6" sha1="de0717dce11c1b2ab1975b50d404a574f97e634f" offset="000000" />
+				<rom name="kaisen game daa (1990)(project team interrupt).dim" size="1261824" crc="fab410a6" sha1="de0717dce11c1b2ab1975b50d404a574f97e634f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26539,7 +26710,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="knightmk">
+	<!-- doesn't autoboot, loading Abort (illegal opcode with either kmx.x or mmx.x)-->
+	<software name="knightmk" supported="no">
 		<description>Knight Maker</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26582,7 +26754,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="T&amp;H Project" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="korette deesure jong! (19xx)(t&amp;h project).dim" size="1261824" crc="42a93d62" sha1="f58e9a0808b18c160ea89bd5cf3a7895da6100b2" offset="000000" />
+				<rom name="korette deesure jong (19xx)(t&amp;h project).dim" size="1261824" crc="42a93d62" sha1="f58e9a0808b18c160ea89bd5cf3a7895da6100b2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26610,7 +26782,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="kurukuru">
+	<!-- boot OK -->
+	<software name="kurukuru" supported="yes">
 		<description>Kuru Kuru Puzzle</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26756,7 +26929,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="lexus2">
+	<!-- loading Abort on main menu ("bus error") -->
+	<software name="lexus2" supported="no">
 		<description>Lexus 2</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26815,7 +26989,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="limeligt">
+	<!-- boot OK -->
+	<software name="limeligt" supported="yes">
 		<description>Lime Light</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26834,7 +27009,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="lilchin">
+	<!-- boot OK, pressing return doesn't enter into gameplay (how to enter then?), garbled gfxs in gameplay -->
+	<software name="lilchin" supported="no">
 		<description>Little Chinese</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26846,7 +27022,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="lilchind">
+	<!-- Hangs with gfx garbage at game start -->
+	<software name="lilchind" supported="no">
 		<description>Little Chinese Dash</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26870,7 +27047,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="lockon">
+	<!-- boot OK, intentional wrong pitch on left part (btanb?) -->
+	<software name="lockon" supported="yes">
 		<description>Lock On</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26924,7 +27102,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="ldrun1">
+	<!-- boot OK -->
+	<software name="ldrun1" supported="yes">
 		<description>Lode Runner</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26984,7 +27163,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="lunafant">
+	<!-- Abort Retry Fail at boot trying to read DF2 ("copyall a:message c:" in autoexec.bat!?) -->
+	<!-- doesn't boot even if another image is present in DF2 -->
+	<software name="lunafant" supported="no">
 		<description>Lunatic Fantasy v2.0</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27008,8 +27189,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="lyricalp">
-		<description>Lyrical Party</description>
+	<!-- boot OK, no BGM (btanb?) -->
+	<software name="lyricalp" supported="yes">
+		<description>Lyrical Party (demo)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="MIX" />
@@ -27152,7 +27334,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="mahousen">
+	<!-- boot OK -->
+	<software name="mahousen" supported="yes">
 		<description>Mahou no Senshi Physical Melon</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27171,7 +27354,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="majohall">
+	<!-- boot OK -->
+	<software name="majohall" supported="yes">
 		<description>Majo Halldra no Yabou</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27195,7 +27379,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="mappy2">
+	<!-- boot OK -->
+	<software name="mappy2" supported="yes">
 		<description>Mappy (Yopino)</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27310,13 +27495,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="masayochan peeping shot! vol. 1 (19xx)(onoe network)(disk 1 of 2).dim" size="1261824" crc="ec5b755b" sha1="ef247c721cc335ebcb166bde7449a191916bc7f5" offset="000000" />
+				<rom name="masayochan peeping shot vol. 1 (19xx)(onoe network)(disk 1 of 2).dim" size="1261824" crc="ec5b755b" sha1="ef247c721cc335ebcb166bde7449a191916bc7f5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="masayochan peeping shot! vol. 1 (19xx)(onoe network)(disk 2 of 2).dim" size="1261824" crc="ffa65d77" sha1="f3b20e54c5bd9b80ff7aff2294c44d524977c064" offset="000000" />
+				<rom name="masayochan peeping shot vol. 1 (19xx)(onoe network)(disk 2 of 2).dim" size="1261824" crc="ffa65d77" sha1="f3b20e54c5bd9b80ff7aff2294c44d524977c064" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27418,7 +27603,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="meteowrs">
+	<!-- boot OK -->
+	<software name="meteowrs" supported="yes">
 		<description>Meteo Wars</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27437,7 +27623,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Brace" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="mikkun fly! (1991)(brace).dim" size="1261824" crc="b8948ca4" sha1="50b68c4e84cc470e2aa8e5cd18bf8ffae460e369" offset="000000" />
+				<rom name="mikkun fly (1991)(brace).dim" size="1261824" crc="b8948ca4" sha1="50b68c4e84cc470e2aa8e5cd18bf8ffae460e369" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27558,7 +27744,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="mogura">
+	<!-- boot OK -->
+	<software name="mogura" supported="yes">
 		<description>Mogura Attacker</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27613,13 +27800,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="momotarou gaiden momokochan fight! (1991)(todo2)(disk 1 of 2)(disk a).dim" size="1261824" crc="fd0b0e00" sha1="088f5ea8c953196b0d0e8541681be15d95888080" offset="000000" />
+				<rom name="momotarou gaiden momokochan fight (1991)(todo2)(disk 1 of 2)(disk a).dim" size="1261824" crc="fd0b0e00" sha1="088f5ea8c953196b0d0e8541681be15d95888080" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="momotarou gaiden momokochan fight! (1991)(todo2)(disk 2 of 2)(disk b).dim" size="1261824" crc="5b0c6874" sha1="ff03f200e3133f324cdc8c1ab2866e5760023df2" offset="000000" />
+				<rom name="momotarou gaiden momokochan fight (1991)(todo2)(disk 2 of 2)(disk b).dim" size="1261824" crc="5b0c6874" sha1="ff03f200e3133f324cdc8c1ab2866e5760023df2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27715,7 +27902,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="moria">
+	<!-- boot OK -->
+	<software name="moria" supported="yes">
 		<description>Moria v4.87</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27782,7 +27970,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="naniwa do konjou series bangaihen nouten chokudake! 2 (1990)(iron gear).dim" size="1261824" crc="a29a05ce" sha1="35ff987bc2f46b55401c40c28eec4b26e6bcf2a9" offset="000000" />
+				<rom name="naniwa do konjou series bangaihen nouten chokudake 2 (1990)(iron gear).dim" size="1261824" crc="a29a05ce" sha1="35ff987bc2f46b55401c40c28eec4b26e6bcf2a9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27794,7 +27982,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="naniwa do konjou series nouten chokudake! (1990)(iron gear).dim" size="1261824" crc="d6cab31a" sha1="439f9963785c2e0e1c3607caff3f0b7bfdc05795" offset="000000" />
+				<rom name="naniwa do konjou series nouten chokudake (1990)(iron gear).dim" size="1261824" crc="d6cab31a" sha1="439f9963785c2e0e1c3607caff3f0b7bfdc05795" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27806,13 +27994,13 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="naniwa do konjou series nouten chokudake! 3 (1991)(iron gear).dim" size="1261824" crc="00a3fad5" sha1="a54b548807931a3d4ad00fcbfc6ffe982c119056" offset="000000" />
+				<rom name="naniwa do konjou series nouten chokudake 3 (1991)(iron gear).dim" size="1261824" crc="00a3fad5" sha1="a54b548807931a3d4ad00fcbfc6ffe982c119056" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- sold through Takeru vending machines -->
 	<software name="nmfire">
+		<!-- sold through Takeru vending machines -->
 		<description>Nasake Muyou Fire!</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -27831,7 +28019,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Yamaco" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="nasake muyou fire 2! (1994)(yamaco).dim" size="1261824" crc="44546ade" sha1="14d3b3119afd5f2de675e96b4de92ce72fba9b3e" offset="000000" />
+				<rom name="nasake muyou fire 2 (1994)(yamaco).dim" size="1261824" crc="44546ade" sha1="14d3b3119afd5f2de675e96b4de92ce72fba9b3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27969,7 +28157,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="noutendn">
+	<!-- crashes on title screen, sound farts -->
+	<software name="noutendn" supported="no">
 		<description>Nouten Densetsu</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28012,7 +28201,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Maru" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! hajiki! (19xx)(maru).dim" size="1261824" crc="e80fc5ca" sha1="0c261e400bf21ed5b285c25e07845769c288c859" offset="000000" />
+				<rom name="oh hajiki (19xx)(maru).dim" size="1261824" crc="e80fc5ca" sha1="0c261e400bf21ed5b285c25e07845769c288c859" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28029,6 +28218,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<software name="oraorabl">
 		<description>Ora Ora Ball</description>
 		<year>1995</year>
@@ -28097,7 +28287,7 @@ sold through Takeru vending machines -->
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ossan no dotsuki!! game special.dim" size="1261824" crc="da0937bf" sha1="16a1f2fcd66f8e9ad069f7259cea6b6ad1f18713" offset="000000" />
+				<rom name="ossan no dotsuki game special.dim" size="1261824" crc="da0937bf" sha1="16a1f2fcd66f8e9ad069f7259cea6b6ad1f18713" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28149,7 +28339,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="pacmen">
+	<!-- boot OK -->
+	<software name="pacmen" supported="yes">
 		<description>Pac-Men</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28185,7 +28376,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="paikouka">
+	<!-- boot OK -->
+	<software name="paikouka" supported="yes">
 		<description>Pai Koukan Kyou Kou Kan Nakoruru Hen</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28283,7 +28475,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="68 Bank" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="patariro! game (19xx)(68 bank).dim" size="1261824" crc="b60c6c8f" sha1="a88ca5e9365dda1975e9eb46c8bcc9dfd19a9f01" offset="000000" />
+				<rom name="patariro game (19xx)(68 bank).dim" size="1261824" crc="b60c6c8f" sha1="a88ca5e9365dda1975e9eb46c8bcc9dfd19a9f01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28407,7 +28599,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="putiplin">
+	<!-- boot OK -->
+	<software name="putiplin" supported="yes">
 		<description>Mahou no Shooter Puti 'n Plin</description>
 		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28419,8 +28612,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This was released by the author in early 200x with an 'Aspect Ratio Patch' to fix display in emulators -->
-	<software name="putiplina" cloneof="putiplin">
+	<!-- boot OK -->
+	<software name="putiplina" cloneof="putiplin" supported="yes">
+		<!-- This was released by the author in early 200x with an 'Aspect Ratio Patch' to fix display in emulators -->
 		<description>Mahou no Shooter Puti 'n Plin (ARP version)</description>
 		<year>200?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28487,7 +28681,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="popjack">
+	<!-- Prints in Japanese "an error occurred, please reset" -->
+	<!-- old note: Attempts to read second drive with a single floppy? -->
+	<software name="popjack" supported="no">
 		<description>Popjack</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28797,7 +28993,7 @@ sold through Takeru vending machines -->
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="push bon! (1994)(-).dim" size="1261824" crc="eed59df0" sha1="4523eb111b155fb47af53c2c2bf69cab84c38b05" offset="000000" />
+				<rom name="push bon (1994)(-).dim" size="1261824" crc="eed59df0" sha1="4523eb111b155fb47af53c2c2bf69cab84c38b05" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28875,8 +29071,11 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- Biwahosi Software later became D.C.S. -->
-	<software name="quieazum">
+	<!-- boot OK -->
+	<!-- old note: Has layer clearance bugs on title screen (cannot repro) -->
+	<software name="quieazum" supported="yes">
+		<!-- Biwahosi Software later became D.C.S. -->
+		<!-- TODO: Biwahosi or Biwahoshi? -->
 		<description>Quieazum Biwahoshi Quiz System</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28968,7 +29167,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Todo2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="quiz jan! (1990)(todo2).dim" size="1261824" crc="583bc086" sha1="3c8baf368c512fed6ef9c0dac8e04cd40131adfa" offset="000000" />
+				<rom name="quiz jan (1990)(todo2).dim" size="1261824" crc="583bc086" sha1="3c8baf368c512fed6ef9c0dac8e04cd40131adfa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29063,7 +29262,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="raguna">
+	<!-- No BGMs, has text layer bug in intro, low pitch ADPCM -->
+	<!-- known to have game breaking bug later on (TBD) -->
+	<software name="raguna" supported="partial">
 		<description>Raguna</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29123,7 +29324,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="raydefox">
+	<!-- boot OK -->
+	<software name="raydefox" supported="yes">
 		<description>Raydefox Full Metal Powerdsuits v1998.12</description>
 		<year>1998</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29147,7 +29349,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="rayersht">
+	<!-- boot OK, minor GFX glitch appears on game over transition when no credits are available (btanb?) -->
+	<software name="rayersht" supported="yes">
 		<description>Rayer Shoot v1.03</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29234,7 +29437,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="refresh! (1990)(iron gear).dim" size="1261824" crc="98774bbe" sha1="b1386dc4f257a8bdeb22a0df8bade2b6b2e50d5f" offset="000000" />
+				<rom name="refresh (1990)(iron gear).dim" size="1261824" crc="98774bbe" sha1="b1386dc4f257a8bdeb22a0df8bade2b6b2e50d5f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29282,8 +29485,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- sold through Takeru vending machines -->
 	<software name="robotbt2">
+		<!-- sold through Takeru vending machines -->
 		<description>Robot Battle v2</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29294,7 +29497,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="rolldwn2">
+	<!-- boot OK -->
+	<software name="rolldwn2" supported="yes">
 		<description>Roll Down 2</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29421,7 +29625,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="sailrmcq">
+	<!-- boot OK -->
+	<software name="sailrmcq" supported="yes">
 		<description>Sailormoon Chou Card Quiz Game Moon Quiz</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29440,7 +29645,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Mugen Unagi Team" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="sakeru no da! (19xx)(mugen unagi team).dim" size="1261824" crc="3ea3f15b" sha1="66b0cd5f04a1de70d1c9ad382a497c7bb6249a6b" offset="000000" />
+				<rom name="sakeru no da (19xx)(mugen unagi team).dim" size="1261824" crc="3ea3f15b" sha1="66b0cd5f04a1de70d1c9ad382a497c7bb6249a6b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29457,7 +29662,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="sarumune">
+	<!-- boot OK -->
+	<software name="sarumune" supported="yes">
 		<description>The Sarumune of Tetris</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29572,7 +29778,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="sdfightr">
+	<!-- boot OK, text layer leaves trails during gameplay -->
+	<software name="sdfightr" supported="partial">
 		<description>SD Fighter</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29596,7 +29803,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="sdtoki">
+	<!-- boot OK -->
+	<software name="sdtoki" supported="yes">
 		<description>SD Toki no Kagi</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29746,7 +29954,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="senshasn">
+	<!-- boot OK, text layer leaves trails covering the whole screen -->
+	<software name="senshasn" supported="no">
 		<description>Senshasen v1.0</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29782,7 +29991,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="shikato">
+	<!-- boot OK -->
+	<software name="shikato" supported="yes">
 		<description>Shikato</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29974,7 +30184,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="silvrcry">
+	<!-- boot OK -->
+	<software name="silvrcry" supported="yes">
 		<description>Silver Crystal</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30032,13 +30243,14 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="snowkibn">
+	<!-- boot OK -->
+	<software name="snowkibn" supported="yes">
 		<description>Snow na Kibun!</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="snow na kibun! (1991)(-).dim" size="1261824" crc="b1dc4083" sha1="fbfe0698eeefe573aeaa6e2ddd084ccdd76ceeee" offset="000000" />
+				<rom name="snow na kibun (1991)(-).dim" size="1261824" crc="b1dc4083" sha1="fbfe0698eeefe573aeaa6e2ddd084ccdd76ceeee" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30055,7 +30267,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="solitea">
+	<!-- boot OK -->
+	<software name="solitea" supported="yes">
 		<description>Solitea</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30067,7 +30280,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="sorcer">
+	<!-- boot OK -->
+	<software name="sorcer" supported="yes">
 		<description>Sorcerian (AQRS)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30141,8 +30355,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!--  there also exists a bootable version, but it has been made for emulator usage... -->
 	<software name="souhoutv">
+		<!--  there also exists a bootable version, but it has been made for emulator usage... -->
 		<description>Souhou Blue Phoenix Taste Version</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30257,7 +30471,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="starblad">
+	<!-- boot OK -->
+	<software name="starblad" supported="yes">
 		<description>Star Blade v1.00</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30293,7 +30508,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="starcrs2">
+	<!-- boot OK, flashing graphics (bad timings? there's a setting that doesn't clear the screen, btanb?) -->
+	<software name="starcrs2" supported="no">
 		<description>Star Cruiser Sol Will 2</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30347,12 +30563,13 @@ sold through Takeru vending machines -->
 		<info name="developer" value="To$hi" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="star trek (19xx)(to$hi).dim" size="1261824" crc="ce9e9c86" sha1="e627a8a1bbf3d5e4bdfa66a23d20f2574c83cb97" offset="000000" />
+				<rom name="star trek (19xx)(toshi).dim" size="1261824" crc="ce9e9c86" sha1="e627a8a1bbf3d5e4bdfa66a23d20f2574c83cb97" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="starwar">
+	<!-- boot OK -->
+	<software name="starwar" supported="yes">
 		<description>Star War 1991 v2</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30507,7 +30724,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="sukaparo">
+	<!-- Wrong colors for status bar (raster effect?) -->
+	<software name="sukaparo" supported="partial">
 		<description>Sukaparojii</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30597,7 +30815,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="supergft">
+	<!-- boot OK -->
+	<software name="supergft" supported="yes">
 		<description>Super Graphic Theater</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30616,7 +30835,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="superjck">
+	<!-- boot OK -->
+	<software name="superjck" supported="yes">
 		<description>Super Jack Pro 68K</description>
 		<year>1988</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30628,7 +30848,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="smb">
+	<!-- boot OK, input doesn't work, wrong colors -->
+	<software name="smb" supported="no">
 		<description>Super Mario Bros. (Doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31006,7 +31227,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="tankbatt">
+	<!-- boot OK, invisible walls (btanb?) -->
+	<!-- doesn't reload bullet state for player and enemies if they hit the edge of screen (btanb?) -->
+	<software name="tankbatt" supported="partial">
 		<description>Tank Battalion (Pineapple)</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31042,7 +31265,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="target">
+	<!-- boot OK -->
+	<software name="target" supported="yes">
 		<description>Target</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31085,7 +31309,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="PYN" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! dai 8 kikou shidan (1991)(pyn).dim" size="1261824" crc="7b6a19cb" sha1="94d2aa76ec1a57984a87ccf6b47a2d7c9e5034ec" offset="000000" />
+				<rom name="tatakae dai 8 kikou shidan (1991)(pyn).dim" size="1261824" crc="7b6a19cb" sha1="94d2aa76ec1a57984a87ccf6b47a2d7c9e5034ec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31098,13 +31322,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 46 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="4391ae06" sha1="96a502f4adc5aab9d5732a08c65463d0c5496f7c" offset="000000" />
+				<rom name="tatakae konyanko comike 46 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="4391ae06" sha1="96a502f4adc5aab9d5732a08c65463d0c5496f7c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 46 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="3a71e0b1" sha1="66c5bcc635d5f55ee0bb482790ba214407104991" offset="000000" />
+				<rom name="tatakae konyanko comike 46 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="3a71e0b1" sha1="66c5bcc635d5f55ee0bb482790ba214407104991" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31117,13 +31341,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 47 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="fbdf78b1" sha1="bf1d23369dbae6de2602df9b5bcc7ed2ab64fa13" offset="000000" />
+				<rom name="tatakae konyanko comike 47 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="fbdf78b1" sha1="bf1d23369dbae6de2602df9b5bcc7ed2ab64fa13" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 47 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="b0f4fdbe" sha1="2d00b74c437fbbd2ff7e5317e21027cea91ecddf" offset="000000" />
+				<rom name="tatakae konyanko comike 47 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="b0f4fdbe" sha1="2d00b74c437fbbd2ff7e5317e21027cea91ecddf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31136,18 +31360,19 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1474816">
-				<rom name="tatakae! konyanko ex (199x)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1474816" crc="9776a32e" sha1="ad2d3c6195c0d78b3b1e9f336407dc1ea40ccf21" offset="000000" />
+				<rom name="tatakae konyanko ex (199x)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1474816" crc="9776a32e" sha1="ad2d3c6195c0d78b3b1e9f336407dc1ea40ccf21" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1474816">
-				<rom name="tatakae! konyanko ex (199x)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1474816" crc="a8595966" sha1="69adca6e3bf95914db3184cf7203e22f64f79469" offset="000000" />
+				<rom name="tatakae konyanko ex (199x)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1474816" crc="a8595966" sha1="69adca6e3bf95914db3184cf7203e22f64f79469" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tekkense">
+	<!-- boot OK -->
+	<software name="tekkense" supported="yes">
 		<description>Tekken Seisai</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31193,7 +31418,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="terradrv">
+	<!-- boot OK, busted gameplay timings (slightly advances if you keep a keyboard button pressed?) -->
+	<software name="terradrv" supported="no">
 		<description>Terra Drive</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31253,7 +31479,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="tetriscf">
+	<!-- boot OK -->
+	<!-- No graphics if you load tetris.x from Human68k (btanb, autoboot sequence is load.x then tetris.x)-->
+	<software name="tetriscf" supported="yes">
 		<description>Tetris v5 (Cyber Factory)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31371,7 +31599,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="timpaper">
+	<!-- boot OK -->
+	<software name="timpaper" supported="yes">
 		<description>Tim Paper Huzoku Scenario Dairyuuou Alexas</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31419,7 +31648,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="tinyclmn">
+	<!-- boot OK -->
+	<software name="tinyclmn" supported="yes">
 		<description>Tiny Columns X68000 Special</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31514,13 +31744,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 0" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tokkou! kamikaze fighter (1996)(haiteidoradorazu)(disk 1 of 2)(disk 0).dim" size="1261824" crc="fcd6554d" sha1="f7b27942c9a3fbb3c5cc2fbec28e2744a8a5591b" offset="000000" />
+				<rom name="tokkou kamikaze fighter (1996)(haiteidoradorazu)(disk 1 of 2)(disk 0).dim" size="1261824" crc="fcd6554d" sha1="f7b27942c9a3fbb3c5cc2fbec28e2744a8a5591b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tokkou! kamikaze fighter (1996)(haiteidoradorazu)(disk 2 of 2)(disk 1).dim" size="1261824" crc="00af0887" sha1="c7bed328c574a0be09446585afde17dc9bc39c3f" offset="000000" />
+				<rom name="tokkou kamikaze fighter (1996)(haiteidoradorazu)(disk 2 of 2)(disk 1).dim" size="1261824" crc="00af0887" sha1="c7bed328c574a0be09446585afde17dc9bc39c3f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31579,7 +31809,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="druaga">
+	<!-- boot OK -->
+	<software name="druaga" supported="partial">
 		<description>The Tower of Druaga</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31603,7 +31834,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="triangle">
+	<!-- boot OK -->
+	<software name="triangle" supported="yes">
 		<description>Triangle Hearts</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31657,7 +31889,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="TAU Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ueshita hanten!! upside down v1.02a (1995)(tau software).dim" size="1261824" crc="bf03e503" sha1="856f41394425b890eea1765aefeaaa5e588dee55" offset="0" />
+				<rom name="ueshita hanten upside down v1.02a (1995)(tau software).dim" size="1261824" crc="bf03e503" sha1="856f41394425b890eea1765aefeaaa5e588dee55" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -31740,7 +31972,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="vagrantf">
+	<!-- boot OK -->
+	<software name="vagrantf" supported="yes">
 		<description>Vagrant Fighter FX</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31802,7 +32035,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="vision">
+	<!-- boot OK -->
+	<software name="vision" supported="yes">
 		<description>Vision</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31881,7 +32115,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="wanders">
+	<!-- boot OK -->
+	<!-- old note: Has layer clearance bugs (cannot repro) -->
+	<software name="wanders" supported="partial">
 		<description>Wanderers</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -32157,14 +32393,15 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="yugachas">
+	<!-- boot OK -->
+	<software name="yugachas" supported="yes">
 		<description>Yuugai Chase Aa!! Namida no Shimensoka</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="P Shoukai Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="yuugai chase aa!! namida no shimensoka (199x)(p shoukai software).dim" size="1261824" crc="cefba359" sha1="b4d5c9735fae5e6e7215fcb023241d2688dd41d8" offset="000000" />
+				<rom name="yuugai chase aa namida no shimensoka (199x)(p shoukai software).dim" size="1261824" crc="cefba359" sha1="b4d5c9735fae5e6e7215fcb023241d2688dd41d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32181,7 +32418,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="yugaigak">
+	<!-- Doesn't boot, moans about FLOAT2.X (autoexec.bat has 11 bytes but cannot be read by edit.x) -->
+	<software name="yugaigak" supported="no">
 		<description>Yuugai Gakuen - Noukasuitai Chokugeki</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -32212,12 +32450,13 @@ sold through Takeru vending machines -->
 		<info name="developer" value="P Shoukai Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="yuugai wars mamore! akai daichi (199x)(p shoukai software).dim" size="1261824" crc="e10b9f36" sha1="e7ea0e491d52e14fc209fabc41396ec95955ec86" offset="000000" />
+				<rom name="yuugai wars mamore akai daichi (199x)(p shoukai software).dim" size="1261824" crc="e10b9f36" sha1="e7ea0e491d52e14fc209fabc41396ec95955ec86" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="yuzurugi">
+	<!-- boot OK -->
+	<software name="yuzurugi" supported="yes">
 		<description>Yuzurugi -nics I</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -32342,20 +32581,18 @@ a DIM dump with DIFC, these are at least confirmed as coming from real disk (by 
 		</part>
 	</software>
 
-
-
-<!-- This must be loaded in DF1 with Human68k OS in DF0 -->
-
-	<software name="smba" cloneof="smb">
+	<!-- doesn't autoboot, input doesn't work, wrong colors -->
+	<software name="smba" cloneof="smb" supported="no">
 		<description>Famicom - Super Mario Bros.</description>
 		<year>1985</year>
+		<!-- doujin like parent? -->
 		<publisher>Nintendo</publisher>
-		<info name="usage" value="Type S_MARIO.X in Human68k OS" />
+		<!-- This must be loaded in DF1 with Human68k OS in DF0 (correct?) -->
+		<info name="usage" value="Mount Human68k in DF0 and this in DF1, type S_MARIO.X at prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="famicom - super mario bros (1985) (nintendo) [xdf].xdf" size="1261568" crc="2c6d35b3" sha1="c1dfd26c4d7fde821400b37d0c4de60e757dd440" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-
 </softwarelist>

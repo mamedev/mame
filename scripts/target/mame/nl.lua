@@ -56,6 +56,7 @@ SOUNDS["BEEP"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
+SOUNDS["SN76477"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -96,6 +97,7 @@ MACHINES["CXD1095"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
 MACHINES["F3853"] = true
+MACHINES["MB14241"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -183,6 +185,17 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
+  MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/includes/mw8080bw.h",
+  MAME_DIR .. "src/mame/audio/mw8080bw.h",
+  MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/video/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
+	MAME_DIR .. "src/mame/audio/nl_280zzzap.cpp",
+	MAME_DIR .. "src/mame/audio/nl_280zzzap.h",
+
 	MAME_DIR .. "src/mame/audio/cheekyms.cpp",
 	MAME_DIR .. "src/mame/audio/cheekyms.h",
 	MAME_DIR .. "src/mame/audio/nl_cheekyms.cpp",
@@ -251,6 +264,7 @@ files{
 	MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
 	MAME_DIR .. "src/mame/drivers/bailey.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
+	MAME_DIR .. "src/mame/drivers/crazybal.cpp",
 	MAME_DIR .. "src/mame/drivers/electra.cpp",
 	MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
 	MAME_DIR .. "src/mame/drivers/fungames.cpp",

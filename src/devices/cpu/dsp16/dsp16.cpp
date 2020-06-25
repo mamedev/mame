@@ -130,7 +130,7 @@ WRITE_LINE_MEMBER(dsp16_device_base::exm_w)
     high-level passive parallel I/O handlers
 ***********************************************************************/
 
-READ16_MEMBER(dsp16_device_base::pio_r)
+u16 dsp16_device_base::pio_r()
 {
 	if (!pio_pods_active())
 	{
@@ -148,7 +148,7 @@ READ16_MEMBER(dsp16_device_base::pio_r)
 	}
 }
 
-WRITE16_MEMBER(dsp16_device_base::pio_w)
+void dsp16_device_base::pio_w(u16 data)
 {
 	if (!pio_pids_active())
 	{
@@ -186,7 +186,7 @@ dsp16_device_base::dsp16_device_base(
 			{ "ram", ENDIANNESS_BIG, 16, yaau_bits, -1, std::move(data_map) },
 			{ "exm", ENDIANNESS_BIG, 16, 16, -1 } }
 	, m_yaau_bits(yaau_bits)
-	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_pcache(nullptr), m_workram_mask(0U)
+	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_workram_mask(0U)
 	, m_drc_cache(CACHE_SIZE), m_core(nullptr, [] (core_state *core) { core->~core_state(); }), m_recompiler()
 	, m_cache_mode(cache::NONE), m_phase(phase::PURGE), m_int_enable{ 0U, 0U }, m_flags(FLAGS_NONE), m_cache_ptr(0U), m_cache_limit(0U), m_cache_iterations(0U)
 	, m_exm_in(1U), m_int_in(CLEAR_LINE), m_iack_out(1U)
@@ -231,7 +231,7 @@ void dsp16_device_base::device_start()
 	m_spaces[AS_PROGRAM] = &space(AS_PROGRAM);
 	m_spaces[AS_DATA] = &space(AS_DATA);
 	m_spaces[AS_IO] = &space(AS_IO);
-	m_pcache = m_spaces[AS_PROGRAM]->cache<1, -1, ENDIANNESS_BIG>();
+	m_spaces[AS_PROGRAM]->cache(m_pcache);
 	m_workram_mask = u16((m_workram.bytes() >> 1) - 1);
 
 	if (allow_drc())
@@ -363,7 +363,7 @@ void dsp16_device_base::device_reset()
 		m_ose_cb(m_ose_out = 1U);
 
 	// PIO reset outputs
-	m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+	m_pdb_w_cb(m_psel_out, 0xffffU, 0x0000U);
 	if (!m_pids_out)
 	{
 		LOGPIO("DSP16: de-asserting PIDS for reset\n");
@@ -639,7 +639,7 @@ dsp16_disassembler::cpu::predicate dsp16_device_base::check_branch(offs_t pc) co
 		return predicate::INDETERMINATE;
 }
 
-template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
+template <offs_t Base> u16 dsp16_device_base::external_memory_r(offs_t offset, u16 mem_mask)
 {
 	return m_spaces[AS_IO]->read_word(Base + offset, mem_mask);
 }
@@ -1133,7 +1133,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 		set_predicate(predicate);
 
 		if (fetch_target)
-			*fetch_target = m_pcache->read_word(fetch_addr);
+			*fetch_target = m_pcache.read_word(fetch_addr);
 
 		if (phase::OP1 == m_phase)
 		{
@@ -1274,7 +1274,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 					m_core->op_dau_ad(op) = d;
 					if (last_instruction)
 					{
-						m_rom_data = m_pcache->read_word(m_core->xaau_pt);
+						m_rom_data = m_pcache.read_word(m_core->xaau_pt);
 						m_phase = phase::OP2;
 					}
 					else
@@ -1289,7 +1289,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				m_core->dau_temp = s16(m_core->dau_y >> 16);
 				m_core->dau_set_y(yaau_read<Debugger>(op));
-				m_rom_data = m_pcache->read_word(m_core->xaau_pt);
+				m_rom_data = m_pcache.read_word(m_core->xaau_pt);
 				m_phase = phase::OP2;
 				break;
 
@@ -1298,7 +1298,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				m_core->dau_set_y(yaau_read<Debugger>(op));
 				if (last_instruction)
 				{
-					m_rom_data = m_pcache->read_word(m_core->xaau_pt);
+					m_rom_data = m_pcache.read_word(m_core->xaau_pt);
 					m_phase = phase::OP2;
 				}
 				else
@@ -1384,7 +1384,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				// overlapped fetch of next instruction from ROM
 				mode_change = true;
 				m_cache_mode = cache::NONE;
-				m_cache[m_cache_ptr = 0] = m_pcache->read_word(m_core->xaau_pc);
+				m_cache[m_cache_ptr = 0] = m_pcache.read_word(m_core->xaau_pc);
 				m_st_pcbase = m_core->xaau_pc;
 			}
 			else
@@ -1420,7 +1420,7 @@ inline void dsp16_device_base::overlap_rom_data_read()
 	case 0x19: // F1 ; y = a0 ; x = *pt++[i]
 	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-		m_rom_data = m_pcache->read_word(m_core->xaau_pt);
+		m_rom_data = m_pcache.read_word(m_core->xaau_pt);
 		break;
 	}
 }
@@ -1537,7 +1537,7 @@ inline void dsp16_device_base::pio_step()
 		if (!--m_pio_pids_cnt)
 		{
 			if (!m_pio_r_cb.isnull())
-				m_pio_pdx_in = m_pio_r_cb(machine().dummy_space(), m_psel_out, 0xffffU);
+				m_pio_pdx_in = m_pio_r_cb(m_psel_out, 0xffffU);
 			m_pids_cb(m_pids_out = 1U);
 			LOGPIO("DSP16: PIO read active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_in, m_st_pcbase);
 		}
@@ -1555,9 +1555,9 @@ inline void dsp16_device_base::pio_step()
 		{
 			LOGPIO("DSP16: PIO write active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_out, m_st_pcbase);
 			m_pods_cb(1U);
-			m_pio_w_cb(machine().dummy_space(), m_psel_out, m_pio_pdx_out, 0xffffU);
+			m_pio_w_cb(m_psel_out, m_pio_pdx_out, 0xffffU);
 			m_pods_out = 1U;
-			m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+			m_pdb_w_cb(m_psel_out, 0xffffU, 0x0000U);
 		}
 	}
 	else
@@ -2003,7 +2003,7 @@ void dsp16_device_base::pio_pioc_write(u16 value)
 		if (!m_pods_out)
 		{
 			m_pods_cb(m_pods_out = 1U); // actually high-impedance
-			m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+			m_pdb_w_cb(m_psel_out, 0xffffU, 0x0000U);
 		}
 	}
 }
@@ -2066,7 +2066,7 @@ void dsp16_device_base::pio_pdx_write(u16 sel, u16 value)
 		{
 			assert(m_pods_out);
 			m_pods_cb(m_pods_out = 0U);
-			m_pdb_w_cb(machine().dummy_space(), sel, value, 0xffffU);
+			m_pdb_w_cb(sel, value, 0xffffU);
 		}
 		m_pio_pods_cnt = pio_strobe() + 1; // decremented this cycle
 	}
@@ -2092,7 +2092,7 @@ void dsp16_device::external_memory_enable(address_space &space, bool enable)
 	// this assumes internal ROM is mirrored above 2KiB, but actual hardware behaviour is unknown
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
+		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
 	else
 		space.install_rom(0x0000, 0x07ff, 0xf800, &m_rom[0]);
 }
@@ -2123,12 +2123,12 @@ void dsp16a_device::external_memory_enable(address_space &space, bool enable)
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
 	{
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
+		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
 	}
 	else
 	{
 		space.install_rom(0x0000, 0x0fff, &m_rom[0]);
-		space.install_read_handler(0x1000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
+		space.install_read_handler(0x1000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
 	}
 }
 

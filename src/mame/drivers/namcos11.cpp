@@ -238,7 +238,8 @@ Notes:
       The 2nd revision CPU board (GP-13 COH-110) uses 2x 32MBit RAMs instead of
       the 4x D482445LGW-A70 RAMs and the 2 main SONY IC's are updated revisions,
       though the functionality of them is identical. The 2 types of CPU boards can be
-      used with any System 11 motherboard, and any System 11 game.
+      used with any System 11 motherboard, and any System 11 game except Tekken which
+      requires the Revision 1 CPU board otherwise there are big graphical glitches
 
 Gun Board (Used only with Point Blank 2 so far)
 ---------
@@ -345,15 +346,15 @@ public:
 	void tekken2(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(rom8_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_w);
-	DECLARE_WRITE16_MEMBER(lightgun_w);
-	DECLARE_READ16_MEMBER(lightgun_r);
-	DECLARE_READ16_MEMBER(c76_shared_r);
-	DECLARE_WRITE16_MEMBER(c76_shared_w);
-	DECLARE_READ16_MEMBER(c76_speedup_r);
-	DECLARE_WRITE16_MEMBER(c76_speedup_w);
+	void rom8_w(offs_t offset, uint16_t data);
+	void rom8_64_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void rom8_64_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lightgun_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lightgun_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t c76_shared_r(offs_t offset);
+	void c76_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t c76_speedup_r();
+	void c76_speedup_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 
@@ -392,19 +393,19 @@ inline void ATTR_PRINTF(3,4) namcos11_state::verboselog( int n_level, const char
 	}
 }
 
-WRITE16_MEMBER(namcos11_state::rom8_w)
+void namcos11_state::rom8_w(offs_t offset, uint16_t data)
 {
 	m_bank[ offset ]->set_entry( ( ( data & 0xc0 ) >> 4 ) + ( data & 0x03 ) );
 }
 
-WRITE16_MEMBER(namcos11_state::rom8_64_upper_w)
+void namcos11_state::rom8_64_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(2, "rom8_64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	m_n_bankoffset = offset * 16;
 }
 
-WRITE16_MEMBER(namcos11_state::rom8_64_w)
+void namcos11_state::rom8_64_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(2, "rom8_64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
@@ -412,7 +413,7 @@ WRITE16_MEMBER(namcos11_state::rom8_64_w)
 	m_bank[ offset ]->set_entry( ( ( ( ( data & 0xc0 ) >> 3 ) + ( data & 0x07 ) ) ^ m_n_bankoffset ) );
 }
 
-WRITE16_MEMBER(namcos11_state::lightgun_w)
+void namcos11_state::lightgun_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -431,7 +432,7 @@ WRITE16_MEMBER(namcos11_state::lightgun_w)
 	}
 }
 
-READ16_MEMBER(namcos11_state::lightgun_r)
+uint16_t namcos11_state::lightgun_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -465,12 +466,12 @@ READ16_MEMBER(namcos11_state::lightgun_r)
 	return data;
 }
 
-READ16_MEMBER( namcos11_state::c76_shared_r )
+uint16_t namcos11_state::c76_shared_r(offs_t offset)
 {
 	return m_sharedram.target()[ offset ];
 }
 
-WRITE16_MEMBER( namcos11_state::c76_shared_w )
+void namcos11_state::c76_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_sharedram.target()[ offset ] );
 }
@@ -538,7 +539,7 @@ void namcos11_state::c76_map(address_map &map)
 	map(0x301000, 0x301001).nopw();
 }
 
-READ16_MEMBER(namcos11_state::c76_speedup_r)
+uint16_t namcos11_state::c76_speedup_r()
 {
 	if ((m_mcu->pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
@@ -548,7 +549,7 @@ READ16_MEMBER(namcos11_state::c76_speedup_r)
 	return m_su_83;
 }
 
-WRITE16_MEMBER(namcos11_state::c76_speedup_w)
+void namcos11_state::c76_speedup_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_su_83);
 }
@@ -560,7 +561,8 @@ void namcos11_state::driver_start()
 	{
 		m_su_83 = 0;
 		save_item( NAME(m_su_83) );
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos11_state::c76_speedup_r)), write16_delegate(*this, FUNC(namcos11_state::c76_speedup_w)));
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x82, 0x83, read16smo_delegate(*this, FUNC(namcos11_state::c76_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x82, 0x83, write16s_delegate(*this, FUNC(namcos11_state::c76_speedup_w)));
 	}
 
 	if( m_bankedroms != nullptr )

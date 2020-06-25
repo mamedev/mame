@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
 
 	code = m_fgvideoram[tile_index];
 	color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
 			0);
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_bg_tile_info)
 
 	code = m_bgvideoram[tile_index];
 	color = m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((color & 0x80) << 1),
 			(color & 0x1f) + (0x20 * m_palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -124,20 +124,20 @@ void vulgus_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vulgus_state::fgvideoram_w)
+void vulgus_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vulgus_state::bgvideoram_w)
+void vulgus_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(vulgus_state::c804_w)
+void vulgus_state::c804_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -148,7 +148,7 @@ WRITE8_MEMBER(vulgus_state::c804_w)
 }
 
 
-WRITE8_MEMBER(vulgus_state::palette_bank_w)
+void vulgus_state::palette_bank_w(uint8_t data)
 {
 	if (m_palette_bank != (data & 3))
 	{

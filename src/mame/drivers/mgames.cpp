@@ -241,15 +241,15 @@ public:
 private:
 	tilemap_t *m_tilemap;
 
-	DECLARE_READ8_MEMBER(mixport_r);
-	DECLARE_WRITE8_MEMBER(outport0_w);
-	DECLARE_WRITE8_MEMBER(outport1_w);
-	DECLARE_WRITE8_MEMBER(outport2_w);
-	DECLARE_WRITE8_MEMBER(outport3_w);
-	DECLARE_WRITE8_MEMBER(outport4_w);
-	DECLARE_WRITE8_MEMBER(outport5_w);
-	DECLARE_WRITE8_MEMBER(outport6_w);
-	DECLARE_WRITE8_MEMBER(outport7_w);
+	uint8_t mixport_r();
+	void outport0_w(uint8_t data);
+	void outport1_w(uint8_t data);
+	void outport2_w(uint8_t data);
+	void outport3_w(uint8_t data);
+	void outport4_w(uint8_t data);
+	void outport5_w(uint8_t data);
+	void outport6_w(uint8_t data);
+	void outport7_w(uint8_t data);
 
 	void mgames_palette(palette_device &palette) const;
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -273,7 +273,7 @@ TILE_GET_INFO_MEMBER( mgames_state::tile_info )
 	uint8_t code = m_video[tile_index];
 	uint8_t color = m_video[tile_index + 0x400] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void mgames_state::machine_start()
@@ -305,7 +305,7 @@ void mgames_state::mgames_palette(palette_device &palette) const
 	}
 }
 
-READ8_MEMBER(mgames_state::mixport_r)
+uint8_t mgames_state::mixport_r()
 {
 /*  - bits -
     7654 3210
@@ -338,7 +338,7 @@ READ8_MEMBER(mgames_state::mixport_r)
     xxx- ----   Unknown.
 */
 
-//WRITE8_MEMBER(mgames_state::muxed_w)
+//void mgames_state::muxed_w(uint8_t data)
 //{
 //  popmessage("written : %02X %02X %02X %02X %02X %02X %02X %02X", data & 0x01, data & 0x02, data & 0x04, data & 0x08, data & 0x10, data & 0x20, data & 0x40, data & 0x80);
 //}
@@ -355,7 +355,7 @@ READ8_MEMBER(mgames_state::mixport_r)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport0_w)
+void mgames_state::outport0_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - BET */
 	m_lamps[4] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
@@ -376,7 +376,7 @@ WRITE8_MEMBER(mgames_state::outport0_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport1_w)
+void mgames_state::outport1_w(uint8_t data)
 {
 	m_lamps[1] = BIT(data, 0);      /* Lamp 2 - DEAL */
 	m_lamps[5] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
@@ -397,7 +397,7 @@ WRITE8_MEMBER(mgames_state::outport1_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport2_w)
+void mgames_state::outport2_w(uint8_t data)
 {
 	m_lamps[2] = BIT(data, 0);      /* Lamp 3 - CANCEL */
 	m_lamps[6] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
@@ -418,7 +418,7 @@ WRITE8_MEMBER(mgames_state::outport2_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport3_w)
+void mgames_state::outport3_w(uint8_t data)
 {
 	m_lamps[3] = BIT(data, 0);      /* Lamp 4 - STAND */
 	m_lamps[7] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
@@ -439,7 +439,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport4_w)
+void mgames_state::outport4_w(uint8_t data)
 {
 	m_lamps[8] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
 
@@ -459,7 +459,7 @@ WRITE8_MEMBER(mgames_state::outport4_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport5_w)
+void mgames_state::outport5_w(uint8_t data)
 {
 	m_output[5] = data;
 	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -477,7 +477,7 @@ WRITE8_MEMBER(mgames_state::outport5_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport6_w)
+void mgames_state::outport6_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* Payout pulse */
 
@@ -497,7 +497,7 @@ WRITE8_MEMBER(mgames_state::outport6_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mgames_state::outport7_w)
+void mgames_state::outport7_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);  /* Coin pulse */
 

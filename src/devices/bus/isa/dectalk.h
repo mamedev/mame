@@ -29,21 +29,21 @@ private:
 	DECLARE_READ_LINE_MEMBER(bio_line_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(status_w);
-	DECLARE_READ16_MEMBER(cmd_r);
-	DECLARE_WRITE16_MEMBER(data_w);
-	DECLARE_READ16_MEMBER(data_r);
-	DECLARE_READ16_MEMBER(host_irq_r);
-	DECLARE_READ8_MEMBER(dma_r);
-	DECLARE_WRITE8_MEMBER(dma_w);
-	DECLARE_WRITE16_MEMBER(dac_w);
-	DECLARE_READ16_MEMBER(dsp_dma_r);
-	DECLARE_WRITE16_MEMBER(dsp_dma_w);
-	DECLARE_WRITE16_MEMBER(output_ctl_w);
-	DECLARE_WRITE16_MEMBER(irq_line_w);
+	void status_w(uint16_t data);
+	uint16_t cmd_r();
+	void data_w(uint16_t data);
+	uint16_t data_r();
+	uint16_t host_irq_r();
+	uint8_t dma_r();
+	void dma_w(uint8_t data);
+	void dac_w(uint16_t data);
+	uint16_t dsp_dma_r();
+	void dsp_dma_w(uint16_t data);
+	void output_ctl_w(uint16_t data);
+	void irq_line_w(uint16_t data);
 
 	void dectalk_cpu_io(address_map &map);
 	void dectalk_cpu_map(address_map &map);

@@ -402,11 +402,7 @@ void ucom4_cpu_device::execute_run()
 	{
 		// handle interrupt, but not during LI($9x) or EI($31) or while skipping
 		if (m_int_f && m_inte_f && (m_op & 0xf0) != 0x90 && m_op != 0x31 && !m_skip)
-		{
 			do_interrupt();
-			if (m_icount <= 0)
-				break;
-		}
 
 		// remember previous state
 		m_prev_op = m_op;

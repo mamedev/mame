@@ -171,14 +171,14 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(suzy_read);
-	DECLARE_WRITE8_MEMBER(suzy_write);
-	DECLARE_WRITE8_MEMBER(lynx_uart_w);
-	DECLARE_READ8_MEMBER(lynx_uart_r);
-	DECLARE_READ8_MEMBER(mikey_read);
-	DECLARE_WRITE8_MEMBER(mikey_write);
-	DECLARE_READ8_MEMBER(lynx_memory_config_r);
-	DECLARE_WRITE8_MEMBER(lynx_memory_config_w);
+	uint8_t suzy_read(offs_t offset);
+	void suzy_write(offs_t offset, uint8_t data);
+	void lynx_uart_w(offs_t offset, uint8_t data);
+	uint8_t lynx_uart_r(offs_t offset);
+	uint8_t mikey_read(offs_t offset);
+	void mikey_write(offs_t offset, uint8_t data);
+	uint8_t lynx_memory_config_r();
+	void lynx_memory_config_w(uint8_t data);
 	void lynx_divide();
 	void lynx_multiply();
 	uint8_t lynx_timer_read(int which, int offset);

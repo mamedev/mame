@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 	m_c169_cb(m_videoram[tile_index&(m_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
 
 	tileinfo.mask_data = m_mask + 32 * mask;
-	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0/*flag*/);
+	tileinfo.set(0, tile, 0/*color*/, 0/*flag*/);
 }
 
 TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )
@@ -252,22 +252,22 @@ void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-READ16_MEMBER( namco_c169roz_device::control_r )
+uint16_t namco_c169roz_device::control_r(offs_t offset)
 {
 	return m_control[offset];
 }
 
-WRITE16_MEMBER( namco_c169roz_device::control_w )
+void namco_c169roz_device::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control[offset]);
 }
 
-READ16_MEMBER( namco_c169roz_device::videoram_r )
+uint16_t namco_c169roz_device::videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-WRITE16_MEMBER( namco_c169roz_device::videoram_w )
+void namco_c169roz_device::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	for (auto & elem : m_tilemap)

@@ -103,9 +103,9 @@ void isa8_aga_device::device_start()
 	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
 	set_isa_device();
-	m_isa->install_memory(0xb0000, 0xbffff, read8_delegate(*this, FUNC(isa8_aga_device::pc_aga_videoram_r)), write8_delegate(*this, FUNC(isa8_aga_device::pc_aga_videoram_w)));
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_aga_device::pc_aga_mda_r)), write8_delegate(*this, FUNC(isa8_aga_device::pc_aga_mda_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_aga_device::pc_aga_cga_r)), write8_delegate(*this, FUNC(isa8_aga_device::pc_aga_cga_w)));
+	m_isa->install_memory(0xb0000, 0xbffff, read8sm_delegate(*this, FUNC(isa8_aga_device::pc_aga_videoram_r)), write8sm_delegate(*this, FUNC(isa8_aga_device::pc_aga_videoram_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_aga_device::pc_aga_mda_r)), write8sm_delegate(*this, FUNC(isa8_aga_device::pc_aga_mda_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_aga_device::pc_aga_cga_r)), write8sm_delegate(*this, FUNC(isa8_aga_device::pc_aga_cga_w)));
 
 	/* Initialise the cga palette */
 
@@ -181,9 +181,9 @@ void isa8_aga_pc200_device::device_start()
 	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
 	set_isa_device();
-	m_isa->install_memory(0xb0000, 0xbffff, read8_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_videoram_r)), write8_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_videoram_w)));
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_aga_pc200_device::pc_aga_mda_r)), write8_delegate(*this, FUNC(isa8_aga_pc200_device::pc_aga_mda_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_cga_r)), write8_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_cga_w)));
+	m_isa->install_memory(0xb0000, 0xbffff, read8sm_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_videoram_r)), write8sm_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_videoram_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_aga_pc200_device::pc_aga_mda_r)), write8sm_delegate(*this, FUNC(isa8_aga_pc200_device::pc_aga_mda_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_cga_r)), write8sm_delegate(*this, FUNC(isa8_aga_pc200_device::pc200_cga_w)));
 
 	/* Initialise the cga palette */
 
@@ -645,7 +645,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row )
  *
  *************************************/
 
-READ8_MEMBER( isa8_aga_device::pc_aga_mda_r )
+uint8_t isa8_aga_device::pc_aga_mda_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -666,7 +666,7 @@ READ8_MEMBER( isa8_aga_device::pc_aga_mda_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_aga_device::pc_aga_mda_w )
+void isa8_aga_device::pc_aga_mda_w(offs_t offset, uint8_t data)
 {
 	if (m_mode == AGA_MONO) {
 		switch (offset) {
@@ -694,7 +694,7 @@ WRITE8_MEMBER( isa8_aga_device::pc_aga_mda_w )
 	}
 }
 
-READ8_MEMBER( isa8_aga_device::pc_aga_cga_r )
+uint8_t isa8_aga_device::pc_aga_cga_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -739,7 +739,7 @@ void isa8_aga_device::set_palette_luts()
 }
 
 
-WRITE8_MEMBER( isa8_aga_device::pc_aga_cga_w )
+void isa8_aga_device::pc_aga_cga_w(offs_t offset, uint8_t data)
 {
 	if (m_mode == AGA_COLOR) {
 		switch (offset) {
@@ -826,7 +826,7 @@ void isa8_aga_device::pc_aga_set_mode(mode_t mode)
 }
 
 
-WRITE8_MEMBER( isa8_aga_device::pc_aga_videoram_w )
+void isa8_aga_device::pc_aga_videoram_w(offs_t offset, uint8_t data)
 {
 	switch (m_mode) {
 	case AGA_COLOR:
@@ -841,7 +841,7 @@ WRITE8_MEMBER( isa8_aga_device::pc_aga_videoram_w )
 	}
 }
 
-READ8_MEMBER( isa8_aga_device::pc_aga_videoram_r )
+uint8_t isa8_aga_device::pc_aga_videoram_r(offs_t offset)
 {
 	switch (m_mode) {
 	case AGA_COLOR:
@@ -856,7 +856,7 @@ READ8_MEMBER( isa8_aga_device::pc_aga_videoram_r )
 	return 0;
 }
 
-READ8_MEMBER( isa8_aga_pc200_device::pc200_videoram_r )
+uint8_t isa8_aga_pc200_device::pc200_videoram_r(offs_t offset)
 {
 	switch (m_mode)
 	{
@@ -869,7 +869,7 @@ READ8_MEMBER( isa8_aga_pc200_device::pc200_videoram_r )
 	}
 }
 
-WRITE8_MEMBER( isa8_aga_pc200_device::pc200_videoram_w )
+void isa8_aga_pc200_device::pc200_videoram_w(offs_t offset, uint8_t data)
 {
 	switch (m_mode) {
 	default:
@@ -884,9 +884,9 @@ WRITE8_MEMBER( isa8_aga_pc200_device::pc200_videoram_w )
 
 // in reality it is of course only 1 graphics adapter,
 // but now cga and mda are splitted in mess
-WRITE8_MEMBER( isa8_aga_pc200_device::pc200_cga_w )
+void isa8_aga_pc200_device::pc200_cga_w(offs_t offset, uint8_t data)
 {
-	pc_aga_cga_w(space, offset,data,mem_mask);
+	pc_aga_cga_w(offset,data);
 	switch (offset) {
 	case 4:
 		m_portd |= 0x20;
@@ -921,7 +921,7 @@ WRITE8_MEMBER( isa8_aga_pc200_device::pc200_cga_w )
 	}
 }
 
-READ8_MEMBER( isa8_aga_pc200_device::pc200_cga_r )
+uint8_t isa8_aga_pc200_device::pc200_cga_r(offs_t offset)
 {
 	uint8_t result;
 
@@ -943,7 +943,7 @@ READ8_MEMBER( isa8_aga_pc200_device::pc200_cga_r )
 		break;
 
 	default:
-		result = pc_aga_cga_r(space, offset, mem_mask);
+		result = pc_aga_cga_r(offset);
 		break;
 	}
 	return result;

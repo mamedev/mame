@@ -38,9 +38,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_tilemap;
-	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
-	DECLARE_WRITE8_MEMBER(mogura_dac_w);
-	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
+	void mogura_tileram_w(offs_t offset, uint8_t data);
+	void mogura_dac_w(uint8_t data);
+	void mogura_gfxram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_mogura_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x800];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr >> 1) & 7,
 			0);
@@ -118,20 +118,20 @@ uint32_t mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(mogura_state::mogura_tileram_w)
+void mogura_state::mogura_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mogura_state::mogura_dac_w)
+void mogura_state::mogura_dac_w(uint8_t data)
 {
 	m_ldac->write(data >> 4);
 	m_rdac->write(data & 15);
 }
 
 
-WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
+void mogura_state::mogura_gfxram_w(offs_t offset, uint8_t data)
 {
 	m_gfxram[offset] = data ;
 

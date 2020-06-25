@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    driver.c
+    driver.cpp
 
     Core driver device base class.
 
@@ -24,10 +24,19 @@
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, tag, nullptr, 0)
-	, m_system(nullptr)
+	, m_system(mconfig.gamedrv())
 	, m_flip_screen_x(0)
 	, m_flip_screen_y(0)
 {
+	// set the search path to include all parents and cache it because devices search system paths
+	m_searchpath.emplace_back(m_system.name);
+	std::set<game_driver const *> seen;
+	for (int ancestor = driver_list::clone(m_system); 0 <= ancestor; ancestor = driver_list::clone(ancestor))
+	{
+		if (!seen.insert(&driver_list::driver(ancestor)).second)
+			throw emu_fatalerror("driver_device(%s): parent/clone relationships form a loop", m_system.name);
+		m_searchpath.emplace_back(driver_list::driver(ancestor).name);
+	}
 }
 
 
@@ -37,30 +46,6 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 
 driver_device::~driver_device()
 {
-}
-
-
-//-------------------------------------------------
-//  set_game_driver - set the game in the device
-//  configuration
-//-------------------------------------------------
-
-void driver_device::set_game_driver(const game_driver &game)
-{
-	assert(!m_system);
-
-	// set the system
-	m_system = &game;
-
-	// and set the search path to include all parents
-	m_searchpath = game.name;
-	std::set<game_driver const *> seen;
-	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
-	{
-		if (!seen.insert(&driver_list::driver(parent)).second)
-			throw emu_fatalerror("driver_device::set_game_driver(%s): parent/clone relationships form a loop", game.name);
-		m_searchpath.append(";").append(driver_list::driver(parent).name);
-	}
 }
 
 
@@ -83,6 +68,16 @@ void driver_device::static_set_callback(device_t &device, callback_type type, dr
 void driver_device::empty_init()
 {
 	driver_init();
+}
+
+
+//-------------------------------------------------
+//  searchpath - return cached search path
+//-------------------------------------------------
+
+std::vector<std::string> driver_device::searchpath() const
+{
+	return m_searchpath;
 }
 
 
@@ -183,8 +178,7 @@ void driver_device::video_reset()
 
 const tiny_rom_entry *driver_device::device_rom_region() const
 {
-	assert(m_system);
-	return m_system->rom;
+	return m_system.rom;
 }
 
 
@@ -194,8 +188,7 @@ const tiny_rom_entry *driver_device::device_rom_region() const
 
 void driver_device::device_add_mconfig(machine_config &config)
 {
-	assert(m_system);
-	m_system->machine_creator(config, *this);
+	m_system.machine_creator(config, *this);
 }
 
 
@@ -206,7 +199,7 @@ void driver_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor driver_device::device_input_ports() const
 {
-	return m_system->ipt;
+	return m_system.ipt;
 }
 
 
@@ -223,7 +216,7 @@ void driver_device::device_start()
 			throw device_missing_dependencies();
 
 	// call the game-specific init
-	m_system->driver_init(*this);
+	m_system.driver_init(*this);
 
 	// finish image devices init process
 	machine().image().postdevice_init();

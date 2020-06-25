@@ -40,7 +40,7 @@ void bublbobl_state::common_sreset(int state)
 // 44 74 74 76 or 76 36 76 once or more per frame...
 */
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
+void bublbobl_state::bublbobl_bankswitch_w(uint8_t data)
 {
 	//logerror("bankswitch_w:  write of %02X\n", data);
 	/* bits 0-2 select ROM bank */
@@ -72,7 +72,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
    \-------- ? used (idle high, /SRESET?)
 // bublboblp: test and main: 00 C8 C9 C8 C9...; tokio: test 00 09 09 49 main 00 09 C8 CF
 */
-WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
+void bublbobl_state::tokio_bankswitch_w(uint8_t data)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 7);
@@ -99,7 +99,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
    |\------- ? used (idle high, /SBRES? or /SBINT?)
    \-------- VHINV (flip screen)
 */
-WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
+void bublbobl_state::tokio_videoctrl_w(uint8_t data)
 {
 	//logerror("tokio_videoctrl_w:  write of %02X\n", data);
 	/* bits 0-3 not used? */
@@ -113,12 +113,12 @@ WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 	flip_screen_set(data & 0x80);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
+void bublbobl_state::bublbobl_nmitrigger_w(uint8_t data)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
+uint8_t bublbobl_state::tokiob_mcu_r()
 {
 	/* This return value is literally set by a resistor on the bootleg tokio pcb;
 	the MCU footprint is unpopulated but for a resistor tying what would be the
@@ -139,13 +139,13 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_soundcpu_reset_w)
+void bublbobl_state::bublbobl_soundcpu_reset_w(uint8_t data)
 {
 	//logerror("soundcpu_reset_w called with data of %d\n", data);
 	common_sreset(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(bublbobl_state::common_sound_semaphores_r)
+uint8_t bublbobl_state::common_sound_semaphores_r()
 {
 	uint8_t ret = 0xfc;
 	ret |= m_main_to_sound->pending_r() ? 0x2 : 0x0;
@@ -161,54 +161,54 @@ Bubble Bobble MCU
 
 ***************************************************************************/
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr1_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr1_r()
 {
 	return m_ddr1;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr1_w)
+void bublbobl_state::bublbobl_mcu_ddr1_w(uint8_t data)
 {
 	m_ddr1 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr2_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr2_r()
 {
 	return m_ddr2;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr2_w)
+void bublbobl_state::bublbobl_mcu_ddr2_w(uint8_t data)
 {
 	m_ddr2 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr3_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr3_r()
 {
 	return m_ddr3;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr3_w)
+void bublbobl_state::bublbobl_mcu_ddr3_w(uint8_t data)
 {
 	m_ddr3 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr4_r()
 {
 	return m_ddr4;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_w)
+void bublbobl_state::bublbobl_mcu_ddr4_w(uint8_t data)
 {
 	m_ddr4 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
+uint8_t bublbobl_state::bublbobl_mcu_port1_r()
 {
 	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
+void bublbobl_state::bublbobl_mcu_port1_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
 
@@ -231,13 +231,13 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	m_port1_out = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port2_r)
+uint8_t bublbobl_state::bublbobl_mcu_port2_r()
 {
 	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
+void bublbobl_state::bublbobl_mcu_port2_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
@@ -271,25 +271,25 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 	m_port2_out = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port3_r)
+uint8_t bublbobl_state::bublbobl_mcu_port3_r()
 {
 	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
 	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port3_w)
+void bublbobl_state::bublbobl_mcu_port3_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
 	m_port3_out = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port4_r)
+uint8_t bublbobl_state::bublbobl_mcu_port4_r()
 {
 	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
 	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port4_w)
+void bublbobl_state::bublbobl_mcu_port4_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
 
@@ -307,7 +307,7 @@ in boblbobl, so they don't matter. All checks are patched out in sboblbob.
 
 ***************************************************************************/
 
-READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
+uint8_t bublbobl_state::boblbobl_ic43_a_r(offs_t offset)
 {
 	// if (offset >= 2)
 	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", m_mcu->pc(), offset, res);
@@ -318,7 +318,7 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
 		return machine().rand() & 0xff;
 }
 
-WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_a_w)
+void bublbobl_state::boblbobl_ic43_a_w(offs_t offset, uint8_t data)
 {
 	int res = 0;
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_a_w)
 	m_ic43_a = res;
 }
 
-WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
+void bublbobl_state::boblbobl_ic43_b_w(offs_t offset, uint8_t data)
 {
 	static const int xorval[4] = { 4, 1, 8, 2 };
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
 	m_ic43_b = (data >> 4) ^ xorval[offset];
 }
 
-READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
+uint8_t bublbobl_state::boblbobl_ic43_b_r(offs_t offset)
 {
 	//  logerror("%04x: ic43_b_r (offs %d)\n", m_mcu->pc(), offset);
 	if (offset == 0)
@@ -392,7 +392,7 @@ INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 }
 
 
-WRITE8_MEMBER(bub68705_state::port_a_w)
+void bub68705_state::port_a_w(uint8_t data)
 {
 	//logerror("%04x: 68705 port A write %02x\n", m_mcu->pc(), data);
 	m_port_a_out = data;
@@ -419,12 +419,12 @@ WRITE8_MEMBER(bub68705_state::port_a_w)
  *  7   W  not used?
  */
 
-WRITE8_MEMBER(bub68705_state::port_b_w)
+void bub68705_state::port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", m_mcu->pc(), data);
 
 	if (BIT(mem_mask, 0) && !BIT(data, 0) && BIT(m_port_b_out, 0))
-		m_mcu->pa_w(space, 0, m_latch);
+		m_mcu->pa_w(m_latch);
 
 	if (BIT(mem_mask, 1) && BIT(data, 1) && !BIT(m_port_b_out, 1)) /* positive edge trigger */
 	{

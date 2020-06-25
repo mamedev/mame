@@ -9,13 +9,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "audit.h"
-#include "chd.h"
+
+#include "sound/samples.h"
+
+#include "emuopts.h"
 #include "drivenum.h"
 #include "romload.h"
-#include "sound/samples.h"
 #include "softlist_dev.h"
+
+#include "chd.h"
+
+#include <algorithm>
 
 
 //**************************************************************************
@@ -29,7 +34,6 @@
 media_auditor::media_auditor(const driver_enumerator &enumerator)
 	: m_enumerator(enumerator)
 	, m_validation(AUDIT_VALIDATE_FULL)
-	, m_searchpath(nullptr)
 {
 }
 
@@ -47,32 +51,25 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 	// store validation for later
 	m_validation = validation;
 
-// temporary hack until romload is update: get the driver path and support it for
-// all searches
-const char *driverpath = m_enumerator.config()->root_device().searchpath();
-
 	std::size_t found = 0;
 	std::size_t required = 0;
 	std::size_t shared_found = 0;
 	std::size_t shared_required = 0;
 
 	// iterate over devices and regions
+	std::vector<std::string> searchpath;
 	for (device_t &device : device_iterator(m_enumerator.config()->root_device()))
 	{
-		// determine the search path for this source and iterate through the regions
-		m_searchpath = device.searchpath();
+		searchpath.clear();
 
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 		{
-// temporary hack: add the driver path & region name
-std::string combinedpath = util::string_format("%s;%s", device.searchpath(), driverpath);
-if (device.shortname())
-	combinedpath.append(";").append(device.shortname());
-m_searchpath = combinedpath.c_str();
-
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
+				if (searchpath.empty())
+					searchpath = device.searchpath();
+
 				char const *const name(ROM_GETNAME(rom));
 				util::hash_collection const hashes(ROM_GETHASHDATA(rom));
 				device_t *const shared_device(find_shared_device(device, name, hashes, ROM_GETLENGTH(rom)));
@@ -87,9 +84,9 @@ m_searchpath = combinedpath.c_str();
 
 				audit_record *record = nullptr;
 				if (ROMREGION_ISROMDATA(region))
-					record = &audit_one_rom(rom);
+					record = &audit_one_rom(searchpath, rom);
 				else if (ROMREGION_ISDISKDATA(region))
-					record = &audit_one_disk(rom, nullptr);
+					record = &audit_one_disk(rom, device);
 
 				if (record)
 				{
@@ -130,12 +127,32 @@ media_auditor::summary media_auditor::audit_device(device_t &device, const char 
 
 	// store validation for later
 	m_validation = validation;
-	m_searchpath = device.shortname();
 
 	std::size_t found = 0;
 	std::size_t required = 0;
 
-	audit_regions(rom_first_region(device), nullptr, found, required);
+	std::vector<std::string> searchpath;
+	audit_regions(
+			[this, &device, &searchpath] (rom_entry const *region, rom_entry const *rom) -> audit_record const *
+			{
+				if (ROMREGION_ISROMDATA(region))
+				{
+					if (searchpath.empty())
+						searchpath = device.searchpath();
+					return &audit_one_rom(searchpath, rom);
+				}
+				else if (ROMREGION_ISDISKDATA(region))
+				{
+					return &audit_one_disk(rom, device);
+				}
+				else
+				{
+					return nullptr;
+				}
+			},
+			rom_first_region(device),
+			found,
+			required);
 
 	if ((found == 0) && (required > 0))
 	{
@@ -151,7 +168,7 @@ media_auditor::summary media_auditor::audit_device(device_t &device, const char 
 //-------------------------------------------------
 //  audit_software
 //-------------------------------------------------
-media_auditor::summary media_auditor::audit_software(const std::string &list_name, const software_info *swinfo, const char *validation)
+media_auditor::summary media_auditor::audit_software(software_list_device &swlist, const software_info &swinfo, const char *validation)
 {
 	// start fresh
 	m_record_list.clear();
@@ -159,21 +176,31 @@ media_auditor::summary media_auditor::audit_software(const std::string &list_nam
 	// store validation for later
 	m_validation = validation;
 
-	std::string combinedpath(util::string_format("%s;%s%s%s", swinfo->shortname(), list_name, PATH_SEPARATOR, swinfo->shortname()));
-	std::string locationtag(util::string_format("%s%%%s%%", list_name, swinfo->shortname()));
-	if (!swinfo->parentname().empty())
-	{
-		locationtag.append(swinfo->parentname());
-		combinedpath.append(util::string_format(";%s;%s%s%s", swinfo->parentname(), list_name, PATH_SEPARATOR, swinfo->parentname()));
-	}
-	m_searchpath = combinedpath.c_str();
-
 	std::size_t found = 0;
 	std::size_t required = 0;
 
 	// now iterate over software parts
-	for (const software_part &part : swinfo->parts())
-		audit_regions(part.romdata().data(), locationtag.c_str(), found, required);
+	std::vector<std::string> searchpath;
+	auto const do_audit =
+			[this, &swlist, &swinfo, &searchpath] (rom_entry const *region, rom_entry const *rom) -> audit_record const *
+			{
+				if (ROMREGION_ISROMDATA(region))
+				{
+					if (searchpath.empty())
+						searchpath = rom_load_manager::get_software_searchpath(swlist, swinfo);
+					return &audit_one_rom(searchpath, rom);
+				}
+				else if (ROMREGION_ISDISKDATA(region))
+				{
+					return &audit_one_disk(rom, swlist, swinfo);
+				}
+				else
+				{
+					return nullptr;
+				}
+			};
+	for (const software_part &part : swinfo.parts())
+		audit_regions(do_audit, part.romdata().data(), found, required);
 
 	if ((found == 0) && (required > 0))
 	{
@@ -182,7 +209,7 @@ media_auditor::summary media_auditor::audit_software(const std::string &list_nam
 	}
 
 	// return a summary
-	return summarize(list_name.c_str());
+	return summarize(swlist.list_name().c_str());
 }
 
 
@@ -225,9 +252,9 @@ media_auditor::summary media_auditor::audit_samples()
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
-				osd_file::error filerr = file.open(curpath, ".flac");
+				osd_file::error filerr = file.open(curpath + ".flac");
 				if (filerr != osd_file::error::NONE)
-					filerr = file.open(curpath, ".wav");
+					filerr = file.open(curpath + ".wav");
 
 				if (filerr == osd_file::error::NONE)
 				{
@@ -346,25 +373,22 @@ media_auditor::summary media_auditor::summarize(const char *name, std::ostream *
 //  audit_regions - validate/count for regions
 //-------------------------------------------------
 
-void media_auditor::audit_regions(const rom_entry *region, const char *locationtag, std::size_t &found, std::size_t &required)
+template <typename T>
+void media_auditor::audit_regions(T do_audit, const rom_entry *region, std::size_t &found, std::size_t &required)
 {
 	// now iterate over regions
+	std::vector<std::string> searchpath;
 	for ( ; region; region = rom_next_region(region))
 	{
 		// now iterate over rom definitions
-		for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 		{
-			util::hash_collection const hashes(ROM_GETHASHDATA(rom));
-
 			// count the number of files with hashes
+			util::hash_collection const hashes(ROM_GETHASHDATA(rom));
 			if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
 				required++;
 
-			audit_record const *record = nullptr;
-			if (ROMREGION_ISROMDATA(region))
-				record = &audit_one_rom(rom);
-			else if (ROMREGION_ISDISKDATA(region))
-				record = &audit_one_disk(rom, locationtag);
+			audit_record const *const record = do_audit(region, rom);
 
 			// count the number of files that are found.
 			if (record && ((record->status() == audit_status::GOOD) || (record->status() == audit_status::FOUND_INVALID)))
@@ -378,7 +402,7 @@ void media_auditor::audit_regions(const rom_entry *region, const char *locationt
 //  audit_one_rom - validate a single ROM entry
 //-------------------------------------------------
 
-media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
+media_auditor::audit_record &media_auditor::audit_one_rom(const std::vector<std::string> &searchpath, const rom_entry *rom)
 {
 	// allocate and append a new record
 	audit_record &record = *m_record_list.emplace(m_record_list.end(), *rom, media_type::ROM);
@@ -388,26 +412,19 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 	bool const has_crc = record.expected_hashes().crc(crc);
 
 	// find the file and checksum it, getting the file length along the way
-	emu_file file(m_enumerator.options().media_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
-	file.set_restrict_to_mediapath(true);
-	path_iterator path(m_searchpath);
-	std::string curpath;
-	while (path.next(curpath, record.name()))
-	{
-		// open the file if we can
-		osd_file::error filerr;
-		if (has_crc)
-			filerr = file.open(curpath, crc);
-		else
-			filerr = file.open(curpath);
+	emu_file file(m_enumerator.options().media_path(), searchpath, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
+	file.set_restrict_to_mediapath(1);
 
-		// if it worked, get the actual length and hashes, then stop
-		if (filerr == osd_file::error::NONE)
-		{
-			record.set_actual(file.hashes(m_validation), file.size());
-			break;
-		}
-	}
+	// open the file if we can
+	osd_file::error filerr;
+	if (has_crc)
+		filerr = file.open(record.name(), crc);
+	else
+		filerr = file.open(record.name());
+
+	// if it worked, get the actual length and hashes, then stop
+	if (filerr == osd_file::error::NONE)
+		record.set_actual(file.hashes(m_validation), file.size());
 
 	// compute the final status
 	compute_status(record, rom, record.actual_length() != 0);
@@ -419,14 +436,15 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 //  audit_one_disk - validate a single disk entry
 //-------------------------------------------------
 
-media_auditor::audit_record &media_auditor::audit_one_disk(const rom_entry *rom, const char *locationtag)
+template <typename... T>
+media_auditor::audit_record &media_auditor::audit_one_disk(const rom_entry *rom, T &&... args)
 {
 	// allocate and append a new record
 	audit_record &record = *m_record_list.emplace(m_record_list.end(), *rom, media_type::DISK);
 
 	// open the disk
 	chd_file source;
-	chd_error err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, source, locationtag));
+	const chd_error err = rom_load_manager::open_disk_image(m_enumerator.options(), std::forward<T>(args)..., rom, source);
 
 	// if we succeeded, get the hashes
 	if (err == CHDERR_NONE)

@@ -112,7 +112,7 @@ enum
 
 #define SRC_SHIFT           8
 
-WRITE16_MEMBER(rltennis_state::blitter_w)
+void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int old_data=m_blitter[offset];
 	COMBINE_DATA(&m_blitter[offset]);

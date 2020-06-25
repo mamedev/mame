@@ -17,7 +17,7 @@
         0x01    = Scroll MSB
 */
 
-WRITE8_MEMBER(battlane_state::battlane_palette_w)
+void battlane_state::battlane_palette_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 	int bit0, bit1, bit2;
@@ -46,28 +46,28 @@ WRITE8_MEMBER(battlane_state::battlane_palette_w)
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
-WRITE8_MEMBER(battlane_state::battlane_scrollx_w)
+void battlane_state::battlane_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_video_ctrl & 0x01) << 8) + data);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_scrolly_w)
+void battlane_state::battlane_scrolly_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, ((m_cpu_control & 0x01) << 8) + data);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_tileram_w)
+void battlane_state::battlane_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	//m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_spriteram_w)
+void battlane_state::battlane_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
 }
 
-WRITE8_MEMBER(battlane_state::battlane_bitmap_w)
+void battlane_state::battlane_bitmap_w(offs_t offset, uint8_t data)
 {
 	int i, orval;
 
@@ -89,7 +89,7 @@ WRITE8_MEMBER(battlane_state::battlane_bitmap_w)
 	}
 }
 
-WRITE8_MEMBER(battlane_state::battlane_video_ctrl_w)
+void battlane_state::battlane_video_ctrl_w(uint8_t data)
 {
 	m_video_ctrl = data;
 }
@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 	int gfxn = (attr & 0x01) + 1;
 	int color = (attr >> 1) & 0x03;
 
-	SET_TILE_INFO_MEMBER(gfxn, code, color, 0);
+	tileinfo.set(gfxn, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)

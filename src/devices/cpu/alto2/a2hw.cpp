@@ -13,173 +13,173 @@
  * @brief read printer paper ready bit
  * Paper ready bit. 0 when the printer is ready for a paper scrolling operation.
  */
-READ16_MEMBER ( alto2_cpu_device::pprdy_r ) { return X_RDBITS(m_hw.utilin,16,0,0); }
+uint16_t alto2_cpu_device::pprdy_r() { return X_RDBITS(m_hw.utilin,16,0,0); }
 
 /**
  * @brief read printer check bit
  * Printer check bit bit.
  * Should the printer find itself in an abnormal state, it sets this bit to 0
  */
-READ16_MEMBER ( alto2_cpu_device::pcheck_r ) { return X_RDBITS(m_hw.utilin,16,1,1); }
+uint16_t alto2_cpu_device::pcheck_r() { return X_RDBITS(m_hw.utilin,16,1,1); }
 
 /**
  * @brief read unused bit 2
  */
-READ16_MEMBER ( alto2_cpu_device::unused2_r ) { return X_RDBITS(m_hw.utilin,16,2,2); }
+uint16_t alto2_cpu_device::unused2_r() { return X_RDBITS(m_hw.utilin,16,2,2); }
 
 /**
  * @brief read printer daisy ready bit
  * Daisy ready bit. 0 when the printer is ready to print a character.
  */
-READ16_MEMBER ( alto2_cpu_device::pchrdy_r ) { return X_RDBITS(m_hw.utilin,16,3,3); }
+uint16_t alto2_cpu_device::pchrdy_r() { return X_RDBITS(m_hw.utilin,16,3,3); }
 
 /**
  * @brief read printer carriage ready bit
  * Carriage ready bit. 0 when the printer is ready for horizontal positioning.
  */
-READ16_MEMBER ( alto2_cpu_device::parrdy_r ) { return X_RDBITS(m_hw.utilin,16,4,4); }
+uint16_t alto2_cpu_device::parrdy_r() { return X_RDBITS(m_hw.utilin,16,4,4); }
 
 /**
  * @brief read printer ready bit
  * Ready bit. Both this bit and the appropriate other ready bit (carriage,
  * daisy, etc.) must be 0 before attempting any output operation.
  */
-READ16_MEMBER ( alto2_cpu_device::pready_r ) { return X_RDBITS(m_hw.utilin,16,5,5); }
+uint16_t alto2_cpu_device::pready_r() { return X_RDBITS(m_hw.utilin,16,5,5); }
 
 /**
  * @brief memory configuration switch
  */
-READ16_MEMBER ( alto2_cpu_device::memconfig_r ) { return X_RDBITS(m_hw.utilin,16,6,6); }
+uint16_t alto2_cpu_device::memconfig_r() { return X_RDBITS(m_hw.utilin,16,6,6); }
 
 /**
  * @brief get unused bit 7
  */
-READ16_MEMBER ( alto2_cpu_device::unused7_r ) { return X_RDBITS(m_hw.utilin,16,7,7); }
+uint16_t alto2_cpu_device::unused7_r() { return X_RDBITS(m_hw.utilin,16,7,7); }
 
 /**
  * @brief get key set key 0
  */
-READ16_MEMBER ( alto2_cpu_device::keyset_key0_r ) { return X_RDBITS(m_hw.utilin,16,8,8); }
+uint16_t alto2_cpu_device::keyset_key0_r() { return X_RDBITS(m_hw.utilin,16,8,8); }
 
 /**
  * @brief get key set key 1
  */
-READ16_MEMBER ( alto2_cpu_device::keyset_key1_r ) { return X_RDBITS(m_hw.utilin,16,9,9); }
+uint16_t alto2_cpu_device::keyset_key1_r() { return X_RDBITS(m_hw.utilin,16,9,9); }
 
 /**
  * @brief get key set key 2
  */
-READ16_MEMBER ( alto2_cpu_device::keyset_key2_r ) { return X_RDBITS(m_hw.utilin,16,10,10); }
+uint16_t alto2_cpu_device::keyset_key2_r() { return X_RDBITS(m_hw.utilin,16,10,10); }
 
 /**
  * @brief get key set key 3
  */
-READ16_MEMBER ( alto2_cpu_device::keyset_key3_r ) { return X_RDBITS(m_hw.utilin,16,11,11); }
+uint16_t alto2_cpu_device::keyset_key3_r() { return X_RDBITS(m_hw.utilin,16,11,11); }
 
 /**
  * @brief get key set key 4
  */
-READ16_MEMBER ( alto2_cpu_device::keyset_key4_r ) { return X_RDBITS(m_hw.utilin,16,12,12); }
+uint16_t alto2_cpu_device::keyset_key4_r() { return X_RDBITS(m_hw.utilin,16,12,12); }
 
 /**
  * @brief get mouse red button bit
  */
-READ16_MEMBER ( alto2_cpu_device::mouse_red_r ) { return X_RDBITS(m_hw.utilin,16,13,13); }
+uint16_t alto2_cpu_device::mouse_red_r() { return X_RDBITS(m_hw.utilin,16,13,13); }
 
 /**
  * @brief get mouse blue button bit
  */
-READ16_MEMBER ( alto2_cpu_device::mouse_blue_r ) { return X_RDBITS(m_hw.utilin,16,14,14); }
+uint16_t alto2_cpu_device::mouse_blue_r() { return X_RDBITS(m_hw.utilin,16,14,14); }
 
 /**
  * @brief get mouse yellow button bit
  */
-READ16_MEMBER ( alto2_cpu_device::mouse_yellow_r ) { return X_RDBITS(m_hw.utilin,16,15,15); }
+uint16_t alto2_cpu_device::mouse_yellow_r() { return X_RDBITS(m_hw.utilin,16,15,15); }
 
 /**
  * @brief write printer paper ready bit
  */
-WRITE16_MEMBER( alto2_cpu_device::pprdy_w ) { X_WRBITS(m_hw.utilin,16,0,0,data); }
+void alto2_cpu_device::pprdy_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,0,0,data); }
 
 /**
  * @brief write printer check bit
  */
-WRITE16_MEMBER( alto2_cpu_device::pcheck_w ) { X_WRBITS(m_hw.utilin,16,1,1,data); }
+void alto2_cpu_device::pcheck_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,1,1,data); }
 
 /**
  * @brief read unused bit 2
  */
-WRITE16_MEMBER( alto2_cpu_device::unused2_w ) { X_WRBITS(m_hw.utilin,16,2,2,data); }
+void alto2_cpu_device::unused2_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,2,2,data); }
 
 /**
  * @brief write printer daisy ready bit
  */
-WRITE16_MEMBER( alto2_cpu_device::pchrdy_w ) { X_WRBITS(m_hw.utilin,16,3,3,data); }
+void alto2_cpu_device::pchrdy_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,3,3,data); }
 
 /**
  * @brief write printer carriage ready bit
  */
-WRITE16_MEMBER( alto2_cpu_device::parrdy_w ) { X_WRBITS(m_hw.utilin,16,4,4,data); }
+void alto2_cpu_device::parrdy_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,4,4,data); }
 
 /**
  * @brief write printer ready bit
  */
-WRITE16_MEMBER( alto2_cpu_device::pready_w ) { X_WRBITS(m_hw.utilin,16,5,5,data); }
+void alto2_cpu_device::pready_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,5,5,data); }
 
 /**
  * @brief write memory configuration switch
  */
-WRITE16_MEMBER( alto2_cpu_device::memconfig_w ) { X_WRBITS(m_hw.utilin,16,6,6,data); }
+void alto2_cpu_device::memconfig_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,6,6,data); }
 
 /**
  * @brief write unused bit 7
  */
-WRITE16_MEMBER( alto2_cpu_device::unused7_w ) { X_WRBITS(m_hw.utilin,16,7,7,data); }
+void alto2_cpu_device::unused7_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,7,7,data); }
 
 /**
  * @brief write key set key 0
  */
-WRITE16_MEMBER( alto2_cpu_device::keyset_key0_w ) { X_WRBITS(m_hw.utilin,16,8,8,data); }
+void alto2_cpu_device::keyset_key0_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,8,8,data); }
 
 /**
  * @brief write key set key 1
  */
-WRITE16_MEMBER( alto2_cpu_device::keyset_key1_w ) { X_WRBITS(m_hw.utilin,16,9,9,data); }
+void alto2_cpu_device::keyset_key1_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,9,9,data); }
 
 /**
  * @brief write key set key 2
  */
-WRITE16_MEMBER( alto2_cpu_device::keyset_key2_w ) { X_WRBITS(m_hw.utilin,16,10,10,data); }
+void alto2_cpu_device::keyset_key2_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,10,10,data); }
 
 /**
  * @brief write key set key 3
  */
-WRITE16_MEMBER( alto2_cpu_device::keyset_key3_w ) { X_WRBITS(m_hw.utilin,16,11,11,data); }
+void alto2_cpu_device::keyset_key3_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,11,11,data); }
 
 /**
  * @brief write key set key 4
  */
-WRITE16_MEMBER( alto2_cpu_device::keyset_key4_w ) { X_WRBITS(m_hw.utilin,16,12,12,data); }
+void alto2_cpu_device::keyset_key4_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,12,12,data); }
 
 /**
  * @brief write mouse red button bit
  */
-WRITE16_MEMBER( alto2_cpu_device::mouse_red_w ) { X_WRBITS(m_hw.utilin,16,13,13,data); }
+void alto2_cpu_device::mouse_red_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,13,13,data); }
 
 /**
  * @brief write mouse blue button bit
  */
-WRITE16_MEMBER( alto2_cpu_device::mouse_blue_w ) { X_WRBITS(m_hw.utilin,16,14,14,data); }
+void alto2_cpu_device::mouse_blue_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,14,14,data); }
 
 /**
  * @brief write mouse yellow button bit
  */
-WRITE16_MEMBER( alto2_cpu_device::mouse_yellow_w ) { X_WRBITS(m_hw.utilin,16,15,15,data); }
+void alto2_cpu_device::mouse_yellow_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,15,15,data); }
 
 /**
  * @brief write mouse buttons bits
  */
-WRITE16_MEMBER( alto2_cpu_device::mouse_buttons_w ) { X_WRBITS(m_hw.utilin,16,13,15,data); }
+void alto2_cpu_device::mouse_buttons_w(uint16_t data) { X_WRBITS(m_hw.utilin,16,13,15,data); }
 
 /**
  * @brief printer paper strobe bit
@@ -234,7 +234,7 @@ WRITE16_MEMBER( alto2_cpu_device::mouse_buttons_w ) { X_WRBITS(m_hw.utilin,16,13
  * @param offset memory mapped I/O address to be read
  * @return current value on the UTILIN port
  */
-READ16_MEMBER( alto2_cpu_device::utilin_r )
+uint16_t alto2_cpu_device::utilin_r(offs_t offset)
 {
 	uint16_t  data;
 	// FIXME: update the printer status
@@ -254,7 +254,7 @@ READ16_MEMBER( alto2_cpu_device::utilin_r )
  * @param offset memory mapped I/O address to be read
  * @return current value on the XBUS port latch
  */
-READ16_MEMBER( alto2_cpu_device::xbus_r )
+uint16_t alto2_cpu_device::xbus_r(offs_t offset)
 {
 	uint16_t data = m_hw.xbus[offset & 3];
 
@@ -272,7 +272,7 @@ READ16_MEMBER( alto2_cpu_device::xbus_r )
  * @param addr memory mapped I/O address to be read
  * @param data value to write to the XBUS port latch
  */
-WRITE16_MEMBER( alto2_cpu_device::xbus_w )
+void alto2_cpu_device::xbus_w(offs_t offset, uint16_t data)
 {
 	if (!machine().side_effects_disabled()) {
 		LOG((this,LOG_HW,2," XBUS[%d] wr %#o (%#o)\n", offset & 3, offset, data));
@@ -286,7 +286,7 @@ WRITE16_MEMBER( alto2_cpu_device::xbus_w )
  * @param addr memory mapped I/O address to be read
  * @return current value on the UTILOUT port latch
  */
-READ16_MEMBER( alto2_cpu_device::utilout_r )
+uint16_t alto2_cpu_device::utilout_r(offs_t offset)
 {
 	uint16_t data = m_hw.utilout ^ 0177777;
 	if (!machine().side_effects_disabled()) {
@@ -303,7 +303,7 @@ READ16_MEMBER( alto2_cpu_device::utilout_r )
  * @param addr memory mapped I/O address to be read
  * @param data value to write to the UTILOUT port latch
  */
-WRITE16_MEMBER( alto2_cpu_device::utilout_w )
+void alto2_cpu_device::utilout_w(offs_t offset, uint16_t data)
 {
 	if (!machine().side_effects_disabled()) {
 		LOG((this,LOG_HW,2," UTILOUT wr %#o (%#o)\n", offset, data));

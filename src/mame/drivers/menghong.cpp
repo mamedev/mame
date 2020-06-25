@@ -116,13 +116,11 @@ private:
 	uint32_t    m_maxbank;
 	uint32_t    m_FlashCmd;
 
-	DECLARE_WRITE32_MEMBER(Banksw_w);
-	DECLARE_READ32_MEMBER(FlashCmd_r);
-	DECLARE_WRITE32_MEMBER(FlashCmd_w);
+	void Banksw_w(uint32_t data);
+	uint32_t FlashCmd_r();
+	void FlashCmd_w(uint32_t data);
 
-	DECLARE_READ32_MEMBER(crzyddz2_key_r);
-
-	IRQ_CALLBACK_MEMBER(icallback);
+	uint32_t crzyddz2_key_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -130,33 +128,28 @@ private:
 	void crzyddz2_mem(address_map &map);
 
 	// PIO
-	DECLARE_READ32_MEMBER(PIOldat_r);
+	uint32_t PIOldat_r();
 	uint32_t m_PIO;
-	DECLARE_WRITE32_MEMBER(crzyddz2_PIOldat_w);
-	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
+	void crzyddz2_PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t crzyddz2_PIOedat_r();
 	uint8_t m_crzyddz2_prot;
 
-	DECLARE_READ8_MEMBER(menghong_shared_r);
-	DECLARE_WRITE8_MEMBER(menghong_shared_w);
-	DECLARE_READ8_MEMBER(crzyddz2_shared_r);
-	DECLARE_WRITE8_MEMBER(crzyddz2_shared_w);
+	uint8_t menghong_shared_r(offs_t offset);
+	void menghong_shared_w(offs_t offset, uint8_t data);
+	uint8_t crzyddz2_shared_r(offs_t offset);
+	void crzyddz2_shared_w(offs_t offset, uint8_t data);
 	uint8_t *m_sharedram;
 };
 
 
 
-IRQ_CALLBACK_MEMBER(menghong_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
-
-WRITE32_MEMBER(menghong_state::Banksw_w)
+void menghong_state::Banksw_w(uint32_t data)
 {
 	m_Bank = (data >> 1) & 7;
 	m_mainbank->set_entry(m_Bank);
 }
 
-READ32_MEMBER(menghong_state::FlashCmd_r)
+uint32_t menghong_state::FlashCmd_r()
 {
 	if ((m_FlashCmd & 0xff) == 0xff)
 	{
@@ -178,7 +171,7 @@ READ32_MEMBER(menghong_state::FlashCmd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(menghong_state::FlashCmd_w)
+void menghong_state::FlashCmd_w(uint32_t data)
 {
 	m_FlashCmd = data;
 }
@@ -188,12 +181,12 @@ WRITE32_MEMBER(menghong_state::FlashCmd_w)
 // Crazy Dou Di Zhu II
 // To do: HY04 (pic?) protection, 93C46 hookup
 
-READ8_MEMBER(menghong_state::menghong_shared_r)
+uint8_t menghong_state::menghong_shared_r(offs_t offset)
 {
 	return m_sharedram[offset];
 }
 
-WRITE8_MEMBER(menghong_state::menghong_shared_w)
+void menghong_state::menghong_shared_w(offs_t offset, uint8_t data)
 {
 	m_sharedram[offset] = data;
 
@@ -222,12 +215,12 @@ WRITE8_MEMBER(menghong_state::menghong_shared_w)
 	}
 }
 
-READ8_MEMBER(menghong_state::crzyddz2_shared_r)
+uint8_t menghong_state::crzyddz2_shared_r(offs_t offset)
 {
 	return m_sharedram[offset];
 }
 
-WRITE8_MEMBER(menghong_state::crzyddz2_shared_w)
+void menghong_state::crzyddz2_shared_w(offs_t offset, uint8_t data)
 {
 	m_sharedram[offset] = data;
 
@@ -255,12 +248,12 @@ WRITE8_MEMBER(menghong_state::crzyddz2_shared_w)
 	}
 }
 
-READ32_MEMBER(menghong_state::PIOldat_r)
+uint32_t menghong_state::PIOldat_r()
 {
 	return m_PIO;
 }
 
-WRITE32_MEMBER(menghong_state::crzyddz2_PIOldat_w)
+void menghong_state::crzyddz2_PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_PIO);
 	//uint32_t RST = data & 0x01000000;
@@ -282,12 +275,12 @@ WRITE32_MEMBER(menghong_state::crzyddz2_PIOldat_w)
 	}
 }
 
-READ32_MEMBER(menghong_state::crzyddz2_PIOedat_r)
+uint32_t menghong_state::crzyddz2_PIOedat_r()
 {
 	return 0;//m_eeprom->do_read();
 }
 
-READ32_MEMBER(menghong_state::crzyddz2_key_r)
+uint32_t menghong_state::crzyddz2_key_r()
 {
 	static const char *const key_names[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
@@ -469,7 +462,7 @@ void menghong_state::menghong(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::menghong_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(menghong_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	// HY04 running at 8 MHz
 

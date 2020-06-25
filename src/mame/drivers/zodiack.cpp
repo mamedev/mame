@@ -104,12 +104,12 @@ Bounty2:
 #include "speaker.h"
 
 
-WRITE8_MEMBER( zodiack_state::nmi_mask_w )
+void zodiack_state::nmi_mask_w(uint8_t data)
 {
 	m_main_nmi_enabled = (data & 1) ^ 1;
 }
 
-WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
+void zodiack_state::sound_nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enabled = data & 1;
 }
@@ -127,13 +127,13 @@ INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 }
 
 
-WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
+void zodiack_state::master_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER( zodiack_state::control_w )
+void zodiack_state::control_w(uint8_t data)
 {
 	/* Bit 0-1 - coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);

@@ -29,7 +29,7 @@ namespace plib {
 	void ptokenizer::skipeol()
 	{
 		pstring::value_type c = getc();
-		while (c)
+		while (c != 0)
 		{
 			if (c == 10)
 			{
@@ -157,7 +157,7 @@ namespace plib {
 				bool benter(false);
 				bool bexit(false);
 				pstring file;
-				unsigned lineno;
+				unsigned lineno(0);
 
 				ret = get_token_internal();
 				if (!ret.is_type(token_type::NUMBER))
@@ -251,7 +251,8 @@ namespace plib {
 					token_t(id->second, tokstr)
 				:   token_t(token_type::IDENTIFIER, tokstr);
 		}
-		else if (c == m_string)
+
+		if (c == m_string)
 		{
 			pstring tokstr = "";
 			c = getc();
@@ -298,7 +299,7 @@ namespace plib {
 		{
 			if (m_source_location.size() == 1)
 				trail = trail_first;
-			s = trail + plib::pfmt("{1}:{2}:0\n")(m_source_location.back().file_name(), m_source_location.back().line()) + s;
+			s = plib::pfmt("{1}{2}:{3}:0\n{4}")(trail, m_source_location.back().file_name(), m_source_location.back().line(), s);
 			m_source_location.pop_back();
 		}
 		verror("\n" + s + e + " " + currentline_str() + "\n");

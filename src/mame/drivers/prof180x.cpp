@@ -39,7 +39,7 @@ uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 }
 
 
-READ8_MEMBER( prof180x_state::read )
+uint8_t prof180x_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -72,7 +72,7 @@ READ8_MEMBER( prof180x_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( prof180x_state::write )
+void prof180x_state::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x40000)
 	{
@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(prof180x_state::mm1_flag_w)
 	m_mm1 = state;
 }
 
-READ8_MEMBER( prof180x_state::status0_r )
+uint8_t prof180x_state::status0_r()
 {
 	/*
 
@@ -142,7 +142,7 @@ READ8_MEMBER( prof180x_state::status0_r )
 	return 0;
 }
 
-READ8_MEMBER( prof180x_state::status1_r )
+uint8_t prof180x_state::status1_r()
 {
 	/*
 
@@ -162,9 +162,9 @@ READ8_MEMBER( prof180x_state::status1_r )
 	return 0;
 }
 
-READ8_MEMBER( prof180x_state::status_r )
+uint8_t prof180x_state::status_r(offs_t offset)
 {
-	return BIT(offset, 8) ? status1_r(space, offset) : status0_r(space, offset);
+	return BIT(offset, 8) ? status1_r() : status0_r();
 }
 
 /* Address Maps */
@@ -182,7 +182,7 @@ void prof180x_state::prof180x_io(address_map &map)
 	map(0x00d8, 0x00d8).mirror(0xff00).w("syslatch", FUNC(ls259_device::write_nibble_d0));
 	map(0x00d9, 0x00d9).select(0xff00).r(FUNC(prof180x_state::status_r));
 	map(0x00da, 0x00da).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
-	map(0x00db, 0x00db).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00db, 0x00db).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00dc, 0x00dd).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }
 

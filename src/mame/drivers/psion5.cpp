@@ -198,7 +198,7 @@ void psion5mx_state::set_timer_ctrl(int timer, uint32_t value)
 	}
 }
 
-READ32_MEMBER(psion5mx_state::periphs_r)
+uint32_t psion5mx_state::periphs_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t reg = offset << 2;
 	uint32_t data = 0;
@@ -452,7 +452,7 @@ READ32_MEMBER(psion5mx_state::periphs_r)
 	return data;
 }
 
-WRITE32_MEMBER(psion5mx_state::periphs_w)
+void psion5mx_state::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const uint32_t reg = offset << 2;
 	switch (reg)

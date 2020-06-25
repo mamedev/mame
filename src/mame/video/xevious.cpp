@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	uint8_t color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_xevious_fg_videoram[tile_index] | (flip_screen() ? 0x100 : 0),
 			color,
 			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen() ? TILE_FLIPX : 0));
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 	uint8_t code = m_xevious_bg_videoram[tile_index];
 	uint8_t attr = m_xevious_bg_colorram[tile_index];
 	uint8_t color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((attr & 0x01) << 8),
 			color,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -164,31 +164,31 @@ VIDEO_START_MEMBER(xevious_state,xevious)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( xevious_state::xevious_fg_videoram_w )
+void xevious_state::xevious_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_fg_colorram_w )
+void xevious_state::xevious_fg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_videoram_w )
+void xevious_state::xevious_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_colorram_w )
+void xevious_state::xevious_bg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
+void xevious_state::xevious_vh_latch_w(offs_t offset, uint8_t data)
 {
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -220,12 +220,12 @@ WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
 
 
 /* emulation for schematic 9B */
-WRITE8_MEMBER( xevious_state::xevious_bs_w )
+void xevious_state::xevious_bs_w(offs_t offset, uint8_t data)
 {
 	m_xevious_bs[offset & 1] = data;
 }
 
-READ8_MEMBER( xevious_state::xevious_bb_r )
+uint8_t xevious_state::xevious_bb_r(offs_t offset)
 {
 	uint8_t *rom2a = memregion("gfx4")->base();
 	uint8_t *rom2b = rom2a+0x1000;

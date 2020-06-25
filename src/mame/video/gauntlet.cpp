@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = ((m_playfield_tile_bank * 0x1000) + (data & 0xfff)) ^ 0x800;
 	int color = 0x10 + (m_playfield_color_bank * 8) + ((data >> 12) & 7);
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -102,7 +102,7 @@ void gauntlet_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
+void gauntlet_state::gauntlet_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldxscroll = *m_xscroll;
 	COMBINE_DATA(m_xscroll);
@@ -126,7 +126,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
+void gauntlet_state::gauntlet_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldyscroll = *m_yscroll;
 	COMBINE_DATA(m_yscroll);

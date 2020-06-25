@@ -17,12 +17,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(porta_w) override;
-	DECLARE_WRITE16_MEMBER(portb_w) override;
-	DECLARE_WRITE16_MEMBER(portc_w) override;
+	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t portc_r();
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	DECLARE_WRITE_LINE_MEMBER(spi_w);
 
 	uint8_t m_spi_bit;
@@ -195,35 +195,35 @@ void jakks_tvtouch_state::machine_reset()
 	m_spi_val = 0x00;
 }
 
-READ16_MEMBER(jakks_tvtouch_state::porta_r)
+uint16_t jakks_tvtouch_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), 0, mem_mask);
 	return 0;
 }
 
-READ16_MEMBER(jakks_tvtouch_state::portb_r)
+uint16_t jakks_tvtouch_state::portb_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: portb_r: %04x & %04x\n", machine().describe_context(), 0, mem_mask);
 	return 0;
 }
 
-READ16_MEMBER(jakks_tvtouch_state::portc_r)
+uint16_t jakks_tvtouch_state::portc_r()
 {
-	uint16_t data = m_i2cmem->read_sda();
+	uint16_t data = (m_i2cmem->read_sda() & 1) | (m_io_p3->read() & 0xfffe);
 	return data;
 }
 
-WRITE16_MEMBER(jakks_tvtouch_state::porta_w)
+void jakks_tvtouch_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: porta_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE16_MEMBER(jakks_tvtouch_state::portb_w)
+void jakks_tvtouch_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE16_MEMBER(jakks_tvtouch_state::portc_w)
+void jakks_tvtouch_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));
@@ -279,6 +279,14 @@ ROM_START( tvtchspd )
 	ROM_LOAD16_WORD_SWAP( "touchspiderman.bin", 0x000000, 0x400000, CRC(7646f265) SHA1(3b029d9d1dc57f4cae809f177205d8372d722461) )
 ROM_END
 
+ROM_START( tvtchsb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "touchspongebob.bin", 0x000000, 0x400000, CRC(a6d7f544) SHA1(fc15b3d2bbbd951d82c81bef59f45506d6c4e2e3) )
+ROM_END
+
+
 // TV Touch Games (these are re-release versions of classic JAKKS games but using a touchpad controller)
-CONS( 2012, tvtchsw, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
+CONS( 2012, tvtchsw,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
 CONS( 2012, tvtchspd, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Spider-Man in Villain Round-Up", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, tvtchsb,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: SpongeBob SquarePants Jellyfish Dodge", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Cut the Rope was planned but never released

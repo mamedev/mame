@@ -29,8 +29,8 @@ public:
 	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(uint8_t data);
+	uint8_t read();
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:

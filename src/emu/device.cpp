@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    device.c
+    device.cpp
 
     Device interface functions.
 
@@ -84,7 +84,6 @@ emu::detail::device_registrar const registered_device_types;
 
 device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: m_type(type)
-	, m_searchpath(type.shortname())
 	, m_owner(owner)
 	, m_next(nullptr)
 
@@ -96,6 +95,8 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 
 	, m_machine_config(mconfig)
 	, m_input_defaults(nullptr)
+	, m_system_bios(0)
+	, m_default_bios(0)
 	, m_default_bios_tag("")
 
 	, m_machine(nullptr)
@@ -119,6 +120,24 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 
 device_t::~device_t()
 {
+}
+
+
+//-------------------------------------------------
+//  searchpath - get the media search path for a
+//  device
+//-------------------------------------------------
+
+std::vector<std::string> device_t::searchpath() const
+{
+	std::vector<std::string> result;
+	device_t const *system(owner());
+	while (system && !dynamic_cast<driver_device const *>(system))
+		system = system->owner();
+	if (system)
+		result = system->searchpath();
+	result.emplace(result.begin(), shortname());
+	return result;
 }
 
 
@@ -182,8 +201,8 @@ ioport_port *device_t::ioport(std::string tag) const
 
 
 //-------------------------------------------------
-//  ioport - return a pointer to the I/O port
-//  object for a given port name
+//  parameter - return a pointer to a given
+//  parameter
 //-------------------------------------------------
 
 std::string device_t::parameter(const char *tag) const
@@ -1078,7 +1097,7 @@ void device_interface::interface_pre_save()
 //-------------------------------------------------
 //  interface_post_load - called after the loading a
 //  saved state, so that registered variables can
-//  be expaneded as necessary
+//  be expanded as necessary
 //-------------------------------------------------
 
 void device_interface::interface_post_load()

@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device, "wswan_sound", "WonderSwan Cus
 wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WSWAN_SND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 14),
+		device_rom_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_sweep_step(0),
 		m_sweep_time(0),

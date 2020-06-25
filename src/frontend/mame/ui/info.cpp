@@ -104,6 +104,17 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 			local_ports.append(device, sink);
 	}
 
+	// suppress "requires external artwork" warning when external artwork was loaded
+	if (config.root_device().has_running_machine())
+	{
+		for (render_target *target = config.root_device().machine().render().first_target(); target != nullptr; target = target->next())
+			if (!target->hidden() && target->external_artwork())
+			{
+				m_flags &= ~::machine_flags::REQUIRES_ARTWORK;
+				break;
+			}
+	}
+
 	// unemulated trumps imperfect when aggregating (always be pessimistic)
 	m_imperfect_features &= ~m_unemulated_features;
 
@@ -136,7 +147,7 @@ rgb_t machine_static_info::status_color() const
 {
 	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
 		return UI_RED_COLOR;
-	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
+	else if ((machine_flags() & MACHINE_WARNINGS & ~::machine_flags::REQUIRES_ARTWORK) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
 	else
 		return UI_GREEN_COLOR;
@@ -238,11 +249,11 @@ std::string machine_info::warnings_string() const
 	// add one line per machine warning flag
 	if (machine_flags() & ::machine_flags::NO_COCKTAIL)
 		buf << _("Screen flipping in cocktail mode is not supported.\n");
-	if (machine_flags() & ::machine_flags::REQUIRES_ARTWORK) // check if external artwork is present before displaying this warning?
+	if (machine_flags() & ::machine_flags::REQUIRES_ARTWORK)
 		buf << _("This machine requires external artwork files.\n");
-	if (machine_flags() & ::machine_flags::IS_INCOMPLETE )
+	if (machine_flags() & ::machine_flags::IS_INCOMPLETE)
 		buf << _("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
-	if (machine_flags() & ::machine_flags::NO_SOUND_HW )
+	if (machine_flags() & ::machine_flags::NO_SOUND_HW)
 		buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 
 	// these are more severe warnings
@@ -313,7 +324,7 @@ std::string machine_info::game_info_string() const
 		if (!exectags.insert(exec.device().tag()).second)
 			continue;
 		// get cpu specific clock that takes internal multiplier/dividers into account
-		int clock = exec.device().clock();
+		u32 clock = exec.device().clock();
 
 		// count how many identical CPUs we have
 		int count = 1;
@@ -325,16 +336,23 @@ std::string machine_info::game_info_string() const
 					count++;
 		}
 
-		// if more than one, prepend a #x in front of the CPU name
-		// display clock in kHz or MHz
+		std::string hz(std::to_string(clock));
+		int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
+		if (d > 0)
+		{
+			size_t dpos = hz.length() - d;
+			hz.insert(dpos, ".");
+			size_t last = hz.find_last_not_of('0');
+			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+		}
+
+		// if more than one, prepend a #x in front of the CPU name and display clock
 		util::stream_format(buf,
-				(count > 1) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s %3$d.%4$0*5$d%6$s\n",
-				count,
-				name,
-				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
-				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
-				(clock >= 1000000) ? 6 : 3,
-				(clock >= 1000000) ? _("MHz") : _("kHz"));
+				(count > 1)
+					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
+					: ((clock != 0) ? "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%2$s\n"),
+				count, name, hz,
+				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 	}
 
 	// loop over all sound chips
@@ -360,19 +378,24 @@ std::string machine_info::game_info_string() const
 					count++;
 		}
 
-		// if more than one, prepend a #x in front of the CPU name
-		// display clock in kHz or MHz
-		int clock = sound.device().clock();
+		const u32 clock = sound.device().clock();
+		std::string hz(std::to_string(clock));
+		int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
+		if (d > 0)
+		{
+			size_t dpos = hz.length() - d;
+			hz.insert(dpos, ".");
+			size_t last = hz.find_last_not_of('0');
+			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+		}
+
+		// if more than one, prepend a #x in front of the soundchip name and display clock
 		util::stream_format(buf,
 				(count > 1)
-					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
-					: ((clock != 0) ? "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s\n"),
-				count,
-				sound.device().name(),
-				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
-				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
-				(clock >= 1000000) ? 6 : 3,
-				(clock >= 1000000) ? _("MHz") : _("kHz"));
+					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
+					: ((clock != 0) ? "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%2$s\n"),
+				count, sound.device().name(), hz,
+				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 	}
 
 	// display screen information
@@ -390,11 +413,16 @@ std::string machine_info::game_info_string() const
 				detail = _("Vector");
 			else
 			{
+				std::string hz(std::to_string(float(screen.frame_period().as_hz())));
+				size_t last = hz.find_last_not_of('0');
+				size_t dpos = hz.find_last_of('.');
+				hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+
 				const rectangle &visarea = screen.visible_area();
-				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
+				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %s" UTF8_NBSP "Hz",
 						visarea.width(), visarea.height(),
 						(screen.orientation() & ORIENTATION_SWAP_XY) ? "V" : "H",
-						screen.frame_period().as_hz());
+						hz);
 			}
 
 			util::stream_format(buf,

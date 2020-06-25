@@ -51,7 +51,7 @@ TODO:
 #include "speaker.h"
 
 
-READ8_MEMBER(hnayayoi_state::keyboard_0_r)
+uint8_t hnayayoi_state::keyboard_0_r()
 {
 	int res = 0x3f;
 	int i;
@@ -66,21 +66,21 @@ READ8_MEMBER(hnayayoi_state::keyboard_0_r)
 	return res;
 }
 
-READ8_MEMBER(hnayayoi_state::keyboard_1_r)
+uint8_t hnayayoi_state::keyboard_1_r()
 {
 	/* Player 2 not supported */
 	return 0x3f;
 }
 
-WRITE8_MEMBER(hnayayoi_state::keyboard_w)
+void hnayayoi_state::keyboard_w(uint8_t data)
 {
 	m_keyb = data;
 }
 
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
+void hnayayoi_state::adpcm_data_w(uint8_t data)
 {
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 }
 
 

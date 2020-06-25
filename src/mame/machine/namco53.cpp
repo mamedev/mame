@@ -50,7 +50,9 @@
     these values to mode 7 when running.
 
     Unknowns:
-        SO is connected to IOSEL on Pole Position
+    The Atari schematic for Pole Position lists pin 5 (SO) connected to IOSEL.
+    This seems to be a misprint, and it likely goes to to pin 3 (reset) like
+    the other Namco custom chips.
 
 ***************************************************************************/
 
@@ -58,36 +60,38 @@
 #include "namco53.h"
 
 
-#define VERBOSE 0
-#include "logmacro.h"
+WRITE_LINE_MEMBER( namco_53xx_device::reset )
+{
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
 
-
-READ8_MEMBER( namco_53xx_device::K_r )
+uint8_t namco_53xx_device::K_r()
 {
 	return m_k(0);
 }
 
-READ8_MEMBER( namco_53xx_device::R0_r )
+uint8_t namco_53xx_device::R0_r()
 {
 	return m_in[0](0);
 }
 
-READ8_MEMBER( namco_53xx_device::R1_r )
+uint8_t namco_53xx_device::R1_r()
 {
 	return m_in[1](0);
 }
 
-READ8_MEMBER( namco_53xx_device::R2_r )
+uint8_t namco_53xx_device::R2_r()
 {
 	return m_in[2](0);
 }
 
-READ8_MEMBER( namco_53xx_device::R3_r )
+uint8_t namco_53xx_device::R3_r()
 {
 	return m_in[3](0);
 }
 
-WRITE8_MEMBER( namco_53xx_device::O_w )
+void namco_53xx_device::O_w(uint8_t data)
 {
 	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
@@ -96,36 +100,19 @@ WRITE8_MEMBER( namco_53xx_device::O_w )
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
-WRITE8_MEMBER( namco_53xx_device::P_w )
+void namco_53xx_device::P_w(uint8_t data)
 {
-	m_p(space, 0, data);
+	m_p(0, data);
 }
 
-
-TIMER_CALLBACK_MEMBER( namco_53xx_device::irq_clear )
+WRITE_LINE_MEMBER(namco_53xx_device::chip_select)
 {
-	m_cpu->set_input_line(0, CLEAR_LINE);
+	m_cpu->set_input_line(0, state);
 }
 
-WRITE_LINE_MEMBER(namco_53xx_device::read_request)
+uint8_t namco_53xx_device::read()
 {
-	m_cpu->set_input_line(0, ASSERT_LINE);
-
-	// The execution time of one instruction is ~4us, so we must make sure to
-	// give the cpu time to poll the /IRQ input before we clear it.
-	// The input clock to the 06XX interface chip is 64H, that is
-	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
-	// asserted for one clock cycle ~= 21us.
-	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
-}
-
-READ8_MEMBER( namco_53xx_device::read )
-{
-	uint8_t res = m_portO;
-
-	read_request(0);
-
-	return res;
+	return m_portO;
 }
 
 
@@ -159,8 +146,6 @@ void namco_53xx_device::device_start()
 	m_k.resolve_safe(0);
 	m_in.resolve_all_safe(0);
 	m_p.resolve_safe();
-
-	m_irq_cleared_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_53xx_device::irq_clear), this));
 
 	save_item(NAME(m_portO));
 }

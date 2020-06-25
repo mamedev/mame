@@ -256,7 +256,7 @@ TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 			m_digits[digit] = param;
 }
 
-READ8_MEMBER( mpf1_state::ppi_pa_r )
+uint8_t mpf1_state::ppi_pa_r()
 {
 	uint8_t data = 0x7f;
 
@@ -274,7 +274,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( mpf1_state::ppi_pb_w )
+void mpf1_state::ppi_pb_w(uint8_t data)
 {
 	/* swap bits around for the mame 7-segment emulation */
 	uint8_t led_data = bitswap<8>(data, 6, 1, 2, 0, 7, 5, 4, 3);
@@ -283,7 +283,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pb_w )
 	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
 }
 
-WRITE8_MEMBER( mpf1_state::ppi_pc_w )
+void mpf1_state::ppi_pc_w(uint8_t data)
 {
 	/* bits 0-5, led select and keyboard latch */
 	m_lednum = data & 0x3f;
@@ -304,7 +304,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	m_cassette->output( BIT(data, 7) ? 1.0 : -1.0);
 }
 
-READ8_MEMBER(mpf1_state::step_r)
+uint8_t mpf1_state::step_r(offs_t offset)
 {
 	if (!m_break)
 	{

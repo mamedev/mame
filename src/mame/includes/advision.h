@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
-/*****************************************************************************
- *
- * includes/advision.h
- *
- ****************************************************************************/
+// copyright-holders:Dan Boris
+
 #ifndef MAME_INCLUDES_ADVISION_H
 #define MAME_INCLUDES_ADVISION_H
 
@@ -53,18 +49,18 @@ public:
 	void vh_write(int data);
 	void vh_update(int x);
 
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_READ8_MEMBER( ext_ram_r );
-	DECLARE_WRITE8_MEMBER( ext_ram_w );
-	DECLARE_READ8_MEMBER( controller_r );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_WRITE8_MEMBER( av_control_w );
+	uint8_t rom_r(offs_t offset);
+	uint8_t ext_ram_r(offs_t offset);
+	void ext_ram_w(offs_t offset, uint8_t data);
+	uint8_t controller_r();
+	void bankswitch_w(uint8_t data);
+	void av_control_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( vsync_r );
 
 	TIMER_CALLBACK_MEMBER( sound_cmd_sync );
-	DECLARE_READ8_MEMBER( sound_cmd_r );
-	DECLARE_WRITE8_MEMBER( sound_g_w );
-	DECLARE_WRITE8_MEMBER( sound_d_w );
+	uint8_t sound_cmd_r();
+	void sound_g_w(uint8_t data);
+	void sound_d_w(uint8_t data);
 
 	memory_region *m_cart_rom;
 

@@ -191,13 +191,13 @@ uint8_t elan_eu3a05_sound_device::handle_sound_addr_r(int which, int offset)
 	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	handle_sound_addr_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r(offs_t offset)
 {
 	m_stream->update();
 	return handle_sound_addr_r(offset / 3, offset % 3);
@@ -244,19 +244,19 @@ uint8_t elan_eu3a05_sound_device::handle_sound_size_r(int which, int offset)
 	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_size_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	handle_sound_size_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_size_r(offs_t offset)
 {
 	m_stream->update();
 	return handle_sound_size_r(offset / 3, offset % 3);
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r()
 {
 	m_stream->update();
 
@@ -265,7 +265,7 @@ READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r)
 }
 
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -286,14 +286,14 @@ WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w)
 
 /* this is read/written with the same individual bits for each channel as the trigger
    maybe related to interrupts? */
-READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r()
 {
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_unk_r\n", machine().describe_context());
 	// don't think this reads back what was written probably a status of something instead?
 	return 0x00; //m_sound_unk;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w(uint8_t data)
 {
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_unk_w %02x\n", machine().describe_context(), data);
 
@@ -327,7 +327,7 @@ void elan_eu3a05_sound_device::handle_sound_trigger(int which)
 }
 
 
-READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_50a8_r()
 {
 	m_stream->update();
 
@@ -335,13 +335,13 @@ READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)
 	return m_isstopped;
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r)
+uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r(offs_t offset)
 {
 	LOGMASKED( LOG_AUDIO, "%s: sound_volume_r (offset %d, data %02x)\n", machine().describe_context(), offset, m_volumes[offset]);
 	return m_volumes[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)
+void elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -349,36 +349,36 @@ WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)
 	m_volumes[offset] = data;
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::read_unmapped)
+uint8_t elan_eu3a05_sound_device::read_unmapped(offs_t offset)
 {
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::write_unmapped)
+void elan_eu3a05_sound_device::write_unmapped(offs_t offset, uint8_t data)
 {
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::reg50a4_r)
+uint8_t elan_eu3a05_sound_device::reg50a4_r()
 {
 	LOGMASKED( LOG_AUDIO, "%s: reg50a4_r (unknown) (data %02x)\n", machine().describe_context(), m_50a4);
 	return m_50a4;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::reg50a4_w)
+void elan_eu3a05_sound_device::reg50a4_w(uint8_t data)
 {
 	LOGMASKED( LOG_AUDIO, "%s: reg50a4_w (unknown) (data %02x)\n", machine().describe_context(), data);
 	m_50a4 = data;
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::reg50a9_r)
+uint8_t elan_eu3a05_sound_device::reg50a9_r()
 {
 	LOGMASKED( LOG_AUDIO, "%s: reg50a9_r (IRQ mask?) (data %02x)\n", machine().describe_context(), m_50a9);
 	return m_50a9;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::reg50a9_w)
+void elan_eu3a05_sound_device::reg50a9_w(uint8_t data)
 {
 	LOGMASKED( LOG_AUDIO, "%s: reg50a4_w (IRQ mask?) (data %02x)\n", machine().describe_context(), data);
 	m_50a9 = data;

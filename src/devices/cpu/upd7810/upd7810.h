@@ -69,13 +69,19 @@ public:
 	auto pd_out_cb() { return m_pd_out_cb.bind(); }
 	auto pf_out_cb() { return m_pf_out_cb.bind(); }
 
+	void set_pa_pullups(uint8_t p) { m_pa_pullups = p; }
+	void set_pb_pullups(uint8_t p) { m_pb_pullups = p; }
+	void set_pc_pullups(uint8_t p) { m_pc_pullups = p; }
+	void set_pd_pullups(uint8_t p) { m_pd_pullups = p; }
+	void set_pf_pullups(uint8_t p) { m_pf_pullups = p; }
+
 	auto pt_in_cb() { return m_pt_in_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(pc_w);
-	DECLARE_WRITE8_MEMBER(pd_w);
-	DECLARE_WRITE8_MEMBER(pf_w);
+	void pa_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pb_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pc_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pd_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pf_w(uint8_t data, uint8_t mem_mask = ~0);
 
 protected:
 	void upd_internal_128_ram_map(address_map &map);
@@ -131,6 +137,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 3 - 1) / 3; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 3); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
@@ -237,6 +245,7 @@ protected:
 	uint8_t   m_op;     /* opcode */
 	uint8_t   m_op2;    /* opcode part 2 */
 	uint8_t   m_iff;    /* interrupt enable flip flop */
+	uint8_t   m_iff_pending;
 	uint8_t   m_psw;    /* processor status word */
 	PAIR    m_ea;     /* extended accumulator */
 	PAIR    m_va;     /* accumulator + vector register */
@@ -279,6 +288,11 @@ protected:
 	uint8_t   m_pc_out;
 	uint8_t   m_pd_out;
 	uint8_t   m_pf_out;
+	uint8_t   m_pa_pullups;
+	uint8_t   m_pb_pullups;
+	uint8_t   m_pc_pullups;
+	uint8_t   m_pd_pullups;
+	uint8_t   m_pf_pullups;
 	uint8_t   m_cr0;    /* analog digital conversion register 0 */
 	uint8_t   m_cr1;    /* analog digital conversion register 1 */
 	uint8_t   m_cr2;    /* analog digital conversion register 2 */
@@ -329,8 +343,8 @@ protected:
 	const struct opcode_s *m_op64;
 	const struct opcode_s *m_op70;
 	const struct opcode_s *m_op74;
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	int m_icount;
 
 	uint8_t RP(offs_t port);
@@ -1354,6 +1368,17 @@ protected:
 };
 
 
+class upd78c10_device : public upd7810_device
+{
+public:
+	// construction/destruction
+	upd78c10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	upd78c10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+};
+
+
 class upd7807_device : public upd7810_device
 {
 public:
@@ -1374,6 +1399,8 @@ public:
 
 protected:
 	virtual void device_reset() override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void handle_timers(int cycles) override;
@@ -1411,6 +1438,7 @@ public:
 
 
 DECLARE_DEVICE_TYPE(UPD7810,  upd7810_device)
+DECLARE_DEVICE_TYPE(UPD78C10, upd78c10_device)
 DECLARE_DEVICE_TYPE(UPD7807,  upd7807_device)
 DECLARE_DEVICE_TYPE(UPD7801,  upd7801_device)
 DECLARE_DEVICE_TYPE(UPD78C05, upd78c05_device)

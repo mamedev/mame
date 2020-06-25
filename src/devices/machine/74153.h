@@ -40,21 +40,21 @@ public:
 	// select
 	DECLARE_WRITE_LINE_MEMBER(s0_w);
 	DECLARE_WRITE_LINE_MEMBER(s1_w);
-	DECLARE_WRITE8_MEMBER(s_w);
+	void s_w(uint8_t data);
 
 	// input a
 	DECLARE_WRITE_LINE_MEMBER(i0a_w);
 	DECLARE_WRITE_LINE_MEMBER(i1a_w);
 	DECLARE_WRITE_LINE_MEMBER(i2a_w);
 	DECLARE_WRITE_LINE_MEMBER(i3a_w);
-	DECLARE_WRITE8_MEMBER(ia_w);
+	void ia_w(uint8_t data);
 
 	// input b
 	DECLARE_WRITE_LINE_MEMBER(i0b_w);
 	DECLARE_WRITE_LINE_MEMBER(i1b_w);
 	DECLARE_WRITE_LINE_MEMBER(i2b_w);
 	DECLARE_WRITE_LINE_MEMBER(i3b_w);
-	DECLARE_WRITE8_MEMBER(ib_w);
+	void ib_w(uint8_t data);
 
 	// output
 	DECLARE_READ_LINE_MEMBER(za_r);

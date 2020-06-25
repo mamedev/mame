@@ -152,10 +152,10 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "machine/74123.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/rescap.h"
+#include "machine/scn_pci.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -201,14 +201,14 @@ private:
 	void ram_w(offs_t offset, uint8_t data);
 	void memory_ctrl_w(uint8_t data);
 	offs_t vram_map(offs_t offset) const;
-	DECLARE_READ8_MEMBER(z100_vram_r);
-	DECLARE_WRITE8_MEMBER(z100_vram_w);
+	uint8_t z100_vram_r(offs_t offset);
+	void z100_vram_w(offs_t offset, uint8_t data);
 	void kbd_col_w(uint8_t data);
 	uint8_t kbd_rows_r();
 	DECLARE_READ_LINE_MEMBER(kbd_shift_row_r);
 	DECLARE_WRITE_LINE_MEMBER(beep_update);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_motor_w);
+	void floppy_select_w(uint8_t data);
+	void floppy_motor_w(uint8_t data);
 	uint8_t tmr_status_r();
 	void tmr_status_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(timer_flipflop0_w);
@@ -216,9 +216,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vidint_w);
 	DECLARE_WRITE_LINE_MEMBER(vidint_enable_w);
 
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(video_pia_A_w);
-	DECLARE_WRITE8_MEMBER(video_pia_B_w);
+	u8 get_slave_ack(offs_t offset);
+	void video_pia_A_w(u8 data);
+	void video_pia_B_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
 
@@ -234,7 +234,7 @@ private:
 	required_device<pic8259_device> m_pics;
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
-	required_device_array<mc2661_device, 2> m_epci;
+	required_device_array<scn2661b_device, 2> m_epci;
 	required_device<ttl74123_device> m_keyclick;
 	required_device<ttl74123_device> m_keybeep;
 	required_device<beep_device> m_beeper;
@@ -344,12 +344,12 @@ offs_t z100_state::vram_map(offs_t offset) const
 		| ((m_vrmm[(offset & 0xf800) >> 8 | (offset & 0x0070) >> 4] + m_start_addr) & (m_vram_config->read() ? 0xff : 0x7f)) << 8;
 }
 
-READ8_MEMBER( z100_state::z100_vram_r )
+uint8_t z100_state::z100_vram_r(offs_t offset)
 {
 	return m_gvram[vram_map(offset)];
 }
 
-WRITE8_MEMBER( z100_state::z100_vram_w )
+void z100_state::z100_vram_w(offs_t offset, uint8_t data)
 {
 	if(m_vram_enable)
 	{
@@ -407,13 +407,13 @@ WRITE_LINE_MEMBER(z100_state::beep_update)
 
 // todo: side select?
 
-WRITE8_MEMBER( z100_state::floppy_select_w )
+void z100_state::floppy_select_w(uint8_t data)
 {
 	m_floppy = m_floppies[data & 0x03]->get_device();
 	m_fdc->set_floppy(m_floppy);
 }
 
-WRITE8_MEMBER( z100_state::floppy_motor_w )
+void z100_state::floppy_motor_w(uint8_t data)
 {
 	if (m_floppy)
 		m_floppy->mon_w(!BIT(data, 1));
@@ -489,8 +489,8 @@ void z100_state::z100_io(address_map &map)
 //  map(0xde, 0xde) light pen
 	map(0xe0, 0xe3).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
 	map(0xe4, 0xe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe8, 0xeb).rw(m_epci[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-	map(0xec, 0xef).rw(m_epci[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xe8, 0xeb).rw(m_epci[0], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
+	map(0xec, 0xef).rw(m_epci[1], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf5).rw("kbdc", FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
@@ -683,7 +683,7 @@ INPUT_PORTS_START( z100 )
 	PORT_DIPSETTING( 0x01, "64K" )
 INPUT_PORTS_END
 
-READ8_MEMBER( z100_state::get_slave_ack )
+u8 z100_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pics->acknowledge();
@@ -691,7 +691,7 @@ READ8_MEMBER( z100_state::get_slave_ack )
 	return 0;
 }
 
-WRITE8_MEMBER( z100_state::video_pia_A_w )
+void z100_state::video_pia_A_w(u8 data)
 {
 	/*
 	all bits are active low
@@ -711,7 +711,7 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 	m_display_mask = bitswap<8>((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
-WRITE8_MEMBER( z100_state::video_pia_B_w )
+void z100_state::video_pia_B_w(u8 data)
 {
 	m_start_addr = data;
 }
@@ -855,11 +855,11 @@ void z100_state::z100(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
-	MC2661(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
+	SCN2661B(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
 	m_epci[0]->txrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<0>));
 	m_epci[0]->rxrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<1>));
 
-	MC2661(config, m_epci[1], 4.9152_MHz_XTAL); // Second 2661-2 serial port (modem)
+	SCN2661B(config, m_epci[1], 4.9152_MHz_XTAL); // Second 2661-2 serial port (modem)
 	m_epci[1]->txrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<0>));
 	m_epci[1]->rxrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<1>));
 

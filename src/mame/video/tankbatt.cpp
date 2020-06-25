@@ -51,7 +51,7 @@ void tankbatt_state::tankbatt_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::videoram_w)
+void tankbatt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(tankbatt_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_videoram[tile_index] | 0x01;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void tankbatt_state::video_start()

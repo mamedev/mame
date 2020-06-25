@@ -69,6 +69,7 @@ public:
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
 		, m_digits(*this, "digit%u", 0U)
+		, m_swarray(*this, "SW.%u", 0U)
 	{ }
 
 	void s8(machine_config &config);
@@ -79,16 +80,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 private:
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { };
+	void sol2_w(uint8_t data) { }; // solenoids 8-15
+	void sol3_w(uint8_t data); // solenoids 0-7
+	void sound_w(uint8_t data);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
@@ -103,7 +104,7 @@ private:
 
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
-	uint8_t m_kbdrow;
+	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -117,6 +118,7 @@ private:
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	output_finder<61> m_digits;
+	required_ioport_array<8> m_swarray;
 };
 
 void s8_state::s8_main_map(address_map &map)
@@ -139,10 +141,7 @@ void s8_state::s8_audio_map(address_map &map)
 }
 
 static INPUT_PORTS_START( s8 )
-	PORT_START("X0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("X1")
+	PORT_START("SW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
@@ -152,12 +151,12 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
 
-	PORT_START("X2")
+	PORT_START("SW.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0xf6, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("X4")
+	PORT_START("SW.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
@@ -167,21 +166,21 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
 
-	PORT_START("X8")
+	PORT_START("SW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("X10")
+	PORT_START("SW.4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("X20")
+	PORT_START("SW.5")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("X40")
+	PORT_START("SW.6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("X80")
+	PORT_START("SW.7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DIAGS")
@@ -205,13 +204,13 @@ INPUT_CHANGED_MEMBER( s8_state::audio_nmi )
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER( s8_state::sol3_w )
+void s8_state::sol3_w(uint8_t data)
 {
 	if (BIT(data, 1))
 		m_samples->start(0, 6); // knocker
 }
 
-WRITE8_MEMBER( s8_state::sound_w )
+void s8_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 }
@@ -228,11 +227,11 @@ WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
 	m_pias->ca1_w(state);
 }
 
-WRITE8_MEMBER( s8_state::lamp0_w )
+void s8_state::lamp0_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( s8_state::dig0_w )
+void s8_state::dig0_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -241,7 +240,7 @@ WRITE8_MEMBER( s8_state::dig0_w )
 	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
-WRITE8_MEMBER( s8_state::dig1_w )
+void s8_state::dig1_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
@@ -252,19 +251,27 @@ WRITE8_MEMBER( s8_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s8_state::switch_r )
+uint8_t s8_state::switch_r()
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ioport(kbdrow)->read() ^ 0xff;
+	char retval = 0xff;
+	// scan all 8 input columns, since multiple can be selected at once
+	for (int i = 0; i < 7; i++)
+	{
+		if (m_switch_col & (1<<i))
+			retval &= m_swarray[i]->read();
+	}
+	//retval &= ioport("OPTOS")->read(); // optos should be read here as well, and are always active even if no column is selected
+	return ~retval;
 }
 
-WRITE8_MEMBER( s8_state::switch_w )
+void s8_state::switch_w(uint8_t data)
 {
-	m_kbdrow = data;
+	// this drives the pulldown 2N3904 NPN transistors Q7-Q14, each of which drives one column of the switch matrix low
+	// it is possible for multiple columns to be enabled at once, this is handled in switch_r above.
+	m_switch_col = data;
 }
 
-READ8_MEMBER( s8_state::sound_r )
+uint8_t s8_state::sound_r()
 {
 	return m_sound_data;
 }

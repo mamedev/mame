@@ -247,8 +247,8 @@ private:
 	required_device_array<ls259_device, 4> m_outlatch;
 	required_ioport_array<3> m_inputs;
 
-	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
-	//DECLARE_WRITE8_MEMBER(debug_w);
+	void tmspoker_videoram_w(offs_t offset, uint8_t data);
+	//void debug_w(uint8_t data);
 	uint8_t inputs_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void tmspoker_palette(palette_device &palette) const;
@@ -264,7 +264,7 @@ private:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
+void tmspoker_state::tmspoker_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -281,7 +281,7 @@ TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
 */
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
+	tileinfo.set(0 /* bank */, code, 0 /* color */, 0);
 }
 
 void tmspoker_state::video_start()
@@ -304,7 +304,7 @@ void tmspoker_state::tmspoker_palette(palette_device &palette) const
 *  Read / Write Handlers  *
 **************************/
 
-//WRITE8_MEMBER(tmspoker_state::debug_w)
+//void tmspoker_state::debug_w(uint8_t data)
 //{
 //  popmessage("written : %02X", data);
 //}

@@ -151,7 +151,7 @@ ioport_constructor astrocade_rl64ram_device::device_input_ports() const
  -------------------------------------------------*/
 
 // Blue RAM expansions have RAM starting at 0x6000, up to the RAM size
-READ8_MEMBER(astrocade_blueram_4k_device::read)
+uint8_t astrocade_blueram_4k_device::read(offs_t offset)
 {
 	if (offset >= 0x1000 && offset < 0x1000 + m_ram.size())
 		return m_ram[offset - 0x1000];
@@ -159,18 +159,18 @@ READ8_MEMBER(astrocade_blueram_4k_device::read)
 		return 0;
 }
 
-WRITE8_MEMBER(astrocade_blueram_4k_device::write)
+void astrocade_blueram_4k_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x1000 && offset < 0x1000 + m_ram.size() && !m_write_prot->read())
 		m_ram[offset - 0x1000] = data;
 }
 
-READ8_MEMBER(astrocade_blueram_4k_device::read_io)
+uint8_t astrocade_blueram_4k_device::read_io(offs_t offset)
 {
 	return m_ramio->read_io(offset & 0x7f);
 }
 
-WRITE8_MEMBER(astrocade_blueram_4k_device::write_io)
+void astrocade_blueram_4k_device::write_io(offs_t offset, uint8_t data)
 {
 	logerror("write_io: %04x = %02x\n", offset, data);
 	m_ramio->write_io(offset & 0x7f, data);
@@ -196,7 +196,7 @@ void astrocade_blueram_4k_device::portb_w(uint8_t data)
 }
 
 // Viper System 1 expansion has RAM in 0x6000-0x9fff
-READ8_MEMBER(astrocade_viper_sys1_device::read)
+uint8_t astrocade_viper_sys1_device::read(offs_t offset)
 {
 	if (offset >= 0x1000 && offset < 0xa000)
 		return m_ram[offset - 0x1000];
@@ -204,7 +204,7 @@ READ8_MEMBER(astrocade_viper_sys1_device::read)
 		return 0;
 }
 
-WRITE8_MEMBER(astrocade_viper_sys1_device::write)
+void astrocade_viper_sys1_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x1000 && offset < 0xa000 && !m_write_prot->read())
 		m_ram[offset - 0x1000] = data;
@@ -213,12 +213,12 @@ WRITE8_MEMBER(astrocade_viper_sys1_device::write)
 
 
 // Lil' WHITE RAM expansion has RAM in 0x5000-0xcfff + a mirror of the first 0x3000 bytes up to 0xffff
-READ8_MEMBER(astrocade_whiteram_device::read)
+uint8_t astrocade_whiteram_device::read(offs_t offset)
 {
 	return m_ram[offset % 0x8000];
 }
 
-WRITE8_MEMBER(astrocade_whiteram_device::write)
+void astrocade_whiteram_device::write(offs_t offset, uint8_t data)
 {
 	if (!m_write_prot->read())
 		m_ram[offset % 0x8000] = data;
@@ -227,12 +227,12 @@ WRITE8_MEMBER(astrocade_whiteram_device::write)
 
 
 // R&L 64K RAM Board (44KB installed) has RAM in 0x5000-0xffff
-READ8_MEMBER(astrocade_rl64ram_device::read)
+uint8_t astrocade_rl64ram_device::read(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(astrocade_rl64ram_device::write)
+void astrocade_rl64ram_device::write(offs_t offset, uint8_t data)
 {
 	if (!m_write_prot->read())
 		m_ram[offset] = data;

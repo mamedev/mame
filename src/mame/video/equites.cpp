@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
 	int tile = m_fg_videoram[2 * tile_index];
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_fg_info)
 	int tile = m_fg_videoram[2 * tile_index] + (m_fg_char_bank << 8);
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
 	int color = (data & 0xf000) >> 12;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
+	tileinfo.set(1, tile, color, TILE_FLIPXY(fxy));
 }
 
 TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
 	int color = (data & 0xf800) >> 11;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
+	tileinfo.set(1, tile, color, TILE_FLIPXY(fxy));
 	tileinfo.group = color;
 }
 
@@ -151,32 +151,32 @@ VIDEO_START_MEMBER(splndrbt_state,splndrbt)
  *
  *************************************/
 
-READ8_MEMBER(equites_state::equites_fg_videoram_r)
+uint8_t equites_state::equites_fg_videoram_r(offs_t offset)
 {
 	// 8-bit
 	return m_fg_videoram[offset];
 }
 
-WRITE8_MEMBER(equites_state::equites_fg_videoram_w)
+void equites_state::equites_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(equites_state::equites_bg_videoram_w)
+void equites_state::equites_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_bg_videoram + offset);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(equites_state::equites_bgcolor_w)
+void equites_state::equites_bgcolor_w(offs_t offset, uint8_t data)
 {
 	// bg color register
 	if (offset == 0)
 		m_bgcolor = data;
 }
 
-WRITE16_MEMBER(equites_state::equites_scrollreg_w)
+void equites_state::equites_scrollreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_bg_tilemap->set_scrolly(0, data & 0xff);
@@ -197,12 +197,12 @@ WRITE_LINE_MEMBER(equites_state::flip_screen_w)
 	flip_screen_set(state);
 }
 
-WRITE16_MEMBER(splndrbt_state::splndrbt_bg_scrollx_w)
+void splndrbt_state::splndrbt_bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_splndrbt_bg_scrollx);
 }
 
-WRITE16_MEMBER(splndrbt_state::splndrbt_bg_scrolly_w)
+void splndrbt_state::splndrbt_bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_splndrbt_bg_scrolly);
 }

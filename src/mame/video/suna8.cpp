@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 		code = m_spriteram[ 2 * tile_index + 0 ];
 		attr = m_spriteram[ 2 * tile_index + 1 ];
 	}
-	SET_TILE_INFO_MEMBER(m_page / 8,
+	tileinfo.set(m_page / 8,
 			( (attr & 0x03) << 8 ) + code + m_tiles*0x400,
 			(attr >> 2) & 0xf,
 			TILE_FLIPYX( (attr >> 6) & 3 ));
@@ -58,19 +58,19 @@ TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 #endif
 
 
-READ8_MEMBER( suna8_state::banked_paletteram_r )
+uint8_t suna8_state::banked_paletteram_r(offs_t offset)
 {
 	offset += m_palettebank * 0x200;
 	return m_banked_paletteram[offset];
 }
 
-READ8_MEMBER(suna8_state::suna8_banked_spriteram_r)
+uint8_t suna8_state::suna8_banked_spriteram_r(offs_t offset)
 {
 	offset += m_spritebank * 0x2000;
 	return m_spriteram[offset];
 }
 
-WRITE8_MEMBER(suna8_state::suna8_spriteram_w)
+void suna8_state::suna8_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
 #if TILEMAPS
@@ -78,7 +78,7 @@ WRITE8_MEMBER(suna8_state::suna8_spriteram_w)
 #endif
 }
 
-WRITE8_MEMBER(suna8_state::suna8_banked_spriteram_w)
+void suna8_state::suna8_banked_spriteram_w(offs_t offset, uint8_t data)
 {
 	offset += m_spritebank * 0x2000;
 	m_spriteram[offset] = data;
@@ -90,7 +90,7 @@ WRITE8_MEMBER(suna8_state::suna8_banked_spriteram_w)
 /*
     Banked Palette RAM. The data is scrambled
 */
-WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
+void suna8_state::brickzn_banked_paletteram_w(offs_t offset, uint8_t data)
 {
 	if (!m_paletteram_enab)
 		return;

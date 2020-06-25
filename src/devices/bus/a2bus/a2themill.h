@@ -46,8 +46,8 @@ private:
 	bool m_6809Mode;
 	uint8_t m_status;
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
 
 	void m6809_mem(address_map &map);
 };

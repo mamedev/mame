@@ -36,7 +36,7 @@ Interesting test cases (macrossp, quizmoon doesn't use tilemap zoom):
 
 /*** SCR A LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_scra_videoram_w)
+void macrossp_state::macrossp_scra_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_scra_videoram[offset]);
 
@@ -66,12 +66,12 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scra_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(1, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	tileinfo.set(1, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR B LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_scrb_videoram_w)
+void macrossp_state::macrossp_scrb_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_scrb_videoram[offset]);
 
@@ -101,12 +101,12 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrb_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(2, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	tileinfo.set(2, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR C LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_scrc_videoram_w)
+void macrossp_state::macrossp_scrc_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_scrc_videoram[offset]);
 
@@ -136,12 +136,12 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrc_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(3, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	tileinfo.set(3, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** TEXT LAYER ***/
 
-WRITE32_MEMBER(macrossp_state::macrossp_text_videoram_w)
+void macrossp_state::macrossp_text_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_text_videoram[offset]);
 
@@ -156,7 +156,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
 	tileno = m_text_videoram[tile_index] & 0x0000ffff;
 	colour = (m_text_videoram[tile_index] & 0x00fe0000) >> 17;
 
-	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
+	tileinfo.set(4, tileno, colour, 0);
 }
 
 

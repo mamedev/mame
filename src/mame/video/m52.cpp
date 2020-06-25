@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color & 0x7f, flag);
+	tileinfo.set(0, code, color & 0x7f, flag);
 }
 
 
@@ -193,7 +193,7 @@ void m52_alpha1v_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_scroll_w)
+void m52_state::m52_scroll_w(uint8_t data)
 {
 /*
     According to the schematics there is only one video register that holds the X scroll value
@@ -208,7 +208,7 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
 	m_tx_tilemap->set_scrollx(3, -(data + 1));
 }
 
-WRITE8_MEMBER(m52_alpha1v_state::m52_scroll_w)
+void m52_alpha1v_state::m52_scroll_w(uint8_t data)
 {
 /*
    alpha1v must have some board mod to invert scroll register use, as it expects only the first block to remain static
@@ -229,14 +229,14 @@ WRITE8_MEMBER(m52_alpha1v_state::m52_scroll_w)
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_videoram_w)
+void m52_state::m52_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(m52_state::m52_colorram_w)
+void m52_state::m52_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -253,7 +253,7 @@ WRITE8_MEMBER(m52_state::m52_colorram_w)
 /* This looks like some kind of protection implemented by a custom chip on the
    scroll board. It mangles the value written to the port m52_bg1xpos_w, as
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
-READ8_MEMBER(m52_state::m52_protection_r)
+uint8_t m52_state::m52_protection_r()
 {
 	int popcount = 0;
 	int temp;
@@ -271,27 +271,27 @@ READ8_MEMBER(m52_state::m52_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_bg1ypos_w)
+void m52_state::m52_bg1ypos_w(uint8_t data)
 {
 	m_bg1ypos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bg1xpos_w)
+void m52_state::m52_bg1xpos_w(uint8_t data)
 {
 	m_bg1xpos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bg2xpos_w)
+void m52_state::m52_bg2xpos_w(uint8_t data)
 {
 	m_bg2xpos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bg2ypos_w)
+void m52_state::m52_bg2ypos_w(uint8_t data)
 {
 	m_bg2ypos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
+void m52_state::m52_bgcontrol_w(uint8_t data)
 {
 	m_bgcontrol = data;
 }
@@ -304,7 +304,7 @@ WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_flipscreen_w)
+void m52_state::m52_flipscreen_w(uint8_t data)
 {
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
@@ -313,7 +313,7 @@ WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
-WRITE8_MEMBER(m52_alpha1v_state::alpha1v_flipscreen_w)
+void m52_alpha1v_state::alpha1v_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 }

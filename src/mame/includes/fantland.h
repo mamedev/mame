@@ -50,8 +50,8 @@ protected:
 
 	optional_ioport_array<2> m_wheel;
 
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	void nmi_enable_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -59,10 +59,10 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 private:
-	DECLARE_READ8_MEMBER(spriteram_r);
-	DECLARE_READ8_MEMBER(spriteram2_r);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
-	DECLARE_WRITE8_MEMBER(spriteram2_w);
+	uint8_t spriteram_r(offs_t offset);
+	uint8_t spriteram2_r(offs_t offset);
+	void spriteram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void spriteram2_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
 	void fantland_map(address_map &map);
@@ -100,8 +100,8 @@ private:
 	required_device_array<msm5205_device, 4> m_msm;
 	required_region_ptr<uint8_t> m_adpcm_rom;
 
-	DECLARE_READ8_MEMBER(inputs_r);
-	DECLARE_WRITE8_MEMBER(msm5205_w);
+	uint8_t inputs_r(offs_t offset);
+	void msm5205_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	template<int Voice> DECLARE_WRITE_LINE_MEMBER(adpcm_int);

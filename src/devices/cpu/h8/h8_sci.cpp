@@ -40,7 +40,7 @@ void h8_sci_device::set_external_clock_period(const attotime &period)
 	external_clock_period = period;
 }
 
-WRITE8_MEMBER(h8_sci_device::smr_w)
+void h8_sci_device::smr_w(uint8_t data)
 {
 	smr = data;
 	if(V>=2) logerror("smr_w %02x %s %c%c%c%s /%d (%06x)\n", data,
@@ -54,20 +54,20 @@ WRITE8_MEMBER(h8_sci_device::smr_w)
 	clock_update();
 }
 
-READ8_MEMBER(h8_sci_device::smr_r)
+uint8_t h8_sci_device::smr_r()
 {
 	if(V>=2) logerror("smr_r %02x (%06x)\n", smr, cpu->pc());
 	return smr;
 }
 
-WRITE8_MEMBER(h8_sci_device::brr_w)
+void h8_sci_device::brr_w(uint8_t data)
 {
 	brr = data;
 	if(V>=2) logerror("brr_w %02x (%06x)\n", data, cpu->pc());
 	clock_update();
 }
 
-READ8_MEMBER(h8_sci_device::brr_r)
+uint8_t h8_sci_device::brr_r()
 {
 	if(V>=2) logerror("brr_r %02x (%06x)\n", brr, cpu->pc());
 	return brr;
@@ -83,7 +83,7 @@ bool h8_sci_device::has_recv_error() const
 	return ssr & (SSR_ORER|SSR_PER|SSR_FER);
 }
 
-WRITE8_MEMBER(h8_sci_device::scr_w)
+void h8_sci_device::scr_w(uint8_t data)
 {
 	if(V>=2) logerror("scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", data,
 						data & SCR_TIE  ? " txi" : "",
@@ -116,13 +116,13 @@ WRITE8_MEMBER(h8_sci_device::scr_w)
 		intc->internal_interrupt(eri_int);
 }
 
-READ8_MEMBER(h8_sci_device::scr_r)
+uint8_t h8_sci_device::scr_r()
 {
 	if(V>=2) logerror("scr_r %02x (%06x)\n", scr, cpu->pc());
 	return scr;
 }
 
-WRITE8_MEMBER(h8_sci_device::tdr_w)
+void h8_sci_device::tdr_w(uint8_t data)
 {
 	if(V>=2) logerror("tdr_w %02x (%06x)\n", data, cpu->pc());
 	tdr = data;
@@ -133,13 +133,13 @@ WRITE8_MEMBER(h8_sci_device::tdr_w)
 	}
 }
 
-READ8_MEMBER(h8_sci_device::tdr_r)
+uint8_t h8_sci_device::tdr_r()
 {
 	if(V>=2) logerror("tdr_r %02x (%06x)\n", tdr, cpu->pc());
 	return tdr;
 }
 
-WRITE8_MEMBER(h8_sci_device::ssr_w)
+void h8_sci_device::ssr_w(uint8_t data)
 {
 	if(!(scr & SCR_TE)) {
 		data |= SSR_TDRE;
@@ -157,13 +157,13 @@ WRITE8_MEMBER(h8_sci_device::ssr_w)
 		rx_start();
 }
 
-READ8_MEMBER(h8_sci_device::ssr_r)
+uint8_t h8_sci_device::ssr_r()
 {
 	if(V>=3) logerror("ssr_r %02x (%06x)\n", ssr, cpu->pc());
 	return ssr;
 }
 
-READ8_MEMBER(h8_sci_device::rdr_r)
+uint8_t h8_sci_device::rdr_r()
 {
 	if(V>=2) logerror("rdr_r %02x (%06x)\n", rdr, cpu->pc());
 	if(cpu->access_is_dma())
@@ -171,12 +171,12 @@ READ8_MEMBER(h8_sci_device::rdr_r)
 	return rdr;
 }
 
-WRITE8_MEMBER(h8_sci_device::scmr_w)
+void h8_sci_device::scmr_w(uint8_t data)
 {
 	if(V>=2) logerror("scmr_w %02x (%06x)\n", data, cpu->pc());
 }
 
-READ8_MEMBER(h8_sci_device::scmr_r)
+uint8_t h8_sci_device::scmr_r()
 {
 	if(V>=2) logerror("scmr_r (%06x)\n", cpu->pc());
 	return 0x00;

@@ -8,6 +8,7 @@
 /// \file nld_ms_direct1.h
 ///
 
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
@@ -32,18 +33,12 @@ namespace solver
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
 		// ----------------------------------------------------------------------------------------
-		unsigned vsolve_non_dynamic(bool newton_raphson) override
+		void vsolve_non_dynamic() override
 		{
 			this->clear_square_mat(this->m_A);
 			this->fill_matrix_and_rhs();
 
 			this->m_new_V[0] = this->m_RHS[0] / this->m_A[0][0];
-
-			bool err(false);
-			if (newton_raphson)
-				err = this->check_err();
-			this->store();
-			return (err) ? 2 : 1;
 		}
 	};
 

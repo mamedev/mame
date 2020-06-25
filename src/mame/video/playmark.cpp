@@ -15,14 +15,14 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_tx_tile_info)
 {
 	uint16_t code = m_videoram1[2 * tile_index];
 	uint16_t color = m_videoram1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_fg_tile_info)
 {
 	uint16_t code = m_videoram2[2 * tile_index];
 	uint16_t color = m_videoram2[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_tx_tile_info)
 	uint16_t code = m_videoram1[2 * tile_index];
 	uint16_t color = m_videoram1[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(2, code, (color >> 2), 0);
+	tileinfo.set(2, code, (color >> 2), 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
 	uint16_t code = m_videoram2[2 * tile_index];
 	uint16_t color = m_videoram2[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1, (code & 0x7fff), (color >> 2) + 8, (code & 0x8000) ? TILE_FLIPX : 0);
+	tileinfo.set(1, (code & 0x7fff), (color >> 2) + 8, (code & 0x8000) ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
 	uint16_t code = m_videoram3[2 * tile_index];
 	uint16_t color = m_videoram3[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1, (code & 0x7fff), (color >> 2), (code & 0x8000) ? TILE_FLIPX : 0);
+	tileinfo.set(1, (code & 0x7fff), (color >> 2), (code & 0x8000) ? TILE_FLIPX : 0);
 }
 
 
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_tx_tile_info)
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(3, code, (colr >> 13), 0);
+	tileinfo.set(3, code, (colr >> 13), 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
 	int code = m_videoram2[tile_index] & 0x1fff;
 	int colr = m_videoram2[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(2, code, (colr >> 13) + 8, 0);
+	tileinfo.set(2, code, (colr >> 13) + 8, 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 	int code = m_videoram3[tile_index] & 0x1fff;
 	int colr = m_videoram3[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(1, code, (colr >> 13), 0);
+	tileinfo.set(1, code, (colr >> 13), 0);
 }
 
 
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(3, code, (colr >> 12), 0);
+	tileinfo.set(3, code, (colr >> 12), 0);
 }
 
 /***************************************************************************
@@ -246,43 +246,43 @@ VIDEO_START_MEMBER(playmark_state,hrdtimes)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(playmark_state::wbeachvl_txvideoram_w)
+void playmark_state::wbeachvl_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_fgvideoram_w)
+void playmark_state::wbeachvl_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_bgvideoram_w)
+void playmark_state::wbeachvl_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_txvideoram_w)
+void playmark_state::hrdtimes_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_fgvideoram_w)
+void playmark_state::hrdtimes_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_bgvideoram_w)
+void playmark_state::hrdtimes_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
+void playmark_state::bigtwin_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -300,7 +300,7 @@ WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
+void playmark_state::wbeachvl_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -317,7 +317,7 @@ WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
+void playmark_state::excelsr_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -335,7 +335,7 @@ WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
+void playmark_state::hrdtimes_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 

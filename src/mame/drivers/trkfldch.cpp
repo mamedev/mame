@@ -82,7 +82,7 @@ private:
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(read_vector);
+	uint8_t read_vector(offs_t offset);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -90,38 +90,38 @@ private:
 
 	uint8_t tilemap_scroll_window_r(int which, uint8_t reg, uint16_t real_base);
 
-	DECLARE_READ8_MEMBER(tmap0_scroll_window_r);
-	DECLARE_READ8_MEMBER(tmap1_scroll_window_r);
+	uint8_t tmap0_scroll_window_r(offs_t offset);
+	uint8_t tmap1_scroll_window_r(offs_t offset);
 
 	void tilemap_scroll_window_w(int which, uint8_t reg, uint8_t data, uint16_t real_base);
 
-	DECLARE_WRITE8_MEMBER(tmap0_scroll_window_w);
-	DECLARE_WRITE8_MEMBER(tmap1_scroll_window_w);
+	void tmap0_scroll_window_w(offs_t offset, uint8_t data);
+	void tmap1_scroll_window_w(offs_t offset, uint8_t data);
 
 	uint8_t m_dmaregs[0xe];
 
-	DECLARE_READ8_MEMBER(dmaregs_r);
-	DECLARE_WRITE8_MEMBER(dmaregs_w);
+	uint8_t dmaregs_r(offs_t offset);
+	void dmaregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_modebank[0xb];
 
-	DECLARE_READ8_MEMBER(modebankregs_r);
-	DECLARE_WRITE8_MEMBER(modebankregs_w);
+	uint8_t modebankregs_r(offs_t offset);
+	void modebankregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_tilemapbase[0x3];
 
-	DECLARE_READ8_MEMBER(tilemapbase_r);
-	DECLARE_WRITE8_MEMBER(tilemapbase_w);
+	uint8_t tilemapbase_r(offs_t offset);
+	void tilemapbase_w(offs_t offset, uint8_t data);
 
 	uint8_t m_sysregs[0x10];
 
-	DECLARE_READ8_MEMBER(sysregs_r);
-	DECLARE_WRITE8_MEMBER(sysregs_w);
+	uint8_t sysregs_r(offs_t offset);
+	void sysregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_unkregs[0x90];
 
-	DECLARE_READ8_MEMBER(unkregs_r);
-	DECLARE_WRITE8_MEMBER(unkregs_w);
+	uint8_t unkregs_r(offs_t offset);
+	void unkregs_w(offs_t offset, uint8_t data);
 
 	uint8_t m_tmapscroll_window[2][0x12];
 
@@ -303,19 +303,22 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		   m_spriteram[i + 1]  yyyy yyyy
 		   m_spriteram[i + 2]  tttt tttt
 		   m_spriteram[i + 3]  xxxx xxxx
-		   m_spriteram[i + 4]  --zfF-t-x
+		   m_spriteram[i + 4]  --zfF-tdx
 
 		   p = palette bits
-		   t = tile bites
+		   t = tile bits
 		   y = y pos bits
 		   x = x pos bits
 		   z = priority
 		   fF = x/y flip
+		   d = pixel double
 		*/
 
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
 		int tile = m_spriteram[i + 2];
+
+		int doublesize = m_spriteram[i + 4] & 0x02;
 
 		int tilehigh = m_spriteram[i + 4] & 0x04;
 		int tilehigh2 = m_spriteram[i + 0] & 0x04;
@@ -361,8 +364,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 
 		}
 
-
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, flipy, x, y, 0);
+		gfx->zoom_transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, flipy, x, y, doublesize ? 0x20000 : 0x10000, doublesize ? 0x20000 : 0x10000, 0);
 	}
 }
 
@@ -424,13 +426,13 @@ uint8_t trkfldch_state::tilemap_scroll_window_r(int which, uint8_t reg, uint16_t
 	return ret;
 }
 
-READ8_MEMBER(trkfldch_state::tmap0_scroll_window_r)
+uint8_t trkfldch_state::tmap0_scroll_window_r(offs_t offset)
 {
 	uint8_t ret = tilemap_scroll_window_r(0, offset, 0x7820);
 	return ret;
 }
 
-READ8_MEMBER(trkfldch_state::tmap1_scroll_window_r)
+uint8_t trkfldch_state::tmap1_scroll_window_r(offs_t offset)
 {
 	uint8_t ret = tilemap_scroll_window_r(1, offset, 0x7832);
 	return ret;
@@ -520,12 +522,12 @@ void trkfldch_state::tilemap_scroll_window_w(int which, uint8_t reg, uint8_t dat
 	}
 }
 
-WRITE8_MEMBER(trkfldch_state::tmap0_scroll_window_w)
+void trkfldch_state::tmap0_scroll_window_w(offs_t offset, uint8_t data)
 {
 	tilemap_scroll_window_w(0, offset, data, 0x7820);
 }
 
-WRITE8_MEMBER(trkfldch_state::tmap1_scroll_window_w)
+void trkfldch_state::tmap1_scroll_window_w(offs_t offset, uint8_t data)
 {
 	tilemap_scroll_window_w(1, offset, data, 0x7832);
 }
@@ -533,7 +535,7 @@ WRITE8_MEMBER(trkfldch_state::tmap1_scroll_window_w)
 
 
 
-READ8_MEMBER(trkfldch_state::dmaregs_r)
+uint8_t trkfldch_state::dmaregs_r(offs_t offset)
 {
 	uint8_t ret = m_dmaregs[offset];
 
@@ -552,7 +554,7 @@ READ8_MEMBER(trkfldch_state::dmaregs_r)
 	return ret;
 }
 
-WRITE8_MEMBER(trkfldch_state::dmaregs_w)
+void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 {
 	m_dmaregs[offset] = data;
 
@@ -667,14 +669,14 @@ WRITE8_MEMBER(trkfldch_state::dmaregs_w)
 }
 
 
-READ8_MEMBER(trkfldch_state::modebankregs_r)
+uint8_t trkfldch_state::modebankregs_r(offs_t offset)
 {
 	uint8_t ret = m_modebank[offset];
 	logerror("%s: modebankregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
-WRITE8_MEMBER(trkfldch_state::modebankregs_w)
+void trkfldch_state::modebankregs_w(offs_t offset, uint8_t data)
 {
 	m_modebank[offset] = data;
 
@@ -727,14 +729,14 @@ WRITE8_MEMBER(trkfldch_state::modebankregs_w)
 }
 
 
-READ8_MEMBER(trkfldch_state::tilemapbase_r)
+uint8_t trkfldch_state::tilemapbase_r(offs_t offset)
 {
 	uint8_t ret = m_tilemapbase[offset];
 	logerror("%s: tilemapbase_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
-WRITE8_MEMBER(trkfldch_state::tilemapbase_w)
+void trkfldch_state::tilemapbase_w(offs_t offset, uint8_t data)
 {
 	m_tilemapbase[offset] = data;
 	logerror("%s: tilemapbase_w %04x %02x (tilebase %d)\n", machine().describe_context(), offset, data, offset);
@@ -773,11 +775,11 @@ void trkfldch_state::vectors_map(address_map &map)
 	map(0x00, 0x1f).r(FUNC(trkfldch_state::read_vector));
 }
 
-READ8_MEMBER(trkfldch_state::read_vector)
+uint8_t trkfldch_state::read_vector(offs_t offset)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	/* what appears to be a table of vectors apepars at the START of ROM, maybe this gets copied to RAM, maybe used directly?
+	/* what appears to be a table of vectors appears at the START of ROM, maybe this gets copied to RAM, maybe used directly?
 	00 : (invalid)
 	02 : (invalid)
 	04 : 0xA2C6  (dummy)
@@ -992,6 +994,26 @@ static INPUT_PORTS_START( abl4play )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( shtscore )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x8_layout =
 {
@@ -1086,7 +1108,7 @@ GFXDECODE_END
 
 */
 
-READ8_MEMBER(trkfldch_state::sysregs_r)
+uint8_t trkfldch_state::sysregs_r(offs_t offset)
 {
 	uint8_t ret = m_sysregs[offset];
 
@@ -1130,7 +1152,7 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 }
 
 
-WRITE8_MEMBER(trkfldch_state::sysregs_w)
+void trkfldch_state::sysregs_w(offs_t offset, uint8_t data)
 {
 	m_sysregs[offset] = data;
 
@@ -1169,7 +1191,7 @@ WRITE8_MEMBER(trkfldch_state::sysregs_w)
 
 
 
-READ8_MEMBER(trkfldch_state::unkregs_r)
+uint8_t trkfldch_state::unkregs_r(offs_t offset)
 {
 	uint8_t ret = m_unkregs[offset];
 
@@ -1244,7 +1266,7 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 
 
-WRITE8_MEMBER(trkfldch_state::unkregs_w)
+void trkfldch_state::unkregs_w(offs_t offset, uint8_t data)
 {
 	m_unkregs[offset] = data;
 
@@ -1440,8 +1462,12 @@ ROM_START( abl4play )
 	ROM_LOAD( "abl4play.bin", 0x000000, 0x800000, CRC(5d57fb70) SHA1(34cdf80dc8cb08e5cd98c724268e4c5f483780d7) )
 ROM_END
 
+ROM_START( shtscore )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "shootnscore.bin", 0x000000, 0x400000, CRC(37aa16bd) SHA1(609d0191301480c51ec1188c67101a4e88a5170f) )
+ROM_END
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd", "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
+CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      empty_init,    "Halsall / time4toys.com / Electronic Games", "Shoot n' Score", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

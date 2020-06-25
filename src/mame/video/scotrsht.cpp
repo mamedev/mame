@@ -33,19 +33,19 @@ void scotrsht_state::scotrsht_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(scotrsht_state::videoram_w)
+void scotrsht_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(scotrsht_state::colorram_w)
+void scotrsht_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(scotrsht_state::charbank_w)
+void scotrsht_state::charbank_w(uint8_t data)
 {
 	if (m_charbank != (data & 0x01))
 	{
@@ -56,7 +56,7 @@ WRITE8_MEMBER(scotrsht_state::charbank_w)
 	// other bits unknown
 }
 
-WRITE8_MEMBER(scotrsht_state::palettebank_w)
+void scotrsht_state::palettebank_w(uint8_t data)
 {
 	if (m_palette_bank != ((data & 0x70) >> 4))
 	{
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(scotrsht_state::get_bg_tile_info)
 
 	// data & 0x80 -> tile priority?
 
-	SET_TILE_INFO_MEMBER(0, code, color, flag);
+	tileinfo.set(0, code, color, flag);
 }
 
 /* Same as Jailbreak + palette bank */

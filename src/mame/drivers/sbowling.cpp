@@ -80,13 +80,13 @@ private:
 	uint8_t m_pix_sh;
 	uint8_t m_pix[2];
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(pix_shift_w);
-	DECLARE_WRITE8_MEMBER(pix_data_w);
-	DECLARE_READ8_MEMBER(pix_data_r);
-	DECLARE_WRITE8_MEMBER(system_w);
-	DECLARE_WRITE8_MEMBER(graph_control_w);
-	DECLARE_READ8_MEMBER(controls_r);
+	void videoram_w(offs_t offset, uint8_t data);
+	void pix_shift_w(uint8_t data);
+	void pix_data_w(uint8_t data);
+	uint8_t pix_data_r();
+	void system_w(offs_t offset, uint8_t data);
+	void graph_control_w(uint8_t data);
+	uint8_t controls_r();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 	uint8_t *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int flip)
@@ -119,7 +119,7 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 	tmpbitmap->pix16(y, x) = col;
 }
 
-WRITE8_MEMBER(sbowling_state::videoram_w)
+void sbowling_state::videoram_w(offs_t offset, uint8_t data)
 {
 	int flip = flip_screen();
 	int x,y,v1,v2;
@@ -165,21 +165,20 @@ void sbowling_state::video_start()
 
 void sbowling_state::postload()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (int offs = 0; offs < 0x4000; offs++)
-		videoram_w(space, offs, m_videoram[offs]);
+		videoram_w(offs, m_videoram[offs]);
 }
 
-WRITE8_MEMBER(sbowling_state::pix_shift_w)
+void sbowling_state::pix_shift_w(uint8_t data)
 {
 	m_pix_sh = data;
 }
-WRITE8_MEMBER(sbowling_state::pix_data_w)
+void sbowling_state::pix_data_w(uint8_t data)
 {
 	m_pix[0] = m_pix[1];
 	m_pix[1] = data;
 }
-READ8_MEMBER(sbowling_state::pix_data_r)
+uint8_t sbowling_state::pix_data_r()
 {
 	uint32_t p1, p0;
 	int res;
@@ -207,7 +206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::interrupt)
 
 }
 
-WRITE8_MEMBER(sbowling_state::system_w)
+void sbowling_state::system_w(offs_t offset, uint8_t data)
 {
 	/*
 	    76543210
@@ -221,12 +220,12 @@ WRITE8_MEMBER(sbowling_state::system_w)
 	flip_screen_set(BIT(data, 3));
 
 	for (int offs = 0; offs < 0x4000; offs++)
-			videoram_w(space, offs, m_videoram[offs]);
+			videoram_w(offs, m_videoram[offs]);
 
 	m_system = data;
 }
 
-WRITE8_MEMBER(sbowling_state::graph_control_w)
+void sbowling_state::graph_control_w(uint8_t data)
 {
 	/*
 	    76543210
@@ -244,7 +243,7 @@ WRITE8_MEMBER(sbowling_state::graph_control_w)
 	m_tilemap->mark_all_dirty();
 }
 
-READ8_MEMBER(sbowling_state::controls_r)
+uint8_t sbowling_state::controls_r()
 {
 	if (m_system & 2)
 		return ioport("TRACKY")->read();

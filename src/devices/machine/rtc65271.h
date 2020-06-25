@@ -26,6 +26,11 @@ public:
 	void rtc_w(offs_t offset, uint8_t data);
 	void xram_w(offs_t offset, uint8_t data);
 
+	uint8_t read(int xramsel, offs_t offset);
+	void write(int xramsel, offs_t offset, uint8_t data);
+
+	DECLARE_READ_LINE_MEMBER(intrq_r);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,8 +40,6 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
-	uint8_t read(int xramsel, offs_t offset);
-	void write(int xramsel, offs_t offset, uint8_t data);
 	void field_interrupts();
 
 	TIMER_CALLBACK_MEMBER(rtc_SQW_cb);

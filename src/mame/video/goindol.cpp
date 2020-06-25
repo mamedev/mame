@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[2 * tile_index + 1];
 	int attr = m_fg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[2 * tile_index + 1];
 	int attr = m_bg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
@@ -60,13 +60,13 @@ void goindol_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(goindol_state::goindol_fg_videoram_w)
+void goindol_state::goindol_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(goindol_state::goindol_bg_videoram_w)
+void goindol_state::goindol_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

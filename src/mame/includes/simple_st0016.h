@@ -35,14 +35,14 @@ private:
 
 	required_memory_bank m_mainbank;
 
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_select_w);
-	DECLARE_READ32_MEMBER(latch32_r);
-	DECLARE_WRITE32_MEMBER(latch32_w);
-	DECLARE_READ8_MEMBER(latch8_r);
-	DECLARE_WRITE8_MEMBER(latch8_w);
+	uint8_t mux_r();
+	void mux_select_w(uint8_t data);
+	uint32_t latch32_r(offs_t offset);
+	void latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t latch8_r(offs_t offset);
+	void latch8_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(uint8_t data);
 
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(st0016);

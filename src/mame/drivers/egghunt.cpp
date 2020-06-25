@@ -84,14 +84,14 @@ private:
 	required_shared_ptr<uint8_t> m_atram;
 	uint8_t     m_bgram[0x1000];
 	uint8_t     m_spram[0x1000];
-	DECLARE_READ8_MEMBER(egghunt_bgram_r);
-	DECLARE_WRITE8_MEMBER(egghunt_bgram_w);
-	DECLARE_WRITE8_MEMBER(egghunt_atram_w);
-	DECLARE_WRITE8_MEMBER(egghunt_gfx_banking_w);
-	DECLARE_WRITE8_MEMBER(egghunt_vidram_bank_w);
-	DECLARE_WRITE8_MEMBER(egghunt_soundlatch_w);
-	DECLARE_READ8_MEMBER(egghunt_okibanking_r);
-	DECLARE_WRITE8_MEMBER(egghunt_okibanking_w);
+	uint8_t egghunt_bgram_r(offs_t offset);
+	void egghunt_bgram_w(offs_t offset, uint8_t data);
+	void egghunt_atram_w(offs_t offset, uint8_t data);
+	void egghunt_gfx_banking_w(uint8_t data);
+	void egghunt_vidram_bank_w(uint8_t data);
+	void egghunt_soundlatch_w(uint8_t data);
+	uint8_t egghunt_okibanking_r();
+	void egghunt_okibanking_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -162,10 +162,10 @@ TILE_GET_INFO_MEMBER(egghunt_state::get_bg_tile_info)
 //          code += 0;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, colour, 0);
+	tileinfo.set(0, code, colour, 0);
 }
 
-READ8_MEMBER(egghunt_state::egghunt_bgram_r)
+uint8_t egghunt_state::egghunt_bgram_r(offs_t offset)
 {
 	if (m_vidram_bank)
 	{
@@ -177,7 +177,7 @@ READ8_MEMBER(egghunt_state::egghunt_bgram_r)
 	}
 }
 
-WRITE8_MEMBER(egghunt_state::egghunt_bgram_w)
+void egghunt_state::egghunt_bgram_w(offs_t offset, uint8_t data)
 {
 	if (m_vidram_bank)
 	{
@@ -190,7 +190,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_bgram_w)
 	}
 }
 
-WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
+void egghunt_state::egghunt_atram_w(offs_t offset, uint8_t data)
 {
 	m_atram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -212,7 +212,7 @@ uint32_t egghunt_state::screen_update_egghunt(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(egghunt_state::egghunt_gfx_banking_w)
+void egghunt_state::egghunt_gfx_banking_w(uint8_t data)
 {
 	// data & 0x03 is used for tile banking
 	// data & 0x30 is used for sprites banking
@@ -221,23 +221,23 @@ WRITE8_MEMBER(egghunt_state::egghunt_gfx_banking_w)
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
+void egghunt_state::egghunt_vidram_bank_w(uint8_t data)
 {
 	m_vidram_bank = data & 1;
 }
 
-WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
+void egghunt_state::egghunt_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(egghunt_state::egghunt_okibanking_r)
+uint8_t egghunt_state::egghunt_okibanking_r()
 {
 	return m_okibanking;
 }
 
-WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
+void egghunt_state::egghunt_okibanking_w(uint8_t data)
 {
 	m_okibanking = data;
 	m_oki->set_rom_bank((data >> 4) & 1);

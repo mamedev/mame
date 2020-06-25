@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
 #include "includes/blstroid.h"
@@ -24,7 +25,7 @@ TILE_GET_INFO_MEMBER(blstroid_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -73,6 +74,10 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 {
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_irq_on_timer = timer_alloc(TIMER_IRQ_ON);
+
+	m_scanline_int_state = false;
+
+	save_item(NAME(m_scanline_int_state));
 }
 
 
@@ -89,12 +94,11 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case TIMER_IRQ_OFF:
 			/* clear the interrupt */
-			scanline_int_ack_w();
+			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 			break;
 		case TIMER_IRQ_ON:
 			/* generate the interrupt */
-			scanline_int_write_line(1);
-			update_interrupts();
+			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 			break;
 		default:
 			atarigen_state::device_timer(timer, id, param, ptr);
@@ -103,8 +107,9 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-void blstroid_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(blstroid_state::scanline_update)
 {
+	int scanline = param;
 	int offset = (scanline / 8) * 64 + 40;
 
 	/* check for interrupts */
@@ -118,10 +123,10 @@ void blstroid_state::scanline_update(screen_device &screen, int scanline)
 
 			/* set a timer to turn the interrupt on at HBLANK of the 7th scanline */
 			/* and another to turn it off one scanline later */
-			int width = screen.width();
-			int vpos  = screen.vpos();
-			attotime period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
-			attotime period_off = screen.time_until_pos(vpos + 8, width * 0.9);
+			int width = m_screen->width();
+			int vpos  = m_screen->vpos();
+			attotime period_on  = m_screen->time_until_pos(vpos + 7, width * 0.9);
+			attotime period_off = m_screen->time_until_pos(vpos + 8, width * 0.9);
 
 			m_irq_on_timer->adjust(period_on);
 			m_irq_off_timer->adjust(period_off);

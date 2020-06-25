@@ -7,7 +7,6 @@
 
 #include "nld_7473.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -48,7 +47,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(7473A, 7473)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(7473A, 7473) { }
+		NETLIB_CONSTRUCTOR(7473A) { }
 
 	};
 

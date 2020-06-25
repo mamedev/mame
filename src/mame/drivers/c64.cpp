@@ -102,28 +102,28 @@ public:
 
 	void check_interrupts();
 	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);
-	uint8_t read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba);
-	void write_memory(address_space &space, offs_t offset, uint8_t data, int aec, int ba);
+	uint8_t read_memory(offs_t offset, offs_t va, int aec, int ba);
+	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r();
+	uint8_t sid_poty_r();
 
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_WRITE8_MEMBER( cia1_pa_w );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
-	DECLARE_WRITE8_MEMBER( cia1_pb_w );
+	uint8_t cia1_pa_r();
+	void cia1_pa_w(uint8_t data);
+	uint8_t cia1_pb_r();
+	void cia1_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cia2_pa_r );
-	DECLARE_WRITE8_MEMBER( cia2_pa_w );
+	uint8_t cia2_pa_r();
+	void cia2_pa_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_restore );
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
@@ -131,8 +131,8 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c64);
 
-	DECLARE_READ8_MEMBER( cia2_pb_r );
-	DECLARE_WRITE8_MEMBER( cia2_pb_w );
+	uint8_t cia2_pb_r();
+	void cia2_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
@@ -179,8 +179,8 @@ public:
 		: c64_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 	void ntsc_sx(machine_config &config);
 	void ntsc_dx(machine_config &config);
 	void pal_sx(machine_config &config);
@@ -205,11 +205,11 @@ public:
 		: c64c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
+	uint8_t cia1_pa_r();
+	uint8_t cia1_pb_r();
 	void pal_gs(machine_config &config);
 };
 
@@ -459,7 +459,7 @@ int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba)
+uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 {
 	int rw = 1;
 	int io1 = 1, io2 = 1;
@@ -550,7 +550,7 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 //  write_memory -
 //-------------------------------------------------
 
-void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, int aec, int ba)
+void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 {
 	int rw = 0;
 	offs_t va = 0;
@@ -622,14 +622,14 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::read )
+uint8_t c64_state::read(offs_t offset)
 {
 	int aec = 1, ba = 1;
 
 	// VIC address bus is floating
 	offs_t va = 0x3fff;
 
-	return read_memory(space, offset, va, aec, ba);
+	return read_memory(offset, va, aec, ba);
 }
 
 
@@ -637,11 +637,11 @@ READ8_MEMBER( c64_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64_state::write )
+void c64_state::write(offs_t offset, uint8_t data)
 {
 	int aec = 1, ba = 1;
 
-	write_memory(space, offset, data, aec, ba);
+	write_memory(offset, data, aec, ba);
 }
 
 
@@ -649,7 +649,7 @@ WRITE8_MEMBER( c64_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::vic_videoram_r )
+uint8_t c64_state::vic_videoram_r(offs_t offset)
 {
 	int aec = m_vic->aec_r(), ba = m_vic->ba_r();
 	offs_t va = offset;
@@ -657,7 +657,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 	// A15/A14 are not connected to VIC so they are floating
 	//offset |= 0xc000;
 
-	return read_memory(space, offset, va, aec, ba);
+	return read_memory(offset, va, aec, ba);
 }
 
 
@@ -665,7 +665,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::vic_colorram_r )
+uint8_t c64_state::vic_colorram_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -861,7 +861,7 @@ INPUT_PORTS_END
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::sid_potx_r )
+uint8_t c64_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
 
@@ -888,7 +888,7 @@ READ8_MEMBER( c64_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( c64_state::sid_poty_r )
+uint8_t c64_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
 
@@ -920,7 +920,7 @@ READ8_MEMBER( c64_state::sid_poty_r )
 //  MOS6526_INTERFACE( cia1_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::cia1_pa_r )
+uint8_t c64_state::cia1_pa_r()
 {
 	/*
 
@@ -968,7 +968,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cia1_pa_w )
+void c64_state::cia1_pa_w(uint8_t data)
 {
 	/*
 
@@ -988,7 +988,7 @@ WRITE8_MEMBER( c64_state::cia1_pa_w )
 	m_joy2->joy_w(data & 0x1f);
 }
 
-READ8_MEMBER( c64_state::cia1_pb_r )
+uint8_t c64_state::cia1_pb_r()
 {
 	/*
 
@@ -1028,7 +1028,7 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cia1_pb_w )
+void c64_state::cia1_pb_w(uint8_t data)
 {
 	/*
 
@@ -1050,7 +1050,7 @@ WRITE8_MEMBER( c64_state::cia1_pb_w )
 	m_vic->lp_w(BIT(data, 4));
 }
 
-READ8_MEMBER( c64gs_state::cia1_pa_r )
+uint8_t c64gs_state::cia1_pa_r()
 {
 	/*
 
@@ -1078,7 +1078,7 @@ READ8_MEMBER( c64gs_state::cia1_pa_r )
 	return data;
 }
 
-READ8_MEMBER( c64gs_state::cia1_pb_r )
+uint8_t c64gs_state::cia1_pb_r()
 {
 	/*
 
@@ -1111,7 +1111,7 @@ READ8_MEMBER( c64gs_state::cia1_pb_r )
 //  MOS6526_INTERFACE( cia2_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::cia2_pa_r )
+uint8_t c64_state::cia2_pa_r()
 {
 	/*
 
@@ -1140,7 +1140,7 @@ READ8_MEMBER( c64_state::cia2_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cia2_pa_w )
+void c64_state::cia2_pa_w(uint8_t data)
 {
 	/*
 
@@ -1170,12 +1170,12 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 	m_iec->host_data_w(!BIT(data, 5));
 }
 
-READ8_MEMBER( c64_state::cia2_pb_r )
+uint8_t c64_state::cia2_pb_r()
 {
 	return m_user_pb;
 }
 
-WRITE8_MEMBER( c64_state::cia2_pb_w )
+void c64_state::cia2_pb_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1191,7 +1191,7 @@ WRITE8_MEMBER( c64_state::cia2_pb_w )
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::cpu_r )
+uint8_t c64_state::cpu_r()
 {
 	/*
 
@@ -1213,7 +1213,7 @@ READ8_MEMBER( c64_state::cpu_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_state::cpu_w )
+void c64_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -1245,7 +1245,7 @@ WRITE8_MEMBER( c64_state::cpu_w )
 //  M6510_INTERFACE( sx64_cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( sx64_state::cpu_r )
+uint8_t sx64_state::cpu_r()
 {
 	/*
 
@@ -1263,7 +1263,7 @@ READ8_MEMBER( sx64_state::cpu_r )
 	return 0x07;
 }
 
-WRITE8_MEMBER( sx64_state::cpu_w )
+void sx64_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -1289,7 +1289,7 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 //  M6510_INTERFACE( c64gs_cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64gs_state::cpu_r )
+uint8_t c64gs_state::cpu_r()
 {
 	/*
 
@@ -1307,7 +1307,7 @@ READ8_MEMBER( c64gs_state::cpu_r )
 	return 0x07;
 }
 
-WRITE8_MEMBER( c64gs_state::cpu_w )
+void c64gs_state::cpu_w(uint8_t data)
 {
 	/*
 

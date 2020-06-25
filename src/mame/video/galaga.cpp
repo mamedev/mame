@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	int color = m_videoram[tile_index + 0x400] & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
 			color,
 			flip_screen() ? TILE_FLIPX : 0);
@@ -155,7 +155,7 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(galaga_state::galaga_videoram_w)
+void galaga_state::galaga_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);

@@ -79,15 +79,15 @@
 #define VIDEO_UNKNOWN58         m_video[0x58/2] /* $01c0 at startup */
 #define VIDEO_UNKNOWN5a         m_video[0x5a/2] /* $01c0 at startup */
 #define VIDEO_UNKNOWN5c         m_video[0x5c/2] /* $01cf at startup */
-#define VIDEO_UNKNOWN5e         m_video[0x5e/2] /* $01cf at startup */
+#define VIDEO_UNKNOWN5e         m_video[0x5e/2] /* $01cf at startup, kept $01bf in running game, $01c3 at testing */
 #define VIDEO_UNKNOWN60         m_video[0x60/2] /* $01e3 at startup */
 #define VIDEO_UNKNOWN62         m_video[0x62/2] /* $01cf at startup */
 #define VIDEO_UNKNOWN64         m_video[0x64/2] /* $01ff at startup */
-#define VIDEO_UNKNOWN66         m_video[0x66/2] /* $0183 at startup */
+#define VIDEO_UNKNOWN66         m_video[0x66/2] /* $0183 at startup, kept $01bf in running game, $1ff at testing */
 #define VIDEO_UNKNOWN68         m_video[0x68/2] /* $01ff at startup */
 #define VIDEO_UNKNOWN6a         m_video[0x6a/2] /* $000f at startup */
 #define VIDEO_UNKNOWN6c         m_video[0x6c/2] /* $018f at startup */
-#define VIDEO_UNKNOWN6e         m_video[0x6e/2] /* $01ff at startup */
+#define VIDEO_UNKNOWN6e         m_video[0x6e/2] /* $01ff at startup, kept $01ff in running game, $01c3 at testing */
 #define VIDEO_UNKNOWN70         m_video[0x70/2] /* $000f at startup */
 #define VIDEO_UNKNOWN72         m_video[0x72/2] /* $000f at startup */
 #define VIDEO_UNKNOWN74         m_video[0x74/2] /* $01ff at startup */
@@ -260,7 +260,7 @@ void itech32_state::itech020_plane_w(u8 data)
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
+void itech32_state::bloodstm_paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))

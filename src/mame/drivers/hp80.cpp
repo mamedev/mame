@@ -31,6 +31,35 @@
 // - Beeper & 1-bit bitbanged sound
 // - I/O slots
 //
+// The HP86B was also produced with support for various non-English European languages.
+// There were 3 major differences between standard (i.e. English only) and international models:
+// - The keyboard controller IC translated from the matrix position to key code in the
+//   standard model whereas it only reported the row/column position in the international models.
+//   In the latter case the decoding was done in software.
+// - The international models had an extra built-in ROM (the "Language" ROM) that handled the
+//   decoding of various keyboard layouts and also provided some extra BASIC instructions to
+//   deal with non-English text.
+// - There were 3 video controllers that displayed different character shapes in the 00..1b range.
+//
+// This table summarizes the differences between hp86b models.
+//
+// | Model   | Kb layout        | Kb controller | Has           | Video controller | Emulator  |
+// |         |                  | decodes key?  | Language ROM? | version          |           |
+// |---------+------------------+---------------+---------------+------------------+-----------|
+// | Std     | English          | Yes           | No            | 1st              | hp86b     |
+// | Opt 001 | Swedish/Finnish  | No            | Yes           | 2nd              | hp86b_001 |
+// | Opt 002 | Danish/Norwegian | No            | Yes           | 2nd              | hp86b_001 |
+// | Opt 004 | German           | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 006 | Spanish          | No            | Yes           | 2nd              | hp86b_001 |
+// | Opt 008 | French           | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 009 | Italian          | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 010 | Dutch            | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 020 | Swiss German     | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 021 | Swiss French     | No            | Yes           | 3rd              | hp86b_004 |
+//
+// Special thanks to Everett Kaser for his excellent reverse engineering of Language ROM and for
+// all his support.
+//
 // Thanks to all the people who made docs available & dumped the various ROMs.
 //
 // References for these systems:
@@ -102,7 +131,8 @@ static constexpr unsigned CPU_CLOCK = 613000;
 // Time taken by hw timer updating (semi-made up) (in µsec)
 static constexpr unsigned TIMER_BUSY_USEC   = 128;
 static constexpr unsigned IRQ_KEYBOARD_BIT  = 0;
-static constexpr unsigned IRQ_TIMER0_BIT    = 1;
+static constexpr unsigned IRQ_INTKEYB_BIT   = 1;
+static constexpr unsigned IRQ_TIMER0_BIT    = 2;
 static constexpr unsigned TIMER_COUNT       = 4;
 static constexpr unsigned IRQ_IOP0_BIT      = IRQ_TIMER0_BIT + TIMER_COUNT;
 // Maximum count of I/O processors (the same thing as count of I/O slots)
@@ -116,7 +146,7 @@ static constexpr unsigned NO_IRQ            = IRQ_BIT_COUNT;
 class hp80_base_state : public driver_device
 {
 public:
-	hp80_base_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp80_base_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb = false);
 
 protected:
 	void hp80_base(machine_config &config);
@@ -125,30 +155,31 @@ protected:
 	virtual void rombank_mem_map(address_map &map);
 	virtual void unmap_optroms(address_space &space);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	uint8_t intack_r();
 
-	DECLARE_WRITE8_MEMBER(ginten_w);
-	DECLARE_WRITE8_MEMBER(gintdis_w);
-	DECLARE_READ8_MEMBER(keysts_r);
-	DECLARE_WRITE8_MEMBER(keysts_w);
-	DECLARE_READ8_MEMBER(keycod_r);
-	DECLARE_WRITE8_MEMBER(keycod_w);
-	DECLARE_READ8_MEMBER(clksts_r);
-	DECLARE_WRITE8_MEMBER(clksts_w);
-	DECLARE_READ8_MEMBER(clkdat_r);
-	DECLARE_WRITE8_MEMBER(clkdat_w);
-	DECLARE_WRITE8_MEMBER(rselec_w);
-	DECLARE_READ8_MEMBER(intrsc_r);
-	DECLARE_WRITE8_MEMBER(intrsc_w);
+	void ginten_w(uint8_t data);
+	void gintdis_w(uint8_t data);
+	uint8_t keysts_r();
+	void keysts_w(uint8_t data);
+	uint8_t keycod_r();
+	void keycod_w(uint8_t data);
+	uint8_t clksts_r();
+	void clksts_w(uint8_t data);
+	uint8_t clkdat_r();
+	void clkdat_w(uint8_t data);
+	void rselec_w(uint8_t data);
+	uint8_t intrsc_r();
+	void intrsc_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(clk_busy_timer);
 
-	DECLARE_WRITE8_MEMBER(irl_w);
-	DECLARE_WRITE8_MEMBER(halt_w);
+	void irl_w(offs_t offset, uint8_t data);
+	void halt_w(offs_t offset, uint8_t data);
 
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<timer_device> m_clk_busy_timer;
@@ -158,14 +189,16 @@ protected:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_modkeys;
+	optional_ioport m_io_language;
 	required_device_array<hp80_optrom_device , 6> m_rom_drawers;
 	required_device<address_map_bank_device> m_rombank;
 	required_device_array<hp80_io_slot_device , IOP_COUNT> m_io_slots;
 
 	bool m_global_int_en;
 	uint16_t m_int_serv;
-	unsigned m_top_pending;
 	uint16_t m_int_acked;
+	unsigned m_top_acked;
+	unsigned m_top_pending;
 	uint16_t m_int_en;
 	uint8_t m_halt_lines;
 
@@ -174,7 +207,11 @@ protected:
 	bool m_kb_enable;
 	bool m_kb_pressed;
 	bool m_kb_flipped;
+	bool m_kb_lang_readout;
+	bool m_kb_raw_readout;
 	uint8_t m_kb_keycode;
+	uint8_t m_raw_keycode;
+	const bool m_has_int_keyb;
 
 	// Timers
 	typedef struct {
@@ -188,15 +225,18 @@ protected:
 	uint8_t m_timer_idx;
 	bool m_clk_busy;
 
-	bool kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& keycode);
+	bool kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col);
+	unsigned get_kb_irq() const;
 
 	void irq_w(unsigned n_irq , bool state);
 	void irq_en_w(unsigned n_irq , bool state);
+	void release_irq(unsigned n_irq);
+	static unsigned get_top_irq(uint16_t irqs);
 	void update_int_bits();
 	void update_irl();
 };
 
-hp80_base_state::hp80_base_state(const machine_config &mconfig, device_type type, const char *tag)
+hp80_base_state::hp80_base_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb)
 	: driver_device(mconfig , type , tag)
 	, m_cpu(*this , "cpu")
 	, m_clk_busy_timer(*this , "clk_busy_timer")
@@ -206,9 +246,11 @@ hp80_base_state::hp80_base_state(const machine_config &mconfig, device_type type
 	, m_io_key1(*this , "KEY1")
 	, m_io_key2(*this , "KEY2")
 	, m_io_modkeys(*this, "MODKEYS")
+	, m_io_language(*this , "LANGUAGE")
 	, m_rom_drawers(*this , "drawer%u" , 1)
 	, m_rombank(*this , "rombank")
 	, m_io_slots(*this , "slot%u" , 1)
+	, m_has_int_keyb(has_int_keyb)
 {
 }
 
@@ -216,7 +258,8 @@ void hp80_base_state::hp80_base(machine_config &config)
 {
 	HP_CAPRICORN(config, m_cpu, CPU_CLOCK);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp80_base_state::cpu_mem_map);
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp80_base_state::irq_callback));
+	m_cpu->intack_cb().set(FUNC(hp80_base_state::intack_r));
+	config.set_perfect_quantum(m_cpu);
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp80_base_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
@@ -274,11 +317,31 @@ void hp80_base_state::unmap_optroms(address_space &space)
 {
 }
 
+void hp80_base_state::machine_start()
+{
+	save_item(NAME(m_global_int_en));
+	save_item(NAME(m_int_serv));
+	save_item(NAME(m_int_acked));
+	save_item(NAME(m_top_acked));
+	save_item(NAME(m_top_pending));
+	save_item(NAME(m_int_en));
+	save_item(NAME(m_halt_lines));
+	save_pointer(NAME(m_kb_state) , 3);
+	save_item(NAME(m_kb_enable));
+	save_item(NAME(m_kb_pressed));
+	save_item(NAME(m_kb_flipped));
+	save_item(NAME(m_kb_lang_readout));
+	save_item(NAME(m_kb_raw_readout));
+	save_item(NAME(m_kb_keycode));
+	save_item(NAME(m_raw_keycode));
+}
+
 void hp80_base_state::machine_reset()
 {
 	m_int_serv = 0;
-	m_top_pending = NO_IRQ;
 	m_int_acked = 0;
+	m_top_acked = NO_IRQ;
+	m_top_pending = NO_IRQ;
 	m_int_en = 0;
 	m_global_int_en = false;
 	m_kb_state[ 0 ] = 0;
@@ -288,6 +351,8 @@ void hp80_base_state::machine_reset()
 	m_kb_enable = true;
 	m_kb_pressed = false;
 	m_kb_flipped = false;
+	m_kb_lang_readout = false;
+	m_kb_raw_readout = false;
 	for (auto& timer : m_hw_timer) {
 		for (unsigned i = 0; i < 4; i++) {
 			timer.m_timer_cnt[ i ] = 0;
@@ -323,6 +388,7 @@ void hp80_base_state::machine_reset()
 // Vector table (indexed by bit no. in m_int_serv)
 static const uint8_t vector_table[] = {
 	0x04,   // Keyboard
+	0x12,   // International keyboard (or is it 0x14?)
 	0x08,   // Timer 0
 	0x0a,   // Timer 1
 	0x0c,   // Timer 2
@@ -334,10 +400,11 @@ static const uint8_t vector_table[] = {
 	0x00    // No IRQ
 };
 
-IRQ_CALLBACK_MEMBER(hp80_base_state::irq_callback)
+uint8_t hp80_base_state::intack_r()
 {
-	LOG_IRQ("IRQ ACK %u\n" , m_top_pending);
+	LOG_IRQ("INTACK %u %u\n" , m_top_pending , m_top_acked);
 	BIT_SET(m_int_acked , m_top_pending);
+	m_top_acked = m_top_pending;
 	if (m_top_pending > IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT) {
 		// Interrupts are disabled in all I/O translators of higher priority than
 		// the one being serviced
@@ -349,26 +416,36 @@ IRQ_CALLBACK_MEMBER(hp80_base_state::irq_callback)
 	return vector_table[ m_top_pending ];
 }
 
-WRITE8_MEMBER(hp80_base_state::ginten_w)
+void hp80_base_state::ginten_w(uint8_t data)
 {
+	LOG_IRQ("GINTEN\n");
 	m_global_int_en = true;
 	update_irl();
 }
 
-WRITE8_MEMBER(hp80_base_state::gintdis_w)
+void hp80_base_state::gintdis_w(uint8_t data)
 {
+	LOG_IRQ("GINTDIS\n");
 	m_global_int_en = false;
 	update_irl();
 }
 
-READ8_MEMBER(hp80_base_state::keysts_r)
+uint8_t hp80_base_state::keysts_r()
 {
 	uint8_t res = 0;
-	if (BIT(m_int_en , IRQ_KEYBOARD_BIT)) {
+	if (BIT(m_int_en , get_kb_irq())) {
 		BIT_SET(res , 0);
 	}
 	if (m_kb_pressed) {
 		BIT_SET(res , 1);
+	}
+	if (m_has_int_keyb) {
+		if (m_kb_flipped) {
+			BIT_SET(res , 2);
+		}
+		if (BIT(m_io_modkeys->read() , 2)) {
+			BIT_SET(res , 6);
+		}
 	}
 	if (BIT(m_io_modkeys->read() , 0)) {
 		BIT_SET(res , 3);
@@ -379,39 +456,48 @@ READ8_MEMBER(hp80_base_state::keysts_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp80_base_state::keysts_w)
+void hp80_base_state::keysts_w(uint8_t data)
 {
 	if (BIT(data , 0)) {
-		irq_en_w(IRQ_KEYBOARD_BIT , true);
+		irq_en_w(get_kb_irq() , true);
 	} else if (BIT(data , 1)) {
-		irq_en_w(IRQ_KEYBOARD_BIT , false);
+		irq_en_w(get_kb_irq() , false);
+	}
+	if (m_has_int_keyb) {
+		m_kb_lang_readout = BIT(data , 2);
+		m_kb_raw_readout = BIT(data , 3);
 	}
 	m_dac->write(BIT(data , 5));
 	m_beep->set_state(BIT(data , 6));
 	if (BIT(data , 7)) {
 		m_kb_flipped = !m_kb_flipped;
 	}
-	if (data & 0x1c) {
-		LOG("Funny write to keysts=%02x\n" , data);
-	}
 }
 
-READ8_MEMBER(hp80_base_state::keycod_r)
+uint8_t hp80_base_state::keycod_r()
 {
-	return m_kb_keycode;
-}
-
-WRITE8_MEMBER(hp80_base_state::keycod_w)
-{
-	if (data == 1) {
-		irq_w(IRQ_KEYBOARD_BIT , false);
-		m_kb_enable = true;
+	if (m_kb_lang_readout && m_io_language) {
+		return m_io_language->read();
+	} else if (m_kb_raw_readout) {
+		return m_raw_keycode;
 	} else {
-		LOG("Funny write to keycod=%02x\n" , data);
+		return m_kb_keycode;
 	}
 }
 
-READ8_MEMBER(hp80_base_state::clksts_r)
+void hp80_base_state::keycod_w(uint8_t data)
+{
+	if (m_kb_raw_readout) {
+		m_kb_keycode = data;
+	} else if (data == 1) {
+		unsigned irq = get_kb_irq();
+		irq_w(irq , false);
+		m_kb_enable = true;
+		release_irq(irq);
+	}
+}
+
+uint8_t hp80_base_state::clksts_r()
 {
 	uint8_t res = 0;
 	for (unsigned i = 0; i < TIMER_COUNT; i++) {
@@ -425,7 +511,7 @@ READ8_MEMBER(hp80_base_state::clksts_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp80_base_state::clksts_w)
+void hp80_base_state::clksts_w(uint8_t data)
 {
 	if (data == 0x0c) {
 		// Set test mode (see timer_update)
@@ -461,13 +547,14 @@ WRITE8_MEMBER(hp80_base_state::clksts_w)
 		}
 		if (BIT(data , 5)) {
 			// Clear timer irq
-			irq_w(IRQ_TIMER0_BIT + m_timer_idx , false);
+			unsigned irq_n = IRQ_TIMER0_BIT + m_timer_idx;
+			irq_w(irq_n , false);
+			release_irq(irq_n);
 		}
-		update_int_bits();
 	}
 }
 
-READ8_MEMBER(hp80_base_state::clkdat_r)
+uint8_t hp80_base_state::clkdat_r()
 {
 	uint8_t res;
 	unsigned burst_idx = m_cpu->flatten_burst();
@@ -481,7 +568,7 @@ READ8_MEMBER(hp80_base_state::clkdat_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp80_base_state::clkdat_w)
+void hp80_base_state::clkdat_w(uint8_t data)
 {
 	unsigned burst_idx = m_cpu->flatten_burst();
 	if (burst_idx < 4) {
@@ -492,33 +579,35 @@ WRITE8_MEMBER(hp80_base_state::clkdat_w)
 	}
 }
 
-WRITE8_MEMBER(hp80_base_state::rselec_w)
+void hp80_base_state::rselec_w(uint8_t data)
 {
 	m_rombank->set_bank(data);
 }
 
-READ8_MEMBER(hp80_base_state::intrsc_r)
+uint8_t hp80_base_state::intrsc_r()
 {
-	if (m_top_pending >= IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT && BIT(m_int_acked , m_top_pending)) {
-		return (uint8_t)m_io_slots[ m_top_pending - IRQ_IOP0_BIT ]->get_base_addr();
+	if (m_top_acked >= IRQ_IOP0_BIT && m_top_acked < IRQ_BIT_COUNT) {
+		LOG_IRQ("INTRSC %u\n" , m_top_acked);
+		// Clear interrupt request in the slot being serviced
+		m_io_slots[ m_top_acked - IRQ_IOP0_BIT ]->clear_service();
+		return (uint8_t)m_io_slots[ m_top_acked - IRQ_IOP0_BIT ]->get_base_addr();
 	} else {
 		// Probably..
 		return 0xff;
 	}
 }
 
-WRITE8_MEMBER(hp80_base_state::intrsc_w)
+void hp80_base_state::intrsc_w(uint8_t data)
 {
-	if (m_top_pending >= IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT && BIT(m_int_acked , m_top_pending)) {
-		// Clear interrupt request in the slot being serviced
-		m_io_slots[ m_top_pending - IRQ_IOP0_BIT ]->clear_service();
-	}
+	LOG_IRQ("INTRSC W %u %03x %03x %03x\n" , m_top_acked , m_int_serv , m_int_en , m_int_acked);
 	for (auto& iop: m_io_slots) {
 		iop->inten();
 	}
 	for (unsigned i = IRQ_IOP0_BIT; i < (IRQ_IOP0_BIT + IOP_COUNT); i++) {
 		irq_en_w(i , true);
 	}
+	m_int_acked &= ~(((1U << IOP_COUNT) - 1) << IRQ_IOP0_BIT);
+	update_int_bits();
 }
 
 // Outer index: key position [0..79] = r * 8 + c
@@ -607,31 +696,21 @@ static const uint8_t keyboard_table[ 80 ][ 2 ] = {
 	{ 0x8a , 0x8a }     // 9,7: PAPER ADVANCE   N/U
 };
 
-bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& keycode)
+bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col)
 {
-	while (pressed) {
+	if (pressed) {
 		unsigned bit_no = 31 - count_leading_zeros(pressed);
-		uint8_t unshifted = keyboard_table[ idx_base + bit_no ][ 0 ];
-		bool isalpha = unshifted >= 'A' && unshifted <= 'Z';
-		ioport_value modifiers = m_io_modkeys->read();
-		bool shift = BIT(modifiers , 0);
-		bool caps_lock = BIT(modifiers , 1);
-		bool control = BIT(modifiers , 2);
-		if (isalpha) {
-			shift = shift ^ caps_lock ^ m_kb_flipped;
-		}
-		keycode = keyboard_table[ idx_base + bit_no ][ shift ];
-		uint8_t tmp = isalpha ? unshifted : keycode;
-		if (control && (tmp & 0xe0) == 0x40) {
-			keycode &= ~0xe0;
-		}
-		if (keycode != 0xff) {
-			return true;
-		}
-		ioport_value mask = BIT_MASK<ioport_value>(bit_no);
-		pressed &= ~mask;
+		row = (idx_base + bit_no) / 8;
+		col = (idx_base + bit_no) % 8;
+		return true;
+	} else {
+		return false;
 	}
-	return false;
+}
+
+unsigned hp80_base_state::get_kb_irq() const
+{
+	return m_has_int_keyb ? IRQ_INTKEYB_BIT : IRQ_KEYBOARD_BIT;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::kb_scan)
@@ -642,15 +721,35 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::kb_scan)
 	input[ 2 ] = m_io_key2->read();
 
 	if (m_kb_enable) {
-		uint8_t keycode;
+		uint8_t row;
+		uint8_t col;
 
-		bool got_key = kb_scan_ioport(input[ 0 ] & ~m_kb_state[ 0 ] , 0 , keycode) ||
-			kb_scan_ioport(input[ 1 ] & ~m_kb_state[ 1 ] , 32 , keycode) ||
-			kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , 64 , keycode);
+		bool got_key = kb_scan_ioport(input[ 0 ] & ~m_kb_state[ 0 ] , 0 , row , col) ||
+			kb_scan_ioport(input[ 1 ] & ~m_kb_state[ 1 ] , 32 , row , col) ||
+			kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , 64 , row , col);
 
 		if (got_key) {
-			m_kb_keycode = keycode;
-			irq_w(IRQ_KEYBOARD_BIT , true);
+			if (m_has_int_keyb) {
+				m_raw_keycode = (row << 4) + col;
+			} else {
+				uint8_t keycode = (row << 3) + col;
+				uint8_t unshifted = keyboard_table[ keycode ][ 0 ];
+				bool isalpha = unshifted >= 'A' && unshifted <= 'Z';
+				ioport_value modifiers = m_io_modkeys->read();
+				bool shift = BIT(modifiers , 0);
+				bool caps_lock = BIT(modifiers , 1);
+				bool control = BIT(modifiers , 2);
+				if (isalpha) {
+					shift = shift ^ caps_lock ^ m_kb_flipped;
+				}
+				keycode = keyboard_table[ keycode ][ shift ];
+				uint8_t tmp = isalpha ? unshifted : keycode;
+				if (control && (tmp & 0xe0) == 0x40) {
+					keycode &= ~0xe0;
+				}
+				m_kb_keycode = keycode;
+			}
+			irq_w(get_kb_irq() , true);
 			m_kb_enable = false;
 		}
 	}
@@ -762,12 +861,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::clk_busy_timer)
 	m_clk_busy = false;
 }
 
-WRITE8_MEMBER(hp80_base_state::irl_w)
+void hp80_base_state::irl_w(offs_t offset, uint8_t data)
 {
 	irq_w(offset + IRQ_IOP0_BIT , data != 0);
 }
 
-WRITE8_MEMBER(hp80_base_state::halt_w)
+void hp80_base_state::halt_w(offs_t offset, uint8_t data)
 {
 	bool prev_halt = m_halt_lines != 0;
 	COPY_BIT(data != 0 , m_halt_lines , offset);
@@ -780,35 +879,44 @@ WRITE8_MEMBER(hp80_base_state::halt_w)
 
 void hp80_base_state::irq_w(unsigned n_irq , bool state)
 {
-	if (state && !BIT(m_int_serv , n_irq)) {
-		// Set service request
-		BIT_SET(m_int_serv , n_irq);
-		BIT_CLR(m_int_acked , n_irq);
-	} else if (!state && BIT(m_int_serv , n_irq)) {
-		// Clear service request
-		BIT_CLR(m_int_serv , n_irq);
-		BIT_CLR(m_int_acked , n_irq);
-	}
+	LOG_IRQ("IRQ_W %u %d\n" , n_irq , state);
+	COPY_BIT(state , m_int_serv , n_irq);
 	update_int_bits();
 }
 
 void hp80_base_state::irq_en_w(unsigned n_irq , bool state)
 {
+	LOG_IRQ("IRQ_EN_W %u %d\n" , n_irq , state);
 	COPY_BIT(state , m_int_en , n_irq);
 	update_int_bits();
 }
 
+void hp80_base_state::release_irq(unsigned n_irq)
+{
+	if (BIT(m_int_acked , n_irq)) {
+		BIT_CLR(m_int_acked , n_irq);
+		update_int_bits();
+	}
+}
+
+unsigned hp80_base_state::get_top_irq(uint16_t irqs)
+{
+	unsigned top;
+	for (top = 0; top < IRQ_BIT_COUNT && !BIT(irqs , 0); top++ , irqs >>= 1) {
+	}
+	return top;
+}
+
 void hp80_base_state::update_int_bits()
 {
-	uint16_t irqs = m_int_en & m_int_serv;
-	for (m_top_pending = 0; m_top_pending < IRQ_BIT_COUNT && !BIT(irqs , m_top_pending); m_top_pending++) {
-	}
+	m_top_pending = get_top_irq(m_int_en & m_int_serv);
+	m_top_acked = get_top_irq(m_int_acked);
 	update_irl();
 }
 
 void hp80_base_state::update_irl()
 {
-	m_cpu->set_input_line(0 , m_global_int_en && m_top_pending < IRQ_BIT_COUNT && !BIT(m_int_acked , m_top_pending));
+	m_cpu->set_input_line(0 , m_global_int_en && m_top_pending < m_top_acked);
 }
 
 // ************
@@ -882,14 +990,14 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_WRITE8_MEMBER(prtlen_w);
-	DECLARE_READ8_MEMBER(prchar_r);
-	DECLARE_WRITE8_MEMBER(prchar_w);
-	DECLARE_READ8_MEMBER(prtsts_r);
-	DECLARE_WRITE8_MEMBER(prtctl_w);
-	DECLARE_WRITE8_MEMBER(prtdat_w);
+	uint8_t crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, uint8_t data);
+	void prtlen_w(uint8_t data);
+	uint8_t prchar_r();
+	void prchar_w(uint8_t data);
+	uint8_t prtsts_r();
+	void prtctl_w(uint8_t data);
+	void prtdat_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(prt_busy_timer);
@@ -955,6 +1063,7 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 
 void hp85_state::machine_start()
 {
+	hp80_base_state::machine_start();
 	m_screen->register_screen_bitmap(m_bitmap);
 	m_video_mem.resize(VIDEO_MEM_SIZE);
 }
@@ -1031,7 +1140,7 @@ WRITE_LINE_MEMBER(hp85_state::vblank_w)
 	}
 }
 
-READ8_MEMBER(hp85_state::crtc_r)
+uint8_t hp85_state::crtc_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -1058,7 +1167,7 @@ READ8_MEMBER(hp85_state::crtc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp85_state::crtc_w)
+void hp85_state::crtc_w(offs_t offset, uint8_t data)
 {
 	// Write to CRT controller (1MA5)
 	uint8_t burst_idx = m_cpu->flatten_burst();
@@ -1105,7 +1214,7 @@ WRITE8_MEMBER(hp85_state::crtc_w)
 	}
 }
 
-WRITE8_MEMBER(hp85_state::prtlen_w)
+void hp85_state::prtlen_w(uint8_t data)
 {
 	if (data == 0) {
 		// Advance paper
@@ -1120,22 +1229,22 @@ WRITE8_MEMBER(hp85_state::prtlen_w)
 	}
 }
 
-READ8_MEMBER(hp85_state::prchar_r)
+uint8_t hp85_state::prchar_r()
 {
 	return m_prchar_r;
 }
 
-WRITE8_MEMBER(hp85_state::prchar_w)
+void hp85_state::prchar_w(uint8_t data)
 {
 	m_prchar_w = data;
 }
 
-READ8_MEMBER(hp85_state::prtsts_r)
+uint8_t hp85_state::prtsts_r()
 {
 	return m_prtsts;
 }
 
-WRITE8_MEMBER(hp85_state::prtctl_w)
+void hp85_state::prtctl_w(uint8_t data)
 {
 	m_prtctl = data;
 	BIT_SET(m_prtsts , PRTSTS_PRTRDY_BIT);
@@ -1151,7 +1260,7 @@ WRITE8_MEMBER(hp85_state::prtctl_w)
 	}
 }
 
-WRITE8_MEMBER(hp85_state::prtdat_w)
+void hp85_state::prtdat_w(uint8_t data)
 {
 	m_cpu->flatten_burst();
 	if (m_prt_idx < PRT_BUFFER_SIZE) {
@@ -1500,7 +1609,7 @@ ROM_END
 class hp86_state : public hp80_base_state
 {
 public:
-	hp86_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp86_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb = false);
 
 	// **** Constants of HP86 ****
 	static constexpr unsigned MASTER_CLOCK  = 12260000;
@@ -1566,28 +1675,28 @@ private:
 	// Run light
 	bool m_rulite;
 
-	DECLARE_WRITE8_MEMBER(crtsad_w);
-	DECLARE_WRITE8_MEMBER(crtbad_w);
-	DECLARE_READ8_MEMBER(crtsts_r);
-	DECLARE_WRITE8_MEMBER(crtsts_w);
-	DECLARE_READ8_MEMBER(crtdat_r);
-	DECLARE_WRITE8_MEMBER(crtdat_w);
+	void crtsad_w(uint8_t data);
+	void crtbad_w(uint8_t data);
+	uint8_t crtsts_r();
+	void crtsts_w(uint8_t data);
+	uint8_t crtdat_r();
+	void crtdat_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	uint16_t get_video_limit() const;
-	DECLARE_WRITE8_MEMBER(rulite_w);
+	void rulite_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(rulite_timer);
-	DECLARE_READ8_MEMBER(direct_ram_r);
-	DECLARE_WRITE8_MEMBER(direct_ram_w);
-	DECLARE_READ8_MEMBER(emc_r);
-	DECLARE_WRITE8_MEMBER(emc_w);
+	uint8_t direct_ram_r(offs_t offset);
+	void direct_ram_w(offs_t offset, uint8_t data);
+	uint8_t emc_r(offs_t offset);
+	void emc_w(offs_t offset, uint8_t data);
 	uint32_t& get_ptr();
 	void ptr12_decrement();
 	DECLARE_WRITE_LINE_MEMBER(lma_cycle);
 	void opcode_cb(uint8_t opcode);
 };
 
-hp86_state::hp86_state(const machine_config &mconfig, device_type type, const char *tag)
-	: hp80_base_state(mconfig , type , tag)
+hp86_state::hp86_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb)
+	: hp80_base_state(mconfig , type , tag , has_int_keyb)
 	, m_screen(*this , "screen")
 	, m_palette(*this , "palette")
 	, m_vm_timer(*this , "vm_timer")
@@ -1654,6 +1763,8 @@ void hp86_state::hp86(machine_config &config)
 
 void hp86_state::machine_start()
 {
+	hp80_base_state::machine_start();
+
 	m_run_light.resolve();
 
 	m_screen->register_screen_bitmap(m_bitmap);
@@ -1796,7 +1907,7 @@ attotime hp86_state::time_to_video_mem_availability() const
 	}
 }
 
-WRITE8_MEMBER(hp86_state::crtsad_w)
+void hp86_state::crtsad_w(uint8_t data)
 {
 	auto burst_idx = m_cpu->flatten_burst();
 	if (burst_idx == 0) {
@@ -1807,7 +1918,7 @@ WRITE8_MEMBER(hp86_state::crtsad_w)
 	}
 }
 
-WRITE8_MEMBER(hp86_state::crtbad_w)
+void hp86_state::crtbad_w(uint8_t data)
 {
 	auto burst_idx = m_cpu->flatten_burst();
 	if (burst_idx == 0) {
@@ -1818,12 +1929,12 @@ WRITE8_MEMBER(hp86_state::crtbad_w)
 	}
 }
 
-READ8_MEMBER(hp86_state::crtsts_r)
+uint8_t hp86_state::crtsts_r()
 {
 	return m_crt_sts;
 }
 
-WRITE8_MEMBER(hp86_state::crtsts_w)
+void hp86_state::crtsts_w(uint8_t data)
 {
 	m_crt_sts = (m_crt_sts & 0x11) | (data & ~0x11);
 	if (BIT(data , 0)) {
@@ -1835,12 +1946,12 @@ WRITE8_MEMBER(hp86_state::crtsts_w)
 	}
 }
 
-READ8_MEMBER(hp86_state::crtdat_r)
+uint8_t hp86_state::crtdat_r()
 {
 	return m_crt_byte;
 }
 
-WRITE8_MEMBER(hp86_state::crtdat_w)
+void hp86_state::crtdat_w(uint8_t data)
 {
 	m_crt_byte = data;
 	BIT_SET(m_crt_sts , 0);
@@ -1877,7 +1988,7 @@ uint16_t hp86_state::get_video_limit() const
 	}
 }
 
-WRITE8_MEMBER(hp86_state::rulite_w)
+void hp86_state::rulite_w(uint8_t data)
 {
 	bool new_rulite = !BIT(data , 0);
 
@@ -1897,17 +2008,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp86_state::rulite_timer)
 	m_rulite_timer->adjust(attotime::from_msec(m_run_light ? RULITE_ON_MS : RULITE_OFF_MS));
 }
 
-READ8_MEMBER(hp86_state::direct_ram_r)
+uint8_t hp86_state::direct_ram_r(offs_t offset)
 {
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER(hp86_state::direct_ram_w)
+void hp86_state::direct_ram_w(offs_t offset, uint8_t data)
 {
 	m_ram->write(offset , data);
 }
 
-READ8_MEMBER(hp86_state::emc_r)
+uint8_t hp86_state::emc_r(offs_t offset)
 {
 	auto idx = m_cpu->flatten_burst();
 	uint8_t res = 0xff;
@@ -1942,7 +2053,7 @@ READ8_MEMBER(hp86_state::emc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp86_state::emc_w)
+void hp86_state::emc_w(offs_t offset, uint8_t data)
 {
 	auto idx = m_cpu->flatten_burst();
 
@@ -2121,5 +2232,207 @@ ROM_START(hp86b)
 	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(e90fad22) SHA1(6b2ecef96906ead99cd688e54c507611747c8687))
 ROM_END
 
-COMP( 1980, hp85, 0, 0, hp85, hp85, hp85_state, empty_init, "HP", "HP 85", 0)
-COMP( 1983, hp86b,0, 0, hp86, hp86, hp86_state, empty_init, "HP", "HP 86B",0)
+// ****************
+//  hp86_int_state
+// ****************
+class hp86_int_state : public hp86_state
+{
+public:
+	hp86_int_state(const machine_config &mconfig, device_type type, const char *tag);
+
+protected:
+	virtual void rombank_mem_map(address_map &map) override;
+	virtual void unmap_optroms(address_space &space) override;
+};
+
+hp86_int_state::hp86_int_state(const machine_config &mconfig, device_type type, const char *tag)
+	: hp86_state(mconfig , type , tag , true)
+{
+}
+
+void hp86_int_state::rombank_mem_map(address_map &map)
+{
+	hp86_state::rombank_mem_map(map);
+	// rom030 (language)
+	map(0x30000, 0x31fff).rom();
+}
+
+void hp86_int_state::unmap_optroms(address_space &space)
+{
+	LOG("hp86_int_state::unmap_optroms\n");
+	// OptROMs are in rombanks [02..17] & [19..CF] & [D2..FF]
+	space.unmap_read(HP80_OPTROM_SIZE * 2 , HP80_OPTROM_SIZE * 0x18 - 1);
+	space.unmap_read(HP80_OPTROM_SIZE * 0x19 , HP80_OPTROM_SIZE * 0xd0 - 1);
+	space.unmap_read(HP80_OPTROM_SIZE * 0xd2 , HP80_OPTROM_SIZE * 0x100 - 1);
+}
+
+static INPUT_PORTS_START(hp86_int)
+	// Keyboard is arranged in a matrix of 11 rows and 8 columns. In addition there are 2 keys with
+	// dedicated input lines: SHIFT & CONTROL.
+	// A key on row "r"=[0..10] and column "c"=[0..7] is mapped to bit "b" of KEY"n" input, where
+	// n = r / 4
+	// b = (r % 4) * 8 + c
+	PORT_START("KEY0")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')                            // 0,0: K
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')                            // 0,1: M
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')                            // 0,2: N
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')                            // 0,3: B
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')                            // 0,4: V
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')                            // 0,5: Z
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')                            // 0,6: X
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')                            // 0,7: C
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')                            // 1,0: 9
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_NAME("k5 k12")        // 1,1: k5 / k12
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_NAME("k4 k11")       // 1,2: k4 / k11
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_NAME("k3 k10")       // 1,3: k3 / k10
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_NAME("k2 k9")        // 1,4: k2 / k9
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_NAME("Caps")                                // 1,5: Caps
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LABEL KEY")                                                       // 1,6: LABEL KEY
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("k1 k8")        // 1,7: k1 / k8
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')                           // 2,0: I
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')                           // 2,1: J
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')                           // 2,2: H
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')                           // 2,3: G
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')                           // 2,4: F
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')                           // 2,5: A
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')                           // 2,6: S
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')                           // 2,7: D
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')                           // 3,0: 8
+	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')                           // 3,1: U
+	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')                           // 3,2: Y
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')                           // 3,3: T
+	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')                           // 3,4: R
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')                           // 3,5: Q
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')                           // 3,6: W
+	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')                           // 3,7: E
+
+	PORT_START("KEY1")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')                            // 4,0: 0
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')                       // 4,1: = +
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\\') PORT_CHAR('|')                       // 4,2: \ |
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                     // 4,3: BS
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("E TEST")                                                           // 4,4: KP E / TEST
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("^ RESLT")                                                          // 4,5: KP ^ / RESLT
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME(") INIT")                                                           // 4,6: KP ) / INIT
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("( RESET")                                                          // 4,7: KP ( / RESET
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')                            // 5,0: P
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')                        // 5,1: ; :
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')                      // 5,2: ' "
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("END LINE")                 // 5,3: END LINE
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_CHAR('$')      // 5,4: KP 4
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("KP *") // 5,5: KP *
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_CHAR('^')      // 5,6: KP 6
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) PORT_CHAR('%')      // 5,7: KP 5
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')                           // 6,0: L
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')                        // 6,1: .
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')                       // 6,2: / ?
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LIST P LST")                                                      // 6,3: LIST / P LST
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_CHAR('!')      // 6,4: KP 1
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("KP -")   // 6,5: KP -
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) PORT_CHAR('#')      // 6,6: KP 3
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_CHAR('@')      // 6,7: KP 2
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')                           // 7,0: O
+	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')                           // 7,1: 7
+	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')                           // 7,2: 6
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')                           // 7,3: 5
+	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')                           // 7,4: 4
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')                           // 7,5: 1
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')                           // 7,6: 2
+	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')                           // 7,7: 3
+
+	PORT_START("KEY2")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')                        // 8,0: - _
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(') PORT_CHAR('[')                    // 8,1: ( [
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')') PORT_CHAR(']')                   // 8,2: ) ]
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("CONT TR/NORM")                                                     // 8,3: CONT / TR/NORM
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) PORT_CHAR('&')       // 8,4: KP 7
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) PORT_NAME("KP /")    // 8,5: KP /
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) PORT_CHAR('(')       // 8,6: KP 9
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_CHAR('*')       // 8,7: KP 8
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')                        // 9,0: ,
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')                                       // 9,1: Space
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("PAUSE STEP")                                                      // 9,2: PAUSE / STEP
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("RUN")                                                             // 9,3: RUN
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_CHAR(')')      // 9,4: KP 0
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) PORT_NAME("KP +") // 9,5: KP +
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) PORT_CHAR('<')  // 9,6: KP ,
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CHAR('.') PORT_CHAR('>') PORT_NAME("KP .")                              // 9,7: KP .
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_NAME("k6 k13")       // 10,0: k6 / k13
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_NAME("k7 k14")       // 10,1: k7 / k14
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("-LINE CLEAR")                                                     // 10,2: -LINE / CLEAR
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Up Home")      // 10,3: Up / Home
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Down A/G") // 10,4: Down / A/G
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("ROLL")                                    // 10,5: ROLL
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right -CHAR") // 10,6: RIGHT / -CHAR
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left I/R") // 10,7: LEFT / I/R
+
+	PORT_START("MODKEYS")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)                // Shift
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)              // Control
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(hp86_001)
+	PORT_INCLUDE(hp86_int)
+
+	PORT_START("LANGUAGE")
+	PORT_DIPNAME(0x3f , 0 , "Language")
+	PORT_DIPLOCATION("S2:7,6,5,4,3,2")
+	PORT_DIPSETTING(0x00 , "English")
+	PORT_DIPSETTING(0x01 , "Swedish/Finnish")
+	PORT_DIPSETTING(0x02 , "Norwegian/Danish")
+	PORT_DIPSETTING(0x06 , "Spanish")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(hp86_004)
+	PORT_INCLUDE(hp86_int)
+
+	PORT_START("LANGUAGE")
+	PORT_DIPNAME(0x3f , 0 , "Language")
+	PORT_DIPLOCATION("S2:7,6,5,4,3,2")
+	PORT_DIPSETTING(0x00 , "English")
+	PORT_DIPSETTING(0x04 , "German")
+	PORT_DIPSETTING(0x08 , "French")
+	PORT_DIPSETTING(0x09 , "Italian")
+	PORT_DIPSETTING(0x0a , "Dutch")
+	PORT_DIPSETTING(0x14 , "Swiss German")
+	PORT_DIPSETTING(0x15 , "Swiss French")
+INPUT_PORTS_END
+
+ROM_START(hp86b_001)
+	ROM_REGION(0x6000 , "cpu" , 0)
+	ROM_LOAD("romsys1.bin" , 0x0000 , 0x2000 , CRC(bfa473b8) SHA1(cc420742a5f03c466484a5063e0abcbc084bf298))
+	ROM_LOAD("romsys2.bin" , 0x2000 , 0x2000 , CRC(2bc3ba4b) SHA1(760bef9c482f562677f80b18d6163a19ee7aea1c))
+	ROM_LOAD("romsys3.bin" , 0x4000 , 0x2000 , CRC(86bf3b8b) SHA1(209c91b9b972ab514c600752e2e4af68f984612e))
+
+	ROM_REGION(0x1a4000 , "rombank" , 0)
+	ROM_LOAD("rom000.bin" , 0x0000 , 0x2000 , CRC(c3ca5c54) SHA1(2b291607de101c7206bfae9520a18f1009929e9b))
+	ROM_LOAD("rom001.bin" , 0x2000 , 0x2000 , CRC(59a1616c) SHA1(e0fe840f9740bdb455fe1872869671f8712b7cff))
+	ROM_LOAD("rom030.bin" , 0x30000 , 0x2000 , CRC(14507bc0) SHA1(67ca5a15019bd7b2bfbf53bb8cfbe2ca20a6239c))
+	ROM_LOAD("rom320.bin" , 0x1a0000 , 0x2000 , CRC(c921e2e4) SHA1(e37ac61364830cfa214e6d1b9942cc1cde6ad01f))
+	ROM_LOAD("rom321.bin" , 0x1a2000 , 0x2000 , CRC(e6e5cc91) SHA1(67711de228cc48a78d04b13f0a1c91dc26f7e87c))
+
+	ROM_REGION(0x500 , "chargen" , 0)
+	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(a3d891c2) SHA1(df7c262b585e9394251640d0775474a76c199905))
+ROM_END
+
+ROM_START(hp86b_004)
+	ROM_REGION(0x6000 , "cpu" , 0)
+	ROM_LOAD("romsys1.bin" , 0x0000 , 0x2000 , CRC(bfa473b8) SHA1(cc420742a5f03c466484a5063e0abcbc084bf298))
+	ROM_LOAD("romsys2.bin" , 0x2000 , 0x2000 , CRC(2bc3ba4b) SHA1(760bef9c482f562677f80b18d6163a19ee7aea1c))
+	ROM_LOAD("romsys3.bin" , 0x4000 , 0x2000 , CRC(86bf3b8b) SHA1(209c91b9b972ab514c600752e2e4af68f984612e))
+
+	ROM_REGION(0x1a4000 , "rombank" , 0)
+	ROM_LOAD("rom000.bin" , 0x0000 , 0x2000 , CRC(c3ca5c54) SHA1(2b291607de101c7206bfae9520a18f1009929e9b))
+	ROM_LOAD("rom001.bin" , 0x2000 , 0x2000 , CRC(59a1616c) SHA1(e0fe840f9740bdb455fe1872869671f8712b7cff))
+	ROM_LOAD("rom030.bin" , 0x30000 , 0x2000 , CRC(14507bc0) SHA1(67ca5a15019bd7b2bfbf53bb8cfbe2ca20a6239c))
+	ROM_LOAD("rom320.bin" , 0x1a0000 , 0x2000 , CRC(c921e2e4) SHA1(e37ac61364830cfa214e6d1b9942cc1cde6ad01f))
+	ROM_LOAD("rom321.bin" , 0x1a2000 , 0x2000 , CRC(e6e5cc91) SHA1(67711de228cc48a78d04b13f0a1c91dc26f7e87c))
+
+	ROM_REGION(0x500 , "chargen" , 0)
+	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(c7d04292) SHA1(b86ed801ee9f7a57b259374b8a9810572cb03230))
+ROM_END
+
+COMP( 1980, hp85,      0,     0, hp85, hp85,     hp85_state,     empty_init, "HP", "HP 85", 0)
+COMP( 1983, hp86b,     0,     0, hp86, hp86,     hp86_state,     empty_init, "HP", "HP 86B",0)
+COMP( 1983, hp86b_001, hp86b, 0, hp86, hp86_001, hp86_int_state, empty_init, "HP", "HP 86B Opt 001",0)
+COMP( 1983, hp86b_004, hp86b, 0, hp86, hp86_004, hp86_int_state, empty_init, "HP", "HP 86B Opt 004",0)

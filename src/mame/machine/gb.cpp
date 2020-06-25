@@ -143,8 +143,8 @@ void gb_state::gb_init_regs()
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x05, 0x00);       /* TIMECNT */
-	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x06, 0x00);       /* TIMEMOD */
+	gb_io_w(0x05, 0x00);       /* TIMECNT */
+	gb_io_w(0x06, 0x00);       /* TIMEMOD */
 }
 
 
@@ -223,7 +223,7 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 }
 
 
-WRITE8_MEMBER(gb_state::gb_io_w)
+void gb_state::gb_io_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t timer_shifts[4] = {10, 4, 6, 8};
 
@@ -304,7 +304,7 @@ logerror("SIOCONT write, serial clock is %04x\n", m_internal_serial_clock);
 	m_gb_io[offset] = data;
 }
 
-WRITE8_MEMBER(gb_state::gb_io2_w)
+void gb_state::gb_io2_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x10)
 	{
@@ -312,7 +312,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 		m_bios_disable = true;
 	}
 	else
-		m_ppu->video_w(space, offset, data);
+		m_ppu->video_w(offset, data);
 }
 
 #ifdef MAME_DEBUG
@@ -353,7 +353,7 @@ static const char *const sgbcmds[32] =
 };
 #endif
 
-WRITE8_MEMBER(gb_state::sgb_io_w)
+void gb_state::sgb_io_w(offs_t offset, uint8_t data)
 {
 	uint8_t *sgb_data = m_sgb_data;
 
@@ -462,7 +462,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 			return;
 		default:
 			/* we didn't handle the write, so pass it to the GB handler */
-			gb_io_w(space, offset, data);
+			gb_io_w(offset, data);
 			return;
 	}
 
@@ -470,18 +470,18 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 }
 
 /* Interrupt Enable register */
-READ8_MEMBER(gb_state::gb_ie_r)
+uint8_t gb_state::gb_ie_r()
 {
 	return m_maincpu->get_ie();
 }
 
-WRITE8_MEMBER(gb_state::gb_ie_w)
+void gb_state::gb_ie_w(uint8_t data)
 {
 	m_maincpu->set_ie(data);
 }
 
 /* IO read */
-READ8_MEMBER(gb_state::gb_io_r)
+uint8_t gb_state::gb_io_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -565,7 +565,7 @@ void gb_state::gb_timer_increment()
 }
 
 // This gets called while the cpu is executing instructions to keep the timer state in sync
-WRITE8_MEMBER(gb_state::gb_timer_callback)
+void gb_state::gb_timer_callback(uint8_t data)
 {
 	uint16_t old_gb_divcount = m_divcount;
 	uint16_t old_internal_serial_clock = m_internal_serial_clock;
@@ -603,9 +603,9 @@ WRITE8_MEMBER(gb_state::gb_timer_callback)
 }
 
 
-WRITE8_MEMBER(gb_state::gbc_io_w)
+void gb_state::gbc_io_w(offs_t offset, uint8_t data)
 {
-	gb_io_w(space, offset, data);
+	gb_io_w(offset, data);
 
 	// On CGB the internal serial transfer clock is selectable
 	if (offset == 0x02)
@@ -616,7 +616,7 @@ WRITE8_MEMBER(gb_state::gbc_io_w)
 }
 
 
-WRITE8_MEMBER(gb_state::gbc_io2_w)
+void gb_state::gbc_io2_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -637,10 +637,10 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 		default:
 			break;
 	}
-	m_ppu->video_w(space, offset, data);
+	m_ppu->video_w(offset, data);
 }
 
-READ8_MEMBER(gb_state::gbc_io2_r)
+uint8_t gb_state::gbc_io2_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -653,7 +653,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	default:
 		break;
 	}
-	return m_ppu->video_r(space, offset);
+	return m_ppu->video_r(offset);
 }
 
 /****************************************************************************
@@ -711,7 +711,7 @@ void megaduck_state::machine_reset()
 
  **************/
 
-READ8_MEMBER(megaduck_state::megaduck_video_r)
+uint8_t megaduck_state::megaduck_video_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -719,13 +719,13 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 	{
 		offset ^= 0x0C;
 	}
-	data = m_ppu->video_r(space, offset);
+	data = m_ppu->video_r(offset);
 	if (offset)
 		return data;
 	return bitswap<8>(data,7,0,5,4,6,3,2,1);
 }
 
-WRITE8_MEMBER(megaduck_state::megaduck_video_w)
+void megaduck_state::megaduck_video_w(offs_t offset, uint8_t data)
 {
 	if (!offset)
 	{
@@ -735,7 +735,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 	{
 		offset ^= 0x0C;
 	}
-	m_ppu->video_w(space, offset, data);
+	m_ppu->video_w(offset, data);
 }
 
 /* Map megaduck audio offset to game boy audio offsets */
@@ -743,7 +743,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 
 static const uint8_t megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
+void megaduck_state::megaduck_sound_w1(offs_t offset, uint8_t data)
 {
 	if ((offset == 0x01) || (offset == 0x07))
 		m_apu->sound_w(megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
@@ -751,7 +751,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 		m_apu->sound_w(megaduck_sound_offsets[offset], data);
 }
 
-READ8_MEMBER(megaduck_state::megaduck_sound_r1)
+uint8_t megaduck_state::megaduck_sound_r1(offs_t offset)
 {
 	uint8_t data = m_apu->sound_r(megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x07))
@@ -760,7 +760,7 @@ READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 		return data;
 }
 
-WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
+void megaduck_state::megaduck_sound_w2(offs_t offset, uint8_t data)
 {
 	if ((offset == 0x01) || (offset == 0x02))
 		m_apu->sound_w(0x10 + megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
@@ -768,7 +768,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 		m_apu->sound_w(0x10 + megaduck_sound_offsets[offset], data);
 }
 
-READ8_MEMBER(megaduck_state::megaduck_sound_r2)
+uint8_t megaduck_state::megaduck_sound_r2(offs_t offset)
 {
 	uint8_t data = m_apu->sound_r(0x10 + megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x02))

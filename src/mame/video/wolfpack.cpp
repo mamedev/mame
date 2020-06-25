@@ -43,51 +43,51 @@ void wolfpack_state::wolfpack_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(wolfpack_state::ship_size_w)
+void wolfpack_state::ship_size_w(uint8_t data)
 {
 	m_ship_size = data;
 }
-WRITE8_MEMBER(wolfpack_state::video_invert_w)
+void wolfpack_state::video_invert_w(uint8_t data)
 {
 	m_video_invert = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::ship_reflect_w)
+void wolfpack_state::ship_reflect_w(uint8_t data)
 {
 	m_ship_reflect = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::pt_pos_select_w)
+void wolfpack_state::pt_pos_select_w(uint8_t data)
 {
 	m_pt_pos_select = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::pt_horz_w)
+void wolfpack_state::pt_horz_w(uint8_t data)
 {
 	m_pt_horz = data;
 }
-WRITE8_MEMBER(wolfpack_state::pt_pic_w)
+void wolfpack_state::pt_pic_w(uint8_t data)
 {
 	m_pt_pic = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::ship_h_w)
+void wolfpack_state::ship_h_w(uint8_t data)
 {
 	m_ship_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::torpedo_pic_w)
+void wolfpack_state::torpedo_pic_w(uint8_t data)
 {
 	m_torpedo_pic = data;
 }
-WRITE8_MEMBER(wolfpack_state::ship_h_precess_w)
+void wolfpack_state::ship_h_precess_w(uint8_t data)
 {
 	m_ship_h_precess = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::ship_pic_w)
+void wolfpack_state::ship_pic_w(uint8_t data)
 {
 	m_ship_pic = data & 0x0f;
 }
-WRITE8_MEMBER(wolfpack_state::torpedo_h_w)
+void wolfpack_state::torpedo_h_w(uint8_t data)
 {
 	m_torpedo_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::torpedo_v_w)
+void wolfpack_state::torpedo_v_w(uint8_t data)
 {
 	m_torpedo_v = data;
 }

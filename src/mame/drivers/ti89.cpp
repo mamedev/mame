@@ -49,7 +49,7 @@ uint8_t ti68k_state::keypad_r()
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
+void ti68k_state::ti68k_io_w(offs_t offset, uint16_t data)
 {
 	switch(offset & 0x0f)
 	{
@@ -92,7 +92,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io_r )
+uint16_t ti68k_state::ti68k_io_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -114,7 +114,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
+void ti68k_state::ti68k_io2_w(offs_t offset, uint16_t data)
 {
 	switch(offset & 0x7f)
 	{
@@ -130,7 +130,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io2_r )
+uint16_t ti68k_state::ti68k_io2_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -143,7 +143,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io2_r )
 }
 
 
-READ16_MEMBER ( ti68k_state::rom_r )
+uint16_t ti68k_state::rom_r(offs_t offset)
 {
 	return m_rom_base[offset];
 }
@@ -464,11 +464,11 @@ void ti68k_state::machine_start()
 
 		if (initial_pc > 0x400000)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16_delegate(*this, FUNC(ti68k_state::rom_r)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16sm_delegate(*this, FUNC(ti68k_state::rom_r)));
 		}
 		else
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16_delegate(*this, FUNC(ti68k_state::rom_r)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16sm_delegate(*this, FUNC(ti68k_state::rom_r)));
 		}
 	}
 

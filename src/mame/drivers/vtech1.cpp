@@ -85,12 +85,12 @@ public:
 	void init_vtech1h();
 
 private:
-	DECLARE_READ8_MEMBER(vtech1_lightpen_r);
-	DECLARE_READ8_MEMBER(vtech1_keyboard_r);
-	DECLARE_WRITE8_MEMBER(vtech1_latch_w);
+	uint8_t vtech1_lightpen_r(offs_t offset);
+	uint8_t vtech1_keyboard_r(offs_t offset);
+	void vtech1_latch_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
+	void vtech1_video_bank_w(uint8_t data);
+	uint8_t mc6847_videoram_r(offs_t offset);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
@@ -191,13 +191,13 @@ SNAPSHOT_LOAD_MEMBER(vtech1_state::snapshot_cb)
     INPUTS
 ***************************************************************************/
 
-READ8_MEMBER( vtech1_state::vtech1_lightpen_r )
+uint8_t vtech1_state::vtech1_lightpen_r(offs_t offset)
 {
 	logerror("vtech1_lightpen_r(%d)\n", offset);
 	return 0xff;
 }
 
-READ8_MEMBER( vtech1_state::vtech1_keyboard_r )
+uint8_t vtech1_state::vtech1_keyboard_r(offs_t offset)
 {
 	uint8_t result = 0x3f;
 
@@ -225,7 +225,7 @@ READ8_MEMBER( vtech1_state::vtech1_keyboard_r )
     I/O LATCH
 ***************************************************************************/
 
-WRITE8_MEMBER( vtech1_state::vtech1_latch_w )
+void vtech1_state::vtech1_latch_w(uint8_t data)
 {
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
@@ -253,7 +253,7 @@ WRITE8_MEMBER( vtech1_state::vtech1_latch_w )
     MEMORY BANKING
 ***************************************************************************/
 
-WRITE8_MEMBER( vtech1_state::vtech1_video_bank_w )
+void vtech1_state::vtech1_video_bank_w(uint8_t data)
 {
 	membank("bank4")->set_entry(data & 0x03);
 }
@@ -263,7 +263,7 @@ WRITE8_MEMBER( vtech1_state::vtech1_video_bank_w )
     VIDEO EMULATION
 ***************************************************************************/
 
-READ8_MEMBER( vtech1_state::mc6847_videoram_r )
+uint8_t vtech1_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 

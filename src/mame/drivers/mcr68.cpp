@@ -74,11 +74,11 @@
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
+void mcr68_state::xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 /*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
-	m_sounds_good->write(space, offset, ((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
+	m_sounds_good->write(((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
 }
 
 
@@ -89,11 +89,11 @@ WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::blasted_control_w)
+void mcr68_state::blasted_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 /*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
-	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x1f);
+	m_sounds_good->write((m_control_word >> 8) & 0x1f);
 }
 
 
@@ -104,31 +104,31 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
  *
  *************************************/
 
-READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
+uint16_t mcr68_state::spyhunt2_port_0_r()
 {
 	int result = ioport("IN0")->read();
 	int analog = m_adc->read();
 
-	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
+	return result | ((m_sounds_good->read() & 1) << 5) | (analog << 8);
 }
 
 
-READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
+uint16_t mcr68_state::spyhunt2_port_1_r()
 {
 	int result = ioport("IN1")->read();
-	return result | ((m_turbo_cheap_squeak->read(space, 0) & 1) << 7);
+	return result | ((m_turbo_cheap_squeak->read() & 1) << 7);
 }
 
 
-WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
+void mcr68_state::spyhunt2_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 
 /*  m_turbo_cheap_squeak->reset_write(~m_control_word & 0x0080);*/
-	m_turbo_cheap_squeak->write(space, offset, (m_control_word >> 8) & 0x001f);
+	m_turbo_cheap_squeak->write((m_control_word >> 8) & 0x001f);
 
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
-	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
+	m_sounds_good->write((m_control_word >> 8) & 0x001f);
 
 	m_adc->write((m_control_word >> 3) & 0x0f);
 }
@@ -168,7 +168,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 
 static const uint8_t translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
-READ16_MEMBER(mcr68_state::archrivl_port_1_r)
+uint16_t mcr68_state::archrivl_port_1_r()
 {
 	return (translate49[ioport("49WAYY2")->read() >> 4] << 12) |
 			(translate49[ioport("49WAYX2")->read() >> 4] << 8) |
@@ -177,7 +177,7 @@ READ16_MEMBER(mcr68_state::archrivl_port_1_r)
 }
 
 
-WRITE16_MEMBER(mcr68_state::archrivl_control_w)
+void mcr68_state::archrivl_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
@@ -192,7 +192,7 @@ WRITE16_MEMBER(mcr68_state::archrivl_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::pigskin_protection_w)
+void mcr68_state::pigskin_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* ignore upper-byte only */
 	if (ACCESSING_BITS_0_7)
@@ -209,7 +209,7 @@ WRITE16_MEMBER(mcr68_state::pigskin_protection_w)
 }
 
 
-READ16_MEMBER(mcr68_state::pigskin_protection_r)
+uint16_t mcr68_state::pigskin_protection_r()
 {
 	/* based on the last 5 bytes return a value */
 	if (m_protection_data[4] == 0xe3 && m_protection_data[3] == 0x94)
@@ -229,7 +229,7 @@ READ16_MEMBER(mcr68_state::pigskin_protection_r)
 }
 
 
-READ16_MEMBER(mcr68_state::pigskin_port_1_r)
+uint16_t mcr68_state::pigskin_port_1_r()
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
 	return ioport("IN1")->read() |
@@ -238,7 +238,7 @@ READ16_MEMBER(mcr68_state::pigskin_port_1_r)
 }
 
 
-READ16_MEMBER(mcr68_state::pigskin_port_2_r)
+uint16_t mcr68_state::pigskin_port_2_r()
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
 	return ioport("DSW")->read() |
@@ -254,7 +254,7 @@ READ16_MEMBER(mcr68_state::pigskin_port_2_r)
  *
  *************************************/
 
-READ16_MEMBER(mcr68_state::trisport_port_1_r)
+uint16_t mcr68_state::trisport_port_1_r()
 {
 	int xaxis = (int8_t)ioport("AN1")->read();
 	int yaxis = (int8_t)ioport("AN2")->read();
@@ -1488,7 +1488,7 @@ void mcr68_state::init_xenophob()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::xenophobe_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::xenophobe_control_w)));
 }
 
 
@@ -1500,9 +1500,9 @@ void mcr68_state::init_spyhunt2()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::spyhunt2_control_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_0_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::spyhunt2_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16smo_delegate(*this, FUNC(mcr68_state::spyhunt2_port_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16smo_delegate(*this, FUNC(mcr68_state::spyhunt2_port_1_r)));
 }
 
 
@@ -1516,7 +1516,7 @@ void mcr68_state::init_blasted()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 }
 
 void mcr68_state::init_intlaser()
@@ -1527,7 +1527,7 @@ void mcr68_state::init_intlaser()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 
 }
 
@@ -1541,13 +1541,13 @@ void mcr68_state::init_archrivl()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivl_port_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16smo_delegate(*this, FUNC(mcr68_state::archrivl_port_1_r)));
 }
 
-READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
+uint16_t mcr68_state::archrivlb_port_1_r()
 {
 	return ioport("IN1")->read();
 }
@@ -1560,10 +1560,10 @@ void mcr68_state::init_archrivlb()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick replaced by standard 8way stick */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivlb_port_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16smo_delegate(*this, FUNC(mcr68_state::archrivlb_port_1_r)));
 }
 
 

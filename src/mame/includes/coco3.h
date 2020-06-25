@@ -40,9 +40,9 @@ public:
 		: coco_state(mconfig, type, tag)
 		, m_gime(*this, GIME_TAG) { }
 
-	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
-	virtual DECLARE_READ8_MEMBER( ff40_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff40_write ) override;
+	virtual void ff20_write(offs_t offset, uint8_t data) override;
+	virtual uint8_t ff40_read(offs_t offset) override;
+	virtual void ff40_write(offs_t offset, uint8_t data) override;
 
 	DECLARE_WRITE_LINE_MEMBER(gime_firq_w) { recalculate_firq(); }
 	DECLARE_WRITE_LINE_MEMBER(gime_irq_w) { recalculate_irq(); }

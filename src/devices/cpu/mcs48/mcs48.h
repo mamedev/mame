@@ -216,10 +216,9 @@ protected:
 	int         m_icount;
 
 	/* Memory spaces */
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	required_shared_ptr<uint8_t> m_dataptr;
 
@@ -235,15 +234,15 @@ protected:
 	const mcs48_ophandler *const m_opcode_table;
 
 	/* ROM is mapped to AS_PROGRAM */
-	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
+	uint8_t program_r(offs_t a)         { return m_program.read_byte(a); }
 
 	/* RAM is mapped to AS_DATA */
-	uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
-	void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
+	uint8_t ram_r(offs_t a)             { return m_data.read_byte(a); }
+	void    ram_w(offs_t a, uint8_t v)  { m_data.write_byte(a, v); }
 
 	/* ports are mapped to AS_IO and callbacks */
-	uint8_t ext_r(offs_t a)             { return m_io->read_byte(a); }
-	void    ext_w(offs_t a, uint8_t v)  { m_io->write_byte(a, v); }
+	uint8_t ext_r(offs_t a)             { return m_io.read_byte(a); }
+	void    ext_w(offs_t a, uint8_t v)  { m_io.write_byte(a, v); }
 	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
 	void    port_w(offs_t a, uint8_t v) { m_port_out_cb[a - 1](v); }
 	int     test_r(offs_t a)            { return m_test_in_cb[a](); }
@@ -622,8 +621,8 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
-	DECLARE_READ8_MEMBER(upi41_master_r);
-	DECLARE_WRITE8_MEMBER(upi41_master_w);
+	uint8_t upi41_master_r(offs_t offset);
+	void upi41_master_w(offs_t offset, uint8_t data);
 
 protected:
 	// construction/destruction

@@ -605,10 +605,10 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
+void mw8080bw_state::tornbase_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)
-		tornbase_audio_w(space, 0, data);
+		tornbase_audio_w(data);
 
 	if (offset & 0x02)
 		m_mb14241->shift_count_w(data);
@@ -739,7 +739,7 @@ void mw8080bw_state::tornbase(machine_config &config)
  *
  *************************************/
 
-void mw8080bw_state::zzzap_io_map(address_map &map)
+void zzzap_state::io_map(address_map &map)
 {
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
@@ -747,10 +747,10 @@ void mw8080bw_state::zzzap_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x02, 0x02).w(FUNC(mw8080bw_state::zzzap_audio_1_w));
+	map(0x02, 0x02).w("soundboard", FUNC(zzzap_audio_device::p1_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w(FUNC(mw8080bw_state::zzzap_audio_2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(zzzap_audio_device::p2_w));
 	map(0x07, 0x07).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -824,12 +824,12 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-void mw8080bw_state::zzzap(machine_config &config)
+void zzzap_state::zzzap(machine_config &config)
 {
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::zzzap_io_map);
+	m_maincpu->set_addrmap(AS_IO, &zzzap_state::io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1))); /* 1.1s */
 
@@ -837,7 +837,7 @@ void mw8080bw_state::zzzap(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	/* zzzap_audio(config); */
+	ZZZAP_AUDIO(config, "soundboard");
 }
 
 
@@ -881,7 +881,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
+void mw8080bw_state::maze_coin_counter_w(uint8_t data)
 {
 	/* the data is not used, just pulse the counter */
 	machine().bookkeeping().coin_counter_w(0, 0);
@@ -889,9 +889,9 @@ WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_io_w)
+void mw8080bw_state::maze_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
+	if (offset & 0x01)  maze_coin_counter_w(data);
 
 	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
@@ -1063,9 +1063,9 @@ void boothill_state::boothill(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
+void mw8080bw_state::checkmat_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
+	if (offset & 0x01)  checkmat_audio_w(data);
 
 	if (offset & 0x02)  m_watchdog->watchdog_reset();
 }
@@ -2277,7 +2277,7 @@ void mw8080bw_state::phantom2(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
+uint8_t mw8080bw_state::bowler_shift_result_r()
 {
 	/* ZV - not too sure why this is needed, I don't see
 	   anything unusual on the schematics that would cause
@@ -2286,7 +2286,7 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 	return ~m_mb14241->shift_result_r();
 }
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
+void mw8080bw_state::bowler_lights_1_w(uint8_t data)
 {
 	output().set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
 
@@ -2307,7 +2307,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
+void mw8080bw_state::bowler_lights_2_w(uint8_t data)
 {
 	output().set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
 	output().set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);
@@ -3090,18 +3090,18 @@ ROM_END
 
 /* 596 */ GAMEL( 1976, seawolf,    0,        seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
 /* 596 */ GAMEL( 1976, seawolfo,   seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
-/* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
 /* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, desertgu,   0,        desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, roadrunm,   desertgu, desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 619 */ GAME(  1977, dplay,      0,        dplay,    dplay,    dplay_state,    empty_init, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL( 1977, lagunar,    0,        zzzap,    lagunar,  mw8080bw_state, empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
+/* 622 */ GAMEL( 1977, lagunar,    0,        zzzap,    lagunar,  zzzap_state, empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
 /* 623 */ GAME(  1977, gmissile,   0,        gmissile, gmissile, boothill_state, empty_init, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 626 */ GAME(  1977, m4,         0,        m4,       m4,       boothill_state, empty_init, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )

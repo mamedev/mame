@@ -69,14 +69,14 @@ bootleg todo:
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
+void pktgaldx_state::pktgaldx_oki_bank_w(uint16_t data)
 {
 	m_oki2->set_rom_bank(data & 3);
 }
 
 /**********************************************************************************/
 
-READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
+uint16_t pktgaldx_state::pktgaldx_protection_region_f_104_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
@@ -84,7 +84,7 @@ READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
+void pktgaldx_state::pktgaldx_protection_region_f_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( pktgaldx_state::vblank_w )
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-WRITE16_MEMBER( pktgaldx_state::vblank_ack_w )
+void pktgaldx_state::vblank_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
@@ -135,12 +135,12 @@ void pktgaldx_state::decrypted_opcodes_map(address_map &map)
 
 /* Pocket Gal Deluxe (bootleg!) */
 
-READ16_MEMBER(pktgaldx_state::pckgaldx_unknown_r)
+uint16_t pktgaldx_state::pckgaldx_unknown_r()
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(pktgaldx_state::pckgaldx_protection_r)
+uint16_t pktgaldx_state::pckgaldx_protection_r()
 {
 	logerror("pckgaldx_protection_r address %06x\n",m_maincpu->pc());
 	return -1;
@@ -362,8 +362,6 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);

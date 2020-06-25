@@ -36,12 +36,12 @@ private:
 	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( irq_read );
-	DECLARE_WRITE16_MEMBER( irq_write );
-	DECLARE_READ16_MEMBER( pad_r );
-	DECLARE_WRITE16_MEMBER( pad_w );
-	DECLARE_READ8_MEMBER( extio_r );
-	DECLARE_WRITE8_MEMBER( extio_w );
+	uint16_t irq_read(offs_t offset);
+	void irq_write(offs_t offset, uint16_t data);
+	uint16_t pad_r(offs_t offset);
+	void pad_w(offs_t offset, uint16_t data);
+	uint8_t extio_r(offs_t offset);
+	void extio_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq8_w );
 	DECLARE_WRITE_LINE_MEMBER( irq9_w );
@@ -82,14 +82,14 @@ private:
 };
 
 
-READ8_MEMBER(pcfx_state::extio_r)
+uint8_t pcfx_state::extio_r(offs_t offset)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
 	return io_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(pcfx_state::extio_w)
+void pcfx_state::extio_w(offs_t offset, uint8_t data)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
@@ -106,7 +106,7 @@ void pcfx_state::pcfx_mem(address_map &map)
 	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
 }
 
-READ16_MEMBER( pcfx_state::pad_r )
+uint16_t pcfx_state::pad_r(offs_t offset)
 {
 	uint16_t res;
 	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
@@ -160,7 +160,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	set_irq_line(11, 1);
 }
 
-WRITE16_MEMBER( pcfx_state::pad_w )
+void pcfx_state::pad_w(offs_t offset, uint16_t data)
 {
 	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( pcfx )
 INPUT_PORTS_END
 
 
-READ16_MEMBER( pcfx_state::irq_read )
+uint16_t pcfx_state::irq_read(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -266,7 +266,7 @@ READ16_MEMBER( pcfx_state::irq_read )
 }
 
 
-WRITE16_MEMBER( pcfx_state::irq_write )
+void pcfx_state::irq_write(offs_t offset, uint16_t data)
 {
 	switch( offset )
 	{

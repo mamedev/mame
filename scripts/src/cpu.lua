@@ -198,23 +198,6 @@ if (CPUS["AMIS2000"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Alpha 8201
---@src/devices/cpu/alph8201/alph8201.h,CPUS["ALPHA8201"] = true
---------------------------------------------------
-
-if (CPUS["ALPHA8201"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/cpu/alph8201/alph8201.cpp",
-		MAME_DIR .. "src/devices/cpu/alph8201/alph8201.h",
-	}
-end
-
-if (CPUS["ALPHA8201"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alph8201/8201dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alph8201/8201dasm.h")
-end
-
---------------------------------------------------
 -- Analog Devices ADSP21xx series
 --@src/devices/cpu/adsp2100/adsp2100.h,CPUS["ADSP21XX"] = true
 --------------------------------------------------
@@ -698,6 +681,31 @@ if (CPUS["H8"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2000d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2600d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2600d.h")
+end
+
+--------------------------------------------------
+-- Hitachi H8/500 series
+--@src/devices/cpu/h8500/h8500.h,CPUS["H8500"] = true
+--------------------------------------------------
+
+if (CPUS["H8500"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/h8500/h8500.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8510.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8510.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8520.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8520.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8532.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8532.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8534.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8534.h",
+	}
+end
+
+if (CPUS["H8500"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h8500/h8500dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h8500/h8500dasm.h")
 end
 
 --------------------------------------------------
@@ -1274,6 +1282,16 @@ if (CPUS["PIC16C5X"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- PIC1670 - Disassembler only temporarily
+--@src/devices/cpu/pic1670/pic1670.h,CPUS["PIC1670"] = true
+--------------------------------------------------
+
+if (CPUS["PIC1670"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic1670/pic1670d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic1670/pic1670d.h")
+end
+
+--------------------------------------------------
 -- Microchip PIC16C62x
 --@src/devices/cpu/pic16c62x/pic16c62x.h,CPUS["PIC16C62X"] = true
 --------------------------------------------------
@@ -1288,6 +1306,35 @@ end
 if (CPUS["PIC16C62X"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16c62x/16c62xdsm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16c62x/16c62xdsm.h")
+end
+
+--------------------------------------------------
+-- Generic PIC16 - Disassembler only
+--@src/devices/cpu/pic16/pic16.h,CPUS["PIC16"] = true
+--------------------------------------------------
+
+if (CPUS["PIC16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16/pic16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16/pic16d.h")
+end
+
+--------------------------------------------------
+-- Microchip PIC17
+--@src/devices/cpu/pic17/pic17.h,CPUS["PIC17"] = true
+--------------------------------------------------
+
+if (CPUS["PIC17"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/pic17/pic17.cpp",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17.h",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.cpp",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.h",
+	}
+end
+
+if (CPUS["PIC17"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic17/pic17d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic17/pic17d.h")
 end
 
 --------------------------------------------------
@@ -1602,7 +1649,6 @@ if (CPUS["M6800"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6800/m6801.cpp",
 		MAME_DIR .. "src/devices/cpu/m6800/m6801.h",
 		MAME_DIR .. "src/devices/cpu/m6800/6800ops.hxx",
-		MAME_DIR .. "src/devices/cpu/m6800/6800tbl.hxx",
 	}
 end
 
@@ -1818,6 +1864,7 @@ if (CPUS["NEC"]~=null) then
 		MAME_DIR .. "src/devices/cpu/nec/necea.h",
 		MAME_DIR .. "src/devices/cpu/nec/necinstr.h",
 		MAME_DIR .. "src/devices/cpu/nec/necinstr.hxx",
+		MAME_DIR .. "src/devices/cpu/nec/nec80inst.hxx",
 		MAME_DIR .. "src/devices/cpu/nec/necmacro.h",
 		MAME_DIR .. "src/devices/cpu/nec/necmodrm.h",
 		MAME_DIR .. "src/devices/cpu/nec/necpriv.h",
@@ -2023,6 +2070,23 @@ end
 if (CPUS["RSP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rsp/rsp_dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rsp/rsp_dasm.h")
+end
+
+--------------------------------------------------
+-- Panasonic MN1880
+--@src/devices/cpu/mn1800/mn1880.h,CPUS["MN1880"] = true
+--------------------------------------------------
+
+if (CPUS["MN1880"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.h",
+	}
+end
+
+if (CPUS["MN1880"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1880/mn1880d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1880/mn1880d.h")
 end
 
 --------------------------------------------------
@@ -2506,6 +2570,13 @@ if (CPUS["TLCS900"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.h",
 	}
 end
 
@@ -3138,7 +3209,9 @@ end
 
 --------------------------------------------------
 -- NEC 78K
---@src/devices/cpu/upd78k/upd78k.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k0.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k2.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k3.h,CPUS["UPD78K"] = true
 --------------------------------------------------
 
 if (CPUS["UPD78K"]~=null) then
@@ -3197,4 +3270,14 @@ end
 if (CPUS["KS0164"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ks0164/ks0164d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ks0164/ks0164d.h")
+end
+
+--------------------------------------------------
+-- uPD177x - Disassembler only
+--@src/devices/cpu/upd177x/upd177x.h,CPUS["UPD177X"] = true
+--------------------------------------------------
+
+if (CPUS["UPD177X"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.h")
 end

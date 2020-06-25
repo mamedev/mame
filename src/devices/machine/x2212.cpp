@@ -136,7 +136,7 @@ void x2212_device::do_recall()
 //  write - store to the live RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( x2212_device::write )
+void x2212_device::write(offs_t offset, uint8_t data)
 {
 	assert(offset < m_size_data);
 	m_sram[offset] = data & 0x0f;
@@ -147,7 +147,7 @@ WRITE8_MEMBER( x2212_device::write )
 //  read - read from the live RAM
 //-------------------------------------------------
 
-READ8_MEMBER( x2212_device::read )
+u8 x2212_device::read(address_space &space, offs_t offset)
 {
 	assert(offset < m_size_data);
 	return (m_sram[offset] & 0x0f) | (space.unmap() & 0xf0);
@@ -159,7 +159,7 @@ READ8_MEMBER( x2212_device::read )
 //  (FIXME: actually active low, not active high)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( x2212_device::store )
+void x2212_device::store(int state)
 {
 	if (state != 0 && !m_store)
 		do_store();
@@ -172,7 +172,7 @@ WRITE_LINE_MEMBER( x2212_device::store )
 //  (FIXME: actually active low, not active high)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( x2212_device::recall )
+void x2212_device::recall(int state)
 {
 	if (state != 0 && !m_array_recall)
 		do_recall();

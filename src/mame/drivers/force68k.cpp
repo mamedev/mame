@@ -166,11 +166,11 @@ public:
 	void fccpu1(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ16_MEMBER (vme_a24_r);
-	DECLARE_WRITE16_MEMBER (vme_a24_w);
-	DECLARE_READ16_MEMBER (vme_a16_r);
-	DECLARE_WRITE16_MEMBER (vme_a16_w);
+	uint16_t bootvect_r(offs_t offset);
+	uint16_t vme_a24_r();
+	void vme_a24_w(uint16_t data);
+	uint16_t vme_a16_r();
+	void vme_a16_w(uint16_t data);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 
@@ -195,7 +195,7 @@ private:
 	// User EPROM/SRAM slot(s)
 	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
-	DECLARE_READ16_MEMBER (read16_rom);
+	uint16_t read16_rom(offs_t offset);
 
 	void force68k_mem(address_map &map);
 
@@ -381,9 +381,9 @@ void force68k_state::machine_start ()
 	{
 		m_usrrom = (uint16_t*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-#else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(*this, FUNC(force68k_state::read16_rom)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16sm_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
+#else // So we installs a custom very inefficient handler for now until we understand hop to solve the problem better
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16sm_delegate(*this, FUNC(force68k_state::read16_rom)));
 #endif
 	}
 }
@@ -404,14 +404,14 @@ void force68k_state::machine_reset ()
 	m_brg->timer_enable((mc14411_device::timer_id) m_serial_p5->read(), true);
 }
 
-/* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
-READ16_MEMBER (force68k_state::read16_rom){
+/* A very inefficient User cart emulation of two 8 bit sockets (odd and even) */
+uint16_t force68k_state::read16_rom(offs_t offset){
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
 	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (force68k_state::bootvect_r){
+uint16_t force68k_state::bootvect_r(offs_t offset){
 	return m_sysrom [offset];
 }
 
@@ -434,24 +434,24 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r)
+uint16_t force68k_state::vme_a24_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w)
+void force68k_state::vme_a24_w(uint16_t data)
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r)
+uint16_t force68k_state::vme_a16_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w)
+void force68k_state::vme_a16_w(uint16_t data)
 {
 	LOG("%s\n", FUNCNAME);
 }
@@ -584,7 +584,7 @@ void force68k_state::fccpu1(machine_config &config)
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	PIT68230(config, m_pit, XTAL(16'000'000) / 2);
-	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pit->h2_out_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// Centronics

@@ -60,7 +60,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 }
 
 
-WRITE16_MEMBER(m92_state::spritecontrol_w)
+void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritecontrol[offset]);
 	// offset0: sprite list size (negative)
@@ -96,7 +96,7 @@ WRITE16_MEMBER(m92_state::spritecontrol_w)
 //  logerror("%s: spritecontrol_w %08x %08x\n",m_maincpu->pc(),offset,data);
 }
 
-WRITE16_MEMBER(m92_state::videocontrol_w)
+void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videocontrol);
 	/*
@@ -133,12 +133,12 @@ WRITE16_MEMBER(m92_state::videocontrol_w)
 //  logerror("%s: videocontrol_w %d = %02x\n",m_maincpu->pc(),offset,data);
 }
 
-READ16_MEMBER(m92_state::paletteram_r)
+uint16_t m92_state::paletteram_r(offs_t offset)
 {
 	return m_paletteram[offset | (m_palette_bank << 10)];
 }
 
-WRITE16_MEMBER(m92_state::paletteram_w)
+void m92_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_palette->write16(offset | (m_palette_bank << 10), data, mem_mask);
 }
@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 	attrib = m_vram_data[tile_index + 1];
 	tile = m_vram_data[tile_index] + ((attrib & 0x8000) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			attrib & 0x7f,
 			TILE_FLIPYX(attrib >> 9));
@@ -165,13 +165,11 @@ TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::vram_w)
+void m92_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int laynum;
-
 	COMBINE_DATA(&m_vram_data[offset]);
 
-	for (laynum = 0; laynum < 3; laynum++)
+	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		if ((offset & 0x6000) == m_pf_layer[laynum].vram_base)
 		{
@@ -185,7 +183,7 @@ WRITE16_MEMBER(m92_state::vram_w)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::master_control_w)
+void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_pf_master_control[offset];
 	M92_pf_layer_info *layer;

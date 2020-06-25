@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="msx1_cart" description="MSX1 cartridges">
 
 <!--
@@ -1343,7 +1346,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="アドベン・チュー太" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="adven' chuta! (japan).rom" size="16384" crc="96e02df3" sha1="ae0c0b0c9468e137eba5b52f96241acd55d9746a" offset="0" />
+				<rom name="adven' chuta (japan).rom" size="16384" crc="96e02df3" sha1="ae0c0b0c9468e137eba5b52f96241acd55d9746a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2791,7 +2794,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="シーソー" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="c-so! (japan).rom" size="16384" crc="df8bfc89" sha1="cd69ce70747bc0deebba9fd307a07f5dfb926cc3" offset="0" />
+				<rom name="c-so (japan).rom" size="16384" crc="df8bfc89" sha1="cd69ce70747bc0deebba9fd307a07f5dfb926cc3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3475,7 +3478,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="カモン！ピコ" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="come on! picot (japan).rom" size="32768" crc="98b1cc99" sha1="1cf39e12313ff3064353c136262f176a56ab20a6" offset="0" />
+				<rom name="come on picot (japan).rom" size="32768" crc="98b1cc99" sha1="1cf39e12313ff3064353c136262f176a56ab20a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5309,7 +5312,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="gw126a">
+	<software name="gw126a" cloneof="gw126">
 		<description>Game World - 126 Games (Kor, Hacked?)</description>
 		<year>19??</year>
 		<publisher>Zemina</publisher>
@@ -6164,7 +6167,7 @@ kept for now until finding out what those bytes affect...
 		<info name="usage" value="Requires a machine with RAM in a main slot" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="hustle! chumy (japan).rom" size="16384" crc="99518a12" sha1="e06ed9b0b3e1fbb9f27be65c37b4d9b548889b4f" offset="0" />
+				<rom name="hustle chumy (japan).rom" size="16384" crc="99518a12" sha1="e06ed9b0b3e1fbb9f27be65c37b4d9b548889b4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6176,7 +6179,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ハッスルチュミー" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="hustle! chumy (japan) (alt 1).rom" size="16384" crc="22fd4780" sha1="86e688cea0f0c8bcd31b6bcd19fd72ac108646bb" offset="0" />
+				<rom name="hustle chumy (japan) (alt 1).rom" size="16384" crc="22fd4780" sha1="86e688cea0f0c8bcd31b6bcd19fd72ac108646bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6462,6 +6465,19 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="iriegas (japan).rom" size="16384" crc="36a08e0b" sha1="95ae5b3e24ad0bea21902cb7dfd3fd9581166a76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ink">
+		<description>Ink - Exxon Surfing</description>
+		<year>2006</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ink" />
+			<dataarea name="rom" size="524288">
+				<!-- Am29F040B flashrom dump -->
+				<rom name="ink.bin" size="524288" crc="23049642" sha1="4d74d3bad55a9b1deb88b81bd4ad5165383508d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9720,7 +9736,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ピットフォール" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="pitfall! (japan).rom" size="16384" crc="5a009c55" sha1="b88e9c548873dcfd190e0e38f7b279344eea41ec" offset="0" />
+				<rom name="pitfall (japan).rom" size="16384" crc="5a009c55" sha1="b88e9c548873dcfd190e0e38f7b279344eea41ec" offset="0" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 				<rom size="16384" offset="0x8000" loadflag="reload" />
 				<rom size="16384" offset="0xc000" loadflag="reload" />
@@ -9736,7 +9752,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ピットフォール" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="pitfall! (japan) (alt 1).rom" size="16384" crc="930aeb2c" sha1="5fb4b6c3735e4d9415565a856bb69f9fb4857161" offset="0" />
+				<rom name="pitfall (japan) (alt 1).rom" size="16384" crc="930aeb2c" sha1="5fb4b6c3735e4d9415565a856bb69f9fb4857161" offset="0" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 				<rom size="16384" offset="0x8000" loadflag="reload" />
 				<rom size="16384" offset="0xc000" loadflag="reload" />
@@ -9752,7 +9768,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ピットフォール" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="pitfall! (japan) (alt 2).rom" size="16384" crc="2cb24473" sha1="2fa9c0f016efc2d1752a272c632393f5063ea06c" offset="0" />
+				<rom name="pitfall (japan) (alt 2).rom" size="16384" crc="2cb24473" sha1="2fa9c0f016efc2d1752a272c632393f5063ea06c" offset="0" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 				<rom size="16384" offset="0x8000" loadflag="reload" />
 				<rom size="16384" offset="0xc000" loadflag="reload" />
@@ -12011,7 +12027,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="띠띠!빵빵!" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="ti ti! pang pang!.rom" size="32768" crc="2808a3bc" sha1="00ffd7adfc0a7a342912344ad64902e226b3ad41" offset="0x0000" />
+				<rom name="ti ti pang pang.rom" size="32768" crc="2808a3bc" sha1="00ffd7adfc0a7a342912344ad64902e226b3ad41" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12022,7 +12038,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="top roller! (japan).rom" size="16384" crc="fc609730" sha1="37c85041128ee21300327726b7300a20ef6b84dd" offset="0" />
+				<rom name="top roller (japan).rom" size="16384" crc="fc609730" sha1="37c85041128ee21300327726b7300a20ef6b84dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>

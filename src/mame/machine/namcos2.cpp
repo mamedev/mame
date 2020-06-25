@@ -4,7 +4,7 @@
 
 Namco System II
 
-  machine.c
+  namcos2.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -20,7 +20,7 @@ Namco System II
 
 
 
-READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
+uint16_t namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 {
 	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
 	static const uint16_t table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
@@ -114,7 +114,7 @@ void namcos2_state::reset_all_subcpus(int state)
 	}
 }
 
-WRITE8_MEMBER(namcos2_state::sound_reset_w)
+void namcos2_state::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -129,7 +129,7 @@ WRITE8_MEMBER(namcos2_state::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namcos2_state::system_reset_w)
+void namcos2_state::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -141,12 +141,12 @@ WRITE8_MEMBER(namcos2_state::system_reset_w)
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-WRITE8_MEMBER( namcos2_state::eeprom_w )
+void namcos2_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER( namcos2_state::eeprom_r )
+uint8_t namcos2_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -186,7 +186,7 @@ suzuk8h2    1993
 sws93       1993    334         $014e
  *************************************************************/
 
-READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
+uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 {
 	switch (m_gametype)
 	{
@@ -358,7 +358,7 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 	return machine().rand()&0xffff;
 }
 
-WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
+void namcos2_state::namcos2_68k_key_w(offs_t offset, uint16_t data)
 {
 	int gametype = m_gametype;
 	if( gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
@@ -393,7 +393,38 @@ WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-WRITE8_MEMBER( namcos2_state::sound_bankselect_w )
+void namcos2_state::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
+}
+
+uint16_t namcos2_state::c140_rom_r(offs_t offset)
+{
+	/*
+	    Verified from schematics:
+	    MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
+	    MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
+	    MA0-MA18 : Connected in Address bus of ROMs
+	    MA19 : Connected in 74LS157 Select Pin
+	    MA20 : Connected in 74LS157 Strobe(Enable) Pin
+	    MA21 : ROM select in MD4-MD11 area
+	*/
+	if (m_c140_region != nullptr)
+	{
+		bool romsel = BIT(offset, 21);
+		bool lsb_en = BIT(~offset, 20);
+		bool lsb_swap = BIT(~offset, 19);
+		offset &= 0x7ffff;
+		u16 ret = m_c140_region[(romsel << 19) | offset] & 0xff00; // voice1 or voice2
+		if (lsb_en)
+		{
+			u8 lsb = m_c140_region[offset] & 0xff; // voice0
+			if (lsb_swap)
+				lsb <<= 4; // D0-D3
+
+			ret |= (lsb & 0xf0);
+		}
+		return ret;
+	}
+	return 0;
 }

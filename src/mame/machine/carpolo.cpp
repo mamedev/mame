@@ -57,7 +57,7 @@
 #define CAR_BORDER_EXTRA_BITS       0x50
 
 
-WRITE8_MEMBER(carpolo_state::ttl74148_3s_cb)
+void carpolo_state::ttl74148_3s_cb(uint8_t data)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_ttl74148_3s->output_valid_r() ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -136,7 +136,7 @@ void carpolo_state::generate_car_border_interrupt(int car, int horizontal_border
 }
 
 
-READ8_MEMBER(carpolo_state::ball_screen_collision_cause_r)
+uint8_t carpolo_state::ball_screen_collision_cause_r()
 {
 	/* bit 0 - 0=ball collided with border
 	   bit 1 - 0=ball collided with goal
@@ -145,19 +145,19 @@ READ8_MEMBER(carpolo_state::ball_screen_collision_cause_r)
 	return m_ball_screen_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::car_ball_collision_x_r)
+uint8_t carpolo_state::car_ball_collision_x_r()
 {
 	/* the x coordinate of the colliding pixel */
 	return m_car_ball_collision_x;
 }
 
-READ8_MEMBER(carpolo_state::car_ball_collision_y_r)
+uint8_t carpolo_state::car_ball_collision_y_r()
 {
 	/* the y coordinate of the colliding pixel */
 	return m_car_ball_collision_y;
 }
 
-READ8_MEMBER(carpolo_state::car_car_collision_cause_r)
+uint8_t carpolo_state::car_car_collision_cause_r()
 {
 	/* bit 0 - car 4 collided
 	   bit 1 - car 3 collided
@@ -166,7 +166,7 @@ READ8_MEMBER(carpolo_state::car_car_collision_cause_r)
 	return m_car_car_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::car_goal_collision_cause_r)
+uint8_t carpolo_state::car_goal_collision_cause_r()
 {
 	/* bit 0-1 - which car collided
 	   bit 2   - horizontal timing bit 1TEC4 (not accessed)
@@ -174,14 +174,14 @@ READ8_MEMBER(carpolo_state::car_goal_collision_cause_r)
 	return m_car_goal_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::car_ball_collision_cause_r)
+uint8_t carpolo_state::car_ball_collision_cause_r()
 {
 	/* bit 0-1 - which car collided
 	   bit 2-3 - unconnected */
 	return m_car_ball_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::car_border_collision_cause_r)
+uint8_t carpolo_state::car_border_collision_cause_r()
 {
 	/* bit 0-1 - which car collided
 	   bit 2   - 0=vertical border, 1=horizontal border */
@@ -189,7 +189,7 @@ READ8_MEMBER(carpolo_state::car_border_collision_cause_r)
 }
 
 
-READ8_MEMBER(carpolo_state::interrupt_cause_r)
+uint8_t carpolo_state::interrupt_cause_r()
 {
 	/* the output of the 148 goes to bits 1-3 (which is priority ^ 7) */
 	return (m_ttl74148_3s->output_r() << 1) | m_priority_0_extension;
@@ -280,37 +280,37 @@ WRITE_LINE_MEMBER(carpolo_state::coin4_interrupt_clear_w)
 	m_ttl7474_2u_2->clear_w(state);
 }
 
-WRITE8_MEMBER(carpolo_state::ball_screen_interrupt_clear_w)
+void carpolo_state::ball_screen_interrupt_clear_w(uint8_t data)
 {
 	m_ttl74148_3s->input_line_w(BALL_SCREEN_PRIORITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::car_car_interrupt_clear_w)
+void carpolo_state::car_car_interrupt_clear_w(uint8_t data)
 {
 	m_ttl74148_3s->input_line_w(CAR_CAR_PRIORITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::car_goal_interrupt_clear_w)
+void carpolo_state::car_goal_interrupt_clear_w(uint8_t data)
 {
 	m_ttl74148_3s->input_line_w(CAR_GOAL_PRIORITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::car_ball_interrupt_clear_w)
+void carpolo_state::car_ball_interrupt_clear_w(uint8_t data)
 {
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::car_border_interrupt_clear_w)
+void carpolo_state::car_border_interrupt_clear_w(uint8_t data)
 {
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::timer_interrupt_clear_w)
+void carpolo_state::timer_interrupt_clear_w(uint8_t data)
 {
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
 	m_ttl74148_3s->update();
@@ -333,7 +333,7 @@ WRITE_LINE_MEMBER( carpolo_state::ls153_zb_w )
 	m_ls153_zb = state;
 }
 
-WRITE8_MEMBER(carpolo_state::pia_0_port_a_w)
+void carpolo_state::pia_0_port_a_w(uint8_t data)
 {
 	/* bit 0 - Coin counter
 	   bit 1 - Player 4 crash sound
@@ -354,7 +354,7 @@ WRITE8_MEMBER(carpolo_state::pia_0_port_a_w)
 }
 
 
-WRITE8_MEMBER(carpolo_state::pia_0_port_b_w)
+void carpolo_state::pia_0_port_b_w(uint8_t data)
 {
 	/* bit 0 - Strobe speed bits sound
 	   bit 1 - Speed bit 0 sound
@@ -367,7 +367,7 @@ WRITE8_MEMBER(carpolo_state::pia_0_port_b_w)
 	m_ttl74153_1k->s1_w(BIT(data, 7));
 }
 
-READ8_MEMBER(carpolo_state::pia_0_port_b_r)
+uint8_t carpolo_state::pia_0_port_b_r()
 {
 	/* bit 4 - Pedal bit 0
 	   bit 5 - Pedal bit 1 */
@@ -376,7 +376,7 @@ READ8_MEMBER(carpolo_state::pia_0_port_b_r)
 }
 
 
-READ8_MEMBER(carpolo_state::pia_1_port_a_r)
+uint8_t carpolo_state::pia_1_port_a_r()
 {
 	uint8_t ret;
 
@@ -399,7 +399,7 @@ READ8_MEMBER(carpolo_state::pia_1_port_a_r)
 }
 
 
-READ8_MEMBER(carpolo_state::pia_1_port_b_r)
+uint8_t carpolo_state::pia_1_port_b_r()
 {
 	uint8_t ret;
 

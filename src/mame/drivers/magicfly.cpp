@@ -483,10 +483,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
-	DECLARE_WRITE8_MEMBER(magicfly_colorram_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
+	void magicfly_videoram_w(offs_t offset, uint8_t data);
+	void magicfly_colorram_w(offs_t offset, uint8_t data);
+	uint8_t mux_port_r();
+	void mux_port_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
 	void magicfly_palette(palette_device &palette) const;
@@ -502,13 +502,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(magicfly_state::magicfly_videoram_w)
+void magicfly_state::magicfly_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(magicfly_state::magicfly_colorram_w)
+void magicfly_state::magicfly_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -537,7 +537,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 void magicfly_state::video_start()
@@ -568,7 +568,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x04) << 5);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 VIDEO_START_MEMBER(magicfly_state, 7mezzo)
@@ -643,7 +643,7 @@ void magicfly_state::bchance_palette(palette_device &palette) const
 **************************************************/
 
 
-READ8_MEMBER(magicfly_state::mux_port_r)
+uint8_t magicfly_state::mux_port_r()
 {
 	switch( m_input_selector )
 	{
@@ -656,7 +656,7 @@ READ8_MEMBER(magicfly_state::mux_port_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(magicfly_state::mux_port_w)
+void magicfly_state::mux_port_w(uint8_t data)
 {
 /*  - bits -
     7654 3210

@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(kingofb_state::get_bg_tile_info)
 	int code = (tile_index / 16) ? m_videoram[tile_index] + ((attr & 0x03) << 8) : 0;
 	int color = ((attr & 0x70) >> 4) + 8 * m_palette_bank;
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(kingofb_state::get_fg_tile_info)
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER(kingofb_state::get_fg_tile_info)
 	int code = m_videoram2[tile_index] + ((attr & 0x01) << 8);
 	int color = (attr & 0x38) >> 3;
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 VIDEO_START_MEMBER(kingofb_state,kingofb)
@@ -254,7 +254,7 @@ TILE_GET_INFO_MEMBER(kingofb_state::ringking_get_bg_tile_info)
 	int code = (tile_index / 16) ? m_videoram[tile_index] : 0;
 	int color = ((m_colorram[tile_index] & 0x70) >> 4) + 8 * m_palette_bank;
 
-	SET_TILE_INFO_MEMBER(4, code, color, 0);
+	tileinfo.set(4, code, color, 0);
 }
 
 VIDEO_START_MEMBER(kingofb_state,ringking)

@@ -160,7 +160,7 @@ MACHINE_START_MEMBER(srmp2_state,mjyuugi)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
+void srmp2_state::srmp2_flags_w(uint16_t data)
 {
 /*
     ---- ---x : Coin Counter
@@ -177,7 +177,7 @@ WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
+void srmp2_state::mjyuugi_flags_w(uint16_t data)
 {
 /*
     ---- ---x : Coin Counter
@@ -189,7 +189,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
+void srmp2_state::mjyuugi_adpcm_bank_w(uint16_t data)
 {
 /*
     ---- xxxx : ADPCM Bank
@@ -201,7 +201,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
 }
 
 
-WRITE8_MEMBER(srmp2_state::adpcm_code_w)
+void srmp2_state::adpcm_code_w(uint8_t data)
 {
 /*
     - Received data may be playing ADPCM number.
@@ -240,12 +240,12 @@ WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 			}
 			else
 			{
-				m_msm->write_data(((m_adpcm_data >> 4) & 0x0f));
+				m_msm->data_w((m_adpcm_data >> 4) & 0x0f);
 			}
 		}
 		else
 		{
-			m_msm->write_data(((m_adpcm_data >> 0) & 0x0f));
+			m_msm->data_w((m_adpcm_data >> 0) & 0x0f);
 			m_adpcm_sptr++;
 			m_adpcm_data = -1;
 		}
@@ -256,7 +256,7 @@ WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 	}
 }
 
-READ8_MEMBER(srmp2_state::vox_status_r)
+uint8_t srmp2_state::vox_status_r()
 {
 	return 1;
 }
@@ -283,7 +283,7 @@ uint8_t srmp2_state::iox_key_matrix_calc(uint8_t p_side)
 	return 0;
 }
 
-READ8_MEMBER(srmp2_state::iox_mux_r)
+uint8_t srmp2_state::iox_mux_r()
 {
 	/* first off check any pending protection value */
 	{
@@ -326,12 +326,12 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 	return ioport("SERVICE")->read() & 0xff;
 }
 
-READ8_MEMBER(srmp2_state::iox_status_r)
+uint8_t srmp2_state::iox_status_r()
 {
 	return 1;
 }
 
-WRITE8_MEMBER(srmp2_state::iox_command_w)
+void srmp2_state::iox_command_w(uint8_t data)
 {
 	/*
 	bit wise command port apparently
@@ -344,7 +344,7 @@ WRITE8_MEMBER(srmp2_state::iox_command_w)
 	m_iox.ff = 0; // this also set flip flop back to 0
 }
 
-WRITE8_MEMBER(srmp2_state::iox_data_w)
+void srmp2_state::iox_data_w(uint8_t data)
 {
 	m_iox.data = data;
 
@@ -358,7 +358,7 @@ WRITE8_MEMBER(srmp2_state::iox_data_w)
 		m_iox.ff = 1;
 }
 
-WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
+void srmp2_state::srmp3_rombank_w(uint8_t data)
 {
 /*
     ---- xxxx : MAIN ROM bank
@@ -376,12 +376,12 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 
 **************************************************************************/
 
-WRITE8_MEMBER(srmp2_state::srmp2_irq2_ack_w)
+void srmp2_state::srmp2_irq2_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
+void srmp2_state::srmp2_irq4_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
@@ -409,13 +409,13 @@ void srmp2_state::srmp2_map(address_map &map)
 	map(0xf00000, 0xf00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 }
 
-READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
+uint8_t srmp2_state::mjyuugi_irq2_ack_r()
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
 }
 
-READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
+uint8_t srmp2_state::mjyuugi_irq4_ack_r()
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
@@ -449,7 +449,7 @@ void srmp2_state::mjyuugi_map(address_map &map)
 	map(0xffc000, 0xffffff).ram().share("nvram");
 }
 
-WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
+void srmp2_state::srmp3_flags_w(uint8_t data)
 {
 /*
     ---- ---x : Coin Counter
@@ -462,7 +462,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 	m_gfx_bank = (data >> 6) & 0x03;
 }
 
-WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
+void srmp2_state::srmp3_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -506,7 +506,7 @@ void srmp2_state::rmgoldyh_map(address_map &map)
 	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
 }
 
-WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
+void srmp2_state::rmgoldyh_rombank_w(uint8_t data)
 {
 /*
     ---x xxxx : MAIN ROM bank

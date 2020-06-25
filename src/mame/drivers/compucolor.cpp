@@ -72,8 +72,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_WRITE8_MEMBER( xo_w );
+	uint8_t xi_r();
+	void xo_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( xmt_w );
 
 	IRQ_CALLBACK_MEMBER( int_ack );
@@ -299,7 +299,7 @@ uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-READ8_MEMBER( compucolor2_state::xi_r )
+uint8_t compucolor2_state::xi_r()
 {
 	uint8_t data = 0xff;
 
@@ -321,7 +321,7 @@ READ8_MEMBER( compucolor2_state::xi_r )
 	return data;
 }
 
-WRITE8_MEMBER( compucolor2_state::xo_w )
+void compucolor2_state::xo_w(uint8_t data)
 {
 	/*
 

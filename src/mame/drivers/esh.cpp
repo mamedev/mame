@@ -63,11 +63,10 @@ private:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	bool m_ld_video_visible;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_write);
-	DECLARE_WRITE8_MEMBER(led_writes);
-	DECLARE_WRITE8_MEMBER(nmi_line_w);
+	uint8_t ldp_read();
+	void misc_write(uint8_t data);
+	void led_writes(offs_t offset, uint8_t data);
+	void nmi_line_w(uint8_t data);
 	bool m_nmi_enable;
 	void esh_palette(palette_device &palette) const;
 	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -145,17 +144,13 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 
 /* MEMORY HANDLERS */
-READ8_MEMBER(esh_state::ldp_read)
+
+uint8_t esh_state::ldp_read()
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(esh_state::ldp_write)
-{
-	m_laserdisc->data_w(data);
-}
-
-WRITE8_MEMBER(esh_state::misc_write)
+void esh_state::misc_write(uint8_t data)
 {
 	/* Bit 0 unknown */
 
@@ -169,7 +164,7 @@ WRITE8_MEMBER(esh_state::misc_write)
 	/* They cycle through a repeating pattern though */
 }
 
-WRITE8_MEMBER(esh_state::led_writes)
+void esh_state::led_writes(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -200,7 +195,7 @@ WRITE8_MEMBER(esh_state::led_writes)
 	}
 }
 
-WRITE8_MEMBER(esh_state::nmi_line_w)
+void esh_state::nmi_line_w(uint8_t data)
 {
 	// 0 -> 1 transition enables this, else disabled?
 	m_nmi_enable = (data & 1) == 1;
@@ -232,7 +227,7 @@ void esh_state::z80_0_io(address_map &map)
 	map(0xf1, 0xf1).portr("IN1");
 	map(0xf2, 0xf2).portr("IN2");
 	map(0xf3, 0xf3).portr("IN3");
-	map(0xf4, 0xf4).rw(FUNC(esh_state::ldp_read), FUNC(esh_state::ldp_write));
+	map(0xf4, 0xf4).r(FUNC(esh_state::ldp_read)).w(m_laserdisc, FUNC(pioneer_ldv1000_device::data_w));
 	map(0xf5, 0xf5).w(FUNC(esh_state::misc_write));    /* Continuously writes repeating patterns */
 	map(0xf8, 0xfd).w(FUNC(esh_state::led_writes));
 	map(0xfe, 0xfe).w(FUNC(esh_state::nmi_line_w));    /* Both 0xfe and 0xff flip quickly between 0 and 1 */

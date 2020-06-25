@@ -24,7 +24,7 @@ class psikyo_state : public driver_device
 public:
 	psikyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram_%u", 0)
+		, m_vram(*this, "vram_%u", 0U, (u8)32)
 		, m_vregs(*this, "vregs")
 		, m_bootleg_spritebuffer(*this, "boot_spritebuf")
 		, m_spritelut(*this, "spritelut")
@@ -43,6 +43,8 @@ public:
 		, m_spriteram(*this, "spriteram")
 	{
 		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), ~u32(0));
+		std::fill(std::begin(m_old_tmapsize), std::end(m_old_tmapsize), ~u32(0));
+		std::fill(std::begin(m_tmapsize), std::end(m_tmapsize), ~u32(0));
 	}
 
 	void sngkace(machine_config &config);
@@ -64,11 +66,11 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr_array<u32, 2> m_vram;
+	required_shared_ptr_array<u16, 2> m_vram;
 	required_shared_ptr<u32> m_vregs;
 	optional_shared_ptr<u32> m_bootleg_spritebuffer;
 
-	required_memory_region m_spritelut;
+	required_region_ptr<u16> m_spritelut;
 	optional_memory_bank m_audiobank;
 	optional_memory_bank m_okibank;
 	optional_ioport m_in_dsw;
@@ -86,10 +88,12 @@ private:
 		u32 primask;
 	};
 
-	tilemap_t   *m_tilemap[2][4];
+	tilemap_t   *m_tilemap[2];
 	u8          m_tilemap_bank[2];
 	bool        m_ka302c_banking;
 	u32         m_old_linescroll[2];
+	u32         m_old_tmapsize[2];
+	u32         m_tmapsize[2];
 	std::unique_ptr<sprite_t[]> m_spritelist;
 	struct sprite_t *m_sprite_ptr_pre;
 	u16         m_sprite_ctrl;
@@ -108,34 +112,35 @@ private:
 	u8          m_s1945_mcu_bctrl;
 	const u8    *m_s1945_mcu_table;
 
-	DECLARE_READ32_MEMBER(sngkace_input_r);
-	DECLARE_READ32_MEMBER(gunbird_input_r);
+	u32 sngkace_input_r(offs_t offset);
+	u32 gunbird_input_r(offs_t offset);
 	void s1945_mcu_data_w(uint8_t data);
 	void s1945_mcu_control_w(uint8_t data);
 	void s1945_mcu_direction_w(uint8_t data);
 	void s1945_mcu_bctrl_w(uint8_t data);
 	void s1945_mcu_command_w(uint8_t data);
-	uint32_t s1945_mcu_data_r();
+	u32 s1945_mcu_data_r();
 	uint8_t s1945_mcu_control_r();
-	DECLARE_READ32_MEMBER(s1945_input_r);
-	DECLARE_WRITE8_MEMBER(s1945bl_okibank_w);
-	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
+	u32 s1945_input_r(offs_t offset);
+	void s1945bl_okibank_w(u8 data);
+	template<int Shift> void sound_bankswitch_w(u8 data);
+	template<int Layer> u16 vram_r(offs_t offset);
+	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template<int Layer> TILEMAP_MAPPER_MEMBER(tile_scan);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(sngkace);
 	DECLARE_VIDEO_START(psikyo);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bootleg);
 	void switch_bgbanks(u8 tmap, u8 bank);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprites();
 	void get_sprites_bootleg();
-	u16 tilemap_width(u8 size);
 	void s1945_mcu_init();
 
 	/* devices */

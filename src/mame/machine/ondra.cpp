@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 
 
-READ8_MEMBER(ondra_state::ondra_keyboard_r)
+uint8_t ondra_state::ondra_keyboard_r(offs_t offset)
 {
 	uint8_t retVal = 0x00;
 
@@ -49,11 +49,11 @@ void ondra_state::ondra_update_banks()
 		m_bank3->set_base(m_ram->pointer() + 0xe000);
 	} else {
 		space.unmap_write(0xe000, 0xffff);
-		space.install_read_handler (0xe000, 0xffff, read8_delegate(*this, FUNC(ondra_state::ondra_keyboard_r)));
+		space.install_read_handler (0xe000, 0xffff, read8sm_delegate(*this, FUNC(ondra_state::ondra_keyboard_r)));
 	}
 }
 
-WRITE8_MEMBER(ondra_state::ondra_port_03_w)
+void ondra_state::ondra_port_03_w(uint8_t data)
 {
 	m_video_enable = data & 1;
 	m_bank1_status = (data >> 1) & 1;
@@ -62,11 +62,11 @@ WRITE8_MEMBER(ondra_state::ondra_port_03_w)
 	m_cassette->output(((data >> 3) & 1) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER(ondra_state::ondra_port_09_w)
+void ondra_state::ondra_port_09_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(ondra_state::ondra_port_0a_w)
+void ondra_state::ondra_port_0a_w(uint8_t data)
 {
 }
 

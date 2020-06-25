@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-Compiled by K1W1
--->
+license:CC0
 
-<!--
+Compiled by K1W1
 
   * Cartridge pictures can be seen here http://www.pitfalljones.com/0800-low.htm
 
@@ -497,7 +496,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language v3.6.rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710"/> <!-- Verified -->
+				<rom name="action programming language v3.6.rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -510,7 +509,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac"/> <!-- Verified -->
+				<rom name="action programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -522,7 +521,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss043m" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language v3.5.rom" size="16384" crc="ae298a33" sha1="8928a0c6a93e5b78aa3f91d8bd25b2e529e274ae"/>
+				<rom name="action programming language v3.5.rom" size="16384" crc="ae298a33" sha1="8928a0c6a93e5b78aa3f91d8bd25b2e529e274ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -908,7 +907,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atarinet v1.0 (2015)(slorsoft)(us)[!].rom" size="16384" crc="f483b0e1" sha1="0e875d5a4aec426641b22f6db4d89010799622e1"/> <!-- Verified -->
+				<rom name="atarinet v1.0 (2015)(slorsoft)(us).rom" size="16384" crc="f483b0e1" sha1="0e875d5a4aec426641b22f6db4d89010799622e1"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1277,7 +1276,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_bbsb" />
 			<dataarea name="rom" size="40960">
-				<rom name="bounty bob strikes back!.rom" size="40960" crc="cc7912ed" sha1="5a064551c22a267879c69b7cc97ea3c67f21b851"/> <!-- Verified -->
+				<rom name="bounty bob strikes back.rom" size="40960" crc="cc7912ed" sha1="5a064551c22a267879c69b7cc97ea3c67f21b851"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1290,7 +1289,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_bbsb" />
 			<dataarea name="rom" size="40960">
-				<rom name="bounty bob strikes back! (alt).rom" size="40960" crc="0d00f072" sha1="57e3856b6b00e94490350156620dc61cf0669c17"/>
+				<rom name="bounty bob strikes back (alt).rom" size="40960" crc="0d00f072" sha1="57e3856b6b00e94490350156620dc61cf0669c17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1615,7 +1614,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="choplifter!.rom" size="16384" crc="3ebc05ff" sha1="a8a28c18e249272c27f7d72f7c40dab2e8d712f2"/> <!-- Verified -->
+				<rom name="choplifter.rom" size="16384" crc="3ebc05ff" sha1="a8a28c18e249272c27f7d72f7c40dab2e8d712f2"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2122,7 +2121,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="ducks ahoy!.rom" size="16384" crc="4cdfceb9" sha1="e2bb6270e2646b9c721c4c038c0fddfccf7218a4"/> <!-- Verified -->
+				<rom name="ducks ahoy.rom" size="16384" crc="4cdfceb9" sha1="e2bb6270e2646b9c721c4c038c0fddfccf7218a4"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2161,7 +2160,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="e.t. phone home!.rom" size="16384" crc="bce4ef51" sha1="c4a10ce59ee183ef4299e50a0825ec23b4315b56"/> <!-- Verified -->
+				<rom name="e.t. phone home.rom" size="16384" crc="bce4ef51" sha1="c4a10ce59ee183ef4299e50a0825ec23b4315b56"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2316,7 +2315,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_express" />
 			<dataarea name="rom" size="65536">
-				<rom name="express! v1.12.rom" size="65536" crc="4a5fcefd" sha1="5ed02fc71cdc1ba661120e873fcf58feade78d7a"/>
+				<rom name="express v1.12.rom" size="65536" crc="4a5fcefd" sha1="5ed02fc71cdc1ba661120e873fcf58feade78d7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2509,7 +2508,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="frogger ii - threedeep!.rom" size="16384" crc="7a5b4f65" sha1="a70678dbc4f00059faeff8f15896c535730256cb"/> <!-- Verified -->
+				<rom name="frogger ii - threedeep.rom" size="16384" crc="7a5b4f65" sha1="a70678dbc4f00059faeff8f15896c535730256cb"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2985,7 +2984,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="kaboom!.rom" size="8192" crc="c2e2e645" sha1="f9275d682581e6a07f2e23831bdf40ab3757ae12"/> <!-- Verified -->
+				<rom name="kaboom.rom" size="8192" crc="c2e2e645" sha1="f9275d682581e6a07f2e23831bdf40ab3757ae12"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3926,7 +3925,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr do!'s castle (proto).rom" size="8192" crc="abed3b88" sha1="c44711b34d3a2372d39a34b9cab25ba96bc6d504"/>
+				<rom name="mr do's castle (proto).rom" size="8192" crc="abed3b88" sha1="c44711b34d3a2372d39a34b9cab25ba96bc6d504"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4030,7 +4029,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="night strike!.rom" size="8192" crc="61245a75" sha1="b307df40cc03d7f990aebf5e3ec7c9087087e343"/> <!-- Verified -->
+				<rom name="night strike.rom" size="8192" crc="61245a75" sha1="b307df40cc03d7f990aebf5e3ec7c9087087e343"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4197,7 +4196,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="pitfall!.rom" size="8192" crc="b58bdf1c" sha1="9487baa01e3ba56d082fadec56e8ddee1cde3486"/> <!-- Verified -->
+				<rom name="pitfall.rom" size="8192" crc="b58bdf1c" sha1="9487baa01e3ba56d082fadec56e8ddee1cde3486"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4210,7 +4209,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="pitfall! 2 - lost caverns.rom" size="16384" crc="1668cf3b" sha1="74483a0bf38c61b495268591396d65e1a9518101"/> <!-- Verified -->
+				<rom name="pitfall 2 - lost caverns.rom" size="16384" crc="1668cf3b" sha1="74483a0bf38c61b495268591396d65e1a9518101"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4288,7 +4287,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="rack 'em up!.rom" size="16384" crc="5335d935" sha1="e5d2a855b46883d6247c591a7ecd30bd240c6aad"/>
+				<rom name="rack 'em up.rom" size="16384" crc="5335d935" sha1="e5d2a855b46883d6247c591a7ecd30bd240c6aad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5107,7 +5106,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="squish 'em!.rom" size="8192" crc="f0553d6c" sha1="e2f2ac31793bc587fc977137c08f83aa162198a4"/> <!-- Verified -->
+				<rom name="squish 'em.rom" size="8192" crc="f0553d6c" sha1="e2f2ac31793bc587fc977137c08f83aa162198a4"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

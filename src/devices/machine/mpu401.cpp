@@ -59,7 +59,7 @@
 
 void mpu401_device::mpu401_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(FUNC(mpu401_device::regs_mode2_r), FUNC(mpu401_device::regs_mode2_w));
+	map(0x0000, 0x001f).m(m_ourcpu, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0020, 0x0021).rw(FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
 	map(0x0080, 0x00ff).ram(); // on-chip RAM
 	map(0x0800, 0x0fff).ram(); // external RAM
@@ -153,64 +153,28 @@ void mpu401_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 	m_ourcpu->m6801_clock_serial();
 }
 
-READ8_MEMBER(mpu401_device::regs_mode2_r)
-{
-	switch (offset)
-	{
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 0xf:
-//          logerror("MPU401: read @ unk %x %s\n", offset, machine().describe_context());
-			break;
-
-		default:
-			return m_ourcpu->m6801_io_r(space, offset);
-	}
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(mpu401_device::regs_mode2_w)
-{
-	switch (offset)
-	{
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 0xf:
-//          logerror("MPU401: %02x @ unk %x %s\n", data, offset, machine().describe_context());
-			break;
-
-		default:
-			return m_ourcpu->m6801_io_w(space, offset, data);
-	}
-}
-
-READ8_MEMBER(mpu401_device::port1_r)
+uint8_t mpu401_device::port1_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(mpu401_device::port1_w)
+void mpu401_device::port1_w(uint8_t data)
 {
 //  printf("port1_w: %02x met %x syncout %x DSRD %d DRRD %d\n", data, data & 3, (data>>3) & 3, (data>>6) & 1, (data>>7) & 1);
 }
 
-READ8_MEMBER(mpu401_device::port2_r)
+uint8_t mpu401_device::port2_r()
 {
 //  printf("%s Read P2\n", machine().describe_context().c_str());
 	return m_port2;
 }
 
-WRITE8_MEMBER(mpu401_device::port2_w)
+void mpu401_device::port2_w(uint8_t data)
 {
 //  printf("port2_w: %02x SYCOUT %d SYCIN %d SRCK %d MIDI OUT %d\n", data, (data & 1), (data>>1) & 1, (data>>2) & 1, (data>>4) & 1);
 }
 
-READ8_MEMBER(mpu401_device::mpu_r)
+uint8_t mpu401_device::mpu_r(offs_t offset)
 {
 //  printf("mpu_r @ %d\n", offset);
 
@@ -226,7 +190,7 @@ READ8_MEMBER(mpu401_device::mpu_r)
 	}
 }
 
-WRITE8_MEMBER(mpu401_device::mpu_w)
+void mpu401_device::mpu_w(offs_t offset, uint8_t data)
 {
 //  printf("%02x to MPU-401 @ %d\n", data, offset);
 	m_command = data;
@@ -242,7 +206,7 @@ WRITE8_MEMBER(mpu401_device::mpu_w)
 	}
 }
 
-READ8_MEMBER(mpu401_device::asic_r)
+uint8_t mpu401_device::asic_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -257,7 +221,7 @@ READ8_MEMBER(mpu401_device::asic_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mpu401_device::asic_w)
+void mpu401_device::asic_w(offs_t offset, uint8_t data)
 {
 //  printf("MPU401: %02x to gate array @ %d\n", data, offset);
 
@@ -270,7 +234,7 @@ WRITE8_MEMBER(mpu401_device::asic_w)
 }
 
 // MIDI receive
-WRITE_LINE_MEMBER( mpu401_device::midi_rx_w )
+void mpu401_device::midi_rx_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

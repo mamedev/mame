@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		cvs_scroll_stars();
 	}
 }
@@ -99,14 +99,14 @@ WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galaxia_state::galaxia_video_w)
+void galaxia_state::galaxia_video_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_partial(m_screen->vpos());
 	m_bg_tilemap->mark_tile_dirty(offset);
-	cvs_video_or_color_ram_w(space, offset, data);
+	cvs_video_or_color_ram_w(offset, data);
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
+void galaxia_state::galaxia_scroll_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 		m_bg_tilemap->set_scrolly(i, data);
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
+void galaxia_state::galaxia_ctrlport_w(uint8_t data)
 {
 	// d0: triggers on every new credit
 	// d1: coin counter? if you put a coin in slot A, galaxia constantly
@@ -125,18 +125,18 @@ WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
 	// other bits: unknown
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
+void galaxia_state::galaxia_dataport_w(uint8_t data)
 {
 	// seems to be related to sound board comms
 }
 
-READ8_MEMBER(galaxia_state::galaxia_collision_r)
+uint8_t galaxia_state::galaxia_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision_register;
 }
 
-READ8_MEMBER(galaxia_state::galaxia_collision_clear)
+uint8_t galaxia_state::galaxia_collision_clear()
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision_register = 0;
@@ -309,6 +309,7 @@ void galaxia_state::galaxia(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -351,6 +352,7 @@ void galaxia_state::astrowar(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

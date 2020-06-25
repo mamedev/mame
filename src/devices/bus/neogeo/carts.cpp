@@ -109,6 +109,7 @@ void neogeo_cart(device_slot_interface &device)
 	device.option_add_internal("boot_samsho5b", NEOGEO_SAMSHO5B_CART);
 	device.option_add_internal("boot_mslug3b6", NEOGEO_MSLUG3B6_CART);  // this also uses a CMC42 for gfx
 	device.option_add_internal("boot_ms5plus",  NEOGEO_MS5PLUS_CART);   // this also uses a CMC50 for gfx + audiocpu & NEOPCM2 for YM scramble
+	device.option_add_internal("boot_mslug5b",  NEOGEO_MSLUG5B_CART);
 	device.option_add_internal("boot_kog",      NEOGEO_KOG_CART);
 
 	device.option_add_internal("boot_kf10th",   NEOGEO_KOF10TH_CART);

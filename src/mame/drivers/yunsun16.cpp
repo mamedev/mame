@@ -105,16 +105,21 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 ***************************************************************************/
 
-WRITE8_MEMBER(shocking_state::sound_bank_w)
+void shocking_state::sound_bank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 3);
 }
 
 template<int Layer>
-WRITE16_MEMBER(yunsun16_state::vram_w)
+void yunsun16_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
+}
+
+void yunsun16_state::int_ack_w(uint8_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
 
 void yunsun16_state::main_map(address_map &map)
@@ -132,7 +137,7 @@ void yunsun16_state::main_map(address_map &map)
 	map(0x80010c, 0x80010f).ram().share("scrollram_1"); // Scrolling
 	map(0x800114, 0x800117).ram().share("scrollram_0"); // Scrolling
 	map(0x800154, 0x800155).ram().share("priorityram"); // Priority
-	map(0x8001fe, 0x8001ff).nopw();    // ? 0 (during int)
+	map(0x8001fe, 0x8001fe).w(FUNC(yunsun16_state::int_ack_w));
 	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x908000, 0x90bfff).ram().w(FUNC(yunsun16_state::vram_w<1>)).share("vram_1"); // Layer 1
 	map(0x90c000, 0x90ffff).ram().w(FUNC(yunsun16_state::vram_w<0>)).share("vram_0"); // Layer 0
@@ -154,7 +159,7 @@ void shocking_state::main_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(magicbub_state::magicbub_sound_command_w)
+void magicbub_state::magicbub_sound_command_w(uint8_t data)
 {
 	// HACK: the game continuously sends this. It'll play the oki sample number 0 on each voice. That sample is 00000-00000.
 	if ((data & 0xff) != 0x3a)
@@ -601,7 +606,6 @@ void magicbub_state::magicbub(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &magicbub_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(magicbub_state::irq2_line_hold));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000) / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &magicbub_state::sound_map);
@@ -612,6 +616,7 @@ void magicbub_state::magicbub(machine_config &config)
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0); /* TODO: completely inaccurate */
 	m_screen->set_screen_update(FUNC(magicbub_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsun16);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
@@ -642,13 +647,13 @@ void shocking_state::shocking(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &shocking_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(shocking_state::irq2_line_hold));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0); /* TODO: completely inaccurate */
 	m_screen->set_screen_update(FUNC(shocking_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsun16);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);

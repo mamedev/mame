@@ -89,7 +89,7 @@ void gyruss_state::gyruss_palette(palette_device &palette) const
 
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
+void gyruss_state::gyruss_spriteram_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(gyruss_state::gyruss_get_tile_info)
 
 	tileinfo.group = (m_colorram[tile_index] & 0x10) ? 0 : 1;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 
@@ -120,7 +120,7 @@ void gyruss_state::video_start()
 
 
 
-READ8_MEMBER(gyruss_state::gyruss_scanline_r)
+uint8_t gyruss_state::gyruss_scanline_r()
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();

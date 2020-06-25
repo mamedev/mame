@@ -9,7 +9,6 @@
 #include "emu.h"
 #import "memoryview.h"
 
-#include "debug/debugcpu.h"
 #include "debug/debugvw.h"
 
 #include "util/xmlfile.h"
@@ -108,12 +107,16 @@
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	int const   selected = view->source_index(*view->source());
+	int const   selected = [self selectedSubviewIndex];
 	if (selected != index)
 	{
-		view->set_source(*view->source(index));
-		if ([[self window] firstResponder] != self)
-			view->set_cursor_visible(false);
+		const debug_view_source *source = view->source(index);
+		if (source != nullptr)
+		{
+			view->set_source(*source);
+			if ([[self window] firstResponder] != self)
+				view->set_cursor_visible(false);
+		}
 	}
 }
 

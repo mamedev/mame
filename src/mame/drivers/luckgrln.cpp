@@ -126,16 +126,16 @@ private:
 	int m_palette_count;
 	uint8_t m_palette_ram[0x10000];
 
-	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
-	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_attr_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
-	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(lamps_b_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_READ8_MEMBER(test_r);
+	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
+	template<uint8_t Reel> void reel_attr_w(offs_t offset, uint8_t data);
+	void output_w(uint8_t data);
+	void palette_offset_low_w(uint8_t data);
+	void palette_offset_high_w(uint8_t data);
+	void palette_w(uint8_t data);
+	void lamps_a_w(uint8_t data);
+	void lamps_b_w(uint8_t data);
+	void counters_w(uint8_t data);
+	uint8_t test_r();
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
@@ -156,14 +156,14 @@ void luckgrln_state::machine_start()
 }
 
 template<uint8_t Reel>
-WRITE8_MEMBER(luckgrln_state::reel_ram_w)
+void luckgrln_state::reel_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel_ram[Reel][offset] = data;
 	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
 }
 
 template<uint8_t Reel>
-WRITE8_MEMBER(luckgrln_state::reel_attr_w)
+void luckgrln_state::reel_attr_w(offs_t offset, uint8_t data)
 {
 	m_reel_attr[Reel][offset] = data;
 	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_reel_tile_info)
 	code |= (attr & 0xe0)<<3;
 
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			col,
 			0);
@@ -339,7 +339,7 @@ void luckgrln_state::_7smash_map(address_map &map)
 	map(0xf0000, 0xfffff).unmaprw();
 }
 
-WRITE8_MEMBER(luckgrln_state::output_w)
+void luckgrln_state::output_w(uint8_t data)
 {
 	data &= 0xc7;
 
@@ -354,17 +354,17 @@ WRITE8_MEMBER(luckgrln_state::output_w)
 
 
 
-WRITE8_MEMBER(luckgrln_state::palette_offset_low_w)
+void luckgrln_state::palette_offset_low_w(uint8_t data)
 {
 	m_palette_count = data<<1;
 }
-WRITE8_MEMBER(luckgrln_state::palette_offset_high_w)
+void luckgrln_state::palette_offset_high_w(uint8_t data)
 {
 	m_palette_count = m_palette_count | data<<9;
 }
 
 
-WRITE8_MEMBER(luckgrln_state::palette_w)
+void luckgrln_state::palette_w(uint8_t data)
 {
 	m_palette_ram[m_palette_count] = data;
 
@@ -386,7 +386,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 }
 
 /* Analyzing the lamps, the game should have a 12-buttons control layout */
-WRITE8_MEMBER(luckgrln_state::lamps_a_w)
+void luckgrln_state::lamps_a_w(uint8_t data)
 {
 /*  LAMPS A:
 
@@ -406,7 +406,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_a_w)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(luckgrln_state::lamps_b_w)
+void luckgrln_state::lamps_b_w(uint8_t data)
 {
 /*  LAMPS B:
 
@@ -423,7 +423,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
 		m_lamps[i + 8] = BIT(data, i);
 }
 
-WRITE8_MEMBER(luckgrln_state::counters_w)
+void luckgrln_state::counters_w(uint8_t data)
 {
 /*  COUNTERS:
 
@@ -502,7 +502,7 @@ void luckgrln_state::luckgrln_io(address_map &map)
 }
 
 /* reads a bit 1 status there after every round played */
-READ8_MEMBER(luckgrln_state::test_r)
+uint8_t luckgrln_state::test_r()
 {
 	return 0xff;
 }

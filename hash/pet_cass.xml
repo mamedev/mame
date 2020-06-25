@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="pet_cass" description="Commodore PET cassettes">
 
@@ -1041,7 +1044,7 @@
 		<publisher>Microcomputer Games</publisher>
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="21505180">
-				<rom name="galaxy! (1982)(avalon hill).wav" size="21505180" crc="d9475975" sha1="56532c57ebf8935212c410eebc7d9192c3c6578c"/>
+				<rom name="galaxy (1982)(avalon hill).wav" size="21505180" crc="d9475975" sha1="56532c57ebf8935212c410eebc7d9192c3c6578c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2410,7 +2413,7 @@
 		<!-- pet2001b16 Side B: lit comp4-owww -->
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="11977626">
-				<rom name="2-2 take me out to the ball game for some salad ! (1980)(our weird and wacky world).wav" size="11977626" crc="f3bd4a97" sha1="02436bc9dd373e9fd7fa278467215e3b37ac99b0"/>
+				<rom name="2-2 take me out to the ball game for some salad  (1980)(our weird and wacky world).wav" size="11977626" crc="f3bd4a97" sha1="02436bc9dd373e9fd7fa278467215e3b37ac99b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2423,7 +2426,7 @@
 		<!-- pet2001b16 Side A: lit comp5-owww -->
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="11871006">
-				<rom name="3-1 beware of attack rabbit! (1980)(our weird and wacky world).wav" size="11871006" crc="7005e1ff" sha1="5246327dd9e8dfcf911eabf773e9ab79648e7f1f"/>
+				<rom name="3-1 beware of attack rabbit (1980)(our weird and wacky world).wav" size="11871006" crc="7005e1ff" sha1="5246327dd9e8dfcf911eabf773e9ab79648e7f1f"/>
 			</dataarea>
 		</part>
 
@@ -2503,7 +2506,7 @@
 		<!-- pet2001b16 Side A: crit rdg5-owww -->
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="11153230">
-				<rom name="7-1 a cup of coffee for $141,000 (1980)(our weird and wacky world).wav" size="11153230" crc="8f95d56c" sha1="6666ae2b8b9100c742a42330deb77990ed77e673"/>
+				<rom name="7-1 a cup of coffee for 141,000 (1980)(our weird and wacky world).wav" size="11153230" crc="8f95d56c" sha1="6666ae2b8b9100c742a42330deb77990ed77e673"/>
 			</dataarea>
 		</part>
 

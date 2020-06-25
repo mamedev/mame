@@ -73,21 +73,21 @@ void vixen_state::update_interrupt()
 }
 
 
-READ8_MEMBER( vixen_state::opram_r )
+uint8_t vixen_state::opram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(0); // read videoram
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER( vixen_state::oprom_r )
+uint8_t vixen_state::oprom_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
 
-READ8_MEMBER( vixen_state::status_r )
+uint8_t vixen_state::status_r()
 {
 	/*
 
@@ -118,7 +118,7 @@ READ8_MEMBER( vixen_state::status_r )
 	return data;
 }
 
-WRITE8_MEMBER( vixen_state::cmd_w )
+void vixen_state::cmd_w(uint8_t data)
 {
 	/*
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 	update_interrupt();
 }
 
-READ8_MEMBER( vixen_state::ieee488_r )
+uint8_t vixen_state::ieee488_r()
 {
 	/*
 
@@ -203,7 +203,7 @@ READ8_MEMBER( vixen_state::ieee488_r )
 //  port3_r - serial status read
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::port3_r )
+uint8_t vixen_state::port3_r()
 {
 	/*
 
@@ -373,14 +373,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(vixen_state::vsync_tick)
 	}
 }
 
-void vixen_state::video_start()
-{
-	// register for state saving
-	save_item(NAME(m_alt));
-	save_item(NAME(m_256));
-	save_item(NAME(m_vsync));
-}
-
 uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
@@ -456,7 +448,7 @@ DISCRETE_SOUND_END
 //  I8155 interface
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::i8155_pa_r )
+uint8_t vixen_state::i8155_pa_r()
 {
 	uint8_t data = 0xff;
 
@@ -466,12 +458,12 @@ READ8_MEMBER( vixen_state::i8155_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vixen_state::i8155_pb_w )
+void vixen_state::i8155_pb_w(uint8_t data)
 {
 	m_col = data;
 }
 
-WRITE8_MEMBER( vixen_state::i8155_pc_w )
+void vixen_state::i8155_pc_w(uint8_t data)
 {
 	/*
 
@@ -513,7 +505,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 //  I8155 IO interface
 //-------------------------------------------------
 
-WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
+void vixen_state::io_i8155_pb_w(uint8_t data)
 {
 	/*
 
@@ -555,7 +547,7 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 	m_ieee488->host_ren_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
+void vixen_state::io_i8155_pc_w(uint8_t data)
 {
 	/*
 
@@ -658,6 +650,20 @@ void vixen_state::machine_start()
 	save_item(NAME(m_cmd_d0));
 	save_item(NAME(m_cmd_d1));
 	save_item(NAME(m_fdint));
+	save_item(NAME(m_alt));
+	save_item(NAME(m_256));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_srq));
+	save_item(NAME(m_atn));
+	save_item(NAME(m_enb_srq_int));
+	save_item(NAME(m_enb_atn_int));
+	save_item(NAME(m_rxrdy));
+	save_item(NAME(m_txrdy));
+	save_item(NAME(m_int_clk));
+	save_item(NAME(m_enb_xmt_int));
+	save_item(NAME(m_enb_rcv_int));
+	save_item(NAME(m_enb_ring_int));
+
 }
 
 void vixen_state::machine_reset()
@@ -777,4 +783,4 @@ void vixen_state::init_vixen()
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  0 )
+COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  MACHINE_SUPPORTS_SAVE )

@@ -10,6 +10,7 @@
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debugger.h"
 
@@ -22,7 +23,7 @@ public:
 	{
 	}
 
-	virtual ~debug_none() = default;
+	virtual ~debug_none() { }
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override { }
@@ -42,7 +43,7 @@ void debug_none::init_debugger(running_machine &machine)
 
 void debug_none::wait_for_debugger(device_t &device, bool firststop)
 {
-	m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	m_machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 void debug_none::debugger_update()

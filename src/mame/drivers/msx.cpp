@@ -551,9 +551,9 @@ void msx_state::msx_io_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x99).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
@@ -568,9 +568,9 @@ void msx2_state::msx2_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x4f).rw(FUNC(msx2_state::msx_switched_r), FUNC(msx2_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -587,9 +587,9 @@ void msx2_state::msx2p_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x4f).rw(FUNC(msx2_state::msx_switched_r), FUNC(msx2_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
@@ -1661,7 +1661,9 @@ ROM_END
 void msx_state::canonv20(machine_config &config)
 {
 	msx1(TMS9929A, config);
+	// XTAL: 1431818(Z80/PSG) + 10.6875(VDP)
 	// YM2149
+	// TMS9929ANL
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
@@ -3397,7 +3399,8 @@ ROM_END
 void msx_state::hb10p(machine_config &config)
 {
 	msx1(TMS9929A, config);
-	// AY8910/YM2149?
+	// XTAL: 3.579545 + 22.168(VDP)
+	// YM2149 (in S3527 MSX-Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// T6950
@@ -5878,6 +5881,7 @@ ROM_END
 void msx2_state::nms8245(machine_config &config)
 {
 	msx2_pal(config);
+	// XTAL: 21328.1 (different from default)
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots

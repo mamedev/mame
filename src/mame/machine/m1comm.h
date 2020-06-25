@@ -26,17 +26,17 @@ public:
 	// public API - stuff that gets called from the model1
 	// shared memory 4k
 	// reads/writes at I/O 0xB00xxx
-	DECLARE_READ8_MEMBER(share_r);
-	DECLARE_WRITE8_MEMBER(share_w);
+	uint8_t share_r(offs_t offset);
+	void share_w(offs_t offset, uint8_t data);
 
 	// single bit registers (74LS74)
 	// reads/writes at I/O 0xB01000
-	DECLARE_READ8_MEMBER(cn_r);
-	DECLARE_WRITE8_MEMBER(cn_w);
+	uint8_t cn_r();
+	void cn_w(uint8_t data);
 
 	// reads/writes at I/O 0xB01002
-	DECLARE_READ8_MEMBER(fg_r);
-	DECLARE_WRITE8_MEMBER(fg_w);
+	uint8_t fg_r();
+	void fg_w(uint8_t data);
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
@@ -64,14 +64,14 @@ private:
 
 	// MB89237A handler
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_w);
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, uint8_t data);
 
 	// single bit registers (74LS74)
-	DECLARE_READ8_MEMBER(syn_r);
-	DECLARE_WRITE8_MEMBER(syn_w);
-	DECLARE_READ8_MEMBER(zfg_r);
-	DECLARE_WRITE8_MEMBER(zfg_w);
+	uint8_t syn_r();
+	void syn_w(uint8_t data);
+	uint8_t zfg_r();
+	void zfg_w(uint8_t data);
 
 	// shared memory 4k
 	// reads/writes at 0xC000-FFFF

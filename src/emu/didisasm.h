@@ -7,6 +7,7 @@
     Device disassembly interfaces.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DIDISASM_H
 #define MAME_EMU_DIDISASM_H
 

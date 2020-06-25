@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 DEC VT Terminal video emulation
@@ -244,7 +244,7 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 }
 
 // Also used by Rainbow-100 ************
-WRITE8_MEMBER(vt100_video_device::dc012_w)
+void vt100_video_device::dc012_w(offs_t offset, uint8_t data)
 {
 	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
@@ -337,7 +337,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 }
 
 // Writing to DC011 resets internal counters (& disturbs display) on real hardware.
-WRITE8_MEMBER(vt100_video_device::dc011_w)
+void vt100_video_device::dc011_w(uint8_t data)
 {
 	if (!BIT(data, 5))
 	{
@@ -358,7 +358,7 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 	recompute_parameters();
 }
 
-WRITE8_MEMBER(vt100_video_device::brightness_w)
+void vt100_video_device::brightness_w(uint8_t data)
 {
 	//m_palette->set_pen_color(1, data, data, data);
 }
@@ -629,6 +629,53 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 
 			if (m_columns == 80)
 				bitmap.pix16(y_preset, x_preset + 9) = bit;
+		}
+
+		/* The DEC terminals use a single ROM bitmap font and
+		 * dot-stretching to synthesize multiple variants that are not
+		 * just nearest neighbor resampled. The result is the same
+		 * as one would get by fake-bolding; the already doubled raster image;
+		 * by rendering twice with 1px horizontal offset.
+		 *
+		 * For details see: https://vt100.net/dec/vt220/glyphs
+		 */
+		int prev_bit = back_intensity;
+		int bits_width = 21;
+		if (!double_width)
+		{
+			if (m_columns == 80)
+				bits_width = 11;
+			else
+				bits_width = 10;
+		}
+		for (int b = 0; b < bits_width; b++)
+		{
+			if (double_width)
+			{
+				if (bitmap.pix16(y_preset, DOUBLE_x_preset + b) == fg_intensity)
+				{
+					prev_bit = fg_intensity;
+				}
+				else
+				{
+					if (prev_bit == fg_intensity)
+						bitmap.pix16(y_preset, DOUBLE_x_preset + b) = fg_intensity;
+					prev_bit = back_intensity;
+				}
+			}
+			else
+			{
+				if (bitmap.pix16(y_preset, x_preset + b) == fg_intensity)
+				{
+					prev_bit = fg_intensity;
+				}
+				else
+				{
+					if (prev_bit == fg_intensity)
+						bitmap.pix16(y_preset, x_preset + b) = fg_intensity;
+					prev_bit = back_intensity;
+				}
+			}
 		}
 	} // for (scan_line)
 

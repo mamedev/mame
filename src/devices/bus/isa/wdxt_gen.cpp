@@ -118,17 +118,17 @@ WRITE_LINE_MEMBER( wdxt_gen_device::mr_w )
 	}
 }
 
-READ8_MEMBER( wdxt_gen_device::rd322_r )
+uint8_t wdxt_gen_device::rd322_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( wdxt_gen_device::ram_r )
+uint8_t wdxt_gen_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( wdxt_gen_device::ram_w )
+void wdxt_gen_device::ram_w(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 }
@@ -200,7 +200,7 @@ void wdxt_gen_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
-	m_isa->install_device(0x0320, 0x0323, read8_delegate(*m_host, FUNC(wd11c00_17_device::io_r)), write8_delegate(*m_host, FUNC(wd11c00_17_device::io_w)));
+	m_isa->install_device(0x0320, 0x0323, read8sm_delegate(*m_host, FUNC(wd11c00_17_device::io_r)), write8sm_delegate(*m_host, FUNC(wd11c00_17_device::io_w)));
 	m_isa->set_dma_channel(3, this, false);
 }
 
@@ -260,7 +260,7 @@ READ_LINE_MEMBER( wdxt_gen_device::wd1015_t1_r )
 //  wd1015_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
+uint8_t wdxt_gen_device::wd1015_p1_r()
 {
 	/*
 
@@ -289,7 +289,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 //  wd1015_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
+void wdxt_gen_device::wd1015_p1_w(uint8_t data)
 {
 	/*
 
@@ -316,7 +316,7 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
 //  wd1015_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
+uint8_t wdxt_gen_device::wd1015_p2_r()
 {
 	/*
 
@@ -347,7 +347,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
 //  wd1015_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
+void wdxt_gen_device::wd1015_p2_w(uint8_t data)
 {
 	/*
 

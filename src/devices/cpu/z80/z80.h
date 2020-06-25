@@ -236,11 +236,11 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_opcodes_config;
 	const address_space_config m_io_config;
-	address_space *m_program;
-	address_space *m_opcodes;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcodes_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_args;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+
 	devcb_write_line m_irqack_cb;
 	devcb_write8 m_refresh_cb;
 	devcb_write_line m_halt_cb;

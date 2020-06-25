@@ -9,10 +9,10 @@
 
 #include "unspdasm.h"
 
-#define LOG_UNSP_SHIFTS          (1U << 2)
 #define LOG_UNSP_MULS            (1U << 1)
+#define LOG_UNSP_SHIFTS          (1U << 2)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_UNSP_SHIFTS)
 
 #include "logmacro.h"
 
@@ -49,14 +49,15 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 	else if (((op & 0xf1c0) == 0xe040))
 	{
 		// Register BITOP  BITOP Rd,offset
-		uint8_t bitop =  (op & 0x0030) >> 4;
-		uint8_t rd =     (op & 0x0e00) >> 9;
-		uint8_t offset = (op & 0x000f) >> 0;
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t offset = (op & 0x000f) >> 0;
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
 
 		switch (bitop)
 		{
-		case 0x00:
-			fatalerror("UNSP: unknown opcode tstb Rd,offset (%04x) at %04x\n", op, UNSP_LPC);
+		case 0x00: // tstb
 			return;
 
 		case 0x01: // setb
@@ -76,92 +77,158 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 	else if (((op & 0xf1c0) == 0xe180))
 	{
 		// Memory BITOP    BITOP [Rd], offset
-		uint8_t bitop =  (op & 0x0030) >> 4;
-		uint8_t rd =     (op & 0x0e00) >> 9;
-		uint8_t offset = (op & 0x000f) >> 0;
-		logerror("%s [%s],%d\n", bitops[bitop], regs[rd], offset);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t offset = (op & 0x000f) >> 0;
+		const uint16_t addr =  m_core->m_r[rd];
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf1c0) == 0xe1c0))
 	{
 		// Memory BITOP    BITOP ds:[Rd], offset
-		uint8_t bitop =  (op & 0x0030) >> 4;
-		uint8_t rd =     (op & 0x0e00) >> 9;
-		uint8_t offset = (op & 0x000f) >> 0;
-		logerror("%s ds:[%s],%d\n", bitops[bitop], regs[rd], offset);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t offset = (op & 0x000f) >> 0;
+		const uint32_t addr =  m_core->m_r[rd] | (get_ds() << 16);
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf1c8) == 0xe100))
 	{
 		// Memory BITOP    BITOP [Rd], Rs
-		uint8_t bitop = (op & 0x0030) >> 4;
-		uint8_t rd =    (op & 0x0e00) >> 9;
-		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s [%s],%s\n", bitops[bitop], regs[rd], regs[rs]);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t rs =     (op & 0x0007) >> 0;
+		const uint8_t offset = (1 << (m_core->m_r[rs] & 0xf));
+		const uint16_t addr =  m_core->m_r[rd];
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf1c8) == 0xe140))
 	{
 		// Memory BITOP    BITOP ds:[Rd], Rs
-		uint8_t bitop = (op & 0x0030) >> 4;
-		uint8_t rd =    (op & 0x0e00) >> 9;
-		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s ds:[%s],%s\n", bitops[bitop], regs[rd], regs[rs]);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t rs =     (op & 0x0007) >> 0;
+		const uint8_t offset = (1 << m_core->m_r[rs]);
+		const uint32_t addr =  m_core->m_r[rd] | (get_ds() << 16);
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
-	else if (((op & 0xf0f8) == 0xe008))
+	else if (((op & 0xf1f8) == 0xe008))
 	{
 		// MUL operations
 		// MUL      1 1 1 0*  r r r S*  0 0 0 0   1 r r r     (* = sign bit, fixed here)
 		/*
-		print_mul(stream, op); // MUL uu or MUL su
+		print_mul(stream, op); // MUL uu
 		*/
+		// only valid if S is 1, otherwise falls through to shifter
 
-		if (op & 0x0100)
-		{
-			// MUL su ( unsigned * signed )
-			const uint16_t opa = (op >> 9) & 7;
-			const uint16_t opb = op & 7;
-			m_core->m_icount -= 12;
+		// MUL uu (unsigned * unsigned)
+		uint32_t lres = 0;
+		const uint16_t opa = (op >> 9) & 7;
+		const uint16_t opb = op & 7;
 
-			LOGMASKED(LOG_UNSP_MULS, "%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]);
+		m_core->m_icount -= 12; // unknown
 
-			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
-			if (m_core->m_r[opa] & 0x8000)
-			{
-				lres -= m_core->m_r[opb] << 16;
-			}
-			m_core->m_r[REG_R4] = lres >> 16;
-			m_core->m_r[REG_R3] = (uint16_t)lres;
+		LOGMASKED(LOG_UNSP_MULS, "%s: MUL uu with %04x (unsigned) * %04x (unsigned) (fra:%d) :\n", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb], m_core->m_fra);
 
-			LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
+		lres = m_core->m_r[opa] * m_core->m_r[opb];
+		m_core->m_r[REG_R4] = lres >> 16;
+		m_core->m_r[REG_R3] = (uint16_t)lres;
 
-			return;
-		}
-		else
-		{
-			// MUL uu (unsigned * unsigned)
-			uint32_t lres = 0;
-			const uint16_t opa = (op >> 9) & 7;
-			const uint16_t opb = op & 7;
+		LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
 
-			m_core->m_icount -= 12; // unknown
-			lres = m_core->m_r[opa] * m_core->m_r[opb];
-			m_core->m_r[REG_R4] = lres >> 16;
-			m_core->m_r[REG_R3] = (uint16_t)lres;
-			return;
-		}
 		return;
 	}
-	else if (((op & 0xf080) == 0xe080))
+	else if (((op & 0xf180) == 0xe080))
 	{
 		// MULS     1 1 1 0*  r r r S*  1 s s s   s r r r    (* = sign bit, fixed here)
 		/*
-		// MULS uu or MULS su (invalid?)
+		// MULS uu
+		// only valid if S is 1? otherwise falls through to shifter
+
 		print_muls(stream, op);
 		*/
 		LOGMASKED(LOG_UNSP_MULS, "MULS uu or su\n");
@@ -177,101 +244,78 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 
 		switch (shift)
 		{
-		case 0x00:
-			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
-			unimplemented_opcode(op);
-			return;
-
-		case 0x01: // jak_car2 on starting a game
+		case 0x00: // jak_smwm train movement
 		{
-			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asror %s\n", regs[rd], regs[rd], regs[rs]);
-			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
-				unimplemented_opcode(op);
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
+			int16_t rdval = (int16_t)((uint16_t)m_core->m_r[rd]);
+			int shift = (m_core->m_r[rs] & 0x1f);
+			uint32_t res;
+			res = rdval >> shift;
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
+			m_core->m_r[rd] = res;
+			return;
+		}
 
-			uint32_t res = (uint16_t)(m_core->m_r[rd]);
-			int shift = (m_core->m_r[rs] & 0x01f);
-			res <<= 16;
+		case 0x01: // jak_car2 on starting a game, myac220 'piggy golf' ball movement
+		{
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asror %s (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
-			if (res & 0x80000000)
-			{
-				res = res >> shift;
-				res |= (0xffffffff << (32 - shift));
-
-				m_core->m_r[rd] = (res >> 16);
-				m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
-			}
-			else
-			{
-				res = res >> shift;
-				m_core->m_r[rd] = (res >> 16);
-				m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
-			}
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+			const int32_t rdval = (int32_t)(m_core->m_r[rd] << 16);
+			const int shift = (m_core->m_r[rs] & 0x1f);
+			const uint32_t res = rdval >> shift;
+			m_core->m_r[REG_R3] |= (uint16_t)res;
+			m_core->m_r[REG_R4] = (uint16_t)(res >> 16);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
 
 		case 0x02:
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsl %s (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x01f));
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
-
+		{
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsl %s (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			const uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
+			const int shift = (m_core->m_r[rs] & 0x1f);
+			const uint32_t res = (uint16_t)(rdval << shift);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
+			m_core->m_r[rd] = res;
 			return;
+		}
 
 		case 0x03:
 		{
 			// wrlshunt uses this
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lslor %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
-			if (rd != 3) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
-				unimplemented_opcode(op);
-
-			uint32_t res = (uint16_t)(m_core->m_r[rd]);
-
-			res <<= (m_core->m_r[rs] & 0x01f);
-
-			m_core->m_r[rd] = (res & 0xffff);
-			m_core->m_r[rd + 1] |= (res >> 16); // register bleeding?
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+			const uint32_t rdval = (uint16_t)m_core->m_r[rd];
+			const int shift = (m_core->m_r[rs] & 0x1f);
+			const uint32_t res = rdval << shift;
+			m_core->m_r[REG_R3] = (uint16_t)res;
+			m_core->m_r[REG_R4] |= (uint16_t)(res >> 16);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
 
 		case 0x04:
-			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsr %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0x1f));
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+		{
+			// smartfp loops increasing shift by 4 up to values of 28
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsr %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+
+			const uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
+			const int shift = (m_core->m_r[rs] & 0x1f);
+			const uint32_t res = (uint16_t)(rdval >> shift);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
+			m_core->m_r[rd] = res;
 			return;
+		}
 
 		case 0x05:
 		{
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-
-			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
-				unimplemented_opcode(op);
-
-			uint32_t res = (uint16_t)(m_core->m_r[rd]);
-
-			res <<= 16;
-
-			res = res >> (m_core->m_r[rs] & 0x01f);
-
-			// register bleeding behavior needed (for example) in jak_cars2 nand browser when increasing upper digits of address
-			// TODO: check if I'm missing something becaus this doesn't really seem logical, maybe other code is meant to take care of those bits?
-			//  (although R3/R4 are the 'MR' register used for multiply stuff, so maybe there is some logic to this?)
-
-			// code attempts to put a 32-bit value in r4/r3 then shift it like this?
-			//3c990: e92a            r4 = r4 lsl r2
-			//3c991: e73a            r3 = r3 lslor r2
-
-			m_core->m_r[rd] = (res >> 16);
-			m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
-
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			const uint32_t rdval = m_core->m_r[rd] << 16;
+			const int shift = (m_core->m_r[rs] & 0x1f);
+			const uint32_t res = rdval >> shift;
+			m_core->m_r[REG_R3] |= (uint16_t)res;
+			m_core->m_r[REG_R4] = (uint16_t)(res >> 16);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
 

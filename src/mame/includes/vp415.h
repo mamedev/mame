@@ -83,36 +83,36 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(sel34_w);
-	DECLARE_READ8_MEMBER(sel37_r);
+	void sel34_w(uint8_t data);
+	uint8_t sel37_r();
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_int1_w);
 
-	DECLARE_WRITE8_MEMBER(data_mcu_port1_w);
-	DECLARE_READ8_MEMBER(data_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(data_mcu_port2_w);
-	DECLARE_READ8_MEMBER(data_mcu_port2_r);
+	void data_mcu_port1_w(uint8_t data);
+	uint8_t data_mcu_port1_r();
+	void data_mcu_port2_w(uint8_t data);
+	uint8_t data_mcu_port2_r();
 
-	DECLARE_WRITE8_MEMBER(ctrl_regs_w);
-	DECLARE_READ8_MEMBER(ctrl_regs_r);
-	DECLARE_WRITE8_MEMBER(ctrl_cpu_port1_w);
-	DECLARE_READ8_MEMBER(ctrl_cpu_port1_r);
-	DECLARE_WRITE8_MEMBER(ctrl_cpu_port3_w);
-	DECLARE_READ8_MEMBER(ctrl_cpu_port3_r);
+	void ctrl_regs_w(offs_t offset, uint8_t data);
+	uint8_t ctrl_regs_r(offs_t offset);
+	void ctrl_cpu_port1_w(uint8_t data);
+	uint8_t ctrl_cpu_port1_r();
+	void ctrl_cpu_port3_w(uint8_t data);
+	uint8_t ctrl_cpu_port3_r();
 
-	DECLARE_WRITE8_MEMBER(ctrl_mcu_port1_w);
-	DECLARE_READ8_MEMBER(ctrl_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(ctrl_mcu_port2_w);
-	DECLARE_READ8_MEMBER(ctrl_mcu_port2_r);
+	void ctrl_mcu_port1_w(uint8_t data);
+	uint8_t ctrl_mcu_port1_r();
+	void ctrl_mcu_port2_w(uint8_t data);
+	uint8_t ctrl_mcu_port2_r();
 
-	DECLARE_READ8_MEMBER(drive_i8155_pb_r);
-	DECLARE_READ8_MEMBER(drive_i8155_pc_r);
+	uint8_t drive_i8155_pb_r();
+	uint8_t drive_i8155_pc_r();
 
-	DECLARE_WRITE8_MEMBER(drive_i8255_pa_w);
-	DECLARE_WRITE8_MEMBER(drive_i8255_pb_w);
-	DECLARE_READ8_MEMBER(drive_i8255_pc_r);
-	DECLARE_WRITE8_MEMBER(drive_cpu_port1_w);
-	DECLARE_WRITE8_MEMBER(drive_cpu_port3_w);
+	void drive_i8255_pa_w(uint8_t data);
+	void drive_i8255_pb_w(uint8_t data);
+	uint8_t drive_i8255_pc_r();
+	void drive_cpu_port1_w(uint8_t data);
+	void drive_cpu_port3_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(refv_w);
 

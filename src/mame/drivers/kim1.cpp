@@ -138,7 +138,7 @@ static INPUT_PORTS_START( kim1 )
 INPUT_PORTS_END
 
 // Read from keyboard
-READ8_MEMBER( kim1_state::kim1_u2_read_a )
+uint8_t kim1_state::kim1_u2_read_a()
 {
 	uint8_t data = 0xff;
 
@@ -150,7 +150,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 }
 
 // Write to 7-Segment LEDs
-WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
+void kim1_state::kim1_u2_write_a(uint8_t data)
 {
 	uint8_t idx = ( m_u2_port_b >> 1 ) & 0x0f;
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 }
 
 // Load from cassette
-READ8_MEMBER( kim1_state::kim1_u2_read_b )
+uint8_t kim1_state::kim1_u2_read_b()
 {
 	if ( m_riot2->portb_out_get() & 0x20 )
 		return 0xFF;
@@ -174,7 +174,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_b )
 }
 
 // Save to cassette
-WRITE8_MEMBER( kim1_state::kim1_u2_write_b )
+void kim1_state::kim1_u2_write_b(uint8_t data)
 {
 	m_u2_port_b = data;
 

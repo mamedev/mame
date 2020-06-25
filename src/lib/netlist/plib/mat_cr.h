@@ -36,18 +36,23 @@ namespace plib
 		static constexpr const int NSQ = (N < 0 ? -N * N : N * N);
 		static constexpr const int Np1 = (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1);
 
-		COPYASSIGNMOVE(pmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pmatrix_cr_t, default)
 
 		enum constants_e
 		{
 			FILL_INFINITY = 9999999
 		};
 
+		// FIXME: these should be private
+		// NOLINTNEXTLINE
 		parray<index_type, N> diag;      // diagonal index pointer n
+		// NOLINTNEXTLINE
 		parray<index_type, Np1> row_idx;      // row index pointer n + 1
+		// NOLINTNEXTLINE
 		parray<index_type, NSQ> col_idx;       // column index array nz_num, initially (n * n)
+		// NOLINTNEXTLINE
 		parray<value_type, NSQ> A;    // Matrix elements nz_num, initially (n * n)
-
+		// NOLINTNEXTLINE
 		std::size_t nz_num;
 
 		explicit pmatrix_cr_t(std::size_t n)
@@ -68,7 +73,7 @@ namespace plib
 
 		~pmatrix_cr_t() = default;
 
-		constexpr std::size_t size() const noexcept { return (N>0) ? static_cast<std::size_t>(N) : m_size; }
+		constexpr std::size_t size() const noexcept { return (N>0) ? narrow_cast<std::size_t>(N) : m_size; }
 
 		void clear() noexcept
 		{
@@ -81,6 +86,13 @@ namespace plib
 		{
 			for (std::size_t i=0, e=nz_num; i<e; i++)
 				A[i] = scalar;
+		}
+
+		void set_row_scalar(C r, T val) noexcept
+		{
+			C ri = row_idx[r];
+			while (ri < row_idx[r+1])
+				A[ri++] = val;
 		}
 
 		void set(C r, C c, T val) noexcept
@@ -120,9 +132,9 @@ namespace plib
 				row_idx[k] = nz;
 
 				for (std::size_t j=0; j < size(); j++)
-					if (f[k][j] <= max_fill && plib::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
+					if (f[k][j] <= max_fill && plib::abs(narrow_cast<int>(k)-narrow_cast<int>(j)) <= narrow_cast<int>(band_width))
 					{
-						col_idx[nz] = static_cast<C>(j);
+						col_idx[nz] = narrow_cast<C>(j);
 						if (j == k)
 							diag[k] = nz;
 						nz++;
@@ -138,7 +150,7 @@ namespace plib
 			{
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
-						nzbd[k].push_back(static_cast<C>(j));
+						nzbd[k].push_back(narrow_cast<C>(j));
 				nzbd[k].push_back(0); // end of sequence
 			}
 
@@ -148,7 +160,7 @@ namespace plib
 		void mult_vec(VTR & res, const VTV & x) const noexcept
 		{
 
-			 // res = A * x
+			// res = A * x
 #if 0
 			//plib::omp::set_num_threads(4);
 			plib::omp::for_static(0, constants<std::size_t>::zero(), m_size, [this, &res, &x](std::size_t row)
@@ -230,6 +242,8 @@ namespace plib
 		}
 
 	protected:
+		// FIXME: this should be private
+		// NOLINTNEXTLINE
 		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
@@ -242,7 +256,7 @@ namespace plib
 		using base = B;
 		using index_type = typename base::index_type;
 
-		COPYASSIGNMOVE(pGEmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pGEmatrix_cr_t, default)
 
 		explicit pGEmatrix_cr_t(std::size_t n)
 		: B(n)
@@ -329,7 +343,7 @@ namespace plib
 		{
 			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
 				if (plib::container::contains( m_ge_par[i], k))
-					return static_cast<int>(i);
+					return narrow_cast<int>(i);
 			return -1;
 		}
 
@@ -476,7 +490,7 @@ namespace plib
 		using base = B;
 		using index_type = typename base::index_type;
 
-		COPYASSIGNMOVE(pLUmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pLUmatrix_cr_t, default)
 
 		explicit pLUmatrix_cr_t(std::size_t n)
 		: B(n)
@@ -511,7 +525,7 @@ namespace plib
 					}
 				}
 				if (found)
-					ilu_rows[p++] = static_cast<index_type>(i);
+					ilu_rows[p++] = narrow_cast<index_type>(i);
 			}
 			ilu_rows[p] = 0; // end of array
 			this->build_from_fill_mat(fill, ilup); //, m_band_width); // ILU(2)

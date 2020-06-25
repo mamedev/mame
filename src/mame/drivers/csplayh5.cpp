@@ -61,12 +61,12 @@ public:
 
 	uint16_t m_mux_data;
 
-	DECLARE_READ16_MEMBER(csplayh5_mux_r);
-	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	uint16_t csplayh5_mux_r();
+	void csplayh5_mux_w(uint16_t data);
+	void tmp68301_parallel_port_w(uint16_t data);
 
 	#if USE_H8
-	DECLARE_READ16_MEMBER(test_r);
+	uint16_t test_r();
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
 
@@ -108,7 +108,7 @@ public:
 
 
 
-READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
+uint16_t csplayh5_state::csplayh5_mux_r()
 {
 	for(int i=0;i<5;i++)
 	{
@@ -121,7 +121,7 @@ READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
+void csplayh5_state::csplayh5_mux_w(uint16_t data)
 {
 	m_mux_data = (~data & 0x1f);
 }
@@ -143,7 +143,7 @@ void csplayh5_state::csplayh5_map(address_map &map)
 }
 
 #if USE_H8
-READ16_MEMBER(csplayh5_state::test_r)
+uint16_t csplayh5_state::test_r()
 {
 	return machine().rand();
 }
@@ -342,7 +342,7 @@ WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
 }
 #endif
 
-WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
+void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 {
 	/*
 	    -x-- ---- used during ROM check, h8 reset assert?
@@ -525,7 +525,7 @@ ROM_START( sengomjk )
 	DISK_IMAGE_READONLY( "nb8002", 0, SHA1(d3502496526e62a877f12dccc27b32ae33d3704d) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
+	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(9f0dec43) SHA1(d836e564da496c3049e16f025daf362cced413d4) )
 ROM_END
 
 ROM_START( junai )
@@ -817,7 +817,7 @@ ROM_START( nuretemi )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000369, CRC(39f3edc7) SHA1(be07e8133cf2afa4f806d902d8d971d523326dd5) )
+	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(865de327) SHA1(a97374ee765443d9da6919d0e226108c062f7942) )
 ROM_END
 
 ROM_START( tsuwaku )
@@ -901,7 +901,7 @@ ROM_START( konhaji )
 	DISK_IMAGE_READONLY( "nb8019", 0, SHA1(f59ac1587009d7d15618549dc60cbd24c263a95f) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal16v8b.jed", 0x000000, 0x000368, CRC(6b21325e) SHA1(cf894f591aa7e0b2680eda8fbbb591397cd170ab) )
+	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(9f0dec43) SHA1(d836e564da496c3049e16f025daf362cced413d4) )
 ROM_END
 
 
@@ -913,34 +913,34 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan", "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
-GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                         "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
-/* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1998, sengomjk, nichidvd, csplayh5, csplayh5, csplayh5_state, init_sengomjk, ROT0, "Nichibutsu/Just&Just", "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
-/* 03 */ GAME( 1998, junai,    nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai,    ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh5, ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1998, junai2,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai2,   ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
+/* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just",                           "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1998, sengomjk, nichidvd, csplayh5, csplayh5, csplayh5_state, init_sengomjk, ROT0, "Nichibutsu/Just&Just",                           "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,    nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai,    ROT0, "Nichibutsu/eic",                                 "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh5, ROT0, "Nichibutsu",                                     "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai2,   ROT0, "Nichibutsu/eic",                                 "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
 /* 06 */ GAME( 1998, mogitate, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mogitate, ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate (Japan)", MACHINE_NOT_WORKING )
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjmania,  ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
-/* 08 */ GAME( 1999, renaimj,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_renaimj,  ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
-/* 09 */ GAME( 1999, bikiniko, nichidvd, csplayh5, csplayh5, csplayh5_state, init_bikiniko, ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1999, csplayh6, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh6, ROT0, "Nichibutsu/eic",   "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjmania,  ROT0, "Sphinx/Just&Just",            "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ GAME( 1999, renaimj,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_renaimj,  ROT0, "Nichibutsu/eic",              "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko, nichidvd, csplayh5, csplayh5, csplayh5_state, init_bikiniko, ROT0, "Nichibutsu/eic",              "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
+/* 10 */ GAME( 1999, csplayh6, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh6, ROT0, "Nichibutsu/eic",              "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
 /* 11 */ GAME( 1999, thenanpa, nichidvd, csplayh5, csplayh5, csplayh5_state, init_thenanpa, ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
-/* 12 */ GAME( 1999, pokoachu, nichidvd, csplayh5, csplayh5, csplayh5_state, init_pokoachu, ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
-/* 13 */ GAME( 1999, csplayh7, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh7, ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
-/* 14 */ GAME( 1999, aimode,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_aimode,   ROT0, "Nichibutsu/eic", "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
+/* 12 */ GAME( 1999, pokoachu, nichidvd, csplayh5, csplayh5, csplayh5_state, init_pokoachu, ROT0, "Nichibutsu/eic",              "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh7, ROT0, "Nichibutsu/eic",              "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
+/* 14 */ GAME( 1999, aimode,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_aimode,   ROT0, "Nichibutsu/eic",              "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
 
 // 2000
-/* 15 */ GAME( 2000, fuudol,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_fuudol,   ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
-/* 16 */ GAME( 2000, nuretemi, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nuretemi, ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_fuudol,   ROT0, "Nichibutsu/eic",                    "Fuudol (Japan)", MACHINE_NOT_WORKING )
+/* 16 */ GAME( 2000, nuretemi, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nuretemi, ROT0, "Nichibutsu/Love Factory",           "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_tsuwaku,  ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, init_torarech, ROT0, "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
-/* sp */ GAME( 2000, nichisel, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nichisel, ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
+/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, init_torarech, ROT0, "Nichibutsu/Love Factory/M Friend",  "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
+/* sp */ GAME( 2000, nichisel, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nichisel, ROT0, "Nichibutsu",                        "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
 /* 19 */ GAME( 2001, konhaji,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_konhaji,  ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )

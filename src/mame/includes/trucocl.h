@@ -45,10 +45,10 @@ private:
 	uint8_t m_irq_mask;
 	emu_timer *m_dac_irq_timer;
 
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
-	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
-	DECLARE_WRITE8_MEMBER(audio_dac_w);
+	void irq_enable_w(uint8_t data);
+	void trucocl_videoram_w(offs_t offset, uint8_t data);
+	void trucocl_colorram_w(offs_t offset, uint8_t data);
+	void audio_dac_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void trucocl_palette(palette_device &palette) const;
 	uint32_t screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

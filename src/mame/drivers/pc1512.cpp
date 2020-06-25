@@ -96,6 +96,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 #include "includes/pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -108,7 +109,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 //  system_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_base_state::system_r )
+uint8_t pc1512_base_state::system_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -180,7 +181,7 @@ READ8_MEMBER( pc1512_base_state::system_r )
 //  system_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::system_w )
+void pc1512_base_state::system_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -274,7 +275,7 @@ WRITE8_MEMBER( pc1512_base_state::system_w )
 //  mouse_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_base_state::mouse_r )
+uint8_t pc1512_base_state::mouse_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -297,7 +298,7 @@ READ8_MEMBER( pc1512_base_state::mouse_r )
 //  mouse_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::mouse_w )
+void pc1512_base_state::mouse_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -321,7 +322,7 @@ WRITE8_MEMBER( pc1512_base_state::mouse_w )
 //  dma_page_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::dma_page_w )
+void pc1512_base_state::dma_page_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -364,7 +365,7 @@ WRITE8_MEMBER( pc1512_base_state::dma_page_w )
 //  nmi_mask_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::nmi_mask_w )
+void pc1512_base_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_enable = BIT(data, 7);
 }
@@ -379,7 +380,7 @@ WRITE8_MEMBER( pc1512_base_state::nmi_mask_w )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_base_state::printer_r )
+uint8_t pc1512_base_state::printer_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -442,7 +443,7 @@ READ8_MEMBER( pc1512_base_state::printer_r )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::printer_r )
+uint8_t pc1640_state::printer_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -494,7 +495,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 		break;
 
 	default:
-		data = pc1512_base_state::printer_r(space, offset);
+		data = pc1512_base_state::printer_r(offset);
 		break;
 	}
 
@@ -506,7 +507,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 //  printer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::printer_w )
+void pc1512_base_state::printer_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -552,7 +553,7 @@ WRITE8_MEMBER( pc1512_base_state::printer_w )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::io_r )
+uint8_t pc1640_state::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 	offs_t addr = offset & 0x3ff;
@@ -561,13 +562,13 @@ READ8_MEMBER( pc1640_state::io_r )
 	if      (                 addr <= 0x00f) { data = m_dmac->read(offset & 0x0f); decoded = true; }
 	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(offset & 0x01); decoded = true; }
 	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(offset & 0x03); decoded = true; }
-	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
+	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(offset & 0x0f); decoded = true; }
 	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(offset & 0x01); decoded = true; }
-	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
-	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(offset & 0x07); decoded = true; }
+	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
-	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(); decoded = true; }
-	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(); decoded = true; }
+	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->msr_r(); decoded = true; }
+	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fifo_r(); decoded = true; }
 	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(offset & 0x07); decoded = true; }
 
 	if (decoded)
@@ -610,7 +611,7 @@ READ8_MEMBER( pc1640_state::io_r )
 void pc1512_state::pc1512_mem(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
-	map(0xb8000, 0xbbfff).rw(FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
+	map(0xb8000, 0xbbfff).rw(m_vdu, FUNC(ams40041_device::video_ram_r), FUNC(ams40041_device::video_ram_w));
 	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 
@@ -635,8 +636,9 @@ void pc1512_state::pc1512_io(address_map &map)
 	map(0x080, 0x083).w(FUNC(pc1512_state::dma_page_w));
 	map(0x0a1, 0x0a1).w(FUNC(pc1512_state::nmi_mask_w));
 	map(0x378, 0x37b).rw(FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
-	map(0x3d0, 0x3df).rw(FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
-	map(0x3f0, 0x3f7).m(m_fdc, FUNC(pc_fdc_xt_device::map));
+	map(0x3d0, 0x3df).rw(m_vdu, FUNC(ams40041_device::vdu_r), FUNC(ams40041_device::vdu_w));
+	map(0x3f2, 0x3f2).w(FUNC(pc1512_state::drive_select_w));
+	map(0x3f4, 0x3f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x3f8, 0x3ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
 
@@ -669,8 +671,8 @@ void pc1640_state::pc1640_io(address_map &map)
 	map(0x080, 0x083).w(FUNC(pc1640_state::dma_page_w));
 	map(0x0a1, 0x0a1).w(FUNC(pc1640_state::nmi_mask_w));
 	map(0x378, 0x37b).w(FUNC(pc1640_state::printer_w));
-	map(0x3f2, 0x3f2).w(m_fdc, FUNC(pc_fdc_xt_device::dor_w));
-	map(0x3f5, 0x3f5).w(PC_FDC_XT_TAG ":upd765", FUNC(upd765_family_device::fifo_w));
+	map(0x3f2, 0x3f2).w(FUNC(pc1640_state::drive_select_w));
+	map(0x3f5, 0x3f5).w(m_fdc, FUNC(upd765a_device::fifo_w));
 	map(0x3f8, 0x3ff).w(m_uart, FUNC(ins8250_device::ins8250_w));
 }
 
@@ -799,7 +801,7 @@ WRITE_LINE_MEMBER( pc1512_base_state::kbclk_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( pc1512_base_state::mouse_x_w )
+void pc1512_base_state::mouse_x_w(uint8_t data)
 {
 	if (data > m_mouse_x_old)
 		m_mouse_x+=3;
@@ -809,7 +811,7 @@ WRITE8_MEMBER( pc1512_base_state::mouse_x_w )
 	m_mouse_x_old = data;
 }
 
-WRITE8_MEMBER( pc1512_base_state::mouse_y_w )
+void pc1512_base_state::mouse_y_w(uint8_t data)
 {
 	if (data > m_mouse_y_old)
 		m_mouse_y-=3;
@@ -847,7 +849,7 @@ WRITE_LINE_MEMBER( pc1512_base_state::eop_w )
 	}
 }
 
-READ8_MEMBER( pc1512_base_state::memr_r )
+uint8_t pc1512_base_state::memr_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -855,7 +857,7 @@ READ8_MEMBER( pc1512_base_state::memr_r )
 	return program.read_byte(page_offset + offset);
 }
 
-WRITE8_MEMBER( pc1512_base_state::memw_w )
+void pc1512_base_state::memw_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -863,12 +865,12 @@ WRITE8_MEMBER( pc1512_base_state::memw_w )
 	program.write_byte(page_offset + offset, data);
 }
 
-READ8_MEMBER( pc1512_base_state::ior1_r )
+uint8_t pc1512_base_state::ior1_r()
 {
 	return m_bus->dack_r(1);
 }
 
-READ8_MEMBER( pc1512_base_state::ior2_r )
+uint8_t pc1512_base_state::ior2_r()
 {
 	if (m_nden)
 		return m_fdc->dma_r();
@@ -876,23 +878,23 @@ READ8_MEMBER( pc1512_base_state::ior2_r )
 		return m_bus->dack_r(2);
 }
 
-READ8_MEMBER( pc1512_base_state::ior3_r )
+uint8_t pc1512_base_state::ior3_r()
 {
 	return m_bus->dack_r(3);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow0_w )
+void pc1512_base_state::iow0_w(uint8_t data)
 {
 	m_dreq0 = 0;
 	m_dmac->dreq0_w(m_dreq0);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow1_w )
+void pc1512_base_state::iow1_w(uint8_t data)
 {
 	m_bus->dack_w(1, data);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow2_w )
+void pc1512_base_state::iow2_w(uint8_t data)
 {
 	if (m_nden)
 		m_fdc->dma_w(data);
@@ -900,7 +902,7 @@ WRITE8_MEMBER( pc1512_base_state::iow2_w )
 		m_bus->dack_w(2, data);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow3_w )
+void pc1512_base_state::iow3_w(uint8_t data)
 {
 	m_bus->dack_w(3, data);
 }
@@ -980,6 +982,27 @@ WRITE_LINE_MEMBER( pc1512_base_state::fdc_int_w )
 WRITE_LINE_MEMBER( pc1512_base_state::fdc_drq_w )
 {
 	m_ddrq = state;
+	update_fdc_drq();
+}
+
+void pc1512_base_state::drive_select_w(uint8_t data)
+{
+	m_fdc->set_floppy((data & 0x03) < 2 ? m_floppy[data & 0x03]->get_device() : nullptr);
+	for (int n = 0; n < 2; n++)
+	{
+		floppy_image_device *img = m_floppy[n]->get_device();
+		if (img != nullptr)
+			 img->mon_w((data & 0x03) == n && BIT(data, n + 4) ? 0 : 1);
+	}
+
+	if (m_dreset != BIT(data, 2))
+	{
+		m_dreset = BIT(data, 2);
+		m_fdc->soft_reset();
+	}
+
+	m_nden = BIT(data, 3);
+	update_fdc_int();
 	update_fdc_drq();
 }
 
@@ -1068,6 +1091,7 @@ void pc1512_base_state::machine_start()
 	save_item(NAME(m_nden));
 	save_item(NAME(m_dint));
 	save_item(NAME(m_ddrq));
+	save_item(NAME(m_dreset));
 	save_item(NAME(m_neop));
 	save_item(NAME(m_ack_int_enable));
 	save_item(NAME(m_centronics_ack));
@@ -1092,23 +1116,12 @@ void pc1512_state::machine_start()
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 		program.unmap_readwrite(ram_size, 0x9ffff);
 	}
-
-	// state saving
-	save_item(NAME(m_toggle));
-	save_item(NAME(m_lpen));
-	save_item(NAME(m_blink));
-	save_item(NAME(m_cursor));
-	save_item(NAME(m_blink_ctr));
-	save_item(NAME(m_vdu_mode));
-	save_item(NAME(m_vdu_color));
-	save_item(NAME(m_vdu_plane));
-	save_item(NAME(m_vdu_rdsel));
-	save_item(NAME(m_vdu_border));
 }
 
 void pc1512_base_state::machine_reset()
 {
 	m_nmi_enable = 0;
+	drive_select_w(0);
 
 	m_kb_bits = 0;
 	m_kb->data_w(1);
@@ -1119,18 +1132,7 @@ void pc1512_state::machine_reset()
 {
 	pc1512_base_state::machine_reset();
 
-	m_toggle = 0;
 	m_pit2 = 1;
-
-	m_lpen = 0;
-	m_blink = 0;
-	m_cursor = 0;
-	m_blink_ctr = 0;
-	m_vdu_mode = 0;
-	m_vdu_color = 0;
-	m_vdu_rdsel = 0;
-	m_vdu_plane = 0x0f;
-	m_vdu_border = 0;
 }
 
 
@@ -1163,7 +1165,13 @@ void pc1512_state::pc1512(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video
-	pc1512_video(config);
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(28.636363_MHz_XTAL, 912, 0, 910, 262, 0, 260);
+	screen.set_screen_update(m_vdu, FUNC(ams40041_device::screen_update));
+
+	AMS40041(config, m_vdu, 28.636363_MHz_XTAL);
+	m_vdu->set_screen(SCREEN_TAG);
+	m_vdu->set_show_border_area(true);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -1211,11 +1219,12 @@ void pc1512_state::pc1512(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	PC_FDC_XT(config, m_fdc, 0);
+	UPD765A(config, m_fdc, 24_MHz_XTAL / 6, false, false);
+	// SED9420CAC (dedicated 16 MHz XTAL) is used as read data separator only
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
 
 	INS8250(config, m_uart, 1.8432_MHz_XTAL);
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -1273,7 +1282,7 @@ void pc1512_state::pc1512(machine_config &config)
 void pc1512_state::pc1512dd(machine_config &config)
 {
 	pc1512(config);
-	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+	m_floppy[1]->set_default_option("525dd");
 }
 
 
@@ -1332,10 +1341,10 @@ void pc1640_state::pc1640(machine_config &config)
 	m_dmac->out_dack_callback<2>().set(FUNC(pc1640_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(pc1640_state::dack3_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
@@ -1346,11 +1355,12 @@ void pc1640_state::pc1640(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	PC_FDC_XT(config, m_fdc, 0);
+	UPD765A(config, m_fdc, 24_MHz_XTAL / 6, false, false);
+	// FDC91C36 (clocked by CK8K) is used as read data separator only
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
 
 	INS8250(config, m_uart, 1.8432_MHz_XTAL);
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -1410,7 +1420,7 @@ void pc1640_state::pc1640(machine_config &config)
 void pc1640_state::pc1640dd(machine_config &config)
 {
 	pc1640(config);
-	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+	m_floppy[1]->set_default_option("525dd");
 }
 
 

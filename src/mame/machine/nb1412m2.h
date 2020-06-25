@@ -25,26 +25,14 @@ public:
 	nb1412m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( command_w );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
-
-	DECLARE_WRITE8_MEMBER( rom_address_w );
-	DECLARE_READ8_MEMBER( rom_decrypt_r );
-	DECLARE_WRITE8_MEMBER( rom_op_w );
-	DECLARE_WRITE8_MEMBER( rom_adjust_w );
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
-	DECLARE_WRITE8_MEMBER( timer_ack_w );
-	DECLARE_READ8_MEMBER( const90_r );
-	DECLARE_WRITE8_MEMBER( const90_w );
-	DECLARE_WRITE8_MEMBER( dac_address_w );
-	DECLARE_WRITE8_MEMBER( dac_timer_w );
+	void command_w(uint8_t data);
+	void data_w(uint8_t data);
+	uint8_t data_r();
 
 	auto dac_callback() { return m_dac_cb.bind(); }
 
-
 	void nb1412m2_map(address_map &map);
+
 protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const override;
@@ -73,6 +61,18 @@ private:
 
 	static const device_timer_id TIMER_MAIN = 1;
 	static const device_timer_id TIMER_DAC = 2;
+
+	void rom_address_w(offs_t offset, uint8_t data);
+	uint8_t rom_decrypt_r();
+	void rom_op_w(uint8_t data);
+	void rom_adjust_w(offs_t offset, uint8_t data);
+	uint8_t timer_r();
+	void timer_w(uint8_t data);
+	void timer_ack_w(uint8_t data);
+	uint8_t const90_r();
+	void const90_w(uint8_t data);
+	void dac_address_w(offs_t offset, uint8_t data);
+	void dac_timer_w(uint8_t data);
 };
 
 

@@ -8,7 +8,7 @@
 /// \file nl_convert.h
 ///
 
-#include "plib/plists.h"
+#include "plib/palloc.h"
 #include "plib/pstring.h"
 #include "plib/ptokenizer.h"
 #include "plib/ptypes.h"
@@ -19,12 +19,20 @@
 //  convert - convert a spice netlist
 // -------------------------------------------------
 
+namespace netlist
+{
+
+namespace convert
+{
+
+using arena = plib::aligned_arena;
+
 class nl_convert_base_t
 {
 public:
 	using str_list = std::vector<pstring>;
 
-	COPYASSIGNMOVE(nl_convert_base_t, delete)
+	PCOPYASSIGNMOVE(nl_convert_base_t, delete)
 
 	virtual ~nl_convert_base_t();
 
@@ -124,7 +132,7 @@ private:
 		double value() const { return m_val;}
 		const str_list &extra() const { return m_extra;}
 
-		bool has_model() const { return m_model != ""; }
+		bool has_model() const { return !m_model.empty(); }
 		bool has_value() const { return m_has_val; }
 
 		void add_extra(const pstring &s) { m_extra.push_back(s); }
@@ -156,7 +164,7 @@ private:
 		pstring m_alias;
 	};
 
-	void add_device(plib::unique_ptr<dev_t> dev);
+	void add_device(arena::unique_ptr<dev_t> dev);
 	dev_t *get_device(const pstring &name)
 	{
 		for (auto &e : m_devs)
@@ -167,10 +175,10 @@ private:
 
 	std::stringstream m_buf;
 
-	std::vector<plib::unique_ptr<dev_t>> m_devs;
-	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
+	std::vector<arena::unique_ptr<dev_t>> m_devs;
+	std::unordered_map<pstring, arena::unique_ptr<net_t> > m_nets;
 	std::vector<std::pair<pstring, pstring>> m_ext_alias;
-	std::unordered_map<pstring, plib::unique_ptr<pin_alias_t>> m_pins;
+	std::unordered_map<pstring, arena::unique_ptr<pin_alias_t>> m_pins;
 
 	std::vector<unit_t> m_units;
 	pstring m_numberchars;
@@ -209,11 +217,10 @@ public:
 	public:
 		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm);
 
-		token_id_t m_tok_ADD;
-		token_id_t m_tok_VALUE;
-		token_id_t m_tok_SIGNAL;
-		token_id_t m_tok_SEMICOLON;
-
+		token_id_t m_tok_ADD;       // NOLINT
+		token_id_t m_tok_VALUE;     // NOLINT
+		token_id_t m_tok_SIGNAL;    // NOLINT
+		token_id_t m_tok_SEMICOLON; // NOLINT
 	protected:
 
 		void verror(const pstring &msg) override;
@@ -242,16 +249,15 @@ public:
 	public:
 		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm);
 
-		token_id_t m_tok_HEA;
-		token_id_t m_tok_APP;
-		token_id_t m_tok_TIM;
-		token_id_t m_tok_TYP;
-		token_id_t m_tok_ADDC;
-		token_id_t m_tok_ATTC;
-		token_id_t m_tok_NET;
-		token_id_t m_tok_TER;
-		token_id_t m_tok_END;
-
+		token_id_t m_tok_HEA; // NOLINT
+		token_id_t m_tok_APP; // NOLINT
+		token_id_t m_tok_TIM; // NOLINT
+		token_id_t m_tok_TYP; // NOLINT
+		token_id_t m_tok_ADDC; // NOLINT
+		token_id_t m_tok_ATTC; // NOLINT
+		token_id_t m_tok_NET; // NOLINT
+		token_id_t m_tok_TER; // NOLINT
+		token_id_t m_tok_END; // NOLINT
 	protected:
 
 		void verror(const pstring &msg) override;
@@ -268,5 +274,8 @@ protected:
 private:
 
 };
+
+} // namespace convert
+} // namespace netlist
 
 #endif // NL_CONVERT_H_

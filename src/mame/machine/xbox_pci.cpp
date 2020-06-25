@@ -76,12 +76,12 @@ void nv2a_ram_device::device_start()
 	ram.resize(ram_size * 1024 * 1024 / 4);
 }
 
-READ32_MEMBER(nv2a_ram_device::config_register_r)
+uint32_t nv2a_ram_device::config_register_r()
 {
 	return 0x08800044;
 }
 
-WRITE32_MEMBER(nv2a_ram_device::config_register_w)
+void nv2a_ram_device::config_register_w(uint32_t data)
 {
 }
 
@@ -236,7 +236,7 @@ void mcpx_isalpc_device::update_smi_line()
 		m_smi_callback(0);
 }
 
-READ32_MEMBER(mcpx_isalpc_device::acpi_r)
+uint32_t mcpx_isalpc_device::acpi_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("Acpi read from %04X mask %08X\n", (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	if ((offset == 0xa) && ACCESSING_BITS_0_15)
@@ -246,7 +246,7 @@ READ32_MEMBER(mcpx_isalpc_device::acpi_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
+void mcpx_isalpc_device::acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("Acpi write %08X to %04X mask %08X\n", data, (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	// Seen using word registers at offsets
@@ -302,7 +302,7 @@ WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 		logerror("Acpi write not recognized\n");
 }
 
-WRITE8_MEMBER(mcpx_isalpc_device::boot_state_w)
+void mcpx_isalpc_device::boot_state_w(uint8_t data)
 {
 	if (m_boot_state_hook)
 		m_boot_state_hook((offs_t)0, data);
@@ -313,7 +313,7 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
 	m_interrupt_output(state);
 }
 
-READ8_MEMBER(mcpx_isalpc_device::get_slave_ack)
+uint8_t mcpx_isalpc_device::get_slave_ack(offs_t offset)
 {
 	if (offset == 2) // IRQ = 2
 		return pic8259_2->acknowledge();
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::irq15)
 	pic8259_2->ir7_w(state);
 }
 
-READ8_MEMBER(mcpx_isalpc_device::portb_r)
+uint8_t mcpx_isalpc_device::portb_r()
 {
 	uint8_t data = m_speaker;
 
@@ -382,7 +382,7 @@ READ8_MEMBER(mcpx_isalpc_device::portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(mcpx_isalpc_device::portb_w)
+void mcpx_isalpc_device::portb_w(uint8_t data)
 {
 	m_speaker = data;
 	pit8254->write_gate2(BIT(data, 0));
@@ -628,22 +628,22 @@ void mcpx_smbus_device::smbus_write(int bus, offs_t offset, uint32_t data, uint3
 		smbusst[bus].command = data;
 }
 
-READ32_MEMBER(mcpx_smbus_device::smbus0_r)
+uint32_t mcpx_smbus_device::smbus0_r(offs_t offset, uint32_t mem_mask)
 {
 	return smbus_read(0, offset, mem_mask);
 }
 
-WRITE32_MEMBER(mcpx_smbus_device::smbus0_w)
+void mcpx_smbus_device::smbus0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	smbus_write(0, offset, data, mem_mask);
 }
 
-READ32_MEMBER(mcpx_smbus_device::smbus1_r)
+uint32_t mcpx_smbus_device::smbus1_r(offs_t offset, uint32_t mem_mask)
 {
 	return smbus_read(1, offset, mem_mask);
 }
 
-WRITE32_MEMBER(mcpx_smbus_device::smbus1_w)
+void mcpx_smbus_device::smbus1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	smbus_write(1, offset, data, mem_mask);
 }
@@ -733,7 +733,7 @@ void mcpx_ohci_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		ohci_usb->timer(timer, id, param, ptr);
 }
 
-READ32_MEMBER(mcpx_ohci_device::ohci_r)
+uint32_t mcpx_ohci_device::ohci_r(offs_t offset)
 {
 	if (!ohci_usb)
 		return 0;
@@ -741,13 +741,13 @@ READ32_MEMBER(mcpx_ohci_device::ohci_r)
 	{
 		hack_callback();
 	}
-	return ohci_usb->read(space, offset, mem_mask);
+	return ohci_usb->read(offset);
 }
 
-WRITE32_MEMBER(mcpx_ohci_device::ohci_w)
+void mcpx_ohci_device::ohci_w(offs_t offset, uint32_t data)
 {
 	if (ohci_usb)
-		ohci_usb->write(space, offset, data, mem_mask);
+		ohci_usb->write(offset, data);
 }
 
 /*
@@ -786,21 +786,21 @@ void mcpx_eth_device::device_reset()
 	pci_device::device_reset();
 }
 
-READ32_MEMBER(mcpx_eth_device::eth_r)
+uint32_t mcpx_eth_device::eth_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_eth_device::eth_w)
+void mcpx_eth_device::eth_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(mcpx_eth_device::eth_io_r)
+uint32_t mcpx_eth_device::eth_io_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_eth_device::eth_io_w)
+void mcpx_eth_device::eth_io_w(uint32_t data)
 {
 }
 
@@ -876,7 +876,7 @@ void mcpx_apu_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-READ32_MEMBER(mcpx_apu_device::apu_r)
+uint32_t mcpx_apu_device::apu_r(offs_t offset, uint32_t mem_mask)
 {
 #ifdef LOG_AUDIO
 	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
@@ -886,7 +886,7 @@ READ32_MEMBER(mcpx_apu_device::apu_r)
 	return apust.memory[offset];
 }
 
-WRITE32_MEMBER(mcpx_apu_device::apu_w)
+void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 
@@ -1040,7 +1040,7 @@ void mcpx_ac97_audio_device::device_reset()
 	pci_device::device_reset();
 }
 
-READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_r)
+uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
@@ -1071,7 +1071,7 @@ READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_r)
 	return ret;
 }
 
-WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_w)
+void mcpx_ac97_audio_device::ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #ifdef LOG_AUDIO
 	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
@@ -1087,21 +1087,21 @@ WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_w)
 	}
 }
 
-READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io0_r)
+uint32_t mcpx_ac97_audio_device::ac97_audio_io0_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io0_w)
+void mcpx_ac97_audio_device::ac97_audio_io0_w(uint32_t data)
 {
 }
 
-READ32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io1_r)
+uint32_t mcpx_ac97_audio_device::ac97_audio_io1_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io1_w)
+void mcpx_ac97_audio_device::ac97_audio_io1_w(uint32_t data)
 {
 }
 
@@ -1219,7 +1219,7 @@ void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 	}
 }
 
-WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
+void mcpx_ide_device::class_rev_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1254,22 +1254,22 @@ WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
 	}
 }
 
-READ8_MEMBER(mcpx_ide_device::pri_read_cs1_r)
+uint8_t mcpx_ide_device::pri_read_cs1_r()
 {
 	return m_pri->read_cs1(1, 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(mcpx_ide_device::pri_write_cs1_w)
+void mcpx_ide_device::pri_write_cs1_w(uint8_t data)
 {
 	m_pri->write_cs1(1, data << 16, 0xff0000);
 }
 
-READ8_MEMBER(mcpx_ide_device::sec_read_cs1_r)
+uint8_t mcpx_ide_device::sec_read_cs1_r()
 {
 	return m_sec->read_cs1(1, 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(mcpx_ide_device::sec_write_cs1_w)
+void mcpx_ide_device::sec_write_cs1_w(uint8_t data)
 {
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
@@ -1311,7 +1311,7 @@ void nv2a_agp_device::device_reset()
 	agp_bridge_device::device_reset();
 }
 
-READ32_MEMBER(nv2a_agp_device::unknown_r)
+uint32_t nv2a_agp_device::unknown_r(offs_t offset, uint32_t mem_mask)
 {
 	// 4c 8 or 32
 	// 44 8
@@ -1324,7 +1324,7 @@ READ32_MEMBER(nv2a_agp_device::unknown_r)
 	return 0;
 }
 
-WRITE32_MEMBER(nv2a_agp_device::unknown_w)
+void nv2a_agp_device::unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("W %08X %08X %08X\n", 0x40+offset*4, mem_mask, data);
 }
@@ -1381,22 +1381,22 @@ void nv2a_gpu_device::device_reset()
 	nvidia_nv2a->set_ram_base(m_program->get_read_ptr(0));
 }
 
-READ32_MEMBER(nv2a_gpu_device::geforce_r)
+uint32_t nv2a_gpu_device::geforce_r(offs_t offset, uint32_t mem_mask)
 {
-	return nvidia_nv2a->geforce_r(space, offset, mem_mask);
+	return nvidia_nv2a->geforce_r(offset, mem_mask);
 }
 
-WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
+void nv2a_gpu_device::geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	nvidia_nv2a->geforce_w(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER(nv2a_gpu_device::nv2a_mirror_r)
+uint32_t nv2a_gpu_device::nv2a_mirror_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_program->read_dword(offset << 2);
 }
 
-WRITE32_MEMBER(nv2a_gpu_device::nv2a_mirror_w)
+void nv2a_gpu_device::nv2a_mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_program->write_dword(offset << 2, data, mem_mask);
 }

@@ -167,7 +167,7 @@ void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 
-WRITE16_MEMBER( nile_device::nile_sndctrl_w )
+void nile_device::nile_sndctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t ctrl=m_ctrl;
 
@@ -181,14 +181,14 @@ WRITE16_MEMBER( nile_device::nile_sndctrl_w )
 }
 
 
-READ16_MEMBER( nile_device::nile_sndctrl_r )
+uint16_t nile_device::nile_sndctrl_r()
 {
 	m_stream->update();
 	return m_ctrl;
 }
 
 
-READ16_MEMBER( nile_device::nile_snd_r )
+uint16_t nile_device::nile_snd_r(offs_t offset)
 {
 	int reg=offset&0xf;
 
@@ -212,7 +212,7 @@ READ16_MEMBER( nile_device::nile_snd_r )
 }
 
 
-WRITE16_MEMBER( nile_device::nile_snd_w )
+void nile_device::nile_snd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int v, r;
 

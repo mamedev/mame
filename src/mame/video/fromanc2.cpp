@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_tile_info)
 	int tile  = (m_videoram[VRAM][Layer][tile_index] & 0x3fff) | (m_gfxbank[VRAM][Layer] << 14);
 	int color = (m_videoram[VRAM][Layer][tile_index] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(Layer, tile, color, 0);
+	tileinfo.set(Layer, tile, color, 0);
 }
 
 template<int VRAM, int Layer>
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_tile_info)
 {
 	int tile = m_videoram[VRAM][Layer][tile_index] | (m_gfxbank[VRAM][Layer] << 16);
 
-	SET_TILE_INFO_MEMBER(Layer, tile, 0, 0);
+	tileinfo.set(Layer, tile, 0, 0);
 }
 
 
@@ -49,12 +49,12 @@ inline void fromanc2_state::fromanc2_dispvram_w( offs_t offset, uint16_t data, u
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_0_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_1_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_2_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_3_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
+void fromanc2_state::fromanc2_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
+void fromanc2_state::fromanc2_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
+void fromanc2_state::fromanc2_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
+void fromanc2_state::fromanc2_videoram_3_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
+void fromanc2_state::fromanc2_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -67,7 +67,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
+void fromanc2_state::fromanc2_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -80,7 +80,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
+void fromanc2_state::fromanc2_gfxreg_2_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -93,7 +93,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
+void fromanc2_state::fromanc2_gfxreg_3_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -106,7 +106,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_0_w)
+void fromanc2_state::fromanc2_gfxbank_0_w(uint16_t data)
 {
 	m_gfxbank[0][0] = (data & 0x000f) >>  0;
 	m_gfxbank[0][1] = (data & 0x00f0) >>  4;
@@ -118,7 +118,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_0_w)
 	m_tilemap[0][3]->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_1_w)
+void fromanc2_state::fromanc2_gfxbank_1_w(uint16_t data)
 {
 	m_gfxbank[1][0] = (data & 0x000f) >>  0;
 	m_gfxbank[1][1] = (data & 0x00f0) >>  4;
@@ -139,11 +139,11 @@ inline void fromanc2_state::fromancr_vram_w(offs_t offset, uint16_t data, uint16
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_0_w){ fromancr_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_1_w){ fromancr_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_2_w){ fromancr_vram_w(offset, data, mem_mask, 2); }
+void fromanc2_state::fromancr_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 1); }
+void fromanc2_state::fromancr_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 0); }
+void fromanc2_state::fromancr_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 2); }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
+void fromanc2_state::fromancr_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
+void fromanc2_state::fromancr_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -190,11 +190,11 @@ inline void fromanc2_state::fromanc4_vram_w( offs_t offset, uint16_t data, uint1
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_0_w){ fromanc4_vram_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_1_w){ fromanc4_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_2_w){ fromanc4_vram_w(offset, data, mem_mask, 0); }
+void fromanc2_state::fromanc4_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 2); }
+void fromanc2_state::fromanc4_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 1); }
+void fromanc2_state::fromanc4_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 0); }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
+void fromanc2_state::fromanc4_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -212,7 +212,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
+void fromanc2_state::fromanc4_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -230,7 +230,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
+void fromanc2_state::fromanc4_gfxreg_2_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{

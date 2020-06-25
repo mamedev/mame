@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/atarisy1.h"
+#include "cpu/m68000/m68000.h"
 
 
 
@@ -87,7 +88,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = (data >> 10) & 0x07;
 	int opaque = data & 0x2000;
-	SET_TILE_INFO_MEMBER(0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -98,7 +99,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
 	int gfxindex = (lookup >> 8) & 15;
 	int code = ((lookup & 0xff) << 8) | (data & 0xff);
 	int color = 0x20 + (((lookup >> 12) & 15) << m_bank_color_shift[gfxindex]);
-	SET_TILE_INFO_MEMBER(gfxindex, code, color, (data >> 15) & 1);
+	tileinfo.set(gfxindex, code, color, (data >> 15) & 1);
 }
 
 
@@ -143,18 +144,18 @@ const atari_motion_objects_config atarisy1_state::s_mob_config =
 	0xffff              /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::video_start()
 {
-	/* first decode the graphics */
+	// first decode the graphics
 	uint16_t motable[256];
 	decode_gfx(m_playfield_lookup, motable);
 
-	/* modify the motion object code lookup */
+	// modify the motion object code lookup
 	std::vector<uint32_t> &codelookup = m_mob->code_lookup();
 	for (unsigned int i = 0; i < codelookup.size(); i++)
 		codelookup[i] = (i & 0xff) | ((motable[i >> 8] & 0xff) << 8);
 
-	/* modify the motion object color and gfx lookups */
+	// modify the motion object color and gfx lookups
 	std::vector<uint8_t> &colorlookup = m_mob->color_lookup();
 	std::vector<uint8_t> &gfxlookup = m_mob->gfx_lookup();
 	for (unsigned int i = 0; i < colorlookup.size(); i++)
@@ -163,14 +164,18 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 		gfxlookup[i] = (motable[i] >> 8) & 15;
 	}
 
-	/* reset the statics */
+	// reset the statics
 	m_mob->set_yscroll(256);
 	m_next_timer_scanline = -1;
+	m_scanline_int_state = 0;
+	m_bankselect = 0xff;
 
-	/* save state */
+	// save state
 	save_item(NAME(m_playfield_tile_bank));
 	save_item(NAME(m_playfield_priority_pens));
 	save_item(NAME(m_next_timer_scanline));
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_bankselect));
 }
 
 
@@ -181,41 +186,45 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
+void atarisy1_state::bankselect_w(uint8_t data)
 {
-	uint16_t oldselect = *m_bankselect;
-	uint16_t newselect = oldselect, diff;
+	uint8_t oldselect = m_bankselect;
+	uint8_t newselect = data;
 	int scanline = m_screen->vpos();
 
-	/* update memory */
-	COMBINE_DATA(&newselect);
-	diff = oldselect ^ newselect;
+	// update memory
+	uint8_t diff = oldselect ^ newselect;
 
-	/* sound CPU reset */
+	// sound CPU reset
 	if (BIT(diff, 7))
 	{
 		m_outlatch->clear_w(BIT(newselect, 7));
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(newselect, 7) ? CLEAR_LINE : ASSERT_LINE);
-		if (!BIT(newselect, 7)) m_soundcomm->sound_cpu_reset();
+		if (!BIT(newselect, 7))
+		{
+			m_mainlatch->acknowledge_w();
+			if (m_via.found())
+				m_via->reset();
+		}
 	}
 
-	/* if MO or playfield banks change, force a partial update */
-	if (diff & 0x003c)
+	// if MO or playfield banks change, force a partial update
+	if (diff & 0x3c)
 		m_screen->update_partial(scanline);
 
-	/* motion object bank select */
+	// motion object bank select
 	m_mob->set_bank((newselect >> 3) & 7);
 	update_timers(scanline);
 
-	/* playfield bank select */
-	if (diff & 0x0004)
+	// playfield bank select
+	if (diff & 0x04)
 	{
 		m_playfield_tile_bank = (newselect >> 2) & 1;
 		m_playfield_tilemap->mark_all_dirty();
 	}
 
-	/* stash the new value */
-	*m_bankselect = newselect;
+	// stash the new value
+	m_bankselect = newselect;
 }
 
 
@@ -226,7 +235,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_priority_w )
+void atarisy1_state::atarisy1_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldpens = m_playfield_priority_pens;
 	uint16_t newpens = oldpens;
@@ -246,7 +255,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_priority_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_xscroll_w )
+void atarisy1_state::atarisy1_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -271,13 +280,13 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_xscroll_w )
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_reset_yscroll_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::reset_yscroll_callback)
 {
 	m_playfield_tilemap->set_scrolly(0, param);
 }
 
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
+void atarisy1_state::atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -311,7 +320,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
+void atarisy1_state::atarisy1_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int active_bank = m_mob->bank();
 	uint16_t *spriteram = m_mob->spriteram();
@@ -351,24 +360,26 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::int3off_callback)
 {
-	/* clear the state */
-	scanline_int_ack_w();
+	// clear the state
+	m_scanline_int_state = 0;
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::int3_callback)
 {
 	int scanline = param;
 
-	/* update the state */
-	scanline_int_write_line(1);
+	// update the state
+	m_scanline_int_state = 1;
+	m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 
-	/* set a timer to turn it off */
+	// set a timer to turn it off
 	m_int3off_timer->adjust(m_screen->scan_period());
 
-	/* determine the time of the next one */
+	// determine the time of the next one
 	m_next_timer_scanline = -1;
 	update_timers(scanline);
 }
@@ -381,7 +392,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
  *
  *************************************/
 
-READ16_MEMBER( atarisy1_state::atarisy1_int3state_r )
+uint16_t atarisy1_state::atarisy1_int3state_r()
 {
 	return m_scanline_int_state ? 0x0080 : 0x0000;
 }

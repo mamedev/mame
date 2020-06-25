@@ -34,10 +34,18 @@ void warpwarp_state::geebee_palette(palette_device &palette) const
 
 void warpwarp_state::navarone_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, geebee_pens[0]);
-	palette.set_pen_color(1, geebee_pens[1]);
-	palette.set_pen_color(2, geebee_pens[1]);
-	palette.set_pen_color(3, geebee_pens[0]);
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
+	palette.set_pen_color(2, rgb_t::white());
+	palette.set_pen_color(3, rgb_t::black());
+}
+
+void warpwarp_state::sos_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t::white());
+	palette.set_pen_color(1, rgb_t::black());
+	palette.set_pen_color(2, rgb_t::black());
+	palette.set_pen_color(3, rgb_t::white());
 }
 
 MACHINE_RESET_MEMBER(warpwarp_state,kaitei)
@@ -159,7 +167,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::geebee_get_tile_info)
 {
 	int code = m_geebee_videoram[tile_index];
 	int color = (m_geebee_bgw & 1) | ((code & 0x80) >> 6);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);
@@ -169,7 +177,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
 {
 	int code = m_geebee_videoram[tile_index];
 	int color = m_geebee_bgw & 1;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);
@@ -177,7 +185,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
 
 TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index],
 			m_videoram[tile_index + 0x400],
 			0);
@@ -214,13 +222,13 @@ VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(warpwarp_state::geebee_videoram_w)
+void warpwarp_state::geebee_videoram_w(offs_t offset, uint8_t data)
 {
 	m_geebee_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
+void warpwarp_state::warpwarp_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);

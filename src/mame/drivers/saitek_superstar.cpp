@@ -13,11 +13,18 @@ Hardware notes (Superstar 28K):
 - 24KB ROM (3*M5L2764K)
 - TTL, buzzer, 28 LEDs, 8*8 chessboard buttons
 
+Superstar 36K:
+- PCB label: YO1CD-PE-006 REV3
+- SYU6502A @ 2MHz
+- 4KB RAM (2*HM6116P-3)
+- 32KB ROM (custom label), extension ROM slot
+
 Turbostar 432:
 - PCB label: SUPERSTAR REV-3
 - R65C02P4 @ 4MHz
 - 4KB RAM (2*HM6116P-4)
-- 32KB ROM (custom label), extension ROM slot
+- 32KB ROM (custom label, contents nearly identical to sstar36k)
+- extension ROM slot
 
 There are 2 versions of Turbostar 432, the 2nd one has a lighter shade and
 the top-right is gray instead of red. It came with the KSO ROM included.
@@ -28,7 +35,6 @@ so the internal chess clock would run too fast.
 
 TODO:
 - verify sstar28k CPU speed
-- dump/add sstar36k (is it simply a 2MHz version of tstar432?)
 
 ******************************************************************************/
 
@@ -61,12 +67,12 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_extrom(*this, "extrom"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine configs
 	void sstar28k(machine_config &config);
+	void sstar36k(machine_config &config);
 	void tstar432(machine_config &config);
 
 protected:
@@ -78,7 +84,6 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	optional_device<generic_slot_device> m_extrom;
 	required_ioport_array<2> m_inputs;
 
 	// address maps
@@ -86,17 +91,14 @@ private:
 	void tstar432_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	u8 input_r();
 
-	u8 m_inp_mux;
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
+	u8 m_inp_mux = 0;
 };
 
 void star_state::machine_start()
 {
-	m_inp_mux = 0;
 	save_item(NAME(m_inp_mux));
 }
 
@@ -106,21 +108,7 @@ void star_state::machine_start()
     I/O
 ******************************************************************************/
 
-// Extension ROM
-
-DEVICE_IMAGE_LOAD_MEMBER(star_state::extrom_load)
-{
-	u32 size = m_extrom->common_get_size("rom");
-	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
-// TTL
-
-WRITE8_MEMBER(star_state::control_w)
+void star_state::control_w(u8 data)
 {
 	// d0-d3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -132,7 +120,7 @@ WRITE8_MEMBER(star_state::control_w)
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(star_state::input_r)
+u8 star_state::input_r()
 {
 	u8 data = 0;
 
@@ -211,8 +199,8 @@ void star_state::sstar28k(machine_config &config)
 	M6502(config, m_maincpu, 2000000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	const attotime irq_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -236,16 +224,26 @@ void star_state::tstar432(machine_config &config)
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	config.set_default_layout(layout_saitek_tstar432);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_kso", "bin");
-	m_extrom->set_device_load(FUNC(star_state::extrom_load));
-
+	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_kso");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
+}
+
+void star_state::sstar36k(machine_config &config)
+{
+	tstar432(config);
+
+	/* basic machine hardware */
+	M6502(config.replace(), m_maincpu, 2_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
+
+	const attotime nmi_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 }
 
 
@@ -261,10 +259,14 @@ ROM_START( sstar28k )
 	ROM_LOAD("yo1c-v25_e0.u5", 0xe000, 0x2000, CRC(371b81fe) SHA1(c08dd0de8eebd7c1ed2d2281bf0241a83ee0f391) ) // "
 ROM_END
 
-
 ROM_START( tstar432 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("yo1d-j.u4", 0x8000, 0x8000, CRC(aa993096) SHA1(06db69a284eaf022b26e1087e09d8d459d270d03) )
+	ROM_LOAD("yo1d-j.u6", 0x8000, 0x8000, CRC(aa993096) SHA1(06db69a284eaf022b26e1087e09d8d459d270d03) )
+ROM_END
+
+ROM_START( sstar36k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("yo1d.u6", 0x8000, 0x8000, CRC(270c9a81) SHA1(5c9ef3a140651d7c9d9b801f2524cb93b0f92bb4) )
 ROM_END
 
 } // anonymous namespace
@@ -275,7 +277,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, sstar28k, 0,      0, sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMP MACHINE   INPUT     STATE       INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1983, sstar28k, 0,        0, sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1985, tstar432, 0,      0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, tstar432, 0,        0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, sstar36k, tstar432, 0, sstar36k, sstar28k, star_state, empty_init, "SciSys", "Superstar 36K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

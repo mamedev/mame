@@ -545,7 +545,7 @@ private:
 
 	uint32_t screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(vip2000_outputs_w);
+	void vip2000_outputs_w(uint16_t data);
 
 	void bingor2_map(address_map &map);
 	void bingor_io(address_map &map);
@@ -745,7 +745,7 @@ void bingor_state::vip2000_io(address_map &map)
 	map(0x0280, 0x0281).w(FUNC(bingor_state::vip2000_outputs_w));
 }
 
-WRITE16_MEMBER(bingor_state::vip2000_outputs_w)
+void bingor_state::vip2000_outputs_w(uint16_t data)
 {
 	m_slavecpu->set_input_line(MCS51_INT0_LINE, BIT(data, 15) ? CLEAR_LINE : ASSERT_LINE);
 }

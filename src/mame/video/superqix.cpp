@@ -2,7 +2,7 @@
 // copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
 /***************************************************************************
 
-  video.c
+  superqix.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(hotsmash_state::pb_get_bg_tile_info)
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] + 256 * (attr & 0x7);
 	int color = (attr & 0xf0) >> 4;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(superqix_state_base::sqix_get_bg_tile_info)
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(superqix_state_base::sqix_get_bg_tile_info)
 
 	if (bank) code += 1024 * m_gfxbank;
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 	tileinfo.group = (attr & 0x08) >> 3;
 }
 
@@ -84,13 +84,13 @@ rgb_t superqix_state_base::BBGGRRII(uint32_t raw)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(superqix_state_base::superqix_videoram_w)
+void superqix_state_base::superqix_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(superqix_state_base::superqix_bitmapram_w)
+void superqix_state_base::superqix_bitmapram_w(offs_t offset, uint8_t data)
 {
 	if (m_bitmapram[offset] != data)
 	{
@@ -104,7 +104,7 @@ WRITE8_MEMBER(superqix_state_base::superqix_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state_base::superqix_bitmapram2_w)
+void superqix_state_base::superqix_bitmapram2_w(offs_t offset, uint8_t data)
 {
 	if (data != m_bitmapram2[offset])
 	{
@@ -118,7 +118,7 @@ WRITE8_MEMBER(superqix_state_base::superqix_bitmapram2_w)
 	}
 }
 
-WRITE8_MEMBER(hotsmash_state::pbillian_0410_w)
+void hotsmash_state::pbillian_0410_w(u8 data)
 {
 	/*
 	 -------0  ? [not used]
@@ -140,7 +140,7 @@ WRITE8_MEMBER(hotsmash_state::pbillian_0410_w)
 	flip_screen_set(BIT(data,5));
 }
 
-WRITE8_MEMBER(superqix_state_base::superqix_0410_w)
+void superqix_state_base::superqix_0410_w(uint8_t data)
 {
 	/*
 	 ------10  tile bank

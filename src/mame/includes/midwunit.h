@@ -43,18 +43,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(midwunit_cmos_enable_w);
-	DECLARE_WRITE16_MEMBER(midwunit_cmos_w);
-	DECLARE_READ16_MEMBER(midwunit_cmos_r);
-	DECLARE_WRITE16_MEMBER(midwunit_io_w);
-	DECLARE_READ16_MEMBER(midwunit_io_r);
-	DECLARE_READ16_MEMBER(midwunit_security_r);
-	DECLARE_WRITE16_MEMBER(midwunit_security_w);
-	DECLARE_READ16_MEMBER(midwunit_sound_r);
-	DECLARE_READ16_MEMBER(midwunit_sound_state_r);
-	DECLARE_WRITE16_MEMBER(midwunit_sound_w);
-	DECLARE_WRITE16_MEMBER(umk3_palette_hack_w);
-	DECLARE_WRITE16_MEMBER(wwfmania_io_0_w);
+	void midwunit_cmos_enable_w(uint16_t data);
+	void midwunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midwunit_cmos_r(offs_t offset);
+	void midwunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midwunit_io_r(offs_t offset);
+	uint16_t midwunit_security_r();
+	void midwunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midwunit_sound_r();
+	uint16_t midwunit_sound_state_r();
+	void midwunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void umk3_palette_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wwfmania_io_0_w(uint16_t data);
 
 	void init_mk3_common();
 	void main_map(address_map &map);

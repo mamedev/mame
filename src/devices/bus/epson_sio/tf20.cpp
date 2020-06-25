@@ -215,7 +215,7 @@ IRQ_CALLBACK_MEMBER( epson_tf20_device::irq_callback )
 }
 
 // a read from this location disables the rom
-READ8_MEMBER( epson_tf20_device::rom_disable_r )
+uint8_t epson_tf20_device::rom_disable_r()
 {
 	// switch in ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x0000, 0x7fff, m_ram->pointer());
@@ -231,7 +231,7 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 //  fdc interrupt
 //-------------------------------------------------
 
-READ8_MEMBER( epson_tf20_device::upd765_tc_r )
+uint8_t epson_tf20_device::upd765_tc_r()
 {
 	logerror("%s: upd765_tc_r\n", machine().describe_context());
 
@@ -242,7 +242,7 @@ READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
+void epson_tf20_device::fdc_control_w(uint8_t data)
 {
 	logerror("%s: tf20_fdc_control_w(%02x)\n", machine().describe_context(), data);
 

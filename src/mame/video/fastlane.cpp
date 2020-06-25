@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			1 + 64 * (attr & 0x0f),
 			0);
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			0 + 64 * (attr & 0x0f),
 			0);
@@ -106,13 +106,13 @@ void fastlane_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fastlane_state::fastlane_vram1_w)
+void fastlane_state::fastlane_vram1_w(offs_t offset, uint8_t data)
 {
 	m_videoram1[offset] = data;
 	m_layer0->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(fastlane_state::fastlane_vram2_w)
+void fastlane_state::fastlane_vram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_layer1->mark_tile_dirty(offset & 0x3ff);

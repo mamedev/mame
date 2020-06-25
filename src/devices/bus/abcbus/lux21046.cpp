@@ -161,7 +161,7 @@ void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(FUNC(luxor_55_21046_device::_9a_r));
 	map(0x68, 0x6b).mirror(0xff00).r(m_fdc, FUNC(fd1793_device::read));
 	map(0x78, 0x7b).mirror(0xff00).w(m_fdc, FUNC(fd1793_device::write));
-	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 }
 
 
@@ -232,22 +232,22 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
-READ8_MEMBER( luxor_55_21046_device::memory_read_byte )
+uint8_t luxor_55_21046_device::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::memory_write_byte )
+void luxor_55_21046_device::memory_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER( luxor_55_21046_device::io_read_byte )
+uint8_t luxor_55_21046_device::io_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::io_write_byte )
+void luxor_55_21046_device::io_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
@@ -789,10 +789,9 @@ void luxor_55_21046_device::device_reset()
 
 	m_maincpu->reset();
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	_4b_w(space, 0, 0);
-	_9b_w(space, 0, 0);
-	_8a_w(space, 0, 0);
+	_4b_w(0);
+	_9b_w(0);
+	_8a_w(0);
 }
 
 
@@ -932,9 +931,9 @@ void luxor_55_21046_device::abcbus_c4(uint8_t data)
 //  3d_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::out_r )
+uint8_t luxor_55_21046_device::out_r()
 {
-	if (m_busy)
+	if (m_busy && !machine().side_effects_disabled())
 	{
 		m_busy = 0;
 	}
@@ -947,7 +946,7 @@ READ8_MEMBER( luxor_55_21046_device::out_r )
 //  4d_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::inp_w )
+void luxor_55_21046_device::inp_w(uint8_t data)
 {
 	if (m_busy)
 	{
@@ -962,7 +961,7 @@ WRITE8_MEMBER( luxor_55_21046_device::inp_w )
 //  4b_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
+void luxor_55_21046_device::_4b_w(uint8_t data)
 {
 	/*
 
@@ -993,7 +992,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
 //  9b_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
+void luxor_55_21046_device::_9b_w(uint8_t data)
 {
 	/*
 
@@ -1033,7 +1032,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 //  8a_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
+void luxor_55_21046_device::_8a_w(uint8_t data)
 {
 	/*
 
@@ -1053,7 +1052,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	*/
 
 	// FDC master reset
-	if (!BIT(data, 0)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 0));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
@@ -1066,7 +1065,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 //  9a_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::_9a_r )
+uint8_t luxor_55_21046_device::_9a_r(offs_t offset)
 {
 	/*
 

@@ -103,7 +103,7 @@ Notes:
 
 /******************************************************************************/
 
-READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
+uint16_t funkyjet_state::funkyjet_protection_region_0_146_r(offs_t offset)
 {
 //  uint16_t realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
 
@@ -118,7 +118,7 @@ READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
+void funkyjet_state::funkyjet_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  deco16_146_funkyjet_prot_w(space,offset&0x3ff,data,mem_mask);
 
@@ -336,8 +336,6 @@ void funkyjet_state::funkyjet(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);

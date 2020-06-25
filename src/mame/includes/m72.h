@@ -166,17 +166,17 @@ private:
 	void mcu_low_w(u8 data);
 	void mcu_high_w(u8 data);
 
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(protection_w);
+	u16 protection_r(offs_t offset, u16 mem_mask = ~0);
+	void protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// game specific
-	DECLARE_WRITE16_MEMBER(bchopper_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(nspirit_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
+	void bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void imgfight_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rtype2_port02_w(u8 data);
 	void poundfor_port02_w(u8 data);
 	void m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask);

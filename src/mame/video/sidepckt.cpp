@@ -54,7 +54,7 @@ void sidepckt_state::sidepckt_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 {
 	uint8_t attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);
@@ -87,24 +87,24 @@ void sidepckt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sidepckt_state::videoram_w)
+void sidepckt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::colorram_w)
+void sidepckt_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(sidepckt_state::scroll_y_r)
+uint8_t sidepckt_state::scroll_y_r()
 {
 	return (m_scroll_y);
 }
 
-WRITE8_MEMBER(sidepckt_state::scroll_y_w)
+void sidepckt_state::scroll_y_w(uint8_t data)
 {
 	// Bits 0-5: Scroll y
 	m_scroll_y = data & 0x3F;

@@ -231,7 +231,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0_tile_info)
 
 	code=code | ((color & 0xe0) << 3);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,   //tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
@@ -244,7 +244,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0xf0) << 4),
 			(color>>0) & 0x0f,
 			0);
@@ -255,7 +255,7 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0xc0) << 2) | (m_bg_bank << 10),
 			(color>>0) & 0xf,
 			0);
@@ -357,13 +357,13 @@ uint32_t witch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER(witch_state::gfx0_vram_w)
+void witch_state::gfx0_vram_w(offs_t offset, uint8_t data)
 {
 	m_gfx0_vram[offset] = data;
 	m_gfx0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(witch_state::gfx0_cram_w)
+void witch_state::gfx0_cram_w(offs_t offset, uint8_t data)
 {
 	m_gfx0_cram[offset] = data;
 	m_gfx0_tilemap->mark_tile_dirty(offset);
@@ -372,32 +372,32 @@ WRITE8_MEMBER(witch_state::gfx0_cram_w)
 #define FIX_OFFSET() do { \
 	offset=(((offset + ((m_scrolly & 0xf8) << 2) ) & 0x3e0)+((offset + (m_scrollx >> 3) ) & 0x1f)+32)&0x3ff; } while(0)
 
-WRITE8_MEMBER(witch_state::gfx1_vram_w)
+void witch_state::gfx1_vram_w(offs_t offset, uint8_t data)
 {
 	FIX_OFFSET();
 	m_gfx1_vram[offset] = data;
 	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(witch_state::gfx1_cram_w)
+void witch_state::gfx1_cram_w(offs_t offset, uint8_t data)
 {
 	FIX_OFFSET();
 	m_gfx1_cram[offset] = data;
 	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
-READ8_MEMBER(witch_state::gfx1_vram_r)
+uint8_t witch_state::gfx1_vram_r(offs_t offset)
 {
 	FIX_OFFSET();
 	return m_gfx1_vram[offset];
 }
 
-READ8_MEMBER(witch_state::gfx1_cram_r)
+uint8_t witch_state::gfx1_cram_r(offs_t offset)
 {
 	FIX_OFFSET();
 	return m_gfx1_cram[offset];
 }
 
-READ8_MEMBER(witch_state::read_a000)
+uint8_t witch_state::read_a000()
 {
 	switch (m_reg_a002 & 0x3f)
 	{
@@ -413,7 +413,7 @@ READ8_MEMBER(witch_state::read_a000)
 	}
 }
 
-WRITE8_MEMBER(witch_state::write_a002)
+void witch_state::write_a002(uint8_t data)
 {
 	//A002 bit 7&6 = m_bank ????
 	m_reg_a002 = data;
@@ -421,7 +421,7 @@ WRITE8_MEMBER(witch_state::write_a002)
 	m_mainbank->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
+void keirinou_state::write_keirinou_a002(uint8_t data)
 {
 	uint8_t new_bg_bank;
 	m_reg_a002 = data;
@@ -437,7 +437,7 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 //  m_mainbank->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(witch_state::write_a006)
+void witch_state::write_a006(uint8_t data)
 {
 	// don't write when zeroed on reset
 	if (data == 0)
@@ -451,17 +451,17 @@ WRITE8_MEMBER(witch_state::write_a006)
 	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6)); // coin in counter
 }
 
-WRITE8_MEMBER(witch_state::main_write_a008)
+void witch_state::main_write_a008(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(witch_state::sub_write_a008)
+void witch_state::sub_write_a008(uint8_t data)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(witch_state::prot_read_700x)
+uint8_t witch_state::prot_read_700x(offs_t offset)
 {
 /*
     Code @$21a looks like simple protection check.
@@ -486,7 +486,7 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	return memregion("sub")->base()[0x7000+offset];
 }
 
-WRITE8_MEMBER(witch_state::xscroll_w)
+void witch_state::xscroll_w(uint8_t data)
 {
 	m_scrollx = data;
 	// need to mark tiles dirty here, as the tilemap writes are affected by scrollx, see FIX_OFFSET macro.
@@ -495,12 +495,12 @@ WRITE8_MEMBER(witch_state::xscroll_w)
 	m_gfx1_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(witch_state::yscroll_w)
+void witch_state::yscroll_w(uint8_t data)
 {
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(keirinou_state::palette_w)
+void keirinou_state::palette_w(offs_t offset, uint8_t data)
 {
 	int r,g,b;
 
@@ -1136,7 +1136,7 @@ void witch_state::init_witch()
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);
 
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(*this, FUNC(witch_state::prot_read_700x)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8sm_delegate(*this, FUNC(witch_state::prot_read_700x)));
 }
 
 GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )

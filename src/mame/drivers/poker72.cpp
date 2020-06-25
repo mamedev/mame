@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Robbbert
+// copyright-holders:David Haywood
 /************************************************************************************************
   Poker Monarch
 
@@ -54,9 +54,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(tile_bank_w);
+	void poker72_paletteram_w(offs_t offset, uint8_t data);
+	void output_w(uint8_t data);
+	void tile_bank_w(uint8_t data);
 	void poker72_palette(palette_device &palette) const;
 	uint32_t screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void poker72_map(address_map &map);
@@ -93,7 +93,7 @@ uint32_t poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
+void poker72_state::poker72_paletteram_w(offs_t offset, uint8_t data)
 {
 	m_pal[offset] = data;
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 	m_palette->set_pen_color( offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
-WRITE8_MEMBER(poker72_state::output_w)
+void poker72_state::output_w(uint8_t data)
 {
 	printf("%02x\n",data);
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(poker72_state::output_w)
 		membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER(poker72_state::tile_bank_w)
+void poker72_state::tile_bank_w(uint8_t data)
 {
 	m_tile_bank = (data & 4) >> 2;
 }

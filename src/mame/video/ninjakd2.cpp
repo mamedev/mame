@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(mnight_state::mnight_get_bg_tile_info)
 	int const flipy = (hi & 0x20) >> 5;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			flipy ? TILE_FLIPY : 0);
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info)
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(Layer + 2,
+	tileinfo.set(Layer + 2,
 			tile,
 			color,
 			0);
@@ -199,13 +199,13 @@ VIDEO_START_MEMBER(omegaf_state,omegaf)
  *
  *************************************/
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bgvideoram_w)
+void ninjakd2_state::ninjakd2_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
+void ninjakd2_state::ninjakd2_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -229,12 +229,12 @@ void ninjakd2_state::bg_ctrl(int offset, int data, tilemap_t* tilemap)
 	tilemap->set_scrolly(0, scrolly);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bg_ctrl_w)
+void ninjakd2_state::ninjakd2_bg_ctrl_w(offs_t offset, uint8_t data)
 {
 	bg_ctrl(offset, data, m_bg_tilemap);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
+void ninjakd2_state::ninjakd2_sprite_overdraw_w(uint8_t data)
 {
 	m_next_sprite_overdraw_enabled = data & 1;
 }

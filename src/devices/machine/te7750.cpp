@@ -286,7 +286,7 @@ void te7750_device::set_ios()
 //  read - read input port and/or output latch
 //-------------------------------------------------
 
-READ8_MEMBER(te7750_device::read)
+u8 te7750_device::read(offs_t offset)
 {
 	if (offset < 9)
 	{
@@ -303,7 +303,7 @@ READ8_MEMBER(te7750_device::read)
 	}
 
 	logerror("Attempt to read from register with offset %X\n", offset);
-	return space.unmap();
+	return 0xff;
 }
 
 //-------------------------------------------------
@@ -311,7 +311,7 @@ READ8_MEMBER(te7750_device::read)
 //  register
 //-------------------------------------------------
 
-WRITE8_MEMBER(te7750_device::write)
+void te7750_device::write(offs_t offset, u8 data)
 {
 	if (offset < 9)
 	{

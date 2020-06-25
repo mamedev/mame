@@ -37,10 +37,10 @@ public:
 	void zac_proto(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(out0_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void out0_w(offs_t offset, uint8_t data);
+	void out1_w(uint8_t data);
+	void digit_w(offs_t offset, uint8_t data);
+	void sound_w(uint8_t data);
 	void zac_proto_map(address_map &map);
 
 	virtual void machine_reset() override;
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( zac_proto )
 INPUT_PORTS_END
 
 // solenoids (not knocker)
-WRITE8_MEMBER( zac_proto_state::out0_w )
+void zac_proto_state::out0_w(offs_t offset, uint8_t data)
 {
 	uint16_t t = data | (offset << 8);
 
@@ -215,13 +215,13 @@ WRITE8_MEMBER( zac_proto_state::out0_w )
 	}
 }
 
-WRITE8_MEMBER( zac_proto_state::out1_w )
+void zac_proto_state::out1_w(uint8_t data)
 {
 // lamps
 }
 
 // need to implement blanking of leading zeroes
-WRITE8_MEMBER( zac_proto_state::digit_w )
+void zac_proto_state::digit_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
 	static const uint8_t decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
@@ -231,7 +231,7 @@ WRITE8_MEMBER( zac_proto_state::digit_w )
 	m_digits[offset] = patterns[data>>4] | decimals[offset];
 }
 
-WRITE8_MEMBER( zac_proto_state::sound_w )
+void zac_proto_state::sound_w(uint8_t data)
 {
 // to unknown sound board
 }

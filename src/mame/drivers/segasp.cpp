@@ -48,6 +48,7 @@ Dinosaur King - Operation: Dinosaur Rescue  837-14434-91              ROM  US/EX
 - // -                                      834-14662-01    MDA-C0021 CF                          AAFE-01B87574811
 Dinosaur King 2                             ???-?????                 no          253-5508-0408   AAFE-xxxxxxxxxxx
 Dinosaur King 2 Ver 2.5                     834-14792-02 F  MDA-C0047 CF   EXP    253-5508-0408   AAFE-01D73384904
+Dinosaur King 2 Ver 2.501 China             ???-?????       MDA-C0081 CF   EXP    253-5508-0408   AAFE-xxxxxxxxxxx
 Dinosaur King Ver 4.000                     ???-?????       MDA-C0061 CF   JP     253-5508-0408   AAFE-xxxxxxxxxxx
 Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -87,14 +88,14 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 #include "includes/segasp.h"
 #include "machine/naomim4.h"
 
-READ64_MEMBER(segasp_state::sp_bank_r)
+uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_bank;
 }
 
-WRITE64_MEMBER(segasp_state::sp_bank_w)
+void segasp_state::sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
@@ -104,7 +105,7 @@ WRITE64_MEMBER(segasp_state::sp_bank_w)
 	m_sp_bank = bank;
 }
 
-READ64_MEMBER(segasp_state::sn_93c46a_r)
+uint64_t segasp_state::sn_93c46a_r()
 {
 	int res;
 
@@ -114,7 +115,7 @@ READ64_MEMBER(segasp_state::sn_93c46a_r)
 	return res;
 }
 
-WRITE64_MEMBER(segasp_state::sn_93c46a_w)
+void segasp_state::sn_93c46a_w(uint64_t data)
 {
 	/* bit 4 is data */
 	/* bit 2 is clock */
@@ -124,14 +125,14 @@ WRITE64_MEMBER(segasp_state::sn_93c46a_w)
 	m_eeprom->clk_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(segasp_state::sp_eeprom_r)
+uint64_t segasp_state::sp_eeprom_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_eeprom->do_read() << 4;
 }
 
-WRITE64_MEMBER(segasp_state::sp_eeprom_w)
+void segasp_state::sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
@@ -140,14 +141,14 @@ WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 	m_sp_eeprom->clk_write((data & 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(segasp_state::sp_rombdflg_r)
+uint64_t segasp_state::sp_rombdflg_r()
 {
 	// bit 0 - romboard type, 1 = M4
 	// bit 1 - debug mode (enable easter eggs in BIOS, can boot game without proper eeproms/settings)
 	return ioport("CFG")->read();
 }
 
-READ64_MEMBER(segasp_state::sp_io_r)
+uint64_t segasp_state::sp_io_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t retval;
 
@@ -603,6 +604,26 @@ ROM_START( dinoki25 )
 	ROM_LOAD( "dino_type3.bin", 0, 0x80, CRC(1b6c9ea7) SHA1(2e56a1969c49c347f7facda187e5bf787c74328c) )
 ROM_END
 
+// This game's protection uses contact IC card reader made by Hirocon, with 2 IC card slots, cards probably SLE4428 or SLE5528.
+ROM_START( dinokich )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v200" )
+	SEGASP_EXP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	// DINOSAUR KING
+	// MDA-C0081
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0081", 0, SHA1(c9b8449666124f52b175a3d3d795bc0e7ea4d91e) ) // unused space contain leftovers from "Disney Magical Dream Dance" game, encrypted, key is 1ffbc9f0
+
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
+ROM_END
+
 // This version does not use RFID readers and Management chips.
 ROM_START( dinoki4 )
 	SEGASP_BIOS
@@ -700,6 +721,7 @@ GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 // These use a CF card
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
+GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
 GAME( 2008, dinoki4,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )

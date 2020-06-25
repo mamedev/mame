@@ -165,7 +165,7 @@ void segag80r_state::spaceod_bg_init_palette()
 TILE_GET_INFO_MEMBER(segag80r_state::spaceod_get_tile_info)
 {
 	int code = memregion("gfx2")->base()[tile_index + 0x1000 * (m_spaceod_bg_control >> 6)];
-	SET_TILE_INFO_MEMBER(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
+	tileinfo.set(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
 
@@ -180,7 +180,7 @@ TILEMAP_MAPPER_MEMBER(segag80r_state::spaceod_scan_rows)
 TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
 {
 	int code = memregion("gfx2")->base()[tile_index];
-	SET_TILE_INFO_MEMBER(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
+	tileinfo.set(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
 }
 
 
@@ -262,9 +262,8 @@ void segag80r_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
+void segag80r_state::segag80r_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
 	/* accesses to the upper half of VRAM go to paletteram if selected */
 	if ((offset & 0x1000) && (m_video_control & 0x02))
 	{
@@ -275,7 +274,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 	}
 
 	/* all other accesses go to videoram */
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
@@ -290,7 +289,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::segag80r_video_port_r)
+uint8_t segag80r_state::segag80r_video_port_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -310,7 +309,7 @@ READ8_MEMBER(segag80r_state::segag80r_video_port_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
+void segag80r_state::segag80r_video_port_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -338,7 +337,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::spaceod_back_port_r)
+uint8_t segag80r_state::spaceod_back_port_r(offs_t offset)
 {
 	/* force an update to get the current detection value */
 	m_screen->update_partial(m_screen->vpos());
@@ -346,7 +345,7 @@ READ8_MEMBER(segag80r_state::spaceod_back_port_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
+void segag80r_state::spaceod_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -426,7 +425,7 @@ WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
+void segag80r_state::monsterb_videoram_w(offs_t offset, uint8_t data)
 {
 	/* accesses to the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
@@ -440,11 +439,11 @@ WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(space, offset, data);
+	segag80r_videoram_w(offset, data);
 }
 
 
-WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
+void segag80r_state::monsterb_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -496,7 +495,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
+void segag80r_state::pignewt_videoram_w(offs_t offset, uint8_t data)
 {
 	/* accesses to the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
@@ -509,11 +508,11 @@ WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(space, offset, data);
+	segag80r_videoram_w(offset, data);
 }
 
 
-WRITE8_MEMBER(segag80r_state::pignewt_back_color_w)
+void segag80r_state::pignewt_back_color_w(offs_t offset, uint8_t data)
 {
 	/* it is not really known what this does */
 	if (offset == 0)
@@ -523,7 +522,7 @@ WRITE8_MEMBER(segag80r_state::pignewt_back_color_w)
 }
 
 
-WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
+void segag80r_state::pignewt_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -579,7 +578,7 @@ WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
+void segag80r_state::sindbadm_videoram_w(offs_t offset, uint8_t data)
 {
 	/* accesses to the area $f000-$f03f go to background palette if */
 	/* the palette access enable bit is set */
@@ -592,11 +591,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(space, offset, data);
+	segag80r_videoram_w(offset, data);
 }
 
 
-WRITE8_MEMBER(segag80r_state::sindbadm_back_port_w)
+void segag80r_state::sindbadm_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{

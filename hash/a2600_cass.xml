@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Info from Atariage and Atarimania
 -->
 
@@ -779,17 +781,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sweat! - the decathlon game (1 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="32297adf" sha1="709a413f7d83176c5e6a6a753308752aecd16923"/>
+				<rom name="sweat - the decathlon game (1 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="32297adf" sha1="709a413f7d83176c5e6a6a753308752aecd16923"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sweat! - the decathlon game (2 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="bc58243a" sha1="e84a3f964098c435d361aba9a2948f7ddc58dc60"/>
+				<rom name="sweat - the decathlon game (2 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="bc58243a" sha1="e84a3f964098c435d361aba9a2948f7ddc58dc60"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sweat! - the decathlon game (3 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="ba1f666b" sha1="bea35df3bbcdc7b0a52e5b09716ab6f49719d9b1"/>
+				<rom name="sweat - the decathlon game (3 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="ba1f666b" sha1="bea35df3bbcdc7b0a52e5b09716ab6f49719d9b1"/>
 			</dataarea>
 		</part>
 	</software>

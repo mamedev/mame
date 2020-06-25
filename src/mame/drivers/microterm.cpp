@@ -9,8 +9,8 @@ Skeleton driver for Micro-Term terminals.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "machine/scn_pci.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -29,7 +29,7 @@ public:
 private:
 	u32 mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(c000_r);
+	u8 c000_r();
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mt420_io_map(address_map &map);
@@ -47,7 +47,7 @@ u32 microterm_state::mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(microterm_state::c000_r)
+u8 microterm_state::c000_r()
 {
 	return machine().rand() & 0x80;
 }
@@ -66,7 +66,7 @@ void microterm_state::mt420_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xe0, 0xef).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0xf0, 0xf3).rw("aci", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf0, 0xf3).rw("aci", FUNC(scn2641_device::read), FUNC(scn2641_device::write));
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER(microterm_state::draw_character)
@@ -106,7 +106,7 @@ void microterm_state::mt420(machine_config &config)
 	duart.outport_cb().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
 	duart.outport_cb().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(3);
 
-	MC2661(config, "aci", 3.6864_MHz_XTAL); // SCN2641
+	SCN2641(config, "aci", 3.6864_MHz_XTAL);
 
 	EEPROM_93C46_16BIT(config, "eeprom").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
 

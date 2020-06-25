@@ -54,17 +54,17 @@ void model1_state::copro_reset()
 	memset(m_copro_ram_data.get(), 0, 0x2000*4);
 }
 
-READ16_MEMBER(model1_state::v60_copro_ram_adr_r)
+u16 model1_state::v60_copro_ram_adr_r()
 {
 	return m_v60_copro_ram_adr;
 }
 
-WRITE16_MEMBER(model1_state::v60_copro_ram_adr_w)
+void model1_state::v60_copro_ram_adr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_v60_copro_ram_adr);
 }
 
-READ16_MEMBER(model1_state::v60_copro_ram_r)
+u16 model1_state::v60_copro_ram_r(offs_t offset)
 {
 	u16 r;
 	if (!offset)
@@ -80,7 +80,7 @@ READ16_MEMBER(model1_state::v60_copro_ram_r)
 	return r;
 }
 
-WRITE16_MEMBER(model1_state::v60_copro_ram_w)
+void model1_state::v60_copro_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_v60_copro_ram_latch + offset);
 
@@ -92,7 +92,7 @@ WRITE16_MEMBER(model1_state::v60_copro_ram_w)
 	}
 }
 
-READ16_MEMBER(model1_state::v60_copro_fifo_r)
+u16 model1_state::v60_copro_fifo_r(offs_t offset)
 {
 	if (!offset) {
 		m_v60_copro_fifo_r = m_copro_fifo_out->pop();
@@ -102,7 +102,7 @@ READ16_MEMBER(model1_state::v60_copro_fifo_r)
 		return m_v60_copro_fifo_r >> 16;
 }
 
-WRITE16_MEMBER(model1_state::v60_copro_fifo_w)
+void model1_state::v60_copro_fifo_w(offs_t offset, u16 data)
 {
 	if(offset) {
 		m_v60_copro_fifo_w = (m_v60_copro_fifo_w & 0x0000ffff) | (data << 16);
@@ -144,17 +144,17 @@ void model1_state::copro_rf_map(address_map &map)
 	map(0x0, 0x0).nopw(); // leds
 }
 
-WRITE32_MEMBER(model1_state::copro_ramadr_w)
+void model1_state::copro_ramadr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_ram_adr[offset >> 3]);
 }
 
-READ32_MEMBER(model1_state::copro_ramadr_r)
+u32 model1_state::copro_ramadr_r(offs_t offset)
 {
 	return m_copro_ram_adr[offset >> 3];
 }
 
-WRITE32_MEMBER(model1_state::copro_ramdata_w)
+void model1_state::copro_ramdata_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if(m_copro_ram_adr[offset >> 3] & 0x40000) {
 		COMBINE_DATA(&m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)]);
@@ -164,7 +164,7 @@ WRITE32_MEMBER(model1_state::copro_ramdata_w)
 	m_copro_ram_adr[offset >> 3] ++;
 }
 
-READ32_MEMBER(model1_state::copro_ramdata_r)
+u32 model1_state::copro_ramdata_r(offs_t offset)
 {
 	u32 val = (m_copro_ram_adr[offset >> 3] & 0x40000) ? m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)] : m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
 	if(!machine().side_effects_disabled())
@@ -174,12 +174,12 @@ READ32_MEMBER(model1_state::copro_ramdata_r)
 
 
 
-WRITE32_MEMBER(model1_state::copro_sincos_w)
+void model1_state::copro_sincos_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_sincos_base);
 }
 
-READ32_MEMBER(model1_state::copro_sincos_r)
+u32 model1_state::copro_sincos_r(offs_t offset)
 {
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
@@ -191,12 +191,12 @@ READ32_MEMBER(model1_state::copro_sincos_r)
 	return result;
 }
 
-WRITE32_MEMBER(model1_state::copro_inv_w)
+void model1_state::copro_inv_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_inv_base);
 }
 
-READ32_MEMBER(model1_state::copro_inv_r)
+u32 model1_state::copro_inv_r(offs_t offset)
 {
 	offs_t index = ((m_copro_inv_base >> 9) & 0x3ffe) | (offset & 1);
 	u32 result = m_copro_tables[index | 0x8000];
@@ -208,12 +208,12 @@ READ32_MEMBER(model1_state::copro_inv_r)
 	return result;
 }
 
-WRITE32_MEMBER(model1_state::copro_isqrt_w)
+void model1_state::copro_isqrt_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_isqrt_base);
 }
 
-READ32_MEMBER(model1_state::copro_isqrt_r)
+u32 model1_state::copro_isqrt_r(offs_t offset)
 {
 	offs_t index = 0x2000 ^ (((m_copro_isqrt_base>> 10) & 0x3ffe) | (offset & 1));
 	u32 result = m_copro_tables[index | 0xc000];
@@ -225,12 +225,12 @@ READ32_MEMBER(model1_state::copro_isqrt_r)
 	return result;
 }
 
-WRITE32_MEMBER(model1_state::copro_atan_w)
+void model1_state::copro_atan_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_atan_base[offset]);
 }
 
-READ32_MEMBER(model1_state::copro_atan_r)
+u32 model1_state::copro_atan_r()
 {
 	u32 idx = m_copro_atan_base[3] & 0xffff;
 	if(idx & 0xc000)
@@ -274,12 +274,12 @@ READ32_MEMBER(model1_state::copro_atan_r)
 	return result & 0xffff;
 }
 
-WRITE32_MEMBER(model1_state::copro_data_w)
+void model1_state::copro_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_data_base);
 }
 
-READ32_MEMBER(model1_state::copro_data_r)
+u32 model1_state::copro_data_r(offs_t offset)
 {
 	offs_t index = (m_copro_data_base & ~0x7fff) | offset;
 	index &= (m_copro_data->bytes() >> 2) - 1;

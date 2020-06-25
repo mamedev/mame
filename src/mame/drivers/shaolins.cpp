@@ -6,7 +6,97 @@ Shaolin's Road
 
 driver by Allard van der Bas
 
-***************************************************************************/
+****************************************************************************
+
+Shaolin's Road & Kicker hardware info by Guru
+
+This is a single screen platform beat-em up game using an 8-way joystick and 2 buttons.
+Based on the soldered-in PROM labels, Shaolin's Road came first (likely the Japan release)
+and Kicker was probably the later US/World release.
+Up to two speakers are connected in the cabinet but the output is mono/dual mono.
+
+KONAMI GX477 PWB 200214B
+|----------------------------------------------------------|
+|  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  A|
+|                         083   477K07  477J11             |
+|    LA4460           477J09 477K06  477J10 477J12         |
+|                                                    502  B|
+|                                                          |
+|       VOLUME                                            C|
+|                                                          |
+|1                       477L03                            |
+|8                          477L04              2148 2148 D|
+|w                            477L05                       |
+|A                 6809                                   E|
+|Y           76489                                         |
+|                                                          |
+|            76489           2009 2009    085      477J08 F|
+|                                                          |
+|                                                          |
+|TA7900S        18.432MHz                                 G|
+|          DIPSW2                                          |
+|      DIPSW1  DIPSW3                       477K01     083 |
+|    CN1         504   082           2016 503   477K02    H|
+|----------------------------------------------------------|
+Notes:
+      TA7900S  - Toshiba TA7900S 5V Reference & Watchdog Timer
+      LA4460   - Sanyo LA4460 12W Power Amplifier IC
+      477J*    - 82S129 256 x4-bit Bi-Polar PROM, compatible with MMI6301, TBP24S10, N74S287, MB7052 etc
+      76489    - Texas Instruments SN76489 Complex Digital Sound Generator (x2). Clock inputs are 1.536MHz and 3.072MHz
+      CN1      - 4-pin connector for monitors that require separate syncs. Pin 1 is negative vertical sync output.
+                 VSync measures 60.6060Hz *exactly*. Horizontal sync is taken from the regular composite sync on the PCB on pin B14.
+      DIPSW1/2 - 8-position DIP switch
+      DIPSW3   - 4-position DIP switch
+      2016     - TMM2016 2k x8-bit SRAM
+      2009     - TMM2009. This RAM is completely undocumented (even in Toshiba Databooks of the era) but the
+                 schematic shows it has a pinout that matches TMM2016/6116 2k x8-bit SRAM
+      2148     - Fujitsu MBM2148 1k x4-bit SRAM
+      6809     - Clock 1.536MHz [18.432/12]
+      ROMs     - 477L03(2764), 477L04(27128), 477L05(27128) - Main Program
+                 477J01(27128), 477J02(27128) - Sprites
+                 477J06(2764), 477J07(2764) - Characters/Backgrounds etc
+                 477J08(82S129) - Sprite Lookup Table
+                 477J09(82S129) - Character Lookup Table
+                 477J10(82S129) - Red PROM
+                 477J11(82S129) - Green PROM
+                 477J12(82S129) - Blue PROM
+  Custom Chips - 085, 083, 083, 082, 502, 503, 504
+                 Sometimes the custom chips are replaced by a daughterboard containing common logic chips.
+                 These have been seen:
+                                      PWB4000231 replaces 502
+                                      KC001 replaces 503
+                                      PWB4000206A replaces 504
+                                      300381 replaces 082
+
+Shaolin's Road / Kicker 18-WAY PCB Edge Connector Pinout
+--------------------------------------------------------
+Note this is the standard Konami pinout used in many
+Konami games from this era with some pins not used.
+
+---------------+-----+-----+---------------
+   Solder Side |     |     | Parts Side
+---------------+-----+-----+---------------
+-5V (not used) | A1  | B1  | +12V
+       Speaker | A2  | B2  | Speaker
+   2P Button 2 | A3  | B3  | 2P Btn 1
+       2P Left | A4  | B4  | 2P Right
+      1P Start | A5  | B5  | 2P Start
+      1P Btn 1 | A6  | B6  | 2P Up
+      1P Btn 2 | A7  | B7  | Service
+      1P Right | A8  | B8  | 1P Left
+         1P Up | A9  | B9  | 2P Down
+        Coin 1 | A10 | B10 | Coin 2
+       1P Down | A11 | B11 | Coin Counter 1
+    (not used) | A12 | B12 | Coin Counter 2
+   Video Green | A13 | B13 | Video Blue
+     Video Red | A14 | B14 | Video Sync
+    (not used) | A15 | B15 | (not used)
+           GND | A16 | B16 | GND
+           GND | A17 | B17 | GND
+           +5V | A18 | B18 | +5V
+---------------+-----+-----+---------------
+
+****************************************************************************/
 
 #include "emu.h"
 #include "includes/shaolins.h"
@@ -40,12 +130,12 @@ void shaolins_state::shaolins_map(address_map &map)
 	map(0x0300, 0x0300).w("sn1", FUNC(sn76489a_device::write)); /* trigger chip to read from latch. The program always */
 	map(0x0400, 0x0400).w("sn2", FUNC(sn76489a_device::write)); /* writes the same number as the latch, so we don't */
 															/* bother emulating them. */
-	map(0x0500, 0x0500).portr("DSW1");
-	map(0x0600, 0x0600).portr("DSW2");
+	map(0x0500, 0x0500).portr("DSW2");
+	map(0x0600, 0x0600).portr("DSW3");
 	map(0x0700, 0x0700).portr("SYSTEM");
 	map(0x0701, 0x0701).portr("P1");
 	map(0x0702, 0x0702).portr("P2");
-	map(0x0703, 0x0703).portr("DSW3");
+	map(0x0703, 0x0703).portr("DSW1");
 	map(0x0800, 0x0800).nopw();                    /* latch for 76496 #0 */
 	map(0x1000, 0x1000).nopw();                    /* latch for 76496 #1 */
 	map(0x1800, 0x1800).w(FUNC(shaolins_state::palettebank_w));
@@ -91,41 +181,7 @@ static INPUT_PORTS_START( shaolins )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "30000 and every 70000" )
-	PORT_DIPSETTING(    0x10, "40000 and every 80000" )
-	PORT_DIPSETTING(    0x08, "40000" )
-	PORT_DIPSETTING(    0x00, "50000" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-		/* This bank only have four switches */
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("DIPSW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -142,7 +198,7 @@ static INPUT_PORTS_START( shaolins )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("DIPSW1:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -158,6 +214,42 @@ static INPUT_PORTS_START( shaolins )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, "Invalid" )  // coin sound made but no credit given so effectively Coin B is disabled
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("DIPSW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DIPSW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DIPSW2:4,5")
+	PORT_DIPSETTING(    0x18, "30000 and every 70000" )
+	PORT_DIPSETTING(    0x10, "40000 and every 80000" )
+	PORT_DIPSETTING(    0x08, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DIPSW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIPSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+		/* This bank only has four switches */
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DIPSW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )          PORT_DIPLOCATION("DIPSW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )                     PORT_DIPLOCATION("DIPSW3:3")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DIPSW3:4" )
+
 INPUT_PORTS_END
 
 
@@ -239,17 +331,17 @@ void shaolins_state::shaolinb(machine_config &config)
 
 ROM_START( kicker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "477-l03.d9",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
-	ROM_LOAD( "477-l04.d10",  0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
-	ROM_LOAD( "477-l05.d11",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
+	ROM_LOAD( "477l03.d9",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
+	ROM_LOAD( "477l04.d10",  0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
+	ROM_LOAD( "477l05.d11",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "477-k06.a10",  0x0000, 0x2000, CRC(4d156afc) SHA1(29eb66e2ebcf2f1c1d5ece5413d1ebf54663f9cf) )
-	ROM_LOAD( "477-k07.a11",  0x2000, 0x2000, CRC(ff6ca5df) SHA1(dfcd445c8b233a0a4168eb249472e53784eda25d) )
+	ROM_LOAD( "477k06.a10",  0x0000, 0x2000, CRC(4d156afc) SHA1(29eb66e2ebcf2f1c1d5ece5413d1ebf54663f9cf) )
+	ROM_LOAD( "477k07.a11",  0x2000, 0x2000, CRC(ff6ca5df) SHA1(dfcd445c8b233a0a4168eb249472e53784eda25d) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "477-k02.h15",  0x0000, 0x4000, CRC(b94e645b) SHA1(65ae48134a0fe1e910a787714f7ae721734ded5b) )
-	ROM_LOAD( "477-k01.h14",  0x4000, 0x4000, CRC(61bbf797) SHA1(97d276099172975499f646f381a6fc587c022435) )
+	ROM_LOAD( "477k02.h15",  0x0000, 0x4000, CRC(b94e645b) SHA1(65ae48134a0fe1e910a787714f7ae721734ded5b) )
+	ROM_LOAD( "477k01.h14",  0x4000, 0x4000, CRC(61bbf797) SHA1(97d276099172975499f646f381a6fc587c022435) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "477j10.a12",   0x0000, 0x0100, CRC(b09db4b4) SHA1(d21176cdc7def760da109083eb52e5b6a515021f) ) /* palette red component */
@@ -261,17 +353,17 @@ ROM_END
 
 ROM_START( shaolins )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "477-l03.d9",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
-	ROM_LOAD( "477-l04.d10",  0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
-	ROM_LOAD( "477-l05.d11",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
+	ROM_LOAD( "477l03.d9",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
+	ROM_LOAD( "477l04.d10",  0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
+	ROM_LOAD( "477l05.d11",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "shaolins.a10", 0x0000, 0x2000, CRC(ff18a7ed) SHA1(f28bfeff84bb6a08a8bee999a0b7a19e09a8dfc3) ) /* proper Konami rom labels unknown */
-	ROM_LOAD( "shaolins.a11", 0x2000, 0x2000, CRC(5f53ae61) SHA1(ad29e2255855c503295c6b63eb4cd6700a1e3f0e) ) /* proper Konami rom labels unknown */
+	ROM_LOAD( "477j06.a10", 0x0000, 0x2000, CRC(ff18a7ed) SHA1(f28bfeff84bb6a08a8bee999a0b7a19e09a8dfc3) )
+	ROM_LOAD( "477j07.a11", 0x2000, 0x2000, CRC(5f53ae61) SHA1(ad29e2255855c503295c6b63eb4cd6700a1e3f0e) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "477-k02.h15",  0x0000, 0x4000, CRC(b94e645b) SHA1(65ae48134a0fe1e910a787714f7ae721734ded5b) )
-	ROM_LOAD( "477-k01.h14",  0x4000, 0x4000, CRC(61bbf797) SHA1(97d276099172975499f646f381a6fc587c022435) )
+	ROM_LOAD( "477j02.h15",  0x0000, 0x4000, CRC(b94e645b) SHA1(65ae48134a0fe1e910a787714f7ae721734ded5b) ) // actual labels are 477J02 but data matches Kicker 477K02
+	ROM_LOAD( "477j01.h14",  0x4000, 0x4000, CRC(61bbf797) SHA1(97d276099172975499f646f381a6fc587c022435) ) // actual labels are 477J01 but data matches Kicker 477K01
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "477j10.a12",   0x0000, 0x0100, CRC(b09db4b4) SHA1(d21176cdc7def760da109083eb52e5b6a515021f) ) /* palette red component */

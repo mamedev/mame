@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(2, code, code == 0x3f ? 1 : 0, 0);
+	tileinfo.set(2, code, code == 0x3f ? 1 : 0, 0);
 }
 
 

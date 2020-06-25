@@ -39,8 +39,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	const address_space_config m_program_config;
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_program_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_program_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	int m_icount, m_ei_count;
 	u32 m_pc;
@@ -108,8 +108,8 @@ protected:
 		if(r & 0x80000000)
 			f |= F_N;
 		m_hr[4] = (m_hr[4] & ~F_MASK) | f;
-		return r;		
-	}		
+		return r;
+	}
 
 	inline u32 do_lsl(u32 v1, u32 shift) {
 		if(!shift) {
@@ -117,7 +117,7 @@ protected:
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 << shift;
-			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			u32 f = r ? r & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (32-shift)))
 				f |= F_C;
 			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
@@ -137,7 +137,7 @@ protected:
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 >> shift;
-			u32 f = v1 ? 0 : F_Z;
+			u32 f = r ? 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
 			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
@@ -157,7 +157,7 @@ protected:
 			return v1;
 		} else if(shift < 32) {
 			u32 r = static_cast<s32>(v1) >> shift;
-			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			u32 f = r ? r & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
 			m_hr[4] = (m_hr[4] & ~F_MASK) | f;

@@ -164,7 +164,7 @@ INPUT_PORTS_END
 //  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::ppi0_pc_w )
+void sage2_state::ppi0_pc_w(uint8_t data)
 {
 	/*
 
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( sage2_state::ppi1_pb_r )
+uint8_t sage2_state::ppi1_pb_r()
 {
 	/*
 
@@ -277,7 +277,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sage2_state::ppi1_pc_w )
+void sage2_state::ppi1_pc_w(uint8_t data)
 {
 	/*
 
@@ -387,10 +387,10 @@ void sage2_state::machine_reset()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.unmap_readwrite(0x000000, 0x07ffff);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base());
-	program.install_read_handler(0xfe0000, 0xfe3fff, read16_delegate(*this, FUNC(sage2_state::rom_r)));
+	program.install_read_handler(0xfe0000, 0xfe3fff, read16sm_delegate(*this, FUNC(sage2_state::rom_r)));
 }
 
-READ16_MEMBER(sage2_state::rom_r)
+uint16_t sage2_state::rom_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.unmap_readwrite(0x000000, 0x07ffff);
@@ -423,7 +423,7 @@ void sage2_state::sage2(machine_config &config)
 	ppi0.out_pc_callback().set(FUNC(sage2_state::ppi0_pc_w));
 
 	i8255_device &ppi1(I8255A(config, I8255A_1_TAG));
-	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
 	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 

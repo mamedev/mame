@@ -16,7 +16,7 @@
 enum
 {
 	GTRON_PC, GTRON_NPC,
-	GTRON_AC, GTRON_X, GTRON_Y
+	GTRON_AC, GTRON_X, GTRON_Y, GTRON_IREG
 };
 
 
@@ -26,7 +26,8 @@ public:
 	// construction/destruction
 	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	auto outx_cb() { return m_outx_cb.bind(); }
-	
+	auto ir_cb() { return m_ir_cb.bind(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,6 +62,7 @@ protected:
 	uint16_t m_ppc;
 	uint8_t m_inReg;
 	uint16_t m_ramMask;
+	uint16_t m_romMask;
 	uint16_t m_out;
 	uint16_t m_outx;
 
@@ -77,8 +79,9 @@ private:
 	int m_icount;
 
 	void gigatron_illegal();
-	
+
 	devcb_write8 m_outx_cb;
+	devcb_read8 m_ir_cb;
 };
 
 

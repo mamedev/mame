@@ -4,14 +4,13 @@
 #include "includes/tigeroad.h"
 
 
-WRITE16_MEMBER(tigeroad_state::tigeroad_videoram_w)
+void tigeroad_state::tigeroad_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
+void tigeroad_state::tigeroad_videoctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank;
 
@@ -51,7 +50,7 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
 	}
 }
 
-WRITE16_MEMBER(tigeroad_state::tigeroad_scroll_w)
+void tigeroad_state::tigeroad_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = 0;
 
@@ -80,7 +79,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.group = (attr & 0x10) ? 1 : 0;
 }
 
@@ -93,7 +92,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILEMAP_MAPPER_MEMBER(tigeroad_state::tigeroad_tilemap_scan)

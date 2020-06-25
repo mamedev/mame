@@ -154,7 +154,7 @@ void ecb_grip21_device::grip_io(address_map &map)
 	map(0x50, 0x50).w(MC6845_TAG, FUNC(mc6845_device::address_w));
 	map(0x52, 0x52).w(MC6845_TAG, FUNC(mc6845_device::register_w));
 	map(0x53, 0x53).r(MC6845_TAG, FUNC(mc6845_device::register_r));
-	map(0x60, 0x60).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x60, 0x60).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x70, 0x73).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  map(0x80, 0x80).w(FUNC(ecb_grip21_device::bl2out_w));
 //  map(0x90, 0x90).w(FUNC(ecb_grip21_device::gr2out_w));
@@ -223,7 +223,7 @@ static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
 //  I8255A interface
 //-------------------------------------------------
 
-READ8_MEMBER( ecb_grip21_device::ppi_pa_r )
+uint8_t ecb_grip21_device::ppi_pa_r()
 {
 	/*
 
@@ -243,7 +243,7 @@ READ8_MEMBER( ecb_grip21_device::ppi_pa_r )
 	return m_ppi_pa;
 }
 
-WRITE8_MEMBER( ecb_grip21_device::ppi_pa_w )
+void ecb_grip21_device::ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER( ecb_grip21_device::ppi_pa_w )
 	m_ppi_pa = data;
 }
 
-READ8_MEMBER( ecb_grip21_device::ppi_pb_r )
+uint8_t ecb_grip21_device::ppi_pb_r()
 {
 	/*
 
@@ -283,7 +283,7 @@ READ8_MEMBER( ecb_grip21_device::ppi_pb_r )
 	return m_keydata;
 }
 
-WRITE8_MEMBER( ecb_grip21_device::ppi_pc_w )
+void ecb_grip21_device::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -324,7 +324,7 @@ WRITE_LINE_MEMBER(ecb_grip21_device::write_centronics_busy)
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( ecb_grip21_device::sti_gpio_r )
+uint8_t ecb_grip21_device::sti_gpio_r()
 {
 	/*
 
@@ -634,7 +634,7 @@ void ecb_grip21_device::device_reset()
 //  vol0_w - volume 0
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecb_grip21_device::vol0_w )
+void ecb_grip21_device::vol0_w(uint8_t data)
 {
 	m_vol0 = BIT(data, 7);
 }
@@ -644,7 +644,7 @@ WRITE8_MEMBER( ecb_grip21_device::vol0_w )
 //  vol1_w - volume 1
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecb_grip21_device::vol1_w )
+void ecb_grip21_device::vol1_w(uint8_t data)
 {
 	m_vol1 = BIT(data, 7);
 }
@@ -654,7 +654,7 @@ WRITE8_MEMBER( ecb_grip21_device::vol1_w )
 //  flash_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecb_grip21_device::flash_w )
+void ecb_grip21_device::flash_w(uint8_t data)
 {
 	m_flash = BIT(data, 7);
 }
@@ -664,7 +664,7 @@ WRITE8_MEMBER( ecb_grip21_device::flash_w )
 //  page_w - video page select
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecb_grip21_device::page_w )
+void ecb_grip21_device::page_w(uint8_t data)
 {
 	m_page = BIT(data, 7);
 
@@ -681,7 +681,7 @@ WRITE_LINE_MEMBER(ecb_grip21_device::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( ecb_grip21_device::stat_r )
+uint8_t ecb_grip21_device::stat_r()
 {
 	/*
 
@@ -739,9 +739,10 @@ READ8_MEMBER( ecb_grip21_device::stat_r )
 //  lrs_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ecb_grip21_device::lrs_r )
+uint8_t ecb_grip21_device::lrs_r()
 {
-	m_lps = 0;
+	if (!machine().side_effects_disabled())
+		m_lps = 0;
 
 	return 0;
 }
@@ -751,7 +752,7 @@ READ8_MEMBER( ecb_grip21_device::lrs_r )
 //  lrs_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecb_grip21_device::lrs_w )
+void ecb_grip21_device::lrs_w(uint8_t data)
 {
 	m_lps = 0;
 }
@@ -761,10 +762,13 @@ WRITE8_MEMBER( ecb_grip21_device::lrs_w )
 //  cxstb_r - centronics strobe
 //-------------------------------------------------
 
-READ8_MEMBER( ecb_grip21_device::cxstb_r )
+uint8_t ecb_grip21_device::cxstb_r()
 {
-	m_centronics->write_strobe(0);
-	m_centronics->write_strobe(1);
+	if (!machine().side_effects_disabled())
+	{
+		m_centronics->write_strobe(0);
+		m_centronics->write_strobe(1);
+	}
 
 	return 0;
 }
@@ -774,7 +778,7 @@ READ8_MEMBER( ecb_grip21_device::cxstb_r )
 //  cxstb_w - centronics strobe
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecb_grip21_device::cxstb_w )
+void ecb_grip21_device::cxstb_w(uint8_t data)
 {
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
@@ -785,7 +789,7 @@ WRITE8_MEMBER( ecb_grip21_device::cxstb_w )
 //  eprom_w - EPROM bank select
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip5_state::eprom_w )
+void grip5_state::eprom_w(uint8_t data)
 {
     membank("eprom")->set_entry(BIT(data, 0));
 }
@@ -795,7 +799,7 @@ WRITE8_MEMBER( grip5_state::eprom_w )
 //  dpage_w - display page select
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip5_state::dpage_w )
+void grip5_state::dpage_w(uint8_t data)
 {
     m_dpage = BIT(data, 7);
 }

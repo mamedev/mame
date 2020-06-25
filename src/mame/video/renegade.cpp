@@ -10,29 +10,29 @@
 #include "includes/renegade.h"
 
 
-WRITE8_MEMBER(renegade_state::bg_videoram_w)
+void renegade_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(renegade_state::fg_videoram_w)
+void renegade_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(renegade_state::flipscreen_w)
+void renegade_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x01);
 }
 
-WRITE8_MEMBER(renegade_state::scroll_lsb_w)
+void renegade_state::scroll_lsb_w(uint8_t data)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_MEMBER(renegade_state::scroll_msb_w)
+void renegade_state::scroll_msb_w(uint8_t data)
 {
 	m_scrollx = (m_scrollx & 0xff) | (data << 8);
 }
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
 {
 	const uint8_t *source = &m_bg_videoram[tile_index];
 	uint8_t attributes = source[0x400]; /* CCC??BBB */
-	SET_TILE_INFO_MEMBER(1 + (attributes & 0x7),
+	tileinfo.set(1 + (attributes & 0x7),
 		source[0],
 		attributes >> 5,
 		0);
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(renegade_state::get_fg_tilemap_info)
 {
 	const uint8_t *source = &m_fg_videoram[tile_index];
 	uint8_t attributes = source[0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		((attributes & 3) << 8) | source[0],
 		attributes >> 6,
 		0);
@@ -75,9 +75,10 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	while (source < finish)
 	{
-		int sy = 240 - source[0];
+		// 224 matches reference (stage 1 boss in kuniokun is aligned with the train door)
+		int sy = 224 - source[0];
 
-		if (sy >= 16)
+		//if (sy >= 0)
 		{
 			int attributes = source[1]; /* SFCCBBBB */
 			int sx = source[3];
@@ -88,11 +89,14 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (sx > 248)
 				sx -= 256;
+			// wrap-around (stage 2 bike tires)
+			if (sy < 0)
+				sy += 256;
 
 			if (flip_screen())
 			{
 				sx = 240 - sx;
-				sy = 240 - sy;
+				sy = 224 - sy;
 				xflip = !xflip;
 			}
 

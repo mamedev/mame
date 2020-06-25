@@ -14,7 +14,7 @@ TODO:
 - granits has a module slot, is it usable?
 - granits overlock + dynamic /2 cpu divider? (like SC12) instead of static /2 divider
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Voice Excellence (model 6092)
 ----------------
@@ -115,7 +115,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Designer 2000 (model 6102)
 ----------------
@@ -126,7 +126,7 @@ basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): exactly same, but running at 5MHz
 
-(Designer 1500 is on 80C50 hardware)
+(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see fidel_sc6.cpp)
 
 ******************************************************************************/
 
@@ -202,9 +202,9 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(speech_r);
-	DECLARE_WRITE8_MEMBER(ttl_w);
-	DECLARE_READ8_MEMBER(ttl_r);
+	u8 speech_r(offs_t offset);
+	void ttl_w(offs_t offset, u8 data);
+	u8 ttl_r(offs_t offset);
 
 	u8 m_select;
 	u8 m_7seg_data;
@@ -242,7 +242,7 @@ INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 	m_speech_bank = (m_speech_bank & 1) | newval << 1;
 }
 
-READ8_MEMBER(excel_state::speech_r)
+u8 excel_state::speech_r(offs_t offset)
 {
 	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
 	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
@@ -252,7 +252,7 @@ READ8_MEMBER(excel_state::speech_r)
 
 // TTL
 
-WRITE8_MEMBER(excel_state::ttl_w)
+void excel_state::ttl_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: 74259(1)
 	u8 mask = 1 << offset;
@@ -289,12 +289,12 @@ WRITE8_MEMBER(excel_state::ttl_w)
 
 		// Q0-Q5: TSI C0-C5
 		// Q7: TSI START line
-		m_speech->data_w(space, 0, m_speech_data & 0x3f);
+		m_speech->data_w(m_speech_data & 0x3f);
 		m_speech->start_w(m_speech_data >> 7 & 1);
 	}
 }
 
-READ8_MEMBER(excel_state::ttl_r)
+u8 excel_state::ttl_r(offs_t offset)
 {
 	u8 sel = m_select & 0xf;
 	u8 d7 = 0x80;

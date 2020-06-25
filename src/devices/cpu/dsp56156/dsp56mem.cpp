@@ -487,7 +487,7 @@ void dsp56156_io_reset(dsp56156_core* cpustate)
 
 
 /* Work */
-READ16_MEMBER( dsp56156_device::peripheral_register_r )
+uint16_t dsp56156_device::peripheral_register_r(offs_t offset)
 {
 	dsp56156_core* cpustate = &m_core;
 	// (printf) cpustate->device->logerror("Peripheral read 0x%04x\n", O2A(offset));
@@ -621,7 +621,7 @@ READ16_MEMBER( dsp56156_device::peripheral_register_r )
 	return cpustate->peripheral_ram[offset];
 }
 
-WRITE16_MEMBER( dsp56156_device::peripheral_register_w )
+void dsp56156_device::peripheral_register_w(offs_t offset, uint16_t data)
 {
 	dsp56156_core* cpustate = &m_core;
 

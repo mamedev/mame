@@ -56,7 +56,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER( kaypro_state::kaypro484_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
+u8 kaypro_state::kaypro484_87_r() { return 0x7f; }    /* to bypass unemulated HD controller */
 
 /***********************************************************
 
@@ -66,9 +66,9 @@ READ8_MEMBER( kaypro_state::kaypro484_87_r ) { return 0x7f; }    /* to bypass un
 
 void kaypro_state::kaypro_map(address_map &map)
 {
-	map(0x0000, 0x2fff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0x2fff).bankr("bankr").bankw("bankw");
 	map(0x3000, 0x3fff).bankrw("bank3");
-	map(0x4000, 0xffff).ram().region("rambank", 0x4000);
+	map(0x4000, 0xffff).ram();
 }
 
 void kaypro_state::kayproii_io(address_map &map)
@@ -93,7 +93,7 @@ void kaypro_state::kaypro484_io(address_map &map)
 	map(0x0c, 0x0f).rw("sio_2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x14, 0x17).rw(FUNC(kaypro_state::kaypro484_system_port_r), FUNC(kaypro_state::kaypro484_system_port_w));
-	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x1c, 0x1c).rw(FUNC(kaypro_state::kaypro484_status_r), FUNC(kaypro_state::kaypro484_index_w));
 	map(0x1d, 0x1d).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(kaypro_state::kaypro484_register_w));
 	map(0x1f, 0x1f).rw(FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
@@ -203,9 +203,6 @@ void kaypro_state::kayproii(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &kaypro_state::kayproii_io);
 	m_maincpu->set_daisy_config(kayproii_daisy_chain);
 
-	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
-	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_refresh_hz(60);
@@ -214,8 +211,6 @@ void kaypro_state::kayproii(machine_config &config)
 	m_screen->set_visarea(0, 80*7-1, 0, 24*10-1);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kayproii));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kayproii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -250,7 +245,7 @@ void kaypro_state::kayproii(machine_config &config)
 
 	Z80PIO(config, m_pio_g, 20_MHz_XTAL / 8);
 	m_pio_g->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio_g->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio_g->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	Z80PIO(config, m_pio_s, 20_MHz_XTAL / 8);
 	m_pio_s->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -276,12 +271,17 @@ void kaypro_state::kayproii(machine_config &config)
 void kaypro_state::kayproiv(machine_config &config)
 {
 	kayproii(config);
-	m_pio_s->set_clock(2500000);
 	m_pio_s->out_pa_callback().set(FUNC(kaypro_state::kayproiv_pio_system_w));
 	config.device_remove("fdc:0");
 	config.device_remove("fdc:1");
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
+
+void kaypro_state::omni2(machine_config &config)
+{
+	kayproiv(config);
+	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_omni2));
 }
 
 void kaypro_state::kaypro484(machine_config &config)
@@ -292,8 +292,6 @@ void kaypro_state::kaypro484(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &kaypro_state::kaypro484_io);
 	m_maincpu->set_daisy_config(kaypro484_daisy_chain);
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -301,8 +299,6 @@ void kaypro_state::kaypro484(machine_config &config)
 	m_screen->set_size(80*8, 25*16);
 	m_screen->set_visarea(0,80*8-1,0,25*16-1);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kaypro484));
-
-	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kaypro484);
 	PALETTE(config, m_palette, FUNC(kaypro_state::kaypro_palette), 3);
@@ -390,22 +386,23 @@ void kaypro_state::kaypro284(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 }
 
-void kaypro_state::omni2(machine_config &config)
-{
-	kayproiv(config);
-	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_omni2));
-}
-
 void kaypro_state::init_kaypro()
 {
-	uint8_t *main = memregion("roms")->base();
-	uint8_t *ram = memregion("rambank")->base();
+	m_ram = make_unique_clear<u8[]>(0x4000);
+	m_vram = make_unique_clear<u8[]>(0x1000);
+	m_dummy = std::make_unique<u8[]>(0x3000);
 
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &ram[0x0000]);
-	membank("bank3")->configure_entry(1, &main[0x3000]);
-	membank("bank3")->configure_entry(0, &ram[0x3000]);
-	membank("bankw0")->configure_entry(0, &ram[0x0000]);
+	u8 *m = memregion("roms")->base();
+	u8 *r = m_ram.get();
+	u8 *v = m_vram.get();
+	u8 *d = m_dummy.get();
+
+	m_bankr->configure_entry(1, &m[0]);
+	m_bankr->configure_entry(0, r);
+	m_bankw->configure_entry(1, d);
+	m_bankw->configure_entry(0, r);
+	m_bank3->configure_entry(1, v);
+	m_bank3->configure_entry(0, r+0x3000);
 }
 
 
@@ -420,7 +417,7 @@ void kaypro_state::init_kaypro()
 // Kaypro II
 ROM_START(kayproii)
 	/* The original board could take a 2716 or 2732 */
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "149", "81-149 for Kaypro Bd. 81-110")
 	ROMX_LOAD("81-149.u47",   0x0000, 0x0800, CRC(28264bc1) SHA1(a12afb11a538fc0217e569bc29633d5270dfa51b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "149b", "81-149B for Kaypro Bd. 81-110")
@@ -437,7 +434,6 @@ ROM_START(kayproii)
 	ROMX_LOAD("kplus83.rom",  0x0000, 0x2000, CRC(5e9b817d) SHA1(26ea875ee3659a964cbded4ed0c82a3af42db64b), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "pro8v3", "MicroCornucopia_Pro8_V3.3")
 	ROMX_LOAD("pro8-3.rom",  0x0000, 0x1000, CRC(f2d4c598) SHA1(269b2fddeb98db3e5eba2056ff250dff72b0561e), ROM_BIOS(7) )
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
@@ -445,7 +441,7 @@ ROM_END
 
 // Kaypro IV (or 4'83)
 ROM_START(kayproiv)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "232", "81-232 for Kaypro Bd. 81-240")
 	ROMX_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "roadrunner", "Highland Microkit Roadrunner 1.5")
@@ -456,7 +452,6 @@ ROM_START(kayproiv)
 	ROMX_LOAD("kplus83.rom",  0x0000, 0x2000, CRC(5e9b817d) SHA1(26ea875ee3659a964cbded4ed0c82a3af42db64b), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "pro8v3", "MicroCornucopia_Pro8_V3.3")
 	ROMX_LOAD("pro8-3.rom",  0x0000, 0x1000, CRC(f2d4c598) SHA1(269b2fddeb98db3e5eba2056ff250dff72b0561e), ROM_BIOS(4) )
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
@@ -464,7 +459,7 @@ ROM_END
 
 // Kaypro 10, '83 model, hard disk cable connector in the middle of the mainboard, no space for modem or RTC
 ROM_START(kaypro10)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "188", "V1.9 for Kaypro Bd. 81-180")
 	ROMX_LOAD("81-188.u42",   0x0000, 0x1000, CRC(6cbd6aa0) SHA1(47004f8c6e17407e4f8d613c9520f9316716d9e2), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "x", "V1.7")
@@ -473,7 +468,6 @@ ROM_START(kaypro10)
 	ROMX_LOAD("trom34.rom",   0x0000, 0x2000, CRC(0ec6d39a) SHA1(8c2a92b8642e144452c28300bf50a00a11a060cd), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "kplus83", "MICROCode Consulting KayPLUS 83")
 	ROMX_LOAD("kplus83.rom",  0x0000, 0x2000, CRC(5e9b817d) SHA1(26ea875ee3659a964cbded4ed0c82a3af42db64b), ROM_BIOS(3) )
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-187.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -481,7 +475,7 @@ ROM_END
 
 // Kaypro 10, '84 model, hard disk cable on the right hand side of the mainboard
 ROM_START(kaypro1084)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "302", "V1.9E for Kaypro Bd. 81-181")
 	ROMX_LOAD("81-302.u42",   0x0000, 0x1000, CRC(3f9bee20) SHA1(b29114a199e70afe46511119b77a662e97b093a0), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "1.9ee", "V1.9ee")
@@ -495,14 +489,12 @@ ROM_START(kaypro1084)
 	ROM_SYSTEM_BIOS( 5, "kplus", "MICROCode Consulting KayPLUS 84")
 	ROMX_LOAD("kplus84.rom",   0x0000, 0x2000, CRC(4551905a) SHA1(48f0964edfad05b214810ae5595638245c30e5c0), ROM_BIOS(5) )
 
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
-
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-187.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
 ROM_START(kaypro484) // later renamed in 2X (or 2X MTC to signify the inclusion of Modem and RTC in comparison with the "old" 2X)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "292a", "81-292a for Kaypro Bd. 81-184")
 	ROMX_LOAD("81-292a.u34",  0x0000, 0x1000, CRC(241f27a5) SHA1(82711289d19e9b165e35324da010466d225e503a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "turbo", "Advent Turbo ROM")
@@ -513,8 +505,6 @@ ROM_START(kaypro484) // later renamed in 2X (or 2X MTC to signify the inclusion 
 	ROMX_LOAD("pro884mx.rom",   0x0000, 0x2000, CRC(febc6f51) SHA1(1f009aa9b7c9a3eddd0ee6ea7321a1c47c3e9807), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "pro8v5", "MicroCornucopia Pro8 V5")
 	ROMX_LOAD("pro884v5.rom",  0x0000, 0x2000, CRC(fe0051b1) SHA1(cac429154d40e21174ae05ceb0017b62473cdebd), ROM_BIOS(4) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -522,7 +512,7 @@ ROM_END
 
  // Kaypro 2'84, like the 4'84, but two single sided drives, no RTC, no modem
 ROM_START(kaypro284)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "292a", "81-292a for Kaypro Bd. 81-184")
 	ROMX_LOAD("81-292a.u34",  0x0000, 0x1000, CRC(241f27a5) SHA1(82711289d19e9b165e35324da010466d225e503a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "turbo", "Advent Turbo ROM")
@@ -533,8 +523,6 @@ ROM_START(kaypro284)
 	ROMX_LOAD("pro884mx.rom",   0x0000, 0x2000, CRC(febc6f51) SHA1(1f009aa9b7c9a3eddd0ee6ea7321a1c47c3e9807), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "pro8v5", "MicroCornucopia Pro8 V5")
 	ROMX_LOAD("pro884v5.rom",  0x0000, 0x2000, CRC(fe0051b1) SHA1(cac429154d40e21174ae05ceb0017b62473cdebd), ROM_BIOS(4) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -560,20 +548,17 @@ ROM_START(kaypro2x)
 	ROM_SYSTEM_BIOS( 7, "handyman", "Hitech Research Handyman")                                                             // http://content.thetechnickel.com/misc/kaypro-handyman/kaypro-4-plus-88-06.jpg
 	ROMX_LOAD( "handyman.bin", 0x0000, 0x8000, CRC(f020d82c) SHA1(576a6608270d4ec7cf814c9de46ecf4e2869d30a), ROM_BIOS(7) )  // fits any classic Kaypro, needs its own 16K RAM
 
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
-
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
 // Kaypro II'84 plus 88, the "KAYPRO-88" board has 128k or 256k of its own ram on it, it's a factory installed SWP CoPower 88
 ROM_START(kayproiip88)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "232", "81-232 for Kaypro Bd. 81-240")
 	ROMX_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "kplus83", "MICROCode Consulting KayPLUS 83")
 	ROMX_LOAD("kplus83.rom",  0x0000, 0x2000, CRC(5e9b817d) SHA1(26ea875ee3659a964cbded4ed0c82a3af42db64b), ROM_BIOS(1) )
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
@@ -584,13 +569,11 @@ ROM_END
 
 // Kaypro 4'84 plus 88, the "KAYPRO-88" board has 128k or 256k of its own ram on it, it's a factory installed SWP CoPower 88
 ROM_START(kaypro484p88)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "292a", "292A")
 	ROMX_LOAD("81-292a.u34",  0x0000, 0x1000, CRC(241f27a5) SHA1(82711289d19e9b165e35324da010466d225e503a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "kplus", "MICROCode Consulting KayPLUS 84")
 	ROMX_LOAD("kplus84.rom",   0x0000, 0x2000, CRC(4551905a) SHA1(48f0964edfad05b214810ae5595638245c30e5c0), ROM_BIOS(1) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -598,13 +581,11 @@ ROM_END
 
 // Kaypro New 2, no modem, no RTC, single DS/DD disk drive
 ROM_START(kaypronew2)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "478", "V2.01 for Kaypro Bd. 81-294 (universal")
 	ROMX_LOAD("81-478.u42",   0x0000, 0x2000, CRC(de618380) SHA1(c8d6312e6eeb62a53e741f1ff3b878bdcb7b5aaa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "kplus", "MICROCode Consulting KayPLUS 84")
 	ROMX_LOAD("kplus84.rom",   0x0000, 0x2000, CRC(4551905a) SHA1(48f0964edfad05b214810ae5595638245c30e5c0), ROM_BIOS(1) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -612,13 +593,11 @@ ROM_END
 
 // "Desktop" PC with two high density, 2.8MB floppy disk drivers over the monitor
 ROM_START(robie)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "326", "V1.7R")
 	ROMX_LOAD("81-326.u34",   0x0000, 0x2000, CRC(7f0c3f68) SHA1(54b088a1b2200f9df4b9b347bbefb0115f3a4976), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "u", "V1.4")
 	ROMX_LOAD("robie_u.u34",  0x0000, 0x2000, CRC(da7248b5) SHA1(1dc053b3e44ead47255cc166b7b4b0adaeb3dd3d), ROM_BIOS(1) ) // rom number unknown
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -626,10 +605,8 @@ ROM_END
 
 // Kaypro 4X, a Robie in the standard portable Kaypro enclosure
 ROM_START(kaypro4x)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_LOAD("81-326.u34",   0x0000, 0x2000, CRC(7f0c3f68) SHA1(54b088a1b2200f9df4b9b347bbefb0115f3a4976) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
@@ -637,7 +614,7 @@ ROM_END
 
 // Kaypro 1, equivalent to "old" 2X, before 4'84 became 2X
 ROM_START(kaypro1)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_SYSTEM_BIOS( 0, "478", "V2.01 for Kaypro Bd. 81-294 (universal")
 	ROMX_LOAD("81-478.u42",   0x0000, 0x2000, CRC(de618380) SHA1(c8d6312e6eeb62a53e741f1ff3b878bdcb7b5aaa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "turbo", "Advent Turbo ROM")
@@ -645,18 +622,14 @@ ROM_START(kaypro1)
 	ROM_SYSTEM_BIOS( 2, "kplus", "MICROCode Consulting KayPLUS 84")
 	ROMX_LOAD("kplus84.rom",   0x0000, 0x2000, CRC(4551905a) SHA1(48f0964edfad05b214810ae5595638245c30e5c0), ROM_BIOS(2) )
 
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
-
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
 // Omni II logic analyzer
 ROM_START(omni2)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_LOAD("omni2.u47",    0x0000, 0x1000, CRC(2883f9e0) SHA1(d98c784e62853582d298bf7ca84c75872847ac9b) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("omni2.u43",    0x0000, 0x0800, CRC(049b3381) SHA1(46f1d4f038747ba9048b075dc617361be088f82a) )
@@ -664,10 +637,8 @@ ROM_END
 
 // Omni 4 logic analyzer
 ROM_START(omni4)
-	ROM_REGION(0x4000, "roms",0)
+	ROM_REGION(0x3000, "roms",0)
 	ROM_LOAD("omni4.u34",    0x0000, 0x2000, CRC(f24e8521) SHA1(374f2e2b791a807f103744a22c9c8f3af55f1033) )
-
-	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("omni4.u9",    0x0000, 0x1000, CRC(579665a6) SHA1(261fcdc5a44821de9484340cbe429110400140b4) )
@@ -675,18 +646,18 @@ ROM_END
 
 
 /*    YEAR  NAME          PARENT     COMPAT  MACHINE     INPUT   CLASS         INIT         COMPANY               FULLNAME */
-COMP( 1982, kayproii,     0,         0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro II - 2/83" , 0 )
-COMP( 1983, kayproiv,     kayproii,  0,      kayproiv,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro IV - 4/83" , 0 ) // model 81-004
-COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10 - 1983", 0 )
-COMP( 1983, kayproiip88,  kayproii,  0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro484,    0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84" , MACHINE_NOT_WORKING ) // model 81-015
-COMP( 1984, kaypro284,    kaypro484, 0,      kaypro284,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2/84" , MACHINE_NOT_WORKING ) // model 81-015
-COMP( 1984, kaypro484p88, kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84 plus88", MACHINE_NOT_WORKING ) // model 81-015 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
-COMP( 1984, robie,        0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro Robie" , MACHINE_NOT_WORKING )
-COMP( 1985, kaypro2x,     kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
-COMP( 1985, kaypronew2,   0,         0,      kaypronew2, kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro New 2", MACHINE_NOT_WORKING )
-COMP( 1985, kaypro4x,     robie,     0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4x" , MACHINE_NOT_WORKING )
-COMP( 1986, kaypro1,      kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 1", MACHINE_NOT_WORKING )
-COMP( 198?, omni2,        kayproii,  0,      omni2,      kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Omni II Logic Analyzer" , 0 )
-COMP( 198?, omni4,        kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Omni Logic Inc.",    "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING )
+COMP( 1982, kayproii,     0,         0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro II - 2/83" , MACHINE_SUPPORTS_SAVE )
+COMP( 1983, kayproiv,     kayproii,  0,      kayproiv,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro IV - 4/83" , MACHINE_SUPPORTS_SAVE ) // model 81-004
+COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10 - 1983", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, kayproiip88,  kayproii,  0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-004 with an added 8088 daughterboard and rom
+COMP( 1984, kaypro484,    0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
+COMP( 1984, kaypro284,    kaypro484, 0,      kaypro284,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2/84" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
+COMP( 1984, kaypro484p88, kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84 plus88", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015 with an added 8088 daughterboard and rom
+COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-005
+COMP( 1984, robie,        0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro Robie" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, kaypro2x,     kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2x" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-025
+COMP( 1985, kaypronew2,   0,         0,      kaypronew2, kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro New 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, kaypro4x,     robie,     0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4x" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, kaypro1,      kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 1", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, omni2,        kayproii,  0,      omni2,      kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Omni II Logic Analyzer" , MACHINE_SUPPORTS_SAVE )
+COMP( 198?, omni4,        kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Omni Logic Inc.",    "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

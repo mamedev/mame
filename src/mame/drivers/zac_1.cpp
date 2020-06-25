@@ -50,12 +50,12 @@ public:
 	void zac_1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	uint8_t ctrl_r();
+	void ctrl_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
-	DECLARE_READ8_MEMBER(reset_int_r);
-	DECLARE_WRITE8_MEMBER(reset_int_w);
+	uint8_t reset_int_r();
+	void reset_int_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
 
@@ -159,7 +159,7 @@ static INPUT_PORTS_START( zac_1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-READ8_MEMBER( zac_1_state::ctrl_r )
+uint8_t zac_1_state::ctrl_r()
 {
 // reads inputs
 	if (m_input_line == 0xfe)
@@ -183,12 +183,12 @@ READ8_MEMBER( zac_1_state::ctrl_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( zac_1_state::ctrl_w )
+void zac_1_state::ctrl_w(uint8_t data)
 {
 	m_input_line = data;
 }
 
-WRITE8_MEMBER( zac_1_state::reset_int_w )
+void zac_1_state::reset_int_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -223,10 +223,7 @@ void zac_1_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
 {
 	if (m_t_c > 0x40)
-	{
-		uint8_t vector = (ioport("TEST")->read() ) ? 0x10 : 0x18;
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector); // S2650
-	}
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	else
 		m_t_c++;
 }
@@ -268,6 +265,7 @@ void zac_1_state::zac_1(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &zac_1_state::zac_1_data);
 	m_maincpu->sense_handler().set(FUNC(zac_1_state::serial_r));
 	m_maincpu->flag_handler().set(FUNC(zac_1_state::serial_w));
+	m_maincpu->intack_handler().set([this]() { return (ioport("TEST")->read() ) ? 0x10 : 0x18; });
 
 	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
@@ -302,7 +300,7 @@ void zac_1_state::locomotp_data(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(zac_1_state::reset_int_r));
 }
 
-READ8_MEMBER( zac_1_state::reset_int_r )
+uint8_t zac_1_state::reset_int_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0;

@@ -25,7 +25,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(skykid_state::inputport_select_w)
+void skykid_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -37,7 +37,7 @@ WRITE8_MEMBER(skykid_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(skykid_state::inputport_r)
+uint8_t skykid_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
@@ -60,24 +60,24 @@ READ8_MEMBER(skykid_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(skykid_state::skykid_led_w)
+void skykid_state::skykid_led_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 3);
 	m_leds[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_subreset_w)
+void skykid_state::skykid_subreset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_bankswitch_w)
+void skykid_state::skykid_bankswitch_w(offs_t offset, uint8_t data)
 {
 	membank("bank1")->set_entry(!BIT(offset,11));
 }
 
-WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
+void skykid_state::skykid_irq_1_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	m_main_irq_mask = bit;
@@ -85,7 +85,7 @@ WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
+void skykid_state::skykid_irq_2_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,13);
 	m_mcu_irq_mask = bit;
@@ -124,7 +124,7 @@ void skykid_state::skykid_map(address_map &map)
 
 void skykid_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_mcu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
@@ -427,7 +427,7 @@ void skykid_state::skykid(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
 	m_maincpu->set_addrmap(AS_PROGRAM, &skykid_state::skykid_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* or compatible 6808 with extra instructions */
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8); /* or compatible 6808 with extra instructions */
 	m_mcu->set_addrmap(AS_PROGRAM, &skykid_state::mcu_map);
 	m_mcu->in_p1_cb().set(FUNC(skykid_state::inputport_r));         /* input ports read */
 	m_mcu->out_p1_cb().set(FUNC(skykid_state::inputport_select_w)); /* input port select */

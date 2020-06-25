@@ -2,15 +2,37 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    fileio.c
+    fileio.cpp
 
     File access functions.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "unzip.h"
 #include "fileio.h"
+
+#include "unzip.h"
+
+//#define VERBOSE 1
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
+
+
+template path_iterator::path_iterator(char *&, int);
+template path_iterator::path_iterator(char * const &, int);
+template path_iterator::path_iterator(char const *&, int);
+template path_iterator::path_iterator(char const * const &, int);
+template path_iterator::path_iterator(std::vector<std::string> &, int);
+template path_iterator::path_iterator(const std::vector<std::string> &, int);
+
+template emu_file::emu_file(std::string &, u32);
+template emu_file::emu_file(const std::string &, u32);
+template emu_file::emu_file(char *&, u32);
+template emu_file::emu_file(char * const &, u32);
+template emu_file::emu_file(char const *&, u32);
+template emu_file::emu_file(char const * const &, u32);
+template emu_file::emu_file(std::vector<std::string> &, u32);
+template emu_file::emu_file(const std::vector<std::string> &, u32);
 
 
 const u32 OPEN_FLAG_HAS_CRC  = 0x10000;
@@ -28,6 +50,7 @@ const u32 OPEN_FLAG_HAS_CRC  = 0x10000;
 path_iterator::path_iterator(std::string &&searchpath)
 	: m_searchpath(std::move(searchpath))
 	, m_current(m_searchpath.cbegin())
+	, m_separator(';') // FIXME this should be a macro - UNIX prefers :
 	, m_is_first(true)
 {
 }
@@ -35,6 +58,7 @@ path_iterator::path_iterator(std::string &&searchpath)
 path_iterator::path_iterator(std::string const &searchpath)
 	: m_searchpath(searchpath)
 	, m_current(m_searchpath.cbegin())
+	, m_separator(';') // FIXME this should be a macro - UNIX prefers :
 	, m_is_first(true)
 {
 }
@@ -47,6 +71,7 @@ path_iterator::path_iterator(path_iterator &&that)
 path_iterator::path_iterator(path_iterator const &that)
 	: m_searchpath(that.m_searchpath)
 	, m_current(std::next(m_searchpath.cbegin(), std::distance(that.m_searchpath.cbegin(), that.m_current)))
+	, m_separator(that.m_separator)
 	, m_is_first(that.m_is_first)
 {
 }
@@ -61,6 +86,7 @@ path_iterator &path_iterator::operator=(path_iterator &&that)
 	auto const current(std::distance(that.m_searchpath.cbegin(), that.m_current));
 	m_searchpath = std::move(that.m_searchpath);
 	m_current = std::next(m_searchpath.cbegin(), current);
+	m_separator = that.m_separator;
 	m_is_first = that.m_is_first;
 	return *this;
 }
@@ -69,6 +95,7 @@ path_iterator &path_iterator::operator=(path_iterator const &that)
 {
 	m_searchpath = that.m_searchpath;
 	m_current = std::next(m_searchpath.cbegin(), std::distance(that.m_searchpath.cbegin(), that.m_current));
+	m_separator = that.m_separator;
 	m_is_first = that.m_is_first;
 	return *this;
 }
@@ -86,7 +113,7 @@ bool path_iterator::next(std::string &buffer, const char *name)
 		return false;
 
 	// copy up to the next separator
-	auto const sep(std::find(m_current, m_searchpath.cend(), ';')); // FIXME this should be a macro - UNIX prefers :
+	auto const sep(std::find(m_current, m_searchpath.cend(), m_separator));
 	buffer.assign(m_current, sep);
 	m_current = sep;
 	if (m_searchpath.cend() != m_current)
@@ -165,31 +192,31 @@ const osd::directory::entry *file_enumerator::next()
 //-------------------------------------------------
 
 emu_file::emu_file(u32 openflags)
-	: m_file()
-	, m_iterator(std::string())
-	, m_mediapaths(std::string())
-	, m_crc(0)
-	, m_openflags(openflags)
-	, m_zipfile(nullptr)
-	, m_ziplength(0)
-	, m_remove_on_close(false)
-	, m_restrict_to_mediapath(false)
+	: emu_file(path_iterator(std::string()), openflags)
 {
-	// sanity check the open flags
-	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
-		throw emu_fatalerror("Attempted to open a file for write with OPEN_FLAG_HAS_CRC");
+
 }
 
-emu_file::emu_file(std::string &&searchpath, u32 openflags)
-	: m_file()
-	, m_iterator(searchpath)
-	, m_mediapaths(std::move(searchpath))
+emu_file::emu_file(path_iterator &&searchpath, u32 openflags)
+	: emu_file(openflags, EMPTY)
+{
+	m_iterator.emplace_back(searchpath, std::string());
+	m_mediapaths.emplace_back(std::move(searchpath), std::string());
+}
+
+emu_file::emu_file(u32 openflags, empty_t)
+	: m_filename()
+	, m_fullpath()
+	, m_file()
+	, m_iterator()
+	, m_mediapaths()
+	, m_first(true)
 	, m_crc(0)
 	, m_openflags(openflags)
 	, m_zipfile(nullptr)
 	, m_ziplength(0)
 	, m_remove_on_close(false)
-	, m_restrict_to_mediapath(false)
+	, m_restrict_to_mediapath(0)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
@@ -279,26 +306,8 @@ osd_file::error emu_file::open(const std::string &name)
 	m_openflags &= ~OPEN_FLAG_HAS_CRC;
 
 	// reset the iterator and open_next
-	m_iterator.reset();
+	m_first = true;
 	return open_next();
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2);
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2 + name3);
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2 + name3 + name4);
 }
 
 osd_file::error emu_file::open(const std::string &name, u32 crc)
@@ -309,26 +318,8 @@ osd_file::error emu_file::open(const std::string &name, u32 crc)
 	m_openflags |= OPEN_FLAG_HAS_CRC;
 
 	// reset the iterator and open_next
-	m_iterator.reset();
+	m_first = true;
 	return open_next();
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, u32 crc)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2, crc);
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, u32 crc)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2 + name3, crc);
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, u32 crc)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2 + name3 + name4, crc);
 }
 
 
@@ -340,24 +331,64 @@ osd_file::error emu_file::open(const std::string &name1, const std::string &name
 osd_file::error emu_file::open_next()
 {
 	// if we're open from a previous attempt, close up now
-	if (m_file != nullptr)
+	if (m_file)
 		close();
 
 	// loop over paths
+	LOG("emu_file: open next '%s'\n", m_filename);
 	osd_file::error filerr = osd_file::error::NOT_FOUND;
-	while (m_iterator.next(m_fullpath, m_filename.c_str()))
+	while (osd_file::error::NONE != filerr)
 	{
+		if (m_first)
+		{
+			m_first = false;
+			for (searchpath_vector::value_type &i : m_iterator)
+			{
+				i.first.reset();
+				if (!i.first.next(i.second))
+					return filerr;
+			}
+		}
+		else
+		{
+			searchpath_vector::iterator i(m_iterator.begin());
+			while (i != m_iterator.end())
+			{
+				if (i->first.next(i->second))
+				{
+					LOG("emu_file: next path %d '%s'\n", std::distance(m_iterator.begin(), i), i->second);
+					for (searchpath_vector::iterator j = m_iterator.begin(); i != j; ++j)
+					{
+						j->first.reset();
+						j->first.next(j->second);
+					}
+					break;
+				}
+				++i;
+			}
+			if (m_iterator.end() == i)
+				return filerr;
+		}
+
+		// build full path
+		m_fullpath.clear();
+		for (searchpath_vector::value_type const &path : m_iterator)
+		{
+			m_fullpath.append(path.second);
+			if (!m_fullpath.empty() && !util::is_directory_separator(m_fullpath.back()))
+				m_fullpath.append(PATH_SEPARATOR);
+		}
+		m_fullpath.append(m_filename);
+
 		// attempt to open the file directly
+		LOG("emu_file: attempting to open '%s' directly\n", m_fullpath);
 		filerr = util::core_file::open(m_fullpath, m_openflags, m_file);
-		if (filerr == osd_file::error::NONE)
-			break;
 
 		// if we're opening for read-only we have other options
-		if ((m_openflags & (OPEN_FLAG_READ | OPEN_FLAG_WRITE)) == OPEN_FLAG_READ)
+		if ((osd_file::error::NONE != filerr) && ((m_openflags & (OPEN_FLAG_READ | OPEN_FLAG_WRITE)) == OPEN_FLAG_READ))
 		{
+			LOG("emu_file: attempting to open '%s' from archives\n", m_fullpath);
 			filerr = attempt_zipped();
-			if (filerr == osd_file::error::NONE)
-				break;
 		}
 	}
 	return filerr;
@@ -420,7 +451,7 @@ osd_file::error emu_file::compress(int level)
 //   loading if needed
 //-------------------------------------------------
 
-bool emu_file::compressed_file_ready(void)
+bool emu_file::compressed_file_ready()
 {
 	// load the ZIP file now if we haven't yet
 	if (m_zipfile && (load_zipped_file() != osd_file::error::NONE))
@@ -629,16 +660,55 @@ void emu_file::flush()
 //  any media path
 //-------------------------------------------------
 
-bool emu_file::part_of_mediapath(std::string path)
+bool emu_file::part_of_mediapath(const std::string &path)
 {
-	bool result = false;
-	std::string mediapath;
-	m_mediapaths.reset();
-	while (m_mediapaths.next(mediapath, nullptr) && !result) {
-		if (path.compare(mediapath.substr(0, mediapath.length())))
-			result = true;
+	if (!m_restrict_to_mediapath)
+		return true;
+
+	for (size_t i = 0U; (m_mediapaths.size() > i) && ((0 > m_restrict_to_mediapath) || (i < m_restrict_to_mediapath)); i++)
+	{
+		m_mediapaths[i].first.reset();
+		if (!m_mediapaths[i].first.next(m_mediapaths[i].second))
+			return false;
 	}
-	return result;
+
+	std::string mediapath;
+	while (true)
+	{
+		mediapath.clear();
+		for (size_t i = 0U; (m_mediapaths.size() > i) && ((0 > m_restrict_to_mediapath) || (i < m_restrict_to_mediapath)); i++)
+		{
+			mediapath.append(m_mediapaths[i].second);
+			if (!mediapath.empty() && !util::is_directory_separator(mediapath.back()))
+				mediapath.append(PATH_SEPARATOR);
+		}
+
+		if (!path.compare(0, mediapath.size(), mediapath))
+		{
+			LOG("emu_file: path '%s' matches media path '%s'\n", path, mediapath);
+			return true;
+		}
+
+		size_t i = 0U;
+		while ((m_mediapaths.size() > i) && ((0 > m_restrict_to_mediapath) || (i < m_restrict_to_mediapath)))
+		{
+			if (m_mediapaths[i].first.next(m_mediapaths[i].second))
+			{
+				for (size_t j = 0U; i != j; j++)
+				{
+					m_mediapaths[j].first.reset();
+					m_mediapaths[j].first.next(m_mediapaths[j].second);
+				}
+				break;
+			}
+			i++;
+		}
+		if ((m_mediapaths.size() == i) || ((0 <= m_restrict_to_mediapath) && (i == m_restrict_to_mediapath)))
+		{
+			LOG("emu_file: path '%s' not in media path\n", path);
+			return false;
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -659,21 +729,24 @@ osd_file::error emu_file::attempt_zipped()
 		// loop over directory parts up to the start of filename
 		while (1)
 		{
-			// find the final path separator
-			auto const dirsep = m_fullpath.find_last_of(PATH_SEPARATOR[0]);
-			if (dirsep == std::string::npos)
+			if (!part_of_mediapath(m_fullpath))
 				break;
 
-			if (restrict_to_mediapath() && !part_of_mediapath(m_fullpath))
+			// find the final path separator
+			auto const dirsepiter(std::find_if(m_fullpath.rbegin(), m_fullpath.rend(), util::is_directory_separator));
+			if (dirsepiter == m_fullpath.rend())
 				break;
+			std::string::size_type const dirsep(std::distance(m_fullpath.begin(), dirsepiter.base()) - 1);
 
 			// insert the part from the right of the separator into the head of the filename
-			if (!filename.empty()) filename.insert(0, 1, '/');
+			if (!filename.empty())
+				filename.insert(0, 1, '/');
 			filename.insert(0, m_fullpath.substr(dirsep + 1, std::string::npos));
 
 			// remove this part of the filename and append an archive extension
 			m_fullpath.resize(dirsep);
 			m_fullpath.append(suffixes[i]);
+			LOG("emu_file: looking for '%s' in archive '%s'\n", filename, m_fullpath);
 
 			// attempt to open the archive file
 			util::archive_file::ptr zip;

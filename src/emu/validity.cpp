@@ -1550,7 +1550,7 @@ void validity_checker::validate_roms(device_t &root)
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
-				if (!m_region_map.insert(std::make_pair(fulltag, current_length)).second)
+				if (!m_region_map.emplace(fulltag, current_length).second)
 					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag);
 			}
 			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
@@ -1618,6 +1618,10 @@ void validity_checker::validate_roms(device_t &root)
 					osd_printf_error("ROM '%s' extends past the defined memory region\n", last_name);
 			}
 		}
+
+		// if we haven't seen any items since the last region, print a warning
+		if (items_since_region == 0)
+			osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
 
 		// check that default BIOS exists
 		if (defbios && (bios_names.find(defbios) == bios_names.end()))

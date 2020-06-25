@@ -54,7 +54,7 @@ enum
  *
  *************************************/
 
-WRITE16_MEMBER( acclaim_rax_device::data_w )
+void acclaim_rax_device::data_w(uint16_t data)
 {
 	m_data_in->write(data);
 	m_cpu->set_input_line(ADSP2181_IRQL0, ASSERT_LINE);
@@ -62,7 +62,7 @@ WRITE16_MEMBER( acclaim_rax_device::data_w )
 }
 
 
-READ16_MEMBER( acclaim_rax_device::data_r )
+uint16_t acclaim_rax_device::data_r()
 {
 	m_adsp_snd_pf0 = 1;
 	return m_data_out->read();
@@ -75,7 +75,7 @@ READ16_MEMBER( acclaim_rax_device::data_r )
  *
  *************************************/
 
-READ16_MEMBER( acclaim_rax_device::adsp_control_r )
+uint16_t acclaim_rax_device::adsp_control_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -91,7 +91,7 @@ READ16_MEMBER( acclaim_rax_device::adsp_control_r )
 	return res;
 }
 
-WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
+void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 {
 	m_control_regs[offset] = data;
 
@@ -241,25 +241,25 @@ void acclaim_rax_device::update_data_ram_bank()
 		membank("databank")->set_entry(1 + m_data_bank);
 }
 
-WRITE16_MEMBER( acclaim_rax_device::ram_bank_w )
+void acclaim_rax_device::ram_bank_w(uint16_t data)
 {
 	// Note: The PCB has two unstuffed RAM locations
 	m_data_bank = data & 3;
 	update_data_ram_bank();
 }
 
-WRITE16_MEMBER( acclaim_rax_device::rom_bank_w )
+void acclaim_rax_device::rom_bank_w(uint16_t data)
 {
 	m_rom_bank = data;
 }
 
-READ16_MEMBER( acclaim_rax_device::host_r )
+uint16_t acclaim_rax_device::host_r()
 {
 	m_cpu->set_input_line(ADSP2181_IRQL0, CLEAR_LINE);
 	return m_data_in->read();
 }
 
-WRITE16_MEMBER( acclaim_rax_device::host_w )
+void acclaim_rax_device::host_w(uint16_t data)
 {
 	m_data_out->write(data);
 	m_adsp_snd_pf0 = 0;
@@ -401,7 +401,7 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 	}
 }
 
-WRITE32_MEMBER(acclaim_rax_device::adsp_sound_tx_callback)
+void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
 {
 	int which = offset;
 
@@ -455,7 +455,7 @@ WRITE32_MEMBER(acclaim_rax_device::adsp_sound_tx_callback)
 	m_reg_timer[which]->reset();
 }
 
-WRITE32_MEMBER(acclaim_rax_device::dmovlay_callback)
+void acclaim_rax_device::dmovlay_callback(uint32_t data)
 {
 	if (data < 0 || data > 1)
 	{

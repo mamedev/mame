@@ -29,8 +29,8 @@ public:
 	auto out_rx_callback() { return m_out_rx_cb.bind(); }
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(uint8_t data);
+	uint8_t read();
 	void send_keycode_down(uint8_t row, uint8_t col);
 	void send_keycode_up(uint8_t row, uint8_t col);
 	void send_mouse(uint8_t x, uint8_t y);

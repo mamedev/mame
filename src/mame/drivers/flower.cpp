@@ -114,12 +114,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(audio_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(bgvram_w);
-	DECLARE_WRITE8_MEMBER(fgvram_w);
+	void flipscreen_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
+	void sound_command_w(uint8_t data);
+	void audio_nmi_mask_w(uint8_t data);
+	void bgvram_w(offs_t offset, uint8_t data);
+	void fgvram_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
 	int code = m_bgvram[tile_index];
 	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
 	int code = m_fgvram[tile_index];
 	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void flower_state::video_start()
@@ -304,36 +304,36 @@ uint32_t flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(flower_state::flipscreen_w)
+void flower_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 	m_flip_screen = BIT(data,0);
 }
 
-WRITE8_MEMBER(flower_state::coin_counter_w)
+void flower_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 1);
 }
 
-WRITE8_MEMBER(flower_state::sound_command_w)
+void flower_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	if(m_audio_nmi_enable == true)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(flower_state::audio_nmi_mask_w)
+void flower_state::audio_nmi_mask_w(uint8_t data)
 {
 	m_audio_nmi_enable = BIT(data,0);
 }
 
-WRITE8_MEMBER(flower_state::bgvram_w)
+void flower_state::bgvram_w(offs_t offset, uint8_t data)
 {
 	m_bgvram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xff);
 }
 
-WRITE8_MEMBER(flower_state::fgvram_w)
+void flower_state::fgvram_w(offs_t offset, uint8_t data)
 {
 	m_fgvram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0xff);

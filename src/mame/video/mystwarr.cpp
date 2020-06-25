@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 
 	colour |= m_sub1_colorbase << 4;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state, gaiapols)
@@ -178,7 +178,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 
 	colour = m_sub1_colorbase;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
+	tileinfo.set(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state, dadandrn)
@@ -327,7 +327,7 @@ uint32_t mystwarr_state::screen_update_martchmp(screen_device &screen, bitmap_rg
 
 
 
-WRITE16_MEMBER(mystwarr_state::ddd_053936_enable_w)
+void mystwarr_state::ddd_053936_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -336,7 +336,7 @@ WRITE16_MEMBER(mystwarr_state::ddd_053936_enable_w)
 	}
 }
 
-WRITE16_MEMBER(mystwarr_state::ddd_053936_clip_w)
+void mystwarr_state::ddd_053936_clip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int old, clip_x, clip_y, size_x, size_y;
 	int minx, maxx, miny, maxy;
@@ -381,7 +381,7 @@ WRITE16_MEMBER(mystwarr_state::ddd_053936_clip_w)
 }
 
 // reference: 223e5c in gaiapolis (ROMs 34j and 36m)
-READ16_MEMBER(mystwarr_state::gai_053936_tilerom_0_r)
+uint16_t mystwarr_state::gai_053936_tilerom_0_r(offs_t offset)
 {
 	uint8_t *ROM1 = (uint8_t *)memregion("gfx4")->base();
 	uint8_t *ROM2 = (uint8_t *)memregion("gfx4")->base();
@@ -392,7 +392,7 @@ READ16_MEMBER(mystwarr_state::gai_053936_tilerom_0_r)
 	return ((ROM1[offset]<<8) | ROM2[offset]);
 }
 
-READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_0_r)
+uint16_t mystwarr_state::ddd_053936_tilerom_0_r(offs_t offset)
 {
 	uint8_t *ROM1 = (uint8_t *)memregion("gfx4")->base();
 	uint8_t *ROM2 = (uint8_t *)memregion("gfx4")->base();
@@ -403,7 +403,7 @@ READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_0_r)
 }
 
 // reference: 223e1a in gaiapolis (ROM 36j)
-READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_1_r)
+uint16_t mystwarr_state::ddd_053936_tilerom_1_r(offs_t offset)
 {
 	uint8_t *ROM = (uint8_t *)memregion("gfx4")->base();
 
@@ -411,7 +411,7 @@ READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_1_r)
 }
 
 // reference: 223db0 in gaiapolis (ROMs 32n, 29n, 26n)
-READ16_MEMBER(mystwarr_state::gai_053936_tilerom_2_r)
+uint16_t mystwarr_state::gai_053936_tilerom_2_r(offs_t offset)
 {
 	uint8_t *ROM = (uint8_t *)memregion("gfx3")->base();
 
@@ -420,7 +420,7 @@ READ16_MEMBER(mystwarr_state::gai_053936_tilerom_2_r)
 	return ROM[offset/2]<<8;
 }
 
-READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_2_r)
+uint16_t mystwarr_state::ddd_053936_tilerom_2_r(offs_t offset)
 {
 	uint8_t *ROM = (uint8_t *)memregion("gfx3")->base();
 

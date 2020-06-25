@@ -87,10 +87,12 @@ private:
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
 
-	DECLARE_WRITE16_MEMBER(mjmux_w);
-	DECLARE_READ16_MEMBER(mjmux_r);
-	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
-	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
+	void mjmux_w(uint16_t data);
+	uint16_t mjmux_r();
+	void okim1_rombank_w(uint16_t data);
+	void okim0_rombank_w(uint16_t data);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -101,7 +103,6 @@ private:
 
 void miragemj_state::video_start()
 {
-	m_sprgen->alloc_sprite_bitmap();
 }
 
 uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -111,27 +112,24 @@ uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
-
 	m_deco_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(256, cliprect); /* not verified */
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
-
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	return 0;
 }
 
 
-WRITE16_MEMBER(miragemj_state::mjmux_w)
+void miragemj_state::mjmux_w(uint16_t data)
 {
 	m_mux_data = data & 0x1f;
 }
 
-READ16_MEMBER(miragemj_state::mjmux_r)
+uint16_t miragemj_state::mjmux_r()
 {
 	switch (m_mux_data & 0x1f)
 	{
@@ -145,12 +143,12 @@ READ16_MEMBER(miragemj_state::mjmux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(miragemj_state::okim1_rombank_w)
+void miragemj_state::okim1_rombank_w(uint16_t data)
 {
 	m_oki_sfx->set_rom_bank(data & 0x3);
 }
 
-WRITE16_MEMBER(miragemj_state::okim0_rombank_w)
+void miragemj_state::okim0_rombank_w(uint16_t data)
 {
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 4));
@@ -263,6 +261,15 @@ static GFXDECODE_START( gfx_mirage )
 GFXDECODE_END
 
 
+DECOSPR_PRIORITY_CB_MEMBER(miragemj_state::pri_callback)
+{
+	u32 mask = 0; // above everything
+	if (extpri)
+		mask |= GFX_PMASK_2; // under the uppermost playfield
+
+	return mask;
+}
+
 DECO16IC_BANK_CB_MEMBER(miragemj_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
@@ -304,8 +311,6 @@ void miragemj_state::mirage(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
@@ -318,6 +323,7 @@ void miragemj_state::mirage(machine_config &config)
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_pri_callback(FUNC(miragemj_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */

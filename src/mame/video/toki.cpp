@@ -28,7 +28,7 @@ remove all the code writing the $a0000 area.)
 
 *************************************************************************/
 
-WRITE16_MEMBER(toki_state::toki_control_w)
+void toki_state::toki_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos() - 1);
 	COMBINE_DATA(&m_scrollram[offset]);
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			0);
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color,
 			0);
@@ -94,20 +94,19 @@ void toki_state::video_start()
 
 /*************************************/
 
-WRITE16_MEMBER(toki_state::foreground_videoram_w)
+void toki_state::foreground_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_state::background1_videoram_w)
+void toki_state::background1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background1_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_state::background2_videoram_w)
+void toki_state::background2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background2_videoram[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);

@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  machine.c
+  galaxold.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -13,7 +13,7 @@
 #include "includes/galaxold.h"
 
 
-IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
+uint8_t galaxold_state::hunchbkg_intack()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;
@@ -33,7 +33,7 @@ WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
 	m_maincpu->set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)
+void galaxold_state::galaxold_nmi_enable_w(uint8_t data)
 {
 	m_7474_9m_1->preset_w(data ? 1 : 0);
 }
@@ -84,34 +84,34 @@ MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 	machine_reset_common(0);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)
+void galaxold_state::galaxold_coin_lockout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_w)
+void galaxold_state::galaxold_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_1_w)
+void galaxold_state::galaxold_coin_counter_1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
+void galaxold_state::galaxold_coin_counter_2_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(2, data & 0x01);
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
+void galaxold_state::galaxold_leds_w(offs_t offset, uint8_t data)
 {
 	m_leds[offset] = BIT(data, 0);
 }
 
-READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
+uint8_t galaxold_state::scramblb_protection_1_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -123,7 +123,7 @@ READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
 	}
 }
 
-READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
+uint8_t galaxold_state::scramblb_protection_2_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -135,16 +135,15 @@ READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
 }
 
 
-WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
+void galaxold_state::_4in1_bank_w(uint8_t data)
 {
 	m__4in1_bank = data & 0x03;
-	galaxold_gfxbank_w(space, 0, m__4in1_bank);
+	galaxold_gfxbank_w(0, m__4in1_bank);
 	membank("bank1")->set_entry(m__4in1_bank);
 }
 
 void galaxold_state::init_4in1()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	const offs_t len = memregion("maincpu")->bytes();
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -155,14 +154,14 @@ void galaxold_state::init_4in1()
 	/* games are banked at 0x0000 - 0x3fff */
 	membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
-	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
+	_4in1_bank_w(0); /* set the initial CPU bank */
 
 	save_item(NAME(m__4in1_bank));
 }
 
 INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 {
-	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 }
 
 void galaxold_state::init_bullsdrtg()

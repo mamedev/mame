@@ -2,7 +2,7 @@
 // copyright-holders:byuu, Anthony Kruize, Fabio Priuli
 /***************************************************************************
 
-  snes.c
+  snes.cpp
 
   Video file to handle emulation of the Nintendo Super NES.
 
@@ -1481,7 +1481,7 @@ inline uint32_t snes_ppu_device::get_vram_address()
 	return addr << 1;
 }
 
-READ8_MEMBER( snes_ppu_device::vram_read )
+uint8_t snes_ppu_device::vram_read(offs_t offset)
 {
 	uint8_t res;
 	offset &= 0xffff; // only 64KB are present on SNES
@@ -1517,7 +1517,7 @@ READ8_MEMBER( snes_ppu_device::vram_read )
 	return res;
 }
 
-WRITE8_MEMBER( snes_ppu_device::vram_write )
+void snes_ppu_device::vram_write(offs_t offset, uint8_t data)
 {
 	offset &= 0xffff; // only 64KB are present on SNES, Robocop 3 relies on this
 
@@ -1532,7 +1532,7 @@ WRITE8_MEMBER( snes_ppu_device::vram_write )
 			if (h <= 4)
 				m_vram[offset] = data;
 			else if (h == 6)
-				m_vram[offset] = m_openbus_cb(space, 0);
+				m_vram[offset] = m_openbus_cb(0);
 			else
 			{
 				//printf("%d %d VRAM write, CHECK!\n",h,v);
@@ -1673,7 +1673,7 @@ void snes_ppu_device::write_object( uint16_t address, uint8_t data )
  solution adopted by BSNES without enabling it.
 *************************************************/
 
-READ8_MEMBER( snes_ppu_device::cgram_read )
+uint8_t snes_ppu_device::cgram_read(offs_t offset)
 {
 	uint8_t res;
 	offset &= 0x1ff;
@@ -1699,7 +1699,7 @@ READ8_MEMBER( snes_ppu_device::cgram_read )
 	return res;
 }
 
-WRITE8_MEMBER( snes_ppu_device::cgram_write )
+void snes_ppu_device::cgram_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1ff;
 
@@ -1886,7 +1886,7 @@ void snes_ppu_device::update_video_mode()
 	}
 }
 
-uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wrio_bit7)
+uint8_t snes_ppu_device::read(uint32_t offset, uint8_t wrio_bit7)
 {
 	uint8_t value;
 
@@ -1935,7 +1935,7 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 			}
 		case SLHV:      /* Software latch for H/V counter */
 			set_latch_hv(screen().hpos(), screen().vpos());
-			return m_openbus_cb(space, 0);       /* Return value is meaningless */
+			return m_openbus_cb(0);       /* Return value is meaningless */
 
 		case ROAMDATA:  /* Read data from OAM (DR) */
 		{
@@ -1952,8 +1952,8 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 
 				if (!m_vram_fgr_high)
 				{
-					m_vram_read_buffer = vram_read(space, addr);
-					m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
+					m_vram_read_buffer = vram_read(addr);
+					m_vram_read_buffer |= (vram_read(addr + 1) << 8);
 
 					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
 				}
@@ -1967,8 +1967,8 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 
 				if (m_vram_fgr_high)
 				{
-					m_vram_read_buffer = vram_read(space, addr);
-					m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
+					m_vram_read_buffer = vram_read(addr);
+					m_vram_read_buffer |= (vram_read(addr + 1) << 8);
 
 					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
 				}
@@ -1977,11 +1977,11 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 			}
 		case RCGDATA:   /* Read data from CGRAM */
 			if (!(m_cgram_address & 0x01))
-				m_ppu2_open_bus = cgram_read(space, m_cgram_address);
+				m_ppu2_open_bus = cgram_read(m_cgram_address);
 			else
 			{
 				m_ppu2_open_bus &= 0x80;
-				m_ppu2_open_bus |= cgram_read(space, m_cgram_address) & 0x7f;
+				m_ppu2_open_bus |= cgram_read(m_cgram_address) & 0x7f;
 			}
 
 			m_cgram_address = (m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
@@ -2029,11 +2029,11 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 	}
 
 	/* note: remaining registers (Namely TM in Super Kick Boxing) returns MDR open bus, not PPU Open Bus! */
-	return m_openbus_cb(space, 0);
+	return m_openbus_cb(0);
 }
 
 
-void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
+void snes_ppu_device::write(uint32_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2177,8 +2177,8 @@ void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
 				uint32_t addr;
 				m_vmadd = (m_vmadd & 0xff00) | (data << 0);
 				addr = get_vram_address();
-				m_vram_read_buffer = vram_read(space, addr);
-				m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
+				m_vram_read_buffer = vram_read(addr);
+				m_vram_read_buffer |= (vram_read(addr + 1) << 8);
 			}
 			break;
 		case VMADDH:    /* Address for VRAM read/write (high) */
@@ -2186,14 +2186,14 @@ void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
 				uint32_t addr;
 				m_vmadd = (m_vmadd & 0x00ff) | (data << 8);
 				addr = get_vram_address();
-				m_vram_read_buffer = vram_read(space, addr);
-				m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
+				m_vram_read_buffer = vram_read(addr);
+				m_vram_read_buffer |= (vram_read(addr + 1) << 8);
 			}
 			break;
 		case VMDATAL:   /* 2118: Data for VRAM write (low) */
 			{
 				uint32_t addr = get_vram_address();
-				vram_write(space, addr, data);
+				vram_write(addr, data);
 
 				if (!m_vram_fgr_high)
 					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
@@ -2202,7 +2202,7 @@ void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
 		case VMDATAH:   /* 2119: Data for VRAM write (high) */
 			{
 				uint32_t addr = get_vram_address();
-				vram_write(space, addr + 1, data);
+				vram_write(addr + 1, data);
 
 				if (m_vram_fgr_high)
 					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
@@ -2243,7 +2243,7 @@ void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
 			m_cgram_address = data << 1;
 			break;
 		case CGDATA:    /* Data for colour RAM */
-			cgram_write(space, m_cgram_address, data);
+			cgram_write(m_cgram_address, data);
 			m_cgram_address = (m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:    /* Window mask settings for BG1-2 */

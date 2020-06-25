@@ -77,10 +77,8 @@ Some of the roms for each game are encrypted:
 
 The only difference between the two Gratia sets are the encrypted ROMs in each set (they use
 different custom chips). The program ROMs are the same, as is all non encrypted graphics data.
-94019_30ver1.0.30 matches 94019_2.030 when both are decrypted with their respective encryption
-routines.  Due to the badly dumped mr94019-07.10, it hasn't been verified that it's data is
-identical to 94019_2.07 when both are decrypted. Waiting for a proper redump of mr94019-07.10
-for verification.
+It's been verified that when the encrypted data is decrypted with it's respective algorithms
+the data in both sets match 100%
 
 
 ToDo / Notes
@@ -156,7 +154,7 @@ Tetris Plus 2 (tp2m32)
 Best Bout Boxing (bbbxing)
 Wangan Sensou / Desert War (desertwr)
 Second Earth Gratia (92047-01 version) (gratia)
-*Second Earth Gratia  (91022-10 version) (gratiaa) (redump needed)
+Second Earth Gratia (91022-10 version) (gratiaa)
 F-1 Super Battle (f1superb)
 
 Idol Janshi Su-Chi-Pi 2 (suchie2)
@@ -512,7 +510,7 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 }
 
 
-READ32_MEMBER(ms32_state::ms32_read_inputs3)
+u32 ms32_state::ms32_read_inputs3()
 {
 	int a,b,c,d;
 	a = ioport("AN2?")->read(); // unused?
@@ -523,7 +521,7 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 }
 
 
-WRITE32_MEMBER(ms32_state::ms32_sound_w)
+void ms32_state::ms32_sound_w(u32 data)
 {
 	m_soundlatch->write(data & 0xff);
 
@@ -531,12 +529,12 @@ WRITE32_MEMBER(ms32_state::ms32_sound_w)
 	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
-READ32_MEMBER(ms32_state::ms32_sound_r)
+u32 ms32_state::ms32_sound_r()
 {
 	return m_to_main^0xff;
 }
 
-WRITE32_MEMBER(ms32_state::reset_sub_w)
+void ms32_state::reset_sub_w(u32 data)
 {
 	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
 }
@@ -547,91 +545,91 @@ WRITE32_MEMBER(ms32_state::reset_sub_w)
 /********** MEMORY MAP **********/
 
 
-READ8_MEMBER(ms32_state::ms32_nvram_r8)
+u8 ms32_state::ms32_nvram_r8(offs_t offset)
 {
 	return m_nvram_8[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_nvram_w8)
+void ms32_state::ms32_nvram_w8(offs_t offset, u8 data)
 {
 	m_nvram_8[offset] = data;
 }
 
-READ8_MEMBER(ms32_state::ms32_priram_r8)
+u8 ms32_state::ms32_priram_r8(offs_t offset)
 {
 	return m_priram[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_priram_w8)
+void ms32_state::ms32_priram_w8(offs_t offset, u8 data)
 {
 	m_priram[offset] = data;
 }
 
-READ16_MEMBER(ms32_state::ms32_palram_r16)
+u16 ms32_state::ms32_palram_r16(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_palram_w16)
+void ms32_state::ms32_palram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_rozram_r16)
+u16 ms32_state::ms32_rozram_r16(offs_t offset)
 {
 	return m_rozram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_rozram_w16)
+void ms32_state::ms32_rozram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_lineram_r16)
+u16 ms32_state::ms32_lineram_r16(offs_t offset)
 {
 	return m_lineram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_lineram_w16)
+void ms32_state::ms32_lineram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_sprram_r16)
+u16 ms32_state::ms32_sprram_r16(offs_t offset)
 {
 	return m_sprram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_sprram_w16)
+void ms32_state::ms32_sprram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_txram_r16)
+u16 ms32_state::ms32_txram_r16(offs_t offset)
 {
 	return m_txram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_txram_w16)
+void ms32_state::ms32_txram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_bgram_r16)
+u16 ms32_state::ms32_bgram_r16(offs_t offset)
 {
 	return m_bgram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_bgram_w16)
+void ms32_state::ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
-WRITE32_MEMBER(ms32_state::pip_w)
+void ms32_state::pip_w(u32 data)
 {
 	m_tilemaplayoutcontrol = data;
 
@@ -639,7 +637,7 @@ WRITE32_MEMBER(ms32_state::pip_w)
 		popmessage("fce00a7c = %02x",data);
 }
 
-WRITE32_MEMBER(ms32_state::coin_counter_w)
+void ms32_state::coin_counter_w(u32 data)
 {
 	// desertwr/p47aces sets 4 here
 	// f1superb sets 2
@@ -692,23 +690,23 @@ void ms32_state::ms32_map(address_map &map)
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use its own memory map */
 
-WRITE16_MEMBER(ms32_state::ms32_extra_w16)
+void ms32_state::ms32_extra_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_f1superb_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_extra_r16)
+u16 ms32_state::ms32_extra_r16(offs_t offset)
 {
 	return m_f1superb_extraram[offset];
 }
 
-WRITE32_MEMBER(ms32_state::ms32_irq2_guess_w)
+void ms32_state::ms32_irq2_guess_w(u32 data)
 {
 	irq_raise(2);
 }
 
-WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
+void ms32_state::ms32_irq5_guess_w(u32 data)
 {
 	irq_raise(5);
 }
@@ -1664,18 +1662,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
  code at $38 reads the 2nd command latch ??
 */
 
-READ8_MEMBER(ms32_state::latch_r)
+u8 ms32_state::latch_r()
 {
 	return m_soundlatch->read()^0xff;
 }
 
-WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
+void ms32_state::ms32_snd_bank_w(u8 data)
 {
 	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
 	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
 }
 
-WRITE8_MEMBER(ms32_state::to_main_w)
+void ms32_state::to_main_w(u8 data)
 {
 	m_to_main=data;
 	irq_raise(1);
@@ -2031,8 +2029,7 @@ ROM_START( gratiaa )
 	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
-//  ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(acb75824) SHA1(3b43e00a2d240761565042c8feead25a83ef0eb1) )  // FIXED BITS (xxxxxxxx11111111)
-	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) ) /* HAND CRAFTED: decrypted & re-encrypted 94019_2.07 - marked BAD_DUMP until proper ROM redump */
+	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
 	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(30)" */

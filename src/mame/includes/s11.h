@@ -47,6 +47,7 @@ public:
 		, m_ym(*this, "ym2151")
 		, m_bg(*this, "bgm")
 		, m_digits(*this, "digit%u", 0U)
+		, m_swarray(*this, "SW.%u", 0U)
 		{ }
 
 	void s11(machine_config &config);
@@ -56,22 +57,22 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
+	uint8_t sound_r();
+	void bank_w(uint8_t data);
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { };
+	void sol2_w(uint8_t data) { }; // solenoids 8-15
+	void sol3_w(uint8_t data); // solenoids 0-7
+	void sound_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE8_MEMBER(pia34_pb_w);
+	void pia2c_pa_w(uint8_t data);
+	void pia2c_pb_w(uint8_t data);
+	void pia34_pa_w(uint8_t data);
+	void pia34_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia40_pb_w);
+	void pia40_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
@@ -85,9 +86,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(pia28_w7_r);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	uint8_t pia28_w7_r();
 
 protected:
 	DECLARE_MACHINE_RESET(s11);
@@ -111,6 +112,7 @@ protected:
 	optional_device<ym2151_device> m_ym;
 	optional_device<s11c_bg_device> m_bg;
 	output_finder<63> m_digits;
+	required_ioport_array<8> m_swarray;
 
 	// getters/setters
 	uint8_t get_strobe() { return m_strobe; }
@@ -131,7 +133,7 @@ private:
 
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
-	uint8_t m_kbdrow;
+	uint8_t m_switch_col;
 	uint8_t m_diag;
 	uint32_t m_segment1;
 	uint32_t m_segment2;

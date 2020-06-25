@@ -18,8 +18,8 @@ public:
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ32_MEMBER (reg_r);
-	DECLARE_WRITE32_MEMBER(reg_w);
+	uint32_t reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_resolve_objects() override;

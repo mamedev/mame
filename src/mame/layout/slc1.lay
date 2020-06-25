@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here -->
+
 	<element name="g_led" defstate="0">
 		<disk>
 			<color red="0.0" green="0.75" blue="0.0" />

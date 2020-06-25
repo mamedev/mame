@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
   Missing Cartridges
 
@@ -142,7 +142,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="b-17 bomber.50" size="0x4000" crc="5f612afb" sha1="8b9b7d938590ede5fe651f165f405ffc9e41cabd"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="b-17 bomber.d0" size="0x2000" crc="3e932009" sha1="f0fcc934ba19a9e88b470a99a2d984820369c57c"/>
 			</dataarea>
 		</part>
@@ -240,7 +240,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="bomb squad.50" size="0x4000" crc="6f34430f" sha1="2c101e5241856691debc75b8012e35e696689c3d"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="bomb squad.d0" size="0x2000" crc="f99180e1" sha1="8d4a7ca33fc9ac5db8b1bdcf8806d899c898ae03"/>
 			</dataarea>
 		</part>
@@ -282,10 +282,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="bump n jump.50" size="0x4000" crc="6f667338" sha1="bdb657130dc9421fad842bbbc9ba7ac380ed0c86"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="bump n jump.d0" size="0x2000" crc="96265252" sha1="3919925e229e7ec57d726245f13c034f78b7d863"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="bump n jump.f0" size="0x2000" crc="038df644" sha1="cb60703bffcbfaec77098a9525136c32cbe260f8"/>
 			</dataarea>
 		</part>
@@ -354,7 +354,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="championship tennis.50" size="0x4000" crc="59d1eaf3" sha1="e836a9712238843a2e319d8d9618b58373ebacbd"/>
 			</dataarea>
-			<dataarea name="D000" size="0x4000">
+			<dataarea name="d000" size="0x4000">
 				<rom name="championship tennis.d0" size="0x4000" crc="c7dd6388" sha1="446514366065262ea9658e4ba399e84b2a249fb8"/>
 			</dataarea>
 		</part>
@@ -496,7 +496,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="green demo cart.50" size="0x4000" crc="52609fec" sha1="780183183d4d1fc1a23a9a0435788c3b750003d1"/>
 			</dataarea>
-			<dataarea name="D000" size="0x4000">
+			<dataarea name="d000" size="0x4000">
 				<rom name="green demo cart.d0" size="0x4000" crc="9b37afbe" sha1="ad5d06b040f2ddea2b4ab9f0e98d77ee7c310498"/>
 			</dataarea>
 		</part>
@@ -511,7 +511,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="international demo cart.50" size="0x4000" crc="5d575728" sha1="b663031fff53ff36942c5f325d25e913dd8367f1"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="international demo cart.d0" size="0x2000" crc="7a837bc9" sha1="dcc708901b391fc62bf799fa2e9db4551f93ba8f"/>
 			</dataarea>
 		</part>
@@ -763,7 +763,7 @@
 			<dataarea name="9000" size="0x6000">
 				<rom name="hover force.90" size="0x6000" crc="75d45110" sha1="f7d9d7c932be1cbf65dcfff0cfdab9e8b8f86661"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="hover force.d0" size="0x2000" crc="ed7c8fac" sha1="140986d67ba22e5c344e27ac74fa3e14f35097e7"/>
 			</dataarea>
 		</part>
@@ -883,10 +883,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="masters of the universe.50" size="0x4000" crc="143e8ca2" sha1="0f54ee719269ac96443ceab78f96224ce1516296"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="masters of the universe.d0" size="0x2000" crc="9c94b9f8" sha1="b18daefc51c709e7f0e20df0b937faded3a51fe9"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="masters of the universe.f0" size="0x2000" crc="7655e78a" sha1="c11533e250ab71ea27d0fec0225ddfbd69b17c41"/>
 			</dataarea>
 		</part>
@@ -972,7 +972,7 @@
 			<dataarea name="8800" size="0x6000">
 				<rom name="ms.88" size="0x6000" crc="714bc9b0" sha1="91d6ddd487fd8d5559a5abc3025af12f7aac889a"/>
 			</dataarea>
-			<dataarea name="D000" size="0x6000">
+			<dataarea name="d000" size="0x6000">
 				<rom name="ms.d0" size="0x6000" crc="467e8990" sha1="68be9156d29925575ac2838a2cd52e7c87ac568e"/>
 			</dataarea>
 		</part>
@@ -1040,7 +1040,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="pinball.50" size="0x4000" crc="eea1a9a7" sha1="89a725d2c404a27ce5f931a896c1f411ea6707bd"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="pinball.d0" size="0x2000" crc="ce21806d" sha1="532cb88d9a6797ca218c5364275cb57691eb1322"/>
 			</dataarea>
 		</part>
@@ -1518,10 +1518,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="thin ice.50" size="0x4000" crc="0d2e9e57" sha1="211c6012c7d1a1216282bead1b01c58101dd11be"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="thin ice.d0" size="0x2000" crc="ab5d151b" sha1="807276b1180f8c90e10f5ba4c1a7cdec2b08e458"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="thin ice.f0" size="0x2000" crc="bc59178e" sha1="72d7ccbc4e00becae6ad0887da76f583eafbb895"/>
 			</dataarea>
 		</part>
@@ -1537,10 +1537,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="thunder castle.50" size="0x4000" crc="f77a5612" sha1="9a0b509b328aa0e9feff16cc0ce42150c8619e6c"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="thunder castle.d0" size="0x2000" crc="b2e18fed" sha1="2a6ba9e022bd5684eb7c2c38bdc267dee3e5b85a"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="thunder castle.f0" size="0x2000" crc="f305da4e" sha1="9be241701112e5fe9a3cbec874e64826fd02e25c"/>
 			</dataarea>
 		</part>
@@ -1559,10 +1559,10 @@
 			<dataarea name="9000" size="0x4000">
 				<rom name="tower of doom.90" size="0x4000" crc="df232856" sha1="7a612c7316b6fa56171fcfc6243cae5b097429db"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="tower of doom.d0" size="0x2000" crc="67a60cee" sha1="3b30d44d0b61bedb167f517440eb2662a2df69cf"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="tower of doom.f0" size="0x2000" crc="f683cbe6" sha1="6bea72aab5398dd0cd5c13eab57fc2f9d23fb952"/>
 			</dataarea>
 		</part>
@@ -1636,7 +1636,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="tron - solar sailer.50" size="0x4000" crc="96b2681e" sha1="08880cf77ed6ab9a20b9a2161ac2bb998b42bc78"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="tron - solar sailer.d0" size="0x2000" crc="0e45e775" sha1="a6d317c3e342c53d6ddbbf7bd774a84a6b44dfb8"/>
 			</dataarea>
 		</part>
@@ -1717,7 +1717,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="vectron.50" size="0x4000" crc="9ac88229" sha1="937300637b3fba2126be4ee119b9f1e902b9f15b"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="vectron.d0" size="0x2000" crc="eeaed70a" sha1="ef78c2159eb810853ba0e2c2bd0f27d15de8f7c3"/>
 			</dataarea>
 		</part>
@@ -1760,10 +1760,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="world cup football.50" size="0x4000" crc="ec17636c" sha1="f96ce3b97e2250d5a37710c55f59e29319f2cf28"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="world cup football.d0" size="0x2000" crc="0d5be7c7" sha1="9a03652e525316ec9e889b0989d22a35fb6a8358"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="world cup football.f0" size="0x2000" crc="4bb2b777" sha1="82ae81c3eb35e7e7e53c4f81a86bdf5ac3d925ff"/>
 			</dataarea>
 		</part>
@@ -1825,7 +1825,7 @@
 			<dataarea name="7000" size="0x2000">
 				<rom name="ecs_rom.70" size="0x2000" crc="46bb1f48" sha1="eda44a8476fdada1ae90fba0d0287611e2efa074" />
 			</dataarea>
-			<dataarea name="E000" size="0x2000">
+			<dataarea name="e000" size="0x2000">
 				<rom name="ecs_rom.e0" size="0x2000" crc="c2ebcd90" sha1="b3c14955f56c57e6f0d8fbb695771946cfcf6582" />
 			</dataarea>
 			<dataarea name="ram" size="0x800">
@@ -1849,10 +1849,10 @@
 			<dataarea name="9000" size="16384">
 				<rom name="ad&amp;d tower of mystery.90" size="16384" crc="69ea443d" sha1="5348845531a326cf66991697c55efd9287b4874b" />
 			</dataarea>
-			<dataarea name="D000" size="8192">
+			<dataarea name="d000" size="8192">
 				<rom name="ad&amp;d tower of mystery.d0" size="8192" crc="35f27a1e" sha1="2cfdee85347c1226c48d15cdfd6b8819136db130" />
 			</dataarea>
-			<dataarea name="F000" size="8192">
+			<dataarea name="f000" size="8192">
 				<rom name="ad&amp;d tower of mystery.f0" size="8192" crc="c60bb7f6" sha1="9f53d330453807c18dcb4c0ed37ad0e77251213a" />
 			</dataarea>
 		</part>
@@ -1903,7 +1903,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="all star major league baseball.50" size="0x4000" crc="4a7e080a" sha1="ee2edd084c371d39dfcd725ed4aa5679e0c34a27"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="all star major league baseball.d0" size="0x2000" crc="31325854" sha1="fe7b5f3969e214ac23d20c5c137dc23f4515108d"/>
 			</dataarea>
 		</part>
@@ -1942,7 +1942,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="choplifter.50" size="0x4000" crc="b05cd576" sha1="61205b84aa3673d7a50da4f92ed0ed78e34ac951"/>
 			</dataarea>
-			<dataarea name="D000" size="0x3000">
+			<dataarea name="d000" size="0x3000">
 				<rom name="choplifter.d0" size="0x3000" crc="9b09666e" sha1="a024e5189e52ae07aa666fdcba612a6e9d7da4bc"/>
 			</dataarea>
 		</part>
@@ -2047,7 +2047,7 @@
 			<dataarea name="9000" size="24576">
 				<rom name="hover force_3d.90" size="24576" crc="1cf011ef" sha1="5cfc7a9bb09937d499b3cdfd5e84a3e975f543a6" />
 			</dataarea>
-			<dataarea name="D000" size="8192">
+			<dataarea name="d000" size="8192">
 				<rom name="hover force_3d.d0" size="8192" crc="d6e96ddc" sha1="2833c891028772d2a3acf23dce67e3cd597d486f" />
 			</dataarea>
 		</part>
@@ -2086,7 +2086,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="king of the mountain.50" size="0x4000" crc="3b689be9" sha1="794f7fbf5592a1c4962264db3b21d543763462ad"/>
 			</dataarea>
-			<dataarea name="D000" size="0x4000">
+			<dataarea name="d000" size="0x4000">
 				<rom name="king of the mountain.d0" size="0x4000" crc="45e7021d" sha1="3e6c17470ce5a92b28fa476c94ae0b84ab01e9c2"/>
 			</dataarea>
 		</part>
@@ -2125,7 +2125,7 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="league of light (prototype) (1983) (activision) [a1][!].50" size="16384" crc="19360442" sha1="9c36d2fec6c1c2bc01bb3863997e267f74325e06" />
+				<rom name="league of light (prototype) (1983) (activision) [a1].50" size="16384" crc="19360442" sha1="9c36d2fec6c1c2bc01bb3863997e267f74325e06" />
 			</dataarea>
 		</part>
 	</software>
@@ -2152,7 +2152,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="magic carousel.50" size="0x4000" crc="a1b985d2" sha1="2fdeb148f4376f1fa8eeff3a887465dfd8ffbb7d"/>
 			</dataarea>
-			<dataarea name="D000" size="0x4000">
+			<dataarea name="d000" size="0x4000">
 				<rom name="magic carousel.d0" size="0x4000" crc="86bc2541" sha1="997a9b9ecb88df4f90f1f8c3cbf817c057c4a933"/>
 			</dataarea>
 		</part>
@@ -2189,7 +2189,7 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="minotaur v2 (1981) (mattel) [!].50" size="16384" crc="5a4ce519" sha1="3f6939a673f0ace5d02d7ebb5d9e44dfd4d80413" />
+				<rom name="minotaur v2 (1981) (mattel).50" size="16384" crc="5a4ce519" sha1="3f6939a673f0ace5d02d7ebb5d9e44dfd4d80413" />
 			</dataarea>
 		</part>
 	</software>
@@ -2201,7 +2201,7 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="minotaur v1.1 (1981) (mattel) [!].50" size="16384" crc="6746607b" sha1="227d64182bc8adf46a17903c57c553353dd5e65a" />
+				<rom name="minotaur v1.1 (1981) (mattel).50" size="16384" crc="6746607b" sha1="227d64182bc8adf46a17903c57c553353dd5e65a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2230,7 +2230,7 @@
 			<dataarea name="5000" size="0x2000">
 				<rom name="blowout.50" size="0x2000" crc="f98d2330" sha1="20db3279fb6b792799722e5157c20d5b5227e059"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="blowout.d0" size="0x2000" crc="f257a189" sha1="3bfc013252af2b05c35be21b01ebaeadd5ce4d0b"/>
 			</dataarea>
 		</part>
@@ -2245,7 +2245,7 @@
 			<dataarea name="5000" size="0x2000">
 				<rom name="blowouta.50" size="0x2000" crc="25b7aa92" sha1="a232a43407bfa5781b30c5afded8df4af75e1788"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="blowouta.d0" size="0x2000" crc="b7e29589" sha1="4e1b1c2bf93952d52827b13752e61584a66672ea"/>
 			</dataarea>
 		</part>
@@ -2374,7 +2374,7 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="space shuttle.50" size="0x4000" crc="b16905d6" sha1="ec276c57a954c9bbe032ed166de660e77a7087be"/>
 			</dataarea>
-			<dataarea name="D000" size="0x4000">
+			<dataarea name="d000" size="0x4000">
 				<rom name="space shuttle.d0" size="0x4000" crc="4b497d5e" sha1="1bc4d9af71b01cae44099297aeb0f00056463b03"/>
 			</dataarea>
 		</part>
@@ -2389,10 +2389,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="super soccer.50" size="0x4000" crc="02a2fb6c" sha1="b7f75755f019f5f89f99942924bc22bb2c78bd1e"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="super soccer.d0" size="0x2000" crc="fd061aff" sha1="2425e6bb365d3d617e80e29580f098eeb5af779b"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="super soccer.f0" size="0x2000" crc="3348dc4b" sha1="c723206a8f5b8e445b7ca45ad4bf05d1b36a5ab9"/>
 			</dataarea>
 		</part>
@@ -2417,7 +2417,7 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="thin ice (prototype) (1983) (intv corp) [!].50" size="16384" crc="d6495910" sha1="e038024463fc6b5577983621d861152602b281a6" />
+				<rom name="thin ice (prototype) (1983) (intv corp).50" size="16384" crc="d6495910" sha1="e038024463fc6b5577983621d861152602b281a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -2431,10 +2431,10 @@
 			<dataarea name="5000" size="16384">
 				<rom name="yogi's frustration.50" size="16384" crc="7f4ba6ad" sha1="277a3ad0bdbad4fa8086655bb7508ff4bb0dde5c" />
 			</dataarea>
-			<dataarea name="D000" size="8192">
+			<dataarea name="d000" size="8192">
 				<rom name="yogi's frustration.d0" size="8192" crc="cf15e8c5" sha1="bbc103a8fc3d979a05dc42aa5b773355ab11df60" />
 			</dataarea>
-			<dataarea name="F000" size="8192">
+			<dataarea name="f000" size="8192">
 				<rom name="yogi's frustration.f0" size="8192" crc="2bc63759" sha1="463b7a8f2e139fcb8434c565b2b275b313a9d52e" />
 			</dataarea>
 		</part>
@@ -2494,10 +2494,10 @@
 			<dataarea name="9000" size="16384">
 				<rom name="dkinty.90" size="16384" crc="a927412f" sha1="acb7359db142c1b77c3a17d1547ecc8a259d3f02" />
 			</dataarea>
-			<dataarea name="D000" size="8192">
+			<dataarea name="d000" size="8192">
 				<rom name="dkinty.d0" size="8192" crc="642d6557" sha1="5a2fa6bd9a6c173581da5d08699a44198da0231c" />
 			</dataarea>
-			<dataarea name="F000" size="8192">
+			<dataarea name="f000" size="8192">
 				<rom name="dkinty.f0" size="8192" crc="3e39ee68" sha1="c266e320a9b2266c7db44bc0965e2b68ffa18e27" />
 			</dataarea>
 		</part>
@@ -2551,10 +2551,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="samegame and robots.50" size="0x4000" crc="9092f2e6" sha1="0c29a0b4de011874f27c517f1f9ef16b16fdb4fc"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="samegame and robots.d0" size="0x2000" crc="675698d3" sha1="dbcc9090a3614a86dfa9747079857fe6e0c65b97"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="samegame and robots.f0" size="0x2000" crc="1a198ae9" sha1="8553cdaae55e2c0d579a0f06f857c79323d7efb6"/>
 			</dataarea>
 		</part>
@@ -2567,7 +2567,7 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="zzzzz! spina the bee.50" size="16384" crc="01efa214" sha1="1a70d73512da0f78957bbd74b14077303e4fb905" />
+				<rom name="zzzzz spina the bee.50" size="16384" crc="01efa214" sha1="1a70d73512da0f78957bbd74b14077303e4fb905" />
 			</dataarea>
 		</part>
 	</software>
@@ -2594,10 +2594,10 @@
 			<dataarea name="5000" size="16384">
 				<rom name="space patrol teaser edition.50" size="16384" crc="3c3d75bf" sha1="761e379d43ba1551198dab8199764356fc615b1b" />
 			</dataarea>
-			<dataarea name="D000" size="8192">
+			<dataarea name="d000" size="8192">
 				<rom name="space patrol teaser edition.d0" size="8192" crc="04101767" sha1="54f8dfe0d5413097c280f72b45f6684bc9e1a3d5" />
 			</dataarea>
-			<dataarea name="F000" size="8192">
+			<dataarea name="f000" size="8192">
 				<rom name="space patrol teaser edition.f0" size="8192" crc="a6950b88" sha1="27891c3026f0a1fb34a13438502960485d33b24f" />
 			</dataarea>
 		</part>
@@ -2613,10 +2613,10 @@
 			<dataarea name="5000" size="0x4000">
 				<rom name="stonix.50" size="0x4000" crc="9af3ca58" sha1="46302bcdc15afc28968649cbdeb804e0190c251e"/>
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
+			<dataarea name="d000" size="0x2000">
 				<rom name="stonix.d0" size="0x2000" crc="9c5c4301" sha1="3eb7cb8a62080ff8ac2ac83c888cf5155a97d991"/>
 			</dataarea>
-			<dataarea name="F000" size="0x2000">
+			<dataarea name="f000" size="0x2000">
 				<rom name="stonix.f0" size="0x2000" crc="baea7cb2" sha1="83a49852a6612be840e8ae75302784b99251946f"/>
 			</dataarea>
 		</part>
@@ -2631,7 +2631,7 @@
 			<dataarea name="5000" size="16384">
 				<rom name="burgrtm2.50" size="16384" crc="54848723" sha1="e791fe7ae0af267689fc831e60c407c02c5ee280" />
 			</dataarea>
-			<dataarea name="D000" size="24576">
+			<dataarea name="d000" size="24576">
 				<rom name="burgrtm2.d0" size="24576" crc="53feb216" sha1="d462c44ddbe91fdbfad8ef26658dc07cea4a6dbc" />
 			</dataarea>
 		</part>
@@ -2662,7 +2662,7 @@
 			<dataarea name="5000" size="16384">
 				<rom name="king of the mountain (alt).50" size="16384" crc="3634697b" sha1="c20c17bd68e92b7f81a522c4c1d0dd4ae8926bdd" />
 			</dataarea>
-			<dataarea name="D000" size="16896">
+			<dataarea name="d000" size="16896">
 				<rom name="king of the mountain (alt).d0" size="16896" crc="2c7f5de1" sha1="c86a04a969542a08b46ef50dd30c649ad6ef5b47" />
 			</dataarea>
 		</part>
@@ -2680,7 +2680,7 @@
 			<dataarea name="5000" size="16384">
 				<rom name="quest.50" size="16384" crc="6d5013df" sha1="c1535a9dd54d621ca3d44fd9ca1b5d5c745eb3ad" />
 			</dataarea>
-			<dataarea name="D000" size="16384">
+			<dataarea name="d000" size="16384">
 				<rom name="quest.d0" size="16384" crc="869ce44f" sha1="43196b47bde3fccf281c355f2966c71099a6a436" />
 			</dataarea>
 		</part>

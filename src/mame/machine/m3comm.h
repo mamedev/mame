@@ -21,21 +21,21 @@ public:
 
 	void m3_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	uint16_t ctrl_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(ioregs_r);
-	DECLARE_WRITE16_MEMBER(ioregs_w);
+	uint16_t ioregs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(m3_m68k_ram_r);
-	DECLARE_WRITE16_MEMBER(m3_m68k_ram_w);
-	DECLARE_READ8_MEMBER(m3_comm_ram_r);
-	DECLARE_WRITE8_MEMBER(m3_comm_ram_w);
-	DECLARE_READ16_MEMBER(m3_ioregs_r);
-	DECLARE_WRITE16_MEMBER(m3_ioregs_w);
+	uint16_t m3_m68k_ram_r(offs_t offset);
+	void m3_m68k_ram_w(offs_t offset, uint16_t data);
+	uint8_t m3_comm_ram_r(offs_t offset);
+	void m3_comm_ram_w(offs_t offset, uint8_t data);
+	uint16_t m3_ioregs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void m3_ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(naomi_r);
-	DECLARE_WRITE16_MEMBER(naomi_w);
+	uint16_t naomi_r(offs_t offset);
+	void naomi_w(offs_t offset, uint16_t data);
 
 	void m3comm_mem(address_map &map);
 protected:

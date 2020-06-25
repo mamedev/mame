@@ -98,12 +98,12 @@ void softbox_device::softbox_io(address_map &map)
 //  I8255A 0 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_device::ppi0_pa_r )
+uint8_t softbox_device::ppi0_pa_r()
 {
-	return m_bus->read_dio() ^ 0xff;
+	return m_bus->dio_r() ^ 0xff;
 }
 
-WRITE8_MEMBER( softbox_device::ppi0_pb_w )
+void softbox_device::ppi0_pb_w(uint8_t data)
 {
 	m_bus->dio_w(this, data ^ 0xff);
 }
@@ -112,7 +112,7 @@ WRITE8_MEMBER( softbox_device::ppi0_pb_w )
 //  I8255A 1 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_device::ppi1_pa_r )
+uint8_t softbox_device::ppi1_pa_r()
 {
 	/*
 
@@ -143,7 +143,7 @@ READ8_MEMBER( softbox_device::ppi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_device::ppi1_pb_w )
+void softbox_device::ppi1_pb_w(uint8_t data)
 {
 	/*
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER( softbox_device::ppi1_pb_w )
 	m_bus->ifc_w(this, !BIT(data, 7));
 }
 
-READ8_MEMBER( softbox_device::ppi1_pc_r )
+uint8_t softbox_device::ppi1_pc_r()
 {
 	/*
 
@@ -187,7 +187,7 @@ READ8_MEMBER( softbox_device::ppi1_pc_r )
 
 	*/
 
-	uint8_t status = m_hdc->status_r(space, 0);
+	uint8_t status = m_hdc->status_r();
 	uint8_t data = 0;
 
 	data |= (status & corvus_hdc_device::CONTROLLER_BUSY) ? 0 : 0x10;
@@ -196,7 +196,7 @@ READ8_MEMBER( softbox_device::ppi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_device::ppi1_pc_w )
+void softbox_device::ppi1_pc_w(uint8_t data)
 {
 	/*
 
@@ -376,7 +376,7 @@ void softbox_device::ieee488_ifc(int state)
 //  dbrg_w - baud rate selection
 //-------------------------------------------------
 
-WRITE8_MEMBER( softbox_device::dbrg_w )
+void softbox_device::dbrg_w(uint8_t data)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);

@@ -66,9 +66,6 @@ dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, co
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_inst_space(nullptr)
-	, m_data_space(nullptr)
-	, m_inst_cache(nullptr)
 	, m_birq_out_cb(*this)
 	, m_data_out_cb(*this)
 	, m_data_dly_cb(*this)
@@ -174,9 +171,9 @@ void dp8344_device::device_resolve_objects()
 void dp8344_device::device_start()
 {
 	// get memory spaces
-	m_inst_space = &space(AS_PROGRAM);
-	m_data_space = &space(AS_DATA);
-	m_inst_cache = m_inst_space->cache<1, -1, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_inst_cache);
+	space(AS_PROGRAM).specific(m_inst_space);
+	space(AS_DATA).specific(m_data_space);
 
 	set_icountptr(m_icount);
 
@@ -655,7 +652,7 @@ u8 dp8344_device::rotate_right(u8 data, u8 b)
 u8 dp8344_device::add_nzcv(u8 s1, u8 s2, bool carry_in)
 {
 	s16 result = s8(s1) + s8(s2) + (carry_in ? 1 : 0);
-	if (result >= 128 && result < -128)
+	if (result >= 128 || result < -128)
 		m_ccr |= 0x04;
 	else
 		m_ccr &= 0xfb;
@@ -674,7 +671,7 @@ u8 dp8344_device::add_nzcv(u8 s1, u8 s2, bool carry_in)
 u8 dp8344_device::sub_nzcv(u8 s1, u8 s2, bool carry_in)
 {
 	s16 result = s8(s1) - s8(s2) - (carry_in ? 1 : 0);
-	if (result >= 128 && result < -128)
+	if (result >= 128 || result < -128)
 		m_ccr |= 0x04;
 	else
 		m_ccr &= 0xfb;
@@ -1490,7 +1487,7 @@ void dp8344_device::execute_set_input(int irqline, int state)
 
 void dp8344_device::prefetch_instruction()
 {
-	m_latched_instr = m_inst_cache->read_word(m_pc);
+	m_latched_instr = m_inst_cache.read_word(m_pc);
 }
 
 
@@ -1844,7 +1841,7 @@ void dp8344_device::data_write()
 		break;
 	}
 
-	m_data_space->write_byte(m_data_address, m_source_data);
+	m_data_space.write_byte(m_data_address, m_source_data);
 }
 
 
@@ -1855,7 +1852,7 @@ void dp8344_device::data_write()
 
 void dp8344_device::data_read()
 {
-	write_register(m_latched_instr & ((m_latched_instr & 0xf000) == 0x9000 ? 0x000f : 0x001f), m_data_space->read_byte(m_data_address));
+	write_register(m_latched_instr & ((m_latched_instr & 0xf000) == 0x9000 ? 0x000f : 0x001f), m_data_space.read_byte(m_data_address));
 }
 
 
@@ -2086,13 +2083,13 @@ u8 dp8344_device::remote_read(offs_t offset)
 	{
 	case 0x00:
 		// Read from data memory
-		data = m_data_space->read_byte(offset);
+		data = m_data_space.read_byte(offset);
 		break;
 
 	case 0x01:
 		// Read from instruction memory
 		if (!m_hib && !machine().side_effects_disabled())
-			m_latched_instr = m_inst_space->read_word(m_pc);
+			m_latched_instr = m_inst_space.read_word(m_pc);
 		data = m_hib ? m_latched_instr >> 8 : m_latched_instr & 0xff;
 		if (!machine().side_effects_disabled())
 		{
@@ -2133,7 +2130,7 @@ void dp8344_device::remote_write(offs_t offset, u8 data)
 	{
 	case 0x00:
 		// Write to data memory
-		m_data_space->write_byte(offset, data);
+		m_data_space.write_byte(offset, data);
 		break;
 
 	case 0x01:
@@ -2146,7 +2143,7 @@ void dp8344_device::remote_write(offs_t offset, u8 data)
 		{
 			m_hib = !m_hib;
 			if (!m_hib)
-				m_inst_space->write_word(m_pc++, m_latched_instr);
+				m_inst_space.write_word(m_pc++, m_latched_instr);
 		}
 		break;
 

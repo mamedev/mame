@@ -1729,7 +1729,7 @@ WRITE_LINE_MEMBER(newport_base_device::update_screen_size)
 	m_screen->set_visarea_full();
 }
 
-READ64_MEMBER(newport_base_device::rex3_r)
+uint64_t newport_base_device::rex3_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0;
 	switch (offset & ~(0x800/8))
@@ -3557,7 +3557,7 @@ void newport_base_device::write_y_end(int32_t val)
 	m_rex3.m_xy_end_i = (m_rex3.m_xy_end_i & 0xffff0000) | (uint16_t)m_rex3.m_y_end_i;
 }
 
-WRITE64_MEMBER(newport_base_device::rex3_w)
+void newport_base_device::rex3_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 #if ENABLE_NEWVIEW_LOG
 	if (m_newview_log != nullptr)
@@ -4434,11 +4434,6 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 	{
 		do_rex3_command();
 	}
-}
-
-void newport_base_device::install_device()
-{
-	m_gio64->install_graphics(*this, &newport_base_device::mem_map);
 }
 
 void newport_base_device::device_add_mconfig(machine_config &config)

@@ -169,7 +169,7 @@ public:
 	vsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
+		m_nmi_on(*this, "nmi_on"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
 		m_board(*this, "board"),
@@ -189,7 +189,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
+	required_device<timer_device> m_nmi_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
 	required_device<sensorboard_device> m_board;
@@ -202,22 +202,22 @@ private:
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
-	DECLARE_READ8_MEMBER(main_io_trampoline_r);
-	DECLARE_WRITE8_MEMBER(main_io_trampoline_w);
+	u8 main_io_trampoline_r(offs_t offset);
+	void main_io_trampoline_w(offs_t offset, u8 data);
 
 	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(nmi_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(speech_r);
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-	DECLARE_READ8_MEMBER(pio_porta_r);
-	DECLARE_READ8_MEMBER(pio_portb_r);
-	DECLARE_WRITE8_MEMBER(pio_portb_w);
+	u8 speech_r(offs_t offset);
+	void ppi_porta_w(u8 data);
+	void ppi_portb_w(u8 data);
+	void ppi_portc_w(u8 data);
+	u8 pio_porta_r();
+	u8 pio_portb_r();
+	void pio_portb_w(u8 data);
 
 	u8 m_led_data;
 	u8 m_7seg_data;
@@ -260,7 +260,7 @@ void vsc_state::update_display()
 	m_display->matrix(m_cb_mux, m_led_data << 8 | m_7seg_data);
 }
 
-READ8_MEMBER(vsc_state::speech_r)
+u8 vsc_state::speech_r(offs_t offset)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -268,24 +268,24 @@ READ8_MEMBER(vsc_state::speech_r)
 
 // I8255 PPI
 
-WRITE8_MEMBER(vsc_state::ppi_porta_w)
+void vsc_state::ppi_porta_w(u8 data)
 {
 	// d0-d5: TSI C0-C5
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
 	m_7seg_data = bitswap<8>(data,7,6,2,1,0,5,4,3);
 	update_display();
 }
 
-WRITE8_MEMBER(vsc_state::ppi_portb_w)
+void vsc_state::ppi_portb_w(u8 data)
 {
 	// d0-d7: led row data
 	m_led_data = data;
 	update_display();
 }
 
-WRITE8_MEMBER(vsc_state::ppi_portc_w)
+void vsc_state::ppi_portc_w(u8 data)
 {
 	// d0-d3: select digits
 	// d0-d7: select leds, chessboard input mux
@@ -296,7 +296,7 @@ WRITE8_MEMBER(vsc_state::ppi_portc_w)
 
 // Z80 PIO
 
-READ8_MEMBER(vsc_state::pio_porta_r)
+u8 vsc_state::pio_porta_r()
 {
 	u8 data = 0;
 
@@ -318,7 +318,7 @@ READ8_MEMBER(vsc_state::pio_porta_r)
 	return data;
 }
 
-READ8_MEMBER(vsc_state::pio_portb_r)
+u8 vsc_state::pio_portb_r()
 {
 	u8 data = 0;
 
@@ -328,7 +328,7 @@ READ8_MEMBER(vsc_state::pio_portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(vsc_state::pio_portb_w)
+void vsc_state::pio_portb_w(u8 data)
 {
 	// d0,d1: keypad input mux
 	// d5: enable language switch
@@ -361,7 +361,7 @@ void vsc_state::main_map(address_map &map)
 }
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
-READ8_MEMBER(vsc_state::main_io_trampoline_r)
+u8 vsc_state::main_io_trampoline_r(offs_t offset)
 {
 	u8 data = 0xff; // open bus
 	if (~offset & 4)
@@ -372,7 +372,7 @@ READ8_MEMBER(vsc_state::main_io_trampoline_r)
 	return data;
 }
 
-WRITE8_MEMBER(vsc_state::main_io_trampoline_w)
+void vsc_state::main_io_trampoline_w(offs_t offset, u8 data)
 {
 	if (~offset & 4)
 		m_ppi8255->write(offset & 3, data);
@@ -426,10 +426,10 @@ void vsc_state::vsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
 
-	const attotime irq_period = attotime::from_hz(600); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(vsc_state::irq_on<INPUT_LINE_NMI>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
-	TIMER(config, "irq_off").configure_periodic(FUNC(vsc_state::irq_off<INPUT_LINE_NMI>), irq_period);
+	const attotime nmi_period = attotime::from_hz(600); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
+	TIMER(config, m_nmi_on).configure_periodic(FUNC(vsc_state::nmi_on<INPUT_LINE_NMI>), nmi_period);
+	m_nmi_on->set_start_delay(nmi_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
+	TIMER(config, "nmi_off").configure_periodic(FUNC(vsc_state::nmi_off<INPUT_LINE_NMI>), nmi_period);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(vsc_state::ppi_porta_w));

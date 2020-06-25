@@ -233,9 +233,10 @@ protected:
 	unsigned m_fastROM;       /* SNES specific */
 	unsigned m_ir;            /* Instruction Register */
 	unsigned m_irq_delay;     /* delay 1 instruction before checking irq */
-	address_space *m_data_space;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_program_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_opcode;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+
 	unsigned m_stopped;       /* Sets how the CPU is stopped */
 	const opcode_func* m_opcodes;
 	get_reg_func m_get_reg;
@@ -1539,21 +1540,28 @@ protected:
 };
 
 
+class g65802_device : public g65816_device
+{
+public:
+	g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class _5a22_device : public g65816_device
 {
 public:
 	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( wrmpya_w );
-	DECLARE_WRITE8_MEMBER( wrmpyb_w );
-	DECLARE_WRITE8_MEMBER( wrdivl_w );
-	DECLARE_WRITE8_MEMBER( wrdivh_w );
-	DECLARE_WRITE8_MEMBER( wrdvdd_w );
-	DECLARE_WRITE8_MEMBER( memsel_w );
-	DECLARE_READ8_MEMBER( rddivl_r );
-	DECLARE_READ8_MEMBER( rddivh_r );
-	DECLARE_READ8_MEMBER( rdmpyl_r );
-	DECLARE_READ8_MEMBER( rdmpyh_r );
+	void wrmpya_w(uint8_t data);
+	void wrmpyb_w(uint8_t data);
+	void wrdivl_w(uint8_t data);
+	void wrdivh_w(uint8_t data);
+	void wrdvdd_w(uint8_t data);
+	void memsel_w(uint8_t data);
+	uint8_t rddivl_r();
+	uint8_t rddivh_r();
+	uint8_t rdmpyl_r();
+	uint8_t rdmpyh_r();
 
 	void set_5a22_map();
 
@@ -1570,6 +1578,7 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(G65816, g65816_device)
+DECLARE_DEVICE_TYPE(G65802, g65802_device)
 DECLARE_DEVICE_TYPE(_5A22,  _5a22_device)
 
 

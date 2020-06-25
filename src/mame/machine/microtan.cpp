@@ -113,20 +113,20 @@ static const char keyboard[8][9][8] = {
 };
 
 
-READ8_MEMBER(microtan_state::sound_r)
+uint8_t microtan_state::sound_r()
 {
 	int data = 0xff;
 	LOG("sound_r: -> %02x\n", data);
 	return data;
 }
 
-WRITE8_MEMBER(microtan_state::sound_w)
+void microtan_state::sound_w(uint8_t data)
 {
 	LOG("sound_w: <- %02x\n", data);
 }
 
 
-READ8_MEMBER(microtan_state::bffx_r)
+uint8_t microtan_state::bffx_r(offs_t offset)
 {
 	int data = 0xff;
 	switch( offset & 3 )
@@ -172,7 +172,7 @@ TIMER_CALLBACK_MEMBER(microtan_state::pulse_nmi)
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(microtan_state::bffx_w)
+void microtan_state::bffx_w(offs_t offset, uint8_t data)
 {
 	switch( offset & 3 )
 	{
@@ -197,7 +197,7 @@ WRITE8_MEMBER(microtan_state::bffx_w)
 	}
 }
 
-READ8_MEMBER(mt6809_state::keyboard_r)
+uint8_t mt6809_state::keyboard_r()
 {
 	uint8_t data = m_keyboard_ascii;
 
@@ -309,7 +309,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
 }
 
 
-WRITE8_MEMBER(microtan_state::pgm_chargen_w)
+void microtan_state::pgm_chargen_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x200)
 	{
@@ -660,10 +660,10 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		for (int i = 0; i < 16; i++ )
 		{
 			if (i < 4)
-				bffx_w(space, i, snapshot_buff[base++]);
+				bffx_w(i, snapshot_buff[base++]);
 		}
 
-		sound_w(space, 0, snapshot_buff[base++]);
+		sound_w(snapshot_buff[base++]);
 		m_chunky_graphics = snapshot_buff[base++];
 
 		/* first set of AY8910 registers */

@@ -5,10 +5,22 @@
 
 Fidelity's 1st generation chess computers:
 - *Chess Challenger
-- Chess Challenger 3
-- *Chess Challenger 10 (UCC10)
+- Chess Challenger (upgraded version) - more commonly known as CC3
+- *Chess Challenger (model UCC10) - more commonly known as CC10 ver. C
 
 * denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
+
+The first generation of chesscomputers didn't have an electronic chessboard.
+Some of them required a separate chessboard, others had a small chessboard
+attached to it (the latter applies to Fidelity).
+
+For those familiar with MAME's sensorboard interface and really want to use it
+for the old keypad-input machines, there is an awkward workaround: Start a 2nd
+instance of MAME with -sound none and load mephisto3 or mephisto2e, turn off
+the ESB 6000 board in the machine configuration, and set the video options to
+"Internal Layout (Board)". The same thing can be done with ccmk6.
+
+That being said, it's probably a better idea to use a real chessboard.
 
 *******************************************************************************
 
@@ -30,13 +42,21 @@ CC1 hardware overview:
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
 - 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
 
-Chess Challenger 3 is on the same hardware, but with double ROM size, and they
-corrected the reversed chess notation. It was also offered as an upgrade to CC1.
-PCB label P179 C-3 9.77.
+Chess Challenger (upgraded version) released a few months later is on the same
+hardware, but with double the ROM size, and they corrected the reversed chess
+notation. It was also offered as an upgrade to CC1. PCB label P179 C-3 9.77.
 
-Chess Challenger 10 version 'C'(model UCC10) is on (nearly) the same PCB too,
-same label as CC3, with a small daughterboard for 8KB ROM. Again, it was also
-offered as an upgrade to CC1, or CC3.
+Chess Challenger (model UCC10) is on nearly the same PCB too, same label as CC3,
+with a small daughterboard for 8KB ROM. Again, it was also offered as an upgrade
+to CC1, or CC3.
+
+Note that although these 2 newer versions are known as "Chess Challenger 3" and
+"Chess Challeger 10 C" nowadays, those are not the official titles. CC3 simply
+says "upgraded version" on the 1st page of the manual (even the newly sold ones,
+not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Consumenta
+Computer(reseller of Fidelity chesscomputers) did name it Chess-Challenger 10 C.
+Officially, Fidelity started adding level numbers to their chesscomputer titles
+with CCX and CC7.
 
 ******************************************************************************/
 
@@ -89,9 +109,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(ppi_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	u8 ppi_porta_r();
+	void ppi_portb_w(u8 data);
+	void ppi_portc_w(u8 data);
 
 	u8 m_led_select;
 	u8 m_7seg_data;
@@ -122,7 +142,7 @@ void cc1_state::update_display()
 	m_display->matrix(m_led_select, m_7seg_data);
 }
 
-READ8_MEMBER(cc1_state::ppi_porta_r)
+u8 cc1_state::ppi_porta_r()
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
@@ -135,14 +155,14 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portb_w)
+void cc1_state::ppi_portb_w(u8 data)
 {
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portc_w)
+void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
 	if (~data & m_led_select & 0x40 && !m_delay->enabled())
@@ -258,7 +278,6 @@ ROM_START( cc1 )
 	ROM_LOAD( "d2316ac_011", 0x0000, 0x0800, BAD_DUMP CRC(e27f9816) SHA1(ad9881b3bf8341829a27e86de27805fc2ccb5f7d) ) // A4 line was broken
 ROM_END
 
-
 ROM_START( cc3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2332c_011", 0x0000, 0x1000, CRC(51cf4682) SHA1(197374c633a0bf1a9b7ea51a72dc2b89a6c9c508) )
@@ -274,5 +293,4 @@ ROM_END
 
 //    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1977, cc1,  0,      0, cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-
-CONS( 1977, cc3,  0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger 3", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1977, cc3,  0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3

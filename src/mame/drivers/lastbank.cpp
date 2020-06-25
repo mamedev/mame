@@ -54,17 +54,16 @@ private:
 	required_device<es8712_device> m_essnd;
 
 	virtual void machine_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	uint8_t m_mux_data;
 	uint8_t m_sound_flags;
 
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(mux_0_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(sound_flags_w);
+	uint8_t mux_0_r();
+	void mux_w(uint8_t data);
+	void sound_flags_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank_audio_io(address_map &map);
@@ -79,15 +78,6 @@ void lastbank_state::machine_start()
 	save_item(NAME(m_sound_flags));
 }
 
-uint32_t lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	m_vdp->screen_update(screen, bitmap, cliprect);
-
-	return 0;
-}
-
 WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 {
 	if (state)
@@ -97,7 +87,7 @@ WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 }
 
 
-READ8_MEMBER(lastbank_state::mux_0_r)
+uint8_t lastbank_state::mux_0_r()
 {
 	const char *const keynames[2][5] = {
 		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
@@ -116,7 +106,7 @@ READ8_MEMBER(lastbank_state::mux_0_r)
 	return res;
 }
 
-WRITE8_MEMBER(lastbank_state::output_w)
+void lastbank_state::output_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -134,12 +124,12 @@ WRITE8_MEMBER(lastbank_state::output_w)
 	}
 }
 
-WRITE8_MEMBER(lastbank_state::mux_w)
+void lastbank_state::mux_w(uint8_t data)
 {
 	m_mux_data = data;
 }
 
-WRITE8_MEMBER(lastbank_state::sound_flags_w)
+void lastbank_state::sound_flags_w(uint8_t data)
 {
 	m_sound_flags = data;
 	if (!BIT(data, 4))
@@ -424,11 +414,12 @@ void lastbank_state::lastbank(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lastbank_state::screen_update));
+	screen.set_screen_update("tc0091lvc", FUNC(tc0091lvc_device::screen_update));
 	screen.screen_vblank().set(FUNC(lastbank_state::screen_vblank));
 	screen.set_palette("tc0091lvc:palette");
 
 	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_tilemap_xoffs(0,192); // TODO: correct?
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 

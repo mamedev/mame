@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="cdi" description="CD-i CD-ROMs">
 
 <!--
@@ -18,7 +21,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3rd degree (1993)(philips)(us)[!]" sha1="2cc0223253e2d2454bafa56e905643905a8af161"/>
+				<disk name="3rd degree (1993)(philips)(us)" sha1="2cc0223253e2d2454bafa56e905643905a8af161"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44,13 +47,13 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[!][the game][dvc][8110033v113 50404169 02]" sha1="d1ef3e8c9f05f6d928cb459c116e422b391d6758"/>
+				<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[the game][dvc][8110033v113 50404169 02]" sha1="d1ef3e8c9f05f6d928cb459c116e422b391d6758"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Music" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
+				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 			</diskarea>
 		</part>
 	</software>
@@ -76,13 +79,13 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[!][the game][dvc][8111033v113 50404169 01]" sha1="f08256a2719f0f4f3010cb95d3f8e2c3ff63d0fe"/>
+				<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[the game][dvc][8111033v113 50404169 01]" sha1="f08256a2719f0f4f3010cb95d3f8e2c3ff63d0fe"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Music" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
+				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 			</diskarea>
 		</part>
 	</software>
@@ -108,13 +111,13 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="Das Spiel" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(de)(disc 1 of 2)[!][das spiel][dvc]" sha1="d73d783fc580e927653077afa4867d3316f77674"/>
+				<disk name="7th guest, the (1994)(philips)(de)(disc 1 of 2)[das spiel][dvc]" sha1="d73d783fc580e927653077afa4867d3316f77674"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="Die Musik" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
+				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 			</diskarea>
 		</part>
 	</software>
@@ -146,7 +149,7 @@
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Music (?)" />
 			<diskarea name="cdrom">
-				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
+				<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 			</diskarea>
 		</part>
 	</software>
@@ -178,7 +181,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a great day at the races (1993)(philips)(us)[!]" sha1="ffb3909edbf80770552dd817a75b69a8592f33a8"/>
+				<disk name="a great day at the races (1993)(philips)(us)" sha1="ffb3909edbf80770552dd817a75b69a8592f33a8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -195,7 +198,7 @@
 		<publisher>Titus</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="affaire morlov, l' (1996)(titus)(eu)(en-fr)[!][the morlov affair][cd-i-pc]" sha1="3325ce50053fcfe32386224013051f9a483c9aea"/>
+				<disk name="affaire morlov, l' (1996)(titus)(eu)(en-fr)[the morlov affair][cd-i-pc]" sha1="3325ce50053fcfe32386224013051f9a483c9aea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -211,7 +214,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alice in wonderland (1992)(philips)(us)[!]" sha1="4f7089c5bcc5311c75480f45daf9f437e4a80836"/>
+				<disk name="alice in wonderland (1992)(philips)(us)" sha1="4f7089c5bcc5311c75480f45daf9f437e4a80836"/>
 			</diskarea>
 		</part>
 	</software>
@@ -259,7 +262,7 @@
 		<publisher>Namco ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arcade classics (1996)(namco - philips)(eu)[!][compilation]" sha1="f8f6305fdd06703cb645bf2282e6288e75bc57f4"/>
+				<disk name="arcade classics (1996)(namco - philips)(eu)[compilation]" sha1="f8f6305fdd06703cb645bf2282e6288e75bc57f4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -275,7 +278,7 @@
 		<publisher>Dutch Electronic Publishers</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="archeon cd-i quiz (1994)(dutch electronic publishers)(nl)(en-nl)[!]" sha1="f85cfe8b15a86c163b5ccce9312640035d2f37cf"/>
+				<disk name="archeon cd-i quiz (1994)(dutch electronic publishers)(nl)(en-nl)" sha1="f85cfe8b15a86c163b5ccce9312640035d2f37cf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -291,7 +294,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asterix - caesar's challenge v3.9 (1995)(pathe - philips)(eu)[!]" sha1="3777794ec0639337600d54e35d8db6923c394f39"/>
+				<disk name="asterix - caesar's challenge v3.9 (1995)(pathe - philips)(eu)" sha1="3777794ec0639337600d54e35d8db6923c394f39"/>
 			</diskarea>
 		</part>
 	</software>
@@ -307,7 +310,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asterix - de uitdaging van caesar v3.9 (1995)(pathe - philips)(nl)[!]" sha1="0290879cd9965aebdc2d0132d6ec7e43656873c6"/>
+				<disk name="asterix - de uitdaging van caesar v3.9 (1995)(pathe - philips)(nl)" sha1="0290879cd9965aebdc2d0132d6ec7e43656873c6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -323,7 +326,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asterix - die grosse reise v3.9 (1995)(pathe - philips)(de)[!]" sha1="96410b35ab85ff47eabfa5b3cbb70f3946bd518b"/>
+				<disk name="asterix - die grosse reise v3.9 (1995)(pathe - philips)(de)" sha1="96410b35ab85ff47eabfa5b3cbb70f3946bd518b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -339,7 +342,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asterix - el desafio de cesar v3.9 (1995)(pathe - philips)(es)[!]" sha1="fe8ad664dbd702cb406a17f1a92134af5e5335e5"/>
+				<disk name="asterix - el desafio de cesar v3.9 (1995)(pathe - philips)(es)" sha1="fe8ad664dbd702cb406a17f1a92134af5e5335e5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -404,7 +407,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="axis and allies (1994)(philips)(us)[!]" sha1="a54f59e8182b0b260639702404551d7775551089"/>
+				<disk name="axis and allies (1994)(philips)(us)" sha1="a54f59e8182b0b260639702404551d7775551089"/>
 			</diskarea>
 		</part>
 	</software>
@@ -420,7 +423,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="backgammon (1992)(philips)(eu-us)[!]" sha1="b40690ce0eb3ee2ab9a273d24c16a319a9bc02ba"/>
+				<disk name="backgammon (1992)(philips)(eu-us)" sha1="b40690ce0eb3ee2ab9a273d24c16a319a9bc02ba"/>
 			</diskarea>
 		</part>
 	</software>
@@ -436,7 +439,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battleship (1991)(philips)(eu-us)[!]" sha1="86eace40e9ae0bb7757eda1f24af1f37cd976c36"/>
+				<disk name="battleship (1991)(philips)(eu-us)" sha1="86eace40e9ae0bb7757eda1f24af1f37cd976c36"/>
 			</diskarea>
 		</part>
 	</software>
@@ -469,7 +472,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="burn-cycle (1994)(philips)(eu)[!]" sha1="0f66e0ad6dc73a0e3f3a6533a43e52b14fed7470"/>
+				<disk name="burn-cycle (1994)(philips)(eu)" sha1="0f66e0ad6dc73a0e3f3a6533a43e52b14fed7470"/>
 			</diskarea>
 		</part>
 	</software>
@@ -485,7 +488,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="burn-cycle (1994)(philips)(es)[!]" sha1="1ab708d7ce2b2f31ce9ba59a29e4ec8c2686129e"/>
+				<disk name="burn-cycle (1994)(philips)(es)" sha1="1ab708d7ce2b2f31ce9ba59a29e4ec8c2686129e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -501,7 +504,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="burn-cycle (1995)(philips)(de)[!]" sha1="fcac5add4b00945db5e6519888d951162eb59f14"/>
+				<disk name="burn-cycle (1995)(philips)(de)" sha1="fcac5add4b00945db5e6519888d951162eb59f14"/>
 			</diskarea>
 		</part>
 	</software>
@@ -550,7 +553,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="caesars world of boxing (1993)(philips)(eu)[!][dvc]" sha1="dc7975a8e8c8230215e18e5444a030a9cce36bee"/>
+				<disk name="caesars world of boxing (1993)(philips)(eu)[dvc]" sha1="dc7975a8e8c8230215e18e5444a030a9cce36bee"/>
 			</diskarea>
 		</part>
 	</software>
@@ -598,7 +601,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="caesars world of gambling (1992)(philips)(eu-us)[!]" sha1="8265630e29394ed077a268bea08972d53639ebe0"/>
+				<disk name="caesars world of gambling (1992)(philips)(eu-us)" sha1="8265630e29394ed077a268bea08972d53639ebe0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -614,7 +617,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cd shoot (1992)(philips)(eu)(m8)[!]" sha1="32ff756a0d73fdfb355442c88ece89cdb8229a0d"/>
+				<disk name="cd shoot (1992)(philips)(eu)(m8)" sha1="32ff756a0d73fdfb355442c88ece89cdb8229a0d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -664,7 +667,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="chaos control v1.15 (1995)(philips)(eu)[!][dvc]" sha1="7edc539334eb37dfd82f2e3f540967f8be9a3354"/>
+				<disk name="chaos control v1.15 (1995)(philips)(eu)[dvc]" sha1="7edc539334eb37dfd82f2e3f540967f8be9a3354"/>
 			</diskarea>
 		</part>
 	</software>
@@ -698,7 +701,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="chaos control v1.15 (1995)(philips)(de)[!][dvc]" sha1="a7d73fc368276e88efff52fbd4f2237b4fc92c00"/>
+				<disk name="chaos control v1.15 (1995)(philips)(de)[dvc]" sha1="a7d73fc368276e88efff52fbd4f2237b4fc92c00"/>
 			</diskarea>
 		</part>
 	</software>
@@ -749,7 +752,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="christmas crisis (1995)(dima - philips)(eu)[!][dvc]" sha1="abd547a3b4ff916e19de6338625db166602a7906"/>
+				<disk name="christmas crisis (1995)(dima - philips)(eu)[dvc]" sha1="abd547a3b4ff916e19de6338625db166602a7906"/>
 			</diskarea>
 		</part>
 	</software>
@@ -816,7 +819,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="connect four v1 (1991)(philips)(eu-us)[!]" sha1="f9dd892664d02398bd1cd1ab6ad82711a7b1e721"/>
+				<disk name="connect four v1 (1991)(philips)(eu-us)" sha1="f9dd892664d02398bd1cd1ab6ad82711a7b1e721"/>
 			</diskarea>
 		</part>
 	</software>
@@ -856,7 +859,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dark castle (1992)(philips)(eu-us)[!]" sha1="7a3ea3e374e1012ec0d605aa5f5fba45474c4fa0"/>
+				<disk name="dark castle (1992)(philips)(eu-us)" sha1="7a3ea3e374e1012ec0d605aa5f5fba45474c4fa0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -872,7 +875,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="defender of the crown (1992)(philips)(eu-us)[!]" sha1="f29d4d8e5079f15bc7efed81aef5ac639f5cccc5"/>
+				<disk name="defender of the crown (1992)(philips)(eu-us)" sha1="f29d4d8e5079f15bc7efed81aef5ac639f5cccc5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -904,7 +907,7 @@
 		<publisher>Haarlems Uitgeef Bedrijf</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="domino - het oudste spel, het nieuwste medium (1997)(haarlems uitgeef bedrijf)(nl)[!]" sha1="a23f8bae5cd942344d09f17b1971bd4fdf362dcb"/>
+				<disk name="domino - het oudste spel, het nieuwste medium (1997)(haarlems uitgeef bedrijf)(nl)" sha1="a23f8bae5cd942344d09f17b1971bd4fdf362dcb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -921,7 +924,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dragon's lair (1994)(philips)(eu)[!][dvc]" sha1="ae039a16098a58257fba0d0b3145fe4efabd017c"/>
+				<disk name="dragon's lair (1994)(philips)(eu)[dvc]" sha1="ae039a16098a58257fba0d0b3145fe4efabd017c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -938,7 +941,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dragon's lair (1994)(philips)(us)[!][dvc]" sha1="d52877389d012f7f2b8ee8f1485717410103eef6"/>
+				<disk name="dragon's lair (1994)(philips)(us)[dvc]" sha1="d52877389d012f7f2b8ee8f1485717410103eef6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -971,7 +974,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dragon's lair ii - time warp (1994)(philips)(us)[!][dvc][13920805 02]" sha1="bb92a302ef1698825bf740e76ce71fae2da0b64d"/>
+				<disk name="dragon's lair ii - time warp (1994)(philips)(us)[dvc][13920805 02]" sha1="bb92a302ef1698825bf740e76ce71fae2da0b64d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1021,7 +1024,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="earth command - the future of our world is in your hands v1.05 (1994)(philips)(eu)[!]" sha1="0e7995dba96b0bde58934722bc61178e086af7f2"/>
+				<disk name="earth command - the future of our world is in your hands v1.05 (1994)(philips)(eu)" sha1="0e7995dba96b0bde58934722bc61178e086af7f2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1037,7 +1040,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="earth command - de toekomst van de wereld ligt in jouw handen v1.05 (1994)(philips)(nl)[!]" sha1="cfd569efec5c5962269a748e3c76221583fd96ad"/>
+				<disk name="earth command - de toekomst van de wereld ligt in jouw handen v1.05 (1994)(philips)(nl)" sha1="cfd569efec5c5962269a748e3c76221583fd96ad"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1053,7 +1056,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="earth command - die zukunft unserer welt liegt in ihrer hand v1.05 (1994)(philips)(de)[!]" sha1="8f4b8205bf95c55dee468099eeb0170f99c3cf80"/>
+				<disk name="earth command - die zukunft unserer welt liegt in ihrer hand v1.05 (1994)(philips)(de)" sha1="8f4b8205bf95c55dee468099eeb0170f99c3cf80"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1117,7 +1120,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="escape from cybercity (1992)(philips)(eu-us)[!]" sha1="23fc4cde1ba3bec728524b0fe15e6b4e16f876a6"/>
+				<disk name="escape from cybercity (1992)(philips)(eu-us)" sha1="23fc4cde1ba3bec728524b0fe15e6b4e16f876a6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1133,7 +1136,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="family games i (1995)(philips)(eu)[!][compilation]" sha1="43216e96bf14d7a2816bedd56770e247aee843fe"/>
+				<disk name="family games i (1995)(philips)(eu)[compilation]" sha1="43216e96bf14d7a2816bedd56770e247aee843fe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1149,7 +1152,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="family games ii - junk food jive (1995)(philips)(eu)[!][compilation]" sha1="25dd2d8dc84ab5dfb694e86a6a2da6bd7bd37dd0"/>
+				<disk name="family games ii - junk food jive (1995)(philips)(eu)[compilation]" sha1="25dd2d8dc84ab5dfb694e86a6a2da6bd7bd37dd0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1165,7 +1168,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="flashback (1995)(philips)(eu)(m7)[!]" sha1="1bd16c1a03ac86ab22556d15f2f2090bbb0b6b34"/>
+				<disk name="flashback (1995)(philips)(eu)(m7)" sha1="1bd16c1a03ac86ab22556d15f2f2090bbb0b6b34"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1181,7 +1184,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="girl's club - the fantasy dating game (1993)(philips)(us)[!]" sha1="336cdf39f13e5c11611253f7508a51beb907ce59"/>
+				<disk name="girl's club - the fantasy dating game (1993)(philips)(us)" sha1="336cdf39f13e5c11611253f7508a51beb907ce59"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1213,7 +1216,7 @@
 		<publisher>SPC Vision</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="golden oldies ii (1997)(spc vision)(eu)[!][compilation]" sha1="c029022a00949985778ef504dee1216877fedfbb"/>
+				<disk name="golden oldies ii (1997)(spc vision)(eu)[compilation]" sha1="c029022a00949985778ef504dee1216877fedfbb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1230,7 +1233,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="guignols de l'info, les - le jeu! (1996)(canal+ - philips)(fr)[dvc]" sha1="f85f3fa97e65664bacba69489ab5ecf539dc0e6b"/>
+				<disk name="guignols de l'info, les - le jeu (1996)(canal+ - philips)(fr)[dvc]" sha1="f85f3fa97e65664bacba69489ab5ecf539dc0e6b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1262,7 +1265,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hotel mario (1994)(philips)(eu)[!]" sha1="f24e118b807bc2479794eaa6cc35526e70be5bf0"/>
+				<disk name="hotel mario (1994)(philips)(eu)" sha1="f24e118b807bc2479794eaa6cc35526e70be5bf0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1278,7 +1281,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hotel mario (1994)(philips)(us)[!]" sha1="5478517aa0cd42bbdd2503f8d687adbae5a0c387"/>
+				<disk name="hotel mario (1994)(philips)(us)" sha1="5478517aa0cd42bbdd2503f8d687adbae5a0c387"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1294,7 +1297,7 @@
 		<publisher>Coktel Vision ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="inca (1993)(coktel vision - philips)(eu)(m4)[!][en-de-fr-nl][8100126 50341 698 01]" sha1="589f7388811de359c9c1f8c6c81b4530befb419a"/>
+				<disk name="inca (1993)(coktel vision - philips)(eu)(m4)[en-de-fr-nl][8100126 50341 698 01]" sha1="589f7388811de359c9c1f8c6c81b4530befb419a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1326,7 +1329,7 @@
 		<publisher>Coktel Vision ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="inca (1994)(coktel vision - philips)(eu)(m4)[!][en-de-fr-nl][8100126v206 50399445 01]" sha1="06f34b281008583940d00bb38a2e030ed55740b0"/>
+				<disk name="inca (1994)(coktel vision - philips)(eu)(m4)[en-de-fr-nl][8100126v206 50399445 01]" sha1="06f34b281008583940d00bb38a2e030ed55740b0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1342,7 +1345,7 @@
 		<publisher>Coktel Vision ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="inca (1994)(coktel vision - philips)(eu)(m4)[!][es-fr-it-pt]" sha1="07ddb72c8a3a2f683bb8547471a2d7d917359c44"/>
+				<disk name="inca (1994)(coktel vision - philips)(eu)(m4)[es-fr-it-pt]" sha1="07ddb72c8a3a2f683bb8547471a2d7d917359c44"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1358,7 +1361,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="international tennis open (1993)(pathe - philips)(eu-us)(en-fr)[!]" sha1="0e2337d13cf9910070e594d58710197beee65141"/>
+				<disk name="international tennis open (1993)(pathe - philips)(eu-us)(en-fr)" sha1="0e2337d13cf9910070e594d58710197beee65141"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1390,7 +1393,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="international tennis open v3.01 (1993)(pathe - philips)(de)(en-de)[!]" sha1="37b5402572b7d36f12ca1d4c5dcf7e520e074b86"/>
+				<disk name="international tennis open v3.01 (1993)(pathe - philips)(de)(en-de)" sha1="37b5402572b7d36f12ca1d4c5dcf7e520e074b86"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1438,7 +1441,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="international tennis open v3.03 (1994)(pathe - philips)(eu)(en-fr)[!][2 players]" sha1="1b0c0f0dee5520b5eec8fd7803fbff0c6f9e5fd6"/>
+				<disk name="international tennis open v3.03 (1994)(pathe - philips)(eu)(en-fr)[2 players]" sha1="1b0c0f0dee5520b5eec8fd7803fbff0c6f9e5fd6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1454,7 +1457,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="international tennis open v3.03 (1994)(philips)(us)(en-fr)[!][2 players]" sha1="91b20094bf9a71767fb07d6d3e572df9778da010"/>
+				<disk name="international tennis open v3.03 (1994)(philips)(us)(en-fr)[2 players]" sha1="91b20094bf9a71767fb07d6d3e572df9778da010"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1470,7 +1473,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jeopardy! (1994)(philips)(us)[!]" sha1="1e22a814391dd417ef968baed80cf33ad3552098"/>
+				<disk name="jeopardy (1994)(philips)(us)" sha1="1e22a814391dd417ef968baed80cf33ad3552098"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1486,7 +1489,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jigsaw - the ultimate electronic challenge (1992)(philips)(us)[!]" sha1="5798df3e0978d371b087ab810c73d9c83d522713"/>
+				<disk name="jigsaw - the ultimate electronic challenge (1992)(philips)(us)" sha1="5798df3e0978d371b087ab810c73d9c83d522713"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1502,7 +1505,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="joker's wild! jr., the (1994)(philips)(us)" sha1="e5e6fe4f7b766e82c4f381bd3d57402f6f098189"/>
+				<disk name="joker's wild jr., the (1994)(philips)(us)" sha1="e5e6fe4f7b766e82c4f381bd3d57402f6f098189"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1518,7 +1521,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="joker's wild!, the (1994)(philips)(us)[!]" sha1="a5609953241b49d64bfdfd671edfdffc93b4b3dd"/>
+				<disk name="joker's wild, the (1994)(philips)(us)" sha1="a5609953241b49d64bfdfd671edfdffc93b4b3dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1534,7 +1537,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kether v3.11 (1994)(philips)(eu)(en-fr)[!]" sha1="d869629ca9d5531cf1ae0ea7daee3a205b2531cf"/>
+				<disk name="kether v3.11 (1994)(philips)(eu)(en-fr)" sha1="d869629ca9d5531cf1ae0ea7daee3a205b2531cf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1614,7 +1617,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kether v3.11 (1994)(philips)(de)(en-de)[!]" sha1="4c3eb8713f7cfcca271d711ec493f822170b06d3"/>
+				<disk name="kether v3.11 (1994)(philips)(de)(en-de)" sha1="4c3eb8713f7cfcca271d711ec493f822170b06d3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1647,7 +1650,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kingdom - shadoan (1996)(philips)(eu)[!][dvc]" sha1="8da46f34c91ee11e7df9ec67eb64818ee74c01ec"/>
+				<disk name="kingdom - shadoan (1996)(philips)(eu)[dvc]" sha1="8da46f34c91ee11e7df9ec67eb64818ee74c01ec"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1664,7 +1667,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kingdom - the far reaches (1995)(philips)(us)[!][dvc]" sha1="55077066216a3173694766749969d3f639e56f3c"/>
+				<disk name="kingdom - the far reaches (1995)(philips)(us)[dvc]" sha1="55077066216a3173694766749969d3f639e56f3c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1761,7 +1764,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lemmings (1994)(philips)(eu)[!]" sha1="bd345d28bc439d4e3f43f12b188788eaf17d4c53"/>
+				<disk name="lemmings (1994)(philips)(eu)" sha1="bd345d28bc439d4e3f43f12b188788eaf17d4c53"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1777,7 +1780,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lingo v1.07 (1995)(philips)(nl)[!]" sha1="3b79620a45d21e9aa699943ef093d21f5ef0afae"/>
+				<disk name="lingo v1.07 (1995)(philips)(nl)" sha1="3b79620a45d21e9aa699943ef093d21f5ef0afae"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1793,7 +1796,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="link - the faces of evil (1993)(philips)(eu)[!]" sha1="e51a56fdf657f7cba2b5f556708fa20b9c30824a"/>
+				<disk name="link - the faces of evil (1993)(philips)(eu)" sha1="e51a56fdf657f7cba2b5f556708fa20b9c30824a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1825,7 +1828,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="link - de gezichten van het kwaad (1993)(philips)(nl)[!]" sha1="ecd2a331b4cd33972a924b43f696774756aad378"/>
+				<disk name="link - de gezichten van het kwaad (1993)(philips)(nl)" sha1="ecd2a331b4cd33972a924b43f696774756aad378"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1841,7 +1844,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="link - die fratzen des boesen (1993)(philips)(de)[!]" sha1="3ad711cd1f5a7768a74dc608b5e4381115053d57"/>
+				<disk name="link - die fratzen des boesen (1993)(philips)(de)" sha1="3ad711cd1f5a7768a74dc608b5e4381115053d57"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1858,7 +1861,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="litil divil (1994)(philips)(eu)[!][dvc]" sha1="1f342cbca16defa5aae923aaaf3b12b0f55ceca4"/>
+				<disk name="litil divil (1994)(philips)(eu)[dvc]" sha1="1f342cbca16defa5aae923aaaf3b12b0f55ceca4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1875,7 +1878,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="litil divil (1994)(philips)(us)[!][dvc]" sha1="ec46239ffeb6158e6184c0a5010f821000f12b08"/>
+				<disk name="litil divil (1994)(philips)(us)[dvc]" sha1="ec46239ffeb6158e6184c0a5010f821000f12b08"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1891,7 +1894,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lords of the rising sun (1992)(philips)(us)[!]" sha1="1a5e88e2a432c985f0c033850f736294e8998f1e"/>
+				<disk name="lords of the rising sun (1992)(philips)(us)" sha1="1a5e88e2a432c985f0c033850f736294e8998f1e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1908,7 +1911,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lost eden (1995)(philips)(eu)[!][dvc]" sha1="9578b91f9e84f05b5d954033456b38187110238a"/>
+				<disk name="lost eden (1995)(philips)(eu)[dvc]" sha1="9578b91f9e84f05b5d954033456b38187110238a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1925,7 +1928,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lost eden (1995)(philips)(de)[!][dvc]" sha1="099652b449a96190dd54c5b990bc467c4dc8b73d"/>
+				<disk name="lost eden (1995)(philips)(de)[dvc]" sha1="099652b449a96190dd54c5b990bc467c4dc8b73d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1942,7 +1945,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lost eden (1995)(philips)(nl)(m4)[!][dvc]" sha1="82b9327e88b127be1304761a8e8b2461d4b7ec76"/>
+				<disk name="lost eden (1995)(philips)(nl)(m4)[dvc]" sha1="82b9327e88b127be1304761a8e8b2461d4b7ec76"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2010,7 +2013,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mad dog mccree (1994)(philips)(eu)[!][dvc]" sha1="7a2e986f5da5d522a73c0016e073299475ec69b5"/>
+				<disk name="mad dog mccree (1994)(philips)(eu)[dvc]" sha1="7a2e986f5da5d522a73c0016e073299475ec69b5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2096,13 +2099,13 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
 			<diskarea name="cdrom">
-				<disk name="marco polo (1995)(philips)(eu)(disc 1 of 2)[!][the game]" sha1="f785d70e556a38b0e2ab6d9bb300d8df63011e97"/>
+				<disk name="marco polo (1995)(philips)(eu)(disc 1 of 2)[the game]" sha1="f785d70e556a38b0e2ab6d9bb300d8df63011e97"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Documentation" />
 			<diskarea name="cdrom">
-				<disk name="marco polo (1995)(philips)(eu)(disc 2 of 2)[!][the documentation]" sha1="6c31873f8f3898ab8e44d03bf0a1485000f9018a"/>
+				<disk name="marco polo (1995)(philips)(eu)(disc 2 of 2)[the documentation]" sha1="6c31873f8f3898ab8e44d03bf0a1485000f9018a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2160,7 +2163,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega maze v1.06 (1994)(philips)(eu)[!]" sha1="f90ed728571bceba3a5b8e306cf4f853b846bd50"/>
+				<disk name="mega maze v1.06 (1994)(philips)(eu)" sha1="f90ed728571bceba3a5b8e306cf4f853b846bd50"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2192,7 +2195,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="merlin's apprentice v1.1 (1995)(philips)(eu)[!]" sha1="c2a2ecb0287e43fb18d36dbc0328b3ae700bd914"/>
+				<disk name="merlin's apprentice v1.1 (1995)(philips)(eu)" sha1="c2a2ecb0287e43fb18d36dbc0328b3ae700bd914"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2224,7 +2227,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="micro machines (1995)(philips)(eu)[!]" sha1="80ca15fa486b20cacee7d6f74204723c6721c17f"/>
+				<disk name="micro machines (1995)(philips)(eu)" sha1="80ca15fa486b20cacee7d6f74204723c6721c17f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2240,7 +2243,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="micro machines (demo) (1995)(philips)(eu)[!]" sha1="a3276183ca0e81021c83a7806e76e53040211f06"/>
+				<disk name="micro machines (demo) (1995)(philips)(eu)" sha1="a3276183ca0e81021c83a7806e76e53040211f06"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2257,7 +2260,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mutant rampage - bodyslam (1994)(philips)(eu)[!][dvc]" sha1="a9bab3fff44c3979a368e986fdae2432de49a63c"/>
+				<disk name="mutant rampage - bodyslam (1994)(philips)(eu)[dvc]" sha1="a9bab3fff44c3979a368e986fdae2432de49a63c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2290,7 +2293,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="myst (1996)(philips)(eu)[!]" sha1="8c8b649fd00f36429879894bc0f253f6b1dcadf7"/>
+				<disk name="myst (1996)(philips)(eu)" sha1="8c8b649fd00f36429879894bc0f253f6b1dcadf7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2306,7 +2309,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mystic midway - phantom express (1993)(philips)(eu)[!]" sha1="1d4a53be21f561c8550a9263279b4b56116cccd0"/>
+				<disk name="mystic midway - phantom express (1993)(philips)(eu)" sha1="1d4a53be21f561c8550a9263279b4b56116cccd0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2322,7 +2325,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mystic midway - rest in pieces (1992)(philips)(eu-us)[!]" sha1="85440db8f32a38ac81d302b1301202ea294b0915"/>
+				<disk name="mystic midway - rest in pieces (1992)(philips)(eu-us)" sha1="85440db8f32a38ac81d302b1301202ea294b0915"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2354,7 +2357,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl football trivia challenge '94-'95 edition (1994)(philips)(eu)[!]" sha1="d146440debf5935a759e4516fc5b31c47a206c91"/>
+				<disk name="nfl football trivia challenge '94-'95 edition (1994)(philips)(eu)" sha1="d146440debf5935a759e4516fc5b31c47a206c91"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2370,7 +2373,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl football trivia challenge (1993)(philips)(us)[!]" sha1="d930a62379bdaf0bb1767cae8be7315570607d41"/>
+				<disk name="nfl football trivia challenge (1993)(philips)(us)" sha1="d930a62379bdaf0bb1767cae8be7315570607d41"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2387,7 +2390,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl hall of fame football (1994)(philips)(eu)[!][dvc]" sha1="ece5b8bc3a70d7fd93c53fcb74c1fdac723e7608"/>
+				<disk name="nfl hall of fame football (1994)(philips)(eu)[dvc]" sha1="ece5b8bc3a70d7fd93c53fcb74c1fdac723e7608"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2403,7 +2406,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="othello (1993)(philips)(eu)[!]" sha1="5a228539d1704b953dce182230c503712d27578f"/>
+				<disk name="othello (1993)(philips)(eu)" sha1="5a228539d1704b953dce182230c503712d27578f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2419,7 +2422,7 @@
 		<publisher>Namco ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pac-panic (1995)(namco - philips)(eu)[!]" sha1="cebfdbb61f4900cc14887b689a3a6df2707814f8"/>
+				<disk name="pac-panic (1995)(namco - philips)(eu)" sha1="cebfdbb61f4900cc14887b689a3a6df2707814f8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2435,7 +2438,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="palm springs open, the (1991)(philips)(eu-us)[!]" sha1="aded26e3aa1ba4422a02d733261b71f2e6fed3b6"/>
+				<disk name="palm springs open, the (1991)(philips)(eu-us)" sha1="aded26e3aa1ba4422a02d733261b71f2e6fed3b6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2451,7 +2454,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="palm springs open, die (1992)(philips)(de)[!]" sha1="f75e3bc2f6e4256477c104786793c1d506a8194d"/>
+				<disk name="palm springs open, die (1992)(philips)(de)" sha1="f75e3bc2f6e4256477c104786793c1d506a8194d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2499,7 +2502,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="palm springs open, the (1991)(philips)(us)[!]" sha1="6d43807b55ad663c4db44aca2dd527be2b63d374"/>
+				<disk name="palm springs open, the (1991)(philips)(us)" sha1="6d43807b55ad663c4db44aca2dd527be2b63d374"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2515,7 +2518,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pinball (1992)(philips)(us)[!][3106900342 50238 037 03]" sha1="66efa836b24a1dc7e4baf5dc4deb57ad4787a74f"/>
+				<disk name="pinball (1992)(philips)(us)[3106900342 50238 037 03]" sha1="66efa836b24a1dc7e4baf5dc4deb57ad4787a74f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2531,7 +2534,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pinball (1992)(philips)(us)[!][3106900342 50238 037 04]" sha1="874349861d21240a70688d921f320410f58ed10d"/>
+				<disk name="pinball (1992)(philips)(us)[3106900342 50238 037 04]" sha1="874349861d21240a70688d921f320410f58ed10d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2547,7 +2550,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="power hitter (1992)(philips)(eu)[!]" sha1="d6a4b075f8a2796c4b0e1fb272147f5df12080b4"/>
+				<disk name="power hitter (1992)(philips)(eu)" sha1="d6a4b075f8a2796c4b0e1fb272147f5df12080b4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2596,7 +2599,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rise of the robots (1995)(philips)(eu)[!][dvc]" sha1="73c7e39a0c6a83b772e417eb2f21ca8a68ea8d33"/>
+				<disk name="rise of the robots (1995)(philips)(eu)[dvc]" sha1="73c7e39a0c6a83b772e417eb2f21ca8a68ea8d33"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2612,7 +2615,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sargon chess (1992)(philips)(us)[!][690 030-2 50253 278 01]" sha1="c039575bdb8f9db14ceebcd33c61a8dce1e3371a"/>
+				<disk name="sargon chess (1992)(philips)(us)[690 030-2 50253 278 01]" sha1="c039575bdb8f9db14ceebcd33c61a8dce1e3371a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2676,7 +2679,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="scotland yard - interactive v1.09 (1993)(philips)(de)[!]" sha1="b2d75c0cfa6e352638efa7a7e296dfc7d0780a67"/>
+				<disk name="scotland yard - interactive v1.09 (1993)(philips)(de)" sha1="b2d75c0cfa6e352638efa7a7e296dfc7d0780a67"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2692,7 +2695,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="secret mission v1.03 (1996)(philips)(eu)[!]" sha1="919c0ddbeb6b8f0b9082c93cb8c0486fb2b97239"/>
+				<disk name="secret mission v1.03 (1996)(philips)(eu)" sha1="919c0ddbeb6b8f0b9082c93cb8c0486fb2b97239"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2757,7 +2760,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="space ace (1994)(philips)(eu)[!][dvc]" sha1="8c74b9a3184c433137d1b072858117c03e38dfcd"/>
+				<disk name="space ace (1994)(philips)(eu)[dvc]" sha1="8c74b9a3184c433137d1b072858117c03e38dfcd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2774,7 +2777,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="space ace (1994)(philips)(us)[!][dvc]" sha1="382ef7f1d46bb050678615294f506f64c5b62b8a"/>
+				<disk name="space ace (1994)(philips)(us)[dvc]" sha1="382ef7f1d46bb050678615294f506f64c5b62b8a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2806,7 +2809,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="striker pro (1994)(philips)(eu)(m6)[!]" sha1="60ceedab75579214354968e924a6d6d269b2e652"/>
+				<disk name="striker pro (1994)(philips)(eu)(m6)" sha1="60ceedab75579214354968e924a6d6d269b2e652"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2870,7 +2873,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tangram - the ultimate chinese game (1992)(philips)(eu)(m8)[!]" sha1="245309b5e0feab2207bc44f0ae4a9c12043da5d5"/>
+				<disk name="tangram - the ultimate chinese game (1992)(philips)(eu)(m8)" sha1="245309b5e0feab2207bc44f0ae4a9c12043da5d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2886,7 +2889,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tetris (1992)(philips)(eu-us)[!]" sha1="6502f5d0263007875c08f0c8a1225cfd9a449855"/>
+				<disk name="tetris (1992)(philips)(eu-us)" sha1="6502f5d0263007875c08f0c8a1225cfd9a449855"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2919,7 +2922,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="texttiles v1 (1992)(philips)(us)[!]" sha1="9a82b7019004bdd0f745c228b33346cc471eee3a"/>
+				<disk name="texttiles v1 (1992)(philips)(us)" sha1="9a82b7019004bdd0f745c228b33346cc471eee3a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2942,13 +2945,13 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
 			<diskarea name="cdrom">
-				<disk name="thunder in paradise (1995)(philips)(eu)(disc 1 of 2)[!][the game][dvc]" sha1="8e4844ff6f3aabfb4520110475811875009e3808"/>
+				<disk name="thunder in paradise (1995)(philips)(eu)(disc 1 of 2)[the game][dvc]" sha1="8e4844ff6f3aabfb4520110475811875009e3808"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Episode" />
 			<diskarea name="cdrom">
-				<disk name="thunder in paradise (1995)(philips)(eu)(disc 2 of 2)[!][the episode][dvc]" sha1="39b0a2825d6254095a3a97649b0bcc52cabd8f1b"/>
+				<disk name="thunder in paradise (1995)(philips)(eu)(disc 2 of 2)[the episode][dvc]" sha1="39b0a2825d6254095a3a97649b0bcc52cabd8f1b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2971,13 +2974,13 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="The Game" />
 			<diskarea name="cdrom">
-				<disk name="thunder in paradise (1995)(philips)(us)(disc 1 of 2)[!][the game][dvc]" sha1="c3915a61ad43c43a9105ac0c271ac431b8d3d4b2"/>
+				<disk name="thunder in paradise (1995)(philips)(us)(disc 1 of 2)[the game][dvc]" sha1="c3915a61ad43c43a9105ac0c271ac431b8d3d4b2"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Episode" />
 			<diskarea name="cdrom">
-				<disk name="thunder in paradise (1995)(philips)(us)(disc 2 of 2)[!][the episode][dvc]" sha1="27c8cf91919c286a0e98e7d63ca0e70e26e56edd"/>
+				<disk name="thunder in paradise (1995)(philips)(us)(disc 2 of 2)[the episode][dvc]" sha1="27c8cf91919c286a0e98e7d63ca0e70e26e56edd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3007,7 +3010,7 @@
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="The Episode (?)" />
 			<diskarea name="cdrom">
-				<disk name="thunder in paradise (1995)(philips)(eu)(disc 2 of 2)[!][the episode][dvc]" sha1="39b0a2825d6254095a3a97649b0bcc52cabd8f1b"/>
+				<disk name="thunder in paradise (1995)(philips)(eu)(disc 2 of 2)[the episode][dvc]" sha1="39b0a2825d6254095a3a97649b0bcc52cabd8f1b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3023,7 +3026,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultimate noah's ark, the (1994)(philips)(eu)[!]" sha1="4610bf0608fdf692c18cd4416018c679be0aa2e1"/>
+				<disk name="ultimate noah's ark, the (1994)(philips)(eu)" sha1="4610bf0608fdf692c18cd4416018c679be0aa2e1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3105,7 +3108,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="video speedway - the ultimate racing experience (1993)(philips)(eu)[!]" sha1="6b8a07eb1ea506da5e18447148b6da29e94a29a5"/>
+				<disk name="video speedway - the ultimate racing experience (1993)(philips)(eu)" sha1="6b8a07eb1ea506da5e18447148b6da29e94a29a5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3155,7 +3158,7 @@
 		<info name="usage" value="Access code 3333" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="voyeur ...don't get caught (1993)(philips)(eu)[!][adult, access code 3333]" sha1="8f68bab3336b932481bfe0fe7163814d8f528d23"/>
+				<disk name="voyeur ...don't get caught (1993)(philips)(eu)[adult, access code 3333]" sha1="8f68bab3336b932481bfe0fe7163814d8f528d23"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3206,7 +3209,7 @@
 		<info name="usage" value="Access code 3333" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="voyeur ...lass dich nicht erwischen! (1995)(philips)(de)[!][adult, access code 3333]" sha1="5aadbe13fc19a892837bca715a5e38f572aeb762"/>
+				<disk name="voyeur ...lass dich nicht erwischen (1995)(philips)(de)[adult, access code 3333]" sha1="5aadbe13fc19a892837bca715a5e38f572aeb762"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3255,7 +3258,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wacky world of minature golf, the - with eugene levy (1993)(philips)(us)[!]" sha1="37734eac08c39e70dda887addaaf9d0b92da1a3c"/>
+				<disk name="wacky world of minature golf, the - with eugene levy (1993)(philips)(us)" sha1="37734eac08c39e70dda887addaaf9d0b92da1a3c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3354,7 +3357,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world cup golf (1995)(philips)(eu)[!][dvc]" sha1="9debd983029ef28f576119425d456aa96bf9e5e0"/>
+				<disk name="world cup golf (1995)(philips)(eu)[dvc]" sha1="9debd983029ef28f576119425d456aa96bf9e5e0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3387,7 +3390,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zelda - the wand of gamelon (1993)(philips)(eu)[!]" sha1="0c7b977fe42373a8aaff106d637aa39081927f0c"/>
+				<disk name="zelda - the wand of gamelon (1993)(philips)(eu)" sha1="0c7b977fe42373a8aaff106d637aa39081927f0c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3531,7 +3534,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zombie dinos from planet zeltoid (1992)(philips)(us)[!]" sha1="101a3eb8507f822f4b9df6601b28648652f377ae"/>
+				<disk name="zombie dinos from planet zeltoid (1992)(philips)(us)" sha1="101a3eb8507f822f4b9df6601b28648652f377ae"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3563,7 +3566,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zombie dinos vom planeten zeltoid (1994)(philips)(de)[!]" sha1="8989945e53bf489fec53934bb037d1e07a611d4e"/>
+				<disk name="zombie dinos vom planeten zeltoid (1994)(philips)(de)" sha1="8989945e53bf489fec53934bb037d1e07a611d4e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3583,7 +3586,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="1995 - all the news and views (1995)(philips)(eu)[!][dvc]" sha1="2e94dff65233e0a41135cffda383330d9e1e6717"/>
+				<disk name="1995 - all the news and views (1995)(philips)(eu)[dvc]" sha1="2e94dff65233e0a41135cffda383330d9e1e6717"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3632,7 +3635,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a national parks tour (1992)(philips)(us)[!]" sha1="ea43dd4b73fe88ac9e9d8480bb82efc095793c38"/>
+				<disk name="a national parks tour (1992)(philips)(us)" sha1="ea43dd4b73fe88ac9e9d8480bb82efc095793c38"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3665,7 +3668,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a visit to sesame street - letters (1992)(philips)(eu-us)[!]" sha1="b0425346454d3c075e248fcbae87720fc2e2a11c"/>
+				<disk name="a visit to sesame street - letters (1992)(philips)(eu-us)" sha1="b0425346454d3c075e248fcbae87720fc2e2a11c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3681,7 +3684,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a visit to sesame street - numbers (1991)(philips)(us)[!][3106900632 01]" sha1="621f29a4aac2ae311768963e809c891de1f8c5f4"/>
+				<disk name="a visit to sesame street - numbers (1991)(philips)(us)[3106900632 01]" sha1="621f29a4aac2ae311768963e809c891de1f8c5f4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3713,7 +3716,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a visit to the valley of puebla and the amparo museum (1992)(philips)(us)[!]" sha1="7b6a4d937eaf07a89deb8cc79b3568f761c5084d"/>
+				<disk name="a visit to the valley of puebla and the amparo museum (1992)(philips)(us)" sha1="7b6a4d937eaf07a89deb8cc79b3568f761c5084d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4216,7 +4219,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="all the fun of the fair - engels voor kinderen (1993)(philips)(nl)[!]" sha1="d1bf78195943f979aafc197ae0f34da8c9ca913c"/>
+				<disk name="all the fun of the fair - engels voor kinderen (1993)(philips)(nl)" sha1="d1bf78195943f979aafc197ae0f34da8c9ca913c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4248,7 +4251,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alles over cd-i - aug-sep 1994 (1994)(philips)(nl)[!]" sha1="0b348fc5dbffa4a7a5961a7aa53e9fd1f4663525"/>
+				<disk name="alles over cd-i - aug-sep 1994 (1994)(philips)(nl)" sha1="0b348fc5dbffa4a7a5961a7aa53e9fd1f4663525"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4281,7 +4284,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="andrew lloyd webber - the premiere collection encore (1993)(philips - polygram)(pal)(eu)[!][dvc]" sha1="f7976b9a92eaee3226874f2235484923b84961b0"/>
+				<disk name="andrew lloyd webber - the premiere collection encore (1993)(philips - polygram)(pal)(eu)[dvc]" sha1="f7976b9a92eaee3226874f2235484923b84961b0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4330,7 +4333,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="anne willan presents the food of france (1992)(philips)(us)[!]" sha1="64e3487e29270f0aaf440bc5e55144055684c51e"/>
+				<disk name="anne willan presents the food of france (1992)(philips)(us)" sha1="64e3487e29270f0aaf440bc5e55144055684c51e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4379,7 +4382,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="art of the czars, the - st. petersburg and the treasures of the hermitage (1992)(philips)(eu-us)[!]" sha1="8d08fa6f9680e8458da6fb1445a955df172412d3"/>
+				<disk name="art of the czars, the - st. petersburg and the treasures of the hermitage (1992)(philips)(eu-us)" sha1="8d08fa6f9680e8458da6fb1445a955df172412d3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4475,7 +4478,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="schone und das tier, die (1993)(philips)(de)[!]" sha1="581fb486d418c4373f5927ad631e709e8f042ef0"/>
+				<disk name="schone und das tier, die (1993)(philips)(de)" sha1="581fb486d418c4373f5927ad631e709e8f042ef0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4491,7 +4494,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="berenstain bears, the - on their own and you on your own (1993)(philips)(us)[!]" sha1="abaa741c099d257c739ad92c88567394bf1b23d0"/>
+				<disk name="berenstain bears, the - on their own and you on your own (1993)(philips)(us)" sha1="abaa741c099d257c739ad92c88567394bf1b23d0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4523,7 +4526,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="berenstain-baren, die - selbst ist der bar - mach mit - ist gar nicht schwer! (1993)(philips)(de)" sha1="4ee5a2c3f7ec9cb4307adba7c5f0caa49d62a43e"/>
+				<disk name="berenstain-baren, die - selbst ist der bar - mach mit - ist gar nicht schwer (1993)(philips)(de)" sha1="4ee5a2c3f7ec9cb4307adba7c5f0caa49d62a43e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4539,7 +4542,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bij de berenstain beren, thuis - thuis en bij jou (1993)(philips)(nl)[!]" sha1="f8f9ea72b8ae06c5da5f2d764a25dd61e2e86033"/>
+				<disk name="bij de berenstain beren, thuis - thuis en bij jou (1993)(philips)(nl)" sha1="f8f9ea72b8ae06c5da5f2d764a25dd61e2e86033"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4555,7 +4558,7 @@
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bertelsmann universal lexikon (1995)(pathe - philips)(de)[!]" sha1="acf71211f2fcd63b23bac39f9ed73da9d264c289"/>
+				<disk name="bertelsmann universal lexikon (1995)(pathe - philips)(de)" sha1="acf71211f2fcd63b23bac39f9ed73da9d264c289"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4572,7 +4575,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bertelsmann universal lexikon (1995)(pathe - philips)(de)[!][dvc]" sha1="4ed55755bef1f1b0a79973ba3d7acbebc0155283"/>
+				<disk name="bertelsmann universal lexikon (1995)(pathe - philips)(de)[dvc]" sha1="4ed55755bef1f1b0a79973ba3d7acbebc0155283"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4621,7 +4624,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="best of draw-50 with lee ames, the (1993)(philips)(us)[!]" sha1="1afb8ad4ef46a82f7f6d254dd2777336c47d49ed"/>
+				<disk name="best of draw-50 with lee ames, the (1993)(philips)(us)" sha1="1afb8ad4ef46a82f7f6d254dd2777336c47d49ed"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4670,7 +4673,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="brer rabbit and the wonderful tar baby (1991)(philips)(us)[!]" sha1="49de13fd9a8c5c995a402ad305c59ca7f0529f21"/>
+				<disk name="brer rabbit and the wonderful tar baby (1991)(philips)(us)" sha1="49de13fd9a8c5c995a402ad305c59ca7f0529f21"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4712,7 +4715,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="burn-cycle - the music (1994)(philips)(eu)[!][burn-cycle, 810 0114, 813 0118, 815 0102, 816 0056][cd-audio]" sha1="15a23f92b1a5f2d8faacb7b7c09d3c8da54d991c"/>
+				<disk name="burn-cycle - the music (1994)(philips)(eu)[burn-cycle, 810 0114, 813 0118, 815 0102, 816 0056][cd-audio]" sha1="15a23f92b1a5f2d8faacb7b7c09d3c8da54d991c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4761,7 +4764,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cartoon carnival (1993)(philips)(eu-us)[!][dvc enhanced]" sha1="a6a6b29a56ed0e083a3c640c11554d5f3f3fd54f"/>
+				<disk name="cartoon carnival (1993)(philips)(eu-us)[dvc enhanced]" sha1="a6a6b29a56ed0e083a3c640c11554d5f3f3fd54f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4793,7 +4796,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cartoon jukebox (1991)(philips)(us)[3106900012 01!]" sha1="581e145098f868360ddfa19b6cdf5fe8a542b484"/>
+				<disk name="cartoon jukebox (1991)(philips)(us)[3106900012 01]" sha1="581e145098f868360ddfa19b6cdf5fe8a542b484"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4844,7 +4847,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cd-i demonstratie disc - fall 1996 - spring 1997 (1996)(philips)(nl)[!][dvc]" sha1="bac7c5e6ee1aa67e357ef76c8bea33246b801d04"/>
+				<disk name="cd-i demonstratie disc - fall 1996 - spring 1997 (1996)(philips)(nl)[dvc]" sha1="bac7c5e6ee1aa67e357ef76c8bea33246b801d04"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5023,7 +5026,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cdi 450 - tutorial disc (1994)(philips)(eu)(m6)[!]" sha1="53495b6d630fb131bf3bea0256b9f115730d5814"/>
+				<disk name="cdi 450 - tutorial disc (1994)(philips)(eu)(m6)" sha1="53495b6d630fb131bf3bea0256b9f115730d5814"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5103,7 +5106,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cistercian architecture (1994)(philips)(eu)(m3)[!]" sha1="7191e0f12b7e72d757a54fc220b886801d5785ce"/>
+				<disk name="cistercian architecture (1994)(philips)(eu)(m3)" sha1="7191e0f12b7e72d757a54fc220b886801d5785ce"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5119,7 +5122,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="classical jukebox (1991)(philips)(eu-us)[!]" sha1="56ab1275e231c7aec015858b04e2380d1e98f7fb"/>
+				<disk name="classical jukebox (1991)(philips)(eu-us)" sha1="56ab1275e231c7aec015858b04e2380d1e98f7fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5168,7 +5171,7 @@
 		<publisher>Compton's NewMedia</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="compton's interactive encyclopedia - cd-interactive (1992)(compton's newmedia)(eu)[!]" sha1="ce808c53d454980693c09cb48db8aa5f5c9a048f"/>
+				<disk name="compton's interactive encyclopedia - cd-interactive (1992)(compton's newmedia)(eu)" sha1="ce808c53d454980693c09cb48db8aa5f5c9a048f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5184,7 +5187,7 @@
 		<publisher>Compton's NewMedia</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="compton's interactive encyclopedia - cd-interactive (1992)(compton's newmedia)(us)[!]" sha1="a043a47d8cfb64c111ad18a029b084b2c037b077"/>
+				<disk name="compton's interactive encyclopedia - cd-interactive (1992)(compton's newmedia)(us)" sha1="a043a47d8cfb64c111ad18a029b084b2c037b077"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5200,7 +5203,7 @@
 		<publisher>Oxford University Press ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="concise oxford dictionary &amp; oxford thesaurus, the (1995)(oxford university press - philips)(eu)[!]" sha1="a45ed67970d459f4df7dfcf0b164721bc1ca7138"/>
+				<disk name="concise oxford dictionary &amp; oxford thesaurus, the (1995)(oxford university press - philips)(eu)" sha1="a45ed67970d459f4df7dfcf0b164721bc1ca7138"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5216,7 +5219,7 @@
 		<publisher>Mercury ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cool oldies jukebox (1991)(mercury - philips)(us)[!]" sha1="55a43b5c46b2aab24ab7a8b7888eaa99a2a16433"/>
+				<disk name="cool oldies jukebox (1991)(mercury - philips)(us)" sha1="55a43b5c46b2aab24ab7a8b7888eaa99a2a16433"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5325,7 +5328,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="create your own caricature with spitting image (1992)(philips)(eu)[!][8110001 50274 188 01]" sha1="5733d619ef9d5d31ffdfc002d97aeee554ea5fd6"/>
+				<disk name="create your own caricature with spitting image (1992)(philips)(eu)[8110001 50274 188 01]" sha1="5733d619ef9d5d31ffdfc002d97aeee554ea5fd6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5374,7 +5377,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dansen! (1996)(philips)(nl)[!][dvc]" sha1="19c3103c37e8d594791305d6c90d76953c86cf80"/>
+				<disk name="dansen (1996)(philips)(nl)[dvc]" sha1="19c3103c37e8d594791305d6c90d76953c86cf80"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5390,7 +5393,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dave grusin - the gershwin connection (1993)(philips)(us)[!]" sha1="2fba08da5de4e16ce50117fff11f3e997d471405"/>
+				<disk name="dave grusin - the gershwin connection (1993)(philips)(us)" sha1="2fba08da5de4e16ce50117fff11f3e997d471405"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5507,7 +5510,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dit was 1994 - wereldnieuws overzicht (1995)(philips)(nl)[!][dvc]" sha1="4944e60cab3d709d1847a8a8abb76fbe113c0ab1"/>
+				<disk name="dit was 1994 - wereldnieuws overzicht (1995)(philips)(nl)[dvc]" sha1="4944e60cab3d709d1847a8a8abb76fbe113c0ab1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5604,7 +5607,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="e-z play today keyboard - now anyone can learn to play keyboard! (1994)(philips)(eu)" sha1="bc72914f6446c2792335822901ff60a0509e1c69"/>
+				<disk name="e-z play today keyboard - now anyone can learn to play keyboard (1994)(philips)(eu)" sha1="bc72914f6446c2792335822901ff60a0509e1c69"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5652,7 +5655,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="emperor's new clothes, the (1992)(philips)(us)[!]" sha1="e4887b8b51e4090e61d5aa06e6764b79848c9c1a"/>
+				<disk name="emperor's new clothes, the (1992)(philips)(us)" sha1="e4887b8b51e4090e61d5aa06e6764b79848c9c1a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5669,7 +5672,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="encyclopaedia hachette (1994)(philips)(eu)[!][aka dictionnaire hachette multimedia]" sha1="4a8c757d20a3ac5f87fc471a5d7b7342b4631552"/>
+				<disk name="encyclopaedia hachette (1994)(philips)(eu)[aka dictionnaire hachette multimedia]" sha1="4a8c757d20a3ac5f87fc471a5d7b7342b4631552"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5912,7 +5915,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="flowers of robert mapplethorpe, the (1992)(philips)(us)[!][photo cd]" sha1="e66a82313a0894eff7d93803febb645c7fd67f07"/>
+				<disk name="flowers of robert mapplethorpe, the (1992)(philips)(us)[photo cd]" sha1="e66a82313a0894eff7d93803febb645c7fd67f07"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5929,7 +5932,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(philips)(fr)[!][dvc]" sha1="ea48f982568a3971c21164e3669a90ac90b4672c"/>
+				<disk name="football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(philips)(fr)[dvc]" sha1="ea48f982568a3971c21164e3669a90ac90b4672c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5945,7 +5948,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="french impressionists, the (1992)(philips)(us)[!]" sha1="27b86e716830ef97a5d238d26249df513a109258"/>
+				<disk name="french impressionists, the (1992)(philips)(us)" sha1="27b86e716830ef97a5d238d26249df513a109258"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5961,7 +5964,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="franse impressionisten, de (1991)(philips)(nl)[!]" sha1="dd429e0edb2b8941da9e1131bf118cbc46e67bee"/>
+				<disk name="franse impressionisten, de (1991)(philips)(nl)" sha1="dd429e0edb2b8941da9e1131bf118cbc46e67bee"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6009,7 +6012,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gardening by choice - flowers &amp; foliage (1992)(philips)(us)[!]" sha1="3acd1ff594260f592e1d93ebc56fb72e14ca0777"/>
+				<disk name="gardening by choice - flowers &amp; foliage (1992)(philips)(us)" sha1="3acd1ff594260f592e1d93ebc56fb72e14ca0777"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6042,7 +6045,7 @@
 		<publisher>Temple Millar Multimedia ~ Xdra</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="getting ahead - making time (1994)(temple millar multimedia - xdra)(eu)[!][cd-i-pc]" sha1="c41c5e1cf44cf57a73772101bdc87c721eff4da0"/>
+				<disk name="getting ahead - making time (1994)(temple millar multimedia - xdra)(eu)[cd-i-pc]" sha1="c41c5e1cf44cf57a73772101bdc87c721eff4da0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6058,7 +6061,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gnomes v2.10 (1995)(philips)(us)[!]" sha1="990bdd1887f7e0da1a823dac40c9e018ff54da9f"/>
+				<disk name="gnomes v2.10 (1995)(philips)(us)" sha1="990bdd1887f7e0da1a823dac40c9e018ff54da9f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6074,7 +6077,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="golden oldies jukebox (1991)(philips)(us)[!][310690006-2 50240 109 01]" sha1="53217cf52ab46a92618402bf72f168b157b8f225"/>
+				<disk name="golden oldies jukebox (1991)(philips)(us)[310690006-2 50240 109 01]" sha1="53217cf52ab46a92618402bf72f168b157b8f225"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6216,7 +6219,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="great british golf - middle ages - 1940 (1992)(philips)(eu)[!]" sha1="90431e383fd213cbb19d8dd0978fc5e2e7aad922"/>
+				<disk name="great british golf - middle ages - 1940 (1992)(philips)(eu)" sha1="90431e383fd213cbb19d8dd0978fc5e2e7aad922"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6232,7 +6235,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="harvest of the sun - vincent van gogh revisited (1991)(philips)(us)[!][028294 01]" sha1="bc489d6490285ab62923ab3d2299b1ca9d70c9b2"/>
+				<disk name="harvest of the sun - vincent van gogh revisited (1991)(philips)(us)[028294 01]" sha1="bc489d6490285ab62923ab3d2299b1ca9d70c9b2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6280,7 +6283,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="harvest of the sun - van gogh - une moisson de soleils (1992)(philips)(fr)[!]" sha1="385376d98cc637617ed24a8f172002b87b624b4e"/>
+				<disk name="harvest of the sun - van gogh - une moisson de soleils (1992)(philips)(fr)" sha1="385376d98cc637617ed24a8f172002b87b624b4e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6296,7 +6299,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="oogst van de zon - leven en kunst van vincent van gogh (1992)(philips)(nl)[!]" sha1="091370ec3ec14d3a6b54321dd750b1e038ff17e9"/>
+				<disk name="oogst van de zon - leven en kunst van vincent van gogh (1992)(philips)(nl)" sha1="091370ec3ec14d3a6b54321dd750b1e038ff17e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6328,7 +6331,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cosecha del sol, la - vincent van gogh revivido (1992)(philips)(es)[!]" sha1="f4cdfc01e465e1160082c4aa45a4115394334ccb"/>
+				<disk name="cosecha del sol, la - vincent van gogh revivido (1992)(philips)(es)" sha1="f4cdfc01e465e1160082c4aa45a4115394334ccb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6366,19 +6369,19 @@
 		<part name="cdrom1" interface="cdi_cdrom">
 			<feature name="part_id" value="Inleiding Ehbo2 Toets" />
 			<diskarea name="cdrom">
-				<disk name="help! opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 1 of 3)[inleiding ehbo2 toets]" sha1="2371b2fda7d55d30f92e040d1420dd21cd8a4fd5"/>
+				<disk name="help opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 1 of 3)[inleiding ehbo2 toets]" sha1="2371b2fda7d55d30f92e040d1420dd21cd8a4fd5"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<feature name="part_id" value="Ehbo1" />
 			<diskarea name="cdrom">
-				<disk name="help! opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 2 of 3)[ehbo1]" sha1="9de2182d95a4447e3060737a3044b7da6d9a5813"/>
+				<disk name="help opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 2 of 3)[ehbo1]" sha1="9de2182d95a4447e3060737a3044b7da6d9a5813"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdi_cdrom">
 			<feature name="part_id" value="Brand Ontruiming" />
 			<diskarea name="cdrom">
-				<disk name="help! opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 3 of 3)[brand ontruiming]" sha1="6db47cfd5fc307bbd64543b45e01b8c915e55aea"/>
+				<disk name="help opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 3 of 3)[brand ontruiming]" sha1="6db47cfd5fc307bbd64543b45e01b8c915e55aea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6427,7 +6430,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hieperdepiep, ik lees! - 10 leesspelletjes (1996)(philips)(nl)" sha1="2d35519683b0261477b0884139cb4b3431c1c2a1"/>
+				<disk name="hieperdepiep, ik lees - 10 leesspelletjes (1996)(philips)(nl)" sha1="2d35519683b0261477b0884139cb4b3431c1c2a1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6544,7 +6547,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hollandse meesters uit de zeventiende eeuw (1992)(philips)(nl)[!]" sha1="76c880c048e172a7ba82de7886288d9dd661d9ce"/>
+				<disk name="hollandse meesters uit de zeventiende eeuw (1992)(philips)(nl)" sha1="76c880c048e172a7ba82de7886288d9dd661d9ce"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6577,7 +6580,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="how the camel got it's hump (1992)(philips)(us)(en-es)[!]" sha1="3f340c2c3a4bdf83484e92a5bc1e6c956d17455f"/>
+				<disk name="how the camel got it's hump (1992)(philips)(us)(en-es)" sha1="3f340c2c3a4bdf83484e92a5bc1e6c956d17455f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6593,7 +6596,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 02!]" sha1="fbffc12e6246c8ae26239e7c1933223a038b3684"/>
+				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 02]" sha1="fbffc12e6246c8ae26239e7c1933223a038b3684"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6609,7 +6612,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wie das rhinozeros zu seiner haut kam (1993)(philips)(de)[!]" sha1="8d8943d2dc8a6d20a23d826537af34abe40eea21"/>
+				<disk name="wie das rhinozeros zu seiner haut kam (1993)(philips)(de)" sha1="8d8943d2dc8a6d20a23d826537af34abe40eea21"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6642,7 +6645,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="how to photograph nature (1993)(philips)(us)[!][cd-i-photo cd]" sha1="5a0338596cec6feef16283ba7c3aa30066d48a77"/>
+				<disk name="how to photograph nature (1993)(philips)(us)[cd-i-photo cd]" sha1="5a0338596cec6feef16283ba7c3aa30066d48a77"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6659,7 +6662,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ik, mik, letterland - een leesavontuur met maan roos vis (1996)(philips)(nl)[!][dvc]" sha1="1a13af6aba462ad0a1a7454ea3298c610133609e"/>
+				<disk name="ik, mik, letterland - een leesavontuur met maan roos vis (1996)(philips)(nl)[dvc]" sha1="1a13af6aba462ad0a1a7454ea3298c610133609e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6729,7 +6732,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="internetten op je tv! - demo disc (1996)(philips)(nl)[!][dvc][8140154]" sha1="1620b35d3b7f36d5066734694d7baf948cd776a8"/>
+				<disk name="internetten op je tv - demo disc (1996)(philips)(nl)[dvc][8140154]" sha1="1620b35d3b7f36d5066734694d7baf948cd776a8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6746,7 +6749,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="internetten op je tv! - demo disc (1996)(philips)(nl)[dvc][8100330]" sha1="908ea704879b1a50e8f5e9d5fb3cf6a72c5b84f4"/>
+				<disk name="internetten op je tv - demo disc (1996)(philips)(nl)[dvc][8100330]" sha1="908ea704879b1a50e8f5e9d5fb3cf6a72c5b84f4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6778,7 +6781,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jazz giants - from big band to bossa nova (1992)(philips)(us)[!]" sha1="5e624d7faef4b9897b123e2353365c345c711954"/>
+				<disk name="jazz giants - from big band to bossa nova (1992)(philips)(us)" sha1="5e624d7faef4b9897b123e2353365c345c711954"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6880,7 +6883,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="joy of sex, the v3.03 (1993)(philips)(eu)[!][dvc]" sha1="1c172310e21fbf1e256c9b3e92187d3c5d1c3a4d"/>
+				<disk name="joy of sex, the v3.03 (1993)(philips)(eu)[dvc]" sha1="1c172310e21fbf1e256c9b3e92187d3c5d1c3a4d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7029,12 +7032,12 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom1" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="keep the faith - an evening with bon jovi (1993)(philips - polygram)(pal)(eu)(disc 1 of 2)[!][dvc]" sha1="16dd9ae93d2d24456feda0a1419d56f60b0ac490"/>
+				<disk name="keep the faith - an evening with bon jovi (1993)(philips - polygram)(pal)(eu)(disc 1 of 2)[dvc]" sha1="16dd9ae93d2d24456feda0a1419d56f60b0ac490"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="keep the faith - an evening with bon jovi (1993)(philips - polygram)(pal)(eu)(disc 2 of 2)[!][dvc]" sha1="9f033b463ae2f9ec806d1a36c72ba77a9cde7a9e"/>
+				<disk name="keep the faith - an evening with bon jovi (1993)(philips - polygram)(pal)(eu)(disc 2 of 2)[dvc]" sha1="9f033b463ae2f9ec806d1a36c72ba77a9cde7a9e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7145,7 +7148,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kunstschatten van rusluand, de - st. petersburg en de collectie van de hermitage (1993)(philips)(nl)[!]" sha1="bb8e9d9606f1c272eddfcef54bdf3fc75efa4a07"/>
+				<disk name="kunstschatten van rusluand, de - st. petersburg en de collectie van de hermitage (1993)(philips)(nl)" sha1="bb8e9d9606f1c272eddfcef54bdf3fc75efa4a07"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7274,18 +7277,18 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom1" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="language director - english level 1 (1993)(philips)(eu)(disc 1 of 3)[!]" sha1="543d5b9508856ac1f832b0ec731859b7c207fda7"/>
+				<disk name="language director - english level 1 (1993)(philips)(eu)(disc 1 of 3)" sha1="543d5b9508856ac1f832b0ec731859b7c207fda7"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="language director - english level 1 (1993)(philips)(eu)(disc 2 of 3)[!]" sha1="4bfd08cf7b5d993ce827eb7aa476078a8af62438"/>
+				<disk name="language director - english level 1 (1993)(philips)(eu)(disc 2 of 3)" sha1="4bfd08cf7b5d993ce827eb7aa476078a8af62438"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdi_cdrom">
 			<feature name="part_id" value="Guided Tour" />
 			<diskarea name="cdrom">
-				<disk name="language director - english level 1 (1993)(philips)(eu)(disc 3 of 3)[!][guided tour]" sha1="2a7e30728368606b5112595e892fc0710ac9523d"/>
+				<disk name="language director - english level 1 (1993)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="2a7e30728368606b5112595e892fc0710ac9523d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7569,7 +7572,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="malschule 1 (1992)(philips)(de)[!][escuela de pintura i (es), schilderschool i (nl)]" sha1="7a30c1212e2856c633a4d010d550531fc1b5d79b"/>
+				<disk name="malschule 1 (1992)(philips)(de)[escuela de pintura i (es), schilderschool i (nl)]" sha1="7a30c1212e2856c633a4d010d550531fc1b5d79b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7798,7 +7801,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="monty python's more naughty bits (1995)(daedalus)(us)(m4)[!][dvc]" sha1="35cead179d6ba852f9f53d38db70af5614e27451"/>
+				<disk name="monty python's more naughty bits (1995)(daedalus)(us)(m4)[dvc]" sha1="35cead179d6ba852f9f53d38db70af5614e27451"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7830,7 +7833,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mother goose - hidden pictures (1991)(philips)(us)[!][0152911 01]" sha1="779d5e20f6d7105321addf45a368587bc0025518"/>
+				<disk name="mother goose - hidden pictures (1991)(philips)(us)[0152911 01]" sha1="779d5e20f6d7105321addf45a368587bc0025518"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7878,7 +7881,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mother goose - rhymes to color (1991)(philips)(us)[mgrtc392 03!]" sha1="283726728e161712428f3080f51ea0f03bd0412b"/>
+				<disk name="mother goose - rhymes to color (1991)(philips)(us)[mgrtc392 03]" sha1="283726728e161712428f3080f51ea0f03bd0412b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7928,7 +7931,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="name that tune (1993)(philips)(us)[!]" sha1="84183679d5a649303aa3103c1d60d41d82476d1b"/>
+				<disk name="name that tune (1993)(philips)(us)" sha1="84183679d5a649303aa3103c1d60d41d82476d1b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7945,7 +7948,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nederlands elftal compleet - alles over de europese kampioenschappen (1996)(philips)(nl)[!][dvc]" sha1="702934457d67cc356044e4aa835a77217eb82d14"/>
+				<disk name="nederlands elftal compleet - alles over de europese kampioenschappen (1996)(philips)(nl)[dvc]" sha1="702934457d67cc356044e4aa835a77217eb82d14"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7962,7 +7965,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nederlands film festival '95 - 15 jaar gouden kalf (1995)(philips)(nl)[!][dvc]" sha1="1bbf2dcf1dc7fd4399bddbc643aa535f55c15f59"/>
+				<disk name="nederlands film festival '95 - 15 jaar gouden kalf (1995)(philips)(nl)[dvc]" sha1="1bbf2dcf1dc7fd4399bddbc643aa535f55c15f59"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7978,7 +7981,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl 100 greatest touchdowns (1996)(philips)(eu)[!]" sha1="af374e8c3d721d3393a708d718237c179023011b"/>
+				<disk name="nfl 100 greatest touchdowns (1996)(philips)(eu)" sha1="af374e8c3d721d3393a708d718237c179023011b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8075,7 +8078,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ontdek het onbekende nederland - nederland-waterland v1.0 (1995)(philips)(nl)[!][dvc]" sha1="7f1f443710b1cd57928ea42229578e284794355a"/>
+				<disk name="ontdek het onbekende nederland - nederland-waterland v1.0 (1995)(philips)(nl)[dvc]" sha1="7f1f443710b1cd57928ea42229578e284794355a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8104,7 +8107,7 @@
 		<publisher>Pascavision</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="opera imaginaire (1995)(pascavision)(eu)[!]" sha1="5526f7be339ded40867fa9748f91255b7a2f4fd0"/>
+				<disk name="opera imaginaire (1995)(pascavision)(eu)" sha1="5526f7be339ded40867fa9748f91255b7a2f4fd0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8120,7 +8123,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="origami (1993)(philips)(eu)[!]" sha1="4c3fa6d45ed4b069a0f743f0a0c20233b1033efc"/>
+				<disk name="origami (1993)(philips)(eu)" sha1="4c3fa6d45ed4b069a0f743f0a0c20233b1033efc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8216,7 +8219,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pegasus (1992)(philips)(eu-us)[!]" sha1="443709b95fdd1d06f9c18d504b14713d5b0e6d21"/>
+				<disk name="pegasus (1992)(philips)(eu-us)" sha1="443709b95fdd1d06f9c18d504b14713d5b0e6d21"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8267,7 +8270,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="philips media interactieve encyclopedie (1995)(philips)(nl)[!][aka standaard interactieve encyclopedie][dvc]" sha1="28bb605dc2ebfaacd978b3939b3dd02c00830f87"/>
+				<disk name="philips media interactieve encyclopedie (1995)(philips)(nl)[aka standaard interactieve encyclopedie][dvc]" sha1="28bb605dc2ebfaacd978b3939b3dd02c00830f87"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8284,7 +8287,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="philips media interactieve encyclopedie - demonstratie - exemplaar (1995)(philips)(nl)[!][dvc]" sha1="ec911541e153d06f6f8b64b6c92cb3eed17e05d7"/>
+				<disk name="philips media interactieve encyclopedie - demonstratie - exemplaar (1995)(philips)(nl)[dvc]" sha1="ec911541e153d06f6f8b64b6c92cb3eed17e05d7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8301,7 +8304,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="philips media medische encyclopedie (1996)(philips)(nl)[!][dvc]" sha1="015e23599f7c83dcec262d49f269cecca5657c17"/>
+				<disk name="philips media medische encyclopedie (1996)(philips)(nl)[dvc]" sha1="015e23599f7c83dcec262d49f269cecca5657c17"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8367,7 +8370,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="playboy's complete massage (1993)(philips)(us)[!][dvc]" sha1="e4b64d8aba8244e43664330ef00b711ada3a1c2f"/>
+				<disk name="playboy's complete massage (1993)(philips)(us)[dvc]" sha1="e4b64d8aba8244e43664330ef00b711ada3a1c2f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8415,7 +8418,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ritratto di citta - venezia (1993)(philips)(it)[!]" sha1="ac1a4d19b36fef9bf7d613f8d9688feff4e0af54"/>
+				<disk name="ritratto di citta - venezia (1993)(philips)(it)" sha1="ac1a4d19b36fef9bf7d613f8d9688feff4e0af54"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8431,7 +8434,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="private lesson series - classical guitar - a beginner's guide (1992)(philips)(eu-us)[!]" sha1="4dcf9f92868f740febec03f9a6f1b158c6862b9f"/>
+				<disk name="private lesson series - classical guitar - a beginner's guide (1992)(philips)(eu-us)" sha1="4dcf9f92868f740febec03f9a6f1b158c6862b9f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8463,7 +8466,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="private lesson series - rock guitar - a beginner's guide (1992)(philips)(eu)[!]" sha1="f3042444888b5b12bb8d881cba4b3c347b137dfd"/>
+				<disk name="private lesson series - rock guitar - a beginner's guide (1992)(philips)(eu)" sha1="f3042444888b5b12bb8d881cba4b3c347b137dfd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8496,7 +8499,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pyramid adventures - episode 1 - treasures of the lost pyramid (1995)(compact disc incorporated)(us)[!][dvc]" sha1="462c7461fe3366f97da87407d140d17107ab5f12"/>
+				<disk name="pyramid adventures - episode 1 - treasures of the lost pyramid (1995)(compact disc incorporated)(us)[dvc]" sha1="462c7461fe3366f97da87407d140d17107ab5f12"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8619,7 +8622,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="reihe privatunterricht - die klassische gitarre (1992)(philips)(de)[!]" sha1="126c70115df8c48de37aa103cb0a40ea2cafbfa3"/>
+				<disk name="reihe privatunterricht - die klassische gitarre (1992)(philips)(de)" sha1="126c70115df8c48de37aa103cb0a40ea2cafbfa3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8667,7 +8670,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="renaissance gallery, the (1992)(philips)(us)[!][310690 0442 50260 353 01]" sha1="e5faa80fba864da1ce7c1513f6a489dcfd2e79b3"/>
+				<disk name="renaissance gallery, the (1992)(philips)(us)[310690 0442 50260 353 01]" sha1="e5faa80fba864da1ce7c1513f6a489dcfd2e79b3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8683,7 +8686,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="renaissance of florence, the (1991)(philips)(us)[!][0442397 01, 0442397 02]" sha1="44c3c3dac949a3750ef90c496ea6528effdfe015"/>
+				<disk name="renaissance of florence, the (1991)(philips)(us)[0442397 01, 0442397 02]" sha1="44c3c3dac949a3750ef90c496ea6528effdfe015"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8843,7 +8846,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="richard scarry's allerbeste buurt disc! (1992)(philips)(nl)" sha1="5c5ce51cac105286090897a16f26f818369f7506"/>
+				<disk name="richard scarry's allerbeste buurt disc (1992)(philips)(nl)" sha1="5c5ce51cac105286090897a16f26f818369f7506"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8859,7 +8862,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="richard scarry's allerdrukste buurt disc! (1992)(philips)(nl)" sha1="25a2b872c5de744f2dc932b6ec6cd8004bd7589a"/>
+				<disk name="richard scarry's allerdrukste buurt disc (1992)(philips)(nl)" sha1="25a2b872c5de744f2dc932b6ec6cd8004bd7589a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8891,7 +8894,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="richard scarry's best neighborhood disc ever! (1992)(philips)(us)[!]" sha1="f4af755915242aade356ee3673f23d211753f160"/>
+				<disk name="richard scarry's best neighborhood disc ever (1992)(philips)(us)" sha1="f4af755915242aade356ee3673f23d211753f160"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8907,7 +8910,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="richard scarry's busiest neighborhood disc ever! (1991)(philips)(us)[0382911 01]" sha1="88df1839736343d84431a6d907a9e4f2d14808ee"/>
+				<disk name="richard scarry's busiest neighborhood disc ever (1991)(philips)(us)[0382911 01]" sha1="88df1839736343d84431a6d907a9e4f2d14808ee"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8923,7 +8926,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="richard scarry's busiest neighborhood disc ever! (1992)(philips)(us)[03820201 01]" sha1="1ff04341f934316d26aa3f6e10f4e5dcfd2d3b72"/>
+				<disk name="richard scarry's busiest neighborhood disc ever (1992)(philips)(us)[03820201 01]" sha1="1ff04341f934316d26aa3f6e10f4e5dcfd2d3b72"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8939,7 +8942,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="richard scarry's busiest neighborhood disc ever! (1992)(philips)(us)[3106900382 50257 831 01]" sha1="2ee6cec5c95319d8b6da2bc79e4898db3f6e1665"/>
+				<disk name="richard scarry's busiest neighborhood disc ever (1992)(philips)(us)[3106900382 50257 831 01]" sha1="2ee6cec5c95319d8b6da2bc79e4898db3f6e1665"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8990,12 +8993,12 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom1" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rio '88 - tina turner (1988)(philips - polygram)(pal)(eu)(disc 1 of 2)[!][dvc]" sha1="e054c54935db3c87213a47cae20ef123c1190334"/>
+				<disk name="rio '88 - tina turner (1988)(philips - polygram)(pal)(eu)(disc 1 of 2)[dvc]" sha1="e054c54935db3c87213a47cae20ef123c1190334"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rio '88 - tina turner (1988)(philips - polygram)(pal)(eu)(disc 2 of 2)[!][dvc]" sha1="358f0cbd295da6a69eb3f099bdeb76f057159f52"/>
+				<disk name="rio '88 - tina turner (1988)(philips - polygram)(pal)(eu)(disc 2 of 2)[dvc]" sha1="358f0cbd295da6a69eb3f099bdeb76f057159f52"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9091,7 +9094,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sandy's circus adventure (1991)(philips)(us)[!]" sha1="8b6d1670a86d69cd212b9182e3f48265810c4534"/>
+				<disk name="sandy's circus adventure (1991)(philips)(us)" sha1="8b6d1670a86d69cd212b9182e3f48265810c4534"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9188,7 +9191,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="schonsten hotels der welt, die - von burba holiday (1992)(philips)(de)[!][photo cd]" sha1="f233fa4abf5b60a363f1e664a3f5688193e05a78"/>
+				<disk name="schonsten hotels der welt, die - von burba holiday (1992)(philips)(de)[photo cd]" sha1="f233fa4abf5b60a363f1e664a3f5688193e05a78"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9239,7 +9242,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shari lewis - lamb chop's play-along! - action songs (1993)(philips)(us)[dvc]" sha1="8c49529d1f41ced2ca444d198b5da02a268409a1"/>
+				<disk name="shari lewis - lamb chop's play-along - action songs (1993)(philips)(us)[dvc]" sha1="8c49529d1f41ced2ca444d198b5da02a268409a1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9255,7 +9258,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shark alert (1993)(philips)(us)[!]" sha1="caf667c63488c01de9ad34d11e70b311f3185127"/>
+				<disk name="shark alert (1993)(philips)(us)" sha1="caf667c63488c01de9ad34d11e70b311f3185127"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9271,7 +9274,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shipwreck v3.03 (1993)(philips)(eu)[!]" sha1="8df5f291ae306159b204ae4eadc95c89e18fa50d"/>
+				<disk name="shipwreck v3.03 (1993)(philips)(eu)" sha1="8df5f291ae306159b204ae4eadc95c89e18fa50d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9399,7 +9402,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="stickybear family fun games (1995)(philips)(us)[!]" sha1="bed6ec58e876dea844711166d2ff57ab006bb7fd"/>
+				<disk name="stickybear family fun games (1995)(philips)(us)" sha1="bed6ec58e876dea844711166d2ff57ab006bb7fd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9480,7 +9483,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sting - ten summoner's tales (1994)(philips)(eu)[!][dvc]" sha1="d0efcc0dbb8524fdc77410ae7e1c56b0f29bb991"/>
+				<disk name="sting - ten summoner's tales (1994)(philips)(eu)[dvc]" sha1="d0efcc0dbb8524fdc77410ae7e1c56b0f29bb991"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9496,7 +9499,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="story machine - magic tales v1.0 (1992)(philips)(us)[!]" sha1="a8451ec16a6d261775d3f449b8a0faee6d40656d"/>
+				<disk name="story machine - magic tales v1.0 (1992)(philips)(us)" sha1="a8451ec16a6d261775d3f449b8a0faee6d40656d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9608,7 +9611,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tell me why one (1991)(philips)(us)[!]" sha1="87c5a079180e36bb1ae25df581faaed5e1a8e756"/>
+				<disk name="tell me why one (1991)(philips)(us)" sha1="87c5a079180e36bb1ae25df581faaed5e1a8e756"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9704,7 +9707,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tim &amp; baer auf dem flughafen (1995)(philips)(de)[!]" sha1="27ad7513d0fe79e2baedca150fe1da5cd1091e52"/>
+				<disk name="tim &amp; baer auf dem flughafen (1995)(philips)(de)" sha1="27ad7513d0fe79e2baedca150fe1da5cd1091e52"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9832,7 +9835,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tim et ted au cinema (1995)(philips)(fr)[!]" sha1="7c0734a90e3f809fc7872e04e58990f5ef403721"/>
+				<disk name="tim et ted au cinema (1995)(philips)(fr)" sha1="7c0734a90e3f809fc7872e04e58990f5ef403721"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9848,7 +9851,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="time-life - 35mm photography (1991)(philips)(us)[!][310690017-2 50240 104 01]" sha1="37f6893beae2fcb0d11dd4e860f135c90bb05251"/>
+				<disk name="time-life - 35mm photography (1991)(philips)(us)[310690017-2 50240 104 01]" sha1="37f6893beae2fcb0d11dd4e860f135c90bb05251"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9864,7 +9867,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="time-life - 35mm photography (1991)(philips)(us)[!][3106900642 01]" sha1="39223320b3792b71f4aacea032da12a23d405ec6"/>
+				<disk name="time-life - 35mm photography (1991)(philips)(us)[3106900642 01]" sha1="39223320b3792b71f4aacea032da12a23d405ec6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9880,7 +9883,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="time-life - astrology (1993)(philips)(eu-us)[!]" sha1="370215359ab175680447701e25cbc55d90e071aa"/>
+				<disk name="time-life - astrology (1993)(philips)(eu-us)" sha1="370215359ab175680447701e25cbc55d90e071aa"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9896,7 +9899,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="time-life - kleinbeeld fotografie (1992)(philips)(nl)[!]" sha1="25b610d1010f957696f16b684a2febee50540827"/>
+				<disk name="time-life - kleinbeeld fotografie (1992)(philips)(nl)" sha1="25b610d1010f957696f16b684a2febee50540827"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10042,7 +10045,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tr-i - no world order (1993)(philips)(us)[!][26720805 01]" sha1="f9f8231e7ebb24c2c93c8bd2c909bade07e25caf"/>
+				<disk name="tr-i - no world order (1993)(philips)(us)[26720805 01]" sha1="f9f8231e7ebb24c2c93c8bd2c909bade07e25caf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10058,7 +10061,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tr-i - no world order (1993)(philips)(us)[!][6902672 50378963 01]" sha1="d1649ecfd8058f20414631968ba077bbf4386cdf"/>
+				<disk name="tr-i - no world order (1993)(philips)(us)[6902672 50378963 01]" sha1="d1649ecfd8058f20414631968ba077bbf4386cdf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10074,7 +10077,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="treasures of the smithsonian (1991)(philips)(us)[!]" sha1="6f4a6e248e408620c57ac94c3afb1653960f9ef6"/>
+				<disk name="treasures of the smithsonian (1991)(philips)(us)" sha1="6f4a6e248e408620c57ac94c3afb1653960f9ef6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10157,7 +10160,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[!][de-fr-nl][dvc enhanced][8100101v104 50404061 01]" sha1="fc40fd4e77f88fc4297a08ca0f6decb567d50f7f"/>
+				<disk name="usa '94 - world cup (1994)(philips)(eu)(m3)[de-fr-nl][dvc enhanced][8100101v104 50404061 01]" sha1="fc40fd4e77f88fc4297a08ca0f6decb567d50f7f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10239,7 +10242,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="verhalen toverdoos - sterrendromen v1.0 (1992)(philips)(nl)[!]" sha1="f9ad334ca69af7bc8f41c4a66920678e3a982bae"/>
+				<disk name="verhalen toverdoos - sterrendromen v1.0 (1992)(philips)(nl)" sha1="f9ad334ca69af7bc8f41c4a66920678e3a982bae"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10401,7 +10404,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world of impressionism, the (1992)(philips)(eu-us)[!]" sha1="23810c8fe4205e068d5d2ba447a0a315371d96f2"/>
+				<disk name="world of impressionism, the (1992)(philips)(eu-us)" sha1="23810c8fe4205e068d5d2ba447a0a315371d96f2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10536,7 +10539,7 @@
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="xplora 1 - peter gabriel's secret world (1995)(philips)(eu)[!][dvc]" sha1="794a42059b172f0cfff4c670568b061386d71897"/>
+				<disk name="xplora 1 - peter gabriel's secret world (1995)(philips)(eu)[dvc]" sha1="794a42059b172f0cfff4c670568b061386d71897"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10552,7 +10555,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yearn 2 learn - peanuts (1994)(philips)(eu)(m4)[!]" sha1="4c35d7b7c5f8f60e63fde6e4530f12d913f53d11"/>
+				<disk name="yearn 2 learn - peanuts (1994)(philips)(eu)(m4)" sha1="4c35d7b7c5f8f60e63fde6e4530f12d913f53d11"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10584,7 +10587,7 @@
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zoo ...eenvoudig! (1993)(philips)(nl)" sha1="8b8b10c141de14e36d50aec71103a5a7fa23a88a"/>
+				<disk name="zoo ...eenvoudig (1993)(philips)(nl)" sha1="8b8b10c141de14e36d50aec71103a5a7fa23a88a"/>
 			</diskarea>
 		</part>
 	</software>

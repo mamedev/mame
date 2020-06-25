@@ -21,7 +21,6 @@
 #include "machine/timer.h"
 #include "video/v9938.h"
 #include "sound/sn76496.h"
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/colorbus/colorbus.h"
 #include "bus/ti99/internal/evpcconn.h"
 
@@ -31,11 +30,11 @@ class snug_enhanced_video_device : public device_t, public device_ti99_peribox_c
 {
 public:
 	snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	void setaddress_dbin(offs_t offset, int state) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( hblank_interrupt );

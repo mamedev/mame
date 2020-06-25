@@ -134,14 +134,14 @@ Notes:
 /******************************************************************************/
 
 template<int Layer>
-WRITE16_MEMBER(lastduel_state::lastduel_vram_w)
+void lastduel_state::lastduel_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
 template<int Layer>
-WRITE16_MEMBER(lastduel_state::madgear_vram_w)
+void lastduel_state::madgear_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset & 0x7ff);
@@ -197,7 +197,7 @@ void lastduel_state::sound_map(address_map &map)
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
+void lastduel_state::mg_bankswitch_w(uint8_t data)
 {
 	m_audiobank->set_entry(data & 0x01);
 }

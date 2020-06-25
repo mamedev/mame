@@ -368,18 +368,18 @@ public:
 	void coh3002t_t1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(control3_r);
-	DECLARE_WRITE8_MEMBER(control3_w);
-	DECLARE_READ16_MEMBER(gn_1fb70000_r);
-	DECLARE_WRITE16_MEMBER(gn_1fb70000_w);
-	DECLARE_READ16_MEMBER(hack1_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
-	DECLARE_READ32_MEMBER(zsg2_ext_r);
+	uint8_t control_r();
+	void control_w(uint8_t data);
+	void control2_w(uint16_t data);
+	uint8_t control3_r();
+	void control3_w(uint8_t data);
+	uint16_t gn_1fb70000_r();
+	void gn_1fb70000_w(uint16_t data);
+	uint16_t hack1_r(offs_t offset);
+	void coin_w(uint8_t data);
+	uint8_t coin_r();
+	uint8_t gnet_mahjong_panel_r();
+	uint32_t zsg2_ext_r(offs_t offset);
 
 	void flashbank_map(address_map &map);
 	void main_map(address_map &map);
@@ -408,12 +408,12 @@ private:
 
 // Misc. controls
 
-READ8_MEMBER(taitogn_state::control_r)
+uint8_t taitogn_state::control_r()
 {
 	return m_control;
 }
 
-WRITE8_MEMBER(taitogn_state::control_w)
+void taitogn_state::control_w(uint8_t data)
 {
 	// 20 = watchdog
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
@@ -445,22 +445,22 @@ WRITE8_MEMBER(taitogn_state::control_w)
 	m_control = data;
 }
 
-WRITE16_MEMBER(taitogn_state::control2_w)
+void taitogn_state::control2_w(uint16_t data)
 {
 	m_control2 = data;
 }
 
-READ8_MEMBER(taitogn_state::control3_r)
+uint8_t taitogn_state::control3_r()
 {
 	return m_control3;
 }
 
-WRITE8_MEMBER(taitogn_state::control3_w)
+void taitogn_state::control3_w(uint8_t data)
 {
 	m_control3 = data;
 }
 
-READ16_MEMBER(taitogn_state::gn_1fb70000_r)
+uint16_t taitogn_state::gn_1fb70000_r()
 {
 	// (1328) 1348 tests mask 0002, 8 times.
 	// Called by 1434, exit at 143c
@@ -472,13 +472,13 @@ READ16_MEMBER(taitogn_state::gn_1fb70000_r)
 	return 2;
 }
 
-WRITE16_MEMBER(taitogn_state::gn_1fb70000_w)
+void taitogn_state::gn_1fb70000_w(uint16_t data)
 {
-	// Writes 0 or 1 all the time, it *may* have somthing to do with
+	// Writes 0 or 1 all the time, it *may* have something to do with
 	// i/o port width, but then maybe not
 }
 
-READ16_MEMBER(taitogn_state::hack1_r)
+uint16_t taitogn_state::hack1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -497,7 +497,7 @@ READ16_MEMBER(taitogn_state::hack1_r)
 
 
 
-WRITE8_MEMBER(taitogn_state::coin_w)
+void taitogn_state::coin_w(uint8_t data)
 {
 	/* 0x01=counter
 	   0x02=coin lock 1
@@ -511,13 +511,13 @@ WRITE8_MEMBER(taitogn_state::coin_w)
 	m_coin_info = data;
 }
 
-READ8_MEMBER(taitogn_state::coin_r)
+uint8_t taitogn_state::coin_r()
 {
 	return m_coin_info;
 }
 
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
-READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
+uint8_t taitogn_state::gnet_mahjong_panel_r()
 {
 	switch (m_coin_info & 0xcc)
 	{
@@ -534,7 +534,7 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 	return ioport("P4")->read();
 }
 
-READ32_MEMBER(taitogn_state::zsg2_ext_r)
+uint32_t taitogn_state::zsg2_ext_r(offs_t offset)
 {
 	offset <<= 1;
 

@@ -33,27 +33,26 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_READ16_MEMBER(reg_r) override;
-	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
+	virtual uint16_t reg_r(address_space &space, offs_t offset) override;
+	virtual void reg_w(address_space &space, offs_t offset, uint16_t data) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(dc_w);
-	DECLARE_READ8_MEMBER(dc_r);
+	void dc_w(uint8_t data);
+	uint8_t dc_r();
+	uint8_t int_ack_r();
 
-	DECLARE_WRITE8_MEMBER(hpib_data_w);
-	DECLARE_WRITE8_MEMBER(hpib_ctrl_w);
-	DECLARE_READ8_MEMBER(hpib_ctrl_r);
-	DECLARE_READ8_MEMBER(hpib_data_r);
-	DECLARE_READ8_MEMBER(idr_r);
-	DECLARE_WRITE8_MEMBER(odr_w);
-	DECLARE_READ8_MEMBER(mode_reg_r);
-	DECLARE_WRITE8_MEMBER(mode_reg_clear_w);
-	DECLARE_READ8_MEMBER(switch_r);
+	void hpib_data_w(uint8_t data);
+	void hpib_ctrl_w(uint8_t data);
+	uint8_t hpib_ctrl_r();
+	uint8_t hpib_data_r();
+	uint8_t idr_r();
+	void odr_w(uint8_t data);
+	uint8_t mode_reg_r();
+	void mode_reg_clear_w(uint8_t data);
+	uint8_t switch_r();
 
 	void np_io_map(address_map &map);
 	void np_program_map(address_map &map);
-
-	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
 

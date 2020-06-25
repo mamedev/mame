@@ -115,7 +115,7 @@ void snkwave_device::sound_stream_update(sound_stream &stream, stream_sample_t *
     2-5         waveform (8 3-bit nibbles)
 */
 
-WRITE8_MEMBER( snkwave_device::snkwave_w )
+void snkwave_device::snkwave_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 

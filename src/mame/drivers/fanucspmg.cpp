@@ -592,26 +592,26 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(shared_r);
-	DECLARE_WRITE8_MEMBER(shared_w);
-	DECLARE_READ8_MEMBER(vram1_r);
-	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_READ8_MEMBER(vram2_r);
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_READ8_MEMBER(vblank_ack_r);
-	DECLARE_WRITE8_MEMBER(vbl_ctrl_w);
-	DECLARE_WRITE8_MEMBER(keyboard_row_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
-	DECLARE_READ8_MEMBER(fdcdma_r);
-	DECLARE_WRITE8_MEMBER(fdcdma_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(dma_page_w);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t shared_r(offs_t offset);
+	void shared_w(offs_t offset, uint8_t data);
+	uint8_t vram1_r(offs_t offset);
+	void vram1_w(offs_t offset, uint8_t data);
+	uint8_t vram2_r(offs_t offset);
+	void vram2_w(offs_t offset, uint8_t data);
+	void vram_bank_w(uint8_t data);
+	uint8_t vblank_ack_r();
+	void vbl_ctrl_w(uint8_t data);
+	void keyboard_row_w(uint8_t data);
+	uint8_t keyboard_r();
+	void video_ctrl_w(uint8_t data);
+	uint8_t fdcdma_r();
+	void fdcdma_w(uint8_t data);
+	uint8_t get_slave_ack(offs_t offset);
+	void dma_page_w(uint8_t data);
 
-	DECLARE_READ16_MEMBER(magic_r);
+	uint16_t magic_r();
 
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
@@ -646,17 +646,17 @@ void fanucspmg_state::init_fanucspmg()
 	save_item(NAME(m_video_ctrl));
 }
 
-READ8_MEMBER(fanucspmg_state::shared_r)
+uint8_t fanucspmg_state::shared_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-WRITE8_MEMBER(fanucspmg_state::shared_w)
+void fanucspmg_state::shared_w(offs_t offset, uint8_t data)
 {
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(fanucspmg_state::get_slave_ack)
+uint8_t fanucspmg_state::get_slave_ack(offs_t offset)
 {
 	if(offset == 7)
 		return m_pic[1]->acknowledge();
@@ -675,17 +675,17 @@ WRITE_LINE_MEMBER(fanucspmg_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
-READ8_MEMBER(fanucspmg_state::fdcdma_r)
+uint8_t fanucspmg_state::fdcdma_r()
 {
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER(fanucspmg_state::fdcdma_w)
+void fanucspmg_state::fdcdma_w(uint8_t data)
 {
 	m_fdc->dma_w(data);
 }
 
-WRITE8_MEMBER(fanucspmg_state::dma_page_w)
+void fanucspmg_state::dma_page_w(uint8_t data)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -696,7 +696,7 @@ WRITE8_MEMBER(fanucspmg_state::dma_page_w)
 	m_dma_page = (data >> 2) & 0xf;
 }
 
-READ16_MEMBER(fanucspmg_state::magic_r)
+uint16_t fanucspmg_state::magic_r()
 {
 	return 0x0041;  // 31 = memory error
 }
@@ -742,32 +742,32 @@ WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
 	m_vbl_stat = (state == ASSERT_LINE) ? 1 : 0;
 }
 
-READ8_MEMBER(fanucspmg_state::vram1_r)
+uint8_t fanucspmg_state::vram1_r(offs_t offset)
 {
 	return m_vram[m_vram_bank + offset];
 }
 
-WRITE8_MEMBER(fanucspmg_state::vram1_w)
+void fanucspmg_state::vram1_w(offs_t offset, uint8_t data)
 {
 	m_vram[m_vram_bank + offset] = data;
 }
 
-READ8_MEMBER(fanucspmg_state::vram2_r)
+uint8_t fanucspmg_state::vram2_r(offs_t offset)
 {
 	return m_vram[m_vram_bank + offset + 0x600];
 }
 
-WRITE8_MEMBER(fanucspmg_state::vram2_w)
+void fanucspmg_state::vram2_w(offs_t offset, uint8_t data)
 {
 	m_vram[m_vram_bank + offset + 0x600] = data;
 }
 
-WRITE8_MEMBER(fanucspmg_state::vram_bank_w)
+void fanucspmg_state::vram_bank_w(uint8_t data)
 {
 	m_vram_bank = (data & 7) * 0xc00;
 }
 
-READ8_MEMBER(fanucspmg_state::vblank_ack_r)
+uint8_t fanucspmg_state::vblank_ack_r()
 {
 	m_subcpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 
@@ -776,26 +776,26 @@ READ8_MEMBER(fanucspmg_state::vblank_ack_r)
 
 // bit 1 is unknown
 // bit 3 appears to enable vblank IRQs
-WRITE8_MEMBER(fanucspmg_state::vbl_ctrl_w)
+void fanucspmg_state::vbl_ctrl_w(uint8_t data)
 {
 	m_vbl_ctrl = data;
 }
 
 // row 2: raising a bit toggles the corresponding bit at 500a
 // row 3: raising a bit toggles the corresponding bit at 500b
-WRITE8_MEMBER(fanucspmg_state::keyboard_row_w)
+void fanucspmg_state::keyboard_row_w(uint8_t data)
 {
 	m_keyboard_row = data;
 }
 
-READ8_MEMBER(fanucspmg_state::keyboard_r)
+uint8_t fanucspmg_state::keyboard_r()
 {
 	return 0;
 }
 
 // bit 0 is set when clearing VRAM
 // bit 1 is display enable
-WRITE8_MEMBER(fanucspmg_state::video_ctrl_w)
+void fanucspmg_state::video_ctrl_w(uint8_t data)
 {
 	m_video_ctrl = data;
 }
@@ -832,13 +832,13 @@ void fanucspmg_state::machine_reset()
 	m_dma_page = 0;
 }
 
-READ8_MEMBER(fanucspmg_state::memory_read_byte)
+uint8_t fanucspmg_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma_page << 16));
 }
 
-WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
+void fanucspmg_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset | (m_dma_page << 16), data);

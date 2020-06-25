@@ -661,7 +661,6 @@ INPUT_PORTS_START(matrix_dk)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(matrix_ch)
-	// FIXME: natural keyboard doesn't play nicely with PORT_CONDITION, but it's an issue with natural keyboard itself
 	PORT_INCLUDE(matrix_common)
 
 	PORT_START("CFG")

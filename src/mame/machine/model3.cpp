@@ -290,16 +290,16 @@ void model3_state::tap_reset()
 /*****************************************************************************/
 /* Epson RTC-72421 */
 
-READ32_MEMBER(model3_state::rtc72421_r)
+uint32_t model3_state::rtc72421_r(offs_t offset)
 {
 	int reg = offset;
 	uint32_t data;
-	data = m_rtc->read(space, reg) << 24;
+	data = m_rtc->read(reg) << 24;
 	data |= 0x30000;    /* these bits are set to pass the battery voltage test */
 	return data;
 }
 
-WRITE32_MEMBER(model3_state::rtc72421_w)
+void model3_state::rtc72421_w(offs_t offset, uint32_t data)
 {
-	m_rtc->write(space, offset, data >> 24);
+	m_rtc->write(offset, data >> 24);
 }

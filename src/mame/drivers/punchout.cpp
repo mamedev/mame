@@ -202,14 +202,14 @@ void punchout_state::punchout_vlm_map(address_map &map)
 // e.g. relying on the masking done by the internal registers.
 // The RP5H01 one-time PROM (OTP) is confirmed to be unprogrammed.
 
-READ8_MEMBER(punchout_state::spunchout_exp_r)
+uint8_t punchout_state::spunchout_exp_r(offs_t offset)
 {
 	// d0-d3: D0-D3 from RP5C01
 	// d4: N/C
 	// d5: _ALARM from RP5C01
 	// d6: COUNTER OUT from RP5H01
 	// d7: DATA OUT from RP5H01 - always 0?
-	uint8_t ret = m_rtc->read(space, offset >> 4 & 0xf) & 0xf;
+	uint8_t ret = m_rtc->read(offset >> 4 & 0xf) & 0xf;
 	ret |= 0x10;
 	ret |= m_rtc->alarm_r() ? 0x00 : 0x20;
 	ret |= m_rp5h01->counter_r() ? 0x00 : 0x40;
@@ -218,23 +218,23 @@ READ8_MEMBER(punchout_state::spunchout_exp_r)
 	return ret;
 }
 
-WRITE8_MEMBER(punchout_state::spunchout_exp_w)
+void punchout_state::spunchout_exp_w(offs_t offset, uint8_t data)
 {
 	// d0-d3: D0-D3 to RP5C01
-	m_rtc->write(space, offset >> 4 & 0xf, data & 0xf);
+	m_rtc->write(offset >> 4 & 0xf, data & 0xf);
 }
 
-WRITE8_MEMBER(punchout_state::spunchout_rp5h01_reset_w)
+void punchout_state::spunchout_rp5h01_reset_w(uint8_t data)
 {
 	// d0: 74LS74 2D
 	// 74LS74 2Q -> RP5H01 RESET
 	// 74LS74 _2Q -> 74LS74 _1 RESET
 	m_rp5h01->reset_w(data & 1);
 	if (data & 1)
-		spunchout_rp5h01_clock_w(space, 0, 0);
+		spunchout_rp5h01_clock_w(0);
 }
 
-WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
+void punchout_state::spunchout_rp5h01_clock_w(uint8_t data)
 {
 	// d0: 74LS74 1D
 	// 74LS74 1Q -> RP5H01 DATA CLOCK + TEST

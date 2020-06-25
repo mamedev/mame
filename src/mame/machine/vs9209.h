@@ -44,8 +44,8 @@ public:
 	auto porth_output_cb() { return m_output_cb[7].bind(); }
 
 	// memory handlers
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(address_space &space, offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides

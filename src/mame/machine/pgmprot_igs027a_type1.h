@@ -92,14 +92,14 @@ private:
 	void pgm_decode_kovlsqh2_samples();
 	void pgm_decode_kovqhsgs_program();
 	void pgm_decode_kovqhsgs2_program();
-	DECLARE_READ16_MEMBER( arm7_type1_sim_r );
+	u16 arm7_type1_sim_r(offs_t offset);
 	void command_handler_ddp3(int pc);
 	void command_handler_puzzli2(int pc);
 	void command_handler_py2k2(int pc);
 	void command_handler_pstars(int pc);
 	void command_handler_kov(int pc);
 	void command_handler_oldsplus(int pc);
-	DECLARE_WRITE16_MEMBER( arm7_type1_sim_w );
+	void arm7_type1_sim_w(offs_t offset, u16 data);
 	u16 arm7_type1_sim_protram_r(offs_t offset);
 	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
 	int m_simregion;

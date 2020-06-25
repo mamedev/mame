@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="hp86_rom" description="HP-86/7 Option ROMs">
 	<software name="miksam">
@@ -15,22 +18,11 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="language">
-		<description>Language ROM</description>
-		<year>1983</year>
-		<publisher>Hewlett-Packard</publisher>
-
-		<part name="rom" interface="hp80_rom">
-			<feature name="sc" value="0x18"/>
-			<dataarea name="rom" size="0x2000">
-				<rom name="rom030.bin" size="0x2000" crc="14507bc0" sha1="67ca5a15019bd7b2bfbf53bb8cfbe2ca20a6239c"/>
-			</dataarea>
-		</part>
-	</software>
 	<software name="assembler">
 		<description>Assembler ROM</description>
 		<year>1982</year>
 		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15007"/>
 
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0x28"/>
@@ -82,11 +74,38 @@
 		<description>Extended Mass Storage ROM</description>
 		<year>1984</year>
 		<publisher>Structured Software Systems</publisher>
+		<info name="serial" value="00087-15013"/>
 
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0xcf"/>
 			<dataarea name="rom" size="0x2000">
 				<rom name="rom317.bin" size="0x2000" crc="187f7a1e" sha1="4e52f81139a7bbb6e0ed8758dc4fe2307c3da074"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="service">
+		<description>Service ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-60912"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xe0"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom340.bin" size="0x2000" crc="f8e0647e" sha1="6729f022be586502656944c8517e2e4c0a0ea6c5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="service_hpib">
+		<description>HPIB service ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-60913"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xe1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom341.bin" size="0x2000" crc="2927aeeb" sha1="c5f76fb86146b001c30bdb20bc7f27004530d9b0"/>
 			</dataarea>
 		</part>
 	</software>

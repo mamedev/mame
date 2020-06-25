@@ -31,8 +31,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	static constexpr device_timer_id TIMER_TC = 0;
@@ -51,12 +51,12 @@ private:
 	uint8_t m_i8255_1_pc;
 	uint8_t m_i8255_portb;
 
-	DECLARE_WRITE8_MEMBER(i8255_b_w);
-	DECLARE_READ8_MEMBER(i8255_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_c_w);
+	void i8255_b_w(uint8_t data);
+	uint8_t i8255_c_r();
+	void i8255_c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(tc_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	uint8_t tc_r();
+	void control_w(uint8_t data);
 
 	void sd725_io(address_map &map);
 	void sd725_mem(address_map &map);

@@ -243,32 +243,32 @@ int x68k_state::read_mouse()
     0xe98005 - Z8530 command port A
     0xe98007 - Z8530 data port A  (RS232)
 */
-READ16_MEMBER(x68k_state::scc_r )
+uint16_t x68k_state::scc_r(offs_t offset)
 {
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return m_scc->reg_r(space, 0);
+		return m_scc->reg_r(0);
 	case 1:
 		return read_mouse();
 	case 2:
-		return m_scc->reg_r(space, 1);
+		return m_scc->reg_r(1);
 	case 3:
-		return m_scc->reg_r(space, 3);
+		return m_scc->reg_r(3);
 	default:
 		return 0xff;
 	}
 }
 
-WRITE16_MEMBER(x68k_state::scc_w )
+void x68k_state::scc_w(offs_t offset, uint16_t data)
 {
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		m_scc->reg_w(space, 0,(uint8_t)data);
+		m_scc->reg_w(0,(uint8_t)data);
 		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -281,13 +281,13 @@ WRITE16_MEMBER(x68k_state::scc_w )
 		}
 		break;
 	case 1:
-		m_scc->reg_w(space, 2,(uint8_t)data);
+		m_scc->reg_w(2,(uint8_t)data);
 		break;
 	case 2:
-		m_scc->reg_w(space, 1,(uint8_t)data);
+		m_scc->reg_w(1,(uint8_t)data);
 		break;
 	case 3:
-		m_scc->reg_w(space, 3,(uint8_t)data);
+		m_scc->reg_w(3,(uint8_t)data);
 		break;
 	}
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
@@ -497,7 +497,7 @@ uint8_t x68k_state::xpd1lr_r(int port)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-READ8_MEMBER(x68k_state::ppi_port_a_r)
+uint8_t x68k_state::ppi_port_a_r()
 {
 	int ctrl = m_ctrltype->read() & 0x0f;
 
@@ -519,7 +519,7 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_b_r)
+uint8_t x68k_state::ppi_port_b_r()
 {
 	int ctrl = m_ctrltype->read() & 0xf0;
 
@@ -541,7 +541,7 @@ READ8_MEMBER(x68k_state::ppi_port_b_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_c_r)
+uint8_t x68k_state::ppi_port_c_r()
 {
 	return m_ppi_port[2];
 }
@@ -554,7 +554,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan (00 = Both, 01 = Right only, 10 = Left only, 11 = Off)
 */
-WRITE8_MEMBER(x68k_state::ppi_port_c_w)
+void x68k_state::ppi_port_c_w(uint8_t data)
 {
 	// ADPCM / Joystick control
 	m_ppi_port[2] = data;
@@ -595,7 +595,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 
 
 // NEC uPD72065 at 0xe94000
-WRITE16_MEMBER(x68k_state::fdc_w)
+void x68k_state::fdc_w(offs_t offset, uint16_t data)
 {
 	unsigned int drive, x;
 	switch(offset)
@@ -639,7 +639,7 @@ WRITE16_MEMBER(x68k_state::fdc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::fdc_r)
+uint16_t x68k_state::fdc_r(offs_t offset)
 {
 	unsigned int ret;
 	int x;
@@ -685,7 +685,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 	}
 }
 
-WRITE8_MEMBER(x68k_state::ct_w)
+void x68k_state::ct_w(uint8_t data)
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -719,7 +719,7 @@ WRITE8_MEMBER(x68k_state::ct_w)
                 - bits 7-2 = vector
                 - bits 1,0 = device (00 = FDC, 01 = FDD, 10 = HDD, 11 = Printer)
 */
-WRITE16_MEMBER(x68k_state::ioc_w)
+void x68k_state::ioc_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{
@@ -751,7 +751,7 @@ WRITE16_MEMBER(x68k_state::ioc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::ioc_r)
+uint16_t x68k_state::ioc_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -783,7 +783,7 @@ READ16_MEMBER(x68k_state::ioc_r)
                                          Any other value, then SRAM is read only.
  Port 8 (0xe8e00f) - Power off control - write 0x00, 0x0f, 0x0f sequentially to switch power off.
 */
-WRITE16_MEMBER(x68k_state::sysport_w)
+void x68k_state::sysport_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -806,7 +806,7 @@ WRITE16_MEMBER(x68k_state::sysport_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::sysport_r)
+uint16_t x68k_state::sysport_r(offs_t offset)
 {
 	int ret = 0;
 	switch(offset)
@@ -826,18 +826,18 @@ READ16_MEMBER(x68k_state::sysport_r)
 	}
 }
 
-WRITE16_MEMBER(x68k_state::ppi_w)
+void x68k_state::ppi_w(offs_t offset, uint16_t data)
 {
 	m_ppi->write(offset & 0x03,data);
 }
 
-READ16_MEMBER(x68k_state::ppi_r)
+uint16_t x68k_state::ppi_r(offs_t offset)
 {
 	return m_ppi->read(offset & 0x03);
 }
 
 
-WRITE16_MEMBER(x68k_state::sram_w)
+void x68k_state::sram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_sysport.sram_writeprotect == 0x31)
 	{
@@ -845,7 +845,7 @@ WRITE16_MEMBER(x68k_state::sram_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::sram_r)
+uint16_t x68k_state::sram_r(offs_t offset)
 {
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
@@ -855,7 +855,7 @@ READ16_MEMBER(x68k_state::sram_r)
 	return m_nvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::vid_w)
+void x68k_state::vid_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -892,7 +892,7 @@ WRITE16_MEMBER(x68k_state::vid_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::vid_r)
+uint16_t x68k_state::vid_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -909,19 +909,19 @@ READ16_MEMBER(x68k_state::vid_r)
 	return 0xff;
 }
 
-READ16_MEMBER(x68k_state::areaset_r)
+uint16_t x68k_state::areaset_r()
 {
 	// register is write-only
 	return 0xffff;
 }
 
-WRITE16_MEMBER(x68k_state::areaset_w)
+void x68k_state::areaset_w(uint16_t data)
 {
 	// TODO
 	LOGMASKED(LOG_SYS, "SYS: Supervisor area set: 0x%02x\n",data & 0xff);
 }
 
-WRITE16_MEMBER(x68k_state::enh_areaset_w )
+void x68k_state::enh_areaset_w(offs_t offset, uint16_t data)
 {
 	// TODO
 	LOGMASKED(LOG_SYS, "SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
@@ -946,7 +946,7 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
-READ16_MEMBER(x68k_state::rom0_r)
+uint16_t x68k_state::rom0_r(offs_t offset, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -955,7 +955,7 @@ READ16_MEMBER(x68k_state::rom0_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::rom0_w)
+void x68k_state::rom0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -963,7 +963,7 @@ WRITE16_MEMBER(x68k_state::rom0_w)
 		set_bus_error((offset << 1) + 0xbffffc, false, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::emptyram_r)
+uint16_t x68k_state::emptyram_r(offs_t offset, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -972,7 +972,7 @@ READ16_MEMBER(x68k_state::emptyram_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::emptyram_w)
+void x68k_state::emptyram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -980,7 +980,7 @@ WRITE16_MEMBER(x68k_state::emptyram_w)
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::exp_r)
+uint16_t x68k_state::exp_r(offs_t offset, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
@@ -988,7 +988,7 @@ READ16_MEMBER(x68k_state::exp_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::exp_w)
+void x68k_state::exp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
@@ -1001,7 +1001,7 @@ WRITE_LINE_MEMBER(x68k_state::dma_irq)
 	update_ipl();
 }
 
-WRITE8_MEMBER(x68k_state::dma_end)
+void x68k_state::dma_end(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -1021,7 +1021,7 @@ WRITE_LINE_MEMBER(x68k_state::fm_irq)
 	}
 }
 
-WRITE8_MEMBER(x68k_state::adpcm_w)
+void x68k_state::adpcm_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

@@ -136,7 +136,7 @@ mw-9.rom = ST M27C1001 / GFX
  *
  *************************************/
 
-READ8_MEMBER(mitchell_state::pang_port5_r)
+uint8_t mitchell_state::pang_port5_r()
 {
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
 	    bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -148,17 +148,17 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
 	return (ioport("SYS0")->read() & 0xfe) | (m_irq_source & 1);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_cs_w)
+void mitchell_state::eeprom_cs_w(uint8_t data)
 {
 	m_eeprom->cs_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_clock_w)
+void mitchell_state::eeprom_clock_w(uint8_t data)
 {
 	m_eeprom->clk_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
+void mitchell_state::eeprom_serial_w(uint8_t data)
 {
 	m_eeprom->di_write(data & 1);
 }
@@ -170,7 +170,7 @@ WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
+void mitchell_state::pang_bankswitch_w(uint8_t data)
 {
 	m_bank1->set_entry(data & 0x0f);
 	if(m_bank1d)
@@ -183,7 +183,7 @@ WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(mitchell_state::block_input_r)
+uint8_t mitchell_state::block_input_r(offs_t offset)
 {
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
@@ -227,7 +227,7 @@ READ8_MEMBER(mitchell_state::block_input_r)
 	}
 }
 
-WRITE8_MEMBER(mitchell_state::block_dial_control_w)
+void mitchell_state::block_dial_control_w(uint8_t data)
 {
 	if (data == 0x08)
 	{
@@ -242,7 +242,7 @@ WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 }
 
 
-READ8_MEMBER(mitchell_state::mahjong_input_r)
+uint8_t mitchell_state::mahjong_input_r(offs_t offset)
 {
 	int i;
 	static const char *const keynames[2][5] =
@@ -260,13 +260,13 @@ READ8_MEMBER(mitchell_state::mahjong_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mitchell_state::mahjong_input_select_w)
+void mitchell_state::mahjong_input_select_w(uint8_t data)
 {
 	m_keymatrix = data;
 }
 
 
-READ8_MEMBER(mitchell_state::input_r)
+uint8_t mitchell_state::input_r(offs_t offset)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
@@ -277,12 +277,12 @@ READ8_MEMBER(mitchell_state::input_r)
 			return ioport(portnames[offset])->read();
 		case 1:     /* Mahjong games */
 			if (offset)
-				return mahjong_input_r(space, offset - 1);
+				return mahjong_input_r(offset - 1);
 			else
 				return ioport("IN0")->read();
 		case 2:     /* Block Block - dial control */
 			if (offset)
-				return block_input_r(space, offset - 1);
+				return block_input_r(offset - 1);
 			else
 				return ioport("IN0")->read();
 		case 3:     /* Super Pang - simulate START 1 press to initialize EEPROM */
@@ -291,7 +291,7 @@ READ8_MEMBER(mitchell_state::input_r)
 }
 
 
-WRITE8_MEMBER(mitchell_state::input_w)
+void mitchell_state::input_w(uint8_t data)
 {
 	switch (m_input_type)
 	{
@@ -300,10 +300,10 @@ WRITE8_MEMBER(mitchell_state::input_w)
 			logerror("PC %04x: write %02x to port 01\n", m_maincpu->pc(), data);
 			break;
 		case 1:
-			mahjong_input_select_w(space, offset, data);
+			mahjong_input_select_w(data);
 			break;
 		case 2:
-			block_dial_control_w(space, offset, data);
+			block_dial_control_w(data);
 			break;
 	}
 }
@@ -386,7 +386,7 @@ void mitchell_state::spangbl_io_map(address_map &map)
 	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
 }
 
-WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
+void mitchell_state::sound_bankswitch_w(uint8_t data)
 {
 	m_msm->reset_w(BIT(data, 3));
 
@@ -417,7 +417,7 @@ void mitchell_state::pangba_sound_map(address_map &map)
 
 
 /**** Monsters World ****/
-WRITE8_MEMBER(mitchell_state::oki_banking_w)
+void mitchell_state::oki_banking_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 3);
 }
@@ -431,7 +431,7 @@ void mitchell_state::mstworld_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
+void mitchell_state::mstworld_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

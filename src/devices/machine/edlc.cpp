@@ -18,8 +18,7 @@
  *
  * TODO:
  *   - RxDC (discard) and TxRET (retransmit) logic
- *   - 80c03 support
- *   - testing
+ *   - 80c03 inter-packet gap (undocumented)
  */
 
 #include "emu.h"
@@ -33,16 +32,22 @@
 //#define VERBOSE (LOG_GENERAL|LOG_FRAMES|LOG_FILTER)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(SEEQ8003, seeq8003_device, "seeq8003", "SEEQ 8003 EDLC")
+DEFINE_DEVICE_TYPE(SEEQ8003,  seeq8003_device,  "seeq8003",  "SEEQ 8003 EDLC")
+DEFINE_DEVICE_TYPE(SEEQ80C03, seeq80c03_device, "seeq80c03", "SEEQ 80C03 EDLC")
 
 static const u8 ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-seeq8003_device::seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SEEQ8003, tag, owner, clock)
+seeq8003_device::seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10.0f)
 	, m_out_int(*this)
 	, m_out_rxrdy(*this)
 	, m_out_txrdy(*this)
+{
+}
+
+seeq8003_device::seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: seeq8003_device(mconfig, SEEQ8003, tag, owner, clock)
 {
 }
 
@@ -107,14 +112,7 @@ int seeq8003_device::recv_start_cb(u8 *buf, int length)
 
 void seeq8003_device::map(address_map &map)
 {
-	map.unmap_value_high();
-
-	map(0, 0).w(FUNC(seeq8003_device::station_address_w<0>));
-	map(1, 1).w(FUNC(seeq8003_device::station_address_w<1>));
-	map(2, 2).w(FUNC(seeq8003_device::station_address_w<2>));
-	map(3, 3).w(FUNC(seeq8003_device::station_address_w<3>));
-	map(4, 4).w(FUNC(seeq8003_device::station_address_w<4>));
-	map(5, 5).w(FUNC(seeq8003_device::station_address_w<5>));
+	map(0, 5).rw(FUNC(seeq8003_device::unused_r), FUNC(seeq8003_device::station_address_w));
 	map(6, 6).rw(FUNC(seeq8003_device::rx_status_r), FUNC(seeq8003_device::rx_command_w));
 	map(7, 7).rw(FUNC(seeq8003_device::tx_status_r), FUNC(seeq8003_device::tx_command_w));
 }
@@ -136,12 +134,10 @@ void seeq8003_device::write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-	case 0: station_address_w<0>(data); break;
-	case 1: station_address_w<1>(data); break;
-	case 2: station_address_w<2>(data); break;
-	case 3: station_address_w<3>(data); break;
-	case 4: station_address_w<4>(data); break;
-	case 5: station_address_w<5>(data); break;
+	case 0: case 1: case 2:
+	case 3: case 4: case 5:
+		station_address_w(offset, data);
+		break;
 	case 6: rx_command_w(data); break;
 	case 7: tx_command_w(data); break;
 	}
@@ -189,7 +185,9 @@ u8 seeq8003_device::fifo_r()
 
 int seeq8003_device::rxeof_r()
 {
-	return m_rx_fifo.queue_length() == 1;
+	// HACK: should be asserted while the last byte is being read from the fifo
+	// but doing it when the fifo is empty makes emulation simpler
+	return m_rx_fifo.empty();
 }
 
 void seeq8003_device::fifo_w(u8 data)
@@ -246,6 +244,20 @@ u8 seeq8003_device::tx_status_r()
 	return data;
 }
 
+void seeq8003_device::rx_command_w(u8 data)
+{
+	LOG("rx_command_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_rx_command = data;
+}
+
+void seeq8003_device::tx_command_w(u8 data)
+{
+	LOG("tx_command_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_tx_command = data;
+}
+
 void seeq8003_device::transmit(void *ptr, int param)
 {
 	if (m_tx_fifo.queue_length())
@@ -257,12 +269,20 @@ void seeq8003_device::transmit(void *ptr, int param)
 		while (!m_tx_fifo.empty())
 			buf[length++] = m_tx_fifo.dequeue();
 
+		// transmit packet autopad
+		if (mode_tx_pad() && (length < 60))
+			while (length < 60)
+				buf[length++] = 0;
+
 		// compute and append fcs
-		u32 const fcs = util::crc32_creator::simple(buf, length);
-		buf[length++] = (fcs >> 0) & 0xff;
-		buf[length++] = (fcs >> 8) & 0xff;
-		buf[length++] = (fcs >> 16) & 0xff;
-		buf[length++] = (fcs >> 24) & 0xff;
+		if (mode_tx_crc())
+		{
+			u32 const fcs = util::crc32_creator::simple(buf, length);
+			buf[length++] = (fcs >> 0) & 0xff;
+			buf[length++] = (fcs >> 8) & 0xff;
+			buf[length++] = (fcs >> 16) & 0xff;
+			buf[length++] = (fcs >> 24) & 0xff;
+		}
 
 		LOG("transmitting frame length %d\n", length);
 		dump_bytes(buf, length);
@@ -303,7 +323,8 @@ int seeq8003_device::receive(u8 *buf, int length)
 		m_rx_status |= RXS_G;
 
 	// enqueue from buffer
-	for (unsigned i = 0; i < length - 4; i++)
+	unsigned const fcs_bytes = mode_rx_crc() ? 0 : 4;
+	for (unsigned i = 0; i < length - fcs_bytes; i++)
 		m_rx_fifo.enqueue(buf[i]);
 
 	// enable rx fifo
@@ -334,15 +355,7 @@ bool seeq8003_device::address_filter(u8 *address)
 
 	if ((m_rx_command & RXC_M) == RXC_M1)
 	{
-		LOG("address_filter accepted: promiscuous mode enabled\n");
-
-		return true;
-	}
-
-	// ethernet broadcast
-	if (!memcmp(address, ETH_BROADCAST, 6))
-	{
-		LOGMASKED(LOG_FILTER, "address_filter accepted: broadcast\n");
+		LOGMASKED(LOG_FILTER, "address_filter accepted: promiscuous mode enabled\n");
 
 		return true;
 	}
@@ -355,9 +368,255 @@ bool seeq8003_device::address_filter(u8 *address)
 		return true;
 	}
 
+	// ethernet broadcast
+	if (!memcmp(address, ETH_BROADCAST, 6))
+	{
+		LOGMASKED(LOG_FILTER, "address_filter accepted: broadcast\n");
+
+		return true;
+	}
+
 	// ethernet multicast
 	if (((m_rx_command & RXC_M) == RXC_M3) && (address[0] & 0x1))
 	{
+		LOGMASKED(LOG_FILTER, "address_filter accepted: multicast address match\n");
+
+		return true;
+	}
+
+	return false;
+}
+
+seeq80c03_device::seeq80c03_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: seeq8003_device(mconfig, SEEQ80C03, tag, owner, clock)
+	, m_regbank(*this, "regbank")
+{
+}
+
+void seeq80c03_device::device_add_mconfig(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config, m_regbank).set_map(&seeq80c03_device::map_reg).set_options(ENDIANNESS_NATIVE, 8, 5, 8);
+}
+
+void seeq80c03_device::device_start()
+{
+	seeq8003_device::device_start();
+
+	save_item(NAME(m_tx_cc));
+	save_item(NAME(m_cc));
+	save_item(NAME(m_flags));
+	save_item(NAME(m_control));
+	save_item(NAME(m_config));
+	save_item(NAME(m_multicast_filter));
+}
+
+void seeq80c03_device::device_reset()
+{
+	seeq8003_device::device_reset();
+
+	m_tx_cc = 0;
+	m_cc = 0;
+	m_flags = 0;
+	m_control = 0;
+	m_config = 0;
+	m_multicast_filter = 0;
+}
+
+void seeq80c03_device::send_complete_cb(int result)
+{
+	if (result)
+	{
+		if (m_control & CTL_SQE)
+			m_flags |= FLAGS_SQE;
+	}
+	else
+	{
+		// assume transmit failure and no device means loss of carrier
+		if ((m_control & CTL_TNC) && !m_dev)
+			m_flags |= FLAGS_TNC;
+	}
+}
+
+void seeq80c03_device::map(address_map &map)
+{
+	map(0, 7).m(m_regbank, FUNC(address_map_bank_device::amap8));
+}
+
+void seeq80c03_device::map_reg(address_map &map)
+{
+	map(0x00, 0x05).w(FUNC(seeq80c03_device::station_address_w));
+
+	map(0x08, 0x11).w(FUNC(seeq80c03_device::multicast_filter_w));
+	map(0x12, 0x12).nopw(); // TODO: inter-packet gap
+	map(0x13, 0x13).w(FUNC(seeq80c03_device::control_w));
+	map(0x14, 0x14).w(FUNC(seeq80c03_device::config_w));
+
+	map(0x00, 0x00).r(FUNC(seeq80c03_device::tx_ccl_r)).mirror(0x18);
+	map(0x01, 0x01).r(FUNC(seeq80c03_device::tx_cch_r)).mirror(0x18);
+	map(0x02, 0x02).r(FUNC(seeq80c03_device::ccl_r)).mirror(0x18);
+	map(0x03, 0x03).r(FUNC(seeq80c03_device::cch_r)).mirror(0x18);
+	map(0x04, 0x04).r(FUNC(seeq80c03_device::test_r)).mirror(0x18);
+	map(0x05, 0x05).r(FUNC(seeq80c03_device::flags_r)).mirror(0x18);
+
+	map(0x06, 0x06).rw(FUNC(seeq80c03_device::rx_status_r), FUNC(seeq80c03_device::rx_command_w)).mirror(0x18);
+	map(0x07, 0x07).rw(FUNC(seeq80c03_device::tx_status_r), FUNC(seeq80c03_device::tx_command_w)).mirror(0x18);
+}
+
+u8 seeq80c03_device::read(offs_t offset)
+{
+	u8 data = 0xff;
+
+	switch (offset)
+	{
+	case 0: data = tx_ccl_r(); break;
+	case 1: data = tx_cch_r(); break;
+	case 2: data = ccl_r(); break;
+	case 3: data = cch_r(); break;
+	case 4: data = test_r(); break;
+	case 5: data = flags_r(); break;
+	case 6: data = rx_status_r(); break;
+	case 7: data = tx_status_r(); break;
+	}
+
+	return data;
+}
+
+void seeq80c03_device::write(offs_t offset, u8 data)
+{
+	switch (m_tx_command & TXC_B)
+	{
+	case 0x00:
+		switch (offset)
+		{
+		case 0: case 1: case 2:
+		case 3: case 4: case 5:
+			station_address_w(offset, data);
+			break;
+		case 6: rx_command_w(data); break;
+		case 7: tx_command_w(data); break;
+		}
+		break;
+	case 0x20:
+		switch (offset)
+		{
+		case 0: case 1: case 2:
+		case 3: case 4: case 5:
+			multicast_filter_w(offset, data);
+			break;
+		case 6: rx_command_w(data); break;
+		case 7: tx_command_w(data); break;
+		}
+		break;
+	case 0x40:
+		switch (offset)
+		{
+		case 0: case 1:
+			multicast_filter_w(offset + 8, data);
+			break;
+		case 2: break; // TODO: inter-packet gap
+		case 3: control_w(data); break;
+		case 4: config_w(data); break;
+		case 6: rx_command_w(data); break;
+		case 7: tx_command_w(data); break;
+		}
+		break;
+	case 0x60:
+		switch (offset)
+		{
+		case 6: rx_command_w(data); break;
+		case 7: tx_command_w(data); break;
+		}
+		break;
+	}
+}
+
+void seeq80c03_device::multicast_filter_w(offs_t offset, u8 data)
+{
+	unsigned const shift = (offset < 6) ? (offset * 8) : ((offset - 2) * 8);
+
+	m_multicast_filter &= ~(u64(0xff) << shift);
+	m_multicast_filter |= u64(data) << shift;
+}
+
+void seeq80c03_device::tx_command_w(u8 data)
+{
+	seeq8003_device::tx_command_w(data);
+
+	m_regbank->set_bank((data >> 5) & 3);
+}
+
+void seeq80c03_device::control_w(u8 data)
+{
+	LOG("control_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	if ((m_control & CTL_TCC) && !(data & CTL_TCC))
+		m_tx_cc = 0;
+	if ((m_control & CTL_CC) && !(data & CTL_CC))
+		m_cc = 0;
+	if ((m_control & CTL_SQE) && !(data & CTL_SQE))
+		m_flags &= ~FLAGS_SQE;
+	if ((m_control & CTL_TNC) && !(data & CTL_TNC))
+		m_flags &= ~FLAGS_TNC;
+
+	m_control = data;
+}
+
+void seeq80c03_device::config_w(u8 data)
+{
+	LOG("config_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_config = data;
+}
+
+bool seeq80c03_device::address_filter(u8 *address)
+{
+	LOGMASKED(LOG_FILTER, "address_filter testing destination address %02x:%02x:%02x:%02x:%02x:%02x\n",
+		address[0], address[1], address[2], address[3], address[4], address[5]);
+
+	if ((m_rx_command & RXC_M) == RXC_M1)
+	{
+		LOGMASKED(LOG_FILTER, "address_filter accepted: promiscuous mode enabled\n");
+
+		return true;
+	}
+
+	// station address
+	if (m_config & CFG_GAM)
+	{
+		if (!memcmp(address, m_station_address, 5) && !(((address[5] ^ m_station_address[5]) & 0xf0)))
+		{
+			LOGMASKED(LOG_FILTER, "address_filter accepted: station address match\n");
+
+			return true;
+		}
+	}
+	else if (!memcmp(address, m_station_address, 6))
+	{
+		LOGMASKED(LOG_FILTER, "address_filter accepted: station address match\n");
+
+		return true;
+	}
+
+	// ethernet broadcast
+	if (!memcmp(address, ETH_BROADCAST, 6))
+	{
+		LOGMASKED(LOG_FILTER, "address_filter accepted: broadcast\n");
+
+		return true;
+	}
+
+	// ethernet multicast
+	if (((m_rx_command & RXC_M) == RXC_M3) && (address[0] & 0x1))
+	{
+		// multicast hash filter
+		if (m_control & CTL_MHF)
+		{
+			u32 const crc = util::crc32_creator::simple(address, 6);
+
+			if (!BIT(m_multicast_filter, crc & 63))
+				return false;
+		}
+
 		LOGMASKED(LOG_FILTER, "address_filter accepted: multicast address match\n");
 
 		return true;

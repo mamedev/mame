@@ -264,6 +264,7 @@ cps1bl_pic.cpp
 cps2.cpp
 cps3.cpp
 cpzodiac.cpp
+crazybal.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
@@ -342,6 +343,7 @@ dooyong.cpp
 dorachan.cpp
 dotrikun.cpp
 dragrace.cpp
+drdmania.cpp
 dreambal.cpp
 dreamwld.cpp
 drgnmst.cpp
@@ -486,6 +488,7 @@ goldstar.cpp
 gomoku.cpp
 good.cpp
 goodejan.cpp
+goori.cpp
 gotcha.cpp
 gottlieb.cpp
 gotya.cpp
@@ -580,6 +583,7 @@ jack.cpp
 jackal.cpp
 jackie.cpp
 jackpool.cpp
+jackpot.cpp
 jaguar.cpp
 jailbrek.cpp
 jalmah.cpp
@@ -616,6 +620,7 @@ kas89.cpp
 kchamp.cpp
 kenseim.cpp
 kickgoal.cpp
+kikikai.cpp
 kingdrby.cpp
 kingobox.cpp
 kingpin.cpp
@@ -743,12 +748,12 @@ merit.cpp
 merit3xx.cpp
 meritm.cpp
 merits.cpp
+meritsdx.cpp
 mermaid.cpp
 metalmx.cpp
 metlclsh.cpp
 metlfrzr.cpp
 metro.cpp
-mexico86.cpp
 meyc8080.cpp
 meyc8088.cpp
 mgames.cpp
@@ -1012,9 +1017,11 @@ re900.cpp
 realbrk.cpp
 redalert.cpp
 redclash.cpp
+regama.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
+rfslots8085.cpp
 rgum.cpp
 rltennis.cpp
 rmhaihai.cpp
@@ -1059,6 +1066,7 @@ sbasketb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schick.cpp
 scm_500.cpp
 scobra.cpp
 scotrsht.cpp
@@ -1069,6 +1077,7 @@ sderby.cpp
 sderby2.cpp
 seabattl.cpp
 sealy.cpp
+sealy_fr.cpp
 seattle.cpp
 segaatom.cpp
 segac2.cpp
@@ -1140,6 +1149,7 @@ slapshot.cpp
 sleic.cpp
 sliver.cpp
 slotcarn.cpp
+smotor.cpp
 smsmcorp.cpp
 sms_bootleg.cpp
 snesb.cpp
@@ -1198,6 +1208,7 @@ starfire.cpp
 stargame.cpp
 starrider.cpp
 starshp1.cpp
+startouch.cpp
 starwars.cpp
 statriv2.cpp
 stellafr.cpp
@@ -1315,6 +1326,7 @@ trackfld.cpp
 travrusa.cpp
 triforce.cpp
 triplhnt.cpp
+triviaquiz.cpp
 trivrus.cpp
 truco.cpp
 trucocl.cpp

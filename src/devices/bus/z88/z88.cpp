@@ -170,10 +170,10 @@ std::string z88cart_slot_device::get_default_card_software(get_default_card_soft
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(z88cart_slot_device::read)
+uint8_t z88cart_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset);
+		return m_cart->read(offset);
 	else
 		return 0xff;
 }
@@ -183,10 +183,10 @@ READ8_MEMBER(z88cart_slot_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(z88cart_slot_device::write)
+void z88cart_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write(space, offset, data);
+		m_cart->write(offset, data);
 }
 
 

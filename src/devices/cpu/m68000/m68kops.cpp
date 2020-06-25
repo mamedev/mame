@@ -11402,7 +11402,7 @@ void m68000_base_device::x0c80_cmpi_l_071234fc()
 	u32 res = dst - src;
 
 	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(*m_program, m_ir & 7, src, 0xffffffff);
+		(m_cmpild_instr_callback)(m_ir & 7, src);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -30167,7 +30167,7 @@ void m68000_base_device::x4ad0_tas_b_ai_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30189,7 +30189,7 @@ void m68000_base_device::x4ad8_tas_b_pi_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30211,7 +30211,7 @@ void m68000_base_device::x4adf_tas_b_pi7_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30233,7 +30233,7 @@ void m68000_base_device::x4ae0_tas_b_pd_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30255,7 +30255,7 @@ void m68000_base_device::x4ae7_tas_b_pd7_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30277,7 +30277,7 @@ void m68000_base_device::x4ae8_tas_b_di_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30299,7 +30299,7 @@ void m68000_base_device::x4af0_tas_b_ix_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30321,7 +30321,7 @@ void m68000_base_device::x4af8_tas_b_aw_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30343,7 +30343,7 @@ void m68000_base_device::x4af9_tas_b_al_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -34705,105 +34705,105 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x50e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x50f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x51c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x51c8, 0xfff8, { 12,  14,  12,   6,   4,   4,   4,   4}},
+	{ 0x51c8, 0xfff8, { 12,  14,  10,   6,   4,   4,   4,   4}},
 	{ 0x51d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x51d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x51e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x51e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x51f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x52c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x52c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x52c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x52d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x52d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x52e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x52e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x52f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x53c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x53c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x53c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x53d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x53d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x53e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x53e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x53f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x54c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x54c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x54c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x54d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x54d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x54e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x54e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x54f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x55c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x55c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x55c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x55d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x55d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x55e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x55e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x55f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x56c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x56c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x56c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x56d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x56d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x56e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x56e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x56f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x57c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x57c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x57c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x57d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x57d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x57e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x57e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x57f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x58c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x58c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x58c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x58d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x58d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x58e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x58e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x58f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x59c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x59c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x59c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x59d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x59d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x59e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x59e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x59f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5ac0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5ac8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5ac8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5ad0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ad8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ae0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5ae8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5af0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5bc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5bc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5bc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5bd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5bd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5be0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5be8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5bf0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5cc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5cc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5cc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5cd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5cd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ce0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5ce8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5cf0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5dc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5dc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5dc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5dd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5dd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5de0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5de8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5df0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5ec0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5ec8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5ec8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5ed0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ed8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ee0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5ee8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5ef0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5fc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5fc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5fc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5fd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5fd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5fe0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},

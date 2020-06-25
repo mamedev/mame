@@ -74,20 +74,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(m107_state::coincounter_w)
+void m107_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(m107_state::bankswitch_w)
+void m107_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-WRITE16_MEMBER(m107_state::sound_reset_w)
+void m107_state::sound_reset_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -143,7 +143,7 @@ void m107_state::dsoccr94_io_map(address_map &map)
 }
 
 /* same as M107 but with an extra i/o board */
-WRITE16_MEMBER(m107_state::wpksoc_output_w)
+void m107_state::wpksoc_output_w(uint16_t data)
 {
 	/*
 	x--- ---- ?
@@ -176,7 +176,7 @@ void m107_state::sound_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
-	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
+	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::read), FUNC(iremga20_device::write)).umask16(0x00ff);
 	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xa8044, 0xa8044).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));

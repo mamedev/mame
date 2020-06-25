@@ -400,7 +400,7 @@ void raiden_state::raidenu(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenu_sub_map);
 }
 
-WRITE16_MEMBER( raidenb_state::raidenb_layer_scroll_w )
+void raidenb_state::raidenb_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }

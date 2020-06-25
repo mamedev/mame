@@ -49,7 +49,7 @@
 #define LOG_INVALID_SEGMENT (1 << 1)
 #define LOG_OTHER           (1 << 2)
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
@@ -94,38 +94,38 @@ private:
 	void geometry_pipe_map(address_map &map);
 	void fpa_map(address_map &map);
 
-	DECLARE_READ32_MEMBER(mmu_r);
-	DECLARE_WRITE32_MEMBER(mmu_w);
+	uint32_t mmu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(mouse_buttons_r);
-	DECLARE_WRITE8_MEMBER(mouse_buttons_w);
-	DECLARE_READ16_MEMBER(mouse_quad_r);
-	DECLARE_WRITE16_MEMBER(mouse_quad_w);
-	DECLARE_READ16_MEMBER(dips_r);
-	DECLARE_READ8_MEMBER(clock_ctrl_r);
-	DECLARE_WRITE8_MEMBER(clock_ctrl_w);
-	DECLARE_READ8_MEMBER(clock_data_r);
-	DECLARE_WRITE8_MEMBER(clock_data_w);
-	DECLARE_READ8_MEMBER(kernel_base_r);
-	DECLARE_WRITE8_MEMBER(kernel_base_w);
-	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_WRITE16_MEMBER(status_w);
-	DECLARE_READ8_MEMBER(parity_ctrl_r);
-	DECLARE_WRITE8_MEMBER(parity_ctrl_w);
-	DECLARE_READ8_MEMBER(multibus_prot_r);
-	DECLARE_WRITE8_MEMBER(multibus_prot_w);
-	DECLARE_READ32_MEMBER(page_table_map_r);
-	DECLARE_WRITE32_MEMBER(page_table_map_w);
-	DECLARE_READ16_MEMBER(text_data_base_r);
-	DECLARE_WRITE16_MEMBER(text_data_base_w);
-	DECLARE_READ16_MEMBER(text_data_limit_r);
-	DECLARE_WRITE16_MEMBER(text_data_limit_w);
-	DECLARE_READ16_MEMBER(stack_base_r);
-	DECLARE_WRITE16_MEMBER(stack_base_w);
-	DECLARE_READ16_MEMBER(stack_limit_r);
-	DECLARE_WRITE16_MEMBER(stack_limit_w);
-	DECLARE_READ8_MEMBER(romboard_r);
-	DECLARE_WRITE8_MEMBER(romboard_w);
+	uint8_t mouse_buttons_r();
+	void mouse_buttons_w(uint8_t data);
+	uint16_t mouse_quad_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mouse_quad_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dips_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint8_t clock_ctrl_r();
+	void clock_ctrl_w(uint8_t data);
+	uint8_t clock_data_r();
+	void clock_data_w(uint8_t data);
+	uint8_t kernel_base_r(offs_t offset);
+	void kernel_base_w(offs_t offset, uint8_t data);
+	uint16_t status_r(offs_t offset, uint16_t mem_mask = ~0);
+	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t parity_ctrl_r();
+	void parity_ctrl_w(uint8_t data);
+	uint8_t multibus_prot_r();
+	void multibus_prot_w(uint8_t data);
+	uint32_t page_table_map_r(offs_t offset, uint32_t mem_mask = ~0);
+	void page_table_map_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t text_data_base_r(offs_t offset, uint16_t mem_mask = ~0);
+	void text_data_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t text_data_limit_r(offs_t offset, uint16_t mem_mask = ~0);
+	void text_data_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t stack_base_r(offs_t offset, uint16_t mem_mask = ~0);
+	void stack_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t stack_limit_r(offs_t offset, uint16_t mem_mask = ~0);
+	void stack_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t romboard_r(offs_t offset);
+	void romboard_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 
@@ -228,7 +228,7 @@ QUICKLOAD_LOAD_MEMBER(iris3000_state::load_romboard)
     MACHINE FUNCTIONS
 ***************************************************************************/
 
-READ32_MEMBER(iris3000_state::mmu_r)
+uint32_t iris3000_state::mmu_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint8_t type = (offset >> 26) & 0xf;
 	const uint32_t vaddr = offset & 0x03ffffff;
@@ -273,7 +273,7 @@ READ32_MEMBER(iris3000_state::mmu_r)
 	return ret;
 }
 
-WRITE32_MEMBER(iris3000_state::mmu_w)
+void iris3000_state::mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const uint8_t type = (offset >> 26) & 0xf;
 	const uint32_t vaddr = offset & 0x03ffffff;
@@ -315,62 +315,62 @@ WRITE32_MEMBER(iris3000_state::mmu_w)
 	}
 }
 
-READ8_MEMBER(iris3000_state::mouse_buttons_r)
+uint8_t iris3000_state::mouse_buttons_r()
 {
 	LOGMASKED(LOG_OTHER, "%s: mouse_buttons_r: %02x\n", machine().describe_context(), m_mouse_buttons | BOARD_REV1);
 	return m_mouse_buttons | BOARD_REV1;
 }
 
-WRITE8_MEMBER(iris3000_state::mouse_buttons_w)
+void iris3000_state::mouse_buttons_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: mouse_buttons_w (ignored): %02x\n", machine().describe_context(), data);
 }
 
-READ16_MEMBER(iris3000_state::mouse_quad_r)
+uint16_t iris3000_state::mouse_quad_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: mouse_quad_r: %04x & %04x\n", machine().describe_context(), m_mouse_quadrature, mem_mask);
 	return m_mouse_quadrature;
 }
 
-WRITE16_MEMBER(iris3000_state::mouse_quad_w)
+void iris3000_state::mouse_quad_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: mouse_quad_w (ignored): %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-READ16_MEMBER(iris3000_state::dips_r)
+uint16_t iris3000_state::dips_r(offs_t offset, uint16_t mem_mask)
 {
 	const uint16_t data = m_dips->read();
 	LOGMASKED(LOG_OTHER, "%s: dips_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-READ8_MEMBER(iris3000_state::clock_ctrl_r)
+uint8_t iris3000_state::clock_ctrl_r()
 {
 	const uint8_t data = m_rtc->read(1);
 	LOGMASKED(LOG_RTC, "%s: clock_ctrl_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
 
-WRITE8_MEMBER(iris3000_state::clock_ctrl_w)
+void iris3000_state::clock_ctrl_w(uint8_t data)
 {
 	LOGMASKED(LOG_RTC, "%s: clock_ctrl_w: %02x\n", machine().describe_context(), data);
 	m_rtc->write(1, data);
 }
 
-READ8_MEMBER(iris3000_state::clock_data_r)
+uint8_t iris3000_state::clock_data_r()
 {
 	uint8_t data = m_rtc->read(0);
 	LOGMASKED(LOG_RTC, "%s: clock_data_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
 
-WRITE8_MEMBER(iris3000_state::clock_data_w)
+void iris3000_state::clock_data_w(uint8_t data)
 {
 	LOGMASKED(LOG_RTC, "%s: clock_data_w: %02x\n", machine().describe_context(), data);
 	m_rtc->write(0, data);
 }
 
-READ8_MEMBER(iris3000_state::kernel_base_r)
+uint8_t iris3000_state::kernel_base_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -381,7 +381,7 @@ READ8_MEMBER(iris3000_state::kernel_base_r)
 	return 0;
 }
 
-WRITE8_MEMBER(iris3000_state::kernel_base_w)
+void iris3000_state::kernel_base_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -391,13 +391,13 @@ WRITE8_MEMBER(iris3000_state::kernel_base_w)
 	}
 }
 
-READ16_MEMBER(iris3000_state::status_r)
+uint16_t iris3000_state::status_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: status_r: %04x & %04x\n", machine().describe_context(), m_status, mem_mask);
 	return m_status;
 }
 
-WRITE16_MEMBER(iris3000_state::status_w)
+void iris3000_state::status_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: status_w: %04x & %04x (DIAG:%x, ENABEXT:%d, ENABINT:%d, BINIT:%d, NOTBOOT:%d)\n", machine().describe_context(), data, mem_mask,
 		data & 0xf, BIT(data, STATUS_ENABEXT), BIT(data, STATUS_ENABINT), BIT(data, STATUS_BINIT), BIT(data, STATUS_NOTBOOT));
@@ -408,101 +408,101 @@ WRITE16_MEMBER(iris3000_state::status_w)
 	COMBINE_DATA(&m_status);
 }
 
-READ8_MEMBER(iris3000_state::parity_ctrl_r)
+uint8_t iris3000_state::parity_ctrl_r()
 {
 	LOGMASKED(LOG_OTHER, "%s: parity_ctrl_r: %02x\n", m_parity_ctrl);
 	return m_parity_ctrl;
 }
 
-WRITE8_MEMBER(iris3000_state::parity_ctrl_w)
+void iris3000_state::parity_ctrl_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: parity_ctrl_w: %02x\n", machine().describe_context(), data);
 	m_parity_ctrl = data;
 }
 
-READ8_MEMBER(iris3000_state::multibus_prot_r)
+uint8_t iris3000_state::multibus_prot_r()
 {
 	LOGMASKED(LOG_OTHER, "%s: multibus_prot_r: %02x\n", machine().describe_context(), m_multibus_prot);
 	return m_multibus_prot;
 }
 
-WRITE8_MEMBER(iris3000_state::multibus_prot_w)
+void iris3000_state::multibus_prot_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: multibus_prot_w: %02x\n", machine().describe_context(), data);
 	m_multibus_prot = data;
 }
 
-READ32_MEMBER(iris3000_state::page_table_map_r)
+uint32_t iris3000_state::page_table_map_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: page_table_map_r: %08x = %08x & %08x\n", machine().describe_context(), 0x3b000000 + (offset << 2), m_page_table_map[offset], mem_mask);
 	return m_page_table_map[offset];
 }
 
-WRITE32_MEMBER(iris3000_state::page_table_map_w)
+void iris3000_state::page_table_map_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: page_table_map_w: %08x = %08x & %08x\n", machine().describe_context(), 0x3b000000 + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_page_table_map[offset]);
 }
 
-READ16_MEMBER(iris3000_state::text_data_base_r)
+uint16_t iris3000_state::text_data_base_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: text_data_base_r: %04x & %04x\n", machine().describe_context(), m_text_data_base, mem_mask);
 	return m_text_data_base;
 }
 
-WRITE16_MEMBER(iris3000_state::text_data_base_w)
+void iris3000_state::text_data_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: text_data_base_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_text_data_base);
 }
 
 
-READ16_MEMBER(iris3000_state::text_data_limit_r)
+uint16_t iris3000_state::text_data_limit_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: text_data_limit_r: %04x & %04x\n", machine().describe_context(), m_text_data_limit, mem_mask);
 	return m_text_data_limit;
 }
 
-WRITE16_MEMBER(iris3000_state::text_data_limit_w)
+void iris3000_state::text_data_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: text_data_limit_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_text_data_limit);
 }
 
 
-READ16_MEMBER(iris3000_state::stack_base_r)
+uint16_t iris3000_state::stack_base_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: stack_base_r: %04x & %04x\n", machine().describe_context(), m_stack_base, mem_mask);
 	return m_stack_base;
 }
 
-WRITE16_MEMBER(iris3000_state::stack_base_w)
+void iris3000_state::stack_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: stack_base_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_stack_base);
 }
 
 
-READ16_MEMBER(iris3000_state::stack_limit_r)
+uint16_t iris3000_state::stack_limit_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: stack_limit_r: %04x & %04x\n", machine().describe_context(), m_stack_limit, mem_mask);
 	return m_stack_limit;
 }
 
-WRITE16_MEMBER(iris3000_state::stack_limit_w)
+void iris3000_state::stack_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_OTHER, "%s: stack_limit_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_stack_limit);
 }
 
-READ8_MEMBER(iris3000_state::romboard_r)
+uint8_t iris3000_state::romboard_r(offs_t offset)
 {
 	const uint8_t data = offset < m_file_data.size() ? m_file_data[offset] : 0;
 	LOGMASKED(LOG_OTHER, "%s: romboard_r: %08x = %02x\n", machine().describe_context(), 0x40000000 + offset, data);
 	return data;
 }
 
-WRITE8_MEMBER(iris3000_state::romboard_w)
+void iris3000_state::romboard_w(offs_t offset, uint8_t data)
 {
 	if (offset > m_file_data.size())
 		m_file_data.resize(offset + 1);

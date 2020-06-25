@@ -10,22 +10,23 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
+#include "machine/slapstic.h"
 #include "audio/atarijsa.h"
+#include "audio/atarisac.h"
 #include "video/atarimo.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
 
-class cyberbal_base_state : public atarigen_state
+class cyberbal_base_state : public driver_device
 {
 protected:
 	cyberbal_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_playfield(*this, "playfield"),
 		m_alpha(*this, "alpha"),
 		m_mob(*this, "mob")
@@ -41,6 +42,8 @@ protected:
 
 	static const atari_motion_objects_config s_mob_config;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tilemap_device> m_playfield;
 	required_device<tilemap_device> m_alpha;
 	required_device<atari_motion_objects_device> m_mob;
@@ -59,16 +62,15 @@ class cyberbal2p_state : public cyberbal_base_state
 public:
 	cyberbal2p_state(const machine_config &mconfig, device_type type, const char *tag) :
 		cyberbal_base_state(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_jsa(*this, "jsa")
 	{ }
 
 	void cyberbal2p(machine_config &config);
 
 protected:
-	DECLARE_READ16_MEMBER(sound_state_r);
+	uint16_t sound_state_r();
 
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -77,6 +79,12 @@ protected:
 	void cyberbal2p_map(address_map &map);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_ack_w(uint16_t data = 0);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+
+	required_device<screen_device> m_screen;
 	required_device<atari_jsa_ii_device> m_jsa;
 };
 
@@ -86,13 +94,9 @@ class cyberbal_state : public cyberbal_base_state
 public:
 	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		cyberbal_base_state(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu"),
+		m_slapstic(*this, "slapstic"),
 		m_extracpu(*this, "extra"),
-		m_daccpu(*this, "dac"),
-		m_rdac(*this, "rdac"),
-		m_ldac(*this, "ldac"),
-		m_soundcomm(*this, "soundcomm"),
-		m_ymsnd(*this, "ymsnd"),
+		m_sac(*this, "sac"),
 		m_playfield2(*this, "playfield2"),
 		m_alpha2(*this, "alpha2"),
 		m_mob2(*this, "mob2"),
@@ -107,46 +111,29 @@ public:
 	void cyberbalt(machine_config &config);
 
 protected:
-	DECLARE_WRITE16_MEMBER(p2_reset_w);
+	void p2_reset_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	// sound-related
-	DECLARE_READ8_MEMBER(special_port3_r);
-	DECLARE_READ8_MEMBER(sound_6502_stat_r);
-	DECLARE_WRITE8_MEMBER(sound_bank_select_w);
-	DECLARE_READ8_MEMBER(sound_68k_6502_r);
-	DECLARE_WRITE8_MEMBER(sound_68k_6502_w);
-	DECLARE_WRITE16_MEMBER(io_68k_irq_ack_w);
-	DECLARE_READ16_MEMBER(sound_68k_r);
-	DECLARE_WRITE16_MEMBER(sound_68k_w);
-	DECLARE_WRITE16_MEMBER(sound_68k_dac_w);
-	INTERRUPT_GEN_MEMBER(sound_68k_irq_gen);
-	void cyberbal_sound_reset();
-	void update_sound_68k_interrupts();
-
 	// memory maps
 	void main_map(address_map &map);
 	void extra_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_68k_map(address_map &map);
 
 private:
-	required_device<m6502_device> m_audiocpu;
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_ack_w(uint16_t data = 0);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+
+	optional_device<atari_slapstic_device> m_slapstic;
 	required_device<cpu_device> m_extracpu;
-	required_device<cpu_device> m_daccpu;
-	required_device<dac_word_interface> m_rdac;
-	required_device<dac_word_interface> m_ldac;
-	required_device<atari_sound_comm_device> m_soundcomm;
-	required_device<ym2151_device> m_ymsnd;
+	required_device<atari_sac_device> m_sac;
 	required_device<tilemap_device> m_playfield2;
 	required_device<tilemap_device> m_alpha2;
 	required_device<atari_motion_objects_device> m_mob2;
@@ -154,12 +141,6 @@ private:
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
 
-	uint8_t m_fast_68k_int;
-	uint8_t m_io_68k_int;
-	uint8_t m_sound_data_from_68k;
-	uint8_t m_sound_data_from_6502;
-	uint8_t m_sound_data_from_68k_ready;
-	uint8_t m_sound_data_from_6502_ready;
 };
 
 #endif // MAME_INCLUDES_CYBERBAL_H

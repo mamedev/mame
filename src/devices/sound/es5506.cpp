@@ -1422,7 +1422,7 @@ inline void es5506_device::reg_write_test(es550x_voice *voice, offs_t offset, u3
 	}
 }
 
-WRITE8_MEMBER(es5506_device::write)
+void es5506_device::write(offs_t offset, u8 data)
 {
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	int shift = 8 * (offset & 3);
@@ -1631,7 +1631,7 @@ inline u32 es5506_device::reg_read_test(es550x_voice *voice, offs_t offset)
 	return result;
 }
 
-READ8_MEMBER(es5506_device::read)
+u8 es5506_device::read(offs_t offset)
 {
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	int shift = 8 * (offset & 3);
@@ -1954,7 +1954,7 @@ inline void es5505_device::reg_write_test(es550x_voice *voice, offs_t offset, u1
 }
 
 
-WRITE16_MEMBER(es5505_device::write)
+void es5505_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 
@@ -2170,7 +2170,7 @@ inline u16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 }
 
 
-READ16_MEMBER(es5505_device::read)
+u16 es5505_device::read(offs_t offset)
 {
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	u16 result;

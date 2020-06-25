@@ -403,10 +403,10 @@ void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect
 TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_txt_tile_info)
 {
 	int code = m_txtram[tile_index];
-	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	tileinfo.set(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
-WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
+void wecleman_state::wecleman_txtram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_data = m_txtram[offset];
 	uint16_t new_data = COMBINE_DATA(&m_txtram[offset]);
@@ -451,7 +451,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_bg_tile_info)
 	int page = m_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
-	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	tileinfo.set(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -464,7 +464,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_fg_tile_info)
 	int code = m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
 	if (!code || code==0xffff) code = 0x20;
-	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	tileinfo.set(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -472,7 +472,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_fg_tile_info)
 ------------------------------------------------------------------------*/
 
 /* Pages that compose both the background and the foreground */
-WRITE16_MEMBER(wecleman_state::wecleman_pageram_w)
+void wecleman_state::wecleman_pageram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pageram[offset]);
 
@@ -810,7 +810,7 @@ void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 
 // new video and palette code
 // TODO: remove me.
-WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
+void wecleman_state::wecleman_videostatus_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_videostatus);
 
@@ -830,7 +830,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
 	}
 }
 
-WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
+void wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword, r, g, b;
 
@@ -845,7 +845,7 @@ WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
 	m_palette->set_pen_color(offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
-WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
+void wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 

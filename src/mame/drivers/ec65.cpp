@@ -46,9 +46,9 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void ec65(machine_config &config);
-	void ec65_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
+	void ec65_mem(address_map &map);
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -81,7 +81,7 @@ void ec65_state::ec65_mem(address_map &map)
 	map(0xe141, 0xe141).rw(MC6845_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe7ff).ram(); // 1KB on-board RAM
 	map(0xe800, 0xefff).ram().share("videoram");
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu",0);
 }
 
 void ec65k_state::ec65k_mem(address_map &map)
@@ -89,7 +89,7 @@ void ec65k_state::ec65k_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("videoram");
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu",0);
 }
 
 /* Input ports */
@@ -140,7 +140,7 @@ MC6845_UPDATE_ROW( ec65_state::crtc_update_row )
 }
 
 /* F4 Character Displayer */
-static const gfx_layout ec65_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -154,7 +154,7 @@ static const gfx_layout ec65_charlayout =
 };
 
 static GFXDECODE_START( gfx_ec65 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 void ec65_state::ec65(machine_config &config)
@@ -221,16 +221,16 @@ void ec65k_state::ec65k(machine_config &config)
 
 /* ROM definition */
 ROM_START( ec65 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ec65.ic6", 0xf000, 0x1000, CRC(acd928ed) SHA1(e02a688a057ff77294717cf7b887425fed0b1153))
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ec65.ic6", 0x0000, 0x1000, CRC(acd928ed) SHA1(e02a688a057ff77294717cf7b887425fed0b1153))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card
 ROM_END
 
 ROM_START( ec65k )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ec65k.ic19",  0xf000, 0x1000, CRC(5e5a890a) SHA1(daa006f2179fd156833e11c73b37881cafe5dede))
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ec65k.ic19",  0x0000, 0x1000, CRC(5e5a890a) SHA1(daa006f2179fd156833e11c73b37881cafe5dede))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card, suspect bad dump
@@ -238,5 +238,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME  FLAGS */
-COMP( 1985, ec65,  0,      0,      ec65,    ec65,  ec65_state,  empty_init, "Elektor Electronics", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, ec65k, ec65,   0,      ec65k,   ec65,  ec65k_state, empty_init, "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, ec65,  0,      0,      ec65,    ec65,  ec65_state,  empty_init, "Elektor Electronics", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ec65k, ec65,   0,      ec65k,   ec65,  ec65k_state, empty_init, "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -63,13 +63,13 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
-	DECLARE_READ8_MEMBER(kbd1_r);
-	DECLARE_READ8_MEMBER(kbd2_r);
-	DECLARE_READ8_MEMBER(shift_kb1_r);
-	DECLARE_READ8_MEMBER(ctrl_kb1_r);
+	uint8_t kbd1_r();
+	uint8_t kbd2_r();
+	uint8_t shift_kb1_r();
+	uint8_t ctrl_kb1_r();
 
-	DECLARE_WRITE8_MEMBER(scanlines_kbd1_w);
-	DECLARE_WRITE8_MEMBER(scanlines_kbd2_w);
+	void scanlines_kbd1_w(uint8_t data);
+	void scanlines_kbd2_w(uint8_t data);
 
 	void base(machine_config &config);
 protected:
@@ -105,8 +105,8 @@ public:
 		, m_via_video_pbb_data(0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(via_video_pba_w);
-	DECLARE_WRITE8_MEMBER(via_video_pbb_w);
+	void via_video_pba_w(uint8_t data);
+	void via_video_pbb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_video_ca2_w);
 
 	void goupil_g1(machine_config &config);
@@ -144,8 +144,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
 
-	DECLARE_READ8_MEMBER(visu24x80_ram_r);
-	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
+	uint8_t visu24x80_ram_r(offs_t offset);
+	void visu24x80_ram_w(offs_t offset, uint8_t data);
 
 	void goupil_g2(machine_config &config);
 
@@ -237,22 +237,22 @@ void goupil_g2_state::mem(address_map &map)
 	map(0xF800, 0xFFFF).rom().region("maincpu", 0xF800); // Monitor (MON 2)
 }
 
-WRITE8_MEMBER( goupil_base_state::scanlines_kbd1_w )
+void goupil_base_state::scanlines_kbd1_w(uint8_t data)
 {
 	m_row_kbd1 = data;
 }
 
-READ8_MEMBER( goupil_base_state::ctrl_kb1_r )
+uint8_t goupil_base_state::ctrl_kb1_r()
 {
 	return BIT(m_ctrl->read(), 1);
 }
 
-READ8_MEMBER( goupil_base_state::shift_kb1_r )
+uint8_t goupil_base_state::shift_kb1_r()
 {
 	return BIT(m_ctrl->read(), 0);
 }
 
-READ8_MEMBER( goupil_base_state::kbd1_r )
+uint8_t goupil_base_state::kbd1_r()
 {
 	char kbdrow[6];
 	uint8_t data = 0xff;
@@ -267,12 +267,12 @@ READ8_MEMBER( goupil_base_state::kbd1_r )
 	return data;
 }
 
-WRITE8_MEMBER( goupil_base_state::scanlines_kbd2_w )
+void goupil_base_state::scanlines_kbd2_w(uint8_t data)
 {
 	m_row_kbd2 = data & 7;
 }
 
-READ8_MEMBER( goupil_base_state::kbd2_r )
+uint8_t goupil_base_state::kbd2_r()
 {
 	char kbdrow[6];
 	uint8_t data = 0xff;
@@ -464,13 +464,13 @@ void goupil_g1_state::machine_reset()
 	m_via_video_pbb_data = 0;
 }
 
-WRITE8_MEMBER(goupil_g1_state::via_video_pba_w)
+void goupil_g1_state::via_video_pba_w(uint8_t data)
 {
 	LOG("%s: write via_video_pba_w reg : 0x%X\n",machine().describe_context(),data);
 	m_ef9364->char_latch_w(data);
 }
 
-WRITE8_MEMBER(goupil_g1_state::via_video_pbb_w)
+void goupil_g1_state::via_video_pbb_w(uint8_t data)
 {
 	LOG("%s: write via_video_pbb_w reg : 0x%X\n",machine().describe_context(),data);
 	m_via_video_pbb_data = data;
@@ -507,14 +507,14 @@ MC6845_ON_UPDATE_ADDR_CHANGED(goupil_g2_state::crtc_update_addr_changed)
 {
 }
 
-WRITE8_MEMBER( goupil_g2_state::visu24x80_ram_w )
+void goupil_g2_state::visu24x80_ram_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: write visu24x80_ram_w mem : 0x%.4X <- 0x%X\n",machine().describe_context(),offset,data);
 
 	m_visu24x80_ram->pointer()[offset] = data;
 }
 
-READ8_MEMBER( goupil_g2_state::visu24x80_ram_r )
+uint8_t goupil_g2_state::visu24x80_ram_r(offs_t offset)
 {
 	uint8_t data;
 

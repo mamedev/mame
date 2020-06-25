@@ -264,7 +264,7 @@ TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index],
 			attr & 0x3f,
 			0);
@@ -276,7 +276,7 @@ TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
@@ -288,7 +288,7 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index],
 			attr & 0x3f,
 			0);
@@ -335,30 +335,30 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mappy_state::superpac_videoram_w)
+void mappy_state::superpac_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(mappy_state::mappy_videoram_w)
+void mappy_state::mappy_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
+void mappy_state::superpac_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(mappy_state::superpac_flipscreen_r)
+uint8_t mappy_state::superpac_flipscreen_r()
 {
 	flip_screen_set(1);
 	return 0xff;
 }
 
-WRITE8_MEMBER(mappy_state::mappy_scroll_w)
+void mappy_state::mappy_scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll = offset >> 3;
 }

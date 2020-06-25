@@ -345,18 +345,18 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(blitter_y_w);
-	DECLARE_WRITE8_MEMBER(blitter_unk_w);
-	DECLARE_WRITE8_MEMBER(blitter_x_w);
-	DECLARE_WRITE8_MEMBER(blitter_aux_w);
-	DECLARE_READ8_MEMBER(blitter_status_r);
-	DECLARE_WRITE8_MEMBER(blitter_trig_wdht_w);
-	DECLARE_WRITE8_MEMBER(sound_latch_w);
-	DECLARE_READ8_MEMBER(sound_latch_r);
-	DECLARE_WRITE8_MEMBER(ball_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
-	DECLARE_WRITE8_MEMBER(wc_meters_w);
+	void blitter_y_w(uint8_t data);
+	void blitter_unk_w(uint8_t data);
+	void blitter_x_w(uint8_t data);
+	void blitter_aux_w(uint8_t data);
+	uint8_t blitter_status_r();
+	void blitter_trig_wdht_w(uint8_t data);
+	void sound_latch_w(uint8_t data);
+	uint8_t sound_latch_r();
+	void ball_w(uint8_t data);
+	uint8_t mux_port_r();
+	void mux_port_w(uint8_t data);
+	void wc_meters_w(uint8_t data);
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	void corona_palette(palette_device &palette) const;
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -424,27 +424,27 @@ void corona_state::corona_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(corona_state::blitter_y_w)
+void corona_state::blitter_y_w(uint8_t data)
 {
 	m_blitter_y_reg = data;
 }
 
-WRITE8_MEMBER(corona_state::blitter_unk_w)
+void corona_state::blitter_unk_w(uint8_t data)
 {
 	m_blitter_unk_reg = data;
 }
 
-WRITE8_MEMBER(corona_state::blitter_x_w)
+void corona_state::blitter_x_w(uint8_t data)
 {
 	m_blitter_x_reg = data;
 }
 
-WRITE8_MEMBER(corona_state::blitter_aux_w)
+void corona_state::blitter_aux_w(uint8_t data)
 {
 	m_blitter_aux_reg = data;
 }
 
-READ8_MEMBER(corona_state::blitter_status_r)
+uint8_t corona_state::blitter_status_r()
 {
 /* code checks bit 6 and/or bit 7 */
 	//return machine().rand() & 0xc0;
@@ -487,7 +487,7 @@ void corona_state::blitter_execute(int x, int y, int color, int width, int flag)
 	}
 }
 
-WRITE8_MEMBER(corona_state::blitter_trig_wdht_w)
+void corona_state::blitter_trig_wdht_w(uint8_t data)
 {
 	blitter_execute(m_blitter_x_reg, 0x100 - m_blitter_y_reg, m_blitter_aux_reg & 0xf, data, m_blitter_aux_reg & 0xf0);
 }
@@ -524,20 +524,20 @@ uint32_t corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind1
 *           Read & Write Handlers          *
 *******************************************/
 
-WRITE8_MEMBER(corona_state::sound_latch_w)
+void corona_state::sound_latch_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(corona_state::sound_latch_r)
+uint8_t corona_state::sound_latch_r()
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read();
 }
 
 
-WRITE8_MEMBER(corona_state::ball_w)
+void corona_state::ball_w(uint8_t data)
 {
 	m_lamp = data;
 
@@ -549,7 +549,7 @@ WRITE8_MEMBER(corona_state::ball_w)
 
 /********  Multiplexed Inputs  ********/
 
-READ8_MEMBER(corona_state::mux_port_r)
+uint8_t corona_state::mux_port_r()
 {
 	switch( m_input_selector )
 	{
@@ -564,7 +564,7 @@ READ8_MEMBER(corona_state::mux_port_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(corona_state::mux_port_w)
+void corona_state::mux_port_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -583,7 +583,7 @@ WRITE8_MEMBER(corona_state::mux_port_w)
 //  logerror("muxsel: %02x \n", m_input_selector);
 }
 
-WRITE8_MEMBER(corona_state::wc_meters_w)
+void corona_state::wc_meters_w(uint8_t data)
 {
 /*  - bits -
     7654 3210

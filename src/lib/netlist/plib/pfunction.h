@@ -9,7 +9,6 @@
 ///
 
 #include "pmath.h"
-#include "pstate.h"
 #include "pstring.h"
 #include "putil.h"
 
@@ -52,23 +51,15 @@ namespace plib {
 		};
 	public:
 
-		/// \brief Constructor with state saving support
-		///
-		/// \param name Name of this object
-		/// \param owner Owner of this object
-		/// \param state_manager State manager to handle saving object state
-		///
-		///
-		pfunction(const pstring &name, const void *owner, state_manager_t &state_manager)
-		: m_lfsr(0xace1U)
-		{
-			state_manager.save_item(owner, m_lfsr, name + ".lfsr");
-		}
+		using value_type = NT;
 
-		/// \brief Constructor without state saving support
+		using inputs_container = std::vector<pstring>;
+		using values_container = std::vector<value_type>;
+
+		/// \brief Constructor
 		///
 		pfunction()
-		: m_lfsr(0xace1U)
+		: m_lfsr(0xace1U) // NOLINT
 		{
 		}
 
@@ -78,32 +69,38 @@ namespace plib {
 		///          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false);
+		void compile(const pstring &expr, const inputs_container &inputs) noexcept(false);
 
 		/// \brief Compile a rpn expression
 		///
 		/// \param expr Reverse polish notation expression, e.g. "A B + 1.3 /"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_postfix(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false);
+		void compile_postfix(const pstring &expr, const inputs_container &inputs) noexcept(false);
 
 		/// \brief Compile an infix expression
 		///
 		/// \param expr Infix expression, e.g. "(A+B)/1.3"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_infix(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false);
+		void compile_infix(const pstring &expr, const inputs_container &inputs) noexcept(false);
 
 		/// \brief Evaluate the expression
 		///
 		/// \param values for input variables, e.g. {1.1, 2.2}
 		/// \return value of expression
 		///
-		NT evaluate(const std::vector<NT> &values = std::vector<NT>()) noexcept;
+		value_type evaluate(const values_container &values = values_container()) noexcept;
+
+		template <typename ST>
+		void save_state(ST &st)
+		{
+			st.save_item(m_lfsr, "m_lfsr");
+		}
 
 	private:
 
-		void compile_postfix(const std::vector<pstring> &inputs,
+		void compile_postfix(const inputs_container &inputs,
 				const std::vector<pstring> &cmds, const pstring &expr);
 
 		std::vector<rpn_inst> m_precompiled; //!< precompiled expression
@@ -115,8 +112,9 @@ namespace plib {
 	extern template class pfunction<double>;
 	extern template class pfunction<long double>;
 #if (PUSE_FLOAT128)
-	extern template class pfunction<__float128>;
+	extern template class pfunction<FLOAT128>;
 #endif
+
 } // namespace plib
 
 #endif // PEXCEPTION_H_

@@ -61,17 +61,17 @@ private:
 
 	u8 pio0_pa_r();
 	void pio0_pa_w(u8 data);
-//  DECLARE_READ8_MEMBER(pio0_pb_r);
+//  u8 pio0_pb_r();
 	void pio0_pb_w(u8 data);
 
-//  DECLARE_READ8_MEMBER(pio1_pa_r);
+//  u8 pio1_pa_r();
 	void pio1_pa_w(u8 data);
-//  DECLARE_READ8_MEMBER(pio1_pb_r);
+//  u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
 
-//  DECLARE_READ8_MEMBER(pio2_pa_r);
+//  u8 pio2_pa_r();
 	void pio2_pa_w(u8 data);
-//  DECLARE_READ8_MEMBER(pio2_pb_r);
+//  u8 pio2_pb_r();
 	void pio2_pb_w(u8 data);
 
 	required_device_array<z80pio_device, 3> m_pio;

@@ -2,7 +2,7 @@
 // copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
-  sauro.c
+  sauro.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -13,31 +13,31 @@
 
 /* General */
 
-WRITE8_MEMBER(sauro_state::videoram_w)
+void sauro_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::colorram_w)
+void sauro_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::sauro_videoram2_w)
+void sauro_state::sauro_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::sauro_colorram2_w)
+void sauro_state::sauro_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::scroll_bg_w)
+void sauro_state::scroll_bg_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
 	int color = ((m_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 	int color = ((m_colorram2[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 /* Sauro */
@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER(sauro_state::sauro_palette_bank1_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
+void sauro_state::sauro_scroll_fg_w(uint8_t data)
 {
 	const int *map = (flip_screen() ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];

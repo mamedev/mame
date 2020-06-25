@@ -217,16 +217,16 @@ WRITE_LINE_MEMBER(jedi_state::coin_counter_right_w)
  *
  *************************************/
 
-READ8_MEMBER(jedi_state::novram_data_r)
+u8 jedi_state::novram_data_r(address_space &space, offs_t offset)
 {
 	return (m_novram[0]->read(space, offset) & 0x0f) | (m_novram[1]->read(space, offset) << 4);
 }
 
 
-WRITE8_MEMBER(jedi_state::novram_data_w)
+void jedi_state::novram_data_w(offs_t offset, u8 data)
 {
-	m_novram[0]->write(space, offset, data & 0x0f);
-	m_novram[1]->write(space, offset, data >> 4);
+	m_novram[0]->write(offset, data & 0x0f);
+	m_novram[1]->write(offset, data >> 4);
 }
 
 

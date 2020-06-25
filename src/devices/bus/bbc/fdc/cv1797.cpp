@@ -6,6 +6,10 @@
 
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/ComputerVillage_FDC.html
 
+    Notes:
+    Everything seems to work, but schematic required to confirm implementation
+    of side and motor control.
+
 **********************************************************************/
 
 
@@ -21,14 +25,14 @@ DEFINE_DEVICE_TYPE(BBC_CV1797, bbc_cv1797_device,  "bbc_cv1797", "Computer Villa
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cv1797 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_cv1797_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_FSD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 static void bbc_floppies_525(device_slot_interface &device)
 {
@@ -38,6 +42,10 @@ static void bbc_floppies_525(device_slot_interface &device)
 	device.option_add("525dd",   FLOPPY_525_DD);
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
+
+//-------------------------------------------------
+//  ROM( cv1797 )
+//-------------------------------------------------
 
 ROM_START( cv1797 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -55,12 +63,12 @@ ROM_END
 void bbc_cv1797_device::device_add_mconfig(machine_config &config)
 {
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
-	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
-	m_fdc->hld_wr_callback().set(FUNC(bbc_cv1797_device::motor_w));
+	m_fdc->sso_wr_callback().set(FUNC(bbc_cv1797_device::fdc_sso_w));
+	m_fdc->hld_wr_callback().set(FUNC(bbc_cv1797_device::fdc_hld_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[0], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
 
 const tiny_rom_entry *bbc_cv1797_device::device_rom_region() const
@@ -80,9 +88,8 @@ bbc_cv1797_device::bbc_cv1797_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, BBC_CV1797, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "fd1797")
-	, m_floppy0(*this, "fd1797:0")
-	, m_floppy1(*this, "fd1797:1")
-	, m_drive_control(0)
+	, m_floppies(*this, "fd1797:%u", 0)
+	, m_floppy(nullptr)
 {
 }
 
@@ -92,7 +99,6 @@ bbc_cv1797_device::bbc_cv1797_device(const machine_config &mconfig, const char *
 
 void bbc_cv1797_device::device_start()
 {
-	save_item(NAME(m_drive_control));
 }
 
 
@@ -106,11 +112,11 @@ uint8_t bbc_cv1797_device::read(offs_t offset)
 
 	if (offset & 0x04)
 	{
-		data = m_fdc->read(offset & 0x03);
+		data = 0xfe;
 	}
 	else
 	{
-		data = m_drive_control;
+		data = m_fdc->read(offset & 0x03);
 	}
 	return data;
 }
@@ -119,36 +125,30 @@ void bbc_cv1797_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{
-		m_fdc->write(offset & 0x03, data);
-	}
-	else
-	{
-		floppy_image_device *floppy = nullptr;
-
-		m_drive_control = data;
-		logerror("fdc: Drive control %02x\n", data);
 		// bit 0: drive select
-		switch (BIT(data, 0))
-		{
-		case 0: floppy = m_floppy0->get_device(); break;
-		case 1: floppy = m_floppy1->get_device(); break;
-		}
-		m_fdc->set_floppy(floppy);
+		m_floppy = m_floppies[BIT(data, 0)]->get_device();
+		m_fdc->set_floppy(m_floppy);
 
 		// bit 1: side select
-		if (floppy)
-			floppy->ss_w(BIT(data, 1));
+		if (m_floppy)
+			m_floppy->ss_w(BIT(data, 1));
 
 		// bit 2: density
 		m_fdc->dden_w(!BIT(data, 2));
-
-		// bit 6: reset
-		//if (BIT(data, 6)) m_fdc->soft_reset();
+	}
+	else
+	{
+		m_fdc->write(offset & 0x03, data);
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_cv1797_device::motor_w)
+WRITE_LINE_MEMBER(bbc_cv1797_device::fdc_sso_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
+	// TODO: schematic required to confirm usage.
+}
+
+WRITE_LINE_MEMBER(bbc_cv1797_device::fdc_hld_w)
+{
+	if (m_floppy)
+		m_floppy->mon_w(!state);
 }

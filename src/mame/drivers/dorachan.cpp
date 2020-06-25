@@ -38,10 +38,10 @@ public:
 	void dorachan(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_READ8_MEMBER(v128_r);
+	void control_w(uint8_t data);
+	void protection_w(uint8_t data);
+	uint8_t protection_r();
+	uint8_t v128_r();
 	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void dorachan_io_map(address_map &map);
 	void dorachan_map(address_map &map);
@@ -107,7 +107,7 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(dorachan_state::protection_w)
+void dorachan_state::protection_w(uint8_t data)
 {
 	// e0 seems like some sort of control byte?
 	// ignore f3 writes, written after every command?
@@ -118,7 +118,7 @@ WRITE8_MEMBER(dorachan_state::protection_w)
 	}
 }
 
-READ8_MEMBER(dorachan_state::protection_r)
+uint8_t dorachan_state::protection_r()
 {
 	switch (m_prot_value)
 	{
@@ -135,13 +135,13 @@ READ8_MEMBER(dorachan_state::protection_r)
 	return 0;
 }
 
-READ8_MEMBER(dorachan_state::v128_r)
+uint8_t dorachan_state::v128_r()
 {
 	// to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped
 	return 0xfe | (BIT(m_screen->vpos(), 7) ^ m_flip_screen);
 }
 
-WRITE8_MEMBER(dorachan_state::control_w)
+void dorachan_state::control_w(uint8_t data)
 {
 	// d6: flip screen
 	// other: ?

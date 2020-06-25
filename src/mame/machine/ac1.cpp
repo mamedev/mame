@@ -13,7 +13,7 @@
 #include "imagedev/cassette.h"
 #include "includes/ac1.h"
 
-READ8_MEMBER(ac1_state::ac1_port_b_r)
+uint8_t ac1_state::ac1_port_b_r()
 {
 	uint8_t data = 0x7f;
 
@@ -25,7 +25,7 @@ READ8_MEMBER(ac1_state::ac1_port_b_r)
 
 #define BNOT(x) ((x) ? 0 : 1)
 
-READ8_MEMBER(ac1_state::ac1_port_a_r)
+uint8_t ac1_state::ac1_port_a_r()
 {
 	uint8_t line0 = m_io_line[0]->read();
 	uint8_t line1 = m_io_line[1]->read();
@@ -75,11 +75,11 @@ READ8_MEMBER(ac1_state::ac1_port_a_r)
 	return td0 + (td1 << 1) +(td2 << 2) +(td3 << 3) +(td4 << 4) +(td5 << 5) +(td6 << 6) +(tast << 7);
 }
 
-WRITE8_MEMBER(ac1_state::ac1_port_a_w)
+void ac1_state::ac1_port_a_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(ac1_state::ac1_port_b_w)
+void ac1_state::ac1_port_b_w(uint8_t data)
 {
 	/*
 

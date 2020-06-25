@@ -18,27 +18,42 @@ enum
 #define T11_IRQ2        2      /* IRQ2 */
 #define T11_IRQ3        3      /* IRQ3 */
 
-#define T11_RESERVED    0x000   /* Reserved vector */
-#define T11_TIMEOUT     0x004   /* Time-out/system error vector */
-#define T11_ILLINST     0x008   /* Illegal and reserved instruction vector */
-#define T11_BPT         0x00C   /* BPT instruction vector */
-#define T11_IOT         0x010   /* IOT instruction vector */
-#define T11_PWRFAIL     0x014   /* Power fail vector */
-#define T11_EMT         0x018   /* EMT instruction vector */
-#define T11_TRAP        0x01C   /* TRAP instruction vector */
-
 
 class t11_device :  public cpu_device
 {
 public:
+	enum
+	{
+		CP0_LINE = 0,           // -AI4 (at PI time)
+		CP1_LINE = 1,           // -AI3 (at PI time)
+		CP2_LINE = 2,           // -AI2 (at PI time)
+		CP3_LINE = 3,           // -AI1 (at PI time)
+		VEC_LINE = 4,           // -AI5 (at PI time)
+		PF_LINE = 5,            // -AI6 (at PI time)
+		HLT_LINE = 6            // -AI7 (at PI time)
+	};
+
 	// construction/destruction
 	t11_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// configuration helpers
 	void set_initial_mode(const uint16_t mode) { c_initial_mode = mode; }
 	auto out_reset() { return m_out_reset_func.bind(); }
+	auto in_iack() { return m_in_iack_func.bind(); }
 
 protected:
+	enum
+	{
+		T11_RESERVED    = 000,  // Reserved vector
+		T11_TIMEOUT     = 004,  // Time-out/system error vector
+		T11_ILLINST     = 010,  // Illegal and reserved instruction vector
+		T11_BPT         = 014,  // BPT instruction vector
+		T11_IOT         = 020,  // IOT instruction vector
+		T11_PWRFAIL     = 024,  // Power fail vector
+		T11_EMT         = 030,  // EMT instruction vector
+		T11_TRAP        = 034   // TRAP instruction vector
+	};
+
 	t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -48,10 +63,10 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 12; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 114; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PF_LINE || inputnum == HLT_LINE; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return -1; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -69,13 +84,20 @@ protected:
 	PAIR                m_ppc;    /* previous program counter */
 	PAIR                m_reg[8];
 	PAIR                m_psw;
-	uint16_t              m_initial_pc;
-	uint8_t               m_wait_state;
-	uint8_t               m_irq_state;
+	uint16_t            m_initial_pc;
+	uint8_t             m_wait_state;
+	uint8_t             m_cp_state;
+	bool                m_vec_active;
+	bool                m_pf_active;
+	bool                m_hlt_active;
+	bool                m_power_fail;
+	bool                m_ext_halt;
 	int                 m_icount;
-	address_space *m_program;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
-	devcb_write_line   m_out_reset_func;
+	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::specific m_program;
+
+	devcb_write_line    m_out_reset_func;
+	devcb_read8         m_in_iack_func;
 
 	inline int ROPCODE();
 	inline int RBYTE(int addr);
@@ -85,6 +107,7 @@ protected:
 	inline void PUSH(int val);
 	inline int POP();
 	void t11_check_irqs();
+	void take_interrupt(uint8_t vector);
 
 	typedef void ( t11_device::*opcode_func )(uint16_t op);
 	static const opcode_func s_opcode_table[65536 >> 3];

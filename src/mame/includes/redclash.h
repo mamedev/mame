@@ -44,12 +44,12 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_WRITE8_MEMBER(star_reset_w);
-	template <unsigned B> DECLARE_WRITE8_MEMBER(star_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void gfxbank_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void irqack_w(uint8_t data);
+	void star_reset_w(uint8_t data);
+	template <unsigned B> void star_w(uint8_t data);
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 

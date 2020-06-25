@@ -81,7 +81,7 @@ void irem_audio_device::device_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::cmd_w )
+void irem_audio_device::cmd_w(uint8_t data)
 {
 	m_soundlatch = data;
 	if ((data & 0x80) == 0)
@@ -95,7 +95,7 @@ WRITE8_MEMBER( irem_audio_device::cmd_w )
  *
  *************************************/
 
-READ8_MEMBER( irem_audio_device::soundlatch_r )
+uint8_t irem_audio_device::soundlatch_r()
 {
 	return m_soundlatch;
 }
@@ -106,13 +106,13 @@ READ8_MEMBER( irem_audio_device::soundlatch_r )
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::m6803_port1_w )
+void irem_audio_device::m6803_port1_w(uint8_t data)
 {
 	m_port1 = data;
 }
 
 
-WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
+void irem_audio_device::m6803_port2_w(uint8_t data)
 {
 	/* write latch */
 	if ((m_port2 & 0x01) && !(data & 0x01))
@@ -146,7 +146,7 @@ WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
  *
  *************************************/
 
-READ8_MEMBER( irem_audio_device::m6803_port1_r )
+uint8_t irem_audio_device::m6803_port1_r()
 {
 	/* PSG 0 or 1? */
 	if (m_port2 & 0x08)
@@ -157,7 +157,7 @@ READ8_MEMBER( irem_audio_device::m6803_port1_r )
 }
 
 
-READ8_MEMBER( irem_audio_device::m6803_port2_r )
+uint8_t irem_audio_device::m6803_port2_r()
 {
 	/*
 	 * Pin21, 6803 (Port 21) tied with 4.7k to +5V
@@ -175,7 +175,7 @@ READ8_MEMBER( irem_audio_device::m6803_port2_r )
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
+void irem_audio_device::ay8910_45M_portb_w(uint8_t data)
 {
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	m_adpcm1->playmode_w((data >> 2) & 7);
@@ -189,7 +189,7 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
 }
 
 
-WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
+void irem_audio_device::ay8910_45L_porta_w(uint8_t data)
 {
 	/*
 	 *  45L 21 IOA0  ==> BD
@@ -215,32 +215,32 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::sound_irq_ack_w )
+void irem_audio_device::sound_irq_ack_w(uint8_t data)
 {
 	if ((m_soundlatch & 0x80) != 0)
 		m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
+void irem_audio_device::m52_adpcm_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
-		m_adpcm1->write_data(data);
+		m_adpcm1->data_w(data);
 	}
 	if (offset & 2)
 	{
 		if (m_adpcm2 != nullptr)
-			m_adpcm2->write_data(data);
+			m_adpcm2->data_w(data);
 	}
 }
 
 
-WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
+void irem_audio_device::m62_adpcm_w(offs_t offset, uint8_t data)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2.target() : m_adpcm1.target();
 	if (adpcm != nullptr)
-		adpcm->write_data(data);
+		adpcm->data_w(data);
 }
 
 

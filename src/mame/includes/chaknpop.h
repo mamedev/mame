@@ -44,15 +44,15 @@ public:
 	uint8_t    m_flip_x;
 	uint8_t    m_flip_y;
 
-	DECLARE_WRITE8_MEMBER(coinlock_w);
-	DECLARE_READ8_MEMBER(gfxmode_r);
-	DECLARE_WRITE8_MEMBER(gfxmode_w);
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(attrram_w);
-	DECLARE_WRITE8_MEMBER(unknown_port_1_w);
-	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
-	DECLARE_WRITE8_MEMBER(unknown_port_3_w);
-	DECLARE_READ8_MEMBER(mcu_status_r);
+	void coinlock_w(uint8_t data);
+	uint8_t gfxmode_r();
+	void gfxmode_w(uint8_t data);
+	void txram_w(offs_t offset, uint8_t data);
+	void attrram_w(offs_t offset, uint8_t data);
+	void unknown_port_1_w(uint8_t data);
+	void unknown_port_2_w(uint8_t data);
+	void unknown_port_3_w(uint8_t data);
+	uint8_t mcu_status_r();
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	virtual void machine_start() override;

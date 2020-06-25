@@ -27,16 +27,16 @@ public:
 	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
 
 	// 16 bit handlers
-	DECLARE_WRITE16_MEMBER(videoram16_w);
-	DECLARE_READ16_MEMBER(videoram16_r);
-	DECLARE_WRITE16_MEMBER(control16_w);
-	DECLARE_READ16_MEMBER(control16_r);
+	void videoram16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t videoram16_r(offs_t offset);
+	void control16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t control16_r(offs_t offset);
 
 	// 8 bit handlers
-	DECLARE_WRITE8_MEMBER(videoram8_w);
-	DECLARE_READ8_MEMBER(videoram8_r);
-	DECLARE_WRITE8_MEMBER(control8_w);
-	DECLARE_READ8_MEMBER(control8_r);
+	void videoram8_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t videoram8_r(offs_t offset);
+	void control8_w(offs_t offset, uint8_t data);
+	uint8_t control8_r(offs_t offset);
 
 	void mark_all_dirty(void);
 	void init_scroll(int flip);

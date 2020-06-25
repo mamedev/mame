@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -23,6 +24,7 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_spriteram(*this,"spriteram"),
 		m_spc_regs(*this, "spc_regs"),
 		m_v3_regs(*this, "v3_regs"),
@@ -86,6 +88,7 @@ private:
 	required_device<sknsspr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_spc_regs;
@@ -133,32 +136,32 @@ private:
 	uint8_t *m_btiles;
 	uint8_t m_region;
 
-	DECLARE_WRITE32_MEMBER(hit_w);
-	DECLARE_WRITE32_MEMBER(hit2_w);
-	DECLARE_READ32_MEMBER(hit_r);
-	DECLARE_WRITE32_MEMBER(io_w);
-	DECLARE_WRITE32_MEMBER(v3t_w);
-	DECLARE_WRITE32_MEMBER(pal_regs_w);
-	DECLARE_WRITE32_MEMBER(palette_ram_w);
-	DECLARE_WRITE32_MEMBER(tilemapA_w);
-	DECLARE_WRITE32_MEMBER(tilemapB_w);
-	DECLARE_WRITE32_MEMBER(v3_regs_w);
+	void hit_w(offs_t offset, uint32_t data);
+	void hit2_w(uint32_t data);
+	uint32_t hit_r(offs_t offset);
+	void io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void v3t_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void pal_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void palette_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tilemapA_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tilemapB_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void v3_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(gutsn_speedup_r);
-	DECLARE_READ32_MEMBER(cyvern_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloopj_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloopa_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloopu_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloope_speedup_r);
-	DECLARE_READ32_MEMBER(senknow_speedup_r);
-	DECLARE_READ32_MEMBER(teljan_speedup_r);
-	DECLARE_READ32_MEMBER(jjparads_speedup_r);
-	DECLARE_READ32_MEMBER(jjparad2_speedup_r);
-	DECLARE_READ32_MEMBER(ryouran_speedup_r);
-	DECLARE_READ32_MEMBER(galpans2_speedup_r);
-	DECLARE_READ32_MEMBER(panicstr_speedup_r);
-	DECLARE_READ32_MEMBER(sengekis_speedup_r);
-	DECLARE_READ32_MEMBER(sengekij_speedup_r);
+	uint32_t gutsn_speedup_r();
+	uint32_t cyvern_speedup_r();
+	uint32_t puzzloopj_speedup_r();
+	uint32_t puzzloopa_speedup_r();
+	uint32_t puzzloopu_speedup_r();
+	uint32_t puzzloope_speedup_r();
+	uint32_t senknow_speedup_r();
+	uint32_t teljan_speedup_r();
+	uint32_t jjparads_speedup_r();
+	uint32_t jjparad2_speedup_r();
+	uint32_t ryouran_speedup_r();
+	uint32_t galpans2_speedup_r();
+	uint32_t panicstr_speedup_r();
+	uint32_t sengekis_speedup_r();
+	uint32_t sengekij_speedup_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -173,6 +176,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tilemap_A_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap_B_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, uint32_t* scrollram);

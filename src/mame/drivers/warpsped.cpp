@@ -115,8 +115,8 @@ private:
 	tilemap_t   *m_starfield_tilemap;
 	uint8_t       m_regs[0x28];
 
-	DECLARE_WRITE8_MEMBER(hardware_w);
-	DECLARE_WRITE8_MEMBER(vidram_w);
+	void hardware_w(offs_t offset, uint8_t data);
+	void vidram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
@@ -130,7 +130,7 @@ private:
 	void warpspeed_map(address_map &map);
 };
 
-WRITE8_MEMBER(warpspeed_state::hardware_w)
+void warpspeed_state::hardware_w(offs_t offset, uint8_t data)
 {
 	m_regs[offset] = data;
 }
@@ -138,7 +138,7 @@ WRITE8_MEMBER(warpspeed_state::hardware_w)
 TILE_GET_INFO_MEMBER(warpspeed_state::get_text_tile_info)
 {
 	uint8_t code = m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
@@ -148,10 +148,10 @@ TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
 	{
 		code = memregion("starfield")->base()[tile_index >> 1] & 0x3f;
 	}
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
-WRITE8_MEMBER(warpspeed_state::vidram_w)
+void warpspeed_state::vidram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);

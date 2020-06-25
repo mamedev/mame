@@ -190,7 +190,7 @@ void tnx1_state::update_palette()
 	m_palette_bank_cache = m_palette_bank;
 }
 
-WRITE8_MEMBER(tnx1_state::background_w)
+void tnx1_state::background_w(offs_t offset, uint8_t data)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (data & 0x80) == 0;
@@ -204,7 +204,7 @@ WRITE8_MEMBER(tnx1_state::background_w)
 	}
 }
 
-WRITE8_MEMBER(tpp2_state::background_w)
+void tpp2_state::background_w(offs_t offset, uint8_t data)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (offset & 0x40) == 0;
@@ -219,13 +219,13 @@ WRITE8_MEMBER(tpp2_state::background_w)
 	}
 }
 
-WRITE8_MEMBER(tnx1_state::popeye_videoram_w)
+void tnx1_state::popeye_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tnx1_state::popeye_colorram_w)
+void tnx1_state::popeye_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void tnx1_state::video_start()

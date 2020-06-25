@@ -81,23 +81,23 @@ private:
 		TIMER_NMI_CLEAR
 	};
 
-	void qbert_knocker(uint8_t knock);
+	void qbert_knocker(u8 knock);
 
-	DECLARE_WRITE8_MEMBER(analog_reset_w);
+	void analog_reset_w(u8 data);
 	void general_output_w(u8 data);
-	DECLARE_WRITE8_MEMBER(reactor_output_w);
-	DECLARE_WRITE8_MEMBER(stooges_output_w);
-	DECLARE_WRITE8_MEMBER(qbertqub_output_w);
-	DECLARE_WRITE8_MEMBER(qbert_output_w);
-	DECLARE_READ8_MEMBER(laserdisc_status_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
-	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
+	void reactor_output_w(u8 data);
+	void stooges_output_w(u8 data);
+	void qbertqub_output_w(u8 data);
+	void qbert_output_w(u8 data);
+	u8 laserdisc_status_r(offs_t offset);
+	void laserdisc_select_w(u8 data);
+	void laserdisc_command_w(u8 data);
 	void sound_w(u8 data);
 	void palette_w(offs_t offset, u8 data);
 	void video_control_w(u8 data);
 	void laserdisc_video_control_w(u8 data);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(charram_w);
+	void videoram_w(offs_t offset, u8 data);
+	void charram_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 	DECLARE_VIDEO_START(screwloo);
@@ -128,40 +128,40 @@ private:
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
 	optional_device<samples_device> m_knocker_sample;
 
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_charram;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_charram;
+	required_shared_ptr<u8> m_spriteram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<u8> m_paletteram;
 
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
 	output_finder<3> m_leds;  // only used by reactor
 
-	uint8_t m_knocker_prev;
-	uint8_t m_joystick_select;
-	uint8_t m_track[2];
+	u8 m_knocker_prev;
+	u8 m_joystick_select;
+	u8 m_track[2];
 	emu_timer *m_laserdisc_bit_timer;
 	emu_timer *m_laserdisc_philips_timer;
-	uint8_t m_laserdisc_select;
-	uint8_t m_laserdisc_status;
+	u8 m_laserdisc_select;
+	u8 m_laserdisc_status;
 	uint16_t m_laserdisc_philips_code;
-	std::unique_ptr<uint8_t[]> m_laserdisc_audio_buffer;
+	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
 	uint16_t m_laserdisc_audio_address;
 	int16_t m_laserdisc_last_samples[2];
 	attotime m_laserdisc_last_time;
 	attotime m_laserdisc_last_clock;
-	uint8_t m_laserdisc_zero_seen;
-	uint8_t m_laserdisc_audio_bits;
-	uint8_t m_laserdisc_audio_bit_count;
-	uint8_t m_gfxcharlo;
-	uint8_t m_gfxcharhi;
-	uint8_t m_background_priority;
-	uint8_t m_spritebank;
-	uint8_t m_transparent0;
+	u8 m_laserdisc_zero_seen;
+	u8 m_laserdisc_audio_bits;
+	u8 m_laserdisc_audio_bit_count;
+	u8 m_gfxcharlo;
+	u8 m_gfxcharhi;
+	u8 m_background_priority;
+	u8 m_spritebank;
+	u8 m_transparent0;
 	tilemap_t *m_bg_tilemap;
 	double m_weights[4];
 };

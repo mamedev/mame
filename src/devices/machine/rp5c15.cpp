@@ -293,7 +293,7 @@ void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( rp5c15_device::read )
+uint8_t rp5c15_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 	offset &= 0x0f;
@@ -324,7 +324,7 @@ READ8_MEMBER( rp5c15_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( rp5c15_device::write )
+void rp5c15_device::write(offs_t offset, uint8_t data)
 {
 	data &= 0x0f;
 	offset &= 0x0f;

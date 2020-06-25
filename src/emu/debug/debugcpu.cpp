@@ -13,6 +13,7 @@
 #include "debugbuf.h"
 
 #include "express.h"
+#include "points.h"
 #include "debugcon.h"
 #include "debugvw.h"
 
@@ -36,7 +37,6 @@ const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 debugger_cpu::debugger_cpu(running_machine &machine)
 	: m_machine(machine)
 	, m_livecpu(nullptr)
-	, m_visiblecpu(nullptr)
 	, m_breakcpu(nullptr)
 	, m_symtable(nullptr)
 	, m_vblank_occurred(false)
@@ -53,17 +53,12 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
-	m_symtable = std::make_unique<symbol_table>(&m_machine);
+	m_symtable = std::make_unique<symbol_table>(machine);
+	m_symtable->set_memory_modified_func([this]() { set_memory_modified(true); });
 
-	// configure our base memory accessors
-	configure_memory(*m_symtable);
-
-	/* add "wpaddr", "wpdata", "cycles", "cpunum", "logunmap" to the global symbol table */
+	/* add "wpaddr", "wpdata" to the global symbol table */
 	m_symtable->add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
-
-	using namespace std::placeholders;
-	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this, _1));
 
 	screen_device_iterator screen_iterator = screen_device_iterator(m_machine.root_device());
 	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
@@ -71,19 +66,21 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	if (count == 1)
 	{
-		m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
-		m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
-		m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
-		iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+		screen_device &screen = *iter.current();
+		m_symtable->add("beamx", [&screen]() { return screen.hpos(); });
+		m_symtable->add("beamy", [&screen]() { return screen.vpos(); });
+		m_symtable->add("frame", [&screen]() { return screen.frame_number(); });
+		screen.register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 	}
 	else if (count > 1)
 	{
 		for (uint32_t i = 0; i < count; i++, iter++)
 		{
-			m_symtable->add(string_format("beamx%d", i).c_str(), std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
-			m_symtable->add(string_format("beamy%d", i).c_str(), std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
-			m_symtable->add(string_format("frame%d", i).c_str(), std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
-			iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+			screen_device &screen = *iter.current();
+			m_symtable->add(string_format("beamx%d", i).c_str(), [&screen]() { return screen.hpos(); });
+			m_symtable->add(string_format("beamy%d", i).c_str(), [&screen]() { return screen.vpos(); });
+			m_symtable->add(string_format("frame%d", i).c_str(), [&screen]() { return screen.frame_number(); });
+			screen.register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 		}
 	}
 
@@ -94,28 +91,8 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 		sprintf(symname, "temp%d", regnum);
 		m_symtable->add(symname, symbol_table::READ_WRITE, &m_tempvar[regnum]);
 	}
-
-	/* first CPU is visible by default */
-	for (device_t &device : device_iterator(m_machine.root_device()))
-	{
-		auto *cpu = dynamic_cast<cpu_device *>(&device);
-		if (cpu != nullptr)
-		{
-			m_visiblecpu = cpu;
-			break;
-		}
-	}
 }
 
-void debugger_cpu::configure_memory(symbol_table &table)
-{
-	using namespace std::placeholders;
-	table.configure_memory(
-		&m_machine,
-		std::bind(&debugger_cpu::expression_validate, this, _1, _2, _3),
-		std::bind(&debugger_cpu::expression_read_memory, this, _1, _2, _3, _4, _5, _6),
-		std::bind(&debugger_cpu::expression_write_memory, this, _1, _2, _3, _4, _5, _6, _7));
-}
 
 /*-------------------------------------------------
     flush_traces - flushes all traces; this is
@@ -130,22 +107,6 @@ void debugger_cpu::flush_traces()
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		if (device.debug() != nullptr)
 			device.debug()->trace_flush();
-}
-
-
-
-/***************************************************************************
-    SYMBOL TABLE INTERFACES
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_visible_symtable - return the
-    locally-visible symbol table
--------------------------------------------------*/
-
-symbol_table* debugger_cpu::get_visible_symtable()
-{
-	return &m_visiblecpu->debug()->symtable();
 }
 
 
@@ -204,7 +165,7 @@ bool debugger_cpu::comment_save()
 		if (found_comments)
 		{
 			emu_file file(m_machine.options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
+			osd_file::error filerr = file.open(m_machine.basename() + ".cmt");
 			if (filerr == osd_file::error::NONE)
 			{
 				root->write(file);
@@ -230,7 +191,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 {
 	// open the file
 	emu_file file(m_machine.options().comment_directory(), OPEN_FLAG_READ);
-	osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
+	osd_file::error filerr = file.open(m_machine.basename() + ".cmt");
 
 	// if an error, just return false
 	if (filerr != osd_file::error::NONE)
@@ -288,294 +249,6 @@ bool debugger_cpu::comment_load(bool is_inline)
 
 
 /***************************************************************************
-    DEBUGGER MEMORY ACCESSORS
-***************************************************************************/
-
-/*-------------------------------------------------
-    read_byte - return a byte from the specified
-    memory space
--------------------------------------------------*/
-
-u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, return 0xff */
-		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-			return 0xff;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	return space.read_byte(address);
-}
-
-
-/*-------------------------------------------------
-    read_word - return a word from the specified
-    memory space
--------------------------------------------------*/
-
-u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, return 0xffff */
-		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-			return 0xffff;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	return space.read_word_unaligned(address);
-}
-
-
-/*-------------------------------------------------
-    read_dword - return a dword from the specified
-    memory space
--------------------------------------------------*/
-
-u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, return 0xffffffff */
-		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-			return 0xffffffff;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	return space.read_dword_unaligned(address);
-}
-
-
-/*-------------------------------------------------
-    read_qword - return a qword from the specified
-    memory space
--------------------------------------------------*/
-
-u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, return 0xffffffff */
-		if (!memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-			return ~u64(0);
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	return space.read_qword_unaligned(address);
-}
-
-
-/*-------------------------------------------------
-    read_memory - return 1,2,4 or 8 bytes
-    from the specified memory space
--------------------------------------------------*/
-
-u64 debugger_cpu::read_memory(address_space &space, offs_t address, int size, bool apply_translation)
-{
-	u64 result = ~u64(0) >> (64 - 8*size);
-	switch (size)
-	{
-		case 1:     result = read_byte(space, address, apply_translation);    break;
-		case 2:     result = read_word(space, address, apply_translation);    break;
-		case 4:     result = read_dword(space, address, apply_translation);   break;
-		case 8:     result = read_qword(space, address, apply_translation);   break;
-	}
-	return result;
-}
-
-
-/*-------------------------------------------------
-    write_byte - write a byte to the specified
-    memory space
--------------------------------------------------*/
-
-void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, we're done */
-		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			return;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	space.write_byte(address, data);
-
-	m_memory_modified = true;
-}
-
-
-/*-------------------------------------------------
-    write_word - write a word to the specified
-    memory space
--------------------------------------------------*/
-
-void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, we're done */
-		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			return;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	space.write_word_unaligned(address, data);
-
-	m_memory_modified = true;
-}
-
-
-/*-------------------------------------------------
-    write_dword - write a dword to the specified
-    memory space
--------------------------------------------------*/
-
-void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, we're done */
-		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			return;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	space.write_dword_unaligned(address, data);
-
-	m_memory_modified = true;
-}
-
-
-/*-------------------------------------------------
-    write_qword - write a qword to the specified
-    memory space
--------------------------------------------------*/
-
-void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, bool apply_translation)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	if (apply_translation)
-	{
-		/* mask against the logical byte mask */
-		address &= space.logaddrmask();
-
-		/* translate if necessary; if not mapped, we're done */
-		if (!memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			return;
-	}
-
-	/* otherwise, call the byte reading function for the translated address */
-	space.write_qword_unaligned(address, data);
-
-	m_memory_modified = true;
-}
-
-
-/*-------------------------------------------------
-    write_memory - write 1,2,4 or 8 bytes to the
-    specified memory space
--------------------------------------------------*/
-
-void debugger_cpu::write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation)
-{
-	switch (size)
-	{
-		case 1:     write_byte(space, address, data, apply_translation);  break;
-		case 2:     write_word(space, address, data, apply_translation);  break;
-		case 4:     write_dword(space, address, data, apply_translation); break;
-		case 8:     write_qword(space, address, data, apply_translation); break;
-	}
-}
-
-
-/*-------------------------------------------------
-    read_opcode - read 1,2,4 or 8 bytes at the
-    given offset from opcode space
--------------------------------------------------*/
-
-u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
-{
-	device_memory_interface &memory = space.device().memory();
-
-	u64 result = ~u64(0) & (~u64(0) >> (64 - 8*size));
-
-	/* keep in logical range */
-	address &= space.logaddrmask();
-
-	/* translate to physical first */
-	if (!memory.translate(space.spacenum(), TRANSLATE_FETCH_DEBUG, address))
-		return result;
-
-	/* keep in physical range */
-	address &= space.addrmask();
-
-	/* switch off the size and handle unaligned accesses */
-	switch (size)
-	{
-		case 1:
-			result = space.read_byte(address);
-			break;
-
-		case 2:
-			result = space.read_word_unaligned(address);
-			break;
-
-		case 4:
-			result = space.read_dword_unaligned(address);
-			break;
-
-		case 6:
-		case 8:
-			result = space.read_qword_unaligned(address);
-			break;
-	}
-
-	return result;
-}
-
-
-
-/***************************************************************************
     INTERNAL HELPERS
 ***************************************************************************/
 
@@ -605,566 +278,9 @@ void debugger_cpu::reset_transient_flags()
 }
 
 
-
-/***************************************************************************
-    EXPRESSION HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    expression_get_device - return a device
-    based on a case insensitive tag search
--------------------------------------------------*/
-
-device_t* debugger_cpu::expression_get_device(const char *tag)
-{
-	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
-	std::string fullname(tag);
-	strmakelower(fullname);
-	return m_machine.root_device().subdevice(fullname.c_str());
-}
-
-
-/*-------------------------------------------------
-    expression_read_memory - read 1,2,4 or 8 bytes
-    at the given offset in the given address
-    space
--------------------------------------------------*/
-
-u64 debugger_cpu::expression_read_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, bool disable_se)
-{
-	switch (spacenum)
-	{
-		case EXPSPACE_PROGRAM_LOGICAL:
-		case EXPSPACE_DATA_LOGICAL:
-		case EXPSPACE_IO_LOGICAL:
-		case EXPSPACE_SPACE3_LOGICAL:
-		{
-			device_t *device = nullptr;
-			device_memory_interface *memory;
-
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
-			{
-				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effects(disable_se);
-				return read_memory(space, address, size, true);
-			}
-			break;
-		}
-
-		case EXPSPACE_PROGRAM_PHYSICAL:
-		case EXPSPACE_DATA_PHYSICAL:
-		case EXPSPACE_IO_PHYSICAL:
-		case EXPSPACE_SPACE3_PHYSICAL:
-		{
-			device_t *device = nullptr;
-			device_memory_interface *memory;
-
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
-			{
-				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effects(disable_se);
-				return read_memory(space, address, size, false);
-			}
-			break;
-		}
-
-		case EXPSPACE_RAMWRITE:
-		{
-			device_t *device = nullptr;
-			device_memory_interface *memory;
-
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			auto dis = m_machine.disable_side_effects(disable_se);
-			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
-			break;
-		}
-
-		case EXPSPACE_OPCODE:
-		{
-			device_t *device = nullptr;
-			device_memory_interface *memory;
-
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			auto dis = m_machine.disable_side_effects(disable_se);
-			return expression_read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
-			break;
-		}
-
-		case EXPSPACE_REGION:
-			if (name == nullptr)
-				break;
-			return expression_read_memory_region(name, address, size);
-			break;
-
-		default:
-			break;
-	}
-
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    expression_read_program_direct - read memory
-    directly from an opcode or RAM pointer
--------------------------------------------------*/
-
-u64 debugger_cpu::expression_read_program_direct(address_space &space, int opcode, offs_t address, int size)
-{
-	u8 *base;
-
-	/* adjust the address into a byte address, but not if being called recursively */
-	if ((opcode & 2) == 0)
-		address = space.address_to_byte(address);
-
-	/* call ourself recursively until we are byte-sized */
-	if (size > 1)
-	{
-		int halfsize = size / 2;
-
-		/* read each half, from lower address to upper address */
-		u64 r0 = expression_read_program_direct(space, opcode | 2, address + 0, halfsize);
-		u64 r1 = expression_read_program_direct(space, opcode | 2, address + halfsize, halfsize);
-
-		/* assemble based on the target endianness */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			return r0 | (r1 << (8 * halfsize));
-		else
-			return r1 | (r0 << (8 * halfsize));
-	}
-
-	/* handle the byte-sized final requests */
-	else
-	{
-		/* lowmask specified which address bits are within the databus width */
-		offs_t lowmask = space.data_width() / 8 - 1;
-
-		/* get the base of memory, aligned to the address minus the lowbits */
-		base = (u8 *)space.get_read_ptr(address & ~lowmask);
-
-		/* if we have a valid base, return the appropriate byte */
-		if (base != nullptr)
-		{
-			if (space.endianness() == ENDIANNESS_LITTLE)
-				return base[BYTE8_XOR_LE(address) & lowmask];
-			else
-				return base[BYTE8_XOR_BE(address) & lowmask];
-		}
-	}
-
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    expression_read_memory_region - read memory
-    from a memory region
--------------------------------------------------*/
-
-u64 debugger_cpu::expression_read_memory_region(const char *rgntag, offs_t address, int size)
-{
-	memory_region *region = m_machine.root_device().memregion(rgntag);
-	u64 result = ~u64(0) >> (64 - 8*size);
-
-	/* make sure we get a valid base before proceeding */
-	if (region != nullptr)
-	{
-		/* call ourself recursively until we are byte-sized */
-		if (size > 1)
-		{
-			int halfsize = size / 2;
-			u64 r0, r1;
-
-			/* read each half, from lower address to upper address */
-			r0 = expression_read_memory_region(rgntag, address + 0, halfsize);
-			r1 = expression_read_memory_region(rgntag, address + halfsize, halfsize);
-
-			/* assemble based on the target endianness */
-			if (region->endianness() == ENDIANNESS_LITTLE)
-				result = r0 | (r1 << (8 * halfsize));
-			else
-				result = r1 | (r0 << (8 * halfsize));
-		}
-
-		/* only process if we're within range */
-		else if (address < region->bytes())
-		{
-			/* lowmask specified which address bits are within the databus width */
-			u32 lowmask = region->bytewidth() - 1;
-			u8 *base = region->base() + (address & ~lowmask);
-
-			/* if we have a valid base, return the appropriate byte */
-			if (region->endianness() == ENDIANNESS_LITTLE)
-				result = base[BYTE8_XOR_LE(address) & lowmask];
-			else
-				result = base[BYTE8_XOR_BE(address) & lowmask];
-		}
-	}
-	return result;
-}
-
-
-/*-------------------------------------------------
-    expression_write_memory - write 1,2,4 or 8
-    bytes at the given offset in the given address
-    space
--------------------------------------------------*/
-
-void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, u64 data, bool disable_se)
-{
-	device_t *device = nullptr;
-	device_memory_interface *memory;
-
-	switch (spacenum)
-	{
-		case EXPSPACE_PROGRAM_LOGICAL:
-		case EXPSPACE_DATA_LOGICAL:
-		case EXPSPACE_IO_LOGICAL:
-		case EXPSPACE_SPACE3_LOGICAL:
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
-			{
-				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effects(disable_se);
-				write_memory(space, address, data, size, true);
-			}
-			break;
-
-		case EXPSPACE_PROGRAM_PHYSICAL:
-		case EXPSPACE_DATA_PHYSICAL:
-		case EXPSPACE_IO_PHYSICAL:
-		case EXPSPACE_SPACE3_PHYSICAL:
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
-			{
-				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effects(disable_se);
-				write_memory(space, address, data, size, false);
-			}
-			break;
-
-		case EXPSPACE_RAMWRITE: {
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			auto dis = m_machine.disable_side_effects(disable_se);
-			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
-			break;
-		}
-
-		case EXPSPACE_OPCODE: {
-			if (name != nullptr)
-				device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-			{
-				device = get_visible_cpu();
-				memory = &device->memory();
-			}
-			auto dis = m_machine.disable_side_effects(disable_se);
-			expression_write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
-			break;
-		}
-
-		case EXPSPACE_REGION:
-			if (name == nullptr)
-				break;
-			expression_write_memory_region(name, address, size, data);
-			break;
-
-		default:
-			break;
-	}
-}
-
-
-/*-------------------------------------------------
-    expression_write_program_direct - write memory
-    directly to an opcode or RAM pointer
--------------------------------------------------*/
-
-void debugger_cpu::expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data)
-{
-	/* adjust the address into a byte address, but not if being called recursively */
-	if ((opcode & 2) == 0)
-		address = space.address_to_byte(address);
-
-	/* call ourself recursively until we are byte-sized */
-	if (size > 1)
-	{
-		int halfsize = size / 2;
-
-		/* break apart based on the target endianness */
-		u64 halfmask = ~u64(0) >> (64 - 8 * halfsize);
-		u64 r0, r1;
-		if (space.endianness() == ENDIANNESS_LITTLE)
-		{
-			r0 = data & halfmask;
-			r1 = (data >> (8 * halfsize)) & halfmask;
-		}
-		else
-		{
-			r0 = (data >> (8 * halfsize)) & halfmask;
-			r1 = data & halfmask;
-		}
-
-		/* write each half, from lower address to upper address */
-		expression_write_program_direct(space, opcode | 2, address + 0, halfsize, r0);
-		expression_write_program_direct(space, opcode | 2, address + halfsize, halfsize, r1);
-	}
-
-	/* handle the byte-sized final case */
-	else
-	{
-		/* lowmask specified which address bits are within the databus width */
-		offs_t lowmask = space.data_width() / 8 - 1;
-
-		/* get the base of memory, aligned to the address minus the lowbits */
-		u8 *base = (u8 *)space.get_read_ptr(address & ~lowmask);
-
-		/* if we have a valid base, write the appropriate byte */
-		if (base != nullptr)
-		{
-			if (space.endianness() == ENDIANNESS_LITTLE)
-				base[BYTE8_XOR_LE(address) & lowmask] = data;
-			else
-				base[BYTE8_XOR_BE(address) & lowmask] = data;
-			m_memory_modified = true;
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    expression_write_memory_region - write memory
-    from a memory region
--------------------------------------------------*/
-
-void debugger_cpu::expression_write_memory_region(const char *rgntag, offs_t address, int size, u64 data)
-{
-	memory_region *region = m_machine.root_device().memregion(rgntag);
-
-	/* make sure we get a valid base before proceeding */
-	if (region != nullptr)
-	{
-		/* call ourself recursively until we are byte-sized */
-		if (size > 1)
-		{
-			int halfsize = size / 2;
-
-			/* break apart based on the target endianness */
-			u64 halfmask = ~u64(0) >> (64 - 8 * halfsize);
-			u64 r0, r1;
-			if (region->endianness() == ENDIANNESS_LITTLE)
-			{
-				r0 = data & halfmask;
-				r1 = (data >> (8 * halfsize)) & halfmask;
-			}
-			else
-			{
-				r0 = (data >> (8 * halfsize)) & halfmask;
-				r1 = data & halfmask;
-			}
-
-			/* write each half, from lower address to upper address */
-			expression_write_memory_region(rgntag, address + 0, halfsize, r0);
-			expression_write_memory_region(rgntag, address + halfsize, halfsize, r1);
-		}
-
-		/* only process if we're within range */
-		else if (address < region->bytes())
-		{
-			/* lowmask specified which address bits are within the databus width */
-			u32 lowmask = region->bytewidth() - 1;
-			u8 *base = region->base() + (address & ~lowmask);
-
-			/* if we have a valid base, set the appropriate byte */
-			if (region->endianness() == ENDIANNESS_LITTLE)
-			{
-				base[BYTE8_XOR_LE(address) & lowmask] = data;
-			}
-			else
-			{
-				base[BYTE8_XOR_BE(address) & lowmask] = data;
-			}
-			m_memory_modified = true;
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    expression_validate - validate that the
-    provided expression references an
-    appropriate name
--------------------------------------------------*/
-
-expression_error::error_code debugger_cpu::expression_validate(void *param, const char *name, expression_space space)
-{
-	device_t *device = nullptr;
-	device_memory_interface *memory;
-
-	switch (space)
-	{
-	case EXPSPACE_PROGRAM_LOGICAL:
-	case EXPSPACE_DATA_LOGICAL:
-	case EXPSPACE_IO_LOGICAL:
-	case EXPSPACE_SPACE3_LOGICAL:
-		if (name)
-		{
-			device = expression_get_device(name);
-			if (device == nullptr)
-				return expression_error::INVALID_MEMORY_NAME;
-		}
-		if (!device)
-			device = get_visible_cpu();
-		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
-
-	case EXPSPACE_PROGRAM_PHYSICAL:
-	case EXPSPACE_DATA_PHYSICAL:
-	case EXPSPACE_IO_PHYSICAL:
-	case EXPSPACE_SPACE3_PHYSICAL:
-		if (name)
-		{
-			device = expression_get_device(name);
-			if (device == nullptr)
-				return expression_error::INVALID_MEMORY_NAME;
-		}
-		if (!device)
-			device = get_visible_cpu();
-		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
-
-	case EXPSPACE_RAMWRITE:
-		if (name)
-		{
-			device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-				return expression_error::INVALID_MEMORY_NAME;
-		}
-		if (!device)
-			device = get_visible_cpu();
-		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
-
-	case EXPSPACE_OPCODE:
-		if (name)
-		{
-			device = expression_get_device(name);
-			if (device == nullptr || !device->interface(memory))
-				return expression_error::INVALID_MEMORY_NAME;
-		}
-		if (!device)
-			device = get_visible_cpu();
-		if (!device->interface(memory) || !memory->has_space(AS_OPCODES))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
-
-	case EXPSPACE_REGION:
-		if (!name)
-			return expression_error::MISSING_MEMORY_NAME;
-		if (!m_machine.root_device().memregion(name) || !m_machine.root_device().memregion(name)->base())
-			return expression_error::INVALID_MEMORY_NAME;
-		break;
-
-	default:
-		return expression_error::NO_SUCH_MEMORY_SPACE;
-	}
-	return expression_error::NONE;
-}
-
-
-
-/***************************************************************************
-    VARIABLE GETTERS/SETTERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_beamx - get beam horizontal position
--------------------------------------------------*/
-
-u64 debugger_cpu::get_beamx(symbol_table &table, screen_device *screen)
-{
-	return (screen != nullptr) ? screen->hpos() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_beamy - get beam vertical position
--------------------------------------------------*/
-
-u64 debugger_cpu::get_beamy(symbol_table &table, screen_device *screen)
-{
-	return (screen != nullptr) ? screen->vpos() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_frame - get current frame number
--------------------------------------------------*/
-
-u64 debugger_cpu::get_frame(symbol_table &table, screen_device *screen)
-{
-	return (screen != nullptr) ? screen->frame_number() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_cpunum - getter callback for the
-    'cpunum' symbol
--------------------------------------------------*/
-
-u64 debugger_cpu::get_cpunum(symbol_table &table)
-{
-	execute_interface_iterator iter(m_machine.root_device());
-	return iter.indexof(m_visiblecpu->execute());
-}
-
+//**************************************************************************
+//  EXECUTION HOOKS
+//**************************************************************************
 
 void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 {
@@ -1172,8 +288,15 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	assert(m_livecpu == nullptr);
 	m_livecpu = device;
 
+	// can't stop on a device without a state interface
+	if (m_execution_state == exec_state::STOPPED && dynamic_cast<device_state_interface *>(device) == nullptr)
+	{
+		if (m_stop_when_not_device == nullptr)
+			m_stop_when_not_device = device;
+		m_execution_state = exec_state::RUNNING;
+	}
 	// if we're a new device, stop now
-	if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device)
+	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing())
 	{
 		m_stop_when_not_device = nullptr;
 		m_execution_state = exec_state::STOPPED;
@@ -1183,13 +306,14 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	// if we're running, do some periodic updating
 	if (m_execution_state != exec_state::STOPPED)
 	{
-		if (device == m_visiblecpu && osd_ticks() > m_last_periodic_update_time + osd_ticks_per_second() / 4)
+		device_t *visiblecpu = m_machine.debugger().console().get_visible_cpu();
+		if (device == visiblecpu && osd_ticks() > m_last_periodic_update_time + osd_ticks_per_second() / 4)
 		{   // check for periodic updates
 			m_machine.debug_view().update_all();
 			m_machine.debug_view().flush_osd_updates();
 			m_last_periodic_update_time = osd_ticks();
 		}
-		else if (device == m_breakcpu)
+		if (device == m_breakcpu)
 		{   // check for pending breaks
 			m_execution_state = exec_state::STOPPED;
 			m_breakcpu = nullptr;
@@ -1209,13 +333,23 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 		}
 		// check for debug keypresses
 		if (m_machine.ui_input().pressed(IPT_UI_DEBUG_BREAK))
-			m_visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
+		{
+			visiblecpu->debug()->ignore(false);
+			visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
+		}
 	}
 }
 
 void debugger_cpu::stop_hook(device_t *device)
 {
 	assert(m_livecpu == device);
+
+	// if we are supposed to be stopped at this point (most likely because of a watchpoint), keep going until this CPU is live again
+	if (m_execution_state == exec_state::STOPPED)
+	{
+		m_breakcpu = device;
+		m_execution_state = exec_state::RUNNING;
+	}
 
 	// clear the live CPU
 	m_livecpu = nullptr;
@@ -1285,7 +419,7 @@ device_debug::device_debug(device_t &device)
 	, m_state(nullptr)
 	, m_disasm(nullptr)
 	, m_flags(0)
-	, m_symtable(&device, device.machine().debugger().cpu().get_global_symtable())
+	, m_symtable(std::make_unique<symbol_table>(device.machine(), &device.machine().debugger().cpu().global_symtable(), &device))
 	, m_instrhook(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
@@ -1298,7 +432,7 @@ device_debug::device_debug(device_t &device)
 	, m_last_total_cycles(0)
 	, m_pc_history_index(0)
 	, m_bplist()
-	, m_rplist()
+	, m_rplist(std::make_unique<std::forward_list<debug_registerpoint>>())
 	, m_triggered_breakpoint(nullptr)
 	, m_triggered_watchpoint(nullptr)
 	, m_trace(nullptr)
@@ -1338,34 +472,34 @@ device_debug::device_debug(device_t &device)
 		// add global symbol for cycles and totalcycles
 		if (m_exec != nullptr)
 		{
-			m_symtable.add("cycles", get_cycles);
-			m_symtable.add("totalcycles", get_totalcycles);
-			m_symtable.add("lastinstructioncycles", get_lastinstructioncycles);
+			m_symtable->add("cycles", [this]() { return m_exec->cycles_remaining(); });
+			m_symtable->add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
+			m_symtable->add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
 		}
 
 		// add entries to enable/disable unmap reporting for each space
 		if (m_memory != nullptr)
 		{
 			if (m_memory->has_space(AS_PROGRAM))
-				m_symtable.add(
+				m_symtable->add(
 						"logunmap",
-						[&space = m_memory->space(AS_PROGRAM)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_PROGRAM)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_DATA))
-				m_symtable.add(
+				m_symtable->add(
 						"logunmap",
-						[&space = m_memory->space(AS_DATA)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_DATA)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_IO))
-				m_symtable.add(
+				m_symtable->add(
 						"logunmap",
-						[&space = m_memory->space(AS_IO)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_IO)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_OPCODES))
-				m_symtable.add(
+				m_symtable->add(
 						"logunmap",
-						[&space = m_memory->space(AS_OPCODES)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_OPCODES)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
 		}
 
 		// add all registers into it
@@ -1377,10 +511,10 @@ device_debug::device_debug(device_t &device)
 			{
 				using namespace std::placeholders;
 				strmakelower(tempstr.assign(entry->symbol()));
-				m_symtable.add(
+				m_symtable->add(
 						tempstr.c_str(),
-						std::bind(&device_debug::get_state, _1, entry->index()),
-						entry->writeable() ? std::bind(&device_debug::set_state, _1, entry->index(), _2) : symbol_table::setter_func(nullptr),
+						std::bind(&device_state_interface::state_int, m_state, entry->index()),
+						entry->writeable() ? std::bind(&device_state_interface::set_state_int, m_state, entry->index(), _1) : symbol_table::setter_func(nullptr),
 						entry->format_string());
 			}
 		}
@@ -1392,8 +526,8 @@ device_debug::device_debug(device_t &device)
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
 
 		// if no curpc, add one
-		if (m_state && !m_symtable.find("curpc"))
-			m_symtable.add("curpc", get_current_pc);
+		if (m_state && !m_symtable->find("curpc"))
+			m_symtable->add("curpc", std::bind(&device_state_interface::pcbase, m_state));
 	}
 
 	// set up trace
@@ -1518,9 +652,25 @@ void device_debug::exception_hook(int exception)
 	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
-		m_device.machine().debugger().cpu().set_execution_stopped();
-		m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d)\n", m_device.tag(), exception);
-		compute_debug_flags();
+		bool matched = true;
+		if (m_exception_condition && !m_exception_condition->is_empty())
+		{
+			try
+			{
+				matched = m_exception_condition->execute();
+			}
+			catch (expression_error &)
+			{
+				return;
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d, PC=%X)\n", m_device.tag(), exception, m_state->pcbase());
+			compute_debug_flags();
+		}
 	}
 }
 
@@ -1532,18 +682,18 @@ void device_debug::exception_hook(int exception)
 
 void device_debug::privilege_hook()
 {
-	bool matched = 1;
-
 	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
 	{
+		bool matched = true;
 		if (m_privilege_condition && !m_privilege_condition->is_empty())
 		{
 			try
 			{
 				matched = m_privilege_condition->execute();
 			}
-			catch (...)
+			catch (expression_error &)
 			{
+				return;
 			}
 		}
 
@@ -1650,7 +800,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		debugcpu.set_break_cpu(nullptr);
 
 		// remember the last visible CPU in the debugger
-		debugcpu.set_visible_cpu(&m_device);
+		machine.debugger().console().set_visible_cpu(&m_device);
 
 		// update all views
 		machine.debug_view().update_all();
@@ -1685,10 +835,10 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (machine.scheduled_event_pending())
 				debugcpu.set_execution_running();
 		}
-		m_device.machine().sound().debugger_mute(false);
+		machine.sound().debugger_mute(false);
 
 		// remember the last visible CPU in the debugger
-		debugcpu.set_visible_cpu(&m_device);
+		machine.debugger().console().set_visible_cpu(&m_device);
 	}
 
 	// handle step out/over on the instruction we are about to execute
@@ -1866,12 +1016,13 @@ void device_debug::go_next_device()
 //  exception fires on the visible CPU
 //-------------------------------------------------
 
-void device_debug::go_exception(int exception)
+void device_debug::go_exception(int exception, const char *condition)
 {
 	assert(m_exec != nullptr);
 
 	m_device.machine().rewind_invalidate();
 	m_stopexception = exception;
+	m_exception_condition = std::make_unique<parsed_expression>(*m_symtable, condition);
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -1902,7 +1053,7 @@ void device_debug::go_privilege(const char *condition)
 {
 	assert(m_exec != nullptr);
 	m_device.machine().rewind_invalidate();
-	m_privilege_condition = std::make_unique<parsed_expression>(&m_symtable, condition);
+	m_privilege_condition = std::make_unique<parsed_expression>(*m_symtable, condition);
 	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -1926,11 +1077,11 @@ void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<std:
 //  given address, or nullptr if none exists there
 //-------------------------------------------------
 
-const device_debug::breakpoint *device_debug::breakpoint_find(offs_t address) const
+const debug_breakpoint *device_debug::breakpoint_find(offs_t address) const
 {
-	for (const breakpoint &bp : m_bplist)
-		if (bp.address() == address)
-			return &bp;
+	auto bpitp = m_bplist.equal_range(address);
+	if (bpitp.first != bpitp.second)
+		return bpitp.first->second.get();
 
 	return nullptr;
 }
@@ -1944,11 +1095,11 @@ int device_debug::breakpoint_set(offs_t address, const char *condition, const ch
 {
 	// allocate a new one and hook it into our list
 	u32 id = m_device.machine().debugger().cpu().get_breakpoint_index();
-	m_bplist.emplace_front(this, m_symtable, id, address, condition, action);
+	m_bplist.emplace(address, std::make_unique<debug_breakpoint>(this, *m_symtable, id, address, condition, action));
 
 	// update the flags and return the index
 	breakpoint_update_flags();
-	return m_bplist.front().m_index;
+	return id;
 }
 
 
@@ -1960,10 +1111,10 @@ int device_debug::breakpoint_set(offs_t address, const char *condition, const ch
 bool device_debug::breakpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
-	for (auto bbp = m_bplist.before_begin(); std::next(bbp) != m_bplist.end(); ++bbp)
-		if (std::next(bbp)->m_index == index)
+	for (auto bpit = m_bplist.begin(); bpit != m_bplist.end(); ++bpit)
+		if (bpit->second->m_index == index)
 		{
-			m_bplist.erase_after(bbp);
+			m_bplist.erase(bpit);
 			breakpoint_update_flags();
 			return true;
 		}
@@ -1993,13 +1144,16 @@ void device_debug::breakpoint_clear_all()
 bool device_debug::breakpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this breakpoint
-	for (breakpoint &bp : m_bplist)
+	for (auto &bpp : m_bplist)
+	{
+		debug_breakpoint &bp = *bpp.second;
 		if (bp.m_index == index)
 		{
 			bp.m_enabled = enable;
 			breakpoint_update_flags();
 			return true;
 		}
+	}
 
 	// we don't own it, return false
 	return false;
@@ -2014,8 +1168,8 @@ bool device_debug::breakpoint_enable(int index, bool enable)
 void device_debug::breakpoint_enable_all(bool enable)
 {
 	// apply the enable to all breakpoints we own
-	for (breakpoint &bp : m_bplist)
-		breakpoint_enable(bp.index(), enable);
+	for (auto &bpp : m_bplist)
+		breakpoint_enable(bpp.second->index(), enable);
 }
 
 
@@ -2031,7 +1185,7 @@ int device_debug::watchpoint_set(address_space &space, read_or_write type, offs_
 
 	// allocate a new one
 	u32 id = m_device.machine().debugger().cpu().get_watchpoint_index();
-	m_wplist[space.spacenum()].emplace_back(std::make_unique<watchpoint>(this, m_symtable, id, space, type, address, length, condition, action));
+	m_wplist[space.spacenum()].emplace_back(std::make_unique<debug_watchpoint>(this, *m_symtable, id, space, type, address, length, condition, action));
 
 	return id;
 }
@@ -2115,11 +1269,11 @@ int device_debug::registerpoint_set(const char *condition, const char *action)
 {
 	// allocate a new one
 	u32 id = m_device.machine().debugger().cpu().get_registerpoint_index();
-	m_rplist.emplace_front(m_symtable, id, condition, action);
+	m_rplist->emplace_front(*m_symtable, id, condition, action);
 
 	// update the flags and return the index
 	breakpoint_update_flags();
-	return m_rplist.front().m_index;
+	return m_rplist->front().m_index;
 }
 
 
@@ -2131,10 +1285,10 @@ int device_debug::registerpoint_set(const char *condition, const char *action)
 bool device_debug::registerpoint_clear(int index)
 {
 	// scan the list to see if we own this registerpoint
-	for (auto brp = m_rplist.before_begin(); std::next(brp) != m_rplist.end(); ++brp)
+	for (auto brp = m_rplist->before_begin(); std::next(brp) != m_rplist->end(); ++brp)
 		if (std::next(brp)->m_index == index)
 		{
-			m_rplist.erase_after(brp);
+			m_rplist->erase_after(brp);
 			breakpoint_update_flags();
 			return true;
 		}
@@ -2151,7 +1305,7 @@ bool device_debug::registerpoint_clear(int index)
 void device_debug::registerpoint_clear_all()
 {
 	// clear the list
-	m_rplist.clear();
+	m_rplist->clear();
 	breakpoint_update_flags();
 }
 
@@ -2164,7 +1318,7 @@ void device_debug::registerpoint_clear_all()
 bool device_debug::registerpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this conditionpoint
-	for (registerpoint &rp : m_rplist)
+	for (debug_registerpoint &rp : *m_rplist)
 		if (rp.m_index == index)
 		{
 			rp.m_enabled = enable;
@@ -2185,7 +1339,7 @@ bool device_debug::registerpoint_enable(int index, bool enable)
 void device_debug::registerpoint_enable_all(bool enable)
 {
 	// apply the enable to all registerpoints we own
-	for (registerpoint &rp : m_rplist)
+	for (debug_registerpoint &rp : *m_rplist)
 		registerpoint_enable(rp.index(), enable);
 }
 
@@ -2508,8 +1662,8 @@ void device_debug::breakpoint_update_flags()
 {
 	// see if there are any enabled breakpoints
 	m_flags &= ~DEBUG_FLAG_LIVE_BP;
-	for (breakpoint &bp : m_bplist)
-		if (bp.m_enabled)
+	for (auto &bpp : m_bplist)
+		if (bpp.second->m_enabled)
 		{
 			m_flags |= DEBUG_FLAG_LIVE_BP;
 			break;
@@ -2518,7 +1672,7 @@ void device_debug::breakpoint_update_flags()
 	if ( ! ( m_flags & DEBUG_FLAG_LIVE_BP ) )
 	{
 		// see if there are any enabled registerpoints
-		for (registerpoint &rp : m_rplist)
+		for (debug_registerpoint &rp : *m_rplist)
 		{
 			if (rp.m_enabled)
 			{
@@ -2543,7 +1697,10 @@ void device_debug::breakpoint_check(offs_t pc)
 	debugger_cpu& debugcpu = m_device.machine().debugger().cpu();
 
 	// see if we match
-	for (breakpoint &bp : m_bplist)
+	auto bpitp = m_bplist.equal_range(pc);
+	for (auto bpit = bpitp.first; bpit != bpitp.second; ++bpit)
+	{
+		debug_breakpoint &bp = *bpit->second;
 		if (bp.hit(pc))
 		{
 			// halt in the debugger by default
@@ -2561,9 +1718,10 @@ void device_debug::breakpoint_check(offs_t pc)
 			}
 			break;
 		}
+	}
 
 	// see if we have any matching registerpoints
-	for (registerpoint &rp : m_rplist)
+	for (debug_registerpoint &rp : *m_rplist)
 	{
 		if (rp.hit())
 		{
@@ -2634,496 +1792,6 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 			m_hotspots[0] = temp;
 		}
 	}
-}
-
-//-------------------------------------------------
-//  get_current_pc - getter callback for a device's
-//  current instruction pointer
-//-------------------------------------------------
-
-u64 device_debug::get_current_pc(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->state().pcbase();
-}
-
-
-//-------------------------------------------------
-//  get_cycles - getter callback for the
-//  'cycles' symbol
-//-------------------------------------------------
-
-u64 device_debug::get_cycles(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_exec->cycles_remaining();
-}
-
-
-//-------------------------------------------------
-//  get_totalcycles - getter callback for the
-//  'totalcycles' symbol
-//-------------------------------------------------
-
-u64 device_debug::get_totalcycles(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_total_cycles;
-}
-
-
-//-------------------------------------------------
-//  get_lastinstructioncycles - getter callback for the
-//  'lastinstructioncycles' symbol
-//-------------------------------------------------
-
-u64 device_debug::get_lastinstructioncycles(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device_debug *debug = device->debug();
-	return debug->m_total_cycles - debug->m_last_total_cycles;
-}
-
-
-//-------------------------------------------------
-//  get_state - getter callback for a device's
-//  state symbols
-//-------------------------------------------------
-
-u64 device_debug::get_state(symbol_table &table, int index)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_state->state_int(index);
-}
-
-
-//-------------------------------------------------
-//  set_state - setter callback for a device's
-//  state symbols
-//-------------------------------------------------
-
-void device_debug::set_state(symbol_table &table, int index, u64 value)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device->debug()->m_state->set_state_int(index, value);
-}
-
-
-
-//**************************************************************************
-//  DEBUG BREAKPOINT
-//**************************************************************************
-
-//-------------------------------------------------
-//  breakpoint - constructor
-//-------------------------------------------------
-
-device_debug::breakpoint::breakpoint(device_debug* debugInterface,
-										symbol_table &symbols,
-										int index,
-										offs_t address,
-										const char *condition,
-										const char *action)
-	: m_debugInterface(debugInterface),
-		m_index(index),
-		m_enabled(true),
-		m_address(address),
-		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-		m_action((action != nullptr) ? action : "")
-{
-}
-
-
-//-------------------------------------------------
-//  hit - detect a hit
-//-------------------------------------------------
-
-bool device_debug::breakpoint::hit(offs_t pc)
-{
-	// don't hit if disabled
-	if (!m_enabled)
-		return false;
-
-	// must match our address
-	if (m_address != pc)
-		return false;
-
-	// must satisfy the condition
-	if (!m_condition.is_empty())
-	{
-		try
-		{
-			return (m_condition.execute() != 0);
-		}
-		catch (expression_error &)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-
-//**************************************************************************
-//  DEBUG WATCHPOINT
-//**************************************************************************
-
-//-------------------------------------------------
-//  watchpoint - constructor
-//-------------------------------------------------
-
-device_debug::watchpoint::watchpoint(device_debug* debugInterface,
-										symbol_table &symbols,
-										int index,
-										address_space &space,
-										read_or_write type,
-										offs_t address,
-										offs_t length,
-										const char *condition,
-										const char *action)
-	: m_debugInterface(debugInterface),
-	  m_phr(nullptr),
-	  m_phw(nullptr),
-	  m_space(space),
-	  m_index(index),
-	  m_enabled(true),
-	  m_type(type),
-	  m_address(address & space.addrmask()),
-	  m_length(length),
-	  m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-	  m_action((action != nullptr) ? action : ""),
-	  m_installing(false)
-{
-	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
-	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
-	std::fill(std::begin(m_masks), std::end(m_masks), 0);
-
-	int ashift = m_space.addr_shift();
-	endianness_t endian = m_space.endianness();
-	offs_t subamask = m_space.alignment() - 1;
-	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
-	offs_t start = m_address;
-	offs_t end = (m_address + m_length - 1) & space.addrmask();
-	if (end < start)
-		end = space.addrmask();
-	offs_t rstart = start & ~subamask;
-	offs_t rend = end | subamask;
-	u64 smask, mmask, emask;
-	smask = mmask = emask = make_bitmask<u64>(m_space.data_width());
-	if (start != rstart)
-	{
-		if (endian == ENDIANNESS_LITTLE)
-			smask &= ~make_bitmask<u64>((start - rstart) * unit_size);
-		else
-			smask &= make_bitmask<u64>((rstart + subamask + 1 - start) * unit_size);
-	}
-	if (end != rend)
-	{
-		if (endian == ENDIANNESS_LITTLE)
-			emask &= make_bitmask<u64>((subamask + 1 + end - rend) * unit_size);
-		else
-			emask &= ~make_bitmask<u64>((rend - end) * unit_size);
-	}
-
-	if (rend == (rstart | subamask) || smask == emask)
-	{
-		m_start_address[0] = rstart;
-		m_end_address[0] = rend;
-		m_masks[0] = smask & emask;
-	}
-	else
-	{
-		int idx = 0;
-		if (smask != mmask)
-		{
-			m_start_address[idx] = rstart;
-			m_end_address[idx] = rstart | subamask;
-			m_masks[idx] = smask;
-			idx++;
-			rstart += subamask + 1;
-		}
-		if (mmask == emask)
-		{
-			m_start_address[idx] = rstart;
-			m_end_address[idx] = rend;
-			m_masks[idx] = emask;
-		}
-		else
-		{
-			if (rstart < rend - subamask)
-			{
-				m_start_address[idx] = rstart;
-				m_end_address[idx] = rend - subamask - 1;
-				m_masks[idx] = mmask;
-				idx++;
-			}
-			m_start_address[idx] = rend - subamask;
-			m_end_address[idx] = rend;
-			m_masks[idx] = emask;
-		}
-	}
-
-	install(read_or_write::READWRITE);
-	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
-												 if (m_enabled)
-												 {
-													 install(mode);
-												 }
-											 });
-}
-
-device_debug::watchpoint::~watchpoint()
-{
-	m_space.remove_change_notifier(m_notifier);
-	if (m_phr)
-		m_phr->remove();
-	if (m_phw)
-		m_phw->remove();
-}
-
-void device_debug::watchpoint::setEnabled(bool value)
-{
-	if (m_enabled != value)
-	{
-		m_enabled = value;
-		if (m_enabled)
-			install(read_or_write::READWRITE);
-		else
-		{
-			m_installing = true;
-			if(m_phr)
-				m_phr->remove();
-			if(m_phw)
-				m_phw->remove();
-			m_installing = false;
-		}
-	}
-}
-
-void device_debug::watchpoint::install(read_or_write mode)
-{
-	if (m_installing)
-		return;
-	m_installing = true;
-	if ((u32(mode) & u32(read_or_write::READ)) && m_phr)
-		m_phr->remove();
-	if ((u32(mode) & u32(read_or_write::WRITE)) && m_phw)
-		m_phw->remove();
-	std::string name = util::string_format("wp@%x", m_address);
-	switch (m_space.data_width())
-	{
-	case  8:
-		if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-			m_phr = m_space.install_read_tap(m_start_address[0], m_end_address[0], name,
-											 [this](offs_t offset, u8 &data, u8 mem_mask) {
-												 triggered(read_or_write::READ, offset, data, mem_mask);
-											 }, m_phr);
-		if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-			m_phw = m_space.install_write_tap(m_start_address[0], m_end_address[0], name,
-											  [this](offs_t offset, u8 &data, u8 mem_mask) {
-												  triggered(read_or_write::WRITE, offset, data, mem_mask);
-											  }, m_phw);
-		break;
-
-	case 16:
-		for (int i=0; i != 3; i++)
-			if (m_masks[i])
-			{
-				u16 mask = m_masks[i];
-				if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-					m_phr = m_space.install_read_tap(m_start_address[i], m_end_address[i], name,
-													 [this, mask](offs_t offset, u16 &data, u16 mem_mask) {
-														 if (mem_mask & mask)
-															 triggered(read_or_write::READ, offset, data, mem_mask);
-													 }, m_phr);
-				if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-					m_phw = m_space.install_write_tap(m_start_address[i], m_end_address[i], name,
-													  [this, mask](offs_t offset, u16 &data, u16 mem_mask) {
-														  if (mem_mask & mask)
-															  triggered(read_or_write::WRITE, offset, data, mem_mask);
-													  }, m_phw);
-			}
-		break;
-
-	case 32:
-		for (int i=0; i != 3; i++)
-			if (m_masks[i])
-			{
-				u32 mask = m_masks[i];
-				if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-					m_phr = m_space.install_read_tap(m_start_address[i], m_end_address[i], name,
-													 [this, mask](offs_t offset, u32 &data, u32 mem_mask) {
-														 if (mem_mask & mask)
-															 triggered(read_or_write::READ, offset, data, mem_mask);
-													 }, m_phr);
-				if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-					m_phw = m_space.install_write_tap(m_start_address[i], m_end_address[i], name,
-													  [this, mask](offs_t offset, u32 &data, u32 mem_mask) {
-														  if (mem_mask & mask)
-															  triggered(read_or_write::WRITE, offset, data, mem_mask);
-													  }, m_phw);
-			}
-		break;
-
-	case 64:
-		for (int i=0; i != 3; i++)
-			if (m_masks[i])
-			{
-				u64 mask = m_masks[i];
-				if (u32(m_type) & u32(mode) & u32(read_or_write::READ))
-					m_phr = m_space.install_read_tap(m_start_address[i], m_end_address[i], name,
-													 [this, mask](offs_t offset, u64 &data, u64 mem_mask) {
-														 if (mem_mask & mask)
-															 triggered(read_or_write::READ, offset, data, mem_mask);
-													 }, m_phr);
-				if (u32(m_type) & u32(mode) & u32(read_or_write::WRITE))
-					m_phw = m_space.install_write_tap(m_start_address[i], m_end_address[i], name,
-													  [this, mask](offs_t offset, u64 &data, u64 mem_mask) {
-														  if (mem_mask & mask)
-															  triggered(read_or_write::WRITE, offset, data, mem_mask);
-													  }, m_phw);
-			}
-		break;
-	}
-	m_installing = false;
-}
-
-void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask)
-{
-	auto &machine = m_debugInterface->m_device.machine();
-	auto &debug = machine.debugger();
-
-	// if we're within debugger code, don't trigger
-	if (debug.cpu().within_instruction_hook() || machine.side_effects_disabled())
-		return;
-
-	// adjust address, size & value_to_write based on mem_mask.
-	offs_t size = 0;
-	int ashift = m_space.addr_shift();
-	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
-	u64 unit_mask = make_bitmask<u64>(unit_size);
-
-	offs_t address_offset = 0;
-
-	if(!mem_mask)
-		mem_mask = 0xff;
-
-	while (!(mem_mask & unit_mask))
-	{
-		address_offset++;
-		data >>= unit_size;
-		mem_mask >>= unit_size;
-	}
-
-	while (mem_mask)
-	{
-		size++;
-		mem_mask >>= unit_size;
-	}
-
-	data &= make_bitmask<u64>(size * unit_size);
-
-	if (m_space.endianness() == ENDIANNESS_LITTLE)
-		address += address_offset;
-	else
-		address += m_space.alignment() - size - address_offset;
-
-	// stash the value that will be written or has just been read
-	debug.cpu().set_wpinfo(address, data);
-
-	// protect against recursion
-	debug.cpu().set_within_instruction(true);
-
-	// must satisfy the condition
-	if (!m_condition.is_empty())
-	{
-		try
-		{
-			if (!m_condition.execute())
-			{
-				debug.cpu().set_within_instruction(false);
-				return;
-			}
-		}
-		catch (expression_error &)
-		{
-			debug.cpu().set_within_instruction(false);
-			return;
-		}
-	}
-
-	// halt in the debugger by default
-	debug.cpu().set_execution_stopped();
-
-	// evaluate the action
-	if (!m_action.empty())
-		debug.console().execute_command(m_action, false);
-
-	// print a notification, unless the action made us go again
-	if (debug.cpu().is_stopped())
-	{
-		offs_t pc = m_space.device().state().pcbase();
-		std::string buffer;
-
-		buffer = string_format(type == read_or_write::READ ?
-							   "Stopped at watchpoint %X reading %0*X from %08X (PC=%X)" :
-							   "Stopped at watchpoint %X writing %0*X to %08X (PC=%X)",
-							   m_index,
-							   size * unit_size / 4,
-							   data,
-							   address,
-							   pc);
-		debug.console().printf("%s\n", buffer);
-		m_debugInterface->compute_debug_flags();
-		m_debugInterface->set_triggered_watchpoint(this);
-	}
-
-	debug.cpu().set_within_instruction(false);
-}
-
-//**************************************************************************
-//  DEBUG REGISTERPOINT
-//**************************************************************************
-
-//-------------------------------------------------
-//  registerpoint - constructor
-//-------------------------------------------------
-
-device_debug::registerpoint::registerpoint(symbol_table &symbols, int index, const char *condition, const char *action)
-	: m_index(index),
-		m_enabled(true),
-		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-		m_action((action != nullptr) ? action : "")
-{
-}
-
-
-//-------------------------------------------------
-//  hit - detect a hit
-//-------------------------------------------------
-
-bool device_debug::registerpoint::hit()
-{
-	// don't hit if disabled
-	if (!m_enabled)
-		return false;
-
-	// must satisfy the condition
-	if (!m_condition.is_empty())
-	{
-		try
-		{
-			return (m_condition.execute() != 0);
-		}
-		catch (expression_error &)
-		{
-			return false;
-		}
-	}
-
-	return true;
 }
 
 

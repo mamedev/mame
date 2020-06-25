@@ -291,7 +291,7 @@ SamRam
 /****************************************************************************************************/
 /* Spectrum 48k functions */
 
-READ8_MEMBER(spectrum_state::pre_opcode_fetch_r)
+uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -303,7 +303,7 @@ READ8_MEMBER(spectrum_state::pre_opcode_fetch_r)
 	return retval;
 }
 
-READ8_MEMBER(spectrum_state::spectrum_data_r)
+uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
 	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
@@ -311,18 +311,18 @@ READ8_MEMBER(spectrum_state::spectrum_data_r)
 	return retval;
 }
 
-WRITE8_MEMBER(spectrum_state::spectrum_data_w)
+void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 {
 	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
+void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
 		m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER(spectrum_state::spectrum_rom_r)
+uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -341,7 +341,7 @@ READ8_MEMBER(spectrum_state::spectrum_rom_r)
  bit 2-0: border colour
 */
 
-WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
+void spectrum_state::spectrum_port_fe_w(offs_t offset, uint8_t data)
 {
 	unsigned char Changed;
 
@@ -365,13 +365,16 @@ WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
 	}
 
+	if (m_exp)
+		m_exp->iorq_w(offset, data);
+
 	m_port_fe_data = data;
 }
 
 
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
-READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
+uint8_t spectrum_state::spectrum_port_fe_r(offs_t offset)
 {
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -446,7 +449,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	return data;
 }
 
-READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
+uint8_t spectrum_state::spectrum_port_ula_r(offs_t offset)
 {
 	// known ports used for reading floating bus are:
 	//   0x28ff   Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
@@ -457,6 +460,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 	offset |= 1;
 	//logerror("fb: %04x\n", offset);
 
+#if 0 // TODO make this expansion devices friendly
 	// Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
 	if (offset == 0x28ff)
 		return floating_bus_r();
@@ -464,6 +468,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 	// Sidewize
 	if (offset == 0x40ff)
 		return floating_bus_r();
+#endif
 
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
@@ -472,7 +477,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 	return floating_bus_r();
 }
 
-READ8_MEMBER(spectrum_state::spectrum_clone_port_ula_r)
+uint8_t spectrum_state::spectrum_clone_port_ula_r()
 {
 	int vpos = m_screen->vpos();
 
@@ -848,40 +853,43 @@ ROM_START(spectrum)
 	ROMX_LOAD("spectrum.rom", 0x0000, 0x4000, CRC(ddee531f) SHA1(5ea7c2b824672e914525d1d5c419d71b84a426a2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "sp", "Spanish")
 	ROMX_LOAD("48e.rom", 0x0000, 0x4000, CRC(f051746e) SHA1(9e535e2e24231ccb65e33d107f6d0ceb23e99477), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "bsrom118", "BusySoft Upgrade v1.18")
-	ROMX_LOAD("bsrom118.rom", 0x0000, 0x4000, CRC(1511cddb) SHA1(ab3c36daad4325c1d3b907b6dc9a14af483d14ec), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "bsrom140", "BusySoft Upgrade v1.40")
-	ROMX_LOAD("bsrom140.rom", 0x0000, 0x4000, CRC(07017c6d) SHA1(2ee2dbe6ab96b60d7af1d6cb763b299374c21776), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "groot", "De Groot's Upgrade")
-	ROMX_LOAD("groot.rom", 0x0000, 0x4000, CRC(abf18c45) SHA1(51165cde68e218512d3145467074bc7e786bf307), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "48turbo", "48 Turbo")
-	ROMX_LOAD("48turbo.rom", 0x0000, 0x4000, CRC(56189781) SHA1(e62a431b0938af414b7ab8b1349a18b3c4407f70), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "psycho", "Maly's Psycho Upgrade")
-	ROMX_LOAD("psycho.rom", 0x0000, 0x4000, CRC(cd60b589) SHA1(0853e25857d51dd41b20a6dbc8e80f028c5befaa), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "turbo23", "Turbo 2.3")
-	ROMX_LOAD("turbo2_3.rom", 0x0000, 0x4000, CRC(fd3b0413) SHA1(84ea64af06adaf05e68abe1d69454b4fc6888505), ROM_BIOS(7))
-	ROM_SYSTEM_BIOS(8, "turbo44", "Turbo 4.4")
-	ROMX_LOAD("turbo4_4.rom", 0x0000, 0x4000, CRC(338b6e87) SHA1(21ad93ffe41a4458704c866cca2754f066f6a560), ROM_BIOS(8))
-	ROM_SYSTEM_BIOS(9, "imc", "Ian Collier's Upgrade")
-	ROMX_LOAD("imc.rom", 0x0000, 0x4000, CRC(d1be99ee) SHA1(dee814271c4d51de257d88128acdb324fb1d1d0d), ROM_BIOS(9))
-	ROM_SYSTEM_BIOS(10, "plus4", "ZX Spectrum +4")
-	ROMX_LOAD("plus4.rom",0x0000,0x4000, CRC(7e0f47cb) SHA1(c103e89ef58e6ade0c01cea0247b332623bd9a30), ROM_BIOS(10))
-	ROM_SYSTEM_BIOS(11, "deutsch", "German unofficial (Andrew Owen)")
-	ROMX_LOAD("deutsch.rom",0x0000,0x4000, CRC(1a9190f4) SHA1(795c20324311dd5a56300e6e4ec49b0a694ac0b3), ROM_BIOS(11))
-	ROM_SYSTEM_BIOS(12, "hdt", "HDT-ISO HEX-DEC-TEXT")
-	ROMX_LOAD("hdt-iso.rom",0x0000,0x4000, CRC(b81c570c) SHA1(2a9745ba3b369a84c4913c98ede66ec87cb8aec1), ROM_BIOS(12))
-	ROM_SYSTEM_BIOS(13, "sc", "The Sea Change Minimal ROM V1.78")
-	ROMX_LOAD("sc01.rom",0x0000,0x4000, CRC(73b4057a) SHA1(c58ff44a28db47400f09ed362ca0527591218136), ROM_BIOS(13))
-	ROM_SYSTEM_BIOS(14, "gosh", "GOSH Wonderful ZX Spectrum ROM V1.32")
-	ROMX_LOAD("gw03.rom",0x0000,0x4000, CRC(5585d7c2) SHA1(a701c3d4b698f7d2be537dc6f79e06e4dbc95929), ROM_BIOS(14))
-	ROM_SYSTEM_BIOS(15, "1986es", "1986ES Snapshot")
-	ROMX_LOAD("1986es.rom",0x0000,0x4000, CRC(9e0fdaaa) SHA1(f9d23f25640c51bcaa63e21ed5dd66bb2d5f63d4), ROM_BIOS(15))
-	ROM_SYSTEM_BIOS(16, "jgh", "JGH ROM V0.74 (C) J.G.Harston")
-	ROMX_LOAD("jgh.rom",0x0000,0x4000, CRC(7224138e) SHA1(d7f02ed66455f1c08ac0c864c7038a92a88ba94a), ROM_BIOS(16))
-	ROM_SYSTEM_BIOS(17, "iso22", "ISO ROM V2.2")
-	ROMX_LOAD("isomoje.rom",0x0000,0x4000, CRC(62ab3640) SHA1(04adbdb1380d6ccd4ab26ddd61b9ccbba462a60f), ROM_BIOS(17))
-	ROM_SYSTEM_BIOS(18, "iso8", "ISO ROM 8")
-	ROMX_LOAD("iso8bm.rom",0x0000,0x4000, CRC(43e9c2fd) SHA1(5752e6f789769475711b91e0a75911fa5232c767), ROM_BIOS(18))
+	ROM_SYSTEM_BIOS(2, "p", "Prototype") // breadboard PCB with a maze of wires underneath, keyboard has handwritten labels
+	ROMX_LOAD("0,1.eprom1", 0x0000, 0x2000, CRC(6b807b7a) SHA1(7d14f1929c086b0954edb386f02b06ed283b602a), ROM_BIOS(2))
+	ROMX_LOAD("2,3.eprom2", 0x2000, 0x2000, CRC(f54a389b) SHA1(eab62eda635a56c24132022947fdeefcd18215f5), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "bsrom118", "BusySoft Upgrade v1.18")
+	ROMX_LOAD("bsrom118.rom", 0x0000, 0x4000, CRC(1511cddb) SHA1(ab3c36daad4325c1d3b907b6dc9a14af483d14ec), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "bsrom140", "BusySoft Upgrade v1.40")
+	ROMX_LOAD("bsrom140.rom", 0x0000, 0x4000, CRC(07017c6d) SHA1(2ee2dbe6ab96b60d7af1d6cb763b299374c21776), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "groot", "De Groot's Upgrade")
+	ROMX_LOAD("groot.rom", 0x0000, 0x4000, CRC(abf18c45) SHA1(51165cde68e218512d3145467074bc7e786bf307), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "48turbo", "48 Turbo")
+	ROMX_LOAD("48turbo.rom", 0x0000, 0x4000, CRC(56189781) SHA1(e62a431b0938af414b7ab8b1349a18b3c4407f70), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "psycho", "Maly's Psycho Upgrade")
+	ROMX_LOAD("psycho.rom", 0x0000, 0x4000, CRC(cd60b589) SHA1(0853e25857d51dd41b20a6dbc8e80f028c5befaa), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(8, "turbo23", "Turbo 2.3")
+	ROMX_LOAD("turbo2_3.rom", 0x0000, 0x4000, CRC(fd3b0413) SHA1(84ea64af06adaf05e68abe1d69454b4fc6888505), ROM_BIOS(8))
+	ROM_SYSTEM_BIOS(9, "turbo44", "Turbo 4.4")
+	ROMX_LOAD("turbo4_4.rom", 0x0000, 0x4000, CRC(338b6e87) SHA1(21ad93ffe41a4458704c866cca2754f066f6a560), ROM_BIOS(9))
+	ROM_SYSTEM_BIOS(10, "imc", "Ian Collier's Upgrade")
+	ROMX_LOAD("imc.rom", 0x0000, 0x4000, CRC(d1be99ee) SHA1(dee814271c4d51de257d88128acdb324fb1d1d0d), ROM_BIOS(10))
+	ROM_SYSTEM_BIOS(11, "plus4", "ZX Spectrum +4")
+	ROMX_LOAD("plus4.rom",0x0000,0x4000, CRC(7e0f47cb) SHA1(c103e89ef58e6ade0c01cea0247b332623bd9a30), ROM_BIOS(11))
+	ROM_SYSTEM_BIOS(12, "deutsch", "German unofficial (Andrew Owen)")
+	ROMX_LOAD("deutsch.rom",0x0000,0x4000, CRC(1a9190f4) SHA1(795c20324311dd5a56300e6e4ec49b0a694ac0b3), ROM_BIOS(12))
+	ROM_SYSTEM_BIOS(13, "hdt", "HDT-ISO HEX-DEC-TEXT")
+	ROMX_LOAD("hdt-iso.rom",0x0000,0x4000, CRC(b81c570c) SHA1(2a9745ba3b369a84c4913c98ede66ec87cb8aec1), ROM_BIOS(13))
+	ROM_SYSTEM_BIOS(14, "sc", "The Sea Change Minimal ROM V1.78")
+	ROMX_LOAD("sc01.rom",0x0000,0x4000, CRC(73b4057a) SHA1(c58ff44a28db47400f09ed362ca0527591218136), ROM_BIOS(14))
+	ROM_SYSTEM_BIOS(15, "gosh", "GOSH Wonderful ZX Spectrum ROM V1.32")
+	ROMX_LOAD("gw03.rom",0x0000,0x4000, CRC(5585d7c2) SHA1(a701c3d4b698f7d2be537dc6f79e06e4dbc95929), ROM_BIOS(15))
+	ROM_SYSTEM_BIOS(16, "1986es", "1986ES Snapshot")
+	ROMX_LOAD("1986es.rom",0x0000,0x4000, CRC(9e0fdaaa) SHA1(f9d23f25640c51bcaa63e21ed5dd66bb2d5f63d4), ROM_BIOS(16))
+	ROM_SYSTEM_BIOS(17, "jgh", "JGH ROM V0.74 (C) J.G.Harston")
+	ROMX_LOAD("jgh.rom",0x0000,0x4000, CRC(7224138e) SHA1(d7f02ed66455f1c08ac0c864c7038a92a88ba94a), ROM_BIOS(17))
+	ROM_SYSTEM_BIOS(18, "iso22", "ISO ROM V2.2")
+	ROMX_LOAD("isomoje.rom",0x0000,0x4000, CRC(62ab3640) SHA1(04adbdb1380d6ccd4ab26ddd61b9ccbba462a60f), ROM_BIOS(18))
+	ROM_SYSTEM_BIOS(19, "iso8", "ISO ROM 8")
+	ROMX_LOAD("iso8bm.rom",0x0000,0x4000, CRC(43e9c2fd) SHA1(5752e6f789769475711b91e0a75911fa5232c767), ROM_BIOS(19))
 ROM_END
 
 ROM_START(specide)
@@ -1076,7 +1084,7 @@ ROM_END
 
 /*  Any clone known to have the same "floating bus" behaviour as official Sinclair models should be changed to use the "spectrum" machine  */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE          INPUT      CLASS           INIT           COMPANY                  FULLNAME                 FLAGS
+//    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT      CLASS           INIT           COMPANY                  FULLNAME                 FLAGS
 COMP( 1982, spectrum, 0,        0,      spectrum,       spectrum,  spectrum_state, init_spectrum, "Sinclair Research Ltd", "ZX Spectrum" ,          0 )
 COMP( 1987, spec80k,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "ZX Spectrum 80K",       MACHINE_UNOFFICIAL )
 COMP( 1995, specide,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "ZX Spectrum IDE",       MACHINE_UNOFFICIAL )

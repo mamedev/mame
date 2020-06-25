@@ -145,10 +145,10 @@ public:
 	void init_ddealer();
 
 private:
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(back_vram_w);
-	DECLARE_WRITE16_MEMBER(mcu_shared_w);
-	DECLARE_READ16_MEMBER(mcu_r);
+	void flipscreen_w(uint16_t data);
+	void back_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mcu_r();
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
@@ -188,7 +188,7 @@ private:
 
 
 
-WRITE16_MEMBER(ddealer_state::flipscreen_w)
+void ddealer_state::flipscreen_w(uint16_t data)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -196,7 +196,7 @@ WRITE16_MEMBER(ddealer_state::flipscreen_w)
 TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
 	int code = m_back_vram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0xfff,
 			code >> 12,
 			0);
@@ -205,6 +205,7 @@ TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 void ddealer_state::video_start()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_back_tilemap->set_scrolldx(64,64);
 }
 
 void ddealer_state::draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
@@ -292,7 +293,6 @@ void ddealer_state::draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_
 
 uint32_t ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_back_tilemap->set_scrollx(0, -64);
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,
@@ -401,7 +401,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 
 
 
-WRITE16_MEMBER(ddealer_state::back_vram_w)
+void ddealer_state::back_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_vram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -429,7 +429,7 @@ Protection handling, identical to Hacha Mecha Fighter / Thunder Dragon with diff
 		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-WRITE16_MEMBER(ddealer_state::mcu_shared_w)
+void ddealer_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
 
@@ -586,33 +586,9 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
 static GFXDECODE_START( gfx_ddealer )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
 void ddealer_state::machine_start()
@@ -658,7 +634,7 @@ void ddealer_state::ddealer(machine_config &config)
 
 
 
-READ16_MEMBER(ddealer_state::mcu_r)
+uint16_t ddealer_state::mcu_r()
 {
 	static const int resp[] =
 	{
@@ -681,7 +657,7 @@ READ16_MEMBER(ddealer_state::mcu_r)
 
 void ddealer_state::init_ddealer()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(*this, FUNC(ddealer_state::mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16smo_delegate(*this, FUNC(ddealer_state::mcu_r)));
 }
 
 ROM_START( ddealer )

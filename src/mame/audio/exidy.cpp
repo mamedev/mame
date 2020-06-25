@@ -389,7 +389,7 @@ void exidy_sound_device::common_sh_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_porta_w)
+void exidy_sh8253_sound_device::r6532_porta_w(uint8_t data)
 {
 	if (m_cvsd.found())
 		m_cvsdcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -401,7 +401,7 @@ WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_porta_w)
 	}
 }
 
-READ8_MEMBER(exidy_sh8253_sound_device::r6532_porta_r)
+uint8_t exidy_sh8253_sound_device::r6532_porta_r()
 {
 	uint8_t status = 0xff;
 	if (m_tms.found())
@@ -412,7 +412,7 @@ READ8_MEMBER(exidy_sh8253_sound_device::r6532_porta_r)
 	return status;
 }
 
-WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_portb_w)
+void exidy_sh8253_sound_device::r6532_portb_w(uint8_t data)
 {
 	if (m_tms.found())
 	{
@@ -422,7 +422,7 @@ WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_portb_w)
 }
 
 
-READ8_MEMBER(exidy_sh8253_sound_device::r6532_portb_r)
+uint8_t exidy_sh8253_sound_device::r6532_portb_r()
 {
 	uint8_t newdata = m_riot->portb_in_get();
 	if (m_tms.found())
@@ -467,7 +467,7 @@ void exidy_sh8253_sound_device::sh8253_register_state_globals()
  *
  *************************************/
 
-WRITE8_MEMBER(exidy_sh8253_sound_device::sh8253_w)
+void exidy_sh8253_sound_device::sh8253_w(offs_t offset, uint8_t data)
 {
 	int chan;
 
@@ -510,7 +510,7 @@ WRITE8_MEMBER(exidy_sh8253_sound_device::sh8253_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy_sound_device::sh6840_r)
+uint8_t exidy_sound_device::sh6840_r(offs_t offset)
 {
 	/* force an update of the stream */
 	m_stream->update();
@@ -535,7 +535,7 @@ READ8_MEMBER(exidy_sound_device::sh6840_r)
 }
 
 
-WRITE8_MEMBER(exidy_sound_device::sh6840_w)
+void exidy_sound_device::sh6840_w(offs_t offset, uint8_t data)
 {
 	sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
 
@@ -597,7 +597,7 @@ WRITE8_MEMBER(exidy_sound_device::sh6840_w)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy_sound_device::sfxctrl_w)
+void exidy_sound_device::sfxctrl_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -623,7 +623,7 @@ WRITE8_MEMBER(exidy_sound_device::sfxctrl_w)
  *
  *************************************/
 
-WRITE8_MEMBER(venture_sound_device::filter_w)
+void venture_sound_device::filter_w(uint8_t data)
 {
 	logerror("exidy_sound_filter_w = %02X\n", data);
 }
@@ -688,15 +688,15 @@ void exidy_sh8253_sound_device::device_reset()
 }
 
 
-WRITE8_MEMBER(venture_sound_device::pa_w)
+void venture_sound_device::pa_w(uint8_t data)
 {
-	m_pia->write_porta(data);
+	m_pia->porta_w(data);
 }
 
 
-WRITE8_MEMBER(venture_sound_device::pb_w)
+void venture_sound_device::pb_w(uint8_t data)
 {
-	m_pia->write_portb(data);
+	m_pia->portb_w(data);
 }
 
 
@@ -712,13 +712,13 @@ WRITE_LINE_MEMBER(venture_sound_device::cb_w)
 }
 
 
-WRITE8_MEMBER(venture_sound_device::pia_pa_w)
+void venture_sound_device::pia_pa_w(uint8_t data)
 {
 	m_pa_callback(data);
 }
 
 
-WRITE8_MEMBER(venture_sound_device::pia_pb_w)
+void venture_sound_device::pia_pb_w(uint8_t data)
 {
 	m_pb_callback(data);
 }
@@ -791,7 +791,7 @@ mtrap_sound_device::mtrap_sound_device(const machine_config &mconfig, const char
 {
 }
 
-WRITE8_MEMBER(mtrap_sound_device::voiceio_w)
+void mtrap_sound_device::voiceio_w(offs_t offset, uint8_t data)
 {
 	if (!(offset & 0x10))
 		m_cvsd->digit_w(data & 1);
@@ -801,7 +801,7 @@ WRITE8_MEMBER(mtrap_sound_device::voiceio_w)
 }
 
 
-READ8_MEMBER(mtrap_sound_device::voiceio_r)
+uint8_t mtrap_sound_device::voiceio_r(offs_t offset)
 {
 	if (!(offset & 0x80))
 	{
@@ -857,7 +857,7 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
 
 
 
-READ8_MEMBER(victory_sound_device::response_r)
+uint8_t victory_sound_device::response_r()
 {
 	uint8_t ret = m_pia->b_output();
 
@@ -873,7 +873,7 @@ READ8_MEMBER(victory_sound_device::response_r)
 }
 
 
-READ8_MEMBER(victory_sound_device::status_r)
+uint8_t victory_sound_device::status_r()
 {
 	uint8_t ret = (m_pia_ca1 << 7) | (m_pia_cb1 << 6);
 
@@ -885,12 +885,12 @@ READ8_MEMBER(victory_sound_device::status_r)
 
 TIMER_CALLBACK_MEMBER(victory_sound_device::delayed_command_w)
 {
-	m_pia->write_porta(param);
+	m_pia->porta_w(param);
 	m_pia_ca1 = 0;
 	m_pia->ca1_w(m_pia_ca1);
 }
 
-WRITE8_MEMBER(victory_sound_device::command_w)
+void victory_sound_device::command_w(uint8_t data)
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound command = %02X\n", machine().describe_context(), data);
 
@@ -960,7 +960,7 @@ void victory_sound_device::device_reset()
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
 	   as the sound CPU checks port A before the main CPU ever writes to it */
-	m_pia->write_porta(0);
+	m_pia->porta_w(0);
 	m_pia_ca1 = 1;
 	m_pia->ca1_w(m_pia_ca1);
 }

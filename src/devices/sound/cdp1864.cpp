@@ -306,7 +306,7 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  dispon_r -
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1864_device::dispon_r )
+uint8_t cdp1864_device::dispon_r()
 {
 	m_disp = 1;
 
@@ -318,7 +318,7 @@ READ8_MEMBER( cdp1864_device::dispon_r )
 //  dispoff_r -
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1864_device::dispoff_r )
+uint8_t cdp1864_device::dispoff_r()
 {
 	m_disp = 0;
 
@@ -333,7 +333,7 @@ READ8_MEMBER( cdp1864_device::dispoff_r )
 //  step_bgcolor_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1864_device::step_bgcolor_w )
+void cdp1864_device::step_bgcolor_w(uint8_t data)
 {
 	m_disp = 1;
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER( cdp1864_device::step_bgcolor_w )
 //  tone_latch_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1864_device::tone_latch_w )
+void cdp1864_device::tone_latch_w(uint8_t data)
 {
 	m_latch = data;
 }
@@ -356,7 +356,7 @@ WRITE8_MEMBER( cdp1864_device::tone_latch_w )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1864_device::dma_w )
+void cdp1864_device::dma_w(uint8_t data)
 {
 	int rdata = 1, bdata = 1, gdata = 1;
 	int sx = screen().hpos() + 4;
@@ -389,7 +389,7 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 //  con_w - color on write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1864_device::con_w )
+void cdp1864_device::con_w(int state)
 {
 	m_con = state;
 }
@@ -399,7 +399,7 @@ WRITE_LINE_MEMBER( cdp1864_device::con_w )
 //  aoe_w - audio output enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1864_device::aoe_w )
+void cdp1864_device::aoe_w(int state)
 {
 	if (!state)
 	{
@@ -414,7 +414,7 @@ WRITE_LINE_MEMBER( cdp1864_device::aoe_w )
 //  evs_w - external vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1864_device::evs_w )
+void cdp1864_device::evs_w(int state)
 {
 }
 

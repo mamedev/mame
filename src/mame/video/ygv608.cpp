@@ -587,11 +587,11 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 
 	if( col >= m_page_x )
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y )
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else
 	{
@@ -669,7 +669,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 			j += m_namcond1_gfxbank * 0x8000;
 		}
 
-		SET_TILE_INFO_MEMBER(set, j, attr & 0x0F, f );
+		tileinfo.set(set, j, attr & 0x0F, f );
 	}
 }
 
@@ -688,15 +688,15 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 
 	if (m_md & MD_1PLANE )
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if (col >= m_page_x)
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if (row >= m_page_y)
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else
 	{
@@ -774,7 +774,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 			j += m_namcond1_gfxbank * 0x8000;
 		}
 
-		SET_TILE_INFO_MEMBER(set, j, attr, f );
+		tileinfo.set(set, j, attr, f );
 	}
 }
 
@@ -792,87 +792,87 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	int             base = row >> m_base_y_shift;
 
 	if( col >= m_page_x ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else {
-	int sx, sy, page;
-	int j;
-	int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
-	int f = 0;
-	i += pattern_name_base;
+		int sx, sy, page;
+		int j;
+		int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
+		int f = 0;
+		i += pattern_name_base;
 
-	j = m_pattern_name_table[i];
-	if( m_bits16 ) {
-		j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
-		// attribute only valid in 16 color mode
-		if( set == GFX_16X16_4BIT )
-			attr = m_pattern_name_table[i+1] >> 4;
+		j = m_pattern_name_table[i];
+		if( m_bits16 ) {
+			j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
+			// attribute only valid in 16 color mode
+			if( set == GFX_16X16_4BIT )
+				attr = m_pattern_name_table[i+1] >> 4;
 
-		if (m_flip == true)
-		{
-		if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
-		if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			if (m_flip == true)
+			{
+			if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
+			if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			}
 		}
-	}
 
-	/* calculate page according to scroll data */
-	/* - assuming full-screen scroll only for now... */
-	if (m_v_div_size) {
-		page = 0;
-	}
-	else {
-		sy = (int)m_scroll_data_table[0][translated_column] +
-		   (((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
-		sx = (int)m_scroll_data_table[0][0x80] +
-		   (((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
-
-		if (m_md == MD_2PLANE_16BIT) {
-			page = ( ( sx + col * 16 ) % 2048 ) / 512;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
-		}
-		else if (m_page_size) {
-			page = ( sx + col * 16 ) / 512;
-			page += ( ( sy + row * 16 ) / 1024 ) * 8;
+		/* calculate page according to scroll data */
+		/* - assuming full-screen scroll only for now... */
+		if (m_v_div_size) {
+			page = 0;
 		}
 		else {
-			page = ( sx + col * 16 ) / 1024;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
+			sy = (int)m_scroll_data_table[0][translated_column] +
+			   (((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
+			sx = (int)m_scroll_data_table[0][0x80] +
+			   (((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
+
+			if (m_md == MD_2PLANE_16BIT) {
+				page = ( ( sx + col * 16 ) % 2048 ) / 512;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
+			else if (m_page_size) {
+				page = ( sx + col * 16 ) / 512;
+				page += ( ( sy + row * 16 ) / 1024 ) * 8;
+			}
+			else {
+				page = ( sx + col * 16 ) / 1024;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
 		}
-	}
 
-	page &= 0x1f;
+		page &= 0x1f;
 
-	/* add page, base address to pattern name */
-	j += ( (int)m_scroll_data_table[0][0xc0+page] << 8 );
-	j += ( m_base_addr[0][base] << 8 );
+		/* add page, base address to pattern name */
+		j += ( (int)m_scroll_data_table[0][0xc0+page] << 8 );
+		j += ( m_base_addr[0][base] << 8 );
 
-	if( j >= layout_total(set) ) {
-	logerror( "A_16X16: tilemap=%d\n", j );
-		j = 0;
-	}
+		if( j >= layout_total(set) ) {
+		logerror( "A_16X16: tilemap=%d\n", j );
+			j = 0;
+		}
 
-	if (m_planeA_color_fetch != 0)
-	{
-		// attribute only valid in 16 color mode
-		if( set == GFX_16X16_4BIT )
-			attr = ( j >> ( m_planeA_color_fetch * 2 ) ) & 0x0f;
-	}
+		if (m_planeA_color_fetch != 0)
+		{
+			// attribute only valid in 16 color mode
+			if( set == GFX_16X16_4BIT )
+				attr = ( j >> ( m_planeA_color_fetch * 2 ) ) & 0x0f;
+		}
 
-	// banking
-	if (set == GFX_16X16_4BIT)
-	{
-		j += m_namcond1_gfxbank * 0x4000;
-	}
-	else // 8x8x8
-	{
-		j += m_namcond1_gfxbank * 0x2000;
-	}
+		// banking
+		if (set == GFX_16X16_4BIT)
+		{
+			j += m_namcond1_gfxbank * 0x4000;
+		}
+		else // 8x8x8
+		{
+			j += m_namcond1_gfxbank * 0x2000;
+		}
 
 
-	SET_TILE_INFO_MEMBER(set, j, attr, f );
+		tileinfo.set(set, j, attr, f );
 	}
 }
 
@@ -890,88 +890,88 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	int             base = row >> m_base_y_shift;
 
 	if(m_md & MD_1PLANE ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	if( col >= m_page_x ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else {
-	int sx, sy, page;
-	int j;
-	int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
-	int f = 0;
-	i += pattern_name_base;
+		int sx, sy, page;
+		int j;
+		int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
+		int f = 0;
+		i += pattern_name_base;
 
-	j = m_pattern_name_table[i];
-	if( m_bits16 ) {
-		j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
-		attr = m_pattern_name_table[i+1] >> 4; /*& 0x00; 0xf0;*/
+		j = m_pattern_name_table[i];
+		if( m_bits16 ) {
+			j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
+			attr = m_pattern_name_table[i+1] >> 4; /*& 0x00; 0xf0;*/
 
-		if (m_flip == true)
-		{
-			if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
-			if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			if (m_flip == true)
+			{
+				if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
+				if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			}
 		}
-	}
 
-	/* calculate page according to scroll data */
-	/* - assuming full-screen scroll only for now... */
-	if (m_v_div_size) {
-		page = 0;
-	}
-	else {
-		sy = (int)m_scroll_data_table[1][translated_column] +
-		   (((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
-		sx = (int)m_scroll_data_table[1][0x80] +
-		   (((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
-
-		if (m_md == MD_2PLANE_16BIT) {
-			page = ( ( sx + col * 16 ) % 2048 ) / 512;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
-		}
-		else if (m_page_size) {
-			page = ( sx + col * 16 ) / 512;
-			page += ( ( sy + row * 16 ) / 1024 ) * 8;
+		/* calculate page according to scroll data */
+		/* - assuming full-screen scroll only for now... */
+		if (m_v_div_size) {
+			page = 0;
 		}
 		else {
-			page = ( sx + col * 16 ) / 1024;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
+			sy = (int)m_scroll_data_table[1][translated_column] +
+			   (((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
+			sx = (int)m_scroll_data_table[1][0x80] +
+			   (((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
+
+			if (m_md == MD_2PLANE_16BIT) {
+				page = ( ( sx + col * 16 ) % 2048 ) / 512;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
+			else if (m_page_size) {
+				page = ( sx + col * 16 ) / 512;
+				page += ( ( sy + row * 16 ) / 1024 ) * 8;
+			}
+			else {
+				page = ( sx + col * 16 ) / 1024;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
 		}
-	}
 
-	page &= 0x1f;
+		page &= 0x1f;
 
-	/* add page, base address to pattern name */
-	j += ( (int)m_scroll_data_table[1][0xc0+page] << 8 );
-	j += ( m_base_addr[1][base] << 8 );
+		/* add page, base address to pattern name */
+		j += ( (int)m_scroll_data_table[1][0xc0+page] << 8 );
+		j += ( m_base_addr[1][base] << 8 );
 
-	if( j >= layout_total(set) ) {
-	logerror( "B_16X16: tilemap=%d\n", j );
-		j = 0;
-	}
+		if( j >= layout_total(set) ) {
+			logerror( "B_16X16: tilemap=%d\n", j );
+			j = 0;
+		}
 
-	if (m_planeB_color_fetch != 0)
-	{
-		uint8_t color = (m_planeB_color_fetch);
+		if (m_planeB_color_fetch != 0)
+		{
+			uint8_t color = (m_planeB_color_fetch);
 
-		/* assume 16 colour mode for now... */
-		attr = ( j >> (color * 2)) & 0x0f;
-	}
+			/* assume 16 colour mode for now... */
+			attr = ( j >> (color * 2)) & 0x0f;
+		}
 
-	// banking
-	if (set == GFX_16X16_4BIT)
-	{
-		j += m_namcond1_gfxbank * 0x4000;
-	}
-	else // 8x8x8
-	{
-		j += m_namcond1_gfxbank * 0x2000;
-	}
+		// banking
+		if (set == GFX_16X16_4BIT)
+		{
+			j += m_namcond1_gfxbank * 0x4000;
+		}
+		else // 8x8x8
+		{
+			j += m_namcond1_gfxbank * 0x2000;
+		}
 
-	SET_TILE_INFO_MEMBER(set, j, attr, f );
+		tileinfo.set(set, j, attr, f );
 	}
 }
 
@@ -1445,7 +1445,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
  ****************************************/
 
  // P#0R - pattern name table data port
-READ8_MEMBER( ygv608_device::pattern_name_table_r )
+uint8_t ygv608_device::pattern_name_table_r()
 {
 	int pn = 0;
 
@@ -1496,7 +1496,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 }
 
 // P#1R - sprite data port
-READ8_MEMBER( ygv608_device::sprite_data_r )
+uint8_t ygv608_device::sprite_data_r()
 {
 	uint8_t res = m_sprite_attribute_table.b[m_sprite_address];
 
@@ -1507,7 +1507,7 @@ READ8_MEMBER( ygv608_device::sprite_data_r )
 }
 
 // P#2R - scroll data port
-READ8_MEMBER( ygv608_device::scroll_data_r )
+uint8_t ygv608_device::scroll_data_r()
 {
 	uint8_t res = m_scroll_data_table[m_ba_plane_scroll_select][m_scroll_address];
 
@@ -1523,7 +1523,7 @@ READ8_MEMBER( ygv608_device::scroll_data_r )
 }
 
 // P#3 - color palette data port
-READ8_MEMBER( ygv608_device::palette_data_r )
+uint8_t ygv608_device::palette_data_r()
 {
 	uint8_t res = m_colour_palette[m_palette_address][m_color_state_r];
 
@@ -1539,7 +1539,7 @@ READ8_MEMBER( ygv608_device::palette_data_r )
 }
 
 // P#4R - register data port
-READ8_MEMBER(ygv608_device::register_data_r)
+uint8_t ygv608_device::register_data_r()
 {
 	int regNum = m_register_address & 0x3f;
 	uint8_t res = m_iospace->read_byte(regNum);
@@ -1570,20 +1570,20 @@ READ8_MEMBER(ygv608_device::register_data_r)
  * ---- --x- HB 1 when horizontal border or retrace is in progress (read only)
  * ---- ---x VB 1 when vertical border or retrace is in progress (read only)
  ***/
-READ8_MEMBER( ygv608_device::status_port_r )
+uint8_t ygv608_device::status_port_r()
 {
 	// TODO: we need to use h/vpos in case of border support instead due of how MAME framework works here.
 	return (m_screen_status & 0x1c) | (screen().hblank()<<1) | screen().vblank();
 }
 
 // P#7R - system control port
-READ8_MEMBER( ygv608_device::system_control_r )
+uint8_t ygv608_device::system_control_r()
 {
 	return m_dma_status;
 }
 
 // P#0W - pattern name table data write
-WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
+void ygv608_device::pattern_name_table_w(uint8_t data)
 {
 	int pn = 0;
 
@@ -1671,7 +1671,7 @@ inline void ygv608_device::pattern_name_autoinc_check()
 }
 
 // P#1W - sprite data port
-WRITE8_MEMBER( ygv608_device::sprite_data_w )
+void ygv608_device::sprite_data_w(uint8_t data)
 {
 	m_sprite_attribute_table.b[m_sprite_address] = data;
 
@@ -1680,7 +1680,7 @@ WRITE8_MEMBER( ygv608_device::sprite_data_w )
 }
 
 // P#2W - scroll data port
-WRITE8_MEMBER( ygv608_device::scroll_data_w )
+void ygv608_device::scroll_data_w(uint8_t data)
 {
 	m_scroll_data_table[m_ba_plane_scroll_select][m_scroll_address] = data;
 
@@ -1694,7 +1694,7 @@ WRITE8_MEMBER( ygv608_device::scroll_data_w )
 }
 
 // P#3W - colour palette data port
-WRITE8_MEMBER( ygv608_device::palette_data_w )
+void ygv608_device::palette_data_w(uint8_t data)
 {
 	m_colour_palette[m_palette_address][m_color_state_w] = data;
 	if (++m_color_state_w == 3)
@@ -1713,7 +1713,7 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 }
 
 // P#4W - register data port
-WRITE8_MEMBER( ygv608_device::register_data_w )
+void ygv608_device::register_data_w(uint8_t data)
 {
 	uint8_t regNum = m_register_address & 0x3f;
 	//logerror( "R#%d = $%02X\n", regNum, data );
@@ -1737,7 +1737,7 @@ WRITE8_MEMBER( ygv608_device::register_data_w )
 }
 
 // P#5W - register select port
-WRITE8_MEMBER( ygv608_device::register_select_w )
+void ygv608_device::register_select_w(uint8_t data)
 {
 	m_register_address = data & 0x3f;
 	m_register_autoinc_r = BIT(data,6);
@@ -1745,7 +1745,7 @@ WRITE8_MEMBER( ygv608_device::register_select_w )
 }
 
 // P#6W - status port
-WRITE8_MEMBER( ygv608_device::status_port_w )
+void ygv608_device::status_port_w(uint8_t data)
 {
 	/* writing a '1' resets that bit */
 	m_screen_status &= ~data;
@@ -1758,7 +1758,7 @@ WRITE8_MEMBER( ygv608_device::status_port_w )
 }
 
 // P#7W - system control port
-WRITE8_MEMBER( ygv608_device::system_control_w )
+void ygv608_device::system_control_w(uint8_t data)
 {
 	m_dma_status = data;
 	if (m_dma_status & 0x3e)
@@ -1866,13 +1866,13 @@ void ygv608_device::HandleRomTransfers(uint8_t type)
  ****************************************/
 
  // R#0R - Pattern Name Table Access pointer Y
-READ8_MEMBER( ygv608_device::pattern_name_table_y_r )
+uint8_t ygv608_device::pattern_name_table_y_r()
 {
 	return (m_ytile_autoinc << 7) | (m_plane_select_access << 6) | m_ytile_ptr;
 }
 
  // R#0W - Pattern Name Table Access pointer Y
-WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
+void ygv608_device::pattern_name_table_y_w(uint8_t data)
 {
 	m_ytile_ptr = data & 0x3f;
 	//if (yTile >= m_page_y)
@@ -1887,13 +1887,13 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_y_w )
 }
 
  // R#1R - Pattern Name Table Access pointer X
-READ8_MEMBER( ygv608_device::pattern_name_table_x_r )
+uint8_t ygv608_device::pattern_name_table_x_r()
 {
 	return (m_xtile_autoinc << 7) | m_xtile_ptr;
 }
 
  // R#1W - Pattern Name Table Access pointer X
-WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
+void ygv608_device::pattern_name_table_x_w(uint8_t data)
 {
 	m_xtile_ptr = data & 0x3f;
 	//if (xTile >= m_page_x)
@@ -1916,7 +1916,7 @@ WRITE8_MEMBER( ygv608_device::pattern_name_table_x_w )
  * ---- --x- SAAW Address autoincrements after sprite attribute table write
  * ---- ---x SAAR Address autoincrements after sprite attribute table read
  ***/
-READ8_MEMBER( ygv608_device::ram_access_ctrl_r )
+uint8_t ygv608_device::ram_access_ctrl_r()
 {
 	return (m_cpaw<<7) | (m_cpar<<6) |
 		   (m_ba_plane_scroll_select<<4) |
@@ -1924,7 +1924,7 @@ READ8_MEMBER( ygv608_device::ram_access_ctrl_r )
 }
 
 // R#2W - Built in RAM access control
-WRITE8_MEMBER( ygv608_device::ram_access_ctrl_w )
+void ygv608_device::ram_access_ctrl_w(uint8_t data)
 {
 	m_saar = BIT(data,0);
 	m_saaw = BIT(data,1);
@@ -1937,50 +1937,50 @@ WRITE8_MEMBER( ygv608_device::ram_access_ctrl_w )
 
 
 // R#3R - sprite attribute table access pointer
-READ8_MEMBER( ygv608_device::sprite_address_r )
+uint8_t ygv608_device::sprite_address_r()
 {
 	return m_sprite_address;
 }
 
 // R#3W - sprite attribute table access pointer
-WRITE8_MEMBER( ygv608_device::sprite_address_w )
+void ygv608_device::sprite_address_w(uint8_t data)
 {
 	m_sprite_address = data;
 }
 
 
  // R#4R - scroll table access pointer
-READ8_MEMBER( ygv608_device::scroll_address_r )
+uint8_t ygv608_device::scroll_address_r()
 {
 	return m_scroll_address;
 }
 
  // R#4W - scroll table access pointer
-WRITE8_MEMBER( ygv608_device::scroll_address_w )
+void ygv608_device::scroll_address_w(uint8_t data)
 {
 	m_scroll_address = data;
 }
 
  // R#5R - color palette access pointer
-READ8_MEMBER( ygv608_device::palette_address_r )
+uint8_t ygv608_device::palette_address_r()
 {
 	return m_palette_address;
 }
 
  // R#5W - color palette access pointer
-WRITE8_MEMBER( ygv608_device::palette_address_w )
+void ygv608_device::palette_address_w(uint8_t data)
 {
 	m_palette_address = data;
 }
 
 // R#6R - sprite generator base address
-READ8_MEMBER( ygv608_device::sprite_bank_r )
+uint8_t ygv608_device::sprite_bank_r()
 {
 	return m_sprite_bank;
 }
 
 // R#6W - sprite generator base address
-WRITE8_MEMBER( ygv608_device::sprite_bank_w )
+void ygv608_device::sprite_bank_w(uint8_t data)
 {
 	m_sprite_bank = data;
 }
@@ -1997,14 +1997,14 @@ WRITE8_MEMBER( ygv608_device::sprite_bank_w )
  * ---- -00-      2 planes/8 bits
  * ---- ---x DSPE display permission of pattern planes (screen blanked if 0)
  ***/
-READ8_MEMBER( ygv608_device::screen_ctrl_7_r )
+uint8_t ygv608_device::screen_ctrl_7_r()
 {
 	return (m_dckm<<7)|(m_flip<<6)|
 		   (m_zron<<3)|((m_md & 3)<<1)|(m_dspe<<0);
 }
 
 // R#7W - screen control 7
-WRITE8_MEMBER( ygv608_device::screen_ctrl_7_w )
+void ygv608_device::screen_ctrl_7_w(uint8_t data)
 {
 	uint8_t new_md = (data >> 1) & 3;
 	if( new_md != m_md)
@@ -2058,7 +2058,7 @@ inline void ygv608_device::pattern_mode_setup()
  * ---- -x-- RLSC scroll wraparound disable
  * ---- ---x PGS page size (0=64x32, 1=32x64; Mode 2=32x32)
  ***/
-READ8_MEMBER( ygv608_device::screen_ctrl_8_r )
+uint8_t ygv608_device::screen_ctrl_8_r()
 {
 	return (m_h_display_size<<6)|(m_v_display_size<<4)|
 		   (m_roz_wrap_disable<<3)|(m_scroll_wrap_disable<<2)|
@@ -2066,7 +2066,7 @@ READ8_MEMBER( ygv608_device::screen_ctrl_8_r )
 }
 
 // R#8W - screen control 8
-WRITE8_MEMBER( ygv608_device::screen_ctrl_8_w )
+void ygv608_device::screen_ctrl_8_w(uint8_t data)
 {
 	if( (data & 1) != m_page_size)
 		m_tilemap_resize = true;
@@ -2091,13 +2091,13 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_8_w )
  * ---- -100 8 dots division
  * ---- -000 entire screen
  ***/
-READ8_MEMBER( ygv608_device::screen_ctrl_9_r )
+uint8_t ygv608_device::screen_ctrl_9_r()
 {
 	return (m_pattern_size<<6)|
 		   (m_h_div_size<<3)|(m_v_div_size<<0);
 }
 
-WRITE8_MEMBER( ygv608_device::screen_ctrl_9_w )
+void ygv608_device::screen_ctrl_9_w(uint8_t data)
 {
 	uint8_t new_pts = (data >> 6) & 3;
 
@@ -2137,14 +2137,14 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_9_w )
  * ---- xx-- MCBx: Mosaic enable on plane B
  * ---- --xx MCAx: Mosaic enable on plane A
  ***/
-READ8_MEMBER( ygv608_device::screen_ctrl_10_r )
+uint8_t ygv608_device::screen_ctrl_10_r()
 {
 	return (m_sprite_aux_reg << 6) | ((m_sprite_aux_mode == true) << 5) | ((m_sprite_disable == true) << 4)
 								   | (m_mosaic_bplane << 2) | (m_mosaic_aplane & 3);
 }
 
 // R#10W - screen control: mosaic & sprite
-WRITE8_MEMBER( ygv608_device::screen_ctrl_10_w )
+void ygv608_device::screen_ctrl_10_w(uint8_t data)
 {
 	m_sprite_aux_reg = (data & 0xc0) >> 6;
 	m_sprite_aux_mode = BIT(data, 5);
@@ -2158,14 +2158,14 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_10_w )
 }
 
 // R#11R - screen control 11
-READ8_MEMBER( ygv608_device::screen_ctrl_11_r )
+uint8_t ygv608_device::screen_ctrl_11_r()
 {
 	return (m_scm<<6)|(m_yse<<5)|(m_cbdr<<4)|
 		   (m_priority_mode<<2)|(m_planeB_trans_enable<<1)|(m_planeA_trans_enable<<0);
 }
 
 // R#11W - screen control 11
-WRITE8_MEMBER( ygv608_device::screen_ctrl_11_w )
+void ygv608_device::screen_ctrl_11_w(uint8_t data)
 {
 /**/m_scm = (data >> 6) & 3;
 /**/m_yse = BIT(data,5);
@@ -2176,13 +2176,13 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_11_w )
 }
 
 // R#12R - screen control 12: color fetch modes
-READ8_MEMBER( ygv608_device::screen_ctrl_12_r )
+uint8_t ygv608_device::screen_ctrl_12_r()
 {
 	return (m_sprite_color_fetch<<6)|(m_planeB_color_fetch<<3)|(m_planeA_color_fetch<<0);
 }
 
 // R#12W - screen control 12: color fetch modes
-WRITE8_MEMBER( ygv608_device::screen_ctrl_12_w )
+void ygv608_device::screen_ctrl_12_w(uint8_t data)
 {
 	m_sprite_color_fetch = (data >> 6) & 3;
 	m_planeB_color_fetch = (data >> 3) & 7;
@@ -2190,19 +2190,19 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_12_w )
 }
 
 // R#13W - border color
-WRITE8_MEMBER( ygv608_device::border_color_w )
+void ygv608_device::border_color_w(uint8_t data)
 {
 	m_border_color = data;
 }
 
 // R#14R interrupt mask control
-READ8_MEMBER( ygv608_device::irq_mask_r )
+uint8_t ygv608_device::irq_mask_r()
 {
 	return (m_raster_irq_mask << 1) | (m_vblank_irq_mask << 0);
 }
 
 // R#14W interrupt mask control
-WRITE8_MEMBER( ygv608_device::irq_mask_w )
+void ygv608_device::irq_mask_w(uint8_t data)
 {
 	m_vblank_irq_mask = BIT(data, 0);
 	m_raster_irq_mask = BIT(data, 1);
@@ -2213,7 +2213,7 @@ WRITE8_MEMBER( ygv608_device::irq_mask_w )
 }
 
 // R#15R / R#16R raster interrupt control
-READ8_MEMBER( ygv608_device::irq_ctrl_r )
+uint8_t ygv608_device::irq_ctrl_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -2232,7 +2232,7 @@ READ8_MEMBER( ygv608_device::irq_ctrl_r )
 }
 
 // R#15W / R#16W raster interrupt control
-WRITE8_MEMBER( ygv608_device::irq_ctrl_w )
+void ygv608_device::irq_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0) // R#15
 	{
@@ -2281,7 +2281,7 @@ attotime ygv608_device::raster_sync_offset()
  * -xxx ---- write to base address + 1
  * ---- -xxx write to base address
  */
-WRITE8_MEMBER( ygv608_device::base_address_w )
+void ygv608_device::base_address_w(offs_t offset, uint8_t data)
 {
 	int plane = offset >> 2;
 	int addr = ( offset << 1 ) & 0x07;
@@ -2292,22 +2292,22 @@ WRITE8_MEMBER( ygv608_device::base_address_w )
 }
 
 // R#25W - R#27W - X coordinate of initial value
-WRITE8_MEMBER( ygv608_device::roz_ax_w )  { m_ax = roz_convert_raw24(&m_raw_ax,offset,data); }
+void ygv608_device::roz_ax_w(offs_t offset, uint8_t data)  { m_ax = roz_convert_raw24(&m_raw_ax,offset,data); }
 
 // R#28W - R#29W - increment of coordinate in X direction
-WRITE8_MEMBER( ygv608_device::roz_dx_w )  { m_dx = roz_convert_raw16(&m_raw_dx,offset,data); }
+void ygv608_device::roz_dx_w(offs_t offset, uint8_t data)  { m_dx = roz_convert_raw16(&m_raw_dx,offset,data); }
 
 // R#30W - R#31W - increment of coordinate in X direction in movement toward Y direction
-WRITE8_MEMBER( ygv608_device::roz_dxy_w ) { m_dxy = roz_convert_raw16(&m_raw_dxy,offset,data); }
+void ygv608_device::roz_dxy_w(offs_t offset, uint8_t data) { m_dxy = roz_convert_raw16(&m_raw_dxy,offset,data); }
 
 // R#32W - R#34W - Y coordinate of initial value
-WRITE8_MEMBER( ygv608_device::roz_ay_w )  { m_ay = roz_convert_raw24(&m_raw_ay,offset,data); }
+void ygv608_device::roz_ay_w(offs_t offset, uint8_t data)  { m_ay = roz_convert_raw24(&m_raw_ay,offset,data); }
 
 // R#35W - R#36W - increment of coordinate in Y direction
-WRITE8_MEMBER( ygv608_device::roz_dy_w )  { m_dy = roz_convert_raw16(&m_raw_dy,offset,data); }
+void ygv608_device::roz_dy_w(offs_t offset, uint8_t data)  { m_dy = roz_convert_raw16(&m_raw_dy,offset,data); }
 
 // R#37W - R#38W - increment of coordinate in Y direction in movement toward X direction
-WRITE8_MEMBER( ygv608_device::roz_dyx_w ) { m_dyx = roz_convert_raw16(&m_raw_dyx,offset,data); }
+void ygv608_device::roz_dyx_w(offs_t offset, uint8_t data) { m_dyx = roz_convert_raw16(&m_raw_dyx,offset,data); }
 
 // ROZ assign helpers
 inline uint32_t ygv608_device::roz_convert_raw24(uint32_t *raw_reg, uint8_t offset, uint8_t data)
@@ -2347,7 +2347,7 @@ inline uint32_t ygv608_device::roz_convert_raw16(uint16_t *raw_reg, uint8_t offs
 }
 
 // R#39W - R#46W display scan control write
-WRITE8_MEMBER( ygv608_device::crtc_w )
+void ygv608_device::crtc_w(offs_t offset, uint8_t data)
 {
 	//printf("[%d] <- %02x\n",offset+39,data);
 

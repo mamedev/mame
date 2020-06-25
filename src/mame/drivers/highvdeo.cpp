@@ -148,31 +148,31 @@ private:
 	uint16_t m_vblank_bit;
 	uint16_t m_brasil_prot_latch;
 	uint16_t m_grancapi_prot_latch;
-	DECLARE_READ16_MEMBER(read0_r);
-	DECLARE_READ16_MEMBER(read1_r);
-	DECLARE_READ16_MEMBER(read2_r);
-	DECLARE_READ8_MEMBER(read2_nmi_clear_r);
-	template<int Mask> DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE16_MEMBER(write1_w);
-	DECLARE_READ16_MEMBER(tv_ncf_read1_r);
-	DECLARE_READ16_MEMBER(newmcard_status_r);
-	DECLARE_READ16_MEMBER(newmcard_vblank_r);
-	DECLARE_WRITE16_MEMBER(newmcard_vblank_w);
-	DECLARE_WRITE16_MEMBER(write2_w);
-	DECLARE_WRITE16_MEMBER(nyj_write2_w);
-	DECLARE_READ16_MEMBER(brasil_status_r);
-	DECLARE_WRITE16_MEMBER(brasil_status_w);
-	DECLARE_READ16_MEMBER(ciclone_status_r);
-	DECLARE_READ16_MEMBER(grancapi_status_r);
-	DECLARE_WRITE16_MEMBER(grancapi_status_w);
-	DECLARE_READ16_MEMBER(magicbom_status_r);
-	DECLARE_READ16_MEMBER(record_status_r);
-	DECLARE_WRITE16_MEMBER(fashion_output_w);
-	DECLARE_WRITE16_MEMBER(tv_oki6376_w);
-	DECLARE_READ8_MEMBER(tv_oki6376_r);
-	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
-	DECLARE_READ8_MEMBER(nmi_clear_r);
-	DECLARE_WRITE8_MEMBER(nmi_clear_w);
+	uint16_t read0_r();
+	uint16_t read1_r();
+	uint16_t read2_r();
+	uint8_t read2_nmi_clear_r();
+	template<int Mask> void bankselect_w(uint8_t data);
+	void write1_w(uint16_t data);
+	uint16_t tv_ncf_read1_r();
+	uint16_t newmcard_status_r(offs_t offset);
+	uint16_t newmcard_vblank_r();
+	void newmcard_vblank_w(uint16_t data);
+	void write2_w(uint16_t data);
+	void nyj_write2_w(uint16_t data);
+	uint16_t brasil_status_r(offs_t offset);
+	void brasil_status_w(uint16_t data);
+	uint16_t ciclone_status_r(offs_t offset);
+	uint16_t grancapi_status_r(offs_t offset);
+	void grancapi_status_w(uint16_t data);
+	uint16_t magicbom_status_r(offs_t offset);
+	uint16_t record_status_r(offs_t offset);
+	void fashion_output_w(uint16_t data);
+	void tv_oki6376_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t tv_oki6376_r();
+	void tv_ncf_oki6376_st_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t nmi_clear_r();
+	void nmi_clear_w(uint8_t data);
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -263,22 +263,22 @@ uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb3
 
 
 
-READ16_MEMBER(highvdeo_state::read0_r)
+uint16_t highvdeo_state::read0_r()
 {
 	return m_inputs[0]->read();
 }
 
-READ16_MEMBER(highvdeo_state::read1_r)
+uint16_t highvdeo_state::read1_r()
 {
 	return m_inputs[1]->read();
 }
 
-READ16_MEMBER(highvdeo_state::read2_r)
+uint16_t highvdeo_state::read2_r()
 {
 	return m_inputs[2]->read();
 }
 
-READ8_MEMBER(highvdeo_state::read2_nmi_clear_r)
+uint8_t highvdeo_state::read2_nmi_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -286,13 +286,13 @@ READ8_MEMBER(highvdeo_state::read2_nmi_clear_r)
 }
 
 template<int Mask>
-WRITE8_MEMBER(highvdeo_state::bankselect_w)
+void highvdeo_state::bankselect_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & Mask);
 }
 
 
-WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
+void highvdeo_state::tv_oki6376_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data)
@@ -303,7 +303,7 @@ WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 	}
 }
 
-READ8_MEMBER(highvdeo_state::tv_oki6376_r)
+uint8_t highvdeo_state::tv_oki6376_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -311,7 +311,7 @@ READ8_MEMBER(highvdeo_state::tv_oki6376_r)
 	return m_okim6376->busy_r();
 }
 
-READ8_MEMBER(highvdeo_state::nmi_clear_r)
+uint8_t highvdeo_state::nmi_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -319,12 +319,12 @@ READ8_MEMBER(highvdeo_state::nmi_clear_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(highvdeo_state::nmi_clear_w)
+void highvdeo_state::nmi_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(highvdeo_state::write1_w)
+void highvdeo_state::write1_w(uint16_t data)
 {
 /*
     - Lbits -
@@ -368,7 +368,7 @@ void highvdeo_state::tv_vcf_io(address_map &map)
 }
 
 
-READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
+uint16_t highvdeo_state::tv_ncf_read1_r()
 {
 	static int resetpulse = 0;
 
@@ -379,7 +379,7 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
 	return (m_inputs[1]->read() & 0xbf) | resetpulse;
 }
 
-WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
+void highvdeo_state::tv_ncf_oki6376_st_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -438,7 +438,7 @@ void highvdeo_state::nyjoker_io(address_map &map)
 }
 
 
-WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
+void highvdeo_state::nyj_write2_w(uint16_t data)
 {
 /*
     7654 3210
@@ -479,7 +479,7 @@ void highvdeo_state::tv_tcf_io(address_map &map)
 *
 ****************************/
 
-READ16_MEMBER(highvdeo_state::ciclone_status_r)
+uint16_t highvdeo_state::ciclone_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 	switch(offset*2)
@@ -505,7 +505,7 @@ void highvdeo_state::ciclone_io(address_map &map)
 *
 ****************************/
 
-READ16_MEMBER(highvdeo_state::newmcard_status_r)
+uint16_t highvdeo_state::newmcard_status_r(offs_t offset)
 {
 	switch(offset*2)
 	{
@@ -519,7 +519,7 @@ READ16_MEMBER(highvdeo_state::newmcard_status_r)
 	return 0;
 }
 
-READ16_MEMBER(highvdeo_state::record_status_r)
+uint16_t highvdeo_state::record_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 	switch(offset*2)
@@ -537,17 +537,17 @@ READ16_MEMBER(highvdeo_state::record_status_r)
 }
 
 
-READ16_MEMBER(highvdeo_state::newmcard_vblank_r)
+uint16_t highvdeo_state::newmcard_vblank_r()
 {
 	return m_vblank_bit; //0x80
 }
 
-WRITE16_MEMBER(highvdeo_state::newmcard_vblank_w)
+void highvdeo_state::newmcard_vblank_w(uint16_t data)
 {
 	m_vblank_bit = data;
 }
 
-WRITE16_MEMBER(highvdeo_state::write2_w)
+void highvdeo_state::write2_w(uint16_t data)
 {
 	int i;
 
@@ -604,7 +604,7 @@ void highvdeo_state::record_io(address_map &map)
 ****************************/
 
 
-READ16_MEMBER(highvdeo_state::brasil_status_r)
+uint16_t highvdeo_state::brasil_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 
@@ -621,7 +621,7 @@ READ16_MEMBER(highvdeo_state::brasil_status_r)
 }
 
 /*bankaddress might be incorrect.*/
-WRITE16_MEMBER(highvdeo_state::brasil_status_w)
+void highvdeo_state::brasil_status_w(uint16_t data)
 {
 	switch(data & 3) //data & 7?
 	{
@@ -635,7 +635,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 //  popmessage("%04x",data);
 }
 
-READ16_MEMBER(highvdeo_state::grancapi_status_r)
+uint16_t highvdeo_state::grancapi_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 
@@ -652,7 +652,7 @@ READ16_MEMBER(highvdeo_state::grancapi_status_r)
 }
 
 /*bankaddress might be incorrect.*/
-WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
+void highvdeo_state::grancapi_status_w(uint16_t data)
 {
 	switch(data & 3) //data & 7?
 	{
@@ -666,7 +666,7 @@ WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 //  popmessage("%04x",data);
 }
 
-READ16_MEMBER(highvdeo_state::magicbom_status_r)
+uint16_t highvdeo_state::magicbom_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 
@@ -705,7 +705,7 @@ void highvdeo_state::brasil_io(address_map &map)
 //  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
 
-WRITE16_MEMBER(highvdeo_state::fashion_output_w)
+void highvdeo_state::fashion_output_w(uint16_t data)
 {
 	int i;
 

@@ -15,6 +15,7 @@
 
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okiadpcm.h"
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,7 +25,7 @@
 
 class qs1000_device :   public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<24>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
@@ -44,24 +45,25 @@ public:
 	// external
 	i8052_device &cpu() const { return *m_cpu; }
 	void serial_in(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( set_irq );
+	void set_irq(int state);
 
-	DECLARE_WRITE8_MEMBER( wave_w );
+	void wave_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( p0_r );
-	DECLARE_WRITE8_MEMBER( p0_w );
+	uint8_t p0_r();
+	void p0_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
 
 	void qs1000_io_map(address_map &map);
 	void qs1000_prg_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -129,7 +131,7 @@ private:
 
 	qs1000_channel                  m_channels[QS1000_CHANNELS];
 
-	DECLARE_READ8_MEMBER( data_to_i8052 );
+	uint8_t data_to_i8052();
 };
 
 

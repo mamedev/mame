@@ -133,6 +133,15 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 			{
 				outL[i] = outR[i] = 0;
 			}
+
+			// IIvx/IIvi bootrom indicates VASP updates this flag even when the chip is off
+			if (m_chip_type == asc_type::VASP)
+			{
+				if (m_fifo_cap_a < 0x1ff)
+				{
+					m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A less than half full
+				}
+			}
 			break;
 
 		case 1: // FIFO mode
@@ -266,7 +275,7 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-READ8_MEMBER( asc_device::read )
+uint8_t asc_device::read(offs_t offset)
 {
 	uint8_t rv;
 
@@ -412,7 +421,7 @@ READ8_MEMBER( asc_device::read )
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( asc_device::write )
+void asc_device::write(offs_t offset, uint8_t data)
 {
   //printf("ASC: write %02x to %x\n", data, offset);
 
@@ -463,8 +472,6 @@ WRITE8_MEMBER( asc_device::write )
 		{
 			case R_MODE:
 				data &= 3;  // only bits 0 and 1 can be written
-
-				//printf("%d to MODE\n", data);
 
 				if (data != m_regs[R_MODE-0x800])
 				{

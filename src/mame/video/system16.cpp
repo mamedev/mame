@@ -102,7 +102,7 @@ static const int resistances_normal[6] = {3900, 2000, 1000, 1000/2, 1000/4, 0};
 static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 
 #ifdef UNUSED_CODE
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
+void segas1x_bootleg_state::sys16_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword;
 
@@ -232,7 +232,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -244,7 +244,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -256,7 +256,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -268,13 +268,13 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_tileram_w)
+void segas1x_bootleg_state::sys16_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldword = m_tileram[offset];
 
@@ -320,14 +320,14 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 
 	if (!m_shinobl_kludge)
 	{
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				(tile_number & 0x1ff) | (m_tile_bank[0] << 12),
 				(tile_number >> 9) % 8,
 				0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				(tile_number & 0xff) | (m_tile_bank[0] << 12),
 				(tile_number >> 8) % 8,
 				0);
@@ -339,7 +339,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 		tileinfo.category = 0;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
+void segas1x_bootleg_state::sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
@@ -478,7 +478,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)
 	data = m_textram[tile_index];
 	tile_number = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			((data >> 9) & 0x7),
 			0);
@@ -492,7 +492,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)
 	tile_number = data & 0x1fff;
 
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -505,33 +505,33 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)
 	data = m_bg1_tileram[tile_index];
 	tile_number = data & 0x1fff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w)
+void segas1x_bootleg_state::s16a_bootleg_bgscrolly_w(uint16_t data)
 {
 	m_bg_scrolly = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w)
+void segas1x_bootleg_state::s16a_bootleg_bgscrollx_w(uint16_t data)
 {
 	m_bg_scrollx = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w)
+void segas1x_bootleg_state::s16a_bootleg_fgscrolly_w(uint16_t data)
 {
 	m_fg_scrolly = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w)
+void segas1x_bootleg_state::s16a_bootleg_fgscrollx_w(uint16_t data)
 {
 	m_fg_scrollx = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
+void segas1x_bootleg_state::s16a_bootleg_tilemapselect_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapselect);
 	//printf("system16 bootleg tilemapselect %04x\n", m_tilemapselect);

@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
 	tileinfo.category = (attributes & 0x8) >> 3;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number + 256 * (attributes & 0x3),
 			attributes >> 4,
 			0);
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
 	tileinfo.category = (attributes & 0x8) >> 3;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number + 256 * (attributes & 0x3),
 			attributes >> 4,
 			0);
@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 {
 	const u16 data = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			data&0x7ff,
 			data>>11,
 			0);
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 {
 	const u16 data = m_bg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			data & 0x3ff,
 			data >> 11,
 			0);
@@ -372,7 +372,6 @@ u32 armedf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
 			m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 			break;
-
 	}
 
 	screen.priority().fill(0, cliprect);

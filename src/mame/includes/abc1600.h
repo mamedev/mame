@@ -6,19 +6,19 @@
 #define MAME_INCLUDES_ABC1600_H
 
 #include "bus/abcbus/abcbus.h"
+#include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/8530scc.h"
-#include "bus/abckb/abckb.h"
+#include "imagedev/floppy.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
 #include "machine/nmc9306.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
 #include "machine/z80dma.h"
+#include "machine/z80scc.h"
+#include "machine/z80sio.h"
 #include "machine/z8536.h"
-#include "imagedev/floppy.h"
 #include "video/abc1600.h"
 
 
@@ -45,6 +45,7 @@
 #define BUS2_TAG            "bus2"
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
+#define RS232_PR_TAG        "rs232pr"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
 
 
@@ -58,26 +59,26 @@
 class abc1600_state : public driver_device
 {
 public:
-	abc1600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, MC68008P8_TAG),
-			m_dma0(*this, Z8410AB1_0_TAG),
-			m_dma1(*this, Z8410AB1_1_TAG),
-			m_dma2(*this, Z8410AB1_2_TAG),
-			m_dart(*this, Z8470AB1_TAG),
-			m_scc(*this, Z8530B1_TAG),
-			m_cio(*this, Z8536B1_TAG),
-			m_fdc(*this, SAB1797_02P_TAG),
-			m_rtc(*this, E050_C16PC_TAG),
-			m_nvram(*this, NMC9306_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, SAB1797_02P_TAG":0"),
-			m_floppy1(*this, SAB1797_02P_TAG":1"),
-			m_floppy2(*this, SAB1797_02P_TAG":2"),
-			m_bus0i(*this, BUS0I_TAG),
-			m_bus0x(*this, BUS0X_TAG),
-			m_bus1(*this, BUS1_TAG),
-			m_bus2(*this, BUS2_TAG)
+	abc1600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MC68008P8_TAG),
+		m_dma0(*this, Z8410AB1_0_TAG),
+		m_dma1(*this, Z8410AB1_1_TAG),
+		m_dma2(*this, Z8410AB1_2_TAG),
+		m_dart(*this, Z8470AB1_TAG),
+		m_scc(*this, Z8530B1_TAG),
+		m_cio(*this, Z8536B1_TAG),
+		m_fdc(*this, SAB1797_02P_TAG),
+		m_rtc(*this, E050_C16PC_TAG),
+		m_nvram(*this, NMC9306_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, SAB1797_02P_TAG":0"),
+		m_floppy1(*this, SAB1797_02P_TAG":1"),
+		m_floppy2(*this, SAB1797_02P_TAG":2"),
+		m_bus0i(*this, BUS0I_TAG),
+		m_bus0x(*this, BUS0X_TAG),
+		m_bus1(*this, BUS1_TAG),
+		m_bus2(*this, BUS2_TAG)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -85,7 +86,7 @@ public:
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
 	required_device<z80dart_device> m_dart;
-	required_device<scc8530_legacy_device> m_scc;
+	required_device<scc8530_device> m_scc;
 	required_device<z8536_device> m_cio;
 	required_device<fd1797_device> m_fdc;
 	required_device<e0516_device> m_rtc;
@@ -102,25 +103,25 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( dart_r );
-	DECLARE_WRITE8_MEMBER( dart_w );
-	DECLARE_READ8_MEMBER( scc_r );
-	DECLARE_WRITE8_MEMBER( scc_w );
-	DECLARE_READ8_MEMBER( cio_r );
-	DECLARE_WRITE8_MEMBER( cio_w );
-	DECLARE_WRITE8_MEMBER( fw0_w );
-	DECLARE_WRITE8_MEMBER( fw1_w );
-	DECLARE_WRITE8_MEMBER( spec_contr_reg_w );
+	uint8_t bus_r(offs_t offset);
+	void bus_w(offs_t offset, uint8_t data);
+	uint8_t dart_r(offs_t offset);
+	void dart_w(offs_t offset, uint8_t data);
+	uint8_t scc_r(offs_t offset);
+	void scc_w(offs_t offset, uint8_t data);
+	uint8_t cio_r(offs_t offset);
+	void cio_w(offs_t offset, uint8_t data);
+	void fw0_w(uint8_t data);
+	void fw1_w(uint8_t data);
+	void spec_contr_reg_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
 
-	DECLARE_READ8_MEMBER( cio_pa_r );
-	DECLARE_READ8_MEMBER( cio_pb_r );
-	DECLARE_WRITE8_MEMBER( cio_pb_w );
-	DECLARE_READ8_MEMBER( cio_pc_r );
-	DECLARE_WRITE8_MEMBER( cio_pc_w );
+	uint8_t cio_pa_r();
+	uint8_t cio_pb_r();
+	void cio_pb_w(uint8_t data);
+	uint8_t cio_pc_r();
+	void cio_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 

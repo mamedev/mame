@@ -133,15 +133,15 @@ public:
 	void a7800_ntsc(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(bios_or_cart_r);
-	DECLARE_READ8_MEMBER(tia_r);
-	DECLARE_WRITE8_MEMBER(tia_w);
+	uint8_t bios_or_cart_r(offs_t offset);
+	uint8_t tia_r(offs_t offset);
+	void tia_w(offs_t offset, uint8_t data);
 	void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
-	DECLARE_READ8_MEMBER(riot_joystick_r);
-	DECLARE_READ8_MEMBER(riot_console_button_r);
-	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
+	uint8_t riot_joystick_r();
+	uint8_t riot_console_button_r();
+	void riot_button_pullup_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -192,17 +192,17 @@ protected:
  ***************************************************************************/
 
 // RIOT
-READ8_MEMBER(a7800_state::riot_joystick_r)
+uint8_t a7800_state::riot_joystick_r()
 {
 	return m_io_joysticks->read();
 }
 
-READ8_MEMBER(a7800_state::riot_console_button_r)
+uint8_t a7800_state::riot_console_button_r()
 {
 	return m_io_console_buttons->read();
 }
 
-WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
+void a7800_state::riot_button_pullup_w(uint8_t data)
 {
 	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x04)
 		m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
@@ -210,7 +210,7 @@ WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
 		m_p2_one_button = data & 0x10;
 }
 
-READ8_MEMBER(a7800_state::tia_r)
+uint8_t a7800_state::tia_r(offs_t offset)
 {
 	switch (offset & 0x0f)
 	{
@@ -250,7 +250,7 @@ READ8_MEMBER(a7800_state::tia_r)
 }
 
 // TIA
-WRITE8_MEMBER(a7800_state::tia_w)
+void a7800_state::tia_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x20)
 	{ //INPTCTRL covers TIA registers 0x00-0x1F until locked
@@ -267,7 +267,7 @@ WRITE8_MEMBER(a7800_state::tia_w)
 			m_ctrl_reg = data;
 		}
 	}
-	m_tia->tia_sound_w(space, offset, data);
+	m_tia->tia_sound_w(offset, data);
 }
 
 
@@ -288,12 +288,12 @@ TIMER_CALLBACK_MEMBER(a7800_state::maria_startdma)
 
 
 // ROM
-READ8_MEMBER(a7800_state::bios_or_cart_r)
+uint8_t a7800_state::bios_or_cart_r(offs_t offset)
 {
 	if (!(m_ctrl_reg & 0x04))
 		return m_bios[offset];
 	else
-		return m_cart->read_40xx(space, offset + 0x8000);
+		return m_cart->read_40xx(offset + 0x8000);
 }
 
 /***************************************************************************
@@ -1343,8 +1343,8 @@ void a7800_state::machine_start()
 		{
 		case A78_HSC:
 			// ROM+NVRAM accesses for HiScore
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(*m_cart, FUNC(a78_cart_slot_device::read_10xx)), write8_delegate(*m_cart, FUNC(a78_cart_slot_device::write_10xx)));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(*m_cart, FUNC(a78_cart_slot_device::read_30xx)), write8_delegate(*m_cart, FUNC(a78_cart_slot_device::write_30xx)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::read_10xx)), write8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::write_10xx)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::read_30xx)), write8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::write_30xx)));
 			break;
 		case A78_XB_BOARD:
 		case A78_TYPE0_POK450:
@@ -1353,14 +1353,14 @@ void a7800_state::machine_start()
 		case A78_TYPEA_POK450:
 		case A78_VERSA_POK450:
 			// POKEY and RAM regs at 0x400-0x47f
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(*m_cart, FUNC(a78_cart_slot_device::read_04xx)), write8_delegate(*m_cart, FUNC(a78_cart_slot_device::write_04xx)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::read_04xx)), write8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::write_04xx)));
 			break;
 		case A78_XM_BOARD:
 			// POKEY and RAM and YM regs at 0x400-0x47f
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(*m_cart, FUNC(a78_cart_slot_device::read_04xx)), write8_delegate(*m_cart, FUNC(a78_cart_slot_device::write_04xx)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::read_04xx)), write8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::write_04xx)));
 			// ROM+NVRAM accesses for HiScore
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(*m_cart, FUNC(a78_cart_slot_device::read_10xx)), write8_delegate(*m_cart, FUNC(a78_cart_slot_device::write_10xx)));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(*m_cart, FUNC(a78_cart_slot_device::read_30xx)), write8_delegate(*m_cart, FUNC(a78_cart_slot_device::write_30xx)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::read_10xx)), write8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::write_10xx)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::read_30xx)), write8sm_delegate(*m_cart, FUNC(a78_cart_slot_device::write_30xx)));
 			break;
 		}
 	}

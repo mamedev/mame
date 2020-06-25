@@ -20,11 +20,11 @@ public:
 	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
 	template <typename... T> void set_tile_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( scroll_r );
-	DECLARE_WRITE8_MEMBER( scroll_w );
-	DECLARE_WRITE8_MEMBER( vreg_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t scroll_r(offs_t offset);
+	void scroll_w(offs_t offset, uint8_t data);
+	void vreg_w(offs_t offset, uint8_t data);
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority);

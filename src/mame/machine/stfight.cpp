@@ -107,7 +107,7 @@ void stfight_state::machine_reset()
 
 // It's entirely possible that this bank is never switched out
 // - in fact I don't even know how/where it's switched in!
-WRITE8_MEMBER(stfight_state::stfight_bank_w)
+void stfight_state::stfight_bank_w(uint8_t data)
 {
 	m_main_bank->set_entry(bitswap(data, 7, 2));
 }
@@ -140,19 +140,19 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
  *      Hardware handlers
  */
 
-WRITE8_MEMBER(stfight_state::stfight_io_w)
+void stfight_state::stfight_io_w(uint8_t data)
 {
 	// TODO: What is bit 4?
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-READ8_MEMBER(stfight_state::stfight_coin_r)
+uint8_t stfight_state::stfight_coin_r()
 {
 	return m_coin_state;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_coin_w)
+void stfight_state::stfight_coin_w(uint8_t data)
 {
 	// Acknowledge coin signals (active low)
 	if (!BIT(data, 0))
@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 			adpcm_data >>= 4;
 		++m_adpcm_data_offs;
 
-		m_msm->write_data(adpcm_data & 0x0f);
+		m_msm->data_w(adpcm_data & 0x0f);
 	}
 }
 
@@ -192,13 +192,13 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
  *      Machine hardware for YM2303 FM sound control
  */
 
-WRITE8_MEMBER(stfight_state::stfight_fm_w)
+void stfight_state::stfight_fm_w(uint8_t data)
 {
 	// The sound cpu ignores any FM data without bit 7 set
 	m_fm_data = 0x80 | data;
 }
 
-READ8_MEMBER(stfight_state::stfight_fm_r)
+uint8_t stfight_state::stfight_fm_r()
 {
 	uint8_t const data = m_fm_data;
 
@@ -214,18 +214,18 @@ READ8_MEMBER(stfight_state::stfight_fm_r)
  *  MCU communications
  */
 
-WRITE8_MEMBER(stfight_state::stfight_mcu_w)
+void stfight_state::stfight_mcu_w(uint8_t data)
 {
 	m_cpu_to_mcu_data = data & 0x0f;
 	m_cpu_to_mcu_empty = false;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_a_w)
+void stfight_state::stfight_68705_port_a_w(uint8_t data)
 {
 	m_port_a_out = data;
 }
 
-READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
+uint8_t stfight_state::stfight_68705_port_b_r()
 {
 	return
 			(m_coin_mech->read() << 6) |
@@ -233,14 +233,14 @@ READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
 			(m_cpu_to_mcu_data & 0x0f);
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
+void stfight_state::stfight_68705_port_b_w(uint8_t data)
 {
 	// Acknowledge Z80 command
 	if (!BIT(data, 5))
 		m_cpu_to_mcu_empty = true;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
+void stfight_state::stfight_68705_port_c_w(uint8_t data)
 {
 	// Signal a valid coin on the falling edge
 	if (BIT(m_port_c_out, 0) && !BIT(data, 0))

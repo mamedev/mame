@@ -58,10 +58,10 @@ public:
 	void init_mquake();
 
 private:
-	DECLARE_READ8_MEMBER( es5503_sample_r );
-	DECLARE_WRITE16_MEMBER( output_w );
-	DECLARE_READ16_MEMBER( coin_chip_r );
-	DECLARE_WRITE16_MEMBER( coin_chip_w );
+	uint8_t es5503_sample_r(offs_t offset);
+	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t coin_chip_r(offs_t offset, uint16_t mem_mask = ~0);
+	void coin_chip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
@@ -81,7 +81,7 @@ private:
  *
  *************************************/
 
-READ8_MEMBER( mquake_state::es5503_sample_r )
+uint8_t mquake_state::es5503_sample_r(offs_t offset)
 {
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
@@ -91,14 +91,14 @@ void mquake_state::mquake_es5503_map(address_map &map)
 	map(0x000000, 0x1ffff).r(FUNC(mquake_state::es5503_sample_r));
 }
 
-WRITE16_MEMBER( mquake_state::output_w )
+void mquake_state::output_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x:output_w(%x) = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 
-READ16_MEMBER( mquake_state::coin_chip_r )
+uint16_t mquake_state::coin_chip_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
@@ -106,7 +106,7 @@ READ16_MEMBER( mquake_state::coin_chip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( mquake_state::coin_chip_w )
+void mquake_state::coin_chip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", m_maincpu->pc(), offset, data, mem_mask);
 }

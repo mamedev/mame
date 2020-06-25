@@ -114,7 +114,6 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 		device_video_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(tms3556_device::tms3556), this)),
 		m_reg(0), m_reg2(0),
-		m_reg_access_phase(0),
 		m_row_col_written(0),
 		m_bamp_written(0),
 		m_colrow(0),
@@ -146,7 +145,6 @@ void tms3556_device::device_start()
 	save_item(NAME(m_address_regs));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_reg2));
-	save_item(NAME(m_reg_access_phase));
 	save_item(NAME(m_row_col_written));
 	save_item(NAME(m_bamp_written));
 	save_item(NAME(m_colrow));
@@ -180,36 +178,44 @@ uint32_t tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  vram_r - VRAM read
 //-------------------------------------------------
 
-READ8_MEMBER( tms3556_device::vram_r )
+uint8_t tms3556_device::vram_r()
 {
 	uint8_t ret;
-	if (m_bamp_written) {
-		m_bamp_written=false;
-		m_vdp_acmpxy_mode=dma_write;
-		if (m_init_read)
-			m_vdp_acmp=VDP_BAMP;
-		else
-			m_vdp_acmp=(VDP_BAMP-1)&0xFFFF;
+	if (!machine().side_effects_disabled()) {
+		if (m_bamp_written) {
+			m_bamp_written=false;
+			m_vdp_acmpxy_mode=dma_write;
+			if (m_init_read)
+				m_vdp_acmp=VDP_BAMP;
+			else
+				m_vdp_acmp=(VDP_BAMP-1)&0xFFFF;
+		}
+
+		if (m_row_col_written) {
+			m_row_col_written=0;
+			m_vdp_acmpxy_mode=dma_read;
+			if (m_init_read)
+				m_vdp_acmpxy=m_colrow;
+			else
+				m_vdp_acmpxy=(m_colrow-1)&0xFFFF;
+		}
+
+		m_init_read = false;
+		m_reg = 0;
 	}
 
-	if (m_row_col_written) {
-		m_row_col_written=0;
-		m_vdp_acmpxy_mode=dma_read;
-		if (m_init_read)
-			m_vdp_acmpxy=m_colrow;
-		else
-			m_vdp_acmpxy=(m_colrow-1)&0xFFFF;
-	}
-
-	m_init_read=false;
 	if (m_vdp_acmpxy_mode==dma_read) {
 		ret=readbyte(m_vdp_acmpxy);
-		m_vdp_acmpxy++;
-		if (m_vdp_acmpxy==VDP_BAMTF) m_vdp_acmpxy=VDP_BAMP;
+		if (!machine().side_effects_disabled()) {
+			m_vdp_acmpxy++;
+			if (m_vdp_acmpxy==VDP_BAMTF) m_vdp_acmpxy=VDP_BAMP;
+		}
 	} else {
 		ret=readbyte(m_vdp_acmp);
-		m_vdp_acmp++;
-		if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
+		if (!machine().side_effects_disabled()) {
+			m_vdp_acmp++;
+			if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
+		}
 	}
 	return ret;
 }
@@ -218,7 +224,7 @@ READ8_MEMBER( tms3556_device::vram_r )
 //  vram_w - VRAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms3556_device::vram_w )
+void tms3556_device::vram_w(uint8_t data)
 {
 	if (m_bamp_written) {
 		m_bamp_written=false;
@@ -242,6 +248,8 @@ WRITE8_MEMBER( tms3556_device::vram_w )
 		if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
 	}
 
+	if (!machine().side_effects_disabled())
+		m_reg = 0;
 }
 
 
@@ -249,12 +257,13 @@ WRITE8_MEMBER( tms3556_device::vram_w )
 //  reg_r - read from register port
 //-------------------------------------------------
 
-READ8_MEMBER( tms3556_device::reg_r )
+uint8_t tms3556_device::reg_r()
 {
-	LOG("TMS3556 Reg Read: %06x\n", offset);
-
-	int reply = 0; // FIXME : will send internal status (VBL, HBL...)
-	m_reg_access_phase = 0;
+	uint8_t reply = 0; // FIXME : will send internal status (VBL, HBL...)
+	if (!machine().side_effects_disabled()) {
+		LOG("TMS3556 Register %X Read: %02X\n", m_reg, reply);
+		m_reg = m_reg2;
+	}
 	return reply;
 }
 
@@ -262,81 +271,56 @@ READ8_MEMBER( tms3556_device::reg_r )
 //  reg_w - write to register port
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms3556_device::reg_w )
+void tms3556_device::reg_w(uint8_t data)
 {
-	LOG("TMS3556 Reg Write: %06x = %02x\n", offset, data);
+	LOG("TMS3556 Register %X Write: %02X\n", m_reg, data);
 
-	switch (m_reg_access_phase) {
-	case 0:
+	if (m_reg == 0) {
 		m_reg=data&0x0F;
 		m_reg2=(data&0xF0)>>4;
-		if (m_reg!=0)
-			m_reg_access_phase=1;
-		return;
-
-	case 1:
-		if (m_reg<8) {
-			m_control_regs[m_reg]=data;
-			// leve un flag si le dernier registre ecrit est row ou col
-			if ((m_reg==2) || (m_reg==1)) {
-				m_colrow=(m_control_regs[2]<<8)|m_control_regs[1];
-				m_row_col_written=true;
-			}
-
-			if (m_reg2==0) {
-				m_reg_access_phase=0;
-				return;
-			} else {
-				m_reg_access_phase=1;
-				m_reg=m_reg2;
-				m_reg2=0;
-				return;
-			}
-		} else {
-			m_address_regs[m_reg-8]=(m_control_regs[2]<<8)|m_control_regs[1];
-			// cas speciaux de decalage pour les generateurs
-			if ((m_reg>=0xB) && (m_reg<=0xE)) {
-				m_address_regs[m_reg-8]+=2;
-				m_address_regs[m_reg-8]&=0xFFFF;
-			} else {
-				m_address_regs[m_reg-8]+=1;
-				m_address_regs[m_reg-8]&=0xFFFF;
-			}
-			if (m_reg==9) {
-				m_row_col_written=false;
-				m_bamp_written=true;
-				m_reg_access_phase=0;
-				return;
-			} else {
-				m_row_col_written=0;
-				m_bamp_written=false;
-				m_reg_access_phase=2;//???
-				return;
-			}
-			logerror("VDP16[%d] = x%x",m_reg,m_address_regs[m_reg-8]);
-			if (m_reg2==0) {
-				m_reg_access_phase=0;
-				return;
-			} else {
-				m_reg_access_phase=1;
-				m_reg=m_reg2;
-				m_reg2=0;
-				return;
-			}
+	} else if (m_reg<8) {
+		m_control_regs[m_reg]=data;
+		// leve un flag si le dernier registre ecrit est row ou col
+		if ((m_reg==2) || (m_reg==1)) {
+			m_colrow=(m_control_regs[2]<<8)|m_control_regs[1];
+			m_row_col_written=true;
 		}
-	case 2:
-		m_reg_access_phase=0;
-		return;
+
+		if (!machine().side_effects_disabled())
+			m_reg = m_reg2;
+	} else {
+		m_address_regs[m_reg-8]=(m_control_regs[2]<<8)|m_control_regs[1];
+		// cas speciaux de decalage pour les generateurs
+		if ((m_reg>=0xB) && (m_reg<=0xE)) {
+			m_address_regs[m_reg-8]+=2;
+			m_address_regs[m_reg-8]&=0xFFFF;
+		} else {
+			m_address_regs[m_reg-8]+=1;
+			m_address_regs[m_reg-8]&=0xFFFF;
+		}
+		if (m_reg==9) {
+			m_row_col_written=false;
+			m_bamp_written=true;
+		} else {
+			m_row_col_written=0;
+			m_bamp_written=false;
+		}
+		//logerror("VDP16[%d] = x%x",m_reg,m_address_regs[m_reg-8]);
+		if (!machine().side_effects_disabled())
+			m_reg = m_reg2;
 	}
 }
 
 //--------------------------------------------------------------------------
-//  initptr_r - set VDP in read mode (not exacly on the VDP but on the TAL)
+//  initptr_r - set VDP in read mode (not exactly on the VDP but on the TAL)
 //--------------------------------------------------------------------------
 
-READ8_MEMBER( tms3556_device::initptr_r )
+uint8_t tms3556_device::initptr_r()
 {
-	m_init_read=true;
+	if (!machine().side_effects_disabled()) {
+		m_init_read = true;
+		m_reg = 0;
+	}
 	return 0xff;
 }
 

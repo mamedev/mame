@@ -48,13 +48,13 @@ public:
 		, m_led(*this, "led6")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(ppi2_b_w);
-	DECLARE_WRITE8_MEMBER(ppi2_c_w);
+	void bg_scroll_w(offs_t offset, uint8_t data);
+	void bg_tile_w(offs_t offset, uint8_t data);
+	void fg_tile_w(offs_t offset, uint8_t data);
+	void fg_color_w(offs_t offset, uint8_t data);
+	void nmi_and_coins_w(uint8_t data);
+	void ppi2_b_w(uint8_t data);
+	void ppi2_c_w(uint8_t data);
 	void show_out();
 	void init_cabaret();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -93,13 +93,13 @@ protected:
 
 
 
-WRITE8_MEMBER(cabaret_state::bg_scroll_w)
+void cabaret_state::bg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_scroll[offset] = data;
 	m_bg_tilemap->set_scrolly(offset,data);
 }
 
-WRITE8_MEMBER(cabaret_state::bg_tile_w)
+void cabaret_state::bg_tile_w(offs_t offset, uint8_t data)
 {
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -108,23 +108,23 @@ WRITE8_MEMBER(cabaret_state::bg_tile_w)
 TILE_GET_INFO_MEMBER(cabaret_state::get_bg_tile_info)
 {
 	int code = m_bg_tile_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code & 0xff, 0, 0);
+	tileinfo.set(1, code & 0xff, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(cabaret_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	tileinfo.set(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(cabaret_state::fg_tile_w)
+void cabaret_state::fg_tile_w(offs_t offset, uint8_t data)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cabaret_state::fg_color_w)
+void cabaret_state::fg_color_w(offs_t offset, uint8_t data)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -163,7 +163,7 @@ void cabaret_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
+void cabaret_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
@@ -184,13 +184,13 @@ WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(cabaret_state::ppi2_b_w)
+void cabaret_state::ppi2_b_w(uint8_t data)
 {
 	m_out[1] = data;
 	show_out();
 }
 
-WRITE8_MEMBER(cabaret_state::ppi2_c_w)
+void cabaret_state::ppi2_c_w(uint8_t data)
 {
 	m_out[2] = data;
 	show_out();

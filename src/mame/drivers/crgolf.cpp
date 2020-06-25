@@ -107,7 +107,7 @@ protected or a snippet should do the aforementioned string copy.
  *
  *************************************/
 
-WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
+void crgolf_state::rom_bank_select_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 15);
 }
@@ -149,7 +149,7 @@ void crgolf_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(crgolf_state::switch_input_r)
+uint8_t crgolf_state::switch_input_r()
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 
@@ -157,13 +157,13 @@ READ8_MEMBER(crgolf_state::switch_input_r)
 }
 
 
-READ8_MEMBER(crgolf_state::analog_input_r)
+uint8_t crgolf_state::analog_input_r()
 {
 	return ((ioport("STICK0")->read() >> 4) | (ioport("STICK1")->read() & 0xf0)) ^ 0x88;
 }
 
 
-WRITE8_MEMBER(crgolf_state::switch_input_select_w)
+void crgolf_state::switch_input_select_w(uint8_t data)
 {
 	if (!(data & 0x40)) m_port_select = 6;
 	if (!(data & 0x20)) m_port_select = 5;
@@ -175,7 +175,7 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 }
 
 
-WRITE8_MEMBER(crgolf_state::unknown_w)
+void crgolf_state::unknown_w(uint8_t data)
 {
 	logerror("%04X:unknown_w = %02X\n", m_audiocpu->pc(), data);
 }
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		m_msm->write_data((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 }
 
 
-WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
+void crgolf_state::crgolfhi_sample_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -348,22 +348,22 @@ void crgolf_state::mastrglf_submap(address_map &map)
 }
 
 
-READ8_MEMBER(crgolf_state::unk_sub_02_r)
+uint8_t crgolf_state::unk_sub_02_r()
 {
 	return 0x00;
 }
 
-READ8_MEMBER(crgolf_state::unk_sub_05_r)
+uint8_t crgolf_state::unk_sub_05_r()
 {
 	return 0x00;
 }
 
-READ8_MEMBER(crgolf_state::unk_sub_07_r)
+uint8_t crgolf_state::unk_sub_07_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
+void crgolf_state::unk_sub_0c_w(uint8_t data)
 {
 }
 
@@ -778,7 +778,7 @@ ROM_END
 
 void crgolf_state::init_crgolfhi()
 {
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8sm_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
 }
 
 

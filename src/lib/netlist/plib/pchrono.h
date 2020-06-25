@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "pgsl.h"
 #include "ptypes.h"
 
 #include <chrono>
@@ -196,13 +197,11 @@ namespace plib {
 				explicit guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
 				~guard_t() noexcept { m_m.m_time += T::stop(); ++m_m.m_count; }
 
-				COPYASSIGNMOVE(guard_t, default)
+				PCOPYASSIGNMOVE(guard_t, default)
 
 			private:
 				timer &m_m;
 			};
-
-			friend struct guard_t;
 
 			timer() : m_time(0), m_count(0) { }
 
@@ -214,8 +213,8 @@ namespace plib {
 			ctype count() const noexcept { return m_count; }
 
 			template <typename S>
-			S as_seconds() const noexcept { return static_cast<S>(total())
-					/ static_cast<S>(T::per_second()); }
+			S as_seconds() const noexcept { return narrow_cast<S>(total())
+					/ narrow_cast<S>(T::per_second()); }
 
 			guard_t guard() noexcept { return guard_t(*this); }
 		private:
@@ -232,7 +231,7 @@ namespace plib {
 			struct guard_t
 			{
 				guard_t() = default;
-				COPYASSIGNMOVE(guard_t, default)
+				PCOPYASSIGNMOVE(guard_t, default)
 				// using default constructor will trigger warning on
 				// unused local variable.
 
@@ -246,7 +245,7 @@ namespace plib {
 			constexpr type total() const noexcept { return 0; }
 			constexpr ctype count() const noexcept { return 0; }
 			template <typename S>
-			S as_seconds() const noexcept { return static_cast<S>(0.0); }
+			S as_seconds() const noexcept { return narrow_cast<S>(0); }
 			constexpr static bool enabled = false;
 			guard_t guard() { return guard_t(); }
 		};

@@ -1,18 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- Fujitsu FM-7 cassette images -->
-<!-- Multi-image games are currently untested -->
-
 <!--
+license:CC0
+
+Fujitsu FM-7 cassette images
+Multi-image games are currently untested
 
 Titles, serial #s, publishers and release dates taken from:
   - Oh!FM-7 ( http://retropc.net/fm-7/ )
 
--->
 
-
-<!--
     Loading instructions:
     At the F-Basic Ready prompt, type run"" and press Return.
     If a Bad File Mode error occurs, then you must type loadm"",r and press Return.  Once the loader has loaded,

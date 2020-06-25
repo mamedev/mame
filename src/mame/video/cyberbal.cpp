@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(cyberbal_base_state::get_alpha_tile_info)
 	uint16_t data = m_alpha->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
+	tileinfo.set(2, code, color, (data >> 15) & 1);
 }
 
 
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
 	uint16_t data = m_alpha2->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
+	tileinfo.set(2, code, color, (data >> 15) & 1);
 }
 
 
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(cyberbal_base_state::get_playfield_tile_info)
 	uint16_t data = m_playfield->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
 	uint16_t data = m_playfield2->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -202,15 +202,15 @@ void cyberbal_base_state::scanline_update_one(screen_device &screen, int scanlin
 	i++;
 }
 
-void cyberbal_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(cyberbal_state::scanline_update)
 {
-	scanline_update_one(*m_lscreen, scanline, 0, *m_playfield, *m_alpha);
-	scanline_update_one(*m_rscreen, scanline, 1, *m_playfield2, *m_alpha2);
+	scanline_update_one(*m_lscreen, param, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_rscreen, param, 1, *m_playfield2, *m_alpha2);
 }
 
-void cyberbal2p_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(cyberbal2p_state::scanline_update)
 {
-	scanline_update_one(*m_screen, scanline, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_screen, param, 0, *m_playfield, *m_alpha);
 }
 
 

@@ -24,82 +24,82 @@ public:
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 	double get_framerate() { return has_screen() ? screen().frame_period().as_hz() : double(m_framerate); }
 
-	DECLARE_READ16_MEMBER( segacd_dmaaddr_r );
-	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );
+	uint16_t segacd_dmaaddr_r();
+	void segacd_dmaaddr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( scd_a12000_halt_reset_w );
-	DECLARE_READ16_MEMBER( scd_a12000_halt_reset_r );
-	DECLARE_READ16_MEMBER( scd_a12002_memory_mode_r );
+	void scd_a12000_halt_reset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scd_a12000_halt_reset_r();
+	uint16_t scd_a12002_memory_mode_r();
 	void scd_a12002_memory_mode_w_8_15(u8 data);
 	void scd_a12002_memory_mode_w_0_7(u8 data);
-	DECLARE_WRITE16_MEMBER( scd_a12002_memory_mode_w );
-	DECLARE_READ16_MEMBER( segacd_sub_memory_mode_r );
+	void scd_a12002_memory_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_sub_memory_mode_r();
 	void segacd_sub_memory_mode_w_8_15(u8 data);
 	void segacd_sub_memory_mode_w_0_7(u8 data);
-	DECLARE_WRITE16_MEMBER( segacd_sub_memory_mode_w );
+	void segacd_sub_memory_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( segacd_comms_flags_r );
-	DECLARE_WRITE16_MEMBER( segacd_comms_flags_subcpu_w );
-	DECLARE_WRITE16_MEMBER( segacd_comms_flags_maincpu_w );
-	DECLARE_READ16_MEMBER( scd_4m_prgbank_ram_r );
-	DECLARE_WRITE16_MEMBER( scd_4m_prgbank_ram_w );
-	DECLARE_READ16_MEMBER( segacd_comms_main_part1_r );
-	DECLARE_WRITE16_MEMBER( segacd_comms_main_part1_w );
-	DECLARE_READ16_MEMBER( segacd_comms_main_part2_r );
-	DECLARE_WRITE16_MEMBER( segacd_comms_main_part2_w );
-	DECLARE_READ16_MEMBER( segacd_comms_sub_part1_r );
-	DECLARE_WRITE16_MEMBER( segacd_comms_sub_part1_w );
-	DECLARE_READ16_MEMBER( segacd_comms_sub_part2_r );
-	DECLARE_WRITE16_MEMBER( segacd_comms_sub_part2_w );
-
-
-
-	DECLARE_READ16_MEMBER( segacd_main_dataram_part1_r );
-	DECLARE_WRITE16_MEMBER( segacd_main_dataram_part1_w );
-
-	DECLARE_READ16_MEMBER( scd_hint_vector_r );
-	DECLARE_READ16_MEMBER( scd_a12006_hint_register_r );
-	DECLARE_WRITE16_MEMBER( scd_a12006_hint_register_w );
+	uint16_t segacd_comms_flags_r();
+	void segacd_comms_flags_subcpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void segacd_comms_flags_maincpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scd_4m_prgbank_ram_r(offs_t offset);
+	void scd_4m_prgbank_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_comms_main_part1_r(offs_t offset);
+	void segacd_comms_main_part1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_comms_main_part2_r(offs_t offset);
+	void segacd_comms_main_part2_w(uint16_t data);
+	uint16_t segacd_comms_sub_part1_r(offs_t offset);
+	void segacd_comms_sub_part1_w(uint16_t data);
+	uint16_t segacd_comms_sub_part2_r(offs_t offset);
+	void segacd_comms_sub_part2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
-	DECLARE_WRITE16_MEMBER( segacd_stopwatch_timer_w );
-	DECLARE_READ16_MEMBER( segacd_stopwatch_timer_r );
-	DECLARE_READ16_MEMBER( segacd_sub_led_ready_r );
-	DECLARE_WRITE16_MEMBER( segacd_sub_led_ready_w );
-	DECLARE_READ16_MEMBER( segacd_sub_dataram_part1_r );
-	DECLARE_WRITE16_MEMBER( segacd_sub_dataram_part1_w );
-	DECLARE_READ16_MEMBER( segacd_sub_dataram_part2_r );
-	DECLARE_WRITE16_MEMBER( segacd_sub_dataram_part2_w );
+
+	uint16_t segacd_main_dataram_part1_r(offs_t offset);
+	void segacd_main_dataram_part1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t scd_hint_vector_r(offs_t offset);
+	uint16_t scd_a12006_hint_register_r();
+	void scd_a12006_hint_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
-	DECLARE_READ16_MEMBER( segacd_stampsize_r );
-	DECLARE_WRITE16_MEMBER( segacd_stampsize_w );
+	void segacd_stopwatch_timer_w(uint16_t data);
+	uint16_t segacd_stopwatch_timer_r();
+	uint16_t segacd_sub_led_ready_r(offs_t offset, uint16_t mem_mask = ~0);
+	void segacd_sub_led_ready_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_sub_dataram_part1_r(offs_t offset);
+	void segacd_sub_dataram_part1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_sub_dataram_part2_r(offs_t offset);
+	void segacd_sub_dataram_part2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+
+	uint16_t segacd_stampsize_r();
+	void segacd_stampsize_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_1x1_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_1x1_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
 
-	WRITE16_MEMBER( segacd_trace_vector_base_address_w );
-	READ16_MEMBER( segacd_imagebuffer_vdot_size_r );
-	WRITE16_MEMBER( segacd_imagebuffer_vdot_size_w );
-	READ16_MEMBER( segacd_stampmap_base_address_r );
-	WRITE16_MEMBER( segacd_stampmap_base_address_w );
-	READ16_MEMBER( segacd_imagebuffer_start_address_r );
-	WRITE16_MEMBER( segacd_imagebuffer_start_address_w );
-	READ16_MEMBER( segacd_imagebuffer_offset_r );
-	WRITE16_MEMBER( segacd_imagebuffer_offset_w );
-	READ16_MEMBER( segacd_imagebuffer_vcell_size_r );
-	WRITE16_MEMBER( segacd_imagebuffer_vcell_size_w );
-	READ16_MEMBER( segacd_imagebuffer_hdot_size_r );
-	WRITE16_MEMBER( segacd_imagebuffer_hdot_size_w );
-	READ16_MEMBER( segacd_irq3timer_r );
-	WRITE16_MEMBER( segacd_irq3timer_w );
-	READ8_MEMBER( backupram_r );
-	WRITE8_MEMBER( backupram_w );
-	READ8_MEMBER( font_color_r );
-	WRITE8_MEMBER( font_color_w );
-	READ16_MEMBER( font_converted_r );
+	void segacd_trace_vector_base_address_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_imagebuffer_vdot_size_r();
+	void segacd_imagebuffer_vdot_size_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_stampmap_base_address_r();
+	void segacd_stampmap_base_address_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_imagebuffer_start_address_r();
+	void segacd_imagebuffer_start_address_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_imagebuffer_offset_r();
+	void segacd_imagebuffer_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_imagebuffer_vcell_size_r();
+	void segacd_imagebuffer_vcell_size_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_imagebuffer_hdot_size_r();
+	void segacd_imagebuffer_hdot_size_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t segacd_irq3timer_r();
+	void segacd_irq3timer_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t backupram_r(offs_t offset);
+	void backupram_w(offs_t offset, uint8_t data);
+	uint8_t font_color_r();
+	void font_color_w(uint8_t data);
+	uint16_t font_converted_r(offs_t offset);
 
 	void segacd_map(address_map &map);
 	void segacd_pcm_map(address_map &map);
@@ -111,7 +111,7 @@ protected:
 
 	required_device<cpu_device> m_scdcpu;
 	required_device<cpu_device> m_hostcpu;
-	required_device<rf5c68_device> m_rfsnd;
+	required_device<rf5c164_device> m_rfsnd;
 	required_device<lc89510_temp_device> m_lc89510_temp;
 	required_device<timer_device> m_stopwatch_timer;
 	required_device<timer_device> m_stamp_timer;
@@ -161,8 +161,8 @@ protected:
 
 
 	inline void write_pixel(uint8_t pix, int pixeloffset);
-	uint16_t segacd_1meg_mode_word_read(int offset, uint16_t mem_mask);
-	void segacd_1meg_mode_word_write(int offset, uint16_t data, uint16_t mem_mask, int use_pm);
+	uint16_t segacd_1meg_mode_word_read(offs_t offset);
+	void segacd_1meg_mode_word_write(offs_t offset, uint16_t data, uint16_t mem_mask, int use_pm);
 
 	uint16_t m_dmaaddr;
 

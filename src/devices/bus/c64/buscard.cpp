@@ -91,13 +91,13 @@ ioport_constructor c64_buscard_device::device_input_ports() const
 //  PPI interface
 //-------------------------------------------------
 
-READ8_MEMBER( c64_buscard_device::ppi_pa_r )
+uint8_t c64_buscard_device::ppi_pa_r()
 {
 	uint8_t data = 0xff;
 
 	if (!m_te)
 	{
-		data = m_ieee1->read(space, 0);
+		data = m_ieee1->read();
 	}
 
 	if (m_dipsw)
@@ -108,9 +108,9 @@ READ8_MEMBER( c64_buscard_device::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_buscard_device::ppi_pa_w )
+void c64_buscard_device::ppi_pa_w(uint8_t data)
 {
-	m_ieee1->write(space, 0, data);
+	m_ieee1->write(data);
 
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_data1(BIT(data, 1));
@@ -122,7 +122,7 @@ WRITE8_MEMBER( c64_buscard_device::ppi_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 }
 
-WRITE8_MEMBER( c64_buscard_device::ppi_pb_w )
+void c64_buscard_device::ppi_pb_w(uint8_t data)
 {
 	/*
 
@@ -147,7 +147,7 @@ WRITE8_MEMBER( c64_buscard_device::ppi_pb_w )
 	m_dipsw = BIT(data, 7);
 }
 
-READ8_MEMBER( c64_buscard_device::ppi_pc_r )
+uint8_t c64_buscard_device::ppi_pc_r()
 {
 	/*
 
@@ -177,7 +177,7 @@ READ8_MEMBER( c64_buscard_device::ppi_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_buscard_device::ppi_pc_w )
+void c64_buscard_device::ppi_pc_w(uint8_t data)
 {
 	/*
 

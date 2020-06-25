@@ -22,16 +22,16 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
 	int tileno;
 
 	tileno = m_txvideoram[tile_index] + (m_txbank * 0x100);
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
+void angelkds_state::angelkds_txvideoram_w(offs_t offset, uint8_t data)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_txbank_write)
+void angelkds_state::angelkds_txbank_write(uint8_t data)
 {
 	if (m_txbank != data)
 	{
@@ -51,16 +51,16 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
 	tileno = m_bgtopvideoram[tile_index];
 
 	tileno += m_bgtopbank * 0x100 ;
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	tileinfo.set(1, tileno, 0, 0);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
+void angelkds_state::angelkds_bgtopvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgtopvideoram[offset] = data;
 	m_bgtop_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
+void angelkds_state::angelkds_bgtopbank_write(uint8_t data)
 {
 	if (m_bgtopbank != data)
 	{
@@ -69,7 +69,7 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
 	}
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgtopscroll_write)
+void angelkds_state::angelkds_bgtopscroll_write(uint8_t data)
 {
 	m_bgtop_tilemap->set_scrollx(0, data);
 }
@@ -85,17 +85,17 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
 	tileno = m_bgbotvideoram[tile_index];
 
 	tileno += m_bgbotbank * 0x100 ;
-	SET_TILE_INFO_MEMBER(2, tileno, 1, 0);
+	tileinfo.set(2, tileno, 1, 0);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
+void angelkds_state::angelkds_bgbotvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgbotvideoram[offset] = data;
 	m_bgbot_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
+void angelkds_state::angelkds_bgbotbank_write(uint8_t data)
 {
 	if (m_bgbotbank != data)
 	{
@@ -104,13 +104,13 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
 	}
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgbotscroll_write)
+void angelkds_state::angelkds_bgbotscroll_write(uint8_t data)
 {
 	m_bgbot_tilemap->set_scrollx(0, data);
 }
 
 
-WRITE8_MEMBER(angelkds_state::angelkds_layer_ctrl_write)
+void angelkds_state::angelkds_layer_ctrl_write(uint8_t data)
 {
 	m_layer_ctrl = data;
 }

@@ -74,12 +74,12 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_a_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void ppi8255_a_w(uint8_t data);
+	void ppi8255_b_w(uint8_t data);
+	void ppi8255_c_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -94,7 +94,7 @@ private:
 /* video */
 
 
-WRITE8_MEMBER(vroulet_state::paletteram_w)
+void vroulet_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	/*
 	 paletteram_xxxxBBBBGGGGRRRR_byte_be_w
@@ -114,13 +114,13 @@ WRITE8_MEMBER(vroulet_state::paletteram_w)
 	}
 }
 
-WRITE8_MEMBER(vroulet_state::videoram_w)
+void vroulet_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(vroulet_state::colorram_w)
+void vroulet_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -132,7 +132,7 @@ TILE_GET_INFO_MEMBER(vroulet_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void vroulet_state::video_start()
@@ -274,9 +274,9 @@ GFXDECODE_END
 
 /* PPI8255 Interface */
 
-WRITE8_MEMBER(vroulet_state::ppi8255_a_w){}// watchdog ?
-WRITE8_MEMBER(vroulet_state::ppi8255_b_w){}// lamps ?
-WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
+void vroulet_state::ppi8255_a_w(uint8_t data) {}// watchdog ?
+void vroulet_state::ppi8255_b_w(uint8_t data) {}// lamps ?
+void vroulet_state::ppi8255_c_w(uint8_t data) {}
 
 /* Machine Driver */
 

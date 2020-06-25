@@ -15,30 +15,30 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
+void pecom_state::pecom_cdp1869_w(offs_t offset, uint8_t data)
 {
 	uint16_t ma = m_cdp1802->get_memory_address();
 
 	switch (offset + 3)
 	{
 	case 3:
-		m_cdp1869->out3_w(space, ma, data);
+		m_cdp1869->out3_w(data);
 		break;
 
 	case 4:
-		m_cdp1869->out4_w(space, ma, data);
+		m_cdp1869->out4_w(ma);
 		break;
 
 	case 5:
-		m_cdp1869->out5_w(space, ma, data);
+		m_cdp1869->out5_w(ma);
 		break;
 
 	case 6:
-		m_cdp1869->out6_w(space, ma, data);
+		m_cdp1869->out6_w(ma);
 		break;
 
 	case 7:
-		m_cdp1869->out7_w(space, ma, data);
+		m_cdp1869->out7_w(ma);
 		break;
 	}
 }

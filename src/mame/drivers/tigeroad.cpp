@@ -58,28 +58,22 @@ single plane board.
 
 
 
-WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
+void tigeroad_state::tigeroad_soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_soundlatch->write(data >> 8);
 }
 
 
-WRITE8_MEMBER(tigeroad_state::msm5205_w)
+void tigeroad_state::msm5205_w(uint8_t data)
 {
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 	m_msm->vclk_w(1);
 	m_msm->vclk_w(0);
 }
 
-
-WRITE8_MEMBER(f1dream_state::out1_w)
-{
-	m_soundlatch->write(data);
-}
-
-WRITE8_MEMBER(f1dream_state::out3_w)
+void f1dream_state::out3_w(uint8_t data)
 {
 	if ((m_old_p3 & 0x20) != (data & 0x20))
 	{
@@ -98,7 +92,7 @@ WRITE8_MEMBER(f1dream_state::out3_w)
 	m_old_p3 = data;
 }
 
-WRITE16_MEMBER(f1dream_state::blktiger_to_mcu_w)
+void f1dream_state::blktiger_to_mcu_w(uint16_t data)
 {
 	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 
@@ -129,13 +123,13 @@ void tigeroad_state::main_map(address_map &map)
 }
 
 
-READ8_MEMBER(f1dream_state::mcu_shared_r)
+uint8_t f1dream_state::mcu_shared_r(offs_t offset)
 {
 	uint8_t ret = m_ram16[(0x3fe0 / 2) + offset];
 	return ret;
 }
 
-WRITE8_MEMBER(f1dream_state::mcu_shared_w)
+void f1dream_state::mcu_shared_w(offs_t offset, uint8_t data)
 {
 	m_ram16[(0x3fe0 / 2) + offset] = (m_ram16[(0x3fe0 / 2) + offset] & 0xff00) | data;
 }
@@ -681,7 +675,7 @@ void f1dream_state::f1dream(machine_config &config)
 
 	I8751(config, m_mcu, XTAL(10'000'000)); /* ??? */
 	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
-	m_mcu->port_out_cb<1>().set(FUNC(f1dream_state::out1_w));
+	m_mcu->port_out_cb<1>().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
 }
 

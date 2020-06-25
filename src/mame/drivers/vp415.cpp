@@ -132,7 +132,7 @@ WRITE_LINE_MEMBER(vp415_state::cpu_int1_w)
 	set_int_line(0, state);
 }
 
-WRITE8_MEMBER(vp415_state::sel34_w)
+void vp415_state::sel34_w(uint8_t data)
 {
 	logerror("%s: sel34: /INTR=%d, RES=%d, ERD=%d, ENW=%d\n", machine().describe_context(), BIT(data, SEL34_INTR_N_BIT), BIT(data, SEL34_RES_BIT), BIT(data, SEL34_ERD_BIT), BIT(data, SEL34_ENW_BIT));
 	m_sel34 = data;
@@ -144,7 +144,7 @@ WRITE8_MEMBER(vp415_state::sel34_w)
 	}
 }
 
-READ8_MEMBER(vp415_state::sel37_r)
+uint8_t vp415_state::sel37_r()
 {
 	logerror("%s: sel37: ID0=%d, ID1=%d\n", machine().describe_context(), BIT(m_sel37, SEL37_ID0_BIT), BIT(m_sel37, SEL37_ID1_BIT));
 	return m_sel37;
@@ -165,23 +165,23 @@ void vp415_state::update_cpu_int()
 	m_datacpu->set_input_line(0, (m_sel37 & (SEL37_ID0 | SEL37_ID1)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(vp415_state::data_mcu_port1_w)
+void vp415_state::data_mcu_port1_w(uint8_t data)
 {
 	logerror("%s: data_mcu_port1_w: %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(vp415_state::data_mcu_port1_r)
+uint8_t vp415_state::data_mcu_port1_r()
 {
 	logerror("%s: data_mcu_port1_r: %02x\n", machine().describe_context(), 0);
 	return 0;
 }
 
-WRITE8_MEMBER(vp415_state::data_mcu_port2_w)
+void vp415_state::data_mcu_port2_w(uint8_t data)
 {
 	logerror("%s: data_mcu_port2_w: %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(vp415_state::data_mcu_port2_r)
+uint8_t vp415_state::data_mcu_port2_r()
 {
 	logerror("%s: data_mcu_port2_r: %02x\n", machine().describe_context(), 0);
 	return 0;
@@ -211,7 +211,7 @@ void vp415_state::datamcu_program_map(address_map &map)
 
 // Control Module (S)
 
-WRITE8_MEMBER(vp415_state::ctrl_regs_w)
+void vp415_state::ctrl_regs_w(offs_t offset, uint8_t data)
 {
 	const uint8_t handler_index = (offset & 0x0c00) >> 10;
 	switch (handler_index)
@@ -222,7 +222,7 @@ WRITE8_MEMBER(vp415_state::ctrl_regs_w)
 			break;
 		case 1: // WR3
 			logerror("%s: ctrl_regs_w: WR3 (UPI-41): %d=%02x\n", machine().describe_context(), (offset >> 9) & 1, data);
-			m_ctrlmcu->upi41_master_w(space, (offset >> 9) & 1, data);
+			m_ctrlmcu->upi41_master_w((offset >> 9) & 1, data);
 			break;
 		case 2:
 			logerror("%s: ctrl_regs_w: N.C. write %02x\n", machine().describe_context(), data);
@@ -233,7 +233,7 @@ WRITE8_MEMBER(vp415_state::ctrl_regs_w)
 	}
 }
 
-READ8_MEMBER(vp415_state::ctrl_regs_r)
+uint8_t vp415_state::ctrl_regs_r(offs_t offset)
 {
 	const uint8_t handler_index = (offset & 0x0c00) >> 10;
 	uint8_t value = 0;
@@ -244,7 +244,7 @@ READ8_MEMBER(vp415_state::ctrl_regs_r)
 			logerror("%s: ctrl_regs_r: RDEN: %02x\n", machine().describe_context(), value);
 			break;
 		case 1: // /RD3
-			value = m_ctrlmcu->upi41_master_r(space, (offset >> 9) & 1);
+			value = m_ctrlmcu->upi41_master_r((offset >> 9) & 1);
 			logerror("%s: ctrl_regs_r: RD3 (UPI-41): %d (%02x)\n", machine().describe_context(), (offset >> 9) & 1, value);
 			break;
 		case 2: // /RD2
@@ -258,7 +258,7 @@ READ8_MEMBER(vp415_state::ctrl_regs_r)
 	return value;
 }
 
-WRITE8_MEMBER(vp415_state::ctrl_cpu_port1_w)
+void vp415_state::ctrl_cpu_port1_w(uint8_t data)
 {
 	uint8_t old = m_ctrl_cpu_p1;
 	m_ctrl_cpu_p1 = data;
@@ -269,7 +269,7 @@ WRITE8_MEMBER(vp415_state::ctrl_cpu_port1_w)
 	}
 }
 
-READ8_MEMBER(vp415_state::ctrl_cpu_port1_r)
+uint8_t vp415_state::ctrl_cpu_port1_r()
 {
 	uint8_t ret = m_ctrl_cpu_p1;
 	m_ctrl_cpu_p1 ^= 0x10;
@@ -277,33 +277,33 @@ READ8_MEMBER(vp415_state::ctrl_cpu_port1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vp415_state::ctrl_cpu_port3_w)
+void vp415_state::ctrl_cpu_port3_w(uint8_t data)
 {
 	m_ctrl_cpu_p3 = ~data;
 	logerror("%s: ctrl_cpu_port3_w: %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(vp415_state::ctrl_cpu_port3_r)
+uint8_t vp415_state::ctrl_cpu_port3_r()
 {
 	uint8_t ret = m_ctrl_cpu_p3;
 	logerror("%s: ctrl_cpu_port3_r (%02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vp415_state::ctrl_mcu_port1_w)
+void vp415_state::ctrl_mcu_port1_w(uint8_t data)
 {
 	m_ctrl_mcu_p1 = data;
 	logerror("%s: ctrl_mcu_port1_w: %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(vp415_state::ctrl_mcu_port1_r)
+uint8_t vp415_state::ctrl_mcu_port1_r()
 {
 	uint8_t value = m_ctrl_mcu_p1;
 	logerror("%s: ctrl_mcu_port1_r: %02x\n", machine().describe_context(), value);
 	return value;
 }
 
-WRITE8_MEMBER(vp415_state::ctrl_mcu_port2_w)
+void vp415_state::ctrl_mcu_port2_w(uint8_t data)
 {
 	m_ctrl_mcu_p2 = data;
 	if (BIT(data, 4))
@@ -313,7 +313,7 @@ WRITE8_MEMBER(vp415_state::ctrl_mcu_port2_w)
 	logerror("%s: ctrl_mcu_port2_w: %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(vp415_state::ctrl_mcu_port2_r)
+uint8_t vp415_state::ctrl_mcu_port2_r()
 {
 	logerror("%s: ctrl_mcu_port2_r: %02x\n", machine().describe_context(), 0);
 	return 0;
@@ -346,7 +346,7 @@ void vp415_state::ctrlmcu_program_map(address_map &map)
 
 // Drive Processor Module (R)
 
-READ8_MEMBER(vp415_state::drive_i8155_pb_r)
+uint8_t vp415_state::drive_i8155_pb_r()
 {
 	uint8_t ret = I8155PB_FRLOCK | m_drive_2ppr;
 	if (m_drive_rad_mir_dac >= 0x7e && m_drive_rad_mir_dac < 0x82 && BIT(m_drive_i8255_pb, I8255PB_RLS_N_BIT))
@@ -355,19 +355,19 @@ READ8_MEMBER(vp415_state::drive_i8155_pb_r)
 	return ret;
 }
 
-READ8_MEMBER(vp415_state::drive_i8155_pc_r)
+uint8_t vp415_state::drive_i8155_pc_r()
 {
 	logerror("%s: drive_i8155_pc_r: %02x\n", machine().describe_context(), 0);
 	return 0;
 }
 
-WRITE8_MEMBER(vp415_state::drive_i8255_pa_w)
+void vp415_state::drive_i8255_pa_w(uint8_t data)
 {
 	logerror("%s: drive_i8255_pa_w: radial mirror DAC = %02x\n", machine().describe_context(), data);
 	m_drive_rad_mir_dac = data;
 }
 
-WRITE8_MEMBER(vp415_state::drive_i8255_pb_w)
+void vp415_state::drive_i8255_pb_w(uint8_t data)
 {
 	m_drive_i8255_pb = data;
 	logerror("%s: drive_i8255_pb_w: COMM-1:%d, COMM-2:%d, COMM-3:%d, COMM-4:%d, /RLS:%d, SL-PWR:%d, /RAD-FS:%d, STR1:%d\n"
@@ -386,7 +386,7 @@ WRITE8_MEMBER(vp415_state::drive_i8255_pb_w)
 	}
 }
 
-READ8_MEMBER(vp415_state::drive_i8255_pc_r)
+uint8_t vp415_state::drive_i8255_pc_r()
 {
 	static int focus_kludge = 250;
 	static int motor_kludge = 200;
@@ -410,7 +410,7 @@ READ8_MEMBER(vp415_state::drive_i8255_pc_r)
 	return m_drive_pc_bits;
 }
 
-WRITE8_MEMBER(vp415_state::drive_cpu_port1_w)
+void vp415_state::drive_cpu_port1_w(uint8_t data)
 {
 	uint8_t old = m_drive_p1;
 	m_drive_p1 = data;
@@ -439,7 +439,7 @@ WRITE8_MEMBER(vp415_state::drive_cpu_port1_w)
 //{
 //  logerror("%s: drive_txd_w: %d\n", machine().describe_context(), state);
 //}
-WRITE8_MEMBER(vp415_state::drive_cpu_port3_w)
+void vp415_state::drive_cpu_port3_w(uint8_t data)
 {
 	logerror("%s: drive_cpu_port3_w: %02x\n", machine().describe_context(), data);
 }

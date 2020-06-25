@@ -115,14 +115,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::gberet_interrupt_tick)
  *
  *************************************/
 
-WRITE8_MEMBER(gberet_state::gberet_coin_counter_w)
+void gberet_state::gberet_coin_counter_w(uint8_t data)
 {
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
+void gberet_state::mrgoemon_coin_counter_w(uint8_t data)
 {
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 1);
@@ -132,7 +132,7 @@ WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 	membank("bank1")->set_entry(((data & 0xe0) >> 5));
 }
 
-WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
+void gberet_state::gberet_flipscreen_w(uint8_t data)
 {
 	/* bits 0/1/2 = interrupt enable */
 	uint8_t ack_mask = ~data & m_interrupt_mask; // 1->0
@@ -149,7 +149,7 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 	flip_screen_set(data & 8);
 }
 
-WRITE8_MEMBER(gberet_state::gberet_sound_w)
+void gberet_state::gberet_sound_w(uint8_t data)
 {
 	m_sn->write(*m_soundlatch);
 }
@@ -198,18 +198,18 @@ void gberet_state::mrgoemon_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(gberet_state::gberetb_flipscreen_w)
+void gberet_state::gberetb_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 8);
 }
 
-READ8_MEMBER(gberet_state::gberetb_irq_ack_r)
+uint8_t gberet_state::gberetb_irq_ack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
-WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
+void gberet_state::gberetb_nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }

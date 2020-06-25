@@ -185,7 +185,7 @@ void kangaroo_state::machine_start()
 MACHINE_START_MEMBER(kangaroo_state,kangaroo_mcu)
 {
 	kangaroo_state::machine_start();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xef00, 0xefff, read8_delegate(*this, FUNC(kangaroo_state::mcu_sim_r)), write8_delegate(*this, FUNC(kangaroo_state::mcu_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xef00, 0xefff, read8smo_delegate(*this, FUNC(kangaroo_state::mcu_sim_r)), write8smo_delegate(*this, FUNC(kangaroo_state::mcu_sim_w)));
 	save_item(NAME(m_mcu_clock));
 }
 
@@ -220,12 +220,12 @@ void kangaroo_state::machine_reset()
    this just seems to do the trick -V-
 */
 
-READ8_MEMBER(kangaroo_state::mcu_sim_r)
+uint8_t kangaroo_state::mcu_sim_r()
 {
 	return ++m_mcu_clock & 0x0f;
 }
 
-WRITE8_MEMBER(kangaroo_state::mcu_sim_w)
+void kangaroo_state::mcu_sim_w(uint8_t data)
 {
 }
 
@@ -237,7 +237,7 @@ WRITE8_MEMBER(kangaroo_state::mcu_sim_w)
  *
  *************************************/
 
-WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
+void kangaroo_state::kangaroo_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);

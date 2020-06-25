@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- license:CC0 -->
+
+<!--
+    Missing carts:
+
+500-13288-A DIDJi Racing -  Tiki Tropics
+500-13289-A Super Chicks - Make friends. Shop. Save the world
+        Tinker Bell and The Lost Treasure
+500-13286-C Sonic The Hedgehog
+        Nancy Drew
+        Foster's Home for Imaginary Friends
+        Wolverine and the X-Men
+        Neopets - Quizara's Curse
+        Hannah Montana
+        High School Musical
+        Mitchell Van Morgan
+        Star Wars - Jedi Trials
+-->
+
+<softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj Cartridges">
+	<!-- NAND ROMs, dumps not yet verified as good, although they do contain a filesystem -->
+
+	<software name="andinvasn" supported="no">
+		<description>Nicktoon Android Invasion (USA)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13290-B"/>
+		<part name="cart" interface="leapfrog_didj_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="500-13290-B - Nicktoons Android Invasion (US).bin" size="0x4200000" crc="1bdd1865" sha1="a500858c6e701617c5f6e1d0b23b058956a834ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indjones" supported="no">
+		<description>Indiana Jones (USA)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13304-A"/>
+		<part name="cart" interface="leapfrog_didj_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="500-13304-A - Indiana Jones (US).bin" size="0x4200000" crc="c3bc1813" sha1="95e55b02ffe6e62ee89b44403375fdffcd573510" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spbobfifo" supported="no">
+		<description>Nickelodeon Spongebob Squarepants - Fists of Foam (USA)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13291-B"/>
+		<part name="cart" interface="leapfrog_didj_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="500-13291-B - Spongebob Squarepants - Fists of Foam (US).bin" size="0x4200000" crc="4edb2270" sha1="8a6752bcdfa94cb68f05764b808ce1142a8919ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swclonewrs" supported="no">
+		<description>Star Wars - The Clone Wars (USA)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13292-A"/>
+		<part name="cart" interface="leapfrog_didj_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="500-13292-A - Star Wars - The Clone Wars (US).bin" size="0x4200000" crc="df7e9cc3" sha1="b9f8936bfa9073a8120658669923a1663f839093" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

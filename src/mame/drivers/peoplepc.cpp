@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-   
-/********************************************************************************************* 
+
+/*********************************************************************************************
 The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 
 [ASC] [ESC] [F1 ] [F2 ] [F3 ] [F4 ] [F5 ] [F6 ] [F7 ] [F8 ] [F9 ] [F10] [F11] [F11] [PRN]
@@ -9,7 +9,7 @@ The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 [ TAB ]  [ Q ] [ W ] [ E ] [ R ] [ T ] [ Z ] [ U ] [ I ] [ O ] [ P ] [ Ü ] [+ *]  [ DEL ]   [ 4 ] [ 5 ] [ 5 ] [ - ] [HOM]
 [SHIFTLOCK] [ A ] [ S ] [ D ] [ F ] [ G ] [ H ] [ J ] [ K ] [ L ] [ Ö ] [ Ä ] [# '] [RET]   [ 1 ] [ 2 ] [ 3 ] [RET] [UP ]
 [SHIFT] [2 3]  [ Y ] [ X ] [ C ] [ V ] [ B ] [ N ] [ M ] [, ;] [. :] [- _] [ Ü ]    [URN]   [    0    ] [ . ] [URN] [DWN]
-[ CTRL  ] [                    SPACE                     ]                       
+[ CTRL  ] [                    SPACE                     ]
 
 * The ASC key top left has a red LED, "Depressing the ASCII key, [...], switches off the LED indicator. This key acts as a
   toggle between the ASCII character set, and your country's standard (NATIONAL) character set. You would use this feature if
@@ -19,10 +19,10 @@ The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 * BKS is the full word BACKSPACE
 * the C to the right of BKS has a red keycap, it deletes the complete line
 * the five direction keys are all marked with arrows, HOME being diagonally to the top left
-* SHIFTLOCK also has an LED indicator, and is released by pressing one of the SHIFT keys 
+* SHIFTLOCK also has an LED indicator, and is released by pressing one of the SHIFT keys
 
 **********************************************************************************************/
-   
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
@@ -78,16 +78,16 @@ private:
 	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE16_MEMBER(charram_w);
+	uint8_t get_slave_ack(offs_t offset);
+	void charram_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
-	DECLARE_WRITE8_MEMBER(p7c_w);
+	void dmapg_w(uint8_t data);
+	void p7c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
@@ -141,7 +141,7 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 	}
 }
 
-READ8_MEMBER(peoplepc_state::get_slave_ack)
+uint8_t peoplepc_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -149,7 +149,7 @@ READ8_MEMBER(peoplepc_state::get_slave_ack)
 	return 0x00;
 }
 
-WRITE16_MEMBER(peoplepc_state::charram_w)
+void peoplepc_state::charram_w(offs_t offset, uint16_t data)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
@@ -167,12 +167,12 @@ WRITE_LINE_MEMBER(peoplepc_state::kbd_clock_tick_w)
 	m_8251key->write_rxc(state);
 }
 
-WRITE8_MEMBER(peoplepc_state::dmapg_w)
+void peoplepc_state::dmapg_w(uint8_t data)
 {
 	m_dma0pg = data;
 }
 
-WRITE8_MEMBER(peoplepc_state::p7c_w)
+void peoplepc_state::p7c_w(uint8_t data)
 {
 	m_p7c = data;
 	m_crtc->set_hpixels_per_column(BIT(data, 1) ? 16 : 8);
@@ -189,13 +189,13 @@ WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
-READ8_MEMBER(peoplepc_state::memory_read_byte)
+uint8_t peoplepc_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(peoplepc_state::memory_write_byte)
+void peoplepc_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);

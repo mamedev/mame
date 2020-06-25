@@ -42,7 +42,7 @@ ROM_END
 qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
@@ -176,7 +176,7 @@ void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_
 }
 
 
-WRITE8_MEMBER(qsound_hle_device::qsound_w)
+void qsound_hle_device::qsound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -200,7 +200,7 @@ WRITE8_MEMBER(qsound_hle_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_hle_device::qsound_r)
+uint8_t qsound_hle_device::qsound_r()
 {
 	// ready bit (0x00 = busy, 0x80 == ready)
 	m_stream->update();

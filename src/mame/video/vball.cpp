@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t attr = m_attribram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
 			0);
@@ -56,13 +56,13 @@ void vball_state::video_start()
 	save_item(NAME(m_spprombank));
 }
 
-WRITE8_MEMBER(vball_state::videoram_w)
+void vball_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(vball_state::attrib_w)
+void vball_state::attrib_w(offs_t offset, uint8_t data)
 {
 	m_attribram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

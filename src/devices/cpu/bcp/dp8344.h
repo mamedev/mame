@@ -144,9 +144,9 @@ private:
 	// address spaces
 	const address_space_config m_inst_config;
 	const address_space_config m_data_config;
-	address_space *m_inst_space;
-	address_space *m_data_space;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_inst_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_inst_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_inst_space;
+	memory_access<16, 0,  0, ENDIANNESS_LITTLE>::specific m_data_space;
 
 	// output callbacks
 	devcb_write_line m_birq_out_cb;

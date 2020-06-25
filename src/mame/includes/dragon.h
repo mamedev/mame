@@ -61,6 +61,7 @@ public:
 	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dragon_state(mconfig, type, tag)
 		, m_acia(*this, ACIA_TAG)
+		, m_rombank(*this, "rombank%u", 0U)
 	{
 	}
 
@@ -68,15 +69,20 @@ public:
 	void dragon64(machine_config &config);
 	void tanodr64h(machine_config &config);
 	void dragon64h(machine_config &config);
+	DECLARE_WRITE_LINE_MEMBER( acia_irq );
 protected:
-	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff00_write ) override;
+	void d64_rom0(address_map &map);
+	void d64_rom1(address_map &map);
+	void d64_io0(address_map &map);
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void pia1_pb_changed(uint8_t data) override;
 	void page_rom(bool romswitch);
 
 private:
 	required_device<mos6551_device> m_acia;
+	required_memory_bank_array<2> m_rombank;
 };
 
 
@@ -112,8 +118,8 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(d64plus_6845_disp_r);
-	DECLARE_WRITE8_MEMBER(d64plus_bank_w);
+	uint8_t d64plus_6845_disp_r();
+	void d64plus_bank_w(uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void d64plus(machine_config &config);

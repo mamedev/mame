@@ -576,9 +576,9 @@ void nslasher_state::tattass_map(address_map &map)
 	map(0x150000, 0x150003).w(FUNC(nslasher_state::tattass_control_w)); /* Volume port/Eprom/Priority */
 	map(0x162000, 0x162fff).ram();             /* 'Jack' RAM!? */
 	map(0x163000, 0x16309f).rw(m_deco_ace, FUNC(deco_ace_device::ace_r), FUNC(deco_ace_device::ace_w)).umask32(0x0000ffff); /* 'Ace' RAM */
-	map(0x164000, 0x164003).nopw(); /* Palette control BG2/3 ($1a constant) */
-	map(0x164004, 0x164007).nopw(); /* Palette control Obj1 ($6 constant) */
-	map(0x164008, 0x16400b).nopw(); /* Palette control Obj2 ($5 constant) */
+	map(0x164000, 0x164000).w(FUNC(nslasher_state::tilemap_color_bank_w));
+	map(0x164004, 0x164004).w(FUNC(nslasher_state::sprite1_color_bank_w));
+	map(0x164008, 0x164008).w(FUNC(nslasher_state::sprite2_color_bank_w));
 	map(0x16400c, 0x16400f).nopw();
 	map(0x168000, 0x169fff).rw(m_deco_ace, FUNC(deco_ace_device::buffered_palette_r), FUNC(deco_ace_device::buffered_palette_w));
 	map(0x16c000, 0x16c003).nopw();
@@ -614,9 +614,9 @@ void nslasher_state::nslasher_map(address_map &map)
 	map(0x150000, 0x150000).w(FUNC(nslasher_state::eeprom_w));
 	map(0x150001, 0x150001).w(FUNC(nslasher_state::volume_w));
 	map(0x163000, 0x16309f).rw(m_deco_ace, FUNC(deco_ace_device::ace_r), FUNC(deco_ace_device::ace_w)).umask32(0x0000ffff); /* 'Ace' RAM */
-	map(0x164000, 0x164003).nopw(); /* Palette control BG2/3 ($1a constant) */
-	map(0x164004, 0x164007).nopw(); /* Palette control Obj1 ($4 constant) */
-	map(0x164008, 0x16400b).nopw(); /* Palette control Obj2 ($6 constant) */
+	map(0x164000, 0x164000).w(FUNC(nslasher_state::tilemap_color_bank_w));
+	map(0x164004, 0x164004).w(FUNC(nslasher_state::sprite1_color_bank_w));
+	map(0x164008, 0x164008).w(FUNC(nslasher_state::sprite2_color_bank_w));
 	map(0x16400c, 0x16400f).nopw();
 	map(0x168000, 0x169fff).rw(m_deco_ace, FUNC(deco_ace_device::buffered_palette_r), FUNC(deco_ace_device::buffered_palette_w));
 	map(0x16c000, 0x16c003).nopw();
@@ -874,6 +874,27 @@ DECOSPR_PRIORITY_CB_MEMBER( captaven_state::captaven_pri_callback )
 	}
 }
 
+DECOSPR_PRIORITY_CB_MEMBER( fghthist_state::fghthist_pri_callback )
+{
+	u32 mask = GFX_PMASK_8; // under the text layer
+	if (extpri)
+		mask |= GFX_PMASK_4; // under the uppermost playfield
+
+	return mask;
+}
+
+void captaven_state::tile_callback(u32 &tile, u32 &colour, int layer, bool is_8x8)
+{
+	// Captain America operates this chip in 8bpp mode.
+	// In 8bpp mode you appear to only get 1 layer, not 2, but you also
+	// have an extra 2 tile bits, and 2 less colour bits.
+	if (layer == 0)
+	{
+		tile |= ((colour & 0x3) << 12);
+		colour >>= 2;
+	}
+}
+
 DECO16IC_BANK_CB_MEMBER( captaven_state::bank_callback )
 {
 	return (bank & 0x20) << 9;
@@ -899,6 +920,11 @@ DECO16IC_BANK_CB_MEMBER( dragngun_state::bank_2_callback )
 DECO16IC_BANK_CB_MEMBER( nslasher_state::bank_callback )
 {
 	return (bank & ~0xf) << 8;
+}
+
+u16 nslasher_state::mix_callback(u16 p, u16 p2)
+{
+	return ((p & 0x70f) + (((p & 0x30) | (p2 & 0x0f)) << 4)) & 0x7ff;
 }
 
 
@@ -975,7 +1001,8 @@ void deco32_state::eeprom_w(u8 data)
 	// -6------  eeprom cs
 	// --5-----  eeprom clk
 	// ---4----  eeprom di
-	// ----32--  unknown
+	// ----3---  unknown
+	// -----2--  color fading effect mode (0 = without obj1, 1 = with obj1)
 	// ------1-  bg2/3 joint mode (8bpp) (not used by fghthist?)
 	// -------0  layer priority
 
@@ -983,7 +1010,7 @@ void deco32_state::eeprom_w(u8 data)
 	m_eeprom->di_write(BIT(data, 4));
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
-	pri_w(data & 0x03);
+	pri_w(data & 0x07);
 }
 
 void dragngun_state::eeprom_w(u8 data)
@@ -1123,7 +1150,7 @@ void nslasher_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
-	pri_w(data & 0x3); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+	pri_w(data & 0x7); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp), Bit 2 - color fading effect mode (with/without OBJ1)? */
 
 	/* Sound board reset control */
 	if (BIT(data, 7))
@@ -1815,20 +1842,12 @@ static GFXDECODE_START( gfx_dragngun )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,   0, 32 ) /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_tattass )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 128 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 1536,  16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  1024+256,  32 ) /* Sprites 16x16 */
-GFXDECODE_END
-
 static GFXDECODE_START( gfx_nslasher )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 128 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 1024,  16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,      1536,  32 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x800, 128 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 128 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 0,  16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,      0,  16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 
@@ -1865,8 +1884,6 @@ void captaven_state::captaven(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -1878,12 +1895,11 @@ void captaven_state::captaven(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);    // pf3 is in 8bpp mode, pf4 is not used
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0xff);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x00);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x10);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x03);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x00);
+	m_deco_tilegen[1]->set_tile_callback(FUNC(captaven_state::tile_callback));
 	m_deco_tilegen[1]->set_bank1_callback(FUNC(captaven_state::bank_callback));
 	// no bank2 callback
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
@@ -1944,8 +1960,6 @@ void fghthist_state::fghthist(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -1959,8 +1973,6 @@ void fghthist_state::fghthist(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
@@ -1973,6 +1985,7 @@ void fghthist_state::fghthist(machine_config &config)
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_pri_callback(FUNC(fghthist_state::fghthist_pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
@@ -2067,8 +2080,6 @@ void dragngun_state::dragngun(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -2082,8 +2093,6 @@ void dragngun_state::dragngun(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0xff);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0xff);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x04);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x03);
@@ -2193,8 +2202,6 @@ void dragngun_state::lockload(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -2208,8 +2215,6 @@ void dragngun_state::lockload(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
-	m_deco_tilegen[1]->set_pf1_trans_mask(0xff);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0xff);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x04);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x03);
@@ -2264,15 +2269,13 @@ void nslasher_state::tattass(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
-	m_screen->set_screen_update(FUNC(nslasher_state::screen_update));
+	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_tattass));
 
 	DECO_ACE(config, m_deco_ace, 0);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -2286,14 +2289,13 @@ void nslasher_state::tattass(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
 	m_deco_tilegen[1]->set_bank1_callback(FUNC(nslasher_state::bank_callback));
 	m_deco_tilegen[1]->set_bank2_callback(FUNC(nslasher_state::bank_callback));
+	m_deco_tilegen[1]->set_mix_callback(FUNC(nslasher_state::mix_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -2306,7 +2308,7 @@ void nslasher_state::tattass(machine_config &config)
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_tattass);
+	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_nslasher);
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");
@@ -2338,15 +2340,13 @@ void nslasher_state::nslasher(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248);
-	m_screen->set_screen_update(FUNC(nslasher_state::screen_update));
+	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_nslasher));
 
 	DECO_ACE(config, m_deco_ace, 0);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -2360,14 +2360,13 @@ void nslasher_state::nslasher(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
 	m_deco_tilegen[1]->set_bank1_callback(FUNC(nslasher_state::bank_callback));
 	m_deco_tilegen[1]->set_bank2_callback(FUNC(nslasher_state::bank_callback));
+	m_deco_tilegen[1]->set_mix_callback(FUNC(nslasher_state::mix_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);

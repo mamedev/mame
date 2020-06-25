@@ -76,11 +76,11 @@ protected:
 
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(nascom1_port_00_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_00_w);
-	DECLARE_READ8_MEMBER(nascom1_port_01_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
-	DECLARE_READ8_MEMBER(nascom1_port_02_r);
+	uint8_t nascom1_port_00_r();
+	void nascom1_port_00_w(uint8_t data);
+	uint8_t nascom1_port_01_r();
+	void nascom1_port_01_w(uint8_t data);
+	uint8_t nascom1_port_02_r();
 	DECLARE_READ_LINE_MEMBER(hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(hd6402_so);
 
@@ -175,12 +175,12 @@ private:
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( nascom_state::nascom1_port_00_r )
+uint8_t nascom_state::nascom1_port_00_r()
 {
 	return m_keyboard[m_kb_select]->read() | ~0x7f;
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
+void nascom_state::nascom1_port_00_w(uint8_t data)
 {
 	u8 bits = data ^ m_port00;
 
@@ -203,17 +203,17 @@ WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 //  CASSETTE
 //**************************************************************************
 
-READ8_MEMBER( nascom_state::nascom1_port_01_r )
+uint8_t nascom_state::nascom1_port_01_r()
 {
-	return m_hd6402->get_received_data();
+	return m_hd6402->receive();
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
+void nascom_state::nascom1_port_01_w(uint8_t data)
 {
-	m_hd6402->set_transmit_data(data);
+	m_hd6402->transmit(data);
 }
 
-READ8_MEMBER( nascom_state::nascom1_port_02_r )
+uint8_t nascom_state::nascom1_port_02_r()
 {
 	uint8_t data = 0x31; // bits 0,4,5 not used
 

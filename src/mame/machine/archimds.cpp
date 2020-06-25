@@ -260,7 +260,7 @@ void archimedes_state::archimedes_init()
 	m_timer[3]->adjust(attotime::never);
 }
 
-READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
+uint32_t archimedes_state::archimedes_memc_logical_r(offs_t offset)
 {
 	uint32_t page, poffs;
 
@@ -298,7 +298,7 @@ READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 
 
 
-WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
+void archimedes_state::archimedes_memc_logical_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t page, poffs;
 
@@ -327,7 +327,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
 }
 
 /* Aristocrat Mark 5 - same as normal AA except with Dram emulator */
-READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
+uint32_t archimedes_state::aristmk5_drame_memc_logical_r(offs_t offset)
 {
 	uint32_t page, poffs;
 
@@ -448,7 +448,7 @@ bool archimedes_state::check_floppy_ready()
 }
 
 /* TODO: should be a 8-bit handler */
-READ32_MEMBER( archimedes_state::ioc_ctrl_r )
+uint32_t archimedes_state::ioc_ctrl_r(offs_t offset)
 {
 	if(IOC_LOG)
 		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
@@ -471,7 +471,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		}
 
 		case KART:  // keyboard read
-			return m_kart->read(space,0);
+			return m_kart->read();
 
 		case IRQ_STATUS_A:
 			return (m_ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
@@ -521,7 +521,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 }
 
 /* TODO: should be a 8-bit handler */
-WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
+void archimedes_state::ioc_ctrl_w(offs_t offset, uint32_t data)
 {
 	if(IOC_LOG)
 	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], m_maincpu->pc());
@@ -552,7 +552,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			break;
 
 		case KART:
-			m_kart->write(space,0,data);
+			m_kart->write(data);
 			break;
 
 		case IRQ_MASK_A:
@@ -651,7 +651,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 	}
 }
 
-READ32_MEMBER(archimedes_state::archimedes_ioc_r)
+uint32_t archimedes_state::archimedes_ioc_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -668,7 +668,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 		{
 			switch((ioc_addr & 0x70000) >> 16)
 			{
-				case 0: return ioc_ctrl_r(space,offset,mem_mask);
+				case 0: return ioc_ctrl_r(offset);
 				case 1:
 					if (m_fdc)
 					{
@@ -732,7 +732,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
+void archimedes_state::archimedes_ioc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -749,7 +749,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 		{
 			switch((ioc_addr & 0x70000) >> 16)
 			{
-				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
+				case 0: ioc_ctrl_w(offset,data); return;
 				case 1:
 						if (m_fdc)
 						{
@@ -811,10 +811,10 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 							case 0x18: // latch B
 								/*
 								---- x--- floppy controller reset
+								---x ---- printer strobe
 								*/
 								m_fdc->dden_w(BIT(data, 1));
-								if (!(data & 8))
-									m_fdc->soft_reset();
+								m_fdc->mr_w(BIT(data, 3));
 								if(data & ~0xa)
 									printf("%02x Latch B\n",data);
 								return;
@@ -852,7 +852,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", m_maincpu->pc(), data, (offset*4)+0x3000000, mem_mask);
 }
 
-WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
+void archimedes_state::archimedes_memc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// is it a register?
 	if ((data & 0x0fe00000) == 0x03600000)
@@ -970,7 +970,7 @@ The physical page is encoded differently depending on the page size :
             1 being bit 6
 */
 
-WRITE32_MEMBER(archimedes_state::archimedes_memc_page_w)
+void archimedes_state::archimedes_memc_page_w(uint32_t data)
 {
 	uint32_t log, phys, memc;
 

@@ -187,12 +187,11 @@ private:
 	uint32_t    m_maxbank;
 	uint32_t    m_FlashCmd;
 
-	IRQ_CALLBACK_MEMBER(icallback);
-	DECLARE_READ32_MEMBER(system_input_r);
-	DECLARE_WRITE32_MEMBER(Banksw_w);
-	DECLARE_READ32_MEMBER(FlashCmd_r);
-	DECLARE_WRITE32_MEMBER(FlashCmd_w);
-	DECLARE_WRITE32_MEMBER(coin_counters_w);
+	uint32_t system_input_r();
+	void Banksw_w(uint32_t data);
+	uint32_t FlashCmd_r();
+	void FlashCmd_w(uint32_t data);
+	void coin_counters_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -200,35 +199,31 @@ private:
 	void crystal_mem(address_map &map);
 
 	// PIO
-	DECLARE_READ32_MEMBER(PIOldat_r);
-	DECLARE_WRITE32_MEMBER(PIOldat_w);
-	DECLARE_READ32_MEMBER(PIOedat_r);
+	uint32_t PIOldat_r();
+	void PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t PIOedat_r();
 	uint32_t m_PIO;
 };
 
-IRQ_CALLBACK_MEMBER(crystal_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
-READ32_MEMBER(crystal_state::system_input_r)
+uint32_t crystal_state::system_input_r()
 {
 	return ( ioport("SYSTEM")->read() << 16) | (ioport("DSW")->read()) | 0xff00ff00;
 }
 
-WRITE32_MEMBER(crystal_state::Banksw_w)
+void crystal_state::Banksw_w(uint32_t data)
 {
 	m_Bank = (data >> 1) & 7;
 	m_mainbank->set_entry(m_Bank);
 }
 
-READ32_MEMBER(crystal_state::PIOldat_r)
+uint32_t crystal_state::PIOldat_r()
 {
 	return m_PIO;
 }
 
 // PIO Latched output DATa Register
-WRITE32_MEMBER(crystal_state::PIOldat_w)
+void crystal_state::PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t RST = data & 0x01000000;
 	uint32_t CLK = data & 0x02000000;
@@ -242,12 +237,12 @@ WRITE32_MEMBER(crystal_state::PIOldat_w)
 }
 
 // PIO External DATa Register
-READ32_MEMBER(crystal_state::PIOedat_r)
+uint32_t crystal_state::PIOedat_r()
 {
 	return m_ds1302->io_r() << 28;
 }
 
-READ32_MEMBER(crystal_state::FlashCmd_r)
+uint32_t crystal_state::FlashCmd_r()
 {
 	if ((m_FlashCmd & 0xff) == 0xff)
 	{
@@ -269,12 +264,12 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(crystal_state::FlashCmd_w)
+void crystal_state::FlashCmd_w(uint32_t data)
 {
 	m_FlashCmd = data;
 }
 
-WRITE32_MEMBER(crystal_state::coin_counters_w)
+void crystal_state::coin_counters_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -455,28 +450,28 @@ static INPUT_PORTS_START( crystal )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Pause ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Pause ) )       PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Free_Play ) )   PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )        PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -553,7 +548,7 @@ void crystal_state::crystal(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crystal_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(crystal_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

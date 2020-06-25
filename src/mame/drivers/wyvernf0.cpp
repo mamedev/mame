@@ -84,8 +84,8 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
+	void bgram_w(offs_t offset, uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -95,14 +95,14 @@ private:
 	uint8_t       m_rombank;
 	uint8_t       m_rambank;
 
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	void rambank_w(uint8_t data);
+	void rombank_w(uint8_t data);
+	void sound_command_w(uint8_t data);
+	void nmi_disable_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
-	DECLARE_READ8_MEMBER(mcu_status_r);
+	uint8_t mcu_status_r();
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -132,13 +132,13 @@ private:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wyvernf0_state::bgram_w)
+void wyvernf0_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(wyvernf0_state::fgram_w)
+void wyvernf0_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
@@ -150,7 +150,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
 	int code = m_bgram[offs] + (m_bgram[offs+1] << 8);
 	int color = 0 + ((code & 0x3000) >> 12);
 
-	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
+	tileinfo.set(1, code, color, TILE_FLIPXY(code >> 14));
 }
 TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 {
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	int code = m_fgram[offs] + (m_fgram[offs+1] << 8);
 	int color = 8 + ((code & 0x3000) >> 12);
 
-	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
+	tileinfo.set(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
 void wyvernf0_state::video_start()
@@ -299,7 +299,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 ***************************************************************************/
 
-READ8_MEMBER(wyvernf0_state::mcu_status_r)
+uint8_t wyvernf0_state::mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -316,7 +316,7 @@ READ8_MEMBER(wyvernf0_state::mcu_status_r)
 ***************************************************************************/
 
 // D100
-WRITE8_MEMBER(wyvernf0_state::rambank_w)
+void wyvernf0_state::rambank_w(uint8_t data)
 {
 	// bit 0 Flip X/Y
 	// bit 1 Flip X/Y
@@ -337,7 +337,7 @@ WRITE8_MEMBER(wyvernf0_state::rambank_w)
 }
 
 // D200
-WRITE8_MEMBER(wyvernf0_state::rombank_w)
+void wyvernf0_state::rombank_w(uint8_t data)
 {
 	// bit 0-2 ROM bank
 	m_rombank = data;
@@ -355,18 +355,18 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(wyvernf0_state::sound_command_w)
+void wyvernf0_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(wyvernf0_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(wyvernf0_state::nmi_disable_w)
+void wyvernf0_state::nmi_disable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(wyvernf0_state::nmi_enable_w)
+void wyvernf0_state::nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)

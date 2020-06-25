@@ -18,8 +18,8 @@ class taito68705_mcu_device_base : public device_t
 {
 public:
 	// host interface
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	u8 data_r();
+	void data_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_READ_LINE_MEMBER(host_semaphore_r) { return m_host_flag ? 1 : 0; }
 	DECLARE_READ_LINE_MEMBER(mcu_semaphore_r) { return m_mcu_flag ? 1 : 0; }
@@ -35,7 +35,7 @@ protected:
 	auto semaphore_cb() { return m_semaphore_cb.bind(); }
 
 	// MCU callbacks
-	DECLARE_WRITE8_MEMBER(mcu_pa_w);
+	void mcu_pa_w(u8 data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -70,8 +70,8 @@ public:
 protected:
 	taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual DECLARE_READ8_MEMBER(mcu_portc_r);
-	DECLARE_WRITE8_MEMBER(mcu_portb_w);
+	virtual u8 mcu_portc_r();
+	void mcu_portb_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -88,7 +88,7 @@ public:
 	taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual DECLARE_READ8_MEMBER(mcu_portc_r) override;
+	virtual u8 mcu_portc_r() override;
 };
 
 
@@ -107,9 +107,9 @@ protected:
 			u32 clock);
 
 	// MCU callbacks
-	DECLARE_READ8_MEMBER(mcu_pb_r);
-	DECLARE_READ8_MEMBER(mcu_pc_r);
-	DECLARE_WRITE8_MEMBER(mcu_pc_w);
+	u8 mcu_pb_r();
+	u8 mcu_pc_r();
+	void mcu_pc_w(u8 data);
 
 	virtual void device_start() override;
 

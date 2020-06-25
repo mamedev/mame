@@ -8,43 +8,54 @@ Hegener + Glaser Mephisto chesscomputers with plugin modules
 After Roma, H+G started naming the different versions 16 Bit/32 Bit instead of 68000/68020.
 With Genius and the TM versions, they still applied "68030".
 
-Almeria 16 Bit 12MHz
-Almeria 32 Bit 12MHz
-Portorose 16 Bit 12MHz
-Portorose 32 Bit 12MHz
-Lyon 16 Bit 12MHz
-Lyon 32 Bit 12MHz
-Vancouver 16 Bit 12MHz
-Vancouver 32 Bit 12MHz
-Genius 68030 33.3330MHz
-
 The London program (1994 competition) is not a dedicated module, but an EPROM upgrade
 released by Richard Lang for Almeria, Lyon, Portorose and Vancouver modules, and also
-available as upgrades for Berlin/Berlin Pro and Genius.
-No Mephisto modules were released anymore after Saitek took over H+G, engine is the
-same as Saitek's 1996 Mephisto London 68030 (limited release TM version).
+available as upgrades for Berlin/Berlin Pro and Genius. The engine is the same as
+Saitek's 1996 Mephisto London 68030 (limited release TM version).
+
+Hardware notes:
+
+Almeria 16 Bit, Lyon 16 Bit:
+- MC68HC000FN12, 12.288MHz XTAL
+- 128KB ROM (2*27C512)
+- 512KB RAM (4*TC514256AP-10, or equivalent)
+
+Portorose 32 Bit:
+- MC68020RC12E, 12.288MHz XTAL
+- 128KB ROM (TC5710000-20)
+- 1MB RAM (8*TC514256AP-70)
+
+Genius 68030:
+- M68EC030RP40B, 33.3330MHz XTAL, 6.144MHz XTAL
+- 256KB ROM (M27C2001)
+- 512+256 KB RAM (TC518512PL-10, 8*TC55465P-20)
+
+Display Modul:
+- HD44780, 2-line LCD display
+- 8KB RAM (TC5565APL-15L), battery
+- piezo speaker
 
 For the dedicated tournament machines, see mephisto_modular_tm.cpp
-
-TODO:
-- match I/S= diag speed test with real hardware (good test for proper waitstates),
-  especially gen32 is way too fast when comparing sound pitch
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding CLEAR on boot will clear the battery backed RAM
 
+TODO:
+- match I/S= diag speed test with real hardware (good test for proper waitstates),
+  especially gen32 is way too fast when comparing sound pitch
+
 ===============================================================================
 
 Bavaria piece recognition board:
--------------------------------------------------
+ _______________________________________________
 |                                               |
 | 74HC21                      74HC74    74HC238 |
 | 74HC4040   74HC574          74HC173   74HC374 |
 | ROM                  XTAL   74HC368   74HC374 |
 | 74HC4024   74HC32           74HC139   74HC374 |
-|                                               |
--------------------------------------------------
+|_______________________________________________|
+
 XTAL = 7.37280MHz
 ROM = TC57256AD-12, sine table (not used in MAME)
 
@@ -131,9 +142,9 @@ private:
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bavaria_w);
-	DECLARE_READ8_MEMBER(bavaria1_r);
-	DECLARE_READ8_MEMBER(bavaria2_r);
+	void bavaria_w(u8 data);
+	u8 bavaria1_r();
+	u8 bavaria2_r();
 
 	u8 spawn_cb(offs_t offset);
 	void set_sbtype(ioport_value newval);
@@ -177,7 +188,7 @@ u8 mmodular_state::spawn_cb(offs_t offset)
 	return (!m_board->get()->is_inductive() && offset > 12) ? 0 : offset;
 }
 
-WRITE8_MEMBER(mmodular_state::bavaria_w)
+void mmodular_state::bavaria_w(u8 data)
 {
 	if (!m_board->get()->is_inductive())
 		return;
@@ -191,7 +202,7 @@ WRITE8_MEMBER(mmodular_state::bavaria_w)
 	m_bav_data = data;
 }
 
-READ8_MEMBER(mmodular_state::bavaria1_r)
+u8 mmodular_state::bavaria1_r()
 {
 	if (!m_board->get()->is_inductive())
 		return 0;
@@ -207,7 +218,7 @@ READ8_MEMBER(mmodular_state::bavaria1_r)
 	return piece_id[m_board->get()->read_sensor(x, y) & 0xf];
 }
 
-READ8_MEMBER(mmodular_state::bavaria2_r)
+u8 mmodular_state::bavaria2_r()
 {
 	if (!m_board->get()->is_inductive())
 		return 0;
@@ -391,7 +402,7 @@ INPUT_PORTS_END
 void mmodular_state::alm16(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
 
@@ -399,8 +410,9 @@ void mmodular_state::alm16(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmodular_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
-	m_board->subdevice<sensorboard_device>("board")->set_spawnpoints(12+2); // 2 jokers
-	m_board->subdevice<sensorboard_device>("board")->spawn_cb().set(FUNC(mmodular_state::spawn_cb));
+	subdevice<sensorboard_device>("board:board")->set_spawnpoints(12+2); // 2 jokers
+	subdevice<sensorboard_device>("board:board")->spawn_cb().set(FUNC(mmodular_state::spawn_cb));
+	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
 
 	TIMER(config, "bav_busy").configure_generic(nullptr);
 
@@ -426,9 +438,11 @@ void mmodular_state::alm32(machine_config &config)
 	alm16(config);
 
 	/* basic machine hardware */
-	M68020(config.replace(), m_maincpu, 12_MHz_XTAL);
+	M68020(config.replace(), m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm32_mem);
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(750));
+
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000); // 750Hz
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
 	config.set_default_layout(layout_mephisto_alm32);
 }
@@ -450,7 +464,7 @@ void mmodular_state::gen32(machine_config &config)
 	van32(config);
 
 	/* basic machine hardware */
-	M68EC030(config.replace(), m_maincpu, 33.333_MHz_XTAL); // M68EC030RP40B
+	M68EC030(config.replace(), m_maincpu, 33.333_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::gen32_mem);
 
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
@@ -466,6 +480,11 @@ void mmodular_state::gen32(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
+// sinus table lookup ROM for Mephisto Bavaria chessboard (unused on MAME)
+#define BAVARIA_BOARD_ROM() \
+	ROM_REGION( 0x8000, "bavaria", 0 ) \
+	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+
 ROM_START( alm32 ) // U012 D21A 2FCE
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("alm32.bin", 0x00000, 0x20000, CRC(38f4b305) SHA1(43459a057ff29248c74d656a036ac325202b9c15) )
@@ -473,24 +492,29 @@ ROM_END
 
 ROM_START( alm16 ) // U013 65CE 2FCE
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) )
-	ROM_LOAD16_BYTE("alm16odd.bin", 0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
+	ROM_LOAD16_BYTE("almeria_16bit_v013_even", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) )
+	ROM_LOAD16_BYTE("almeria_16bit_v013_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
 ROM_END
 
-ROM_START( port32 ) // V103 C734 1CD7
+ROM_START( port32 ) // V104 3F63 1CD7
+	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD("portorose_32bit_v104", 0x00000, 0x20000, CRC(66a6c84c) SHA1(b71035f91a452901e1765e351fb36c3f18888e42) )
+
+	BAVARIA_BOARD_ROM()
+ROM_END
+
+ROM_START( port32a ) // V103 C734 1CD7
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("portorose_32bit_v103", 0x00000, 0x20000, CRC(02c091b3) SHA1(f1d48e73b24093288dbb8a06617bb62420c07508) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD( "sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
-ROM_START( port32a ) // V101 7805 1CD7
+ROM_START( port32b ) // V101 7805 1CD7
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("portorose_32bit_v101", 0x00000, 0x20000, CRC(405bd668) SHA1(8c6eacff7f6784fa1d38344d594c7e52ac828a23) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( port16 ) // V101 630D 1CD7
@@ -498,74 +522,65 @@ ROM_START( port16 ) // V101 630D 1CD7
 	ROM_LOAD16_BYTE("port16ev.bin", 0x00000, 0x10000, CRC(68e4a37d) SHA1(33e7216db664174a8448e455bba97738a29c0f31) )
 	ROM_LOAD16_BYTE("port16od.bin", 0x00001, 0x10000, CRC(cae77a05) SHA1(9a0ca8bb37325698f8d208f64a340690b9a933b5) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lyon32 ) // V207 AE64 5805
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("lyon32.bin", 0x00000, 0x20000, CRC(5c128b06) SHA1(954c8f0d3fae29900cb1e9c14a41a9a07a8e185f) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lyon16 ) // V207 EC82 5805
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
-	ROM_LOAD16_BYTE("lyon16od.bin", 0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
+	ROM_LOAD16_BYTE("lyon_16bit_even_v207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
+	ROM_LOAD16_BYTE("lyon_16bit_odd_v207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( van32 ) // V309 3FD3 18D3
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("vanc32.bin", 0x00000, 0x40000, CRC(f872beb5) SHA1(9919f207264f74e2b634b723b048ae9ca2cefbc7) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( van16 ) // V309 C8F3 18D3
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("va16even.bin", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
-	ROM_LOAD16_BYTE("va16odd.bin",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
+	ROM_LOAD16_BYTE("vancouver_16_even_v309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
+	ROM_LOAD16_BYTE("vancouver_16_odd_v309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( gen32 ) // V401 D1BB 5A88
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("genius_68030_version_4.01", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( gen32a ) // V400 3B95 5A88
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("gen32_4.bin",  0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( gen32l ) // V500 EDC1 B0D1
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("gen32l.bin", 0x00000, 0x40000, CRC(853baa4e) SHA1(946951081d4e91e5bdd9e93d0769568a7fe79bad) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lond32 ) // V500 DF8B B0D1
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("london_program_68020_module", 0x00000, 0x40000, CRC(3225b8da) SHA1(fd8f6f4e9c03b6cdc86d8405e856c26041bfad12) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 ROM_START( lond16 ) // V500 5ED1 B0D1
@@ -573,8 +588,7 @@ ROM_START( lond16 ) // V500 5ED1 B0D1
 	ROM_LOAD16_BYTE("london_program_68000_module_even", 0x00000, 0x20000, CRC(68cfc2de) SHA1(93b551180f01f8ed6991c082795cd9ead922179a) )
 	ROM_LOAD16_BYTE("london_program_68000_module_odd",  0x00001, 0x20000, CRC(2d75e2cf) SHA1(2ec9222c95f4be9667fb3b4be1b6f90fd4ad11c4) )
 
-	ROM_REGION( 0x8000, "bavaria", 0 )
-	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
+	BAVARIA_BOARD_ROM()
 ROM_END
 
 } // anonymous namespace
@@ -589,8 +603,9 @@ ROM_END
 CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

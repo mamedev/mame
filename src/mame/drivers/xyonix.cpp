@@ -71,11 +71,11 @@ private:
 	bool m_nmi_mask;
 
 	DECLARE_WRITE_LINE_MEMBER(nmiclk_w);
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_WRITE8_MEMBER(nmiack_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(vidram_w);
+	void irqack_w(uint8_t data);
+	void nmiack_w(uint8_t data);
+	uint8_t io_r();
+	void io_w(uint8_t data);
+	void vidram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void xyonix_palette(palette_device &palette) const;
@@ -102,7 +102,7 @@ void xyonix_state::machine_reset()
 	m_nmi_mask = false;
 }
 
-WRITE8_MEMBER(xyonix_state::irqack_w)
+void xyonix_state::irqack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(xyonix_state::nmiclk_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(xyonix_state::nmiack_w)
+void xyonix_state::nmiack_w(uint8_t data)
 {
 	m_nmi_mask = BIT(data, 0);
 	if (!m_nmi_mask)
@@ -157,10 +157,10 @@ TILE_GET_INFO_MEMBER(xyonix_state::get_tile_info)
 
 	tileno = (m_vidram[tile_index+1] << 0) | ((attr & 0x0f) << 8);
 
-	SET_TILE_INFO_MEMBER(0,tileno,attr >> 4,0);
+	tileinfo.set(0,tileno,attr >> 4,0);
 }
 
-WRITE8_MEMBER(xyonix_state::vidram_w)
+void xyonix_state::vidram_w(offs_t offset, uint8_t data)
 {
 	m_vidram[offset] = data;
 	m_tilemap->mark_tile_dirty((offset-1)&0x0fff);
@@ -246,7 +246,7 @@ void xyonix_state::handle_coins(int coin)
 }
 
 
-READ8_MEMBER(xyonix_state::io_r)
+uint8_t xyonix_state::io_r()
 {
 	int regPC = m_maincpu->pc();
 
@@ -297,7 +297,7 @@ READ8_MEMBER(xyonix_state::io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(xyonix_state::io_w)
+void xyonix_state::io_w(uint8_t data)
 {
 	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, m_maincpu->pc());
 	m_e0_data = data;

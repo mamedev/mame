@@ -136,25 +136,25 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(looping_videoram_w);
-	DECLARE_WRITE8_MEMBER(looping_colorram_w);
+	void looping_videoram_w(offs_t offset, uint8_t data);
+	void looping_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(level2_irq_set);
 	DECLARE_WRITE_LINE_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
 	DECLARE_WRITE_LINE_MEMBER(looping_souint_clr);
-	DECLARE_WRITE8_MEMBER(looping_soundlatch_w);
+	void looping_soundlatch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ballon_enable_w);
-	DECLARE_WRITE8_MEMBER(out_0_w);
-	DECLARE_WRITE8_MEMBER(out_2_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
+	void out_0_w(uint8_t data);
+	void out_2_w(uint8_t data);
+	uint8_t adc_r();
+	void adc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(plr2_w);
-	DECLARE_READ8_MEMBER(cop_unk_r);
+	uint8_t cop_unk_r();
 	DECLARE_READ_LINE_MEMBER(cop_serial_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(protection_r);
+	void cop_l_w(uint8_t data);
+	uint8_t protection_r();
 	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
-	DECLARE_WRITE8_MEMBER(looping_sound_sw);
+	void looping_sound_sw(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -246,7 +246,7 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
-	SET_TILE_INFO_MEMBER(0, tile_number, color, 0);
+	tileinfo.set(0, tile_number, color, 0);
 }
 
 
@@ -279,17 +279,15 @@ WRITE_LINE_MEMBER(looping_state::flip_screen_y_w)
 }
 
 
-WRITE8_MEMBER(looping_state::looping_videoram_w)
+void looping_state::looping_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(looping_state::looping_colorram_w)
+void looping_state::looping_colorram_w(offs_t offset, uint8_t data)
 {
-	int i;
-
 	m_colorram[offset] = data;
 
 	/* odd bytes are column color attribute */
@@ -297,7 +295,7 @@ WRITE8_MEMBER(looping_state::looping_colorram_w)
 	{
 		/* mark the whole column dirty */
 		offs_t offs = (offset/2);
-		for (i = 0; i < 0x20; i++)
+		for (int i = 0; i < 0x20; i++)
 			m_bg_tilemap->mark_tile_dirty(i * 0x20 + offs);
 	}
 
@@ -418,7 +416,7 @@ WRITE_LINE_MEMBER(looping_state::looping_spcint)
 }
 
 
-WRITE8_MEMBER(looping_state::looping_soundlatch_w)
+void looping_state::looping_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
@@ -430,7 +428,7 @@ WRITE8_MEMBER(looping_state::looping_soundlatch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::looping_sound_sw)
+void looping_state::looping_sound_sw(uint8_t data)
 {
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
@@ -480,11 +478,11 @@ WRITE_LINE_MEMBER(looping_state::ballon_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::out_0_w){ osd_printf_debug("out0 = %02X\n", data); }
-WRITE8_MEMBER(looping_state::out_2_w){ osd_printf_debug("out2 = %02X\n", data); }
+void looping_state::out_0_w(uint8_t data) { osd_printf_debug("out0 = %02X\n", data); }
+void looping_state::out_2_w(uint8_t data) { osd_printf_debug("out2 = %02X\n", data); }
 
-READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", m_maincpu->pc()); return 0xff; }
-WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", m_maincpu->pc(), data); }
+uint8_t looping_state::adc_r() { osd_printf_debug("%04X:ADC read\n", m_maincpu->pc()); return 0xff; }
+void looping_state::adc_w(uint8_t data) { osd_printf_debug("%04X:ADC write = %02X\n", m_maincpu->pc(), data); }
 
 WRITE_LINE_MEMBER(looping_state::plr2_w)
 {
@@ -500,7 +498,7 @@ WRITE_LINE_MEMBER(looping_state::plr2_w)
  *
  *************************************/
 
-READ8_MEMBER(looping_state::cop_unk_r)
+uint8_t looping_state::cop_unk_r()
 {
 	return 1;
 }
@@ -510,13 +508,13 @@ READ_LINE_MEMBER(looping_state::cop_serial_r)
 	return 1;
 }
 
-WRITE8_MEMBER(looping_state::cop_l_w)
+void looping_state::cop_l_w(uint8_t data)
 {
 	m_cop_port_l = data;
 	logerror("%02x  ",data);
 }
 
-READ8_MEMBER(looping_state::protection_r)
+uint8_t looping_state::protection_r()
 {
 //        The code reads ($7002) ($7004) alternately
 //        The result must change at least once every 10 reads
@@ -533,7 +531,7 @@ READ8_MEMBER(looping_state::protection_r)
 //        it is trivial to bypass the protection.
 
 //        cop write alternately $02 $01 $08 $04 in port $102
-//        cop write randomly fc (unfortunatly) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
+//        cop write randomly fc (unfortunately) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
 	// missing something
 	if(m_cop_port_l != 0xfc) return m_cop_port_l;
@@ -933,7 +931,7 @@ void looping_state::init_looping()
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(*this, FUNC(looping_state::protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8smo_delegate(*this, FUNC(looping_state::protection_r)));
 }
 
 

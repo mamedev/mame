@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="sega_beena_cart" description="Sega Beena Cartridges">
 	<!-- you must byteswap ROMs to see text, due to endian? -->
 
@@ -9,7 +12,7 @@
 		<publisher>Sega Toys</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100008-1000 - Shoku Iku Series 1 Soreike! Anpanman-Sukikirai Nai Ko Genki na Ko!.bin" size="0x00800000" crc="e7d8333d" sha1="7488dddf64cb0c93b17235db93cf6a1bd5c05c0f" />
+				<rom loadflag="load16_word_swap" name="S-100008-1000 - Shoku Iku Series 1 Soreike Anpanman-Sukikirai Nai Ko Genki na Ko.bin" size="0x00800000" crc="e7d8333d" sha1="7488dddf64cb0c93b17235db93cf6a1bd5c05c0f" />
 			</dataarea>
 			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x01d4aed0" crc="b023d113" sha1="6ac75a2710a140d39276d620638b596735290938"  />
@@ -59,7 +62,7 @@
 		<publisher>Sega Toys</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100002-1200 - Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana - Gojuuon Board Kinou-tsuki.bin" size="0x00800000" crc="b6e038c9" sha1="b12bd91e8ead04f558d32ce9086102a3c99f13eb" />
+				<rom loadflag="load16_word_swap" name="S-100002-1200 - Soreike Anpanman Hajimete Kaketa yo Oboeta yo Hiragana Katakana - Gojuuon Board Kinou-tsuki.bin" size="0x00800000" crc="b6e038c9" sha1="b12bd91e8ead04f558d32ce9086102a3c99f13eb" />
 			</dataarea>
 			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x01b8b6ae" crc="e4c3a37a" sha1="de492d61bf91bee346734f62a6db257a6ce74f1c" />
@@ -155,7 +158,7 @@
 		<publisher>Sega Toys</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes! Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
+				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
 			</dataarea>
 			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
@@ -180,9 +183,9 @@
 		<publisher>Sega Toys</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monsters Diamond and Pearl Pokemon o Sagase! Meiro de Daibouken!.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7" />
+				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monsters Diamond and Pearl Pokemon o Sagase Meiro de Daibouken.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7" />
 			</dataarea>
-			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x0204f417" crc="088c3d4c" sha1="d66a27f30374568998cff2ed89e494ac7f449687" />
 				<rom name="0 - 0002.png" size="0x020d5ff7" crc="3f992374" sha1="b5dd1f438afc18ac6ca78aa2757129bb1f53b54e" />
 				<rom name="0 - 0003.png" size="0x020912fe" crc="b064c6ea" sha1="a4107dbcdc40713a651da52653b9e639b2d9addc" />
@@ -205,9 +208,9 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="T-110008-1101 - Yes! PreCure 5 Asonde Oboeyou Hiragana!.bin" size="0x00800000" crc="6ae77335" sha1="29650349b117b96105882da7b12cac8fe9a04813" />
+				<rom loadflag="load16_word_swap" name="T-110008-1101 - Yes PreCure 5 Asonde Oboeyou Hiragana.bin" size="0x00800000" crc="6ae77335" sha1="29650349b117b96105882da7b12cac8fe9a04813" />
 			</dataarea>
-			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x01fd2372" crc="9290ac04" sha1="d106071e01ee790d85d46a2378ce5f638331b67a"  />
 				<rom name="0 - 0002.png" size="0x0200a259" crc="d919d19b" sha1="20444680d29b6a66471cbdb77537ba054753b9d6"  />
 				<rom name="0 - 0003.png" size="0x01fd80c8" crc="97c2ba5e" sha1="128b226187bfc53e4b1abf7be04c068a61c88240"  />
@@ -230,7 +233,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="T-110015-1000 - Oshare ni Henshin HeartCatch PreCure! (Japan).bin" size="0x00800000" crc="e2575324" sha1="500ad94f4dda4b886ff1991ddc4a730d94b37cd6" />
+				<rom loadflag="load16_word_swap" name="T-110015-1000 - Oshare ni Henshin HeartCatch PreCure (Japan).bin" size="0x00800000" crc="e2575324" sha1="500ad94f4dda4b886ff1991ddc4a730d94b37cd6" />
 			</dataarea>
 			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x01e37d48" crc="579e4159" sha1="75fd0eaa077c12507c78711ce099a76878eb532d" />
@@ -255,7 +258,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="T-110012-1000 - Samurai Sentai Shinkenger Battle ga Ippai! Iza Mairu!.bin" size="0x00800000" crc="41ed4615" sha1="f0106c4a79f9aff9815318eadc272c7c62a50ec2" />
+				<rom loadflag="load16_word_swap" name="T-110012-1000 - Samurai Sentai Shinkenger Battle ga Ippai Iza Mairu.bin" size="0x00800000" crc="41ed4615" sha1="f0106c4a79f9aff9815318eadc272c7c62a50ec2" />
 			</dataarea>
 			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x019ac721" crc="2d276d8a" sha1="ff068e3823c692a21c2134b6a34aa4835d6d8ac1" />

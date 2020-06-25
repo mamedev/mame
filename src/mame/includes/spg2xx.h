@@ -39,34 +39,36 @@ public:
 	void rad_sktv(machine_config &config);
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
-	void abltenni(machine_config &config);
+	void spg2xx(machine_config &config);
+	void comil(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
 	void tmntmutm(machine_config &config);
 
 
 	void init_crc();
-	void init_wiwi18();
 	void init_tvsprt10();
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void decrypt_ac_ff(uint16_t* ROM, int size);
+
 	void switch_bank(uint32_t bank);
 
-	DECLARE_WRITE8_MEMBER(i2c_w);
-	DECLARE_READ8_MEMBER(i2c_r);
+	void i2c_w(offs_t offset, uint8_t data);
+	uint8_t i2c_r(offs_t offset);
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w);
-	virtual DECLARE_WRITE16_MEMBER(portb_w);
-	virtual DECLARE_WRITE16_MEMBER(portc_w);
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(base_porta_r);
-	DECLARE_READ16_MEMBER(base_portb_r);
-	DECLARE_READ16_MEMBER(base_portc_r);
-	DECLARE_READ16_MEMBER(base_guny_r);
-	DECLARE_READ16_MEMBER(base_gunx_r);
+	uint16_t base_porta_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t base_portb_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t base_portc_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t base_guny_r();
+	uint16_t base_gunx_r();
 
 	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -99,10 +101,29 @@ public:
 	void pballpup(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t porta_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+};
+
+class spg2xx_game_comil_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_comil_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
+		m_extra_in(*this, "EXTRA%u", 0U)
+	{ }
+
+	void comil(machine_config &config);
+
+private:
+	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t m_porta_data;
+	required_ioport_array<8> m_extra_in;
 };
 
 class spg2xx_game_swclone_state : public spg2xx_game_state
@@ -118,8 +139,8 @@ public:
 	void init_swclone();
 
 private:
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t porta_r();
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	uint16_t m_porta_data;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -136,13 +157,26 @@ public:
 	void tmntmutm(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(guny_r);
-	DECLARE_READ16_MEMBER(gunx_r);
+	uint16_t guny_r();
+	uint16_t gunx_r();
 
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class spg2xx_game_albkickb_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_albkickb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
 
+	void ablkickb(machine_config &config);
+
+	void init_ablkickb();
+
+private:
+	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);
+};
 
 class spg2xx_game_dreamlss_state : public spg2xx_game_state
 {
@@ -160,14 +194,66 @@ private:
 	uint16_t m_porta_data;
 	uint16_t m_portb_data;
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t porta_r();
+	uint16_t portb_r();
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class spg2xx_game_gssytts_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_gssytts_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_upperbank(*this, "upperbank")
+	{ }
+
+	void gssytts(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+private:
+	required_memory_bank m_upperbank;
+
+	void mem_map_upperbank(address_map& map);
+};
+
+class spg2xx_game_senspeed_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_senspeed_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void senspeed(machine_config &config);
+
+private:
+	uint16_t portb_r();
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_fordrace_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_fordrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void fordrace(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(wheel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(wheel2_r);
+
+private:
+};
 
 
 #endif // MAME_INCLUDES_SPG2XX_H

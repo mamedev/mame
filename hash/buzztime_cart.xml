@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Only 4 cartridges were released for this system, all in 'Series 1' -->
+Only 4 cartridges were released for this system, all in 'Series 1'
+-->
 
 <softwarelist name="buzztime_cart" description="Cadaco Buzztime Trivia Cartridges">
 	<software name="tv" supported="no">

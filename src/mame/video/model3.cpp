@@ -221,7 +221,7 @@ do { \
 	uint16_t t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7ff0) >> 4; \
-	SET_TILE_INFO_MEMBER(0, tile, color, 0); \
+	tileinfo.set(0, tile, color, 0); \
 } while (0)
 
 #define MODEL3_TILE_INFO8(address)  \
@@ -230,7 +230,7 @@ do { \
 	uint16_t t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7f00) >> 8; \
-	SET_TILE_INFO_MEMBER(1, tile >> 1, color, 0); \
+	tileinfo.set(1, tile >> 1, color, 0); \
 } while (0)
 
 TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_4bit) { MODEL3_TILE_INFO4(0x000); }
@@ -388,24 +388,24 @@ uint32_t model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 
 
 
 
-READ64_MEMBER(model3_state::model3_char_r)
+uint64_t model3_state::model3_char_r(offs_t offset)
 {
 	return m_m3_char_ram[offset];
 }
 
-WRITE64_MEMBER(model3_state::model3_char_w)
+void model3_state::model3_char_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_m3_char_ram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset / 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
 }
 
-READ64_MEMBER(model3_state::model3_tile_r)
+uint64_t model3_state::model3_tile_r(offs_t offset)
 {
 	return m_m3_tile_ram[offset];
 }
 
-WRITE64_MEMBER(model3_state::model3_tile_w)
+void model3_state::model3_tile_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_m3_tile_ram[offset]);
 
@@ -483,7 +483,7 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 */
 
 
-READ64_MEMBER(model3_state::model3_vid_reg_r)
+uint64_t model3_state::model3_vid_reg_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -496,7 +496,7 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::model3_vid_reg_w)
+void model3_state::model3_vid_reg_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -515,7 +515,7 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::model3_palette_w)
+void model3_state::model3_palette_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram64[offset]);
 	uint32_t data1 = BYTE_REVERSE32((uint32_t)(m_paletteram64[offset] >> 32));
@@ -525,7 +525,7 @@ WRITE64_MEMBER(model3_state::model3_palette_w)
 	m_palette->set_pen_color((offset*2)+1, pal5bit(data2 >> 0), pal5bit(data2 >> 5), pal5bit(data2 >> 10));
 }
 
-READ64_MEMBER(model3_state::model3_palette_r)
+uint64_t model3_state::model3_palette_r(offs_t offset)
 {
 	return m_paletteram64[offset];
 }
@@ -981,7 +981,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 */
 
 
-WRITE64_MEMBER(model3_state::real3d_display_list_w)
+void model3_state::real3d_display_list_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -993,7 +993,7 @@ WRITE64_MEMBER(model3_state::real3d_display_list_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
+void model3_state::real3d_polygon_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -1358,7 +1358,7 @@ void model3_state::real3d_polygon_ram_dma(uint32_t src, uint32_t dst, int length
 	}
 }
 
-WRITE64_MEMBER(model3_state::real3d_cmd_w)
+void model3_state::real3d_cmd_w(uint64_t data)
 {
 	real3d_display_list_end();
 }

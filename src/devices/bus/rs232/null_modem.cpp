@@ -19,7 +19,8 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_input_index(0),
 	m_timer_poll(nullptr),
 	m_rts(0),
-	m_dtr(0)
+	m_dtr(0),
+	m_xoff(0)
 {
 }
 
@@ -37,10 +38,11 @@ static INPUT_PORTS_START(null_modem)
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", null_modem_device, update_serial)
 
 	PORT_START("FLOW_CONTROL")
-	PORT_CONFNAME(0x03, 0x00, "Flow Control")
+	PORT_CONFNAME(0x07, 0x00, "Flow Control")
 	PORT_CONFSETTING(0x00, "Off")
 	PORT_CONFSETTING(0x01, "RTS")
 	PORT_CONFSETTING(0x02, "DTR")
+	PORT_CONFSETTING(0x04, "XON/XOFF")
 INPUT_PORTS_END
 
 ioport_constructor null_modem_device::device_input_ports() const
@@ -77,6 +79,7 @@ WRITE_LINE_MEMBER(null_modem_device::update_serial)
 
 	m_rts = 0;
 	m_dtr = 0;
+	m_xoff = 0;
 }
 
 void null_modem_device::device_reset()
@@ -112,7 +115,7 @@ void null_modem_device::queue()
 		{
 			uint8_t fc = m_flow->read();
 
-			if (fc == 0 || (fc == 1 && m_rts == 0) || (fc == 2 && m_dtr == 0))
+			if (fc == 0 || (fc == 1 && m_rts == 0) || (fc == 2 && m_dtr == 0) || (fc == 4 && m_xoff == 0))
 			{
 				transmit_register_setup(m_input_buffer[m_input_index++]);
 				m_timer_poll->adjust(attotime::never);
@@ -137,8 +140,32 @@ void null_modem_device::tra_complete()
 
 void null_modem_device::rcv_complete()
 {
+	u8 data;
+
 	receive_register_extract();
-	m_stream->output(get_received_char());
+
+	data = get_received_char();
+	if (m_flow->read() != 4)
+	{
+		m_stream->output(data);
+	}
+	else
+	{
+		switch (data)
+		{
+		case 0x13: // XOFF
+			m_xoff = 1;
+			return;
+
+		case 0x11: // XON
+			m_xoff = 0;
+			return;
+
+		default:
+			break;
+		}
+		m_stream->output(data);
+	}
 }
 
 DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS232 Null Modem")

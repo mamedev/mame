@@ -1041,10 +1041,10 @@ void seibuspi_state::spi_map(address_map &map)
 	map(0x00000688, 0x00000688).w(FUNC(seibuspi_state::z80_prg_transfer_w));
 	map(0x0000068c, 0x0000068c).w(FUNC(seibuspi_state::z80_enable_w));
 	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_state::rf2_layer_bank_w));
-	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
-	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
-	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
-	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
 	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
 	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
 }
@@ -1060,10 +1060,10 @@ void seibuspi_state::rdft2_map(address_map &map)
 	map(0x00000688, 0x00000688).w(FUNC(seibuspi_state::z80_prg_transfer_w));
 	map(0x0000068c, 0x0000068c).w(FUNC(seibuspi_state::z80_enable_w));
 	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_state::rf2_layer_bank_w));
-	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
-	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
-	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
-	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
 	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
 	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
 }
@@ -1077,10 +1077,10 @@ void seibuspi_state::sxx2e_map(address_map &map)
 	map(0x00000684, 0x00000684).r(FUNC(seibuspi_state::sound_fifo_status_r));
 	map(0x00000688, 0x0000068b).noprw(); // ?
 	map(0x0000068c, 0x0000068f).nopw();
-	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
-	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
-	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
-	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
 	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
 }
 
@@ -2010,50 +2010,50 @@ void seibuspi_state::sys386f(machine_config &config)
 
 void seibuspi_state::init_senkyu()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32smo_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_senkyua()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32smo_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_batlball()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32smo_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32smo_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1o()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32smo_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_ejanhs()
 {
 //  idle skip doesn't work properly?
-//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
+//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32smo_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft2()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32smo_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
 
 	rdft2_text_decrypt(memregion("chars")->base());
 	rdft2_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2063,7 +2063,7 @@ void seibuspi_state::init_rdft2()
 
 void seibuspi_state::init_rfjet()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32smo_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
 
 	rfjet_text_decrypt(memregion("chars")->base());
 	rfjet_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2072,21 +2072,21 @@ void seibuspi_state::init_rfjet()
 }
 
 
-READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
+u32 seibuspi_state::senkyu_speedup_r()
 {
 	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
-READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
+u32 seibuspi_state::senkyua_speedup_r()
 {
 	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
 
-READ32_MEMBER(seibuspi_state::batlball_speedup_r)
+u32 seibuspi_state::batlball_speedup_r()
 {
 //  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
@@ -2099,7 +2099,7 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 	return m_mainram[0x0018db4/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
+u32 seibuspi_state::viprp1_speedup_r()
 {
 	/* viprp1 */
 	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
@@ -2115,7 +2115,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 	return m_mainram[0x001e2e0/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
+u32 seibuspi_state::viprp1o_speedup_r()
 {
 	/* viperp1o */
 	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
@@ -2125,7 +2125,7 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 
 #ifdef UNUSED_FUNCTION
 // causes input problems?
-READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
+u32 seibuspi_state::ejanhs_speedup_r()
 {
 // osd_printf_debug("%08x\n",m_maincpu->pc());
 	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
@@ -2133,7 +2133,7 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 }
 #endif
 
-READ32_MEMBER(seibuspi_state::rdft_speedup_r)
+u32 seibuspi_state::rdft_speedup_r()
 {
 	/* rdft */
 	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
@@ -2161,7 +2161,7 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 	return m_mainram[0x00298d0/4];
 }
 
-READ32_MEMBER(seibuspi_state::rf2_speedup_r)
+u32 seibuspi_state::rf2_speedup_r()
 {
 	/* rdft22kc */
 	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
@@ -2180,7 +2180,7 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 	return m_mainram[0x0282ac/4];
 }
 
-READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
+u32 seibuspi_state::rfjet_speedup_r()
 {
 	/* rfjet, rfjetu, rfjeta */
 	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
@@ -3721,6 +3721,43 @@ ROM_START( rdft2t ) /* SPI Cart, Taiwan */
 	ROM_LOAD("flash0_blank_region20.u1053", 0x000000, 0x100000, CRC(f2051161) SHA1(45cbd5fd9ae0ca0c5c3450bca5f6806ddce3c56f) )
 ROM_END
 
+ROM_START( rdft2s ) /* SPI Cart, Switzerland; SPI PCB is marked "(C)1997 SXX2C ROM SUB8" */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program, all are 27C040 */
+	ROM_LOAD32_BYTE("seibu__1.u0211", 0x000000, 0x80000, CRC(28b2a185) SHA1(a42adc166992629e96b1ad2fa0859643689fb5c4) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_BYTE("seibu__2.u0212", 0x000001, 0x80000, CRC(cab55d88) SHA1(246e13880d34b6c7c3f4ab5e18fa8a0547c03d9d) ) // socket is silkscreened on pcb PRG2
+	ROM_LOAD32_BYTE("seibu__3.u0221", 0x000002, 0x80000, CRC(83758b0e) SHA1(63adb2d09e7bd7dba47a55b3b579d543dfb553e3) ) // socket is silkscreened on pcb PRG3
+	ROM_LOAD32_BYTE("seibu__4.u0220", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) ) // socket is silkscreened on pcb PRG4
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "chars", ROMREGION_ERASEFF ) /* text layer roms - all are 27C512 */
+	ROM_LOAD24_BYTE("seibu__5.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) ) // socket is silkscreened on pcb FIX0
+	ROM_LOAD24_BYTE("seibu__6.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) ) // socket is silkscreened on pcb FIX1
+	ROM_LOAD24_BYTE("seibu__7.u0514", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) ) // socket is silkscreened on pcb FIXP
+
+	ROM_REGION( 0xc00000, "tiles", ROMREGION_ERASEFF ) /* background layer roms - half are MX semiconductor MX23C3210MC, half are some sort of 23C1610 equivalent with no visible manufacturer name */
+	ROM_LOAD24_WORD("raiden-f2bg-1d.u0535",   0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("raiden-f2__bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("raiden-f2bg-2d.u0536",   0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("raiden-f2__bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) ) // pads are silkscreened on pcb BG3P
+
+	ROM_REGION( 0x1200000, "sprites", 0 ) /* sprites - all are paired MX semconductor MX23C3210TC and MX23C1610TC mask roms */
+	ROM_LOAD("raiden-f2obj-3.u0434", 0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) ) // pads are silkscreened on pcb OBJ3
+	ROM_LOAD("raiden-f2obj-6.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) ) // pads are silkscreened on pcb OBJ3B
+	ROM_LOAD("raiden-f2obj-2.u0431", 0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("raiden-f2obj-5.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) ) // pads are silkscreened on pcb OBJ2B
+	ROM_LOAD("raiden-f2obj-1.u0429", 0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("raiden-f2obj-4.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) ) // pads are silkscreened on pcb OBJ1B
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms - sound0 is some sort of 23C1610 equivalent with no visible manufacturer name, sound1 is a 27C040 */
+	ROM_LOAD32_WORD("raiden-f2__pcm.u0217", 0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) ) // pads are silkscreened on pcb SOUND0
+	ROM_CONTINUE(                           0x400000, 0x100000 )
+	ROM_LOAD32_BYTE("seibu__8.u0222",       0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // socket is silkscreened on pcb SOUND1
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region9c.u1053", 0x000000, 0x100000, CRC(d73d640c) SHA1(61a99af2a153de9d53e28872a2493e2ba797a325) )
+ROM_END
+
 
 ROM_START( rfjet ) /* SPI Cart, Europe */
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
@@ -4189,6 +4226,7 @@ GAME( 1996, rdftit,     rdft,     spi,     spi_3button, seibuspi_state, init_rdf
 GAME( 1997, rdft2,      0,        rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rdft2j,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rdft2a,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2s,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Switzerland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // this is another
 GAME( 1997, rdft2ja,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

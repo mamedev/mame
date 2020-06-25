@@ -312,7 +312,7 @@ void iop_dma_device::transfer_finish(uint32_t chan)
 	}
 }
 
-READ32_MEMBER(iop_dma_device::bank0_r)
+uint32_t iop_dma_device::bank0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -350,7 +350,7 @@ READ32_MEMBER(iop_dma_device::bank0_r)
 	return ret;
 }
 
-WRITE32_MEMBER(iop_dma_device::bank0_w)
+void iop_dma_device::bank0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -385,7 +385,7 @@ WRITE32_MEMBER(iop_dma_device::bank0_w)
 	}
 }
 
-READ32_MEMBER(iop_dma_device::bank1_r)
+uint32_t iop_dma_device::bank1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -424,7 +424,7 @@ READ32_MEMBER(iop_dma_device::bank1_r)
 	return ret;
 }
 
-WRITE32_MEMBER(iop_dma_device::bank1_w)
+void iop_dma_device::bank1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset & 0x1f)
 	{

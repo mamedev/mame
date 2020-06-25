@@ -140,6 +140,7 @@ public:
 	auto iack5_callback() { return m_iack5_callback.bind(); }
 	auto iack7_callback() { return m_iack7_callback.bind(); }
 	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
+	auto uart_rtsn_callback() { return m_uart_rtsn_callback.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(in2_w);
 	DECLARE_WRITE_LINE_MEMBER(in4_w);
@@ -150,10 +151,11 @@ public:
 
 	// external callbacks
 	void uart_rx(uint8_t data);
+	void uart_ctsn(int state);
 
-	TIMER_CALLBACK_MEMBER( timer0_callback );
-	TIMER_CALLBACK_MEMBER( rx_callback );
-	TIMER_CALLBACK_MEMBER( tx_callback );
+	void timer0_callback();
+	void rx_callback();
+	void tx_callback();
 
 	// register structures
 	struct i2c_regs_t
@@ -192,6 +194,7 @@ public:
 		int16_t transmit_pointer;
 		uint8_t transmit_buffer[32768];
 		emu_timer* tx_timer;
+		bool transmit_ctsn;
 	};
 
 	struct timer_regs_t
@@ -261,6 +264,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
@@ -272,6 +276,10 @@ protected:
 private:
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
+
+	static constexpr device_timer_id TIMER_TMR0 = 0;
+	static constexpr device_timer_id TIMER_UART_RX = 1;
+	static constexpr device_timer_id TIMER_UART_TX = 2;
 
 	void update_ipl();
 	uint8_t iack_r(offs_t offset);
@@ -323,6 +331,7 @@ private:
 	void uart_rx_check();
 	void uart_tx_check();
 	void uart_tx(uint8_t data);
+	void uart_do_tx();
 	void set_timer_callback(int channel);
 
 	// callbacks
@@ -331,6 +340,7 @@ private:
 	devcb_read8 m_iack5_callback;
 	devcb_read8 m_iack7_callback;
 	devcb_write8 m_uart_tx_callback;
+	devcb_write_line m_uart_rtsn_callback;
 
 	// internal state
 	uint8_t m_ipl;

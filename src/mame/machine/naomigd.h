@@ -28,10 +28,10 @@ public:
 	void map_control(address_map &map);
 	void map_dma(address_map &map);
 
-	DECLARE_READ32_MEMBER(ide_cs0_r);
-	DECLARE_READ32_MEMBER(ide_cs1_r);
-	DECLARE_WRITE32_MEMBER(ide_cs0_w);
-	DECLARE_WRITE32_MEMBER(ide_cs1_w);
+	uint32_t ide_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t ide_cs1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ide_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void ide_cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 
 protected:
@@ -89,40 +89,42 @@ public:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE16_MEMBER(dimm_command_w);     // 5f703c
-	DECLARE_READ16_MEMBER(dimm_command_r);
-	DECLARE_WRITE16_MEMBER(dimm_offsetl_w);     // 5f7040
-	DECLARE_READ16_MEMBER(dimm_offsetl_r);
-	DECLARE_WRITE16_MEMBER(dimm_parameterl_w);  // 5f7044
-	DECLARE_READ16_MEMBER(dimm_parameterl_r);
-	DECLARE_WRITE16_MEMBER(dimm_parameterh_w);  // 5f7048
-	DECLARE_READ16_MEMBER(dimm_parameterh_r);
-	DECLARE_WRITE16_MEMBER(dimm_status_w);      // 5f704c
-	DECLARE_READ16_MEMBER(dimm_status_r);
+	void dimm_command_w(uint16_t data);     // 5f703c
+	uint16_t dimm_command_r();
+	void dimm_offsetl_w(uint16_t data);     // 5f7040
+	uint16_t dimm_offsetl_r();
+	void dimm_parameterl_w(uint16_t data);  // 5f7044
+	uint16_t dimm_parameterl_r();
+	void dimm_parameterh_w(uint16_t data);  // 5f7048
+	uint16_t dimm_parameterh_r();
+	void dimm_status_w(uint16_t data);      // 5f704c
+	uint16_t dimm_status_r();
 
-	DECLARE_WRITE32_MEMBER(sh4_unknown_w);      // 14000000
-	DECLARE_READ32_MEMBER(sh4_unknown_r);
-	DECLARE_WRITE32_MEMBER(sh4_command_w);      // 14000014
-	DECLARE_READ32_MEMBER(sh4_command_r);
-	DECLARE_WRITE32_MEMBER(sh4_offsetl_w);      // 14000018
-	DECLARE_READ32_MEMBER(sh4_offsetl_r);
-	DECLARE_WRITE32_MEMBER(sh4_parameterl_w);   // 1400001c
-	DECLARE_READ32_MEMBER(sh4_parameterl_r);
-	DECLARE_WRITE32_MEMBER(sh4_parameterh_w);   // 14000020
-	DECLARE_READ32_MEMBER(sh4_parameterh_r);
-	DECLARE_WRITE32_MEMBER(sh4_status_w);       // 14000024
-	DECLARE_READ32_MEMBER(sh4_status_r);
-	DECLARE_WRITE32_MEMBER(sh4_control_w);      // 14000028
-	DECLARE_READ32_MEMBER(sh4_control_r);
-	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);     // 14000030
-	DECLARE_READ32_MEMBER(sh4_des_keyl_r);
-	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);     // 14000034
-	DECLARE_READ32_MEMBER(sh4_des_keyh_r);
+	void sh4_unknown_w(uint32_t data);      // 14000000
+	uint32_t sh4_unknown_r();
+	void sh4_command_w(uint32_t data);      // 14000014
+	uint32_t sh4_command_r();
+	void sh4_offsetl_w(uint32_t data);      // 14000018
+	uint32_t sh4_offsetl_r();
+	void sh4_parameterl_w(uint32_t data);   // 1400001c
+	uint32_t sh4_parameterl_r();
+	void sh4_parameterh_w(uint32_t data);   // 14000020
+	uint32_t sh4_parameterh_r();
+	void sh4_status_w(uint32_t data);       // 14000024
+	uint32_t sh4_status_r();
+	void sh4_control_w(uint32_t data);      // 14000028
+	uint32_t sh4_control_r();
+	void sh4_sdramconfig_w(uint32_t data);  // 1400002c
+	uint32_t sh4_sdramconfig_r();
+	void sh4_des_keyl_w(uint32_t data);     // 14000030
+	uint32_t sh4_des_keyl_r();
+	void sh4_des_keyh_w(uint32_t data);     // 14000034
+	uint32_t sh4_des_keyh_r();
 
-	DECLARE_READ64_MEMBER(i2cmem_dimm_r);
-	DECLARE_WRITE64_MEMBER(i2cmem_dimm_w);
-	DECLARE_READ8_MEMBER(pic_dimm_r);
-	DECLARE_WRITE8_MEMBER(pic_dimm_w);
+	uint64_t i2cmem_dimm_r();
+	void i2cmem_dimm_w(uint64_t data);
+	uint8_t pic_dimm_r(offs_t offset);
+	void pic_dimm_w(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -160,6 +162,7 @@ private:
 	uint32_t dimm_parameterh;
 	uint32_t dimm_status;
 	uint32_t dimm_control;
+	uint32_t dimm_sdramconfig;
 	uint32_t sh4_unknown;
 	uint64_t dimm_des_key;
 

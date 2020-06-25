@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
 
 	tile += m_roz_size ? 0x800 : 0x2000;
 
-	SET_TILE_INFO_MEMBER(m_roz_size, tile, color, flags);
+	tileinfo.set(m_roz_size, tile, color, flags);
 }
 
 
@@ -342,12 +342,12 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 	}
 }
 
-READ32_MEMBER( k001604_device::tile_r )
+uint32_t k001604_device::tile_r(offs_t offset)
 {
 	return m_tile_ram[offset];
 }
 
-READ32_MEMBER( k001604_device::char_r )
+uint32_t k001604_device::char_r(offs_t offset)
 {
 	int set, bank;
 	uint32_t addr;
@@ -364,7 +364,7 @@ READ32_MEMBER( k001604_device::char_r )
 	return m_char_ram[addr];
 }
 
-READ32_MEMBER( k001604_device::reg_r )
+uint32_t k001604_device::reg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -375,7 +375,7 @@ READ32_MEMBER( k001604_device::reg_r )
 	return m_reg[offset];
 }
 
-WRITE32_MEMBER( k001604_device::tile_w )
+void k001604_device::tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int x/*, y*/;
 	COMBINE_DATA(m_tile_ram.get() + offset);
@@ -421,7 +421,7 @@ WRITE32_MEMBER( k001604_device::tile_w )
 	}
 }
 
-WRITE32_MEMBER( k001604_device::char_w )
+void k001604_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int set, bank;
 	uint32_t addr;
@@ -441,7 +441,7 @@ WRITE32_MEMBER( k001604_device::char_w )
 	gfx(1)->mark_dirty(addr / 128);
 }
 
-WRITE32_MEMBER( k001604_device::reg_w )
+void k001604_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
 

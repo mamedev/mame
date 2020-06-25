@@ -193,31 +193,31 @@ TODO!
 #include "speaker.h"
 
 
-WRITE8_MEMBER(taitob_state::bankswitch_w)
+void taitob_state::bankswitch_w(uint8_t data)
 {
 	m_audiobank->set_entry(data & 3);
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::tracky_hi_r)
+uint16_t taitob_state::tracky_hi_r()
 {
 	return m_trackx_io[Player]->read();
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::tracky_lo_r)
+uint16_t taitob_state::tracky_lo_r()
 {
 	return (m_trackx_io[Player]->read() & 0xff) << 8;
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::trackx_hi_r)
+uint16_t taitob_state::trackx_hi_r()
 {
 	return m_tracky_io[Player]->read();
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::trackx_lo_r)
+uint16_t taitob_state::trackx_lo_r()
 {
 	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
@@ -233,12 +233,12 @@ INPUT_CHANGED_MEMBER(taitob_c_state::realpunc_sensor)
 
 ***************************************************************************/
 
-READ16_MEMBER(taitob_state::eep_latch_r)
+uint16_t taitob_state::eep_latch_r()
 {
 	return m_eep_latch;
 }
 
-WRITE16_MEMBER(taitob_state::eeprom_w)
+void taitob_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_eep_latch);
 
@@ -267,7 +267,7 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 *************************************************************************/
 
 
-WRITE8_MEMBER(taitob_state::player_12_coin_ctrl_w)
+void taitob_state::player_12_coin_ctrl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -275,12 +275,12 @@ WRITE8_MEMBER(taitob_state::player_12_coin_ctrl_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ16_MEMBER(taitob_state::player_34_coin_ctrl_r)
+uint16_t taitob_state::player_34_coin_ctrl_r()
 {
 	return m_coin_word;
 }
 
-WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
+void taitob_state::player_34_coin_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_coin_word);
 
@@ -291,7 +291,7 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 	machine().bookkeeping().coin_counter_w(3,  data & 0x0800);
 }
 
-WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
+void taitob_state::spacedxo_tc0220ioc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_tc0220ioc->write(offset, data & 0xff);
@@ -302,7 +302,7 @@ WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_c_state::realpunc_output_w)
+void taitob_c_state::realpunc_output_w(uint16_t data)
 {
 /*
    15 = Camera Enable?
@@ -559,8 +559,7 @@ void taitob_c_state::realpunc_map(address_map &map)
 	map(0x18c000, 0x18c001).w(FUNC(taitob_c_state::realpunc_output_w));
 	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x300002, 0x300003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x300000, 0x300003).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 //  map(0x320000, 0x320001).nop(); // ?
 	map(0x320002, 0x320003).nopr();
 	map(0x320002, 0x320002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
@@ -1702,7 +1701,7 @@ INPUT_PORTS_END
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
+void taitob_state::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{

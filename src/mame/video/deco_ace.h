@@ -25,17 +25,16 @@ class deco_ace_device : public device_t, public device_video_interface, public d
 public:
 	deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( buffered_palette_r );
-	DECLARE_READ16_MEMBER( buffered_palette16_r );
-	DECLARE_READ16_MEMBER( ace_r );
-	DECLARE_WRITE32_MEMBER( buffered_palette_w );
-	DECLARE_WRITE16_MEMBER( buffered_palette16_w );
-	DECLARE_WRITE16_MEMBER( ace_w );
+	uint32_t buffered_palette_r(offs_t offset);
+	uint16_t buffered_palette16_r(offs_t offset);
+	uint16_t ace_r(offs_t offset);
+	void buffered_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void buffered_palette16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ace_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void palette_update();
-	void set_palette_effect_max(uint32_t val);
 	uint16_t get_aceram(uint8_t val);
 	uint8_t get_alpha(uint8_t val);
-	DECLARE_WRITE16_MEMBER( palette_dma_w );
+	void palette_dma_w(uint16_t data);
 
 protected:
 	// device-level overrides
@@ -44,12 +43,10 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 2048; }
+	virtual uint32_t palette_entries() const override { return 2048 * 2; }
 
 private:
 	// internal state
-	uint32_t m_palette_effect_min;
-	uint32_t m_palette_effect_max;
 	std::unique_ptr<uint32_t[]> m_paletteram;
 	std::unique_ptr<uint32_t[]> m_paletteram_buffered;
 	std::unique_ptr<uint16_t[]> m_ace_ram;

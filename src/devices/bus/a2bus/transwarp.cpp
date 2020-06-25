@@ -210,19 +210,21 @@ void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, 
 	m_timer->adjust(attotime::never);
 }
 
-READ8_MEMBER( a2bus_transwarp_device::dma_r )
+uint8_t a2bus_transwarp_device::dma_r(offs_t offset)
 {
 	if (offset == 0xc070)
 	{
 		hit_slot_joy();
 	}
-
-	if ((offset >= 0xc090) && (offset <= 0xc0ff))
+	else if ((offset >= 0xc090) && (offset <= 0xc0ff))
 	{
 		hit_slot(((offset >> 4) & 0xf) - 8);
 	}
-
-	if ((offset >= 0xf000) && (!m_bReadA2ROM))
+	else if ((offset >= 0xc100) && (offset <= 0xc7ff))
+	{
+		hit_slot((offset >> 8) & 0x7);
+	}
+	else if ((offset >= 0xf000) && (!m_bReadA2ROM))
 	{
 		return m_rom[offset & 0xfff];
 	}
@@ -235,7 +237,7 @@ READ8_MEMBER( a2bus_transwarp_device::dma_r )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
+void a2bus_transwarp_device::dma_w(offs_t offset, uint8_t data)
 {
 	//if ((offset >= 0xc070) && (offset <= 0xc07f)) printf("%02x to %04x\n", data, offset);
 
@@ -278,6 +280,10 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 	else if ((offset >= 0xc090) && (offset <= 0xc0ff))
 	{
 		hit_slot(((offset >> 4) & 0xf) - 8);
+	}
+	else if ((offset >= 0xc100) && (offset <= 0xc7ff))
+	{
+		hit_slot((offset >> 8) & 0x7);
 	}
 
 	slot_dma_write(offset, data);

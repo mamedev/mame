@@ -165,23 +165,23 @@ http://www.z88forever.org.uk/zxplus3e/
 /* TS2048 specific functions */
 
 
-READ8_MEMBER( timex_state::ts2068_port_f4_r )
+uint8_t timex_state::ts2068_port_f4_r()
 {
 	return m_port_f4_data;
 }
 
-WRITE8_MEMBER( timex_state::ts2068_port_f4_w )
+void timex_state::ts2068_port_f4_w(uint8_t data)
 {
 	m_port_f4_data = data;
 	ts2068_update_memory();
 }
 
-READ8_MEMBER( timex_state::ts2068_port_ff_r )
+uint8_t timex_state::ts2068_port_ff_r()
 {
 	return m_port_ff_data;
 }
 
-WRITE8_MEMBER( timex_state::ts2068_port_ff_w )
+void timex_state::ts2068_port_ff_w(offs_t offset, uint8_t data)
 {
 		/* Bits 0-2 Video Mode Select
 		   Bits 3-5 64 column mode ink/paper selection
@@ -565,7 +565,7 @@ MACHINE_RESET_MEMBER(timex_state,ts2068)
 /* TC2048 specific functions */
 
 
-WRITE8_MEMBER( timex_state::tc2048_port_ff_w )
+void timex_state::tc2048_port_ff_w(offs_t offset, uint8_t data)
 {
 	m_port_ff_data = data;
 	logerror("Port %04x write %02x\n", offset, data);
@@ -717,6 +717,7 @@ void timex_state::ts2068(machine_config &config)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");
+	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 
 	/* internal ram */
 	m_ram->set_default_size("48K");
@@ -749,6 +750,9 @@ void timex_state::tc2048(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("48K");
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 }
 
 

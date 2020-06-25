@@ -423,12 +423,12 @@ void k053250_device::dma(int limiter)
 	m_page ^= 1;
 }
 
-READ16_MEMBER(k053250_device::reg_r)
+uint16_t k053250_device::reg_r(offs_t offset)
 {
 	return m_regs[offset];
 }
 
-WRITE16_MEMBER(k053250_device::reg_w)
+void k053250_device::reg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -440,17 +440,17 @@ WRITE16_MEMBER(k053250_device::reg_w)
 	}
 }
 
-READ16_MEMBER(k053250_device::ram_r)
+uint16_t k053250_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER(k053250_device::ram_w)
+void k053250_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER(k053250_device::rom_r)
+uint16_t k053250_device::rom_r(offs_t offset)
 {
 	return m_rom[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
 }

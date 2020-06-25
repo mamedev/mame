@@ -8,10 +8,10 @@
 /// \file ptokenizer.h
 ///
 
-#include "plists.h"
 #include "pstream.h"
 #include "pstring.h"
 
+#include "penum.h"
 #include "putil.h" // psource_t
 
 #include <unordered_map>
@@ -35,11 +35,11 @@ namespace plib {
 			m_source_location.emplace_back(plib::source_location("Unknown", 0));
 		}
 
-		COPYASSIGNMOVE(ptokenizer, delete)
+		PCOPYASSIGNMOVE(ptokenizer, delete)
 
 		virtual ~ptokenizer() = default;
 
-		P_ENUM(token_type,
+		PENUM(token_type,
 			IDENTIFIER,
 			NUMBER,
 			TOKEN,

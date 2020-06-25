@@ -31,7 +31,7 @@ public:
 	}
 
 protected:
-	DECLARE_READ8_MEMBER(tape_r);
+	uint8_t tape_r();
 
 	required_device<cassette_image_device> m_cassette;
 	required_memory_region m_region_maincpu;
@@ -73,12 +73,12 @@ private:
 		TIMER_UPDATE_DISPLAY
 	};
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
+	uint8_t keyboard_r(offs_t offset);
+	void keyboard_w(offs_t offset, uint8_t data);
+	void sound_w(uint8_t data);
+	uint8_t ppi_portb_r();
+	uint8_t ppi_portc_r();
+	void ppi_porta_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -126,8 +126,8 @@ private:
 		TIMER_UPDATE_DISPLAY
 	};
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(led_w);
+	uint8_t keyboard_r();
+	void led_w(offs_t offset, uint8_t data);
 
 	required_memory_region m_region_proms;
 

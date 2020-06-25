@@ -111,23 +111,23 @@ static const int gyruss_timer[10] =
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x09, 0x0a, 0x0b, 0x0a, 0x0d
 };
 
-READ8_MEMBER(gyruss_state::gyruss_portA_r)
+uint8_t gyruss_state::gyruss_portA_r()
 {
 	return gyruss_timer[(m_audiocpu->total_cycles() / 1024) % 10];
 }
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
+void gyruss_state::gyruss_dac_w(uint8_t data)
 {
 	m_discrete->write(NODE(16), data);
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
+void gyruss_state::gyruss_irq_clear_w(uint8_t data)
 {
 	m_audiocpu_2->set_input_line(0, CLEAR_LINE);
 }
 
-void gyruss_state::filter_w(address_space &space, int chip, int data )
+void gyruss_state::filter_w(int chip, int data )
 {
 	//printf("chip %d - %02x\n", chip, data);
 	for (int i = 0; i < 3; i++)
@@ -139,24 +139,24 @@ void gyruss_state::filter_w(address_space &space, int chip, int data )
 	}
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_filter0_w)
+void gyruss_state::gyruss_filter0_w(uint8_t data)
 {
-	filter_w(space, 0, data);
+	filter_w(0, data);
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
+void gyruss_state::gyruss_filter1_w(uint8_t data)
 {
-	filter_w(space, 1, data);
+	filter_w(1, data);
 }
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_sh_irqtrigger_w)
+void gyruss_state::gyruss_sh_irqtrigger_w(uint8_t data)
 {
 	/* writing to this register triggers IRQ on the sound CPU */
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
+void gyruss_state::gyruss_i8039_irq_w(uint8_t data)
 {
 	m_audiocpu_2->set_input_line(0, ASSERT_LINE);
 }
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(gyruss_state::master_nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gyruss_state::slave_irq_mask_w)
+void gyruss_state::slave_irq_mask_w(uint8_t data)
 {
 	m_slave_irq_mask = data & 1;
 	if (!m_slave_irq_mask)

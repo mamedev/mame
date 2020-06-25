@@ -16,7 +16,7 @@ public:
 	{
 	}
 
-	virtual ~netdev_none() = default;
+	virtual ~netdev_none() { }
 	virtual int init(const osd_options &options) override { return 0; }
 };
 

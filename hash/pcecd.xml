@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pcecd" description="NEC PC-Engine / Turbografx 16 CD-ROMs">
 
 <!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007
@@ -215,7 +218,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asuka 120% maxima burning fest (scd)(jpn)" sha1="27bb73a3372a0189ad9597fc8d9fb546cc466eef"/>
+				<disk name="asuka 120 maxima burning fest (scd)(jpn)" sha1="27bb73a3372a0189ad9597fc8d9fb546cc466eef"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1982,7 +1985,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="go! go! birdie chance (scd)(jpn)" sha1="7ae94f6dc48a3e63683eb765f8c23819ab9f301b"/>
+				<disk name="go go birdie chance (scd)(jpn)" sha1="7ae94f6dc48a3e63683eb765f8c23819ab9f301b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4361,7 +4364,7 @@
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quiz marugoto the world ii - time machine ni onegai! (cd)(jpn)" sha1="1c2a663efd7214d274f8cdd33c36789bb03c996e"/>
+				<disk name="quiz marugoto the world ii - time machine ni onegai (cd)(jpn)" sha1="1c2a663efd7214d274f8cdd33c36789bb03c996e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4457,7 +4460,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ranma datou, ganso musabetsu kakutou-ryuu! (cd, scd)(jpn)" sha1="d37addaf2cc3a37c8430842570e1846ea6afe02a"/>
+				<disk name="ranma datou, ganso musabetsu kakutou-ryuu (cd, scd)(jpn)" sha1="d37addaf2cc3a37c8430842570e1846ea6afe02a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4697,7 +4700,7 @@
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rom karaoke - volume iv - choito otona! (cd)(jpn)" sha1="266eb12d8d47c82ad67e85b8076453020eedcc9a"/>
+				<disk name="rom karaoke - volume iv - choito otona (cd)(jpn)" sha1="266eb12d8d47c82ad67e85b8076453020eedcc9a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5974,7 +5977,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! ryououki (scd)(jpn)" sha1="bccd9bbe173ae17c0485a2a75375ab0126be82fb"/>
+				<disk name="tenchi muyou ryououki (scd)(jpn)" sha1="bccd9bbe173ae17c0485a2a75375ab0126be82fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6347,7 +6350,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="top o nerae! gunbuster volume i (scd)(jpn)" sha1="82034516ba041a3634b0edbed642518308c10309"/>
+				<disk name="top o nerae gunbuster volume i (scd)(jpn)" sha1="82034516ba041a3634b0edbed642518308c10309"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6363,7 +6366,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="top o nerae! gunbuster volume ii (scd)(jpn)" sha1="9eea2a1d0236a12cfa356e6cde3e64e3cf334f1a"/>
+				<disk name="top o nerae gunbuster volume ii (scd)(jpn)" sha1="9eea2a1d0236a12cfa356e6cde3e64e3cf334f1a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6395,7 +6398,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="travelers! densetsu wo buttobase [imperfect] (scd)(jpn)" sha1="406c222c6b16af097e088128e03c065f227a1500"/>
+				<disk name="travelers densetsu wo buttobase [imperfect] (scd)(jpn)" sha1="406c222c6b16af097e088128e03c065f227a1500"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6833,7 +6836,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yawara! (scd)(jpn)" sha1="2da1ea9a6a83f7c8c830836779ab006838759fb9"/>
+				<disk name="yawara (scd)(jpn)" sha1="2da1ea9a6a83f7c8c830836779ab006838759fb9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6849,7 +6852,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yawara! ii (scd)(jpn)" sha1="9c46a0ccdc9cbaeb8d856c801e67fdbb26280af6"/>
+				<disk name="yawara ii (scd)(jpn)" sha1="9c46a0ccdc9cbaeb8d856c801e67fdbb26280af6"/>
 			</diskarea>
 		</part>
 	</software>

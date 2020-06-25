@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="victor9k_flop" description="Victor 9000 / ACT Sirius 1 diskettes">
 
 	<software name="audiokit">
@@ -9,7 +12,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="626688">
-				<rom name="victor__audio_toolkit__version_1.2_s-n_302__copyright_1983_victor_technologies,inc.__beta_release_part_no.103779-01_rev_b.ssdd.img" size="626688" crc="afea9d2f" sha1="c20b56631f622872aa462ad4cfed84ee806c1a42"/>
+				<rom name="victor__audio_toolkit__version_1.2_s-n_302__beta_release_part_no.103779-01_rev_b.ssdd.img" size="626688" crc="afea9d2f" sha1="c20b56631f622872aa462ad4cfed84ee806c1a42"/>
 			</dataarea>
 		</part>
 	</software>

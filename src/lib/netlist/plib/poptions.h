@@ -8,7 +8,7 @@
 /// \file poptions.h
 ///
 
-#include "plists.h"
+#include "pfmtlog.h"
 #include "pstonum.h"
 #include "pstring.h"
 #include "putil.h"
@@ -25,9 +25,9 @@ namespace plib {
 		option_base(options &parent, const pstring &help);
 		virtual ~option_base() = default;
 
-		COPYASSIGNMOVE(option_base, delete)
+		PCOPYASSIGNMOVE(option_base, delete)
 
-		pstring help() const { return m_help; }
+		virtual pstring help() const { return m_help; }
 	private:
 		pstring m_help;
 	};
@@ -136,7 +136,7 @@ namespace plib {
 
 			if (raw != plib::container::npos)
 			{
-				m_val = static_cast<T>(raw);
+				m_val = narrow_cast<T>(raw);
 				return 0;
 			}
 
@@ -169,15 +169,22 @@ namespace plib {
 	public:
 		option_num(options &parent, const pstring &ashort, const pstring &along, T defval,
 				const pstring &help,
-				T minval = std::numeric_limits<T>::min(),
+				T minval = std::numeric_limits<T>::lowest(),
 				T maxval = std::numeric_limits<T>::max() )
 		: option(parent, ashort, along, help, true)
 		, m_val(defval)
 		, m_min(minval)
 		, m_max(maxval)
+		, m_def(defval)
 		{}
 
 		T operator ()() const { return m_val; }
+
+		pstring help() const override
+		{
+			auto hs(option::help());
+			return plib::pfmt(hs)(m_def, m_min, m_max);
+		}
 
 	protected:
 		int parse(const pstring &argument) override
@@ -191,6 +198,7 @@ namespace plib {
 		T m_val;
 		T m_min;
 		T m_max;
+		T m_def;
 	};
 
 	class option_vec : public option
@@ -217,15 +225,19 @@ namespace plib {
 		{}
 	};
 
-	class options : public nocopyassignmove
+	class options
 	{
 	public:
 
 		options();
 		explicit options(option **o);
 
+		~options() = default;
+
+		PCOPYASSIGNMOVE(options, delete)
+
 		void register_option(option_base *opt);
-		int parse(int argc, char **argv);
+		std::size_t parse(const std::vector<putf8string> &argv);
 
 		pstring help(const pstring &description, const pstring &usage,
 				unsigned width = 72, unsigned indent = 20) const;
@@ -234,14 +246,14 @@ namespace plib {
 
 	private:
 		static pstring split_paragraphs(const pstring &text, unsigned width, unsigned indent,
-				unsigned firstline_indent);
+				unsigned firstline_indent, const pstring &line_end = "\n");
 
 		void check_consistency() noexcept(false);
 
 		template <typename T>
 		T *getopt_type() const
 		{
-			for (auto & optbase : m_opts )
+			for (const auto & optbase : m_opts )
 			{
 				if (auto opt = dynamic_cast<T *>(optbase))
 					return opt;

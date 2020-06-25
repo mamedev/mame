@@ -17,7 +17,7 @@
 #include "bus/mtx/exp.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
@@ -81,26 +81,26 @@ private:
 	int m_centronics_perror;
 	int m_centronics_select;
 
-	DECLARE_WRITE8_MEMBER(mtx_subpage_w);
-	DECLARE_WRITE8_MEMBER(mtx_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mtx_sound_latch_w);
-	DECLARE_WRITE8_MEMBER(mtx_sense_w);
-	DECLARE_READ8_MEMBER(mtx_key_lo_r);
-	DECLARE_READ8_MEMBER(mtx_key_hi_r);
-	DECLARE_WRITE8_MEMBER(hrx_address_w);
-	DECLARE_READ8_MEMBER(hrx_data_r);
-	DECLARE_WRITE8_MEMBER(hrx_data_w);
-	DECLARE_READ8_MEMBER(hrx_attr_r);
-	DECLARE_WRITE8_MEMBER(hrx_attr_w);
+	void mtx_subpage_w(uint8_t data);
+	void mtx_bankswitch_w(uint8_t data);
+	void mtx_sound_latch_w(uint8_t data);
+	void mtx_sense_w(uint8_t data);
+	uint8_t mtx_key_lo_r();
+	uint8_t mtx_key_hi_r();
+	void hrx_address_w(offs_t offset, uint8_t data);
+	uint8_t hrx_data_r();
+	void hrx_data_w(uint8_t data);
+	uint8_t hrx_attr_r();
+	void hrx_attr_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg2_w);
-	DECLARE_READ8_MEMBER(mtx_strobe_r);
-	DECLARE_READ8_MEMBER(mtx_sound_strobe_r);
-	DECLARE_WRITE8_MEMBER(mtx_cst_w);
-	DECLARE_WRITE8_MEMBER(mtx_cst_motor_w);
-	DECLARE_READ8_MEMBER(mtx_prt_r);
+	uint8_t mtx_strobe_r();
+	uint8_t mtx_sound_strobe_r();
+	void mtx_cst_w(uint8_t data);
+	void mtx_cst_motor_w(uint8_t data);
+	uint8_t mtx_prt_r();
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);

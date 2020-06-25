@@ -32,7 +32,7 @@
 
 #define SINGLE_INSTRUCTION_MODE (0)
 
-#define ENABLE_UNSP_DRC         (1)
+#define ENABLE_UNSP_DRC         (0)
 
 #define UNSP_LOG_OPCODES        (0)
 #define UNSP_LOG_REGS           (0)
@@ -61,13 +61,16 @@ enum
 	UNSP_IRQ_EN,
 	UNSP_FIQ_EN,
 	UNSP_FIR_MOV_EN,
-	UNSP_IRQ,
-	UNSP_FIQ,
-#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	UNSP_SB,
+	UNSP_AQ,
+	UNSP_FRA,
+	UNSP_BNK,
+	UNSP_INE,
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
+	UNSP_PRI,
 	UNSP_LOG_OPS
 #else
-	UNSP_SB
+	UNSP_PRI
 #endif
 };
 
@@ -100,6 +103,9 @@ public:
 
 	void set_ds(uint16_t ds);
 	uint16_t get_ds();
+
+	void set_fr(uint16_t fr);
+	uint16_t get_fr();
 
 	inline void ccfunc_unimplemented();
 	void invalidate_cache();
@@ -152,7 +158,12 @@ protected:
 		REG_R4,
 		REG_BP,
 		REG_SR,
-		REG_PC
+		REG_PC,
+
+		REG_SR1 = 0,
+		REG_SR2,
+		REG_SR3,
+		REG_SR4
 	};
 
 	/* internal compiler state */
@@ -168,15 +179,24 @@ protected:
 	struct internal_unsp_state
 	{
 		uint32_t m_r[16]; // required to be 32 bits due to DRC
+		uint32_t m_secbank[4];
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
 		uint32_t m_fir_move;
-		uint32_t m_irq;
 		uint32_t m_fiq;
-		uint32_t m_curirq;
+		uint32_t m_irq;
 		uint32_t m_sirq;
 		uint32_t m_sb;
-		uint32_t m_saved_sb[3];
+		uint32_t m_aq;
+		uint32_t m_fra;
+		uint32_t m_bnk;
+		uint32_t m_ine;
+		uint32_t m_pri;
+
+		uint32_t m_divq_bit;
+		uint32_t m_divq_dividend;
+		uint32_t m_divq_divisor;
+		uint32_t m_divq_a;
 
 		uint32_t m_arg0;
 		uint32_t m_arg1;
@@ -189,14 +209,14 @@ protected:
 	internal_unsp_state* m_core;
 
 protected:
-	uint16_t read16(uint32_t address) { return m_program->read_word(address); }
+	uint16_t read16(uint32_t address) { return m_program.read_word(address); }
 
 	void write16(uint32_t address, uint16_t data)
 	{
 	#if UNSP_LOG_REGS
 		log_write(address, data);
 	#endif
-		m_program->write_word(address, data);
+		m_program.write_word(address, data);
 	}
 
 	void add_lpc(const int32_t offset)
@@ -214,7 +234,7 @@ protected:
 	virtual void execute_fxxx_101_group(uint16_t op);
 	void execute_fxxx_110_group(uint16_t op);
 	void execute_fxxx_111_group(uint16_t op);
-	void execute_fxxx_group(uint16_t op);;
+	void execute_fxxx_group(uint16_t op);
 	void execute_fxxx_100_group(uint16_t op);
 	virtual void execute_extended_group(uint16_t op);
 	virtual void execute_exxx_group(uint16_t op);
@@ -222,6 +242,7 @@ protected:
 	void unimplemented_opcode(uint16_t op);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm_2);
+	virtual bool op_is_divq(const uint16_t op) { return false; }
 
 	int m_iso;
 
@@ -266,9 +287,8 @@ private:
 
 
 	address_space_config m_program_config;
-	address_space *m_program;
-	std::function<u16 (offs_t)> m_pr16;
-	std::function<const void * (offs_t)> m_prptr;
+	memory_access<23, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<23, 1, -1, ENDIANNESS_BIG>::specific m_program;
 
 	uint32_t m_debugger_temp;
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
@@ -279,7 +299,7 @@ private:
 	inline void trigger_irq(int line);
 	void check_irqs();
 
-	drc_cache m_cache;
+	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<unsp_frontend> m_drcfe;
 	uint32_t m_drcoptions;
@@ -354,7 +374,8 @@ protected:
 
 	virtual void execute_fxxx_101_group(uint16_t op) override;
 	virtual void execute_exxx_group(uint16_t op) override;
-
+	void execute_divq(uint16_t op);
+	bool op_is_divq(const uint16_t op) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -375,8 +396,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint32_t m_secondary_r[8];
-
 	enum
 	{
 		UNSP20_R8 = 0,

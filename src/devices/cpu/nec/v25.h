@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "necdasm.h"
 
 #define NEC_INPUT_LINE_INTP0 10
 #define NEC_INPUT_LINE_INTP1 11
@@ -15,13 +16,15 @@
 enum
 {
 	V25_PC=0,
-	V25_IP, V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
-	V25_FLAGS, V25_ES, V25_CS, V25_SS, V25_DS,
+	V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
+	V25_DS1, V25_PS, V25_SS, V25_DS0,
+	V25_AL, V25_AH, V25_CL, V25_CH, V25_DL, V25_DH, V25_BL, V25_BH,
+	V25_PSW,
 	V25_IDB,
 	V25_PENDING
 };
 
-class v25_common_device : public cpu_device
+class v25_common_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// configuration helpers
@@ -68,16 +71,21 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return 1; };
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	/* internal RAM and register banks */
 	required_shared_ptr<uint16_t> m_internal_ram;
 
 	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;

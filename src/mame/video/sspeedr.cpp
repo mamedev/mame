@@ -10,73 +10,73 @@ Taito Super Speed Race video emulation
 #include "includes/sspeedr.h"
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_driver_horz_w)
+void sspeedr_state::sspeedr_driver_horz_w(uint8_t data)
 {
 	m_driver_horz = (m_driver_horz & 0x100) | data;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_driver_horz_2_w)
+void sspeedr_state::sspeedr_driver_horz_2_w(uint8_t data)
 {
 	m_driver_horz = (m_driver_horz & 0xff) | ((data & 1) << 8);
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_driver_vert_w)
+void sspeedr_state::sspeedr_driver_vert_w(uint8_t data)
 {
 	m_driver_vert = data;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_driver_pic_w)
+void sspeedr_state::sspeedr_driver_pic_w(uint8_t data)
 {
 	m_driver_pic = data & 0x1f;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_drones_horz_w)
+void sspeedr_state::sspeedr_drones_horz_w(uint8_t data)
 {
 	m_drones_horz = (m_drones_horz & 0x100) | data;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_drones_horz_2_w)
+void sspeedr_state::sspeedr_drones_horz_2_w(uint8_t data)
 {
 	m_drones_horz = (m_drones_horz & 0xff) | ((data & 1) << 8);
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_drones_mask_w)
+void sspeedr_state::sspeedr_drones_mask_w(uint8_t data)
 {
 	m_drones_mask = data & 0x3f;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_drones_vert_w)
+void sspeedr_state::sspeedr_drones_vert_w(offs_t offset, uint8_t data)
 {
 	m_drones_vert[offset] = data;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_track_horz_w)
+void sspeedr_state::sspeedr_track_horz_w(uint8_t data)
 {
 	m_track_horz = (m_track_horz & 0x100) | data;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_track_horz_2_w)
+void sspeedr_state::sspeedr_track_horz_2_w(uint8_t data)
 {
 	m_track_horz = (m_track_horz & 0xff) | ((data & 1) << 8);
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_track_vert_w)
+void sspeedr_state::sspeedr_track_vert_w(offs_t offset, uint8_t data)
 {
 	m_track_vert[offset] = data & 0x7f;
 }
 
 
-WRITE8_MEMBER(sspeedr_state::sspeedr_track_ice_w)
+void sspeedr_state::sspeedr_track_ice_w(uint8_t data)
 {
 	m_track_ice = data & 0x07;
 }

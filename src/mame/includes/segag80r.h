@@ -125,35 +125,35 @@ private:
 	uint16_t m_bg_scrolly;
 	uint8_t m_pignewt_bg_color_offset;
 
-	DECLARE_READ8_MEMBER(g80r_opcode_r);
-	DECLARE_WRITE8_MEMBER(mainram_w);
-	DECLARE_WRITE8_MEMBER(vidram_w);
-	DECLARE_WRITE8_MEMBER(monsterb_vidram_w);
-	DECLARE_WRITE8_MEMBER(pignewt_vidram_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_vidram_w);
-	DECLARE_READ8_MEMBER(mangled_ports_r);
-	DECLARE_READ8_MEMBER(spaceod_mangled_ports_r);
-	DECLARE_READ8_MEMBER(spaceod_port_fc_r);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
-	DECLARE_WRITE8_MEMBER(segag80r_videoram_w);
-	DECLARE_READ8_MEMBER(segag80r_video_port_r);
-	DECLARE_WRITE8_MEMBER(segag80r_video_port_w);
-	DECLARE_READ8_MEMBER(spaceod_back_port_r);
-	DECLARE_WRITE8_MEMBER(spaceod_back_port_w);
-	DECLARE_WRITE8_MEMBER(monsterb_videoram_w);
-	DECLARE_WRITE8_MEMBER(monsterb_back_port_w);
-	DECLARE_WRITE8_MEMBER(pignewt_videoram_w);
-	DECLARE_WRITE8_MEMBER(pignewt_back_color_w);
-	DECLARE_WRITE8_MEMBER(pignewt_back_port_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_videoram_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_back_port_w);
-	DECLARE_WRITE8_MEMBER(astrob_sound_w);
-	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
+	uint8_t g80r_opcode_r(offs_t offset);
+	void mainram_w(offs_t offset, uint8_t data);
+	void vidram_w(offs_t offset, uint8_t data);
+	void monsterb_vidram_w(offs_t offset, uint8_t data);
+	void pignewt_vidram_w(offs_t offset, uint8_t data);
+	void sindbadm_vidram_w(offs_t offset, uint8_t data);
+	uint8_t mangled_ports_r(offs_t offset);
+	uint8_t spaceod_mangled_ports_r(offs_t offset);
+	uint8_t spaceod_port_fc_r();
+	void coin_count_w(uint8_t data);
+	void segag80r_videoram_w(offs_t offset, uint8_t data);
+	uint8_t segag80r_video_port_r(offs_t offset);
+	void segag80r_video_port_w(offs_t offset, uint8_t data);
+	uint8_t spaceod_back_port_r(offs_t offset);
+	void spaceod_back_port_w(offs_t offset, uint8_t data);
+	void monsterb_videoram_w(offs_t offset, uint8_t data);
+	void monsterb_back_port_w(offs_t offset, uint8_t data);
+	void pignewt_videoram_w(offs_t offset, uint8_t data);
+	void pignewt_back_color_w(offs_t offset, uint8_t data);
+	void pignewt_back_port_w(offs_t offset, uint8_t data);
+	void sindbadm_videoram_w(offs_t offset, uint8_t data);
+	void sindbadm_back_port_w(offs_t offset, uint8_t data);
+	void astrob_sound_w(offs_t offset, uint8_t data);
+	void spaceod_sound_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);
+	void usb_ram_w(offs_t offset, uint8_t data);
+	void sindbadm_misc_w(uint8_t data);
+	void sindbadm_sn1_SN76496_w(uint8_t data);
+	void sindbadm_sn2_SN76496_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
@@ -164,8 +164,8 @@ private:
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
-	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
-	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
+	void sega005_sound_a_w(uint8_t data);
+	void sega005_sound_b_w(uint8_t data);
 
 	void vblank_latch_set();
 	void g80_set_palette_entry(int entry, uint8_t data);
@@ -174,7 +174,7 @@ private:
 	void draw_background_spaceod(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_page_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_full_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	offs_t decrypt_offset(address_space &space, offs_t offset);
+	offs_t decrypt_offset(offs_t offset);
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 

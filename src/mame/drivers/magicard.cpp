@@ -431,9 +431,9 @@ private:
 	required_shared_ptr<uint16_t> m_magicram;
 	required_shared_ptr<uint16_t> m_magicramb;
 	required_shared_ptr<uint16_t> m_pcab_vregs;
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_READ16_MEMBER(philips_66470_r);
-	DECLARE_WRITE16_MEMBER(philips_66470_w);
+	uint16_t test_r();
+	uint16_t philips_66470_r(offs_t offset);
+	void philips_66470_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -713,12 +713,12 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 *      R/W Handlers      *
 *************************/
 
-READ16_MEMBER(magicard_state::test_r)
+uint16_t magicard_state::test_r()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(magicard_state::philips_66470_r)
+uint16_t magicard_state::philips_66470_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -737,7 +737,7 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 	return m_pcab_vregs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::philips_66470_w)
+void magicard_state::philips_66470_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pcab_vregs[offset]);
 

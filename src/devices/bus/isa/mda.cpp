@@ -182,7 +182,7 @@ void isa8_mda_device::device_start()
 
 	set_isa_device();
 	m_videoram.resize(0x1000);
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_mda_device::io_write)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_mda_device::io_read)), write8sm_delegate(*this, FUNC(isa8_mda_device::io_write)));
 	m_isa->install_bank(0xb0000, 0xb0fff, "bank_mda", &m_videoram[0]);
 	m_isa->install_bank(0xb1000, 0xb1fff, "bank_mda", &m_videoram[0]);
 	m_isa->install_bank(0xb2000, 0xb2fff, "bank_mda", &m_videoram[0]);
@@ -424,7 +424,7 @@ WRITE_LINE_MEMBER( isa8_mda_device::vsync_changed )
 /*
  *  rW  MDA mode control register (see #P138)
  */
-WRITE8_MEMBER( isa8_mda_device::mode_control_w )
+void isa8_mda_device::mode_control_w(uint8_t data)
 {
 	m_mode_control = data;
 
@@ -453,10 +453,11 @@ WRITE8_MEMBER( isa8_mda_device::mode_control_w )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-READ8_MEMBER( isa8_mda_device::status_r )
+uint8_t isa8_mda_device::status_r()
 {
 	// Faking pixel stream here
-	m_pixel++;
+	if (!machine().side_effects_disabled())
+		m_pixel++;
 
 	return 0xF0 | (m_pixel & 0x08) | m_hsync;
 }
@@ -468,7 +469,7 @@ READ8_MEMBER( isa8_mda_device::status_r )
  *      monochrome display adapter
  *
  *************************************************************************/
-WRITE8_MEMBER( isa8_mda_device::io_write )
+void isa8_mda_device::io_write(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -479,15 +480,15 @@ WRITE8_MEMBER( isa8_mda_device::io_write )
 			m_crtc->register_w(data);
 			break;
 		case 0x08:
-			mode_control_w(space, offset, data);
+			mode_control_w(data);
 			break;
 		case 0x0c: case 0x0d:  case 0x0e:
-			m_lpt->write(space, offset - 0x0c, data);
+			m_lpt->write(offset - 0x0c, data);
 			break;
 	}
 }
 
-READ8_MEMBER( isa8_mda_device::io_read )
+uint8_t isa8_mda_device::io_read(offs_t offset)
 {
 	int data = 0xff;
 	switch( offset )
@@ -499,11 +500,11 @@ READ8_MEMBER( isa8_mda_device::io_read )
 			data = m_crtc->register_r();
 			break;
 		case 0x0a:
-			data = status_r(space, offset);
+			data = status_r();
 			break;
 		/* LPT ports */
 		case 0x0c: case 0x0d:  case 0x0e:
-			data = m_lpt->read(space, offset - 0x0c);
+			data = m_lpt->read(offset - 0x0c);
 			break;
 	}
 	return data;
@@ -601,7 +602,7 @@ void isa8_hercules_device::device_start()
 
 	m_videoram.resize(0x10000);
 	set_isa_device();
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_hercules_device::io_read)), write8_delegate(*this, FUNC(isa8_hercules_device::io_write)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_hercules_device::io_read)), write8sm_delegate(*this, FUNC(isa8_hercules_device::io_write)));
 	m_isa->install_bank(0xb0000, 0xbffff, "bank_hercules", &m_videoram[0]);
 
 	/* Initialise the mda palette */
@@ -662,7 +663,7 @@ MC6845_UPDATE_ROW( isa8_hercules_device::hercules_gfx_update_row )
 }
 
 
-WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
+void isa8_hercules_device::mode_control_w(uint8_t data)
 {
 	m_mode_control = data;
 
@@ -687,7 +688,7 @@ WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
 }
 
 
-WRITE8_MEMBER( isa8_hercules_device::io_write )
+void isa8_hercules_device::io_write(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -698,10 +699,10 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
 		m_crtc->register_w(data);
 		break;
 	case 0x08:
-		mode_control_w(space, offset, data);
+		mode_control_w(data);
 		break;
 	case 0x0c: case 0x0d:  case 0x0e:
-		m_lpt->write(space, offset - 12, data);
+		m_lpt->write(offset - 12, data);
 		break;
 	case 0x0f:
 		m_configuration_switch = data;
@@ -721,16 +722,17 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-READ8_MEMBER( isa8_hercules_device::status_r )
+uint8_t isa8_hercules_device::status_r()
 {
 	// Faking pixel stream here
-	m_pixel++;
+	if (!machine().side_effects_disabled())
+		m_pixel++;
 
 	return m_vsync | ( m_pixel & 0x08 ) | m_hsync;
 }
 
 
-READ8_MEMBER( isa8_hercules_device::io_read )
+uint8_t isa8_hercules_device::io_read(offs_t offset)
 {
 	int data = 0xff;
 	switch( offset )
@@ -742,11 +744,11 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 		data = m_crtc->register_r();
 		break;
 	case 0x0a:
-		data = status_r(space, offset);
+		data = status_r();
 		break;
 	/* LPT ports */
 	case 0xc: case 0xd:  case 0xe:
-		data = m_lpt->read(space, offset - 0x0c);
+		data = m_lpt->read(offset - 0x0c);
 		break;
 	}
 	return data;
@@ -943,7 +945,7 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_blink_update_row )
 	}
 }
 
-WRITE8_MEMBER( isa8_ec1840_0002_device::mode_control_w )
+void isa8_ec1840_0002_device::mode_control_w(uint8_t data)
 {
 	m_mode_control = data;
 

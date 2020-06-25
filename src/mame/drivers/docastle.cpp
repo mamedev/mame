@@ -189,24 +189,24 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->write_data(m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
-READ8_MEMBER(docastle_state::idsoccer_adpcm_status_r)
+uint8_t docastle_state::idsoccer_adpcm_status_r()
 {
 	// this is wrong, but the samples work anyway!!
 	m_adpcm_status ^= 0x80;
 	return m_adpcm_status;
 }
 
-WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
+void docastle_state::idsoccer_adpcm_w(uint8_t data)
 {
 	if (data & 0x80)
 	{
@@ -547,9 +547,7 @@ GFXDECODE_END
 
 void docastle_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 9; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		m_buffer0[i] = 0;
 		m_buffer1[i] = 0;
@@ -560,11 +558,11 @@ void docastle_state::machine_reset()
 	m_adpcm_data = -1;
 	m_adpcm_status = 0;
 
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		m_inp[i]->write_ms(0); // pin 5 tied low
 		//m_inp[i]->write_ce(1); // pin 4 tied high
-		m_inp[i]->write_s(machine().dummy_space(), 0, 0); // cleared with LS273
+		m_inp[i]->write_s(0); // cleared with LS273
 	}
 	flip_screen_set(0); // cleared with LS273
 }
@@ -911,7 +909,7 @@ ROM_START( spiero )
 	ROM_LOAD( "bprom1.bin",   0x0000, 0x0200, CRC(fc1b66ff) SHA1(0a73f7e00501c638f017473b1e0786d7bcbbe82a) ) // color prom
 ROM_END
 
-ROM_START( dowild )
+ROM_START( dowild ) // UNIVERSAL 8339A PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w1",           0x0000, 0x2000, CRC(097de78b) SHA1(8d0cedde09a893ff67db0cb8e239babeb2cb3701) )
 	ROM_LOAD( "w3",           0x4000, 0x2000, CRC(fc6a1cbb) SHA1(4cf59459d521c725e41bbd9363fb58bffdad13a2) )

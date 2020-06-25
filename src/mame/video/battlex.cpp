@@ -10,7 +10,7 @@
 #include "includes/battlex.h"
 
 
-WRITE8_MEMBER(battlex_state::battlex_palette_w)
+void battlex_state::battlex_palette_w(offs_t offset, uint8_t data)
 {
 	int palette_num = offset / 8;
 	int color_num = offset & 7;
@@ -21,27 +21,27 @@ WRITE8_MEMBER(battlex_state::battlex_palette_w)
 	m_palette->set_pen_color(64+palette_num*16+color_num+8, pal2bit((data >> 0)&1), pal2bit((data >> 2)&1), pal2bit( (data >> 1) &1));
 }
 
-WRITE8_MEMBER(battlex_state::battlex_scroll_x_lsb_w)
+void battlex_state::battlex_scroll_x_lsb_w(uint8_t data)
 {
 	m_scroll_lsb = data;
 }
 
-WRITE8_MEMBER(battlex_state::battlex_scroll_x_msb_w)
+void battlex_state::battlex_scroll_x_msb_w(uint8_t data)
 {
 	m_scroll_msb = data;
 }
 
-WRITE8_MEMBER(battlex_state::battlex_scroll_starfield_w)
+void battlex_state::battlex_scroll_starfield_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(battlex_state::battlex_videoram_w)
+void battlex_state::battlex_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(battlex_state::battlex_flipscreen_w)
+void battlex_state::battlex_flipscreen_w(uint8_t data)
 {
 	m_starfield_enabled = data & 0x10;
 
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(battlex_state::get_bg_tile_info)
 	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x01)) << 8);
 	int color = (m_videoram[tile_index * 2 + 1] & 0x0e) >> 1; // high bits unused
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(battlex_state::get_dodgeman_bg_tile_info)
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(battlex_state::get_dodgeman_bg_tile_info)
 	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x03)) << 8);
 	int color = (m_videoram[tile_index * 2 + 1] & 0x0c) >> 2; // high bits unused
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void battlex_state::video_start()

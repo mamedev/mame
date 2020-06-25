@@ -1,12 +1,18 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Frode van der Meeren
 /***************************************************************************
 
     Tiki 100
 
     12/05/2009 Skeleton driver.
 
-    http://www.djupdal.org/tiki/
+    Most of the driver is written by Curt Coder.
+
+    2020-06-02:
+       Screen-drawing redone by Frode van der Meeren.
+       There is still some work that needs to get this
+       even more accurate, but it's mostly down to
+       triggering update at the right times.
 
 ****************************************************************************/
 
@@ -14,7 +20,6 @@
 
     TODO:
 
-    - palette RAM should be written during HBLANK
     - winchester hard disk
     - analog/digital I/O
     - light pen
@@ -32,7 +37,7 @@
 
 /* Memory Banking */
 
-READ8_MEMBER( tiki100_state::mrq_r )
+uint8_t tiki100_state::mrq_r(offs_t offset)
 {
 	bool mdis = 1;
 
@@ -66,7 +71,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::mrq_w )
+void tiki100_state::mrq_w(offs_t offset, uint8_t data)
 {
 	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
@@ -87,14 +92,14 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 	m_exp->mrq_w(offset, data);
 }
 
-READ8_MEMBER( tiki100_state::iorq_r )
+uint8_t tiki100_state::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
 	case 0x00: // KEYS
-		data = keyboard_r(space, 0);
+		data = keyboard_r();
 		break;
 
 	case 0x01: // SERS
@@ -126,14 +131,14 @@ READ8_MEMBER( tiki100_state::iorq_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::iorq_w )
+void tiki100_state::iorq_w(offs_t offset, uint8_t data)
 {
 	m_exp->iorq_w(offset, data);
 
 	switch ((offset & 0xff) >> 2)
 	{
 	case 0x00: // KEYS
-		keyboard_w(space, 0, data);
+		keyboard_w(data);
 		break;
 
 	case 0x01: // SERS
@@ -145,7 +150,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x03: // VIPB
-		video_mode_w(space, 0, data);
+		video_mode_w(data);
 		break;
 
 	case 0x04: // FLOP
@@ -156,7 +161,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		switch (offset & 0x03)
 		{
 		case 0: case 1:
-			palette_w(space, 0, data);
+			palette_w(data);
 			break;
 
 		case 2:
@@ -174,34 +179,34 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x07: // SYL
-		system_w(space, 0, data);
+		system_w(data);
 		break;
 	}
 }
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( tiki100_state::keyboard_r )
+uint8_t tiki100_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
-	if (m_keylatch < 12)
+	if (m_keylatch < 13)
 	{
 		data = m_y[m_keylatch]->read();
 	}
 
 	m_keylatch++;
-	if (m_keylatch == 12) m_keylatch = 0;
+	if (m_keylatch == 16) m_keylatch = 0;   // Column selected by a 4-bit counter
 
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::keyboard_w )
+void tiki100_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = 0;
 }
 
-WRITE8_MEMBER( tiki100_state::video_mode_w )
+void tiki100_state::video_mode_w(uint8_t data)
 {
 	/*
 
@@ -219,17 +224,9 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 	*/
 
 	m_mode = data;
-
-	if (BIT(data, 7))
-	{
-		int color = data & 0x0f;
-		uint8_t colordata = ~m_palette_val;
-
-		m_palette->set_pen_color(color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
-	}
 }
 
-WRITE8_MEMBER( tiki100_state::palette_w )
+void tiki100_state::palette_w(uint8_t data)
 {
 	/*
 
@@ -249,7 +246,7 @@ WRITE8_MEMBER( tiki100_state::palette_w )
 	m_palette_val = data;
 }
 
-WRITE8_MEMBER( tiki100_state::system_w )
+void tiki100_state::system_w(uint8_t data)
 {
 	/*
 
@@ -258,7 +255,7 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	    0       DRIS0   drive select 0
 	    1       DRIS1   drive select 1
 	    2       _ROME   enable ROM at 0000-3fff
-	    3       VIRE    enable video RAM at 0000-7fff
+	    3       VIRE    enable video RAM at 0000-7fff or 4000-bfff
 	    4       SDEN    single density select (0=DD, 1=SD)
 	    5       _LMP0   GRAFIKK key led
 	    6       MOTON   floppy motor
@@ -323,7 +320,10 @@ static INPUT_PORTS_START( tiki100 )
      10 | + (num) | - (num) | * (num) | 7 (num) | 8 (num) | 9 (num) | % (num) | = (num) |
      11 | 4 (num) | 5 (num) | 6 (num) | HTAB    | 1 (num) | 0 (num) | . (num) |         |
      12 | HJEM    | H?YRE   | 2 (num) | 3 (num) | ENTER   |         |         |         |
+     13 |         |         |         |         |         |         |         |         |
     ----+---------+---------+---------+---------+---------+---------+---------+---------+
+
+    Unused bits may return some fixed values, an undocumented system call will read and return them.
 */
 	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -445,6 +445,16 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("Y13")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("ST")
 	PORT_CONFNAME( 0x01, 0x01, "DART TxCA")
 	PORT_CONFSETTING( 0x00, "BAR0" )
@@ -453,71 +463,69 @@ INPUT_PORTS_END
 
 /* Video */
 
+TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::scanline_start )
+{
+	// TODO: Optional assertion of VSYNC on one of the PIO-pins, as used by some demos
+	//int scanline = param;
+
+	// TODO: use TIMER to trigger this every 16-pixel chunk (20MHz/16) instead of once at the end of the scanline
+	m_screen->update_now();
+
+	// This point is by the end of a line. Changes in palette are applied here.
+	if (BIT(m_mode, 7))
+	{
+		int color = m_mode & 0x0f;
+		uint8_t colordata = ~m_palette_val;
+
+		m_palette->set_pen_color(color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
+	}
+}
+
 uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	//
+	//  Emulates the pixel-shifter and row/column counters from a
+	//  starting point on screen to an ending point on screen.
+	//
+	//  For the most accurate results, this should be run once for
+	//  every 16-pixel chunk, but per the spring of 2020 there is
+	//  only one demo that require this degree of accuracy.
+	//
+	//
+
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint16_t addr = (m_scroll << 7);
-	int sx, y, pixel, mode = (m_mode >> 4) & 0x03;
 
-	for (y = 0; y < 256; y++)
+	for (int vaddr = cliprect.min_y; vaddr <= cliprect.max_y; vaddr++)
 	{
-		for (sx = 0; sx < 128; sx++)
+		// This is at the start of a line
+		int haddr = (cliprect.min_x>>4);
+		int haddr_end = (cliprect.max_x>>4);
+		for (; haddr <= haddr_end; haddr++)
 		{
-			uint8_t data = m_video_ram[addr & TIKI100_VIDEORAM_MASK];
-
-			switch (mode)
+			// This is at the start of a 16-dot cluster. Changes in m_scroll and m_video_ram come into effect here.
+			uint16_t addr = ((vaddr+m_scroll)<<7) | (haddr<<1);
+			uint16_t data = (m_video_ram[(addr+1) & TIKI100_VIDEORAM_MASK]<<8) | m_video_ram[addr & TIKI100_VIDEORAM_MASK];
+			for(int dot = 0; dot < 16; dot++)
 			{
-			case 0:
-				for (pixel = 0; pixel < 8; pixel++)
+				// This is at the start of a dot. Changes in m_mode are applied at this point.
+				int mode = (m_mode >> 4) & 0x03;
+				if((mode == 1) || (!(dot&0x01) && mode == 2) || (!(dot&0x03) && mode == 3))
 				{
-					int x = (sx * 8) + pixel;
-
-					bitmap.pix32(y, x) = palette[0];
+					// This is the point when a pixel is latched from the dot-shifter.
+					//
+					//   For the sake of readability:
+					//   mode == 0: keep the old pixel
+					//   mode == 1: latch new pixel once per dot
+					//   mode == 2: latch new pixel once per 2 dots
+					//   mode == 3: latch new pixel once per 4 dots
+					//
+					m_current_pixel = data&0x0F;
 				}
-				break;
+				bitmap.pix32(vaddr, (haddr<<4) + dot) = palette[m_current_pixel&0x0F];
 
-			case 1: /* 1024x256x2 */
-				for (pixel = 0; pixel < 8; pixel++)
-				{
-					int x = (sx * 8) + pixel;
-					int color = BIT(data, 0);
-
-					bitmap.pix32(y, x) = palette[color];
-
-					data >>= 1;
-				}
-				break;
-
-			case 2: /* 512x256x4 */
-				for (pixel = 0; pixel < 4; pixel++)
-				{
-					int x = (sx * 8) + (pixel * 2);
-					int color = data & 0x03;
-
-					bitmap.pix32(y, x) = palette[color];
-					bitmap.pix32(y, x + 1) = palette[color];
-
-					data >>= 2;
-				}
-				break;
-
-			case 3: /* 256x256x16 */
-				for (pixel = 0; pixel < 2; pixel++)
-				{
-					int x = (sx * 8) + (pixel * 4);
-					int color = data & 0x0f;
-
-					bitmap.pix32(y, x) = palette[color];
-					bitmap.pix32(y, x + 1) = palette[color];
-					bitmap.pix32(y, x + 2) = palette[color];
-					bitmap.pix32(y, x + 3) = palette[color];
-
-					data >>= 4;
-				}
-				break;
+				// This will run the dot-shifter and add the TEST-pattern to the upper bits (usually hidden by palette).
+				data = (data>>1)|((haddr&0x02)<<14);
 			}
-
-			addr++;
 		}
 	}
 
@@ -541,7 +549,7 @@ DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( tiki100_state::pio_pb_r )
+uint8_t tiki100_state::pio_pb_r()
 {
 	/*
 
@@ -571,7 +579,7 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::pio_pb_w )
+void tiki100_state::pio_pb_w(uint8_t data)
 {
 	/*
 
@@ -637,7 +645,7 @@ static void tiki100_floppies(device_slot_interface &device)
 
 /* AY-3-8912 Interface */
 
-WRITE8_MEMBER( tiki100_state::video_scroll_w )
+void tiki100_state::video_scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }
@@ -691,9 +699,7 @@ void tiki100_state::machine_start()
 
 void tiki100_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	system_w(space, 0, 0);
+	system_w(0);
 
 	m_st = m_st_io->read();
 }
@@ -709,9 +715,10 @@ void tiki100_state::tiki100(machine_config &config)
 	m_maincpu->set_daisy_config(tiki100_daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
-	screen.set_screen_update(FUNC(tiki100_state::screen_update));
+	TIMER(config, "scantimer").configure_scanline(FUNC(tiki100_state::scanline_start), "screen", 0, 1);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
+	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);
 
 	TIKI100_BUS(config, m_exp, 0);
@@ -736,8 +743,8 @@ void tiki100_state::tiki100(machine_config &config)
 
 	Z80PIO(config, m_pio, 8_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->in_pb_callback().set(FUNC(tiki100_state::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(tiki100_state::pio_pb_w));
 

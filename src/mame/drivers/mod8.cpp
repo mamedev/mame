@@ -70,10 +70,10 @@ public:
 	void mod8(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE8_MEMBER(tty_w);
+	void out_w(uint8_t data);
+	void tty_w(uint8_t data);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(tty_r);
+	uint8_t tty_r();
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
 	void mod8_io(address_map &map);
 	void mod8_mem(address_map &map);
@@ -86,7 +86,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER( mod8_state::out_w )
+void mod8_state::out_w(uint8_t data)
 {
 	m_tty_data >>= 1;
 	m_tty_data |= BIT(data, 0) ? 0x8000 : 0;
@@ -99,13 +99,13 @@ WRITE8_MEMBER( mod8_state::out_w )
 	}
 }
 
-WRITE8_MEMBER( mod8_state::tty_w )
+void mod8_state::tty_w(uint8_t data)
 {
 	m_tty_data = 0;
 	m_tty_cnt = 0;
 }
 
-READ8_MEMBER( mod8_state::tty_r )
+uint8_t mod8_state::tty_r()
 {
 	uint8_t d = m_tty_key_data & 1;
 	m_tty_key_data >>= 1;

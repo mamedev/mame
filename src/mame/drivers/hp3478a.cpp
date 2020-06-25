@@ -132,10 +132,10 @@ protected:
 	virtual void machine_start() override;
 	//virtual void machine_reset() override;    //not needed?
 
-	DECLARE_READ8_MEMBER(p1read);
-	DECLARE_WRITE8_MEMBER(p1write);
-	DECLARE_WRITE8_MEMBER(p2write);
-	DECLARE_WRITE8_MEMBER(nvwrite);
+	uint8_t p1read();
+	void p1write(uint8_t data);
+	void p2write(uint8_t data);
+	void nvwrite(offs_t offset, uint8_t data);
 
 	void io_bank(address_map &map);
 	void i8039_io(address_map &map);
@@ -192,7 +192,7 @@ protected:
 /***** callbacks */
 /* port1 manages the keypad matrix */
 
-READ8_MEMBER( hp3478a_state::p1read )
+uint8_t hp3478a_state::p1read()
 {
 	unsigned i;
 	uint8_t data = m_maincpu->p1_r() | 0x0F; //P10-P13 "pull-up"
@@ -208,7 +208,7 @@ READ8_MEMBER( hp3478a_state::p1read )
 }
 
 /* pin P17 rising edges also reset the external WDT counter */
-WRITE8_MEMBER( hp3478a_state::p1write )
+void hp3478a_state::p1write(uint8_t data)
 {
 	if (~m_p1_oldstate & data & 0x80) {
 		//P17 rising edge
@@ -220,7 +220,7 @@ WRITE8_MEMBER( hp3478a_state::p1write )
 /** a lot of stuff multiplexed on the P2 pins.
  * parse the chipselect lines, A12 line, and LCD interface.
  */
-WRITE8_MEMBER( hp3478a_state::p2write )
+void hp3478a_state::p2write(uint8_t data)
 {
 	LOGMASKED(DEBUG_PORTS, "port2 write: %02X\n", data);
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER( hp3478a_state::p2write )
 
 /* CAL RAM write handler, to implement "CAL enable" front panel switch
 */
-WRITE8_MEMBER( hp3478a_state::nvwrite ) {
+void hp3478a_state::nvwrite(offs_t offset, uint8_t data) {
 	if (m_calenable->read()) {
 		m_nvram_raw[offset] = data;
 		LOGMASKED(DEBUG_CAL, "write %02X to cal[%02X]\n", data, offset);
@@ -513,7 +513,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 				//changing to SELECTED_ISA
 				m_lcdstate = lcd_state::SYNC_SKIP;
 				if (m_lcd_bitcount) {
-					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%I64X)\n", m_lcd_bitcount, m_lcd_bitbuf);
+					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%X)\n", m_lcd_bitcount, m_lcd_bitbuf);
 				} else {
 					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA\n");
 				}
@@ -529,7 +529,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			if (m_lcd_bitcount != m_lcd_want) {
 				break;
 			}
-			LOGMASKED(DEBUG_LCD, "LCD : data 0x%I64X\n", m_lcd_bitbuf);
+			LOGMASKED(DEBUG_LCD, "LCD : data 0x%X\n", m_lcd_bitbuf);
 			switch (m_lcdiwa) {
 			case lcd_iwatype::ANNUNS:
 				LOGMASKED(DEBUG_LCD2, "LCD : write annuns 0x%02X\n", m_lcd_bitbuf & 0xFF);
@@ -537,12 +537,12 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			case lcd_iwatype::REG_A:
 				lcd_update_lonib(m_lcd_bitbuf);
 				lcd_map_chars();
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
 				break;
 			case lcd_iwatype::REG_B:
 				lcd_update_hinib(m_lcd_bitbuf);
 				lcd_map_chars();
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %I64X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %X, text=%s\n", m_lcd_bitbuf, (char *) m_lcd_text);
 				break;
 			default:
 				//discard

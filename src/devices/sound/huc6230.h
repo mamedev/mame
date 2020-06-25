@@ -19,7 +19,7 @@ public:
 	auto vca_callback() { return m_vca_cb.bind(); }
 
 	// write only
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

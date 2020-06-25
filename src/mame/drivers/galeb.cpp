@@ -33,18 +33,18 @@ void galeb_state::machine_start()
 	m_dac->write(m_dac_state);
 }
 
-WRITE8_MEMBER(galeb_state::dac_w)
+void galeb_state::dac_w(uint8_t data)
 {
 	m_dac_state = !m_dac_state;
 	m_dac->write(m_dac_state);
 }
 
-READ8_MEMBER(galeb_state::keyboard_r)
+uint8_t galeb_state::keyboard_r(offs_t offset)
 {
 	return m_keyboard[offset]->read();
 }
 
-READ8_MEMBER(galeb_state::tape_status_r)
+uint8_t galeb_state::tape_status_r()
 {
 	int status = 0;
 	status |= 2; /// send ready
@@ -52,12 +52,12 @@ READ8_MEMBER(galeb_state::tape_status_r)
 	return status;
 }
 
-WRITE8_MEMBER(galeb_state::tape_data_w)
+void galeb_state::tape_data_w(uint8_t data)
 {
 	logerror("tape_data_w %02x\n", data);
 }
 
-READ8_MEMBER(galeb_state::tape_data_r)
+uint8_t galeb_state::tape_data_r()
 {
 	logerror("tape_data_r (press escape to cancel load)\n");
 	return 0x00;

@@ -26,7 +26,6 @@ public:
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
 		m_videoram(*this, "videoram"),
-		m_bitmapram(*this, "bitmapram"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -53,40 +52,43 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
 
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_bitmapram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_videoram;
+	required_shared_ptr<u16> m_spriteram;
 
-	uint8_t m_upd_rom_bank;
+	u8 m_upd_rom_bank;
 	int m_sprite_palette;
 	int m_sprite_xoffs;
-	uint16_t m_videoflags;
-	uint8_t m_bins;
-	uint8_t m_gins;
+	u16 m_videoflags;
+	u8 m_sprite_pri;
+	u8 m_sprite_num;
 	tilemap_t *m_background[2];
+	std::unique_ptr<bitmap_ind16> m_pixmap;
 	emu_timer *m_crtc_timer;
 
-	DECLARE_READ16_MEMBER(sound_busy_r);
-	DECLARE_WRITE16_MEMBER(rpunch_videoram_w);
-	DECLARE_WRITE16_MEMBER(rpunch_videoreg_w);
-	DECLARE_WRITE16_MEMBER(rpunch_scrollreg_w);
-	DECLARE_WRITE8_MEMBER(rpunch_gga_w);
-	DECLARE_WRITE8_MEMBER(rpunch_gga_data_w);
-	DECLARE_WRITE16_MEMBER(rpunch_ins_w);
-	DECLARE_WRITE8_MEMBER(upd_control_w);
-	DECLARE_WRITE8_MEMBER(upd_data_w);
+	u16 sound_busy_r();
+	u8 pixmap_r(offs_t offset);
+	void pixmap_w(offs_t offset, u8 data);
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void videoreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scrollreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gga_w(offs_t offset, u8 data);
+	void gga_data_w(offs_t offset, u8 data);
+	void sprite_ctrl_w(offs_t offset, u8 data);
+	void upd_control_w(u8 data);
+	void upd_data_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 
 	DECLARE_VIDEO_START(rpunch);
 	DECLARE_VIDEO_START(svolley);
 
-	uint32_t screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
 	void sound_map(address_map &map);
+	void rpunch_map(address_map &map);
+	void svolley_map(address_map &map);
 	void svolleybl_main_map(address_map &map);
 	void svolleybl_sound_map(address_map &map);
 };

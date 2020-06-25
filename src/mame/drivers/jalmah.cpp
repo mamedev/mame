@@ -136,18 +136,18 @@ public:
 		m_dsw_io(*this, "DSW")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_WRITE8_MEMBER(okirom_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_READ16_MEMBER(urashima_mcu_r);
-	DECLARE_WRITE16_MEMBER(urashima_mcu_w);
-	DECLARE_READ16_MEMBER(daireika_mcu_r);
-	DECLARE_WRITE16_MEMBER(daireika_mcu_w);
-	DECLARE_READ16_MEMBER(mjzoomin_mcu_r);
-	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
-	DECLARE_READ16_MEMBER(kakumei_mcu_r);
-	DECLARE_READ16_MEMBER(suchiesp_mcu_r);
+	void tilebank_w(uint8_t data);
+	void okirom_w(uint8_t data);
+	void okibank_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	uint16_t urashima_mcu_r();
+	void urashima_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t daireika_mcu_r();
+	void daireika_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mjzoomin_mcu_r();
+	void mjzoomin_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t kakumei_mcu_r();
+	uint16_t suchiesp_mcu_r();
 	void init_suchiesp();
 	void init_kakumei();
 	void init_urashima();
@@ -231,14 +231,14 @@ public:
 		  m_gfxdecode(*this, "gfxdecode")
 	{}
 
-	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vregs_r);
-	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vregs_w);
+	template<int TileChip> uint16_t urashima_vregs_r(offs_t offset);
+	template<int TileChip> void urashima_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vram_r);
-	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vram_w);
+	template<int TileChip> uint16_t urashima_vram_r(offs_t offset);
+	template<int TileChip> void urashima_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(urashima_vreg_log_w);
-	DECLARE_WRITE8_MEMBER(urashima_priority_w);
+	void urashima_vreg_log_w(offs_t offset, uint16_t data);
+	void urashima_priority_w(uint8_t data);
 
 	template<int TileChip> TILE_GET_INFO_MEMBER(get_tile_info_urashima);
 
@@ -246,7 +246,7 @@ public:
 	void urashima_map(address_map &map);
 
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(urashima_bank_w);
+	void urashima_bank_w(uint8_t data);
 
 protected:
 	virtual void video_start() override;
@@ -281,7 +281,7 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 	uint16_t tile = code & 0xfff;
 	int region = (TileChip == 0) ? m_tile_bank : 3;
 
-	SET_TILE_INFO_MEMBER(region,
+	tileinfo.set(region,
 			tile,
 			code >> 12,
 			0);
@@ -420,7 +420,7 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(jalmah_state::tilebank_w)
+void jalmah_state::tilebank_w(uint8_t data)
 {
 	/*
 	 --xx ---- fg bank (used by suchiesp)
@@ -438,7 +438,7 @@ WRITE8_MEMBER(jalmah_state::tilebank_w)
 	}
 }
 
-WRITE8_MEMBER(urashima_state::urashima_bank_w)
+void urashima_state::urashima_bank_w(uint8_t data)
 {
 	if (m_tile_bank != (data & 0x03))
 	{
@@ -451,39 +451,39 @@ WRITE8_MEMBER(urashima_state::urashima_bank_w)
 }
 
 template<int TileChip>
-READ16_MEMBER(urashima_state::urashima_vram_r)
+uint16_t urashima_state::urashima_vram_r(offs_t offset)
 {
 	return m_videoram[TileChip][offset];
 }
 
 template<int TileChip>
-WRITE16_MEMBER(urashima_state::urashima_vram_w)
+void urashima_state::urashima_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[TileChip][offset]);
 	m_layer[TileChip]->mark_tile_dirty(offset);
 }
 
 template<int TileChip>
-READ16_MEMBER(urashima_state::urashima_vregs_r)
+uint16_t urashima_state::urashima_vregs_r(offs_t offset)
 {
 	return m_vreg[TileChip][offset];
 }
 
 template<int TileChip>
-WRITE16_MEMBER(urashima_state::urashima_vregs_w)
+void urashima_state::urashima_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vreg[TileChip][offset]);
 }
 
 // Urashima Mahjong uses a bigger video register area (mostly mirrored?)
 // we use this fallback so that it doesn't pollute logerror and get the info we want
-WRITE16_MEMBER(urashima_state::urashima_vreg_log_w)
+void urashima_state::urashima_vreg_log_w(offs_t offset, uint16_t data)
 {
 	if(data)
 		logerror("Warning vreg write to [%04x] -> %04x\n",offset*2,data);
 }
 
-WRITE8_MEMBER(urashima_state::urashima_priority_w)
+void urashima_state::urashima_priority_w(uint8_t data)
 {
 	m_pri = data & 1;
 }
@@ -629,7 +629,7 @@ Basic driver start
 ******************************************************************************************/
 
 
-WRITE8_MEMBER(jalmah_state::okirom_w)
+void jalmah_state::okirom_w(uint8_t data)
 {
 	m_oki_rom = data & 1;
 
@@ -642,7 +642,7 @@ WRITE8_MEMBER(jalmah_state::okirom_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE8_MEMBER(jalmah_state::okibank_w)
+void jalmah_state::okibank_w(uint8_t data)
 {
 	m_oki_bank = data & 3;
 
@@ -652,7 +652,7 @@ WRITE8_MEMBER(jalmah_state::okibank_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE8_MEMBER(jalmah_state::flip_screen_w)
+void jalmah_state::flip_screen_w(uint8_t data)
 {
 	/*---- ----x flip screen*/
 	flip_screen_set(data & 1);
@@ -1476,7 +1476,7 @@ MCU code snippets
 
 ******************************************************************************************/
 
-READ16_MEMBER(jalmah_state::urashima_mcu_r)
+uint16_t jalmah_state::urashima_mcu_r()
 {
 	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1507,7 +1507,7 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu. Is it related to the MCU?
 */
-WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
+void jalmah_state::urashima_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1535,7 +1535,7 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::daireika_mcu_r)
+uint16_t jalmah_state::daireika_mcu_r()
 {
 	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1557,7 +1557,7 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 	return res;
 }
 
-WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
+void jalmah_state::daireika_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1604,7 +1604,7 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
+uint16_t jalmah_state::mjzoomin_mcu_r()
 {
 	static const int resp[] = { 0x9c, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1628,7 +1628,7 @@ READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
+void jalmah_state::mjzoomin_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1657,7 +1657,7 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::kakumei_mcu_r)
+uint16_t jalmah_state::kakumei_mcu_r()
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
@@ -1678,7 +1678,7 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 	return res;
 }
 
-READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
+uint16_t jalmah_state::suchiesp_mcu_r()
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
@@ -1701,45 +1701,45 @@ READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 
 void jalmah_state::init_urashima()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::urashima_mcu_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::urashima_mcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::urashima_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16s_delegate(*this, FUNC(jalmah_state::urashima_mcu_w)));
 
 	m_mcu_prg = URASHIMA_MCU;
 }
 
 void jalmah_state::init_daireika()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::daireika_mcu_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::daireika_mcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::daireika_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16s_delegate(*this, FUNC(jalmah_state::daireika_mcu_w)));
 
 	m_mcu_prg = DAIREIKA_MCU;
 }
 
 void jalmah_state::init_mjzoomin()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16s_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_w)));
 
 	m_mcu_prg = MJZOOMIN_MCU;
 }
 
 void jalmah_state::init_kakumei()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI_MCU;
 }
 
 void jalmah_state::init_kakumei2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI2_MCU;
 }
 
 void jalmah_state::init_suchiesp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::suchiesp_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::suchiesp_mcu_r)));
 
 	m_mcu_prg = SUCHIESP_MCU;
 }

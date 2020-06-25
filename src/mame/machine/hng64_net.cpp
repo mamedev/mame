@@ -46,7 +46,7 @@ void hng64_state::write_comm_data(uint32_t offset,uint8_t data)
 
 }
 
-READ8_MEMBER(hng64_state::hng64_comm_space_r)
+uint8_t hng64_state::hng64_comm_space_r(offs_t offset)
 {
 	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
 		return m_comm_rom[offset];
@@ -60,7 +60,7 @@ READ8_MEMBER(hng64_state::hng64_comm_space_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(hng64_state::hng64_comm_space_w)
+void hng64_state::hng64_comm_space_w(offs_t offset, uint8_t data)
 {
 	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
 		return;// m_comm_rom[offset];
@@ -75,7 +75,7 @@ WRITE8_MEMBER(hng64_state::hng64_comm_space_w)
 	}
 }
 
-READ8_MEMBER(hng64_state::hng64_comm_mmu_r)
+uint8_t hng64_state::hng64_comm_mmu_r(offs_t offset)
 {
 	return m_mmu_regs[offset];
 }
@@ -83,7 +83,7 @@ READ8_MEMBER(hng64_state::hng64_comm_mmu_r)
 #define MMUA (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2)
 #define MMUB (m_mmu_regs[(offset&~1)+0]&0x3f)
 
-WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
+void hng64_state::hng64_comm_mmu_w(offs_t offset, uint8_t data)
 {
 	m_mmu_regs[offset] = data;
 

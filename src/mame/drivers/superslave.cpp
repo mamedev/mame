@@ -28,8 +28,8 @@ Oxx,yy          = Out port
 #include "machine/am9519.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
-#include "machine/z80dart.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 #define Z80_TAG         "u45"
 #define Z80DART_0_TAG   "u14"
@@ -67,11 +67,11 @@ private:
 	void superslave_io(address_map &map);
 	void superslave_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( memctrl_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void memctrl_w(uint8_t data);
+	uint8_t status_r();
+	void cmd_w(uint8_t data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
@@ -96,7 +96,7 @@ private:
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( superslave_state::read )
+uint8_t superslave_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -130,7 +130,7 @@ READ8_MEMBER( superslave_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::write )
+void superslave_state::write(offs_t offset, uint8_t data)
 {
 	offs_t boundary = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER( superslave_state::write )
 //  memctrl_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::memctrl_w )
+void superslave_state::memctrl_w(uint8_t data)
 {
 	/*
 
@@ -181,7 +181,7 @@ WRITE8_MEMBER( superslave_state::memctrl_w )
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( superslave_state::status_r)
+uint8_t superslave_state::status_r()
 {
 	/*
 
@@ -214,7 +214,7 @@ READ8_MEMBER( superslave_state::status_r)
 //  cmd_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::cmd_w )
+void superslave_state::cmd_w(uint8_t data)
 {
 	/*
 

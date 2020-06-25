@@ -40,14 +40,14 @@ private:
 	void digdug_palette(palette_device &palette) const;
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(digdug_videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_select_w);
+	void digdug_videoram_w(offs_t offset, uint8_t data);
+	void bg_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tx_color_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(bg_disable_w);
 
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
 	virtual void machine_start() override;
 
 	void digdug_map(address_map &map);

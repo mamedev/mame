@@ -132,12 +132,12 @@ void st0016_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 }
 
 
-READ8_MEMBER( st0016_device::st0016_snd_r )
+uint8_t st0016_device::snd_r(offs_t offset)
 {
 	return m_regs[offset];
 }
 
-WRITE8_MEMBER( st0016_device::st0016_snd_w )
+void st0016_device::snd_w(offs_t offset, uint8_t data)
 {
 	int voice = offset/32;
 	int reg = offset & 0x1f;

@@ -219,13 +219,13 @@ protected:
 	virtual void machine_start() override { m_lamps.resolve(); m_digits.resolve(); }
 
 private:
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(port30_r);
-	DECLARE_WRITE8_MEMBER(port31_w);
-	DECLARE_WRITE8_MEMBER(port32_w);
-	DECLARE_READ8_MEMBER(psg_portA_r);
-	DECLARE_READ8_MEMBER(psg_portB_r);
+	void port0_w(uint8_t data);
+	uint8_t port2_r();
+	uint8_t port30_r();
+	void port31_w(uint8_t data);
+	void port32_w(uint8_t data);
+	uint8_t psg_portA_r();
+	uint8_t psg_portB_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ball_speed );
 	TIMER_DEVICE_CALLBACK_MEMBER( wheel_speed );
@@ -318,7 +318,7 @@ void rulechan_state::main_io(address_map &map)
 *      Read Handlers      *
 **************************/
 
-READ8_MEMBER(rulechan_state::port2_r)
+uint8_t rulechan_state::port2_r()
 {
 	return m_keymx[m_sline]->read();
 }
@@ -328,22 +328,22 @@ READ8_MEMBER(rulechan_state::port2_r)
 *  bit 2 - ball detector      *
 *  bit 3 - step detector      *
 *  bit 4 - Zero detector      *
-*  bit 5 - Ball in shotter    *
+*  bit 5 - Ball in shooter    *
 ******************************/
 
-READ8_MEMBER(rulechan_state::port30_r)
+uint8_t rulechan_state::port30_r()
 {
 	return m_p30;
 }
 
-READ8_MEMBER(rulechan_state::psg_portA_r)
+uint8_t rulechan_state::psg_portA_r()
 {
 	m_lamps[60] = (BIT(m_aux->read(), 3)) ? 0 : 1;    // Show Operator Key via layout lamp.
 	m_lamps[61] = (BIT(m_aux->read(), 7)) ? 0 : 1;    // Show Page Key via layout lamp.
 	return m_aux->read();                             // Operator Key read.
 }
 
-READ8_MEMBER(rulechan_state::psg_portB_r)
+uint8_t rulechan_state::psg_portB_r()
 {
 	return m_dsw->read();                   // DIP Switch read.
 }
@@ -353,7 +353,7 @@ READ8_MEMBER(rulechan_state::psg_portB_r)
 *    Write Handlers    *
 ***********************/
 
-WRITE8_MEMBER(rulechan_state::port0_w)
+void rulechan_state::port0_w(uint8_t data)
 {
 	m_sline = data & 0x07;                 // Matrix scan line selector.
 
@@ -368,7 +368,7 @@ WRITE8_MEMBER(rulechan_state::port0_w)
 *  bit 7 - ball shooter                 *
 ****************************************/
 
-WRITE8_MEMBER(rulechan_state::port31_w)
+void rulechan_state::port31_w(uint8_t data)
 {
 	m_p31 = data;
 
@@ -394,7 +394,7 @@ WRITE8_MEMBER(rulechan_state::port31_w)
 *                                       *
 ****************************************/
 
-WRITE8_MEMBER(rulechan_state::port32_w)
+void rulechan_state::port32_w(uint8_t data)
 {
 	m_p32 = data;
 }

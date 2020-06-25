@@ -21,9 +21,9 @@ public:
 	virtual uint16_t get_helper() override;
 	virtual uint32_t get_bank_base(uint16_t sel) override;
 	virtual uint32_t get_special_bank() override;
-	virtual DECLARE_READ16_MEMBER(addon_r) override;
-	virtual DECLARE_READ16_MEMBER(protection_r) override;
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override;
+	virtual uint16_t addon_r(offs_t offset) override;
+	virtual uint16_t protection_r(address_space &space, offs_t offset) override;
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 0; }

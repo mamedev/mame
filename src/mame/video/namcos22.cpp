@@ -1710,7 +1710,7 @@ void namcos22_state::draw_sprites()
 	}
 }
 
-READ32_MEMBER(namcos22s_state::namcos22s_vics_control_r)
+u32 namcos22s_state::namcos22s_vics_control_r(offs_t offset)
 {
 	u32 ret = m_vics_control[offset];
 
@@ -1734,7 +1734,7 @@ READ32_MEMBER(namcos22s_state::namcos22s_vics_control_r)
 	return ret;
 }
 
-WRITE32_MEMBER(namcos22s_state::namcos22s_vics_control_w)
+void namcos22s_state::namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
 }
@@ -1751,10 +1751,10 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 	* ----.xx--.----.---- flip
 	* ----.--xx.xxxx.xxxx code
 	*/
-	SET_TILE_INFO_MEMBER(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
+	tileinfo.set(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
+void namcos22_state::namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 prev = m_textram[offset];
 	COMBINE_DATA(&m_textram[offset]);
@@ -1765,7 +1765,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 	}
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
+void namcos22_state::namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 prev = m_cgram[offset];
 	COMBINE_DATA(&m_cgram[offset]);
@@ -1805,7 +1805,7 @@ TIMER_CALLBACK_MEMBER(namcos22_state::posirq_callback)
 	posirq_update();
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_tilemapattr_w)
+void namcos22_state::namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*
 	0: R/W - x offset
@@ -1830,7 +1830,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_tilemapattr_w)
 	}
 }
 
-READ16_MEMBER(namcos22_state::namcos22_tilemapattr_r)
+u16 namcos22_state::namcos22_tilemapattr_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1879,7 +1879,7 @@ low byte is indirect pen, high byte is shift amount when spot is in alpha blend 
 
 */
 
-READ16_MEMBER(namcos22s_state::spotram_r)
+u16 namcos22s_state::spotram_r(offs_t offset)
 {
 	if (offset == 2)
 	{
@@ -1895,7 +1895,7 @@ READ16_MEMBER(namcos22s_state::spotram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22s_state::spotram_w)
+void namcos22s_state::spotram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
@@ -1936,9 +1936,7 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 	// prepare spot
 	bool spot_enabled = (m_spotram_enable & 1) && (m_chipselect & 0xc000);
 	int spot_factor = (m_spot_factor < 0x100) ? 0 : m_spot_factor & 0xff;
-	rgbaint_t spot_color(0, spot_factor, spot_factor, spot_factor);
 	int spot_palbase = m_text_palbase >> 8 & 3; // src[x] >> 8 & 3
-	int spot_shift = 0;
 
 	// prepare fader
 	bool fade_enabled = (m_mixer_flags & 2) && m_screen_fade_factor;
@@ -1959,16 +1957,11 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 				if (spot_enabled)
 				{
 					// remap pen
-					int spot_data = m_spotram[(src[x] << 2 | spot_palbase) & 0x3ff];
-					pen = spot_data;
-
-					if (pen >= 0x80)
-					{
-						spot_shift = spot_data >> 8 & 7;
-						rgb.set(spot_color);
-					}
-					else
+					pen = m_spotram[(src[x] << 2 | spot_palbase) & 0x3ff];
+					if (pen < 0x80)
 						rgb.set(pens[pen | m_text_palbase]);
+					else if (prival != 6)
+						continue;
 				}
 				else
 				{
@@ -1976,17 +1969,23 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 					pen = src[x];
 				}
 
-				// apply fade
-				if (fade_enabled)
-					rgb.blend(fade_color, fade_factor);
-
 				// spot pen becomes brightness factor
 				if (spot_enabled && pen >= 0x80)
-					rgb.blend(rgbaint_t(dest[x]), (~pen & 0x7f) >> spot_shift);
+				{
+					rgb.set(rgbaint_t(dest[x]));
+					u16 factor = (spot_factor * (pen & 0x7f)) >> 7;
+					rgb.scale_imm_and_clamp(0x100 - factor);
+				}
+				else
+				{
+					// apply fade
+					if (fade_enabled)
+						rgb.blend(fade_color, fade_factor);
 
-				// otherwise apply alpha
-				else if (alpha_factor && ((pen & 0xf) == alpha_mask || (pen >= alpha_check12 && pen <= alpha_check13)))
-					rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
+					// apply alpha
+					if (alpha_factor && ((pen & 0xf) == alpha_mask || (pen >= alpha_check12 && pen <= alpha_check13)))
+						rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
+				}
 
 				dest[x] = rgb.to_rgba();
 			}
@@ -2093,7 +2092,7 @@ void namcos22s_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitma
 
 /*********************************************************************************************/
 
-WRITE32_MEMBER(namcos22_state::namcos22_paletteram_w)
+void namcos22_state::namcos22_paletteram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 prev = m_paletteram[offset];
 	COMBINE_DATA(&m_paletteram[offset]);
@@ -2121,7 +2120,7 @@ void namcos22_state::update_palette()
 }
 
 
-WRITE16_MEMBER(namcos22s_state::namcos22s_czattr_w)
+void namcos22s_state::namcos22s_czattr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*
 	       0    1    2    3    4    5    6    7
@@ -2150,12 +2149,12 @@ WRITE16_MEMBER(namcos22s_state::namcos22s_czattr_w)
 	}
 }
 
-READ16_MEMBER(namcos22s_state::namcos22s_czattr_r)
+u16 namcos22s_state::namcos22s_czattr_r(offs_t offset)
 {
 	return m_czattr[offset];
 }
 
-WRITE32_MEMBER(namcos22s_state::namcos22s_czram_w)
+void namcos22s_state::namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	/*
 	czram contents, it's basically a big cz compare table
@@ -2182,7 +2181,7 @@ WRITE32_MEMBER(namcos22s_state::namcos22s_czram_w)
 	}
 }
 
-READ32_MEMBER(namcos22s_state::namcos22s_czram_r)
+u32 namcos22s_state::namcos22s_czram_r(offs_t offset)
 {
 	int bank = m_czattr[5] & 3;
 	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];

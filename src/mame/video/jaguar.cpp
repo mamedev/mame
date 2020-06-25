@@ -4,6 +4,12 @@
 
     Atari Jaguar hardware
 
+    TODO (list of exceptions):
+    jaguar_state::generic_blitter()
+    - atarikrt, bretth, brutalsp, nbajamte, spacewar, spacewarp, tempst2k
+    jaguar_state::blitter_09800009_000020_000020()
+    - ruinerp
+
 ****************************************************************************
 
     ------------------------------------------------------------
@@ -150,7 +156,8 @@
 #define LOG_BLITTER_STATS   0
 #define LOG_BLITTER_WRITE   0
 #define LOG_UNHANDLED_BLITS 0
-
+// use the new version in jag_blitter.cpp/.h if 0
+#define USE_LEGACY_BLITTER  1
 
 
 
@@ -266,25 +273,38 @@ inline bool jaguar_state::adjust_object_timer(int vc)
  *
  *************************************/
 
-void jaguar_state::update_cpu_irq()
+// TODO: new TOM install irq handler
+inline void jaguar_state::verify_host_cpu_irq()
 {
-	if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
-		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+	// jaguar uses irq 2
+	if (m_is_cojag == false)
+		m_maincpu->set_input_line(M68K_IRQ_2, ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0) ? ASSERT_LINE : CLEAR_LINE);
 	else
-		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+	{
+		// cojag r3000 uses irq 4
+		// cojag 68020 uses irq 6
+		if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
+			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		else
+			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+	}
+}
+
+inline void jaguar_state::trigger_host_cpu_irq(int level)
+{
+	m_cpu_irq_state |= 1 << level;
+	verify_host_cpu_irq();
 }
 
 
 WRITE_LINE_MEMBER( jaguar_state::gpu_cpu_int )
 {
-	m_cpu_irq_state |= 2;
-	update_cpu_irq();
+	trigger_host_cpu_irq(1);
 }
 
 WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
 {
-	m_cpu_irq_state |= 16;
-	update_cpu_irq();
+	trigger_host_cpu_irq(4);
 }
 
 
@@ -522,8 +542,9 @@ if (++reps % 100 == 99)
 	g_profiler.stop();
 }
 
-READ32_MEMBER( jaguar_state::blitter_r )
+uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 {
+#if USE_LEGACY_BLITTER
 	switch (offset)
 	{
 		case B_CMD: /* B_CMD */
@@ -533,11 +554,15 @@ READ32_MEMBER( jaguar_state::blitter_r )
 			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
 			return 0;
 	}
+	#else
+	return m_blitter->iobus_r(offset, mem_mask);
+	#endif
 }
 
 
-WRITE32_MEMBER( jaguar_state::blitter_w )
+void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+#if USE_LEGACY_BLITTER
 	COMBINE_DATA(&m_blitter_regs[offset]);
 	if ((offset == B_CMD) && ACCESSING_BITS_0_15)
 	{
@@ -549,7 +574,10 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 	}
 
 	if (LOG_BLITTER_WRITE)
-	logerror("%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
+		logerror("%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
+#else
+	m_blitter->iobus_w(offset, data, mem_mask);
+#endif
 }
 
 
@@ -560,7 +588,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
  *
  *************************************/
 
-READ16_MEMBER( jaguar_state::tom_regs_r )
+uint16_t jaguar_state::tom_regs_r(offs_t offset)
 {
 	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
 		logerror("%s:TOM read register @ F00%03X\n", machine().describe_context(), offset * 2);
@@ -568,7 +596,9 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 	switch (offset)
 	{
 		case INT1:
+		{
 			return m_cpu_irq_state;
+		}
 
 		case HC:
 			return m_screen->hpos() % (m_screen->width() / 2);
@@ -589,7 +619,7 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 	return m_gpu_regs[offset];
 }
 
-WRITE16_MEMBER( jaguar_state::tom_regs_w )
+void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t reg_store = m_gpu_regs[offset];
 	attotime sample_period;
@@ -615,8 +645,10 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 
 			case INT1:
 				m_cpu_irq_state &= ~(m_gpu_regs[INT1] >> 8);
-				update_cpu_irq();
+				verify_host_cpu_irq();
 				break;
+
+			// TODO: INT2 bus mechanism
 
 			case VMODE:
 				if (reg_store != m_gpu_regs[offset])
@@ -624,8 +656,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 				break;
 
 			case OBF:   /* clear GPU interrupt */
-				m_cpu_irq_state &= 0xfd;
-				update_cpu_irq();
+				m_gpu->set_input_line(3, CLEAR_LINE);
 				break;
 
 			case HP:
@@ -673,7 +704,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
  *
  *************************************/
 
-READ32_MEMBER( jaguar_state::cojag_gun_input_r )
+uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
 {
 	int beamx, beamy;
 
@@ -715,10 +746,7 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		case TID_PIT:
 			if (m_gpu_regs[INT1] & 0x8)
-			{
-				m_cpu_irq_state |= 8;
-				update_cpu_irq();
-			}
+				trigger_host_cpu_irq(3);
 			if (m_gpu_regs[PIT0] != 0)
 			{
 				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
@@ -789,10 +817,7 @@ void jaguar_state::scanline_update(int param)
 	{
 		/* handle vertical interrupts */
 		if (vc == m_gpu_regs[VI])
-		{
-			m_cpu_irq_state |= 1;
-			update_cpu_irq();
-		}
+			trigger_host_cpu_irq(0);
 
 		/* point to the next counter value */
 		if (++vc / 2 >= m_screen->height())
@@ -824,7 +849,7 @@ void jaguar_state::video_start()
 
 void jaguar_state::device_postload()
 {
-	update_cpu_irq();
+	verify_host_cpu_irq();
 }
 
 

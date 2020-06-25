@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="saturn" description="Sega Saturn CD-ROMs">
 
@@ -3205,7 +3208,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="conveni 2, the - zenkoku chain tenkai da! (japan)" sha1="add782a8ae61b0cce64f329cccabf35da89ba1ce" />
+				<disk name="conveni 2, the - zenkoku chain tenkai da (japan)" sha1="add782a8ae61b0cce64f329cccabf35da89ba1ce" />
 			</diskarea>
 		</part>
 	</software>
@@ -3221,7 +3224,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="conveni!, the - ano machi wo dokusen seyo (japan)" sha1="c665746819905284948ff339e65b89e677fa0673" />
+				<disk name="conveni, the - ano machi wo dokusen seyo (japan)" sha1="c665746819905284948ff339e65b89e677fa0673" />
 			</diskarea>
 		</part>
 	</software>
@@ -3512,7 +3515,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahoo! deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
+				<disk name="detana twinbee yahoo deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
 			</diskarea>
 		</part>
 	</software>
@@ -4382,7 +4385,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="game tengoku - the game paradise! (japan)" sha1="2f20518a4859bdab0e363c426d853be3d2808ff7" />
+				<disk name="game tengoku - the game paradise (japan)" sha1="2f20518a4859bdab0e363c426d853be3d2808ff7" />
 			</diskarea>
 		</part>
 	</software>
@@ -4462,7 +4465,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gokujou parodius da! deluxe pack (japan) (rev a)" sha1="7185b3c3783b2150ed421e664829555e4e400e2c" />
+				<disk name="gokujou parodius da deluxe pack (japan) (rev a)" sha1="7185b3c3783b2150ed421e664829555e4e400e2c" />
 			</diskarea>
 		</part>
 	</software>
@@ -4704,7 +4707,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hansha de spark! (japan)" sha1="7ca18c7423472dc9cda7d746c1165abf52e2b31a" />
+				<disk name="hansha de spark (japan)" sha1="7ca18c7423472dc9cda7d746c1165abf52e2b31a" />
 			</diskarea>
 		</part>
 	</software>
@@ -4840,7 +4843,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! (japan) (rev a)" sha1="0dc41e7682de14d0593ee39aed27dc67670bea40" />
+				<disk name="j. league pro soccer club wo tsukurou (japan) (rev a)" sha1="0dc41e7682de14d0593ee39aed27dc67670bea40" />
 			</diskarea>
 		</part>
 	</software>
@@ -4856,7 +4859,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! (japan) (rev b)" sha1="14765abc2546ea51ee3243fdd6a9b8f4c2601c62" />
+				<disk name="j. league pro soccer club wo tsukurou (japan) (rev b)" sha1="14765abc2546ea51ee3243fdd6a9b8f4c2601c62" />
 			</diskarea>
 		</part>
 	</software>
@@ -4872,7 +4875,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! (japan)" sha1="9e9cb093db744793eb81ec3c2e21a477e19b483e" />
+				<disk name="j. league pro soccer club wo tsukurou (japan)" sha1="9e9cb093db744793eb81ec3c2e21a477e19b483e" />
 			</diskarea>
 		</part>
 	</software>
@@ -4888,7 +4891,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! 2 (japan) (1m)" sha1="eda6e0b3a6659b5b02510fa93ff6ec8900e894aa" />
+				<disk name="j. league pro soccer club wo tsukurou 2 (japan) (1m)" sha1="eda6e0b3a6659b5b02510fa93ff6ec8900e894aa" />
 			</diskarea>
 		</part>
 	</software>
@@ -4904,7 +4907,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! 2 (japan) (3m)" sha1="0550fd2599b7d0395b27171ecbf638a3c53af46d" />
+				<disk name="j. league pro soccer club wo tsukurou 2 (japan) (3m)" sha1="0550fd2599b7d0395b27171ecbf638a3c53af46d" />
 			</diskarea>
 		</part>
 	</software>
@@ -4920,7 +4923,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! 2 (japan) (4m)" sha1="97b161d41afaf530fbacc6881e2759a56df6c93d" />
+				<disk name="j. league pro soccer club wo tsukurou 2 (japan) (4m)" sha1="97b161d41afaf530fbacc6881e2759a56df6c93d" />
 			</diskarea>
 		</part>
 	</software>
@@ -4936,7 +4939,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j. league pro soccer club wo tsukurou! 2 (japan) (rev c) (32m)" sha1="c3f638176ca7002f1fa09f3176523dfdddfbc949" />
+				<disk name="j. league pro soccer club wo tsukurou 2 (japan) (rev c) (32m)" sha1="c3f638176ca7002f1fa09f3176523dfdddfbc949" />
 			</diskarea>
 		</part>
 	</software>
@@ -5060,7 +5063,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jissen pachi-slot hisshouhou! 3 (japan)" sha1="e9d1c8b9ad3c17b082b4f6f8c68c7c8357590dff" />
+				<disk name="jissen pachi-slot hisshouhou 3 (japan)" sha1="e9d1c8b9ad3c17b082b4f6f8c68c7c8357590dff" />
 			</diskarea>
 		</part>
 	</software>
@@ -5367,7 +5370,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kururin pa! (japan)" sha1="4519c15312679594cdc1e5c1833e55f038fe81ae" />
+				<disk name="kururin pa (japan)" sha1="4519c15312679594cdc1e5c1833e55f038fe81ae" />
 			</diskarea>
 		</part>
 	</software>
@@ -5651,7 +5654,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="magical drop iii - toretate zoukangou! (japan) (2m)" sha1="69e6d120ac04fdcb12a82f849f358f6072d2873f" />
+				<disk name="magical drop iii - toretate zoukangou (japan) (2m)" sha1="69e6d120ac04fdcb12a82f849f358f6072d2873f" />
 			</diskarea>
 		</part>
 	</software>
@@ -6136,7 +6139,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nihon daihyou team no kantoku ni naruu! sekaihatsu soccer rpg (japan)" sha1="46cf0931c104189479390a88680e593c47f41597" />
+				<disk name="nihon daihyou team no kantoku ni naruu sekaihatsu soccer rpg (japan)" sha1="46cf0931c104189479390a88680e593c47f41597" />
 			</diskarea>
 		</part>
 	</software>
@@ -6232,7 +6235,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ochige designer tsukutte pon! (japan)" sha1="a95f79dca7f97042480d03f04d553db9e11215a4" />
+				<disk name="ochige designer tsukutte pon (japan)" sha1="a95f79dca7f97042480d03f04d553db9e11215a4" />
 			</diskarea>
 		</part>
 	</software>
@@ -6360,7 +6363,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pia carrot e youkoso!! we've been waiting for you (japan)" sha1="842bf38452103165fd208a69432deecc7b8d2e63" />
+				<disk name="pia carrot e youkoso we've been waiting for you (japan)" sha1="842bf38452103165fd208a69432deecc7b8d2e63" />
 			</diskarea>
 		</part>
 	</software>
@@ -6548,7 +6551,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro yakyuu team mo tsukurou! (japan) (rev b)" sha1="b44c7c96ebac7014f2352af37916056468a33159" />
+				<disk name="pro yakyuu team mo tsukurou (japan) (rev b)" sha1="b44c7c96ebac7014f2352af37916056468a33159" />
 			</diskarea>
 		</part>
 	</software>
@@ -6564,7 +6567,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro yakyuu team mo tsukurou! (japan)" sha1="d9d18c0f74cdbaa67dcb647264281f320f884cc3" />
+				<disk name="pro yakyuu team mo tsukurou (japan)" sha1="d9d18c0f74cdbaa67dcb647264281f320f884cc3" />
 			</diskarea>
 		</part>
 	</software>
@@ -6744,7 +6747,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rayman yo! electoon wo sukue! (japan)" sha1="93ee26786fa392d7f0677df8778f2271882029e5" />
+				<disk name="rayman yo electoon wo sukue (japan)" sha1="93ee26786fa392d7f0677df8778f2271882029e5" />
 			</diskarea>
 		</part>
 	</software>
@@ -7222,7 +7225,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="saturn bomberman fight!! (japan)" sha1="ddb18c531619242c1cb920ea3047c15cd9e29a4b" />
+				<disk name="saturn bomberman fight (japan)" sha1="ddb18c531619242c1cb920ea3047c15cd9e29a4b" />
 			</diskarea>
 		</part>
 	</software>
@@ -8524,7 +8527,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! ryououki gokuraku cd-rom for sega saturn (japan) (1m)" sha1="22694cd6d0c885723091ca9fe502d5ff27780f4d" />
+				<disk name="tenchi muyou ryououki gokuraku cd-rom for sega saturn (japan) (1m)" sha1="22694cd6d0c885723091ca9fe502d5ff27780f4d" />
 			</diskarea>
 		</part>
 	</software>
@@ -8642,7 +8645,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="time bokan series - bokan to ippatsu! doronboo kanpekiban (japan)" sha1="762d85c30b6ae5dbbb96ff0459339e9eacfafb23" />
+				<disk name="time bokan series - bokan to ippatsu doronboo kanpekiban (japan)" sha1="762d85c30b6ae5dbbb96ff0459339e9eacfafb23" />
 			</diskarea>
 		</part>
 	</software>
@@ -9451,7 +9454,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yakyuuken special, the - konya wa 12 kaisen!! (japan) (1m)" sha1="670ce0a3ba9446b148c4c9e784f5e630b1858dae" />
+				<disk name="yakyuuken special, the - konya wa 12 kaisen (japan) (1m)" sha1="670ce0a3ba9446b148c4c9e784f5e630b1858dae" />
 			</diskarea>
 		</part>
 	</software>
@@ -9816,7 +9819,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="big ichigeki! pachi-slot daikouryaku (jpn) (v1.000) (dw0472)" sha1="37883821cc470ec2ff0907ed9f34e26630033aa3" />
+				<disk name="big ichigeki pachi-slot daikouryaku (jpn) (v1.000) (dw0472)" sha1="37883821cc470ec2ff0907ed9f34e26630033aa3" />
 			</diskarea>
 		</part>
 	</software>
@@ -9848,7 +9851,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blam! - machinehead (jpn) (dw0613)" sha1="709557e127f5d0090bfda9705a97f2b70383974b" />
+				<disk name="blam - machinehead (jpn) (dw0613)" sha1="709557e127f5d0090bfda9705a97f2b70383974b" />
 			</diskarea>
 		</part>
 	</software>
@@ -10685,7 +10688,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="feda remake! the emblem of justice (jpn) (dw0526)" sha1="f7b28dd6cf99bac22ec110439d81581e34bebcc0" />
+				<disk name="feda remake the emblem of justice (jpn) (dw0526)" sha1="f7b28dd6cf99bac22ec110439d81581e34bebcc0" />
 			</diskarea>
 		</part>
 	</software>
@@ -10864,7 +10867,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gakkou no kowai uwasa - hanako-san ga kita!! (jpn) (dw0639)" sha1="97a8b7a1afb0b00afb7058c5c78061afac21ba6d" />
+				<disk name="gakkou no kowai uwasa - hanako-san ga kita (jpn) (dw0639)" sha1="97a8b7a1afb0b00afb7058c5c78061afac21ba6d" />
 			</diskarea>
 		</part>
 	</software>
@@ -11259,7 +11262,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="heisei tensai bakabon susume! bakabons hibaihin (jpn) (dw0900)" sha1="058b81f21756ece9478818fd0d7a89dbfbf16628" />
+				<disk name="heisei tensai bakabon susume bakabons hibaihin (jpn) (dw0900)" sha1="058b81f21756ece9478818fd0d7a89dbfbf16628" />
 			</diskarea>
 		</part>
 	</software>
@@ -11353,7 +11356,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j league pro soccer club o tsukurou! (jpn) (v1.100) (dw0529)" sha1="fa29abc1ac45d8ecb73a1495c85a3e88a1ea8ec1" />
+				<disk name="j league pro soccer club o tsukurou (jpn) (v1.100) (dw0529)" sha1="fa29abc1ac45d8ecb73a1495c85a3e88a1ea8ec1" />
 			</diskarea>
 		</part>
 	</software>
@@ -11369,7 +11372,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j league pro soccer club o tsukurou! 2 (jpn) (v1.007) (dw0530)" sha1="31a64653c3966f44b1de40531f0f89ba4d0aa069" />
+				<disk name="j league pro soccer club o tsukurou 2 (jpn) (v1.007) (dw0530)" sha1="31a64653c3966f44b1de40531f0f89ba4d0aa069" />
 			</diskarea>
 		</part>
 	</software>
@@ -11858,7 +11861,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mahou gakuen lunar! (jpn) (dw0290)" sha1="811680d6886366dee1cdb764a9efb1443892db77" />
+				<disk name="mahou gakuen lunar (jpn) (dw0290)" sha1="811680d6886366dee1cdb764a9efb1443892db77" />
 			</diskarea>
 		</part>
 	</software>
@@ -12157,7 +12160,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nihon daihyou chimu no kantoku ninarou! sekaihatsu soccer (jpn) (dw0586)" sha1="eb9057fa52e9ea7f1f6bab1e6224d5b93d79116f" />
+				<disk name="nihon daihyou chimu no kantoku ninarou sekaihatsu soccer (jpn) (dw0586)" sha1="eb9057fa52e9ea7f1f6bab1e6224d5b93d79116f" />
 			</diskarea>
 		</part>
 	</software>
@@ -12400,7 +12403,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro yakyuu team mo tsukurou! (jpn) (dw0634)" sha1="c6ed7cb10eb0453e84249a00f27094e8736f2e5f" />
+				<disk name="pro yakyuu team mo tsukurou (jpn) (dw0634)" sha1="c6ed7cb10eb0453e84249a00f27094e8736f2e5f" />
 			</diskarea>
 		</part>
 	</software>
@@ -14631,7 +14634,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zap! snowboarding trix (jpn) (dw0110)" sha1="3c289689c75ce257134b435cf970bcf1df8537c1" />
+				<disk name="zap snowboarding trix (jpn) (dw0110)" sha1="3c289689c75ce257134b435cf970bcf1df8537c1" />
 			</diskarea>
 		</part>
 	</software>
@@ -15203,7 +15206,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bakushou!! all yoshimoto quiz ou ketteisen dx (t-20001g)" sha1="833dde87f204484307255424dcb9042051618673" />
+				<disk name="bakushou all yoshimoto quiz ou ketteisen dx (t-20001g)" sha1="833dde87f204484307255424dcb9042051618673" />
 			</diskarea>
 		</part>
 	</software>
@@ -15543,7 +15546,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bug too! motto motto jump shite, fundzukechatte, pecchanko (gs-9128)" sha1="6a3f86204444351e6e1bb666ffb26264eee97012" />
+				<disk name="bug too motto motto jump shite, fundzukechatte, pecchanko (gs-9128)" sha1="6a3f86204444351e6e1bb666ffb26264eee97012" />
 			</diskarea>
 		</part>
 	</software>
@@ -15559,7 +15562,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bug! jump shite, fundzukechatte, pecchanko (gs-9063)" sha1="2a8aa27c45eac02ab6585c8bd5a39358a22b460c" />
+				<disk name="bug jump shite, fundzukechatte, pecchanko (gs-9063)" sha1="2a8aa27c45eac02ab6585c8bd5a39358a22b460c" />
 			</diskarea>
 		</part>
 	</software>
@@ -16394,7 +16397,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho ! deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
+				<disk name="detana twinbee yahho  deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
 			</diskarea>
 		</part>
 	</software>
@@ -17993,7 +17996,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hissatsu! (t-23402g)" sha1="36cf29b82d8036b0e6d5fee2bae18bae18e2874f" />
+				<disk name="hissatsu (t-23402g)" sha1="36cf29b82d8036b0e6d5fee2bae18bae18e2874f" />
 			</diskarea>
 		</part>
 	</software>
@@ -18231,7 +18234,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="j league go go goal! (t-3602g)" sha1="6b3bc8ac0075017701e38ab87c4315c1d9624d28" />
+				<disk name="j league go go goal (t-3602g)" sha1="6b3bc8ac0075017701e38ab87c4315c1d9624d28" />
 			</diskarea>
 		</part>
 	</software>
@@ -18343,7 +18346,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jissen pachinko hisshouhou! twin (j) (t-2407g)" sha1="b073f8280980d34da18173cc4c8be4c422cdd1a6" />
+				<disk name="jissen pachinko hisshouhou twin (j) (t-2407g)" sha1="b073f8280980d34da18173cc4c8be4c422cdd1a6" />
 			</diskarea>
 		</part>
 	</software>
@@ -18374,7 +18377,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jissen! pachislot hisshouhou! iron hook (t-2404g)" sha1="bb7e6697a754d517345d2ec037c7fdaf5a2b0c7a" />
+				<disk name="jissen pachislot hisshouhou iron hook (t-2404g)" sha1="bb7e6697a754d517345d2ec037c7fdaf5a2b0c7a" />
 			</diskarea>
 		</part>
 	</software>
@@ -18547,7 +18550,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kochira katsushikaku kameari kouenmae hashutsujo nakagawa land dai race! no maki (satakore) (t-13332g)" sha1="a3505b03f7046c09575a90c0a7c83de04e041426" />
+				<disk name="kochira katsushikaku kameari kouenmae hashutsujo nakagawa land dai race no maki (satakore) (t-13332g)" sha1="a3505b03f7046c09575a90c0a7c83de04e041426" />
 			</diskarea>
 		</part>
 	</software>
@@ -19263,12 +19266,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="requirement" value="sat_cart:ram32"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pia carrot e youkoso!! 2 disc 1 (t-20114g)" sha1="eeacac1c1a8140953b958f91642f3b102cfdf603" />
+				<disk name="pia carrot e youkoso 2 disc 1 (t-20114g)" sha1="eeacac1c1a8140953b958f91642f3b102cfdf603" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pia carrot e youkoso!! 2 disc 2 (t-20114g)" sha1="de2d05f62c9e03a0c8578562036e67009ca549e5" />
+				<disk name="pia carrot e youkoso 2 disc 2 (t-20114g)" sha1="de2d05f62c9e03a0c8578562036e67009ca549e5" />
 			</diskarea>
 		</part>
 	</software>
@@ -20249,12 +20252,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shutsudou! mini-skirt police disc 1 (t-30812g)" sha1="b4d4f9310884a1298ab4896c2dcc75ce291ba3b8" />
+				<disk name="shutsudou mini-skirt police disc 1 (t-30812g)" sha1="b4d4f9310884a1298ab4896c2dcc75ce291ba3b8" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shutsudou! mini-skirt police audio disc (t-30812g)" sha1="a76bf8d86b3a4733efb728604cc75dd48fac8987" />
+				<disk name="shutsudou mini-skirt police audio disc (t-30812g)" sha1="a76bf8d86b3a4733efb728604cc75dd48fac8987" />
 			</diskarea>
 		</part>
 	</software>
@@ -20461,7 +20464,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="standby say you! (shokai gentei special package 2) (t-4312g)" sha1="dbfd9a3127f28d50656cb66cc8426e65cf631988" />
+				<disk name="standby say you (shokai gentei special package 2) (t-4312g)" sha1="dbfd9a3127f28d50656cb66cc8426e65cf631988" />
 			</diskarea>
 		</part>
 	</software>
@@ -20823,7 +20826,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! rensa hitsuyou (t-22204g)" sha1="f0b178c20977a4145ede5646aa40bd615ece14aa" />
+				<disk name="tenchi muyou rensa hitsuyou (t-22204g)" sha1="f0b178c20977a4145ede5646aa40bd615ece14aa" />
 			</diskarea>
 		</part>
 	</software>
@@ -21446,7 +21449,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tsuukai! slot shooting (j) (t-21504g)" sha1="e6de21835af424f0574267a261bdace0fd0a14de" />
+				<disk name="tsuukai slot shooting (j) (t-21504g)" sha1="e6de21835af424f0574267a261bdace0fd0a14de" />
 			</diskarea>
 		</part>
 	</software>
@@ -22411,7 +22414,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zap! snowboarding trix (t-7502g)" sha1="96c3755cd9cb83198a998a79debfd64ad0f7de05" />
+				<disk name="zap snowboarding trix (t-7502g)" sha1="96c3755cd9cb83198a998a79debfd64ad0f7de05" />
 			</diskarea>
 		</part>
 	</software>
@@ -23755,7 +23758,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kochira katsushikaku kamearikouenmae hashutsujo nakagawa land dai race! no maki (t-13319g)" sha1="e14cbaecd4fc7f1b51cd83a1004fd784c64ff5ef" />
+				<disk name="kochira katsushikaku kamearikouenmae hashutsujo nakagawa land dai race no maki (t-13319g)" sha1="e14cbaecd4fc7f1b51cd83a1004fd784c64ff5ef" />
 			</diskarea>
 		</part>
 	</software>
@@ -24504,7 +24507,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mezase idol star!! natsuiro memories (j) (t-31001g)" sha1="95271daac285215079f2df1df24b4eb38f68efa1" />
+				<disk name="mezase idol star natsuiro memories (j) (t-31001g)" sha1="95271daac285215079f2df1df24b4eb38f68efa1" />
 			</diskarea>
 		</part>
 	</software>
@@ -24835,7 +24838,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ninkuu - tsuyokina yatsura no daigekitotsu! (gs-9036)" sha1="bc73b082415207666f925f818d3884dbe36df33b" />
+				<disk name="ninkuu - tsuyokina yatsura no daigekitotsu (gs-9036)" sha1="bc73b082415207666f925f818d3884dbe36df33b" />
 			</diskarea>
 		</part>
 	</software>
@@ -26192,7 +26195,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tadaima wakusei kaitakuchu! (j) (t-16602g)" sha1="5d757cca73c3106fa2d42ca5ccd783574471eb8a" />
+				<disk name="tadaima wakusei kaitakuchu (j) (t-16602g)" sha1="5d757cca73c3106fa2d42ca5ccd783574471eb8a" />
 			</diskarea>
 		</part>
 	</software>
@@ -26295,12 +26298,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! toukou muyou - aniraji collection disc 1 (t-26103g)" sha1="36af9e97cfe84df964e25ce82e8aeba29f3a6b46" />
+				<disk name="tenchi muyou toukou muyou - aniraji collection disc 1 (t-26103g)" sha1="36af9e97cfe84df964e25ce82e8aeba29f3a6b46" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! toukou muyou - aniraji collection disc 2 (t-26103g)" sha1="170a4dfb5fb4d0a8d66ead4245a49ce5f028242e" />
+				<disk name="tenchi muyou toukou muyou - aniraji collection disc 2 (t-26103g)" sha1="170a4dfb5fb4d0a8d66ead4245a49ce5f028242e" />
 			</diskarea>
 		</part>
 	</software>
@@ -27796,7 +27799,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="derby stallion v1.001 (1999)(ascii)(ntsc)(jp)[!]" sha1="f6e875e07147833c4631cbf728873e995d68f6e5" />
+				<disk name="derby stallion v1.001 (1999)(ascii)(ntsc)(jp)" sha1="f6e875e07147833c4631cbf728873e995d68f6e5" />
 			</diskarea>
 		</part>
 	</software>
@@ -27813,12 +27816,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 1 of 2)[!]" sha1="233c4a4eefc7fae89d4fc559943e2b999ce5a0e1" />
+				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 1 of 2)" sha1="233c4a4eefc7fae89d4fc559943e2b999ce5a0e1" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 2 of 2)[!][omake]" sha1="ecd7363ee5977c41f9333672ff059d8f384c2b4d" />
+				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 2 of 2)[omake]" sha1="ecd7363ee5977c41f9333672ff059d8f384c2b4d" />
 			</diskarea>
 		</part>
 	</software>
@@ -27855,7 +27858,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gt 24 v1.003 (1998)(jaleco)(ntsc)(jp)[!]" sha1="32535fa6987d4f578469a1ca3aede27297860f7e" />
+				<disk name="gt 24 v1.003 (1998)(jaleco)(ntsc)(jp)" sha1="32535fa6987d4f578469a1ca3aede27297860f7e" />
 			</diskarea>
 		</part>
 	</software>
@@ -27871,7 +27874,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gaiden i - senritsu no blue v1.000 (1996)(bandai)(ntsc)(jp)[!]" sha1="6f6c93a1b95e6136bb3868139107bfd60fd1971f" />
+				<disk name="kidou senshi gundam gaiden i - senritsu no blue v1.000 (1996)(bandai)(ntsc)(jp)" sha1="6f6c93a1b95e6136bb3868139107bfd60fd1971f" />
 			</diskarea>
 		</part>
 	</software>
@@ -27887,7 +27890,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gaiden ii - ao o uketsugu mono v1.000 (1996)(bandai)(ntsc)(jp)[!]" sha1="d50f4397ec6674eb2f67ee1d35d760a6dd5735e5" />
+				<disk name="kidou senshi gundam gaiden ii - ao o uketsugu mono v1.000 (1996)(bandai)(ntsc)(jp)" sha1="d50f4397ec6674eb2f67ee1d35d760a6dd5735e5" />
 			</diskarea>
 		</part>
 	</software>
@@ -27903,7 +27906,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gaiden iii - sabakareshi mono v1.000 (1997)(bandai)(ntsc)(jp)[!]" sha1="eb7ce46739ef523cfb62c022d09c830230fb3b26" />
+				<disk name="kidou senshi gundam gaiden iii - sabakareshi mono v1.000 (1997)(bandai)(ntsc)(jp)" sha1="eb7ce46739ef523cfb62c022d09c830230fb3b26" />
 			</diskarea>
 		</part>
 	</software>
@@ -27919,7 +27922,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gihren no yabou - kouryaku shireisho v1.000 (1998)(bandai)(ntsc)(jp)[!]" sha1="4161b582f61b753c3619b2342357cbe1cb769952" />
+				<disk name="kidou senshi gundam gihren no yabou - kouryaku shireisho v1.000 (1998)(bandai)(ntsc)(jp)" sha1="4161b582f61b753c3619b2342357cbe1cb769952" />
 			</diskarea>
 		</part>
 	</software>
@@ -27935,7 +27938,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gihren no yabou v1.003 (1998)(bandai)(ntsc)(jp)[!]" sha1="896bee4337fb492d06a47401b8555ba65cefce8e" />
+				<disk name="kidou senshi gundam gihren no yabou v1.003 (1998)(bandai)(ntsc)(jp)" sha1="896bee4337fb492d06a47401b8555ba65cefce8e" />
 			</diskarea>
 		</part>
 	</software>
@@ -27951,7 +27954,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam v1.000 (1995)(bandai)(ntsc)(jp)[!]" sha1="f8fb9ee5051c27906d8f415a172863192184edcf" />
+				<disk name="kidou senshi gundam v1.000 (1995)(bandai)(ntsc)(jp)" sha1="f8fb9ee5051c27906d8f415a172863192184edcf" />
 			</diskarea>
 		</part>
 	</software>
@@ -27967,7 +27970,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi z gundam - zenpen zeta no kodou v1.002 (1997)(bandai)(ntsc)(jp)[!]" sha1="9a51d3c1983055cbecfe9f4d69e0350333aafda3" />
+				<disk name="kidou senshi z gundam - zenpen zeta no kodou v1.002 (1997)(bandai)(ntsc)(jp)" sha1="9a51d3c1983055cbecfe9f4d69e0350333aafda3" />
 			</diskarea>
 		</part>
 	</software>
@@ -27983,7 +27986,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="winning post ex v1.000 (1995)(koei)(ntsc)(jp)[!]" sha1="ff7257e1ba92cb76bbcd3f25d63523138a9c657b" />
+				<disk name="winning post ex v1.000 (1995)(koei)(ntsc)(jp)" sha1="ff7257e1ba92cb76bbcd3f25d63523138a9c657b" />
 			</diskarea>
 		</part>
 	</software>
@@ -29030,7 +29033,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="motteke tamago with ganbare! kamonohashi (hks)" sha1="3b1ede185d2292f9d7aa376572d2297a987b011b" />
+				<disk name="motteke tamago with ganbare kamonohashi (hks)" sha1="3b1ede185d2292f9d7aa376572d2297a987b011b" />
 			</diskarea>
 		</part>
 	</software>
@@ -29163,7 +29166,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ojousama o nerae!! (japan) [t-38101g]" sha1="ad7a84bc6867674303bca22eaee0aaf6e85bc2aa" />
+				<disk name="ojousama o nerae (japan) [t-38101g]" sha1="ad7a84bc6867674303bca22eaee0aaf6e85bc2aa" />
 			</diskarea>
 		</part>
 	</software>
@@ -29467,7 +29470,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shingata kururin pa! (japan)" sha1="907e88ecb84a0084b2f69cc80f3bd8dcf07b223e"/>
+				<disk name="shingata kururin pa (japan)" sha1="907e88ecb84a0084b2f69cc80f3bd8dcf07b223e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29897,7 +29900,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtua_fighter_kids(kor)[!]" sha1="48bbdd59caa47e3a950bfb1610b4e86656a0e08e" />
+				<disk name="virtua_fighter_kids(kor)" sha1="48bbdd59caa47e3a950bfb1610b4e86656a0e08e" />
 			</diskarea>
 		</part>
 	</software>
@@ -30115,7 +30118,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien trilogy v1.000 (1996)(acclaim)(pal)(de)[!]" sha1="b8c2a277bc70d780d11ff8926b75bbd26b4a4fae" />
+				<disk name="alien trilogy v1.000 (1996)(acclaim)(pal)(de)" sha1="b8c2a277bc70d780d11ff8926b75bbd26b4a4fae" />
 			</diskarea>
 		</part>
 	</software>
@@ -30129,7 +30132,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alone in the dark - jack is back v1.100 (1996)(infogrames)(pal)(m5)[!][t-15101hp-00738 a]" sha1="4c0824cb426dccf2692fb75ca2ffdbaa69331cfe" />
+				<disk name="alone in the dark - jack is back v1.100 (1996)(infogrames)(pal)(m5)[t-15101hp-00738 a]" sha1="4c0824cb426dccf2692fb75ca2ffdbaa69331cfe" />
 			</diskarea>
 		</part>
 	</software>
@@ -30157,7 +30160,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="andretti racing v1.000 (1997)(electronic arts)(pal)[!]" sha1="b31955a6b9c69f07ef1e2db80a21fc3ba03232b2" />
+				<disk name="andretti racing v1.000 (1997)(electronic arts)(pal)" sha1="b31955a6b9c69f07ef1e2db80a21fc3ba03232b2" />
 			</diskarea>
 		</part>
 	</software>
@@ -30242,12 +30245,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="atlantis - the lost tales v1.200 (1998)(sega)(pal)(m3)(disc 1 of 2)[!]" sha1="bf9f8736e131da6b685519154e397adad242f351" />
+				<disk name="atlantis - the lost tales v1.200 (1998)(sega)(pal)(m3)(disc 1 of 2)" sha1="bf9f8736e131da6b685519154e397adad242f351" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="atlantis - the lost tales v1.200 (1998)(sega)(pal)(m3)(disc 2 of 2)[!]" sha1="44ec8d08830b053af2d15eb72c55783e8690cf78" />
+				<disk name="atlantis - the lost tales v1.200 (1998)(sega)(pal)(m3)(disc 2 of 2)" sha1="44ec8d08830b053af2d15eb72c55783e8690cf78" />
 			</diskarea>
 		</part>
 	</software>
@@ -30281,7 +30284,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="baku baku v1.001 (1996)(sega)(pal)[!]" sha1="cf890c61b5c203062f1278d632dfe5d63429d5b5" />
+				<disk name="baku baku v1.001 (1996)(sega)(pal)" sha1="cf890c61b5c203062f1278d632dfe5d63429d5b5" />
 			</diskarea>
 		</part>
 	</software>
@@ -30337,7 +30340,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle monsters v1.000 (1996)(acclaim)(pal)[!]" sha1="5e631d720dcb17432d454e438481bfbc3531952c" />
+				<disk name="battle monsters v1.000 (1996)(acclaim)(pal)" sha1="5e631d720dcb17432d454e438481bfbc3531952c" />
 			</diskarea>
 		</part>
 	</software>
@@ -30365,7 +30368,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="black dawn v1.000 (1997)(virgin)(pal)[!]" sha1="e13f9c7b81017e3f538a9b2fa0eded4a64302704" />
+				<disk name="black dawn v1.000 (1997)(virgin)(pal)" sha1="e13f9c7b81017e3f538a9b2fa0eded4a64302704" />
 			</diskarea>
 		</part>
 	</software>
@@ -30393,7 +30396,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blam! -machinehead v1.000 (1996)(eidos)(pal)[!]" sha1="e1bd70b8f0650467253a2b4608bd4b75d84213d2" />
+				<disk name="blam -machinehead v1.000 (1996)(eidos)(pal)" sha1="e1bd70b8f0650467253a2b4608bd4b75d84213d2" />
 			</diskarea>
 		</part>
 	</software>
@@ -30421,7 +30424,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blam! -machinehead v1.000 (1996)(eidos)(pal)(de)[!]" sha1="dfde4275a621f8e2e4227db957cce1aac3a6a387" />
+				<disk name="blam -machinehead v1.000 (1996)(eidos)(pal)(de)" sha1="dfde4275a621f8e2e4227db957cce1aac3a6a387" />
 			</diskarea>
 		</part>
 	</software>
@@ -30435,7 +30438,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blast chamber v1.000 (1996)(activision)(pal)[!]" sha1="eca08ad622073c13fe3c30d3b0f86c1215cf4dd7" />
+				<disk name="blast chamber v1.000 (1996)(activision)(pal)" sha1="eca08ad622073c13fe3c30d3b0f86c1215cf4dd7" />
 			</diskarea>
 		</part>
 	</software>
@@ -30505,7 +30508,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bubble bobble also featuring rainbow islands v1.000 (1996)(acclaim)(pal)[!]" sha1="6788dcbf4f655f1b68433ebee095d4426e3d6522" />
+				<disk name="bubble bobble also featuring rainbow islands v1.000 (1996)(acclaim)(pal)" sha1="6788dcbf4f655f1b68433ebee095d4426e3d6522" />
 			</diskarea>
 		</part>
 	</software>
@@ -30519,7 +30522,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bug too! v1.000 (1997)(segasoft)(pal)[!]" sha1="0ec4d48ef276530f42a17b35c3bcbd38514ebf89" />
+				<disk name="bug too v1.000 (1997)(segasoft)(pal)" sha1="0ec4d48ef276530f42a17b35c3bcbd38514ebf89" />
 			</diskarea>
 		</part>
 	</software>
@@ -30533,7 +30536,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bug! v1.019 (1995)(sega)(pal)[!]" sha1="ef0226fc044b05b69212e833c492dcbcce8cdd68" />
+				<disk name="bug v1.019 (1995)(sega)(pal)" sha1="ef0226fc044b05b69212e833c492dcbcce8cdd68" />
 			</diskarea>
 		</part>
 	</software>
@@ -30561,7 +30564,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bust-a-move 2 - arcade edition v1.000 (1996)(acclaim)(pal)[!]" sha1="1882afe0a9c9fb965fd5c0d9716b210cffbf6f84" />
+				<disk name="bust-a-move 2 - arcade edition v1.000 (1996)(acclaim)(pal)" sha1="1882afe0a9c9fb965fd5c0d9716b210cffbf6f84" />
 			</diskarea>
 		</part>
 	</software>
@@ -30739,7 +30742,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="croc - legend of the gobbos v1.000 (1997)(fox)(pal)[!]" sha1="db32cdfff6130c1fb8ee818f6df55c11c2b1a7cb" />
+				<disk name="croc - legend of the gobbos v1.000 (1997)(fox)(pal)" sha1="db32cdfff6130c1fb8ee818f6df55c11c2b1a7cb" />
 			</diskarea>
 		</part>
 	</software>
@@ -30809,7 +30812,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="crypt killer v1.001 (1997)(konami)(pal)[!]" sha1="65178976cbe4a169020320d2d6e839b1a3646977" />
+				<disk name="crypt killer v1.001 (1997)(konami)(pal)" sha1="65178976cbe4a169020320d2d6e839b1a3646977" />
 			</diskarea>
 		</part>
 	</software>
@@ -30837,7 +30840,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtual-on - cyber troopers v1.002 (1996)(sega)(pal)[!]" sha1="84e280deb038d67d65233a5b2244eec1a22b32f2" />
+				<disk name="virtual-on - cyber troopers v1.002 (1996)(sega)(pal)" sha1="84e280deb038d67d65233a5b2244eec1a22b32f2" />
 			</diskarea>
 		</part>
 	</software>
@@ -30851,7 +30854,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cyberia v1.000 (1996)(interplay)(pal)(m3)[!]" sha1="07e8961ec291c8d3bcd4cba75da15d5c9bbfe68a" />
+				<disk name="cyberia v1.000 (1996)(interplay)(pal)(m3)" sha1="07e8961ec291c8d3bcd4cba75da15d5c9bbfe68a" />
 			</diskarea>
 		</part>
 	</software>
@@ -30866,12 +30869,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d v1.000 (1995)(acclaim)(pal)(disc 1 of 2)[!]" sha1="42639b46f848dfd55d4a7c0c37d6e7158cbd8093" />
+				<disk name="d v1.000 (1995)(acclaim)(pal)(disc 1 of 2)" sha1="42639b46f848dfd55d4a7c0c37d6e7158cbd8093" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d v1.000 (1995)(acclaim)(pal)(disc 2 of 2)[!]" sha1="e8d2101b6d5157b48c6979be3b2b63f3d4294335" />
+				<disk name="d v1.000 (1995)(acclaim)(pal)(disc 2 of 2)" sha1="e8d2101b6d5157b48c6979be3b2b63f3d4294335" />
 			</diskarea>
 		</part>
 	</software>
@@ -30906,12 +30909,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d v1.000 (1995)(acclaim)(pal)(de)(disc 1 of 2)[!]" sha1="c22eb646dcd89aee8cb16eaa2a9b1c5e30881170" />
+				<disk name="d v1.000 (1995)(acclaim)(pal)(de)(disc 1 of 2)" sha1="c22eb646dcd89aee8cb16eaa2a9b1c5e30881170" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d v1.000 (1995)(acclaim)(pal)(de)(disc 2 of 2)[!]" sha1="955f05c3448e12f135f8a11ba14c00a56121548c" />
+				<disk name="d v1.000 (1995)(acclaim)(pal)(de)(disc 2 of 2)" sha1="955f05c3448e12f135f8a11ba14c00a56121548c" />
 			</diskarea>
 		</part>
 	</software>
@@ -30939,7 +30942,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="darius ii v1.000 (1996)(sega)(pal)[!]" sha1="d0137deb386607458a14f4b957a3efb6aa94b63c" />
+				<disk name="darius ii v1.000 (1996)(sega)(pal)" sha1="d0137deb386607458a14f4b957a3efb6aa94b63c" />
 			</diskarea>
 		</part>
 	</software>
@@ -30967,7 +30970,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="darklight conflict v1.000 (1997)(electronic arts)(pal)(m6)[!]" sha1="01aa2d39d49e002d1245f113ea7674d6bb9d050f" />
+				<disk name="darklight conflict v1.000 (1997)(electronic arts)(pal)(m6)" sha1="01aa2d39d49e002d1245f113ea7674d6bb9d050f" />
 			</diskarea>
 		</part>
 	</software>
@@ -31057,7 +31060,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="destruction derby v2.900 (1996)(psygnosis)(pal)[!]" sha1="dbc908991986291e9d5239614d98cebefb281b59" />
+				<disk name="destruction derby v2.900 (1996)(psygnosis)(pal)" sha1="dbc908991986291e9d5239614d98cebefb281b59" />
 			</diskarea>
 		</part>
 	</software>
@@ -31099,7 +31102,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="digital pinball v1.004 (1995)(sega)(pal)[!][mk-81680p-426 9-95 7sb4]" sha1="913b915e5e3806ea6c0703f59a3ece008d89a71b" />
+				<disk name="digital pinball v1.004 (1995)(sega)(pal)[mk-81680p-426 9-95 7sb4]" sha1="913b915e5e3806ea6c0703f59a3ece008d89a71b" />
 			</diskarea>
 		</part>
 	</software>
@@ -31439,7 +31442,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="formula karts - special edition v1.000 (1997)(manic media productions)(pal)[!]" sha1="3d8b90d8c9123ab3e2a190a30d49692ca1b780bc" />
+				<disk name="formula karts - special edition v1.000 (1997)(manic media productions)(pal)" sha1="3d8b90d8c9123ab3e2a190a30d49692ca1b780bc" />
 			</diskarea>
 		</part>
 	</software>
@@ -31481,7 +31484,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="galactic attack v1.000 (1996)(acclaim)(pal)[!]" sha1="0a6c88ddb74ad020c403b50493a92b89859cfaf8" />
+				<disk name="galactic attack v1.000 (1996)(acclaim)(pal)" sha1="0a6c88ddb74ad020c403b50493a92b89859cfaf8" />
 			</diskarea>
 		</part>
 	</software>
@@ -31523,7 +31526,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ghen war v1.000 (1996)(virgin)(pal)[!]" sha1="f4b1adf675d3f2eb5bb88c4aa24b9b3d4b282bff" />
+				<disk name="ghen war v1.000 (1996)(virgin)(pal)" sha1="f4b1adf675d3f2eb5bb88c4aa24b9b3d4b282bff" />
 			</diskarea>
 		</part>
 	</software>
@@ -31551,7 +31554,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="grid run v1.000 (1996)(virgin)(pal)[!]" sha1="6a16d0a60890483a6eefb5e1623edf287e5c52f9" />
+				<disk name="grid run v1.000 (1996)(virgin)(pal)" sha1="6a16d0a60890483a6eefb5e1623edf287e5c52f9" />
 			</diskarea>
 		</part>
 	</software>
@@ -31579,7 +31582,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gun griffon - the eurasian conflict v1.00 (1996)(sega)(pal)[!]" sha1="fa041aea0cb7dc92b6646de2bbe43faea0a17bac" />
+				<disk name="gun griffon - the eurasian conflict v1.00 (1996)(sega)(pal)" sha1="fa041aea0cb7dc92b6646de2bbe43faea0a17bac" />
 			</diskarea>
 		</part>
 	</software>
@@ -31607,7 +31610,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hardcore 4x4 v1.001 (1996)(gremlin)(pal)[!]" sha1="f55af7175a31b3abef3cd51946184796cbea83d1" />
+				<disk name="hardcore 4x4 v1.001 (1996)(gremlin)(pal)" sha1="f55af7175a31b3abef3cd51946184796cbea83d1" />
 			</diskarea>
 		</part>
 	</software>
@@ -31649,7 +31652,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hi-octane v1.000 (1994)(electronic arts)(pal)(m4)[!]" sha1="1a0d37a79283b4c2bd14568096d905830dca81cf" />
+				<disk name="hi-octane v1.000 (1994)(electronic arts)(pal)(m4)" sha1="1a0d37a79283b4c2bd14568096d905830dca81cf" />
 			</diskarea>
 		</part>
 	</software>
@@ -31747,7 +31750,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="in the hunt v1.000 (1996)(kokopeli)(pal)[!]" sha1="cbcba0e4a8f2c45ef3456e29794e7980049bb64e" />
+				<disk name="in the hunt v1.000 (1996)(kokopeli)(pal)" sha1="cbcba0e4a8f2c45ef3456e29794e7980049bb64e" />
 			</diskarea>
 		</part>
 	</software>
@@ -31775,7 +31778,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="independence day - the game v1.000 (1997)(fox)(pal)(m6)[!]" sha1="638b1784658c5556f2f31a33edcb66fd5285a171" />
+				<disk name="independence day - the game v1.000 (1997)(fox)(pal)(m6)" sha1="638b1784658c5556f2f31a33edcb66fd5285a171" />
 			</diskarea>
 		</part>
 	</software>
@@ -31846,7 +31849,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jonah lomu rugby v1.100 (1997)(sports master)(pal)(m4)[!]" sha1="285c613c58c9351cb2a9c32898a324d6fdf4e17c" />
+				<disk name="jonah lomu rugby v1.100 (1997)(sports master)(pal)(m4)" sha1="285c613c58c9351cb2a9c32898a324d6fdf4e17c" />
 			</diskarea>
 		</part>
 	</software>
@@ -31902,7 +31905,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="krazy ivan v1.150 (1996)(psygnosis)(pal)[!]" sha1="b20a226b6358682dd81a292c2afbcc00d93882f8" />
+				<disk name="krazy ivan v1.150 (1996)(psygnosis)(pal)" sha1="b20a226b6358682dd81a292c2afbcc00d93882f8" />
 			</diskarea>
 		</part>
 	</software>
@@ -32098,7 +32101,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mass destruction v1.200 (1997)(sega)(pal)[!]" sha1="724482d0d5928d1ff8f5102d529109abeeb95b32" />
+				<disk name="mass destruction v1.200 (1997)(sega)(pal)" sha1="724482d0d5928d1ff8f5102d529109abeeb95b32" />
 			</diskarea>
 		</part>
 	</software>
@@ -32126,7 +32129,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mechwarrior 2 v1.000 (1997)(activision)(pal)[!]" sha1="f9fece620b4325c3e594747cb63845ec395f6e18" />
+				<disk name="mechwarrior 2 v1.000 (1997)(activision)(pal)" sha1="f9fece620b4325c3e594747cb63845ec395f6e18" />
 			</diskarea>
 		</part>
 	</software>
@@ -32182,7 +32185,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat trilogy v1.000 (1997)(gt interactive)(pal)[!]" sha1="c79aa6bcb4eb44c42af47d3a56c2fa09db6801f4" />
+				<disk name="mortal kombat trilogy v1.000 (1997)(gt interactive)(pal)" sha1="c79aa6bcb4eb44c42af47d3a56c2fa09db6801f4" />
 			</diskarea>
 		</part>
 	</software>
@@ -32216,7 +32219,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="myst v1.100 (1995)(sunsoft)(pal)(m4)[!]" sha1="ed5e7e5e603c66ccf01deb51b98945e314906f01" />
+				<disk name="myst v1.100 (1995)(sunsoft)(pal)(m4)" sha1="ed5e7e5e603c66ccf01deb51b98945e314906f01" />
 			</diskarea>
 		</part>
 	</software>
@@ -32230,7 +32233,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mystaria - the realms of lore v1.000 (1995)(sega)(pal)[!]" sha1="5b450d633d0bec08e43b419da9665f0421765874" />
+				<disk name="mystaria - the realms of lore v1.000 (1995)(sega)(pal)" sha1="5b450d633d0bec08e43b419da9665f0421765874" />
 			</diskarea>
 		</part>
 	</software>
@@ -32300,7 +32303,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nba action 98 v1.007 (1997)(sega)(pal)[!]" sha1="e18925797051e2988f42ce7df2b914c2e23eb9e8" />
+				<disk name="nba action 98 v1.007 (1997)(sega)(pal)" sha1="e18925797051e2988f42ce7df2b914c2e23eb9e8" />
 			</diskarea>
 		</part>
 	</software>
@@ -32314,7 +32317,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nba action v1.026 (1995)(sega)(pal)[!]" sha1="06de6a521f4e86629a27441853ac415607b9e97b" />
+				<disk name="nba action v1.026 (1995)(sega)(pal)" sha1="06de6a521f4e86629a27441853ac415607b9e97b" />
 			</diskarea>
 		</part>
 	</software>
@@ -32356,7 +32359,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nba live 97 v1.000 (1997)(electronic arts)(pal)[!]" sha1="42e7e43d36ac13f4ad71829f2017e838e5d3a9f0" />
+				<disk name="nba live 97 v1.000 (1997)(electronic arts)(pal)" sha1="42e7e43d36ac13f4ad71829f2017e838e5d3a9f0" />
 			</diskarea>
 		</part>
 	</software>
@@ -32482,7 +32485,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl all-star hockey v1.001 (1995)(sega)(pal)[!]" sha1="22484e75080742bb631ce535bb248f847f6dd616" />
+				<disk name="nhl all-star hockey v1.001 (1995)(sega)(pal)" sha1="22484e75080742bb631ce535bb248f847f6dd616" />
 			</diskarea>
 		</part>
 	</software>
@@ -32566,7 +32569,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="olympic soccer v2.000 (1994)(u.s. gold)(pal)(m5)[!]" sha1="b56a8c6833621441e702466b1120f99d0af43ae8" />
+				<disk name="olympic soccer v2.000 (1994)(u.s. gold)(pal)(m5)" sha1="b56a8c6833621441e702466b1120f99d0af43ae8" />
 			</diskarea>
 		</part>
 	</software>
@@ -32580,7 +32583,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="olympic soccer v2.000 (1994)(u.s. gold)(pal)(de)[!]" sha1="6c62c9854143db17bed615eba3383aebfc1895c1" />
+				<disk name="olympic soccer v2.000 (1994)(u.s. gold)(pal)(de)" sha1="6c62c9854143db17bed615eba3383aebfc1895c1" />
 			</diskarea>
 		</part>
 	</software>
@@ -32594,7 +32597,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pandemonium! (e)" sha1="76099efa37536a6bc20c29a19c34db9782304d19" />
+				<disk name="pandemonium (e)" sha1="76099efa37536a6bc20c29a19c34db9782304d19" />
 			</diskarea>
 		</part>
 	</software>
@@ -32608,7 +32611,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="panzer dragoon v1.000 (1995)(sega)(pal)[!]" sha1="3e6c7a069576c1d5fd958ff418016128d89b999d" />
+				<disk name="panzer dragoon v1.000 (1995)(sega)(pal)" sha1="3e6c7a069576c1d5fd958ff418016128d89b999d" />
 			</diskarea>
 		</part>
 	</software>
@@ -32836,7 +32839,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="revolution x v1.000 (1996)(acclaim)(pal)[!]" sha1="a711643c16b7b47bb267daefdac9ae9e3ef386de" />
+				<disk name="revolution x v1.000 (1996)(acclaim)(pal)" sha1="a711643c16b7b47bb267daefdac9ae9e3ef386de" />
 			</diskarea>
 		</part>
 	</software>
@@ -32867,22 +32870,22 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 1 of 4)[!]" sha1="00966d9785be07440ed1963d140585f71ff6ac14" />
+				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 1 of 4)" sha1="00966d9785be07440ed1963d140585f71ff6ac14" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 2 of 4)[!]" sha1="6a8e7519d610e2a0f25f1872b8e5a3e4376a0dc3" />
+				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 2 of 4)" sha1="6a8e7519d610e2a0f25f1872b8e5a3e4376a0dc3" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 3 of 4)[!]" sha1="617fcb42ebb5e7087c30a466d07d976eb115705a" />
+				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 3 of 4)" sha1="617fcb42ebb5e7087c30a466d07d976eb115705a" />
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 4 of 4)[!]" sha1="9f42a31a963ead1c16ace8bfd3ced36d099838e9" />
+				<disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 4 of 4)" sha1="9f42a31a963ead1c16ace8bfd3ced36d099838e9" />
 			</diskarea>
 		</part>
 	</software>
@@ -33176,7 +33179,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simcity 2000 v1.000 (1995)(sega)(pal)[!]" sha1="d80bafd8e7b637783b9913daa91aaab50e8bd6a0" />
+				<disk name="simcity 2000 v1.000 (1995)(sega)(pal)" sha1="d80bafd8e7b637783b9913daa91aaab50e8bd6a0" />
 			</diskarea>
 		</part>
 	</software>
@@ -33218,7 +33221,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="slam 'n jam '96 featuring magic &amp; kareem v1.000 (1996)(crystal dynamics)(pal)[!]" sha1="fde6ee0ef8d10a20bb88250e127ec9e80bd7c669" />
+				<disk name="slam 'n jam '96 featuring magic &amp; kareem v1.000 (1996)(crystal dynamics)(pal)" sha1="fde6ee0ef8d10a20bb88250e127ec9e80bd7c669" />
 			</diskarea>
 		</part>
 	</software>
@@ -33372,7 +33375,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="steep slope sliders v1.000 (1997)(sega)(pal)[!]" sha1="3dda113d196032699b613ae67a40a6416d6b45b6" />
+				<disk name="steep slope sliders v1.000 (1997)(sega)(pal)" sha1="3dda113d196032699b613ae67a40a6416d6b45b6" />
 			</diskarea>
 		</part>
 	</software>
@@ -33470,7 +33473,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street racer v1.000 (1996)(ubi soft)(pal)[!]" sha1="d4a1047d44eb482a82cfe328026149871bc56a26" />
+				<disk name="street racer v1.000 (1996)(ubi soft)(pal)" sha1="d4a1047d44eb482a82cfe328026149871bc56a26" />
 			</diskarea>
 		</part>
 	</software>
@@ -33484,7 +33487,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="striker '96 v1.001 (1996)(acclaim)(pal)[!]" sha1="27b50ca41105f624086fd87d8cfd103ea3f7f324" />
+				<disk name="striker '96 v1.001 (1996)(acclaim)(pal)" sha1="27b50ca41105f624086fd87d8cfd103ea3f7f324" />
 			</diskarea>
 		</part>
 	</software>
@@ -33526,7 +33529,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tempest 2000 v1.300 (1997)(interplay)(pal)[!]" sha1="4fb6f8af8a452e9118cfb6dcdae097eccc53cbba" />
+				<disk name="tempest 2000 v1.300 (1997)(interplay)(pal)" sha1="4fb6f8af8a452e9118cfb6dcdae097eccc53cbba" />
 			</diskarea>
 		</part>
 	</software>
@@ -33554,7 +33557,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tetris plus v1.000 (1997)(jvc)(pal)[!]" sha1="84e9cf94218d25ac93c2b02ab7e6e73ff2c70996" />
+				<disk name="tetris plus v1.000 (1997)(jvc)(pal)" sha1="84e9cf94218d25ac93c2b02ab7e6e73ff2c70996" />
 			</diskarea>
 		</part>
 	</software>
@@ -33610,7 +33613,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tilt! v1.000 (1996)(virgin)(pal)(m3)[!]" sha1="6811ef905aec042fa49040c5c73f6c0c771e4f65" />
+				<disk name="tilt v1.000 (1996)(virgin)(pal)(m3)" sha1="6811ef905aec042fa49040c5c73f6c0c771e4f65" />
 			</diskarea>
 		</part>
 	</software>
@@ -33700,7 +33703,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tunnel b1 v1.000 (1996)(ocean)(pal)(m5)[!]" sha1="e38f00f7d3b324ef5264851f5d029dcf2b07ef95" />
+				<disk name="tunnel b1 v1.000 (1996)(ocean)(pal)(m5)" sha1="e38f00f7d3b324ef5264851f5d029dcf2b07ef95" />
 			</diskarea>
 		</part>
 	</software>
@@ -33728,7 +33731,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultimate mortal kombat 3 v1.007 (1996)(gt interactive)(pal)[!]" sha1="17b8cd2f69ebe7fa7d9151d4bd3cb686ca624a7d" />
+				<disk name="ultimate mortal kombat 3 v1.007 (1996)(gt interactive)(pal)" sha1="17b8cd2f69ebe7fa7d9151d4bd3cb686ca624a7d" />
 			</diskarea>
 		</part>
 	</software>
@@ -33756,7 +33759,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="valora valley golf v1.000 (1995)(vic tokai)(pal)[!]" sha1="76e64e16bd85b00ac6c32ebc9e87c2018fbe939f" />
+				<disk name="valora valley golf v1.000 (1995)(vic tokai)(pal)" sha1="76e64e16bd85b00ac6c32ebc9e87c2018fbe939f" />
 			</diskarea>
 		</part>
 	</software>
@@ -33770,7 +33773,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="victory boxing v1.02e (1995)(jvc)(pal)[!][t6005hp535 p1h]" sha1="d9aad7fd81731a20bc80f1c2749a1dab6d1a371b" />
+				<disk name="victory boxing v1.02e (1995)(jvc)(pal)[t6005hp535 p1h]" sha1="d9aad7fd81731a20bc80f1c2749a1dab6d1a371b" />
 			</diskarea>
 		</part>
 	</software>
@@ -33826,7 +33829,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtua fighter 2 v1.001 (1996)(sega)(pal)[!][mk-81014p-00623a]" sha1="fb02d0ebbbd486bea50e10f0664b9edef9427dab" />
+				<disk name="virtua fighter 2 v1.001 (1996)(sega)(pal)[mk-81014p-00623a]" sha1="fb02d0ebbbd486bea50e10f0664b9edef9427dab" />
 			</diskarea>
 		</part>
 	</software>
@@ -33868,7 +33871,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtua fighter remix v0.001 (1995)(sega)(pal)[!]" sha1="f945a82d727afe0aa9fe562e8d903804b17e6892" />
+				<disk name="virtua fighter remix v0.001 (1995)(sega)(pal)" sha1="f945a82d727afe0aa9fe562e8d903804b17e6892" />
 			</diskarea>
 		</part>
 	</software>
@@ -33910,7 +33913,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtual hydlide v1.000 (1995)(sega)(pal)[!][mk-81380p-402 8-95 2sa5]" sha1="460d1f5edaa2e41f1ab36e32dc4ed6415382c9be" />
+				<disk name="virtual hydlide v1.000 (1995)(sega)(pal)[mk-81380p-402 8-95 2sa5]" sha1="460d1f5edaa2e41f1ab36e32dc4ed6415382c9be" />
 			</diskarea>
 		</part>
 	</software>
@@ -33938,7 +33941,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="warcraft ii - the dark saga v1.000 (1997)(electronic arts)(pal)(m5)[!]" sha1="8232a963e614f606851add6d607ce906bd85de32" />
+				<disk name="warcraft ii - the dark saga v1.000 (1997)(electronic arts)(pal)(m5)" sha1="8232a963e614f606851add6d607ce906bd85de32" />
 			</diskarea>
 		</part>
 	</software>
@@ -33980,7 +33983,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="winter heat v1.000 (1997)(sega)(pal)[!]" sha1="c51791f7097f1390d53dec4bea2f35f408a0d0f0" />
+				<disk name="winter heat v1.000 (1997)(sega)(pal)" sha1="c51791f7097f1390d53dec4bea2f35f408a0d0f0" />
 			</diskarea>
 		</part>
 	</software>
@@ -34022,7 +34025,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world cup golf - professional edition v1.001 (1995)(u.s. gold)(pal)[!]" sha1="2c444dccc9e3898a6d8b150c51c77d3a3ffb09e6" />
+				<disk name="world cup golf - professional edition v1.001 (1995)(u.s. gold)(pal)" sha1="2c444dccc9e3898a6d8b150c51c77d3a3ffb09e6" />
 			</diskarea>
 		</part>
 	</software>
@@ -34092,7 +34095,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world series baseball v1.005 (1995)(sega)(pal)[!][mk-81109p-511]" sha1="1b27d7de9b14fe502b605882ed93fe38f67488a2" />
+				<disk name="world series baseball v1.005 (1995)(sega)(pal)[mk-81109p-511]" sha1="1b27d7de9b14fe502b605882ed93fe38f67488a2" />
 			</diskarea>
 		</part>
 	</software>
@@ -34514,7 +34517,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtua fighter c.g. portrait collection v1.000 (1995)(sega)(pal)[!][inc. with virtua fighter remix]" sha1="37e5c2602e6c224f1cdcb343bfedbf6414cd4b02" />
+				<disk name="virtua fighter c.g. portrait collection v1.000 (1995)(sega)(pal)[inc. with virtua fighter remix]" sha1="37e5c2602e6c224f1cdcb343bfedbf6414cd4b02" />
 			</diskarea>
 		</part>
 	</software>
@@ -34662,7 +34665,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a+m+o+k v1.010 (1997)(sega)(ntsc)(us)[!]" sha1="f0286f1c924593fb4450aa3dacd4b7b19714c5fa" />
+				<disk name="a+m+o+k v1.010 (1997)(sega)(ntsc)(us)" sha1="f0286f1c924593fb4450aa3dacd4b7b19714c5fa" />
 			</diskarea>
 		</part>
 	</software>
@@ -34897,7 +34900,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blast chamber v1.000 (1996)(activision)(ntsc)(us)[!]" sha1="9071f06406930d455408dd676237922ba486d995" />
+				<disk name="blast chamber v1.000 (1996)(activision)(ntsc)(us)" sha1="9071f06406930d455408dd676237922ba486d995" />
 			</diskarea>
 		</part>
 	</software>
@@ -34912,7 +34915,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blazing dragons v1.000 (1996)(mindscape)(ntsc)(us)[!]" sha1="44980ad7b94de0af20073d62df126c071e081384" />
+				<disk name="blazing dragons v1.000 (1996)(mindscape)(ntsc)(us)" sha1="44980ad7b94de0af20073d62df126c071e081384" />
 			</diskarea>
 		</part>
 	</software>
@@ -34956,7 +34959,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="brain dead 13 v1.000 (1996)(readysoft)(ntsc)(us)[!]" sha1="f7aff688b5bf389c10ec908b4ae38f741623cabf" />
+				<disk name="brain dead 13 v1.000 (1996)(readysoft)(ntsc)(us)" sha1="f7aff688b5bf389c10ec908b4ae38f741623cabf" />
 			</diskarea>
 		</part>
 	</software>
@@ -34999,7 +35002,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bug too! (sat) (u)" sha1="98d1df5e9971f3d6a5bd86aa36cd90587a640af2" />
+				<disk name="bug too (sat) (u)" sha1="98d1df5e9971f3d6a5bd86aa36cd90587a640af2" />
 			</diskarea>
 		</part>
 	</software>
@@ -35013,7 +35016,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bug! (usa) [81004]" sha1="7f6771930c8cc0a6f8929089122ffbc3c5e6498d" />
+				<disk name="bug (usa) [81004]" sha1="7f6771930c8cc0a6f8929089122ffbc3c5e6498d" />
 			</diskarea>
 		</part>
 	</software>
@@ -35072,7 +35075,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="casper v1.003 (1996)(interplay)(ntsc)(us)[!]" sha1="7c84f3645e2d41d5407e3f06f3acf7c28ab49d9f" />
+				<disk name="casper v1.003 (1996)(interplay)(ntsc)(us)" sha1="7c84f3645e2d41d5407e3f06f3acf7c28ab49d9f" />
 			</diskarea>
 		</part>
 	</software>
@@ -35127,7 +35130,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="college slam v1.000 (1996)(acclaim)(ntsc)(us)[!]" sha1="ede2bc2cbdf7d5d83fbe4a34d1c106f9de458e37" />
+				<disk name="college slam v1.000 (1996)(acclaim)(ntsc)(us)" sha1="ede2bc2cbdf7d5d83fbe4a34d1c106f9de458e37" />
 			</diskarea>
 		</part>
 	</software>
@@ -35261,7 +35264,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="criticom - the critical combat v1.000 (1996)(vic tokai)(ntsc)(us)[!]" sha1="df4456fa316c544fe38aa670ca86d3cd2e91617a" />
+				<disk name="criticom - the critical combat v1.000 (1996)(vic tokai)(ntsc)(us)" sha1="df4456fa316c544fe38aa670ca86d3cd2e91617a" />
 			</diskarea>
 		</part>
 	</software>
@@ -35376,7 +35379,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cyberia v1.000 (1995)(interplay)(ntsc)(us)[!]" sha1="0c5619ec521744a0fd29f0e13a36820b62d12485" />
+				<disk name="cyberia v1.000 (1995)(interplay)(ntsc)(us)" sha1="0c5619ec521744a0fd29f0e13a36820b62d12485" />
 			</diskarea>
 		</part>
 	</software>
@@ -35425,7 +35428,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dark legend v1.002 (1995)(data east)(ntsc)(us)[!]" sha1="f935a4eabfd1d8827279181f1f622ebde2efb171" />
+				<disk name="dark legend v1.002 (1995)(data east)(ntsc)(us)" sha1="f935a4eabfd1d8827279181f1f622ebde2efb171" />
 			</diskarea>
 		</part>
 	</software>
@@ -35512,7 +35515,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="decathlete v1.000 (1996)(sega)(ntsc)(us)[!]" sha1="1712980c30449edb3d594fc919655abadd5bce1b" />
+				<disk name="decathlete v1.000 (1996)(sega)(ntsc)(us)" sha1="1712980c30449edb3d594fc919655abadd5bce1b" />
 			</diskarea>
 		</part>
 	</software>
@@ -35527,7 +35530,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="defcon 5 v1.000 (1995)(data east)(ntsc)(us)[!]" sha1="e8591dc43f0d47dd067af005e55b1a299d8b4eb3" />
+				<disk name="defcon 5 v1.000 (1995)(data east)(ntsc)(us)" sha1="e8591dc43f0d47dd067af005e55b1a299d8b4eb3" />
 			</diskarea>
 		</part>
 	</software>
@@ -35542,7 +35545,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="die hard arcade v1.001 (1996)(sega)(ntsc)(us)[!]" sha1="533eb891d1c447e1869d4e003ff7fdd6f88d483b" />
+				<disk name="die hard arcade v1.001 (1996)(sega)(ntsc)(us)" sha1="533eb891d1c447e1869d4e003ff7fdd6f88d483b" />
 			</diskarea>
 		</part>
 	</software>
@@ -35557,7 +35560,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="die hard trilogy v1.000 (1996)(fox)(ntsc)(us)[!]" sha1="3421beae710f2d77e7ed21b99fd5d4491a6014a1" />
+				<disk name="die hard trilogy v1.000 (1996)(fox)(ntsc)(us)" sha1="3421beae710f2d77e7ed21b99fd5d4491a6014a1" />
 			</diskarea>
 		</part>
 	</software>
@@ -35587,12 +35590,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="double switch v1.000 (1995)(digital pictures)(ntsc)(us)(disc 1 of 2)[!]" sha1="6627dbae0141ad75463e40420c05f3787672eae8" />
+				<disk name="double switch v1.000 (1995)(digital pictures)(ntsc)(us)(disc 1 of 2)" sha1="6627dbae0141ad75463e40420c05f3787672eae8" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="double switch v1.000 (1995)(digital pictures)(ntsc)(us)(disc 2 of 2)[!]" sha1="2f992de6f425d6ced461232a999480fdf908f151" />
+				<disk name="double switch v1.000 (1995)(digital pictures)(ntsc)(us)(disc 2 of 2)" sha1="2f992de6f425d6ced461232a999480fdf908f151" />
 			</diskarea>
 		</part>
 	</software>
@@ -35711,7 +35714,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fifa - road to world cup 98 v1.000 (1997)(electronic arts)(ntsc)(us)[!]" sha1="ccd960ba4973cd5091aa860b23eb81422e2f30eb" />
+				<disk name="fifa - road to world cup 98 v1.000 (1997)(electronic arts)(ntsc)(us)" sha1="ccd960ba4973cd5091aa860b23eb81422e2f30eb" />
 			</diskarea>
 		</part>
 	</software>
@@ -35754,7 +35757,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fighters megamix v1.004 (1997)(sega)(ntsc)(us)[!]" sha1="0e5f4c43b4f9a8f433aff39afdf08b4ea0fd20f0" />
+				<disk name="fighters megamix v1.004 (1997)(sega)(ntsc)(us)" sha1="0e5f4c43b4f9a8f433aff39afdf08b4ea0fd20f0" />
 			</diskarea>
 		</part>
 	</software>
@@ -35784,7 +35787,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fighting vipers v2.000 (1996)(sega)(ntsc)(us)[!]" sha1="4f4edb915c98da2ef2e809db9bc52d35334fe1f4" />
+				<disk name="fighting vipers v2.000 (1996)(sega)(ntsc)(us)" sha1="4f4edb915c98da2ef2e809db9bc52d35334fe1f4" />
 			</diskarea>
 		</part>
 	</software>
@@ -35898,7 +35901,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="grid runner v1.000 (1996)(virgin)(ntsc)(us)[!]" sha1="3082678405c368a48ecfd35f3a17670d1ef3a5eb" />
+				<disk name="grid runner v1.000 (1996)(virgin)(ntsc)(us)" sha1="3082678405c368a48ecfd35f3a17670d1ef3a5eb" />
 			</diskarea>
 		</part>
 	</software>
@@ -36013,7 +36016,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="high velocity - mountain racing challenge v1.002 (1995)(atlus)(ntsc)(us)[!]" sha1="956f9a2543148b7cbd7895ba547fdf3a6611be28" />
+				<disk name="high velocity - mountain racing challenge v1.002 (1995)(atlus)(ntsc)(us)" sha1="956f9a2543148b7cbd7895ba547fdf3a6611be28" />
 			</diskarea>
 		</part>
 	</software>
@@ -36143,7 +36146,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="iron man x-o manowar in heavy metal v1.000 (1996)(acclaim)(ntsc)(us)[!]" sha1="9e4fd6725f8a8e9c0d1dd03f566574435081d5ee" />
+				<disk name="iron man x-o manowar in heavy metal v1.000 (1996)(acclaim)(ntsc)(us)" sha1="9e4fd6725f8a8e9c0d1dd03f566574435081d5ee" />
 			</diskarea>
 		</part>
 	</software>
@@ -36157,7 +36160,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="iron storm v1.000 (1996)(working designs)(ntsc)(us)[!]" sha1="300703ac3873c8d4ebc82ac081c8e6cbd55bc6f9" />
+				<disk name="iron storm v1.000 (1996)(working designs)(ntsc)(us)" sha1="300703ac3873c8d4ebc82ac081c8e6cbd55bc6f9" />
 			</diskarea>
 		</part>
 	</software>
@@ -36215,7 +36218,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of oasis, the v1.002 (1996)(sega)(ntsc)(us)[!]" sha1="aae570c9108f0ba711ac692f8480d708dc79bd73" />
+				<disk name="legend of oasis, the v1.002 (1996)(sega)(ntsc)(us)" sha1="aae570c9108f0ba711ac692f8480d708dc79bd73" />
 			</diskarea>
 		</part>
 	</software>
@@ -36294,7 +36297,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="madden nfl 97 v1.000 (1996)(electronic arts)(ntsc)(us)[!]" sha1="da89b2ce7a049aa2c703f50a6946e32bc4b18eb2" />
+				<disk name="madden nfl 97 v1.000 (1996)(electronic arts)(ntsc)(us)" sha1="da89b2ce7a049aa2c703f50a6946e32bc4b18eb2" />
 			</diskarea>
 		</part>
 	</software>
@@ -36308,7 +36311,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="madden nfl 98 v1.000 (1997)(electronic arts)(ntsc)(us)[!]" sha1="bf7b1d0062259f93464a776ae3a99043461860ca" />
+				<disk name="madden nfl 98 v1.000 (1997)(electronic arts)(ntsc)(us)" sha1="bf7b1d0062259f93464a776ae3a99043461860ca" />
 			</diskarea>
 		</part>
 	</software>
@@ -36351,7 +36354,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mansion of hidden souls, the v1.006 (1995)(sega)(ntsc)(us)[!]" sha1="e133c9b8af6620c24a7a90a7893fa680fe5d5096" />
+				<disk name="mansion of hidden souls, the v1.006 (1995)(sega)(ntsc)(us)" sha1="e133c9b8af6620c24a7a90a7893fa680fe5d5096" />
 			</diskarea>
 		</part>
 	</software>
@@ -36535,7 +36538,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="myst v1.001 (1995)(acclaim)(ntsc)(us)[!]" sha1="fee7f2ca7a623e755ccd7902cc67c0bf2f402d5e" />
+				<disk name="myst v1.001 (1995)(acclaim)(ntsc)(us)" sha1="fee7f2ca7a623e755ccd7902cc67c0bf2f402d5e" />
 			</diskarea>
 		</part>
 	</software>
@@ -36665,7 +36668,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="need for speed, the v1.000 (1996)(electronic arts)(ntsc)(us)[!]" sha1="1e4bffd6b2cab94e7f943d65bfb3b18fc59a75ca" />
+				<disk name="need for speed, the v1.000 (1996)(electronic arts)(ntsc)(us)" sha1="1e4bffd6b2cab94e7f943d65bfb3b18fc59a75ca" />
 			</diskarea>
 		</part>
 	</software>
@@ -36721,7 +36724,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl '97 v1.010 (1996)(sega)(ntsc)(us)[!]" sha1="7ebe07c390e3366176b06f2d8f4f58e3befb8114" />
+				<disk name="nfl '97 v1.010 (1996)(sega)(ntsc)(us)" sha1="7ebe07c390e3366176b06f2d8f4f58e3befb8114" />
 			</diskarea>
 		</part>
 	</software>
@@ -36749,7 +36752,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl quarterback club '97 v1.001 (1997)(acclaim)(ntsc)(us)[!]" sha1="f1ebd5474be368fe55762ef814c03c249ab2314e" />
+				<disk name="nfl quarterback club '97 v1.001 (1997)(acclaim)(ntsc)(us)" sha1="f1ebd5474be368fe55762ef814c03c249ab2314e" />
 			</diskarea>
 		</part>
 	</software>
@@ -36763,7 +36766,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl 97 v1.000 (1996)(electronic arts)(ntsc)(us)[!]" sha1="8b96040ebab8642ab798b61db11157dd0f889a87" />
+				<disk name="nhl 97 v1.000 (1996)(electronic arts)(ntsc)(us)" sha1="8b96040ebab8642ab798b61db11157dd0f889a87" />
 			</diskarea>
 		</part>
 	</software>
@@ -36792,7 +36795,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl all-star hockey 98 v1.015 (1998)(sega)(ntsc)(us)[!]" sha1="fd0b830b3a33dc761332a5efd61798e562f3f8bf" />
+				<disk name="nhl all-star hockey 98 v1.015 (1998)(sega)(ntsc)(us)" sha1="fd0b830b3a33dc761332a5efd61798e562f3f8bf" />
 			</diskarea>
 		</part>
 	</software>
@@ -36806,7 +36809,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl all-star hockey v1.072 (1995)(sega)(ntsc)(us)[!][1008681102 9-95 2sa2]" sha1="9a407b8c2ce9ab869d6689788c3661fefd09ef39" />
+				<disk name="nhl all-star hockey v1.072 (1995)(sega)(ntsc)(us)[1008681102 9-95 2sa2]" sha1="9a407b8c2ce9ab869d6689788c3661fefd09ef39" />
 			</diskarea>
 		</part>
 	</software>
@@ -36835,7 +36838,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="night warriors - darkstalkers' revenge v1.001 (1996)(capcom)(ntsc)(us)[!]" sha1="565ff9b6e7f2f98858183fdfe830b8486264c6c9" />
+				<disk name="night warriors - darkstalkers' revenge v1.001 (1996)(capcom)(ntsc)(us)" sha1="565ff9b6e7f2f98858183fdfe830b8486264c6c9" />
 			</diskarea>
 		</part>
 	</software>
@@ -36921,7 +36924,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pandemonium! (u)" sha1="76072292456d2d3a7700bb0dceafc3a08c5dcb58" />
+				<disk name="pandemonium (u)" sha1="76072292456d2d3a7700bb0dceafc3a08c5dcb58" />
 			</diskarea>
 		</part>
 	</software>
@@ -36997,7 +37000,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pebble beach golf links v0.001 (1995)(sega)(ntsc)(us)[!]" sha1="b73bc2732eb357d8c849bd6866977fbe71c3d36f" />
+				<disk name="pebble beach golf links v0.001 (1995)(sega)(ntsc)(us)" sha1="b73bc2732eb357d8c849bd6866977fbe71c3d36f" />
 			</diskarea>
 		</part>
 	</software>
@@ -37085,7 +37088,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quarterback attack v1.000 (1995)(digital pictures)(ntsc)(us)[!]" sha1="66864e04a1c5d7626ff34600d40ac3ffdaab0c75" />
+				<disk name="quarterback attack v1.000 (1995)(digital pictures)(ntsc)(us)" sha1="66864e04a1c5d7626ff34600d40ac3ffdaab0c75" />
 			</diskarea>
 		</part>
 	</software>
@@ -37158,7 +37161,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="revolution x v1.000 (1995)(acclaim)(ntsc)(us)[!][t-8107h 2-96 2sa1, 5a25]" sha1="c38cdb5e31146874fd14acd93524b1fb3336b481" />
+				<disk name="revolution x v1.000 (1995)(acclaim)(ntsc)(us)[t-8107h 2-96 2sa1, 5a25]" sha1="c38cdb5e31146874fd14acd93524b1fb3336b481" />
 			</diskarea>
 		</part>
 	</software>
@@ -37287,7 +37290,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sega rally championship v1.006 (1995)(sega)(ntsc)(us)[!]" sha1="e6027947843b150d3b094464e8f5df94806497ec" />
+				<disk name="sega rally championship v1.006 (1995)(sega)(ntsc)(us)" sha1="e6027947843b150d3b094464e8f5df94806497ec" />
 			</diskarea>
 		</part>
 	</software>
@@ -37316,7 +37319,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sega touring car championship v1.001 (1997)(sega)(ntsc)(us)[!]" sha1="b0f69d09b86204e32f16ee11711dd006db9e7ba8" />
+				<disk name="sega touring car championship v1.001 (1997)(sega)(ntsc)(us)" sha1="b0f69d09b86204e32f16ee11711dd006db9e7ba8" />
 			</diskarea>
 		</part>
 	</software>
@@ -37346,7 +37349,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="worldwide soccer '98 v1.001 (1997)(sega)(ntsc)(us)[!]" sha1="4e045336642c514b4f36fc06c30bb3c9faceb3b3" />
+				<disk name="worldwide soccer '98 v1.001 (1997)(sega)(ntsc)(us)" sha1="4e045336642c514b4f36fc06c30bb3c9faceb3b3" />
 			</diskarea>
 		</part>
 	</software>
@@ -37460,7 +37463,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simcity 2000 v1.401 (1995)(maxis)(ntsc)(us)[!]" sha1="2115339148097a93e10fe8449eec5157fbe2dd8d" />
+				<disk name="simcity 2000 v1.401 (1995)(maxis)(ntsc)(us)" sha1="2115339148097a93e10fe8449eec5157fbe2dd8d" />
 			</diskarea>
 		</part>
 	</software>
@@ -37606,7 +37609,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="space jam v1.000 (1996)(acclaim)(ntsc)(us)[!]" sha1="fbd87c734896e399a0186d9e213220e6fa484044" />
+				<disk name="space jam v1.000 (1996)(acclaim)(ntsc)(us)" sha1="fbd87c734896e399a0186d9e213220e6fa484044" />
 			</diskarea>
 		</part>
 	</software>
@@ -37663,7 +37666,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter alpha - warrior's dreams v1.000 (1995)(capcom)(ntsc)(us)[!]" sha1="940e5f50f47845df1136d557d9e4f1345c0b908a" />
+				<disk name="street fighter alpha - warrior's dreams v1.000 (1995)(capcom)(ntsc)(us)" sha1="940e5f50f47845df1136d557d9e4f1345c0b908a" />
 			</diskarea>
 		</part>
 	</software>
@@ -37926,7 +37929,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultimate mortal kombat 3 v1.006 (1996)(midway)(ntsc)(us)[!]" sha1="d96c1a4e30a98be84bc3da43c0ca1626ddc49179" />
+				<disk name="ultimate mortal kombat 3 v1.006 (1996)(midway)(ntsc)(us)" sha1="d96c1a4e30a98be84bc3da43c0ca1626ddc49179" />
 			</diskarea>
 		</part>
 	</software>
@@ -38028,7 +38031,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtua fighter remix v0.003 (1995)(sega)(ntsc)(us)[!]" sha1="8dde649220e3bc03c10557a8111fee33078bdecf" />
+				<disk name="virtua fighter remix v0.003 (1995)(sega)(ntsc)(us)" sha1="8dde649220e3bc03c10557a8111fee33078bdecf" />
 			</diskarea>
 		</part>
 	</software>
@@ -38216,7 +38219,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world series baseball v1.003 (1995)(sega)(ntsc)(us)[!][saturn81109 p1h]" sha1="f2cf05b0a7028fd4cd5382060fd44fc0cdcacf29" />
+				<disk name="world series baseball v1.003 (1995)(sega)(ntsc)(us)[saturn81109 p1h]" sha1="f2cf05b0a7028fd4cd5382060fd44fc0cdcacf29" />
 			</diskarea>
 		</part>
 	</software>
@@ -38245,7 +38248,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world series baseball '98 v1.006 (1997)(sega)(ntsc)(us)[!]" sha1="a8570ff5b09483565ace4dda0e565dd919aac9fb" />
+				<disk name="world series baseball '98 v1.006 (1997)(sega)(ntsc)(us)" sha1="a8570ff5b09483565ace4dda0e565dd919aac9fb" />
 			</diskarea>
 		</part>
 	</software>
@@ -38259,7 +38262,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="worldwide soccer - sega international victory goal edition v1.002 (1995)(sega)(ntsc)(us)[!]" sha1="343d887225df7dcdfba292cef90cf5dbf9a78da8" />
+				<disk name="worldwide soccer - sega international victory goal edition v1.002 (1995)(sega)(ntsc)(us)" sha1="343d887225df7dcdfba292cef90cf5dbf9a78da8" />
 			</diskarea>
 		</part>
 	</software>

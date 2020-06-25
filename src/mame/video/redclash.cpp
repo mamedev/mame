@@ -98,13 +98,13 @@ void redclash_state::palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER( redclash_state::videoram_w )
+void redclash_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( redclash_state::gfxbank_w )
+void redclash_state::gfxbank_w(uint8_t data)
 {
 	if (m_gfxbank != (data & 0x01))
 	{
@@ -113,12 +113,12 @@ WRITE8_MEMBER( redclash_state::gfxbank_w )
 	}
 }
 
-WRITE8_MEMBER( redclash_state::flipscreen_w )
+void redclash_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER( redclash_state::star_reset_w )
+void redclash_state::star_reset_w(uint8_t data)
 {
 	m_stars->set_enable(true);
 }
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

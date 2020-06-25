@@ -66,22 +66,23 @@ public:
 		, m_card(*this, "cardslot")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_videoram(*this, "videoram")
+		, m_kbd(*this, "X%u", 0U)
 	{ }
 
 	void i7000(machine_config &config);
 
-	void init_i7000();
-
 protected:
-	void video_start() override;
-	void machine_start() override;
+	virtual void video_start() override;
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
-	uint32_t screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_ioport_array<8> m_kbd;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 
@@ -90,32 +91,25 @@ private:
 	void i7000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
 
-	DECLARE_READ8_MEMBER(i7000_kbd_r);
-	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
+	uint8_t kbd_r();
+	void scanlines_w(uint8_t data);
+
 	void i7000_io(address_map &map);
 	void i7000_mem(address_map &map);
 };
 
-WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
+void i7000_state::scanlines_w(uint8_t data)
 {
 	m_row = data;
 }
 
-READ8_MEMBER( i7000_state::i7000_kbd_r )
+uint8_t i7000_state::kbd_r()
 {
-	uint8_t data = 0xff;
-
 	for (int i=0; i<40*25; i++){
 		m_bg_tilemap->mark_tile_dirty(i);
 	}
 
-	if (m_row < 8)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_row);
-		data = ioport(kbdrow)->read();
-	}
-	return data;
+	return m_kbd[m_row & 7]->read();
 }
 
 /* Input ports */
@@ -227,9 +221,6 @@ static INPUT_PORTS_START( i7000 )
 		PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-void i7000_state::init_i7000()
-{
-}
 
 void i7000_state::machine_start()
 {
@@ -321,7 +312,7 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, /*code:*/ m_videoram[tile_index], /*color:*/ 0, 0);
+	tileinfo.set(0, /*code:*/ m_videoram[tile_index], /*color:*/ 0, 0);
 }
 
 void i7000_state::video_start()
@@ -329,7 +320,7 @@ void i7000_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(i7000_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
-uint32_t i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -354,7 +345,7 @@ void i7000_state::i7000(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(320, 200); /* 40x25 8x8 chars */
 	screen.set_visarea(0, 320-1, 0, 200-1);
-	screen.set_screen_update(FUNC(i7000_state::screen_update_i7000));
+	screen.set_screen_update(FUNC(i7000_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_i7000);
@@ -381,8 +372,8 @@ void i7000_state::i7000(machine_config &config)
 
 	/* Keyboard interface */
 	i8279_device &kbdc(I8279(config, "i8279", 4000000)); /* guessed value. TODO: verify on PCB */
-	kbdc.out_sl_callback().set(FUNC(i7000_state::i7000_scanlines_w));   // scan SL lines
-	kbdc.in_rl_callback().set(FUNC(i7000_state::i7000_kbd_r));          // kbd RL lines
+	kbdc.out_sl_callback().set(FUNC(i7000_state::scanlines_w));         // scan SL lines
+	kbdc.in_rl_callback().set(FUNC(i7000_state::kbd_r));                // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                           // TODO: Shift key
 	kbdc.in_ctrl_callback().set_constant(1);                            // TODO: Ctrl key
 
@@ -422,4 +413,4 @@ ROM_START( i7000 )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1982, i7000, 0,      0,      i7000,   i7000, i7000_state, init_i7000, "Itautec", "I-7000", MACHINE_NOT_WORKING)
+COMP( 1982, i7000, 0,      0,      i7000,   i7000, i7000_state, empty_init, "Itautec", "I-7000", MACHINE_NOT_WORKING)

@@ -57,19 +57,19 @@ void gunsmoke_state::gunsmoke_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_videoram_w)
+void gunsmoke_state::gunsmoke_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_colorram_w)
+void gunsmoke_state::gunsmoke_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
+void gunsmoke_state::gunsmoke_c804_w(uint8_t data)
 {
 	/* bits 0 and 1 are for coin counters */
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
@@ -87,7 +87,7 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 	m_chon = data & 0x80;
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
+void gunsmoke_state::gunsmoke_d806_w(uint8_t data)
 {
 	/* bits 0-2 select the sprite 3 bank */
 	m_sprite3bank = data & 0x07;
@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(gunsmoke_state::get_fg_tile_info)
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(gunsmoke_state::get_fg_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void gunsmoke_state::video_start()

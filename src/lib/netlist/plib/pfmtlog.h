@@ -8,6 +8,7 @@
 #ifndef PFMT_H_
 #define PFMT_H_
 
+#include "penum.h"
 #include "pstring.h"
 #include "ptypes.h"
 #include "putil.h"
@@ -21,12 +22,12 @@
 	{ \
 		template<typename... Args> explicit name(Args&&... args) \
 		: plib::perrmsg(str, std::forward<Args>(args)...) \
-		{ static_assert(narg == sizeof...(args), "Argument count mismatch"); } \
+		{ static_assert((narg) == sizeof...(args), "Argument count mismatch"); } \
 	};
 
 namespace plib {
 
-	P_ENUM(plog_level,
+	PENUM(plog_level,
 		DEBUG,
 		VERBOSE,
 		INFO,
@@ -47,14 +48,14 @@ namespace plib {
 
 	#if (PUSE_FLOAT128)
 	template <>
-	struct ptype_traits_base<__float128>
+	struct ptype_traits_base<FLOAT128>
 	{
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
 		static char32_t fmt_spec() { return 'f'; }
-		static inline void streamify(std::ostream &s, const __float128 &v)
+		static inline void streamify(std::ostream &s, const FLOAT128 &v)
 		{
-			s << static_cast<long double>(v);
+			s << narrow_cast<long double>(v);
 		}
 	};
 	#endif
@@ -153,7 +154,7 @@ namespace plib {
 
 	#if (PUSE_FLOAT128)
 	template<>
-	struct ptype_traits<__float128> : ptype_traits_base<__float128>
+	struct ptype_traits<FLOAT128> : ptype_traits_base<FLOAT128>
 	{
 		static char32_t fmt_spec() { return 'f'; }
 	};
@@ -195,27 +196,22 @@ namespace plib {
 		{
 		}
 
-		COPYASSIGNMOVE(pfmt, default)
+		PCOPYASSIGNMOVE(pfmt, default)
 
 		~pfmt() noexcept = default;
 
 		operator pstring() const { return m_str; }
 
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
+		std::enable_if_t<plib::is_floating_point<T>::value, pfmt &>
 		f(const T &x) {return format_element('f', x);  }
 
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
+		std::enable_if_t<plib::is_floating_point<T>::value, pfmt &>
 		e(const T &x) {return format_element('e', x);  }
 
-	#if PUSE_FLOAT128
-		// FIXME: should use quadmath_snprintf
-		pfmt & e(const __float128 &x) {return format_element('e', static_cast<long double>(x));  }
-	#endif
-
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
+		std::enable_if_t<plib::is_floating_point<T>::value, pfmt &>
 		g(const T &x) {return format_element('g', x);  }
 
 		pfmt &operator ()(const void *x) {return format_element('p', x);  }
@@ -245,14 +241,14 @@ namespace plib {
 		}
 
 		template<typename T>
-		typename std::enable_if<std::is_integral<T>::value, pfmt &>::type
+		std::enable_if_t<plib::is_integral<T>::value, pfmt &>
 		x(const T &x)
 		{
 			return format_element('x', x);
 		}
 
 		template<typename T>
-		typename std::enable_if<std::is_integral<T>::value, pfmt &>::type
+		std::enable_if_t<plib::is_integral<T>::value, pfmt &>
 		o(const T &x)
 		{
 			return format_element('o', x);
@@ -317,7 +313,7 @@ namespace plib {
 	public:
 		explicit pfmt_writer_t() : m_enabled(true)  { }
 
-		COPYASSIGNMOVE(pfmt_writer_t, delete)
+		PCOPYASSIGNMOVE(pfmt_writer_t, delete)
 
 		// runtime enable
 		template<bool enabled, typename... Args>
@@ -326,7 +322,7 @@ namespace plib {
 			if (build_enabled && enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				static_cast<T *>(this)->vdowrite(xlog(pf, std::forward<Args>(args)...));
+				dynamic_cast<T &>(*this).vdowrite(xlog(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -336,7 +332,7 @@ namespace plib {
 			if (build_enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				static_cast<const T *>(this)->vdowrite(xlog(pf, std::forward<Args>(args)...));
+				static_cast<const T &>(*this).vdowrite(xlog(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -370,7 +366,7 @@ namespace plib {
 	public:
 		explicit plog_channel(T &b) : pfmt_writer_t<plog_channel, build_enabled>(), m_base(b) { }
 
-		COPYASSIGNMOVE(plog_channel, delete)
+		PCOPYASSIGNMOVE(plog_channel, delete)
 
 		~plog_channel() noexcept = default;
 
@@ -398,7 +394,7 @@ namespace plib {
 			fatal(proxy)
 		{}
 
-		COPYASSIGNMOVE(plog_base, default)
+		PCOPYASSIGNMOVE(plog_base, default)
 		virtual ~plog_base() noexcept = default;
 
 		plog_channel<T, plog_level::DEBUG, debug_enabled> debug;

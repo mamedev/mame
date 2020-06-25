@@ -211,7 +211,7 @@ void psxdma_device::install_write_handler( int index, write_delegate p_fn_dma_wr
 	m_channel[ index ].fn_write = p_fn_dma_write;
 }
 
-WRITE32_MEMBER( psxdma_device::write )
+void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int index = offset / 4;
 	psx_dma_channel *dma = &m_channel[ index ];
@@ -382,7 +382,7 @@ WRITE32_MEMBER( psxdma_device::write )
 	}
 }
 
-READ32_MEMBER( psxdma_device::read )
+uint32_t psxdma_device::read(offs_t offset, uint32_t mem_mask)
 {
 	int index = offset / 4;
 	psx_dma_channel *dma = &m_channel[ index ];

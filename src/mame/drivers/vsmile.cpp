@@ -26,7 +26,7 @@ void vsmile_base_state::machine_start()
 	m_bankdev->set_bank(bank);
 }
 
-WRITE8_MEMBER(vsmile_base_state::chip_sel_w)
+void vsmile_base_state::chip_sel_w(uint8_t data)
 {
 	const uint16_t cart_offset = m_cart && m_cart->exists() ? 4 : 0;
 	switch (data)
@@ -45,7 +45,7 @@ WRITE8_MEMBER(vsmile_base_state::chip_sel_w)
 	m_maincpu->invalidate_cache();
 }
 
-READ16_MEMBER(vsmile_base_state::bank3_r)
+uint16_t vsmile_base_state::bank3_r(offs_t offset)
 {
 	return ((uint16_t*)m_system_region->base())[offset];
 }
@@ -64,7 +64,7 @@ void vsmile_state::machine_reset()
 	std::fill(std::begin(m_ctrl_select), std::end(m_ctrl_select), false);
 }
 
-WRITE8_MEMBER(vsmile_state::ctrl_tx_w)
+void vsmile_state::ctrl_tx_w(uint8_t data)
 {
 	//printf("Ctrl Tx: %02x\n", data);
 	m_maincpu->uart_rx(data);
@@ -77,25 +77,25 @@ template <int Which> WRITE_LINE_MEMBER(vsmile_state::ctrl_rts_w)
 	m_maincpu->extint_w(Which, state);
 }
 
-WRITE8_MEMBER(vsmile_state::uart_rx)
+void vsmile_state::uart_rx(uint8_t data)
 {
 	//printf("Ctrl Rx: %02x\n", data);
 	m_ctrl[0]->data_w(data);
 	m_ctrl[1]->data_w(data);
 }
 
-READ16_MEMBER(vsmile_state::portb_r)
+uint16_t vsmile_state::portb_r()
 {
 	return VSMILE_PORTB_OFF_SW | VSMILE_PORTB_ON_SW | VSMILE_PORTB_RESET;
 }
 
-WRITE16_MEMBER(vsmile_state::portb_w)
+void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 4))
 		m_cart->set_cs2(BIT(data, 4));
 }
 
-READ16_MEMBER(vsmile_state::portc_r)
+uint16_t vsmile_state::portc_r()
 {
 	uint16_t data = m_dsw_region->read();
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
@@ -106,7 +106,7 @@ READ16_MEMBER(vsmile_state::portc_r)
 	return data;
 }
 
-WRITE16_MEMBER(vsmile_state::portc_w)
+void vsmile_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 8))
 	{
@@ -128,12 +128,12 @@ WRITE16_MEMBER(vsmile_state::portc_w)
  *
  ************************************/
 
-WRITE16_MEMBER(vsmilem_state::porta_w)
+void vsmilem_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("Port A write: %04x & %04x\n", data, mem_mask);
 }
 
-READ16_MEMBER(vsmilem_state::porta_r)
+uint16_t vsmilem_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
 	const uint16_t data = 0xc000;
 	//printf("Port A read: %04x & %04x\n", data, mem_mask);
@@ -191,10 +191,36 @@ static INPUT_PORTS_START( vsmile )
 	PORT_DIPSETTING(    0x04, "UK/US" )
 	PORT_DIPSETTING(    0x07, "China" )
 	PORT_DIPSETTING(    0x08, "Mexico" )
-	PORT_DIPSETTING(    0x0a, "Italy" )
+	PORT_DIPSETTING(    0x0a, "Italy" ) // not valid on V.Smile Motion?
 	PORT_DIPSETTING(    0x0b, "Germany" )
 	PORT_DIPSETTING(    0x0c, "Spain" )
 	PORT_DIPSETTING(    0x0d, "France" )
+	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x10, "On" )
+	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vsmilem )
+	PORT_START("REGION")
+	PORT_DIPNAME( 0x0f, 0x0f, "sysrom Region" )
+	//PORT_DIPSETTING(    0x00, "0" ) // no V.Smile Motion logo, blank cartridge image, "Please insert a Learning Game" text
+	//PORT_DIPSETTING(    0x01, "1" ) // no V.Smile Motion logo, blank cartridge image, no text
+	PORT_DIPSETTING(    0x02, "Italy" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Per favore inserisci una cartuccia di gioco" text (possibly invalid as text on logo is still in English and Italy was previously 0x0a)
+	//PORT_DIPSETTING(    0x03, "3" ) // V.Smile Motion logo with no text, voice 2, regular cartridge image, no text
+	//PORT_DIPSETTING(    0x04, "4" ) // V.Smile Motion logo with no text, voice 2, regular cartridge image, "Please insert a Learning Game" text
+	PORT_DIPSETTING(    0x05, "English (1)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Learning Game" text
+	PORT_DIPSETTING(    0x06, "English (2)" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text
+	PORT_DIPSETTING(    0x07, "China" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, Chinese text
+	PORT_DIPSETTING(    0x08, "Mexico" ) // V.Smile Motion logo with "Sistema Educativo", voice 1, regular cartridge image, "TV Learning System" text
+	PORT_DIPSETTING(    0x09, "Netherlands?" ) // V.Smile Motion logo with "Active Learning System", voice 3, regular cartridge image, "Plaats een game"
+	//PORT_DIPSETTING(    0x0a, "a" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text  (was 'Italy' on regular vsmile)
+	PORT_DIPSETTING(    0x0b, "Germany" ) // V.Smile Motion logo with "Aktives Lernspiel - System", voice 4, regular cartridge image, "Bitte Lernspiel einstecken"
+	PORT_DIPSETTING(    0x0c, "Spain" ) // V.Smile Motion logo with "Aprendizaje Inteligente En Accion", voice 5, regular cartridge image, "Por favor, inserta un cartuncho"
+	PORT_DIPSETTING(    0x0d, "France" ) // V.Smile Motion logo with "Apprendre En Mouvements", voice 6, regular cartridge image, "Inserer une cartouche"
+	//PORT_DIPSETTING(    0x0e, "e" ) // V.Smile Motion logo with "Active Learning System", voice 1, regular cartridge image, "Please insert a Learning Game" text (same as 0x06?)
+	PORT_DIPSETTING(    0x0f, "English (3)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Smartridge(tm)" text   (Smartridge must be a region specific term?)
+
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
 	PORT_DIPSETTING(    0x00, "Off" )
 	PORT_DIPSETTING(    0x10, "On" )
@@ -297,9 +323,9 @@ ROM_END
 
 ROM_START( vsmilem )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, BAD_DUMP CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+	ROM_LOAD16_WORD_SWAP( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5) ) // from a Spanish unit (but doesn't seem region specific)
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
 CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmile,  vsmilem_state, empty_init, "VTech", "V.Smile Motion (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmilem, vsmilem_state, empty_init, "VTech", "V.Smile Motion",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

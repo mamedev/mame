@@ -76,8 +76,7 @@ keeping track of it in a variable in the driver.
 
 void dragon_alpha_state::device_start(void)
 {
-	dragon_state::device_start();
-	save_item(NAME(m_just_reset));
+	dragon64_state::device_start();
 }
 
 
@@ -88,8 +87,7 @@ void dragon_alpha_state::device_start(void)
 
 void dragon_alpha_state::device_reset(void)
 {
-	dragon_state::device_reset();
-	m_just_reset = 1;
+	dragon64_state::device_reset();
 }
 
 
@@ -120,90 +118,6 @@ void dragon_alpha_state::modem_w(offs_t offset, uint8_t data)
 
 
 /***************************************************************************
-  PIA1
-***************************************************************************/
-
-//-------------------------------------------------
-//  ff20_read
-//-------------------------------------------------
-
-READ8_MEMBER( dragon_alpha_state::ff20_read )
-{
-	uint8_t result = 0x00;
-
-	switch(offset & 0x0f)
-	{
-		case 0: case 1: case 2: case 3:
-			result = dragon_state::ff20_read(space, offset, mem_mask);
-			break;
-
-		case 4: case 5: case 6: case 7:
-			result = m_pia_2->read(offset);
-			break;
-
-		case 8: case 9: case 10: case 11:
-			result = modem_r(offset);
-			break;
-
-		case 12:
-			result = m_fdc->data_r();
-			break;
-
-		case 13:
-			result = m_fdc->sector_r();
-			break;
-
-		case 14:
-			result = m_fdc->track_r();
-			break;
-
-		case 15:
-			result = m_fdc->status_r();
-			break;
-	}
-
-	return result;
-}
-
-
-
-//-------------------------------------------------
-//  ff20_write
-//-------------------------------------------------
-
-WRITE8_MEMBER( dragon_alpha_state::ff20_write )
-{
-	switch(offset & 0x0f)
-	{
-		case 0: case 1: case 2: case 3:
-			dragon_state::ff20_write(space, offset, data, mem_mask);
-			break;
-
-		case 4: case 5: case 6: case 7:
-			m_pia_2->write(offset, data);
-			break;
-
-		case 8: case 9: case 10: case 11:
-			modem_w(offset, data);
-			break;
-
-		case 12:
-			m_fdc->data_w(data);
-			break;
-		case 13:
-			m_fdc->sector_w(data);
-			break;
-		case 14:
-			m_fdc->track_w(data);
-			break;
-		case 15:
-			m_fdc->cmd_w(data);
-			break;
-	}
-}
-
-
-/***************************************************************************
   PIA2 ($FF24-$FF28) on Dragon Alpha/Professional
 
     PIA2 PA0        bcdir to AY-8912
@@ -218,7 +132,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 //  pia2_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
+void dragon_alpha_state::pia2_pa_w(uint8_t data)
 {
 	uint8_t ddr = ~m_pia_2->port_b_z_mask();
 
@@ -242,7 +156,7 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 			m_ay8912->data_w(m_pia_2->b_output());
 			break;
 		case 0x02:      /* Read from selected port */
-			m_pia_2->write_portb(m_ay8912->data_r());
+			m_pia_2->portb_w(m_ay8912->data_r());
 			break;
 		case 0x03:      /* Select port to write to */
 			m_ay8912->address_w(m_pia_2->b_output());
@@ -298,7 +212,7 @@ bool dragon_alpha_state::firq_get_line(void)
 //  psg_porta_read
 //-------------------------------------------------
 
-READ8_MEMBER( dragon_alpha_state::psg_porta_read )
+uint8_t dragon_alpha_state::psg_porta_read()
 {
 	return 0;
 }
@@ -309,7 +223,7 @@ READ8_MEMBER( dragon_alpha_state::psg_porta_read )
 //  psg_porta_read
 //-------------------------------------------------
 
-WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
+void dragon_alpha_state::psg_porta_write(uint8_t data)
 {
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
@@ -317,19 +231,16 @@ WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
 
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+	for (int n = 0; n < 4; n++)
+		if (BIT(data, n))
+			floppy = m_floppy[n]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
 	// todo: turning the motor on with bit 4 isn't giving the drive enough
 	// time to spin up, how does it work in hardware?
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
-	if (m_floppy2->get_device()) m_floppy2->get_device()->mon_w(0);
-	if (m_floppy3->get_device()) m_floppy3->get_device()->mon_w(0);
+	for (auto &f : m_floppy)
+		if (f->get_device()) f->get_device()->mon_w(0);
 
 	m_fdc->dden_w(BIT(data, 5));
 }
@@ -347,15 +258,8 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 {
 	if (state)
 	{
-		if (m_just_reset)
-		{
-			m_just_reset = 0;
-		}
-		else
-		{
-			if (m_pia_2->ca2_output_z())
-				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}
+		if (m_pia_2->ca2_output_z())
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	else
 	{

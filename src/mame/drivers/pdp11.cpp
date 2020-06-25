@@ -89,6 +89,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
 #include "cpu/i86/i186.h"
 #include "machine/terminal.h"
@@ -102,6 +103,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
+		, m_qbus(*this, "qbus")
 	{ }
 
 	void pdp11ub2(machine_config &config);
@@ -112,8 +114,9 @@ public:
 private:
 	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( teletype_ctrl_r );
-	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
+	required_device<qbus_device> m_qbus;
+	uint16_t teletype_ctrl_r(offs_t offset);
+	void teletype_ctrl_w(offs_t offset, uint16_t data);
 	void kbd_put(u8 data);
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
@@ -126,7 +129,7 @@ private:
 	void sms1000_mem_188(address_map &map);
 };
 
-READ16_MEMBER(pdp11_state::teletype_ctrl_r)
+uint16_t pdp11_state::teletype_ctrl_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -154,7 +157,7 @@ READ16_MEMBER(pdp11_state::teletype_ctrl_r)
 	return res;
 }
 
-WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
+void pdp11_state::teletype_ctrl_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{
@@ -378,6 +381,13 @@ void pdp11_state::pdp11(machine_config &config)
 	m_terminal->set_keyboard_callback(FUNC(pdp11_state::kbd_put));
 
 	RX01(config, "rx01", 0);
+	QBUS(config, m_qbus, 0);
+	m_qbus->set_cputag("maincpu");
+	m_qbus->birq4().set_inputline(m_maincpu, T11_IRQ0);
+	QBUS_SLOT(config, "qbus" ":1", qbus_cards, "pc11");
+	QBUS_SLOT(config, "qbus" ":2", qbus_cards, nullptr);
+	QBUS_SLOT(config, "qbus" ":3", qbus_cards, nullptr);
+	QBUS_SLOT(config, "qbus" ":4", qbus_cards, nullptr);
 }
 
 void pdp11_state::pdp11ub2(machine_config &config)

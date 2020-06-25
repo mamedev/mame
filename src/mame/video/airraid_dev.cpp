@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_bg_tile_info)
 
 	tile |= (attr & 0x70) << 4;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			attr&0xf,
 			0);
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_fg_tile_info)
 
 	tile |= (attr & 0x70) << 4;
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			attr&0xf,
 			0);
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_cstx_tile_info)
 	int attr = (m_txram[tile_index*2+1]);
 	int color = attr & 0xf;
 
-	SET_TILE_INFO_MEMBER(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
+	tileinfo.set(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
 }
 
 
@@ -239,13 +239,13 @@ uint32_t airraid_video_device::screen_update_airraid(screen_device &screen, bitm
 
 // public functions
 
-WRITE8_MEMBER(airraid_video_device::txram_w)
+void airraid_video_device::txram_w(offs_t offset, uint8_t data)
 {
 	m_txram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(airraid_video_device::vregs_w)
+void airraid_video_device::vregs_w(offs_t offset, uint8_t data)
 {
 	m_vregs[offset] = data;
 

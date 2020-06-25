@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 <!-- define elements -->
@@ -519,14 +522,14 @@
 		<element ref="hl" blend="add" inputtag="IN.2" inputmask="0x01"><bounds x="26" y="61" width="6" height="3.5" /></element>
 
 		<element ref="black"><bounds x="9" y="3" width="14" height="14" /></element>
-		<element ref="hlc" blend="add" inputtag="IN.5" inputmask="0x01"><bounds x="13.666" y="3" width="4.666" height="4.666" /></element>
-		<element ref="hlc" blend="add" inputtag="IN.5" inputmask="0x08"><bounds x="9" y="7.666" width="4.666" height="4.666" /></element>
-		<element ref="hlc" blend="add" inputtag="IN.5" inputmask="0x04"><bounds x="18.333" y="7.666" width="4.666" height="4.666" /></element>
-		<element ref="hlc" blend="add" inputtag="IN.5" inputmask="0x02"><bounds x="13.666" y="12.333" width="4.666" height="4.666" /></element>
-		<element ref="nothing" blend="add" inputtag="IN.5" inputmask="0x01"><bounds x="9" y="3" width="14" height="3.5" /></element>
-		<element ref="nothing" blend="add" inputtag="IN.5" inputmask="0x08"><bounds x="9" y="6" width="5" height="8" /></element>
-		<element ref="nothing" blend="add" inputtag="IN.5" inputmask="0x04"><bounds x="18" y="6" width="5" height="8" /></element>
-		<element ref="nothing" blend="add" inputtag="IN.5" inputmask="0x02"><bounds x="9" y="13.5" width="14" height="3.5" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x01"><bounds x="13.666" y="3" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x08"><bounds x="9" y="7.666" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x04"><bounds x="18.333" y="7.666" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x02"><bounds x="13.666" y="12.333" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x10"><bounds x="9" y="3" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x20"><bounds x="18.333" y="3" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x40"><bounds x="9" y="12.333" width="4.666" height="4.666" /></element>
+		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x80"><bounds x="18.333" y="12.333" width="4.666" height="4.666" /></element>
 
 		<element ref="black"><bounds x="9" y="22.5" width="14" height="45" /></element>
 		<element ref="nothing" blend="add" inputtag="IN.0" inputmask="0x00" inputraw="1"><bounds x="-1" y="-1" width="34" height="69" /></element>
@@ -791,6 +794,24 @@
 	<view name="Internal Layout (Screen)">
 		<group ref="display"><bounds x="20" y="20" width="100" height="114.65" /></group>
 		<element ref="white"><bounds x="20" y="124.5" width="100" height="2" /></element>
+	</view>
+
+	<view name="Internal Layout (Board)">
+		<bounds left="21.5" right="100.5" top="18.5" bottom="88" />
+
+		<group ref="sb_board"><bounds x="33.5" y="21" width="64.5" height="64.5" /></group>
+		<group ref="sb_ui"><bounds x="22.5" y="21" width="8.06" height="64.5" /></group>
+
+		<repeat count="8">
+			<param name="x" start="33.5" increment="8.0625" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_hl~i~"><bounds x="~x~" y="86" width="8.0625" height="1.6125" /></element>
+		</repeat>
+		<repeat count="8">
+			<param name="y" start="24.225" increment="8.0625" />
+			<param name="i" start="8" increment="-1" />
+			<element ref="text_hn~i~"><bounds x="31.3" y="~y~" width="2" height="1.6125" /></element>
+		</repeat>
 	</view>
 
 </mamelayout>

@@ -44,23 +44,23 @@ public:
 	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
-	DECLARE_READ8_MEMBER( via0_pa_r );
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	uint8_t via0_pa_r();
+	void via0_pa_w(uint8_t data);
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( via1_r );
-	DECLARE_WRITE8_MEMBER( via1_w );
+	uint8_t via1_r(offs_t offset);
+	void via1_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_READ8_MEMBER( via1_pb_r );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pb_r();
+	void via1_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
-	DECLARE_READ8_MEMBER( cia_pb_r );
-	DECLARE_WRITE8_MEMBER( cia_pb_w );
+	uint8_t cia_pb_r();
+	void cia_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
@@ -157,8 +157,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	void via0_pa_w(uint8_t data);
+	void via0_pb_w(uint8_t data);
 };
 
 
@@ -176,9 +176,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_READ8_MEMBER( cia_pa_r );
-	DECLARE_WRITE8_MEMBER( cia_pa_w );
-	DECLARE_WRITE8_MEMBER( cia_pb_w );
+	uint8_t cia_pa_r();
+	void cia_pa_w(uint8_t data);
+	void cia_pb_w(uint8_t data);
 
 	void mini_chief_mem(address_map &map);
 };

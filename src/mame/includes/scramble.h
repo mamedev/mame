@@ -35,31 +35,31 @@ public:
 	optional_device<tmsprom_device>  m_tmsprom;
 	optional_shared_ptr<uint8_t> m_soundram;
 	optional_device<digitalker_device> m_digitalker;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_ioport m_dial;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
-	DECLARE_READ8_MEMBER(hncholms_prot_r);
-	DECLARE_READ8_MEMBER(scramble_soundram_r);
-	DECLARE_READ8_MEMBER(mars_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(mars_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scramble_soundram_w);
-	DECLARE_READ8_MEMBER(scramble_portB_r);
-	DECLARE_READ8_MEMBER(hustler_portB_r);
-	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(hotshock_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
+	uint8_t hncholms_prot_r();
+	uint8_t scramble_soundram_r(offs_t offset);
+	uint8_t mars_ppi8255_0_r(offs_t offset);
+	uint8_t mars_ppi8255_1_r(offs_t offset);
+	void scramble_soundram_w(offs_t offset, uint8_t data);
+	uint8_t scramble_portB_r();
+	uint8_t hustler_portB_r();
+	void hotshock_sh_irqtrigger_w(uint8_t data);
+	uint8_t hotshock_soundlatch_r();
+	void mars_ppi8255_0_w(offs_t offset, uint8_t data);
+	void mars_ppi8255_1_w(offs_t offset, uint8_t data);
+	void ad2083_tms5110_ctrl_w(uint8_t data);
 
 	// harem
-	DECLARE_WRITE8_MEMBER(harem_decrypt_bit_w);
-	DECLARE_WRITE8_MEMBER(harem_decrypt_clk_w);
-	DECLARE_WRITE8_MEMBER(harem_decrypt_rst_w);
-	DECLARE_READ8_MEMBER(harem_digitalker_intr_r);
-	DECLARE_WRITE8_MEMBER(harem_digitalker_control_w);
+	void harem_decrypt_bit_w(uint8_t data);
+	void harem_decrypt_clk_w(uint8_t data);
+	void harem_decrypt_rst_w(uint8_t data);
+	uint8_t harem_digitalker_intr_r();
+	void harem_digitalker_control_w(uint8_t data);
 
 	void init_cavelon();
 	void init_mariner();
@@ -88,16 +88,16 @@ public:
 	DECLARE_MACHINE_RESET(scramble);
 	DECLARE_MACHINE_RESET(explorer);
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
-	DECLARE_READ8_MEMBER( mariner_protection_1_r );
-	DECLARE_READ8_MEMBER( mariner_protection_2_r );
-	DECLARE_READ8_MEMBER( triplep_pip_r );
-	DECLARE_READ8_MEMBER( triplep_pap_r );
-	DECLARE_READ8_MEMBER( cavelon_banksw_r );
-	DECLARE_WRITE8_MEMBER( cavelon_banksw_w );
-	DECLARE_READ8_MEMBER( hunchbks_mirror_r );
-	DECLARE_WRITE8_MEMBER( hunchbks_mirror_w );
-	DECLARE_WRITE8_MEMBER( scramble_sh_irqtrigger_w );
-	DECLARE_WRITE8_MEMBER( mrkougar_sh_irqtrigger_w );
+	uint8_t mariner_protection_1_r();
+	uint8_t mariner_protection_2_r();
+	uint8_t triplep_pip_r();
+	uint8_t triplep_pap_r();
+	uint8_t cavelon_banksw_r(offs_t offset);
+	void cavelon_banksw_w(offs_t offset, uint8_t data);
+	uint8_t hunchbks_mirror_r(address_space &space, offs_t offset);
+	void hunchbks_mirror_w(address_space &space, offs_t offset, uint8_t data);
+	void scramble_sh_irqtrigger_w(uint8_t data);
+	void mrkougar_sh_irqtrigger_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 
 	void scramble(machine_config &config);

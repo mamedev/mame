@@ -115,7 +115,7 @@ private:
 			std::fill(std::begin(EnvTarget), std::end(EnvTarget), 0);
 		}
 
-		memory_access_cache<1, 0, ENDIANNESS_LITTLE> *Cache;
+		memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache *Cache;
 		u32 CurSAddr = 0; // Current Address Pointer, 22.10 Fixed Point
 		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
 		u8 EnvStage = 1; // Envelope Stage
@@ -132,9 +132,9 @@ private:
 		void write(offs_t offset, u16 data, u16 mem_mask);
 	};
 
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_texcache;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_fbcache;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_texcache_ctrl;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_texcache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_fbcache;
+	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache *m_texcache_ctrl;
 
 	channel_t m_channel[32];
 	sound_stream *m_stream;

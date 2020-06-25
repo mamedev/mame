@@ -7,6 +7,7 @@
 
 #include "machine/74157.h"
 #include "machine/bankdev.h"
+#include "machine/tc009xlvc.h"
 #include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/msm5205.h"
@@ -21,13 +22,9 @@ public:
 	taitol_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_main_cpu(*this, "maincpu")
+		, m_vdp(*this, "tc0090lvc")
 		, m_upd4701(*this, "upd4701")
-		, m_main_prg(*this, "maincpu")
-		, m_main_bnk(*this, "mainbank")
-		, m_ram_bnks(*this, "rambank%u", 1)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
-		, m_vram(*this, "vram")
+		, m_main_prg(*this, "tc0090lvc")
 	{
 	}
 
@@ -35,72 +32,32 @@ public:
 	DECLARE_MACHINE_RESET(taito_l);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(u8 data);
 
 protected:
-	static constexpr size_t SPRITERAM_SIZE = 0x400;
-
-	/* memory pointers */
-	u8 *       m_shared_ram;
-
-	/* video-related */
-	tilemap_t *m_bg_tilemap[2];
-	tilemap_t *m_tx_tilemap;
-	std::unique_ptr<u8[]> m_buff_spriteram;
-	int m_cur_ctrl;
-	int m_horshoes_gfxbank;
-	int m_bankc[4];
-	int m_flipscreen;
-
 	/* misc */
-	int m_cur_rombank;
-	int m_cur_rambank[4];
-	int m_irq_adr_table[3];
-	int m_irq_enable;
 	int m_last_irq_level;
-	int m_high;
+	int m_main_high;
 
-	DECLARE_WRITE8_MEMBER(irq_adr_w);
-	DECLARE_READ8_MEMBER(irq_adr_r);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(irq_enable_r);
-	DECLARE_WRITE8_MEMBER(rombankswitch_w);
-	DECLARE_READ8_MEMBER(rombankswitch_r);
-	DECLARE_WRITE8_MEMBER(rambankswitch_w);
-	DECLARE_READ8_MEMBER(rambankswitch_r);
+	void irq_enable_w(u8 data);
+	void rombankswitch_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(mcu_control_w);
-	DECLARE_READ8_MEMBER(mcu_control_r);
-	DECLARE_WRITE8_MEMBER(taitol_bankc_w);
-	DECLARE_READ8_MEMBER(taitol_bankc_r);
-	DECLARE_WRITE8_MEMBER(taitol_control_w);
-	DECLARE_READ8_MEMBER(taitol_control_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	virtual void video_start() override;
-	u32 screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mcu_control_w(u8 data);
+	u8 mcu_control_r();
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void l_system_video(machine_config &config);
 
 	void common_banks_map(address_map &map);
-	void tc0090lvc_map(address_map &map);
 
 	virtual void state_register();
 	virtual void taito_machine_reset();
 
 	required_device<cpu_device>                       m_main_cpu;
+	required_device<tc0090lvc_device>                 m_vdp;
 	optional_device<upd4701_device>                   m_upd4701;
 	required_memory_region                            m_main_prg;
-	required_memory_bank                              m_main_bnk;
-	required_device_array<address_map_bank_device, 4> m_ram_bnks;
-	required_device<gfxdecode_device>                 m_gfxdecode;
-	required_device<palette_device>                   m_palette;
-
-	required_shared_ptr<u8>                           m_vram;
 };
 
 
@@ -115,7 +72,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(u8 data);
 
 	void kurikint(machine_config &config);
 	void evilston(machine_config &config);
@@ -146,14 +103,14 @@ public:
 		: taitol_2cpu_state(mconfig, type, tag)
 		, m_slave_prg(*this, "slave")
 		, m_slave_bnk(*this, "slavebank")
-		, m_cur_rombank2(0)
-		, m_high2(0)
+		, m_slave_rombank(0)
+		, m_slave_high(0)
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(rombank2switch_w);
-	DECLARE_READ8_MEMBER(rombank2switch_r);
-	DECLARE_WRITE8_MEMBER(portA_w);
+	void slave_rombank_w(u8 data);
+	u8 slave_rombank_r();
+	void portA_w(u8 data);
 
 	void fhawk(machine_config &config);
 
@@ -168,8 +125,8 @@ protected:
 	required_memory_region      m_slave_prg;
 	required_memory_bank        m_slave_bnk;
 
-	u8  m_cur_rombank2;
-	u8  m_high2;
+	u8  m_slave_rombank;
+	u8  m_slave_high;
 };
 
 
@@ -187,11 +144,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
 
-	DECLARE_WRITE8_MEMBER(msm5205_lo_w);
-	DECLARE_WRITE8_MEMBER(msm5205_hi_w);
-	DECLARE_WRITE8_MEMBER(msm5205_start_w);
-	DECLARE_WRITE8_MEMBER(msm5205_stop_w);
-	DECLARE_WRITE8_MEMBER(msm5205_volume_w);
+	void msm5205_lo_w(u8 data);
+	void msm5205_hi_w(u8 data);
+	void msm5205_start_w(u8 data);
+	void msm5205_stop_w(u8 data);
+	void msm5205_volume_w(u8 data);
 
 	void champwr(machine_config &config);
 
@@ -221,7 +178,7 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(extport_select_and_ym2203_r);
+	u8 extport_select_and_ym2203_r(offs_t offset);
 
 	void init_plottinga();
 
@@ -261,10 +218,18 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(bankg_w);
-
-	DECLARE_MACHINE_RESET(horshoes);
 	void horshoes(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void horshoes_tile_cb(u32 &code);
+
+	void bankg_w(u8 data);
+	int m_horshoes_gfxbank;
+
 	void horshoes_map(address_map &map);
 };
 

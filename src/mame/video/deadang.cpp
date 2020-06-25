@@ -7,25 +7,25 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(deadang_state::foreground_w)
+void deadang_state::foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 	m_pf1_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(deadang_state::text_w)
+void deadang_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(popnrun_state::popnrun_text_w)
+void popnrun_state::popnrun_text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(deadang_state::bank_w)
+void deadang_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -49,14 +49,14 @@ TILE_GET_INFO_MEMBER(deadang_state::get_pf3_tile_info)
 {
 	const uint16_t *bgMap = (const uint16_t *)memregion("gfx6")->base();
 	int code= bgMap[tile_index];
-	SET_TILE_INFO_MEMBER(4,code&0x7ff,code>>12,0);
+	tileinfo.set(4,code&0x7ff,code>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf2_tile_info)
 {
 	const uint16_t *bgMap = (const uint16_t *)memregion("gfx7")->base();
 	int code= bgMap[tile_index];
-	SET_TILE_INFO_MEMBER(3,code&0x7ff,code>>12,0);
+	tileinfo.set(3,code&0x7ff,code>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
 	int color=tile >> 12;
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(2,tile+m_tilebank*0x1000,color,0);
+	tileinfo.set(2,tile+m_tilebank*0x1000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
 	int tile=(m_videoram[tile_index] & 0xff) | ((m_videoram[tile_index] >> 6) & 0x300);
 	int color=(m_videoram[tile_index] >> 8)&0xf;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	tileinfo.set(0,tile,color,0);
 }
 
 void deadang_state::video_start()
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(popnrun_state::get_popnrun_text_tile_info)
 	if(attr & 0x40)
 		tile |= 1;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	tileinfo.set(0,tile,color,0);
 }
 
 void popnrun_state::video_start()

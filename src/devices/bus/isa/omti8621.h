@@ -16,7 +16,7 @@
 #pragma once
 
 #include "isa.h"
-#include "machine/pc_fdc.h"
+#include "machine/upd765.h"
 #include "imagedev/floppy.h"
 
 /***************************************************************************
@@ -30,8 +30,8 @@ class omti_disk_image_device;
 class omti8621_device : public device_t, public device_isa16_card_interface
 {
 public:
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static void set_verbose(int on_off);
 
@@ -61,7 +61,8 @@ protected:
 
 	void set_interrupt(enum line_state line_state);
 
-	required_device<pc_fdc_interface> m_fdc;
+	required_device<upd765a_device> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppy;
 	required_ioport m_iobase;
 	required_ioport m_biosopts;
 
@@ -73,6 +74,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	void fd_moten_w(uint8_t data);
+	void fd_rate_w(uint8_t data);
+	void fd_extra_w(uint8_t data);
+	uint8_t fd_disk_chg_r();
+
+	void fdc_map(address_map &map);
 
 	uint16_t jumper;
 
@@ -105,6 +113,8 @@ private:
 
 	emu_timer *m_timer;
 
+	uint8_t m_moten;
+
 	bool m_installed;
 
 	void clear_sense_data();
@@ -130,8 +140,8 @@ private:
 	uint16_t get_data();
 	void set_data(uint16_t data);
 	void set_jumper(uint16_t disk_type);
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_WRITE8_MEMBER(write8);
+	uint8_t read8(offs_t offset);
+	void write8(offs_t offset, uint8_t data);
 };
 
 /* ----- omti8621 for PC device interface ----- */

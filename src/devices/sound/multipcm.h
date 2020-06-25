@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 #define MULTIPCM_LOG_SAMPLES    0
 
 #if MULTIPCM_LOG_SAMPLES
@@ -13,13 +15,13 @@
 
 class multipcm_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<24>
 {
 public:
 	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read();
 
 protected:
 	// device-level overrides

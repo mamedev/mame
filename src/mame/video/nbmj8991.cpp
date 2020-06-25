@@ -16,7 +16,7 @@
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj8991_state::palette_type1_w)
+void nbmj8991_state::palette_type1_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj8991_state::palette_type1_w)
 	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_MEMBER(nbmj8991_state::palette_type2_w)
+void nbmj8991_state::palette_type2_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -50,7 +50,7 @@ WRITE8_MEMBER(nbmj8991_state::palette_type2_w)
 	m_palette->set_pen_color((offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(nbmj8991_state::palette_type3_w)
+void nbmj8991_state::palette_type3_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 
@@ -71,7 +71,7 @@ WRITE8_MEMBER(nbmj8991_state::palette_type3_w)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj8991_state::blitter_w)
+void nbmj8991_state::blitter_w(offs_t offset, uint8_t data)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 
@@ -115,12 +115,12 @@ WRITE8_MEMBER(nbmj8991_state::blitter_w)
 	}
 }
 
-READ8_MEMBER(nbmj8991_state::clut_r)
+uint8_t nbmj8991_state::clut_r(offs_t offset)
 {
 	return m_clut[offset];
 }
 
-WRITE8_MEMBER(nbmj8991_state::clut_w)
+void nbmj8991_state::clut_w(offs_t offset, uint8_t data)
 {
 	m_clut[((m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }

@@ -35,6 +35,8 @@ beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *ta
 	, m_floppy1(*this, "wd179x:1")
 	, m_floppy2(*this, "wd179x:2")
 	, m_floppy3(*this, "wd179x:3")
+	, m_control(0)
+	, m_motor_active(false)
 {
 }
 
@@ -44,6 +46,9 @@ beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *ta
 
 void beta_disk_device::device_start()
 {
+	save_item(NAME(m_betadisk_active));
+	save_item(NAME(m_control));
+	save_item(NAME(m_motor_active));
 }
 
 //-------------------------------------------------
@@ -52,6 +57,7 @@ void beta_disk_device::device_start()
 
 void beta_disk_device::device_reset()
 {
+	m_control = 0;
 }
 
 int beta_disk_device::is_active()
@@ -69,7 +75,7 @@ void beta_disk_device::disable()
 	m_betadisk_active = 0;
 }
 
-READ8_MEMBER(beta_disk_device::status_r)
+uint8_t beta_disk_device::status_r()
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->status_r();
@@ -78,7 +84,7 @@ READ8_MEMBER(beta_disk_device::status_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::track_r)
+uint8_t beta_disk_device::track_r()
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->track_r();
@@ -87,7 +93,7 @@ READ8_MEMBER(beta_disk_device::track_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::sector_r)
+uint8_t beta_disk_device::sector_r()
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->sector_r();
@@ -96,7 +102,7 @@ READ8_MEMBER(beta_disk_device::sector_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::data_r)
+uint8_t beta_disk_device::data_r()
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->data_r();
@@ -105,10 +111,10 @@ READ8_MEMBER(beta_disk_device::data_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::state_r)
+uint8_t beta_disk_device::state_r()
 {
 	if (m_betadisk_active==1) {
-		uint8_t result = 0x3F;        // actually open bus
+		uint8_t result = 0x3f;        // actually open bus
 		result |= m_wd179x->drq_r() ? 0x40 : 0;
 		result |= m_wd179x->intrq_r() ? 0x80 : 0;
 		return result;
@@ -117,57 +123,71 @@ READ8_MEMBER(beta_disk_device::state_r)
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::param_w)
+void beta_disk_device::param_w(uint8_t data)
 {
 	if (m_betadisk_active == 1)
 	{
 		floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
-
 		floppy_image_device* floppy = connectors[data & 3]->get_device();
 
+		m_control = data;
 		m_wd179x->set_floppy(floppy);
 		floppy->ss_w(BIT(data, 4) ? 0 : 1);
 		m_wd179x->dden_w(BIT(data, 6));
+		m_wd179x->mr_w(BIT(data, 2));
 
-		// bit 3 connected to pin 23 "HLT" of FDC and via diode to INDEX
-		//m_wd179x->hlt_w(BIT(data, 3)); // not handled in current wd_fdc
+		m_wd179x->hlt_w(BIT(data, 3));
+		// bit 3 also connected to FDC /IP pin via diode, AND logic: if this bit is 0 - /IP will be forcibly set to low.
+		// used for bitbang index pulses generation to stop FDD drive motor with no disk inserted, currently not emulated.
 
-		if (BIT(data, 2) == 0) // reset
-		{
-			m_wd179x->reset();
-			floppy->mon_w(ASSERT_LINE);
-		} else {
-			// HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
-			floppy->mon_w(CLEAR_LINE);
-		}
+		motors_control();
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::command_w)
+void beta_disk_device::command_w(uint8_t data)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->cmd_w(data);
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::track_w)
+void beta_disk_device::track_w(uint8_t data)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->track_w(data);
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::sector_w)
+void beta_disk_device::sector_w(uint8_t data)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->sector_w(data);
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::data_w)
+void beta_disk_device::data_w(uint8_t data)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->data_w(data);
+	}
+}
+
+void beta_disk_device::fdc_hld_w(int state)
+{
+	m_wd179x->set_force_ready(state); // HLD connected to RDY pin
+	m_motor_active = state;
+	motors_control();
+}
+
+void beta_disk_device::motors_control()
+{
+	floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_motor_active && (m_control & 3) == i)
+			connectors[i]->get_device()->mon_w(CLEAR_LINE);
+		else
+			connectors[i]->get_device()->mon_w(ASSERT_LINE);
 	}
 }
 
@@ -270,6 +290,7 @@ ROM_END
 void beta_disk_device::device_add_mconfig(machine_config &config)
 {
 	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
+	m_wd179x->hld_wr_callback().set(FUNC(beta_disk_device::fdc_hld_w));
 	FLOPPY_CONNECTOR(config, m_floppy0, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy2, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);

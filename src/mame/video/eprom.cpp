@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 	uint16_t data2 = m_playfield_tilemap->extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
-	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
+	tileinfo.set(0, code, color, (data1 >> 15) & 1);
 }
 
 
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(eprom_state::guts_get_playfield_tile_info)
 	uint16_t data2 = m_playfield_tilemap->extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
-	SET_TILE_INFO_MEMBER(2, code, color, (data1 >> 15) & 1);
+	tileinfo.set(2, code, color, (data1 >> 15) & 1);
 }
 
 
@@ -179,10 +179,10 @@ VIDEO_START_MEMBER(eprom_state,guts)
  *
  *************************************/
 
-void eprom_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(eprom_state::scanline_update)
 {
 	/* update the playfield */
-	if (scanline == 0)
+	if (param == 0)
 	{
 		int xscroll = (m_alpha_tilemap->basemem_read(0x780) >> 7) & 0x1ff;
 		int yscroll = (m_alpha_tilemap->basemem_read(0x781) >> 7) & 0x1ff;

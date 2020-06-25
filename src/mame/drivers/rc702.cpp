@@ -32,8 +32,8 @@ Issues:
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "video/i8275.h"
 
@@ -50,6 +50,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
 		, m_ctc1(*this, "ctc1")
 		, m_pio(*this, "pio")
@@ -62,16 +64,14 @@ public:
 
 	void rc702(machine_config &config);
 
-	void init_rc702();
-
-protected:
-	virtual void machine_reset() override;
-
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_WRITE8_MEMBER(port1c_w);
+	void machine_reset() override;
+	void machine_start() override;
+
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	void port14_w(uint8_t data);
+	void port1c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
@@ -83,8 +83,8 @@ private:
 	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
 
-	void rc702_io(address_map &map);
-	void rc702_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	bool m_q_state;
 	bool m_qbar_state;
@@ -92,8 +92,11 @@ private:
 	uint16_t m_beepcnt;
 	bool m_eop;
 	bool m_dack1;
+	bool m_rom_in_map;
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -105,13 +108,13 @@ private:
 };
 
 
-void rc702_state::rc702_mem(address_map &map)
+void rc702_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0x07ff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
 	map(0x0800, 0xffff).ram();
 }
 
-void rc702_state::rc702_io(address_map &map)
+void rc702_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -121,7 +124,7 @@ void rc702_state::rc702_io(address_map &map)
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { membank("bankr0")->set_entry(1); })); // replace roms with ram
+	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { m_rom_in_map = false; })); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
@@ -157,8 +160,7 @@ INPUT_PORTS_END
 
 void rc702_state::machine_reset()
 {
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	m_rom_in_map = true;
 	m_beepcnt = 0xffff;
 	m_dack1 = 0;
 	m_eop = 0;
@@ -166,6 +168,17 @@ void rc702_state::machine_reset()
 	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
 	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
 	m_maincpu->reset();
+}
+
+void rc702_state::machine_start()
+{
+	save_item(NAME(m_q_state));
+	save_item(NAME(m_qbar_state));
+	save_item(NAME(m_drq_state));
+	save_item(NAME(m_beepcnt));
+	save_item(NAME(m_eop));
+	save_item(NAME(m_dack1));
+	save_item(NAME(m_rom_in_map));
 }
 
 WRITE_LINE_MEMBER( rc702_state::q_w )
@@ -231,14 +244,14 @@ WRITE_LINE_MEMBER( rc702_state::dack1_w )
 	//m_fdc->dack_w = state;  // pin not emulated
 }
 
-WRITE8_MEMBER( rc702_state::port14_w )
+void rc702_state::port14_w(uint8_t data)
 {
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->mon_w(!BIT(data, 0));
 }
 
-WRITE8_MEMBER( rc702_state::port1c_w )
+void rc702_state::port1c_w(uint8_t data)
 {
 	m_beep->set_state(1);
 	m_beepcnt = 0x3000;
@@ -249,15 +262,6 @@ void rc702_state::rc702_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xc0, 0x60, 0x00));
 	palette.set_pen_color(1, rgb_t(0xff, 0xb4, 0x00));
-}
-
-void rc702_state::init_rc702()
-{
-	uint8_t *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
@@ -301,12 +305,12 @@ WRITE_LINE_MEMBER( rc702_state::hreq_w )
 	m_dma->hack_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( rc702_state::memory_read_byte )
+uint8_t rc702_state::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( rc702_state::memory_write_byte )
+void rc702_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
@@ -335,8 +339,8 @@ void rc702_state::rc702(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::rc702_mem);
-	m_maincpu->set_addrmap(AS_IO, &rc702_state::rc702_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &rc702_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
@@ -402,13 +406,13 @@ void rc702_state::rc702(machine_config &config)
 
 /* ROM definition */
 ROM_START( rc702 )
-	ROM_REGION( 0x10800, "maincpu", 0 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "rc702", "RC702")
-	ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(0))
+	ROMX_LOAD( "roa375.ic66", 0x0000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rc703", "RC703")
-	ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(1))
+	ROMX_LOAD( "rob357.rom", 0x0000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rc700", "RC700")
-	ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(2))
+	ROMX_LOAD( "rob358.rom", 0x0000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(2))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
@@ -418,4 +422,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME         FLAGS
-COMP( 1979, rc702, 0,      0,      rc702,   rc702, rc702_state, init_rc702, "Regnecentralen", "RC702 Piccolo", MACHINE_NOT_WORKING )
+COMP( 1979, rc702, 0,      0,      rc702,   rc702, rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

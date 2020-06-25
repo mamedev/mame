@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 	color = pal*16;// + (attributes & 0x0f);
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -224,7 +224,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 	color = pal * 16;// + (attributes & 0x0f);
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -293,12 +293,12 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 
 ***************************************************************************/
 
-READ8_MEMBER(combatsc_state::combatsc_video_r)
+uint8_t combatsc_state::combatsc_video_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_video_w)
+void combatsc_state::combatsc_video_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 
@@ -315,10 +315,10 @@ WRITE8_MEMBER(combatsc_state::combatsc_video_w)
 	}
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
+void combatsc_state::combatsc_pf_control_w(offs_t offset, uint8_t data)
 {
 	k007121_device *k007121 = m_video_circuit ? m_k007121_2 : m_k007121_1;
-	k007121->ctrl_w(space, offset, data);
+	k007121->ctrl_w(offset, data);
 
 	if (offset == 7)
 	{
@@ -338,12 +338,12 @@ WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 	}
 }
 
-READ8_MEMBER(combatsc_state::combatsc_scrollram_r)
+uint8_t combatsc_state::combatsc_scrollram_r(offs_t offset)
 {
 	return m_scrollram[offset];
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
+void combatsc_state::combatsc_scrollram_w(offs_t offset, uint8_t data)
 {
 	m_scrollram[offset] = data;
 }

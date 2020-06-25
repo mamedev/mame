@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
 	/* priority bg/sprites (1 = this bg tile on top of sprites) */
 	tileinfo.category = (attr & 0x08) >> 3;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			(color&4) | ((color&2)>>1) | ((color&1)<<1),
 			0);
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_txt_tile_info)
 	int code = m_txtram[tile_index];
 	int color = ((code>>6) & 0x03);
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code & 0x3f,
 			((color&2)>>1) | ((color&1)<<1),
 			0);
@@ -97,25 +97,25 @@ void tankbust_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tankbust_state::background_videoram_w)
+void tankbust_state::background_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::background_colorram_w)
+void tankbust_state::background_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::txtram_w)
+void tankbust_state::txtram_w(offs_t offset, uint8_t data)
 {
 	m_txtram[offset] = data;
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::xscroll_w)
+void tankbust_state::xscroll_w(offs_t offset, uint8_t data)
 {
 	if( m_xscroll[offset] != data )
 	{
@@ -131,7 +131,7 @@ WRITE8_MEMBER(tankbust_state::xscroll_w)
 }
 
 
-WRITE8_MEMBER(tankbust_state::yscroll_w)
+void tankbust_state::yscroll_w(offs_t offset, uint8_t data)
 {
 	if( m_yscroll[offset] != data )
 	{

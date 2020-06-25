@@ -50,8 +50,8 @@ protected:
 
 private:
 	void update_irqs();
-	DECLARE_WRITE8_MEMBER(pia_out_a);
-	DECLARE_WRITE8_MEMBER(pia_out_b);
+	void pia_out_a(uint8_t data);
+	void pia_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
 

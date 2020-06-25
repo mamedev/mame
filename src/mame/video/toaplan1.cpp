@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_tile_info)
 	tile_number = m_tilevram[Layer][2 * tile_index + 1] & 0x7fff;
 	attrib = m_tilevram[Layer][2 * tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);
@@ -285,7 +285,7 @@ u16 toaplan1_state::frame_done_r()
 	return m_screen->vblank();
 }
 
-WRITE16_MEMBER(toaplan1_state::tile_offsets_w)
+void toaplan1_state::tile_offsets_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset == 0)
 	{

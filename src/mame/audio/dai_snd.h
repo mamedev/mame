@@ -21,7 +21,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
-	DECLARE_WRITE8_MEMBER(set_volume);
+	void set_volume(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

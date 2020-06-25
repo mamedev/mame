@@ -24,9 +24,9 @@ public:
 	void tr175(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(ffec01_w);
-	DECLARE_WRITE8_MEMBER(fff000_w);
-	DECLARE_READ8_MEMBER(fff400_r);
+	void ffec01_w(uint8_t data);
+	void fff000_w(uint8_t data);
+	uint8_t fff400_r();
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mem_map(address_map &map);
@@ -36,17 +36,17 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER(tr175_state::ffec01_w)
+void tr175_state::ffec01_w(uint8_t data)
 {
 	logerror("%s: Writing %02X to FFEC01\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(tr175_state::fff000_w)
+void tr175_state::fff000_w(uint8_t data)
 {
 	logerror("%s: Writing %02X to FFF000\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(tr175_state::fff400_r)
+uint8_t tr175_state::fff400_r()
 {
 	return 0;
 }

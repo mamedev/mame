@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz
 //================================================================
 //
-//  mb86901defs.h - Helpful #defines for emulating the MB86901
-//                  series of SPARC processor.
+//  sparcdefs.h - Helpful #defines for emulating the MB86901
+//                series of SPARC processor.
 //
 //================================================================
 

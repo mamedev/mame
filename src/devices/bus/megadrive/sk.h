@@ -26,8 +26,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	required_device<md_cart_slot_device> m_exp;

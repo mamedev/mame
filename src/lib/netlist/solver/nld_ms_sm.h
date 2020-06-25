@@ -33,6 +33,7 @@
 ///
 
 #include "nld_matrix_solver.h"
+#include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
 #include "plib/vector_ops.h"
 
@@ -46,8 +47,6 @@ namespace solver
 	template <typename FT, int SIZE>
 	class matrix_solver_sm_t: public matrix_solver_ext_t<FT, SIZE>
 	{
-		friend class matrix_solver_t;
-
 	public:
 
 		using float_ext_type = FT;
@@ -67,8 +66,8 @@ namespace solver
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
-		unsigned solve_non_dynamic(bool newton_raphson);
+		void vsolve_non_dynamic() override;
+		void solve_non_dynamic();
 
 		void LE_invert();
 
@@ -197,7 +196,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_sm_t<FT, SIZE>::solve_non_dynamic(bool newton_raphson)
+	void matrix_solver_sm_t<FT, SIZE>::solve_non_dynamic()
 	{
 		static constexpr const bool incremental = true;
 		const std::size_t iN = this->size();
@@ -274,22 +273,16 @@ namespace solver
 		m_cnt++;
 
 		this->LE_compute_x(this->m_new_V);
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 
 		this->clear_square_mat(this->m_A);
 		this->fill_matrix_and_rhs();
 
-		return this->solve_non_dynamic(newton_raphson);
+		this->solve_non_dynamic();
 	}
 
 

@@ -52,11 +52,11 @@ TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
+	tileinfo.set(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 
-WRITE8_MEMBER(m10_state::m10_colorram_w)
+void m10_state::m10_colorram_w(offs_t offset, uint8_t data)
 {
 	if (m_colorram[offset] != data)
 	{
@@ -66,7 +66,7 @@ WRITE8_MEMBER(m10_state::m10_colorram_w)
 }
 
 
-WRITE8_MEMBER(m10_state::m10_chargen_w)
+void m10_state::m10_chargen_w(offs_t offset, uint8_t data)
 {
 	if (m_chargen[offset] != data)
 	{
@@ -76,7 +76,7 @@ WRITE8_MEMBER(m10_state::m10_chargen_w)
 }
 
 
-WRITE8_MEMBER(m10_state::m15_chargen_w)
+void m10_state::m15_chargen_w(offs_t offset, uint8_t data)
 {
 	if (m_chargen[offset] != data)
 	{

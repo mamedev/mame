@@ -85,7 +85,7 @@ void sega_315_5649_device::device_reset()
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( sega_315_5649_device::read )
+uint8_t sega_315_5649_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -142,7 +142,7 @@ READ8_MEMBER( sega_315_5649_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( sega_315_5649_device::write )
+void sega_315_5649_device::write(offs_t offset, uint8_t data)
 {
 	LOG("WR %02x = %02x\n", offset, data);
 

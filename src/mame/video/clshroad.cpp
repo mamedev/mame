@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x40 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x41 ];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			0,
 			0);
@@ -121,13 +121,13 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x00 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x01 ];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			0,
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::vram_0_w)
+void clshroad_state::vram_0_w(offs_t offset, uint8_t data)
 {
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
@@ -176,7 +176,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
 	uint8_t color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
 	tileinfo.group = color;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			color,
 			0);
@@ -186,13 +186,13 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 {
 	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
 	uint8_t color =   m_vram_1[ tile_index + 0x400 ];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code + ((color & 0xf0)<<4),
 			color & 0x0f,
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::vram_1_w)
+void clshroad_state::vram_1_w(offs_t offset, uint8_t data)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset % 0x400);

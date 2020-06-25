@@ -41,13 +41,13 @@ void crbaloon_state::crbaloon_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(crbaloon_state::crbaloon_videoram_w)
+void crbaloon_state::crbaloon_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(crbaloon_state::crbaloon_colorram_w)
+void crbaloon_state::crbaloon_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(crbaloon_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void crbaloon_state::video_start()

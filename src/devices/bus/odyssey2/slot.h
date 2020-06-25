@@ -33,11 +33,11 @@ public:
 	virtual ~device_o2_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom0c) { return 0xff; }
+	virtual uint8_t read_rom04(offs_t offset) { return 0xff; }
+	virtual uint8_t read_rom0c(offs_t offset) { return 0xff; }
 	virtual void write_bank(int bank) { }
 
-	virtual DECLARE_WRITE8_MEMBER(io_write) { }
+	virtual void io_write(offs_t offset, uint8_t data) { }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -97,9 +97,9 @@ public:
 	int get_type() { return m_type; }
 
 	// reading and writing
-	DECLARE_READ8_MEMBER(read_rom04);
-	DECLARE_READ8_MEMBER(read_rom0c);
-	DECLARE_WRITE8_MEMBER(io_write);
+	uint8_t read_rom04(offs_t offset);
+	uint8_t read_rom0c(offs_t offset);
+	void io_write(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
 
 	void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }

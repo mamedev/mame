@@ -19,12 +19,17 @@ DEFINE_DEVICE_TYPE(BBC_AMS3, bbc_ams3_device, "bbc_ams3", "AMS 3\" Microdrive Di
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( ams3 )
+//  FLOPPY_FORMATS( ams3 )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_ams3_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT
 FLOPPY_FORMATS_END
+
+
+//-------------------------------------------------
+//  ROM( ams3 )
+//-------------------------------------------------
 
 ROM_START( ams3 )
 	ROM_REGION(0x8000, "dfs_rom", 0)
@@ -43,7 +48,7 @@ ROM_END
 
 void bbc_ams3_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, DERIVED_CLOCK(1, 4));
+	I8271(config, m_fdc, DERIVED_CLOCK(1, 2));
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_ams3_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_ams3_device::side_w));

@@ -89,21 +89,21 @@ private:
 	const struct prot_data* m_device_data;
 	u8 m_device_value;
 
-	DECLARE_READ8_MEMBER(sound_command_pending_r);
-	DECLARE_WRITE8_MEMBER(sound_nmi_disable_w);
-	DECLARE_WRITE16_MEMBER(unk880000_w);
-	DECLARE_READ16_MEMBER(unk880000_r);
-	DECLARE_WRITE8_MEMBER(z80_bank_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	DECLARE_READ16_MEMBER(prot_status_r);
-	DECLARE_WRITE16_MEMBER(prot_status_w);
-	DECLARE_READ16_MEMBER(prot_data_r);
-	DECLARE_WRITE16_MEMBER(prot_data_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(lineram_w);
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
+	u8 sound_command_pending_r();
+	void sound_nmi_disable_w(u8 data);
+	void unk880000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 unk880000_r(offs_t offset);
+	void z80_bank_w(u8 data);
+	void oki_bank_w(u8 data);
+	u16 prot_status_r(offs_t offset, u16 mem_mask = ~0);
+	void prot_status_w(u16 data);
+	u16 prot_data_r();
+	void prot_data_w(u16 data);
+	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<int Layer> void lineram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 eeprom_r();
+	void eeprom_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 

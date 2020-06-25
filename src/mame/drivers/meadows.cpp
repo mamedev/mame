@@ -138,21 +138,21 @@
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::hsync_chain_r)
+uint8_t meadows_state::hsync_chain_r()
 {
 	uint8_t val = m_screen->hpos();
 	return bitswap<8>(val,0,1,2,3,4,5,6,7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_hi_r)
+uint8_t meadows_state::vsync_chain_hi_r()
 {
 	uint8_t val = m_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_lo_r)
+uint8_t meadows_state::vsync_chain_lo_r()
 {
 	uint8_t val = m_screen->vpos();
 	return val & 0x0f;
@@ -166,7 +166,7 @@ READ8_MEMBER(meadows_state::vsync_chain_lo_r)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_audio_w)
+void meadows_state::meadows_audio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -201,7 +201,7 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
 
 INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 {
-	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82); // S2650
+	m_maincpu->set_input_line(0, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 
@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::audio_hardware_w)
+void meadows_state::audio_hardware_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -289,7 +289,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::audio_hardware_r)
+uint8_t meadows_state::audio_hardware_r(offs_t offset)
 {
 	int data = 0;
 
@@ -626,6 +626,7 @@ void meadows_state::meadows(machine_config &config)
 	/* basic machine hardware */
 	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::meadows_main_map);
+	m_maincpu->intack_handler().set([]() { return 0x82; });
 
 	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);

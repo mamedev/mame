@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(tp84_state::flip_screen_y_w)
 }
 
 
-READ8_MEMBER(tp84_state::tp84_sh_timer_r)
+uint8_t tp84_state::tp84_sh_timer_r()
 {
 	/* main xtal 14.318MHz, divided by 4 to get the CPU clock, further */
 	/* divided by 2048 to get this timer */
@@ -137,7 +137,7 @@ READ8_MEMBER(tp84_state::tp84_sh_timer_r)
 }
 
 
-WRITE8_MEMBER(tp84_state::tp84_filter_w)
+void tp84_state::tp84_filter_w(offs_t offset, uint8_t data)
 {
 	int C;
 
@@ -164,7 +164,7 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
-WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
+void tp84_state::tp84_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0,HOLD_LINE,0xff); // Z80
 }
@@ -214,7 +214,7 @@ void tp84_state::tp84b_cpu1_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
+void tp84_state::sub_irq_mask_w(uint8_t data)
 {
 	m_sub_irq_mask = data & 1;
 	if (!m_sub_irq_mask)

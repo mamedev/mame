@@ -51,11 +51,11 @@ public:
 private:
 	uint8_t m_keyboard_line;
 
-	DECLARE_READ8_MEMBER(joy_1_r);
-	DECLARE_READ8_MEMBER(joy_2_r);
-	DECLARE_WRITE8_MEMBER(_80_porta_w);
-	DECLARE_READ8_MEMBER(_80_portb_r);
-	DECLARE_WRITE8_MEMBER(_80_portc_w);
+	uint8_t joy_1_r();
+	uint8_t joy_2_r();
+	void _80_porta_w(uint8_t data);
+	uint8_t _80_portb_r();
+	void _80_portc_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -149,12 +149,12 @@ void pk8000_state::set_bank(uint8_t data)
 				break;
 	}
 }
-WRITE8_MEMBER(pk8000_state::_80_porta_w)
+void pk8000_state::_80_porta_w(uint8_t data)
 {
 	set_bank(data);
 }
 
-READ8_MEMBER(pk8000_state::_80_portb_r)
+uint8_t pk8000_state::_80_portb_r()
 {
 	if(m_keyboard_line>9) {
 		return 0xff;
@@ -162,7 +162,7 @@ READ8_MEMBER(pk8000_state::_80_portb_r)
 	return m_keyboard[m_keyboard_line]->read();
 }
 
-WRITE8_MEMBER(pk8000_state::_80_portc_w)
+void pk8000_state::_80_portc_w(uint8_t data)
 {
 	m_keyboard_line = data & 0x0f;
 
@@ -172,13 +172,13 @@ WRITE8_MEMBER(pk8000_state::_80_portc_w)
 	m_cassette->output((BIT(data, 6)) ? +1.0 : 0.0);
 }
 
-READ8_MEMBER(pk8000_state::joy_1_r)
+uint8_t pk8000_state::joy_1_r()
 {
 	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy1->read() & 0x7f;
 	return retVal;
 }
-READ8_MEMBER(pk8000_state::joy_2_r)
+uint8_t pk8000_state::joy_2_r()
 {
 	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy2->read() & 0x7f;

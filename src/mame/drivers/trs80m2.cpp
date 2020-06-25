@@ -35,7 +35,7 @@
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( trs80m2_state::read )
+uint8_t trs80m2_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -74,7 +74,7 @@ READ8_MEMBER( trs80m2_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::write )
+void trs80m2_state::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x8000)
 	{
@@ -98,7 +98,7 @@ WRITE8_MEMBER( trs80m2_state::write )
 	}
 }
 
-WRITE8_MEMBER( trs80m2_state::rom_enable_w )
+void trs80m2_state::rom_enable_w(uint8_t data)
 {
 	/*
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER( trs80m2_state::rom_enable_w )
 	m_boot_rom = BIT(data, 0);
 }
 
-WRITE8_MEMBER( trs80m2_state::drvslt_w )
+void trs80m2_state::drvslt_w(uint8_t data)
 {
 	/*
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
 	m_fdc->dden_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( trs80m2_state::keyboard_r )
+uint8_t trs80m2_state::keyboard_r()
 {
 	// clear keyboard interrupt
 	if (!m_kbirq)
@@ -170,7 +170,7 @@ READ8_MEMBER( trs80m2_state::keyboard_r )
 	return m_key_data;
 }
 
-READ8_MEMBER( trs80m2_state::rtc_r )
+uint8_t trs80m2_state::rtc_r()
 {
 	// clear RTC interrupt
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -178,7 +178,7 @@ READ8_MEMBER( trs80m2_state::rtc_r )
 	return 0;
 }
 
-READ8_MEMBER( trs80m2_state::nmi_r )
+uint8_t trs80m2_state::nmi_r()
 {
 	/*
 
@@ -212,7 +212,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::nmi_w )
+void trs80m2_state::nmi_w(uint8_t data)
 {
 	/*
 
@@ -252,17 +252,17 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 	m_msel = BIT(data, 7);
 }
 
-READ8_MEMBER( trs80m2_state::fdc_r )
+uint8_t trs80m2_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( trs80m2_state::fdc_w )
+void trs80m2_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER( trs80m16_state::tcl_w )
+void trs80m16_state::tcl_w(uint8_t data)
 {
 	/*
 
@@ -289,7 +289,7 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
 	m_ual = (m_ual & 0x1fe) | BIT(data, 7);
 }
 
-WRITE8_MEMBER( trs80m16_state::ual_w )
+void trs80m16_state::ual_w(uint8_t data)
 {
 	/*
 
@@ -337,7 +337,7 @@ void trs80m2_state::z80_io(address_map &map)
 	map(0xef, 0xef).w(FUNC(trs80m2_state::drvslt_w));
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
-	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0xf9, 0xf9).w(FUNC(trs80m2_state::rom_enable_w));
 	map(0xfc, 0xfc).r(FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xfd, 0xfd).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -508,13 +508,13 @@ void trs80m2_state::kbd_w(u8 data)
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER(trs80m2_state::io_read_byte)
+uint8_t trs80m2_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(trs80m2_state::io_write_byte)
+void trs80m2_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER( trs80m2_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( trs80m2_state::pio_pa_r )
+uint8_t trs80m2_state::pio_pa_r()
 {
 	/*
 
@@ -579,7 +579,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::pio_pa_w )
+void trs80m2_state::pio_pa_w(uint8_t data)
 {
 	/*
 
@@ -751,7 +751,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
 	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
-	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
 	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2)); // SIO/0
@@ -844,7 +844,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
 	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
-	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
 	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2));

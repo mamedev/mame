@@ -193,12 +193,12 @@ void wpc_dot_state::init_wpc_dot()
 	save_pointer(m_dmdram,"DMD RAM",0x2000);
 }
 
-READ8_MEMBER(wpc_dot_state::ram_r)
+uint8_t wpc_dot_state::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(wpc_dot_state::ram_w)
+void wpc_dot_state::ram_w(offs_t offset, uint8_t data)
 {
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
@@ -206,12 +206,12 @@ WRITE8_MEMBER(wpc_dot_state::ram_w)
 		logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
-WRITE8_MEMBER(wpc_dot_state::wpc_rombank_w)
+void wpc_dot_state::wpc_rombank_w(uint8_t data)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
 
-WRITE8_MEMBER(wpc_dot_state::wpc_dmdbank_w)
+void wpc_dot_state::wpc_dmdbank_w(offs_t offset, uint8_t data)
 {
 	uint8_t const bank(offset & 0x07);
 	uint8_t const page(offset >> 4);
@@ -245,26 +245,6 @@ WRITE_LINE_MEMBER(wpc_dot_state::wpc_irq_w)
 WRITE_LINE_MEMBER(wpc_dot_state::wpc_firq_w)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
-}
-
-READ8_MEMBER(wpc_dot_state::wpc_sound_ctrl_r)
-{
-	return m_wpcsnd->ctrl_r();  // ack FIRQ?
-}
-
-WRITE8_MEMBER(wpc_dot_state::wpc_sound_ctrl_w)
-{
-	m_wpcsnd->ctrl_w(data);
-}
-
-READ8_MEMBER(wpc_dot_state::wpc_sound_data_r)
-{
-	return m_wpcsnd->data_r();
-}
-
-WRITE8_MEMBER(wpc_dot_state::wpc_sound_data_w)
-{
-	m_wpcsnd->data_w(data);
 }
 
 uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -302,10 +282,10 @@ void wpc_dot_state::wpc_dot(machine_config &config)
 	m_wpc->irq_callback().set(FUNC(wpc_dot_state::wpc_irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_dot_state::wpc_firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_dot_state::wpc_rombank_w));
-	m_wpc->sound_ctrl_read().set(FUNC(wpc_dot_state::wpc_sound_ctrl_r));
-	m_wpc->sound_ctrl_write().set(FUNC(wpc_dot_state::wpc_sound_ctrl_w));
-	m_wpc->sound_data_read().set(FUNC(wpc_dot_state::wpc_sound_data_r));
-	m_wpc->sound_data_write().set(FUNC(wpc_dot_state::wpc_sound_data_w));
+	m_wpc->sound_ctrl_read().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_r)); // ack FIRQ?
+	m_wpc->sound_ctrl_write().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_w));
+	m_wpc->sound_data_read().set(m_wpcsnd, FUNC(wpcsnd_device::data_r));
+	m_wpc->sound_data_write().set(m_wpcsnd, FUNC(wpcsnd_device::data_w));
 	m_wpc->dmdbank_write().set(FUNC(wpc_dot_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();

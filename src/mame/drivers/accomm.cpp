@@ -46,6 +46,7 @@ public:
 	accomm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_maincpu_region(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
 		m_via(*this, "via6522"),
@@ -60,16 +61,18 @@ public:
 
 	void accomm(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(ch00switch_w);
-	DECLARE_READ8_MEMBER(read_keyboard1);
-	DECLARE_READ8_MEMBER(read_keyboard2);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(sheila_r);
-	DECLARE_WRITE8_MEMBER(sheila_w);
+	void ch00switch_w(offs_t offset, uint8_t data);
+	uint8_t read_keyboard1(offs_t offset);
+	uint8_t read_keyboard2(offs_t offset);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t sheila_r(offs_t offset);
+	void sheila_w(offs_t offset, uint8_t data);
 
 	void accomm_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vbl_int);
@@ -80,6 +83,7 @@ private:
 
 	// devices
 	required_device<g65816_device> m_maincpu;
+	required_memory_region m_maincpu_region;
 	required_device<beep_device> m_beeper;
 	required_device<ram_device> m_ram;
 	required_device<via6522_device> m_via;
@@ -150,7 +154,7 @@ void accomm_state::accomm_palette(palette_device &palette) const
 	palette.set_pen_colors(0, electron_palette);
 }
 
-READ8_MEMBER(accomm_state::read_keyboard1)
+uint8_t accomm_state::read_keyboard1(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -164,7 +168,7 @@ READ8_MEMBER(accomm_state::read_keyboard1)
 	return data;
 }
 
-READ8_MEMBER(accomm_state::read_keyboard2)
+uint8_t accomm_state::read_keyboard2(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -216,7 +220,7 @@ void accomm_state::video_start()
 	}
 }
 
-WRITE8_MEMBER(accomm_state::ch00switch_w)
+void accomm_state::ch00switch_w(offs_t offset, uint8_t data)
 {
 	logerror("ch00switch_w: offset %04x, data %02x\n", offset, data);
 	if (!machine().side_effects_disabled())
@@ -432,13 +436,13 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-READ8_MEMBER(accomm_state::ram_r)
+uint8_t accomm_state::ram_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_ch00rom_enabled && (offset < 0x10000))
 	{
-		data = memregion("maincpu")->base()[offset];
+		data = m_maincpu_region->base()[offset];
 	}
 	else
 	{
@@ -456,7 +460,7 @@ READ8_MEMBER(accomm_state::ram_r)
 	return data;
 }
 
-WRITE8_MEMBER(accomm_state::ram_w)
+void accomm_state::ram_w(offs_t offset, uint8_t data)
 {
 	switch (m_ram->size())
 	{
@@ -471,7 +475,7 @@ WRITE8_MEMBER(accomm_state::ram_w)
 }
 
 
-READ8_MEMBER(accomm_state::sheila_r)
+uint8_t accomm_state::sheila_r(offs_t offset)
 {
 	uint8_t data = 0;
 	switch ( offset & 0x0f )
@@ -494,7 +498,7 @@ READ8_MEMBER(accomm_state::sheila_r)
 static const int palette_offset[4] = { 0, 4, 5, 1 };
 static const uint16_t screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
 
-WRITE8_MEMBER(accomm_state::sheila_w)
+void accomm_state::sheila_w(offs_t offset, uint8_t data)
 {
 	int i = palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
@@ -646,6 +650,11 @@ void accomm_state::main_map(address_map &map)
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0x010000);                                      /* ROM bank 1 (ROM Slot 0) */
 }
 
+INPUT_CHANGED_MEMBER(accomm_state::trigger_reset)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
@@ -716,7 +725,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.11")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')  PORT_CHAR('}')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))       PORT_NAME("Phone")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))        PORT_NAME("Phone")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(ESC))       PORT_NAME("Escape")
 
 	PORT_START("LINE1.12")
@@ -798,9 +807,9 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 
 	PORT_START("LINE2.11")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))       PORT_NAME("Stop")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))      PORT_NAME("Comp")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Calc")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))      PORT_NAME("Calc")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 
 	PORT_START("LINE2.12")
@@ -814,6 +823,9 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("STOP")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, accomm_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 void accomm_state::accomm(machine_config &config)
@@ -847,7 +859,7 @@ void accomm_state::accomm(machine_config &config)
 
 	/* via */
 	VIA6522(config, m_via, 16_MHz_XTAL / 16);
-	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* acia */
@@ -969,7 +981,7 @@ ROM_START(accommi)
 	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
 
-COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator",             MACHINE_NOT_WORKING )
-COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
-COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )
+COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator",             MACHINE_NOT_WORKING )
+COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
+COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )

@@ -89,8 +89,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(soundcmd_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void okibank_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -147,7 +147,7 @@ uint32_t diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_in
 }
 
 
-WRITE16_MEMBER(diverboy_state::soundcmd_w)
+void diverboy_state::soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(diverboy_state::soundcmd_w)
 	}
 }
 
-WRITE8_MEMBER(diverboy_state::okibank_w)
+void diverboy_state::okibank_w(uint8_t data)
 {
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);

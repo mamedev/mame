@@ -70,10 +70,9 @@ void primo_state::primo_update_memory()
 
 *******************************************************************************/
 
-READ8_MEMBER(primo_state::primo_be_1_r)
+uint8_t primo_state::primo_be_1_r(offs_t offset)
 {
 	uint8_t data = 0x00;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	// bit 7, 6 - not used
 
@@ -88,15 +87,15 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	data |= (m_cassette->input() < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
-	data |= (ioport("RESET")->read()) ? 0x02 : 0x00;
+	data |= (m_reset_port->read()) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	data |= (ioport(portnames[(offset & 0x0030) >> 4])->read() >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
+	data |= (m_keyboard_port[(offset & 0x0030) >> 4]->read() >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
 
 	return data;
 }
 
-READ8_MEMBER(primo_state::primo_be_2_r)
+uint8_t primo_state::primo_be_2_r()
 {
 	uint8_t data = 0xff;
 
@@ -126,10 +125,10 @@ READ8_MEMBER(primo_state::primo_be_2_r)
 	return data;
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_1_w)
+void primo_state::primo_ki_1_w(uint8_t data)
 {
 	// bit 7 - NMI generator enable/disable
-	m_nmi = (data & 0x80) ? 1 : 0;
+	m_nmi = BIT(data, 7);
 
 	// bit 6 - joystick register shift (not emulated)
 
@@ -139,7 +138,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	m_speaker->level_w(BIT(data, 4));
 
 	// bit 3 - display buffer
-	if (data & 0x08)
+	if (BIT(data, 3))
 		m_video_memory_base |= 0x2000;
 	else
 		m_video_memory_base &= 0xdfff;
@@ -162,7 +161,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	}
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_2_w)
+void primo_state::primo_ki_2_w(uint8_t data)
 {
 	// bit 7, 6 - not used
 
@@ -185,9 +184,9 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 //  logerror ("IOW KI-2 data:%02x\n", data);
 }
 
-WRITE8_MEMBER(primo_state::primo_FD_w)
+void primo_state::primo_FD_w(uint8_t data)
 {
-	if (!ioport("MEMORY_EXPANSION")->read())
+	if (!m_mem_exp_port->read())
 	{
 		m_port_FD = data;
 		primo_update_memory();
@@ -200,27 +199,10 @@ WRITE8_MEMBER(primo_state::primo_FD_w)
 
 *******************************************************************************/
 
-void primo_state::primo_common_driver_init (primo_state *state)
+void primo_state::init_primo()
 {
 	m_port_FD = 0x00;
-}
-
-void primo_state::init_primo32()
-{
-	primo_common_driver_init(this);
-	m_video_memory_base = 0x6800;
-}
-
-void primo_state::init_primo48()
-{
-	primo_common_driver_init(this);
-	m_video_memory_base = 0xa800;
-}
-
-void primo_state::init_primo64()
-{
-	primo_common_driver_init(this);
-	m_video_memory_base = 0xe800;
+	m_video_memory_base = 0x2800;
 }
 
 /*******************************************************************************

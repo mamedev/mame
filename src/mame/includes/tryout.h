@@ -47,15 +47,15 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_vram_gfx;
 
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(vram_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void nmi_ack_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void sound_irq_ack_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	void vram_bankswitch_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

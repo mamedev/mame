@@ -127,15 +127,15 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ16_MEMBER( mem_r );
-	DECLARE_WRITE16_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( prtr_snd_r );
-	DECLARE_WRITE8_MEMBER( pint_clr_w );
-	DECLARE_WRITE8_MEMBER( ls_w );
-	DECLARE_WRITE8_MEMBER( contrast_w );
-	DECLARE_WRITE8_MEMBER( palette_w );
-	DECLARE_WRITE16_MEMBER( video_w );
-	DECLARE_WRITE8_MEMBER( lat_w );
+	uint16_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint16_t data);
+	uint8_t prtr_snd_r();
+	void pint_clr_w(uint8_t data);
+	void ls_w(uint8_t data);
+	void contrast_w(uint8_t data);
+	void palette_w(uint8_t data);
+	void video_w(uint16_t data);
+	void lat_w(offs_t offset, uint8_t data);
 
 	void lat_ls259_w(offs_t offset, int state);
 
@@ -218,7 +218,7 @@ static GFXDECODE_START( gfx_act_f1 )
 GFXDECODE_END
 
 
-READ8_MEMBER( fp_state::prtr_snd_r )
+uint8_t fp_state::prtr_snd_r()
 {
 	/*
 
@@ -249,24 +249,24 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 	return data;
 }
 
-WRITE8_MEMBER( fp_state::pint_clr_w )
+void fp_state::pint_clr_w(uint8_t data)
 {
 	m_pic->ir6_w(CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER( fp_state::ls_w )
+void fp_state::ls_w(uint8_t data)
 {
 	m_centronics->write_strobe(!BIT(data, 0));
 }
 
 
-WRITE8_MEMBER( fp_state::contrast_w )
+void fp_state::contrast_w(uint8_t data)
 {
 }
 
 
-WRITE8_MEMBER( fp_state::palette_w )
+void fp_state::palette_w(uint8_t data)
 {
 	/*
 
@@ -285,7 +285,7 @@ WRITE8_MEMBER( fp_state::palette_w )
 }
 
 
-WRITE16_MEMBER( fp_state::video_w )
+void fp_state::video_w(uint16_t data)
 {
 	/*
 
@@ -333,13 +333,13 @@ void fp_state::lat_ls259_w(offs_t offset, int state)
 	}
 }
 
-WRITE8_MEMBER( fp_state::lat_w )
+void fp_state::lat_w(offs_t offset, uint8_t data)
 {
 	lat_ls259_w((offset >> 1) & 0x07, BIT(data, 0));
 }
 
 
-READ16_MEMBER( fp_state::mem_r )
+uint16_t fp_state::mem_r(offs_t offset)
 {
 	uint16_t data = 0xffff;
 
@@ -369,7 +369,7 @@ READ16_MEMBER( fp_state::mem_r )
 }
 
 
-WRITE16_MEMBER( fp_state::mem_w )
+void fp_state::mem_w(offs_t offset, uint16_t data)
 {
 	if (offset >= 0xd0000/2 && offset < 0xe0000/2)
 	{
@@ -443,7 +443,7 @@ void fp_state::fp_io(address_map &map)
 	map(0x000, 0x007).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x008, 0x00f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x018, 0x01f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x022, 0x022).w(FUNC(fp_state::pint_clr_w));
 	map(0x024, 0x024).r(FUNC(fp_state::prtr_snd_r));
 	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
@@ -574,7 +574,7 @@ void fp_state::fp(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fp_state::fp_io);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	HD6301(config, m_soundcpu, 2000000);
+	HD6301V1(config, m_soundcpu, 2000000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
 	m_soundcpu->set_disable();
 

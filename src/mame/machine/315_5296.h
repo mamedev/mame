@@ -47,8 +47,10 @@ public:
 	auto out_cnt1_callback() { return m_out_cnt_cb[1].bind(); }
 	auto out_cnt2_callback() { return m_out_cnt_cb[2].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	void set_ddr_override(uint8_t mask) { m_dir_override = mask; }
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t debug_peek_output(offs_t offset) const { return m_output_latch[offset & 7]; }
 
@@ -65,6 +67,7 @@ private:
 	uint8_t m_output_latch[8];
 	uint8_t m_cnt;
 	uint8_t m_dir;
+	uint8_t m_dir_override;
 };
 
 // device type definition

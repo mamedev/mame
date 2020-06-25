@@ -40,9 +40,9 @@ TILE_GET_INFO_MEMBER(sprint4_state::tile_info)
 	uint8_t code = m_videoram[tile_index];
 
 	if ((code & 0x30) == 0x30)
-		SET_TILE_INFO_MEMBER(0, code & ~0x40, (code >> 6) ^ 3, 0);
+		tileinfo.set(0, code & ~0x40, (code >> 6) ^ 3, 0);
 	else
-		SET_TILE_INFO_MEMBER(0, code, 4, 0);
+		tileinfo.set(0, code, 4, 0);
 }
 
 
@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 }
 
 
-WRITE8_MEMBER(sprint4_state::video_ram_w)
+void sprint4_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_playfield->mark_tile_dirty(offset);

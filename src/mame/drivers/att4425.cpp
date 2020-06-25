@@ -54,10 +54,10 @@ public:
 	void att4425(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_READ8_MEMBER(port14_r);
-	DECLARE_READ8_MEMBER(port15_r);
+	void port10_w(uint8_t data);
+	void port14_w(uint8_t data);
+	uint8_t port14_r();
+	uint8_t port15_r();
 
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -79,23 +79,23 @@ private:
 
 /* Memory Maps */
 
-WRITE8_MEMBER(att4425_state::port10_w)
+void att4425_state::port10_w(uint8_t data)
 {
 	logerror("Writing %02X to port 10\n", data);
 }
 
-WRITE8_MEMBER(att4425_state::port14_w)
+void att4425_state::port14_w(uint8_t data)
 {
 	logerror("Writing %02X to port 14\n", data);
 }
 
-READ8_MEMBER(att4425_state::port14_r)
+uint8_t att4425_state::port14_r()
 {
 	// only complement of bit 0 used?
 	return 0;
 }
 
-READ8_MEMBER(att4425_state::port15_r)
+uint8_t att4425_state::port15_r()
 {
 	// status of something (at least bits 2 and 3 used)
 	return 0;

@@ -34,7 +34,7 @@ ROM_END
 
 
 // C68 looks like a drop-in replacement for C65, so the port mappings must be scrambled in one instance, since this already has a multiplex on the port, assume here
-READ8_MEMBER(namcoc68_device::c68_p5_r)
+uint8_t namcoc68_device::c68_p5_r()
 {
 	uint16_t ret = (m_in_ph_cb() << 8) | m_in_pb_cb();
 
@@ -48,35 +48,35 @@ READ8_MEMBER(namcoc68_device::c68_p5_r)
 	}
 }
 
-READ8_MEMBER(namcoc68_device::mcuc_r)
+uint8_t namcoc68_device::mcuc_r()
 {
 	uint8_t ret = m_in_pc_cb();
 	ret = bitswap<8>(ret, 3, 2, 1, 0, 7, 6, 5, 4);
 	return ret;
 }
 
-WRITE8_MEMBER(namcoc68_device::c68_p3_w)
+void namcoc68_device::c68_p3_w(uint8_t data)
 {
 	m_player_mux = (data & 0x80) ? 1 : 0;
 }
 
-READ8_MEMBER(namcoc68_device::ack_mcu_vbl_r)
+uint8_t namcoc68_device::ack_mcu_vbl_r()
 {
 	m_mcu->set_input_line(m37450_device::M3745X_INT1_LINE, CLEAR_LINE);
 	return 0;
 }
 
-READ8_MEMBER(namcoc68_device::dpram_byte_r)
+uint8_t namcoc68_device::dpram_byte_r(offs_t offset)
 {
 	return m_dp_in(offset);
 }
 
-WRITE8_MEMBER(namcoc68_device::dpram_byte_w)
+void namcoc68_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dp_out(offset,data);
 }
 
-READ8_MEMBER(namcoc68_device::unk_r)
+uint8_t namcoc68_device::unk_r()
 {
 	return 0x00;
 }
@@ -130,6 +130,7 @@ void namcoc68_device::device_resolve_objects()
 
 void namcoc68_device::device_start()
 {
+	save_item(NAME(m_player_mux));
 }
 
 void namcoc68_device::device_reset()

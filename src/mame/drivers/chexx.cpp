@@ -46,20 +46,20 @@ public:
 	}
 
 	// handlers
-	DECLARE_READ8_MEMBER(via_a_in);
-	DECLARE_READ8_MEMBER(via_b_in);
+	uint8_t via_a_in();
+	uint8_t via_b_in();
 
-	DECLARE_WRITE8_MEMBER(via_a_out);
-	DECLARE_WRITE8_MEMBER(via_b_out);
+	void via_a_out(uint8_t data);
+	void via_b_out(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_out);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_out);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_out);
 
-	DECLARE_READ8_MEMBER(input_r);
+	uint8_t input_r();
 
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	void lamp_w(uint8_t data);
 
 	void chexx(machine_config &config);
 	void mem(address_map &map);
@@ -114,7 +114,7 @@ public:
 	void faceoffh(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(ay_w);
+	void ay_w(offs_t offset, uint8_t data);
 
 	void mem(address_map &map);
 
@@ -126,28 +126,28 @@ protected:
 
 // VIA
 
-READ8_MEMBER(chexx_state::via_a_in)
+uint8_t chexx_state::via_a_in()
 {
 	uint8_t ret = 0;
 	logerror("%s: VIA read A: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(chexx_state::via_b_in)
+uint8_t chexx_state::via_b_in()
 {
 	uint8_t ret = 0;
 	logerror("%s: VIA read B: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(chexx_state::via_a_out)
+void chexx_state::via_a_out(uint8_t data)
 {
 	m_port_a = data;    // multiplexer
-	m_digitalker->digitalker_data_w(space, 0, data, 0);
+	m_digitalker->digitalker_data_w(data);
 //  logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chexx_state::via_b_out)
+void chexx_state::via_b_out(uint8_t data)
 {
 	m_port_b = data;
 
@@ -200,7 +200,7 @@ WRITE_LINE_MEMBER(chexx_state::via_irq_out)
 //  logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);
 }
 
-READ8_MEMBER(chexx_state::input_r)
+uint8_t chexx_state::input_r()
 {
 	uint8_t ret = m_dsw->read();          // bits 0-3
 	uint8_t inp = m_input->read();        // bit 7 (multiplexed)
@@ -232,7 +232,7 @@ void chexx_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-WRITE8_MEMBER(chexx_state::lamp_w)
+void chexx_state::lamp_w(uint8_t data)
 {
 	m_lamp = data;
 	m_lamps[0] = BIT(m_lamp,0);
@@ -251,7 +251,7 @@ void faceoffh_state::mem(address_map &map)
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
-WRITE8_MEMBER(faceoffh_state::ay_w)
+void faceoffh_state::ay_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 	{

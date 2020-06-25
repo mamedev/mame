@@ -36,24 +36,24 @@ TODO
 #include "speaker.h"
 
 
-WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
+void galivan_state::galivan_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(galivan_state::soundlatch_clear_r)
+uint8_t galivan_state::soundlatch_clear_r()
 {
 	m_soundlatch->clear_w();
 	return 0;
 }
 
-READ8_MEMBER(galivan_state::IO_port_c0_r)
+uint8_t galivan_state::IO_port_c0_r()
 {
 	// causes a reset in dangar if value differs.
 	return (0x58);
 }
 
-WRITE8_MEMBER(galivan_state::vblank_ack_w)
+void galivan_state::vblank_ack_w(uint8_t data)
 {
 	if (m_nb1414m4 != nullptr)
 		m_nb1414m4->vblank_trigger();
@@ -106,7 +106,7 @@ void dangarj_state::dangarj_io_map(address_map &map)
 	map(0x81, 0x81).w("prot_chip", FUNC(nb1412m2_device::command_w));
 }
 
-WRITE8_MEMBER(galivan_state::blit_trigger_w)
+void galivan_state::blit_trigger_w(uint8_t data)
 {
 	// TODO: may not be right, diverges with armedf.cpp
 	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
@@ -1121,7 +1121,7 @@ ROM_START( youmab2 )
 ROM_END
 
 
-WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
+void galivan_state::youmab_extra_bank_w(uint8_t data)
 {
 	if (data == 0xff)
 		membank("bank2")->set_entry(1);
@@ -1131,18 +1131,18 @@ WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
 		printf("data %03x\n", data);
 }
 
-READ8_MEMBER(galivan_state::youmab_8a_r)
+uint8_t galivan_state::youmab_8a_r()
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(galivan_state::youmab_81_w)
+void galivan_state::youmab_81_w(uint8_t data)
 {
 	// ??
 }
 
 /* scrolling is tied to a serial port, reads from 0xe43d-0xe43e-0xe43f-0xe440 */
-WRITE8_MEMBER(galivan_state::youmab_84_w)
+void galivan_state::youmab_84_w(uint8_t data)
 {
 	m_shift_val &= ~((0x80 >> 7) << m_shift_scroll);
 	m_shift_val |= (((data & 0x80) >> 7) << m_shift_scroll);
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER(galivan_state::youmab_84_w)
 	//if(m_shift_scroll == 25)
 }
 
-WRITE8_MEMBER(galivan_state::youmab_86_w)
+void galivan_state::youmab_86_w(uint8_t data)
 {
 	/* latch values */
 	{
@@ -1171,7 +1171,7 @@ WRITE8_MEMBER(galivan_state::youmab_86_w)
 void galivan_state::init_youmab()
 {
 	// TODO: move all of this to an address map instead
-	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8smo_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");
 	membank("bank3")->set_base(memregion("maincpu")->base());
 
@@ -1179,14 +1179,14 @@ void galivan_state::init_youmab()
 	membank("bank2")->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
 	membank("bank2")->set_entry(0);
 
-	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
-	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..
+	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8smo_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
+	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8smo_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..
 
 	m_maincpu->space(AS_PROGRAM).nop_write(0xd800, 0xd81f); // scrolling isn't here..
 
-	m_maincpu->space(AS_IO).install_read_handler(0x8a, 0x8a, read8_delegate(*this, FUNC(galivan_state::youmab_8a_r))); // ???
+	m_maincpu->space(AS_IO).install_read_handler(0x8a, 0x8a, read8smo_delegate(*this, FUNC(galivan_state::youmab_8a_r))); // ???
 
-	m_maincpu->space(AS_IO).install_write_handler(0x86, 0x86, write8_delegate(*this, FUNC(galivan_state::youmab_86_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x86, 0x86, write8smo_delegate(*this, FUNC(galivan_state::youmab_86_w)));
 
 }
 

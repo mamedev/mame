@@ -494,13 +494,13 @@ private:
 	int m_m5205_next;
 	int m_m5205_part;
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(msm5205_data_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void bank_w(uint8_t data);
+	void msm5205_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
-	DECLARE_READ8_MEMBER(port_38_read);
-	DECLARE_READ8_MEMBER(nmi_read);
+	uint8_t port_38_read();
+	uint8_t nmi_read();
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -564,13 +564,13 @@ uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Access to Banked RAM */
 
-READ8_MEMBER(mastboy_state::vram_r)
+uint8_t mastboy_state::vram_r(offs_t offset)
 {
 	/* we have to invert the data for the GFX decode */
 	return m_vram[offset]^0xff;
 }
 
-WRITE8_MEMBER(mastboy_state::vram_w)
+void mastboy_state::vram_w(offs_t offset, uint8_t data)
 {
 	/* we have to invert the data for the GFX decode */
 	m_vram[offset] = data^0xff;
@@ -579,7 +579,7 @@ WRITE8_MEMBER(mastboy_state::vram_w)
 	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
-WRITE8_MEMBER(mastboy_state::bank_w)
+void mastboy_state::bank_w(uint8_t data)
 {
 	// controls access to banked ram / rom
 	m_bank_c000->set_bank(data);
@@ -587,7 +587,7 @@ WRITE8_MEMBER(mastboy_state::bank_w)
 
 /* MSM5205 Related */
 
-WRITE8_MEMBER(mastboy_state::msm5205_data_w)
+void mastboy_state::msm5205_data_w(uint8_t data)
 {
 	m_m5205_part = 0;
 	m_m5205_next = data;
@@ -595,7 +595,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
-	m_msm->write_data(m_m5205_next);
+	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
@@ -653,12 +653,12 @@ void mastboy_state::bank_c000_map(address_map &map)
 
 /* Ports */
 
-READ8_MEMBER(mastboy_state::port_38_read)
+uint8_t mastboy_state::port_38_read()
 {
 	return 0x00;
 }
 
-READ8_MEMBER(mastboy_state::nmi_read)
+uint8_t mastboy_state::nmi_read()
 {
 	// this is read in the NMI, it's related to the Z180 MMU I think, must return right value or game jumps to 0000
 	return 0x00;
@@ -822,7 +822,7 @@ void mastboy_state::mastboy(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(6000000.0f / 384.0f / 282.0f);
+	screen.set_refresh_hz(6000000.0 / 384.0 / 282.0);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 256-16-1);

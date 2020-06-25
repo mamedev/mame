@@ -16,6 +16,7 @@
 
 DECLARE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device)
 DECLARE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device)
+DECLARE_DEVICE_TYPE(M68HC705C4A, m68hc705c4a_device)
 DECLARE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device)
 DECLARE_DEVICE_TYPE(M68HC705J1A, m68hc705j1a_device)
 DECLARE_DEVICE_TYPE(M68HC05L9,   m68hc05l9_device)
@@ -75,7 +76,9 @@ protected:
 		M68HC05_COPCR,
 		M68HC05_PCOP,
 		M68HC05_NCOPE,
-		M68HC05_NCOP
+		M68HC05_NCOP,
+
+		M68HC705C8A_OPTION
 	};
 
 	enum { PORT_COUNT = 4 };
@@ -92,24 +95,24 @@ protected:
 
 	void set_port_bits(std::array<u8, PORT_COUNT> const &bits);
 	void set_port_interrupt(std::array<u8, PORT_COUNT> const &interrupt);
-	DECLARE_READ8_MEMBER(port_read);
-	DECLARE_WRITE8_MEMBER(port_latch_w);
-	DECLARE_READ8_MEMBER(port_ddr_r);
-	DECLARE_WRITE8_MEMBER(port_ddr_w);
+	u8 port_read(offs_t offset);
+	void port_latch_w(offs_t offset, u8 data);
+	u8 port_ddr_r(offs_t offset);
+	void port_ddr_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(tcr_r);
-	DECLARE_WRITE8_MEMBER(tcr_w);
-	DECLARE_READ8_MEMBER(tsr_r);
-	DECLARE_READ8_MEMBER(icr_r);
-	DECLARE_READ8_MEMBER(ocr_r);
-	DECLARE_WRITE8_MEMBER(ocr_w);
-	DECLARE_READ8_MEMBER(timer_r);
+	u8 tcr_r();
+	void tcr_w(u8 data);
+	u8 tsr_r();
+	u8 icr_r(offs_t offset);
+	u8 ocr_r(offs_t offset);
+	void ocr_w(offs_t offset, u8 data);
+	u8 timer_r(offs_t offset);
 
 	void set_ncope(bool state) { m_ncope = state ? 1 : 0; }
-	DECLARE_WRITE8_MEMBER(coprst_w);
-	DECLARE_READ8_MEMBER(copcr_r);
-	DECLARE_WRITE8_MEMBER(copcr_w);
-	DECLARE_WRITE8_MEMBER(copr_w);
+	void coprst_w(u8 data);
+	u8 copcr_r();
+	void copcr_w(u8 data);
+	void copr_w(u8 data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -225,6 +228,30 @@ protected:
 };
 
 
+// ======================> m68hc705c4a_device
+
+class m68hc705c4a_device : public m68hc705_device
+{
+public:
+	m68hc705c4a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	void c4a_map(address_map &map);
+
+	virtual tiny_rom_entry const *device_rom_region() const override;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	required_region_ptr<u8> m_rom;
+
+	u8 m_option;
+};
+
+
 // ======================> m68hc705c8a_device
 
 class m68hc705c8a_device : public m68hc705_device
@@ -241,6 +268,17 @@ protected:
 	virtual void device_reset() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	required_region_ptr<u8> m_rom;
+
+	u8 ram0_r(offs_t offset);
+	void ram0_w(offs_t offset, u8 data);
+	u8 ram1_r(offs_t offset);
+	void ram1_w(offs_t offset, u8 data);
+
+	u8 m_ram[0x80];
+	u8 m_option;
 };
 
 

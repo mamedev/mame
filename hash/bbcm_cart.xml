@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Master ROM Cartridges -->
+Acorn BBC Master ROM Cartridges
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
 -->
@@ -158,14 +160,27 @@
 		</part>
 	</software>
 
-	<software name="msc">
-		<description>Master Smart Cartridge</description>
+	<software name="msc200" cloneof="msc">
+		<description>Master Smart Cartridge v2</description>
 		<year>1987</year>
 		<publisher>Care Electronics</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<feature name="slot" value="msc" />
 			<dataarea name="rom" size="16384">
 				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
+		</part>
+	</software>
+
+	<software name="msc">
+		<description>Master Smart Cartridge v2.02</description>
+		<year>1987</year>
+		<publisher>Care Electronics</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="msc" />
+			<dataarea name="rom" size="16384">
+				<rom name="smart_v2.02.rom" size="16384" crc="f9cc2e5e" sha1="1419f09408b83a9294c7b4a175d17ccf5d7eb76d" />
 			</dataarea>
 			<dataarea name="ram" size="2048" />
 		</part>

@@ -22,9 +22,9 @@ public:
 
 	auto ack_handler() { return m_ack_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	WRITE_LINE_MEMBER( pcm_write );
+	uint8_t read();
+	void write(uint8_t data);
+	void pcm_write(int state);
 
 protected:
 	// device-level overrides

@@ -86,11 +86,11 @@ public:
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
+			m_ikbd(*this, HD6301V1_TAG),
 			m_fdc(*this, WD1772_TAG),
 			m_floppy(*this, WD1772_TAG ":%u", 0U),
 			m_mfp(*this, MC68901_TAG),
-			m_acia0(*this, MC6850_0_TAG),
-			m_acia1(*this, MC6850_1_TAG),
+			m_acia(*this, {MC6850_0_TAG, MC6850_1_TAG}),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_cart(*this, "cartslot"),
 			m_ram(*this, RAM_TAG),
@@ -128,12 +128,17 @@ public:
 			m_led(*this, "led1")
 	{ }
 
+	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+
+	void st(machine_config &config);
+
+protected:
 	required_device<m68000_base_device> m_maincpu;
+	required_device<cpu_device> m_ikbd;
 	required_device<wd1772_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
-	required_device<acia6850_device> m_acia0;
-	required_device<acia6850_device> m_acia1;
+	required_device_array<acia6850_device, 2> m_acia;
 	required_device<centronics_device> m_centronics;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
@@ -163,42 +168,42 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// video
-	DECLARE_READ8_MEMBER( shifter_base_r );
-	DECLARE_READ8_MEMBER( shifter_counter_r );
-	DECLARE_READ8_MEMBER( shifter_sync_r );
-	DECLARE_READ16_MEMBER( shifter_palette_r );
-	DECLARE_READ8_MEMBER( shifter_mode_r );
+	uint8_t shifter_base_r(offs_t offset);
+	uint8_t shifter_counter_r(offs_t offset);
+	uint8_t shifter_sync_r();
+	uint16_t shifter_palette_r(offs_t offset);
+	uint8_t shifter_mode_r();
 
-	DECLARE_WRITE8_MEMBER( shifter_base_w );
-	DECLARE_WRITE8_MEMBER( shifter_sync_w );
-	DECLARE_WRITE16_MEMBER( shifter_palette_w );
-	DECLARE_WRITE8_MEMBER( shifter_mode_w );
+	void shifter_base_w(offs_t offset, uint8_t data);
+	void shifter_sync_w(uint8_t data);
+	void shifter_palette_w(offs_t offset, uint16_t data);
+	void shifter_mode_w(uint8_t data);
 
-	DECLARE_READ16_MEMBER( blitter_halftone_r );
-	DECLARE_READ16_MEMBER( blitter_src_inc_x_r );
-	DECLARE_READ16_MEMBER( blitter_src_inc_y_r );
-	DECLARE_READ16_MEMBER( blitter_src_r );
-	DECLARE_READ16_MEMBER( blitter_end_mask_r );
-	DECLARE_READ16_MEMBER( blitter_dst_inc_x_r );
-	DECLARE_READ16_MEMBER( blitter_dst_inc_y_r );
-	DECLARE_READ16_MEMBER( blitter_dst_r );
-	DECLARE_READ16_MEMBER( blitter_count_x_r );
-	DECLARE_READ16_MEMBER( blitter_count_y_r );
-	DECLARE_READ16_MEMBER( blitter_op_r );
-	DECLARE_READ16_MEMBER( blitter_ctrl_r );
+	uint16_t blitter_halftone_r(offs_t offset);
+	uint16_t blitter_src_inc_x_r();
+	uint16_t blitter_src_inc_y_r();
+	uint16_t blitter_src_r(offs_t offset);
+	uint16_t blitter_end_mask_r(offs_t offset);
+	uint16_t blitter_dst_inc_x_r();
+	uint16_t blitter_dst_inc_y_r();
+	uint16_t blitter_dst_r(offs_t offset);
+	uint16_t blitter_count_x_r();
+	uint16_t blitter_count_y_r();
+	uint16_t blitter_op_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t blitter_ctrl_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( blitter_halftone_w );
-	DECLARE_WRITE16_MEMBER( blitter_src_inc_x_w );
-	DECLARE_WRITE16_MEMBER( blitter_src_inc_y_w );
-	DECLARE_WRITE16_MEMBER( blitter_src_w );
-	DECLARE_WRITE16_MEMBER( blitter_end_mask_w );
-	DECLARE_WRITE16_MEMBER( blitter_dst_inc_x_w );
-	DECLARE_WRITE16_MEMBER( blitter_dst_inc_y_w );
-	DECLARE_WRITE16_MEMBER( blitter_dst_w );
-	DECLARE_WRITE16_MEMBER( blitter_count_x_w );
-	DECLARE_WRITE16_MEMBER( blitter_count_y_w );
-	DECLARE_WRITE16_MEMBER( blitter_op_w );
-	DECLARE_WRITE16_MEMBER( blitter_ctrl_w );
+	void blitter_halftone_w(offs_t offset, uint16_t data);
+	void blitter_src_inc_x_w(uint16_t data);
+	void blitter_src_inc_y_w(uint16_t data);
+	void blitter_src_w(offs_t offset, uint16_t data);
+	void blitter_end_mask_w(offs_t offset, uint16_t data);
+	void blitter_dst_inc_x_w(uint16_t data);
+	void blitter_dst_inc_y_w(uint16_t data);
+	void blitter_dst_w(offs_t offset, uint16_t data);
+	void blitter_count_x_w(uint16_t data);
+	void blitter_count_y_w(uint16_t data);
+	void blitter_op_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blitter_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void mouse_tick();
 	inline pen_t shift_mode_0();
@@ -215,30 +220,30 @@ public:
 	void blitter_tick();
 
 	// driver
-	DECLARE_READ16_MEMBER( fdc_data_r );
-	DECLARE_WRITE16_MEMBER( fdc_data_w );
-	DECLARE_READ16_MEMBER( dma_status_r );
-	DECLARE_WRITE16_MEMBER( dma_mode_w );
-	DECLARE_READ8_MEMBER( dma_counter_r );
-	DECLARE_WRITE8_MEMBER( dma_base_w );
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_READ16_MEMBER( berr_r );
-	DECLARE_WRITE16_MEMBER( berr_w );
-	DECLARE_READ8_MEMBER( ikbd_port1_r );
-	DECLARE_READ8_MEMBER( ikbd_port2_r );
-	DECLARE_WRITE8_MEMBER( ikbd_port2_w );
-	DECLARE_WRITE8_MEMBER( ikbd_port3_w );
-	DECLARE_READ8_MEMBER( ikbd_port4_r );
-	DECLARE_WRITE8_MEMBER( ikbd_port4_w );
+	uint16_t fdc_data_r(offs_t offset);
+	void fdc_data_w(offs_t offset, uint16_t data);
+	uint16_t dma_status_r();
+	void dma_mode_w(uint16_t data);
+	uint8_t dma_counter_r(offs_t offset);
+	void dma_base_w(offs_t offset, uint8_t data);
+	uint8_t mmu_r();
+	void mmu_w(uint8_t data);
+	uint16_t berr_r();
+	void berr_w(uint16_t data);
+	uint8_t ikbd_port1_r();
+	uint8_t ikbd_port2_r();
+	void ikbd_port2_w(uint8_t data);
+	void ikbd_port3_w(uint8_t data);
+	uint8_t ikbd_port4_r();
+	void ikbd_port4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	DECLARE_WRITE8_MEMBER( psg_pa_w );
+	void psg_pa_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
 
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 	void toggle_dma_fifo();
 	void flush_dma_fifo();
@@ -327,14 +332,11 @@ public:
 	int m_monochrome;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void common(machine_config &config);
-	void st(machine_config &config);
 	void ikbd_map(address_map &map);
 	void cpu_space_map(address_map &map);
 	void st_map(address_map &map);
-protected:
 	void keyboard(machine_config &config);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -351,8 +353,8 @@ public:
 		: st_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ16_MEMBER( fpu_r );
-	DECLARE_WRITE16_MEMBER( fpu_w );
+	uint16_t fpu_r();
+	void fpu_w(uint16_t data);
 	void megast(machine_config &config);
 	void megast_map(address_map &map);
 };
@@ -373,29 +375,29 @@ public:
 
 	optional_device<lmc1992_device> m_lmc1992;
 
-	DECLARE_READ8_MEMBER( shifter_base_low_r );
-	DECLARE_WRITE8_MEMBER( shifter_base_low_w );
-	DECLARE_READ8_MEMBER( shifter_counter_r );
-	DECLARE_WRITE8_MEMBER( shifter_counter_w );
-	DECLARE_WRITE16_MEMBER( shifter_palette_w );
-	DECLARE_READ8_MEMBER( shifter_lineofs_r );
-	DECLARE_WRITE8_MEMBER( shifter_lineofs_w );
-	DECLARE_READ8_MEMBER( shifter_pixelofs_r );
-	DECLARE_WRITE8_MEMBER( shifter_pixelofs_w );
+	uint8_t shifter_base_low_r();
+	void shifter_base_low_w(uint8_t data);
+	uint8_t shifter_counter_r(offs_t offset);
+	void shifter_counter_w(offs_t offset, uint8_t data);
+	void shifter_palette_w(offs_t offset, uint16_t data);
+	uint8_t shifter_lineofs_r();
+	void shifter_lineofs_w(uint8_t data);
+	uint8_t shifter_pixelofs_r();
+	void shifter_pixelofs_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( sound_dma_control_r );
-	DECLARE_READ8_MEMBER( sound_dma_base_r );
-	DECLARE_READ8_MEMBER( sound_dma_counter_r );
-	DECLARE_READ8_MEMBER( sound_dma_end_r );
-	DECLARE_READ8_MEMBER( sound_mode_r );
-	DECLARE_WRITE8_MEMBER( sound_dma_control_w );
-	DECLARE_WRITE8_MEMBER( sound_dma_base_w );
-	DECLARE_WRITE8_MEMBER( sound_dma_end_w );
-	DECLARE_WRITE8_MEMBER( sound_mode_w );
-	DECLARE_READ16_MEMBER( microwire_data_r );
-	DECLARE_WRITE16_MEMBER( microwire_data_w );
-	DECLARE_READ16_MEMBER( microwire_mask_r );
-	DECLARE_WRITE16_MEMBER( microwire_mask_w );
+	uint8_t sound_dma_control_r();
+	uint8_t sound_dma_base_r(offs_t offset);
+	uint8_t sound_dma_counter_r(offs_t offset);
+	uint8_t sound_dma_end_r(offs_t offset);
+	uint8_t sound_mode_r();
+	void sound_dma_control_w(uint8_t data);
+	void sound_dma_base_w(offs_t offset, uint8_t data);
+	void sound_dma_end_w(offs_t offset, uint8_t data);
+	void sound_mode_w(uint8_t data);
+	uint16_t microwire_data_r();
+	void microwire_data_w(uint16_t data);
+	uint16_t microwire_mask_r();
+	void microwire_mask_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
@@ -448,8 +450,8 @@ public:
 		: ste_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ16_MEMBER( cache_r );
-	DECLARE_WRITE16_MEMBER( cache_w );
+	uint16_t cache_r();
+	void cache_w(uint16_t data);
 
 	uint16_t m_cache;
 	void megaste(machine_config &config);
@@ -469,11 +471,11 @@ public:
 
 	required_ioport m_sw400;
 
-	DECLARE_READ16_MEMBER( config_r );
-	DECLARE_WRITE16_MEMBER( lcd_control_w );
+	uint16_t config_r();
+	void lcd_control_w(uint16_t data);
 
-	DECLARE_WRITE8_MEMBER( psg_pa_w );
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	void psg_pa_w(uint8_t data);
+	uint8_t mfp_gpio_r();
 	void stbook_map(address_map &map);
 protected:
 	virtual void machine_start() override;

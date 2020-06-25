@@ -20,6 +20,16 @@
  * TODO:
  *   PXA255 peripherals
  *
+ * 39in1 notes:
+ * The actual PCB just normally boots up to the game, whereas in MAME it
+ * defaults to test mode and checks the rom, then jumps out to the game
+ * after loading all 39 games. It is almost like it is defaulting to test
+ * mode on at bootup. On the real PCB, it just loads the 39 games then
+ * shows the game selection menu. Going into the test mode does the same
+ * code check but then shows  a test screen with color bars. Pressing
+ * next shows a high score clear screen (if the HS dip is on). Pressing
+ * next shows the game dips screens and allows you to set up soft dip
+ * switches for each of the 39 games.
  **************************************************************************/
 
 #include "emu.h"
@@ -52,12 +62,12 @@ private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
+	uint32_t eeprom_r();
+	void eeprom_w(uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(cpld_r);
-	DECLARE_WRITE32_MEMBER(cpld_w);
-	DECLARE_READ32_MEMBER(prot_cheater_r);
+	uint32_t cpld_r(offs_t offset);
+	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t prot_cheater_r();
 	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -82,12 +92,12 @@ inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s
 	}
 }
 
-READ32_MEMBER(_39in1_state::eeprom_r)
+uint32_t _39in1_state::eeprom_r()
 {
 	return (m_eeprom->do_read() << 5) | (1 << 1); // Must be on.  Probably a DIP switch.
 }
 
-WRITE32_MEMBER(_39in1_state::eeprom_w)
+void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
 {
 	if (BIT(mem_mask, 2))
 		m_eeprom->cs_write(ASSERT_LINE);
@@ -97,7 +107,7 @@ WRITE32_MEMBER(_39in1_state::eeprom_w)
 		m_eeprom->di_write(BIT(data, 4));
 }
 
-READ32_MEMBER(_39in1_state::cpld_r)
+uint32_t _39in1_state::cpld_r(offs_t offset)
 {
 	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
 
@@ -152,7 +162,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::cpld_w)
+void _39in1_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -166,7 +176,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 	if (m_maincpu->pc() == 0x2874)
 	{
 		m_state = 2;
-		m_magic = space.read_byte(0xa02d4ff0);
+		m_magic = m_maincpu->space(AS_PROGRAM).read_byte(0xa02d4ff0);
 	}
 	else if (offset == 0xa)
 	{
@@ -179,7 +189,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #endif
 }
 
-READ32_MEMBER(_39in1_state::prot_cheater_r)
+uint32_t _39in1_state::prot_cheater_r()
 {
 	return 0x37;
 }
@@ -187,7 +197,7 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 void _39in1_state::driver_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
+	space.install_read_handler (0xa0151648, 0xa015164b, read32smo_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
 }
 
 void _39in1_state::_39in1_map(address_map &map)
@@ -238,6 +248,23 @@ static INPUT_PORTS_START( 39in1 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80000000, IP_ACTIVE_LOW )
+
+/*  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
+
+    PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
+    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1")
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x02, "Display Mode" )            PORT_DIPLOCATION("SW3:2")
+    PORT_DIPSETTING(    0x02, "CGA 15.75kHz" )
+    PORT_DIPSETTING(    0x00, "VGA 31.5kHz" )
+    PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3")
+    PORT_DIPSETTING(    0x04, "Disabled" )
+    PORT_DIPSETTING(    0x00, "Enabled" )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW3:4")
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+*/
 INPUT_PORTS_END
 
 void _39in1_state::machine_start()

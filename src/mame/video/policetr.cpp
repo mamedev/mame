@@ -136,7 +136,7 @@ void policetr_state::render_display_list(offs_t offset)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::video_w)
+void policetr_state::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* 4 offsets */
 	switch (offset)
@@ -249,7 +249,7 @@ WRITE32_MEMBER(policetr_state::video_w)
  *
  *************************************/
 
-READ32_MEMBER(policetr_state::video_r)
+uint32_t policetr_state::video_r()
 {
 	int inputval;
 	int width = m_screen->width();

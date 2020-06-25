@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="adam_flop" description="Coleco ADAM diskettes">
 
 	<!--
@@ -3061,7 +3064,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="play against adam! (1992) (maine adam library).dsk" size="163840" crc="7c1b6fb8" sha1="165da42af7c04558c56609920b5e14fc26b6ccb4"/>
+				<rom name="play against adam (1992) (maine adam library).dsk" size="163840" crc="7c1b6fb8" sha1="165da42af7c04558c56609920b5e14fc26b6ccb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4296,7 +4299,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 1a (1992) (eyezod graphics).dsk" size="163840" crc="2e7abf79" sha1="aede7c56a476515f97cea216639258f4ec0e6887"/>
+				<rom name="fontasy vol. 1a (1992) (eyezod graphics).dsk" size="163840" crc="2e7abf79" sha1="aede7c56a476515f97cea216639258f4ec0e6887"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4308,7 +4311,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 1a (1992) (eyezod graphics) [a1].dsk" size="163840" crc="ce256b61" sha1="ef0a079821276aa96def405265a14cc843b3d171"/>
+				<rom name="fontasy vol. 1a (1992) (eyezod graphics) [a1].dsk" size="163840" crc="ce256b61" sha1="ef0a079821276aa96def405265a14cc843b3d171"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4320,7 +4323,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 1b (1992) (eyezod graphics).dsk" size="163840" crc="4baacd16" sha1="c53958682a40a82737b155c9805eb4053298c9da"/>
+				<rom name="fontasy vol. 1b (1992) (eyezod graphics).dsk" size="163840" crc="4baacd16" sha1="c53958682a40a82737b155c9805eb4053298c9da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4332,7 +4335,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 1b (1992) (eyezod graphics) [a1].dsk" size="163840" crc="b6a08017" sha1="fdce3f3eae7eb15fc24cf04ca187dda9aa964b40"/>
+				<rom name="fontasy vol. 1b (1992) (eyezod graphics) [a1].dsk" size="163840" crc="b6a08017" sha1="fdce3f3eae7eb15fc24cf04ca187dda9aa964b40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4344,7 +4347,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 2a (1992) (eyezod graphics).dsk" size="163840" crc="7cbbe25c" sha1="9571b798a8689b60a60d2a2b7358c9fa72a104ba"/>
+				<rom name="fontasy vol. 2a (1992) (eyezod graphics).dsk" size="163840" crc="7cbbe25c" sha1="9571b798a8689b60a60d2a2b7358c9fa72a104ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4357,13 +4360,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 2b1 (1992) (eyezod graphics).dsk" size="163840" crc="4816e23c" sha1="6b1720eb43d803994a0c17ea91da4a5206f6a5b1"/>
+				<rom name="fontasy vol. 2b1 (1992) (eyezod graphics).dsk" size="163840" crc="4816e23c" sha1="6b1720eb43d803994a0c17ea91da4a5206f6a5b1"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="163840">
-				<rom name="fontasy! vol. 2b2 (1992) (eyezod graphics).dsk" size="163840" crc="ac7ea30a" sha1="1bdde11cfd774432c0f3923ce11c5898da88d36f"/>
+				<rom name="fontasy vol. 2b2 (1992) (eyezod graphics).dsk" size="163840" crc="ac7ea30a" sha1="1bdde11cfd774432c0f3923ce11c5898da88d36f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4376,13 +4379,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="163840">
-				<rom name="glory b! - disk#01 (1991) (eyezod graphics).dsk" size="163840" crc="4e880350" sha1="41853ddf181784398b6f59fa6a524e0d5e27aa85"/>
+				<rom name="glory b - disk#01 (1991) (eyezod graphics).dsk" size="163840" crc="4e880350" sha1="41853ddf181784398b6f59fa6a524e0d5e27aa85"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="163840">
-				<rom name="glory b! - disk#02 (1991) (eyezod graphics).dsk" size="163840" crc="07cf75e0" sha1="eb2a99cf8877d111bf830088ec37a5a423828950"/>
+				<rom name="glory b - disk#02 (1991) (eyezod graphics).dsk" size="163840" crc="07cf75e0" sha1="eb2a99cf8877d111bf830088ec37a5a423828950"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4395,13 +4398,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="163840">
-				<rom name="glory b! - disk#01 (1991) (eyezod graphics) [a1].dsk" size="163840" crc="ff6004f6" sha1="a495d634e80fe03fbb271ae638a0f31c5b86c1f7"/>
+				<rom name="glory b - disk#01 (1991) (eyezod graphics) [a1].dsk" size="163840" crc="ff6004f6" sha1="a495d634e80fe03fbb271ae638a0f31c5b86c1f7"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="163840">
-				<rom name="glory b! - disk#02 (1991) (eyezod graphics).dsk" size="163840" crc="07cf75e0" sha1="eb2a99cf8877d111bf830088ec37a5a423828950"/>
+				<rom name="glory b - disk#02 (1991) (eyezod graphics).dsk" size="163840" crc="07cf75e0" sha1="eb2a99cf8877d111bf830088ec37a5a423828950"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4641,7 +4644,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="paintmaster paintings! vol. #01 (1986) (adamzap software).dsk" size="163840" crc="6e5c218b" sha1="b7ec9b295281cca23a41b0594a724d9958362932"/>
+				<rom name="paintmaster paintings vol. #01 (1986) (adamzap software).dsk" size="163840" crc="6e5c218b" sha1="b7ec9b295281cca23a41b0594a724d9958362932"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4962,7 +4965,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="signshop signs! vol. #01 (1987) (adamzap software).dsk" size="163840" crc="07d2d2b7" sha1="b975570dc509af5f6822d7a494b6d6ea60eb2660"/>
+				<rom name="signshop signs vol. #01 (1987) (adamzap software).dsk" size="163840" crc="07d2d2b7" sha1="b975570dc509af5f6822d7a494b6d6ea60eb2660"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4974,7 +4977,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="signshop signs! vol. #01 (1987) (adamzap software) [a1].dsk" size="163840" crc="e9ae5dfe" sha1="5c85f2540969808695b206566f1af03a5596880b"/>
+				<rom name="signshop signs vol. #01 (1987) (adamzap software) [a1].dsk" size="163840" crc="e9ae5dfe" sha1="5c85f2540969808695b206566f1af03a5596880b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4986,7 +4989,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="signshop signs! vol. #02 (1987) (adamzap software).dsk" size="163840" crc="dce9de9c" sha1="25af373edb8cbfb757bc6dd7daf814744cdaf687"/>
+				<rom name="signshop signs vol. #02 (1987) (adamzap software).dsk" size="163840" crc="dce9de9c" sha1="25af373edb8cbfb757bc6dd7daf814744cdaf687"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5046,7 +5049,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="smiley face - what an attitude! (1990) (m&amp;m software).dsk" size="163840" crc="760900b8" sha1="04224c450342417b6625621bb0fcb1f3c1555c03"/>
+				<rom name="smiley face - what an attitude (1990) (m&amp;m software).dsk" size="163840" crc="760900b8" sha1="04224c450342417b6625621bb0fcb1f3c1555c03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8986,7 +8989,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="hurricane! (1988) (intergalactic software).dsk" size="163840" crc="c05becc1" sha1="1c6dd47201800dbc0c83497c383acffe4729aeee"/>
+				<rom name="hurricane (1988) (intergalactic software).dsk" size="163840" crc="c05becc1" sha1="1c6dd47201800dbc0c83497c383acffe4729aeee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8998,7 +9001,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="hurricane! (1988) (intergalactic software) [a1].dsk" size="163840" crc="70504252" sha1="c98e8283130118510458ce642cf154cbd0819446"/>
+				<rom name="hurricane (1988) (intergalactic software) [a1].dsk" size="163840" crc="70504252" sha1="c98e8283130118510458ce642cf154cbd0819446"/>
 			</dataarea>
 		</part>
 	</software>

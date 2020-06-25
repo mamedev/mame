@@ -49,16 +49,16 @@ public:
 	void init_ttt();
 
 private:
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void bank_w(uint8_t data);
+	void watchdog_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
+	uint8_t firq_src_r();
+	uint8_t zc_r();
+	uint8_t dcs_data_r();
+	void dcs_data_w(uint8_t data);
+	uint8_t dcs_ctrl_r();
+	void dcs_reset_w(uint8_t data);
+	uint8_t rtc_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
@@ -161,28 +161,28 @@ void wpc_95_state::wpc_95_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0xf8000);
 }
 
-READ8_MEMBER(wpc_95_state::dcs_data_r)
+uint8_t wpc_95_state::dcs_data_r()
 {
 	return dcs->data_r();
 }
 
-WRITE8_MEMBER(wpc_95_state::dcs_data_w)
+void wpc_95_state::dcs_data_w(uint8_t data)
 {
 	dcs->data_w(data);
 }
 
-READ8_MEMBER(wpc_95_state::dcs_ctrl_r)
+uint8_t wpc_95_state::dcs_ctrl_r()
 {
 	return dcs->control_r();
 }
 
-WRITE8_MEMBER(wpc_95_state::dcs_reset_w)
+void wpc_95_state::dcs_reset_w(uint8_t data)
 {
 	dcs->reset_w(0);
 	dcs->reset_w(1);
 }
 
-READ8_MEMBER(wpc_95_state::rtc_r)
+uint8_t wpc_95_state::rtc_r(offs_t offset)
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -204,12 +204,12 @@ READ8_MEMBER(wpc_95_state::rtc_r)
 	}
 }
 
-READ8_MEMBER(wpc_95_state::firq_src_r)
+uint8_t wpc_95_state::firq_src_r()
 {
 	return firq_src;
 }
 
-READ8_MEMBER(wpc_95_state::zc_r)
+uint8_t wpc_95_state::zc_r()
 {
 	uint8_t res = zc;
 	zc &= 0x7f;
@@ -221,12 +221,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(wpc_95_state::zc_timer)
 	zc |= 0x80;
 }
 
-WRITE8_MEMBER(wpc_95_state::bank_w)
+void wpc_95_state::bank_w(uint8_t data)
 {
 	rombank->set_entry(data & 0x3f);
 }
 
-WRITE8_MEMBER(wpc_95_state::watchdog_w)
+void wpc_95_state::watchdog_w(uint8_t data)
 {
 }
 
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER(wpc_95_state::scanline_irq)
 	maincpu->set_input_line(1, state);
 }
 
-WRITE8_MEMBER(wpc_95_state::irq_ack_w)
+void wpc_95_state::irq_ack_w(uint8_t data)
 {
 	maincpu->set_input_line(0, CLEAR_LINE);
 	maincpu->set_input_line(1, CLEAR_LINE);
@@ -2433,6 +2433,18 @@ ROM_START(cv_13)
 	ROM_LOAD16_BYTE("s6v0_4.rom", 0x800000, 0x100000, CRC(36ca43d3) SHA1(b599f88649c220143aa44cd5213e725e62afb0bc))
 ROM_END
 
+ROM_START(cv_d52)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("cv_g11.d52", 0x00000, 0x100000, CRC(2b6b2822) SHA1(177ddd826b7dee060d090cd79f972836a23d6df9))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF) // needs different audio ROMs, not dumped for now
+	ROM_LOAD("s2v1_0.rom", 0x000000, 0x080000, BAD_DUMP CRC(79dbb8ee) SHA1(f76c0db93b89beaf1e90c5f2199262e296fb1b78))
+	ROM_RELOAD(0x000000+0x100000, 0x080000)
+	ROM_LOAD16_BYTE("s3v0_4.rom", 0x200000, 0x100000, BAD_DUMP CRC(8c6c0c56) SHA1(792431cc5b06c3d5028168297614f5eb7e8af34f))
+	ROM_LOAD16_BYTE("s4v0_4.rom", 0x400000, 0x100000, BAD_DUMP CRC(a9014b78) SHA1(abffe32ab729fb39ab2360d850c8b5476094fd92))
+	ROM_LOAD16_BYTE("s5v0_4.rom", 0x600000, 0x100000, BAD_DUMP CRC(7e07a2fc) SHA1(f908363c968c15c0dc62e32695e5e2d0ca869391))
+	ROM_LOAD16_BYTE("s6v0_4.rom", 0x800000, 0x100000, BAD_DUMP CRC(36ca43d3) SHA1(b599f88649c220143aa44cd5213e725e62afb0bc))
+ROM_END
+
 /*-----------------
 /  Congo #50050
 /------------------*/
@@ -3063,6 +3075,7 @@ GAME(1997,  cv_20h,     cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,    
 GAME(1997,  cv_10,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.0)",                  MACHINE_MECHANICAL)
 GAME(1997,  cv_11,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.1)",                  MACHINE_MECHANICAL)
 GAME(1997,  cv_13,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.3)",                  MACHINE_MECHANICAL)
+GAME(1997,  cv_d52,     cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (D.52 prototype)",       MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL) // needs different audio ROMs
 GAME(1995,  congo_21,   0,          wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.1)",                            MACHINE_MECHANICAL)
 GAME(1995,  congo_20,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.0)",                            MACHINE_MECHANICAL)
 GAME(1995,  congo_13,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.3)",                            MACHINE_MECHANICAL)

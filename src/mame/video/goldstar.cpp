@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
 /***************************************************************************
 
-  video.c
+  goldstar.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -21,13 +21,13 @@
 ***************************************************************************/
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_fg_vidram_w)
+void goldstar_state::goldstar_fg_vidram_w(offs_t offset, uint8_t data)
 {
 	m_fg_vidram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldstar_state::goldstar_fg_atrram_w)
+void goldstar_state::goldstar_fg_atrram_w(offs_t offset, uint8_t data)
 {
 	m_fg_atrram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0xf0) << 4,
 			attr & 0x0f,
 			0);
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0x0f) << 8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
+void goldstar_state::goldstar_reel1_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -68,14 +68,14 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel1_ram[tile_index],
 			m_bgcolor,
 			0);
 }
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_reel2_ram_w)
+void goldstar_state::goldstar_reel2_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
@@ -83,13 +83,13 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel2_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel2_ram[tile_index],
 			m_bgcolor,
 			0);
 }
 
-WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
+void goldstar_state::goldstar_reel3_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -97,7 +97,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel3_ram[tile_index],
 			m_bgcolor,
 			0);
@@ -140,7 +140,7 @@ VIDEO_START_MEMBER(goldstar_state, cherrym)
 }
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
+void goldstar_state::goldstar_fa00_w(uint8_t data)
 {
 	/* bit 1 toggles continuously - might be irq enable or watchdog reset */
 
@@ -231,7 +231,7 @@ uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_rgb
 
 
 
-WRITE8_MEMBER(cmaster_state::outport0_w)
+void cmaster_state::outport0_w(uint8_t data)
 {
 	m_cm_enable_reg = data;
 	/*
@@ -246,7 +246,7 @@ WRITE8_MEMBER(cmaster_state::outport0_w)
 	//popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(cmaster_state::girl_scroll_w)
+void cmaster_state::girl_scroll_w(uint8_t data)
 {
 	m_cm_girl_scroll = data;
 	/*
@@ -258,7 +258,7 @@ WRITE8_MEMBER(cmaster_state::girl_scroll_w)
 	*/
 }
 
-WRITE8_MEMBER(cmaster_state::background_col_w)
+void cmaster_state::background_col_w(uint8_t data)
 {
 	//printf("cm_background_col_w %02x\n",data);
 
@@ -338,7 +338,7 @@ TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code | (attr & 0xf0)<<4) + (m_tile_bank * 0x1000),
 			attr & 0x0f,
 			0);
@@ -500,43 +500,43 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 
 
 
 
-WRITE8_MEMBER(sanghopm_state::fg_vidram_w)
+void sanghopm_state::fg_vidram_w(offs_t offset, uint8_t data)
 {
 	m_fg_vidram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::fg_atrram_w)
+void sanghopm_state::fg_atrram_w(offs_t offset, uint8_t data)
 {
 	m_fg_atrram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::bg_vidram_w)
+void sanghopm_state::bg_vidram_w(offs_t offset, uint8_t data)
 {
 	m_bg_vidram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::bg_atrram_w)
+void sanghopm_state::bg_atrram_w(offs_t offset, uint8_t data)
 {
 	m_bg_atrram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::reel1_attrram_w)
+void sanghopm_state::reel1_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_attrram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::reel2_attrram_w)
+void sanghopm_state::reel2_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_attrram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::reel3_attrram_w)
+void sanghopm_state::reel3_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_attrram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -548,7 +548,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -559,7 +559,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
 	int const code = m_bg_vidram[tile_index];
 	int const attr = m_bg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -570,7 +570,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -581,7 +581,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70)>>4,
 			0);
@@ -592,7 +592,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70)>>4,
 			0);
@@ -650,20 +650,20 @@ uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb3
 
 
 
-WRITE8_MEMBER(unkch_state::reel1_attrram_w)
+void unkch_state::reel1_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_attrram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(unkch_state::reel2_attrram_w)
+void unkch_state::reel2_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_attrram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(unkch_state::reel3_attrram_w)
+void unkch_state::reel3_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_attrram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -675,7 +675,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -686,7 +686,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -697,7 +697,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);

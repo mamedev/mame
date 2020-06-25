@@ -73,19 +73,19 @@ void ironhors_state::ironhors_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::videoram_w)
+void ironhors_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::colorram_w)
+void ironhors_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::charbank_w)
+void ironhors_state::charbank_w(uint8_t data)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -98,7 +98,7 @@ WRITE8_MEMBER(ironhors_state::charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(ironhors_state::palettebank_w)
+void ironhors_state::palettebank_w(uint8_t data)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -115,7 +115,7 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 		popmessage("palettebank_w %02x",data);
 }
 
-WRITE8_MEMBER(ironhors_state::flipscreen_w)
+void ironhors_state::flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (~data & 0x08))
 	{
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
 	int flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
 		((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void ironhors_state::video_start()
@@ -246,7 +246,7 @@ TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
 	int color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
 	int flags = 0;//((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 VIDEO_START_MEMBER(ironhors_state,farwest)

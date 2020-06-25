@@ -3,7 +3,16 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Fidelity Sensory Chess Challenger 8
+Fidelity Sensory Chess Challenger "8"
+
+It is the first chesscomputer with sensors under the chessboard.
+
+The box names it Sensory Chess Challenger, Sensory Chess Challenger "8" title
+is on the 1st page of the manual. Like other Fidelity chesscomputers from
+around this time, the number indicates maximum difficulty level.
+
+It was also rereleased in 1983 as "Poppy", marketed for children, the housing
+was in bright red color.
 
 Hardware notes:
 - Z80A CPU @ 3.9MHz
@@ -58,19 +67,15 @@ private:
 	void main_io(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input_r();
+	void control_w(offs_t offset, u8 data);
 
-	u8 m_inp_mux;
-	u8 m_led_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
 
 void scc_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -84,7 +89,7 @@ void scc_state::machine_start()
 
 // TTL
 
-WRITE8_MEMBER(scc_state::control_w)
+void scc_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: led data
 	u8 mask = 1 << (offset & 7);
@@ -98,7 +103,7 @@ WRITE8_MEMBER(scc_state::control_w)
 	m_display->matrix((sel & 0xff) | (data << 4 & 0x100), m_led_data);
 }
 
-READ8_MEMBER(scc_state::input_r)
+u8 scc_state::input_r()
 {
 	u8 data = 0;
 
@@ -165,7 +170,7 @@ void scc_state::scc(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -197,4 +202,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"8\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

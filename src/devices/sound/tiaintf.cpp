@@ -58,7 +58,7 @@ void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 }
 
 
-WRITE8_MEMBER( tia_device::tia_sound_w )
+void tia_device::tia_sound_w(offs_t offset, uint8_t data)
 {
 	m_channel->update();
 	tia_write(m_chip, offset, data);

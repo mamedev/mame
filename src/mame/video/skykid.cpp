@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
 	   screen is flipped, character flip is done by selecting the 2nd character set.
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (flip_screen() ? 0x100 : 0),
 			attr & 0x3f,
 			flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(skykid_state::bg_get_tile_info)
 	int code = m_videoram[tile_index];
 	int attr = m_videoram[tile_index+0x800];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((attr & 0x01) << 8),
 			((attr & 0x7e) >> 1) | ((attr & 0x01) << 6),
 			0);
@@ -125,39 +125,39 @@ void skykid_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(skykid_state::skykid_videoram_r)
+uint8_t skykid_state::skykid_videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(skykid_state::skykid_videoram_w)
+void skykid_state::skykid_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(skykid_state::skykid_textram_r)
+uint8_t skykid_state::skykid_textram_r(offs_t offset)
 {
 	return m_textram[offset];
 }
 
-WRITE8_MEMBER(skykid_state::skykid_textram_w)
+void skykid_state::skykid_textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_scroll_x_w)
+void skykid_state::skykid_scroll_x_w(offs_t offset, uint8_t data)
 {
 	m_scroll_x = offset;
 }
 
-WRITE8_MEMBER(skykid_state::skykid_scroll_y_w)
+void skykid_state::skykid_scroll_y_w(offs_t offset, uint8_t data)
 {
 	m_scroll_y = offset;
 }
 
-WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
+void skykid_state::skykid_flipscreen_priority_w(offs_t offset, uint8_t data)
 {
 	m_priority = data;
 	flip_screen_set(offset & 1);

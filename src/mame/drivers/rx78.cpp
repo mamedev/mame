@@ -88,29 +88,31 @@ public:
 	void rx78(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_READ8_MEMBER( cass_r );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( cass_w );
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_WRITE8_MEMBER( vram_read_bank_w );
-	DECLARE_WRITE8_MEMBER( vram_write_bank_w );
-	DECLARE_WRITE8_MEMBER( key_w );
-	DECLARE_WRITE8_MEMBER( vdp_reg_w );
-	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
-	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
+	u8 key_r();
+	u8 cass_r();
+	u8 vram_r(offs_t offset);
+	void cass_w(u8 data);
+	void vram_w(offs_t offset, u8 data);
+	void vram_read_bank_w(u8 data);
+	void vram_write_bank_w(u8 data);
+	void key_w(u8 data);
+	void vdp_reg_w(offs_t offset, u8 data);
+	void vdp_bg_reg_w(u8 data);
+	void vdp_pri_mask_w(u8 data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
 
-	uint8_t m_vram_read_bank;
-	uint8_t m_vram_write_bank;
-	uint8_t m_pal_reg[7];
-	uint8_t m_pri_mask;
-	uint8_t m_key_mux;
+	u8 m_vram_read_bank;
+	u8 m_vram_write_bank;
+	u8 m_pal_reg[7];
+	u8 m_pri_mask;
+	u8 m_key_mux;
+	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -122,12 +124,12 @@ private:
 #define MASTER_CLOCK XTAL(28'636'363)
 
 
-WRITE8_MEMBER( rx78_state::cass_w )
+void rx78_state::cass_w(u8 data)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( rx78_state::cass_r )
+u8 rx78_state::cass_r()
 {
 	return (m_cass->input() > 0.03);
 }
@@ -135,7 +137,6 @@ READ8_MEMBER( rx78_state::cass_r )
 
 uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *vram = memregion("vram")->base();
 	int color,pen[3];
 	const int borderx = 32, bordery = 20;
 
@@ -150,9 +151,9 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			for (u8 i = 0; i < 8; i++)
 			{
 				/* bg color */
-				pen[0] = (m_pri_mask & 0x08) ? (vram[count + 0x6000] >> (i)) : 0x00;
-				pen[1] = (m_pri_mask & 0x10) ? (vram[count + 0x8000] >> (i)) : 0x00;
-				pen[2] = (m_pri_mask & 0x20) ? (vram[count + 0xa000] >> (i)) : 0x00;
+				pen[0] = (m_pri_mask & 0x08) ? (m_vram[count + 0x6000] >> (i)) : 0x00;
+				pen[1] = (m_pri_mask & 0x10) ? (m_vram[count + 0x8000] >> (i)) : 0x00;
+				pen[2] = (m_pri_mask & 0x20) ? (m_vram[count + 0xa000] >> (i)) : 0x00;
 
 				color  = ((pen[0] & 1) << 0);
 				color |= ((pen[1] & 1) << 1);
@@ -162,9 +163,9 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 					bitmap.pix16(y+bordery, x+i+borderx) = color | 8;
 
 				/* fg color */
-				pen[0] = (m_pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
-				pen[1] = (m_pri_mask & 0x02) ? (vram[count + 0x2000] >> (i)) : 0x00;
-				pen[2] = (m_pri_mask & 0x04) ? (vram[count + 0x4000] >> (i)) : 0x00;
+				pen[0] = (m_pri_mask & 0x01) ? (m_vram[count + 0x0000] >> (i)) : 0x00;
+				pen[1] = (m_pri_mask & 0x02) ? (m_vram[count + 0x2000] >> (i)) : 0x00;
+				pen[2] = (m_pri_mask & 0x04) ? (m_vram[count + 0x4000] >> (i)) : 0x00;
 
 				color  = ((pen[0] & 1) << 0);
 				color |= ((pen[1] & 1) << 1);
@@ -181,7 +182,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-READ8_MEMBER( rx78_state::key_r )
+u8 rx78_state::key_r()
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -203,43 +204,39 @@ READ8_MEMBER( rx78_state::key_r )
 	return 0;
 }
 
-WRITE8_MEMBER( rx78_state::key_w )
+void rx78_state::key_w(u8 data)
 {
 	m_key_mux = data;
 }
 
-READ8_MEMBER( rx78_state::vram_r )
+u8 rx78_state::vram_r(offs_t offset)
 {
-	uint8_t *vram = memregion("vram")->base();
-
 	if(m_vram_read_bank == 0 || m_vram_read_bank > 6)
 		return 0xff;
 
-	return vram[offset + ((m_vram_read_bank - 1) * 0x2000)];
+	return m_vram[offset + ((m_vram_read_bank - 1) * 0x2000)];
 }
 
-WRITE8_MEMBER( rx78_state::vram_w )
+void rx78_state::vram_w(offs_t offset, u8 data)
 {
-	uint8_t *vram = memregion("vram")->base();
-
 	for (u8 i = 0; i < 6; i++)
 		if (BIT(m_vram_write_bank, i))
-			vram[offset + i * 0x2000] = data;
+			m_vram[offset + i * 0x2000] = data;
 }
 
-WRITE8_MEMBER( rx78_state::vram_read_bank_w )
+void rx78_state::vram_read_bank_w(u8 data)
 {
 	m_vram_read_bank = data;
 }
 
-WRITE8_MEMBER( rx78_state::vram_write_bank_w )
+void rx78_state::vram_write_bank_w(u8 data)
 {
 	m_vram_write_bank = data;
 }
 
-WRITE8_MEMBER( rx78_state::vdp_reg_w )
+void rx78_state::vdp_reg_w(offs_t offset, u8 data)
 {
-	uint8_t r,g,b,res,i;
+	u8 r,g,b,res,i;
 
 	m_pal_reg[offset] = data;
 
@@ -257,7 +254,7 @@ WRITE8_MEMBER( rx78_state::vdp_reg_w )
 	}
 }
 
-WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
+void rx78_state::vdp_bg_reg_w(u8 data)
 {
 	int r,g,b;
 
@@ -268,7 +265,7 @@ WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
 	m_palette->set_pen_color(0x10, rgb_t(r,g,b));
 }
 
-WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
+void rx78_state::vdp_pri_mask_w(u8 data)
 {
 	m_pri_mask = data;
 }
@@ -434,9 +431,20 @@ void rx78_state::machine_reset()
 		prg.install_read_handler(0x2000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
+void rx78_state::machine_start()
+{
+	m_vram = make_unique_clear<u8[]>(0xc000);
+	save_pointer(NAME(m_vram), 0xc000);
+	save_item(NAME(m_vram_read_bank));
+	save_item(NAME(m_vram_write_bank));
+	save_pointer(NAME(m_pal_reg), 7);
+	save_item(NAME(m_pri_mask));
+	save_item(NAME(m_key_mux));
+}
+
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
 	{
@@ -509,13 +517,11 @@ void rx78_state::rx78(machine_config &config)
 ROM_START( rx78 )
 	ROM_REGION( 0x2000, "roms", 0 )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(a194ea53) SHA1(ba39e73e6eb7cbb8906fff1f81a98964cd62af0d))
-
-	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 void rx78_state::init_rx78()
 {
-	uint32_t ram_size = m_ram->size();
+	u32 ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	if (ram_size == 0x4000)
@@ -525,4 +531,4 @@ void rx78_state::init_rx78()
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY   FULLNAME     FLAGS */
-COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )
+COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

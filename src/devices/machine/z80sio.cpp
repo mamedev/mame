@@ -3,6 +3,7 @@
 /***************************************************************************
 
     Z80-SIO Serial Input/Output emulation
+    Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Intel 8274 Multi-Protocol Serial Controller emulation
     NEC µPD7201 Multiprotocol Serial Communications Controller emulation
 
@@ -119,7 +120,7 @@ enum : uint8_t
 	RR0_INTERRUPT_PENDING     = 0x02,
 	RR0_TX_BUFFER_EMPTY       = 0x04,
 	RR0_DCD                   = 0x08,
-	RR0_SYNC_HUNT             = 0x10,
+	RR0_SYNC_HUNT             = 0x10, // RI on DART
 	RR0_CTS                   = 0x20,
 	RR0_TX_UNDERRUN           = 0x40,
 	RR0_BREAK_ABORT           = 0x80
@@ -254,9 +255,11 @@ constexpr uint16_t SDLC_RESIDUAL    = 0x1d0f;
 
 // device type definition
 DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL,  z80sio_channel,     "z80sio_channel",  "Z80 SIO channel")
+DEFINE_DEVICE_TYPE(Z80DART_CHANNEL, z80dart_channel,    "z80dart_channel", "Z80 DART channel")
 DEFINE_DEVICE_TYPE(I8274_CHANNEL,   i8274_channel,      "i8274_channel",   "Intel 8274 MPSC channel")
 DEFINE_DEVICE_TYPE(MK68564_CHANNEL, mk68564_channel,    "mk68564_channel", "Mostek MK68564 SIO channel")
 DEFINE_DEVICE_TYPE(Z80SIO,          z80sio_device,      "z80sio",          "Z80 SIO")
+DEFINE_DEVICE_TYPE(Z80DART,         z80dart_device,     "z80dart",         "Z80 DART")
 DEFINE_DEVICE_TYPE(I8274,           i8274_device,       "i8274",           "Intel 8274 MPSC")
 DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,     "upd7201",         "NEC uPD7201 MPSC")
 DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Mostek MK68564 SIO")
@@ -268,6 +271,12 @@ void z80sio_device::device_add_mconfig(machine_config &config)
 {
 	Z80SIO_CHANNEL(config, CHANA_TAG, 0);
 	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
+}
+
+void z80dart_device::device_add_mconfig(machine_config &config)
+{
+	Z80DART_CHANNEL(config, CHANA_TAG, 0);
+	Z80DART_CHANNEL(config, CHANB_TAG, 0);
 }
 
 void i8274_device::device_add_mconfig(machine_config &config)
@@ -358,7 +367,7 @@ inline void z80sio_channel::tx_setup(uint16_t data, int bits, bool framing, bool
 	LOGBIT("%.6f TX_SR %05x data %04x flags %x\n" , machine().time().as_double() , m_tx_sr & TX_SR_MASK , data , m_tx_flags);
 }
 
-inline void z80sio_channel::tx_setup_idle()
+void z80sio_channel::tx_setup_idle()
 {
 	switch (m_wr4 & WR4_SYNC_MODE_MASK)
 	{
@@ -378,6 +387,11 @@ inline void z80sio_channel::tx_setup_idle()
 		break;
 	}
 	m_tx_in_pkt = false;
+}
+
+void z80dart_channel::tx_setup_idle()
+{
+	logerror("%s (sync mode not supported by DART)\n", FUNCNAME);
 }
 
 //-------------------------------------------------
@@ -404,6 +418,11 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 
 z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	z80sio_device(mconfig, Z80SIO, tag, owner, clock)
+{
+}
+
+z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	z80sio_device(mconfig, Z80DART, tag, owner, clock)
 {
 }
 
@@ -943,12 +962,13 @@ z80sio_channel::z80sio_channel(
 	, m_rx_count(0)
 	, m_rx_bit(0)
 	, m_rx_sr(0)
-	, m_rx_first(0)
+	, m_rx_first(false)
 	, m_rxd(1)
 	, m_tx_data(0)
 	, m_tx_clock(0), m_tx_count(0), m_tx_parity(0), m_tx_sr(0), m_tx_crc(0), m_tx_hist(0), m_tx_flags(0)
 	, m_txd(1), m_dtr(0), m_rts(0)
-	, m_ext_latched(0), m_brk_latched(0), m_cts(0), m_dcd(0), m_sync(0)
+	, m_ext_latched(false), m_brk_latched(false)
+	, m_cts(0), m_dcd(0), m_sync(0)
 	, m_rr1_auto_reset(rr1_auto_reset)
 {
 	LOG("%s\n",FUNCNAME);
@@ -960,6 +980,11 @@ z80sio_channel::z80sio_channel(
 
 z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80sio_channel(mconfig, Z80SIO_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
+{
+}
+
+z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80sio_channel(mconfig, Z80DART_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
 {
 }
 
@@ -1005,23 +1030,13 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_wr3));
 	save_item(NAME(m_wr4));
 	save_item(NAME(m_wr5));
-	save_item(NAME(m_wr6));
-	save_item(NAME(m_wr7));
 	save_item(NAME(m_rx_fifo_depth));
 	save_item(NAME(m_rx_data_fifo));
 	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_count));
-	save_item(NAME(m_dlyd_rxd));
 	save_item(NAME(m_rx_bit));
-	save_item(NAME(m_rx_bit_limit));
-	save_item(NAME(m_rx_sync_fsm));
-	save_item(NAME(m_rx_one_cnt));
 	save_item(NAME(m_rx_sr));
-	save_item(NAME(m_rx_sync_sr));
-	save_item(NAME(m_rx_crc_delay));
-	save_item(NAME(m_rx_crc));
-	save_item(NAME(m_rx_crc_en));
 	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_tx_data));
@@ -1029,10 +1044,8 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_tx_phase));
 	save_item(NAME(m_tx_parity));
-	save_item(NAME(m_tx_in_pkt));
-	save_item(NAME(m_tx_forced_sync));
+	save_item(NAME(m_tx_in_pkt)); // TODO: does this actually function in async mode?
 	save_item(NAME(m_tx_sr));
-	save_item(NAME(m_tx_crc));
 	save_item(NAME(m_tx_hist));
 	save_item(NAME(m_tx_flags));
 	save_item(NAME(m_tx_delay));
@@ -1045,6 +1058,29 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_cts));
+	sync_save_state();
+}
+
+void z80sio_channel::sync_save_state()
+{
+	save_item(NAME(m_wr6));
+	save_item(NAME(m_wr7));
+	save_item(NAME(m_dlyd_rxd));
+	save_item(NAME(m_rx_bit_limit));
+	save_item(NAME(m_rx_sync_fsm));
+	save_item(NAME(m_rx_one_cnt));
+	save_item(NAME(m_rx_sync_sr));
+	save_item(NAME(m_rx_crc_delay));
+	save_item(NAME(m_rx_crc));
+	save_item(NAME(m_rx_crc_en));
+	//save_item(NAME(m_tx_in_pkt));
+	save_item(NAME(m_tx_forced_sync));
+	save_item(NAME(m_tx_crc));
+}
+
+void z80dart_channel::sync_save_state()
+{
+	// no need to save the above members
 }
 
 void mk68564_channel::device_start()
@@ -1104,7 +1140,7 @@ void z80sio_channel::device_reset()
 	m_uart->clear_interrupt(m_index, INT_TRANSMIT);
 	m_uart->clear_interrupt(m_index, INT_RECEIVE);
 	reset_ext_status();
-	// FIXME: should this actually reset all the interrtupts, or just the prioritisation (daisy chain) logic?
+	// FIXME: should this actually reset all the interrupts, or just the prioritisation (daisy chain) logic?
 	if (m_index == z80sio_device::CHANNEL_A)
 		m_uart->reset_interrupts();
 }
@@ -1258,6 +1294,11 @@ void z80sio_channel::sync_tx_sr_empty()
 	}
 }
 
+void z80dart_channel::sync_tx_sr_empty()
+{
+	LOG("%s (sync mode not supported by DART)\n", FUNCNAME);
+}
+
 bool z80sio_channel::get_tx_empty() const
 {
 	// During CRC transmission, tx buffer is shown as full
@@ -1335,8 +1376,8 @@ void z80sio_channel::async_tx_setup()
 void z80sio_channel::reset_ext_status()
 {
 	// this will clear latched external pin state
-	m_ext_latched = 0;
-	m_brk_latched = 0;
+	m_ext_latched = false;
+	m_brk_latched = false;
 	read_ext();
 
 	// Clear any pending External interrupt
@@ -1380,7 +1421,7 @@ void z80sio_channel::trigger_ext_int()
 	// update line
 	if (!m_ext_latched)
 		read_ext();
-	m_ext_latched = 1;
+	m_ext_latched = true;
 
 	// trigger interrupt if enabled
 	if (m_wr1 & WR1_EXT_INT_ENABLE)
@@ -1625,7 +1666,7 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	case WR0_ENABLE_INT_NEXT_RX:
 		// enable interrupt on next receive character
 		LOGINT("%s Ch:%c : Enable Interrupt on Next Received Character\n", FUNCNAME, 'A' + m_index);
-		m_rx_first = 1;
+		m_rx_first = true;
 		break;
 	case WR0_RESET_TX_INT:
 		LOGCMD("%s Ch:%c : Reset Transmitter Interrupt Pending\n", FUNCNAME, 'A' + m_index);
@@ -1925,6 +1966,11 @@ void z80sio_channel::enter_hunt_mode()
 	}
 }
 
+void z80dart_channel::enter_hunt_mode()
+{
+	LOG("%s (sync mode not supported by DART)\n", FUNCNAME);
+}
+
 //-------------------------------------------------
 //  sync_receive - synchronous reception handler
 //-------------------------------------------------
@@ -2042,6 +2088,11 @@ void z80sio_channel::sync_receive()
 	m_dlyd_rxd = m_rxd;
 }
 
+void z80dart_channel::sync_receive()
+{
+	LOG("%s (sync mode not supported by DART)\n", FUNCNAME);
+}
+
 //-------------------------------------------------
 //  sdlc_receive - SDLC reception handler
 //-------------------------------------------------
@@ -2068,7 +2119,7 @@ void z80sio_channel::sdlc_receive()
 			LOGRCV("SDLC Abort detected\n");
 			m_rr0 |= RR0_BREAK_ABORT;
 			if (!m_brk_latched) {
-				m_brk_latched = 1;
+				m_brk_latched = true;
 				trigger_ext_int();
 			}
 			enter_hunt_mode();
@@ -2088,7 +2139,7 @@ void z80sio_channel::sdlc_receive()
 		{
 			m_rr0 &= ~RR0_BREAK_ABORT;
 			if (!m_brk_latched) {
-				m_brk_latched = 1;
+				m_brk_latched = true;
 				trigger_ext_int();
 			}
 		}
@@ -2189,6 +2240,11 @@ void z80sio_channel::sdlc_receive()
 	}
 }
 
+void z80dart_channel::sdlc_receive()
+{
+	logerror("%s (sync mode not supported by DART)\n", FUNCNAME);
+}
+
 //-------------------------------------------------
 //  receive_data - receive data word
 //-------------------------------------------------
@@ -2234,7 +2290,7 @@ void z80sio_channel::queue_received(uint16_t data, uint32_t error)
 	case WR1_RX_INT_FIRST:
 		if (m_rx_first || (error & get_special_rx_mask()))
 			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
-		m_rx_first = 0;
+		m_rx_first = false;
 		break;
 
 	case WR1_RX_INT_ALL_PARITY:
@@ -2340,7 +2396,7 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 				LOGRCV("Break termination detected\n");
 				m_rr0 &= ~RR0_BREAK_ABORT;
 				if (!m_brk_latched) {
-					m_brk_latched = 1;
+					m_brk_latched = true;
 					trigger_ext_int();
 				}
 			}
@@ -2407,7 +2463,7 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 					{
 						LOGRCV("Break detected\n");
 						m_rr0 |= RR0_BREAK_ABORT;
-						m_brk_latched = 1;
+						m_brk_latched = true;
 						trigger_ext_int();
 					}
 				}
@@ -2454,7 +2510,8 @@ WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 			m_tx_count = get_clock_mode() / 2;
 			// Send out a delayed half bit
 			bool new_txd = BIT(m_tx_delay , 3);
-			LOGBIT("%.6f TX %d DLY %x\n" , machine().time().as_double() , new_txd , m_tx_delay & 0xf);
+			if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC || !(m_rr1 & RR1_ALL_SENT))
+				LOGBIT("%.6f TX %d DLY %x\n" , machine().time().as_double() , new_txd , m_tx_delay & 0xf);
 			if (new_txd != m_txd && !(m_wr5 & WR5_SEND_BREAK))
 			{
 				out_txd_cb(new_txd);

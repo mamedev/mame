@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- General purpose software list for Amiga software with a MINIMUM requirement of the ECS chipset (A500+ / A600)
-     some ECS software exists instead in other lists if it is backwards compatible with older hardware
+    General purpose software list for Amiga software with a MINIMUM requirement of the ECS chipset (A500+ / A600)
+    some ECS software exists instead in other lists if it is backwards compatible with older hardware
 
     the software listed here is not designed for use on systems without the ECS chipset and
     will not function.

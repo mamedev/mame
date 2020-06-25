@@ -13,10 +13,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8155.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 #include "cp1.lh"
 
@@ -29,9 +32,9 @@ public:
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
 		m_cassette(*this, "cassette"),
+		m_display(*this, "display"),
 		m_io_lines(*this, "LINE%u", 0U),
-		m_io_config(*this, "CONFIG"),
-		m_digits(*this, "digit%u", 0U)
+		m_io_config(*this, "CONFIG")
 	{ }
 
 	void cp1(machine_config &config);
@@ -41,33 +44,33 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t port1_r();
+	uint8_t port2_r();
+	void port1_w(uint8_t data);
+	void port2_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	DECLARE_READ8_MEMBER(i8155_read);
-	DECLARE_WRITE8_MEMBER(i8155_write);
-	DECLARE_WRITE8_MEMBER(i8155_porta_w);
-	DECLARE_READ8_MEMBER(i8155_portb_r);
-	DECLARE_WRITE8_MEMBER(i8155_portb_w);
-	DECLARE_WRITE8_MEMBER(i8155_portc_w);
+	uint8_t i8155_read(offs_t offset);
+	void i8155_write(offs_t offset, uint8_t data);
+	void i8155_porta_w(uint8_t data);
+	uint8_t i8155_portb_r();
+	void i8155_portb_w(uint8_t data);
+	void i8155_portc_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8155_device> m_i8155;
 	required_device<i8155_device> m_i8155_cp3;
 	required_device<cassette_image_device> m_cassette;
+	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_io_lines;
 	required_ioport m_io_config;
-	output_finder<6> m_digits;
 
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
 	uint8_t   m_matrix;
 };
 
-READ8_MEMBER(cp1_state::port1_r)
+uint8_t cp1_state::port1_r()
 {
 	logerror("Read from expansion port 1\n");
 
@@ -79,7 +82,7 @@ READ8_MEMBER(cp1_state::port1_r)
 	return data;
 }
 
-WRITE8_MEMBER(cp1_state::port1_w)
+void cp1_state::port1_w(uint8_t data)
 {
 	logerror("Write to expansion port 1 %x\n", data);
 
@@ -87,7 +90,7 @@ WRITE8_MEMBER(cp1_state::port1_w)
 		m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
-READ8_MEMBER(cp1_state::port2_r)
+uint8_t cp1_state::port2_r()
 {
 	// x--- ----   I8155 IO/M
 	// -x-- ----   I8155 RESET
@@ -104,7 +107,7 @@ READ8_MEMBER(cp1_state::port2_r)
 	return (data & 0x0f) | (m_port2 & 0xf0);
 }
 
-WRITE8_MEMBER(cp1_state::port2_w)
+void cp1_state::port2_w(uint8_t data)
 {
 	if (data & 0x40)
 	{
@@ -117,7 +120,7 @@ WRITE8_MEMBER(cp1_state::port2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(cp1_state::i8155_read)
+uint8_t cp1_state::i8155_read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -136,7 +139,7 @@ READ8_MEMBER(cp1_state::i8155_read)
 	return data;
 }
 
-WRITE8_MEMBER(cp1_state::i8155_write)
+void cp1_state::i8155_write(offs_t offset, uint8_t data)
 {
 	if (!(m_port2 & 0x10))
 	{
@@ -151,39 +154,28 @@ WRITE8_MEMBER(cp1_state::i8155_write)
 	}
 }
 
-WRITE8_MEMBER(cp1_state::i8155_porta_w)
+void cp1_state::i8155_porta_w(uint8_t data)
 {
-	data &= 0x7f;   // PA7 is not connected
-
-	if (m_7seg)
-	{
-		if (!(m_matrix & 0x01))     m_digits[5] = data;
-		if (!(m_matrix & 0x02))     m_digits[4] = data;
-		if (!(m_matrix & 0x04))     m_digits[3] = data;
-		if (!(m_matrix & 0x08))     m_digits[2] = data | 0x80;     // this digit has always the dot active
-		if (!(m_matrix & 0x10))     m_digits[1] = data;
-		if (!(m_matrix & 0x20))     m_digits[0] = data;
-	}
-
-	m_7seg ^= 0x01;
+	m_7seg = data & 0x7f; // PA7 is not connected
+	m_display->matrix(~m_matrix, m_7seg);
 }
 
-READ8_MEMBER(cp1_state::i8155_portb_r)
+uint8_t cp1_state::i8155_portb_r()
 {
 	logerror("read from expansion port 2\n");
 	return 0;
 }
 
-WRITE8_MEMBER(cp1_state::i8155_portb_w)
+void cp1_state::i8155_portb_w(uint8_t data)
 {
 	logerror("Write to expansion port 2 %x\n", data);
 }
 
-WRITE8_MEMBER(cp1_state::i8155_portc_w)
+void cp1_state::i8155_portc_w(uint8_t data)
 {
-	// --xx xxxx   keyboard matrix
-
+	// --xx xxxx   keyboard matrix, 7seg select
 	m_matrix = data & 0x3f;
+	m_display->matrix(~m_matrix, m_7seg);
 }
 
 
@@ -232,7 +224,6 @@ INPUT_PORTS_END
 
 void cp1_state::machine_start()
 {
-	m_digits.resolve();
 }
 
 void cp1_state::machine_reset()
@@ -286,6 +277,8 @@ void cp1_state::cp1(machine_config &config)
 
 	I8155(config, "i8155_cp3", 0);
 
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0x3f, 0x7f);
 	config.set_default_layout(layout_cp1);
 
 	SPEAKER(config, "mono").front_center();

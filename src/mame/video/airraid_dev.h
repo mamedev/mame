@@ -20,8 +20,8 @@ public:
 	// construction/destruction
 	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(vregs_w);
+	void txram_w(offs_t offset, uint8_t data);
+	void vregs_w(offs_t offset, uint8_t data);
 	void layer_enable_w(uint8_t enable);
 
 protected:

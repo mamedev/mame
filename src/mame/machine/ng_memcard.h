@@ -35,8 +35,8 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
 	// bus interface
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	bool present() { return is_loaded(); }
 

@@ -450,35 +450,35 @@ or Fatal Fury for example).
 #define VERBOSE 1
 #include "logmacro.h"
 
-READ32_MEMBER(hng64_state::hng64_com_r)
+uint32_t hng64_state::hng64_com_r(offs_t offset)
 {
 	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
 	return m_idt7133_dpram[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_com_w)
+void hng64_state::hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//LOG("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
 /* TODO: fully understand this */
-WRITE8_MEMBER(hng64_state::hng64_com_share_mips_w)
+void hng64_state::hng64_com_share_mips_w(offs_t offset, uint8_t data)
 {
 	m_com_shared[offset ^ 3] = data;
 }
 
-READ8_MEMBER(hng64_state::hng64_com_share_mips_r)
+uint8_t hng64_state::hng64_com_share_mips_r(offs_t offset)
 {
 	return m_com_shared[offset];
 }
 
-WRITE8_MEMBER(hng64_state::hng64_com_share_w)
+void hng64_state::hng64_com_share_w(offs_t offset, uint8_t data)
 {
 	m_com_shared[offset] = data;
 }
 
-READ8_MEMBER(hng64_state::hng64_com_share_r)
+uint8_t hng64_state::hng64_com_share_r(offs_t offset)
 {
 	if(offset == 4)
 		return m_com_shared[offset] | 1; // some busy flag?
@@ -487,7 +487,7 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 }
 
 
-READ32_MEMBER(hng64_state::hng64_rtc_r)
+uint32_t hng64_state::hng64_rtc_r(offs_t offset, uint32_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -496,9 +496,9 @@ READ32_MEMBER(hng64_state::hng64_rtc_r)
 
 		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
 		if ((rtc_addr & 0xf) == 0xd)
-			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10;
+			return m_rtc->read((rtc_addr) & 0xf) | 0x10;
 
-		return m_rtc->read(space, (rtc_addr) & 0xf);
+		return m_rtc->read((rtc_addr) & 0xf);
 	}
 	else
 	{
@@ -526,7 +526,7 @@ void hng64_state::do_dma(address_space &space)
 	}
 }
 
-READ32_MEMBER(hng64_state::hng64_dmac_r)
+uint32_t hng64_state::hng64_dmac_r(offs_t offset, uint32_t mem_mask)
 {
 	// DMAC seems to be mapped as 4 bytes in every 8
 	if ((offset * 4) == 0x54)
@@ -537,7 +537,7 @@ READ32_MEMBER(hng64_state::hng64_dmac_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(hng64_state::hng64_dmac_w)
+void hng64_state::hng64_dmac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// DMAC seems to be mapped as 4 bytes in every 8
 	switch (offset * 4)
@@ -561,12 +561,12 @@ WRITE32_MEMBER(hng64_state::hng64_dmac_w)
 	}
 }
 
-WRITE32_MEMBER(hng64_state::hng64_rtc_w)
+void hng64_state::hng64_rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset & 1)
 	{
 		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
-		m_rtc->write(space, (offset >> 1) & 0xf, data);
+		m_rtc->write((offset >> 1) & 0xf, data);
 	}
 	else
 	{
@@ -575,14 +575,14 @@ WRITE32_MEMBER(hng64_state::hng64_rtc_w)
 	}
 }
 
-WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
+void hng64_state::hng64_mips_to_iomcu_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
 	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
 	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
 }
 
-READ32_MEMBER(hng64_state::hng64_irqc_r)
+uint32_t hng64_state::hng64_irqc_r(offs_t offset, uint32_t mem_mask)
 {
 	if ((offset * 4) == 0x04)
 	{
@@ -597,7 +597,7 @@ READ32_MEMBER(hng64_state::hng64_irqc_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(hng64_state::hng64_irqc_w)
+void hng64_state::hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -644,7 +644,7 @@ WRITE32_MEMBER(hng64_state::hng64_irqc_w)
   ----
 */
 
-READ32_MEMBER(hng64_state::hng64_sysregs_r)
+uint32_t hng64_state::hng64_sysregs_r(offs_t offset, uint32_t mem_mask)
 {
 	//LOG("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 
@@ -661,7 +661,7 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 	return m_sysregs[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
+void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
 
@@ -686,7 +686,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 * MIPS side Dual Port RAM hookup for MCU
 **************************************/
 
-READ8_MEMBER(hng64_state::hng64_dualport_r)
+uint8_t hng64_state::hng64_dualport_r(offs_t offset)
 {
 	LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
 
@@ -729,7 +729,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
     it seems correct, see hng64_mips_to_iomcu_irq_w )
 */
 
-WRITE8_MEMBER(hng64_state::hng64_dualport_w)
+void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
 {
 	m_dt71321_dpram->right_w(offset, data);
 	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
@@ -738,7 +738,7 @@ WRITE8_MEMBER(hng64_state::hng64_dualport_w)
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
-WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
+void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
@@ -761,7 +761,7 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 	}
 }
 
-WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
+void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
@@ -784,13 +784,13 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 	}
 }
 
-WRITE32_MEMBER(hng64_state::hng64_vregs_w)
+void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
-READ16_MEMBER(hng64_state::main_sound_comms_r)
+uint16_t hng64_state::main_sound_comms_r(offs_t offset)
 {
 	switch(offset *2)
 	{
@@ -805,7 +805,7 @@ READ16_MEMBER(hng64_state::main_sound_comms_r)
 	return 0;
 }
 
-WRITE16_MEMBER(hng64_state::main_sound_comms_w)
+void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset * 2)
 	{
@@ -1819,7 +1819,7 @@ void hng64_state::machine_reset()
 
 ***********************************************/
 
-WRITE8_MEMBER(hng64_state::ioport1_w)
+void hng64_state::ioport1_w(uint8_t data)
 {
 	//LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
 
@@ -1840,18 +1840,18 @@ WRITE8_MEMBER(hng64_state::ioport1_w)
 }
 
 // it does write 0xff here before each set of reading, but before setting a new output address?
-WRITE8_MEMBER(hng64_state::ioport3_w)
+void hng64_state::ioport3_w(uint8_t data)
 {
 
 	if (m_port1 & 0x08) // 0x08 in port1 enables write? otherwise it writes 0xff to port 7 all the time, when port 7 is also lamps
 	{
 		int addr = (m_port1 & 0xe0) >> 5;
-		m_lamps->lamps_w(space, addr, data);
+		m_lamps->lamps_w(addr, data);
 	}
 }
 
 
-READ8_MEMBER(hng64_state::ioport3_r)
+uint8_t hng64_state::ioport3_r()
 {
 	int addr = (m_port1&0xe0)>>5;
 
@@ -1872,7 +1872,7 @@ void hng64_lamps_device::device_start()
 	m_lamps_out_cb.resolve_all_safe();
 }
 
-WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)
+void hng64_state::hng64_drive_lamps7_w(uint8_t data)
 {
 	/*
 	   0x80 - BGM Select #2 (Active High)
@@ -1886,7 +1886,7 @@ WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)
 	*/
 }
 
-WRITE8_MEMBER(hng64_state::hng64_drive_lamps6_w)
+void hng64_state::hng64_drive_lamps6_w(uint8_t data)
 {
 	/*
 	   0x80 - BGM Select #4 (Active High)
@@ -1901,12 +1901,12 @@ WRITE8_MEMBER(hng64_state::hng64_drive_lamps6_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
-WRITE8_MEMBER(hng64_state::hng64_drive_lamps5_w)
+void hng64_state::hng64_drive_lamps5_w(uint8_t data)
 {
 	// force feedback steering position
 }
 
-WRITE8_MEMBER(hng64_state::hng64_shoot_lamps7_w)
+void hng64_state::hng64_shoot_lamps7_w(uint8_t data)
 {
 	/*
 	   0x80
@@ -1930,7 +1930,7 @@ WRITE8_MEMBER(hng64_state::hng64_shoot_lamps7_w)
     0x00004000 gun #3
 */
 
-WRITE8_MEMBER(hng64_state::hng64_shoot_lamps6_w)
+void hng64_state::hng64_shoot_lamps6_w(uint8_t data)
 {
 	// Start Lamp #1 / #2 don't get written to the output port, is this a TLCS870 bug or are they not connected to the 'lamp' outputs, they do get written to the DP ram, see above notes
 	/*
@@ -1945,7 +1945,7 @@ WRITE8_MEMBER(hng64_state::hng64_shoot_lamps6_w)
 	*/
 }
 
-WRITE8_MEMBER(hng64_state::hng64_fight_lamps6_w)
+void hng64_state::hng64_fight_lamps6_w(uint8_t data)
 {
 	/*
 	   0x80
@@ -1968,7 +1968,7 @@ WRITE8_MEMBER(hng64_state::hng64_fight_lamps6_w)
 
 ***********************************************/
 
-WRITE8_MEMBER(hng64_state::ioport7_w)
+void hng64_state::ioport7_w(uint8_t data)
 {
 	/* Port bits
 
@@ -2012,7 +2012,7 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 	m_port7 = data;
 }
 
-READ8_MEMBER(hng64_state::ioport0_r)
+uint8_t hng64_state::ioport0_r()
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
 	uint8_t ret = m_dt71321_dpram->left_r(addr);
@@ -2021,7 +2021,7 @@ READ8_MEMBER(hng64_state::ioport0_r)
 	return ret;
 }
 
-WRITE8_MEMBER(hng64_state::ioport0_w)
+void hng64_state::ioport0_w(uint8_t data)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
 	m_dt71321_dpram->left_w(addr, data);
@@ -2039,7 +2039,7 @@ WRITE8_MEMBER(hng64_state::ioport0_w)
 /* This port is dual purpose, with the upper pins being used as a serial input / output / clock etc. and the output latch (written data) being configured appropriately however the lower 2 bits also seem to be used
    maybe these lower 2 bits were intended for serial comms LEDs, although none are documented in the PCB layouts.
 */
-WRITE8_MEMBER(hng64_state::ioport4_w)
+void hng64_state::ioport4_w(uint8_t data)
 {
 	LOG("%s: ioport4_w %02x\n", machine().describe_context(), data);
 }
@@ -2050,14 +2050,14 @@ WRITE8_MEMBER(hng64_state::ioport4_w)
 
 ***********************************************/
 
-READ8_MEMBER(hng64_state::anport0_r) { return m_an_in[0]->read(); }
-READ8_MEMBER(hng64_state::anport1_r) { return m_an_in[1]->read(); }
-READ8_MEMBER(hng64_state::anport2_r) { return m_an_in[2]->read(); }
-READ8_MEMBER(hng64_state::anport3_r) { return m_an_in[3]->read(); }
-READ8_MEMBER(hng64_state::anport4_r) { return m_an_in[4]->read(); }
-READ8_MEMBER(hng64_state::anport5_r) { return m_an_in[5]->read(); }
-READ8_MEMBER(hng64_state::anport6_r) { return m_an_in[6]->read(); }
-READ8_MEMBER(hng64_state::anport7_r) { return m_an_in[7]->read(); }
+uint8_t hng64_state::anport0_r() { return m_an_in[0]->read(); }
+uint8_t hng64_state::anport1_r() { return m_an_in[1]->read(); }
+uint8_t hng64_state::anport2_r() { return m_an_in[2]->read(); }
+uint8_t hng64_state::anport3_r() { return m_an_in[3]->read(); }
+uint8_t hng64_state::anport4_r() { return m_an_in[4]->read(); }
+uint8_t hng64_state::anport5_r() { return m_an_in[5]->read(); }
+uint8_t hng64_state::anport6_r() { return m_an_in[6]->read(); }
+uint8_t hng64_state::anport7_r() { return m_an_in[7]->read(); }
 
 /***********************************************
 

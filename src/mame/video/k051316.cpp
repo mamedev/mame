@@ -249,7 +249,7 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 
 	m_k051316_cb(&code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 							code,
 							color,
 							flags);

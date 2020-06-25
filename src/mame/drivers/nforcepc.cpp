@@ -76,7 +76,7 @@ void crush11_host_device::config_map(address_map &map)
 	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::unknown_r), FUNC(crush11_host_device::unknown_w));
 }
 
-READ8_MEMBER(crush11_host_device::header_type_r)
+uint8_t crush11_host_device::header_type_r()
 {
 	return 0x80; // from lspci dump
 }
@@ -128,22 +128,22 @@ void crush11_host_device::bios_map(address_map &map)
 	map(0xfffc0000, 0xffffffff).rw(biosrom, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 }
 
-READ8_MEMBER(crush11_host_device::unknown_r)
+uint8_t crush11_host_device::unknown_r()
 {
 	return 4;
 }
 
-WRITE8_MEMBER(crush11_host_device::unknown_w)
+void crush11_host_device::unknown_w(uint8_t data)
 {
 	logerror("test = %02x\n", data);
 }
 
-READ32_MEMBER(crush11_host_device::ram_size_r)
+uint32_t crush11_host_device::ram_size_r()
 {
 	return ram_size * 1024 * 1024 - 1;
 }
 
-WRITE32_MEMBER(crush11_host_device::ram_size_w)
+void crush11_host_device::ram_size_w(uint32_t data)
 {
 	logerror("trying to set size = %d\n", data);
 }
@@ -462,7 +462,7 @@ void it8703f_device::device_add_mconfig(machine_config &config)
 	m_kbdc->gate_a20_callback().set(FUNC(it8703f_device::kbdp21_gp25_gatea20_w));
 }
 
-READ8_MEMBER(it8703f_device::read_it8703f)
+uint8_t it8703f_device::read_it8703f(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -483,7 +483,7 @@ READ8_MEMBER(it8703f_device::read_it8703f)
 		return 0;
 }
 
-WRITE8_MEMBER(it8703f_device::write_it8703f)
+void it8703f_device::write_it8703f(offs_t offset, uint8_t data)
 {
 	uint8_t byt;
 
@@ -897,7 +897,7 @@ void it8703f_device::map_fdc_addresses()
 {
 	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
 
-	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &pc_fdc_interface::map);
+	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &smc37c78_device::map);
 }
 
 void it8703f_device::map_lpt(address_map& map)
@@ -905,14 +905,14 @@ void it8703f_device::map_lpt(address_map& map)
 	map(0x0, 0x3).rw(FUNC(it8703f_device::lpt_read), FUNC(it8703f_device::lpt_write));
 }
 
-READ8_MEMBER(it8703f_device::lpt_read)
+uint8_t it8703f_device::lpt_read(offs_t offset)
 {
-	return pc_lpt_lptdev->read(space, offset, mem_mask);
+	return pc_lpt_lptdev->read(offset);
 }
 
-WRITE8_MEMBER(it8703f_device::lpt_write)
+void it8703f_device::lpt_write(offs_t offset, uint8_t data)
 {
-	pc_lpt_lptdev->write(space, offset, data, mem_mask);
+	pc_lpt_lptdev->write(offset, data);
 }
 
 void it8703f_device::map_lpt_addresses()
@@ -927,12 +927,12 @@ void it8703f_device::map_serial1(address_map& map)
 	map(0x0, 0x7).rw(FUNC(it8703f_device::serial1_read), FUNC(it8703f_device::serial1_write));
 }
 
-READ8_MEMBER(it8703f_device::serial1_read)
+uint8_t it8703f_device::serial1_read(offs_t offset)
 {
 	return pc_serial1_comdev->ins8250_r(offset);
 }
 
-WRITE8_MEMBER(it8703f_device::serial1_write)
+void it8703f_device::serial1_write(offs_t offset, uint8_t data)
 {
 	pc_serial1_comdev->ins8250_w(offset, data);
 }
@@ -949,12 +949,12 @@ void it8703f_device::map_serial2(address_map& map)
 	map(0x0, 0x7).rw(FUNC(it8703f_device::serial2_read), FUNC(it8703f_device::serial2_write));
 }
 
-READ8_MEMBER(it8703f_device::serial2_read)
+uint8_t it8703f_device::serial2_read(offs_t offset)
 {
 	return pc_serial2_comdev->ins8250_r(offset);
 }
 
-WRITE8_MEMBER(it8703f_device::serial2_write)
+void it8703f_device::serial2_write(offs_t offset, uint8_t data)
 {
 	pc_serial2_comdev->ins8250_w(offset, data);
 }
@@ -972,34 +972,34 @@ void it8703f_device::map_keyboard(address_map &map)
 	map(0x4, 0x4).rw(FUNC(it8703f_device::keybc_status_r), FUNC(it8703f_device::keybc_command_w));
 }
 
-READ8_MEMBER(it8703f_device::at_keybc_r)
+uint8_t it8703f_device::at_keybc_r(offs_t offset)
 {
 	switch (offset) //m_kbdc
 	{
 	case 0:
-		return m_kbdc->data_r(space, 0);
+		return m_kbdc->data_r(0);
 	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(it8703f_device::at_keybc_w)
+void it8703f_device::at_keybc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0:
-		m_kbdc->data_w(space, 0, data);
+		m_kbdc->data_w(0, data);
 	}
 }
 
-READ8_MEMBER(it8703f_device::keybc_status_r)
+uint8_t it8703f_device::keybc_status_r()
 {
-	return m_kbdc->data_r(space, 4);
+	return m_kbdc->data_r(4);
 }
 
-WRITE8_MEMBER(it8703f_device::keybc_command_w)
+void it8703f_device::keybc_command_w(uint8_t data)
 {
-	m_kbdc->data_w(space, 4, data);
+	m_kbdc->data_w(4, data);
 }
 
 void it8703f_device::map_keyboard_addresses()
@@ -1054,7 +1054,7 @@ public:
 private:
 	void nforce_map(address_map &map);
 	void nforce_map_io(address_map &map);
-	DECLARE_WRITE8_MEMBER(boot_state_award_w);
+	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
 
@@ -1088,7 +1088,7 @@ const nforcepc_state::boot_state_info nforcepc_state::boot_state_infos_award[] =
 	{ 0, nullptr }
 };
 
-WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
+void nforcepc_state::boot_state_award_w(uint8_t data)
 {
 	const char *desc = "";
 	for (int i = 0; boot_state_infos_award[i].message; i++)

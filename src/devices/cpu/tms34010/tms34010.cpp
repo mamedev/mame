@@ -82,8 +82,6 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_hblank_stable(0)
 	, m_external_host_access(0)
 	, m_executing(0)
-	, m_program(nullptr)
-	, m_cache(nullptr)
 	, m_pixclock(0)
 	, m_pixperclock(0)
 	, m_scantimer(nullptr)
@@ -236,32 +234,32 @@ inline uint32_t tms340x0_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_cache->read_word(pc);
+	return m_cache.read_word(pc);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_cache->read_word(pc);
+	return m_cache.read_word(pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG()
 {
 	uint32_t pc = m_pc;
 	m_pc += 4 << 3;
-	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache.read_word(pc) | (m_cache.read_word(pc + 16) << 16);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD_NO_INC()
 {
-	return m_cache->read_word(m_pc);
+	return m_cache.read_word(m_pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG_NO_INC()
 {
 	uint32_t pc = m_pc;
-	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache.read_word(pc) | (m_cache.read_word(pc + 16) << 16);
 }
 
 /* read memory byte */
@@ -333,7 +331,7 @@ uint32_t tms340x0_device::read_pixel_32(offs_t offset)
 uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 {
 	if (!m_to_shiftreg_cb.isnull())
-		m_to_shiftreg_cb(*m_program, offset, &m_shiftreg[0]);
+		m_to_shiftreg_cb(m_program, offset, &m_shiftreg[0]);
 	else
 		fatalerror("To ShiftReg function not set. PC = %08X\n", m_pc);
 	return m_shiftreg[0];
@@ -475,7 +473,7 @@ void tms340x0_device::write_pixel_r_t_32(offs_t offset, uint32_t data)
 void tms340x0_device::write_pixel_shiftreg(offs_t offset, uint32_t data)
 {
 	if (!m_from_shiftreg_cb.isnull())
-		m_from_shiftreg_cb(*m_program, offset, &m_shiftreg[0]);
+		m_from_shiftreg_cb(m_program, offset, &m_shiftreg[0]);
 	else
 		fatalerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
@@ -642,8 +640,8 @@ void tms340x0_device::device_start()
 
 	m_external_host_access = false;
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 3, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	/* set up the state table */
 	{

@@ -75,8 +75,6 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, device_video_interface(mconfig, *this)
 	, m_rom_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_ram_config("data", ENDIANNESS_LITTLE, 8, 6 + ybits, 0) // actually 7 bits wide
-	, m_rom_cache(nullptr)
-	, m_ram_cache(nullptr)
 	, m_baud_9600_callback(*this)
 	, m_vert_count_callback(*this)
 	, m_uart_rd_callback(*this)
@@ -195,8 +193,8 @@ void vt52_cpu_device::device_resolve_objects()
 void vt5x_cpu_device::device_start()
 {
 	// acquire address spaces
-	m_rom_cache = space(AS_PROGRAM).cache<0, 0, ENDIANNESS_LITTLE>();
-	m_ram_cache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_rom_cache);
+	space(AS_DATA).cache(m_ram_cache);
 
 	screen().register_screen_bitmap(m_bitmap);
 	set_icountptr(m_icount);
@@ -531,7 +529,7 @@ void vt50_cpu_device::execute_tg(u8 inst)
 		break;
 	}
 
-	m_ram_cache->write_byte(translate_xy(), m_ram_do);
+	m_ram_cache.write_byte(translate_xy(), m_ram_do);
 	m_write_ff = false;
 }
 
@@ -560,7 +558,7 @@ void vt52_cpu_device::execute_tg(u8 inst)
 		break;
 	}
 
-	m_ram_cache->write_byte(translate_xy(), m_ram_do);
+	m_ram_cache.write_byte(translate_xy(), m_ram_do);
 	m_write_ff = false;
 }
 
@@ -757,15 +755,15 @@ void vt5x_cpu_device::execute_run()
 
 		case 1:
 			if (!en_cycle)
-				execute_te(m_rom_cache->read_byte(m_pc));
+				execute_te(m_rom_cache.read_byte(m_pc));
 			m_t = 2;
 			break;
 
 		case 2:
 			if (!en_cycle)
-				execute_tf(m_rom_cache->read_byte(m_pc));
+				execute_tf(m_rom_cache.read_byte(m_pc));
 			if (!m_write_ff)
-				m_ram_do = m_ram_cache->read_byte(translate_xy()) & 0177;
+				m_ram_do = m_ram_cache.read_byte(translate_xy()) & 0177;
 			m_cursor_active = m_ac == (m_x ^ (m_x8 ? 8 : 0));
 			if (u8(m_horiz_count - 2) >= 2 * 16)
 			{
@@ -784,13 +782,13 @@ void vt5x_cpu_device::execute_run()
 
 		case 3:
 			if (en_cycle && m_write_ff)
-				execute_tg(m_rom_cache->read_byte(m_pc));
+				execute_tg(m_rom_cache.read_byte(m_pc));
 			m_t = 4;
 			break;
 
 		case 4:
 			if (en_cycle)
-				execute_th(m_rom_cache->read_byte(m_pc));
+				execute_th(m_rom_cache.read_byte(m_pc));
 			m_t = 5;
 			break;
 
@@ -800,13 +798,13 @@ void vt5x_cpu_device::execute_run()
 
 		case 6:
 			if (en_cycle && m_flag_test_ff)
-				execute_tj(m_rom_cache->read_byte(m_pc));
+				execute_tj(m_rom_cache.read_byte(m_pc));
 			m_t = 7;
 			break;
 
 		case 7:
 			if (!en_cycle)
-				execute_tw(m_rom_cache->read_byte(m_pc));
+				execute_tw(m_rom_cache.read_byte(m_pc));
 			m_t = 8;
 			break;
 

@@ -15,7 +15,7 @@
 
 #include "../../lib/netlist/nltypes.h"
 
-class nld_sound_out;
+class netlist_mame_stream_output_device;
 class nld_sound_in;
 
 namespace netlist {
@@ -78,7 +78,7 @@ public:
 	void update_icount(netlist::netlist_time_ext time) noexcept;
 	void check_mame_abort_slice() noexcept;
 
-	static void register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name);
+	static void register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name);
 
 	int m_icount;
 
@@ -99,7 +99,7 @@ protected:
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// Custom to netlist ...
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const { }
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const { }
 
 	// device_t overrides
 	virtual void device_config_complete() override;
@@ -111,8 +111,10 @@ protected:
 	virtual void device_pre_save() override;
 	virtual void device_clock_changed() override;
 
-	plib::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
+	netlist::host_arena::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
+	attotime m_cur_time;
+	attotime m_attotime_per_clock;
 private:
 	void save_state();
 
@@ -178,7 +180,7 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -230,23 +232,29 @@ public:
 
 
 	inline sound_stream *get_stream() { return m_stream; }
+	void update_to_current_time();
 
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
+	void register_stream_output(int channel, netlist_mame_stream_output_device *so);
+
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 private:
-	std::map<int, nld_sound_out *> m_out;
+	std::map<int, netlist_mame_stream_output_device *> m_out;
 	nld_sound_in *m_in;
 	sound_stream *m_stream;
+	bool m_is_device_call;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -257,10 +265,11 @@ class netlist_mame_sub_interface
 {
 public:
 	// construction/destruction
-	netlist_mame_sub_interface(device_t &aowner)
+	netlist_mame_sub_interface(device_t &owner)
 		: m_offset(0.0), m_mult(1.0)
-		, m_owner(dynamic_cast<netlist_mame_device *>(&aowner))
-		, m_sound(dynamic_cast<netlist_mame_sound_device *>(&aowner))
+		, m_owner(dynamic_cast<netlist_mame_device *>(&owner))
+		, m_sound(dynamic_cast<netlist_mame_sound_device *>(&owner))
+		, m_cpu(dynamic_cast<netlist_mame_cpu_device *>(&owner))
 	{
 	}
 
@@ -268,8 +277,8 @@ public:
 	{
 	}
 
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) { }
-	virtual void pre_parse_action(netlist::netlist_state_t &nlstate) { }
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) { }
+	virtual void pre_parse_action(netlist::nlparse_t &parser) { }
 	virtual void validity_helper(validity_checker &valid,
 		netlist::netlist_state_t &nlstate) const { }
 
@@ -278,18 +287,24 @@ public:
 	inline void update_to_current_time()
 	{
 		if (m_sound != nullptr)
-			m_sound->get_stream()->update();
+		{
+			m_sound->update_to_current_time();
+		}
 	}
 
 	void set_mult_offset(const double mult, const double offset);
+
+	netlist_mame_sound_device *sound() { return m_sound;}
+	netlist_mame_cpu_device   *cpu()   { return m_cpu;}
 
 protected:
 	double m_offset;
 	double m_mult;
 
 private:
-	netlist_mame_device *const m_owner;
+	netlist_mame_device       *const m_owner;
 	netlist_mame_sound_device *const m_sound;
+	netlist_mame_cpu_device   *const m_cpu;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -317,10 +332,10 @@ public:
 			write(newval);
 	}
 	inline DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	inline DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	inline DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	inline DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	inline DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	inline void write8(uint8_t data)               { write(data);   }
+	inline void write16(uint16_t data)             { write(data);   }
+	inline void write32(uint32_t data)             { write(data);   }
+	inline void write64(uint64_t data)             { write(data);   }
 
 	virtual void validity_helper(validity_checker &valid,
 		netlist::netlist_state_t &nlstate) const override;
@@ -330,7 +345,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	netlist::param_num_t<nl_fptype> *m_param;
+	netlist::param_num_t<netlist::nl_fptype> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
 	double m_value_for_device_timer;
@@ -348,17 +363,18 @@ public:
 	// construction/destruction
 	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename... T> void set_params(const char *in_name, T &&... args)
+	template <typename... T>
+	void set_params(const char *in_name, T &&... args)
 	{
 		m_in = in_name;
 		m_delegate.set(std::forward<T>(args)...);
 	}
 
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
 private:
 	const char *m_in;
@@ -386,7 +402,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
 private:
 	const char *m_in;
@@ -415,10 +432,10 @@ public:
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
 	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	void write8(uint8_t data)               { write(data);   }
+	void write16(uint16_t data)             { write(data);   }
+	void write32(uint32_t data)             { write(data);   }
+	void write64(uint64_t data)             { write(data);   }
 
 	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
 
@@ -456,10 +473,10 @@ public:
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
 	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	void write8(uint8_t data)               { write(data);   }
+	void write16(uint16_t data)             { write(data);   }
+	void write32(uint32_t data)             { write(data);   }
+	void write64(uint64_t data)             { write(data);   }
 
 	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
 
@@ -522,7 +539,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 private:
 	uint32_t m_channel;
 	const char *m_param_name;
@@ -545,14 +562,34 @@ public:
 
 	void set_params(int channel, const char *out_name);
 
+	void process(netlist::netlist_time_ext tim, netlist::nl_fptype val);
+
+	void buffer_reset(const netlist::netlist_time_ext &upto)
+	{
+		m_last_buffer_time = upto;
+		m_buffer.clear();
+	}
+
+	void sound_update_fill(std::size_t samples, stream_sample_t *target);
+
+	void set_sample_time(netlist::netlist_time t) { m_sample_time = t; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) override;
+	virtual void device_reset() override;
+	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
+	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 
 private:
-	uint32_t m_channel;
-	const char *m_out_name;
+	uint32_t                     m_channel;
+	const char *                 m_out_name;
+
+	std::vector<stream_sample_t> m_buffer;
+	double                       m_cur;
+
+	netlist::netlist_time        m_sample_time;
+	netlist::netlist_time_ext    m_last_buffer_time;
 };
 
 

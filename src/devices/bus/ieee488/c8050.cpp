@@ -257,7 +257,7 @@ void c8050_device::sfd1001_fdc_mem(address_map &map)
 //  riot6532 uc1
 //-------------------------------------------------
 
-READ8_MEMBER( c8050_device::dio_r )
+uint8_t c8050_device::dio_r()
 {
 	/*
 
@@ -274,10 +274,10 @@ READ8_MEMBER( c8050_device::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c8050_device::dio_w )
+void c8050_device::dio_w(uint8_t data)
 {
 	/*
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER( c8050_device::dio_w )
 //  riot6532 ue1
 //-------------------------------------------------
 
-READ8_MEMBER( c8050_device::riot1_pa_r )
+uint8_t c8050_device::riot1_pa_r()
 {
 	/*
 
@@ -332,7 +332,7 @@ READ8_MEMBER( c8050_device::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8050_device::riot1_pa_w )
+void c8050_device::riot1_pa_w(uint8_t data)
 {
 	/*
 
@@ -367,7 +367,7 @@ WRITE8_MEMBER( c8050_device::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( c8050_device::riot1_pb_r )
+uint8_t c8050_device::riot1_pb_r()
 {
 	/*
 
@@ -398,7 +398,7 @@ READ8_MEMBER( c8050_device::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c8050_device::riot1_pb_w )
+void c8050_device::riot1_pb_w(uint8_t data)
 {
 	/*
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER( c8050_device::riot1_pb_w )
 	m_leds[LED_ERR] = BIT(data, 5);
 }
 
-WRITE8_MEMBER( c8050_device::via_pb_w )
+void c8050_device::via_pb_w(uint8_t data)
 {
 	/*
 

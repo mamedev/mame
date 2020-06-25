@@ -87,15 +87,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_row_r);
-	DECLARE_READ8_MEMBER(keyboard_column_r);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-	DECLARE_WRITE8_MEMBER(boot_bank_w);
-	DECLARE_READ8_MEMBER(cartslot_r);
-	DECLARE_WRITE8_MEMBER(cartslot_w);
-	DECLARE_READ8_MEMBER(cartslot_io_r);
-	DECLARE_WRITE8_MEMBER(cartslot_io_w);
+	uint8_t keyboard_row_r();
+	uint8_t keyboard_column_r();
+	uint8_t ppi_portc_r();
+	void ppi_portc_w(uint8_t data);
+	void boot_bank_w(uint8_t data);
+	uint8_t cartslot_r(offs_t offset);
+	void cartslot_w(offs_t offset, uint8_t data);
+	uint8_t cartslot_io_r(offs_t offset);
+	void cartslot_io_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -105,7 +105,7 @@ private:
 	void iq151_io(address_map &map);
 	void iq151_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
@@ -117,7 +117,7 @@ private:
 	uint8_t m_cassette_data;
 };
 
-READ8_MEMBER(iq151_state::keyboard_row_r)
+uint8_t iq151_state::keyboard_row_r()
 {
 	char kbdrow[6];
 	uint8_t data = 0xff;
@@ -131,7 +131,7 @@ READ8_MEMBER(iq151_state::keyboard_row_r)
 	return data;
 }
 
-READ8_MEMBER(iq151_state::keyboard_column_r)
+uint8_t iq151_state::keyboard_column_r()
 {
 	char kbdrow[6];
 	uint8_t data = 0x00;
@@ -146,7 +146,7 @@ READ8_MEMBER(iq151_state::keyboard_column_r)
 	return data;
 }
 
-READ8_MEMBER(iq151_state::ppi_portc_r)
+uint8_t iq151_state::ppi_portc_r()
 {
 	uint8_t data = 0x00;
 
@@ -166,13 +166,13 @@ READ8_MEMBER(iq151_state::ppi_portc_r)
 }
 
 
-WRITE8_MEMBER(iq151_state::ppi_portc_w)
+void iq151_state::ppi_portc_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 3));
 	m_cassette_data = data;
 }
 
-WRITE8_MEMBER(iq151_state::boot_bank_w)
+void iq151_state::boot_bank_w(uint8_t data)
 {
 	m_boot_bank->set_entry(data & 1);
 }
@@ -182,7 +182,7 @@ WRITE8_MEMBER(iq151_state::boot_bank_w)
 //  Cartridge slot emulation
 //**************************************************************************
 
-READ8_MEMBER(iq151_state::cartslot_r)
+uint8_t iq151_state::cartslot_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -192,13 +192,13 @@ READ8_MEMBER(iq151_state::cartslot_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::cartslot_w)
+void iq151_state::cartslot_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_carts)
 		elem->write(offset, data);
 }
 
-READ8_MEMBER(iq151_state::cartslot_io_r)
+uint8_t iq151_state::cartslot_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -208,7 +208,7 @@ READ8_MEMBER(iq151_state::cartslot_io_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::cartslot_io_w)
+void iq151_state::cartslot_io_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_carts)
 		elem->io_write(offset, data);
@@ -395,7 +395,7 @@ void iq151_state::iq151(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &iq151_state::iq151_mem);
 	m_maincpu->set_addrmap(AS_IO, &iq151_state::iq151_io);
 	m_maincpu->set_vblank_int("screen", FUNC(iq151_state::iq151_vblank_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Titles, publishers and release dates taken from:
   - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
 but the website only covers post 1985 titles...
@@ -389,7 +391,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
 		<info name="usage" value="Type FILES then move the cursor to the line of the game and type LOAD (to load) and type RUN when loaded"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
+			<dataarea name="flop" size="348848">
 				<rom name="chackn.d88" size="348848" crc="257df7de" sha1="2bd62b1c1bdeacdeeef80d603b1e1b34a99cbaa0"/>
 			</dataarea>
 		</part>
@@ -515,7 +517,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="大戦略X1"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
+			<dataarea name="flop" size="348848">
 				<rom name="daisenx1.d88" size="348848" crc="cf06fac8" sha1="19024c98bdd96842c8e035b7869de0df7ff03b39"/>
 			</dataarea>
 		</part>
@@ -1671,12 +1673,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
+			<dataarea name="flop" size="348848">
 				<rom name="disk1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
+			<dataarea name="flop" size="348848">
 				<rom name="disk2.d88" size="348848" crc="50f1b9c7" sha1="1b1bfbe1cd1b1891be78c78dba6f44b735a78b48"/>
 			</dataarea>
 		</part>
@@ -2258,17 +2260,17 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="release" value="198606xx"/>
 		<info name="alt_title" value="ザ・スクリーマー"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
+			<dataarea name="flop" size="415792">
 				<rom name="the screamer system.d88" size="415792" crc="ee7c9ddb" sha1="4f42b5ac6eaa60290841038029ea5b6a9db96e99"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
+			<dataarea name="flop" size="415840">
 				<rom name="the screamer data 1.d88" size="415840" crc="5ed7c4cf" sha1="7764365c5603923c62c967b9a865d6cef8a1f796"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
+			<dataarea name="flop" size="415840">
 				<rom name="the screamer data 2.d88" size="415840" crc="098b403d" sha1="fe0a943724e6df673dff18eceb1018817bd24e07"/>
 			</dataarea>
 		</part>
@@ -3350,7 +3352,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="537520">
 				<rom name="wodydata.d88" size="537520" crc="3ff620b9" sha1="0a6682318141c08c3e8c0f8865d824a44417da44"/>
 			</dataarea>
 		</part>
@@ -5427,13 +5429,13 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="422160">
 				<rom name="xdos_sys.d88" size="422160" crc="a35c4f89" sha1="52d503c349132af1a5bf8bbca2ba480e4b5a8d6e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="422160">
 				<rom name="xdosutil.d88" size="422160" crc="73617547" sha1="0cee25e4ef6bf9723687e8427ea0ce6892bdfd03"/>
 			</dataarea>
 		</part>

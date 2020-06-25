@@ -96,7 +96,7 @@ void cgc7900_state::kbd_put(u8 data)
     keyboard_r - keyboard data read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::keyboard_r )
+u16 cgc7900_state::keyboard_r()
 {
 	u16 data;
 
@@ -146,7 +146,7 @@ READ16_MEMBER( cgc7900_state::keyboard_r )
     keyboard_w - keyboard data write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::keyboard_w )
+void cgc7900_state::keyboard_w(u16 data)
 {
 	/*
 
@@ -183,7 +183,7 @@ static const int int_vectors[16] = {
 	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48
 };
 
-WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
+void cgc7900_state::interrupt_mask_w(u16 data)
 {
 	/*
 
@@ -255,7 +255,7 @@ void cgc7900_state::irq_encoder(int pin, int state)
     disk_data_r - disk data read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::disk_data_r )
+u16 cgc7900_state::disk_data_r()
 {
 	return 0;
 }
@@ -264,7 +264,7 @@ READ16_MEMBER( cgc7900_state::disk_data_r )
     disk_data_w - disk data write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::disk_data_w )
+void cgc7900_state::disk_data_w(u16 data)
 {
 }
 
@@ -272,7 +272,7 @@ WRITE16_MEMBER( cgc7900_state::disk_data_w )
     disk_status_r - disk status read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::disk_status_r )
+u16 cgc7900_state::disk_status_r()
 {
 	/*
 
@@ -304,11 +304,11 @@ READ16_MEMBER( cgc7900_state::disk_status_r )
     disk_command_w - disk command write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::disk_command_w )
+void cgc7900_state::disk_command_w(u16 data)
 {
 }
 
-READ16_MEMBER(cgc7900_state::unmapped_r)
+u16 cgc7900_state::unmapped_r()
 {
 	return rand();
 }
@@ -440,9 +440,9 @@ void cgc7900_state::machine_start()
 
 void cgc7900_state::machine_reset()
 {
-	uint8_t *user1 = memregion(M68000_TAG)->base();
+	u8 *user1 = memregion(M68000_TAG)->base();
 
-	memcpy((uint8_t *)m_chrom_ram.target(), user1, 8); // not really what happens but...
+	memcpy((u8 *)m_chrom_ram.target(), user1, 8); // not really what happens but...
 
 	kbd_mods = 0x300; // forces cold boot -- initializes SRAM contents
 	kbd_data = 0;

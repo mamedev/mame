@@ -228,7 +228,7 @@ void econet_e01_device::e01_mem(address_map &map)
 	map(0xfc28, 0xfc28).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));
 	map(0xfc2c, 0xfc2c).mirror(0x00c3).portr("FLAP");
 	map(0xfc30, 0xfc30).mirror(0x00c0).rw(FUNC(econet_e01_device::hdc_data_r), FUNC(econet_e01_device::hdc_data_w));
-	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::read));
 	map(0xfc32, 0xfc32).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_select_w));
 	map(0xfc33, 0xfc33).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_irq_enable_w));
 }
@@ -249,7 +249,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 
 	// devices
 	via6522_device &via(VIA6522(config, R6522_TAG, 8_MHz_XTAL / 4));
-	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 
 	MC6854(config, m_adlc, 0);
@@ -467,7 +467,7 @@ void econet_e01_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::read )
+uint8_t econet_e01_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -488,7 +488,7 @@ READ8_MEMBER( econet_e01_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::write )
+void econet_e01_device::write(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[offset] = data;
 }
@@ -498,9 +498,10 @@ WRITE8_MEMBER( econet_e01_device::write )
 //  eprom_r - ROM/RAM select read
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::ram_select_r )
+uint8_t econet_e01_device::ram_select_r()
 {
-	m_ram_en = true;
+	if (!machine().side_effects_disabled())
+		m_ram_en = true;
 
 	return 0;
 }
@@ -510,7 +511,7 @@ READ8_MEMBER( econet_e01_device::ram_select_r )
 //  floppy_w - floppy control write
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::floppy_w )
+void econet_e01_device::floppy_w(uint8_t data)
 {
 	/*
 
@@ -545,7 +546,7 @@ WRITE8_MEMBER( econet_e01_device::floppy_w )
 	m_fdc->dden_w(BIT(data, 4));
 
 	// floppy master reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 
 	// TODO floppy test
 
@@ -558,9 +559,10 @@ WRITE8_MEMBER( econet_e01_device::floppy_w )
 //  network_irq_disable_r -
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::network_irq_disable_r )
+uint8_t econet_e01_device::network_irq_disable_r()
 {
-	network_irq_enable(0);
+	if (!machine().side_effects_disabled())
+		network_irq_enable(0);
 
 	return 0;
 }
@@ -570,7 +572,7 @@ READ8_MEMBER( econet_e01_device::network_irq_disable_r )
 //  network_irq_disable_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::network_irq_disable_w )
+void econet_e01_device::network_irq_disable_w(uint8_t data)
 {
 	network_irq_enable(0);
 }
@@ -580,9 +582,10 @@ WRITE8_MEMBER( econet_e01_device::network_irq_disable_w )
 //  network_irq_enable_r -
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::network_irq_enable_r )
+uint8_t econet_e01_device::network_irq_enable_r()
 {
-	network_irq_enable(1);
+	if (!machine().side_effects_disabled())
+		network_irq_enable(1);
 
 	return 0;
 }
@@ -592,7 +595,7 @@ READ8_MEMBER( econet_e01_device::network_irq_enable_r )
 //  network_irq_enable_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::network_irq_enable_w )
+void econet_e01_device::network_irq_enable_w(uint8_t data)
 {
 	network_irq_enable(1);
 }
@@ -602,11 +605,12 @@ WRITE8_MEMBER( econet_e01_device::network_irq_enable_w )
 //  hdc_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::hdc_data_r )
+uint8_t econet_e01_device::hdc_data_r()
 {
 	uint8_t data = m_scsi_data_in->read();
 
-	m_scsibus->write_ack(1);
+	if (!machine().side_effects_disabled())
+		m_scsibus->write_ack(1);
 
 	return data;
 }
@@ -616,7 +620,7 @@ READ8_MEMBER( econet_e01_device::hdc_data_r )
 //  hdc_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::hdc_data_w )
+void econet_e01_device::hdc_data_w(uint8_t data)
 {
 	m_scsi_data_out->write(data);
 
@@ -628,7 +632,7 @@ WRITE8_MEMBER( econet_e01_device::hdc_data_w )
 //  hdc_select_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::hdc_select_w )
+void econet_e01_device::hdc_select_w(uint8_t data)
 {
 	m_scsibus->write_sel(1);
 }
@@ -638,7 +642,7 @@ WRITE8_MEMBER( econet_e01_device::hdc_select_w )
 //  hdc_irq_enable_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::hdc_irq_enable_w )
+void econet_e01_device::hdc_irq_enable_w(uint8_t data)
 {
 	hdc_irq_enable(BIT(data, 0));
 }
@@ -648,7 +652,7 @@ WRITE8_MEMBER( econet_e01_device::hdc_irq_enable_w )
 //  rtc_address_r -
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::rtc_address_r )
+uint8_t econet_e01_device::rtc_address_r()
 {
 	return m_rtc->read(0);
 }
@@ -658,7 +662,7 @@ READ8_MEMBER( econet_e01_device::rtc_address_r )
 //  rtc_address_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::rtc_address_w )
+void econet_e01_device::rtc_address_w(uint8_t data)
 {
 	m_rtc->write(0, data);
 }
@@ -668,7 +672,7 @@ WRITE8_MEMBER( econet_e01_device::rtc_address_w )
 //  rtc_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( econet_e01_device::rtc_data_r )
+uint8_t econet_e01_device::rtc_data_r()
 {
 	return m_rtc->read(1);
 }
@@ -678,7 +682,7 @@ READ8_MEMBER( econet_e01_device::rtc_data_r )
 //  rtc_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( econet_e01_device::rtc_data_w )
+void econet_e01_device::rtc_data_w(uint8_t data)
 {
 	m_rtc->write(1, data);
 }

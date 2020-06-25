@@ -151,9 +151,9 @@ void crvision_state::crvision_map(address_map &map)
 	map(0x4000, 0x7fff).bankr(BANK_ROM2);
 	map(0x8000, 0xbfff).bankr(BANK_ROM1);
 //  map(0xc000, 0xe7ff).bankrw(3);
-	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::bus_w));
-	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::write));
+	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::write));
 //  map(0xe802, 0xf7ff).bankrw(4);
 	map(0xf800, 0xffff).rom().region(M6502_TAG, 0);
 }
@@ -473,7 +473,7 @@ INPUT_PORTS_END
     DEVICE CONFIGURATION
 ***************************************************************************/
 
-WRITE8_MEMBER( crvision_state::pia_pa_w )
+void crvision_state::pia_pa_w(uint8_t data)
 {
 	/*
 	    Signal  Description
@@ -524,7 +524,7 @@ uint8_t crvision_state::read_keyboard(int pa)
 	return 0xff;
 }
 
-READ8_MEMBER( crvision_state::pia_pa_r )
+uint8_t crvision_state::pia_pa_r()
 {
 	/*
 	    PA0     Keyboard raster player 1 output (joystick)
@@ -544,7 +544,7 @@ READ8_MEMBER( crvision_state::pia_pa_r )
 	return data;
 }
 
-READ8_MEMBER( crvision_state::pia_pb_r )
+uint8_t crvision_state::pia_pb_r()
 {
 	/*
 	    Signal  Description
@@ -568,7 +568,7 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 	return data;
 }
 
-READ8_MEMBER( laser2001_state::pia_pa_r )
+uint8_t laser2001_state::pia_pa_r()
 {
 	/*
 	    Signal  Description
@@ -592,7 +592,7 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( laser2001_state::pia_pa_w )
+void laser2001_state::pia_pa_w(uint8_t data)
 {
 	/*
 	    PA0     Joystick player 1 output 0
@@ -608,7 +608,7 @@ WRITE8_MEMBER( laser2001_state::pia_pa_w )
 	m_joylatch = data;
 }
 
-READ8_MEMBER( laser2001_state::pia_pb_r )
+uint8_t laser2001_state::pia_pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -619,7 +619,7 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( laser2001_state::pia_pb_w )
+void laser2001_state::pia_pb_w(uint8_t data)
 {
 	/*
 	    Signal  Description
@@ -694,8 +694,8 @@ void crvision_state::machine_start()
 
 	if (m_cart->exists())
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(*m_cart, FUNC(crvision_cart_slot_device::read_rom40)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(*m_cart, FUNC(crvision_cart_slot_device::read_rom80)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8sm_delegate(*m_cart, FUNC(crvision_cart_slot_device::read_rom40)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*m_cart, FUNC(crvision_cart_slot_device::read_rom80)));
 	}
 }
 

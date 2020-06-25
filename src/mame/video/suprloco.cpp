@@ -73,7 +73,7 @@ void suprloco_state::suprloco_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
 	uint8_t attr = m_videoram[2*tile_index+1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0);
@@ -105,13 +105,13 @@ void suprloco_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(suprloco_state::videoram_w)
+void suprloco_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(suprloco_state::scrollram_w)
+void suprloco_state::scrollram_w(offs_t offset, uint8_t data)
 {
 	int adj = flip_screen() ? -8 : 8;
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER(suprloco_state::scrollram_w)
 	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_MEMBER(suprloco_state::control_w)
+void suprloco_state::control_w(uint8_t data)
 {
 	/* There is probably a palette select in here */
 

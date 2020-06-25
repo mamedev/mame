@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Undumped:
   CD Diagnostic Cartridge
   Cybermorph (Rev. 0)(serial "J9000 700700")
@@ -166,7 +168,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- boot OK, gameplay graphics have clipping/alignment issues, eventually throws an exception, no sound -->
 	<software name="atarikrt" supported="no">
 		<description>Atari Karts</description>
 		<year>1995</year>
@@ -179,8 +181,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="mutntpng" supported="no">
+	<!-- boot OK, title screen foreground layer not drawn properly, no sound -->
+	<software name="mutntpng" supported="partial">
 		<description>Attack of the Mutant Penguins</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -478,9 +480,9 @@ Unreleased (possibly no prototypes exist):
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<!-- below dump was mirrored
-				<rom name="flip out! (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
+				<rom name="flip out (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
 				-->
-				<rom name="flip out! (world).j64" size="2097152" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
+				<rom name="flip out (world).j64" size="2097152" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -590,7 +592,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- hangs at the NBA Jam TE logo -->
+	<!-- exception on non-debug, on debug gameplay sports no sprite GFXs -->
+	<!-- minor glitch on team box when selecting one (blitter not filling properly) -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
@@ -964,7 +967,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK, no BGMs, has minor GFX pitch issue when action summary message pops up after a play -->
-	<software name="troyaik" supported="no">
+	<software name="troyaik" supported="partial">
 		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
@@ -1088,7 +1091,7 @@ Unreleased (possibly no prototypes exist):
 		<info name="serial" value="J9109E 705109-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
-				<rom name="zoop! (world).j64" size="1048576" crc="c5562581" sha1="52ec786f7536ab043dc24725af94068cad2b0ec3" offset="000000" />
+				<rom name="zoop (world).j64" size="1048576" crc="c5562581" sha1="52ec786f7536ab043dc24725af94068cad2b0ec3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

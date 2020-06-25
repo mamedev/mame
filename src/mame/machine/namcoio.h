@@ -14,8 +14,8 @@ public:
 	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
 	template <unsigned N> auto out_callback() { return m_out_cb[N].bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	WRITE_LINE_MEMBER( set_reset_line );
 	READ_LINE_MEMBER( read_reset_line );

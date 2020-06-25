@@ -123,9 +123,9 @@ private:
 	uint8_t m_latched_coin;
 	uint8_t m_last_coin;
 
-	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
-	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
+	void statriv2_videoram_w(offs_t offset, uint8_t data);
+	uint8_t question_data_r();
+	void ppi_portc_hi_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
+	tileinfo.set(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
 
 
@@ -203,7 +203,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
  *
  *************************************/
 
-WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
+void statriv2_state::statriv2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -266,7 +266,7 @@ INTERRUPT_GEN_MEMBER(statriv2_state::tripdraw_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(statriv2_state::question_data_r)
+uint8_t statriv2_state::question_data_r()
 {
 	const uint8_t *qrom = memregion("questions")->base();
 	uint32_t qromsize = memregion("questions")->bytes();
@@ -297,7 +297,7 @@ READ_LINE_MEMBER(statriv2_state::latched_coin_r)
 }
 
 
-WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
+void statriv2_state::ppi_portc_hi_w(uint8_t data)
 {
 	data >>= 4;
 	if (data != 0x0f)

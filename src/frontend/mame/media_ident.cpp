@@ -332,6 +332,9 @@ void media_identifier::digest_data(std::vector<file_info> &info, char const *nam
 
 void media_identifier::match_hashes(std::vector<file_info> &info)
 {
+	if (info.empty())
+		return;
+
 	auto match_device =
 			[&info, listnames = std::unordered_set<std::string>()] (device_t &device) mutable
 			{

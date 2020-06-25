@@ -100,10 +100,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(m20_i8259_r);
-	DECLARE_WRITE16_MEMBER(m20_i8259_w);
-	DECLARE_READ16_MEMBER(port21_r);
-	DECLARE_WRITE16_MEMBER(port21_w);
+	uint16_t i8259_r(offs_t offset);
+	void i8259_w(offs_t offset, uint16_t data);
+	uint16_t port21_r();
+	void port21_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
@@ -119,7 +119,8 @@ private:
 	void install_memory();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	IRQ_CALLBACK_MEMBER(m20_irq_callback);
+	uint16_t viack_r();
+	uint16_t nviack_r();
 };
 
 
@@ -169,15 +170,15 @@ port21      =   0x21        !TTL latch
 !   B7  See B3 input                0 => colour card present
 */
 
-READ16_MEMBER(m20_state::port21_r)
+uint16_t m20_state::port21_r()
 {
-	//printf("port21 read: offset 0x%x\n", offset);
+	//printf("port21 read\n");
 	return m_port21;
 }
 
-WRITE16_MEMBER(m20_state::port21_w)
+void m20_state::port21_w(uint16_t data)
 {
-	//printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
+	//printf("port21 write: data 0x%x\n", data);
 	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
 
 	// floppy drive select
@@ -202,12 +203,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 	m_fd1797->dden_w(data & 8);
 }
 
-READ16_MEMBER(m20_state::m20_i8259_r)
+uint16_t m20_state::i8259_r(offs_t offset)
 {
 	return m_i8259->read(offset)<<1;
 }
 
-WRITE16_MEMBER(m20_state::m20_i8259_w)
+void m20_state::i8259_w(offs_t offset, uint16_t data)
 {
 	m_i8259->write(offset, (data>>1));
 }
@@ -226,8 +227,7 @@ WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
 
 WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 {
-	/* Using HOLD_LINE is not completely correct:
-	 * The output of the 8253 is connected to a 74LS74 flop chip.
+	/* The output of the 8253 is connected to a 74LS74 flop chip.
 	 * The output of the flop chip is connected to NVI CPU input.
 	 * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
 	 * outputs to detect an interrupt acknowledge transaction.
@@ -236,7 +236,8 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	 */
 	if(m_apb)
 		m_apb->nvi_w(state);
-	m_maincpu->set_input_line(z8001_device::NVI_LINE, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
+	if(state)
+		m_maincpu->set_input_line(z8001_device::NVI_LINE, ASSERT_LINE);
 }
 
 
@@ -719,25 +720,26 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x80, 0x87).rw(m_i8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
-	map(0xa1, 0xa1).rw(m_kbdi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa3, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 
-	map(0xc1, 0xc1).rw(m_ttyi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc3, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 
 	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	map(0x140, 0x143).rw(FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
+	map(0x140, 0x143).rw(FUNC(m20_state::i8259_r), FUNC(m20_state::i8259_w));
 
 	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
 }
 
-IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
+uint16_t m20_state::viack_r()
 {
-	if (! irqline)
-		return 0xff; // NVI, value ignored
-	else
-		return m_i8259->acknowledge();
+	return m_i8259->acknowledge()<<1;
+}
+
+uint16_t m20_state::nviack_r()
+{
+	m_maincpu->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
+	return 0xffff;
 }
 
 WRITE_LINE_MEMBER(m20_state::int_w)
@@ -768,7 +770,6 @@ void m20_state::machine_reset()
 	m_fd1797->reset();
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
-	m_maincpu->reset();   // FIXME: rewrite Z8000 core to not read the vector at this time
 	m_kbdi8251->write_cts(0);
 	if (m_apb)
 		m_apb->halt();
@@ -797,7 +798,8 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m20_state::m20_program_mem);
 	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
 	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(m20_state::m20_irq_callback));
+	m_maincpu->viack().set(FUNC(m20_state::viack_r));
+	m_maincpu->nviack().set(FUNC(m20_state::nviack_r));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 
@@ -879,6 +881,19 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
+// CPU board: Z8001BPS CPU, Z8010BPS MMU, 32MHz XTAL, P8253 PIT, MC68B50P ACIA, 1 4-dip bank, 512K RAM
+// FDC board: D765AC-2 FDC, D8237AC-5 DMAC, GA04-CF11051, TMP8253P-5, 1 4-dip bank, 1 barely readable chip (AMI8520JFT or something resembling it)
+// there are other undocumented PCBs. It uses 2x 8 inch floppy drives
+ROM_START(m44) // TODO: implement different hardware. Split to another driver?
+	ROM_REGION( 0x14000, "maincpu", 0 ) // 14 MAR. 86 REL B.1
+	ROM_LOAD16_BYTE( "pd30.128.c06", 0x0000, 0x4000, CRC(8155dc69) SHA1(ed65f842e2857ad10170c697d945745fd7d47f9c) )
+	ROM_LOAD16_BYTE( "pd29.128.a06", 0x0001, 0x4000, CRC(74d7de4b) SHA1(dd3a69ff29a2f1292f3a7db73bd2447bd664e54b) )
+
+	ROM_REGION( 0x114, "plds", 0 )
+	ROM_LOAD( "pl46.j09", 0x000, 0x114, NO_DUMP ) // PLD, chip type unknown
+ROM_END
+
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
 COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1986, m44,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_IS_SKELETON )

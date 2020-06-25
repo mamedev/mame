@@ -27,12 +27,12 @@
 
 /*******************************************************************/
 
-READ8_MEMBER(tceptor_state::m68k_shared_r)
+uint8_t tceptor_state::m68k_shared_r(offs_t offset)
 {
 	return m_m68k_shared_ram[offset];
 }
 
-WRITE8_MEMBER(tceptor_state::m68k_shared_w)
+void tceptor_state::m68k_shared_w(offs_t offset, uint8_t data)
 {
 	m_m68k_shared_ram[offset] = data;
 }
@@ -40,29 +40,29 @@ WRITE8_MEMBER(tceptor_state::m68k_shared_w)
 
 /*******************************************************************/
 
-WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
+void tceptor_state::m6809_irq_enable_w(uint8_t data)
 {
 	m_m6809_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
+void tceptor_state::m6809_irq_disable_w(uint8_t data)
 {
 	m_m6809_irq_enable = 0;
 }
 
 
-WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
+void tceptor_state::m68k_irq_enable_w(uint16_t data)
 {
 	m_m68k_irq_enable = data;
 }
 
 
-WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
+void tceptor_state::mcu_irq_enable_w(uint8_t data)
 {
 	m_mcu_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
+void tceptor_state::mcu_irq_disable_w(uint8_t data)
 {
 	m_mcu_irq_enable = 0;
 }
@@ -101,22 +101,22 @@ uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 	return r;
 }
 
-READ8_MEMBER(tceptor_state::dsw0_r)
+uint8_t tceptor_state::dsw0_r()
 {
 	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-READ8_MEMBER(tceptor_state::dsw1_r)
+uint8_t tceptor_state::dsw1_r()
 {
 	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-READ8_MEMBER(tceptor_state::input0_r)
+uint8_t tceptor_state::input0_r()
 {
 	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-READ8_MEMBER(tceptor_state::input1_r)
+uint8_t tceptor_state::input1_r()
 {
 	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
@@ -178,7 +178,7 @@ void tceptor_state::m68k_map(address_map &map)
 
 void tceptor_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x1400, 0x154d).ram();
@@ -328,7 +328,7 @@ void tceptor_state::tceptor(machine_config &config)
 	M68000(config, m_subcpu, XTAL(49'152'000)/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tceptor_state::m68k_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
 	m_mcu->set_addrmap(AS_PROGRAM, &tceptor_state::mcu_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));

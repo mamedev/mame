@@ -17,7 +17,6 @@ Hardware notes:
 TODO:
 - verify irq source/frequency, probably a 555 ic, current approximation is from
   comparing led blink rate with a video recording
-- ARC0/ARC2 rom labels might be the wrong way around
 
 ******************************************************************************/
 
@@ -66,9 +65,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void leds_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
@@ -92,7 +91,7 @@ void regence_state::update_display()
 	m_display->matrix(1 << m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(regence_state::control_w)
+void regence_state::control_w(u8 data)
 {
 	// d0-d3: input mux/led select
 	m_inp_mux = data & 0xf;
@@ -104,14 +103,14 @@ WRITE8_MEMBER(regence_state::control_w)
 	// other: ?
 }
 
-WRITE8_MEMBER(regence_state::leds_w)
+void regence_state::leds_w(u8 data)
 {
 	// d0-d7: led data
 	m_led_data = data;
 	update_display();
 }
 
-READ8_MEMBER(regence_state::input_r)
+u8 regence_state::input_r()
 {
 	u8 data = 0;
 
@@ -207,9 +206,9 @@ void regence_state::regence(machine_config &config)
 
 ROM_START( regence )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("arc0.ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) )
-	ROM_LOAD("arc1.ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) )
-	ROM_LOAD("arc2.ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) )
+	ROM_LOAD("ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) )
+	ROM_LOAD("ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) )
+	ROM_LOAD("ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) )
 ROM_END
 
 } // anonymous namespace

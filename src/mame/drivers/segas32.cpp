@@ -714,7 +714,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
 }
 
 
-READ8_MEMBER(segas32_state::int_control_r)
+uint8_t segas32_state::int_control_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -732,7 +732,7 @@ READ8_MEMBER(segas32_state::int_control_r)
 }
 
 
-WRITE8_MEMBER(segas32_state::int_control_w)
+void segas32_state::int_control_w(offs_t offset, uint8_t data)
 {
 	int duration;
 
@@ -820,7 +820,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
  *************************************/
 
 
-WRITE8_MEMBER(segas32_state::misc_output_0_w)
+void segas32_state::misc_output_0_w(uint8_t data)
 {
 	if (m_sw1_output)
 		(this->*m_sw1_output)(0, data);
@@ -832,7 +832,7 @@ WRITE8_MEMBER(segas32_state::misc_output_0_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::misc_output_1_w)
+void segas32_state::misc_output_1_w(uint8_t data)
 {
 	if (m_sw1_output)
 		(this->*m_sw1_output)(1, data);
@@ -844,21 +844,21 @@ WRITE8_MEMBER(segas32_state::misc_output_1_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::sw2_output_0_w)
+void segas32_state::sw2_output_0_w(uint8_t data)
 {
 	if (m_sw2_output)
 		(this->*m_sw2_output)(0, data);
 }
 
 
-WRITE8_MEMBER(segas32_state::sw2_output_1_w)
+void segas32_state::sw2_output_1_w(uint8_t data)
 {
 	if (m_sw2_output)
 		(this->*m_sw2_output)(1, data);
 }
 
 
-WRITE8_MEMBER(segas32_state::tilebank_external_w)
+void segas32_state::tilebank_external_w(uint8_t data)
 {
 	m_system32_tilebank_external = data;
 }
@@ -876,12 +876,12 @@ WRITE_LINE_MEMBER(segas32_state::display_enable_w)
  *
  *************************************/
 
-WRITE16_MEMBER(segas32_state::random_number_w)
+void segas32_state::random_number_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
-READ16_MEMBER(segas32_state::random_number_r)
+uint16_t segas32_state::random_number_r()
 {
 	return machine().rand();
 }
@@ -893,13 +893,13 @@ READ16_MEMBER(segas32_state::random_number_r)
  *
  *************************************/
 
-READ8_MEMBER(segas32_state::shared_ram_r)
+uint8_t segas32_state::shared_ram_r(offs_t offset)
 {
 	return m_z80_shared_ram[offset];
 }
 
 
-WRITE8_MEMBER(segas32_state::shared_ram_w)
+void segas32_state::shared_ram_w(offs_t offset, uint8_t data)
 {
 	m_z80_shared_ram[offset] = data;
 }
@@ -950,7 +950,7 @@ void segas32_state::clear_sound_irq(int which)
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
+void segas32_state::sound_int_control_lo_w(offs_t offset, uint8_t data)
 {
 	/* odd offsets are interrupt acks */
 	if (offset & 1)
@@ -965,7 +965,7 @@ WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_int_control_hi_w)
+void segas32_state::sound_int_control_hi_w(offs_t offset, uint8_t data)
 {
 	m_sound_irq_control[offset] = data;
 	update_sound_irq_state();
@@ -987,28 +987,28 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
  *
  *************************************/
 
-WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
+void segas32_state::sound_bank_lo_w(uint8_t data)
 {
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
 	m_soundrom_bank->set_entry(m_sound_bank);
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
+void segas32_state::sound_bank_hi_w(uint8_t data)
 {
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
 	m_soundrom_bank->set_entry(m_sound_bank);
 }
 
 
-WRITE8_MEMBER(segas32_state::multipcm_bank_w)
+void segas32_state::multipcm_bank_w(uint8_t data)
 {
 	m_multipcm_bank_hi->set_entry((data >> 3) & 7);
 	m_multipcm_bank_lo->set_entry(data & 7);
 }
 
 
-WRITE8_MEMBER(segas32_state::scross_bank_w)
+void segas32_state::scross_bank_w(uint8_t data)
 {
 	m_multipcm_bank_hi->set_entry(data & 7);
 	m_multipcm_bank_lo->set_entry(data & 7);
@@ -1021,13 +1021,13 @@ WRITE8_MEMBER(segas32_state::scross_bank_w)
  *
  *************************************/
 
-READ8_MEMBER(segas32_state::sound_dummy_r)
+uint8_t segas32_state::sound_dummy_r()
 {
 	return m_sound_dummy_value;
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_dummy_w)
+void segas32_state::sound_dummy_w(uint8_t data)
 {
 	m_sound_dummy_value = data;
 }
@@ -1077,7 +1077,7 @@ inline void segas32_state::update_color(int offset, uint16_t data)
  *************************************/
 
 template<int Which>
-READ16_MEMBER(segas32_state::paletteram_r)
+uint16_t segas32_state::paletteram_r(offs_t offset)
 {
 	int convert;
 
@@ -1095,7 +1095,7 @@ READ16_MEMBER(segas32_state::paletteram_r)
 }
 
 template<int Which>
-WRITE16_MEMBER(segas32_state::paletteram_w)
+void segas32_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t value;
 	int convert;
@@ -1138,13 +1138,13 @@ WRITE16_MEMBER(segas32_state::paletteram_w)
  *************************************/
 
 template<int Which>
-READ16_MEMBER(segas32_state::mixer_r)
+uint16_t segas32_state::mixer_r(offs_t offset)
 {
 	return m_mixer_control[Which][offset];
 }
 
 template<int Which>
-WRITE16_MEMBER(segas32_state::mixer_w)
+void segas32_state::mixer_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mixer_control[Which][offset]);
 }
@@ -1188,9 +1188,9 @@ void segas32_state::multi32_map(address_map &map)
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
 	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x610000, 0x61007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
+	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -1216,8 +1216,7 @@ void segas32_state::system32_sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
 	map(0xa000, 0xbfff).bankr("soundbank");
-	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
-	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
 	map(0xe000, 0xffff).ram().share("z80_shared_ram");
 }
 
@@ -2298,7 +2297,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	ym2.add_route(0, "lspeaker", 0.40);
 	ym2.add_route(1, "rspeaker", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4));
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4)); // ASSP (RF)5C105 or Sega 315-5476A
 	rfsnd.add_route(0, "lspeaker", 0.55);
 	rfsnd.add_route(1, "rspeaker", 0.55);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
@@ -2486,13 +2485,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 
 
 
-WRITE8_MEMBER(segas32_cd_state::lamps1_w)
+void segas32_cd_state::lamps1_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segas32_cd_state::lamps2_w)
+void segas32_cd_state::lamps2_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[8 + i] = BIT(data, i);
@@ -2680,7 +2679,7 @@ ioport_value sega_multi32_analog_state::in3_analog_read()
 	return m_analog_ports[m_analog_bank * 4 + 3].read_safe(0);
 }
 
-WRITE8_MEMBER(sega_multi32_analog_state::analog_bank_w)
+void sega_multi32_analog_state::analog_bank_w(uint8_t data)
 {
 	m_analog_bank = data & 1;
 }
@@ -2775,10 +2774,10 @@ private:
 	optional_device<segas32_state> m_slavepcb;
 
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
-	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
-	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
-	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
-	DECLARE_READ16_MEMBER(dual_pcb_slave);
+	void dual_pcb_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dual_pcb_comms_r(offs_t offset);
+	uint16_t dual_pcb_masterslave();
+	uint16_t dual_pcb_slave();
 };
 
 
@@ -4603,9 +4602,9 @@ ROM_START( radr )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14108.ic9",  0x000000, 0x020000, CRC(38a99b4d) SHA1(b6455e6b29bfef41c5e0ebe3a8064889b7e5f5fd) )
-	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(b42e5833) SHA1(da94ce7c1d7a581a1aa6b79b323c67a919918808) )
-	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(b495e7dc) SHA1(b4143fcee10e0649378fdb1e3f5a0a2c585414ec) )
-	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
+	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "epr-14102.ic3",  0x000000, 0x040000, CRC(5626e80f) SHA1(9844817295a8cd8a9b09da6681b0c1fbfe82618e) )
@@ -4648,8 +4647,8 @@ ROM_START( radru )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14108.ic9",  0x000000, 0x020000, CRC(38a99b4d) SHA1(b6455e6b29bfef41c5e0ebe3a8064889b7e5f5fd) )
-	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(b42e5833) SHA1(da94ce7c1d7a581a1aa6b79b323c67a919918808) )
-	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(b495e7dc) SHA1(b4143fcee10e0649378fdb1e3f5a0a2c585414ec) )
+	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -4693,8 +4692,8 @@ ROM_START( radrj )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14108.ic9",  0x000000, 0x020000, CRC(38a99b4d) SHA1(b6455e6b29bfef41c5e0ebe3a8064889b7e5f5fd) )
-	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(b42e5833) SHA1(da94ce7c1d7a581a1aa6b79b323c67a919918808) )
-	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(b495e7dc) SHA1(b4143fcee10e0649378fdb1e3f5a0a2c585414ec) )
+	ROM_LOAD_x2( "epr-14109.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) // same as radm, but different epr code
+	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -5383,8 +5382,8 @@ ROM_END
 */
 ROM_START( as1 )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x2( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
-	ROM_LOAD32_WORD_x2( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
+	ROM_LOAD32_WORD_x4( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
+	ROM_LOAD32_WORD_x4( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
@@ -5609,12 +5608,12 @@ void segas32_state::scross_sw2_output( int which, uint16_t data )
  *
  *************************************/
 
-WRITE16_MEMBER(segas32_new_state::dual_pcb_comms_w)
+void segas32_new_state::dual_pcb_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dual_pcb_comms[offset]);
 }
 
-READ16_MEMBER(segas32_new_state::dual_pcb_comms_r)
+uint16_t segas32_new_state::dual_pcb_comms_r(offs_t offset)
 {
 	return m_dual_pcb_comms[offset];
 }
@@ -5624,12 +5623,12 @@ READ16_MEMBER(segas32_new_state::dual_pcb_comms_r)
    Probably not a dip/solder link/trace cut, but maybe
    just whichever way the cables are plugged in?
    Both f1en and arescue master units try to set bit 1... */
-READ16_MEMBER(segas32_new_state::dual_pcb_masterslave)
+uint16_t segas32_new_state::dual_pcb_masterslave()
 {
 	return 0; // 0/1 master/slave
 }
 
-READ16_MEMBER(segas32_new_state::dual_pcb_slave)
+uint16_t segas32_new_state::dual_pcb_slave()
 {
 	return 1; // 0/1 master/slave
 }
@@ -5664,11 +5663,13 @@ void segas32_new_state::init_arescue()
 	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1en() {
@@ -5678,11 +5679,13 @@ void segas32_new_state::init_f1en() {
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1lap()
@@ -5704,7 +5707,8 @@ void segas32_state::init_alien3()
 void segas32_state::init_arescue(int m_hasdsp)
 {
 	segas32_common_init();
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(*this, FUNC(segas32_state::arescue_dsp_r)), write16_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xa00007, read16sm_delegate(*this, FUNC(segas32_state::arescue_dsp_r)));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00007, write16s_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
 
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
@@ -5725,8 +5729,8 @@ void segas32_state::init_brival()
 
 	/* install protection handlers */
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(*this, FUNC(segas32_state::brival_protection_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(*this, FUNC(segas32_state::brival_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16s_delegate(*this, FUNC(segas32_state::brival_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16sm_delegate(*this, FUNC(segas32_state::brival_protection_w)));
 }
 
 
@@ -5735,7 +5739,7 @@ void segas32_state::init_darkedge()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16s_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16s_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
 	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
@@ -5745,7 +5749,8 @@ void segas32_state::init_dbzvrvs()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)), write16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xa7ffff, read16smo_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa7ffff, write16mo_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
 	// 0x810000 to 0x8107ff = link RAM? probably not a dual cabinet, though...
 }
 
@@ -5846,7 +5851,7 @@ void segas32_state::init_radr()
 void segas32_state::init_scross()
 {
 	segas32_common_init();
-	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(*this, FUNC(segas32_state::scross_bank_w)));
+	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8smo_delegate(*this, FUNC(segas32_state::scross_bank_w)));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
@@ -5866,7 +5871,7 @@ void segas32_state::init_sonic()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16s_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 

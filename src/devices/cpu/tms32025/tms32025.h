@@ -75,19 +75,6 @@ public:
 
 	void set_mp_mc(bool state) { m_mp_mc = state; }
 
-	DECLARE_READ16_MEMBER( drr_r);
-	DECLARE_WRITE16_MEMBER(drr_w);
-	DECLARE_READ16_MEMBER( dxr_r);
-	DECLARE_WRITE16_MEMBER(dxr_w);
-	DECLARE_READ16_MEMBER( tim_r);
-	DECLARE_WRITE16_MEMBER(tim_w);
-	DECLARE_READ16_MEMBER( prd_r);
-	DECLARE_WRITE16_MEMBER(prd_w);
-	DECLARE_READ16_MEMBER( imr_r);
-	DECLARE_WRITE16_MEMBER(imr_w);
-	DECLARE_READ16_MEMBER( greg_r);
-	DECLARE_WRITE16_MEMBER(greg_w);
-
 	//void tms32025_program(address_map &map);
 	void tms32025_data(address_map &map);
 	void tms32026_data(address_map &map);
@@ -127,10 +114,10 @@ protected:
 	required_shared_ptr<uint16_t> m_b2;
 	optional_shared_ptr<uint16_t> m_b3;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 	typedef void ( tms32025_device::*opcode_func ) ();
 	struct tms32025_opcode
@@ -184,6 +171,19 @@ protected:
 	int     m_mHackIgnoreARP;          /* special handling for lst, lst1 instructions */
 	int     m_waiting_for_serial_frame;
 	bool    m_mp_mc;
+
+	uint16_t drr_r();
+	void drr_w(uint16_t data);
+	uint16_t dxr_r();
+	void dxr_w(uint16_t data);
+	uint16_t tim_r();
+	void tim_w(uint16_t data);
+	uint16_t prd_r();
+	void prd_w(uint16_t data);
+	uint16_t imr_r();
+	void imr_w(uint16_t data);
+	uint16_t greg_r();
+	void greg_w(uint16_t data);
 
 	inline void CLR0(uint16_t flag);
 	inline void SET0(uint16_t flag);

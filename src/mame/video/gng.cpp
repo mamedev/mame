@@ -21,7 +21,7 @@
 TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -62,26 +62,26 @@ void gng_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gng_state::gng_fgvideoram_w)
+void gng_state::gng_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gng_state::gng_bgvideoram_w)
+void gng_state::gng_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(gng_state::gng_bgscrollx_w)
+void gng_state::gng_bgscrollx_w(offs_t offset, uint8_t data)
 {
 	m_scrollx[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scrollx[0] + 256 * m_scrollx[1]);
 }
 
-WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
+void gng_state::gng_bgscrolly_w(offs_t offset, uint8_t data)
 {
 	m_scrolly[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0] + 256 * m_scrolly[1]);

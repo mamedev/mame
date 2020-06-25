@@ -91,8 +91,8 @@ namespace bus { namespace ti99 { namespace internal {
 */
 datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
-	m_video(*owner, TI_VDP_TAG),
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI99_VDP_TAG),
+	m_sound(*owner, TI99_SOUNDCHIP_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ram16b(*owner, TI99_EXPRAM_TAG),
@@ -372,7 +372,7 @@ uint16_t datamux_device::read(offs_t offset)
 				// Reading the even address now (addr)
 				uint8_t hbyte = 0;
 				read_all(m_addr_buf, &hbyte);
-				LOGMASKED(LOG_ACCESS, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+				LOGMASKED(LOG_ACCESS, "%04x -> %02x\n",  m_addr_buf, hbyte);
 
 				value = (hbyte<<8) | m_latch;
 			}
@@ -500,9 +500,11 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 				}
 				if (m_waitcount==2)
 				{
+					// Clear the latch (if no device responds on the bus, we assume the data lines as 0)
+					m_latch = 0;
 					// read odd byte
 					read_all(m_addr_buf+1, &m_latch);
-					LOGMASKED(LOG_ACCESS, "Read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					LOGMASKED(LOG_ACCESS, "%04x -> %02x\n",  m_addr_buf+1, m_latch);
 					// do the setaddress for the even address
 					setaddress_all(m_addr_buf);
 				}

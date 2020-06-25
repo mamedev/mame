@@ -15,24 +15,21 @@ namespace analog
 	// nld_twoterm
 	// ----------------------------------------------------------------------------------------
 
-	void NETLIB_NAME(twoterm)::solve_now()
+	solver::matrix_solver_t * NETLIB_NAME(twoterm)::solver() const noexcept
 	{
-		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
-			m_P.solve_now();
-		else if (m_N.has_net() && !m_N.net().isRailNet())
-			m_N.solve_now();
+		auto *solv(m_P.solver());
+		if (solv != nullptr)
+			return solv;
+		return m_N.solver();
 	}
 
-	void NETLIB_NAME(twoterm)::solve_later(netlist_time delay) noexcept
-	{
-		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
-			m_P.schedule_solve_after(delay);
-		else if (m_N.has_net() && !m_N.net().isRailNet())
-			m_N.schedule_solve_after(delay);
-	}
 
+	void NETLIB_NAME(twoterm)::solve_now() const
+	{
+		auto *solv(solver());
+		if (solv != nullptr)
+			solv->solve_now();
+	}
 
 	NETLIB_UPDATE(twoterm)
 	{
@@ -66,19 +63,22 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(POT)
 	{
-		// FIXME: We only need to update the net first if this is a time stepping net
-		m_R1.solve_now();
-		m_R2.solve_now();
-
 		nl_fptype v = m_Dial();
 		if (m_DialIsLog())
 			v = (plib::exp(v) - nlconst::one()) / (plib::exp(nlconst::one()) - nlconst::one());
 		if (m_Reverse())
 			v = nlconst::one() - v;
-		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-		m_R2.set_R(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
-		m_R1.solve_later();
-		m_R2.solve_later();
+
+		nl_fptype r1(std::max(m_R() * v, exec().gmin()));
+		nl_fptype r2(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
+
+		if (m_R1.solver() == m_R2.solver())
+			m_R1.change_state([this, &r1, &r2]() { m_R1.set_R(r1); m_R2.set_R(r2); });
+		else
+		{
+			m_R1.change_state([this, &r1]() { m_R1.set_R(r1); });
+			m_R2.change_state([this, &r2]() { m_R2.set_R(r2); });
+		}
 
 	}
 
@@ -100,17 +100,17 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(POT2)
 	{
-		// FIXME: We only need to update the net first if this is a time stepping net
-		m_R1.solve_now();
-
 		nl_fptype v = m_Dial();
 
 		if (m_DialIsLog())
 			v = (plib::exp(v) - nlconst::one()) / (plib::exp(nlconst::one()) - nlconst::one());
 		if (m_Reverse())
 			v = nlconst::one() - v;
-		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-		m_R1.solve_later();
+
+		m_R1.change_state([this, &v]()
+		{
+			m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+		});
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -124,7 +124,6 @@ namespace analog
 		m_G = m_gmin;
 		set_mat( m_G, -m_G, -m_I,
 				-m_G,  m_G,  m_I);
-		//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 	}
 
 	NETLIB_UPDATE_PARAM(L)
@@ -134,7 +133,7 @@ namespace analog
 	NETLIB_TIMESTEP(L)
 	{
 		// Gpar should support convergence
-		m_I += m_I + m_G * deltaV();
+		m_I += m_G * deltaV();
 		m_G = step / m_L() + m_gmin;
 		set_mat( m_G, -m_G, -m_I,
 				-m_G,  m_G,  m_I);
@@ -146,8 +145,8 @@ namespace analog
 
 	NETLIB_RESET(D)
 	{
-		nl_fptype Is = m_model.m_IS;
-		nl_fptype n = m_model.m_N;
+		nl_fptype Is = m_modacc.m_IS;
+		nl_fptype n = m_modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
@@ -155,8 +154,8 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(D)
 	{
-		nl_fptype Is = m_model.m_IS;
-		nl_fptype n = m_model.m_N;
+		nl_fptype Is = m_modacc.m_IS;
+		nl_fptype n = m_modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 	}
@@ -164,12 +163,45 @@ namespace analog
 	NETLIB_UPDATE_TERMINALS(D)
 	{
 		m_D.update_diode(deltaV());
-		const nl_fptype G = m_D.G();
-		const nl_fptype I = m_D.Ieq();
+		const nl_fptype G(m_D.G());
+		const nl_fptype I(m_D.Ieq());
 		set_mat( G, -G, -I,
 				-G,  G,  I);
 		//set(m_D.G(), 0.0, m_D.Ieq());
 	}
+
+	// ----------------------------------------------------------------------------------------
+	// nld_Z
+	// ----------------------------------------------------------------------------------------
+
+	NETLIB_RESET(Z)
+	{
+		nl_fptype IsBV = m_modacc.m_IBV / (plib::exp(m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV)) - nlconst::one());
+
+		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
+		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
+	}
+
+	NETLIB_UPDATE_PARAM(Z)
+	{
+		nl_fptype IsBV = m_modacc.m_IBV / (plib::exp(m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV)) - nlconst::one());
+
+		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
+		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
+	}
+
+	NETLIB_UPDATE_TERMINALS(Z)
+	{
+		m_D.update_diode(deltaV());
+		m_R.update_diode(-deltaV());
+		const nl_fptype G(m_D.G() + m_R.G());
+		const nl_fptype I(m_D.Ieq() - m_R.Ieq());
+		set_mat( G, -G, -I,
+				-G,  G,  I);
+	}
+
 
 
 } //namespace analog
@@ -181,6 +213,7 @@ namespace devices {
 	NETLIB_DEVICE_IMPL_NS(analog, C,    "CAP",   "C")
 	NETLIB_DEVICE_IMPL_NS(analog, L,    "IND",   "L")
 	NETLIB_DEVICE_IMPL_NS(analog, D,    "DIODE", "MODEL")
+	NETLIB_DEVICE_IMPL_NS(analog, Z,    "ZDIODE", "MODEL")
 	NETLIB_DEVICE_IMPL_NS(analog, VS,   "VS",    "V")
 	NETLIB_DEVICE_IMPL_NS(analog, CS,   "CS",    "I")
 } // namespace devices

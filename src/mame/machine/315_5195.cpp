@@ -90,7 +90,7 @@ u16 sega_315_5195_mapper_device::open_bus_r()
 //  write - handle a write to the memory mapper
 //-------------------------------------------------
 
-WRITE8_MEMBER( sega_315_5195_mapper_device::write )
+void sega_315_5195_mapper_device::write(offs_t offset, u8 data)
 {
 	// wraps every 32 bytes
 	offset &= 0x1f;
@@ -176,7 +176,7 @@ WRITE8_MEMBER( sega_315_5195_mapper_device::write )
 //  read - handle a read from the memory mapper
 //-------------------------------------------------
 
-READ8_MEMBER( sega_315_5195_mapper_device::read )
+u8 sega_315_5195_mapper_device::read(address_space &space, offs_t offset)
 {
 	// wraps every 32 bytes
 	offset &= 0x1f;
@@ -372,7 +372,7 @@ TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_from_sound)
 //  pread - sound CPU read handler
 //-------------------------------------------------
 
-READ8_MEMBER(sega_315_5195_mapper_device::pread)
+u8 sega_315_5195_mapper_device::pread()
 {
 	if (!m_pbf_callback.isnull() && !machine().side_effects_disabled())
 		m_pbf_callback(CLEAR_LINE);
@@ -384,7 +384,7 @@ READ8_MEMBER(sega_315_5195_mapper_device::pread)
 //  pwrite - sound CPU write handler
 //-------------------------------------------------
 
-WRITE8_MEMBER(sega_315_5195_mapper_device::pwrite)
+void sega_315_5195_mapper_device::pwrite(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_from_sound), this), data);
 }
@@ -483,7 +483,8 @@ void sega_315_5195_mapper_device::update_mapping()
 
 	// first reset everything back to the beginning
 	m_space->unmap_readwrite(0x000000, 0xffffff);
-	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(*this, FUNC(sega_315_5195_mapper_device::read)), write8_delegate(*this, FUNC(sega_315_5195_mapper_device::write)), 0x00ff);
+	m_space->install_read_handler(0x000000, 0xffffff, read8m_delegate(*this, FUNC(sega_315_5195_mapper_device::read)), 0x00ff);
+	m_space->install_write_handler(0x000000, 0xffffff, write8sm_delegate(*this, FUNC(sega_315_5195_mapper_device::write)), 0x00ff);
 
 	// loop over the regions
 	for (int index = 7; index >= 0; index--)

@@ -16,8 +16,10 @@ Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
 instead of black, otherwise it's the same game.
 
 TODO:
-- does not work, most likely due to incomplete cpu emulation
-  (extra I/O ports, unemulated timer registers)
+- does not work, most likely due to incomplete cpu emulation (unemulated timer registers),
+  could also be a bad rom dump on top of that - even when adding IRQ3 with a hack, it
+  doesn't do much at all
+- is 1988 version the same ROM?
 
 ******************************************************************************/
 
@@ -78,7 +80,7 @@ void supremo_state::machine_start()
 
 void supremo_state::main_map(address_map &map)
 {
-	map(0x0000, 0x000e).rw(m_maincpu, FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	map(0x0040, 0x013f).ram(); // internal
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xffff).rom();
@@ -105,6 +107,10 @@ void supremo_state::supremo(machine_config &config)
 	HD6303Y(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supremo_state::main_map);
 
+	// THIS IS A HACK, vector @ 0xffec, use ROM_COPY
+	//const attotime irq_period = attotime::from_ticks(4 * 128 * 10, 8_MHz_XTAL);
+	//m_maincpu->set_periodic_int(FUNC(supremo_state::irq0_line_hold), irq_period);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -123,7 +129,7 @@ void supremo_state::supremo(machine_config &config)
 
 ROM_START( supremo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(745d010f) SHA1(365a8e2afcf63678ba0161b9082f6439a9d78c9f) )
+	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, BAD_DUMP CRC(745d010f) SHA1(365a8e2afcf63678ba0161b9082f6439a9d78c9f) )
 ROM_END
 
 } // anonymous namespace
@@ -135,5 +141,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1988, supremo, 0,      0,      supremo,  supremo, supremo_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1990, supremo, 0,      0,      supremo,  supremo, supremo_state, empty_init, "Novag", "Supremo - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

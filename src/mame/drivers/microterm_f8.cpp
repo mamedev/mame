@@ -49,16 +49,16 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(bell_r);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(uart_transmit_w);
+	u8 bell_r();
+	void scroll_w(u8 data);
+	u8 vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
+	void uart_transmit_w(u8 data);
 	bool poll_keyboard();
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_READ8_MEMBER(port01_r);
+	u8 key_r();
+	u8 port00_r();
+	void port00_w(u8 data);
+	u8 port01_r();
 
 	void f8_mem(address_map &map);
 	void f8_io(address_map &map);
@@ -188,21 +188,21 @@ WRITE_LINE_MEMBER(microterm_f8_state::vblank_w)
 		m_bell->set_state(0);
 }
 
-READ8_MEMBER(microterm_f8_state::bell_r)
+u8 microterm_f8_state::bell_r()
 {
 	if (!machine().side_effects_disabled())
 		m_bell->set_state(1);
 	return 0;
 }
 
-WRITE8_MEMBER(microterm_f8_state::scroll_w)
+void microterm_f8_state::scroll_w(u8 data)
 {
 	m_scroll++;
 	if (m_scroll == 24)
 		m_scroll = 0;
 }
 
-READ8_MEMBER(microterm_f8_state::vram_r)
+u8 microterm_f8_state::vram_r(offs_t offset)
 {
 	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
 	assert(vaddr < 0x800);
@@ -218,7 +218,7 @@ READ8_MEMBER(microterm_f8_state::vram_r)
 		return vdata & 0x7f;
 }
 
-WRITE8_MEMBER(microterm_f8_state::vram_w)
+void microterm_f8_state::vram_w(offs_t offset, u8 data)
 {
 	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
 	assert(vaddr < 0x800);
@@ -228,9 +228,9 @@ WRITE8_MEMBER(microterm_f8_state::vram_w)
 		m_vram[vaddr] |= u16(m_attrlatch) << 4;
 }
 
-WRITE8_MEMBER(microterm_f8_state::uart_transmit_w)
+void microterm_f8_state::uart_transmit_w(u8 data)
 {
-	m_uart->set_transmit_data((data & 0x7f) | (m_dsw[2]->read() & 0x10) << 3);
+	m_uart->transmit((data & 0x7f) | (m_dsw[2]->read() & 0x10) << 3);
 }
 
 bool microterm_f8_state::poll_keyboard()
@@ -254,7 +254,7 @@ bool microterm_f8_state::poll_keyboard()
 	return false;
 }
 
-READ8_MEMBER(microterm_f8_state::key_r)
+u8 microterm_f8_state::key_r()
 {
 	// Cursor is supposed to stop blinking temporarily when keys are depressed
 	// This implementation suspends cursor blinking when keys are actually read
@@ -268,7 +268,7 @@ READ8_MEMBER(microterm_f8_state::key_r)
 	return m_keylatch;
 }
 
-READ8_MEMBER(microterm_f8_state::port00_r)
+u8 microterm_f8_state::port00_r()
 {
 	u8 flags = m_port00;
 
@@ -282,12 +282,12 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 	return flags;
 }
 
-WRITE8_MEMBER(microterm_f8_state::port00_w)
+void microterm_f8_state::port00_w(u8 data)
 {
 	m_port00 = data;
 }
 
-READ8_MEMBER(microterm_f8_state::port01_r)
+u8 microterm_f8_state::port01_r()
 {
 	u8 flags = 0;
 

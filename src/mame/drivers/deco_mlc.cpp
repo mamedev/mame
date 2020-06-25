@@ -119,12 +119,12 @@
 
 /***************************************************************************/
 
-READ32_MEMBER(deco_mlc_state::mlc_440008_r)
+u32 deco_mlc_state::mlc_440008_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
+u32 deco_mlc_state::mlc_44001c_r(offs_t offset)
 {
 /*
     test3 7 - vbl loop on 0x10 0000 at end of IRQ
@@ -137,11 +137,11 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
+void deco_mlc_state::mlc_44001c_w(u32 data)
 {
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_200070_r)
+u32 deco_mlc_state::mlc_200070_r()
 {
 	if (!machine().side_effects_disabled())
 		m_vbl_i ^= 0xffffffff;
@@ -150,29 +150,29 @@ READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 	return m_vbl_i;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_200000_r)
+u32 deco_mlc_state::mlc_200000_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_200004_r)
+u32 deco_mlc_state::mlc_200004_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_20007c_r)
+u32 deco_mlc_state::mlc_20007c_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
+u32 deco_mlc_state::mlc_scanline_r()
 {
 //  logerror("read scanline counter (%d)\n", m_screen->vpos());
 	return m_screen->vpos();
 }
 
 
-WRITE32_MEMBER(deco_mlc_state::eeprom_w)
+void deco_mlc_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -200,7 +200,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 	m_maincpu->set_input_line(m_irqLevel, HOLD_LINE);
 }
 
-WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
+void deco_mlc_state::irq_ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 //  int scanline=m_screen->vpos();
 	COMBINE_DATA(&m_irq_ram[offset]);
@@ -249,7 +249,7 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 }
 
 
-READ32_MEMBER( deco_mlc_state::spriteram_r )
+u32 deco_mlc_state::spriteram_r(offs_t offset, u32 mem_mask)
 {
 	u32 retdata = 0;
 
@@ -267,7 +267,7 @@ READ32_MEMBER( deco_mlc_state::spriteram_r )
 }
 
 
-WRITE32_MEMBER( deco_mlc_state::spriteram_w )
+void  deco_mlc_state::spriteram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -280,7 +280,7 @@ WRITE32_MEMBER( deco_mlc_state::spriteram_w )
 	}
 }
 
-READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
+u16 deco_mlc_state::sh96_protection_region_0_146_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -289,7 +289,7 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
+void deco_mlc_state::sh96_protection_region_0_146_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -938,7 +938,7 @@ void deco_mlc_state::descramble_sound(  )
 	std::copy(buf.begin(), buf.end(), &rom[0]);
 }
 
-READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
+u32 deco_mlc_state::avengrgs_speedup_r()
 {
 	const u32 a = m_mainram[0x89a0 / 4];
 	const u32 p = m_maincpu->pc();
@@ -963,7 +963,7 @@ void deco_mlc_state::init_avengrgs()
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
 	m_irqLevel = 1;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32smo_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));
 	descramble_sound();
 }
 

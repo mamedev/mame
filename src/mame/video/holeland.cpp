@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
@@ -72,19 +72,19 @@ VIDEO_START_MEMBER(holeland_state,crzrally)
 	save_item(NAME(m_palette_offset));
 }
 
-WRITE8_MEMBER(holeland_state::videoram_w)
+void holeland_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::colorram_w)
+void holeland_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::pal_offs_w)
+void holeland_state::pal_offs_w(uint8_t data)
 {
 	if ((m_palette_offset >> 4) != (data & 3))
 	{
@@ -93,7 +93,7 @@ WRITE8_MEMBER(holeland_state::pal_offs_w)
 	}
 }
 
-WRITE8_MEMBER(holeland_state::scroll_w)
+void holeland_state::scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }

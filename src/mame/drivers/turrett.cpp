@@ -169,13 +169,13 @@ READ_LINE_MEMBER( turrett_state::sbrc3_r )
 }
 
 
-READ32_MEMBER( turrett_state::int_r )
+uint32_t turrett_state::int_r()
 {
 	return update_inputs() << 24;
 }
 
 
-WRITE32_MEMBER( turrett_state::int_w )
+void turrett_state::int_w(uint32_t data)
 {
 	// TODO
 	logerror("Output write: %08x\n", data);

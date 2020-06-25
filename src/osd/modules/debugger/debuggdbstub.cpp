@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 #include "debug/textbuf.h"
 #include "debug_module.h"
 #include "debugger.h"
@@ -327,7 +328,7 @@ public:
 	{
 	}
 
-	virtual ~debug_gdbstub() = default;
+	virtual ~debug_gdbstub() { }
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
@@ -426,8 +427,8 @@ private:
 
 	std::map<offs_t, uint64_t> m_address_map;
 
-	device_debug::breakpoint *m_triggered_breakpoint;
-	device_debug::watchpoint *m_triggered_watchpoint;
+	debug_breakpoint *m_triggered_breakpoint;
+	debug_watchpoint *m_triggered_watchpoint;
 
 	std::string m_target_xml;
 
@@ -596,7 +597,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 	}
 	else
 	{
-		device_debug *debug = m_debugger_cpu->get_visible_cpu()->debug();
+		device_debug *debug = m_debugger_console->get_visible_cpu()->debug();
 		m_triggered_watchpoint = debug->triggered_watchpoint();
 		m_triggered_breakpoint = debug->triggered_breakpoint();
 		if ( m_send_stop_packet )
@@ -683,7 +684,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_c(const char *buf)
 	if ( *buf != '\0' )
 		return REPLY_UNSUPPORTED;
 
-	m_debugger_cpu->get_visible_cpu()->debug()->go();
+	m_debugger_console->get_visible_cpu()->debug()->go();
 	m_send_stop_packet = true;
 	return REPLY_NONE;
 }
@@ -696,7 +697,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_D(const char *buf)
 	if ( *buf != '\0' )
 		return REPLY_UNSUPPORTED;
 
-	m_debugger_cpu->get_visible_cpu()->debug()->go();
+	m_debugger_console->get_visible_cpu()->debug()->go();
 	m_dettached = true;
 
 	return REPLY_OK;
@@ -752,7 +753,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_H(const char *buf)
 debug_gdbstub::cmd_reply debug_gdbstub::handle_k(const char *buf)
 {
 	m_machine->schedule_exit();
-	m_debugger_cpu->get_visible_cpu()->debug()->go();
+	m_debugger_console->get_visible_cpu()->debug()->go();
 	m_dettached = true;
 	m_socket.close();
 	return REPLY_NONE;
@@ -969,7 +970,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 	if ( *buf != '\0' )
 		return REPLY_UNSUPPORTED;
 
-	m_debugger_cpu->get_visible_cpu()->debug()->single_step();
+	m_debugger_console->get_visible_cpu()->debug()->single_step();
 	m_send_stop_packet = true;
 	return REPLY_NONE;
 }
@@ -977,7 +978,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 //-------------------------------------------------------------------------
 static bool remove_breakpoint(device_debug *debug, uint64_t address, int /*kind*/)
 {
-	const device_debug::breakpoint *bp = debug->breakpoint_find(address);
+	const debug_breakpoint *bp = debug->breakpoint_find(address);
 	if (bp != nullptr)
 		return debug->breakpoint_clear(bp->index());
 	return false;
@@ -1021,7 +1022,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_z(const char *buf)
 		m_address_map.erase(offset);
 	}
 
-	device_debug *debug = m_debugger_cpu->get_visible_cpu()->debug();
+	device_debug *debug = m_debugger_console->get_visible_cpu()->debug();
 	switch ( type )
 	{
 		// Note: software and hardware breakpoints are treated both the
@@ -1062,7 +1063,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 		m_address_map[offset] = address;
 	}
 
-	device_debug *debug = m_debugger_cpu->get_visible_cpu()->debug();
+	device_debug *debug = m_debugger_console->get_visible_cpu()->debug();
 	switch ( type )
 	{
 		// Note: software and hardware breakpoints are treated both the

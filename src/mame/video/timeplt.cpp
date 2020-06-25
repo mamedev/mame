@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
 	int flags = TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x10) >> 4;
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 	int flags = 0;//TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x80) >> 7;
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 
@@ -151,14 +151,14 @@ VIDEO_START_MEMBER(timeplt_state,chkun)
  *
  *************************************/
 
-WRITE8_MEMBER(timeplt_state::videoram_w)
+void timeplt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::colorram_w)
+void timeplt_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER(timeplt_state::video_enable_w)
 	m_video_enable = state;
 }
 
-READ8_MEMBER(timeplt_state::scanline_r)
+uint8_t timeplt_state::scanline_r()
 {
 	return m_screen->vpos();
 }

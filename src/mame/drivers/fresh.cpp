@@ -64,42 +64,42 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
+	void fresh_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fresh_attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_tile_info);
-	DECLARE_WRITE16_MEMBER(fresh_bg_2_videoram_w);
-	DECLARE_WRITE16_MEMBER(fresh_attr_2_videoram_w);
+	void fresh_bg_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
 
 	uint16_t m_d30000_value;
 
-	DECLARE_WRITE16_MEMBER( d30000_write )
+	void d30000_write(uint16_t data)
 	{
 		m_d30000_value = data;
 	}
 
-	DECLARE_WRITE16_MEMBER( c71000_write )
+	void c71000_write(uint16_t data)
 	{
 		logerror("c74000_write (scroll 0) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	DECLARE_WRITE16_MEMBER( c74000_write )
+	void c74000_write(uint16_t data)
 	{
 		logerror("c74000_write (scroll 1) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	DECLARE_WRITE16_MEMBER( c75000_write )
+	void c75000_write(uint16_t data)
 	{
 		logerror("c75000_write (scroll 2) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	DECLARE_WRITE16_MEMBER( c76000_write )
+	void c76000_write(uint16_t data)
 	{
 		logerror("c76000_write (scroll 3) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
 
-	DECLARE_READ16_MEMBER( unk_r )
+	uint16_t unk_r()
 	{
 		return machine().rand();
 	}
-	DECLARE_READ16_MEMBER( unk2_r )
+	uint16_t unk2_r()
 	{
 		return 0x10;
 	}
@@ -116,17 +116,17 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
 	int tileno, pal;
 	tileno = m_bg_videoram[tile_index];
 	pal = m_attr_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, pal, 0);
+	tileinfo.set(1, tileno, pal, 0);
 }
 
 
-WRITE16_MEMBER(fresh_state::fresh_bg_videoram_w)
+void fresh_state::fresh_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(fresh_state::fresh_attr_videoram_w)
+void fresh_state::fresh_attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_attr_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -138,17 +138,17 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
 	int tileno, pal;
 	tileno = m_bg_2_videoram[tile_index];
 	pal = m_attr_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
+	tileinfo.set(0, tileno, pal, 0);
 }
 
 
-WRITE16_MEMBER(fresh_state::fresh_bg_2_videoram_w)
+void fresh_state::fresh_bg_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_2_videoram[offset]);
 	m_bg_2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(fresh_state::fresh_attr_2_videoram_w)
+void fresh_state::fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_attr_2_videoram[offset]);
 	m_bg_2_tilemap->mark_tile_dirty(offset);

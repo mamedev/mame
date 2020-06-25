@@ -99,11 +99,11 @@ private:
 	void main_io(address_map &map);
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux1_w);
-	DECLARE_WRITE8_MEMBER(mux2_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void mux1_w(u8 data);
+	void mux2_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
+	void sound_w(u8 data);
 
 	u16 m_inp_mux;
 	u16 m_digit_select;
@@ -137,7 +137,7 @@ void tgm_state::update_display()
 	m_display->matrix(m_digit_select, m_digit_data);
 }
 
-WRITE8_MEMBER(tgm_state::mux1_w)
+void tgm_state::mux1_w(u8 data)
 {
 	// P00-P06: input mux part
 	m_inp_mux = (m_inp_mux & 7) | (data << 3 & 0x3f8);
@@ -147,7 +147,7 @@ WRITE8_MEMBER(tgm_state::mux1_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tgm_state::mux2_w)
+void tgm_state::mux2_w(u8 data)
 {
 	// P15-P17: input mux part
 	m_inp_mux = (m_inp_mux & 0x3f8) | (data >> 5 & 7);
@@ -157,14 +157,14 @@ WRITE8_MEMBER(tgm_state::mux2_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tgm_state::digit_w)
+void tgm_state::digit_w(u8 data)
 {
 	// P50-P57: digit 7seg data
 	m_digit_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	update_display();
 }
 
-READ8_MEMBER(tgm_state::input_r)
+u8 tgm_state::input_r()
 {
 	u8 data = 0;
 
@@ -176,7 +176,7 @@ READ8_MEMBER(tgm_state::input_r)
 	return data << 2;
 }
 
-WRITE8_MEMBER(tgm_state::sound_w)
+void tgm_state::sound_w(u8 data)
 {
 	// P40-P47: 555 to speaker (see netlist above)
 	for (int i = 0; i < 8; i++)

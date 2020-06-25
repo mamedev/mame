@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    schedule.c
+    schedule.cpp
 
     Core device execution and scheduling engine.
 

@@ -552,13 +552,13 @@ void mc68hc11m0_device::io_map(address_map &map)
 
 uint8_t mc68hc11_cpu_device::FETCH()
 {
-	return m_cache->read_byte(m_pc++);
+	return m_cache.read_byte(m_pc++);
 }
 
 uint16_t mc68hc11_cpu_device::FETCH16()
 {
 	uint16_t w;
-	w = m_cache->read_word(m_pc);
+	w = m_cache.read_word(m_pc);
 	m_pc += 2;
 	return w;
 }
@@ -567,28 +567,28 @@ uint8_t mc68hc11_cpu_device::READ8(uint32_t address)
 {
 	if(address >= m_reg_position && (address - m_reg_position) < m_reg_block_size)
 	{
-		return m_io->read_byte(address-m_reg_position);
+		return m_io.read_byte(address-m_reg_position);
 	}
 	else if(address >= m_ram_position && address < m_ram_position+m_internal_ram_size)
 	{
-		return m_data->read_byte(address-m_ram_position);
+		return m_data.read_byte(address-m_ram_position);
 	}
-	return m_program->read_byte(address);
+	return m_program.read_byte(address);
 }
 
 void mc68hc11_cpu_device::WRITE8(uint32_t address, uint8_t value)
 {
 	if(address >= m_reg_position && (address - m_reg_position) < m_reg_block_size)
 	{
-		m_io->write_byte(address-m_reg_position, value);
+		m_io.write_byte(address-m_reg_position, value);
 		return;
 	}
 	else if(address >= m_ram_position && address < m_ram_position+m_internal_ram_size)
 	{
-		m_data->write_byte(address-m_ram_position, value);
+		m_data.write_byte(address-m_ram_position, value);
 		return;
 	}
-	m_program->write_byte(address, value);
+	m_program.write_byte(address, value);
 }
 
 uint16_t mc68hc11_cpu_device::READ16(uint32_t address)
@@ -639,10 +639,10 @@ void mc68hc11_cpu_device::device_start()
 		}
 	}
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ix));

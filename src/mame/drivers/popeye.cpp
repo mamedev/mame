@@ -84,7 +84,7 @@ void tpp2_state::decrypt_rom()
 	std::copy_n(buffer.begin(), len, rom);
 }
 
-WRITE8_MEMBER(tnx1_state::refresh_w)
+void tnx1_state::refresh_w(offs_t offset, uint8_t data)
 {
 	const bool nmi_enabled = ((offset >> 8) & 1) != 0;
 	if (m_nmi_enabled != nmi_enabled)
@@ -96,9 +96,9 @@ WRITE8_MEMBER(tnx1_state::refresh_w)
 	}
 }
 
-WRITE8_MEMBER(tpp2_state::refresh_w)
+void tpp2_state::refresh_w(offs_t offset, uint8_t data)
 {
-	tnx1_state::refresh_w(space, offset, data, mem_mask);
+	tnx1_state::refresh_w(offset, data);
 
 	m_watchdog_enabled = ((offset >> 9) & 1) != 0;
 }
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(tpp2_state::screen_vblank)
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-READ8_MEMBER(tnx1_state::protection_r)
+uint8_t tnx1_state::protection_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -156,7 +156,7 @@ READ8_MEMBER(tnx1_state::protection_r)
 	}
 }
 
-WRITE8_MEMBER(tnx1_state::protection_w)
+void tnx1_state::protection_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -255,12 +255,12 @@ protected:
 		std::copy_n(buffer.begin(), len, rom);
 	}
 
-	DECLARE_READ8_MEMBER(eeprom_r)
+	uint8_t eeprom_r()
 	{
 		return m_eeprom->do_read();
 	}
 
-	DECLARE_WRITE8_MEMBER(eeprom_w)
+	void eeprom_w(uint8_t data)
 	{
 		m_eeprom->di_write(data & 0x01);
 		m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -515,7 +515,7 @@ GFXDECODE_END
 
 
 
-WRITE8_MEMBER(tnx1_state::popeye_portB_w)
+void tnx1_state::popeye_portB_w(uint8_t data)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);

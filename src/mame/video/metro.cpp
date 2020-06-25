@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(metro_state::k053936_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0x7fff,
 			0xe,
 			0);
@@ -24,13 +24,13 @@ TILE_GET_INFO_MEMBER(metro_state::k053936_gstrik2_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x7fff)>>2,
 			0xe,
 			0);
 }
 
-WRITE16_MEMBER(metro_state::k053936_w)
+void metro_state::k053936_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_k053936_ram[offset]);
 	m_k053936_tilemap->mark_tile_dirty(offset);

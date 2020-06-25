@@ -62,14 +62,14 @@ private:
 	required_device_array<filter_rc_device, 3> m_filter;
 
 	uint8_t         m_irq_mask;
-	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);
-	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
+	void megazone_i8039_irq_w(uint8_t data);
+	void i8039_irqen_and_status_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(megazone_port_a_r);
-	DECLARE_WRITE8_MEMBER(megazone_port_b_w);
+	uint8_t megazone_port_a_r();
+	void megazone_port_b_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

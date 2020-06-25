@@ -46,7 +46,7 @@ void cpc_doubler_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
-	space.install_read_handler(0xf0e0,0xf0e0, read8_delegate(*this, FUNC(cpc_doubler_device::ext_tape_r)));
+	space.install_read_handler(0xf0e0,0xf0e0, read8smo_delegate(*this, FUNC(cpc_doubler_device::ext_tape_r)));
 }
 
 //-------------------------------------------------
@@ -58,7 +58,7 @@ void cpc_doubler_device::device_reset()
 	// TODO
 }
 
-READ8_MEMBER(cpc_doubler_device::ext_tape_r)
+uint8_t cpc_doubler_device::ext_tape_r()
 {
 	uint8_t data = 0;
 	if(m_tape->input() > 0.03)

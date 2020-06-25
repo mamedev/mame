@@ -14,28 +14,28 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::scroll_x_w)
+void xxmissio_state::scroll_x_w(uint8_t data)
 {
 	m_xscroll = data;
 }
-WRITE8_MEMBER(xxmissio_state::scroll_y_w)
+void xxmissio_state::scroll_y_w(uint8_t data)
 {
 	m_yscroll = data;
 }
 
-WRITE8_MEMBER(xxmissio_state::flipscreen_w)
+void xxmissio_state::flipscreen_w(uint8_t data)
 {
 	m_flipscreen = data & 0x01;
 }
 
-WRITE8_MEMBER(xxmissio_state::bgram_w)
+void xxmissio_state::bgram_w(offs_t offset, uint8_t data)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
 	m_bgram[offset] = data;
 }
-READ8_MEMBER(xxmissio_state::bgram_r)
+uint8_t xxmissio_state::bgram_r(offs_t offset)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
 	int code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
 	int color =  m_bgram[0x400 | tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 	int code = m_fgram[0x000 | tile_index];
 	int color = m_fgram[0x400 | tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void xxmissio_state::video_start()

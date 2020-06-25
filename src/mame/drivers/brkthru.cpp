@@ -160,7 +160,7 @@ buttons down after the game has started then pressing F3 to reset the game.
  *
  *************************************/
 
-WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
+void brkthru_state::brkthru_1803_w(uint8_t data)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = ~data & 1;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::darwin_0803_w)
+void brkthru_state::darwin_0803_w(uint8_t data)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = data & 1;

@@ -136,15 +136,15 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void marinedt_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(trackball_r);
-	DECLARE_READ8_MEMBER(pc3259_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(obj_0_w);
-	DECLARE_WRITE8_MEMBER(obj_1_w);
-	DECLARE_WRITE8_MEMBER(bgm_w);
-	DECLARE_WRITE8_MEMBER(sfx_w);
-	DECLARE_WRITE8_MEMBER(layer_enable_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint8_t trackball_r();
+	uint8_t pc3259_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void obj_0_w(offs_t offset, uint8_t data);
+	void obj_1_w(offs_t offset, uint8_t data);
+	void bgm_w(uint8_t data);
+	void sfx_w(uint8_t data);
+	void layer_enable_w(uint8_t data);
+	void output_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void marinedt_io(address_map &map);
@@ -182,7 +182,7 @@ TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
 {
 	int code = m_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 // initialize sea bitmap gradient
@@ -255,7 +255,7 @@ uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(marinedt_state::vram_w)
+void marinedt_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -287,21 +287,21 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 	gfx->transpen(m_obj[which].bitmap,visarea,tilenum,color,fx,!fy,m_obj[which].x,m_obj[which].y,0);
 }
 
-WRITE8_MEMBER(marinedt_state::obj_0_w) { obj_reg_w(0,offset,data); }
-WRITE8_MEMBER(marinedt_state::obj_1_w) { obj_reg_w(1,offset,data); }
+void marinedt_state::obj_0_w(offs_t offset, uint8_t data) { obj_reg_w(0,offset,data); }
+void marinedt_state::obj_1_w(offs_t offset, uint8_t data) { obj_reg_w(1,offset,data); }
 
-READ8_MEMBER(marinedt_state::trackball_r)
+uint8_t marinedt_state::trackball_r()
 {
 	return (m_in_track[m_in_select & 3])->read();
 }
 
 // discrete sound
-WRITE8_MEMBER(marinedt_state::bgm_w)
+void marinedt_state::bgm_w(uint8_t data)
 {
 	// ...
 }
 
-WRITE8_MEMBER(marinedt_state::sfx_w)
+void marinedt_state::sfx_w(uint8_t data)
 {
 	/*
 	 x--- ---- unknown, probably ties to PC3259 pin 16 like crbaloon
@@ -316,7 +316,7 @@ WRITE8_MEMBER(marinedt_state::sfx_w)
 //      popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(marinedt_state::layer_enable_w)
+void marinedt_state::layer_enable_w(uint8_t data)
 {
 	/*
 	    ---x ---- enabled when shark appears (enables red gradient on sea bitmap apparently)
@@ -328,7 +328,7 @@ WRITE8_MEMBER(marinedt_state::layer_enable_w)
 	m_sea_bank = (data & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(marinedt_state::output_w)
+void marinedt_state::output_w(uint8_t data)
 {
 	/*
 	    ---- x--- trackball input select (x/y)
@@ -407,7 +407,7 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 	return 0;
 }
 
-READ8_MEMBER(marinedt_state::pc3259_r)
+uint8_t marinedt_state::pc3259_r(offs_t offset)
 {
 	uint32_t rest,reso;
 	uint8_t reg = offset >> 2;

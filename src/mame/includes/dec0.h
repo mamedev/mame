@@ -65,8 +65,6 @@ public:
 	void init_midresb();
 	void init_ffantasybl();
 
-	DECLARE_VIDEO_START(dec0_nodma);
-
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -82,11 +80,15 @@ protected:
 	uint16_t *m_buffered_spriteram;
 	uint16_t m_pri;
 
-	DECLARE_READ16_MEMBER(dec0_controls_r);
-	DECLARE_READ16_MEMBER(slyspy_controls_r);
-	DECLARE_WRITE16_MEMBER(priority_w);
+	uint16_t dec0_controls_r(offs_t offset);
+	uint16_t slyspy_controls_r(offs_t offset);
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	DECLARE_VIDEO_START(dec0_nodma);
+	DECLARE_VIDEO_START(slyspy);
 
 	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
+	void baddudes_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 
 	void set_screen_raw_params_data_east(machine_config &config);
 
@@ -113,41 +115,39 @@ private:
 	int m_hippodrm_lsb;
 	uint8_t m_i8751_ports[4];
 
-	DECLARE_WRITE16_MEMBER(dec0_control_w);
-	DECLARE_WRITE16_MEMBER(midres_sound_w);
-	DECLARE_READ16_MEMBER(slyspy_protection_r);
-	DECLARE_WRITE16_MEMBER(slyspy_state_w);
-	DECLARE_READ16_MEMBER(slyspy_state_r);
-	DECLARE_READ16_MEMBER(midres_controls_r);
-	DECLARE_READ8_MEMBER(hippodrm_prot_r);
-	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port0_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port0_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port2_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port3_w);
-	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
-	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
-	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
-	DECLARE_READ16_MEMBER(robocop_68000_share_r);
-	DECLARE_WRITE16_MEMBER(robocop_68000_share_w);
-	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
+	void dec0_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midres_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t slyspy_protection_r(offs_t offset);
+	void slyspy_state_w(uint16_t data);
+	uint16_t slyspy_state_r();
+	uint16_t midres_controls_r(offs_t offset);
+	uint8_t hippodrm_prot_r(offs_t offset);
+	void hippodrm_prot_w(offs_t offset, uint8_t data);
+	uint8_t dec0_mcu_port0_r();
+	void dec0_mcu_port0_w(uint8_t data);
+	void dec0_mcu_port1_w(uint8_t data);
+	void dec0_mcu_port2_w(uint8_t data);
+	void dec0_mcu_port3_w(uint8_t data);
+	uint16_t hippodrm_68000_share_r(offs_t offset);
+	void hippodrm_68000_share_w(offs_t offset, uint16_t data);
+	void sprite_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t robocop_68000_share_r(offs_t offset);
+	void robocop_68000_share_w(offs_t offset, uint16_t data);
+	uint16_t ffantasybl_242024_r();
 
-	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
-	DECLARE_READ8_MEMBER(slyspy_sound_state_reset_r);
+	uint8_t slyspy_sound_state_r();
+	uint8_t slyspy_sound_state_reset_r();
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(slyspy);
 	DECLARE_VIDEO_START(dec0);
+	DECLARE_VIDEO_START(baddudes);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void hbarrel_colpri_cb(u32 &colour, u32 &pri_mask);
 	void bandit_colpri_cb(u32 &colour, u32 &pri_mask);
@@ -196,14 +196,14 @@ private:
 	bool m_adpcm_toggle[2];
 	uint16_t m_automat_scroll_regs[4];
 
-	DECLARE_WRITE16_MEMBER(automat_control_w);
-	DECLARE_READ16_MEMBER( automat_palette_r );
-	DECLARE_WRITE16_MEMBER( automat_palette_w );
-	DECLARE_WRITE16_MEMBER( automat_scroll_w )
+	void automat_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t automat_palette_r(offs_t offset);
+	void automat_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void automat_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(msm1_vclk_cb);
 	DECLARE_WRITE_LINE_MEMBER(msm2_vclk_cb);
 

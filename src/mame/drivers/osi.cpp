@@ -270,7 +270,7 @@ DISCRETE_SOUND_END
 
 /* Keyboard */
 
-READ8_MEMBER( sb2m600_state::keyboard_r )
+uint8_t sb2m600_state::keyboard_r()
 {
 	if (m_io_reset->read())
 		m_maincpu->reset();
@@ -284,7 +284,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( sb2m600_state::keyboard_w )
+void sb2m600_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = data;
 
@@ -292,12 +292,12 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 		m_discrete->write(NODE_01, (data >> 2) & 0x0f);
 }
 
-WRITE8_MEMBER( uk101_state::keyboard_w )
+void uk101_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( sb2m600_state::ctrl_w )
+void sb2m600_state::ctrl_w(uint8_t data)
 {
 	/*
 
@@ -320,7 +320,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_discrete->write(NODE_10, BIT(data, 4));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
+void c1p_state::osi630_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -340,7 +340,7 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 	m_beeper->set_state(BIT(data, 1));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_sound_w )
+void c1p_state::osi630_sound_w(uint8_t data)
 {
 	if (data != 0)
 		m_beeper->set_clock(49152 / data);
@@ -387,7 +387,7 @@ void sb2m600_state::floppy_index_callback(floppy_image_device *floppy, int state
 	m_fdc_index = state;
 }
 
-READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
+uint8_t c1pmf_state::osi470_pia_pa_r()
 {
 	/*
 
@@ -407,7 +407,7 @@ READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 	return (m_fdc_index << 7);
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
+void c1pmf_state::osi470_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pb_w )
+void c1pmf_state::osi470_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -663,6 +663,12 @@ void sb2m600_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 	save_pointer(NAME(m_video_ram.target()), OSI600_VIDEORAM_SIZE);
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_fdc_index));
+	save_item(NAME(m_32));
+	save_item(NAME(m_coloren));
 }
 
 void c1p_state::machine_start()
@@ -686,6 +692,10 @@ void c1p_state::machine_start()
 	}
 
 	/* register for state saving */
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_fdc_index));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_32));
 	save_item(NAME(m_coloren));
@@ -931,8 +941,8 @@ void c1p_state::init_c1p()
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY            FULLNAME                            FLAGS
-COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", 0 )
-//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           0 )
-COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            0 )
+COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_SUPPORTS_SAVE )
+COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_SUPPORTS_SAVE )

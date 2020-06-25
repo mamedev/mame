@@ -97,43 +97,35 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	// TGP
-	DECLARE_READ16_MEMBER(fifoin_status_r);
+	u16 fifoin_status_r();
 
-	DECLARE_READ16_MEMBER(v60_copro_fifo_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_fifo_w);
-	DECLARE_READ16_MEMBER(v60_copro_ram_adr_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_ram_adr_w);
-	DECLARE_READ16_MEMBER(v60_copro_ram_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_ram_w);
+	u16 v60_copro_fifo_r(offs_t offset);
+	void v60_copro_fifo_w(offs_t offset, u16 data);
+	u16 v60_copro_ram_adr_r();
+	void v60_copro_ram_adr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 v60_copro_ram_r(offs_t offset);
+	void v60_copro_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(copro_ram_r);
-	DECLARE_WRITE32_MEMBER(copro_ram_w);
-	DECLARE_READ32_MEMBER(copro_fifoin_pop);
-	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
-
-	DECLARE_WRITE32_MEMBER(copro_sincos_w);
-	DECLARE_READ32_MEMBER(copro_sincos_r);
-	DECLARE_WRITE32_MEMBER(copro_inv_w);
-	DECLARE_READ32_MEMBER(copro_inv_r);
-	DECLARE_WRITE32_MEMBER(copro_isqrt_w);
-	DECLARE_READ32_MEMBER(copro_isqrt_r);
-	DECLARE_WRITE32_MEMBER(copro_atan_w);
-	DECLARE_READ32_MEMBER(copro_atan_r);
-	DECLARE_WRITE32_MEMBER(copro_data_w);
-	DECLARE_READ32_MEMBER(copro_data_r);
-	DECLARE_WRITE32_MEMBER(copro_ramadr_w);
-	DECLARE_READ32_MEMBER(copro_ramadr_r);
-	DECLARE_WRITE32_MEMBER(copro_ramdata_w);
-	DECLARE_READ32_MEMBER(copro_ramdata_r);
+	void copro_sincos_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_sincos_r(offs_t offset);
+	void copro_inv_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_inv_r(offs_t offset);
+	void copro_isqrt_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_isqrt_r(offs_t offset);
+	void copro_atan_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_atan_r();
+	void copro_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_data_r(offs_t offset);
+	void copro_ramadr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_ramadr_r(offs_t offset);
+	void copro_ramdata_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_ramdata_r(offs_t offset);
 
 	void copro_reset();
 
@@ -145,13 +137,13 @@ private:
 	u32 m_copro_ram_adr[4];
 
 	uint16_t m_r360_state;
-	DECLARE_READ8_MEMBER(r360_r);
-	DECLARE_WRITE8_MEMBER(r360_w);
+	uint8_t r360_r();
+	void r360_w(uint8_t data);
 
 	// Rendering
 	virtual void video_start() override;
-	DECLARE_READ16_MEMBER(model1_listctl_r);
-	DECLARE_WRITE16_MEMBER(model1_listctl_w);
+	u16 model1_listctl_r(offs_t offset);
+	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
@@ -214,7 +206,7 @@ private:
 	// Machine
 	void irq_raise(int level);
 	void irq_init();
-	DECLARE_WRITE8_MEMBER(irq_control_w);
+	void irq_control_w(u8 data);
 
 	uint8_t m_irq_status;
 	int m_last_irq;
@@ -347,15 +339,15 @@ private:
 	// I/O related
 	output_finder<2> m_digits;
 	output_finder<8> m_outs;
-	DECLARE_READ8_MEMBER(dpram_r);
-	DECLARE_WRITE8_MEMBER(gen_outputs_w);
-	DECLARE_WRITE8_MEMBER(vf_outputs_w);
-	DECLARE_WRITE8_MEMBER(vr_outputs_w);
-	DECLARE_WRITE8_MEMBER(swa_outputs_w);
-	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
-	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
-	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
-	DECLARE_WRITE8_MEMBER(drive_board_w);
+	u8 dpram_r(offs_t offset);
+	void gen_outputs_w(uint8_t data);
+	void vf_outputs_w(uint8_t data);
+	void vr_outputs_w(uint8_t data);
+	void swa_outputs_w(uint8_t data);
+	void wingwar_outputs_w(uint8_t data);
+	void wingwar360_outputs_w(uint8_t data);
+	void netmerc_outputs_w(uint8_t data);
+	void drive_board_w(uint8_t data);
 };
 
 #endif // MAME_INCLUDES_MODEL1_H

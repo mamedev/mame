@@ -247,9 +247,9 @@ public:
 
 private:
 	TIMER_CALLBACK_MEMBER(periodic_int);
-	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
-	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
-	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
+	uint8_t omegrace_vg_go_r();
+	uint8_t omegrace_spinner1_r();
+	void omegrace_leds_w(uint8_t data);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 	void sound_map(address_map &map);
@@ -303,7 +303,7 @@ TIMER_CALLBACK_MEMBER(omegrace_state::periodic_int)
  *
  *************************************/
 
-READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
+uint8_t omegrace_state::omegrace_vg_go_r()
 {
 	if (!machine().side_effects_disabled())
 		m_dvg->go_w();
@@ -342,7 +342,7 @@ static const uint8_t spinnerTable[64] =
 };
 
 
-READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
+uint8_t omegrace_state::omegrace_spinner1_r()
 {
 	return (spinnerTable[ioport("SPIN0")->read() & 0x3f]);
 }
@@ -355,7 +355,7 @@ READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
  *
  *************************************/
 
-WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
+void omegrace_state::omegrace_leds_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);

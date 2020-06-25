@@ -108,9 +108,9 @@ device_memory_interface::space_config_vector c39_device::memory_space_config() c
 void c39_device::device_start()
 {
 	std::unique_ptr<mi_banked> intf = std::make_unique<mi_banked>();
-	intf->exp = &space(AS_DATA);
-	intf->escache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
-	intf->es4 = &space(AS_IO);
+	space(AS_DATA).cache(intf->escache);
+	space(AS_DATA).specific(intf->exp);
+	space(AS_IO).specific(intf->es4);
 
 	save_item(NAME(intf->bsr));
 	save_item(NAME(intf->pbs));
@@ -186,38 +186,38 @@ void r65c19_device::cir_w(u8 data)
 
 u8 c39_device::mi_banked::exp_read(u16 adr)
 {
-	return exp->read_byte(u32(bsr[(adr & 0xe000) >> 13]) << 13 | (adr & 0x1fff));
+	return exp.read_byte(u32(bsr[(adr & 0xe000) >> 13]) << 13 | (adr & 0x1fff));
 }
 
 u8 c39_device::mi_banked::exp_read_cached(u16 adr)
 {
-	return escache->read_byte(u32(bsr[(adr & 0xe000) >> 13]) << 13 | (adr & 0x1fff));
+	return escache.read_byte(u32(bsr[(adr & 0xe000) >> 13]) << 13 | (adr & 0x1fff));
 }
 
 void c39_device::mi_banked::exp_write(u16 adr, u8 val)
 {
-	exp->write_byte(u32(bsr[(adr & 0xe000) >> 13]) << 13 | (adr & 0x1fff), val);
+	exp.write_byte(u32(bsr[(adr & 0xe000) >> 13]) << 13 | (adr & 0x1fff), val);
 }
 
 u8 c39_device::mi_banked::es4_read(u16 adr)
 {
-	return es4->read_byte(adr & 0x1ff);
+	return es4.read_byte(adr & 0x1ff);
 }
 
 void c39_device::mi_banked::es4_write(u16 adr, u8 val)
 {
-	es4->write_byte(adr & 0x1ff, val);
+	es4.write_byte(adr & 0x1ff, val);
 }
 
 u8 c39_device::mi_banked::read(u16 adr)
 {
-	return program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 u8 c39_device::mi_banked::read_sync(u16 adr)
 {
 	if (adr < 0x0600)
-		return cache->read_byte(adr);
+		return cprogram.read_byte(adr);
 	else if (adr >= 0x0800 || BIT(pbs, 1))
 		return exp_read_cached(adr);
 	else
@@ -227,7 +227,7 @@ u8 c39_device::mi_banked::read_sync(u16 adr)
 u8 c39_device::mi_banked::read_arg(u16 adr)
 {
 	if (adr < 0x0600)
-		return cache->read_byte(adr);
+		return cprogram.read_byte(adr);
 	else if (adr >= 0x0800 || BIT(pbs, 1))
 		return exp_read_cached(adr);
 	else
@@ -236,7 +236,7 @@ u8 c39_device::mi_banked::read_arg(u16 adr)
 
 void c39_device::mi_banked::write(u16 adr, u8 val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 }
 
 u8 c39_device::pbs_r()

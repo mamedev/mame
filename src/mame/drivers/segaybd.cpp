@@ -104,7 +104,7 @@ ioport_value segaybd_state::analog_mux()
 //  output1_w - handle writes to I/O port D
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output1_w)
+void segaybd_state::output1_w(uint8_t data)
 {
 	if (!m_output_cb1.isnull())
 		m_output_cb1(data);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(segaybd_state::output1_w)
 //  misc_output_w - handle writes to I/O port E
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::misc_output_w)
+void segaybd_state::misc_output_w(uint8_t data)
 {
 	//
 	//  D7 = /KILL
@@ -140,7 +140,7 @@ WRITE8_MEMBER(segaybd_state::misc_output_w)
 //  output2_w - handle writes to I/O port H
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output2_w)
+void segaybd_state::output2_w(uint8_t data)
 {
 	if (!m_output_cb2.isnull())
 		m_output_cb2(data);
@@ -641,7 +641,7 @@ void segaybd_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -671,17 +671,17 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 }
 
 
-READ16_MEMBER(segaybd_state::link_r)
+uint16_t segaybd_state::link_r()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(segaybd_state::link2_r)
+uint16_t segaybd_state::link2_r()
 {
 	return 0x0000;
 }
 
-WRITE16_MEMBER(segaybd_state::link2_w)
+void segaybd_state::link2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 	logerror("link2_w %04x\n", data);
@@ -705,7 +705,7 @@ void segaybd_state::link_map(address_map &map)
 }
 
 #if 0
-READ8_MEMBER(segaybd_state::link_portc0_r)
+uint8_t segaybd_state::link_portc0_r()
 {
 	return 0xf8;
 }
@@ -957,7 +957,7 @@ static INPUT_PORTS_START( pdrift )
 	PORT_INCLUDE( yboard_generic )
 
 	PORT_MODIFY("GENERAL")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
 
 	PORT_MODIFY("LIMITSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Safety Sensor Left")

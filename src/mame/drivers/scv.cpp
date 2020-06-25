@@ -41,10 +41,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void porta_w(uint8_t data);
+	uint8_t portb_r();
+	uint8_t portc_r();
+	void portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
 	void scv_palette(palette_device &palette) const;
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -174,13 +174,13 @@ static INPUT_PORTS_START( scv )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( scv_state::porta_w )
+void scv_state::porta_w(uint8_t data)
 {
 	m_porta = data;
 }
 
 
-READ8_MEMBER( scv_state::portb_r )
+uint8_t scv_state::portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -194,7 +194,7 @@ READ8_MEMBER( scv_state::portb_r )
 }
 
 
-READ8_MEMBER( scv_state::portc_r )
+uint8_t scv_state::portc_r()
 {
 	uint8_t data = m_portc;
 
@@ -204,11 +204,11 @@ READ8_MEMBER( scv_state::portc_r )
 }
 
 
-WRITE8_MEMBER( scv_state::portc_w )
+void scv_state::portc_w(uint8_t data)
 {
 	//logerror("%04x: scv_portc_w: data = 0x%02x\n", m_maincpu->pc(), data );
 	m_portc = data;
-	m_cart->write_bank(space, 0, m_portc);
+	m_cart->write_bank(m_portc);
 	m_upd1771c->pcm_write(m_portc & 0x08);
 }
 

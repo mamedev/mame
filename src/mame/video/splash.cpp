@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap0)
 	int attr = data >> 8;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((0x20 + (attr & 0x0f)) << 8),
 			(attr & 0xf0) >> 4,
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap1)
 	int attr = data >> 8;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			(code >> 2) + ((0x30 + (attr & 0x0f)) << 6),
 			(attr & 0xf0) >> 4,
 			TILE_FLIPXY(code & 0x03));
@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap1)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(splash_state::vram_w)
+void splash_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 1);

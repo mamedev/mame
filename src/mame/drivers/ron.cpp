@@ -59,16 +59,16 @@ private:
 	void ron_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(p1_mux_r);
-	DECLARE_READ8_MEMBER(p2_mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_READ8_MEMBER(audio_cmd_r);
-	DECLARE_WRITE8_MEMBER(audio_p1_w);
-	DECLARE_WRITE8_MEMBER(audio_p2_w);
+	void output_w(uint8_t data);
+	uint8_t p1_mux_r(offs_t offset);
+	uint8_t p2_mux_r(offs_t offset);
+	void mux_w(uint8_t data);
+	void sound_cmd_w(uint8_t data);
+	uint8_t audio_cmd_r();
+	void audio_p1_w(uint8_t data);
+	void audio_p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
+	void ay_pa_w(uint8_t data);
 
 	void ron_audio_io(address_map &map);
 	void ron_audio_map(address_map &map);
@@ -143,7 +143,7 @@ uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-WRITE8_MEMBER(ron_state::output_w)
+void ron_state::output_w(uint8_t data)
 {
 	m_nmi_enable = (data & 0x10) == 0x10;
 	if (!m_nmi_enable)
@@ -172,14 +172,14 @@ uint8_t ron_state::read_mux(bool which,bool side)
 	return machine().rand();
 }
 
-READ8_MEMBER(ron_state::p1_mux_r)
+uint8_t ron_state::p1_mux_r(offs_t offset)
 {
 	uint8_t res = offset == 0 ? (m_in0->read() & 0xcc) : (m_in1->read() & 0xfc);
 
 	return read_mux(offset,false) | res;
 }
 
-READ8_MEMBER(ron_state::p2_mux_r)
+uint8_t ron_state::p2_mux_r(offs_t offset)
 {
 	uint8_t res = (offset == 0 ? m_in2 : m_in3)->read();
 
@@ -189,12 +189,12 @@ READ8_MEMBER(ron_state::p2_mux_r)
 }
 
 
-WRITE8_MEMBER(ron_state::mux_w)
+void ron_state::mux_w(uint8_t data)
 {
 	m_mux_data = data;
 }
 
-WRITE8_MEMBER(ron_state::sound_cmd_w)
+void ron_state::sound_cmd_w(uint8_t data)
 {
 	m_sound_command = data;
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -438,12 +438,12 @@ WRITE_LINE_MEMBER(ron_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(ron_state::audio_cmd_r)
+uint8_t ron_state::audio_cmd_r()
 {
 	return m_sound_command << 3;
 }
 
-WRITE8_MEMBER(ron_state::audio_p1_w)
+void ron_state::audio_p1_w(uint8_t data)
 {
 	//address_space &space = m_audiocpu->space(AS_PROGRAM);
 
@@ -456,7 +456,7 @@ WRITE8_MEMBER(ron_state::audio_p1_w)
 		m_ay->data_w(data);
 }
 
-WRITE8_MEMBER(ron_state::audio_p2_w)
+void ron_state::audio_p2_w(uint8_t data)
 {
 	// TODO: guesswork, presumably f/f based
 	// p2 ff
@@ -482,7 +482,7 @@ READ_LINE_MEMBER(ron_state::audio_t1_r)
 	return !BIT(m_sound_command, 6);
 }
 
-WRITE8_MEMBER(ron_state::ay_pa_w)
+void ron_state::ay_pa_w(uint8_t data)
 {
 }
 

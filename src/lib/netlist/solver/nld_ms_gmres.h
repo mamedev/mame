@@ -8,6 +8,7 @@
 /// \file nld_ms_gmres.h
 ///
 
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 #include "plib/gmres.h"
@@ -78,7 +79,7 @@ namespace solver
 			}
 		}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
 	private:
 
@@ -95,7 +96,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_GMRES_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_GMRES_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		const std::size_t iN = this->size();
 
@@ -106,7 +107,7 @@ namespace solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_new_V[k] = this->m_terms[k].template getV<float_type>();
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 		}
 
 		const auto accuracy(static_cast<float_type>(this->m_params.m_accuracy));
@@ -119,14 +120,9 @@ namespace solver
 		if (gsl > iter)
 		{
 			this->m_iterative_fail++;
-			return matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(newton_raphson);
+			matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic();
 		}
 
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 

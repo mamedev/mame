@@ -39,8 +39,8 @@ public:
 	template <typename... T> void set_screen_update_callback(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_memory_update_callback(T &&... args) { m_out_mem_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( flp_w );
 	DECLARE_WRITE_LINE_MEMBER( btl_w );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

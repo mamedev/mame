@@ -35,11 +35,11 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	DECLARE_READ16_MEMBER(control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_READ16_MEMBER(bishi_mirror_r);
-	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
+	uint16_t control_r();
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t bishi_mirror_r(offs_t offset);
+	uint16_t bishi_K056832_rom_r(offs_t offset);
 	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
 	K056832_CB_MEMBER(tile_callback);

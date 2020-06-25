@@ -67,23 +67,23 @@ f80b      ????
 #include "speaker.h"
 
 
-WRITE8_MEMBER(tecmo_state::bankswitch_w)
+void tecmo_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(tecmo_state::adpcm_start_w)
+void tecmo_state::adpcm_start_w(uint8_t data)
 {
 	m_adpcm_pos = data << 8;
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(tecmo_state::adpcm_end_w)
+void tecmo_state::adpcm_end_w(uint8_t data)
 {
 	m_adpcm_end = (data + 1) << 8;
 }
 
-WRITE8_MEMBER(tecmo_state::adpcm_vol_w)
+void tecmo_state::adpcm_vol_w(uint8_t data)
 {
 	m_msm->set_output_gain(ALL_OUTPUTS, (data & 15) / 15.0);
 }
@@ -95,39 +95,39 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 		m_msm->reset_w(1);
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->write_data(m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = m_adpcm_rom[m_adpcm_pos++];
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
 /* the 8-bit dipswitches are split across addresses */
-READ8_MEMBER(tecmo_state::dswa_l_r)
+uint8_t tecmo_state::dswa_l_r()
 {
 	uint8_t port = ioport("DSWA")->read();
 	port &= 0x0f;
 	return port;
 }
 
-READ8_MEMBER(tecmo_state::dswa_h_r)
+uint8_t tecmo_state::dswa_h_r()
 {
 	uint8_t port = ioport("DSWA")->read();
 	port &= 0xf0;
 	return port>>4;
 }
 
-READ8_MEMBER(tecmo_state::dswb_l_r)
+uint8_t tecmo_state::dswb_l_r()
 {
 	uint8_t port = ioport("DSWB")->read();
 	port &= 0x0f;
 	return port;
 }
 
-READ8_MEMBER(tecmo_state::dswb_h_r)
+uint8_t tecmo_state::dswb_h_r()
 {
 	uint8_t port = ioport("DSWB")->read();
 	port &= 0xf0;

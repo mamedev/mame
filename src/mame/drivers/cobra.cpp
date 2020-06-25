@@ -736,44 +736,42 @@ public:
 	required_shared_ptr<uint64_t> m_gfx_ram0;
 	required_shared_ptr<uint64_t> m_gfx_ram1;
 
-	DECLARE_READ64_MEMBER(main_comram_r);
-	DECLARE_WRITE64_MEMBER(main_comram_w);
-	DECLARE_READ64_MEMBER(main_fifo_r);
-	DECLARE_WRITE64_MEMBER(main_fifo_w);
-	DECLARE_READ64_MEMBER(main_mpc106_r);
-	DECLARE_WRITE64_MEMBER(main_mpc106_w);
-	DECLARE_WRITE32_MEMBER(main_cpu_dc_store);
+	uint64_t main_comram_r(offs_t offset, uint64_t mem_mask = ~0);
+	void main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t main_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void main_cpu_dc_store(offs_t offset, uint32_t data);
 
-	DECLARE_READ32_MEMBER(sub_comram_r);
-	DECLARE_WRITE32_MEMBER(sub_comram_w);
-	DECLARE_READ32_MEMBER(sub_unk7e_r);
-	DECLARE_WRITE32_MEMBER(sub_debug_w);
-	DECLARE_READ32_MEMBER(sub_unk1_r);
-	DECLARE_WRITE32_MEMBER(sub_unk1_w);
-	DECLARE_READ32_MEMBER(sub_config_r);
-	DECLARE_WRITE32_MEMBER(sub_config_w);
-	DECLARE_READ32_MEMBER(sub_mainbd_r);
-	DECLARE_WRITE32_MEMBER(sub_mainbd_w);
-	DECLARE_READ16_MEMBER(sub_ata0_r);
-	DECLARE_WRITE16_MEMBER(sub_ata0_w);
-	DECLARE_READ16_MEMBER(sub_ata1_r);
-	DECLARE_WRITE16_MEMBER(sub_ata1_w);
-	DECLARE_READ32_MEMBER(sub_psac2_r);
-	DECLARE_WRITE32_MEMBER(sub_psac2_w);
-	DECLARE_WRITE32_MEMBER(sub_psac_palette_w);
-	DECLARE_WRITE32_MEMBER(sub_sound_dma_w);
+	uint32_t sub_comram_r(offs_t offset);
+	void sub_comram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_unk7e_r();
+	void sub_debug_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_unk1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sub_unk1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_config_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sub_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_mainbd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sub_mainbd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t sub_ata0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sub_ata0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sub_ata1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sub_ata1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t sub_psac2_r();
+	void sub_psac2_w(uint32_t data);
+	void sub_psac_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void sub_sound_dma_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
-	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
-	DECLARE_WRITE64_MEMBER(gfx_fifo2_w);
-	DECLARE_WRITE64_MEMBER(gfx_debug_state_w);
-	DECLARE_READ64_MEMBER(gfx_unk1_r);
-	DECLARE_WRITE64_MEMBER(gfx_unk1_w);
-	DECLARE_READ64_MEMBER(gfx_fifo_r);
-	DECLARE_WRITE64_MEMBER(gfx_buf_w);
-	DECLARE_WRITE32_MEMBER(gfx_cpu_dc_store);
+	void gfx_fifo0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void gfx_fifo1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void gfx_fifo2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void gfx_debug_state_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t gfx_unk1_r(offs_t offset, uint64_t mem_mask = ~0);
+	void gfx_unk1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t gfx_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void gfx_buf_w(uint64_t data);
+	void gfx_cpu_dc_store(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE8_MEMBER(sub_jvs_w);
+	void sub_jvs_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
@@ -1408,17 +1406,7 @@ void cobra_state::mpc106_pci_w(int function, int reg, uint32_t data, uint32_t me
 	COMBINE_DATA(&m_mpc106_regs[reg/4]);
 }
 
-READ64_MEMBER(cobra_state::main_mpc106_r)
-{
-	return m_legacy_pci->read_64be(space, offset, mem_mask);
-}
-
-WRITE64_MEMBER(cobra_state::main_mpc106_w)
-{
-	m_legacy_pci->write_64be(space, offset, data, mem_mask);
-}
-
-READ64_MEMBER(cobra_state::main_fifo_r)
+uint64_t cobra_state::main_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -1488,7 +1476,7 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::main_fifo_w)
+void cobra_state::main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_40_47)
 	{
@@ -1658,7 +1646,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 	}
 }
 
-READ64_MEMBER(cobra_state::main_comram_r)
+uint64_t cobra_state::main_comram_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	int page = m_comram_page;
@@ -1675,7 +1663,7 @@ READ64_MEMBER(cobra_state::main_comram_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::main_comram_w)
+void cobra_state::main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int page = m_comram_page;
 
@@ -1690,7 +1678,7 @@ WRITE64_MEMBER(cobra_state::main_comram_w)
 	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
-WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
+void cobra_state::main_cpu_dc_store(offs_t offset, uint32_t data)
 {
 	if ((offset & 0xf0000000) == 0xc0000000)
 	{
@@ -1703,7 +1691,7 @@ void cobra_state::cobra_main_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("main_ram");
 	map(0x07c00000, 0x07ffffff).ram();
-	map(0x80000cf8, 0x80000cff).rw(FUNC(cobra_state::main_mpc106_r), FUNC(cobra_state::main_mpc106_w));
+	map(0x80000cf8, 0x80000cff).rw(m_legacy_pci, FUNC(pci_bus_legacy_device::read_64be), FUNC(pci_bus_legacy_device::write_64be));
 	map(0xc0000000, 0xc03fffff).ram().share("gfx_main_ram_0");              // GFX board main ram, bank 0
 	map(0xc7c00000, 0xc7ffffff).ram().share("gfx_main_ram_1");              // GFX board main ram, bank 1
 	map(0xfff00000, 0xfff7ffff).rom().region("user1", 0);                   /* Boot ROM */
@@ -1727,7 +1715,7 @@ void cobra_state::cobra_main_map(address_map &map)
 
 //static int ucount = 0;
 
-READ32_MEMBER(cobra_state::sub_unk1_r)
+uint32_t cobra_state::sub_unk1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1739,7 +1727,7 @@ READ32_MEMBER(cobra_state::sub_unk1_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_unk1_w)
+void cobra_state::sub_unk1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	if (!ACCESSING_BITS_24_31)
@@ -1756,7 +1744,7 @@ WRITE32_MEMBER(cobra_state::sub_unk1_w)
 	*/
 }
 
-READ32_MEMBER(cobra_state::sub_mainbd_r)
+uint32_t cobra_state::sub_mainbd_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1803,7 +1791,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_mainbd_w)
+void cobra_state::sub_mainbd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1855,12 +1843,12 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 	}
 }
 
-READ32_MEMBER(cobra_state::sub_unk7e_r)
+uint32_t cobra_state::sub_unk7e_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(cobra_state::sub_debug_w)
+void cobra_state::sub_debug_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1887,7 +1875,7 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 	}
 }
 
-READ32_MEMBER(cobra_state::sub_config_r)
+uint32_t cobra_state::sub_config_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1903,67 +1891,67 @@ READ32_MEMBER(cobra_state::sub_config_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_config_w)
+void cobra_state::sub_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ16_MEMBER(cobra_state::sub_ata0_r)
+uint16_t cobra_state::sub_ata0_r(offs_t offset, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs0(offset, mem_mask);
+	uint32_t data = m_ata->cs0_r(offset, mem_mask);
 	data = ( data << 8 ) | ( data >> 8 );
 
 	return data;
 }
 
-WRITE16_MEMBER(cobra_state::sub_ata0_w)
+void cobra_state::sub_ata0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs0(offset, data, mem_mask);
+	m_ata->cs0_w(offset, data, mem_mask);
 }
 
-READ16_MEMBER(cobra_state::sub_ata1_r)
+uint16_t cobra_state::sub_ata1_r(offs_t offset, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs1(offset, mem_mask);
+	uint32_t data = m_ata->cs1_r(offset, mem_mask);
 
 	return ( data << 8 ) | ( data >> 8 );
 }
 
-WRITE16_MEMBER(cobra_state::sub_ata1_w)
+void cobra_state::sub_ata1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs1(offset, data, mem_mask);
+	m_ata->cs1_w(offset, data, mem_mask);
 }
 
-READ32_MEMBER(cobra_state::sub_comram_r)
+uint32_t cobra_state::sub_comram_r(offs_t offset)
 {
 	int page = m_comram_page ^ 1;
 
 	return m_comram[page][offset];
 }
 
-WRITE32_MEMBER(cobra_state::sub_comram_w)
+void cobra_state::sub_comram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int page = m_comram_page ^ 1;
 
 	COMBINE_DATA(m_comram[page].get() + offset);
 }
 
-WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
+void cobra_state::sub_psac_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-READ32_MEMBER(cobra_state::sub_psac2_r)
+uint32_t cobra_state::sub_psac2_r()
 {
 	m_sub_psac_count++;
 	if (m_sub_psac_count >= 0x8000)
@@ -1974,11 +1962,11 @@ READ32_MEMBER(cobra_state::sub_psac2_r)
 	return m_sub_psac_reg;
 }
 
-WRITE32_MEMBER(cobra_state::sub_psac2_w)
+void cobra_state::sub_psac2_w(uint32_t data)
 {
 }
 
-WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
+void cobra_state::sub_sound_dma_w(offs_t offset, uint32_t data)
 {
 	//printf("DMA write to unknown: size %d, data %08X\n", address, data);
 
@@ -2009,7 +1997,7 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	}
 }
 
-WRITE8_MEMBER(cobra_state::sub_jvs_w)
+void cobra_state::sub_jvs_w(uint8_t data)
 {
 #if LOG_JVS
 	printf("sub_jvs_w: %02X\n", data);
@@ -2923,7 +2911,7 @@ void cobra_renderer::gfx_fifo_exec()
 	wait();
 }
 
-READ64_MEMBER(cobra_state::gfx_fifo_r)
+uint64_t cobra_state::gfx_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -2952,25 +2940,25 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo0_w)
+void cobra_state::gfx_fifo0_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 2;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo1_w)
+void cobra_state::gfx_fifo1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 0;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo2_w)
+void cobra_state::gfx_fifo2_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 1;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-READ64_MEMBER(cobra_state::gfx_unk1_r)
+uint64_t cobra_state::gfx_unk1_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -3003,7 +2991,7 @@ READ64_MEMBER(cobra_state::gfx_unk1_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::gfx_unk1_w)
+void cobra_state::gfx_unk1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("gfx_unk1_w: %08X %08X, %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 
@@ -3042,7 +3030,7 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 	}
 }
 
-WRITE64_MEMBER(cobra_state::gfx_buf_w)
+void cobra_state::gfx_buf_w(uint64_t data)
 {
 //  printf("buf_w: top = %08X\n", gfxfifo_get_top());
 
@@ -3086,7 +3074,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 	}
 }
 
-WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
+void cobra_state::gfx_cpu_dc_store(offs_t offset, uint32_t data)
 {
 	uint32_t addr = offset >> 24;
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
@@ -3113,7 +3101,7 @@ WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
 	}
 }
 
-WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
+void cobra_state::gfx_debug_state_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_40_47)
 	{
@@ -3376,12 +3364,12 @@ void cobra_state::init_cobra()
 								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
 								);
 
-	m_maincpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
+	m_maincpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
 
-	m_gfxcpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
+	m_gfxcpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
 
-	m_subcpu->ppc4xx_set_dma_write_handler(0, write32_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
-	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
+	m_subcpu->ppc4xx_set_dma_write_handler(0, write32sm_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
+	m_subcpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
 
 
 	m_comram[0] = std::make_unique<uint32_t[]>(0x40000/4);

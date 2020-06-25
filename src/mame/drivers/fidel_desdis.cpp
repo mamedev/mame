@@ -96,12 +96,13 @@ protected:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
-	virtual DECLARE_WRITE8_MEMBER(control_w);
-	virtual DECLARE_WRITE8_MEMBER(lcd_w);
-	virtual DECLARE_READ8_MEMBER(input_r);
+	void update_lcd();
+	virtual void control_w(offs_t offset, u8 data);
+	virtual void lcd_w(offs_t offset, u8 data);
+	virtual u8 input_r(offs_t offset);
 
-	u8 m_select;
-	u32 m_lcd_data;
+	u8 m_select = 0;
+	u32 m_lcd_data = 0;
 };
 
 void desdis_state::init_fdes2100d()
@@ -111,10 +112,6 @@ void desdis_state::init_fdes2100d()
 
 void desdis_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_lcd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_lcd_data));
@@ -140,9 +137,8 @@ private:
 	void fdes2265_map(address_map &map);
 	void fdes2325_map(address_map &map);
 
-	// I/O handlers, slightly different (control_w is d0 instead of d7, lcd_w is inverted)
-	virtual DECLARE_WRITE8_MEMBER(control_w) override { desdis_state::control_w(space, offset, data << 7); }
-	virtual DECLARE_WRITE8_MEMBER(lcd_w) override { desdis_state::lcd_w(space, offset, ~data); }
+	// I/O handlers, slightly different (control_w is d0 instead of d7)
+	virtual void control_w(offs_t offset, u8 data) override { desdis_state::control_w(offset, data << 7); }
 };
 
 void desmas_state::init_fdes2265()
@@ -169,10 +165,17 @@ void desmas_state::init_fdes2265()
 
 // TTL/generic
 
-WRITE8_MEMBER(desdis_state::control_w)
+void desdis_state::update_lcd()
 {
-	u8 q3_old = m_select & 8;
+	u8 mask = (m_select & 8) ? 0 : 0xff;
+	for (int i = 0; i < 4; i++)
+		m_display->write_row(i+2, (m_lcd_data >> (8*i) & 0xff) ^ mask);
 
+	m_display->update();
+}
+
+void desdis_state::control_w(offs_t offset, u8 data)
+{
 	// a0-a2,d7: 74259
 	u8 mask = 1 << offset;
 	m_select = (m_select & ~mask) | ((data & 0x80) ? mask : 0);
@@ -192,16 +195,11 @@ WRITE8_MEMBER(desdis_state::control_w)
 	if (m_rombank != nullptr)
 		m_rombank->set_entry(~m_select >> 2 & 1);
 
-	// 74259 Q3: lcd common, update on rising edge
-	if (~q3_old & m_select & 8)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display->write_row(i+2, m_lcd_data >> (8*i) & 0xff);
-	}
-	m_display->update();
+	// 74259 Q3: lcd polarity
+	update_lcd();
 }
 
-WRITE8_MEMBER(desdis_state::lcd_w)
+void desdis_state::lcd_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0-d3: 4*74259 to lcd digit segments
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
@@ -210,9 +208,11 @@ WRITE8_MEMBER(desdis_state::lcd_w)
 		m_lcd_data = (m_lcd_data & ~mask) | ((data >> i & 1) ? 0 : mask);
 		mask <<= 8;
 	}
+
+	update_lcd();
 }
 
-READ8_MEMBER(desdis_state::input_r)
+u8 desdis_state::input_r(offs_t offset)
 {
 	u8 sel = m_select >> 4 & 0xf;
 	u8 data = 0;
@@ -358,7 +358,7 @@ void desmas_state::fdes2325(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01. The 'rev B' dump came from a post-release bugfix by Fidelity
+ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01 - this dump came from a post-release bugfix by Fidelity
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
 
@@ -397,7 +397,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP MACHINE    INPUT   STATE         INIT            COMPANY, FULLNAME, FLAGS
-CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fdes2000d, fdes2100d, 0, fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1989, fdes2265,  0,         0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/raiden2.h"
 
-WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
+void raiden2_state::m_videoram_private_w(offs_t offset, uint16_t data)
 {
 	//  map(0x0d000, 0x0d7ff).ram().w(FUNC(raiden2_state::background_w)).share("back_data");
 	//  map(0x0d800, 0x0dfff).ram().w(FUNC(raiden2_state::foreground_w).share("fore_data");
@@ -260,7 +260,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 
 	tile = (tile & 0xfff) | (m_bg_bank << 12);
 
-	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
+	tileinfo.set(1,tile+0x0000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
@@ -270,7 +270,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 
 	tile = (tile & 0xfff) | (m_mid_bank << 12);
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	tileinfo.set(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
@@ -280,7 +280,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 
 	tile = (tile & 0xfff) | (m_fg_bank << 12);
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	tileinfo.set(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
@@ -290,7 +290,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile + m_tx_bank * 0x1000,color,0);
+	tileinfo.set(0,tile + m_tx_bank * 0x1000,color,0);
 }
 
 void raiden2_state::video_start()

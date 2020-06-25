@@ -82,7 +82,7 @@ const tiny_rom_entry *p1_hdc_device::device_rom_region() const
 //**************************************************************************
 
 
-READ8_MEMBER(p1_hdc_device::p1_HDC_r)
+uint8_t p1_hdc_device::p1_HDC_r(offs_t offset)
 {
 	uint8_t data = 0x00;
 
@@ -96,7 +96,7 @@ READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
+void p1_hdc_device::p1_HDC_w(offs_t offset, uint8_t data)
 {
 	LOG("hdc W $%04x <- $%02x\n", offset, data);
 
@@ -127,7 +127,7 @@ void p1_hdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xe2000, 0xe27ff, "XXX", "p1_hdc");
-	m_isa->install_memory(0xd0000, 0xd0fff, read8_delegate(*this, FUNC(p1_hdc_device::p1_HDC_r)), write8_delegate(*this, FUNC(p1_hdc_device::p1_HDC_w)));
+	m_isa->install_memory(0xd0000, 0xd0fff, read8sm_delegate(*this, FUNC(p1_hdc_device::p1_HDC_r)), write8sm_delegate(*this, FUNC(p1_hdc_device::p1_HDC_w)));
 }
 
 

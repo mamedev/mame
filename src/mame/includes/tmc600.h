@@ -65,17 +65,17 @@ private:
 
 	virtual void video_start() override;
 
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER( vismac_register_w );
-	DECLARE_WRITE8_MEMBER( vismac_data_w );
-	DECLARE_WRITE8_MEMBER( page_ram_w );
+	uint8_t  rtc_r();
+	void printer_w(uint8_t data);
+	void vismac_register_w(uint8_t data);
+	void vismac_data_w(uint8_t data);
+	void page_ram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( sc_w );
-	DECLARE_WRITE8_MEMBER( out3_w );
+	void sc_w(uint8_t data);
+	void out3_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 
 	uint8_t get_color(uint16_t pma);

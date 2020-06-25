@@ -72,18 +72,18 @@ protected:
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_colorram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_control_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_r);
-	DECLARE_WRITE8_MEMBER(seabattl_collision_clear_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_clear_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(time_display_w);
-	DECLARE_WRITE8_MEMBER(score_display_w);
-	DECLARE_WRITE8_MEMBER(score2_display_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
+	void seabattl_videoram_w(offs_t offset, uint8_t data);
+	void seabattl_colorram_w(offs_t offset, uint8_t data);
+	void seabattl_control_w(uint8_t data);
+	uint8_t seabattl_collision_r();
+	void seabattl_collision_clear_w(uint8_t data);
+	uint8_t seabattl_collision_clear_r();
+	void sound_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void time_display_w(uint8_t data);
+	void score_display_w(uint8_t data);
+	void score2_display_w(uint8_t data);
+	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
@@ -143,16 +143,16 @@ TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, code, (color & 0x7), 0);
+	tileinfo.set(1, code, (color & 0x7), 0);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_videoram_w)
+void seabattl_state::seabattl_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_colorram_w)
+void seabattl_state::seabattl_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -279,13 +279,13 @@ void seabattl_state::seabattl_data_map(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(seabattl_state::seabattl_collision_clear_r), FUNC(seabattl_state::seabattl_collision_clear_w));
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_r)
+uint8_t seabattl_state::seabattl_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_control_w)
+void seabattl_state::seabattl_control_w(uint8_t data)
 {
 	// bit 0: play counter
 	// bit 1: super bonus counter
@@ -298,20 +298,20 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	m_waveenable = BIT(data, 5);
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_clear_r)
+uint8_t seabattl_state::seabattl_collision_clear_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_collision_clear_w )
+void seabattl_state::seabattl_collision_clear_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 }
 
-WRITE8_MEMBER(seabattl_state::sound_w )
+void seabattl_state::sound_w(uint8_t data)
 {
 	// sound effects
 	// bits:
@@ -325,7 +325,7 @@ WRITE8_MEMBER(seabattl_state::sound_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::sound2_w )
+void seabattl_state::sound2_w(uint8_t data)
 {
 	// sound effects
 	// bits:
@@ -339,19 +339,19 @@ WRITE8_MEMBER(seabattl_state::sound2_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::time_display_w )
+void seabattl_state::time_display_w(uint8_t data)
 {
 	m_digits[5]->a_w(data & 0x0f);
 	m_digits[4]->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score_display_w )
+void seabattl_state::score_display_w(uint8_t data)
 {
 	m_digits[3]->a_w(data & 0x0f);
 	m_digits[2]->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score2_display_w )
+void seabattl_state::score2_display_w(uint8_t data)
 {
 	m_digits[1]->a_w(data & 0x0f);
 	m_digits[0]->a_w((data >> 4) & 0x0f);
@@ -449,7 +449,7 @@ void seabattl_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 static const gfx_layout tiles32x16x3_layout =
@@ -489,7 +489,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	S2636(config, m_s2636, 0);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);

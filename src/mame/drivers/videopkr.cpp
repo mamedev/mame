@@ -324,22 +324,22 @@ public:
 	void bpoker(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(videopkr_io_r);
-	DECLARE_WRITE8_MEMBER(videopkr_io_w);
-	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
-	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
-	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
-	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
+	uint8_t videopkr_io_r(offs_t offset);
+	void videopkr_io_w(offs_t offset, uint8_t data);
+	uint8_t videopkr_p1_data_r();
+	uint8_t videopkr_p2_data_r();
+	void videopkr_p1_data_w(uint8_t data);
+	void videopkr_p2_data_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(sound_io_r);
-	DECLARE_WRITE8_MEMBER(sound_io_w);
-	DECLARE_READ8_MEMBER(sound_p2_r);
-	DECLARE_WRITE8_MEMBER(sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p0_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p0_w);
-	DECLARE_READ8_MEMBER(baby_sound_p1_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
+	uint8_t sound_io_r();
+	void sound_io_w(uint8_t data);
+	uint8_t sound_p2_r();
+	void sound_p2_w(uint8_t data);
+	uint8_t baby_sound_p0_r();
+	void baby_sound_p0_w(uint8_t data);
+	uint8_t baby_sound_p1_r();
+	void baby_sound_p3_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videopkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(vidadcba);
@@ -522,7 +522,7 @@ TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
 	int attr = m_color_ram[offs] + ioport("IN2")->read(); /* Color Switch Action */
 	int code = m_video_ram[offs];
 	int color = attr;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -549,7 +549,7 @@ uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_in
 *      R/W Handlers      *
 *************************/
 
-READ8_MEMBER(videopkr_state::videopkr_io_r)
+uint8_t videopkr_state::videopkr_io_r(offs_t offset)
 {
 	uint8_t valor = 0, hf, co;
 
@@ -629,7 +629,7 @@ READ8_MEMBER(videopkr_state::videopkr_io_r)
 	return valor;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_io_w)
+void videopkr_state::videopkr_io_w(offs_t offset, uint8_t data)
 {
 	switch (m_p2)
 	{
@@ -698,17 +698,17 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 	}
 }
 
-READ8_MEMBER(videopkr_state::videopkr_p1_data_r)
+uint8_t videopkr_state::videopkr_p1_data_r()
 {
 	return m_p1;
 }
 
-READ8_MEMBER(videopkr_state::videopkr_p2_data_r)
+uint8_t videopkr_state::videopkr_p2_data_r()
 {
 	return m_p2;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
+void videopkr_state::videopkr_p1_data_w(uint8_t data)
 {
 	m_p1 = data;
 
@@ -750,7 +750,7 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 	m_ant_jckp = m_jckp;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_p2_data_w)
+void videopkr_state::videopkr_p2_data_w(uint8_t data)
 {
 	m_p2 = data;
 }
@@ -802,7 +802,7 @@ WRITE_LINE_MEMBER(videopkr_state::prog_w)
 
 */
 
-READ8_MEMBER(videopkr_state::sound_io_r)
+uint8_t videopkr_state::sound_io_r()
 {
 	switch (m_vp_sound_p2)
 	{
@@ -824,7 +824,7 @@ READ8_MEMBER(videopkr_state::sound_io_r)
 	return m_sound_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_io_w)
+void videopkr_state::sound_io_w(uint8_t data)
 {
 	if (m_vp_sound_p2 == 0x5f || m_vp_sound_p2 == 0xdf)
 	{
@@ -833,12 +833,12 @@ WRITE8_MEMBER(videopkr_state::sound_io_w)
 	}
 }
 
-READ8_MEMBER(videopkr_state::sound_p2_r)
+uint8_t videopkr_state::sound_p2_r()
 {
 	return m_vp_sound_p2;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_p2_w)
+void videopkr_state::sound_p2_w(uint8_t data)
 {
 	m_vp_sound_p2 = data;
 
@@ -870,17 +870,17 @@ WRITE8_MEMBER(videopkr_state::sound_p2_w)
 
 /* Baby Sound Handlers */
 
-READ8_MEMBER(videopkr_state::baby_sound_p0_r)
+uint8_t videopkr_state::baby_sound_p0_r()
 {
 	return m_sbp0;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p0_w)
+void videopkr_state::baby_sound_p0_w(uint8_t data)
 {
 	m_sbp0 = data;
 }
 
-READ8_MEMBER(videopkr_state::baby_sound_p1_r)
+uint8_t videopkr_state::baby_sound_p1_r()
 {
 	m_c_io = (m_p1 >> 5) & 1;
 	m_hp_1 = (~m_p24_data >> 6) & 1;
@@ -890,7 +890,7 @@ READ8_MEMBER(videopkr_state::baby_sound_p1_r)
 	return m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | (m_bell << 3) | (m_aux3 << 4) | 0xe0;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
+void videopkr_state::baby_sound_p3_w(uint8_t data)
 {
 	uint8_t lmp_ports, ay_intf;
 	lmp_ports = data >> 1 & 0x07;

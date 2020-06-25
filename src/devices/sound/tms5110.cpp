@@ -1119,7 +1119,7 @@ commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
-WRITE8_MEMBER( tms5110_device::ctl_w )
+void tms5110_device::ctl_w(uint8_t data)
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1133,7 +1133,7 @@ WRITE8_MEMBER( tms5110_device::ctl_w )
 
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( tms5110_device::pdc_w )
+void tms5110_device::pdc_w(int state)
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1159,7 +1159,7 @@ WRITE_LINE_MEMBER( tms5110_device::pdc_w )
 
 ******************************************************************************/
 
-READ8_MEMBER( tms5110_device::ctl_r )
+uint8_t tms5110_device::ctl_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1180,7 +1180,7 @@ READ8_MEMBER( tms5110_device::ctl_r )
 	}
 }
 
-READ8_MEMBER( m58817_device::status_r )
+uint8_t m58817_device::status_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1198,7 +1198,7 @@ void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_romclk_hack_state = !m_romclk_hack_state;
 }
 
-READ_LINE_MEMBER( tms5110_device::romclk_hack_r )
+int tms5110_device::romclk_hack_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -1374,7 +1374,7 @@ void tmsprom_device::device_start()
 	register_for_save_states();
 }
 
-WRITE_LINE_MEMBER( tmsprom_device::m0_w )
+void tmsprom_device::m0_w(int state)
 {
 	/* falling edge counts */
 	if (m_m0 && !state)
@@ -1385,24 +1385,24 @@ WRITE_LINE_MEMBER( tmsprom_device::m0_w )
 	m_m0 = state;
 }
 
-READ_LINE_MEMBER( tmsprom_device::data_r )
+int tmsprom_device::data_r()
 {
 	return (m_rom[m_base_address + m_address] >> m_bit) & 0x01;
 }
 
 
-WRITE8_MEMBER( tmsprom_device::rom_csq_w )
+void tmsprom_device::rom_csq_w(offs_t offset, uint8_t data)
 {
 	if (!data)
 		m_base_address = offset * m_rom_size;
 }
 
-WRITE8_MEMBER( tmsprom_device::bit_w )
+void tmsprom_device::bit_w(uint8_t data)
 {
 	m_bit = data;
 }
 
-WRITE_LINE_MEMBER( tmsprom_device::enable_w )
+void tmsprom_device::enable_w(int state)
 {
 	if (state != m_enable)
 	{

@@ -130,15 +130,15 @@ private:
 	uint16_t m_layer_en;
 	uint16_t m_scrollram[6];
 
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_READ16_MEMBER(mahjong_panel_r);
-	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	void gfxbank_w(uint16_t data);
+	uint16_t mahjong_panel_r();
+	void mahjong_panel_w(uint16_t data);
+	void seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
@@ -205,25 +205,25 @@ private:
 *
 *******************************/
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc0vram_w )
+void goodejan_state::seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc2vram_w )
+void goodejan_state::seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc2_vram[offset]);
 	m_sc2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc1vram_w )
+void goodejan_state::seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc1_vram[offset]);
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc3vram_w )
+void goodejan_state::seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap->mark_tile_dirty(offset);
@@ -247,28 +247,28 @@ TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc0_tile_info )
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 	tile+=(m_seibucrtc_sc0bank<<12);
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc2_tile_info )
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc1_tile_info )
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(3, tile, color, 0);
+	tileinfo.set(3, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc3_tile_info )
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(4, tile, color, 0);
+	tileinfo.set(4, tile, color, 0);
 }
 
 void goodejan_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
@@ -361,13 +361,13 @@ uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #define GOODEJAN_MHZ3 12000000
 
 
-WRITE16_MEMBER(goodejan_state::gfxbank_w)
+void goodejan_state::gfxbank_w(uint16_t data)
 {
 	seibucrtc_sc0bank_w((data & 0x100)>>8);
 }
 
 /* Multiplexer device for the mahjong panel */
-READ16_MEMBER(goodejan_state::mahjong_panel_r)
+uint16_t goodejan_state::mahjong_panel_r()
 {
 	u16 ret;
 	ret = 0xffff;
@@ -381,7 +381,7 @@ READ16_MEMBER(goodejan_state::mahjong_panel_r)
 	return ret;
 }
 
-WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
+void goodejan_state::mahjong_panel_w(uint16_t data)
 {
 	m_mux_data = data;
 }
@@ -422,11 +422,11 @@ void goodejan_state::goodejan_io_map(address_map &map)
 {
 	common_io_map(map);
 	map(0x8000, 0x807f).lrw16(
-							  NAME([this](address_space &space, offs_t offset, u16 mem_mask) {
-								  return m_crtc->read(space, offset ^ 0x20, mem_mask);
+							  NAME([this](offs_t offset) {
+								  return m_crtc->read(offset ^ 0x20);
 							  }),
-							  NAME([this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
-								  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
+							  NAME([this](offs_t offset, u16 data) {
+								  m_crtc->write(offset ^ 0x20, data);
 							  }));
 }
 
@@ -590,12 +590,12 @@ WRITE_LINE_MEMBER(goodejan_state::vblank_irq)
 /* vector 0x00c is just a reti */
 }
 
-WRITE16_MEMBER( goodejan_state::layer_en_w )
+void goodejan_state::layer_en_w(uint16_t data)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( goodejan_state::layer_scroll_w )
+void goodejan_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

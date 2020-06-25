@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -14,22 +15,22 @@
 
 class c352_device : public device_t,
 					public device_sound_interface,
-					public device_rom_interface
+					public device_rom_interface<24>
 {
 public:
 	// construction/destruction
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int divider)
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, int divider)
 		: c352_device(mconfig, tag, owner, clock)
 	{
 		set_divider(divider);
 	}
 
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_divider(int divider) { m_divider = divider; }
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = 0);
 
 protected:
 	// device-level overrides
@@ -67,31 +68,28 @@ private:
 
 	struct c352_voice_t
 	{
-		uint32_t pos;
-		uint32_t counter;
+		u32 pos;
+		u32 counter;
 
-		int16_t sample;
-		int16_t last_sample;
+		s16 sample;
+		s16 last_sample;
 
-		uint16_t vol_f;
-		uint16_t vol_r;
-		uint8_t curr_vol[4];
+		u16 vol_f;
+		u16 vol_r;
+		u8 curr_vol[4];
 
-		uint16_t freq;
-		uint16_t flags;
+		u16 freq;
+		u16 flags;
 
-		uint16_t  wave_bank;
-		uint16_t wave_start;
-		uint16_t wave_end;
-		uint16_t wave_loop;
+		u16  wave_bank;
+		u16 wave_start;
+		u16 wave_end;
+		u16 wave_loop;
 
 	};
 
 	void fetch_sample(c352_voice_t &v);
-	void ramp_volume(c352_voice_t &v, int ch, uint8_t val);
-
-	unsigned short read_reg16(unsigned long address);
-	void write_reg16(unsigned long address, unsigned short val);
+	void ramp_volume(c352_voice_t &v, int ch, u8 val);
 
 	sound_stream *m_stream;
 
@@ -100,10 +98,10 @@ private:
 
 	c352_voice_t m_c352_v[32];
 
-	int16_t m_mulawtab[256];
+	s16 m_mulawtab[256];
 
-	uint16_t m_random;
-	uint16_t m_control; // control flags, purpose unknown.
+	u16 m_random;
+	u16 m_control; // control flags, purpose unknown.
 };
 
 

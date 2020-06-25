@@ -305,7 +305,7 @@ WRITE_LINE_MEMBER( m5_state::write_centronics_busy )
 //  sts_r -
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::sts_r )
+uint8_t m5_state::sts_r()
 {
 	/*
 
@@ -341,7 +341,7 @@ READ8_MEMBER( m5_state::sts_r )
 //  com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::com_w )
+void m5_state::com_w(uint8_t data)
 {
 	/*
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER( m5_state::com_w )
 //  fd5_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::fd5_data_r )
+uint8_t m5_state::fd5_data_r()
 {
 	m_ppi->pc6_w(0);
 
@@ -390,7 +390,7 @@ READ8_MEMBER( m5_state::fd5_data_r )
 //  fd5_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_data_w )
+void m5_state::fd5_data_w(uint8_t data)
 {
 	m_fd5_data = data;
 
@@ -402,7 +402,7 @@ WRITE8_MEMBER( m5_state::fd5_data_w )
 //  fd5_com_r -
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::fd5_com_r )
+uint8_t m5_state::fd5_com_r()
 {
 	/*
 
@@ -427,7 +427,7 @@ READ8_MEMBER( m5_state::fd5_com_r )
 //  fd5_com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_com_w )
+void m5_state::fd5_com_w(uint8_t data)
 {
 	/*
 
@@ -452,7 +452,7 @@ WRITE8_MEMBER( m5_state::fd5_com_w )
 //  fd5_com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_ctrl_w )
+void m5_state::fd5_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 //  fd5_com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_tc_w )
+void m5_state::fd5_tc_w(uint8_t data)
 {
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);
@@ -487,12 +487,12 @@ WRITE8_MEMBER( m5_state::fd5_tc_w )
 //  64KBI support for oldest memory module
 //**************************************************************************
 
-READ8_MEMBER( m5_state::mem64KBI_r ) //in 0x6c
+uint8_t m5_state::mem64KBI_r() //in 0x6c
 {
 	return BIT(m_ram_mode, 0);
 }
 
-WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
+void m5_state::mem64KBI_w(offs_t offset, uint8_t data) //out 0x6c
 {
 	if (m_ram_type != MEM64KBI) return;
 
@@ -519,7 +519,7 @@ WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 		//if AUTOSTART is on don't load any ROM cart
 		if (m_cart && (m_DIPS->read() & 2) != 2)
 		{
-			program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom))); //m_cart pointer to rom cart
+			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 			program.unmap_write(0x2000, 0x3fff);
 		}
 		else
@@ -533,7 +533,7 @@ WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 //  64KBF paging
 //**************************************************************************
 
-WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
+void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 {
 	if (m_ram_type != MEM64KBF) return;
 
@@ -650,7 +650,7 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 //  64KRX paging
 //**************************************************************************
 
-WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
+void m5_state::mem64KRX_w(offs_t offset, uint8_t data) //out 0x7f
 {
 	if (m_ram_type != MEM64KRX) return;
 	if (m_ram_mode == data) return;
@@ -680,7 +680,7 @@ WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 	//if KRX ROM is paged out page in cart ROM if any
 	if (m_cart && BIT(m_ram_mode, 1) == 0 )
 	{
-		program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+		program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 		program.unmap_write(0x2000, 0x6fff);
 	}
 
@@ -728,7 +728,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x35, 0x35).mirror(0x08).portr("Y5");
 	map(0x36, 0x36).mirror(0x08).portr("Y6");
 	map(0x37, 0x37).mirror(0x08).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
 //  map(0x60, 0x63) SIO
 	map(0x6c, 0x6c).rw(FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
@@ -887,12 +887,12 @@ WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
 //  I8255 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::ppi_pa_r )
+uint8_t m5_state::ppi_pa_r()
 {
 	return m_fd5_data;
 }
 
-READ8_MEMBER(m5_state::ppi_pc_r )
+uint8_t m5_state::ppi_pc_r()
 {
 	/*
 
@@ -919,12 +919,12 @@ READ8_MEMBER(m5_state::ppi_pc_r )
 	);
 }
 
-WRITE8_MEMBER( m5_state::ppi_pa_w )
+void m5_state::ppi_pa_w(uint8_t data)
 {
 	m_fd5_data = data;
 }
 
-WRITE8_MEMBER( m5_state::ppi_pb_w )
+void m5_state::ppi_pb_w(uint8_t data)
 {
 	/*
 
@@ -948,7 +948,7 @@ WRITE8_MEMBER( m5_state::ppi_pb_w )
 	}
 }
 
-WRITE8_MEMBER( m5_state::ppi_pc_w )
+void m5_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -1049,7 +1049,7 @@ void brno_state::brno_io(address_map &map)
 	map(0x35, 0x35).portr("Y5");
 	map(0x36, 0x36).portr("Y6");
 	map(0x37, 0x37).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
 //  map(0x60, 0x63)                                                                            //  SIO
 	map(0x64, 0x67).rw(FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                           //  MMU - page select (ramdisk memory paging)
@@ -1061,13 +1061,13 @@ void brno_state::brno_io(address_map &map)
 }
 
 
-READ8_MEMBER( brno_state::mmu_r )
+uint8_t brno_state::mmu_r()
 {
 	return 0;
 }
 
 
-WRITE8_MEMBER( brno_state::mmu_w )
+void brno_state::mmu_w(uint8_t data)
 {
 	m_ramcpu = m_maincpu->state_int(Z80_B);
 	m_rambank = ~data; //m_maincpu->state_int(Z80_A);
@@ -1099,13 +1099,13 @@ WRITE8_MEMBER( brno_state::mmu_w )
 
 }
 
-READ8_MEMBER( brno_state::ramsel_r )
+uint8_t brno_state::ramsel_r()
 {
 	return m_ramen;
 }
 
 
-WRITE8_MEMBER( brno_state::ramsel_w ) //out 6b
+void brno_state::ramsel_w(uint8_t data) //out 6b
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -1117,12 +1117,12 @@ WRITE8_MEMBER( brno_state::ramsel_w ) //out 6b
 	logerror("CASEN change: out (&6b),%x\n",data);
 }
 
-READ8_MEMBER( brno_state::romsel_r )
+uint8_t brno_state::romsel_r()
 {
 	return m_romen;
 }
 
-WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
+void brno_state::romsel_w(uint8_t data) //out 6c
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -1154,13 +1154,13 @@ WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
 //  FD port 7c - Floppy select
 //-------------------------------------------------
 
-READ8_MEMBER( brno_state::fd_r )
+uint8_t brno_state::fd_r()
 {
 	return 0;
 }
 
 
-WRITE8_MEMBER( brno_state::fd_w )
+void brno_state::fd_w(uint8_t data)
 {
 	floppy_image_device *floppy;
 	m_floppy = nullptr;
@@ -1281,10 +1281,10 @@ void m5_state::machine_reset()
 			case EM_5:
 				program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
 				program.unmap_write(0x0000, 0x1fff);
-				program.install_readwrite_handler(0x8000, 0xffff, read8_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::read_ram)), write8_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::write_ram)));
+				program.install_readwrite_handler(0x8000, 0xffff, read8sm_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::read_ram)), write8sm_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::write_ram)));
 				if (m_cart)
 				{
-					program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+					program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 					program.unmap_write(0x2000, 0x6fff);
 				}
 				break;
@@ -1296,7 +1296,7 @@ void m5_state::machine_reset()
 				//if AUTOSTART is on then page out cart and start tape loading
 				if (m_cart && ((m_DIPS->read() & 2) != 2))
 				{
-					program.install_read_handler(0x2000, 0x3fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+					program.install_read_handler(0x2000, 0x3fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 					program.unmap_write(0x2000, 0x3fff);
 				}
 				else
@@ -1342,7 +1342,7 @@ void m5_state::machine_reset()
 		{
 			program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
 			program.unmap_write(0x0000, 0x1fff);
-			program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 			program.unmap_write(0x2000, 0x6fff);
 		}
 	m_ram_mode=0;
@@ -1381,7 +1381,7 @@ void brno_state::machine_reset()
 
 	if (m_cart)
 		{
-			program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 			program.unmap_write(0x2000, 0x6fff);
 		}
 

@@ -35,9 +35,9 @@
  *
  *************************************/
 
-void atarig42_state::update_interrupts()
+void atarig42_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -52,13 +52,6 @@ void atarig42_state::machine_start()
 }
 
 
-void atarig42_state::machine_reset()
-{
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
-}
-
-
 
 /*************************************
  *
@@ -66,14 +59,14 @@ void atarig42_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(atarig42_state::a2d_select_w)
+void atarig42_state::a2d_select_w(offs_t offset, uint8_t data)
 {
 	if (m_adc.found())
 		m_adc->address_offset_start_w(offset, 0);
 }
 
 
-READ8_MEMBER(atarig42_state::a2d_data_r)
+uint8_t atarig42_state::a2d_data_r(offs_t offset)
 {
 	if (!m_adc.found())
 		return 0xff;
@@ -85,7 +78,7 @@ READ8_MEMBER(atarig42_state::a2d_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::io_latch_w)
+void atarig42_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
@@ -112,7 +105,7 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 }
 
 
-WRITE16_MEMBER(atarig42_state::mo_command_w)
+void atarig42_state::mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write((data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -238,7 +231,7 @@ void atarig42_0x200_state::roadriot_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_r)
+uint16_t atarig42_0x200_state::roadriot_sloop_data_r(offs_t offset)
 {
 	roadriot_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -248,7 +241,7 @@ READ16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_w)
+void atarig42_0x200_state::roadriot_sloop_data_w(offs_t offset, uint16_t data)
 {
 	roadriot_sloop_tweak(offset);
 }
@@ -295,7 +288,7 @@ void atarig42_0x400_state::guardians_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_0x400_state::guardians_sloop_data_r)
+uint16_t atarig42_0x400_state::guardians_sloop_data_r(offs_t offset)
 {
 	guardians_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -305,7 +298,7 @@ READ16_MEMBER(atarig42_0x400_state::guardians_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_0x400_state::guardians_sloop_data_w)
+void atarig42_0x400_state::guardians_sloop_data_w(offs_t offset, uint16_t data)
 {
 	guardians_sloop_tweak(offset);
 }
@@ -520,8 +513,10 @@ static const atari_rle_objects_config modesc_0x400 =
 void atarig42_state::atarig42(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig42_state::main_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarig42_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -540,10 +535,10 @@ void atarig42_state::atarig42(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarig42_state::screen_update_atarig42));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(atarig42_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 
@@ -561,7 +556,7 @@ void atarig42_0x200_state::atarig42_0x200(machine_config &config)
 	atarig42(config);
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz / 16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL / 16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
@@ -830,7 +825,7 @@ void atarig42_0x200_state::init_roadriot()
 	m_playfield_base = 0x400;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
@@ -865,7 +860,7 @@ void atarig42_0x400_state::init_guardian()
 	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*

@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16)+(attr & 7),
 			0);
@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
@@ -127,13 +127,13 @@ void labyrunr_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(labyrunr_state::labyrunr_vram1_w)
+void labyrunr_state::labyrunr_vram1_w(offs_t offset, uint8_t data)
 {
 	m_videoram1[offset] = data;
 	m_layer0->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
+void labyrunr_state::labyrunr_vram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_layer1->mark_tile_dirty(offset & 0x3ff);

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    input.c
+    input.cpp
 
     Handle input from the user.
 

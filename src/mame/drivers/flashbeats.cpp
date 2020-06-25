@@ -53,9 +53,9 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(scsp_irq);
-	DECLARE_READ16_MEMBER(p6_r);
-	DECLARE_WRITE16_MEMBER(p6_w);
+	void scsp_irq(offs_t offset, uint8_t data);
+	uint16_t p6_r();
+	void p6_w(uint16_t data);
 
 	required_device<h83007_device> m_maincpu;
 	required_device<m68000_device> m_scspcpu;
@@ -101,12 +101,12 @@ uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-READ16_MEMBER(flashbeats_state::p6_r)
+uint16_t flashbeats_state::p6_r()
 {
 	return (m_eeprom->do_read() << 3);
 }
 
-WRITE16_MEMBER(flashbeats_state::p6_w)
+void flashbeats_state::p6_w(uint16_t data)
 {
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write((data >> 2) & 1);
@@ -176,7 +176,7 @@ void flashbeats_state::flashbeats(machine_config &config)
 	m_scsp->add_route(1, "rspeaker", 1.0);
 }
 
-WRITE8_MEMBER(flashbeats_state::scsp_irq)
+void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)
 {
 }
 

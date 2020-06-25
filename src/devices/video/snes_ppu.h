@@ -52,8 +52,8 @@ public:
 	int16_t current_y() const { return screen().vpos(); }
 	void set_latch_hv(int16_t x, int16_t y);
 
-	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);
-	void write(address_space &space, uint32_t offset, uint8_t data);
+	uint8_t read(uint32_t offset, uint8_t wrio_bit7);
+	void write(uint32_t offset, uint8_t data);
 
 	int vtotal() const { return ((m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL; }
 	uint16_t htmult() const { return m_htmult; }
@@ -299,10 +299,10 @@ protected:
 	uint8_t read_object(uint16_t address);
 	void write_object(uint16_t address, uint8_t data);
 
-	DECLARE_READ8_MEMBER( cgram_read );
-	DECLARE_WRITE8_MEMBER( cgram_write );
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
+	uint8_t cgram_read(offs_t offset);
+	void cgram_write(offs_t offset, uint8_t data);
+	uint8_t vram_read(offs_t offset);
+	void vram_write(offs_t offset, uint8_t data);
 	object m_objects[128]; /* Object Attribute Memory (OAM) */
 	std::unique_ptr<uint16_t[]> m_cgram;   /* Palette RAM */
 	std::unique_ptr<uint8_t[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */

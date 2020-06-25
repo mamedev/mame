@@ -172,22 +172,22 @@ TODO
 
 #include <algorithm>
 
-READ32_MEMBER(namcofl_state::unk1_r)
+uint32_t namcofl_state::unk1_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::network_r)
+uint32_t namcofl_state::network_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::sysreg_r)
+uint32_t namcofl_state::sysreg_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(namcofl_state::sysreg_w)
+void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
@@ -203,9 +203,9 @@ WRITE32_MEMBER(namcofl_state::sysreg_w)
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
-WRITE8_MEMBER(namcofl_state::c116_w)
+void namcofl_state::c116_w(offs_t offset, uint8_t data)
 {
-	m_c116->write(space, offset, data);
+	m_c116->write(offset, data);
 
 	if ((offset & 0x180e) == 0x180a)
 	{
@@ -242,7 +242,7 @@ void namcofl_state::namcofl_bank_mem(address_map &map)
 }
 
 
-WRITE16_MEMBER(namcofl_state::mcu_shared_w)
+void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -264,17 +264,17 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 }
 
 
-READ8_MEMBER(namcofl_state::port6_r)
+uint8_t namcofl_state::port6_r()
 {
 	return m_mcu_port6;
 }
 
-WRITE8_MEMBER(namcofl_state::port6_w)
+void namcofl_state::port6_w(uint8_t data)
 {
 	m_mcu_port6 = data;
 }
 
-READ8_MEMBER(namcofl_state::port7_r)
+uint8_t namcofl_state::port7_r()
 {
 	switch (m_mcu_port6 & 0xf0)
 	{
@@ -297,26 +297,26 @@ READ8_MEMBER(namcofl_state::port7_r)
 	return 0xff;
 }
 
-READ8_MEMBER(namcofl_state::dac7_r)
+uint8_t namcofl_state::dac7_r()
 {
 	return m_accel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac6_r)
+uint8_t namcofl_state::dac6_r()
 {
 	return m_brake.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac5_r)
+uint8_t namcofl_state::dac5_r()
 {
 	return m_wheel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac3_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac2_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac1_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
+uint8_t namcofl_state::dac4_r(){ return 0xff; }
+uint8_t namcofl_state::dac3_r(){ return 0xff; }
+uint8_t namcofl_state::dac2_r(){ return 0xff; }
+uint8_t namcofl_state::dac1_r(){ return 0xff; }
+uint8_t namcofl_state::dac0_r(){ return 0xff; }
 
 void namcofl_state::namcoc75_am(address_map &map)
 {

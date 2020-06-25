@@ -100,25 +100,25 @@
 #include "includes/lucky74.h"
 
 
-WRITE8_MEMBER(lucky74_state::lucky74_fg_videoram_w)
+void lucky74_state::lucky74_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_fg_colorram_w)
+void lucky74_state::lucky74_fg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_bg_videoram_w)
+void lucky74_state::lucky74_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_bg_colorram_w)
+void lucky74_state::lucky74_bg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -206,7 +206,7 @@ TILE_GET_INFO_MEMBER(lucky74_state::get_fg_tile_info)
 	int code = m_fg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(lucky74_state::get_bg_tile_info)
@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(lucky74_state::get_bg_tile_info)
 	int code = m_bg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 

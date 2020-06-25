@@ -72,8 +72,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
+	void sound_cmd_w(uint16_t data);
+	void go2000_pcm_1_bankswitch_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -83,7 +83,7 @@ private:
 };
 
 
-WRITE16_MEMBER(go2000_state::sound_cmd_w)
+void go2000_state::sound_cmd_w(uint16_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
@@ -104,7 +104,7 @@ void go2000_state::go2000_map(address_map &map)
 //  map(0xe00020, 0xe00021).nopw();
 }
 
-WRITE8_MEMBER(go2000_state::go2000_pcm_1_bankswitch_w)
+void go2000_state::go2000_pcm_1_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }

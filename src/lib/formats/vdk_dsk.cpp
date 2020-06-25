@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -10,7 +10,6 @@
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "vdk_dsk.h"
 
 vdk_format::vdk_format()

@@ -71,16 +71,16 @@ void aim65_state::u1_pb_w( u8 data )
 }
 
 
-template <unsigned D> WRITE16_MEMBER( aim65_state::update_ds )
+template <unsigned D> void aim65_state::update_ds(offs_t offset, u16 data)
 {
 	m_digits[((D - 1) << 2) | (offset ^ 3)] = data;
 }
 
-template WRITE16_MEMBER( aim65_state::update_ds<1> );
-template WRITE16_MEMBER( aim65_state::update_ds<2> );
-template WRITE16_MEMBER( aim65_state::update_ds<3> );
-template WRITE16_MEMBER( aim65_state::update_ds<4> );
-template WRITE16_MEMBER( aim65_state::update_ds<5> );
+template void aim65_state::update_ds<1>(offs_t offset, u16 data);
+template void aim65_state::update_ds<2>(offs_t offset, u16 data);
+template void aim65_state::update_ds<3>(offs_t offset, u16 data);
+template void aim65_state::update_ds<4>(offs_t offset, u16 data);
+template void aim65_state::update_ds<5>(offs_t offset, u16 data);
 
 
 /******************************************************************************

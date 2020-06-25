@@ -2,23 +2,32 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Cumana 68008 2nd processor
+    Cumana 68008 Upgrade Board
 
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Cumana_680082ndProcessor.html
+
+    TODO:
+    - Test Winchester, when suitable image is available.
+    - RTC needs further work.
+    - Interrupt handling needs more testing.
+
+    Known Winchester:
+    - NEC D3126 -chs 4,615,17 -ss 256 (not yet imaged)
 
 **********************************************************************/
 
 
 #include "emu.h"
 #include "cumana68k.h"
-#include "bus/scsi/scsihd.h"
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/devices.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_CUMANA68K, bbc_cumana68k_device, "bbc_cumana68k", "Cumana 68008 2nd Processor")
+DEFINE_DEVICE_TYPE(BBC_CUMANA68K, bbc_cumana68k_device, "bbc_cumana68k", "Cumana 68008 Upgrade Board")
 
 
 //-------------------------------------------------
@@ -27,8 +36,8 @@ DEFINE_DEVICE_TYPE(BBC_CUMANA68K, bbc_cumana68k_device, "bbc_cumana68k", "Cumana
 
 void bbc_cumana68k_device::cumana68k_mem(address_map &map)
 {
-	map(0x000000, 0x00ffff).mirror(0x70000).rw(FUNC(bbc_cumana68k_device::mem6502_r), FUNC(bbc_cumana68k_device::mem6502_w));
-	map(0x080000, 0x0fffff).ram();
+	map(0x00000, 0x7ffff).rw(FUNC(bbc_cumana68k_device::mem6502_r), FUNC(bbc_cumana68k_device::mem6502_w));
+	map(0x80000, 0xfffff).ram();
 }
 
 //-------------------------------------------------
@@ -71,35 +80,33 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[3], "525qd", FLOPPY_525_QD, false, bbc_cumana68k_device::floppy_formats).enable_sound(true);
 
 	/* sasi */
-	SCSI_PORT(config, m_sasibus);
-	m_sasibus->set_data_input_buffer(m_sasi_data_in);
-	m_sasibus->sel_handler().set(m_pia_sasi, FUNC(pia6821_device::pb1_w));
-	m_sasibus->io_handler().set(m_pia_sasi, FUNC(pia6821_device::pb2_w));
-	m_sasibus->bsy_handler().set(m_pia_sasi, FUNC(pia6821_device::pb3_w));
-	m_sasibus->cd_handler().set(m_pia_sasi, FUNC(pia6821_device::pb4_w));
-	m_sasibus->msg_handler().set(m_pia_sasi, FUNC(pia6821_device::pb5_w));
-	m_sasibus->req_handler().set(m_pia_sasi, FUNC(pia6821_device::pb7_w));
-	m_sasibus->req_handler().append(m_pia_sasi, FUNC(pia6821_device::ca1_w));
-	m_sasibus->ack_handler().set(m_pia_sasi, FUNC(pia6821_device::ca2_w));
-	m_sasibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	OUTPUT_LATCH(config, m_sasi_data_out);
-	m_sasibus->set_output_latch(*m_sasi_data_out);
-
-	INPUT_BUFFER(config, m_sasi_data_in);
+	NSCSI_BUS(config, "sasi");
+	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
+	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this](device_t* device) {
+			downcast<nscsi_callback_device&>(*device).io_callback().set(m_pia_sasi, FUNC(pia6821_device::pb2_w));
+			downcast<nscsi_callback_device&>(*device).bsy_callback().set(m_pia_sasi, FUNC(pia6821_device::pb3_w));
+			downcast<nscsi_callback_device&>(*device).cd_callback().set(m_pia_sasi, FUNC(pia6821_device::pb4_w));
+			downcast<nscsi_callback_device&>(*device).msg_callback().set(m_pia_sasi, FUNC(pia6821_device::pb5_w));
+			downcast<nscsi_callback_device&>(*device).req_callback().set(m_pia_sasi, FUNC(pia6821_device::pb7_w));
+			downcast<nscsi_callback_device&>(*device).req_callback().append(m_pia_sasi, FUNC(pia6821_device::ca1_w));
+		});
 
 	PIA6821(config, m_pia_sasi, 0);
-	m_pia_sasi->readpa_handler().set(m_sasi_data_in, FUNC(input_buffer_device::bus_r));
-	m_pia_sasi->writepa_handler().set(m_sasi_data_out, FUNC(output_latch_device::bus_w));
+	m_pia_sasi->readpa_handler().set(FUNC(bbc_cumana68k_device::sasi_r));
+	m_pia_sasi->writepa_handler().set(FUNC(bbc_cumana68k_device::sasi_w));
 	m_pia_sasi->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_sasi_pb_w));
+	m_pia_sasi->readca1_handler().set(m_sasi, FUNC(nscsi_callback_device::req_r));
 	m_pia_sasi->readcb1_handler().set_constant(1); // tied to +5V
-	m_pia_sasi->cb2_handler().set(m_sasibus, FUNC(scsi_port_device::write_rst));
+	m_pia_sasi->ca2_handler().set(m_sasi, FUNC(nscsi_callback_device::ack_w));
+	m_pia_sasi->cb2_handler().set(m_sasi, FUNC(nscsi_callback_device::rst_w));
 	m_pia_sasi->irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_pia_sasi->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_pia_rtc, 0);
-	m_pia_rtc->readpa_handler().set(m_rtc, FUNC(mc146818_device::read));
-	m_pia_rtc->writepa_handler().set(m_rtc, FUNC(mc146818_device::write));
+	m_pia_rtc->readpa_handler().set(FUNC(bbc_cumana68k_device::rtc_r));
+	m_pia_rtc->writepa_handler().set(FUNC(bbc_cumana68k_device::rtc_w));
 	m_pia_rtc->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_rtc_pb_w));
 	m_pia_rtc->ca2_handler().set(FUNC(bbc_cumana68k_device::rtc_ce_w));
 	m_pia_rtc->cb2_handler().set(FUNC(bbc_cumana68k_device::reset68008_w));
@@ -107,14 +114,13 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	m_pia_rtc->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_internal_slot_device::irq_w));
-	m_irqs->output_handler().append_inputline(m_m68008, M68K_IRQ_2);
 
 	/* rtc */
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pia_rtc, FUNC(pia6821_device::ca1_w));
 
 	/* software lists */
-	//SOFTWARE_LIST(config, "flop_ls_68008").set_original("bbc_flop_68008");
+	SOFTWARE_LIST(config, "flop_ls_68008").set_original("bbc_flop_68000").set_filter("Cumana");
 }
 
 //-------------------------------------------------
@@ -144,9 +150,7 @@ bbc_cumana68k_device::bbc_cumana68k_device(const machine_config &mconfig, const 
 	, m_rtc(*this, "rtc")
 	, m_fdc(*this, "wd2797")
 	, m_floppy(*this, "wd2797:%u", 0)
-	, m_sasibus(*this, "sasibus")
-	, m_sasi_data_out(*this, "sasi_data_out")
-	, m_sasi_data_in(*this, "sasi_data_in")
+	, m_sasi(*this, "sasi:7:scsicb")
 {
 }
 
@@ -191,6 +195,10 @@ WRITE_LINE_MEMBER(bbc_cumana68k_device::reset68008_w)
 	m_m68008->set_input_line(INPUT_LINE_RESET, state);
 }
 
+WRITE_LINE_MEMBER(bbc_cumana68k_device::irq6502_w)
+{
+	m_m68008->set_input_line(M68K_IRQ_2, state);
+}
 
 void bbc_cumana68k_device::fsel_w(offs_t offset, uint8_t data)
 {
@@ -199,7 +207,7 @@ void bbc_cumana68k_device::fsel_w(offs_t offset, uint8_t data)
 }
 
 
-READ8_MEMBER(bbc_cumana68k_device::mem6502_r)
+uint8_t bbc_cumana68k_device::mem6502_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -220,7 +228,7 @@ READ8_MEMBER(bbc_cumana68k_device::mem6502_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_cumana68k_device::mem6502_w)
+void bbc_cumana68k_device::mem6502_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -239,41 +247,66 @@ WRITE8_MEMBER(bbc_cumana68k_device::mem6502_w)
 }
 
 
-WRITE_LINE_MEMBER(bbc_cumana68k_device::rtc_ce_w)
+uint8_t bbc_cumana68k_device::sasi_r()
 {
-	m_mc146818_ce = state;
-	mc146818_set();
+	return m_sasi->read();
+}
+
+void bbc_cumana68k_device::sasi_w(uint8_t data)
+{
+	m_sasi->write(data);
 }
 
 
-void bbc_cumana68k_device::mc146818_set()
+uint8_t bbc_cumana68k_device::rtc_r()
+{
+	return m_mc146818_data;
+}
+
+void bbc_cumana68k_device::rtc_w(uint8_t data)
+{
+	m_mc146818_data = data;
+}
+
+WRITE_LINE_MEMBER(bbc_cumana68k_device::rtc_ce_w)
+{
+	m_mc146818_ce = !state;
+}
+
+void bbc_cumana68k_device::mc146818_set(int as, int ds, int rw)
 {
 	/* if chip enabled */
 	if (m_mc146818_ce)
 	{
+		/* if address select is set then set the address in the 146818 */
+		if (m_mc146818_as & !as)
+		{
+			m_rtc->write(0, m_mc146818_data);
+			//logerror("addr_w: %02x\n", m_mc146818_data);
+		}
+
 		/* if data select is set then access the data in the 146818 */
-		if (m_mc146818_ds)
+		if (m_mc146818_ds & !ds)
 		{
 			if (m_mc146818_rw)
 			{
-				m_pia_rtc->set_a_input(m_rtc->read(1));
+				m_mc146818_data = m_rtc->read(1);
+				//logerror("data_r: %02x\n", m_mc146818_data);
 			}
 			else
 			{
-				m_rtc->write(1, m_pia_rtc->a_output());
+				m_rtc->write(1, m_mc146818_data);
+				//logerror("data_w: %02x\n", m_mc146818_data);
 			}
 		}
-
-		/* if address select is set then set the address in the 146818 */
-		if (m_mc146818_as)
-		{
-			m_rtc->write(0, m_pia_rtc->a_output());
-		}
 	}
+	m_mc146818_as = as;
+	m_mc146818_ds = ds;
+	m_mc146818_rw = rw;
 }
 
 
-WRITE8_MEMBER(bbc_cumana68k_device::pia_rtc_pb_w)
+void bbc_cumana68k_device::pia_rtc_pb_w(uint8_t data)
 {
 	/* bit 0, 1: drive select */
 	floppy_image_device *floppy = m_floppy[data & 0x03]->get_device();
@@ -290,15 +323,14 @@ WRITE8_MEMBER(bbc_cumana68k_device::pia_rtc_pb_w)
 	/* bit 4: enable precomp */
 
 	/* bit 5, 6, 7: rtc */
-	m_mc146818_as = BIT(data, 5);
-	m_mc146818_ds = BIT(data, 6);
-	m_mc146818_rw = BIT(data, 7);
-	mc146818_set();
+	//logerror("rtc: as=%d ds=%d rw=%d\n", BIT(data, 5), BIT(data, 6), BIT(data, 7));
+	mc146818_set(BIT(data, 5), BIT(data, 6), BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(bbc_cumana68k_device::pia_sasi_pb_w)
+void bbc_cumana68k_device::pia_sasi_pb_w(uint8_t data)
 {
 	/* bit 0: masknmi */
 	m_masknmi = BIT(data, 0);
+	logerror("mask nmi %d\n", m_masknmi);
 }

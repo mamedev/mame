@@ -18,6 +18,9 @@
 
 #include "video/v9938.h"
 
+#define TIGEN_V9938_TAG   "vdp"
+#define COLORBUS_TAG     "colorbus"
+
 namespace bus { namespace ti99 { namespace colorbus {
 
 class v9938_colorbus_device;

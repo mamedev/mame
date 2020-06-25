@@ -19,8 +19,8 @@ public:
 
 	auto ram_read() { return m_ram_read_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( st0016_snd_r );
-	DECLARE_WRITE8_MEMBER( st0016_snd_w );
+	uint8_t snd_r(offs_t offset);
+	void snd_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

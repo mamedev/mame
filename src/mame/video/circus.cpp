@@ -13,18 +13,18 @@
 #include "includes/circus.h"
 
 
-WRITE8_MEMBER(circus_state::circus_videoram_w)
+void circus_state::circus_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(circus_state::circus_clown_x_w)
+void circus_state::circus_clown_x_w(uint8_t data)
 {
 	m_clown_x = 240 - data;
 }
 
-WRITE8_MEMBER(circus_state::circus_clown_y_w)
+void circus_state::circus_clown_y_w(uint8_t data)
 {
 	m_clown_y = 240 - data;
 }
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(circus_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void circus_state::video_start()

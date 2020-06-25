@@ -69,20 +69,20 @@ private:
 	required_device<pc_lpt_device> m_lpt1;
 	required_device<pc_lpt_device> m_lpt2;
 
-	DECLARE_READ8_MEMBER( pc1640_port60_r );
-	DECLARE_WRITE8_MEMBER( pc1640_port60_w );
+	uint8_t pc1640_port60_r(offs_t offset);
+	void pc1640_port60_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( pc1640_mouse_x_r );
-	DECLARE_READ8_MEMBER( pc1640_mouse_y_r );
-	DECLARE_WRITE8_MEMBER( pc1640_mouse_x_w );
-	DECLARE_WRITE8_MEMBER( pc1640_mouse_y_w );
+	uint8_t pc1640_mouse_x_r();
+	uint8_t pc1640_mouse_y_r();
+	void pc1640_mouse_x_w(uint8_t data);
+	void pc1640_mouse_y_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( pc200_port378_r );
-	DECLARE_READ8_MEMBER( pc200_port278_r );
-	DECLARE_READ8_MEMBER( pc1640_port378_r );
-	DECLARE_READ8_MEMBER( pc1640_port3d0_r );
-	DECLARE_READ8_MEMBER( pc1640_port4278_r );
-	DECLARE_READ8_MEMBER( pc1640_port278_r );
+	uint8_t pc200_port378_r(offs_t offset);
+	uint8_t pc200_port278_r(offs_t offset);
+	uint8_t pc1640_port378_r(offs_t offset);
+	uint8_t pc1640_port3d0_r(offs_t offset);
+	uint8_t pc1640_port4278_r(offs_t offset);
+	uint8_t pc1640_port278_r(offs_t offset);
 
 	struct {
 		uint8_t x,y; //byte clipping needed
@@ -259,7 +259,7 @@ port 03de write/read
    7d 01 01 mouse button right
 */
 
-WRITE8_MEMBER( amstrad_pc_state::pc1640_port60_w )
+void amstrad_pc_state::pc1640_port60_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 	case 1:
@@ -290,7 +290,7 @@ WRITE8_MEMBER( amstrad_pc_state::pc1640_port60_w )
 }
 
 
-READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
+uint8_t amstrad_pc_state::pc1640_port60_r(offs_t offset)
 {
 	int data=0;
 	switch (offset) {
@@ -298,7 +298,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 		if (m_port61&0x80)
 			data=m_port60;
 		else
-			data = m_keyboard->read(space, 0);
+			data = m_keyboard->read();
 		break;
 
 	case 1:
@@ -314,9 +314,9 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 	return data;
 }
 
-READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
+uint8_t amstrad_pc_state::pc200_port378_r(offs_t offset)
 {
-	uint8_t data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -326,9 +326,9 @@ READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 	return data;
 }
 
-READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
+uint8_t amstrad_pc_state::pc200_port278_r(offs_t offset)
 {
-	uint8_t data = m_lpt2->read(space, offset);
+	uint8_t data = m_lpt2->read(offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -339,9 +339,9 @@ READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 }
 
 
-READ8_MEMBER( amstrad_pc_state::pc1640_port378_r )
+uint8_t amstrad_pc_state::pc1640_port378_r(offs_t offset)
 {
-	uint8_t data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (ioport("DSW0")->read() & 7);
@@ -364,42 +364,42 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port378_r )
 	return data;
 }
 
-READ8_MEMBER( amstrad_pc_state::pc1640_port3d0_r )
+uint8_t amstrad_pc_state::pc1640_port3d0_r(offs_t offset)
 {
 	if (offset==0xa) m_dipstate=0;
-	return space.read_byte(0x3d0+offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(0x3d0+offset);
 }
 
-READ8_MEMBER( amstrad_pc_state::pc1640_port4278_r )
+uint8_t amstrad_pc_state::pc1640_port4278_r(offs_t offset)
 {
 	if (offset==2) m_dipstate=1;
 	// read parallelport
 	return 0;
 }
 
-READ8_MEMBER( amstrad_pc_state::pc1640_port278_r )
+uint8_t amstrad_pc_state::pc1640_port278_r(offs_t offset)
 {
 	if ((offset==2)||(offset==0)) m_dipstate=2;
 	// read parallelport
 	return 0;
 }
 
-READ8_MEMBER( amstrad_pc_state::pc1640_mouse_x_r )
+uint8_t amstrad_pc_state::pc1640_mouse_x_r()
 {
 	return m_mouse.x - ioport("pc_mouse_x")->read();
 }
 
-READ8_MEMBER( amstrad_pc_state::pc1640_mouse_y_r )
+uint8_t amstrad_pc_state::pc1640_mouse_y_r()
 {
 	return m_mouse.y - ioport("pc_mouse_y")->read();
 }
 
-WRITE8_MEMBER( amstrad_pc_state::pc1640_mouse_x_w )
+void amstrad_pc_state::pc1640_mouse_x_w(uint8_t data)
 {
 	m_mouse.x = data + ioport("pc_mouse_x")->read();
 }
 
-WRITE8_MEMBER( amstrad_pc_state::pc1640_mouse_y_w )
+void amstrad_pc_state::pc1640_mouse_y_w(uint8_t data)
 {
 	m_mouse.y = data + ioport("pc_mouse_y")->read();
 }

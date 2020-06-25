@@ -114,7 +114,7 @@ void hp98034_io_card_device::device_reset()
 	update_dc();
 }
 
-READ16_MEMBER(hp98034_io_card_device::reg_r)
+uint16_t hp98034_io_card_device::reg_r(address_space &space, offs_t offset)
 {
 	uint16_t res = m_odr;
 
@@ -154,7 +154,7 @@ READ16_MEMBER(hp98034_io_card_device::reg_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp98034_io_card_device::reg_w)
+void hp98034_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t data)
 {
 	m_idr = (uint8_t)data;
 
@@ -176,7 +176,7 @@ WRITE16_MEMBER(hp98034_io_card_device::reg_w)
 	LOG("%.06f WR R%u=%04x %s\n" , machine().time().as_double() , offset + 4 , data , machine().describe_context());
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::dc_w)
+void hp98034_io_card_device::dc_w(uint8_t data)
 {
 	if (data != m_dc) {
 		LOG("%.06f DC=%02x\n" , machine().time().as_double() , data);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(hp98034_io_card_device::dc_w)
 	}
 }
 
-READ8_MEMBER(hp98034_io_card_device::dc_r)
+uint8_t hp98034_io_card_device::dc_r()
 {
 	uint8_t res;
 
@@ -199,19 +199,19 @@ READ8_MEMBER(hp98034_io_card_device::dc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::hpib_data_w)
+void hp98034_io_card_device::hpib_data_w(uint8_t data)
 {
 	m_data_out = data;
 	update_data_out();
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::hpib_ctrl_w)
+void hp98034_io_card_device::hpib_ctrl_w(uint8_t data)
 {
 	m_ctrl_out = data;
 	update_ctrl_out();
 }
 
-READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
+uint8_t hp98034_io_card_device::hpib_ctrl_r()
 {
 	uint8_t res = 0;
 
@@ -243,28 +243,28 @@ READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
 	return res;
 }
 
-READ8_MEMBER(hp98034_io_card_device::hpib_data_r)
+uint8_t hp98034_io_card_device::hpib_data_r()
 {
-	return ~m_ieee488->read_dio();
+	return ~m_ieee488->dio_r();
 }
 
-READ8_MEMBER(hp98034_io_card_device::idr_r)
+uint8_t hp98034_io_card_device::idr_r()
 {
 	return m_idr;
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::odr_w)
+void hp98034_io_card_device::odr_w(uint8_t data)
 {
 	m_odr = data;
 }
 
-READ8_MEMBER(hp98034_io_card_device::mode_reg_r)
+uint8_t hp98034_io_card_device::mode_reg_r()
 {
 	LOG("%.06f MR=%02x\n" , machine().time().as_double() , m_mode_reg);
 	return m_mode_reg;
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::mode_reg_clear_w)
+void hp98034_io_card_device::mode_reg_clear_w(uint8_t data)
 {
 	LOG("%.06f clear_w\n" , machine().time().as_double());
 	m_mode_reg = 0xff;
@@ -276,16 +276,16 @@ WRITE8_MEMBER(hp98034_io_card_device::mode_reg_clear_w)
 	}
 }
 
-READ8_MEMBER(hp98034_io_card_device::switch_r)
+uint8_t hp98034_io_card_device::switch_r()
 {
 	return m_sw1->read() | 0xc0;
 }
 
-IRQ_CALLBACK_MEMBER(hp98034_io_card_device::irq_callback)
+uint8_t hp98034_io_card_device::int_ack_r()
 {
 	int res = 0xff;
 
-	if (irqline == 0 && !m_ieee488->ifc_r()) {
+	if (!m_ieee488->ifc_r()) {
 		BIT_CLR(res, 1);
 	}
 
@@ -331,7 +331,7 @@ void hp98034_io_card_device::update_data_out()
 	if (m_clr_hpib) {
 		m_data_out = 0;
 	}
-	m_ieee488->write_dio(~m_data_out);
+	m_ieee488->host_dio_w(~m_data_out);
 }
 
 void hp98034_io_card_device::update_ctrl_out()
@@ -400,7 +400,7 @@ void hp98034_io_card_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &hp98034_io_card_device::np_io_map);
 	m_cpu->dc_changed().set(FUNC(hp98034_io_card_device::dc_w));
 	m_cpu->read_dc().set(FUNC(hp98034_io_card_device::dc_r));
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp98034_io_card_device::irq_callback));
+	m_cpu->int_ack().set(FUNC(hp98034_io_card_device::int_ack_r));
 
 	IEEE488_SLOT(config , "ieee_dev" , 0 , hp_ieee488_devices , nullptr);
 	IEEE488_SLOT(config , "ieee_rem" , 0 , remote488_devices , nullptr);

@@ -6,11 +6,7 @@
 #error Somehow nl_base.h made it into the include chain.
 #endif
 
-#ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
-#else
-#define USE_FRONTIERS 1
-#endif
 
 /* if we use frontiers, use fixed STV for smaller matrix sizes */
 #if (USE_FRONTIERS)
@@ -78,7 +74,7 @@
  *  Kidniki schematics
  * ---------------------------------------------------------------------------*/
 
-NETLIST_START(kidniki_schematics)
+static NETLIST_START(kidniki_schematics)
 	//  EESCHEMA NETLIST VERSION 1.1 (SPICE FORMAT) CREATION DATE: SAT 06 JUN 2015 01:06:26 PM CEST
 	//  TO EXCLUDE A COMPONENT FROM THE SPICE NETLIST ADD [SPICE_NETLIST_ENABLED] USER FIELD SET TO: N
 	//  TO REORDER THE COMPONENT SPICE NODE SEQUENCE ADD [SPICE_NODE_SEQUENCE] USER FIELD AND DEFINE SEQUENCE: 2,1,0
@@ -361,7 +357,7 @@ NETLIST_END()
 
 NETLIST_START(kidniki)
 
-#if (0 || USE_FRONTIERS)
+#if (1 || USE_FRONTIERS)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 300)
@@ -434,7 +430,7 @@ NETLIST_START(kidniki)
 	ALIAS(I_SINH0, SINH_DUMMY.2)
 #endif
 
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
+	NET_MODEL("AY8910PORT FAMILY(TYPE=NMOS OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
 
 	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
 	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")

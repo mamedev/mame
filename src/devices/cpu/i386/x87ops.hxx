@@ -5168,6 +5168,7 @@ void i386_device::build_x87_opcode_table_d9()
 				case 0xcf: ptr = &i386_device::x87_fxch_sti;  break;
 
 				case 0xd0: ptr = &i386_device::x87_fnop;      break;
+				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i386_device::x87_fstp_sti;     break;
 				case 0xe0: ptr = &i386_device::x87_fchs;      break;
 				case 0xe1: ptr = &i386_device::x87_fabs;      break;
 				case 0xe4: ptr = &i386_device::x87_ftst;      break;

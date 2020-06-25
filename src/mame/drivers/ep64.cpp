@@ -215,10 +215,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( rd0_r );
-	DECLARE_WRITE8_MEMBER( wr0_w );
-	DECLARE_READ8_MEMBER( rd1_r );
-	DECLARE_WRITE8_MEMBER( wr2_w );
+	uint8_t rd0_r();
+	void wr0_w(uint8_t data);
+	uint8_t rd1_r();
+	void wr2_w(uint8_t data);
 
 	uint8_t m_key;
 
@@ -241,7 +241,7 @@ private:
 //  rd0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ep64_state::rd0_r )
+uint8_t ep64_state::rd0_r()
 {
 	uint8_t data = 0xff;
 
@@ -258,7 +258,7 @@ READ8_MEMBER( ep64_state::rd0_r )
 //  rd0_r -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ep64_state::wr0_w )
+void ep64_state::wr0_w(uint8_t data)
 {
 	/*
 
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( ep64_state::write_centronics_busy )
 //  rd1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ep64_state::rd1_r )
+uint8_t ep64_state::rd1_r()
 {
 	/*
 
@@ -336,7 +336,7 @@ READ8_MEMBER( ep64_state::rd1_r )
 //  wr2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ep64_state::wr2_w )
+void ep64_state::wr2_w(uint8_t data)
 {
 	/*
 
@@ -416,7 +416,7 @@ void ep64_state::dave_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x8f).m(m_nick, FUNC(nick_device::vio_map));
 	map(0xb5, 0xb5).rw(FUNC(ep64_state::rd0_r), FUNC(ep64_state::wr0_w));
-	map(0xb6, 0xb6).r(FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xb6, 0xb6).r(FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xb7, 0xb7).w(FUNC(ep64_state::wr2_w));
 }
 
@@ -557,10 +557,9 @@ void ep64_state::machine_reset()
 	m_dave->reset();
 	m_nick->reset();
 
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	wr0_w(program, 0, 0);
+	wr0_w(0);
 	subdevice<output_latch_device>("cent_data_out")->write(0);
-	wr2_w(program, 0, 0);
+	wr2_w(0);
 }
 
 

@@ -114,15 +114,15 @@ private:
 	u16 m_lastb2;
 	int m_destl;
 
-	DECLARE_WRITE16_MEMBER(input_select_w);
-	DECLARE_READ16_MEMBER(inputs_r);
-	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_READ16_MEMBER(video_regs_r);
-	DECLARE_WRITE16_MEMBER(dma_w);
-	DECLARE_READ16_MEMBER(tileram_r);
-	DECLARE_WRITE16_MEMBER(tileram_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(irq_ack_r);
+	void input_select_w(u16 data);
+	u16 inputs_r();
+	void video_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 video_regs_r(offs_t offset);
+	void dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tileram_r(offs_t offset);
+	void tileram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 irq_ack_r();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -334,12 +334,12 @@ void srmp6_state::machine_start()
 	save_item(NAME(m_input_select));
 }
 
-WRITE16_MEMBER(srmp6_state::input_select_w)
+void srmp6_state::input_select_w(u16 data)
 {
 	m_input_select = data & 0x0f;
 }
 
-READ16_MEMBER(srmp6_state::inputs_r)
+u16 srmp6_state::inputs_r()
 {
 	switch (m_input_select) // inputs
 	{
@@ -353,7 +353,7 @@ READ16_MEMBER(srmp6_state::inputs_r)
 }
 
 
-WRITE16_MEMBER(srmp6_state::video_regs_w)
+void srmp6_state::video_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
@@ -365,7 +365,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 		}
 
 		// set by IT4
-		case 0x5c/2: // either 0x40 explicitely in many places, or according $2083b0 (IT4)
+		case 0x5c/2: // either 0x40 explicitly in many places, or according $2083b0 (IT4)
 			//Fade in/out (0x40(dark)-0x60(normal)-0x7e?(bright) reset by 0x00?
 			if (m_brightness != data)
 			{
@@ -391,7 +391,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 	COMBINE_DATA(&m_video_regs[offset]);
 }
 
-READ16_MEMBER(srmp6_state::video_regs_r)
+u16 srmp6_state::video_regs_r(offs_t offset)
 {
 	logerror("video_regs_r (PC=%06X): %04x\n", m_maincpu->pcbase(), offset*2);
 	return m_video_regs[offset];
@@ -433,7 +433,7 @@ u32 srmp6_state::process(u8 b,u32 dst_offset)
 }
 
 
-WRITE16_MEMBER(srmp6_state::dma_w)
+void srmp6_state::dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16* dmaram = m_dmaram;
 
@@ -503,12 +503,12 @@ WRITE16_MEMBER(srmp6_state::dma_w)
 }
 
 /* if tileram is actually bigger than the mapped area, how do we access the rest? */
-READ16_MEMBER(srmp6_state::tileram_r)
+u16 srmp6_state::tileram_r(offs_t offset)
 {
 	return m_chrram[offset];
 }
 
-WRITE16_MEMBER(srmp6_state::tileram_w)
+void srmp6_state::tileram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	//u16 tmp;
 	COMBINE_DATA(&m_chrram[offset]);
@@ -517,11 +517,11 @@ WRITE16_MEMBER(srmp6_state::tileram_w)
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
 	{
 		offset &=0x1f;
-		dma_w(space,offset,data,mem_mask);
+		dma_w(offset,data,mem_mask);
 	}
 }
 
-WRITE16_MEMBER(srmp6_state::paletteram_w)
+void srmp6_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int brg = m_brightness & 0x7f;
 
@@ -541,7 +541,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	}
 }
 
-READ16_MEMBER(srmp6_state::irq_ack_r)
+u16 srmp6_state::irq_ack_r()
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0; // value read doesn't matter

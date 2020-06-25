@@ -1279,7 +1279,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 						nrlists++;
 						for (const software_info &swinfo : swlistdev.get_info())
 						{
-							media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
+							media_auditor::summary summary = auditor.audit_software(swlistdev, swinfo, AUDIT_VALIDATE_FAST);
 
 							print_summary(
 									auditor, summary, false,
@@ -1386,7 +1386,7 @@ void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 					// Get the actual software list contents
 					for (const software_info &swinfo : swlistdev.get_info())
 					{
-						media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
+						media_auditor::summary summary = auditor.audit_software(swlistdev, swinfo, AUDIT_VALIDATE_FAST);
 
 						print_summary(
 								auditor, summary, false,
@@ -1452,7 +1452,9 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	ident.identify(filename);
 
 	// return the appropriate error code
-	if (ident.matches() == ident.total())
+	if (ident.total() == 0)
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "No files found.\n");
+	else if (ident.matches() == ident.total())
 		return;
 	else if (ident.matches() == ident.total() - ident.nonroms())
 		throw emu_fatalerror(EMU_ERR_IDENT_NONROMS, "Out of %d files, %d matched, %d are not roms.\n", ident.total(), ident.matches(), ident.nonroms());
@@ -1650,7 +1652,7 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") != osd_file::error::NONE)
+		if (file.open(std::string(emulator_info::get_configname()) + ".ini") != osd_file::error::NONE)
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
@@ -1737,6 +1739,6 @@ void cli_frontend::display_help(const char *exename)
 			"        %s -showconfig   to show your current %s.ini\n"
 			"        %s -listmedia    for a full list of supported media\n"
 			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
+			"For usage instructions, please visit https://docs.mamedev.org \n",exename,
 			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
 }

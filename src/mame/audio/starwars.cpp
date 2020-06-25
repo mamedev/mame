@@ -19,7 +19,7 @@
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::r6532_porta_r)
+uint8_t starwars_state::r6532_porta_r()
 {
 	/* Configured as follows:           */
 	/* d7 (in)  Main Ready Flag         */
@@ -38,7 +38,7 @@ READ8_MEMBER(starwars_state::r6532_porta_r)
 }
 
 
-WRITE8_MEMBER(starwars_state::r6532_porta_w)
+void starwars_state::r6532_porta_w(uint8_t data)
 {
 	/* handle 5220 read */
 	m_tms->rsq_w((data & 2)>>1);
@@ -60,13 +60,13 @@ WRITE_LINE_MEMBER(starwars_state::boost_interleave_hack)
 }
 
 
-READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
+uint8_t starwars_state::starwars_main_ready_flag_r()
 {
 	return m_riot->porta_in_get() & 0xc0;    /* only upper two flag bits mapped */
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
+void starwars_state::starwars_soundrst_w(uint8_t data)
 {
 	m_soundlatch->acknowledge_w();
 	m_mainlatch->acknowledge_w();

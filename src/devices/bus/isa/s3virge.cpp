@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * s3virge.c
+ * s3virge.cpp
  *
  * Implementation of the S3 Virge series of video card
  *
@@ -42,6 +42,7 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: s3_vga_device(mconfig, type, tag, owner, clock)
+	, m_linear_config_changed_cb(*this)
 {
 }
 
@@ -64,9 +65,7 @@ void s3virge_vga_device::device_start()
 {
 	zero();
 
-	int x;
-	int i;
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
@@ -90,6 +89,7 @@ void s3virge_vga_device::device_start()
 	memset(&s3, 0, sizeof(s3));
 	memset(&s3virge, 0, sizeof(s3virge));
 	s3virge.linear_address = 0x70000000;
+	s3virge.linear_address_size_full = 0x10000;
 	s3virge.s3d.cmd_fifo_slots_free = 16;
 	save_item(s3virge.s3d.pattern,"S3D Pattern Data");
 	save_item(s3virge.s3d.reg[0],"S3D Registers: BitBLT");
@@ -98,8 +98,10 @@ void s3virge_vga_device::device_start()
 	save_item(s3virge.s3d.reg[3],"S3D Registers: 3D Line");
 	save_item(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle");
 
+	m_linear_config_changed_cb.resolve_safe();
+
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
-	for(x=0;x<4;x++)
+	for (int x = 0; x < 4; x++)
 	{
 		s3.cursor_fg[x] = 0xff;
 		s3.cursor_bg[x] = 0x00;
@@ -581,8 +583,14 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 				break;
 
 			case 0x58:
+			{
+				const uint8_t old_size = s3virge.linear_address_size;
+				const bool old_enable = s3virge.linear_address_enable;
+				const bool size_changed = old_size != s3virge.linear_address_size;
+
 				s3virge.linear_address_size = data & 0x03;
 				s3virge.linear_address_enable = data & 0x10;
+
 				switch(data & 0x03)
 				{
 					case LAW_64K:
@@ -598,16 +606,39 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 						s3virge.linear_address_size_full = 0x400000;
 						break;
 				}
+
+				if ((s3virge.linear_address_enable != old_enable) || size_changed)
+				{
+					m_linear_config_changed_cb(s3virge.linear_address_enable);
+				}
+
 				LOGREG("CR58: write %02x\n", data);
 				break;
+			}
 			case 0x59:
+			{
+				const uint32_t old_address = s3virge.linear_address;
 				s3virge.linear_address = (s3virge.linear_address & 0x00ff0000) | (data << 24);
 				LOGREG("Linear framebuffer address = %08x\n",s3virge.linear_address);
+
+				if (old_address != s3virge.linear_address && s3virge.linear_address_enable)
+				{
+					m_linear_config_changed_cb(1);
+				}
 				break;
+			}
 			case 0x5a:
+			{
+				const uint32_t old_address = s3virge.linear_address;
 				s3virge.linear_address = (s3virge.linear_address & 0xff000000) | (data << 16);
 				LOGREG("Linear framebuffer address = %08x\n",s3virge.linear_address);
+
+				if (old_address != s3virge.linear_address && s3virge.linear_address_enable)
+				{
+					m_linear_config_changed_cb(1);
+				}
 				break;
+			}
 
 /*
 3d4h index 5Dh (R/W):  Extended Horizontal Overflow Register           (80x +)
@@ -700,7 +731,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 }
 
 
-READ8_MEMBER(s3virge_vga_device::port_03b0_r)
+uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -712,7 +743,7 @@ READ8_MEMBER(s3virge_vga_device::port_03b0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -720,7 +751,7 @@ READ8_MEMBER(s3virge_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03b0_w)
+void s3virge_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -731,37 +762,37 @@ WRITE8_MEMBER(s3virge_vga_device::port_03b0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::port_03c0_r)
+uint8_t s3virge_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = s3_vga_device::port_03c0_r(space,offset,mem_mask);
+			res = s3_vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03c0_w)
+void s3virge_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			s3_vga_device::port_03c0_w(space,offset,data,mem_mask);
+			s3_vga_device::port_03c0_w(offset,data);
 			break;
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::port_03d0_r)
+uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -773,7 +804,7 @@ READ8_MEMBER(s3virge_vga_device::port_03d0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -781,7 +812,7 @@ READ8_MEMBER(s3virge_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03d0_w)
+void s3virge_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -792,13 +823,13 @@ WRITE8_MEMBER(s3virge_vga_device::port_03d0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::mem_r)
+uint8_t s3virge_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 	{
@@ -827,12 +858,12 @@ READ8_MEMBER(s3virge_vga_device::mem_r)
 		return data;
 	}
 	if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
-		return vga_device::mem_r(space,offset,mem_mask);
+		return vga_device::mem_r(offset);
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::mem_w)
+void s3virge_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	// bit 4 of CR53 enables memory-mapped I/O
 	if(s3.cr53 & 0x10)
@@ -866,17 +897,17 @@ WRITE8_MEMBER(s3virge_vga_device::mem_w)
 	}
 
 	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
-READ8_MEMBER(s3virge_vga_device::fb_r)
+uint8_t s3virge_vga_device::fb_r(offs_t offset)
 {
 	if(offset < s3virge.linear_address_size_full)
 		return vga.memory[offset % vga.svga_intf.vram_size];
 	return 0xff;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::fb_w)
+void s3virge_vga_device::fb_w(offs_t offset, uint8_t data)
 {
 	if(offset < s3virge.linear_address_size_full)
 		vga.memory[offset % vga.svga_intf.vram_size] = data;
@@ -887,12 +918,12 @@ void s3virge_vga_device::add_command(int cmd_type)
 	// add command to S3D FIFO
 	if(s3virge.s3d.cmd_fifo_slots_free == 0)
 	{
-		LOGMMIO("Attempt to add command when all command slots are full\n");
+		LOGCMD("Attempt to add command when all command slots are full\n");
 		return;
 	}
 	memcpy(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].reg,s3virge.s3d.reg[cmd_type],256*4);
 	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type = cmd_type;
-	LOGMMIO("Added command type %i cmd %08x ptr %u\n",s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type,s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].reg[S3D_REG_COMMAND],s3virge.s3d.cmd_fifo_next_ptr);
+	LOGCMD("Added command type %i cmd %08x ptr %u\n",s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type,s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].reg[S3D_REG_COMMAND],s3virge.s3d.cmd_fifo_next_ptr);
 	s3virge.s3d.cmd_fifo_next_ptr++;
 	if(s3virge.s3d.cmd_fifo_next_ptr >= 16)
 		s3virge.s3d.cmd_fifo_next_ptr = 0;
@@ -909,6 +940,18 @@ void s3virge_vga_device::command_start()
 
 	switch(cmd_type)
 	{
+		case OP_2DLINE:
+			LOGCMD("2D Line command (unsupported) [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
+			break;
+		case OP_2DPOLY:
+			LOGCMD("2D Poly command (unsupported) [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
+			break;
+		case OP_3DLINE:
+			LOGCMD("3D Line command (unsupported) [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
+			break;
+		case OP_3DTRI:
+			LOGCMD("3D Tri command (unsupported) [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
+			break;
 		case OP_BITBLT:
 			s3virge.s3d.state = S3D_STATE_BITBLT;
 			s3virge.s3d.busy = true;
@@ -936,7 +979,7 @@ void s3virge_vga_device::command_start()
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
 			s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_BG_CLR] = 0xffffffff;  // win31 never sets this?
-			LOGMMIO("Started BitBLT command [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
+			LOGCMD("Started BitBLT command [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
 			//if(((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x01fe0000) >> 17) == 0xf0) machine().debug_break();
 			break;
 	}
@@ -958,9 +1001,30 @@ void s3virge_vga_device::command_finish()
 		command_start();
 	else
 		s3virge.s3d.busy = false;
-	//machine().debug_break();
+
 	LOGMMIO("Command finished [%u] (%u slots free)\n",s3virge.s3d.cmd_fifo_current_ptr,s3virge.s3d.cmd_fifo_slots_free);
 }
+
+void s3virge_vga_device::line2d_step()
+{
+	command_finish();
+}
+
+void s3virge_vga_device::poly2d_step()
+{
+	command_finish();
+}
+
+void s3virge_vga_device::line3d_step()
+{
+	command_finish();
+}
+
+void s3virge_vga_device::poly3d_step()
+{
+	command_finish();
+}
+
 
 uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat)
 {
@@ -1373,6 +1437,18 @@ void s3virge_vga_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			case S3D_STATE_IDLE:
 				m_draw_timer->adjust(attotime::zero);
 				break;
+			case S3D_STATE_2DLINE:
+				line2d_step();
+				break;
+			case S3D_STATE_2DPOLY:
+				poly2d_step();
+				break;
+			case S3D_STATE_3DLINE:
+				line3d_step();
+				break;
+			case S3D_STATE_3DPOLY:
+				poly3d_step();
+				break;
 			case S3D_STATE_BITBLT:
 				bitblt_step();
 				break;
@@ -1399,7 +1475,7 @@ void s3virge_vga_device::device_timer(emu_timer &timer, device_timer_id id, int 
 // bit 31 - 2D / 3D Select
 
 
-READ32_MEMBER(s3virge_vga_device::s3d_sub_status_r)
+uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
 
@@ -1413,14 +1489,14 @@ READ32_MEMBER(s3virge_vga_device::s3d_sub_status_r)
 	return res;
 }
 
-WRITE32_MEMBER(s3virge_vga_device::s3d_sub_control_w)
+void s3virge_vga_device::s3d_sub_control_w(uint32_t data)
 {
 	s3virge.interrupt_enable = data & 0x00003f80;
 	// TODO: bits 14-15==10 - reset engine
 	LOGMMIO("Sub control = %08x\n", data);
 }
 
-READ32_MEMBER(s3virge_vga_device::s3d_func_ctrl_r)
+uint32_t s3virge_vga_device::s3d_func_ctrl_r()
 {
 	uint32_t ret = 0;
 
@@ -1428,7 +1504,7 @@ READ32_MEMBER(s3virge_vga_device::s3d_func_ctrl_r)
 	return ret;
 }
 
-READ32_MEMBER(s3virge_vga_device::s3d_register_r)
+uint32_t s3virge_vga_device::s3d_register_r(offs_t offset)
 {
 	uint32_t res = 0;
 	int op_type = (((offset*4) & 0x1c00) >> 10) - 1;
@@ -1449,7 +1525,7 @@ READ32_MEMBER(s3virge_vga_device::s3d_register_r)
 	return res;
 }
 
-WRITE32_MEMBER(s3virge_vga_device::s3d_register_w)
+void s3virge_vga_device::s3d_register_w(offs_t offset, uint32_t data)
 {
 	int op_type = (((offset*4) & 0x1c00) >> 10) - 1;
 

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 Pretty much all info taken from http://www.sharpmz.org/index.html
 
 Currently, this list lists all dumps known and found. A lot of these are simple
@@ -1366,7 +1367,7 @@ Easidata (English Version)
 		<info name="usage" value="Load from BASIC"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="8989">
-				<rom name="fire!!!.mzf" size="8989" crc="f436dbdf" sha1="13105caad93da5e6edb5a73080f8b1178923c521"/>
+				<rom name="fire.mzf" size="8989" crc="f436dbdf" sha1="13105caad93da5e6edb5a73080f8b1178923c521"/>
 			</dataarea>
 		</part>
 	</software>

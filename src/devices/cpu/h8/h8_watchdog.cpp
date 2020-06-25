@@ -65,7 +65,7 @@ void h8_watchdog_device::tcnt_update(uint64_t cur_time)
 
 }
 
-READ16_MEMBER(h8_watchdog_device::wd_r)
+uint16_t h8_watchdog_device::wd_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -75,7 +75,7 @@ READ16_MEMBER(h8_watchdog_device::wd_r)
 	return 0;
 }
 
-WRITE16_MEMBER(h8_watchdog_device::wd_w)
+void h8_watchdog_device::wd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(mem_mask != 0xffff)
 		return;
@@ -99,14 +99,14 @@ WRITE16_MEMBER(h8_watchdog_device::wd_w)
 	}
 }
 
-READ16_MEMBER(h8_watchdog_device::rst_r)
+uint16_t h8_watchdog_device::rst_r()
 {
 	if (!machine().side_effects_disabled())
 		logerror("rst_r\n");
 	return 0;
 }
 
-WRITE16_MEMBER(h8_watchdog_device::rst_w)
+void h8_watchdog_device::rst_w(uint16_t data)
 {
 	if((data & 0xff00) == 0xa500)
 		logerror("wowf_w %02x\n", data & 0xff);

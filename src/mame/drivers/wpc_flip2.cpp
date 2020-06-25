@@ -197,10 +197,10 @@ void wpc_flip2_state::wpc_flip2(machine_config &config)
 	m_wpc->irq_callback().set(FUNC(wpc_flip2_state::wpc_irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_flip2_state::wpc_firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_flip2_state::wpc_rombank_w));
-	m_wpc->sound_ctrl_read().set(FUNC(wpc_flip2_state::wpc_sound_ctrl_r));
-	m_wpc->sound_ctrl_write().set(FUNC(wpc_flip2_state::wpc_sound_ctrl_w));
-	m_wpc->sound_data_read().set(FUNC(wpc_flip2_state::wpc_sound_data_r));
-	m_wpc->sound_data_write().set(FUNC(wpc_flip2_state::wpc_sound_data_w));
+	m_wpc->sound_ctrl_read().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_r));
+	m_wpc->sound_ctrl_write().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_w));
+	m_wpc->sound_data_read().set(m_wpcsnd, FUNC(wpcsnd_device::data_r));
+	m_wpc->sound_data_write().set(m_wpcsnd, FUNC(wpcsnd_device::data_w));
 	m_wpc->dmdbank_write().set(FUNC(wpc_flip2_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
@@ -619,6 +619,19 @@ ROM_START(tz_l4)
 	ROM_LOAD("tzu18_l2.rom", 0x100000, 0x80000, CRC(66575ec2) SHA1(deceb56324ee9785946f5771f8cfbaf1b1d2c8bc))
 ROM_END
 
+ROM_START(tz_l5)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("tz_l5.u6", 0x00000, 0x80000, CRC(a0b2f052) SHA1(d09376dd6df9dc7afd8448b211bda18125ada2ba))
+	ROM_REGION(0x180000, "sound1",0)
+	ROM_LOAD("tzu14_l2.rom", 0x000000, 0x20000, CRC(5a67bd56) SHA1(98669fbfdc5793bcf09fe72c231e2b4fa2524cc5))
+	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x60000, 0x20000)
+	ROM_LOAD("tzu15_l2.rom", 0x080000, 0x80000, CRC(389d2442) SHA1(58a4bc7cc7a28b47c75d5c9bbf14abf34bd7a9e3))
+	ROM_LOAD("tzu18_l2.rom", 0x100000, 0x80000, CRC(66575ec2) SHA1(deceb56324ee9785946f5771f8cfbaf1b1d2c8bc))
+ROM_END
+
 ROM_START(tz_ifpa)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "code", 0)
@@ -906,6 +919,7 @@ GAME(1993,  tz_l2,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init
 GAME(1993,  tz_ifpa,    tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (IFPA rules)",                               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tz_l3,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-3)",                                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tz_l4,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-4)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  tz_l5,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (L-5)",                                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tz_h7,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (H-7)",                                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tz_h8,      tz_92,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "Twilight Zone (H-8)",                                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(2000,  ww_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-5)",                                        MACHINE_IS_SKELETON_MECHANICAL)

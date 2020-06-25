@@ -45,7 +45,7 @@ Year + Game                 By      Board      Hardware
 
 ***************************************************************************/
 
-WRITE16_MEMBER(suna16_state::soundlatch_w)
+void suna16_state::soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -55,7 +55,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
+void suna16_state::bssoccer_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -69,7 +69,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::uballoon_leds_w)
+void suna16_state::uballoon_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -81,7 +81,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::bestbest_coin_w)
+void suna16_state::bestbest_coin_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -115,7 +115,7 @@ void suna16_state::bssoccer_map(address_map &map)
                                 Ultra Balloon
 ***************************************************************************/
 
-READ8_MEMBER(suna16_state::uballoon_prot_r)
+uint8_t suna16_state::uballoon_prot_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -138,7 +138,7 @@ READ8_MEMBER(suna16_state::uballoon_prot_r)
 	return ret;
 }
 
-WRITE8_MEMBER(suna16_state::uballoon_prot_w)
+void suna16_state::uballoon_prot_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -192,12 +192,12 @@ void suna16_state::sunaq_map(address_map &map)
                             Best Of Best
 ***************************************************************************/
 
-READ8_MEMBER(suna16_state::bestbest_prot_r)
+uint8_t suna16_state::bestbest_prot_r()
 {
 	return m_prot;
 }
 
-WRITE8_MEMBER(suna16_state::bestbest_prot_w)
+void suna16_state::bestbest_prot_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -317,14 +317,14 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 
 /* Bank Switching */
 
-WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
+void suna16_state::bssoccer_pcm_1_bankswitch_w(uint8_t data)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
-WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
+void suna16_state::bssoccer_pcm_2_bankswitch_w(uint8_t data)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", m_pcm2->pc(), data);
@@ -374,7 +374,7 @@ void suna16_state::bssoccer_pcm_2_io_map(address_map &map)
 
 /* Bank Switching */
 
-WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
+void suna16_state::uballoon_pcm_1_bankswitch_w(uint8_t data)
 {
 	const int bank = data & 1;
 	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
@@ -409,8 +409,7 @@ MACHINE_START_MEMBER(suna16_state,uballoon)
 
 MACHINE_RESET_MEMBER(suna16_state,uballoon)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uballoon_pcm_1_bankswitch_w(space, 0, 0);
+	uballoon_pcm_1_bankswitch_w(0);
 }
 
 
@@ -998,7 +997,7 @@ void suna16_state::sunaq(machine_config &config)
                             Best Of Best
 ***************************************************************************/
 
-WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
+void suna16_state::bestbest_ay8910_port_a_w(uint8_t data)
 {
 	// ?
 }

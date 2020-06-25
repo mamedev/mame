@@ -21,7 +21,7 @@
 TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bg_videoram[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_bg_videoram[2 * tile_index] + ((attr & 0x07) << 8),
 			(attr & 0xf0) >> 4,
 			0);
@@ -36,7 +36,7 @@ TILEMAP_MAPPER_MEMBER(gundealr_state::pagescan)
 TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fg_videoram[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_fg_videoram[2 * tile_index] + ((attr & 0x03) << 8),
 			(attr & 0xf0) >> 4,
 			0);
@@ -66,19 +66,19 @@ void gundealr_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gundealr_state::bg_videoram_w)
+void gundealr_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(gundealr_state::fg_videoram_w)
+void gundealr_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(gundealr_state::paletteram_w)
+void gundealr_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	int r,g,b,val;
 

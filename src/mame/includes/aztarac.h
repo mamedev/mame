@@ -39,13 +39,13 @@ public:
 	int m_ycenter;
 
 	void nvram_store_w(uint16_t data);
-	DECLARE_READ16_MEMBER(joystick_r);
+	uint16_t joystick_r();
 	void ubr_w(uint8_t data);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(snd_command_r);
-	DECLARE_READ8_MEMBER(snd_status_r);
-	DECLARE_WRITE8_MEMBER(snd_status_w);
+	uint16_t sound_r();
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t snd_command_r();
+	uint8_t snd_status_r();
+	void snd_status_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

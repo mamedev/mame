@@ -62,20 +62,16 @@ private:
 	void update_reset(ioport_value state);
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void mux_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
-	u8 m_io[2]; // MK3850 I/O ports
-	u8 m_4042;  // 4042 latch output
+	u8 m_io[2] = { 0, 0 };
+	u8 m_4042 = 0;
 };
 
 void boris_state::machine_start()
 {
-	// zerofill
-	memset(m_io, 0, sizeof(m_io));
-	m_4042 = 0;
-
 	// register for savestates
 	save_item(NAME(m_io));
 	save_item(NAME(m_4042));
@@ -116,7 +112,7 @@ void boris_state::update_display()
 	m_display->matrix(1 << (~m_io[0] & 7), seg_data);
 }
 
-WRITE8_MEMBER(boris_state::mux_w)
+void boris_state::mux_w(u8 data)
 {
 	// IO00-IO02: 4028 A-C to digit/input mux (4028 D to GND)
 	// IO03: clock 4042
@@ -124,7 +120,7 @@ WRITE8_MEMBER(boris_state::mux_w)
 	update_display();
 }
 
-READ8_MEMBER(boris_state::input_r)
+u8 boris_state::input_r()
 {
 	// IO04-IO07: multiplexed inputs from 4028 4-7
 	u8 data = m_io[0];
@@ -135,7 +131,7 @@ READ8_MEMBER(boris_state::input_r)
 	return data;
 }
 
-WRITE8_MEMBER(boris_state::digit_w)
+void boris_state::digit_w(u8 data)
 {
 	// IO10-IO17: digit segments
 	m_io[1] = data;

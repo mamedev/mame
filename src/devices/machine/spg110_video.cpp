@@ -6,20 +6,20 @@
 
 DEFINE_DEVICE_TYPE(SPG110_VIDEO, spg110_video_device, "spg110_video", "SPG110 System-on-a-Chip (Video)")
 
-spg110_video_device::spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("spg110_video", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_video_device::map_video), this))
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, "palette")
-	, m_gfxdecode(*this, "gfxdecode")
-	, m_palram(*this, "palram")
-	, m_palctrlram(*this, "palctrlram")
-	, m_sprtileno(*this, "sprtileno")
-	, m_sprattr1(*this, "sprattr1")
-	, m_sprattr2(*this, "sprattr2")
-	, m_video_irq_cb(*this)
+spg110_video_device::spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_space_config("spg110_video", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_video_device::map_video), this)),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, "palette"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_palram(*this, "palram"),
+	m_palctrlram(*this, "palctrlram"),
+	m_sprtileno(*this, "sprtileno"),
+	m_sprattr1(*this, "sprattr1"),
+	m_sprattr2(*this, "sprattr2"),
+	m_video_irq_cb(*this)
 {
 }
 
@@ -339,7 +339,7 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 
 
 // irq source or similar?
-READ16_MEMBER(spg110_video_device::spg110_2063_r)
+uint16_t spg110_video_device::spg110_2063_r()
 {
 	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
 
@@ -347,7 +347,7 @@ READ16_MEMBER(spg110_video_device::spg110_2063_r)
 	return m_video_irq_status | 0x0600; /* | 0x0002; */
 }
 
-WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
+void spg110_video_device::spg110_2063_w(uint16_t data)
 {
 	// writes 0x28, probably clears the IRQ / IRQ sources? 0x63 is the same offset for this in spg2xx but bits used seem to be different
 	const uint16_t old = m_video_irq_enable & m_video_irq_status;
@@ -358,52 +358,52 @@ WRITE16_MEMBER(spg110_video_device::spg110_2063_w)
 }
 
 
-WRITE16_MEMBER(spg110_video_device::spg110_201c_w) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
-WRITE16_MEMBER(spg110_video_device::spg110_2020_w) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
+void spg110_video_device::spg110_201c_w(uint16_t data) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
+void spg110_video_device::spg110_2020_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
 
-WRITE16_MEMBER(spg110_video_device::spg110_2028_w) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
-READ16_MEMBER(spg110_video_device::spg110_2028_r) { return 0x0000; }
+void spg110_video_device::spg110_2028_w(uint16_t data) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
+uint16_t spg110_video_device::spg110_2028_r() { return 0x0000; }
 
-WRITE16_MEMBER(spg110_video_device::spg110_2029_w) { logerror("%s: 2029: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
-READ16_MEMBER(spg110_video_device::spg110_2029_r) { return 0x0000; }
+void spg110_video_device::spg110_2029_w(uint16_t data) { logerror("%s: 2029: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
+uint16_t spg110_video_device::spg110_2029_r() { return 0x0000; }
 
-WRITE16_MEMBER(spg110_video_device::spg110_2031_w) { logerror("%s: 2031: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
-WRITE16_MEMBER(spg110_video_device::spg110_2032_w) { logerror("%s: 2032: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
-WRITE16_MEMBER(spg110_video_device::spg110_2033_w) { logerror("%s: 2033: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
-WRITE16_MEMBER(spg110_video_device::spg110_2034_w) { logerror("%s: 2034: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
-WRITE16_MEMBER(spg110_video_device::spg110_2035_w) { logerror("%s: 2035: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
-WRITE16_MEMBER(spg110_video_device::spg110_2036_w) { logerror("%s: 2036: %04x\n", machine().describe_context(), data); COMBINE_DATA(&m_2036_scroll); } // seems related to ball y position, not scrolling (possibly shadow sprite related?)
+void spg110_video_device::spg110_2031_w(uint16_t data) { logerror("%s: 2031: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
+void spg110_video_device::spg110_2032_w(uint16_t data) { logerror("%s: 2032: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
+void spg110_video_device::spg110_2033_w(uint16_t data) { logerror("%s: 2033: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
+void spg110_video_device::spg110_2034_w(uint16_t data) { logerror("%s: 2034: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+void spg110_video_device::spg110_2035_w(uint16_t data) { logerror("%s: 2035: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+void spg110_video_device::spg110_2036_w(offs_t offset, uint16_t data, uint16_t mem_mask) { logerror("%s: 2036: %04x\n", machine().describe_context(), data); COMBINE_DATA(&m_2036_scroll); } // seems related to ball y position, not scrolling (possibly shadow sprite related?)
 
-READ16_MEMBER(spg110_video_device::spg110_2037_r) { return 0x0000; } // added to something from the PRNG
-WRITE16_MEMBER(spg110_video_device::spg110_2037_w) { logerror("%s: 2037: %04x\n", machine().describe_context(), data); } // 0126 (always?)
+uint16_t spg110_video_device::spg110_2037_r() { return 0x0000; } // added to something from the PRNG
+void spg110_video_device::spg110_2037_w(uint16_t data) { logerror("%s: 2037: %04x\n", machine().describe_context(), data); } // 0126 (always?)
 
-WRITE16_MEMBER(spg110_video_device::spg110_2039_w) { logerror("%s: 2039: %04x\n", machine().describe_context(), data); } // 0803 on every scene transition
+void spg110_video_device::spg110_2039_w(uint16_t data) { logerror("%s: 2039: %04x\n", machine().describe_context(), data); } // 0803 on every scene transition
 
-WRITE16_MEMBER(spg110_video_device::spg110_203c_w) { logerror("%s: 203c: %04x\n", machine().describe_context(), data); } // 0006 on startup, twice
+void spg110_video_device::spg110_203c_w(uint16_t data) { logerror("%s: 203c: %04x\n", machine().describe_context(), data); } // 0006 on startup, twice
 
-WRITE16_MEMBER(spg110_video_device::spg110_203d_w) { logerror("%s: 203d: %04x\n", machine().describe_context(), data); } // changes, usually between scenes
+void spg110_video_device::spg110_203d_w(uint16_t data) { logerror("%s: 203d: %04x\n", machine().describe_context(), data); } // changes, usually between scenes
 
-READ16_MEMBER(spg110_video_device::spg110_2042_r) { return 0x0000; }
-WRITE16_MEMBER(spg110_video_device::spg110_2042_w) { logerror("%s: 2042: %04x\n", machine().describe_context(), data);  } // sets bit 0x0004, masks with 0xfffb etc.
+uint16_t spg110_video_device::spg110_2042_r() { return 0x0000; }
+void spg110_video_device::spg110_2042_w(uint16_t data) { logerror("%s: 2042: %04x\n", machine().describe_context(), data);  } // sets bit 0x0004, masks with 0xfffb etc.
 
-WRITE16_MEMBER(spg110_video_device::spg110_2045_w) { logerror("%s: 2045: %04x\n", machine().describe_context(), data);  } // 0006 on startup, once
+void spg110_video_device::spg110_2045_w(uint16_t data) { logerror("%s: 2045: %04x\n", machine().describe_context(), data);  } // 0006 on startup, once
 
 
-WRITE16_MEMBER(spg110_video_device::spg110_205x_w)
+void spg110_video_device::spg110_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_palctrlram[offset]);
 }
 
 
-WRITE16_MEMBER(spg110_video_device::dma_unk_2061_w) { COMBINE_DATA(&m_dma_unk_2061); }
-WRITE16_MEMBER(spg110_video_device::dma_dst_step_w) { COMBINE_DATA(&m_dma_dst_step); }
-WRITE16_MEMBER(spg110_video_device::dma_unk_2067_w) { COMBINE_DATA(&m_dma_src_high); }
-WRITE16_MEMBER(spg110_video_device::dma_src_step_w) { COMBINE_DATA(&m_dma_src_step); }
+void spg110_video_device::dma_unk_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_unk_2061); }
+void spg110_video_device::dma_dst_step_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_step); }
+void spg110_video_device::dma_unk_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_high); }
+void spg110_video_device::dma_src_step_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_step); }
 
-WRITE16_MEMBER(spg110_video_device::dma_dst_w) { COMBINE_DATA(&m_dma_dst); }
-WRITE16_MEMBER(spg110_video_device::dma_src_w) { COMBINE_DATA(&m_dma_src); }
+void spg110_video_device::dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst); }
+void spg110_video_device::dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src); }
 
-WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
+void spg110_video_device::dma_len_trigger_w(uint16_t data)
 {
 	int length = data & 0x1fff;
 
@@ -452,25 +452,25 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	}
 }
 
-WRITE16_MEMBER(spg110_video_device::dma_manual_w)
+void spg110_video_device::dma_manual_w(uint16_t data)
 {
 	this->space(0).write_word(m_dma_dst * 2, data, 0xffff);
 }
 
-READ16_MEMBER(spg110_video_device::dma_manual_r)
+uint16_t spg110_video_device::dma_manual_r()
 {
 	uint16_t val = this->space(0).read_word(m_dma_dst * 2);
 	return val;
 }
 
-READ16_MEMBER(spg110_video_device::dma_len_status_r)
+uint16_t spg110_video_device::dma_len_status_r()
 {
 	return 0x1fff; // DMA related?
 }
 
 
-READ16_MEMBER(spg110_video_device::tmap0_regs_r) { return tmap0_regs[offset]; }
-READ16_MEMBER(spg110_video_device::tmap1_regs_r) { return tmap1_regs[offset]; }
+uint16_t spg110_video_device::tmap0_regs_r(offs_t offset) { return tmap0_regs[offset]; }
+uint16_t spg110_video_device::tmap1_regs_r(offs_t offset) { return tmap1_regs[offset]; }
 
 void spg110_video_device::tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data)
 {
@@ -513,13 +513,13 @@ void spg110_video_device::tilemap_write_regs(int which, uint16_t* regs, int regn
 }
 
 
-WRITE16_MEMBER(spg110_video_device::tmap0_regs_w)
+void spg110_video_device::tmap0_regs_w(offs_t offset, uint16_t data)
 {
 	tilemap_write_regs(0, tmap0_regs,offset,data);
 }
 
 
-WRITE16_MEMBER(spg110_video_device::tmap1_regs_w)
+void spg110_video_device::tmap1_regs_w(offs_t offset, uint16_t data)
 {
 	tilemap_write_regs(1, tmap1_regs,offset,data);
 }
@@ -550,11 +550,6 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_2036_scroll));
 
 	m_video_irq_cb.resolve();
-
-	if (!strcmp(machine().system().name, "jak_spdmo"))
-		m_is_spiderman = true;
-	else
-		m_is_spiderman = false;
 }
 
 void spg110_video_device::device_reset()
@@ -586,7 +581,7 @@ double spg110_video_device::hue2rgb(double p, double q, double t)
 
 
 // wrong format!
-WRITE16_MEMBER(spg110_video_device::palette_w)
+void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// probably not
 	const double h_add = 0.65f;

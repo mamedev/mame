@@ -46,17 +46,17 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(main_irq_w);
-	DECLARE_WRITE8_MEMBER(irqA_assert_w);
-	DECLARE_WRITE8_MEMBER(irqB_clear_w);
-	DECLARE_READ8_MEMBER(mcu_comm_reset_r);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(charram_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(scrollx_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void cpuA_bankswitch_w(uint8_t data);
+	void cpuB_bankswitch_w(uint8_t data);
+	void main_irq_w(offs_t offset, uint8_t data);
+	void irqA_assert_w(uint8_t data);
+	void irqB_clear_w(uint8_t data);
+	uint8_t mcu_comm_reset_r();
+	template <unsigned N> void bgram_w(offs_t offset, uint8_t data);
+	void charram_w(offs_t offset, uint8_t data);
+	template <unsigned N> void scrollx_w(offs_t offset, uint8_t data);
+	template <unsigned N> void scrolly_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	template <unsigned N> TILE_GET_INFO_MEMBER(get_bg_tile_info);

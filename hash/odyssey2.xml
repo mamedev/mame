@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 TODO:
 add first release date were applicable
 add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
@@ -8,8 +10,7 @@ add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
 add ntsc pal compatibility (<sharedfeat name="compatibility" value="NTSC,PAL"/>)
 add rom names from pcbs (lack of)
 add serials for radiola and jopacs
--->
-<!--
+
 Undumped:
 Spaans          (spanish to dutch translator)
 Crazy Horses
@@ -42,8 +43,7 @@ Clean Up Yer Act (programmed by Robert S. Harris, never completed)
 Star Wars (GST Video)
 Moonsweeper (Imagic)
 Fathom (Imagic)
--->
-<!--
+
 NOTE:
 PAL colours leave a lot to be desired
 Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS microprocessor, which gave the G7000 extra CPU and memory.
@@ -297,7 +297,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="alien invaders - plus! (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
+				<rom name="alien invaders - plus (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
 			</dataarea>
 		</part>
 	</software>

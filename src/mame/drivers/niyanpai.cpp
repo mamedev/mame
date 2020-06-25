@@ -60,7 +60,7 @@ void niyanpai_state::init_niyanpai()
 }
 
 
-READ16_MEMBER(niyanpai_state::dipsw_r)
+uint16_t niyanpai_state::dipsw_r()
 {
 	uint8_t dipsw_a = ioport("DSWA")->read();
 	uint8_t dipsw_b = ioport("DSWB")->read();
@@ -78,7 +78,7 @@ MACHINE_START_MEMBER(niyanpai_state, musobana)
 	save_item(NAME(m_musobana_outcoin_flag));
 }
 
-READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
+uint16_t niyanpai_state::musobana_inputport_0_r()
 {
 	int portdata;
 
@@ -96,7 +96,7 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 	return (portdata);
 }
 
-WRITE16_MEMBER(niyanpai_state::tmp68301_parallel_port_w)
+void niyanpai_state::tmp68301_parallel_port_w(uint16_t data)
 {
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
@@ -117,7 +117,7 @@ READ_LINE_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
 	return m_musobana_outcoin_flag & 0x01;
 }
 
-WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
+void niyanpai_state::musobana_inputport_w(uint16_t data)
 {
 	m_musobana_inputport = data;
 }

@@ -52,8 +52,8 @@ private:
 	required_ioport m_analog_y;
 
 	DECLARE_WRITE_LINE_MEMBER(foreground_mode_w);
-	DECLARE_READ16_MEMBER(analogx_r);
-	DECLARE_READ16_MEMBER(analogy_watchdog_r);
+	uint16_t analogx_r();
+	uint16_t analogy_watchdog_r();
 
 	virtual void machine_start() override;
 
@@ -166,13 +166,13 @@ WRITE_LINE_MEMBER(xtheball_state::foreground_mode_w)
  *
  *************************************/
 
-READ16_MEMBER(xtheball_state::analogx_r)
+uint16_t xtheball_state::analogx_r()
 {
 	return (m_analog_x->read() << 8) | 0x00ff;
 }
 
 
-READ16_MEMBER(xtheball_state::analogy_watchdog_r)
+uint16_t xtheball_state::analogy_watchdog_r()
 {
 	/* doubles as a watchdog address */
 	m_watchdog->watchdog_reset();

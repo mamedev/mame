@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    machine.c
+    machine.cpp
 
     Controls execution of the core MAME system.
 
@@ -273,11 +273,11 @@ void running_machine::start()
 	// start recording movie if specified
 	const char *filename = options().mng_write();
 	if (filename[0] != 0)
-		m_video->begin_recording(filename, video_manager::MF_MNG);
+		m_video->begin_recording(filename, movie_recording::format::MNG);
 
 	filename = options().avi_write();
-	if (filename[0] != 0)
-		m_video->begin_recording(filename, video_manager::MF_AVI);
+	if (filename[0] != 0 && !m_video->is_recording())
+		m_video->begin_recording(filename, movie_recording::format::AVI);
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
@@ -314,10 +314,18 @@ int running_machine::run(bool quiet)
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			osd_file::error filerr = m_logfile->open("error.log");
 			if (filerr != osd_file::error::NONE)
-				throw emu_fatalerror("running_machine::run: unable to open log file");
+				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
 			using namespace std::placeholders;
 			add_logerror_callback(std::bind(&running_machine::logfile_callback, this, _1));
+		}
+
+		if (options().debug() && options().debuglog())
+		{
+			m_debuglogfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			osd_file::error filerr = m_debuglogfile->open("debug.log");
+			if (filerr != osd_file::error::NONE)
+				throw emu_fatalerror("running_machine::run: unable to open debug.log file");
 		}
 
 		// then finish setting up our local machine
@@ -1195,11 +1203,14 @@ void running_machine::nvram_save()
 {
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
-		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+		if (nvram.nvram_can_save())
 		{
-			nvram.nvram_save(file);
-			file.close();
+			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+			{
+				nvram.nvram_save(file);
+				file.close();
+			}
 		}
 	}
 }
@@ -1328,12 +1339,12 @@ void system_time::full_time::set(struct tm &t)
 //  DUMMY ADDRESS SPACE
 //**************************************************************************
 
-READ8_MEMBER(dummy_space_device::read)
+u8 dummy_space_device::read(offs_t offset)
 {
 	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
 }
 
-WRITE8_MEMBER(dummy_space_device::write)
+void dummy_space_device::write(offs_t offset, u8 data)
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }

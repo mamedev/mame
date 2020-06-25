@@ -56,6 +56,11 @@ void rx01_device::firmware_map(address_map &map)
 	map(00000, 02777).rom().region("firmware", 0);
 }
 
+void rx01_device::secbuf_map(address_map &map)
+{
+	map(00000, 01777).ram(); // FIXME: 1-bit
+}
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -64,6 +69,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 {
 	rx01_cpu_device &cpu(RX01_CPU(config, "rx01cpu", 20_MHz_XTAL));
 	cpu.set_addrmap(AS_PROGRAM, &rx01_device::firmware_map);
+	cpu.set_addrmap(AS_DATA, &rx01_device::secbuf_map);
 
 	for (auto &floppy : m_image)
 		LEGACY_FLOPPY(config, floppy, 0, &rx01_floppy_interface);
@@ -99,7 +105,7 @@ void rx01_device::device_reset()
 //  read
 //-------------------------------------------------
 
-READ16_MEMBER( rx01_device::read )
+uint16_t rx01_device::read(offs_t offset)
 {
 	switch(offset & 1) {
 		case 0: return status_read();
@@ -113,7 +119,7 @@ READ16_MEMBER( rx01_device::read )
 //  write
 //-------------------------------------------------
 
-WRITE16_MEMBER( rx01_device::write )
+void rx01_device::write(offs_t offset, uint16_t data)
 {
 	switch(offset & 1) {
 		case 0: command_write(data); break;

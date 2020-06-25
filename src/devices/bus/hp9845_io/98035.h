@@ -34,28 +34,28 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_READ16_MEMBER(reg_r) override;
-	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
+	virtual uint16_t reg_r(address_space &space, offs_t offset) override;
+	virtual void reg_w(address_space &space, offs_t offset, uint16_t data) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(dc_w);
+	void dc_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(ram_addr_w);
-	DECLARE_READ8_MEMBER(ram_data_r);
-	DECLARE_WRITE8_MEMBER(ram_addr_data_w);
-	DECLARE_WRITE8_MEMBER(ram_data_w);
+	void ram_addr_w(uint8_t data);
+	uint8_t ram_data_r();
+	void ram_addr_data_w(uint8_t data);
+	void ram_data_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(clock_key_w);
-	DECLARE_READ8_MEMBER(clock_digit_r);
+	void clock_key_w(uint8_t data);
+	uint8_t clock_digit_r();
 
-	DECLARE_WRITE8_MEMBER(odr_w);
-	DECLARE_READ8_MEMBER(idr_r);
-	DECLARE_READ8_MEMBER(np_status_r);
-	DECLARE_WRITE8_MEMBER(clear_np_irq_w);
-	DECLARE_READ8_MEMBER(clock_mux_r);
-	DECLARE_WRITE8_MEMBER(set_irq_w);
-	DECLARE_READ8_MEMBER(clr_inten_r);
-	DECLARE_WRITE8_MEMBER(clr_inten_w);
+	void odr_w(uint8_t data);
+	uint8_t idr_r();
+	uint8_t np_status_r();
+	void clear_np_irq_w(uint8_t data);
+	uint8_t clock_mux_r();
+	void set_irq_w(uint8_t data);
+	uint8_t clr_inten_r();
+	void clr_inten_w(uint8_t data);
 
 	void np_io_map(address_map &map);
 	void np_program_map(address_map &map);

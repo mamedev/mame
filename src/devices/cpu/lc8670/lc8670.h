@@ -60,12 +60,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// internal map handlers
-	DECLARE_READ8_MEMBER(regs_r);
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(mram_r);
-	DECLARE_WRITE8_MEMBER(mram_w);
-	DECLARE_READ8_MEMBER(xram_r);
-	DECLARE_WRITE8_MEMBER(xram_w);
+	uint8_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t mram_r(offs_t offset);
+	void mram_w(offs_t offset, uint8_t data);
+	uint8_t xram_r(offs_t offset);
+	void xram_w(offs_t offset, uint8_t data);
 
 	// configuration helpers
 	void set_cpu_clock(clock_source source, uint32_t clock) { m_clocks[unsigned(source)] = clock; }
@@ -189,10 +189,10 @@ private:
 	address_space_config  m_data_config;
 	address_space_config  m_io_config;
 
-	address_space *       m_program;              // program space (ROM or flash)
-	address_space *       m_data;                 // internal RAM/register
-	address_space *       m_io;                   // I/O ports
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program; // program space (ROM or flash)
+	memory_access< 9, 0, 0, ENDIANNESS_BIG>::specific m_data;    // internal RAM/register
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;      // I/O ports
 
 	// timers
 	static const device_timer_id BASE_TIMER = 1;

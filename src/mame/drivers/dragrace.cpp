@@ -40,7 +40,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 }
 
 
-WRITE8_MEMBER(dragrace_state::speed1_w)
+void dragrace_state::speed1_w(uint8_t data)
 {
 	unsigned freq = ~data & 0x1f;
 	m_discrete->write(DRAGRACE_MOTOR1_DATA, freq);
@@ -49,7 +49,7 @@ WRITE8_MEMBER(dragrace_state::speed1_w)
 	output().set_value("tachometer", freq);
 }
 
-WRITE8_MEMBER(dragrace_state::speed2_w)
+void dragrace_state::speed2_w(uint8_t data)
 {
 	unsigned freq = ~data & 0x1f;
 	m_discrete->write(DRAGRACE_MOTOR2_DATA, freq);
@@ -58,7 +58,7 @@ WRITE8_MEMBER(dragrace_state::speed2_w)
 	output().set_value("tachometer2", freq);
 }
 
-READ8_MEMBER(dragrace_state::dragrace_input_r)
+uint8_t dragrace_state::dragrace_input_r(offs_t offset)
 {
 	int val = ioport("IN2")->read();
 	static const char *const portnames[] = { "IN0", "IN1" };
@@ -81,7 +81,7 @@ READ8_MEMBER(dragrace_state::dragrace_input_r)
 }
 
 
-READ8_MEMBER(dragrace_state::dragrace_steering_r)
+uint8_t dragrace_state::dragrace_steering_r()
 {
 	int bitA[2];
 	int bitB[2];
@@ -101,7 +101,7 @@ READ8_MEMBER(dragrace_state::dragrace_steering_r)
 }
 
 
-READ8_MEMBER(dragrace_state::dragrace_scanline_r)
+uint8_t dragrace_state::dragrace_scanline_r()
 {
 	return (m_screen->vpos() ^ 0xf0) | 0x0f;
 }

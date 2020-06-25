@@ -232,7 +232,37 @@ void s14001a_device::device_start()
 	m_ext_read_handler.resolve();
 	m_bsy_handler.resolve();
 
-	// note: zerofill is done already by MAME core
+	// zero-fill
+	m_bPhase1 = false;
+	m_uStateP1 = m_uStateP2 = states::IDLE;
+	m_uDAR13To05P1 = 0;
+	m_uDAR13To05P2 = 0;
+	m_uDAR04To00P1 = 0;
+	m_uDAR04To00P2 = 0;
+	m_uCWARP1 = 0;
+	m_uCWARP2 = 0;
+	m_bStopP1 = false;
+	m_bStopP2 = false;
+	m_bVoicedP1 = false;
+	m_bVoicedP2 = false;
+	m_bSilenceP1 = false;
+	m_bSilenceP2 = false;
+	m_uLengthP1 = 0;
+	m_uLengthP2 = 0;
+	m_uXRepeatP1 = 0;
+	m_uXRepeatP2 = 0;
+	m_uDeltaOldP1 = 0;
+	m_uDeltaOldP2 = 0;
+	m_bDAR04To00CarryP2 = false;
+	m_bPPQCarryP2 = false;
+	m_bRepeatCarryP2 = false;
+	m_bLengthCarryP2 = false;
+	m_RomAddrP1 = 0;
+	m_uRomAddrP2 = 0;
+	m_bBusyP1 = false;
+	m_bStart = false;
+	m_uWord = 0;
+
 	ClearStatistics();
 	m_uOutputP1 = m_uOutputP2 = 7;
 
@@ -304,25 +334,25 @@ void s14001a_device::force_update()
 	m_stream->update();
 }
 
-READ_LINE_MEMBER(s14001a_device::romen_r)
+int s14001a_device::romen_r()
 {
 	m_stream->update();
 	return (m_bPhase1) ? 1 : 0;
 }
 
-READ_LINE_MEMBER(s14001a_device::busy_r)
+int s14001a_device::busy_r()
 {
 	m_stream->update();
 	return (m_bBusyP1) ? 1 : 0;
 }
 
-WRITE8_MEMBER(s14001a_device::data_w)
+void s14001a_device::data_w(uint8_t data)
 {
 	m_stream->update();
 	m_uWord = data & 0x3f; // C0-C5
 }
 
-WRITE_LINE_MEMBER(s14001a_device::start_w)
+void s14001a_device::start_w(int state)
 {
 	m_stream->update();
 	m_bStart = (state != 0);

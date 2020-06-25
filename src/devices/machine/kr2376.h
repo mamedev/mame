@@ -60,7 +60,7 @@ public:
 	auto strobe() { return m_write_strobe.bind(); }
 
 	/* keyboard data */
-	DECLARE_READ8_MEMBER( data_r );
+	uint8_t data_r();
 
 	/* Set an input pin */
 	void set_input_pin( input_pin_t pin, int data );

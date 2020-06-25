@@ -27,13 +27,13 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(video_page_select_w);
-	DECLARE_WRITE8_MEMBER(io_page_select_w);
-	DECLARE_WRITE8_MEMBER(quasar_video_w);
-	DECLARE_READ8_MEMBER(quasar_IO_r);
-	DECLARE_WRITE8_MEMBER(quasar_bullet_w);
-	DECLARE_WRITE8_MEMBER(quasar_sh_command_w);
-	DECLARE_READ8_MEMBER(quasar_sh_command_r);
+	void video_page_select_w(offs_t offset, uint8_t data);
+	void io_page_select_w(offs_t offset, uint8_t data);
+	void quasar_video_w(offs_t offset, uint8_t data);
+	uint8_t quasar_IO_r();
+	void quasar_bullet_w(offs_t offset, uint8_t data);
+	void quasar_sh_command_w(uint8_t data);
+	uint8_t quasar_sh_command_r();
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 	void quasar_palette(palette_device &palette) const;
 	uint32_t screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

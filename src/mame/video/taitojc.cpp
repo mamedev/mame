@@ -28,15 +28,15 @@ TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
 	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, 0);
+	tileinfo.set(m_gfx_index, tile, color, 0);
 }
 
-READ32_MEMBER(taitojc_state::taitojc_palette_r)
+uint32_t taitojc_state::taitojc_palette_r(offs_t offset)
 {
 	return m_palette_ram[offset];
 }
 
-WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
+void taitojc_state::taitojc_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r, g, b;
 	uint32_t color;
@@ -51,23 +51,23 @@ WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
-READ32_MEMBER(taitojc_state::taitojc_tile_r)
+uint32_t taitojc_state::taitojc_tile_r(offs_t offset)
 {
 	return m_tile_ram[offset];
 }
 
-READ32_MEMBER(taitojc_state::taitojc_char_r)
+uint32_t taitojc_state::taitojc_char_r(offs_t offset)
 {
 	return m_char_ram[offset];
 }
 
-WRITE32_MEMBER(taitojc_state::taitojc_tile_w)
+void taitojc_state::taitojc_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_tile_ram.get() + offset);
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(taitojc_state::taitojc_char_w)
+void taitojc_state::taitojc_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_char_ram.get() + offset);
 	m_gfxdecode->gfx(m_gfx_index)->mark_dirty(offset/32);

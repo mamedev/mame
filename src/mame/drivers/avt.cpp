@@ -457,11 +457,11 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
-	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
-	DECLARE_READ8_MEMBER( avt_6845_data_r );
-	DECLARE_WRITE8_MEMBER(avt_videoram_w);
-	DECLARE_WRITE8_MEMBER(avt_colorram_w);
+	void avt_6845_address_w(uint8_t data);
+	void avt_6845_data_w(uint8_t data);
+	uint8_t avt_6845_data_r();
+	void avt_videoram_w(offs_t offset, uint8_t data);
+	void avt_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(avtnfl_w);
 	DECLARE_WRITE_LINE_MEMBER(avtbingo_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -506,14 +506,14 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER( avt_state::avt_videoram_w )
+void avt_state::avt_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER( avt_state::avt_colorram_w )
+void avt_state::avt_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -531,7 +531,7 @@ TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 1) << 8);
 	int color = (attr & 0xf0)>>4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -615,26 +615,26 @@ void avt_state::avt_palette(palette_device &palette) const
 *            Read / Write Handlers            *
 **********************************************/
 
-//WRITE8_MEMBER(avt_state::debug_w)
+//void avt_state::debug_w(uint8_t data)
 //{
 //  popmessage("written : %02X", data);
 //}
 
 // [:crtc] M6845: Mode Control 10 is not supported!!!
 
-WRITE8_MEMBER( avt_state::avt_6845_address_w )
+void avt_state::avt_6845_address_w(uint8_t data)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(data);
 }
 
-WRITE8_MEMBER( avt_state::avt_6845_data_w )
+void avt_state::avt_6845_data_w(uint8_t data)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(data);
 }
 
-READ8_MEMBER( avt_state::avt_6845_data_r )
+uint8_t avt_state::avt_6845_data_r()
 {
 	//m_crtc_vreg[m_crtc_index] = data;
 	return m_crtc->register_r();

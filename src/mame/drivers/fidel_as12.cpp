@@ -47,7 +47,6 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.0")
 	{ }
 
@@ -63,7 +62,6 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
 	// address maps
@@ -73,13 +71,11 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void led_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 
 	u16 m_inp_mux;
 	u8 m_led_data;
@@ -104,27 +100,13 @@ void as12_state::machine_start()
     I/O
 ******************************************************************************/
 
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(as12_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
-// TTL/generic
-
 void as12_state::update_display()
 {
 	// 8*8(+1) chessboard leds
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(as12_state::control_w)
+void as12_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
@@ -139,14 +121,14 @@ WRITE8_MEMBER(as12_state::control_w)
 	// d6,d7: N/C?
 }
 
-WRITE8_MEMBER(as12_state::led_w)
+void as12_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-READ8_MEMBER(as12_state::input_r)
+u8 as12_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -234,9 +216,7 @@ void as12_state::as12(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(as12_state::cart_load));
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 

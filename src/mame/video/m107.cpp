@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(m107_state::get_pf_tile_info)
 	attrib = m_vram_data[tile_index + 1];
 	tile = m_vram_data[tile_index] + ((attrib & 0x1000) << 4);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			attrib & 0x7f,
 			TILE_FLIPYX(attrib >> 10));
@@ -64,19 +64,17 @@ TILE_GET_INFO_MEMBER(m107_state::get_pf_tile_info)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::vram_w)
+void m107_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int laynum;
-
 	COMBINE_DATA(&m_vram_data[offset]);
-	for (laynum = 0; laynum < 4; laynum++)
+	for (int laynum = 0; laynum < 4; laynum++)
 		if ((offset & 0x6000) == m_pf_layer[laynum].vram_base)
 			m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
 }
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::control_w)
+void m107_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_control[offset];
 	pf_layer_info *layer;
@@ -371,7 +369,7 @@ void m107_state::screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::spritebuffer_w)
+void m107_state::spritebuffer_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		/*

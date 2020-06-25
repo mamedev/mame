@@ -30,8 +30,8 @@ public:
 	// configuration
 	auto irq_cb() { return m_irq_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( sounddma_w );
-	DECLARE_WRITE8_MEMBER( noise_w );
+	void sounddma_w(offs_t offset, uint8_t data);
+	void noise_w(offs_t offset, uint8_t data);
 
 	void sound_decrement();
 	void soundport_w(int which, int offset, int data);

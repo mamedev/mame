@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Robbbert
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     ACT Apricot F1 series
@@ -55,6 +55,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> f1_daisy_device
+
+class f1_daisy_device : public device_t, public z80_daisy_chain_interface
+{
+public:
+	f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	IRQ_CALLBACK_MEMBER(inta_cb);
+
+protected:
+	virtual void device_start() override;
+};
+
 // ======================> f1_state
 
 class f1_state : public driver_device
@@ -92,18 +105,18 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<input_merger_device> m_irqs;
-	required_shared_ptr<uint16_t> m_p_scrollram;
-	required_shared_ptr<uint16_t> m_p_paletteram;
+	required_shared_ptr<u16> m_p_scrollram;
+	required_shared_ptr<u16> m_p_paletteram;
 	required_device<palette_device> m_palette;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(system_w);
+	u16 palette_r(offs_t offset);
+	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void system_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE8_MEMBER(m1_w);
+	void m1_w(u8 data);
 
 	int m_40_80;
 	int m_200_256;
@@ -117,7 +130,7 @@ private:
 //  VIDEO
 //**************************************************************************
 
-uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
@@ -128,7 +141,7 @@ uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			uint16_t data = program.read_word(addr);
+			u16 data = program.read_word(addr);
 
 			if (m_40_80)
 			{
@@ -161,14 +174,14 @@ uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-READ16_MEMBER(f1_state::palette_r)
+u16 f1_state::palette_r(offs_t offset)
 {
 	return m_p_paletteram[offset];
 }
 
-WRITE16_MEMBER(f1_state::palette_w)
+void f1_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint8_t i,r,g,b;
+	u8 i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
@@ -200,7 +213,7 @@ static GFXDECODE_START( gfx_act_f1 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(f1_state::system_w)
+void f1_state::system_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -315,7 +328,7 @@ WRITE_LINE_MEMBER(f1_state::ctc_z2_w)
 	m_sio->txca_w(state);
 }
 
-WRITE8_MEMBER(f1_state::m1_w)
+void f1_state::m1_w(u8 data)
 {
 	m_ctc->z80daisy_decode(data);
 	m_sio->z80daisy_decode(data);
@@ -336,6 +349,34 @@ void apricotf_floppies(device_slot_interface &device)
 }
 
 
+DEFINE_DEVICE_TYPE(F1_DAISY, f1_daisy_device, "f1_daisy", "F1 daisy chain abstraction")
+
+f1_daisy_device::f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, F1_DAISY, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
+{
+}
+
+void f1_daisy_device::device_start()
+{
+}
+
+IRQ_CALLBACK_MEMBER(f1_daisy_device::inta_cb)
+{
+	device_z80daisy_interface *intf = daisy_get_irq_device();
+	if (intf != nullptr)
+		return intf->z80daisy_irq_ack();
+	else
+		return 0xff;
+}
+
+static const z80_daisy_config f1_daisy_config[] =
+{
+	{ Z80SIO2_TAG },
+	{ Z80CTC_TAG },
+	{ nullptr }
+};
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -351,6 +392,9 @@ void f1_state::act_f1(machine_config &config)
 	I8086(config, m_maincpu, 14_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1_state::act_f1_mem);
 	m_maincpu->set_addrmap(AS_IO, &f1_state::act_f1_io);
+	m_maincpu->set_irq_acknowledge_callback("daisy", FUNC(f1_daisy_device::inta_cb));
+
+	F1_DAISY(config, "daisy").set_daisy_config(f1_daisy_config);
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

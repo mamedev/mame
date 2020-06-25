@@ -25,7 +25,7 @@ Might be some priority glitches
 #include "speaker.h"
 
 
-WRITE8_MEMBER(tbowl_state::coincounter_w)
+void tbowl_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -36,12 +36,12 @@ note: check this, its borrowed from tecmo.cpp / wc90.cpp at the moment and could
 
 ***/
 
-WRITE8_MEMBER(tbowl_state::boardb_bankswitch_w)
+void tbowl_state::boardb_bankswitch_w(uint8_t data)
 {
 	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
+void tbowl_state::boardc_bankswitch_w(uint8_t data)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
@@ -93,7 +93,7 @@ void tbowl_state::_6206B_map(address_map &map)
 }
 
 /* Board C */
-WRITE8_MEMBER(tbowl_state::trigger_nmi)
+void tbowl_state::trigger_nmi(uint8_t data)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -116,19 +116,19 @@ void tbowl_state::_6206C_map(address_map &map)
 
 /* Board A */
 
-WRITE8_MEMBER(tbowl_state::adpcm_start_w)
+void tbowl_state::adpcm_start_w(offs_t offset, uint8_t data)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	m_adpcm_pos[offset & 1] = data << 8;
 	adpcm->reset_w(0);
 }
 
-WRITE8_MEMBER(tbowl_state::adpcm_end_w)
+void tbowl_state::adpcm_end_w(offs_t offset, uint8_t data)
 {
 	m_adpcm_end[offset & 1] = (data + 1) << 8;
 }
 
-WRITE8_MEMBER(tbowl_state::adpcm_vol_w)
+void tbowl_state::adpcm_vol_w(offs_t offset, uint8_t data)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	adpcm->set_output_gain(ALL_OUTPUTS, (data & 127) / 127.0);
@@ -141,7 +141,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		device->reset_w(1);
 	else if (m_adpcm_data[num] != -1)
 	{
-		device->write_data(m_adpcm_data[num] & 0x0f);
+		device->data_w(m_adpcm_data[num] & 0x0f);
 		m_adpcm_data[num] = -1;
 	}
 	else
@@ -149,7 +149,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * num;
 
 		m_adpcm_data[num] = ROM[m_adpcm_pos[num]++];
-		device->write_data(m_adpcm_data[num] >> 4);
+		device->data_w(m_adpcm_data[num] >> 4);
 	}
 }
 

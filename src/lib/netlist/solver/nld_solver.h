@@ -39,9 +39,9 @@ namespace devices
 		void post_start();
 		void stop();
 
-		nl_fptype gmin() const { return m_params.m_gmin(); }
+		auto gmin() const -> decltype(solver::solver_parameters_t::m_gmin()) { return m_params.m_gmin(); }
 
-		void create_solver_code(std::map<pstring, pstring> &mp);
+		solver::static_compile_container create_solver_code(solver::static_compile_target target);
 
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
@@ -51,18 +51,19 @@ namespace devices
 		logic_input_t m_fb_step;
 		logic_output_t m_Q_step;
 
-		std::vector<plib::unique_ptr<solver::matrix_solver_t>> m_mat_solvers;
+		// FIXME: these should be created in device space
+		std::vector<host_arena::unique_ptr<solver::matrix_solver_t>> m_mat_solvers;
 		std::vector<solver::matrix_solver_t *> m_mat_solvers_all;
 		std::vector<solver::matrix_solver_t *> m_mat_solvers_timestepping;
 
 		solver::solver_parameters_t m_params;
 
 		template <typename FT, int SIZE>
-		plib::unique_ptr<solver::matrix_solver_t> create_solver(std::size_t size,
+		host_arena::unique_ptr<solver::matrix_solver_t> create_solver(std::size_t size,
 			const pstring &solvername, analog_net_t::list_t &nets);
 
 		template <typename FT>
-		plib::unique_ptr<solver::matrix_solver_t> create_solvers(
+		host_arena::unique_ptr<solver::matrix_solver_t> create_solvers(
 			const pstring &sname, analog_net_t::list_t &nets);
 	};
 

@@ -497,7 +497,7 @@ void c8050_fdc_device::live_run(const attotime &limit)
 	}
 }
 
-READ8_MEMBER( c8050_fdc_device::read )
+uint8_t c8050_fdc_device::read()
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -505,7 +505,7 @@ READ8_MEMBER( c8050_fdc_device::read )
 	return GCR_DECODE(e, i);
 }
 
-WRITE8_MEMBER( c8050_fdc_device::write )
+void c8050_fdc_device::write(uint8_t data)
 {
 	if (LOG) logerror("%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
 

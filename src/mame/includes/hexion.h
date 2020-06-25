@@ -40,15 +40,15 @@ private:
 	int m_ccu_int_time_count;
 	tilemap_t *m_bg_tilemap[2];
 
-	DECLARE_WRITE8_MEMBER(coincntr_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(bankedram_r);
-	DECLARE_WRITE8_MEMBER(bankedram_w);
-	DECLARE_WRITE8_MEMBER(bankctrl_w);
-	DECLARE_WRITE8_MEMBER(gfxrom_select_w);
+	void coincntr_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	uint8_t bankedram_r(offs_t offset);
+	void bankedram_w(offs_t offset, uint8_t data);
+	void bankctrl_w(uint8_t data);
+	void gfxrom_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
+	void ccu_int_time_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

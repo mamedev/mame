@@ -137,7 +137,7 @@ d0      crafts joining
 
 */
 
-WRITE8_MEMBER(segag80v_state::elim1_sh_w)
+void segag80v_state::elim1_sh_w(uint8_t data)
 {
 	data ^= 0xff;
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER(segag80v_state::elim1_sh_w)
 	}
 }
 
-WRITE8_MEMBER(segag80v_state::elim2_sh_w)
+void segag80v_state::elim2_sh_w(uint8_t data)
 {
 	data ^= 0xff;
 
@@ -196,7 +196,7 @@ WRITE8_MEMBER(segag80v_state::elim2_sh_w)
 }
 
 
-WRITE8_MEMBER(segag80v_state::zektor1_sh_w)
+void segag80v_state::zektor1_sh_w(uint8_t data)
 {
 	data ^= 0xff;
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER(segag80v_state::zektor1_sh_w)
 	}
 }
 
-WRITE8_MEMBER(segag80v_state::zektor2_sh_w)
+void segag80v_state::zektor2_sh_w(uint8_t data)
 {
 	data ^= 0xff;
 
@@ -256,7 +256,7 @@ WRITE8_MEMBER(segag80v_state::zektor2_sh_w)
 
 
 
-WRITE8_MEMBER(segag80v_state::spacfury1_sh_w)
+void segag80v_state::spacfury1_sh_w(uint8_t data)
 {
 	data ^= 0xff;
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER(segag80v_state::spacfury1_sh_w)
 
 }
 
-WRITE8_MEMBER(segag80v_state::spacfury2_sh_w)
+void segag80v_state::spacfury2_sh_w(uint8_t data)
 {
 	data ^= 0xff;
 

@@ -31,7 +31,7 @@ void i80130_device::io_map(address_map &map)
 	//map(0x08, 0x0f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 }
 
-READ16_MEMBER( i80130_device::io_r )
+uint16_t i80130_device::io_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -55,7 +55,7 @@ READ16_MEMBER( i80130_device::io_r )
 	return data;
 }
 
-WRITE16_MEMBER( i80130_device::io_w )
+void i80130_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -80,20 +80,20 @@ WRITE16_MEMBER( i80130_device::io_w )
 //  ROM( i80130 )
 //-------------------------------------------------
 
-ROM_START( i80130 )
-	ROM_REGION16_LE( 0x4000, "rom", 0 )
-	ROM_LOAD( "80130", 0x0000, 0x4000, NO_DUMP )
-ROM_END
+//ROM_START( i80130 )
+//  ROM_REGION16_LE( 0x4000, "rom", 0 )
+//  ROM_LOAD( "80130", 0x0000, 0x4000, NO_DUMP )
+//ROM_END
 
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *i80130_device::device_rom_region() const
-{
-	return ROM_NAME( i80130 );
-}
+//const tiny_rom_entry *i80130_device::device_rom_region() const
+//{
+//  return ROM_NAME( i80130 );
+//}
 
 
 //-------------------------------------------------

@@ -232,16 +232,14 @@ public:
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
 	save_error write_file(emu_file &file);
 	save_error read_file(emu_file &file);
-	
-	save_error write_buffer(u8 *data, size_t size);
-	save_error read_buffer(u8 *data, size_t size);
+
+	save_error write_stream(std::ostream &str);
+	save_error read_stream(std::istream &str);
+
+	save_error write_buffer(void *buf, size_t size);
+	save_error read_buffer(const void *buf, size_t size);
 
 private:
-	// internal helpers
-	u32 signature() const;
-	void dump_registry() const;
-	static save_error validate_header(const u8 *header, const char *gamename, u32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
-
 	// state callback item
 	class state_callback
 	{
@@ -251,6 +249,15 @@ private:
 
 		save_prepost_delegate m_func;                 // delegate
 	};
+
+	// internal helpers
+	template <typename T, typename U, typename V, typename W>
+	save_error do_write(T check_space, U write_block, V start_header, W start_data);
+	template <typename T, typename U, typename V, typename W>
+	save_error do_read(T check_length, U read_block, V start_header, W start_data);
+	u32 signature() const;
+	void dump_registry() const;
+	static save_error validate_header(const u8 *header, const char *gamename, u32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
 
 	// internal state
 	running_machine &         m_machine;              // reference to our machine

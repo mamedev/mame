@@ -287,9 +287,9 @@ private:
 	// address spaces
 	address_space_config m_program_config;
 	address_space_config m_regs_config;
-	address_space *m_program;
-	address_space *m_regs;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<13, 0,  0, ENDIANNESS_LITTLE>::specific m_regs;
 
 	// device callbacks
 	devcb_read8 m_porta_in_cb;

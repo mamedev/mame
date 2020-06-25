@@ -78,7 +78,7 @@ void mario_state::mario_palette(palette_device &palette) const
 	palette.palette()->normalize_range(0, 255);
 }
 
-WRITE8_MEMBER(mario_state::mario_videoram_w)
+void mario_state::mario_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -96,7 +96,7 @@ WRITE_LINE_MEMBER(mario_state::palette_bank_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(mario_state::mario_scroll_w)
+void mario_state::mario_scroll_w(uint8_t data)
 {
 	m_gfx_scroll = data + 17;
 }
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
 	int color = 8 + (m_videoram[tile_index] >> 5) + 16 * m_palette_bank;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void mario_state::video_start()

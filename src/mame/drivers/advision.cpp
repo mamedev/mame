@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Dan Boris
 /*************************************************************************
-
-    drivers/advision.c
 
     Driver for the Entex Adventure Vision
 
@@ -28,7 +26,7 @@
 
 /* Memory Maps */
 
-READ8_MEMBER( advision_state::rom_r )
+uint8_t advision_state::rom_r(offs_t offset)
 {
 	offset += 0x400;
 	return m_cart->read_rom(offset & 0xfff);
@@ -97,7 +95,7 @@ void advision_state::advision(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "advision_cart").set_must_be_loaded(true);
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "advision_cart");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("advision");

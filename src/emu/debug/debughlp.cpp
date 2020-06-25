@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debughlp.c
+    debughlp.cpp
 
     Debugger help engine.
 
@@ -137,7 +137,7 @@ static const help_item static_help_list[] =
 		"  o[ver] [<count>=1] -- single steps over <count> instructions (F10)\n"
 		"  out -- single steps until the current subroutine/exception handler is exited (Shift-F11)\n"
 		"  g[o] [<address>] -- resumes execution, sets temp breakpoint at <address> (F5)\n"
-		"  ge[x] [<exception>] -- resumes execution, setting temp breakpoint if <exception> is raised\n"
+		"  ge[x] [<exception>[,<condition>]] -- resumes execution, setting temp breakpoint if <exception> is raised\n"
 		"  gi[nt] [<irqline>] -- resumes execution, setting temp breakpoint if <irqline> is taken (F7)\n"
 		"  gt[ime] <milliseconds> -- resumes execution until the given delay has elapsed\n"
 		"  gv[blank] -- resumes execution, setting temp breakpoint on the next VBLANK (F8)\n"
@@ -1561,16 +1561,11 @@ const char *debug_get_help(const char *tag)
 	static char ambig_message[1024];
 	const help_item *found = nullptr;
 	int i, msglen, foundcount = 0;
-	int taglen = (int)strlen(tag);
-	char tagcopy[256];
-
-	/* make a lowercase copy of the tag */
-	for (i = 0; i <= taglen; i++)
-		tagcopy[i] = tolower(u8(tag[i]));
+	size_t taglen = strlen(tag);
 
 	/* find a match */
 	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
-		if (!strncmp(static_help_list[i].tag, tagcopy, taglen))
+		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
 		{
 			foundcount++;
 			found = &static_help_list[i];
@@ -1592,7 +1587,7 @@ const char *debug_get_help(const char *tag)
 	/* otherwise, indicate ambiguous help */
 	msglen = sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
 	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
-		if (!strncmp(static_help_list[i].tag, tagcopy, taglen))
+		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
 			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
 	return ambig_message;
 }

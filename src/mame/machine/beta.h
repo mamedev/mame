@@ -25,17 +25,17 @@ class beta_disk_device : public device_t
 public:
 	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(track_r);
-	DECLARE_READ8_MEMBER(sector_r);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(state_r);
+	uint8_t status_r();
+	uint8_t track_r();
+	uint8_t sector_r();
+	uint8_t data_r();
+	uint8_t state_r();
 
-	DECLARE_WRITE8_MEMBER(param_w);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(track_w);
-	DECLARE_WRITE8_MEMBER(sector_w);
-	DECLARE_WRITE8_MEMBER(data_w);
+	void param_w(uint8_t data);
+	void command_w(uint8_t data);
+	void track_w(uint8_t data);
+	void sector_w(uint8_t data);
+	void data_w(uint8_t data);
 
 	int is_active();
 	void enable();
@@ -56,6 +56,10 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
+	void fdc_hld_w(int state);
+	void motors_control();
+	u8 m_control;
+	bool m_motor_active;
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };

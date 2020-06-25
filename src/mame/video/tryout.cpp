@@ -46,26 +46,26 @@ TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 	code |= ((attr & 0x03) << 8);
 	int color = ((attr & 0x4) >> 2) + 6;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
+	tileinfo.set(2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
-READ8_MEMBER(tryout_state::vram_r)
+uint8_t tryout_state::vram_r(offs_t offset)
 {
 	return m_vram[offset]; // debug only
 }
 
-WRITE8_MEMBER(tryout_state::videoram_w)
+void tryout_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(tryout_state::vram_w)
+void tryout_state::vram_w(offs_t offset, uint8_t data)
 {
 	/*  There are eight banks of vram - in bank 0 the first 0x400 bytes
 	is reserved for the tilemap.  In banks 2, 4 and 6 the game never
@@ -133,12 +133,12 @@ WRITE8_MEMBER(tryout_state::vram_w)
 	m_gfxdecode->gfx(2)->mark_dirty((offset-0x400/64)&0x7f);
 }
 
-WRITE8_MEMBER(tryout_state::vram_bankswitch_w)
+void tryout_state::vram_bankswitch_w(uint8_t data)
 {
 	m_vram_bank = data;
 }
 
-WRITE8_MEMBER(tryout_state::flipscreen_w)
+void tryout_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }

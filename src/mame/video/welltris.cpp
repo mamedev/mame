@@ -18,7 +18,7 @@ void welltris_state::setbank(int num, int bank)
 
 /* Not really enough evidence here */
 
-WRITE16_MEMBER(welltris_state::palette_bank_w)
+void welltris_state::palette_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -35,7 +35,7 @@ WRITE16_MEMBER(welltris_state::palette_bank_w)
 	}
 }
 
-WRITE16_MEMBER(welltris_state::gfxbank_w)
+void welltris_state::gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -44,7 +44,7 @@ WRITE16_MEMBER(welltris_state::gfxbank_w)
 	}
 }
 
-WRITE16_MEMBER(welltris_state::scrollreg_w)
+void welltris_state::scrollreg_w(offs_t offset, uint16_t data)
 {
 	switch (offset) {
 		case 0: m_scrollx = data - 14; break;
@@ -57,13 +57,13 @@ TILE_GET_INFO_MEMBER(welltris_state::get_tile_info)
 	uint16_t code = m_charvideoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x0fff) + (m_gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + (8 * m_charpalettebank),
 			0);
 }
 
-WRITE16_MEMBER(welltris_state::charvideoram_w)
+void welltris_state::charvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_charvideoram[offset]);
 	m_char_tilemap->mark_tile_dirty(offset);

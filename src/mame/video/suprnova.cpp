@@ -89,7 +89,7 @@ void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const 
 }
 
 
-WRITE32_MEMBER(skns_state::pal_regs_w)
+void skns_state::pal_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_pal_regs[offset]);
 	m_palette_updated =1;
@@ -176,7 +176,7 @@ WRITE32_MEMBER(skns_state::pal_regs_w)
 }
 
 
-WRITE32_MEMBER(skns_state::palette_ram_w)
+void skns_state::palette_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 	int brightness_r, brightness_g, brightness_b/*, alpha*/;
@@ -282,7 +282,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	if(m_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0+depth,
+	tileinfo.set(0+depth,
 			code,
 			0x40+colr,
 			flags);
@@ -291,7 +291,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	//if (pri) popmessage("pri A!! %02x\n", pri);
 }
 
-WRITE32_MEMBER(skns_state::tilemapA_w)
+void skns_state::tilemapA_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapA_ram[offset]);
 	m_tilemap_A->mark_tile_dirty(offset);
@@ -308,7 +308,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	if(m_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(1+depth,
+	tileinfo.set(1+depth,
 			code,
 			0x40+colr,
 			flags);
@@ -317,13 +317,13 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	//if (pri) popmessage("pri B!! %02x\n", pri); // 02 on cyvern
 }
 
-WRITE32_MEMBER(skns_state::tilemapB_w)
+void skns_state::tilemapB_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapB_ram[offset]);
 	m_tilemap_B->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(skns_state::v3_regs_w)
+void skns_state::v3_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_v3_regs[offset]);
 
@@ -507,7 +507,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 					uint16_t pendata  = src[x]&0x7fff;
 					uint16_t pendata2 = src2[x]&0x7fff;
 					uint16_t bgpendata;
-					uint16_t pendata3 = src3[x]&0x3fff;
+					uint16_t pendata3 = m_alt_enable_sprites ? src3[x]&0x3fff : 0;
 
 					uint32_t coldat;
 
@@ -621,8 +621,13 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	if (m_alt_enable_sprites)
-		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_spc_regs ); // TODO : not all 0x4000 of the sprite RAM area can be displayed on real hardware
-
 	return 0;
+}
+
+WRITE_LINE_MEMBER(skns_state::screen_vblank)
+{
+	if (state)
+	{
+		m_spritegen->skns_draw_sprites(m_sprite_bitmap, m_screen->visible_area(), m_spriteram, m_spriteram.bytes(), m_spc_regs); // TODO: not all 0x4000 of the sprite RAM area can be displayed on real hardware
+	}
 }

@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(vindictr_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (m_playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -93,7 +93,7 @@ void vindictr_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
+void vindictr_state::vindictr_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
@@ -123,9 +123,9 @@ WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
  *
  *************************************/
 
-void vindictr_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(vindictr_state::scanline_update)
 {
-	int x;
+	int scanline = param;
 
 	/* keep in range */
 	int offset = ((scanline - 8) / 8) * 64 + 42;
@@ -135,7 +135,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 		return;
 
 	/* update the current parameters */
-	for (x = 42; x < 64; x++)
+	for (int x = 42; x < 64; x++)
 	{
 		uint16_t data = m_alpha_tilemap->basemem_read(offset++);
 
@@ -144,7 +144,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 			case 2:     /* /PFB */
 				if (m_playfield_tile_bank != (data & 7))
 				{
-					screen.update_partial(scanline - 1);
+					m_screen->update_partial(scanline - 1);
 					m_playfield_tile_bank = data & 7;
 					m_playfield_tilemap->mark_all_dirty();
 				}
@@ -153,7 +153,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 			case 3:     /* /PFHSLD */
 				if (m_playfield_xscroll != (data & 0x1ff))
 				{
-					screen.update_partial(scanline - 1);
+					m_screen->update_partial(scanline - 1);
 					m_playfield_tilemap->set_scrollx(0, data);
 					m_playfield_xscroll = data & 0x1ff;
 				}
@@ -162,7 +162,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 			case 4:     /* /MOHS */
 				if (m_mob->xscroll() != (data & 0x1ff))
 				{
-					screen.update_partial(scanline - 1);
+					m_screen->update_partial(scanline - 1);
 					m_mob->set_xscroll(data & 0x1ff);
 				}
 				break;
@@ -171,20 +171,20 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:     /* /VIRQ */
-				scanline_int_write_line(1);
+				scanline_interrupt();
 				break;
 
 			case 7:     /* /PFVS */
 			{
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
-				const rectangle &visible_area = screen.visible_area();
+				const rectangle &visible_area = m_screen->visible_area();
 				if (offset > visible_area.bottom())
 					offset -= visible_area.bottom() + 1;
 
 				if (m_playfield_yscroll != ((data - offset) & 0x1ff))
 				{
-					screen.update_partial(scanline - 1);
+					m_screen->update_partial(scanline - 1);
 					m_playfield_tilemap->set_scrolly(0, data - offset);
 					m_mob->set_yscroll((data - offset) & 0x1ff);
 				}

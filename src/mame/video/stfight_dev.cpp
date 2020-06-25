@@ -156,7 +156,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_fg_tile_info)
 	attr = m_fgmap[0x8000+tile_index];
 	tile_base = ((attr & 0x80) << 2) | ((attr & 0x20) << 3);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile_base + m_fgmap[tile_index],
 			attr & 0x07,
 			0);
@@ -178,7 +178,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_bg_tile_info)
 	tile_bank = (attr & 0x20) >> 5;
 	tile_base = (attr & 0x80) << 1;
 
-	SET_TILE_INFO_MEMBER(2+tile_bank,
+	tileinfo.set(2+tile_bank,
 			tile_base + m_bgmap[tile_index],
 			attr & 0x07,
 			0);
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_txram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x60) >> 5));
@@ -335,20 +335,20 @@ void stfight_video_device::device_reset()
 
 // public functions
 
-WRITE8_MEMBER(stfight_video_device::stfight_text_char_w)
+void stfight_video_device::stfight_text_char_w(offs_t offset, uint8_t data)
 {
 	m_txram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset&0x3ff);
 }
 
 
-WRITE8_MEMBER(stfight_video_device::stfight_sprite_bank_w)
+void stfight_video_device::stfight_sprite_bank_w(uint8_t data)
 {
 	m_sprite_base = ( ( data & 0x04 ) << 7 ) |
 							( ( data & 0x01 ) << 8 );
 }
 
-WRITE8_MEMBER(stfight_video_device::stfight_vh_latch_w)
+void stfight_video_device::stfight_vh_latch_w(offs_t offset, uint8_t data)
 {
 	int scroll;
 

@@ -5,6 +5,7 @@
     uiinput.h
 
     Internal MAME user interface input state.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_UIINPUT_H

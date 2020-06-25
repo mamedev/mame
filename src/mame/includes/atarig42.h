@@ -16,6 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
 #include "machine/asic65.h"
+#include "machine/timer.h"
 #include "tilemap.h"
 
 class atarig42_state : public atarigen_state
@@ -34,13 +35,12 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_WRITE8_MEMBER(a2d_select_w);
-	DECLARE_READ8_MEMBER(a2d_data_r);
-	DECLARE_WRITE16_MEMBER(io_latch_w);
-	DECLARE_WRITE16_MEMBER(mo_command_w);
+	void video_int_ack_w(uint16_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	void a2d_select_w(offs_t offset, uint8_t data);
+	uint8_t a2d_data_r(offs_t offset);
+	void io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
@@ -84,8 +84,8 @@ public:
 	void atarig42_0x200(machine_config &config);
 
 protected:
-	DECLARE_READ16_MEMBER(roadriot_sloop_data_r);
-	DECLARE_WRITE16_MEMBER(roadriot_sloop_data_w);
+	uint16_t roadriot_sloop_data_r(offs_t offset);
+	void roadriot_sloop_data_w(offs_t offset, uint16_t data);
 	void roadriot_sloop_tweak(int offset);
 };
 
@@ -97,8 +97,8 @@ public:
 	void atarig42_0x400(machine_config &config);
 
 protected:
-	DECLARE_READ16_MEMBER(guardians_sloop_data_r);
-	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
+	uint16_t guardians_sloop_data_r(offs_t offset);
+	void guardians_sloop_data_w(offs_t offset, uint16_t data);
 	void guardians_sloop_tweak(int offset);
 };
 

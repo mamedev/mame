@@ -83,7 +83,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(nibble_videoram_w);
+	void nibble_videoram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void nibble_palette(palette_device &palette) const;
@@ -100,7 +100,7 @@ private:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(nibble_state::nibble_videoram_w)
+void nibble_state::nibble_videoram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(m_videoram+offset);
 	m_bg_tilemap->mark_tile_dirty(offset*2);
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
 */
 	uint8_t code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
+	tileinfo.set(0 /* bank */, code, 0 /* color */, 0);
 }
 
 void nibble_state::video_start()
@@ -336,7 +336,7 @@ GFXDECODE_END
 
 void nibble_state::nibble(machine_config &config)
 {
-	UPD7811(config, m_maincpu, MASTER_CLOCK / 3); // type guessed; clock not verified
+	UPD78C11(config, m_maincpu, MASTER_CLOCK); // type guessed; clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 

@@ -54,12 +54,12 @@ void mb_vcu_device::mb_vcu_pal_ram(address_map &map)
 	}
 }
 
-READ8_MEMBER( mb_vcu_device::mb_vcu_paletteram_r )
+uint8_t mb_vcu_device::mb_vcu_paletteram_r(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
+void mb_vcu_device::mb_vcu_paletteram_w(offs_t offset, uint8_t data)
 {
 	int r,g,b, bit0, bit1, bit2;
 
@@ -229,23 +229,23 @@ void mb_vcu_device::device_reset()
 //**************************************************************************
 //  uint8_t *pcg = memregion("sub2")->base();
 
-READ8_MEMBER( mb_vcu_device::read_ram )
+uint8_t mb_vcu_device::read_ram(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( mb_vcu_device::write_ram )
+void mb_vcu_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 }
 
-WRITE8_MEMBER( mb_vcu_device::write_vregs )
+void mb_vcu_device::write_vregs(offs_t offset, uint8_t data)
 {
 	m_vregs[offset] = data;
 }
 
 /* latches RAM offset to send to params */
-READ8_MEMBER( mb_vcu_device::load_params )
+uint8_t mb_vcu_device::load_params(offs_t offset)
 {
 	m_param_offset_latch = offset;
 
@@ -273,7 +273,7 @@ READ8_MEMBER( mb_vcu_device::load_params )
 	return 0; // open bus?
 }
 
-READ8_MEMBER( mb_vcu_device::load_gfx )
+uint8_t mb_vcu_device::load_gfx(offs_t offset)
 {
 	int xi,yi;
 	int dstx,dsty;
@@ -388,7 +388,7 @@ Read-Modify-Write operations
 ---0 -011 (0x03) clear VRAM
 ---1 -011 (0x13) collision detection
 */
-READ8_MEMBER( mb_vcu_device::load_set_clr )
+uint8_t mb_vcu_device::load_set_clr(offs_t offset)
 {
 	int xi,yi;
 	int dstx,dsty;
@@ -469,7 +469,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	return 0; // open bus?
 }
 
-WRITE8_MEMBER( mb_vcu_device::background_color_w )
+void mb_vcu_device::background_color_w(uint8_t data)
 {
 	int bit0,bit1,bit2;
 	int r,g,b;
@@ -495,7 +495,7 @@ WRITE8_MEMBER( mb_vcu_device::background_color_w )
 	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
 }
 
-READ8_MEMBER( mb_vcu_device::status_r )
+uint8_t mb_vcu_device::status_r()
 {
 	/*
 	---- ---x busy or vblank flag
@@ -503,12 +503,12 @@ READ8_MEMBER( mb_vcu_device::status_r )
 	return m_status;
 }
 
-WRITE8_MEMBER( mb_vcu_device::vbank_w )
+void mb_vcu_device::vbank_w(uint8_t data)
 {
 	m_vbank = (data & 0x40) >> 6;
 }
 
-WRITE8_MEMBER( mb_vcu_device::vbank_clear_w )
+void mb_vcu_device::vbank_clear_w(uint8_t data)
 {
 	m_vbank = (data & 0x40) >> 6;
 

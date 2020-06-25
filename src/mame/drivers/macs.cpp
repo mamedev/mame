@@ -94,10 +94,10 @@ private:
 	uint8_t m_cart_bank;
 	std::unique_ptr<uint8_t[]> m_ram1;
 	required_shared_ptr<uint8_t> m_ram2;
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(macs_input_r);
-	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
-	DECLARE_WRITE8_MEMBER(macs_output_w);
+	void rambank_w(uint8_t data);
+	uint8_t macs_input_r(offs_t offset);
+	void macs_rom_bank_w(uint8_t data);
+	void macs_output_w(offs_t offset, uint8_t data);
 	uint8_t dma_offset();
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -130,12 +130,12 @@ void macs_state::macs_mem(address_map &map)
 	map(0xf800, 0xffff).bankrw("rambank2"); /* common /backup ram ?*/
 }
 
-WRITE8_MEMBER(macs_state::rambank_w)
+void macs_state::rambank_w(uint8_t data)
 {
 	m_rambank[0]->set_entry(2 + (data & 1));
 }
 
-READ8_MEMBER(macs_state::macs_input_r)
+uint8_t macs_state::macs_input_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -168,12 +168,12 @@ READ8_MEMBER(macs_state::macs_input_r)
 }
 
 
-WRITE8_MEMBER(macs_state::macs_rom_bank_w)
+void macs_state::macs_rom_bank_w(uint8_t data)
 {
 	m_rombank[1]->set_entry(m_cart_bank * 0x100 + data);
 }
 
-WRITE8_MEMBER(macs_state::macs_output_w)
+void macs_state::macs_output_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -752,28 +752,28 @@ void macs_state::machine_reset()
 void macs_state::init_macs()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((10 | 0x80));
+	m_maincpu->set_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
 void macs_state::init_macs2()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((10 | 0x80));
+	m_maincpu->set_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
 void macs_state::init_kisekaeh()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((11 | 0x180));
+	m_maincpu->set_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
 void macs_state::init_kisekaem()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((10 | 0x180));
+	m_maincpu->set_game_flag((10 | 0x180));
 	m_rev = 1;
 }
 

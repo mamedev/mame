@@ -23,14 +23,14 @@ public:
 private:
 	required_device<eeprom_serial_93cxx_device> m_sp_eeprom;
 
-	DECLARE_READ64_MEMBER(sp_eeprom_r);
-	DECLARE_WRITE64_MEMBER(sp_eeprom_w);
-	DECLARE_READ64_MEMBER(sp_rombdflg_r);
-	DECLARE_READ64_MEMBER(sp_io_r);
-	DECLARE_READ64_MEMBER(sn_93c46a_r);
-	DECLARE_WRITE64_MEMBER(sn_93c46a_w);
-	DECLARE_READ64_MEMBER(sp_bank_r);
-	DECLARE_WRITE64_MEMBER(sp_bank_w);
+	uint64_t sp_eeprom_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t sp_rombdflg_r();
+	uint64_t sp_io_r(offs_t offset, uint64_t mem_mask = ~0);
+	uint64_t sn_93c46a_r();
+	void sn_93c46a_w(uint64_t data);
+	uint64_t sp_bank_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint16_t m_sp_bank;
 
 	void onchip_port(address_map &map);

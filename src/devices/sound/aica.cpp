@@ -435,8 +435,8 @@ void aica_device::Init()
 	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
 
-	m_DSP.space = m_data;
-	m_DSP.cache = m_cache;
+	space().specific(m_DSP.space);
+	space().cache(m_DSP.cache);
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
 	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerB_cb), this));
 	m_timerC = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerC_cb), this));
@@ -1112,8 +1112,8 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 
 	if (PCMS(slot) == 1) // 8-bit signed
 	{
-		s8 p1 = m_cache->read_byte(SA(slot) + addr1);
-		s8 p2 = m_cache->read_byte(SA(slot) + addr2);
+		s8 p1 = m_cache.read_byte(SA(slot) + addr1);
+		s8 p2 = m_cache.read_byte(SA(slot) + addr2);
 		s32 s;
 		s32 fpart=slot->cur_addr & ((1 << SHIFT) - 1);
 		s = (int)(p1 << 8) * ((1 << SHIFT) - fpart) + (int)(p2 << 8) * fpart;
@@ -1121,8 +1121,8 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	}
 	else if (PCMS(slot) == 0)   //16 bit signed
 	{
-		s16 p1 = m_cache->read_word(SA(slot) + addr1);
-		s16 p2 = m_cache->read_word(SA(slot) + addr2);
+		s16 p1 = m_cache.read_word(SA(slot) + addr1);
+		s16 p2 = m_cache.read_word(SA(slot) + addr2);
 		s32 s;
 		s32 fpart = slot->cur_addr & ((1 << SHIFT) - 1);
 		s = (int)(p1) * ((1 << SHIFT) - fpart) + (int)(p2) * fpart;
@@ -1142,7 +1142,7 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 		while (curstep < steps_to_go)
 		{
 			int shift1 = 4 & (curstep << 2);
-			u8 delta1 = (m_cache->read_byte(base) >> shift1) & 0xf;
+			u8 delta1 = (m_cache.read_byte(base) >> shift1) & 0xf;
 			DecodeADPCM(&(slot->cur_sample), delta1, &(slot->cur_quant));
 			if (!(++curstep & 1))
 				base++;
@@ -1329,7 +1329,7 @@ void aica_device::exec_dma()
 		{
 			for (i = 0; i < m_dma.dlg; i+=2)
 			{
-				m_data->write_word(m_dma.dmea, 0);
+				m_data.write_word(m_dma.dmea, 0);
 				m_dma.dmea += 2;
 			}
 		}
@@ -1339,7 +1339,7 @@ void aica_device::exec_dma()
 			{
 				u16 tmp;
 				tmp = r16(m_dma.drga);
-				m_data->write_word(m_dma.dmea, tmp);
+				m_data.write_word(m_dma.dmea, tmp);
 				m_dma.dmea += 4;
 				m_dma.drga += 4;
 			}
@@ -1359,7 +1359,7 @@ void aica_device::exec_dma()
 		{
 			for (i = 0; i < m_dma.dlg; i+=2)
 			{
-				u16 tmp = m_cache->read_word(m_dma.dmea);
+				u16 tmp = m_cache.read_word(m_dma.dmea);
 				w16(m_dma.drga, tmp);
 				m_dma.dmea += 4;
 				m_dma.drga += 4;
@@ -1408,9 +1408,8 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 void aica_device::device_start()
 {
-	m_data = &space(0);
-	// Find our direct access
-	m_cache = space().cache<1, 0, ENDIANNESS_LITTLE>();
+	space().specific(m_data);
+	space().cache(m_cache);
 
 	// init the emulation
 	Init();

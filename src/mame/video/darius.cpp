@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 	u16 code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
 	u16 attr = m_fg_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			(attr & 0x7f),
 			TILE_FLIPYX((attr & 0xc000) >> 14));

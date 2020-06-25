@@ -25,13 +25,19 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#ifndef NL_AUTO_DEVICES
+#if !NL_AUTO_DEVICES
 
 #define CD4001_GATE(name)                                                      \
 		NET_REGISTER_DEV(CD4001_GATE, name)
 
 #define CD4001_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4001_DIP, name)
+
+#define CD4069_GATE(name)                                                      \
+		NET_REGISTER_DEV(CD4069_GATE, name)
+
+#define CD4069_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4069_DIP, name)
 
 #define CD4070_GATE(name)                                                      \
 		NET_REGISTER_DEV(CD4070_GATE, name)

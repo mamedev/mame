@@ -10,9 +10,10 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "sound/dac.h"
 
-class m72_audio_device : public device_t, public device_rom_interface
+class m72_audio_device : public device_t, public device_rom_interface<32> // unknown address bits
 {
 public:
 	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

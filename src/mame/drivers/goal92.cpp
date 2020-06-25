@@ -20,7 +20,7 @@
 #include "speaker.h"
 
 
-WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
+void goal92_state::goal92_sound_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -29,7 +29,7 @@ WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 	}
 }
 
-READ16_MEMBER(goal92_state::goal92_inputs_r)
+uint16_t goal92_state::goal92_inputs_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -73,14 +73,14 @@ void goal92_state::goal92_map(address_map &map)
 
 /* Sound CPU */
 
-WRITE8_MEMBER(goal92_state::adpcm_control_w)
+void goal92_state::adpcm_control_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x01);
 
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(goal92_state::adpcm_data_w)
+void goal92_state::adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER(goal92_state::irqhandler)
 
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	m_msm->write_data(m_msm5205next);
+	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
 	m_adpcm_toggle^= 1;
 

@@ -633,8 +633,8 @@ public:
 	void chihiro_base(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(mediaboard_r);
-	DECLARE_WRITE32_MEMBER(mediaboard_w);
+	uint32_t mediaboard_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
@@ -682,7 +682,6 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint32_t size) // 0xff000080 == fff00080
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
 	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
@@ -694,11 +693,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = cpu.read_byte(space, addr, true);
+		uint32_t opcode = space.read_byte(addr);
 		addr++;
-		uint32_t op1 = cpu.read_dword(space, addr, true);
+		uint32_t op1 = space.read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = cpu.read_dword(space, addr, true);
+		uint32_t op2 = space.read_dword_unaligned(addr);
 		addr += 4;
 
 		char sop1[16];
@@ -1730,7 +1729,7 @@ uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 	return nullptr;
 }
 
-READ32_MEMBER(chihiro_state::mediaboard_r)
+uint32_t chihiro_state::mediaboard_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r;
 
@@ -1751,7 +1750,7 @@ READ32_MEMBER(chihiro_state::mediaboard_r)
 	return r;
 }
 
-WRITE32_MEMBER(chihiro_state::mediaboard_w)
+void chihiro_state::mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10
@@ -1842,7 +1841,7 @@ void chihiro_state::machine_start()
 	}
 	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
-		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
+		if (machine().basename() == hacks[a].game_name) {
 			m_hack_index = a;
 			break;
 		}

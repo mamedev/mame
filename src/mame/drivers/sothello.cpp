@@ -61,18 +61,18 @@ public:
 	void sothello(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(subcpu_halt_set);
-	DECLARE_READ8_MEMBER(subcpu_halt_clear);
-	DECLARE_READ8_MEMBER(subcpu_comm_status);
-	DECLARE_READ8_MEMBER(soundcpu_status_r);
-	DECLARE_WRITE8_MEMBER(msm_data_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_busyflag_set_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_busyflag_reset_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_int_clear_w);
-	DECLARE_WRITE8_MEMBER(subcpu_status_w);
-	DECLARE_READ8_MEMBER(subcpu_status_r);
-	DECLARE_WRITE8_MEMBER(msm_cfg_w);
+	void bank_w(uint8_t data);
+	uint8_t subcpu_halt_set();
+	uint8_t subcpu_halt_clear();
+	uint8_t subcpu_comm_status();
+	uint8_t soundcpu_status_r();
+	void msm_data_w(uint8_t data);
+	void soundcpu_busyflag_set_w(uint8_t data);
+	void soundcpu_busyflag_reset_w(uint8_t data);
+	void soundcpu_int_clear_w(uint8_t data);
+	void subcpu_status_w(uint8_t data);
+	uint8_t subcpu_status_r();
+	void msm_cfg_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void maincpu_io_map(address_map &map);
@@ -116,7 +116,7 @@ void sothello_state::machine_start()
 	save_item(NAME(m_msm_data));
 }
 
-WRITE8_MEMBER(sothello_state::bank_w)
+void sothello_state::bank_w(uint8_t data)
 {
 	int bank=0;
 	switch(data^0xff)
@@ -140,14 +140,14 @@ TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
 	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER(sothello_state::subcpu_halt_set)
+uint8_t sothello_state::subcpu_halt_set()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sothello_state::subcpu_suspend), this));
 	m_subcpu_status|=2;
 	return 0;
 }
 
-READ8_MEMBER(sothello_state::subcpu_halt_clear)
+uint8_t sothello_state::subcpu_halt_clear()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sothello_state::subcpu_resume), this));
 	m_subcpu_status&=~1;
@@ -155,12 +155,12 @@ READ8_MEMBER(sothello_state::subcpu_halt_clear)
 	return 0;
 }
 
-READ8_MEMBER(sothello_state::subcpu_comm_status)
+uint8_t sothello_state::subcpu_comm_status()
 {
 	return m_subcpu_status;
 }
 
-READ8_MEMBER(sothello_state::soundcpu_status_r)
+uint8_t sothello_state::soundcpu_status_r()
 {
 	return m_soundcpu_busy;
 }
@@ -192,7 +192,7 @@ void sothello_state::maincpu_io_map(address_map &map)
 
 /* sound Z80 */
 
-WRITE8_MEMBER(sothello_state::msm_cfg_w)
+void sothello_state::msm_cfg_w(uint8_t data)
 {
 /*
      bit 0 = RESET
@@ -204,22 +204,22 @@ WRITE8_MEMBER(sothello_state::msm_cfg_w)
 	m_msm->reset_w(data & 1);
 }
 
-WRITE8_MEMBER(sothello_state::msm_data_w)
+void sothello_state::msm_data_w(uint8_t data)
 {
 	m_msm_data = data;
 }
 
-WRITE8_MEMBER(sothello_state::soundcpu_busyflag_set_w)
+void sothello_state::soundcpu_busyflag_set_w(uint8_t data)
 {
 	m_soundcpu_busy=1;
 }
 
-WRITE8_MEMBER(sothello_state::soundcpu_busyflag_reset_w)
+void sothello_state::soundcpu_busyflag_reset_w(uint8_t data)
 {
 	m_soundcpu_busy=0;
 }
 
-WRITE8_MEMBER(sothello_state::soundcpu_int_clear_w)
+void sothello_state::soundcpu_int_clear_w(uint8_t data)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
@@ -255,12 +255,12 @@ void sothello_state::unlock_shared_ram()
 	}
 }
 
-WRITE8_MEMBER(sothello_state::subcpu_status_w)
+void sothello_state::subcpu_status_w(uint8_t data)
 {
 	unlock_shared_ram();
 }
 
-READ8_MEMBER(sothello_state::subcpu_status_r)
+uint8_t sothello_state::subcpu_status_r()
 {
 	unlock_shared_ram();
 	return 0;
@@ -343,7 +343,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
-	m_msm->write_data(m_msm_data & 0x0f);
+	m_msm->data_w(m_msm_data & 0x0f);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 

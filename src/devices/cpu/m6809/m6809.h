@@ -34,8 +34,8 @@ protected:
 
 	class memory_interface {
 	public:
-		address_space *m_program, *m_sprogram;
-		memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_scache;
+		memory_access<16, 0, 0, ENDIANNESS_BIG>::cache cprogram, csprogram;
+		memory_access<16, 0, 0, ENDIANNESS_BIG>::specific program;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;

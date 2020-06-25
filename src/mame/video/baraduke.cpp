@@ -76,7 +76,7 @@ TILEMAP_MAPPER_MEMBER(baraduke_state::tx_tilemap_scan)
 
 TILE_GET_INFO_MEMBER(baraduke_state::tx_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_textram[tile_index],
 			(m_textram[tile_index+0x400] << 2) & 0x1ff,
 			0);
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info0)
 	int code = m_videoram[2*tile_index];
 	int attr = m_videoram[2*tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((attr & 0x03) << 8),
 			attr,
 			0);
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
 	int code = m_videoram[0x1000 + 2*tile_index];
 	int attr = m_videoram[0x1000 + 2*tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code + ((attr & 0x03) << 8),
 			attr,
 			0);
@@ -137,30 +137,30 @@ void baraduke_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(baraduke_state::baraduke_videoram_r)
+uint8_t baraduke_state::baraduke_videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_videoram_w)
+void baraduke_state::baraduke_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset&0xfff)/2);
 }
 
-READ8_MEMBER(baraduke_state::baraduke_textram_r)
+uint8_t baraduke_state::baraduke_textram_r(offs_t offset)
 {
 	return m_textram[offset];
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_textram_w)
+void baraduke_state::baraduke_textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-void baraduke_state::scroll_w(address_space &space, int layer, int offset, int data)
+void baraduke_state::scroll_w(int layer, int offset, int data)
 {
 	switch (offset)
 	{
@@ -176,23 +176,23 @@ void baraduke_state::scroll_w(address_space &space, int layer, int offset, int d
 	}
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_scroll0_w)
+void baraduke_state::baraduke_scroll0_w(offs_t offset, uint8_t data)
 {
-	scroll_w(space, 0, offset, data);
+	scroll_w(0, offset, data);
 }
-WRITE8_MEMBER(baraduke_state::baraduke_scroll1_w)
+void baraduke_state::baraduke_scroll1_w(offs_t offset, uint8_t data)
 {
-	scroll_w(space, 1, offset, data);
+	scroll_w(1, offset, data);
 }
 
 
 
-READ8_MEMBER(baraduke_state::baraduke_spriteram_r)
+uint8_t baraduke_state::baraduke_spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_spriteram_w)
+void baraduke_state::baraduke_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
 

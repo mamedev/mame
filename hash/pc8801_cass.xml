@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+license:CC0
+
+NOTE: This list is here only to document available dumps and it's not used (yet) by MAME!
 -->
 <softwarelist name="pc8801_cass" description="NEC PC-8801 cassettes">
 
@@ -1269,7 +1271,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="release" value="198308xx"/>
 		<info name="alt_title" value="四次元の家"/>
 		<part name="cass" interface="pc8801_cass">
-			<dataarea name="cass" size="19259">
+			<dataarea name="cass" size="24890">
 				<rom name="4 dimension house.t88" size="24890" crc="40e6938c" sha1="b642f87dc619975e60561499dc35b9b5d7afff07"/>
 			</dataarea>
 		</part>
@@ -1355,7 +1357,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="24466">
-				<rom name="jump!.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee"/>
+				<rom name="jump.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee"/>
 			</dataarea>
 		</part>
 	</software>

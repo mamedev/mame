@@ -67,13 +67,13 @@ private:
 	required_device<address_map_bank_device> m_videobank0;
 	required_device<address_map_bank_device> m_videobank1;
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(K052109_r);
-	DECLARE_WRITE8_MEMBER(K052109_w);
-	DECLARE_WRITE8_MEMBER(_5fe0_w);
-	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
-	DECLARE_WRITE8_MEMBER(z80_irq_w);
-	DECLARE_READ8_MEMBER(z80_irq_r);
+	void eeprom_w(uint8_t data);
+	uint8_t K052109_r(offs_t offset);
+	void K052109_w(offs_t offset, uint8_t data);
+	void _5fe0_w(uint8_t data);
+	void z80_arm_nmi_w(uint8_t data);
+	void z80_irq_w(uint8_t data);
+	uint8_t z80_irq_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -84,7 +84,7 @@ private:
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 	K053246_CB_MEMBER(sprite_callback);
 
 	void esckids_map(address_map &map);

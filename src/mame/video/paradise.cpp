@@ -30,12 +30,12 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "includes/paradise.h"
 
-WRITE8_MEMBER(paradise_state::flipscreen_w)
+void paradise_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data ? 0 : 1);
 }
 
-WRITE8_MEMBER(paradise_state::tgtball_flipscreen_w)
+void paradise_state::tgtball_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data ? 1 : 0);
 }
@@ -54,7 +54,7 @@ void paradise_state::update_pix_palbank()
 }
 
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
-WRITE8_MEMBER(paradise_state::palette_w)
+void paradise_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
 	offset %= 0x800;
@@ -76,14 +76,14 @@ WRITE8_MEMBER(paradise_state::palette_w)
 ***************************************************************************/
 
 /* Background */
-WRITE8_MEMBER(paradise_state::vram_0_w)
+void paradise_state::vram_0_w(offs_t offset, uint8_t data)
 {
 	m_vram_0[offset] = data;
 	m_tilemap_0->mark_tile_dirty(offset % 0x400);
 }
 
 /* 16 color tiles with paradise_palbank as color code */
-WRITE8_MEMBER(paradise_state::palbank_w)
+void paradise_state::palbank_w(uint8_t data)
 {
 	int bank1 = (data & 0x0e) | 1;
 	int bank2 = (data & 0xf0);
@@ -102,12 +102,12 @@ WRITE8_MEMBER(paradise_state::palbank_w)
 TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_0)
 {
 	int code = m_vram_0[tile_index] + (m_vram_0[tile_index + 0x400] << 8);
-	SET_TILE_INFO_MEMBER(1, code, m_palbank, 0);
+	tileinfo.set(1, code, m_palbank, 0);
 }
 
 
 /* Midground */
-WRITE8_MEMBER(paradise_state::vram_1_w)
+void paradise_state::vram_1_w(offs_t offset, uint8_t data)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset % 0x400);
@@ -116,12 +116,12 @@ WRITE8_MEMBER(paradise_state::vram_1_w)
 TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_1)
 {
 	int code = m_vram_1[tile_index] + (m_vram_1[tile_index + 0x400] << 8);
-	SET_TILE_INFO_MEMBER(2, code, 0, 0);
+	tileinfo.set(2, code, 0, 0);
 }
 
 
 /* Foreground */
-WRITE8_MEMBER(paradise_state::vram_2_w)
+void paradise_state::vram_2_w(offs_t offset, uint8_t data)
 {
 	m_vram_2[offset] = data;
 	m_tilemap_2->mark_tile_dirty(offset % 0x400);
@@ -130,12 +130,12 @@ WRITE8_MEMBER(paradise_state::vram_2_w)
 TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_2)
 {
 	int code = m_vram_2[tile_index] + (m_vram_2[tile_index + 0x400] << 8);
-	SET_TILE_INFO_MEMBER(3, code, 0, 0);
+	tileinfo.set(3, code, 0, 0);
 }
 
 /* 256 x 256 bitmap. 4 bits per pixel so every byte encodes 2 pixels */
 
-WRITE8_MEMBER(paradise_state::pixmap_w)
+void paradise_state::pixmap_w(offs_t offset, uint8_t data)
 {
 	int x, y;
 
@@ -180,7 +180,7 @@ void paradise_state::video_start()
 ***************************************************************************/
 
 /* Sprites / Layers priority */
-WRITE8_MEMBER(paradise_state::priority_w)
+void paradise_state::priority_w(uint8_t data)
 {
 	m_priority = data;
 }

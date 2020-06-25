@@ -69,33 +69,33 @@ private:
 	segag80_decrypt_func m_decrypt;
 	int m_min_x;
 	int m_min_y;
-	DECLARE_READ8_MEMBER(g80v_opcode_r);
-	DECLARE_WRITE8_MEMBER(mainram_w);
-	DECLARE_WRITE8_MEMBER(vectorram_w);
-	DECLARE_READ8_MEMBER(mangled_ports_r);
-	DECLARE_WRITE8_MEMBER(spinner_select_w);
-	DECLARE_READ8_MEMBER(spinner_input_r);
-	DECLARE_READ8_MEMBER(elim4_input_r);
-	DECLARE_WRITE8_MEMBER(multiply_w);
-	DECLARE_READ8_MEMBER(multiply_r);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
+	uint8_t g80v_opcode_r(offs_t offset);
+	void mainram_w(offs_t offset, uint8_t data);
+	void vectorram_w(offs_t offset, uint8_t data);
+	uint8_t mangled_ports_r(offs_t offset);
+	void spinner_select_w(uint8_t data);
+	uint8_t spinner_input_r();
+	uint8_t elim4_input_r();
+	void multiply_w(offs_t offset, uint8_t data);
+	uint8_t multiply_r();
+	void coin_count_w(uint8_t data);
+	void unknown_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(elim1_sh_w);
-	DECLARE_WRITE8_MEMBER(elim2_sh_w);
-	DECLARE_WRITE8_MEMBER(zektor1_sh_w);
-	DECLARE_WRITE8_MEMBER(zektor2_sh_w);
-	DECLARE_WRITE8_MEMBER(spacfury1_sh_w);
-	DECLARE_WRITE8_MEMBER(spacfury2_sh_w);
+	void elim1_sh_w(uint8_t data);
+	void elim2_sh_w(uint8_t data);
+	void zektor1_sh_w(uint8_t data);
+	void zektor2_sh_w(uint8_t data);
+	void spacfury1_sh_w(uint8_t data);
+	void spacfury2_sh_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(usb_ram_w);
+	void usb_ram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline bool adjust_xy(int rawx, int rawy, int *outx, int *outy);
 	void sega_generate_vector_list();
-	offs_t decrypt_offset(address_space &space, offs_t offset);
+	offs_t decrypt_offset(offs_t offset);
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 
 	void main_map(address_map &map);

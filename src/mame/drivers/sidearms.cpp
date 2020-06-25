@@ -42,6 +42,12 @@ Notes:
   encoding parameters have been identified, the other 28(!) are
   believed to be line-buffer controls.
 
+  A bootleg has been found that matches "sidearmsj" but with the
+  starfield data ROM being half the size of the original one and
+  containing its second half. Also, it seems that, as the original
+  game it's currently emulated, it uses just the first half of the
+  starfield ROM, so it's something worth checking.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -60,14 +66,14 @@ void sidearms_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
-WRITE8_MEMBER(sidearms_state::bankswitch_w)
+void sidearms_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
 
 // Turtle Ship input ports are rotated 90 degrees
-READ8_MEMBER(sidearms_state::turtship_ports_r)
+uint8_t sidearms_state::turtship_ports_r(offs_t offset)
 {
 	int res = 0;
 	for (int i = 0; i < 5;i++)
@@ -132,7 +138,7 @@ void sidearms_state::sidearms_sound_map(address_map &map)
 
 /* Whizz */
 
-WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
+void sidearms_state::whizz_bankswitch_w(uint8_t data)
 {
 	int bank = 0;
 	switch (data & 0xC0)

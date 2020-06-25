@@ -36,8 +36,8 @@ public:
 	virtual ~device_crvision_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom40) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom80) { return 0xff; }
+	virtual uint8_t read_rom40(offs_t offset) { return 0xff; }
+	virtual uint8_t read_rom80(offs_t offset) { return 0xff; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -91,8 +91,8 @@ public:
 	int get_type() { return m_type; }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom40);
-	virtual DECLARE_READ8_MEMBER(read_rom80);
+	uint8_t read_rom40(offs_t offset);
+	uint8_t read_rom80(offs_t offset);
 
 protected:
 	// device-level overrides

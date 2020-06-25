@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include "express.h"
-
 #include <set>
 
 
@@ -40,133 +38,12 @@ typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
 class device_debug
 {
 public:
-	// breakpoint class
-	class breakpoint
-	{
-		friend class device_debug;
-
-	public:
-		// construction/destruction
-		breakpoint(
-				device_debug* debugInterface,
-				symbol_table &symbols,
-				int index,
-				offs_t address,
-				const char *condition = nullptr,
-				const char *action = nullptr);
-
-		// getters
-		const device_debug *debugInterface() const { return m_debugInterface; }
-		int index() const { return m_index; }
-		bool enabled() const { return m_enabled; }
-		offs_t address() const { return m_address; }
-		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action.c_str(); }
-
-		// setters
-		void setEnabled(bool value) { m_enabled = value; }
-
-	private:
-		// internals
-		bool hit(offs_t pc);
-		const device_debug * m_debugInterface;           // the interface we were created from
-		int                  m_index;                    // user reported index
-		bool                 m_enabled;                  // enabled?
-		offs_t               m_address;                  // execution address
-		parsed_expression    m_condition;                // condition
-		std::string          m_action;                   // action
-	};
-
-	// watchpoint class
-	class watchpoint
-	{
-		friend class device_debug;
-
-	public:
-		// construction/destruction
-		watchpoint(
-				device_debug* debugInterface,
-				symbol_table &symbols,
-				int index,
-				address_space &space,
-				read_or_write type,
-				offs_t address,
-				offs_t length,
-				const char *condition = nullptr,
-				const char *action = nullptr);
-		~watchpoint();
-
-		// getters
-		const device_debug *debugInterface() const { return m_debugInterface; }
-		address_space &space() const { return m_space; }
-		int index() const { return m_index; }
-		read_or_write type() const { return m_type; }
-		bool enabled() const { return m_enabled; }
-		offs_t address() const { return m_address; }
-		offs_t length() const { return m_length; }
-		const char *condition() const { return m_condition.original_string(); }
-		const std::string &action() const { return m_action; }
-
-		// setters
-		void setEnabled(bool value);
-
-		// internals
-		bool hit(int type, offs_t address, int size);
-
-	private:
-		device_debug * m_debugInterface;                 // the interface we were created from
-		memory_passthrough_handler *m_phr;               // passthrough handler reference, read access
-		memory_passthrough_handler *m_phw;               // passthrough handler reference, write access
-		address_space &      m_space;                    // address space
-		int                  m_index;                    // user reported index
-		bool                 m_enabled;                  // enabled?
-		read_or_write        m_type;                     // type (read/write)
-		offs_t               m_address;                  // start address
-		offs_t               m_length;                   // length of watch area
-		parsed_expression    m_condition;                // condition
-		std::string          m_action;                   // action
-		int                  m_notifier;                 // address map change notifier id
-
-		offs_t               m_start_address[3];         // the start addresses of the checks to install
-		offs_t               m_end_address[3];           // the end addresses
-		u64                  m_masks[3];                 // the access masks
-		bool                 m_installing;               // prevent recursive multiple installs
-		void install(read_or_write mode);
-		void triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask);
-	};
-
-	// registerpoint class
-	class registerpoint
-	{
-		friend class device_debug;
-
-	public:
-		// construction/destruction
-		registerpoint(symbol_table &symbols, int index, const char *condition, const char *action = nullptr);
-
-		// getters
-		int index() const { return m_index; }
-		bool enabled() const { return m_enabled; }
-		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action.c_str(); }
-
-	private:
-		// internals
-		bool hit();
-
-		int                 m_index;                    // user reported index
-		bool                m_enabled;                  // enabled?
-		parsed_expression   m_condition;                // condition
-		std::string         m_action;                   // action
-	};
-
-public:
 	// construction/destruction
 	device_debug(device_t &device);
 	~device_debug();
 
 	// getters
-	symbol_table &symtable() { return m_symtable; }
+	symbol_table &symtable() { return *m_symtable; }
 
 	// commonly-used pass-throughs
 	int logaddrchars() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).logaddrchars() : 8; }
@@ -201,7 +78,7 @@ public:
 	void go(offs_t targetpc = ~0);
 	void go_vblank();
 	void go_interrupt(int irqline = -1);
-	void go_exception(int exception);
+	void go_exception(int exception, const char *condition);
 	void go_milliseconds(u64 milliseconds);
 	void go_privilege(const char *condition);
 	void go_next_device();
@@ -213,28 +90,28 @@ public:
 	}
 
 	// breakpoints
-	const std::forward_list<breakpoint> &breakpoint_list() const { return m_bplist; }
-	const breakpoint *breakpoint_find(offs_t address) const;
+	const auto &breakpoint_list() const { return m_bplist; }
+	const debug_breakpoint *breakpoint_find(offs_t address) const;
 	int breakpoint_set(offs_t address, const char *condition = nullptr, const char *action = nullptr);
 	bool breakpoint_clear(int index);
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
 	void breakpoint_enable_all(bool enable = true);
-	breakpoint *triggered_breakpoint(void) { breakpoint *ret = m_triggered_breakpoint; m_triggered_breakpoint = nullptr; return ret; }
+	debug_breakpoint *triggered_breakpoint() { debug_breakpoint *ret = m_triggered_breakpoint; m_triggered_breakpoint = nullptr; return ret; }
 
 	// watchpoints
 	int watchpoint_space_count() const { return m_wplist.size(); }
-	const std::vector<std::unique_ptr<watchpoint>> &watchpoint_vector(int spacenum) const { return m_wplist[spacenum]; }
+	const std::vector<std::unique_ptr<debug_watchpoint>> &watchpoint_vector(int spacenum) const { return m_wplist[spacenum]; }
 	int watchpoint_set(address_space &space, read_or_write type, offs_t address, offs_t length, const char *condition, const char *action);
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();
 	bool watchpoint_enable(int index, bool enable = true);
 	void watchpoint_enable_all(bool enable = true);
-	void set_triggered_watchpoint(watchpoint *wp) { m_triggered_watchpoint = wp; }
-	watchpoint *triggered_watchpoint(void) { watchpoint *ret = m_triggered_watchpoint; m_triggered_watchpoint = nullptr; return ret; }
+	void set_triggered_watchpoint(debug_watchpoint *wp) { m_triggered_watchpoint = wp; }
+	debug_watchpoint *triggered_watchpoint() { debug_watchpoint *ret = m_triggered_watchpoint; m_triggered_watchpoint = nullptr; return ret; }
 
 	// registerpoints
-	const std::forward_list<registerpoint> &registerpoint_list() const { return m_rplist; }
+	const std::forward_list<debug_registerpoint> &registerpoint_list() const { return *m_rplist; }
 	int registerpoint_set(const char *condition, const char *action = nullptr);
 	bool registerpoint_clear(int index);
 	void registerpoint_clear_all();
@@ -298,14 +175,6 @@ private:
 	void reinstall(address_space &space, read_or_write mode);
 	void write_tracking(address_space &space, offs_t address, u64 data);
 
-	// symbol get/set callbacks
-	static u64 get_current_pc(symbol_table &table);
-	static u64 get_cycles(symbol_table &table);
-	static u64 get_totalcycles(symbol_table &table);
-	static u64 get_lastinstructioncycles(symbol_table &table);
-	static u64 get_state(symbol_table &table, int index);
-	static void set_state(symbol_table &table, int index, u64 value);
-
 	// basic device information
 	device_t &                 m_device;                // device we are attached to
 	device_execute_interface * m_exec;                  // execute interface, if present
@@ -315,7 +184,7 @@ private:
 
 	// global state
 	u32                         m_flags;                // debugging flags for this CPU
-	symbol_table                m_symtable;             // symbol table for expression evaluation
+	std::unique_ptr<symbol_table> m_symtable;           // symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
 	// stepping information
@@ -328,6 +197,7 @@ private:
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
 	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
+	std::unique_ptr<parsed_expression> m_exception_condition;      // expression to evaluate on exception hit
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
 	u64                     m_last_total_cycles;        // last total cycles
@@ -337,12 +207,12 @@ private:
 	u32                     m_pc_history_index;         // current history index
 
 	// breakpoints and watchpoints
-	std::forward_list<breakpoint> m_bplist;             // list of breakpoints
-	std::vector<std::vector<std::unique_ptr<watchpoint>>> m_wplist;  // watchpoint lists for each address space
-	std::forward_list<registerpoint> m_rplist;          // list of registerpoints
+	std::multimap<offs_t, std::unique_ptr<debug_breakpoint>> m_bplist;     // list of breakpoints
+	std::vector<std::vector<std::unique_ptr<debug_watchpoint>>> m_wplist;  // watchpoint lists for each address space
+	std::unique_ptr<std::forward_list<debug_registerpoint>> m_rplist;      // list of registerpoints
 
-	breakpoint *            m_triggered_breakpoint;     // latest breakpoint that was triggered
-	watchpoint *            m_triggered_watchpoint;     // latest watchpoint that was triggered
+	debug_breakpoint *      m_triggered_breakpoint;     // latest breakpoint that was triggered
+	debug_watchpoint *      m_triggered_watchpoint;     // latest watchpoint that was triggered
 
 	// tracing
 	class tracer
@@ -491,13 +361,8 @@ public:
 	/* flushes all traces; this is useful if a trace is going on when we fatalerror */
 	void flush_traces();
 
-	void configure_memory(symbol_table &table);
-
 
 	/* ----- debugging status & information ----- */
-
-	/* return the visible CPU device (the one that commands should apply to) */
-	device_t *get_visible_cpu() { return m_visiblecpu; }
 
 	/* return true if the current execution state is stopped */
 	bool is_stopped() const { return m_execution_state == exec_state::STOPPED; }
@@ -507,10 +372,7 @@ public:
 	/* ----- symbol table interfaces ----- */
 
 	/* return the global symbol table */
-	symbol_table *get_global_symtable() { return m_symtable.get(); }
-
-	/* return the locally-visible symbol table */
-	symbol_table *get_visible_symtable();
+	symbol_table &global_symtable() { return *m_symtable; }
 
 
 	/* ----- debugger comment helpers ----- */
@@ -522,41 +384,6 @@ public:
 	bool comment_load(bool is_inline);
 
 
-	/* ----- debugger memory accessors ----- */
-
-	/* return a byte from the specified memory space */
-	u8 read_byte(address_space &space, offs_t address, bool apply_translation);
-
-	/* return a word from the specified memory space */
-	u16 read_word(address_space &space, offs_t address, bool apply_translation);
-
-	/* return a dword from the specified memory space */
-	u32 read_dword(address_space &space, offs_t address, bool apply_translation);
-
-	/* return a qword from the specified memory space */
-	u64 read_qword(address_space &space, offs_t address, bool apply_translation);
-
-	/* return 1,2,4 or 8 bytes from the specified memory space */
-	u64 read_memory(address_space &space, offs_t address, int size, bool apply_translation);
-
-	/* write a byte to the specified memory space */
-	void write_byte(address_space &space, offs_t address, u8 data, bool apply_translation);
-
-	/* write a word to the specified memory space */
-	void write_word(address_space &space, offs_t address, u16 data, bool apply_translation);
-
-	/* write a dword to the specified memory space */
-	void write_dword(address_space &space, offs_t address, u32 data, bool apply_translation);
-
-	/* write a qword to the specified memory space */
-	void write_qword(address_space &space, offs_t address, u64 data, bool apply_translation);
-
-	/* write 1,2,4 or 8 bytes to the specified memory space */
-	void write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation);
-
-	/* read 1,2,4 or 8 bytes at the given offset from opcode space */
-	u64 read_opcode(address_space &space, offs_t offset, int size);
-
 	// getters
 	bool within_instruction_hook() const { return m_within_instruction_hook; }
 	bool memory_modified() const { return m_memory_modified; }
@@ -567,7 +394,6 @@ public:
 	u32 get_registerpoint_index() { return m_rpindex++; }
 
 	// setters
-	void set_visible_cpu(device_t * visiblecpu) { m_visiblecpu = visiblecpu; }
 	void set_break_cpu(device_t * breakcpu) { m_breakcpu = breakcpu; }
 	void set_within_instruction(bool within_instruction) { m_within_instruction_hook = within_instruction; }
 	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
@@ -588,29 +414,12 @@ public:
 private:
 	static const size_t NUM_TEMP_VARIABLES;
 
-	/* expression handlers */
-	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size, bool disable_se);
-	u64 expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
-	u64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
-	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data, bool disable_se);
-	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
-	void expression_write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
-	expression_error::error_code expression_validate(void *param, const char *name, expression_space space);
-	device_t* expression_get_device(const char *tag);
-
-	/* variable getters/setters */
-	u64 get_cpunum(symbol_table &table);
-	u64 get_beamx(symbol_table &table, screen_device *screen);
-	u64 get_beamy(symbol_table &table, screen_device *screen);
-	u64 get_frame(symbol_table &table, screen_device *screen);
-
-	/* internal helpers */
+	// internal helpers
 	void on_vblank(screen_device &device, bool vblank_state);
 
 	running_machine&    m_machine;
 
 	device_t *  m_livecpu;
-	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table

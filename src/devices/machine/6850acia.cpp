@@ -159,13 +159,13 @@ uint8_t acia6850_device::status_r()
 {
 	uint8_t status = m_status;
 
+	if (m_divide == 0 || (status & SR_CTS))
+	{
+		status &= ~SR_TDRE;
+	}
+
 	if (!machine().side_effects_disabled())
 	{
-		if (status & SR_CTS)
-		{
-			status &= ~SR_TDRE;
-		}
-
 		if (m_dcd_irq_pending == DCD_IRQ_READ_STATUS)
 		{
 			m_dcd_irq_pending = DCD_IRQ_READ_DATA;
@@ -219,7 +219,14 @@ void acia6850_device::control_w(uint8_t data)
 		m_tx_state = STATE_START;
 		output_txd(1);
 
-		m_status &= SR_CTS;
+		// TDRE flag reads as zero in this reset state, but the drivers
+		// internal SR_TDRE is masked elsewhere when in the reset
+		// state. When taken out of reset the TDRE flag reads as one.
+		m_status |= SR_TDRE;
+
+		// SR_CTS is not affected by a reset, it should still reflect
+		// the pin status.
+		m_status &= SR_CTS | SR_TDRE;
 
 		if (m_dcd)
 		{
@@ -235,12 +242,12 @@ void acia6850_device::control_w(uint8_t data)
 
 int acia6850_device::calculate_txirq()
 {
-	return !(m_tx_irq_enable && ((m_status & SR_TDRE) && !(m_status & SR_CTS)));
+	return !(m_tx_irq_enable && m_divide && (m_status & SR_TDRE) && !(m_status & SR_CTS));
 }
 
 int acia6850_device::calculate_rxirq()
 {
-	return !(m_rx_irq_enable && ((m_status & SR_RDRF) || m_dcd_irq_pending != DCD_IRQ_NONE));
+	return !(m_rx_irq_enable && m_divide && ((m_status & SR_RDRF) || m_dcd_irq_pending != DCD_IRQ_NONE));
 }
 
 void acia6850_device::update_irq()
@@ -252,15 +259,20 @@ void acia6850_device::data_w(uint8_t data)
 {
 	LOG("MC6850 '%s' Data: %02x\n", tag(), data);
 
-	/// TODO: find out if data stored during master reset is sent after divider is set
 	if (m_divide == 0)
 	{
-		logerror("%s:ACIA %p: Data write while in reset!\n", machine().describe_context(), (void *)this);
+		logerror("%s: ACIA data write while in reset!\n", machine().describe_context());
 	}
+	else
+	{
+		// TDRE reads as set when taken out of reset even if data is
+		// written while in reset.
 
-	/// TODO: find out what happens if TDRE is already clear when you write
-	m_tdr = data;
-	m_status &= ~SR_TDRE;
+		// TODO: find out whether this overwrites previous data or has
+		// no effect if TDRE is already clear when you write?
+		m_tdr = data;
+		m_status &= ~SR_TDRE;
+	}
 
 	update_irq();
 }
@@ -484,7 +496,6 @@ WRITE_LINE_MEMBER( acia6850_device::write_txc )
 		{
 			m_tx_counter++;
 
-			/// TODO: check txd is correctly generated, check atarist mcu is reading data, start checking receive data.
 			switch (m_tx_state)
 			{
 			case STATE_START:

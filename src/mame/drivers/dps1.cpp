@@ -17,8 +17,8 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9519.h"
+#include "machine/scn_pci.h"
 #include "machine/upd765.h"
-#include "machine/mc2661.h"
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "softlist.h"
@@ -29,6 +29,8 @@ public:
 	dps1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		//, m_floppy1(*this, "fdc:1")
@@ -36,28 +38,28 @@ public:
 
 	void dps1(machine_config &config);
 
-	void init_dps1();
-
-protected:
-	virtual void machine_reset() override;
-
 private:
-	DECLARE_WRITE8_MEMBER(portb2_w);
-	DECLARE_WRITE8_MEMBER(portb4_w);
-	DECLARE_WRITE8_MEMBER(portb6_w);
-	DECLARE_WRITE8_MEMBER(portb8_w);
-	DECLARE_WRITE8_MEMBER(portba_w);
-	DECLARE_WRITE8_MEMBER(portbc_w);
-	DECLARE_WRITE8_MEMBER(portbe_w);
-	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(portff_w);
+	void machine_reset() override;
+	void machine_start() override;
+	void portb2_w(u8 data);
+	void portb4_w(u8 data);
+	void portb6_w(u8 data);
+	void portb8_w(u8 data);
+	void portba_w(u8 data);
+	void portbc_w(u8 data);
+	void portbe_w(u8 data);
+	u8 portff_r();
+	void portff_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	bool m_rom_in_map;
 	bool m_dma_dir;
-	uint16_t m_dma_adr;
+	u16 m_dma_adr;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	//required_device<floppy_connector> m_floppy1;
@@ -65,7 +67,7 @@ private:
 
 void dps1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x03ff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0x03ff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
 	map(0x0400, 0xffff).ram();
 }
 
@@ -73,7 +75,7 @@ void dps1_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x03).rw("uart", FUNC(mc2661_device::read), FUNC(mc2661_device::write)); // S2651
+	map(0x00, 0x03).rw("uart", FUNC(scn2651_device::read), FUNC(scn2651_device::write));
 	map(0xb0, 0xb1).m(m_fdc, FUNC(upd765_family_device::map));
 	map(0xb2, 0xb3).w(FUNC(dps1_state::portb2_w)); // set dma fdc->memory
 	map(0xb4, 0xb5).w(FUNC(dps1_state::portb4_w)); // set dma memory->fdc
@@ -84,7 +86,7 @@ void dps1_state::io_map(address_map &map)
 	map(0xbe, 0xbf).w(FUNC(dps1_state::portbe_w)); // disable eprom
 	map(0xff, 0xff).rw(FUNC(dps1_state::portff_r), FUNC(dps1_state::portff_w));
 	// other allocated ports, optional
-	// map(0x04, 0x07).rw("uart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write)); // S2651
+	// map(0x04, 0x07).rw("uart2", FUNC(scn2651_device::read), FUNC(scn2651_device::write));
 	// map(0x08, 0x0b) parallel ports
 	// map(0x10, 0x11) // interrupt response
 	map(0x14, 0x14).rw("am9519a", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
@@ -97,54 +99,54 @@ void dps1_state::io_map(address_map &map)
 
 
 // read from disk, to memory
-WRITE8_MEMBER( dps1_state::portb2_w )
+void dps1_state::portb2_w(u8 data)
 {
 	m_dma_dir = 1;
 }
 
 // write to disk, from memory
-WRITE8_MEMBER( dps1_state::portb4_w )
+void dps1_state::portb4_w(u8 data)
 {
 	m_dma_dir = 0;
 }
 
 // enable eprom
-WRITE8_MEMBER( dps1_state::portb6_w )
+void dps1_state::portb6_w(u8 data)
 {
-	membank("bankr0")->set_entry(1); // point at rom
+	m_rom_in_map = true;
 }
 
 // set A16-23
-WRITE8_MEMBER( dps1_state::portb8_w )
+void dps1_state::portb8_w(u8 data)
 {
 }
 
 // set A8-15
-WRITE8_MEMBER( dps1_state::portba_w )
+void dps1_state::portba_w(u8 data)
 {
 	m_dma_adr = (data << 8) | (m_dma_adr & 0xff);
 }
 
 // set A0-7
-WRITE8_MEMBER( dps1_state::portbc_w )
+void dps1_state::portbc_w(u8 data)
 {
 	m_dma_adr = (m_dma_adr & 0xff00) | data;
 }
 
 // disable eprom
-WRITE8_MEMBER( dps1_state::portbe_w )
+void dps1_state::portbe_w(u8 data)
 {
-	membank("bankr0")->set_entry(0); // point at ram
+	m_rom_in_map = false;
 }
 
 // read 8 front-panel switches
-READ8_MEMBER( dps1_state::portff_r )
+u8 dps1_state::portff_r()
 {
 	return 0x0e;
 }
 
 // write to 8 leds
-WRITE8_MEMBER( dps1_state::portff_w )
+void dps1_state::portff_w(u8 data)
 {
 }
 
@@ -169,25 +171,22 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 	// else take /dack high (unsupported)
 }
 
+void dps1_state::machine_start()
+{
+	save_item(NAME(m_rom_in_map));
+	save_item(NAME(m_dma_dir));
+	save_item(NAME(m_dma_adr));
+}
+
 void dps1_state::machine_reset()
 {
-	membank("bankr0")->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	m_rom_in_map = true;
 	// set fdc for 8 inch floppies
 	m_fdc->set_rate(500000);
 	// turn on the motor
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->mon_w(0);
-}
-
-void dps1_state::init_dps1()
-{
-	uint8_t *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x0400]);
-	membank("bankw0")->configure_entry(0, &main[0x0400]);
 }
 
 static INPUT_PORTS_START( dps1 )
@@ -206,15 +205,15 @@ void dps1_state::dps1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &dps1_state::io_map);
 
 	/* video hardware */
-	mc2661_device &uart(MC2661(config, "uart", 5.0688_MHz_XTAL)); // Signetics 2651N
+	scn2651_device &uart(SCN2651(config, "uart", 5.0688_MHz_XTAL)); // Signetics 2651N
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(uart, FUNC(mc2661_device::rx_w));
-	rs232.dsr_handler().set(uart, FUNC(mc2661_device::dsr_w));
-	rs232.cts_handler().set(uart, FUNC(mc2661_device::cts_w));
+	rs232.rxd_handler().set(uart, FUNC(scn2651_device::rxd_w));
+	rs232.dsr_handler().set(uart, FUNC(scn2651_device::dsr_w));
+	rs232.cts_handler().set(uart, FUNC(scn2651_device::cts_w));
 
 	AM9519(config, "am9519a", 0);
 	AM9519(config, "am9519b", 0);
@@ -231,8 +230,8 @@ void dps1_state::dps1(machine_config &config)
 }
 
 ROM_START( dps1 )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "boot 1280", 0x000, 0x400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "boot 1280", 0x0000, 0x0400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
 
-COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, init_dps1, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW )
+COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, empty_init, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

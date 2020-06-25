@@ -182,7 +182,7 @@ TILE_GET_INFO_MEMBER(system1_state::tile_get_info)
 	u32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	u32 color = (tiledata >> 5) & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -244,7 +244,7 @@ VIDEO_START_MEMBER(system1_state,system2)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::common_videomode_w)
+void system1_state::common_videomode_w(u8 data)
 {
 	if (data & 0x6e) logerror("videomode = %02x\n",data);
 
@@ -262,21 +262,21 @@ WRITE8_MEMBER(system1_state::common_videomode_w)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::mixer_collision_r)
+u8 system1_state::mixer_collision_r(offs_t offset)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	return m_mix_collide[offset & 0x3f] | 0x7e | (m_mix_collide_summary << 7);
 }
 
-WRITE8_MEMBER(system1_state::mixer_collision_w)
+void system1_state::mixer_collision_w(offs_t offset, u8 data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_mix_collide[offset & 0x3f] = 0;
 }
 
-WRITE8_MEMBER(system1_state::mixer_collision_reset_w)
+void system1_state::mixer_collision_reset_w(u8 data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -290,21 +290,21 @@ WRITE8_MEMBER(system1_state::mixer_collision_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::sprite_collision_r)
+u8 system1_state::sprite_collision_r(offs_t offset)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	return m_sprite_collide[offset & 0x3ff] | 0x7e | (m_sprite_collide_summary << 7);
 }
 
-WRITE8_MEMBER(system1_state::sprite_collision_w)
+void system1_state::sprite_collision_w(offs_t offset, u8 data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_sprite_collide[offset & 0x3ff] = 0;
 }
 
-WRITE8_MEMBER(system1_state::sprite_collision_reset_w)
+void system1_state::sprite_collision_reset_w(u8 data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -333,14 +333,14 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 	cpu->adjust_icount(-cycles_until_next_fixst);
 }
 
-READ8_MEMBER(system1_state::videoram_r)
+u8 system1_state::videoram_r(offs_t offset)
 {
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(system1_state::videoram_w)
+void system1_state::videoram_w(offs_t offset, u8 data)
 {
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
@@ -356,7 +356,7 @@ WRITE8_MEMBER(system1_state::videoram_w)
 	}
 }
 
-WRITE8_MEMBER(system1_state::videoram_bank_w)
+void system1_state::videoram_bank_w(u8 data)
 {
 	m_videoram_bank = data;
 }
@@ -368,7 +368,7 @@ WRITE8_MEMBER(system1_state::videoram_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::paletteram_w)
+void system1_state::paletteram_w(offs_t offset, u8 data)
 {
 	m_paletteram[offset] = data;
 	m_palette->set_pen_indirect(offset, m_paletteram[offset]);

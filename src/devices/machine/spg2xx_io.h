@@ -35,11 +35,11 @@ public:
 
 	void extint_w(int channel, bool state);
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	uint16_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint16_t data);
 
-	virtual DECLARE_READ16_MEMBER(io_extended_r);
-	virtual DECLARE_WRITE16_MEMBER(io_extended_w);
+	virtual uint16_t io_extended_r(offs_t offset);
+	virtual void io_extended_w(offs_t offset, uint16_t data);
 
 	auto pal_read_callback() { return m_pal_read_cb.bind(); };
 
@@ -50,6 +50,8 @@ public:
 	auto write_ffrq_tmr2_irq_callback() { return m_ffreq_tmr2_irq_cb.bind(); };
 
 	auto write_fiq_vector_callback() { return m_fiq_vector_w.bind(); };
+
+	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 
 protected:
 	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
@@ -95,7 +97,8 @@ protected:
 		REG_EXT_MEMORY_CTRL,
 		REG_WATCHDOG_CLEAR,
 		REG_ADC_CTRL,
-		REG_ADC_DATA = 0x27,
+		REG_ADC_PAD,
+		REG_ADC_DATA,
 
 		REG_SLEEP_MODE,
 		REG_WAKEUP_SOURCE,
@@ -158,6 +161,10 @@ protected:
 	static const device_timer_id TIMER_RNG = 9;
 	static const device_timer_id TIMER_WATCHDOG = 10;
 	static const device_timer_id TIMER_SPI_TX = 11;
+	static const device_timer_id TIMER_ADC0 = 12;
+	static const device_timer_id TIMER_ADC1 = 13;
+	static const device_timer_id TIMER_ADC2 = 14;
+	static const device_timer_id TIMER_ADC3 = 15;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -185,6 +192,8 @@ protected:
 	void update_spi_irqs();
 
 	void do_i2c();
+
+	void do_adc_capture(int channel);
 
 	uint16_t m_io_regs[0x100];
 
@@ -219,7 +228,8 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16::array<2> m_adc_in;
+	devcb_read16::array<4> m_adc_in;
+	emu_timer *m_adc_timer[4];
 
 	devcb_write8 m_i2c_w;
 	devcb_read8 m_i2c_r;
@@ -298,7 +308,7 @@ public:
 
 	spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE16_MEMBER(io_extended_w) override;
+	virtual void io_extended_w(offs_t offset, uint16_t data) override;
 };
 
 DECLARE_DEVICE_TYPE(SPG24X_IO, spg24x_io_device)

@@ -53,11 +53,11 @@ private:
 	required_device<intelfsh8_device> biosrom;
 	uint32_t ram_size;
 
-	virtual DECLARE_READ8_MEMBER(header_type_r) override;
-	DECLARE_READ8_MEMBER(unknown_r);
-	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_READ32_MEMBER(ram_size_r);
-	DECLARE_WRITE32_MEMBER(ram_size_w);
+	virtual uint8_t header_type_r() override;
+	uint8_t unknown_r();
+	void unknown_w(uint8_t data);
+	uint32_t ram_size_r();
+	void ram_size_w(uint32_t data);
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
@@ -234,21 +234,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
 
-	DECLARE_READ8_MEMBER(read_it8703f);
-	DECLARE_WRITE8_MEMBER(write_it8703f);
+	uint8_t read_it8703f(offs_t offset);
+	void write_it8703f(offs_t offset, uint8_t data);
 	// parallel port
-	DECLARE_READ8_MEMBER(lpt_read);
-	DECLARE_WRITE8_MEMBER(lpt_write);
+	uint8_t lpt_read(offs_t offset);
+	void lpt_write(offs_t offset, uint8_t data);
 	// uarts
-	DECLARE_READ8_MEMBER(serial1_read);
-	DECLARE_WRITE8_MEMBER(serial1_write);
-	DECLARE_READ8_MEMBER(serial2_read);
-	DECLARE_WRITE8_MEMBER(serial2_write);
+	uint8_t serial1_read(offs_t offset);
+	void serial1_write(offs_t offset, uint8_t data);
+	uint8_t serial2_read(offs_t offset);
+	void serial2_write(offs_t offset, uint8_t data);
 	// keyboard
-	DECLARE_READ8_MEMBER(at_keybc_r);
-	DECLARE_WRITE8_MEMBER(at_keybc_w);
-	DECLARE_READ8_MEMBER(keybc_status_r);
-	DECLARE_WRITE8_MEMBER(keybc_command_w);
+	uint8_t at_keybc_r(offs_t offset);
+	void at_keybc_w(offs_t offset, uint8_t data);
+	uint8_t keybc_status_r();
+	void keybc_command_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -286,7 +286,7 @@ private:
 	devcb_write_line m_txd2_callback;
 	devcb_write_line m_ndtr2_callback;
 	devcb_write_line m_nrts2_callback;
-	required_device<pc_fdc_interface> floppy_controller_fdcdev;
+	required_device<smc37c78_device> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
 	required_device<ns16450_device> pc_serial1_comdev;
 	required_device<ns16450_device> pc_serial2_comdev;

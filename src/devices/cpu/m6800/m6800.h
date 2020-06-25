@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "6800dasm.h"
-
 enum
 {
 	M6800_PC=1, M6800_S, M6800_A, M6800_B, M6800_X, M6800_CC,
@@ -84,8 +82,8 @@ protected:
 	uint8_t   m_irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
 
 	/* Memory spaces */
-	address_space *m_program, *m_opcodes;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_opcodes_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram, m_copcodes;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
 
 	const op_func *m_insn;
 	const uint8_t *m_cycles;            /* clock cycle of instruction table */

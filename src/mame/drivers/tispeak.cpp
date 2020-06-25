@@ -398,6 +398,16 @@ K28 modules:
   - emulate other known devices
 
 
+Dick Smith catalog numbers, taken from advertisements:
+
+X-1300, Y-1300 : T.I. Speak & Spell
+X-1301 : Super Stumper 1 (for Speak & Spell)
+X-1302 : Super Stumper 2 (for Speak & Spell)
+X-1305 : Vowell Power (for Speak & Spell)
+Y-1310 : T.I. Speak & Math
+Y-1313 : T.I. Speak & Read
+Y-1320 : T.I. Dataman
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -466,21 +476,21 @@ private:
 	virtual void power_off() override;
 	void update_display();
 
-	DECLARE_READ8_MEMBER(snspell_read_k);
-	DECLARE_WRITE16_MEMBER(snmath_write_o);
-	DECLARE_WRITE16_MEMBER(snspell_write_o);
-	DECLARE_WRITE16_MEMBER(snspell_write_r);
-	DECLARE_WRITE16_MEMBER(lantutor_write_r);
+	u8 snspell_read_k();
+	void snmath_write_o(u16 data);
+	void snspell_write_o(u16 data);
+	void snspell_write_r(u16 data);
+	void lantutor_write_r(u16 data);
 
-	DECLARE_READ8_MEMBER(snspellc_read_k);
-	DECLARE_WRITE16_MEMBER(snspellc_write_o);
-	DECLARE_WRITE16_MEMBER(snspellc_write_r);
-	DECLARE_READ8_MEMBER(tntell_read_k);
+	u8 snspellc_read_k();
+	void snspellc_write_o(u16 data);
+	void snspellc_write_r(u16 data);
+	u8 tntell_read_k();
 
 	void k28_update_display(u8 old, u8 data);
-	DECLARE_READ8_MEMBER(k28_read_k);
-	DECLARE_WRITE16_MEMBER(k28_write_o);
-	DECLARE_WRITE16_MEMBER(k28_write_r);
+	u8 k28_read_k();
+	void k28_write_o(u16 data);
+	void k28_write_r(u16 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -592,7 +602,7 @@ void tispeak_state::update_display()
 	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
-WRITE16_MEMBER(tispeak_state::snspell_write_r)
+void tispeak_state::snspell_write_r(u16 data)
 {
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
@@ -606,7 +616,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tispeak_state::snspell_write_o)
+void tispeak_state::snspell_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
@@ -615,7 +625,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	update_display();
 }
 
-READ8_MEMBER(tispeak_state::snspell_read_k)
+u8 tispeak_state::snspell_read_k()
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inputs[8]->read() | read_inputs(8);
@@ -624,7 +634,7 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 
 // snmath specific
 
-WRITE16_MEMBER(tispeak_state::snmath_write_o)
+void tispeak_state::snmath_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
@@ -635,7 +645,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 
 // lantutor specific
 
-WRITE16_MEMBER(tispeak_state::lantutor_write_r)
+void tispeak_state::lantutor_write_r(u16 data)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
@@ -646,7 +656,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 
 // snspellc specific
 
-WRITE16_MEMBER(tispeak_state::snspellc_write_r)
+void tispeak_state::snspellc_write_r(u16 data)
 {
 	// R10: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 10 & 1);
@@ -659,17 +669,17 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 	m_r = m_inp_mux = data;
 }
 
-WRITE16_MEMBER(tispeak_state::snspellc_write_o)
+void tispeak_state::snspellc_write_o(u16 data)
 {
 	// O3210: TMS5100 CTL8124
-	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
+	m_tms5100->ctl_w(bitswap<4>(data,3,0,1,2));
 	m_o = data;
 }
 
-READ8_MEMBER(tispeak_state::snspellc_read_k)
+u8 tispeak_state::snspellc_read_k()
 {
 	// K4: TMS5100 CTL1
-	u8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
+	u8 k4 = m_tms5100->ctl_r() << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return k4 | m_inputs[9]->read() | read_inputs(9);
@@ -678,13 +688,13 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 
 // tntell specific
 
-READ8_MEMBER(tispeak_state::tntell_read_k)
+u8 tispeak_state::tntell_read_k()
 {
 	// K8: overlay code from R5,O4-O7
 	u8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
 
 	// rest is same as snpellc
-	return k8 | snspellc_read_k(space, offset);
+	return k8 | snspellc_read_k();
 }
 
 u8 tispeak_state::tntell_get_hexchar(const char c)
@@ -733,11 +743,11 @@ void tispeak_state::k28_update_display(u8 old, u8 data)
 	// ?
 }
 
-WRITE16_MEMBER(tispeak_state::k28_write_r)
+void tispeak_state::k28_write_r(u16 data)
 {
 	// R1234: TMS5100 CTL8421
 	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
-	m_tms5100->ctl_w(space, 0, r & 0xf);
+	m_tms5100->ctl_w(r & 0xf);
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -754,16 +764,16 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 	m_r = r;
 }
 
-WRITE16_MEMBER(tispeak_state::k28_write_o)
+void tispeak_state::k28_write_o(u16 data)
 {
 	// O0-O7: input mux low
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 }
 
-READ8_MEMBER(tispeak_state::k28_read_k)
+u8 tispeak_state::k28_read_k()
 {
 	// K: TMS5100 CTL, multiplexed inputs (also tied to R1234)
-	return m_tms5100->ctl_r(space, 0) | read_inputs(9) | (m_r & 0xf);
+	return m_tms5100->ctl_r() | read_inputs(9) | (m_r & 0xf);
 }
 
 

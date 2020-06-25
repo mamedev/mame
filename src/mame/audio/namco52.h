@@ -16,17 +16,11 @@ public:
 	void set_extclock(attoseconds_t clk) { m_extclock = clk; }
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
+	namco_52xx_device &set_irq_duration(attotime t) { m_irq_duration = t; return *this; }
 
-	DECLARE_WRITE8_MEMBER(write);
-
-	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ_LINE_MEMBER( SI_r );
-	DECLARE_READ8_MEMBER( R0_r );
-	DECLARE_READ8_MEMBER( R1_r );
-	DECLARE_WRITE8_MEMBER( P_w );
-	DECLARE_WRITE8_MEMBER( R2_w );
-	DECLARE_WRITE8_MEMBER( R3_w );
-	DECLARE_WRITE8_MEMBER( O_w );
+	DECLARE_WRITE_LINE_MEMBER( reset );
+	WRITE_LINE_MEMBER( chip_select );
+	void write(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -35,13 +29,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
 	TIMER_CALLBACK_MEMBER( external_clock_pulse );
+
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
 	required_device<discrete_device> m_discrete;
 
+	attotime m_irq_duration;
 	int m_basenode;
 	attoseconds_t m_extclock;
 	emu_timer *m_extclock_pulse_timer;
@@ -50,6 +45,15 @@ private:
 
 	uint8_t m_latched_cmd;
 	uint32_t m_address;
+
+	uint8_t K_r();
+	DECLARE_READ_LINE_MEMBER( SI_r );
+	uint8_t R0_r();
+	uint8_t R1_r();
+	void P_w(uint8_t data);
+	void R2_w(uint8_t data);
+	void R3_w(uint8_t data);
+	void O_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)

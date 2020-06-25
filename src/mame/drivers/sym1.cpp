@@ -78,11 +78,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
-	DECLARE_READ8_MEMBER(riot_a_r);
-	DECLARE_READ8_MEMBER(riot_b_r);
-	DECLARE_WRITE8_MEMBER(riot_a_w);
-	DECLARE_WRITE8_MEMBER(riot_b_w);
-	DECLARE_WRITE8_MEMBER(via3_a_w);
+	uint8_t riot_a_r();
+	uint8_t riot_b_r();
+	void riot_a_w(uint8_t data);
+	void riot_b_w(uint8_t data);
+	void via3_a_w(uint8_t data);
 
 	void sym1_map(address_map &map);
 
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 	m_digits[param] = m_riot_port_a;
 }
 
-READ8_MEMBER(sym1_state::riot_a_r)
+uint8_t sym1_state::riot_a_r()
 {
 	int data = 0x7f;
 
@@ -130,7 +130,7 @@ READ8_MEMBER(sym1_state::riot_a_r)
 	return data;
 }
 
-READ8_MEMBER(sym1_state::riot_b_r)
+uint8_t sym1_state::riot_b_r()
 {
 	int data = 0x3f;
 
@@ -155,7 +155,7 @@ READ8_MEMBER(sym1_state::riot_b_r)
 	return data;
 }
 
-WRITE8_MEMBER(sym1_state::riot_a_w)
+void sym1_state::riot_a_w(uint8_t data)
 {
 	logerror("%x: riot_a_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -163,7 +163,7 @@ WRITE8_MEMBER(sym1_state::riot_a_w)
 	m_riot_port_a = data;
 }
 
-WRITE8_MEMBER(sym1_state::riot_b_w)
+void sym1_state::riot_b_w(uint8_t data)
 {
 	logerror("%x: riot_b_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -252,7 +252,7 @@ INPUT_PORTS_END
     PA2: Write protect RAM 0x800-0xbff
     PA3: Write protect RAM 0xc00-0xfff
  */
-WRITE8_MEMBER( sym1_state::via3_a_w )
+void sym1_state::via3_a_w(uint8_t data)
 {
 	address_space &cpu0space = m_maincpu->space( AS_PROGRAM );
 

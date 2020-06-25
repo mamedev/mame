@@ -2,15 +2,18 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
-    config.c
+    config.cpp
 
     Configuration file I/O.
+
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "drivenum.h"
 #include "config.h"
+
+#include "drivenum.h"
+#include "emuopts.h"
+
 #include "xmlfile.h"
 
 #define DEBUG_CONFIG        0
@@ -69,7 +72,7 @@ int configuration_manager::load_settings()
 		/* open the config file */
 		emu_file file(machine().options().ctrlr_path(), OPEN_FLAG_READ);
 		osd_printf_verbose("Attempting to parse: %s.cfg\n",controller);
-		osd_file::error filerr = file.open(controller, ".cfg");
+		osd_file::error filerr = file.open(std::string(controller) + ".cfg");
 
 		if (filerr != osd_file::error::NONE)
 			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
@@ -87,7 +90,7 @@ int configuration_manager::load_settings()
 		load_xml(file, config_type::DEFAULT);
 
 	/* finally, load the game-specific file */
-	filerr = file.open(machine().basename(), ".cfg");
+	filerr = file.open(machine().basename() + ".cfg");
 	osd_printf_verbose("Attempting to parse: %s.cfg\n",machine().basename());
 	if (filerr == osd_file::error::NONE)
 		loaded = load_xml(file, config_type::GAME);
@@ -115,7 +118,7 @@ void configuration_manager::save_settings()
 		save_xml(file, config_type::DEFAULT);
 
 	/* finally, save the game-specific file */
-	filerr = file.open(machine().basename(), ".cfg");
+	filerr = file.open(machine().basename() + ".cfg");
 	if (filerr == osd_file::error::NONE)
 		save_xml(file, config_type::GAME);
 

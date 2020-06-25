@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(gaplus_base_state::get_tile_info)
 	const uint8_t attr = m_videoram[tile_index + 0x400];
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
@@ -114,9 +114,12 @@ TILE_GET_INFO_MEMBER(gaplus_base_state::get_tile_info)
 ***************************************************************************/
 
 /* starfield speed constants (bigger = faster) */
-#define SPEED_1 0.5f
-#define SPEED_2 1.0f
-#define SPEED_3 2.0f
+#define SPEED_1 1.0f
+#define SPEED_2 2.0f
+#define SPEED_3 3.0f
+
+/* starfield: top and bottom clipping size */
+#define STARFIELD_CLIPPING_X 16
 
 void gaplus_base_state::starfield_init()
 {
@@ -127,13 +130,14 @@ void gaplus_base_state::starfield_init()
 	const int height = m_screen->height();
 
 	m_total_stars = 0;
+	m_starfield_framecount = 0;
 
 	/* precalculate the star background */
 	/* this comes from the Galaxian hardware, Gaplus is probably different */
 
 	for (int y = 0; y < height; y++)
 	{
-		for (int x = width * 2 - 1; x >= 0; x--)
+		for (int x = width - (STARFIELD_CLIPPING_X * 2) - 1; x >= 0; x--)
 		{
 			generator <<= 1;
 			const int bit1 = (~generator >> 17) & 1;
@@ -143,12 +147,27 @@ void gaplus_base_state::starfield_init()
 
 			if (BIT(~generator, 16) && (generator & 0xff) == 0xff)
 			{
-				const int color = ~(generator >> 8) & 0x3f;
+				const int color = (~(generator >> 8)) % 7 + 1;
+				int color_base = 0;
+				/* A guess based on comparison with PCB video output */
+				switch (set)
+				{
+				case 0:
+					color_base = 0x250;
+					break;
+				case 1:
+					color_base = 0x230;
+					break;
+				case 2:
+					color_base = 0x210;
+					break;
+				}
+
 				if (color && m_total_stars < MAX_STARS)
 				{
-					m_stars[m_total_stars].x = x;
+					m_stars[m_total_stars].x = x + STARFIELD_CLIPPING_X;
 					m_stars[m_total_stars].y = y;
-					m_stars[m_total_stars].col = color;
+					m_stars[m_total_stars].col = color_base + color;
 					m_stars[m_total_stars].set = set++;
 
 					if (set == 3)
@@ -178,6 +197,7 @@ void gaplus_base_state::video_start()
 	starfield_init();
 
 	save_item(NAME(m_starfield_control));
+	save_item(NAME(m_starfield_framecount));
 
 	for (int i = 0; i < MAX_STARS; i++)
 	{
@@ -195,13 +215,13 @@ void gaplus_base_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_base_state::videoram_w)
+void gaplus_base_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gaplus_base_state::starfield_control_w)
+void gaplus_base_state::starfield_control_w(offs_t offset, uint8_t data)
 {
 	m_starfield_control[offset & 3] = data;
 }
@@ -228,6 +248,17 @@ void gaplus_base_state::starfield_render(bitmap_ind16 &bitmap)
 	{
 		int x = m_stars[i].x;
 		int y = m_stars[i].y;
+
+		/* Some stars in the second layer will flash erratically when changing their movements.
+		   (It is when at reverse scrolling stage or get elephant head.)
+		   This is based on a guess from the video output of the PCB.
+		   https://www.youtube.com/watch?v=_1x5Oid3uPg (3:35-, 13:12-)
+		   https://www.youtube.com/watch?v=vrmZAUJYXnI (3:14-, 12:40-) */
+		if (m_stars[i].set == 1 && m_starfield_control[2] != 0x85 && i % 2 == 0)
+		{
+			int bit = BIT(m_starfield_framecount + i, 3) ? 1 : 2;
+			if (BIT(m_starfield_framecount + i, bit)) { continue; }
+		}
 
 		if (x >= 0 && x < width && y >= 0 && y < height)
 		{
@@ -319,6 +350,8 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 		int width = m_screen->width();
 		int height = m_screen->height();
 
+		m_starfield_framecount ++;
+
 		/* check if we're running */
 		if ( ( m_starfield_control[0] & 1 ) == 0 )
 			return;
@@ -330,19 +363,15 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 					/* stand still */
 				break;
 
+				case 0x85:
 				case 0x86:
 					/* scroll down (speed 1) */
 					stars[i].x += SPEED_1;
 				break;
 
-				case 0x85:
+				case 0x06:
 					/* scroll down (speed 2) */
 					stars[i].x += SPEED_2;
-				break;
-
-				case 0x06:
-					/* scroll down (speed 3) */
-					stars[i].x += SPEED_3;
 				break;
 
 				case 0x80:
@@ -361,22 +390,22 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 				break;
 
 				case 0x9f:
-					/* scroll left (speed 2) */
-					stars[i].y += SPEED_2;
+					/* scroll left (speed 3) */
+					stars[i].y += SPEED_3;
 				break;
 
 				case 0xaf:
-					/* scroll left (speed 1) */
-					stars[i].y += SPEED_1;
+					/* scroll right (speed 3) */
+					stars[i].y -= SPEED_3;
 				break;
 			}
 
 			/* wrap */
-			if ( stars[i].x < 0 )
-				stars[i].x = ( float )( width*2 ) + stars[i].x;
+			if ( stars[i].x < STARFIELD_CLIPPING_X )
+				stars[i].x = ( float )( width-STARFIELD_CLIPPING_X*2) + stars[i].x;
 
-			if ( stars[i].x >= ( float )( width*2 ) )
-				stars[i].x -= ( float )( width*2 );
+			if ( stars[i].x >= ( float )( width-STARFIELD_CLIPPING_X) )
+				stars[i].x -= ( float )( width-STARFIELD_CLIPPING_X*2);
 
 			if ( stars[i].y < 0 )
 				stars[i].y = ( float )( height ) + stars[i].y;

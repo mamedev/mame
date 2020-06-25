@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- to boot disks type 'BOOT' and press return
+  to boot disks type 'BOOT' and press return
   alternatively press numpad 9 which seems to do the same thing
 
   disk image formats:

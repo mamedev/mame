@@ -44,25 +44,25 @@ void elan_eu3a05sys_device::device_reset()
 		m_dmaparams[i] = 0x00;
 }
 
-READ8_MEMBER(elan_eu3a05sys_device::dma_param_r)
+uint8_t elan_eu3a05sys_device::dma_param_r(offs_t offset)
 {
 	return m_dmaparams[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05sys_device::dma_param_w)
+void elan_eu3a05sys_device::dma_param_w(offs_t offset, uint8_t data)
 {
 	m_dmaparams[offset] = data;
 }
 
 
-READ8_MEMBER(elan_eu3a05sys_device::elan_eu3a05_dmatrg_r)
+uint8_t elan_eu3a05sys_device::elan_eu3a05_dmatrg_r()
 {
 	logerror("%s: elan_eu3a05_dmatrg_r (DMA operation state?)\n", machine().describe_context());
 	return 0x00;//m_dmatrg_data;
 }
 
 
-WRITE8_MEMBER(elan_eu3a05sys_device::elan_eu3a05_dmatrg_w)
+void elan_eu3a05sys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 {
 	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;

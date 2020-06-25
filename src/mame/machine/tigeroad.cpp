@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/tigeroad.h"
 
-READ16_MEMBER(pushman_state::mcu_comm_r)
+uint16_t pushman_state::mcu_comm_r(offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0x03)
 	{
@@ -20,7 +20,7 @@ READ16_MEMBER(pushman_state::mcu_comm_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
+void pushman_state::pushman_mcu_comm_w(offs_t offset, uint16_t data)
 {
 	switch (offset & 0x01)
 	{
@@ -28,43 +28,43 @@ WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
 		m_host_latch = swapendian_int16(data);
 		break;
 	case 1:
-		m_mcu->pd_w(space, 0, data & 0x00ff);
+		m_mcu->pd_w(data & 0x00ff);
 		m_host_semaphore = true;
 		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
 
-WRITE16_MEMBER(pushman_state::bballs_mcu_comm_w)
+void pushman_state::bballs_mcu_comm_w(uint16_t data)
 {
 	m_host_latch = data;
 	m_host_semaphore = true;
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pushman_state::mcu_pa_w)
+void pushman_state::mcu_pa_w(uint8_t data)
 {
 	m_mcu_output = (m_mcu_output & 0xff00) | (u16(data) & 0x00ff);
 }
 
-WRITE8_MEMBER(pushman_state::mcu_pb_w)
+void pushman_state::mcu_pb_w(uint8_t data)
 {
 	m_mcu_output = (m_mcu_output & 0x00ff) | (u16(data) << 8);
 }
 
-WRITE8_MEMBER(pushman_state::mcu_pc_w)
+void pushman_state::mcu_pc_w(uint8_t data)
 {
 	if (BIT(data, 0))
 	{
-		m_mcu->pa_w(space, 0, 0xff);
-		m_mcu->pb_w(space, 0, 0xff);
+		m_mcu->pa_w(0xff);
+		m_mcu->pb_w(0xff);
 	}
 	else
 	{
 		m_host_semaphore = false;
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-		m_mcu->pa_w(space, 0, (m_host_latch >> 0) & 0x00ff);
-		m_mcu->pb_w(space, 0, (m_host_latch >> 8) & 0x00ff);
+		m_mcu->pa_w((m_host_latch >> 0) & 0x00ff);
+		m_mcu->pb_w((m_host_latch >> 8) & 0x00ff);
 	}
 
 	if (BIT(m_mcu_latch_ctl, 1) && !BIT(data, 1))

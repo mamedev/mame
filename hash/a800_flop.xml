@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
 
     Atari 400 / 800 floppies
     (skeleton list)
@@ -282,7 +283,7 @@
 		<publisher>Utopia Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="34960">
-				<rom name="Montezuma's Revenge!.atr" size="34960" crc="fd7387dd" sha1="563832104dd0658d09411b24cc0c251be5041d33"/>
+				<rom name="Montezuma's Revenge.atr" size="34960" crc="fd7387dd" sha1="563832104dd0658d09411b24cc0c251be5041d33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -411,7 +412,7 @@
 		<sharedfeat name="requirement" value="a800:basicb"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="b-1 nuclear bomber (1981)(avalon hill)(us)[!][basic].atr" size="92176" crc="1d4a3876" sha1="aba9f4e932cf0d15d9752b385e016c795c8411ba"/>  <!-- Verified -->
+				<rom name="b-1 nuclear bomber (1981)(avalon hill)(us)[basic].atr" size="92176" crc="1d4a3876" sha1="aba9f4e932cf0d15d9752b385e016c795c8411ba"/>  <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +425,7 @@
 		<sharedfeat name="requirement" value="a800:basicb"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="crush, crumble and chomp! (1981)(epyx)(us)[!][basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
+				<rom name="crush, crumble and chomp (1981)(epyx)(us)[basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

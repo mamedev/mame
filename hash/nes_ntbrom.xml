@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="nes_ntbrom" description="Nintendo Entertainment System - Nantettatte!! Baseball mini-cartridges">
 
 	<software name="ntb_91">
@@ -11,7 +14,7 @@
 		<part name="cart" interface="ntb_cart">
 			<feature name="slot" value="ntbrom" />
 			<dataarea name="rom" size="16384">
-				<rom name="nantettatte!! baseball '91 kaimaku hen (j) [u].bin" size="16384" crc="fdb61142" sha1="134d2999eca761133236d7abc7cafbd703c628b7" offset="00000" status="baddump" />
+				<rom name="nantettatte baseball '91 kaimaku hen (j) [u].bin" size="16384" crc="fdb61142" sha1="134d2999eca761133236d7abc7cafbd703c628b7" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +28,7 @@
 		<part name="cart" interface="ntb_cart">
 			<feature name="slot" value="ntbrom" />
 			<dataarea name="rom" size="16384">
-				<rom name="nantettatte!! baseball ob allstar hen (j) [u].bin" size="16384" crc="dc0bd3c3" sha1="89ba2b4bf7ba7f7db4f902e4ce20c6dee526433b" offset="00000" status="baddump" />
+				<rom name="nantettatte baseball ob allstar hen (j) [u].bin" size="16384" crc="dc0bd3c3" sha1="89ba2b4bf7ba7f7db4f902e4ce20c6dee526433b" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

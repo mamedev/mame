@@ -60,9 +60,9 @@ public:
 	uint8_t m_keylatch;
 	uint8_t read_keyboard(int pa);
 
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_READ8_MEMBER( pia_pb_r );
+	void pia_pa_w(uint8_t data);
+	uint8_t pia_pa_r();
+	uint8_t pia_pb_r();
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	void creativision(machine_config &config);
@@ -101,10 +101,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_psg_ready );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	uint8_t pia_pa_r();
+	void pia_pa_w(uint8_t data);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_ca2_w );
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );

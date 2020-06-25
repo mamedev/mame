@@ -18,8 +18,8 @@ class dio16_98603a_device :
 public:
 	// construction/destruction
 	dio16_98603a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(rom_w);
+	uint16_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint16_t data);
 
 protected:
 	dio16_98603a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

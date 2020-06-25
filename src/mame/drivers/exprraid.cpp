@@ -221,12 +221,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
 /* Emulate DECO 291 protection (for original express raider, code is cracked on the bootleg)*/
 /*****************************************************************************************/
 
-READ8_MEMBER(exprraid_state::exprraid_prot_data_r)
+uint8_t exprraid_state::exprraid_prot_data_r()
 {
 	return m_prot_value;
 }
 
-READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
+uint8_t exprraid_state::exprraid_prot_status_r()
 {
 	/*
 	    76543210
@@ -238,7 +238,7 @@ READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
 	return 0x02;
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
+void exprraid_state::exprraid_prot_data_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -263,12 +263,12 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 	}
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_int_clear_w)
+void exprraid_state::exprraid_int_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(exprraid_state::vblank_r)
+uint8_t exprraid_state::vblank_r()
 {
 	return ioport("IN0")->read();
 }
@@ -469,12 +469,6 @@ static GFXDECODE_START( gfx_exprraid )
 GFXDECODE_END
 
 
-/* handler called by the 3812 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(exprraid_state::irqhandler)
-{
-	m_slave->set_input_line_and_vector(0, state, 0xff); // M6809
-}
-
 void exprraid_state::machine_start()
 {
 	save_item(NAME(m_prot_value));
@@ -505,10 +499,6 @@ void exprraid_state::exprraid(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_raw(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8); /* not accurate */
 	screen.set_screen_update(FUNC(exprraid_state::screen_update_exprraid));
 	screen.set_palette(m_palette);
@@ -526,7 +516,7 @@ void exprraid_state::exprraid(machine_config &config)
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3526_device &ym2(YM3526(config, "ym2", XTAL(12'000'000) / 4));
-	ym2.irq_handler().set(FUNC(exprraid_state::irqhandler));
+	ym2.irq_handler().set_inputline(m_slave, M6809_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
@@ -856,13 +846,13 @@ void exprraid_state::init_exprraid()
 
 void exprraid_state::init_wexpressb2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(*this, FUNC(exprraid_state::vblank_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8smo_delegate(*this, FUNC(exprraid_state::vblank_r)));
 	exprraid_gfx_expand();
 }
 
 void exprraid_state::init_wexpressb3()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xffc0, 0xffc0, read8_delegate(*this, FUNC(exprraid_state::vblank_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xffc0, 0xffc0, read8smo_delegate(*this, FUNC(exprraid_state::vblank_r)));
 	exprraid_gfx_expand();
 }
 

@@ -27,6 +27,7 @@
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/express.h"
 
 /* seems to be defined on mingw-gcc */
 #undef i386
@@ -1777,7 +1778,7 @@ uint32_t i386_device::i386_get_debug_desc(I386_SREG *seg)
 	return seg->valid;
 }
 
-uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_segbase(int params, const uint64_t *param)
 {
 	uint32_t result;
 	I386_SREG seg;
@@ -1800,7 +1801,7 @@ uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint6
 	return result;
 }
 
-uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_seglimit(int params, const uint64_t *param)
 {
 	uint32_t result = 0;
 	I386_SREG seg;
@@ -1816,7 +1817,7 @@ uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint
 	return result;
 }
 
-uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_segofftovirt(int params, const uint64_t *param)
 {
 	uint32_t result;
 	I386_SREG seg;
@@ -1854,7 +1855,7 @@ uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const 
 	return result;
 }
 
-uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
 	uint32_t result = param[0];
 
@@ -1863,7 +1864,7 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
-uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_cacheflush(int params, const uint64_t *param)
 {
 	uint32_t option;
 	bool invalidate;
@@ -1886,11 +1887,11 @@ uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const ui
 void i386_device::device_debug_setup()
 {
 	using namespace std::placeholders;
-	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2, _3));
-	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
-	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
-	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
-	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2, _3));
+	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2));
+	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2));
+	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2));
+	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2));
+	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2));
 }
 
 /*************************************************************************/
@@ -1936,9 +1937,9 @@ void i386_device::i386_common_init()
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
 		// for the 386sx
-		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache16);
 	} else {
-		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache32);
 	}
 
 	m_io = &space(AS_IO);

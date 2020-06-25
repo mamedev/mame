@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
 	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(2, code, color, (data >> 10) & 1);
+	tileinfo.set(2, code, color, (data >> 10) & 1);
 }
 
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
 	uint32_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = data & 0x3fff;
 	int color = (data >> 16) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 14));
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 14));
 	tileinfo.category = (data >> 20) & 3;
 }
 
@@ -94,7 +94,7 @@ void toobin_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::paletteram_w )
+void toobin_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	uint16_t newword = m_paletteram[offset];
@@ -117,15 +117,13 @@ WRITE16_MEMBER( toobin_state::paletteram_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::intensity_w )
+void toobin_state::intensity_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int i;
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_brightness = (double)(~data & 0x1f) / 31.0;
 
-		for (i = 0; i < 0x400; i++)
+		for (int i = 0; i < 0x400; i++)
 			if (!BIT(m_paletteram[i], 15))
 				m_palette->set_pen_contrast(i, m_brightness);
 	}
@@ -139,7 +137,7 @@ WRITE16_MEMBER( toobin_state::intensity_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::xscroll_w )
+void toobin_state::xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -158,7 +156,7 @@ WRITE16_MEMBER( toobin_state::xscroll_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::yscroll_w )
+void toobin_state::yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -184,7 +182,7 @@ WRITE16_MEMBER( toobin_state::yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::slip_w )
+void toobin_state::slip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldslip = m_mob->slipram(offset);
 	uint16_t newslip = oldslip;

@@ -76,9 +76,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(text_control_w);
-	DECLARE_WRITE8_MEMBER(vmem_w);
+	void control_w(uint8_t data);
+	void text_control_w(uint8_t data);
+	void vmem_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -98,7 +98,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<address_map_bank_device> m_videobank;
 	required_shared_ptr<u8> m_p_videoram;
@@ -160,13 +160,13 @@ void sm7238_state::video_start()
 {
 }
 
-WRITE8_MEMBER(sm7238_state::control_w)
+void sm7238_state::control_w(uint8_t data)
 {
 	LOG("Control Write: %02xh: lut %d nvram %d c2 %d iack %d\n",
 		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5));
 }
 
-WRITE8_MEMBER(sm7238_state::text_control_w)
+void sm7238_state::text_control_w(uint8_t data)
 {
 	if (data ^ m_video.control)
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER(sm7238_state::text_control_w)
 	m_video.control = data;
 }
 
-WRITE8_MEMBER(sm7238_state::vmem_w)
+void sm7238_state::vmem_w(offs_t offset, uint8_t data)
 {
 	m_p_videoram[offset] = data;
 	m_p_videoram[offset + 0x1000] = data;
@@ -357,7 +357,7 @@ void sm7238_state::sm7238(machine_config &config)
 	I8080(config, m_maincpu, 16.5888_MHz_XTAL/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sm7238_state::sm7238_mem);
 	m_maincpu->set_addrmap(AS_IO, &sm7238_state::sm7238_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 

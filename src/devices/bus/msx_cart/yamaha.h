@@ -31,7 +31,6 @@ protected:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-private:
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
 
@@ -61,6 +60,7 @@ class msx_cart_sfg05_device : public msx_cart_sfg_device
 public:
 	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

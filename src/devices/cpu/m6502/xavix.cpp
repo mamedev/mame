@@ -171,13 +171,13 @@ inline uint8_t xavix_device::mi_xavix::read(uint16_t adr)
 // opcode reads
 uint8_t xavix_device::mi_xavix::read_sync(uint16_t adr)
 {
-	return scache->read_byte(base->adr_with_codebank(adr));
+	return csprogram.read_byte(base->adr_with_codebank(adr));
 }
 
 // oprand reads
 uint8_t xavix_device::mi_xavix::read_arg(uint16_t adr)
 {
-	return cache->read_byte(base->adr_with_codebank(adr));
+	return cprogram.read_byte(base->adr_with_codebank(adr));
 }
 
 // data writes

@@ -72,23 +72,23 @@ private:
 	std::unique_ptr<u16[]> m_spriteram_spare;
 	std::unique_ptr<u16[]> m_buffered_spriteram;
 
-	DECLARE_READ32_MEMBER(mlc_440008_r);
-	DECLARE_READ32_MEMBER(mlc_44001c_r);
-	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
+	u32 mlc_440008_r();
+	u32 mlc_44001c_r(offs_t offset);
+	void mlc_44001c_w(u32 data);
 
-	DECLARE_READ32_MEMBER(mlc_200000_r);
-	DECLARE_READ32_MEMBER(mlc_200004_r);
-	DECLARE_READ32_MEMBER(mlc_200070_r);
-	DECLARE_READ32_MEMBER(mlc_20007c_r);
-	DECLARE_READ32_MEMBER(mlc_scanline_r);
-	DECLARE_WRITE32_MEMBER(irq_ram_w);
-	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
+	u32 mlc_200000_r();
+	u32 mlc_200004_r();
+	u32 mlc_200070_r();
+	u32 mlc_20007c_r();
+	u32 mlc_scanline_r();
+	void irq_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 avengrgs_speedup_r();
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 spriteram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+	u16 sh96_protection_region_0_146_r(offs_t offset);
+	void sh96_protection_region_0_146_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);

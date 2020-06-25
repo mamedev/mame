@@ -320,7 +320,7 @@ eof:
 	}
 	else
 	{
-		/* Not the end of file */
+		/* Note the end of file */
 		err = process_rsdos_file(&rsent, image, nullptr, filesize);
 		if (err)
 			return err;

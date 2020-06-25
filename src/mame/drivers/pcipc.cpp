@@ -54,9 +54,9 @@ public:
 private:
 	void pcipc_map(address_map &map);
 	void pcipc_map_io(address_map &map);
-	DECLARE_WRITE8_MEMBER(boot_state_phoenix_w);
-	DECLARE_WRITE8_MEMBER(boot_state_phoenix_ver40_rev6_w);
-	DECLARE_WRITE8_MEMBER(boot_state_award_w);
+	void boot_state_phoenix_w(uint8_t data);
+	void boot_state_phoenix_ver40_rev6_w(uint8_t data);
+	void boot_state_award_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -439,7 +439,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {
 	{ 0, nullptr }
 };
 
-WRITE8_MEMBER(pcipc_state::boot_state_phoenix_w)
+void pcipc_state::boot_state_phoenix_w(uint8_t data)
 {
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix[i].message; i++)
@@ -451,7 +451,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_phoenix_w)
 
 }
 
-WRITE8_MEMBER(pcipc_state::boot_state_phoenix_ver40_rev6_w)
+void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 {
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix_ver40_rev6[i].message; i++)
@@ -464,7 +464,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_phoenix_ver40_rev6_w)
 }
 
 
-WRITE8_MEMBER(pcipc_state::boot_state_award_w)
+void pcipc_state::boot_state_award_w(uint8_t data)
 {
 	const char *desc = "";
 	for(int i=0; boot_state_infos_award[i].message; i++)

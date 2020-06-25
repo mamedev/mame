@@ -60,7 +60,7 @@ private:
 	void attr_map(address_map &map);
 
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
-	DECLARE_WRITE_LINE_MEMBER(mbc_w);
+	void mbc_w(int state);
 
 	u8 p1_r();
 	void p1_w(u8 data);
@@ -98,7 +98,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(adm11_state::draw_character)
 	}
 }
 
-WRITE_LINE_MEMBER(adm11_state::mbc_w)
+void adm11_state::mbc_w(int state)
 {
 	m_mbc = state;
 }

@@ -9,14 +9,14 @@
 #include "emu.h"
 #include "includes/zerozone.h"
 
-WRITE16_MEMBER( zerozone_state::tilemap_w )
+void zerozone_state::tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_zz_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER( zerozone_state::tilebank_w )
+void zerozone_state::tilebank_w(uint16_t data)
 {
 //  popmessage ("Data %04x",data);
 	m_tilebank = data & 0x07;
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(zerozone_state::get_zerozone_tile_info)
 	if (m_vram[tile_index] & 0x0800)
 		tileno += m_tilebank * 0x800;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour >> 12, 0);
+	tileinfo.set(0, tileno, colour >> 12, 0);
 }
 
 void zerozone_state::video_start()

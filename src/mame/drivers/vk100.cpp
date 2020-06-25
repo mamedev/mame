@@ -234,18 +234,18 @@ private:
 	uint8_t m_ADSR;
 	ioport_port* m_col_array[16];
 
-	DECLARE_WRITE8_MEMBER(vgLD_X);
-	DECLARE_WRITE8_MEMBER(vgLD_Y);
-	DECLARE_WRITE8_MEMBER(vgERR);
-	DECLARE_WRITE8_MEMBER(vgSOPS);
-	DECLARE_WRITE8_MEMBER(vgPAT);
-	DECLARE_WRITE8_MEMBER(vgPMUL);
-	DECLARE_WRITE8_MEMBER(vgREG);
-	DECLARE_WRITE8_MEMBER(vgEX);
-	DECLARE_WRITE8_MEMBER(KBDW);
-	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
-	DECLARE_READ8_MEMBER(SYSTAT_A);
-	DECLARE_READ8_MEMBER(SYSTAT_B);
+	void vgLD_X(offs_t offset, uint8_t data);
+	void vgLD_Y(offs_t offset, uint8_t data);
+	void vgERR(uint8_t data);
+	void vgSOPS(uint8_t data);
+	void vgPAT(uint8_t data);
+	void vgPMUL(uint8_t data);
+	void vgREG(offs_t offset, uint8_t data);
+	void vgEX(offs_t offset, uint8_t data);
+	void KBDW(uint8_t data);
+	uint8_t vk100_keyboard_column_r(offs_t offset);
+	uint8_t SYSTAT_A(offs_t offset);
+	uint8_t SYSTAT_B();
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -430,7 +430,7 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
-WRITE8_MEMBER(vk100_state::vgLD_X)
+void vk100_state::vgLD_X(offs_t offset, uint8_t data)
 {
 	m_vgX &= 0xFF << ((1-offset)*8);
 	m_vgX |= ((uint16_t)data) << (offset*8);
@@ -440,7 +440,7 @@ WRITE8_MEMBER(vk100_state::vgLD_X)
 }
 
 /* ports 0x42 and 0x43: load low and high bytes of vector gen Y register */
-WRITE8_MEMBER(vk100_state::vgLD_Y)
+void vk100_state::vgLD_Y(offs_t offset, uint8_t data)
 {
 	m_vgY &= 0xFF << ((1-offset)*8);
 	m_vgY |= ((uint16_t)data) << (offset*8);
@@ -450,7 +450,7 @@ WRITE8_MEMBER(vk100_state::vgLD_Y)
 }
 
 /* port 0x44: "ERR" load bresenham line algorithm 'error' count */
-WRITE8_MEMBER(vk100_state::vgERR)
+void vk100_state::vgERR(uint8_t data)
 {
 	m_vgERR = data;
 #ifdef VG40_VERBOSE
@@ -474,7 +474,7 @@ WRITE8_MEMBER(vk100_state::vgERR)
  * 1   1      8251TXD   ACTS(loop) 8251RXD    J6 /DTR     J7 URTS     GND        8251RTS(loop)  J6 /DSR
  *                      * and UCTS, the pin drives both pins on J7
  */
-WRITE8_MEMBER(vk100_state::vgSOPS)
+void vk100_state::vgSOPS(uint8_t data)
 {
 	m_vgSOPS = data;
 #ifdef VG40_VERBOSE
@@ -484,7 +484,7 @@ WRITE8_MEMBER(vk100_state::vgSOPS)
 }
 
 /* port 0x46: "PAT" load vg Pattern register */
-WRITE8_MEMBER(vk100_state::vgPAT)
+void vk100_state::vgPAT(uint8_t data)
 {
 	m_vgPAT = data;
 #ifdef PAT_DEBUG
@@ -504,7 +504,7 @@ WRITE8_MEMBER(vk100_state::vgPAT)
    the pattern register and increments on each one. if it overflows from
    1111 to 0000 the pattern register is shifted right one bit and the
    counter is reloaded from PMUL */
-WRITE8_MEMBER(vk100_state::vgPMUL)
+void vk100_state::vgPMUL(uint8_t data)
 {
 	m_vgPMUL = data;
 #ifdef VG40_VERBOSE
@@ -521,7 +521,7 @@ WRITE8_MEMBER(vk100_state::vgPMUL)
  *                             Change
  * d7     d6     d5     d4     d3     d2     d1     d0
  */
-WRITE8_MEMBER(vk100_state::vgREG)
+void vk100_state::vgREG(offs_t offset, uint8_t data)
 {
 	m_vgRegFile[offset] = data;
 #ifdef VG60_VERBOSE
@@ -537,7 +537,7 @@ WRITE8_MEMBER(vk100_state::vgREG)
 /* port 0x65: "EX DOT" execute a dot (draw a dot at x,y?) */
 /* port 0x66: "EX VEC" execute a vector (draw a vector from x,y to a destination using du/dvm/dir/err ) */
 /* port 0x67: "EX ER" execute an erase (clear the screen to the bg color, i.e. fill vram with zeroes) */
-WRITE8_MEMBER(vk100_state::vgEX)
+void vk100_state::vgEX(offs_t offset, uint8_t data)
 {
 #ifdef VG60_VERBOSE
 	static const char *const ex_functions[] = { "Move", "Dot", "Vector", "Erase" };
@@ -554,7 +554,7 @@ WRITE8_MEMBER(vk100_state::vgEX)
 
 
 /* port 0x68: "KBDW" d7 is beeper, d6 is keyclick, d5-d0 are keyboard LEDS */
-WRITE8_MEMBER(vk100_state::KBDW)
+void vk100_state::KBDW(uint8_t data)
 {
 	output().set_value("online_led",BIT(data, 5) ? 1 : 0);
 	output().set_value("local_led", BIT(data, 5) ? 0 : 1);
@@ -639,7 +639,7 @@ WRITE8_MEMBER(vk100_state::KBDW)
  299 reads, rotates result right 3 times and ANDs the result with 0x0F
  2A4 reads, rotates result left 1 time and ANDS the result with 0xF0
 */
-READ8_MEMBER(vk100_state::SYSTAT_A)
+uint8_t vk100_state::SYSTAT_A(offs_t offset)
 {
 	uint8_t dipswitchLUT[8] = { 1,3,5,7,6,4,2,0 }; // the dipswitches map in a weird order to offsets
 #ifdef SYSTAT_A_VERBOSE
@@ -666,7 +666,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
  * The 4 attribute ram bits for the cell being pointed at by the X and Y regs are readable as the low nybble.
  * The DSR pin is readable as bit 6.
  */
-READ8_MEMBER(vk100_state::SYSTAT_B)
+uint8_t vk100_state::SYSTAT_B()
 {
 #ifdef SYSTAT_B_VERBOSE
 	logerror("0x%04X: SYSTAT_B Read!\n", m_maincpu->pc());
@@ -674,7 +674,7 @@ READ8_MEMBER(vk100_state::SYSTAT_B)
 	return (m_ACTS<<7)|(m_ADSR<<6)|vram_attr_read();
 }
 
-READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
+uint8_t vk100_state::vk100_keyboard_column_r(offs_t offset)
 {
 	uint8_t code = m_col_array[offset&0xF]->read() | m_capsshift->read();
 #ifdef KBD_VERBOSE

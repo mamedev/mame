@@ -2798,7 +2798,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 7:7 234fc:4
 	u32 res = dst - src;
 
 	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(*m_program, m_ir & 7, src, 0xffffffff);
+		(m_cmpild_instr_callback)(m_ir & 7, src);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2947,7 +2947,7 @@ f278 fff8 ftrapcc  l .          23:4
 	m_pc += 2;
 
 
-51c8 fff8 dbf      w .          01:12 7:14 2:6 34fc:4
+51c8 fff8 dbf      w .          0:12 7:14 1:10 2:6 34fc:4
 	u32* r_dst = &DY();
 	u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
@@ -2964,7 +2964,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-50c8 f0f8 dbcc     w .          01:12 7:14 234fc:6
+50c8 f0f8 dbcc     w .          0:12 7:14 1:10 234fc:6
 	if(M68KMAKE_NOT_CC) {
 		u32* r_dst = &DY();
 		u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
@@ -7805,7 +7805,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 

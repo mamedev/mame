@@ -96,11 +96,11 @@ private:
 
 	bool m_bookkeeping_mode;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void wallc_coin_counter_w(uint8_t data);
+	void unkitpkr_out0_w(uint8_t data);
+	void unkitpkr_out1_w(uint8_t data);
+	void unkitpkr_out2_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
@@ -214,7 +214,7 @@ void wallc_state::unkitpkr_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(wallc_state::videoram_w)
+void wallc_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -222,7 +222,7 @@ WRITE8_MEMBER(wallc_state::videoram_w)
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 1, 0);
+	tileinfo.set(0, m_videoram[tile_index] | 0x100, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
@@ -233,12 +233,12 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 	if (m_bookkeeping_mode || (tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
 		code |= 0x100;
 
-	SET_TILE_INFO_MEMBER(0, code, 1, 0);
+	tileinfo.set(0, code, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_sidampkr)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 0, 0);
+	tileinfo.set(0, m_videoram[tile_index] | 0x100, 0, 0);
 }
 
 void wallc_state::video_start()
@@ -263,22 +263,22 @@ uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
+void wallc_state::wallc_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 2);
 }
 
 
-WRITE8_MEMBER(wallc_state::unkitpkr_out0_w)
+void wallc_state::unkitpkr_out0_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(wallc_state::unkitpkr_out1_w)
+void wallc_state::unkitpkr_out1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 }
 
-WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
+void wallc_state::unkitpkr_out2_w(uint8_t data)
 {
 	if (m_bookkeeping_mode != BIT(data, 0))
 	{

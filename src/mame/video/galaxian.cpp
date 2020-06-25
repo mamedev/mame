@@ -483,24 +483,23 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 	if (m_extend_tile_info_ptr != nullptr)
 		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
-WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
+void galaxian_state::galaxian_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* store the data and mark the corresponding tile dirty */
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(galaxian_state::galaxian_objram_w)
+void galaxian_state::galaxian_objram_w(offs_t offset, uint8_t data)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
@@ -650,7 +649,7 @@ void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
+void galaxian_state::galaxian_flip_screen_x_w(uint8_t data)
 {
 	if (m_flipscreen_x != (data & 0x01))
 	{
@@ -667,7 +666,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
+void galaxian_state::galaxian_flip_screen_y_w(uint8_t data)
 {
 	if (m_flipscreen_y != (data & 0x01))
 	{
@@ -679,10 +678,10 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
+void galaxian_state::galaxian_flip_screen_xy_w(uint8_t data)
 {
-	galaxian_flip_screen_x_w(space, offset, data);
-	galaxian_flip_screen_y_w(space, offset, data);
+	galaxian_flip_screen_x_w(data);
+	galaxian_flip_screen_y_w(data);
 }
 
 
@@ -693,7 +692,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
+void galaxian_state::galaxian_stars_enable_w(uint8_t data)
 {
 	if ((m_stars_enabled ^ data) & 0x01)
 	{
@@ -713,7 +712,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
+void galaxian_state::scramble_background_enable_w(uint8_t data)
 {
 	if ((m_background_enable ^ data) & 0x01)
 	{
@@ -725,7 +724,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
+void galaxian_state::scramble_background_red_w(uint8_t data)
 {
 	if ((m_background_red ^ data) & 0x01)
 	{
@@ -737,7 +736,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
+void galaxian_state::scramble_background_green_w(uint8_t data)
 {
 	if ((m_background_green ^ data) & 0x01)
 	{
@@ -749,7 +748,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
+void galaxian_state::scramble_background_blue_w(uint8_t data)
 {
 	if ((m_background_blue ^ data) & 0x01)
 	{
@@ -768,7 +767,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_gfxbank_w)
+void galaxian_state::galaxian_gfxbank_w(offs_t offset, uint8_t data)
 {
 	if (m_gfxbank[offset] != data)
 	{
@@ -1380,7 +1379,7 @@ void galaxian_state::jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx
  *************************************/
 
 /* gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking */
-WRITE8_MEMBER( galaxian_state::fourplay_rombank_w )
+void galaxian_state::fourplay_rombank_w(offs_t offset, uint8_t data)
 {
 	m_gfxbank[4] = (m_gfxbank[4] & (2 - offset)) | (data << offset);
 
@@ -1411,21 +1410,21 @@ void galaxian_state::videight_extend_sprite_info(const uint8_t *base, uint8_t *s
 
 
 /* This handles the main bankswitching for code and one-bank gfx games */
-WRITE8_MEMBER( galaxian_state::videight_rombank_w )
+void galaxian_state::videight_rombank_w(offs_t offset, uint8_t data)
 {
 	uint8_t gfxbanks[] = { 0, 10, 2, 8, 1, 9, 4, 11 };
 	if (offset == 2)
-		galaxian_stars_enable_w( space, 0, data );
+		galaxian_stars_enable_w( data );
 	else
 	{
 		m_gfxbank[4] = (m_gfxbank[4] & (6 - offset)) | (data << ((offset + 1) >> 1));
-		galaxian_gfxbank_w (space, 0, gfxbanks[m_gfxbank[4]]);
+		galaxian_gfxbank_w (0, gfxbanks[m_gfxbank[4]]);
 		membank("bank1")->set_entry( m_gfxbank[4] );
 	}
 }
 
 /* This handles those games with multiple gfx banks */
-WRITE8_MEMBER( galaxian_state::videight_gfxbank_w )
+void galaxian_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 {
 	/* Moon Cresta (mooncrgx) */
 	if (( data < 2 ) && (m_gfxbank[4] == 3))
@@ -1434,15 +1433,15 @@ WRITE8_MEMBER( galaxian_state::videight_gfxbank_w )
 		if (!offset) m_gfxbank[3] = (m_gfxbank[3] & 6) | data;
 		if (offset == 1) m_gfxbank[3] = (m_gfxbank[3] & 5) | (data << 1);
 		if (offset == 2) m_gfxbank[3] = (m_gfxbank[3] & 3) | (data << 2);
-		galaxian_gfxbank_w(space, 0, gfxbanks[m_gfxbank[3]]);
+		galaxian_gfxbank_w(0, gfxbanks[m_gfxbank[3]]);
 	}
 
 	/* Uniwar S */
 	if (( data < 2 ) && (m_gfxbank[4] == 2) && (offset == 2))
-		galaxian_gfxbank_w( space, 0, data+2 );
+		galaxian_gfxbank_w( 0, data+2 );
 
 	/* Pisces (piscesb) */
 	if (( data < 2 ) && (m_gfxbank[4] == 6) && (offset == 2))
-		galaxian_gfxbank_w( space, 0, data+4 );
+		galaxian_gfxbank_w( 0, data+4 );
 }
 

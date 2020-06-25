@@ -12,7 +12,6 @@
 #include "softfloat/softfloat.h"
 #endif
 
-#include "debug/debugcpu.h"
 #include "divtlb.h"
 
 #include "i386dasm.h"
@@ -36,11 +35,11 @@ public:
 	auto smiact() { return m_smiact.bind(); }
 	auto ferr() { return m_ferr_handler.bind(); }
 
-	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_segofftovirt(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_virttophys(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_cacheflush(symbol_table &table, int params, const uint64_t *param);
+	uint64_t debug_segbase(int params, const uint64_t *param);
+	uint64_t debug_seglimit(int params, const uint64_t *param);
+	uint64_t debug_segofftovirt(int params, const uint64_t *param);
+	uint64_t debug_virttophys(int params, const uint64_t *param);
+	uint64_t debug_cacheflush(int params, const uint64_t *param);
 
 protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
@@ -90,9 +89,9 @@ protected:
 	virtual void cache_clean() {}
 
 	// routine to access memory
-	virtual u8 mem_pr8(offs_t address) { return macache32->read_byte(address); }
-	virtual u16 mem_pr16(offs_t address) { return macache32->read_word(address); }
-	virtual u32 mem_pr32(offs_t address) { return macache32->read_dword(address); }
+	virtual u8 mem_pr8(offs_t address) { return macache32.read_byte(address); }
+	virtual u16 mem_pr16(offs_t address) { return macache32.read_word(address); }
+	virtual u32 mem_pr32(offs_t address) { return macache32.read_dword(address); }
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -308,8 +307,8 @@ protected:
 	address_space *m_program;
 	address_space *m_io;
 	uint32_t m_a20_mask;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *macache16;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *macache32;
+	memory_access<32, 1, 0, ENDIANNESS_LITTLE>::cache macache16;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache macache32;
 
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
@@ -1529,9 +1528,9 @@ public:
 	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual u8 mem_pr8(offs_t address) override { return macache16->read_byte(address); };
-	virtual u16 mem_pr16(offs_t address) override { return macache16->read_word(address); };
-	virtual u32 mem_pr32(offs_t address) override { return macache16->read_dword(address); };
+	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); };
+	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); };
+	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); };
 
 	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege) override;
 	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege) override;

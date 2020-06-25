@@ -328,7 +328,7 @@ void interpro_state::init_common()
 	m_maincpu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
 }
 
-WRITE16_MEMBER(interpro_state::led_w)
+void interpro_state::led_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// 7-segment decode patterns (hex digits) borrowed from wico.cpp (mc14495)
 	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
@@ -338,7 +338,7 @@ WRITE16_MEMBER(interpro_state::led_w)
 	COMBINE_DATA(&m_led);
 }
 
-WRITE16_MEMBER(emerald_state::ctrl1_w)
+void emerald_state::ctrl1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("control register 1 data 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
 
@@ -357,7 +357,7 @@ WRITE16_MEMBER(emerald_state::ctrl1_w)
 	COMBINE_DATA(&m_ctrl1);
 }
 
-WRITE16_MEMBER(turquoise_state::ctrl1_w)
+void turquoise_state::ctrl1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("control register 1 data 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
 
@@ -376,7 +376,7 @@ WRITE16_MEMBER(turquoise_state::ctrl1_w)
 	COMBINE_DATA(&m_ctrl1);
 }
 
-WRITE16_MEMBER(sapphire_state::ctrl1_w)
+void sapphire_state::ctrl1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("control register 1 data 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
 
@@ -391,7 +391,7 @@ WRITE16_MEMBER(sapphire_state::ctrl1_w)
 	COMBINE_DATA(&m_ctrl1);
 }
 
-WRITE16_MEMBER(emerald_state::ctrl2_w)
+void emerald_state::ctrl2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("control register 2 data 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
 	if (data & CTRL2_RESET)
@@ -404,7 +404,7 @@ WRITE16_MEMBER(emerald_state::ctrl2_w)
 		m_ctrl2 = (m_ctrl2 & ~CTRL2_WMASK) | (data & CTRL2_WMASK);
 }
 
-WRITE16_MEMBER(turquoise_state::ctrl2_w)
+void turquoise_state::ctrl2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("control register 2 data 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
 	if (data & CTRL2_RESET)
@@ -417,7 +417,7 @@ WRITE16_MEMBER(turquoise_state::ctrl2_w)
 		m_ctrl2 = (m_ctrl2 & ~CTRL2_WMASK) | (data & CTRL2_WMASK);
 }
 
-WRITE16_MEMBER(sapphire_state::ctrl2_w)
+void sapphire_state::ctrl2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("control register 2 data 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
 	if (data & CTRL2_RESET)
@@ -434,7 +434,7 @@ WRITE16_MEMBER(sapphire_state::ctrl2_w)
 	m_flash_msb->vpp(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ16_MEMBER(interpro_state::error_r)
+u16 interpro_state::error_r()
 {
 	const u16 result = m_error;
 
@@ -445,7 +445,7 @@ READ16_MEMBER(interpro_state::error_r)
 	return result;
 }
 
-READ32_MEMBER(interpro_state::unmapped_r)
+u32 interpro_state::unmapped_r(address_space &space, offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -453,13 +453,13 @@ READ32_MEMBER(interpro_state::unmapped_r)
 		m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 		// tell ioga to raise a bus error
-		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+		m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 	}
 
 	return space.unmap();
 }
 
-WRITE32_MEMBER(interpro_state::unmapped_w)
+void interpro_state::unmapped_w(offs_t offset, u32 data)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -467,40 +467,40 @@ WRITE32_MEMBER(interpro_state::unmapped_w)
 		m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 		// tell ioga to raise a bus error
-		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+		m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 	}
 }
 
-READ32_MEMBER(sapphire_state::unmapped_r)
+u32 sapphire_state::unmapped_r(address_space &space, offs_t offset)
 {
 	// check if non-existent memory errors are enabled
 	if (!machine().side_effects_disabled())
-		if (m_arbga->tctrl_r(space, offset, mem_mask) & interpro_arbga_device::TCTRL_ENNEM)
+		if (m_arbga->tctrl_r() & interpro_arbga_device::TCTRL_ENNEM)
 		{
 			// flag non-existent memory error in system error register
 			m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 			// tell ioga to raise a bus error
-			m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+			m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 		}
 
 	return space.unmap();
 }
 
-WRITE32_MEMBER(sapphire_state::unmapped_w)
+void sapphire_state::unmapped_w(offs_t offset, u32 data)
 {
 	// check if non-existent memory errors are enabled
-	if (m_arbga->tctrl_r(space, offset, mem_mask) & interpro_arbga_device::TCTRL_ENNEM)
+	if (m_arbga->tctrl_r() & interpro_arbga_device::TCTRL_ENNEM)
 	{
 		// flag non-existent memory error in system error register
 		m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 		// tell ioga to raise a bus error
-		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+		m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 	}
 }
 
-READ8_MEMBER(interpro_state::nodeid_r)
+u8 interpro_state::nodeid_r(address_space &space, offs_t offset)
 {
 	// FIXME: hard coded node id for now
 	switch (offset)
@@ -1003,8 +1003,7 @@ void sapphire_state::sapphire(machine_config &config)
 	INTERPRO_FMCC(config, m_mcga, 0);
 
 	// floppy controller
-	N82077AA(config, m_fdc, 24_MHz_XTAL);
-	m_fdc->set_mode(n82077aa_device::mode_t::PS2);
+	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);
 	m_fdc->intrq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 

@@ -21,7 +21,7 @@ void galpanic_state::galpanic_palette(palette_device &palette) const
 		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
-WRITE16_MEMBER(galpanic_state::bgvideoram_w)
+void galpanic_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_bgvideoram[offset]);
 

@@ -133,11 +133,11 @@ public:
 
 	uint8_t read_key(required_ioport_array<8> & key, uint8_t mask);
 
-	DECLARE_READ8_MEMBER(console_r);
-	DECLARE_WRITE8_MEMBER(console_w);
-	DECLARE_READ8_MEMBER(console_status_r);
+	uint8_t console_r();
+	void console_w(uint8_t data);
+	uint8_t console_status_r();
 
-	DECLARE_WRITE32_MEMBER(eeprom_93c46_w);
+	void eeprom_93c46_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_irq);
 
@@ -165,12 +165,12 @@ public:
 		m_st0020(*this, "st0020")
 	{ }
 
-	DECLARE_WRITE32_MEMBER(input_sel1_out3_w);
-	DECLARE_WRITE32_MEMBER(input_sel2_w);
-	DECLARE_READ32_MEMBER(p1_r);
-	DECLARE_READ32_MEMBER(p2_r);
-	DECLARE_WRITE32_MEMBER(out1_w);
-	DECLARE_WRITE32_MEMBER(out2_w);
+	void input_sel1_out3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void input_sel2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t p1_r();
+	uint32_t p2_r();
+	void out1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void out2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -193,22 +193,22 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_memory_bank m_soundbank;
 
-	DECLARE_WRITE32_MEMBER(eeprom_s29290_w);
+	void eeprom_s29290_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// ST-0016 <-> 68EC020
-	DECLARE_READ8_MEMBER(cmd1_r);
-	DECLARE_READ8_MEMBER(cmd2_r);
-	DECLARE_WRITE8_MEMBER(cmd1_w);
-	DECLARE_WRITE8_MEMBER(cmd2_w);
-	DECLARE_READ8_MEMBER(cmd_stat_r);
-	WRITE8_MEMBER(st0016_rom_bank_w); // temp?
+	uint8_t cmd1_r();
+	uint8_t cmd2_r();
+	void cmd1_w(uint8_t data);
+	void cmd2_w(uint8_t data);
+	uint8_t cmd_stat_r();
+	void st0016_rom_bank_w(uint8_t data); // temp?
 
 	// 68EC020 <-> ST-0016
-	DECLARE_READ32_MEMBER(cmd1_word_r);
-	DECLARE_READ32_MEMBER(cmd2_word_r);
-	DECLARE_WRITE32_MEMBER(cmd1_word_w);
-	DECLARE_WRITE32_MEMBER(cmd2_word_w);
-	DECLARE_READ32_MEMBER(cmd_stat_word_r);
+	uint32_t cmd1_word_r();
+	uint32_t cmd2_word_r();
+	void cmd1_word_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void cmd2_word_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cmd_stat_word_r();
 
 	void init_jclub2o();
 
@@ -245,12 +245,12 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE32_MEMBER(input_sel_w);
-	DECLARE_READ32_MEMBER(input_r);
-	DECLARE_WRITE32_MEMBER(out1_w);
+	void input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t input_r();
+	void out1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(tmapram_w);
-	DECLARE_WRITE32_MEMBER(tmapram2_w);
+	void tmapram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tmapram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
@@ -279,16 +279,16 @@ private:
 
 ***************************************************************************/
 
-READ8_MEMBER(common_state::console_r)
+uint8_t common_state::console_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(common_state::console_w)
+void common_state::console_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(common_state::console_status_r)
+uint8_t common_state::console_status_r()
 {
 	// bit 0: 1 = can send to   debug console
 	// bi1 1: 1 = can read from debug console
@@ -343,22 +343,22 @@ TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
 {
 	uint16_t tile     =   m_tmapram[tile_index] >> 16;
 	uint16_t color    =   m_tmapram[tile_index] & 0xffff;
-	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	tileinfo.set(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
 {
 	uint16_t tile     =   m_tmapram2[tile_index] >> 16;
 	uint16_t color    =   m_tmapram2[tile_index] & 0xffff;
-	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	tileinfo.set(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-WRITE32_MEMBER(darkhors_state::tmapram_w)
+void darkhors_state::tmapram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tmapram[offset]);
 	m_tmap->mark_tile_dirty(offset);
 }
-WRITE32_MEMBER(darkhors_state::tmapram2_w)
+void darkhors_state::tmapram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tmapram2[offset]);
 	m_tmap2->mark_tile_dirty(offset);
@@ -460,7 +460,7 @@ uint32_t darkhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // I/O (both older and newer jclub2 hardware)
 
-WRITE32_MEMBER(jclub2_state::input_sel2_w)
+void jclub2_state::input_sel2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// sometimes 0x80000000 bit is set
 	// (it is cleared before reading from 4d0000.b / 4d0004.b / 4d0008.b / 4d000c.b)
@@ -468,7 +468,7 @@ WRITE32_MEMBER(jclub2_state::input_sel2_w)
 		m_input_sel2 = data >> 16;
 }
 
-WRITE32_MEMBER(jclub2_state::input_sel1_out3_w)
+void jclub2_state::input_sel1_out3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_out3);
 
@@ -482,19 +482,19 @@ WRITE32_MEMBER(jclub2_state::input_sel1_out3_w)
 	}
 }
 
-READ32_MEMBER(jclub2_state::p1_r)
+uint32_t jclub2_state::p1_r()
 {
 	uint32_t ret = ioport("P1LOW")->read() & 0x00ffffff;
 	return ret | (read_key(m_key1, m_input_sel1) << 24);
 }
 
-READ32_MEMBER(jclub2_state::p2_r)
+uint32_t jclub2_state::p2_r()
 {
 	uint32_t ret = ioport("P2LOW")->read() & 0x00ffffff;
 	return ret | (read_key(m_key2, m_input_sel2) << 24);
 }
 
-WRITE32_MEMBER(jclub2_state::out1_w)
+void jclub2_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_out1);
 	if (ACCESSING_BITS_16_31)
@@ -520,7 +520,7 @@ WRITE32_MEMBER(jclub2_state::out1_w)
 	}
 }
 
-WRITE32_MEMBER(jclub2_state::out2_w)
+void jclub2_state::out2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_out2);
 	if (ACCESSING_BITS_16_31)
@@ -535,7 +535,7 @@ WRITE32_MEMBER(jclub2_state::out2_w)
 
 // Older hardware (ST-0020 + ST-0016) only
 
-WRITE32_MEMBER(jclub2o_state::eeprom_s29290_w)
+void jclub2o_state::eeprom_s29290_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xff000000)
 		logerror("%s: Unknown EEPROM bit written %08X\n", machine().describe_context(), data);
@@ -555,23 +555,23 @@ WRITE32_MEMBER(jclub2o_state::eeprom_s29290_w)
 
 // 68EC020 <-> ST-0016
 
-READ32_MEMBER(jclub2o_state::cmd1_word_r)
+uint32_t jclub2o_state::cmd1_word_r()
 {
 	m_cmd_stat &= ~0x02;
 	return m_cmd1 << 24;
 }
-READ32_MEMBER(jclub2o_state::cmd2_word_r)
+uint32_t jclub2o_state::cmd2_word_r()
 {
 	m_cmd_stat &= ~0x08;
 	return m_cmd2 << 24;
 }
 
-READ32_MEMBER(jclub2o_state::cmd_stat_word_r)
+uint32_t jclub2o_state::cmd_stat_word_r()
 {
 	return m_cmd_stat << 24;
 }
 
-WRITE32_MEMBER(jclub2o_state::cmd1_word_w)
+void jclub2o_state::cmd1_word_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -580,7 +580,7 @@ WRITE32_MEMBER(jclub2o_state::cmd1_word_w)
 		logerror("%s: cmd1_w %02x\n", machine().describe_context(), m_cmd1);
 	}
 }
-WRITE32_MEMBER(jclub2o_state::cmd2_word_w)
+void jclub2o_state::cmd2_word_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -640,33 +640,33 @@ void jclub2o_state::jclub2o_map(address_map &map)
 // ST-0016 map
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(jclub2o_state::st0016_rom_bank_w)
+void jclub2o_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x1f);
 }
 
-READ8_MEMBER(jclub2o_state::cmd1_r)
+uint8_t jclub2o_state::cmd1_r()
 {
 	m_cmd_stat &= ~0x01;
 	return m_cmd1;
 }
-READ8_MEMBER(jclub2o_state::cmd2_r)
+uint8_t jclub2o_state::cmd2_r()
 {
 	m_cmd_stat &= ~0x04;
 	return m_cmd2;
 }
-READ8_MEMBER(jclub2o_state::cmd_stat_r)
+uint8_t jclub2o_state::cmd_stat_r()
 {
 	return m_cmd_stat;
 }
 
-WRITE8_MEMBER(jclub2o_state::cmd1_w)
+void jclub2o_state::cmd1_w(uint8_t data)
 {
 	m_cmd1 = data;
 	m_cmd_stat |= 0x02;
 	logerror("%s: cmd1_w %02x\n", machine().describe_context(), m_cmd1);
 }
-WRITE8_MEMBER(jclub2o_state::cmd2_w)
+void jclub2o_state::cmd2_w(uint8_t data)
 {
 	m_cmd2 = data;
 	m_cmd_stat |= 0x08;
@@ -698,7 +698,7 @@ void jclub2o_state::st0016_io(address_map &map)
 
 // Newer hardware (ST-0032) only
 
-WRITE32_MEMBER(common_state::eeprom_93c46_w)
+void common_state::eeprom_93c46_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xff000000)
 		logerror("%s: Unknown EEPROM bit written %08X\n", machine().describe_context(), data);
@@ -760,7 +760,7 @@ void jclub2_state::jclub2_map(address_map &map)
 
 // bootleg darkhors hardware
 
-WRITE32_MEMBER(darkhors_state::input_sel_w)
+void darkhors_state::input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 		m_input_sel1 = data >> 16;
@@ -768,13 +768,13 @@ WRITE32_MEMBER(darkhors_state::input_sel_w)
 		m_input_sel2 = data >> 24;
 }
 
-READ32_MEMBER(darkhors_state::input_r)
+uint32_t darkhors_state::input_r()
 {
 	return  (read_key(m_key1, m_input_sel1) << 16) |
 			(read_key(m_key2, m_input_sel2) << 24) ;
 }
 
-WRITE32_MEMBER(darkhors_state::out1_w)
+void darkhors_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_out1);
 	if (ACCESSING_BITS_16_31)

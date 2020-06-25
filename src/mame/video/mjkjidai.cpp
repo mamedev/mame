@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 	int attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
 	int color = m_videoram[tile_index + 0x1000];
-	SET_TILE_INFO_MEMBER(0,code,color >> 3,0);
+	tileinfo.set(0,code,color >> 3,0);
 }
 
 
@@ -39,13 +39,13 @@ void mjkjidai_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
+void mjkjidai_state::mjkjidai_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
+void mjkjidai_state::mjkjidai_ctrl_w(uint8_t data)
 {
 //  logerror("%s: port c0 = %02x\n",m_maincpu->pc(),data);
 

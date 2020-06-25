@@ -117,7 +117,7 @@ void xor100_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( xor100_state::mmu_w )
+void xor100_state::mmu_w(uint8_t data)
 {
 	/*
 
@@ -139,7 +139,7 @@ WRITE8_MEMBER( xor100_state::mmu_w )
 	bankswitch();
 }
 
-WRITE8_MEMBER( xor100_state::prom_toggle_w )
+void xor100_state::prom_toggle_w(uint8_t data)
 {
 	switch (m_mode)
 	{
@@ -150,7 +150,7 @@ WRITE8_MEMBER( xor100_state::prom_toggle_w )
 	bankswitch();
 }
 
-READ8_MEMBER( xor100_state::prom_disable_r )
+uint8_t xor100_state::prom_disable_r()
 {
 	m_mode = EPROM_F800;
 
@@ -159,7 +159,7 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-READ8_MEMBER( xor100_state::fdc_wait_r )
+uint8_t xor100_state::fdc_wait_r()
 {
 	/*
 
@@ -187,7 +187,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	return m_fdc_irq ? 0x7f : 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dcont_w )
+void xor100_state::fdc_dcont_w(uint8_t data)
 {
 	/*
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 	if (floppy) floppy->mon_w(0);
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dsel_w )
+void xor100_state::fdc_dsel_w(uint8_t data)
 {
 	/*
 
@@ -365,7 +365,7 @@ WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(xor100_state::i8255_pc_r)
+uint8_t xor100_state::i8255_pc_r()
 {
 	/*
 
@@ -511,7 +511,7 @@ void xor100_state::xor100(machine_config &config)
 	brg.ft_handler().append(m_uart_b, FUNC(i8251_device::write_rxc));
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pb_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 	ppi.in_pc_callback().set(FUNC(xor100_state::i8255_pc_r));
 

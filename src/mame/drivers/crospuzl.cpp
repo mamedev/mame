@@ -71,12 +71,10 @@ private:
 	uint32_t   m_FlashAddr;
 	uint8_t    m_FlashShift;
 
-//  DECLARE_WRITE32_MEMBER(Banksw_w);
-	DECLARE_READ8_MEMBER(FlashCmd_r);
-	DECLARE_WRITE8_MEMBER(FlashCmd_w);
-	DECLARE_WRITE8_MEMBER(FlashAddr_w);
-
-	IRQ_CALLBACK_MEMBER(icallback);
+//  void Banksw_w(uint32_t data);
+	uint8_t FlashCmd_r();
+	void FlashCmd_w(uint8_t data);
+	void FlashAddr_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -85,20 +83,15 @@ private:
 	// PIO
 	uint32_t m_PIO;
 	uint32_t m_ddr;
-	DECLARE_READ32_MEMBER(PIOlddr_r);
-	DECLARE_WRITE32_MEMBER(PIOlddr_w);
-	DECLARE_READ32_MEMBER(PIOldat_r);
-	DECLARE_WRITE32_MEMBER(PIOldat_w);
-	DECLARE_READ32_MEMBER(PIOedat_r);
+	uint32_t PIOlddr_r();
+	void PIOlddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t PIOldat_r();
+	void PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t PIOedat_r();
 };
 
 
-IRQ_CALLBACK_MEMBER(crospuzl_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
-
-READ32_MEMBER(crospuzl_state::PIOedat_r)
+uint32_t crospuzl_state::PIOedat_r()
 {
 	// TODO: this needs fixing in serflash_device
 	// (has a laconic constant for the ready line)
@@ -106,7 +99,7 @@ READ32_MEMBER(crospuzl_state::PIOedat_r)
 		| (machine().rand() & 0x04000000); // serial ready line
 }
 
-READ8_MEMBER(crospuzl_state::FlashCmd_r)
+uint8_t crospuzl_state::FlashCmd_r()
 {
 	if ((m_FlashCmd & 0xff) == 0xff)
 	{
@@ -135,7 +128,7 @@ READ8_MEMBER(crospuzl_state::FlashCmd_r)
 	return 0;
 }
 
-WRITE8_MEMBER(crospuzl_state::FlashCmd_w)
+void crospuzl_state::FlashCmd_w(uint8_t data)
 {
 	m_FlashPrevCommand = m_FlashCmd;
 	m_FlashCmd = data;
@@ -144,7 +137,7 @@ WRITE8_MEMBER(crospuzl_state::FlashCmd_w)
 	logerror("%08x %08x CMD\n",m_FlashPrevCommand, m_FlashCmd);
 }
 
-WRITE8_MEMBER(crospuzl_state::FlashAddr_w)
+void crospuzl_state::FlashAddr_w(uint8_t data)
 {
 	m_FlashAddr |= data << (m_FlashShift*8);
 	m_FlashShift ++;
@@ -152,12 +145,12 @@ WRITE8_MEMBER(crospuzl_state::FlashAddr_w)
 		logerror("%08x %02x ADDR\n",m_FlashAddr,m_FlashShift);
 }
 
-READ32_MEMBER(crospuzl_state::PIOlddr_r)
+uint32_t crospuzl_state::PIOlddr_r()
 {
 	return m_ddr;
 }
 
-WRITE32_MEMBER(crospuzl_state::PIOlddr_w)
+void crospuzl_state::PIOlddr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (BIT(m_ddr, 19) != BIT(data, 19))
 		m_rtc->sda_w(BIT(data, 19) ? 1 : BIT(m_PIO, 19));
@@ -166,14 +159,14 @@ WRITE32_MEMBER(crospuzl_state::PIOlddr_w)
 	COMBINE_DATA(&m_ddr);
 }
 
-READ32_MEMBER(crospuzl_state::PIOldat_r)
+uint32_t crospuzl_state::PIOldat_r()
 {
 	return m_PIO;
 }
 
 // PIO Latched output DATa Register
 // TODO: change me
-WRITE32_MEMBER(crospuzl_state::PIOldat_w)
+void crospuzl_state::PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!BIT(m_ddr, 19))
 		m_rtc->sda_w(BIT(data, 19));
@@ -364,7 +357,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
 	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::crospuzl_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(crospuzl_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

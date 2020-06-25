@@ -6,20 +6,23 @@
 
 #pragma once
 
+#include "necdasm.h"
 
 #define NEC_INPUT_LINE_POLL 20
 
 enum
 {
 	NEC_PC=0,
-	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
-	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
+	NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
+	NEC_DS1, NEC_PS, NEC_SS, NEC_DS0,
+	NEC_AL, NEC_AH, NEC_CL, NEC_CH, NEC_DL, NEC_DH, NEC_BL, NEC_BH,
+	NEC_PSW,
 	NEC_XA,
 	NEC_PENDING
 };
 
 
-class nec_common_device : public cpu_device
+class nec_common_device : public cpu_device, public nec_disassembler::config
 {
 	friend class device_v5x_interface;
 
@@ -50,6 +53,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return m_MF; };
 
 	virtual u8 io_read_byte(offs_t a) { return m_io->read_byte(a); }
 	virtual u16 io_read_word(offs_t a) { return m_io->read_word_unaligned(a); }
@@ -75,6 +79,7 @@ private:
 	uint16_t  m_sregs[4];
 
 	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;
@@ -97,6 +102,9 @@ private:
 	uint8_t   m_halted;
 
 	address_space *m_program;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	std::function<u8 (offs_t address)> m_dr8;
 	address_space *m_io;
 	int     m_icount;
@@ -115,10 +123,12 @@ private:
 	uint16_t m_E16;
 
 	uint32_t m_debugger_temp;
+	uint8_t m_em;
 
 	typedef void (nec_common_device::*nec_ophandler)();
 	typedef uint32_t (nec_common_device::*nec_eahandler)();
 	static const nec_ophandler s_nec_instruction[256];
+	static const nec_ophandler s_nec80_instruction[256];
 	static const nec_eahandler s_GetEA[192];
 
 protected:
@@ -410,6 +420,252 @@ private:
 	uint32_t EA_205();
 	uint32_t EA_206();
 	uint32_t EA_207();
+
+	void i_nop_80();
+	void i_lxib_80();
+	void i_staxb_80();
+	void i_inxb_80();
+	void i_inrb_80();
+	void i_dcrb_80();
+	void i_mvib_80();
+	void i_rlc_80();
+	void i_dadb_80();
+	void i_ldaxb_80();
+	void i_dcxb_80();
+	void i_inrc_80();
+	void i_dcrc_80();
+	void i_mvic_80();
+	void i_rrc_80();
+	void i_lxid_80();
+	void i_staxd_80();
+	void i_inxd_80();
+	void i_inrd_80();
+	void i_dcrd_80();
+	void i_mvid_80();
+	void i_ral_80();
+	void i_dadd_80();
+	void i_ldaxd_80();
+	void i_dcxd_80();
+	void i_inre_80();
+	void i_dcre_80();
+	void i_mvie_80();
+	void i_rar_80();
+	void i_lxih_80();
+	void i_shld_80();
+	void i_inxh_80();
+	void i_inrh_80();
+	void i_dcrh_80();
+	void i_mvih_80();
+	void i_daa_80();
+	void i_dadh_80();
+	void i_lhld_80();
+	void i_dcxh_80();
+	void i_inrl_80();
+	void i_dcrl_80();
+	void i_mvil_80();
+	void i_cma_80();
+	void i_lxis_80();
+	void i_sta_80();
+	void i_inxs_80();
+	void i_inrm_80();
+	void i_dcrm_80();
+	void i_mvim_80();
+	void i_stc_80();
+	void i_dads_80();
+	void i_lda_80();
+	void i_dcxs_80();
+	void i_inra_80();
+	void i_dcra_80();
+	void i_mvia_80();
+	void i_cmc_80();
+	void i_movbb_80();
+	void i_movbc_80();
+	void i_movbd_80();
+	void i_movbe_80();
+	void i_movbh_80();
+	void i_movbl_80();
+	void i_movbm_80();
+	void i_movba_80();
+	void i_movcb_80();
+	void i_movcc_80();
+	void i_movcd_80();
+	void i_movce_80();
+	void i_movch_80();
+	void i_movcl_80();
+	void i_movcm_80();
+	void i_movca_80();
+	void i_movdb_80();
+	void i_movdc_80();
+	void i_movdd_80();
+	void i_movde_80();
+	void i_movdh_80();
+	void i_movdl_80();
+	void i_movdm_80();
+	void i_movda_80();
+	void i_moveb_80();
+	void i_movec_80();
+	void i_moved_80();
+	void i_movee_80();
+	void i_moveh_80();
+	void i_movel_80();
+	void i_movem_80();
+	void i_movea_80();
+	void i_movhb_80();
+	void i_movhc_80();
+	void i_movhd_80();
+	void i_movhe_80();
+	void i_movhh_80();
+	void i_movhl_80();
+	void i_movhm_80();
+	void i_movha_80();
+	void i_movlb_80();
+	void i_movlc_80();
+	void i_movld_80();
+	void i_movle_80();
+	void i_movlh_80();
+	void i_movll_80();
+	void i_movlm_80();
+	void i_movla_80();
+	void i_movmb_80();
+	void i_movmc_80();
+	void i_movmd_80();
+	void i_movme_80();
+	void i_movmh_80();
+	void i_movml_80();
+	void i_hlt_80();
+	void i_movma_80();
+	void i_movab_80();
+	void i_movac_80();
+	void i_movad_80();
+	void i_movae_80();
+	void i_movah_80();
+	void i_moval_80();
+	void i_movam_80();
+	void i_movaa_80();
+	void i_addb_80();
+	void i_addc_80();
+	void i_addd_80();
+	void i_adde_80();
+	void i_addh_80();
+	void i_addl_80();
+	void i_addm_80();
+	void i_adda_80();
+	void i_adcb_80();
+	void i_adcc_80();
+	void i_adcd_80();
+	void i_adce_80();
+	void i_adch_80();
+	void i_adcl_80();
+	void i_adcm_80();
+	void i_adca_80();
+	void i_subb_80();
+	void i_subc_80();
+	void i_subd_80();
+	void i_sube_80();
+	void i_subh_80();
+	void i_subl_80();
+	void i_subm_80();
+	void i_suba_80();
+	void i_sbbb_80();
+	void i_sbbc_80();
+	void i_sbbd_80();
+	void i_sbbe_80();
+	void i_sbbh_80();
+	void i_sbbl_80();
+	void i_sbbm_80();
+	void i_sbba_80();
+	void i_anab_80();
+	void i_anac_80();
+	void i_anad_80();
+	void i_anae_80();
+	void i_anah_80();
+	void i_anal_80();
+	void i_anam_80();
+	void i_anaa_80();
+	void i_xrab_80();
+	void i_xrac_80();
+	void i_xrad_80();
+	void i_xrae_80();
+	void i_xrah_80();
+	void i_xral_80();
+	void i_xram_80();
+	void i_xraa_80();
+	void i_orab_80();
+	void i_orac_80();
+	void i_orad_80();
+	void i_orae_80();
+	void i_orah_80();
+	void i_oral_80();
+	void i_oram_80();
+	void i_oraa_80();
+	void i_cmpb_80();
+	void i_cmpc_80();
+	void i_cmpd_80();
+	void i_cmpe_80();
+	void i_cmph_80();
+	void i_cmpl_80();
+	void i_cmpm_80();
+	void i_cmpa_80();
+	void i_rnz_80();
+	void i_popb_80();
+	void i_jnz_80();
+	void i_jmp_80();
+	void i_cnz_80();
+	void i_pushb_80();
+	void i_adi_80();
+	void i_rst0_80();
+	void i_rz_80();
+	void i_ret_80();
+	void i_jz_80();
+	void i_cz_80();
+	void i_call_80();
+	void i_aci_80();
+	void i_rst1_80();
+	void i_rnc_80();
+	void i_popd_80();
+	void i_jnc_80();
+	void i_out_80();
+	void i_cnc_80();
+	void i_pushd_80();
+	void i_sui_80();
+	void i_rst2_80();
+	void i_rc_80();
+	void i_jc_80();
+	void i_in_80();
+	void i_cc_80();
+	void i_sbi_80();
+	void i_rst3_80();
+	void i_rpo_80();
+	void i_poph_80();
+	void i_jpo_80();
+	void i_xthl_80();
+	void i_cpo_80();
+	void i_pushh_80();
+	void i_ani_80();
+	void i_rst4_80();
+	void i_rpe_80();
+	void i_pchl_80();
+	void i_jpe_80();
+	void i_xchg_80();
+	void i_cpe_80();
+	void i_calln_80();
+	void i_xri_80();
+	void i_rst5_80();
+	void i_rp_80();
+	void i_popf_80();
+	void i_jp_80();
+	void i_di_80();
+	void i_cp_80();
+	void i_pushf_80();
+	void i_ori_80();
+	void i_rst6_80();
+	void i_rm_80();
+	void i_sphl_80();
+	void i_jm_80();
+	void i_ei_80();
+	void i_cm_80();
+	void i_cpi_80();
+	void i_rst7_80();
 };
 
 

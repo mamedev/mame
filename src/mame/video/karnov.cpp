@@ -32,7 +32,7 @@ uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 {
 	int tile = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile & 0xfff,
 			tile >> 14,
 			0);
@@ -41,13 +41,13 @@ TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 TILE_GET_INFO_MEMBER(karnov_state::get_bg_tile_info)
 {
 	int tile = m_pf_data[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile & 0x7ff,
 			tile >> 12,
 			0);
 }
 
-WRITE16_MEMBER(karnov_state::videoram_w)
+void karnov_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);

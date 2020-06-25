@@ -68,29 +68,29 @@ void o2_rom_device::write_bank(int bank)
 	m_bank_base = bank;
 }
 
-READ8_MEMBER(o2_rom_device::read_rom04)
+uint8_t o2_rom_device::read_rom04(offs_t offset)
 {
 	return m_rom[(offset + (m_bank_base & 0x03) * 0x800) & (m_rom_size - 1)];
 }
-READ8_MEMBER(o2_rom_device::read_rom0c)
+uint8_t o2_rom_device::read_rom0c(offs_t offset)
 {
 	return m_rom[(offset + (m_bank_base & 0x03) * 0x800) & (m_rom_size - 1)];
 }
 
-READ8_MEMBER(o2_rom12_device::read_rom04)
+uint8_t o2_rom12_device::read_rom04(offs_t offset)
 {
 	return m_rom[offset + (m_bank_base & 0x03) * 0xc00];
 }
-READ8_MEMBER(o2_rom12_device::read_rom0c)
+uint8_t o2_rom12_device::read_rom0c(offs_t offset)
 {
 	return m_rom[offset + 0x800 + (m_bank_base & 0x03) * 0xc00];
 }
 
-READ8_MEMBER(o2_rom16_device::read_rom04)
+uint8_t o2_rom16_device::read_rom04(offs_t offset)
 {
 	return m_rom[offset + 0x400 + (m_bank_base & 0x03) * 0x1000];
 }
-READ8_MEMBER(o2_rom16_device::read_rom0c)
+uint8_t o2_rom16_device::read_rom0c(offs_t offset)
 {
 	return m_rom[offset + 0xc00 + (m_bank_base & 0x03) * 0x1000];
 }

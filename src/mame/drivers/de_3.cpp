@@ -42,35 +42,35 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_READ8_MEMBER(pia2c_pb_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void pia34_pa_w(uint8_t data);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	void pia2c_pa_w(uint8_t data);
+	uint8_t pia2c_pb_r();
+	void pia2c_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
-	DECLARE_READ8_MEMBER(pia28_w7_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { }
+	uint8_t pia28_w7_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { }
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE8_MEMBER(sol2_w) { } // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(dac_w) { }
+	void sol2_w(uint8_t data) { } // solenoids 8-15
+	void sol3_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void dac_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_READ8_MEMBER(dmd_status_r);
+	uint8_t dmd_status_r();
 
-//  DECLARE_READ8_MEMBER(sound_latch_r);
-//  DECLARE_WRITE8_MEMBER(sample_bank_w);
+//  uint8_t sound_latch_r();
+//  void sample_bank_w(uint8_t data);
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
+	void lamps_w(offs_t offset, uint8_t data);
 
 	void de_3(machine_config &config);
 
@@ -166,11 +166,11 @@ static INPUT_PORTS_START( de_3 )
 INPUT_PORTS_END
 
 // 6821 PIA at 0x2000
-WRITE8_MEMBER( de_3_state::sol3_w )
+void de_3_state::sol3_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( de_3_state::sound_w )
+void de_3_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
@@ -184,13 +184,13 @@ WRITE_LINE_MEMBER( de_3_state::pia21_ca2_w )
 }
 
 // 6821 PIA at 0x2400
-WRITE8_MEMBER( de_3_state::lamp0_w )
+void de_3_state::lamp0_w(uint8_t data)
 {
 }
 
 
 // 6821 PIA at 0x2800
-WRITE8_MEMBER( de_3_state::dig0_w )
+void de_3_state::dig0_w(uint8_t data)
 {
 //  static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 //  data &= 0x7f;
@@ -201,7 +201,7 @@ WRITE8_MEMBER( de_3_state::dig0_w )
 //  m_segment2 = 0;
 }
 
-WRITE8_MEMBER( de_3_state::dig1_w )
+void de_3_state::dig1_w(uint8_t data)
 {
 //  m_segment2 |= data;
 //  m_segment2 |= 0x30000;
@@ -215,7 +215,7 @@ WRITE8_MEMBER( de_3_state::dig1_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::pia28_w7_r )
+uint8_t de_3_state::pia28_w7_r()
 {
 	uint8_t ret = 0x80;
 
@@ -226,17 +226,17 @@ READ8_MEMBER( de_3_state::pia28_w7_r )
 }
 
 // 6821 PIA at 0x2c00
-WRITE8_MEMBER( de_3_state::pia2c_pa_w )
+void de_3_state::pia2c_pa_w(uint8_t data)
 {
 	/* DMD data */
 	if(m_dmdtype2)
 	{
-		m_dmdtype2->data_w(space,offset,data);
+		m_dmdtype2->data_w(data);
 		logerror("DMD: Data write %02x\n", data);
 	}
 	else if(m_dmdtype1)
 	{
-		m_dmdtype1->data_w(space,offset,data);
+		m_dmdtype1->data_w(data);
 		logerror("DMD: Data write %02x\n", data);
 	}
 //  m_segment1 |= (data<<8);
@@ -248,26 +248,26 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::pia2c_pb_r )
+uint8_t de_3_state::pia2c_pb_r()
 {
 	if(m_dmdtype1)
-		return m_dmdtype1->busy_r(space,offset);
+		return m_dmdtype1->busy_r();
 	if(m_dmdtype2)
-		return m_dmdtype2->busy_r(space,offset);
+		return m_dmdtype2->busy_r();
 	return 0;
 }
 
-WRITE8_MEMBER( de_3_state::pia2c_pb_w )
+void de_3_state::pia2c_pb_w(uint8_t data)
 {
 	/* DMD ctrl */
 	if(m_dmdtype2)
 	{
-		m_dmdtype2->ctrl_w(space,offset,data);
+		m_dmdtype2->ctrl_w(data);
 		logerror("DMD: Control write %02x\n", data);
 	}
 	else if(m_dmdtype1)
 	{
-		m_dmdtype1->ctrl_w(space,offset,data);
+		m_dmdtype1->ctrl_w(data);
 		logerror("DMD: Control write %02x\n", data);
 	}
 
@@ -282,14 +282,14 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 
 
 // 6821 PIA at 0x3000
-READ8_MEMBER( de_3_state::switch_r )
+uint8_t de_3_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_3_state::switch_w )
+void de_3_state::switch_w(uint8_t data)
 {
 	int x;
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER( de_3_state::switch_w )
 }
 
 // 6821 PIA at 0x3400
-WRITE8_MEMBER( de_3_state::pia34_pa_w )
+void de_3_state::pia34_pa_w(uint8_t data)
 {
 	// Not connected?
 //  m_segment2 |= (data<<8);
@@ -314,67 +314,67 @@ WRITE8_MEMBER( de_3_state::pia34_pa_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::dmd_status_r )
+uint8_t de_3_state::dmd_status_r()
 {
 	if(m_dmdtype1)
 	{
-		return m_dmdtype1->status_r(space,offset);
+		return m_dmdtype1->status_r();
 	}
 	else if(m_dmdtype2)
 	{
-		return m_dmdtype2->status_r(space,offset);
+		return m_dmdtype2->status_r();
 	}
 	return 0;
 }
 
-READ8_MEMBER(de_3_state::display_r)
+uint8_t de_3_state::display_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
 	switch(offset)
 	{
 	case 0:
-		ret = pia28_w7_r(space,0);
+		ret = pia28_w7_r();
 		break;
 	case 3:
-		ret = pia2c_pb_r(space,0);
+		ret = pia2c_pb_r();
 		break;
 	}
 
 	return ret;
 }
 
-WRITE8_MEMBER(de_3_state::display_w)
+void de_3_state::display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		dig0_w(space,0,data);
+		dig0_w(data);
 		break;
 	case 1:
-		dig1_w(space,0,data);
+		dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-		pia34_pa_w(space,0,data);
+		pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_3_state::lamps_w)
+void de_3_state::lamps_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		lamp0_w(space,0,data);
+		lamp0_w(data);
 		break;
 	case 1:
-		lamp1_w(space,0,data);
+		lamp1_w(data);
 		break;
 	}
 }
@@ -1093,6 +1093,20 @@ ROM_START(stwr_102)
 	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
 ROM_END
 
+ROM_START(stwr_101)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("starcpu.101", 0x0000, 0x10000, CRC(6efc7b14) SHA1(f669669fbd8733d06b386ea352fdb2041bf98362))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("stardisp_u14.102", 0x00000, 0x40000, CRC(f8087364) SHA1(4cd66b72cf430018cfb7ac8306b96a8499d41896))
+	ROM_LOAD("stardisp_u12.102", 0x40000, 0x40000, CRC(fde126c6) SHA1(0a3eacfd4589ee0f26c4212ba9948dff061f3338))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("s-wars.u7", 0x8000, 0x8000, CRC(cefa19d5) SHA1(7ddf9cc85ab601514305bc46083a07a3d087b286))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("s-wars.u17", 0x000000, 0x80000, CRC(7950a147) SHA1(f5bcd5cf6b35f9e4f14d62b084495c3a743d92a1))
+	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
+ROM_END
+
 ROM_START(stwr_e12)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("starcpue.102", 0x0000, 0x10000, CRC(b441abd3) SHA1(42cab6e16be8e25a68b2db30f53ba516bbb8741d))
@@ -1362,6 +1376,7 @@ GAME(1992,  stwr_103,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1992,  stwr_g11,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01 Germany)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_a14,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (Display Rev.1.04)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_102,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.02)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_101,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_e12,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.02 England)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_303,  0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Tales From the Crypt (3.03)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_302,  tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Tales From the Crypt (3.02 Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)

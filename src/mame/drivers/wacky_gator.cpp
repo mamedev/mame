@@ -55,22 +55,22 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	DECLARE_WRITE8_MEMBER(sample_ctrl_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl1_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl2_w);
+	void sample_ctrl_w(uint8_t data);
+	void alligators_ctrl1_w(uint8_t data);
+	void alligators_ctrl2_w(uint8_t data);
 
 	void set_lamps(int p, uint8_t value);
-	DECLARE_WRITE8_MEMBER(status_lamps_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(timing_lamps_w) { set_lamps((N + 1) << 3, data); }
+	void status_lamps_w(uint8_t data);
+	template <unsigned N> void timing_lamps_w(uint8_t data) { set_lamps((N + 1) << 3, data); }
 
 	void set_digits(int p, uint8_t value);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(disp_w) { set_digits(N << 1, data); }
+	template <unsigned N> void disp_w(uint8_t data) { set_digits(N << 1, data); }
 
 	void pmm8713_ck(int i, int state);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
 
-	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
-	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
+	void irq_ack_w(uint8_t data)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
+	void firq_ack_w(uint8_t data)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
@@ -94,7 +94,7 @@ private:
 };
 
 
-WRITE8_MEMBER(wackygtr_state::status_lamps_w)
+void wackygtr_state::status_lamps_w(uint8_t data)
 {
 	/*
 	    ---x xxxx   status lamps
@@ -109,7 +109,7 @@ WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 	m_ticket->motor_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
+void wackygtr_state::sample_ctrl_w(uint8_t data)
 {
 	/*
 	    --xx xxxx    sample index
@@ -123,7 +123,7 @@ WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
 	m_msm->reset_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
+void wackygtr_state::alligators_ctrl1_w(uint8_t data)
 {
 	m_pit8253[0]->write_gate0(BIT(data, 0));
 	m_pit8253[0]->write_gate1(BIT(data, 1));
@@ -134,7 +134,7 @@ WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl2_w)
+void wackygtr_state::alligators_ctrl2_w(uint8_t data)
 {
 	/*
 	    ---- ---x    PMM8713 0 U/D
@@ -253,7 +253,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}

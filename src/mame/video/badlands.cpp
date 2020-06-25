@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -82,7 +82,7 @@ VIDEO_START_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-WRITE16_MEMBER( badlands_state::badlands_pf_bank_w )
+void badlands_state::badlands_pf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		if (m_playfield_tile_bank != (data & 1))

@@ -78,7 +78,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	}
 
 	// recompute the children
-	set_cpu(*machine().debugger().cpu().get_visible_cpu());
+	set_cpu(*machine().debugger().console().get_visible_cpu());
 
 	// mark the edit box as the default focus and set it
 	editwin_info::set_default_focus();
@@ -94,7 +94,6 @@ cleanup:
 consolewin_info::~consolewin_info()
 {
 }
-
 
 void consolewin_info::set_cpu(device_t &device)
 {
@@ -482,7 +481,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 void consolewin_info::process_string(std::string const &string)
 {
 	if (string.empty()) // an empty string is a single step
-		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
+		machine().debugger().console().get_visible_cpu()->debug()->single_step();
 	else                // otherwise, just process the command
 		machine().debugger().console().execute_command(string, true);
 

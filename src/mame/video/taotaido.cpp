@@ -15,7 +15,7 @@ zooming might be wrong (only used on title logo?)
 #include "screen.h"
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
-WRITE8_MEMBER(taotaido_state::spritebank_w)
+void taotaido_state::spritebank_w(offs_t offset, uint8_t data)
 {
 	m_spritebank[offset] = data;
 }
@@ -26,7 +26,7 @@ WRITE8_MEMBER(taotaido_state::spritebank_w)
 
 /* the tilemap */
 
-WRITE16_MEMBER(taotaido_state::tileregs_w)
+void taotaido_state::tileregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -51,7 +51,7 @@ WRITE16_MEMBER(taotaido_state::tileregs_w)
 	}
 }
 
-WRITE16_MEMBER(taotaido_state::bgvideoram_w)
+void taotaido_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 
 	code |= m_bgbank[bank] << 9;
 
-	SET_TILE_INFO_MEMBER(1, code, col, 0);
+	tileinfo.set(1, code, col, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
