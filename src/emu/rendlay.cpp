@@ -17,6 +17,7 @@
 #include "rendutil.h"
 #include "vecstream.h"
 #include "xmlfile.h"
+#include "aviio.h"
 
 #include <cctype>
 #include <algorithm>
@@ -846,6 +847,7 @@ public:
 
 layout_element::make_component_map const layout_element::s_make_component{
 	{ "image",         &make_component<image_component>         },
+	{ "video",         &make_component<video_component>         },
 	{ "text",          &make_component<text_component>          },
 	{ "dotmatrix",     &make_dotmatrix_component<8>             },
 	{ "dotmatrix5dot", &make_dotmatrix_component<5>             },
@@ -881,7 +883,10 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 	{
 		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
 		if (make_func == s_make_component.end())
+		{
+			printf("unknown element component %s\n", compnode->get_name()); fflush(stdout);
 			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
+		}
 
 		// insert the new component into the list
 		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode, dirname)));
@@ -1223,7 +1228,6 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 		}
 }
 
-
 // image
 class layout_element::image_component : public component
 {
@@ -1305,6 +1309,92 @@ private:
 	bool                m_hasalpha;                 // is there any alpha component present?
 };
 
+
+// video
+class layout_element::video_component : public component
+{
+public:
+	// construction/destruction
+	video_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+		: component(env, compnode, dirname)
+		, m_frame(0)
+		, m_max_frames(0)
+		, m_playing(false)
+	{
+		if (dirname != nullptr)
+			m_dirname = dirname;
+		m_videofile = env.get_attribute_string(compnode, "file", "");
+		m_file = std::make_unique<emu_file>(env.machine().options().art_path(), OPEN_FLAG_READ);
+	}
+
+protected:
+	// overrides
+	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
+	{
+		if ((!m_video || m_max_frames == 0) && m_playing)
+			load_video();
+
+		if (!m_playing)
+			return;
+
+		avi_file::error err = m_video->read_uncompressed_video_frame(m_frame, m_bitmap);
+		if (err != avi_file::error::NONE)
+		{
+			m_playing = false;
+			return;
+		}
+
+		bitmap_argb32 destsub(dest, bounds);
+		render_resample_argb_bitmap_hq(destsub, m_bitmap, color());
+
+		m_frame++;
+		if (m_frame >= m_max_frames)
+			m_frame = 0;
+	}
+
+private:
+	// internal helpers
+	void load_video()
+	{
+		assert(m_file != nullptr);
+
+		bool success = render_detect_and_open_video(*m_file, m_dirname.c_str(), m_videofile.c_str(), m_video);
+		if (!success)
+		{
+			m_playing = false;
+			return;
+		}
+
+		const avi_file::movie_info &info = m_video->get_movie_info();
+
+		m_bitmap.allocate(info.video_width, info.video_height);
+		m_max_frames = info.video_numsamples;
+
+		// if we can't load the video or we have an invalid bitmap, allocate a dummy one and report an error
+		if (!m_video || !m_bitmap.valid())
+		{
+			m_playing = false;
+
+			// log an error
+			osd_printf_warning("Unable to load component video '%s'\n", m_videofile);
+		}
+		else
+		{
+			m_playing = true;
+			m_frame = 0;
+		}
+	}
+
+	// internal state
+	std::unique_ptr<avi_file>	m_video;		// source video
+	bitmap_argb32				m_bitmap;		// source bitmap for blitting
+	std::string         		m_dirname;		// directory name of image file (for lazy loading)
+	std::unique_ptr<emu_file>	m_file;			// file object for reading image/alpha files
+	std::string         		m_videofile;	// name of the image file (for lazy loading)
+	uint64_t					m_frame;		// current frame number
+	uint64_t					m_max_frames;	// maximum frame number
+	bool						m_playing;		// whether we're currently playing
+};
 
 // rectangle
 class layout_element::rect_component : public component
@@ -3206,7 +3296,10 @@ void layout_view::add_items(
 
 			group_map::iterator const found(groupmap.find(ref));
 			if (groupmap.end() == found)
+			{
+				printf("unable to find group %s\n", ref); fflush(stdout);
 				throw layout_syntax_error(util::string_format("unable to find group %s", ref));
+			}
 			unresolved = false;
 			found->second.resolve_bounds(env, groupmap);
 
@@ -3253,6 +3346,7 @@ void layout_view::add_items(
 		}
 		else
 		{
+			printf("unknown view item %s\n", itemnode->get_name()); fflush(stdout);
 			throw layout_syntax_error(util::string_format("unknown view item %s", itemnode->get_name()));
 		}
 	}
@@ -3533,12 +3627,18 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 		// find the layout node
 		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
 		if (!mamelayoutnode)
+		{
+			printf("missing mamelayout node\n"); fflush(stdout);
 			throw layout_syntax_error("missing mamelayout node");
+		}
 
 		// validate the config data version
 		int const version = mamelayoutnode->get_attribute_int("version", 0);
 		if (version != LAYOUT_VERSION)
+		{
+			printf("%s\n", util::string_format("unsupported version %d", version).c_str());
 			throw layout_syntax_error(util::string_format("unsupported version %d", version));
+		}
 
 		// parse all the parameters, elements and groups
 		group_map groupmap;
@@ -3557,6 +3657,7 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 			}
 			catch (layout_reference_error const &err)
 			{
+				printf("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name", ""), err.what()); fflush(stdout);
 				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name", ""), err.what());
 			}
 		}

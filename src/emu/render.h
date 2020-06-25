@@ -623,6 +623,7 @@ private:
 
 	// component implementations
 	class image_component;
+	class video_component;
 	class rect_component;
 	class disk_component;
 	class text_component;

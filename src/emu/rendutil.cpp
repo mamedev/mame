@@ -12,6 +12,7 @@
 #include "render.h"
 #include "rendutil.h"
 #include "png.h"
+#include "aviio.h"
 
 #include "jpeglib.h"
 
@@ -827,4 +828,26 @@ ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char
 
 	file.close();
 	return RENDUTIL_IMGFORMAT_UNKNOWN;
+}
+
+bool render_detect_and_open_video(emu_file &file, const char *dirname, const char *filename, std::unique_ptr<avi_file> &video)
+{
+	if (video)
+		return false;
+
+	// open the file
+	std::string fname;
+	if (dirname)
+		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
+	else
+		fname.assign(filename);
+	osd_file::error const filerr = file.open(fname);
+	if (filerr != osd_file::error::NONE)
+		return false;
+
+	avi_file::error err = avi_file::open(fname, video);
+	if (!video)
+		return false;
+
+	return (err == avi_file::error::NONE);
 }

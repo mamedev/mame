@@ -2052,7 +2052,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	{
 		if (parseerr.error_message)
 		{
-			osd_printf_warning(
+			printf(
 					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
 					filename,
 					parseerr.error_line,
@@ -2061,7 +2061,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		}
 		else
 		{
-			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+			printf("Error parsing XML file '%s', ignorning\n", filename);
 		}
 		return false;
 	}
@@ -2080,13 +2080,15 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 bool render_target::load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode)
 {
+	printf("Trying to load a layout file from %s\n", dirname); fflush(stdout);
 	// parse and catch any errors
 	try
 	{
 		m_filelist.emplace_back(device, rootnode, dirname);
 	}
-	catch (emu_fatalerror &)
+	catch (emu_fatalerror &err)
 	{
+		printf("HELL ASS PISS BITCH FUCK SHIT DAMN\n\n"); fflush(stdout);
 		return false;
 	}
 
