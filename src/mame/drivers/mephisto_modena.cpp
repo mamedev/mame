@@ -25,6 +25,8 @@ Hold Pawn + Knight buttons at boot for test mode.
 #include "mephisto_modena.lh"
 
 
+namespace {
+
 class modena_state : public driver_device
 {
 public:
@@ -216,6 +218,8 @@ ROM_START( modenab )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD("modena_4929_270192.u3", 0x0000, 0x8000, CRC(99212677) SHA1(f0565e5441fb38df201176d01793c953886b0303) )
 ROM_END
+
+} // anonymous namespace
 
 
 

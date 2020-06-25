@@ -11,7 +11,8 @@ Hardware notes:
 - 2*32KB ROM(TC57256AD-12), 1st ROM half-empty
 - 8KB battery-backed RAM(TC5564APL-15)
 - HD44100H, HD44780, 2*16 chars LCD screen
-- magnets chessboard with leds, 8 tri-color leds, beeper
+- 8 tri-color leds (not fully used: always outputs 6 red, 2 green)
+- magnets chessboard with leds, beeper
 
 Since the program is on an external module, it appears it was meant to be
 a modular chesscomputer. However, no extra modules were sold separately.
@@ -30,6 +31,8 @@ Module PCB is the same as Super Mondial II College, label HGS 10 116 05.
 
 #include "mephisto_academy.lh"
 
+
+namespace {
 
 class academy_state : public driver_device
 {
@@ -164,6 +167,8 @@ ROM_START( academyga )
 	ROM_LOAD("academy_16k_04.10.88", 0x0000, 0x8000, CRC(89055eaa) SHA1(4b3045a75b9107737db39a8c9ab9c15ec6b0ead6) )
 	ROM_LOAD("academy_32k_04.10.88", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256) )
 ROM_END
+
+} // anonymous namespace
 
 
 

@@ -30,6 +30,8 @@ Hardware:
 #include "mephisto_mondial68k.lh"
 
 
+namespace {
+
 class mondial68k_state : public driver_device
 {
 public:
@@ -222,6 +224,8 @@ ROM_START( mondl68k )
 	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
 	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
+
+} // anonymous namespace
 
 
 
