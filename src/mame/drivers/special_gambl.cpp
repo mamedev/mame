@@ -13,7 +13,10 @@
    8x KR565RU5(4164) DRAM,
    3x KR573RU10(HM6516) SRAM
 
-  Work in progress driver
+   How to enter statistics mode:
+    - press Test button, "CODE" text will appear
+    - repeat 4x times: press and hold Test button until "INPUT" text appears, release button
+   You may press "Clear stats" key few times to clear all the non-volatile play statistics.
 
 */
 
@@ -41,13 +44,25 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_vram(*this, "vram")
 		, m_hopper(*this, "hopper")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_sram_en(false)
+		, m_cold_boot(0)
 	{ }
 
 	void dice(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(test_mode);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(boot_r) { return m_cold_boot; }
+	DECLARE_INPUT_CHANGED_MEMBER(ram_test) { m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
+	enum
+	{
+		TIMER_COLD_BOOT
+	};
+
 	void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	void dice_palette(palette_device &palette) const;
 	u32 screen_update_dice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -62,8 +77,15 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_shared_ptr<u8> m_vram;
 	required_device<hopper_device> m_hopper;
+	output_finder<8> m_lamps;
+
+	void lamps_w(u8 data);
+	u8 ppi2a_r();
+	void ppi2c_w(u8 data);
 
 	std::unique_ptr<u8[]> m_sram;
+	bool m_sram_en;
+	int m_cold_boot;
 };
 
 
@@ -76,35 +98,49 @@ static INPUT_PORTS_START(dice)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH)   // 8 or more / double more
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL)   // start / double
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT) // payout / take
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6)       // 0 - clear SRAM at boot
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(dinaris_state, boot_r)
 
 	PORT_START("P1")
 	PORT_DIPNAME(0x01, 0x00, DEF_STR(Language))
 	PORT_DIPSETTING(0x00, DEF_STR(English))
 	PORT_DIPSETTING(0x01, "Russian")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) // CODE ?
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2) // ????
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Clear stats")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3) // reset
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON4)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_NAME("Reset")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE2) PORT_CHANGED_MEMBER(DEVICE_SELF, dinaris_state, test_mode, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE3) PORT_NAME("RAM Test") PORT_CHANGED_MEMBER(DEVICE_SELF, dinaris_state, ram_test, 0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(dinaris_state::test_mode)
+void dinaris_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_COLD_BOOT:
+		m_cold_boot = 1;
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in special_state::device_timer");
+	}
 }
 
 void dinaris_state::machine_start()
 {
+	m_lamps.resolve();
+
 	constexpr int size = 0x800; // actually used only 256 bytes
 	m_sram = std::make_unique<u8[]>(size);
 	m_nvram->set_base(&m_sram[0], size);
+
 	save_pointer(NAME(m_sram), size);
+	save_item(NAME(m_sram_en));
+	save_item(NAME(m_cold_boot));
+
+	timer_set(attotime::from_msec(100), TIMER_COLD_BOOT);
 }
 
 void dinaris_state::dice_mem(address_map &map)
@@ -120,6 +156,7 @@ void dinaris_state::dice_io(address_map &map)
 	map(0x00, 0x03).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0c, 0x0d).nopr(); // test mode access code, DIPSW maybe ?
 }
 
 // borrowed from Specialist MX, probably wrong
@@ -165,6 +202,32 @@ u32 dinaris_state::screen_update_dice(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+void dinaris_state::lamps_w(u8 data)
+{
+	// TODO identify each lamp
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
+}
+
+u8 dinaris_state::ppi2a_r()
+{
+	return m_sram_en ? m_sram[m_ppi2->pb_r()] : 0xff;
+}
+
+void dinaris_state::ppi2c_w(u8 data)
+{
+	if (!BIT(data, 2))
+		m_sram_en = true;
+
+	if (!BIT(data, 1))
+		m_sram_en = false;
+
+	if (!BIT(data, 0) && m_sram_en)
+		m_sram[m_ppi2->pb_r()] = m_ppi2->pa_r();
+
+	m_hopper->motor_w(((data & 0x68) == 0x60) ? 1 : 0);
+}
+
 void dinaris_state::dice(machine_config &config)
 {
 	// Basic machine hardware
@@ -200,15 +263,13 @@ void dinaris_state::dice(machine_config &config)
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("P0");
 	m_ppi->in_pb_callback().set_ioport("P1");
-	// TODO port C outputs
+	m_ppi->out_pc_callback().set(FUNC(dinaris_state::lamps_w));
 
 	I8255(config, m_ppi2);
-	m_ppi2->in_pa_callback().set([this] () { return m_sram[m_ppi2->pb_r()]; });
-	m_ppi2->out_pc_callback().set([this](u8 data) { if (!BIT(data, 0)) m_sram[m_ppi2->pb_r()] = m_ppi2->pa_r(); });
-	// TODO identify other port C bits
+	m_ppi2->in_pa_callback().set(FUNC(dinaris_state::ppi2a_r));
+	m_ppi2->out_pc_callback().set(FUNC(dinaris_state::ppi2c_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
@@ -217,4 +278,4 @@ ROM_START(dindice)
 	ROM_LOAD( "27256.bin", 0x0000, 0x8000, CRC(511f8ba8) SHA1(e75a2cab80ac6b08a19d1adb8ba9bb321aa5e7a8))
 ROM_END
 
-GAME( 199?, dindice, 0,    dice,     dice,     dinaris_state, empty_init, ROT0,  "Dinaris",   "Dice game", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_COLORS)
+GAME( 199?, dindice, 0,    dice,     dice,     dinaris_state, empty_init, ROT0,  "Dinaris",   "Dice game", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_COLORS)
