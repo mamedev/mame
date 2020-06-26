@@ -43,7 +43,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
 void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename);
 bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename, bool load_as_alpha_to_existing = false);
 ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char *filename);
-bool render_detect_and_open_video(emu_file &file, const char *dirname, const char *filename, std::unique_ptr<avi_file> &video);
+bool render_detect_and_open_video(emu_file &file, const char *artpath, const char *dirname, const char *filename, std::unique_ptr<avi_file> &video);
 
 
 

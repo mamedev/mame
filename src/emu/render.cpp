@@ -2088,7 +2088,7 @@ bool render_target::load_layout_file(device_t &device, const char *dirname, util
 	}
 	catch (emu_fatalerror &err)
 	{
-		printf("HELL ASS PISS BITCH FUCK SHIT DAMN\n\n"); fflush(stdout);
+		printf("HELL ASS PISS BITCH FUCK SHIT DAMN %s\n", err.what()); fflush(stdout);
 		return false;
 	}
 

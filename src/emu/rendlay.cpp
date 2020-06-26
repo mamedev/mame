@@ -889,7 +889,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 		}
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode, dirname)));
+		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode, machine().options().art_path(), dirname)));
 
 		// accumulate bounds
 		if (first)
@@ -1233,8 +1233,8 @@ class layout_element::image_component : public component
 {
 public:
 	// construction/destruction
-	image_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	image_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 		, m_hasalpha(false)
 	{
 		if (dirname != nullptr)
@@ -1315,11 +1315,12 @@ class layout_element::video_component : public component
 {
 public:
 	// construction/destruction
-	video_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	video_component(environment &env, util::xml::data_node const& compnode, const char *artname, const char* dirname)
+		: component(env, compnode, artname, dirname)
+		, m_environment(env)
 		, m_frame(0)
 		, m_max_frames(0)
-		, m_playing(false)
+		, m_playing(true)
 	{
 		if (dirname != nullptr)
 			m_dirname = dirname;
@@ -1358,7 +1359,7 @@ private:
 	{
 		assert(m_file != nullptr);
 
-		bool success = render_detect_and_open_video(*m_file, m_dirname.c_str(), m_videofile.c_str(), m_video);
+		bool success = render_detect_and_open_video(*m_file, artname(), m_dirname.c_str(), m_videofile.c_str(), m_video);
 		if (!success)
 		{
 			m_playing = false;
@@ -1386,9 +1387,11 @@ private:
 	}
 
 	// internal state
+	environment&				m_environment;
 	std::unique_ptr<avi_file>	m_video;		// source video
 	bitmap_argb32				m_bitmap;		// source bitmap for blitting
-	std::string         		m_dirname;		// directory name of image file (for lazy loading)
+	std::string         		m_dirname;		// directory name of image file
+	std::string         		m_artname;		// directory name of artwork files
 	std::unique_ptr<emu_file>	m_file;			// file object for reading image/alpha files
 	std::string         		m_videofile;	// name of the image file (for lazy loading)
 	uint64_t					m_frame;		// current frame number
@@ -1401,8 +1404,8 @@ class layout_element::rect_component : public component
 {
 public:
 	// construction/destruction
-	rect_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	rect_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -1447,8 +1450,8 @@ class layout_element::disk_component : public component
 {
 public:
 	// construction/destruction
-	disk_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	disk_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -1508,8 +1511,8 @@ class layout_element::text_component : public component
 {
 public:
 	// construction/destruction
-	text_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	text_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 		m_string = env.get_attribute_string(compnode, "string", "");
 		m_textalign = env.get_attribute_int(compnode, "align", 0);
@@ -1536,8 +1539,8 @@ class layout_element::led7seg_component : public component
 {
 public:
 	// construction/destruction
-	led7seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led7seg_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -1598,8 +1601,8 @@ class layout_element::led8seg_gts1_component : public component
 {
 public:
 	// construction/destruction
-	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -1666,8 +1669,8 @@ class layout_element::led14seg_component : public component
 {
 public:
 	// construction/destruction
-	led14seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led14seg_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -1778,8 +1781,8 @@ class layout_element::led16seg_component : public component
 {
 public:
 	// construction/destruction
-	led16seg_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led16seg_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -1900,8 +1903,8 @@ class layout_element::led14segsc_component : public component
 {
 public:
 	// construction/destruction
-	led14segsc_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led14segsc_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -2021,8 +2024,8 @@ class layout_element::led16segsc_component : public component
 {
 public:
 	// construction/destruction
-	led16segsc_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	led16segsc_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 	}
 
@@ -2152,8 +2155,8 @@ class layout_element::dotmatrix_component : public component
 {
 public:
 	// construction/destruction
-	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 		, m_dots(dots)
 	{
 	}
@@ -2193,8 +2196,8 @@ class layout_element::simplecounter_component : public component
 {
 public:
 	// construction/destruction
-	simplecounter_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	simplecounter_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 		, m_digits(env.get_attribute_int(compnode, "digits", 2))
 		, m_textalign(env.get_attribute_int(compnode, "align", 0))
 		, m_maxstate(env.get_attribute_int(compnode, "maxstate", 999))
@@ -2228,8 +2231,8 @@ class layout_element::reel_component : public component
 
 public:
 	// construction/destruction
-	reel_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-		: component(env, compnode, dirname)
+	reel_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
+		: component(env, compnode, artname, dirname)
 	{
 		for (auto & elem : m_hasalpha)
 			elem = false;
@@ -2651,9 +2654,9 @@ private:
 //-------------------------------------------------
 
 template <typename T>
-layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
 {
-	return std::make_unique<T>(env, compnode, dirname);
+	return std::make_unique<T>(env, compnode, artname, dirname);
 }
 
 
@@ -2663,9 +2666,9 @@ layout_element::component::ptr layout_element::make_component(environment &env, 
 //-------------------------------------------------
 
 template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char* artname, const char *dirname)
 {
-	return std::make_unique<dotmatrix_component>(D, env, compnode, dirname);
+	return std::make_unique<dotmatrix_component>(D, env, compnode, artname, dirname);
 }
 
 
@@ -2726,9 +2729,10 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //  component - constructor
 //-------------------------------------------------
 
-layout_element::component::component(environment &env, util::xml::data_node const &compnode, const char *dirname)
+layout_element::component::component(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname)
 	: m_state(env.get_attribute_int(compnode, "state", -1))
 	, m_color(env.parse_color(compnode.get_child("color")))
+	, m_artname(artname)
 {
 	env.parse_bounds(compnode.get_child("bounds"), m_bounds);
 }

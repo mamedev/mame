@@ -586,7 +586,7 @@ private:
 		typedef std::unique_ptr<component> ptr;
 
 		// construction/destruction
-		component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+		component(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname);
 		virtual ~component() = default;
 
 		// setup
@@ -597,6 +597,7 @@ private:
 		virtual int maxstate() const { return m_state; }
 		const render_bounds &bounds() const { return m_bounds; }
 		const render_color &color() const { return m_color; }
+		const char* artname() const { return m_artname; }
 
 		// operations
 		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
@@ -619,6 +620,7 @@ private:
 		int                 m_state;                    // state where this component is visible (-1 means all states)
 		render_bounds       m_bounds;                   // bounds of the element
 		render_color        m_color;                    // color of the element
+		const char*			m_artname;					// path to our artwork directory
 	};
 
 	// component implementations
@@ -655,13 +657,13 @@ private:
 		int                 m_state;        // associated state number
 	};
 
-	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname);
 	typedef std::map<std::string, make_component_func> make_component_map;
 
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
-	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname);
+	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname);
 
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 

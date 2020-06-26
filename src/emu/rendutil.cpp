@@ -830,7 +830,7 @@ ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char
 	return RENDUTIL_IMGFORMAT_UNKNOWN;
 }
 
-bool render_detect_and_open_video(emu_file &file, const char *dirname, const char *filename, std::unique_ptr<avi_file> &video)
+bool render_detect_and_open_video(emu_file &file, const char *artpath, const char *dirname, const char *filename, std::unique_ptr<avi_file> &video)
 {
 	if (video)
 		return false;
@@ -845,7 +845,13 @@ bool render_detect_and_open_video(emu_file &file, const char *dirname, const cha
 	if (filerr != osd_file::error::NONE)
 		return false;
 
-	avi_file::error err = avi_file::open(fname, video);
+	std::string fullname;
+	if (artpath)
+		fullname.assign(artpath).append(PATH_SEPARATOR).append(dirname).append(PATH_SEPARATOR).append(filename);
+	else
+		fullname.assign(fname);
+
+	avi_file::error err = avi_file::open(fullname, video);
 	if (!video)
 		return false;
 

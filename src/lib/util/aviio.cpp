@@ -367,7 +367,7 @@ public:
 
 	// Uncompressed helpers
 	avi_file::error uncompressed_rgb24_to_argb32(const std::uint8_t *data, std::uint32_t numbytes, bitmap_argb32 &bitmap) const;
-	avi_file::error uncompressed_yuv420p_to_argb32(const std::uint8_t *data, std::uint32_t numbytes, bitmap_argb32 &bitmap) const;
+	avi_file::error uncompressed_yuv420p_to_argb32(const std::uint8_t* data, std::uint32_t numbytes, bitmap_argb32& bitmap) const;
 
 private:
 	struct huffyuv_table
@@ -1056,30 +1056,54 @@ avi_file::error avi_stream::rgb32_compress_to_rgb(const bitmap_rgb32 &bitmap, st
 avi_file::error avi_stream::yuv_decompress_to_yuy16(const std::uint8_t *data, std::uint32_t numbytes, bitmap_yuy16 &bitmap) const
 {
 	auto const *const dataend = reinterpret_cast<const std::uint16_t *>(data + numbytes);
-	int x, y;
 
 	/* compressed video */
-	for (y = 0; y < m_height; y++)
+	for (int y = 0; y < m_height; y++)
 	{
-		const std::uint16_t *source = reinterpret_cast<const std::uint16_t *>(data) + y * m_width;
 		std::uint16_t *dest = &bitmap.pix16(y);
 
 		/* switch off the compression */
 		switch (m_format)
 		{
 		case FORMAT_UYVY:
-			for (x = 0; x < m_width && source < dataend; x++)
+		{
+			const std::uint16_t* source = reinterpret_cast<const std::uint16_t*>(data) + y * m_width;
+			for (int x = 0; x < m_width && source < dataend; x++)
 				*dest++ = *source++;
 			break;
+		}
+
+		case FORMAT_Y42B:
+		{
+			const uint32_t y_size = m_width * m_height;
+			const uint32_t y_start = m_width * y;
+			const uint32_t uv_size = (m_width >> 1) * (m_height >> 1);
+			const uint32_t uv_start = (m_width >> 1) * y;
+			const uint32_t u_start = y_size + uv_start;
+			const uint32_t v_start = y_size + uv_size + uv_start;
+			for (int x = 0; x < m_width; x += 2)
+			{
+				const uint8_t y0 = data[y_start + x];
+				const uint8_t y1 = data[y_start + x + 1];
+				const uint8_t u = data[u_start + (x >> 1)];
+				const uint8_t v = data[v_start + (x >> 1)];
+				*dest++ = ((uint16_t)y0 << 8) | u;
+				*dest++ = ((uint16_t)y1 << 8) | v;
+			}
+			break;
+		}
 
 		case FORMAT_VYUY:
 		case FORMAT_YUY2:
-			for (x = 0; x < m_width && source < dataend; x++)
+		{
+			const std::uint16_t* source = reinterpret_cast<const std::uint16_t*>(data) + y * m_width;
+			for (int x = 0; x < m_width && source < dataend; x++)
 			{
 				std::uint16_t pix = *source++;
 				*dest++ = (pix >> 8) | (pix << 8);
 			}
 			break;
+		}
 		}
 	}
 
@@ -1686,7 +1710,12 @@ avi_file::error avi_file_impl::read_uncompressed_video_frame(std::uint32_t frame
 	if (!stream)
 		return error::INVALID_STREAM;
 
-	if (stream->format() != FORMAT_UNCOMPRESSED && stream->format() != FORMAT_DIB && stream->format() != FORMAT_RGB && stream->format() != FORMAT_RAW && stream->format() != FORMAT_I420)
+	if (stream->format() != FORMAT_UNCOMPRESSED &&
+		stream->format() != FORMAT_DIB &&
+		stream->format() != FORMAT_RGB &&
+		stream->format() != FORMAT_RAW &&
+		stream->format() != FORMAT_I420 &&
+		stream->format() != FORMAT_Y42B)
 		return error::UNSUPPORTED_VIDEO_FORMAT;
 
 	if (bitmap.width() < stream->width() || bitmap.height() < stream->height())
@@ -1717,10 +1746,16 @@ avi_file::error avi_file_impl::read_uncompressed_video_frame(std::uint32_t frame
 	if (chunkid == get_chunkid_for_stream(stream))
 	{
 		/* uncompressed YUV420p */
-		if (stream->format() == FORMAT_I420)
+		switch (stream->format())
+		{
+		case FORMAT_I420:
+		case FORMAT_Y42B:
 			avierr = stream->uncompressed_yuv420p_to_argb32(&m_tempbuffer[8], stream->chunk(framenum).length - 8, bitmap);
-		else
+			break;
+		default:
 			avierr = stream->uncompressed_rgb24_to_argb32(&m_tempbuffer[8], stream->chunk(framenum).length - 8, bitmap);
+			break;
+		}
 	}
 	else
 	{
