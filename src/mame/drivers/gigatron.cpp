@@ -56,12 +56,12 @@ uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void gigatron_state::prog_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+	map(0x0000, 0xFFFF).rom().region("maincpu", 0);
 }
 
 void gigatron_state::data_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram();
+	map(0x0000, 0x7FFF).ram();
 }
 
 void gigatron_state::machine_start()

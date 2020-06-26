@@ -67,8 +67,8 @@ protected:
 	uint8_t m_inReg;
 	uint16_t m_ramMask;
 	uint16_t m_romMask;
-	uint16_t m_out;
-	uint16_t m_outx;
+	uint8_t m_out;
+	uint8_t m_outx;
 
 	virtual void init();
 
