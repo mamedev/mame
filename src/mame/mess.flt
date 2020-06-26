@@ -462,6 +462,7 @@ kawai_k4.cpp
 kawai_k5.cpp
 kawai_ksp10.cpp
 kawai_r100.cpp
+kawai_sx240.cpp
 kaypro.cpp
 kc.cpp
 kdt6.cpp
@@ -532,6 +533,7 @@ mekd2.cpp
 mekd3.cpp
 mekd4.cpp
 mekd5.cpp
+mephisto_academy.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp

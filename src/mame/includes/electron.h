@@ -58,6 +58,8 @@ public:
 
 	void electron64(machine_config &config);
 
+	static void plus3_default(device_t* device);
+
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 protected:

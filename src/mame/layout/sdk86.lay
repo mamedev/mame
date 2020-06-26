@@ -22,9 +22,12 @@ copyright-holders:Robbbert
 	<view name="Default Layout">
 
 		<!-- Background -->
-		<backdrop element="background">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<bezel element="background">
 			<bounds left="0" top="0" right="362" bottom="69" />
-		</backdrop>
+		</bezel>
 
 		<!-- LEDs -->
 		<bezel name="digit7" element="digit">
@@ -52,12 +55,6 @@ copyright-holders:Robbbert
 			<bounds left="318" top="10" right="352" bottom="59" />
 		</bezel>
 
-	</view>
-
-	<view name="Terminal">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
 	</view>
 
 </mamelayout>

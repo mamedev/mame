@@ -220,7 +220,8 @@ void eag_state::init_eag2100()
 void eag_state::machine_reset()
 {
 	fidel_clockdiv_state::machine_reset();
-	m_rombank->set_entry(0);
+	if (m_rombank != nullptr)
+		m_rombank->set_entry(0);
 }
 
 

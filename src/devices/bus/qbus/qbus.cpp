@@ -26,8 +26,8 @@ void qbus_cards(device_slot_interface &device)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(QBUS, qbus_device, "qbus", "QBUS bus")
-DEFINE_DEVICE_TYPE(QBUS_SLOT, qbus_slot_device, "qbus_slot", "QBUS slot")
+DEFINE_DEVICE_TYPE(QBUS, qbus_device, "qbus", "DEC Qbus bus")
+DEFINE_DEVICE_TYPE(QBUS_SLOT, qbus_slot_device, "qbus_slot", "DEC Qbus slot")
 
 
 //**************************************************************************

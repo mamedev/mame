@@ -11775,6 +11775,7 @@ lw3_205                         //
 lw3_207                         //
 lw3_207c                        //
 lw3_208                         //
+mj_130                          //
 rab_103                         //
 rab_130                         //
 rab_320                         //
@@ -13037,6 +13038,7 @@ emma2                           // 1979 L.J.Technical Systems
 emu2                            //
 
 @source:emu3.cpp
+emax2                           //
 emu3                            //
 
 @source:enigma2.cpp
@@ -13299,6 +13301,7 @@ yukon1                          // (c) 1989
 attckexd                        // (c) 1977 Exidy
 attckexd2                       // (c) 1977 Exidy
 deathrac                        // (c) 1976 Exidy
+destdrby                        // (c) 1976 Exidy
 rhunting                        // bootleg of deathrac
 
 @source:exp85.cpp
@@ -18670,6 +18673,9 @@ ksp10                           //
 @source:kawai_r100.cpp
 r100                            //
 
+@source:kawai_sx240.cpp
+sx240                           //
+
 @source:kaypro.cpp
 kaypro1                         // Kaypro 1
 kaypro10                        // Kaypro 10/83
@@ -22219,6 +22225,11 @@ mekd5                           // 1980 Motorola Evaluation Kit
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
 
+@source:mephisto_academy.cpp
+academy
+academyg
+academyga
+
 @source:mephisto_berlin.cpp
 berl16                          // 1992 Mephisto Berlin 68000
 berl16a                         // 1992 Mephisto Berlin 68000
@@ -22326,9 +22337,6 @@ polgar10                        // 1990 Mephisto Polgar 10MHz
 polgar101                       // 1990 Mephisto Polgar 10MHz
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
-academy                         // 1989 Mephisto Academy
-academyg                        // 1989 Mephisto Academy
-academyga                       // 1989 Mephisto Academy
 milano                          // 1991 Mephisto Milano
 milanoa                         // 1991 Mephisto Milano
 nshort                          // 1993 Mephisto Nigel Short
@@ -35221,6 +35229,7 @@ frpwr_t6                        //
 grgar_l1                        //
 grgar_t1                        //
 lzbal_l2                        //
+lzbal_l2sp                      //
 lzbal_t2                        //
 scrpn_l1                        //
 scrpn_t1                        //
@@ -37433,6 +37442,9 @@ special                         //
 specialm                        //
 specialp                        //
 specimx                         //
+
+@source:special_gambl.cpp
+dindice                         //
 
 @source:specpls3.cpp
 sp3e8bit                        // 2002 ZX Spectrum +3e 8bit IDE
