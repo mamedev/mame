@@ -17,8 +17,10 @@ iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t 
 	applefdintf_device(mconfig, IWM, tag, owner, clock),
 	m_q3_clock(q3_clock)
 {
-	m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
-	m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
+	if (q3_clock != 0)
+		m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
+	if (clock != 0)
+		m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
 }
 
 u64 iwm_device::q3_to_fclk(u64 cycles) const
