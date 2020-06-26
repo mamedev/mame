@@ -227,9 +227,9 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				if (file != nullptr)
 				{
 					u32 addr = channel->start;
-					while (!BIT(m_rom[addr], 7) && addr < m_pcmlimit)
+					while (!BIT(read_sample(i, addr), 7) && addr < m_pcmlimit)
 					{
-						int16_t out = ((m_rom[addr] & 0x7f) - 0x40) << 7;
+						int16_t out = ((read_sample(i, addr) & 0x7f) - 0x40) << 7;
 						wav_add_data_16(file, &out, 1);
 						addr++;
 					}
