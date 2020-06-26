@@ -13301,6 +13301,7 @@ yukon1                          // (c) 1989
 attckexd                        // (c) 1977 Exidy
 attckexd2                       // (c) 1977 Exidy
 deathrac                        // (c) 1976 Exidy
+destdrby                        // (c) 1976 Exidy
 rhunting                        // bootleg of deathrac
 
 @source:exp85.cpp
