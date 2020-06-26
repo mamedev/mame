@@ -72,7 +72,7 @@ ToDo:
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0x0000, 0x3fff).ram().share("mainram").bankr("bank1");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -275,11 +275,12 @@ void zorba_state::machine_start()
 	save_item(NAME(m_printer_select));
 
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_rom_in_map));
 
 	m_printer_prowriter = false;
 	m_printer_fault = 0;
 	m_printer_select = 0;
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void zorba_state::machine_reset()
@@ -293,7 +294,7 @@ void zorba_state::machine_reset()
 	m_printer_prowriter = BIT(m_config_port->read(), 0);
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 
 	m_maincpu->reset();
 }
@@ -306,25 +307,25 @@ void zorba_state::machine_reset()
 uint8_t zorba_state::ram_r()
 {
 	if (!machine().side_effects_disabled())
-		m_rom_in_map = false;
+		m_bank1->set_entry(0);
 	return 0;
 }
 
 void zorba_state::ram_w(uint8_t data)
 {
-	m_rom_in_map = false;
+	m_bank1->set_entry(0);
 }
 
 uint8_t zorba_state::rom_r()
 {
 	if (!machine().side_effects_disabled())
-		m_rom_in_map = true;
+		m_bank1->set_entry(1);
 	return 0;
 }
 
 void zorba_state::rom_w(uint8_t data)
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 }
 
 
