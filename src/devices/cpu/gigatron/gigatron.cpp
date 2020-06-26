@@ -89,24 +89,6 @@ void gigatron_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	init();
-}
-
-void gigatron_cpu_device::reset_cpu()
-{
-	m_ac = 0;
-	m_x = 0;
-	m_y = 0;
-	m_pc = 0;
-	m_npc = (m_pc + 1) & m_romMask;
-	m_ppc = 0;
-	m_inReg = 0xFF;
-	m_outx = 0;
-	m_out = 0;
-}
-
-void gigatron_cpu_device::init()
-{
 	state_add(GTRON_PC,        "PC",        m_pc);
 	state_add(GTRON_NPC,       "NPC",       m_npc);
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -131,8 +113,21 @@ void gigatron_cpu_device::init()
 	m_outx_cb.resolve_safe();
 	m_out_cb.resolve_safe();
 	m_ir_cb.resolve_safe(0);
-	
-	reset_cpu();
+
+	init();
+}
+
+void gigatron_cpu_device::init()
+{
+	m_ac = 0;
+	m_x = 0;
+	m_y = 0;
+	m_pc = 0;
+	m_npc = (m_pc + 1) & m_romMask;
+	m_ppc = 0;
+	m_inReg = 0xFF;
+	m_outx = 0;
+	m_out = 0;
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
@@ -320,7 +315,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 
 void gigatron_cpu_device::device_reset()
 {
-	reset_cpu();
+	init();
 }
 
 void gigatron_cpu_device::execute_set_input(int irqline, int state)
