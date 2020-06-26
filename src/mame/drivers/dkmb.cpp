@@ -42,8 +42,8 @@ public:
 
 	void dkmb(machine_config &config);
 
-	DECLARE_READ64_MEMBER(unk_2060000_r);
-	DECLARE_READ64_MEMBER(unk_20c0010_r);
+	u64 unk_2060000_r();
+	u64 unk_20c0010_r();
 
 protected:
 	virtual void machine_start() override;
@@ -84,12 +84,12 @@ uint32_t dkmb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-READ64_MEMBER(dkmb_state::unk_2060000_r)
+u64 dkmb_state::unk_2060000_r()
 {
 	return ((u64)machine().rand()) << 56;
 }
 
-READ64_MEMBER(dkmb_state::unk_20c0010_r)
+u64 dkmb_state::unk_20c0010_r()
 {
 	return ((u64)machine().rand()) << 56;
 }

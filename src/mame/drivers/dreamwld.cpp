@@ -179,7 +179,7 @@ private:
 	void prot_p2_w(uint8_t data);
 	uint8_t prot_p2_r();
 
-	DECLARE_WRITE32_MEMBER(to_prot_w);
+	void to_prot_w(uint32_t data);
 
 
 	template<int Layer> u16 vram_r(offs_t offset);
@@ -786,7 +786,7 @@ uint8_t dreamwld_state::prot_p2_r()
 	return m_port2_data;
 }
 
-WRITE32_MEMBER(dreamwld_state::to_prot_w)
+void dreamwld_state::to_prot_w(uint32_t data)
 {
 	m_port2_data &= 0xfb; // lower bit 0x04 to indicate data sent?
 	logerror("%s:to_prot_w %08x\n", machine().describe_context(), data);

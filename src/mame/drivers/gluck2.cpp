@@ -227,9 +227,9 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void video_start() override;
@@ -244,13 +244,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(gluck2_state::videoram_w)
+void gluck2_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gluck2_state::colorram_w)
+void gluck2_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -291,7 +291,7 @@ uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 *                R/W Handlers                 *
 **********************************************/
 
-WRITE8_MEMBER(gluck2_state::counters_w)
+void gluck2_state::counters_w(uint8_t data)
 {
 /*  - bits -
     7654 3210

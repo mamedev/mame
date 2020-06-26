@@ -72,13 +72,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 
 private:
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 	uint8_t port1_r();
 	void port1_w(uint8_t data);
 	uint8_t port2_r();
 	void port2_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(count_reset_w);
+	void count_reset_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 	void ltd3_map(address_map &map);
 	void ltd4_map(address_map &map);
@@ -248,7 +248,7 @@ INPUT_CHANGED_MEMBER( ltd_state::ficha )
 }
 
 // switches
-READ8_MEMBER( ltd_state::io_r )
+uint8_t ltd_state::io_r(offs_t offset)
 {
 	if (offset==0)
 		return ioport("X0")->read();
@@ -269,7 +269,7 @@ READ8_MEMBER( ltd_state::io_r )
 }
 
 // Lamps only used by Zephy
-WRITE8_MEMBER( ltd_state::io_w )
+void ltd_state::io_w(offs_t offset, uint8_t data)
 {
 	offset >>= 10; // reduces offsets to 1 per bank
 }
@@ -361,7 +361,7 @@ void ltd_state::port2_w(uint8_t data)
 	m_port2 = data;
 }
 
-WRITE8_MEMBER( ltd_state::count_reset_w )
+void ltd_state::count_reset_w(uint8_t data)
 {
 	m_counter = 0;
 }

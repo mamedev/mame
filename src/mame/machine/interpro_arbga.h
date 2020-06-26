@@ -13,25 +13,25 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ32_MEMBER(sdepid_r) { return m_sdepid; }
-	DECLARE_WRITE32_MEMBER(sdepid_w) { m_sdepid = data; }
+	u32 sdepid_r() { return m_sdepid; }
+	void sdepid_w(u32 data) { m_sdepid = data; }
 
 	enum arbsnap_mask
 	{
 		ARBSNAP_GRANT   = 0x0000000f,
 		ARBSNAP_HOGLOCK = 0x000000f0
 	};
-	DECLARE_READ32_MEMBER(arbsnap_r) { return m_arbsnap; }
-	DECLARE_WRITE32_MEMBER(arbsnap_w) { m_arbsnap = data; }
-	DECLARE_READ32_MEMBER(fixprils_r) { return m_fixprils; }
-	DECLARE_WRITE32_MEMBER(fixprils_w) { m_fixprils = data; }
-	DECLARE_READ32_MEMBER(fixprims_r) { return m_fixprims; }
-	DECLARE_WRITE32_MEMBER(fixprims_w) { m_fixprims = data; }
+	u32 arbsnap_r() { return m_arbsnap; }
+	void arbsnap_w(u32 data) { m_arbsnap = data; }
+	u32 fixprils_r() { return m_fixprils; }
+	void fixprils_w(u32 data) { m_fixprils = data; }
+	u32 fixprims_r() { return m_fixprims; }
+	void fixprims_w(u32 data) { m_fixprims = data; }
 
-	DECLARE_READ32_MEMBER(sysdomls_r) { return m_sysdomls; }
-	DECLARE_WRITE32_MEMBER(sysdomls_w) { m_sysdomls = data; }
-	DECLARE_READ32_MEMBER(sysdomms_r) { return m_sysdomms; }
-	DECLARE_WRITE32_MEMBER(sysdomms_w) { m_sysdomms = data; }
+	u32 sysdomls_r() { return m_sysdomls; }
+	void sysdomls_w(u32 data) { m_sysdomls = data; }
+	u32 sysdomms_r() { return m_sysdomms; }
+	void sysdomms_w(u32 data) { m_sysdomms = data; }
 
 	enum tctrl_mask
 	{
@@ -39,28 +39,28 @@ public:
 		TCTRL_ENNEM  = 0x00000008,
 		TCTRL_ENHOG  = 0x00000010
 	};
-	DECLARE_READ32_MEMBER(tctrl_r) { return m_tctrl; }
-	DECLARE_WRITE32_MEMBER(tctrl_w) { m_tctrl = data; }
+	u32 tctrl_r() { return m_tctrl; }
+	void tctrl_w(u32 data) { m_tctrl = data; }
 
-	DECLARE_READ8_MEMBER(inem_r) { return m_inem; }
-	DECLARE_WRITE8_MEMBER(inem_w) { m_inem = data; }
-	DECLARE_READ8_MEMBER(enem_r) { return m_enem; }
-	DECLARE_WRITE8_MEMBER(enem_w) { m_enem = data; }
+	u8 inem_r() { return m_inem; }
+	void inem_w(u8 data) { m_inem = data; }
+	u8 enem_r() { return m_enem; }
+	void enem_w(u8 data) { m_enem = data; }
 
-	DECLARE_READ32_MEMBER(hog_r) { return m_hog; }
-	DECLARE_WRITE32_MEMBER(hog_w) { m_hog = data; }
-	DECLARE_READ32_MEMBER(lock_r) { return m_lock; }
-	DECLARE_WRITE32_MEMBER(lock_w) { m_lock = data; }
-	DECLARE_READ32_MEMBER(lockprs_r) { return m_lockprs; }
-	DECLARE_WRITE32_MEMBER(lockprs_w) { m_lockprs = data; }
+	u32 hog_r() { return m_hog; }
+	void hog_w(u32 data) { m_hog = data; }
+	u32 lock_r() { return m_lock; }
+	void lock_w(u32 data) { m_lock = data; }
+	u32 lockprs_r() { return m_lockprs; }
+	void lockprs_w(u32 data) { m_lockprs = data; }
 
-	DECLARE_READ32_MEMBER(hiblockls_r) { return m_hiblockls; }
-	DECLARE_WRITE32_MEMBER(hiblockls_w) { m_hiblockls = data; }
-	DECLARE_READ32_MEMBER(hiblockms_r) { return m_hiblockms; }
-	DECLARE_WRITE32_MEMBER(hiblockms_w) { m_hiblockms = data; }
+	u32 hiblockls_r() { return m_hiblockls; }
+	void hiblockls_w(u32 data) { m_hiblockls = data; }
+	u32 hiblockms_r() { return m_hiblockms; }
+	void hiblockms_w(u32 data) { m_hiblockms = data; }
 
-	DECLARE_READ32_MEMBER(arbrev_r) { return m_arbrev; }
-	DECLARE_WRITE32_MEMBER(arbrev_w) { m_arbrev = data; }
+	u32 arbrev_r() { return m_arbrev; }
+	void arbrev_w(u32 data) { m_arbrev = data; }
 
 protected:
 	virtual void device_start() override;

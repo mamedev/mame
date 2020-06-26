@@ -106,9 +106,9 @@ private:
 	bitmap_ind16 m_motion_object_2_vid;
 	bitmap_ind16 m_motion_object_2_clip;
 
-	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
-	DECLARE_READ8_MEMBER(exidy_interrupt_r);
-	DECLARE_WRITE8_MEMBER(mtrap_ocl_w);
+	void fax_bank_select_w(uint8_t data);
+	uint8_t exidy_interrupt_r();
+	void mtrap_ocl_w(uint8_t data);
 
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(teetert);
@@ -133,9 +133,9 @@ private:
 	uint8_t m_tone_freq;
 	uint8_t m_tone_active;
 	uint8_t m_tone_pointer;
-	DECLARE_WRITE8_MEMBER(targ_audio_1_w);
-	DECLARE_WRITE8_MEMBER(targ_audio_2_w);
-	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
+	void targ_audio_1_w(uint8_t data);
+	void targ_audio_2_w(uint8_t data);
+	void spectar_audio_2_w(uint8_t data);
 	void adjust_sample(uint8_t freq);
 	void common_audio_start(int freq);
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);

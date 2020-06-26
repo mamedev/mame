@@ -35,13 +35,13 @@
 #define LOG_FDC_CTRL        (1 << 6)
 #define LOG_FDC_PORT        (1 << 7)
 #define LOG_FDC_CMD         (1 << 8)
-#define LOG_FDC_MECH		(1 << 9)
+#define LOG_FDC_MECH        (1 << 9)
 #define LOG_OUTPUT_TIMING   (1 << 10)
 #define LOG_BRUSH_ADDR      (1 << 11)
-#define LOG_STORE_ADDR		(1 << 12)
-#define LOG_COMBINER		(1 << 13)
-#define LOG_SIZE_CARD		(1 << 14)
-#define LOG_FILTER_CARD		(1 << 15)
+#define LOG_STORE_ADDR      (1 << 12)
+#define LOG_COMBINER        (1 << 13)
+#define LOG_SIZE_CARD       (1 << 14)
+#define LOG_FILTER_CARD     (1 << 15)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
 
@@ -100,21 +100,21 @@ private:
 	void main_map(address_map &map);
 	void fddcpu_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(bus_error_r);
-	DECLARE_WRITE16_MEMBER(bus_error_w);
+	uint16_t bus_error_r(offs_t offset);
+	void bus_error_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE8_MEMBER(csr_w);
-	DECLARE_READ8_MEMBER(csr_r);
+	void csr_w(uint8_t data);
+	uint8_t csr_r();
 
-	DECLARE_READ16_MEMBER(cpu_ctrlbus_r);
-	DECLARE_WRITE16_MEMBER(cpu_ctrlbus_w);
+	uint16_t cpu_ctrlbus_r();
+	void cpu_ctrlbus_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(req_a_w);
 	DECLARE_WRITE_LINE_MEMBER(req_b_w);
 
 	void fdd_index_callback(floppy_image_device *floppy, int state);
-	DECLARE_READ8_MEMBER(fdd_ctrl_r);
-	DECLARE_READ8_MEMBER(fdd_cmd_r);
+	uint8_t fdd_ctrl_r();
+	uint8_t fdd_cmd_r();
 	void fddcpu_p1_w(uint8_t data);
 	uint8_t fddcpu_p2_r();
 	void fddcpu_p2_w(uint8_t data);
@@ -133,8 +133,8 @@ private:
 		SYSCTRL_REQ_B_IN        = 0x8000
 	};
 
-	DECLARE_READ16_MEMBER(cpu_sysctrl_r);
-	DECLARE_WRITE16_MEMBER(cpu_sysctrl_w);
+	uint16_t cpu_sysctrl_r();
+	void cpu_sysctrl_w(uint16_t data);
 	void update_req_irqs();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -934,7 +934,7 @@ void dpb7000_state::diskseq_tick()
 	}
 }
 
-READ16_MEMBER(dpb7000_state::bus_error_r)
+uint16_t dpb7000_state::bus_error_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -945,7 +945,7 @@ READ16_MEMBER(dpb7000_state::bus_error_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(dpb7000_state::bus_error_w)
+void dpb7000_state::bus_error_w(offs_t offset, uint16_t data)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -955,19 +955,19 @@ WRITE16_MEMBER(dpb7000_state::bus_error_w)
 	}
 }
 
-WRITE8_MEMBER(dpb7000_state::csr_w)
+void dpb7000_state::csr_w(uint8_t data)
 {
 	LOGMASKED(LOG_CSR, "%s: Card Select write: %02x\n", machine().describe_context(), data & 0x0f);
 	m_csr = data & 0x0f;
 }
 
-READ8_MEMBER(dpb7000_state::csr_r)
+uint8_t dpb7000_state::csr_r()
 {
 	LOGMASKED(LOG_CSR, "%s: Card Select read(?): %02x\n", machine().describe_context(), m_csr);
 	return m_csr;
 }
 
-READ16_MEMBER(dpb7000_state::cpu_ctrlbus_r)
+uint16_t dpb7000_state::cpu_ctrlbus_r()
 {
 	uint16_t ret = 0;
 	switch (m_csr)
@@ -1175,7 +1175,7 @@ void dpb7000_state::handle_command(uint16_t data)
 	}
 }
 
-WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
+void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 {
 	switch (m_csr)
 	{
@@ -1276,55 +1276,55 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 					((data >> 8) & 0xf) == 6 ? "Initiate" : "Continue");
 				/*if (((data >> 8) & 0xf) == 6)
 				{
-					m_size_h = 0;
-					m_size_v = 0;
+				    m_size_h = 0;
+				    m_size_v = 0;
 				}
 				uint16_t disc_buffer_addr = 0;
 				uint16_t bx = m_bxlen_counter - m_bxlen;
 				uint16_t by = m_bylen_counter - m_bylen;
 				while (m_diskbuf_data_count > 0 && m_bylen_counter < 0x1000)
 				{
-					uint8_t hv = (m_size_h << 4) | m_size_v;
-					uint8_t hv_permuted = bitswap<8>(hv,4,6,0,2,5,7,1,3);
+				    uint8_t hv = (m_size_h << 4) | m_size_v;
+				    uint8_t hv_permuted = bitswap<8>(hv,4,6,0,2,5,7,1,3);
 
-					if (BIT(m_brush_addr_func, 7)) // Luma Enable
-					{
-						//printf("%02x ", m_diskbuf_ram[disc_buffer_addr]);
-						m_brushstore_lum[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
-					}
+				    if (BIT(m_brush_addr_func, 7)) // Luma Enable
+				    {
+				        //printf("%02x ", m_diskbuf_ram[disc_buffer_addr]);
+				        m_brushstore_lum[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
+				    }
 
-					disc_buffer_addr++;
-					m_diskbuf_data_count--;
+				    disc_buffer_addr++;
+				    m_diskbuf_data_count--;
 
-					if (BIT(m_brush_addr_func, 8)) // Chroma Enable
-					{
-						m_brushstore_chr[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
-					}
+				    if (BIT(m_brush_addr_func, 8)) // Chroma Enable
+				    {
+				        m_brushstore_chr[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
+				    }
 
-					disc_buffer_addr++;
-					m_diskbuf_data_count--;
+				    disc_buffer_addr++;
+				    m_diskbuf_data_count--;
 
-					m_size_h++;
-					if (m_size_h == 16)
-					{
-						m_size_h = 0;
-						m_size_v++;
-						if (m_size_v == 16)
-						{
-							m_size_v = 0;
-						}
-					}
+				    m_size_h++;
+				    if (m_size_h == 16)
+				    {
+				        m_size_h = 0;
+				        m_size_v++;
+				        if (m_size_v == 16)
+				        {
+				            m_size_v = 0;
+				        }
+				    }
 
-					bx++;
-					m_bxlen_counter++;
-					if (m_bxlen_counter == 0x1000)
-					{
-						bx = 0;
-						by++;
-						m_bxlen_counter = m_bxlen;
-						m_bylen_counter++;
-						//printf("\n");
-					}
+				    bx++;
+				    m_bxlen_counter++;
+				    if (m_bxlen_counter == 0x1000)
+				    {
+				        bx = 0;
+				        by++;
+				        m_bxlen_counter = m_bxlen;
+				        m_bylen_counter++;
+				        //printf("\n");
+				    }
 				}*/
 				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
 				break;
@@ -1491,7 +1491,7 @@ WRITE_LINE_MEMBER(dpb7000_state::req_b_w)
 	update_req_irqs();
 }
 
-READ16_MEMBER(dpb7000_state::cpu_sysctrl_r)
+uint16_t dpb7000_state::cpu_sysctrl_r()
 {
 	const uint16_t ctrl = m_sys_ctrl &~ SYSCTRL_AUTO_START;
 	const uint16_t auto_start = m_auto_start->read() ? SYSCTRL_AUTO_START : 0;
@@ -1500,7 +1500,7 @@ READ16_MEMBER(dpb7000_state::cpu_sysctrl_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dpb7000_state::cpu_sysctrl_w)
+void dpb7000_state::cpu_sysctrl_w(uint16_t data)
 {
 	const uint16_t mask = (SYSCTRL_REQ_A_EN | SYSCTRL_REQ_B_EN);
 	LOGMASKED(LOG_SYS_CTRL, "%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
@@ -1516,7 +1516,7 @@ void dpb7000_state::update_req_irqs()
 	m_maincpu->set_input_line(4, (m_sys_ctrl & SYSCTRL_REQ_B_IN) && (m_sys_ctrl & SYSCTRL_REQ_B_EN) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(dpb7000_state::fdd_ctrl_r)
+uint8_t dpb7000_state::fdd_ctrl_r()
 {
 	// D4: Command Tag Flag
 	// D5: Restore Flag
@@ -1563,7 +1563,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 					bit_idx++;
 					//if ((bit_idx % 8) == 0)
 					//{
-					//	printf("%02x ", (uint8_t)curr_window);
+					//  printf("%02x ", (uint8_t)curr_window);
 					//}
 
 					if (!seen_pregap && curr_window == PREGAP_MARK)
@@ -1687,7 +1687,7 @@ uint8_t dpb7000_state::fddcpu_p2_r()
 	return ret;
 }
 
-READ8_MEMBER(dpb7000_state::fdd_cmd_r)
+uint8_t dpb7000_state::fdd_cmd_r()
 {
 	LOGMASKED(LOG_FDC_CMD, "%s: Floppy CPU command read: %02x\n", m_diskseq_cmd_to_ctrl);
 	return m_diskseq_cmd_to_ctrl;

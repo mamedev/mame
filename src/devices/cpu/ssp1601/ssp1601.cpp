@@ -45,8 +45,8 @@
 
 #define PPC    m_ppc.w.h
 
-#define FETCH() m_cache->read_word(rPC++)
-#define PROGRAM_WORD(a) m_program->read_word(a)
+#define FETCH() m_cache.read_word(rPC++)
+#define PROGRAM_WORD(a) m_program.read_word(a)
 #define GET_PPC_OFFS() PPC
 
 #define REG_READ(r) (((r) <= 4) ? m_gr[r].w.h : (this->*reg_read_handlers[r])(r))
@@ -241,13 +241,13 @@ void ssp1601_device::write_unknown(int reg, uint32_t d)
 uint32_t ssp1601_device::read_ext(int reg)
 {
 	reg &= 7;
-	return m_io->read_word((reg << 1));
+	return m_io.read_word((reg << 1));
 }
 
 void ssp1601_device::write_ext(int reg, uint32_t d)
 {
 	reg &= 7;
-	m_io->write_word((reg << 1), d);
+	m_io.write_word((reg << 1), d);
 }
 
 // 4
@@ -521,9 +521,9 @@ void ssp1601_device::device_start()
 	m_g_cycles = 0;
 
 	m_gr[0].w.h = 0xffff; // constant reg
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	state_add( SSP_R0,     "REG0",   m_gr[0].w.h).formatstr("%04X");
 	state_add( SSP_X,      "X",      rX).formatstr("%04X");

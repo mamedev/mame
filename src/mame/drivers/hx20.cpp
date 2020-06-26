@@ -65,7 +65,7 @@ void hx20_state::update_interrupt()
 //  ksc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::ksc_w )
+void hx20_state::ksc_w(uint8_t data)
 {
 	logerror("KSC %02x\n", data);
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER( hx20_state::ksc_w )
 //  krtn07_r -
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::krtn07_r )
+uint8_t hx20_state::krtn07_r()
 {
 	uint8_t data = 0xff;
 	for (int b = 0; 8 > b; ++b)
@@ -92,7 +92,7 @@ READ8_MEMBER( hx20_state::krtn07_r )
 //  krtn89_r -
 //-------------------------------------------------
 
-READ8_MEMBER( hx20_state::krtn89_r )
+uint8_t hx20_state::krtn89_r()
 {
 	/*
 
@@ -122,7 +122,7 @@ READ8_MEMBER( hx20_state::krtn89_r )
 //  lcd_cs_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::lcd_cs_w )
+void hx20_state::lcd_cs_w(uint8_t data)
 {
 	/*
 
@@ -161,7 +161,7 @@ WRITE8_MEMBER( hx20_state::lcd_cs_w )
 //  lcd_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hx20_state::lcd_data_w )
+void hx20_state::lcd_data_w(uint8_t data)
 {
 	logerror("LCD DATA %02x\n", data);
 
@@ -845,7 +845,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 	return image_init_result::PASS;
 }
 
-READ8_MEMBER(hx20_state::optrom_r)
+uint8_t hx20_state::optrom_r(offs_t offset)
 {
 	if (m_optrom->exists())
 		return m_optrom->read_rom(offset);

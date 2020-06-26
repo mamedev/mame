@@ -105,16 +105,16 @@ private:
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
-	DECLARE_WRITE8_MEMBER(nmi_control_w);
-	DECLARE_WRITE8_MEMBER(crt_direction_w);
-	DECLARE_WRITE8_MEMBER(back_color_select_w);
-	DECLARE_WRITE8_MEMBER(vram_page_select_w);
-	DECLARE_WRITE8_MEMBER(intcycle_w);
-	DECLARE_READ8_MEMBER(subcpu_nmi_r);
-	DECLARE_READ8_MEMBER(subcpu_reset_r);
-	DECLARE_WRITE8_MEMBER(ay1_w);
-	DECLARE_READ8_MEMBER(watchdog_clear_r);
-	DECLARE_READ8_MEMBER(inputs_r);
+	void nmi_control_w(uint8_t data);
+	void crt_direction_w(uint8_t data);
+	void back_color_select_w(uint8_t data);
+	void vram_page_select_w(uint8_t data);
+	void intcycle_w(offs_t offset, uint8_t data);
+	uint8_t subcpu_nmi_r();
+	uint8_t subcpu_reset_r();
+	void ay1_w(offs_t offset, uint8_t data);
+	uint8_t watchdog_clear_r();
+	uint8_t inputs_r(offs_t offset);
 };
 
 
@@ -233,7 +233,7 @@ INPUT_PORTS_END
 //  INPUT PORT HANDLING
 //**************************************************************************
 
-READ8_MEMBER( popper_state::inputs_r )
+uint8_t popper_state::inputs_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -304,17 +304,17 @@ void popper_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
 }
 
-WRITE8_MEMBER( popper_state::crt_direction_w )
+void popper_state::crt_direction_w(uint8_t data)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER( popper_state::back_color_select_w )
+void popper_state::back_color_select_w(uint8_t data)
 {
 	m_back_color = data & 1;
 }
 
-WRITE8_MEMBER( popper_state::vram_page_select_w )
+void popper_state::vram_page_select_w(uint8_t data)
 {
 	m_vram_page = data & 1;
 }
@@ -456,7 +456,7 @@ TILE_GET_INFO_MEMBER( popper_state::layer1_tile_info )
 //  SUBCPU
 //**************************************************************************
 
-READ8_MEMBER( popper_state::subcpu_nmi_r )
+uint8_t popper_state::subcpu_nmi_r()
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -464,7 +464,7 @@ READ8_MEMBER( popper_state::subcpu_nmi_r )
 	return 0;
 }
 
-READ8_MEMBER( popper_state::subcpu_reset_r )
+uint8_t popper_state::subcpu_reset_r()
 {
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -472,7 +472,7 @@ READ8_MEMBER( popper_state::subcpu_reset_r )
 	return 0;
 }
 
-WRITE8_MEMBER( popper_state::ay1_w )
+void popper_state::ay1_w(offs_t offset, uint8_t data)
 {
 	if (offset == 3)
 	{
@@ -488,18 +488,18 @@ WRITE8_MEMBER( popper_state::ay1_w )
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER( popper_state::nmi_control_w )
+void popper_state::nmi_control_w(uint8_t data)
 {
 	m_nmi_enable = data & 1;
 }
 
-WRITE8_MEMBER( popper_state::intcycle_w )
+void popper_state::intcycle_w(offs_t offset, uint8_t data)
 {
 	// set to 0 and apparently not used by the game
 	logerror("intcycle_w: %d = %02x\n", offset, data);
 }
 
-READ8_MEMBER( popper_state::watchdog_clear_r )
+uint8_t popper_state::watchdog_clear_r()
 {
 	return 0;
 }

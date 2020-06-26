@@ -27,7 +27,7 @@
 #define NL_DISABLE_DYNAMIC_LOAD 0
 #endif
 
-extern plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::dynlib_static_sym nl_static_solver_syms[];
 
 class tool_app_t : public plib::app
 {
@@ -89,7 +89,7 @@ public:
 		opt_ex4(*this,     "nltool --cmd static --output src/lib/netlist/generated/static_solvers.cpp src/mame/audio/nl_*.cpp src/mame/machine/nl_*.cpp",
 				"Create static solvers for the MAME project.")
 		{}
-public:
+
 	int execute() override;
 	pstring usage() override;
 
@@ -128,7 +128,7 @@ private:
 	plib::option_str    opt_out;
 
 	plib::option_group  opt_grp4;
-	plib::option_num<nl_fptype> opt_ttr;
+	plib::option_num<netlist::nl_fptype> opt_ttr;
 	plib::option_str    opt_boostlib;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
@@ -153,7 +153,7 @@ private:
 
 	struct compile_map_entry
 	{
-		compile_map_entry(pstring mod, pstring code)
+		compile_map_entry(const pstring &mod, const pstring &code)
 		: m_module(mod), m_code(code) { }
 		pstring m_module;
 		pstring m_code;
@@ -201,12 +201,12 @@ public:
 	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
+		stream_ptr strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
 			return stream_ptr(nullptr);
 
 		strm->imbue(std::locale::classic());
-		return std::move(strm); // FIXME: for c++11 clang builds;
+		return strm;
 	}
 
 private:
@@ -216,23 +216,23 @@ private:
 class netlist_tool_callbacks_t : public netlist::callbacks_t
 {
 public:
-	explicit netlist_tool_callbacks_t(tool_app_t &app, pstring boostlib)
+	explicit netlist_tool_callbacks_t(tool_app_t &app, const pstring &boostlib)
 	: m_app(app), m_boostlib(boostlib)
 	{ }
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
 
-	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const override
+	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const override
 	{
 		if (m_boostlib == "builtin")
-			return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
+			return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nl_static_solver_syms);
 		if (m_boostlib == "generic")
-			return plib::make_unique<plib::dynlib_static>(nullptr);
+			return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nullptr);
 		if (NL_DISABLE_DYNAMIC_LOAD)
 			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
 
 		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		return plib::make_unique<plib::dynlib>(m_boostlib);
+		return plib::make_unique<plib::dynlib, netlist::host_arena>(m_boostlib);
 	}
 
 private:
@@ -245,7 +245,7 @@ class netlist_tool_t : public netlist::netlist_state_t
 public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &name, const pstring &boostlib)
-	: netlist::netlist_state_t(name, plib::make_unique<netlist_tool_callbacks_t>(app, boostlib))
+	: netlist::netlist_state_t(name, plib::make_unique<netlist_tool_callbacks_t, netlist::host_arena>(app, boostlib))
 	{
 	}
 
@@ -351,7 +351,7 @@ struct input_t
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &val);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
-		m_value = static_cast<nl_fptype>(val);
+		m_value = static_cast<netlist::nl_fptype>(val);
 		m_time = netlist::netlist_time_ext::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()));
 	}
@@ -364,35 +364,35 @@ struct input_t
 			case netlist::param_t::POINTER:
 				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param.param().name()));
 			case netlist::param_t::DOUBLE:
-				static_cast<netlist::param_fp_t*>(&m_param.param())->set(m_value);
+				plib::downcast<netlist::param_fp_t &>(m_param.param()).set(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(&m_param.param())->set(static_cast<int>(m_value));
+				plib::downcast<netlist::param_int_t &>(m_param.param()).set(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(&m_param.param())->set(static_cast<bool>(m_value));
+				plib::downcast<netlist::param_logic_t &>(m_param.param()).set(static_cast<bool>(m_value));
 				break;
 		}
 	}
 
 	netlist::netlist_time_ext m_time;
 	netlist::param_ref_t m_param;
-	nl_fptype m_value;
+	netlist::nl_fptype m_value;
 };
 
 static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstring &fname)
 {
 	std::vector<input_t> ret;
-	if (fname != "")
+	if (!fname.empty())
 	{
-		plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
+		plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
 		pstring l;
 		while (r.readline(l))
 		{
-			if (l != "")
+			if (!l.empty())
 			{
 				input_t inp(setup, l);
 				ret.push_back(inp);
@@ -410,6 +410,9 @@ void tool_app_t::run()
 
 	if (opt_files().size() != 1)
 		throw netlist::nl_exception("nltool: run needs exactly one file");
+
+	if (!plib::util::exists(opt_files()[0]))
+		throw netlist::nl_exception("nltool: file doesn't exists: {}", opt_files()[0]);
 
 	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
@@ -436,12 +439,12 @@ void tool_app_t::run()
 	}
 
 
-	pout("startup time ==> {1:5.3f}\n", t.as_seconds<nl_fptype>() );
+	pout("startup time ==> {1:5.3f}\n", t.as_seconds<netlist::nl_fptype>() );
 
 	// FIXME: error handling
 	if (opt_loadstate.was_specified())
 	{
-		std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
+		plib::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
 		if (strm.fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
 		strm.imbue(std::locale::classic());
@@ -484,7 +487,7 @@ void tool_app_t::run()
 	if (opt_savestate.was_specified())
 	{
 		auto savestate = nt.save_state();
-		std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
+		plib::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
 		if (strm.fail())
 			throw plib::file_open_e(opt_savestate());
 		strm.imbue(std::locale::classic());
@@ -494,10 +497,10 @@ void tool_app_t::run()
 	}
 	nt.exec().stop();
 
-	auto emutime(t.as_seconds<nl_fptype>());
+	auto emutime(t.as_seconds<netlist::nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
-			(ttr - nlstart).as_fp<nl_fptype>(), emutime,
-			(ttr - nlstart).as_fp<nl_fptype>() / emutime * netlist::nlconst::hundred());
+			(ttr - nlstart).as_fp<netlist::nl_fptype>(), emutime,
+			(ttr - nlstart).as_fp<netlist::nl_fptype>() / emutime * netlist::nlconst::hundred());
 }
 
 void tool_app_t::validate()
@@ -594,7 +597,7 @@ void tool_app_t::static_compile()
 
 	netlist::solver::static_compile_target target = netlist::solver::CXX_STATIC;
 
-	if (!(opt_dir.was_specified() ^ opt_out.was_specified()))
+	if ((opt_dir.was_specified() ^ opt_out.was_specified()) == 0)
 		throw netlist::nl_exception("either --dir or --output option needed");
 
 	if (opt_dir.was_specified())
@@ -608,7 +611,7 @@ void tool_app_t::static_compile()
 
 		for (auto &e : mp)
 		{
-			auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
+			plib::ofstream sout(opt_dir() + "/" + e.first + ".c" );
 			sout << e.second.m_code;
 		}
 	}
@@ -623,7 +626,7 @@ void tool_app_t::static_compile()
 				names.push_back(opt_name());
 			else
 			{
-				plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(f)));
+				plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(f)));
 				if (r.stream().fail())
 					throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(f));
 				r.stream().imbue(std::locale::classic());
@@ -655,7 +658,9 @@ void tool_app_t::static_compile()
 				compile_one_and_add_to_map(f, name, target, map);
 			}
 		}
-		std::ofstream sout = std::ofstream(opt_out());
+		plib::ofstream sout(opt_out());
+		if (sout.fail())
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_out()));
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		for (auto &e : map)
@@ -663,7 +668,8 @@ void tool_app_t::static_compile()
 			sout << "// " << e.second.m_module << "\n";
 			sout << e.second.m_code;
 		}
-		sout << "plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
+		sout << "extern const plib::dynlib_static_sym nl_static_solver_syms[];\n";
+		sout << "const plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		for (auto &e : map)
 		{
 			sout << "// " << e.second.m_module << "\n";
@@ -703,7 +709,7 @@ struct doc_ext
 
 static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 {
-	plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
+	plib::putf8_reader r = plib::putf8_reader(std::make_unique<plib::ifstream>(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
 		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 	r.stream().imbue(std::locale::classic());
@@ -718,7 +724,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 		if (plib::startsWith(l, "//-"))
 		{
 			l = plib::trim(l.substr(3));
-			if (l != "")
+			if (!l.empty())
 			{
 				auto a(plib::psplit(l, ":", true));
 				if (a.empty() || (a.size() > 2))
@@ -758,7 +764,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					else if (n == "FunctionTable")
 						ret.functiontable = v;
 					else if (n == "Param")
-						ret.params.push_back(std::pair<pstring, pstring>(v2, plib::trim(v.substr(v2.length()))));
+						ret.params.emplace_back(v2, plib::trim(v.substr(v2.length())));
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);
@@ -815,7 +821,7 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 			avs += ", " + s.substr(1);
 
 	mac_out("// usage       : " + e->name() + "(name" + vs + ")", false);
-	if (avs != "")
+	if (!avs.empty())
 		mac_out("// auto connect: " + avs.substr(2), false);
 
 	mac_out("#define " + e->name() + "(...)");
@@ -851,7 +857,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 
 void tool_app_t::create_header()
 {
-	if (opt_files().size() > 0)
+	if (!opt_files().empty())
 		throw netlist::nl_exception("Header doesn't support input files, but {1} where given", opt_files().size());
 
 	netlist_tool_t nt(*this, "netlist", opt_boostlib());
@@ -878,9 +884,9 @@ void tool_app_t::create_header()
 
 	for (auto &e : nt.parser().factory())
 	{
-		bool found(opt_pattern().size() == 0);
+		bool found(opt_pattern().empty());
 
-		for (auto &p : opt_pattern())
+		for (const auto &p : opt_pattern())
 			found |= (e->name().find(p) != pstring::npos);
 
 		if (found)
@@ -939,7 +945,7 @@ void tool_app_t::create_docheader()
 	{
 		auto d(read_docsrc(e->source().file_name(), e->name()));
 
-		if (d.id != "")
+		if (!d.id.empty())
 		{
 			pout("//! [{1} csynopsis]\n", e->name());
 			header_entry(e.get());
@@ -961,7 +967,7 @@ void tool_app_t::create_docheader()
 	{
 		//auto d(read_docsrc(e->source().file_name(), e->name()));
 
-		if (d.id != "")
+		if (!d.id.empty())
 		{
 
 			poutprefix("///", "");
@@ -1014,7 +1020,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "");
 			poutprefix("///", "  @section {}_4 Function Table", d.id);
 			poutprefix("///", "");
-			if (d.functiontable == "")
+			if (!d.functiontable.empty())
 				poutprefix("///", "  Please refer to the datasheet.");
 			else
 				poutprefix("///", "  {}", d.functiontable);
@@ -1054,13 +1060,13 @@ void tool_app_t::listdevices()
 	nt.parser().include("dummy");
 	nt.setup().prepare_to_run();
 
-	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::device_arena::unique_ptr<netlist::core_device_t>> devs;
 
 	for (auto & fl : list)
 	{
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(fl->name())(fl->name());
 
-		netlist::factory::element_t *f;
+		netlist::factory::element_t *f = nullptr;
 		nt.parser().register_dev(fl->name(), fl->name() + "_lc",
 			std::vector<pstring>(), &f);
 
@@ -1109,7 +1115,7 @@ void tool_app_t::convert()
 	}
 	else
 	{
-		std::ifstream strm(plib::filesystem::u8path(opt_files()[0]));
+		plib::ifstream strm(plib::filesystem::u8path(opt_files()[0]));
 		if (strm.fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_files()[0]));
 		strm.imbue(std::locale::classic());
@@ -1120,19 +1126,19 @@ void tool_app_t::convert()
 	pstring result;
 	if (opt_type.as_string() == "spice")
 	{
-		nl_convert_spice_t c;
+		netlist::convert::nl_convert_spice_t c;
 		c.convert(contents);
 		result = c.result();
 	}
 	else if (opt_type.as_string() == "eagle")
 	{
-		nl_convert_eagle_t c;
+		netlist::convert::nl_convert_eagle_t c;
 		c.convert(contents);
 		result = c.result();
 	}
 	else if (opt_type.as_string() == "rinf")
 	{
-		nl_convert_rinf_t c;
+		netlist::convert::nl_convert_rinf_t c;
 		c.convert(contents);
 		result = c.result();
 	}

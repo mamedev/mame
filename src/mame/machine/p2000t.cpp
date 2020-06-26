@@ -42,7 +42,7 @@
     If the keyboard interrupt is disabled, reading one of these ports
     will read the corresponding keyboard matrix row
 */
-READ8_MEMBER( p2000t_state::p2000t_port_000f_r )
+uint8_t p2000t_state::p2000t_port_000f_r(offs_t offset)
 {
 	if (m_port_101f & P2000M_101F_KEYINT)
 	{
@@ -75,7 +75,7 @@ READ8_MEMBER( p2000t_state::p2000t_port_000f_r )
     bit 6 - Cassette read clock
     bit 7 - Cassette read data
 */
-READ8_MEMBER( p2000t_state::p2000t_port_202f_r )
+uint8_t p2000t_state::p2000t_port_202f_r()
 {
 	return (0xff);
 }
@@ -93,7 +93,7 @@ READ8_MEMBER( p2000t_state::p2000t_port_202f_r )
     bit 6 - Keyboard interrupt enable
     bit 7 - Printer output
 */
-WRITE8_MEMBER( p2000t_state::p2000t_port_101f_w )
+void p2000t_state::p2000t_port_101f_w(uint8_t data)
 {
 	m_port_101f = data;
 }
@@ -110,7 +110,7 @@ WRITE8_MEMBER( p2000t_state::p2000t_port_101f_w )
     bit 6 - \
     bit 7 - Video disable (0 = enabled)
 */
-WRITE8_MEMBER( p2000t_state::p2000t_port_303f_w )
+void p2000t_state::p2000t_port_303f_w(uint8_t data)
 {
 	m_port_303f = data;
 }
@@ -127,7 +127,7 @@ WRITE8_MEMBER( p2000t_state::p2000t_port_303f_w )
     bit 6 - Unused
     bit 7 - Unused
 */
-WRITE8_MEMBER( p2000t_state::p2000t_port_505f_w )
+void p2000t_state::p2000t_port_505f_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 }
@@ -148,11 +148,11 @@ WRITE8_MEMBER( p2000t_state::p2000t_port_505f_w )
     video refresh is disabled when the CPU accesses video memory
 
 */
-WRITE8_MEMBER( p2000t_state::p2000t_port_707f_w )
+void p2000t_state::p2000t_port_707f_w(uint8_t data)
 {
 	m_port_707f = data;
 }
 
-WRITE8_MEMBER( p2000t_state::p2000t_port_888b_w ) {}
-WRITE8_MEMBER( p2000t_state::p2000t_port_8c90_w ) {}
-WRITE8_MEMBER( p2000t_state::p2000t_port_9494_w ) {}
+void p2000t_state::p2000t_port_888b_w(uint8_t data) {}
+void p2000t_state::p2000t_port_8c90_w(uint8_t data) {}
+void p2000t_state::p2000t_port_9494_w(uint8_t data) {}

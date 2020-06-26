@@ -49,7 +49,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
+void epos_state::dealer_decrypt_rom(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 		m_counter = (m_counter + 1) & 0x03;

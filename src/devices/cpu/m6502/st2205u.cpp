@@ -51,8 +51,8 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 void st2205u_device::device_start()
 {
 	std::unique_ptr<mi_st2205u> intf = std::make_unique<mi_st2205u>();
-	intf->data = &space(AS_DATA);
-	intf->dcache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_DATA).specific(intf->data);
+	space(AS_DATA).cache(intf->dcache);
 	intf->irr_enable = false;
 	intf->irr = 0;
 	intf->prr = 0;
@@ -164,7 +164,7 @@ u8 st2205u_device::mi_st2205u::pread(u16 adr)
 	if (BIT(bank, 15))
 		return ram[0x4000 | (adr & 0x3fff)];
 	else
-		return data->read_byte(u32(bank) << 14 | (adr & 0x3fff));
+		return data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 u8 st2205u_device::mi_st2205u::preadc(u16 adr)
@@ -173,7 +173,7 @@ u8 st2205u_device::mi_st2205u::preadc(u16 adr)
 	if (BIT(bank, 15))
 		return ram[0x4000 | (adr & 0x3fff)];
 	else
-		return dcache->read_byte(u32(bank) << 14 | (adr & 0x3fff));
+		return dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 void st2205u_device::mi_st2205u::pwrite(u16 adr, u8 val)
@@ -182,7 +182,7 @@ void st2205u_device::mi_st2205u::pwrite(u16 adr, u8 val)
 	if (BIT(bank, 15))
 		ram[0x4000 | (adr & 0x3fff)] = val;
 	else
-		data->write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
+		data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::dread(u16 adr)
@@ -190,7 +190,7 @@ u8 st2205u_device::mi_st2205u::dread(u16 adr)
 	if (BIT(drr, 15))
 		return ram[adr & 0x7fff];
 	else
-		return data->read_byte(u32(drr) << 15 | (adr & 0x7fff));
+		return data.read_byte(u32(drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2205u_device::mi_st2205u::dreadc(u16 adr)
@@ -198,7 +198,7 @@ u8 st2205u_device::mi_st2205u::dreadc(u16 adr)
 	if (BIT(drr, 15))
 		return ram[adr & 0x7fff];
 	else
-		return dcache->read_byte(u32(drr) << 15 | (adr & 0x7fff));
+		return dcache.read_byte(u32(drr) << 15 | (adr & 0x7fff));
 }
 
 void st2205u_device::mi_st2205u::dwrite(u16 adr, u8 val)
@@ -206,7 +206,7 @@ void st2205u_device::mi_st2205u::dwrite(u16 adr, u8 val)
 	if (BIT(drr, 15))
 		ram[adr & 0x7fff] = val;
 	else
-		data->write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
+		data.write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::bread(u16 adr)
@@ -214,7 +214,7 @@ u8 st2205u_device::mi_st2205u::bread(u16 adr)
 	if (BIT(brr, 15))
 		return ram[0x2000 | (adr & 0x1fff)];
 	else
-		return data->read_byte(u32(brr) << 13 | (adr & 0x1fff));
+		return data.read_byte(u32(brr) << 13 | (adr & 0x1fff));
 }
 
 u8 st2205u_device::mi_st2205u::breadc(u16 adr)
@@ -222,7 +222,7 @@ u8 st2205u_device::mi_st2205u::breadc(u16 adr)
 	if (BIT(brr, 15))
 		return ram[0x2000 | (adr & 0x1fff)];
 	else
-		return dcache->read_byte(u32(brr) << 13 | (adr & 0x1fff));
+		return dcache.read_byte(u32(brr) << 13 | (adr & 0x1fff));
 }
 
 void st2205u_device::mi_st2205u::bwrite(u16 adr, u8 val)
@@ -230,22 +230,22 @@ void st2205u_device::mi_st2205u::bwrite(u16 adr, u8 val)
 	if (BIT(brr, 15))
 		ram[0x2000 | (adr & 0x1fff)] = val;
 	else
-		data->write_byte(u32(brr) << 13 | (adr & 0x1fff), val);
+		data.write_byte(u32(brr) << 13 | (adr & 0x1fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::read(u16 adr)
 {
-	return program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cache->read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cprogram.read_byte(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cache->read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cprogram.read_byte(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_vector(u16 adr)
@@ -255,7 +255,7 @@ u8 st2205u_device::mi_st2205u::read_vector(u16 adr)
 
 void st2205u_device::mi_st2205u::write(u16 adr, u8 val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 }
 
 u8 st2205u_device::brrl_r()

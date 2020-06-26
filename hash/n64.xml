@@ -374,7 +374,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>AeroGauge (Europe)</description>
 		<year>1998</year>
 		<publisher>ASCII Entertainment</publisher>
-		<info name="serial" value=" NUS-NAGP-NOE, NUS-NAGP-UKV"/>
+		<info name="serial" value="NUS-NAGP-NOE, NUS-NAGP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="U1 [NUS-NAGP-0]" />

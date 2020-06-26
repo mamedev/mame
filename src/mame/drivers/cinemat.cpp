@@ -84,13 +84,13 @@ void cinemat_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::inputs_r)
+uint8_t cinemat_state::inputs_r(offs_t offset)
 {
 	return (m_inputs->read() >> offset) & 1;
 }
 
 
-READ8_MEMBER(cinemat_state::switches_r)
+uint8_t cinemat_state::switches_r(offs_t offset)
 {
 	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
 	return (m_switches->read() >> switch_shuffle[offset]) & 1;
@@ -112,7 +112,7 @@ INPUT_CHANGED_MEMBER(cinemat_state::coin_inserted)
 }
 
 
-READ8_MEMBER(cinemat_state::coin_input_r)
+uint8_t cinemat_state::coin_input_r()
 {
 	return !m_coin_detected;
 }
@@ -165,7 +165,7 @@ uint8_t cinemat_state::joystick_read()
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
+uint8_t cinemat_state::speedfrk_wheel_r(offs_t offset)
 {
 	static const uint8_t speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
@@ -181,7 +181,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 }
 
 
-READ8_MEMBER(cinemat_state::speedfrk_gear_r)
+uint8_t cinemat_state::speedfrk_gear_r(offs_t offset)
 {
 	int gearval = m_gear_input->read();
 
@@ -232,7 +232,7 @@ static const struct
 };
 
 
-READ8_MEMBER(cinemat_16level_state::sundance_inputs_r)
+uint8_t cinemat_16level_state::sundance_inputs_r(offs_t offset)
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
@@ -249,7 +249,7 @@ READ8_MEMBER(cinemat_16level_state::sundance_inputs_r)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_color_state::boxingb_dial_r)
+uint8_t cinemat_color_state::boxingb_dial_r(offs_t offset)
 {
 	int value = ioport("DIAL")->read();
 	if (!m_mux_select) offset += 4;
@@ -264,7 +264,7 @@ READ8_MEMBER(cinemat_color_state::boxingb_dial_r)
  *
  *************************************/
 
-READ8_MEMBER(qb3_state::qb3_frame_r)
+uint8_t qb3_state::qb3_frame_r()
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
@@ -275,7 +275,7 @@ READ8_MEMBER(qb3_state::qb3_frame_r)
 }
 
 
-WRITE8_MEMBER(qb3_state::qb3_ram_bank_w)
+void qb3_state::qb3_ram_bank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(ccpu_cpu_device::CCPU_P) & 3);
 }
@@ -1508,21 +1508,21 @@ ROM_END
 void cinemat_state::init_speedfrk()
 {
 	m_gear = 0xe;
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(*this, FUNC(cinemat_state::speedfrk_wheel_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(*this, FUNC(cinemat_state::speedfrk_gear_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(cinemat_state::speedfrk_wheel_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8sm_delegate(*this, FUNC(cinemat_state::speedfrk_gear_r)));
 	save_item(NAME(m_gear));
 }
 
 
 void cinemat_16level_state::init_sundance()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(*this, FUNC(cinemat_16level_state::sundance_inputs_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8sm_delegate(*this, FUNC(cinemat_16level_state::sundance_inputs_r)));
 }
 
 
 void cinemat_color_state::init_boxingb()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(*this, FUNC(cinemat_color_state::boxingb_dial_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8sm_delegate(*this, FUNC(cinemat_color_state::boxingb_dial_r)));
 }
 
 

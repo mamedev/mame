@@ -148,7 +148,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-WRITE8_MEMBER( hx5102_device::external_operation )
+void hx5102_device::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) LOGMASKED(LOG_WARN, "External operation %s not implemented on HX5102 board\n", extop[offset]);
@@ -182,7 +182,7 @@ WRITE8_MEMBER( hx5102_device::external_operation )
 /*
     Reading from the address space of the drive.
 */
-READ8_MEMBER( hx5102_device::read )
+uint8_t hx5102_device::read(offs_t offset)
 {
 	bool ramen1 = ((offset & 0xf800)==0xe000);
 	bool ramen2 = ((offset & 0xf800)==0xe800);
@@ -220,11 +220,11 @@ READ8_MEMBER( hx5102_device::read )
 
 	// Floppy drive controller
 	if (m_dcs)
-		return fdc_read(space, offset&0x000f);
+		return fdc_read(offset&0x000f);
 
 	// Hexbus controller
 	if (hcs)
-		return ibc_read(space, offset&0x000f);
+		return ibc_read(offset&0x000f);
 
 	// DMA
 	if (m_dack)
@@ -243,7 +243,7 @@ READ8_MEMBER( hx5102_device::read )
 /*
     Writing into the address space of the drive.
 */
-WRITE8_MEMBER( hx5102_device::write )
+void hx5102_device::write(offs_t offset, uint8_t data)
 {
 	bool ramen1 = ((offset & 0xf800)==0xe000);
 	bool ramen2 = ((offset & 0xf800)==0xe800);
@@ -270,14 +270,14 @@ WRITE8_MEMBER( hx5102_device::write )
 	// Floppy drive controller
 	if (m_dcs)
 	{
-		fdc_write(space, offset&0x000f, data);
+		fdc_write(offset&0x000f, data);
 		return;
 	}
 
 	// Hexbus controller
 	if (hcs)
 	{
-		ibc_write(space, offset&0x000f, data);
+		ibc_write(offset&0x000f, data);
 		return;
 	}
 
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER( hx5102_device::mspeed_w )
 /*
     Read access to the floppy controller
 */
-READ8_MEMBER(hx5102_device::fdc_read)
+uint8_t hx5102_device::fdc_read(offs_t offset)
 {
 	uint8_t val = 0;
 	switch (offset)
@@ -388,7 +388,7 @@ READ8_MEMBER(hx5102_device::fdc_read)
 /*
     Write access to the floppy controller
 */
-WRITE8_MEMBER(hx5102_device::fdc_write)
+void hx5102_device::fdc_write(offs_t offset, uint8_t data)
 {
 	m_dcs = ((offset & 0x0003)==0);
 
@@ -416,21 +416,21 @@ void hx5102_device::update_readyff_input()
 /*
     Access to the Hexbus controller
 */
-READ8_MEMBER(hx5102_device::ibc_read)
+uint8_t hx5102_device::ibc_read(offs_t offset)
 {
 	if ((offset & 1)==0)
-		return m_hexbus_ctrl->read(space, (offset>>1)&1);
+		return m_hexbus_ctrl->read((offset>>1)&1);
 	else
 		return 0;
 }
 
-WRITE8_MEMBER(hx5102_device::ibc_write)
+void hx5102_device::ibc_write(offs_t offset, uint8_t data)
 {
 	if ((offset & 1)==0)
-		m_hexbus_ctrl->write(space, (offset>>1)&1, data);
+		m_hexbus_ctrl->write((offset>>1)&1, data);
 }
 
-WRITE8_MEMBER(hx5102_device::hexbus_out)
+void hx5102_device::hexbus_out(uint8_t data)
 {
 	LOGMASKED(LOG_HEXBUS, "Write to hexbus: BAV*=%d, HSK*=%d, data=%x\n", bav_line(data)==ASSERT_LINE? 0:1, hsk_line(data)==ASSERT_LINE? 0:1, data_lines(data));
 
@@ -464,7 +464,7 @@ WRITE_LINE_MEMBER(hx5102_device::hsklatch_out)
     MON = Motor on
     INT = Interrupt from i8272A
 */
-READ8_MEMBER(hx5102_device::cruread)
+uint8_t hx5102_device::cruread(offs_t offset)
 {
 	uint8_t crubits = 0;
 	// LOGMASKED(LOG_CRU, "Reading CRU addresses %04x-%04x\n", 0x17e0 + (offset<<4), 0x17ee + (offset<<4));
@@ -480,7 +480,7 @@ READ8_MEMBER(hx5102_device::cruread)
 /*
     CRU write access.
 */
-WRITE8_MEMBER(hx5102_device::cruwrite)
+void hx5102_device::cruwrite(offs_t offset, uint8_t data)
 {
 	// LOG("Writing CRU address %04x: %x\n", 0x17e0 + (offset<<1), data);
 	switch (offset)

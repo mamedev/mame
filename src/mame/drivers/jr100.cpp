@@ -122,13 +122,13 @@ void jr100_state::mem_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	//map(0x4000, 0x7fff).ram();   expansion ram
 	//map(0x8000, 0xbfff).rom();   expansion rom
-	map(0xc000, 0xc0ff).ram().share("pcg").region("maincpu", 0xc000);
+	map(0xc000, 0xc0ff).ram().share("pcg");
 	map(0xc100, 0xc3ff).ram().share("vram");
 	map(0xc800, 0xc80f).m(m_via, FUNC(via6522_device::map));
 	//map(0xcc00, 0xcfff).;   expansion i/o
 	//map(0xd000, 0xd7ff).rom();   expansion rom for printer control
 	//map(0xd800, 0xdfff).rom();   expansion rom
-	map(0xe000, 0xffff).rom().share("rom");
+	map(0xe000, 0xffff).rom().share("rom").region("maincpu",0);
 }
 
 // Input ports - names in [ ] are screen actions; otherwise the text is literally printed onscreen
@@ -202,6 +202,10 @@ void jr100_state::machine_start()
 {
 	if (!m_sound_timer)
 		m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr100_state::sound_tick), this));
+
+	save_item(NAME(m_keyboard_line));
+	save_item(NAME(m_use_pcg));
+	save_item(NAME(m_pb7));
 }
 
 void jr100_state::machine_reset()
@@ -271,8 +275,8 @@ static const gfx_layout tilesram_layout =
 };
 
 static GFXDECODE_START( gfx_jr100 )
-	GFXDECODE_ENTRY( "maincpu", 0xe000, tilesrom_layout, 0, 1 )   // inside rom
-	GFXDECODE_ENTRY( "maincpu", 0xc000, tilesram_layout, 0, 1 )   // user defined
+	GFXDECODE_ENTRY( "maincpu", 0x0000, tilesrom_layout, 0, 1 )   // inside rom
+	GFXDECODE_RAM  ( "pcg",     0x0000, tilesram_layout, 0, 1 )   // user defined
 GFXDECODE_END
 
 uint8_t jr100_state::pb_r()
@@ -410,17 +414,17 @@ void jr100_state::jr100(machine_config &config)
 
 /* ROM definition */
 ROM_START( jr100 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jr100.ic5", 0xe000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "jr100.ic5", 0x0000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
 ROM_END
 
 ROM_START( jr100u )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jr100u.ic5", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "jr100u.ic5", 0x0000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
-COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  0 )
-COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", 0 )
+COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -67,7 +67,6 @@ public:
 	proteus3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "vram")
 		, m_p_chargen(*this, "chargen")
 		, m_pia(*this, "pia")
 		, m_brg(*this, "brg")
@@ -81,11 +80,11 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
-	void video_w(uint8_t data);
+	void video_w(u8 data);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// Clocks
 	void write_acia_clocks(int id, int state);
@@ -105,16 +104,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
-	void proteus3_mem(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_video_data;
-	uint8_t m_flashcnt;
-	uint16_t m_curs_pos;
-	uint8_t m_cass_data[4];
-	bool m_cassbit, m_cassold, m_cassinbit;
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	u8 m_video_data;
+	u8 m_flashcnt;
+	u16 m_curs_pos;
+	u8 m_cass_data[4];
+	bool m_cassbit, m_cassold, m_cassinbit;
+	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<pia6821_device> m_pia;
 	required_device<mc14411_device> m_brg;
@@ -133,14 +133,14 @@ private:
  Address Maps
 ******************************************************************************/
 
-void proteus3_state::proteus3_mem(address_map &map)
+void proteus3_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
 	map(0x8004, 0x8007).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8008, 0x8009).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // cassette
 	map(0x8010, 0x8011).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // serial keyboard 7E2 (never writes data)
-	map(0xc000, 0xffff).rom();
+	map(0xc000, 0xffff).rom().region("maincpu", 0);
 }
 
 
@@ -206,7 +206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::kansas_r )
 	}
 
 	/* cassette - turn 1200/2400Hz to a bit */
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
 /******************************************************************************
  Video
 ******************************************************************************/
-void proteus3_state::video_w(uint8_t data)
+void proteus3_state::video_w(u8 data)
 {
 	m_video_data = data;
 }
@@ -262,8 +262,8 @@ WRITE_LINE_MEMBER( proteus3_state::ca2_w )
 			case 0x0a: // Line Feed
 				if (m_curs_pos > 959) // on bottom line?
 				{
-					memmove(m_p_videoram, m_p_videoram+64, 960); // scroll
-					memset(m_p_videoram+960, 0x20, 64); // blank bottom line
+					memmove(m_vram.get(), m_vram.get()+64, 960); // scroll
+					memset(m_vram.get()+960, 0x20, 64); // blank bottom line
 				}
 				else
 					m_curs_pos += 64;
@@ -273,49 +273,49 @@ WRITE_LINE_MEMBER( proteus3_state::ca2_w )
 				break;
 			case 0x0c: // CLS
 				m_curs_pos = 0; // home cursor
-				memset(m_p_videoram, 0x20, 1024); // clear screen
+				memset(m_vram.get(), 0x20, 1024); // clear screen
 				break;
 			case 0x0f: // Cursor Left
 				if (m_curs_pos)
 					m_curs_pos--;
 				break;
 			case 0x7f: // Erase character under cursor
-				m_p_videoram[m_curs_pos] = 0x20;
+				m_vram[m_curs_pos] = 0x20;
 				break;
 			default: // If a displayable character, show it
 				if ((m_video_data > 0x1f) && (m_video_data < 0x7f))
 				{
-					m_p_videoram[m_curs_pos] = m_video_data;
+					m_vram[m_curs_pos] = m_video_data;
 					m_curs_pos++;
 					if (m_curs_pos > 1023) // have we run off the bottom?
 					{
 						m_curs_pos -= 64;
-						memmove(m_p_videoram, m_p_videoram+64, 960); // scroll
-						memset(m_p_videoram+960, 0x20, 64); // blank bottom line
+						memmove(m_vram.get(), m_vram.get()+64, 960); // scroll
+						memset(m_vram.get()+960, 0x20, 64); // blank bottom line
 					}
 				}
 		}
 	}
 }
 
-uint32_t proteus3_state::screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 proteus3_state::screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
 	m_flashcnt++;
 
 	for(y = 0; y < 16; y++ )
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
 				gfx = 0;
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x]; // get char in videoram
+					chr = m_vram[x]; // get char in videoram
 					gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
 				}
 				else
@@ -376,6 +376,18 @@ void proteus3_state::machine_reset()
 	m_brg->timer_enable( mc14411_device::TIMER_F8, true); // Cassette interface
 }
 
+void proteus3_state::machine_start()
+{
+	m_vram = make_unique_clear<u8[]>(0x0400);
+	save_pointer(NAME(m_vram), 0x0400);
+	save_item(NAME(m_video_data));
+	save_item(NAME(m_flashcnt));
+	save_item(NAME(m_curs_pos));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassinbit));
+}
 
 /******************************************************************************
  Machine Drivers
@@ -385,7 +397,7 @@ void proteus3_state::proteus3(machine_config &config)
 {
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 internally */
-	m_maincpu->set_addrmap(AS_PROGRAM, &proteus3_state::proteus3_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &proteus3_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -453,32 +465,29 @@ void proteus3_state::proteus3(machine_config &config)
 ******************************************************************************/
 
 ROM_START(proteus3)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASE00)  // if c000 isn't 0 it assumes a rom is there and jumps to it
 	ROM_SYSTEM_BIOS( 0, "14k", "14k BASIC")
-	ROMX_LOAD( "bas1.bin",     0xc800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(0) )
-	ROMX_LOAD( "bas2.bin",     0xd000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(0) )
-	ROMX_LOAD( "bas3.bin",     0xd800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(0) )
-	ROMX_LOAD( "bas4.bin",     0xe000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(0) )
-	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(0) )
-	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(0) )
-	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(0) )
-	ROM_FILL( 0xc000, 1, 0x00 )  // if c000 isn't 0 it assumes a rom is there and jumps to it
+	ROMX_LOAD( "bas1.bin",     0x0800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(0) )
+	ROMX_LOAD( "bas2.bin",     0x1000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(0) )
+	ROMX_LOAD( "bas3.bin",     0x1800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(0) )
+	ROMX_LOAD( "bas4.bin",     0x2000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(0) )
+	ROMX_LOAD( "bas5.bin",     0x2800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(0) )
+	ROMX_LOAD( "bas6.bin",     0x3000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(0) )
+	ROMX_LOAD( "bas7.bin",     0x3800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "8k", "8k BASIC")
-	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(1) )
-	ROM_RELOAD( 0xc000, 0x2000 )
+	ROMX_LOAD( "proteus3_basic8k.m0", 0x2000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(1) )
+	ROM_RELOAD( 0x0000, 0x2000 )
 
 	ROM_SYSTEM_BIOS( 2, "8kms", "8k Micro-Systemes BASIC")
-	ROMX_LOAD( "ms1_basic8k.bin", 0xe000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(2) )
-	ROM_RELOAD( 0xc000, 0x2000 )
+	ROMX_LOAD( "ms1_basic8k.bin", 0x2000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(2) )
+	ROM_RELOAD( 0x0000, 0x2000 )
 
-	ROM_REGION(0x400, "chargen", 0)
+	ROM_REGION(0x0400, "chargen", 0)
 	ROM_LOAD( "proteus3_font.m25",   0x0200, 0x0100, CRC(6a3a30a5) SHA1(ab39bf09722928483e497b87ac2dbd870828893b) )
 	ROM_CONTINUE( 0x100, 0x100 )
 	ROM_CONTINUE( 0x300, 0x100 )
 	ROM_CONTINUE( 0x000, 0x100 )
-
-	ROM_REGION(0x400, "vram", ROMREGION_ERASE00)
 
 	ROM_REGION(0x0800, "user1", 0) // roms not used yet
 	// Proteus III - pbug F800-FFFF, expects RAM at F000-F7FF
@@ -491,4 +500,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME       FLAGS
-COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, empty_init, "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, empty_init, "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -64,7 +64,7 @@ write    read
 20    -> 8
 40    -> 0
 */
-READ16_MEMBER(shangha3_state::shangha3_prot_r)
+uint16_t shangha3_state::shangha3_prot_r()
 {
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
@@ -73,12 +73,12 @@ READ16_MEMBER(shangha3_state::shangha3_prot_r)
 	return result[m_prot_count++ % 9];
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
+void shangha3_state::shangha3_prot_w(uint16_t data)
 {
 	logerror("PC %04x: write %02x to 20004e\n",m_maincpu->pc(),data);
 }
 
-WRITE8_MEMBER(shangha3_state::shangha3_coinctrl_w)
+void shangha3_state::shangha3_coinctrl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
@@ -86,7 +86,7 @@ WRITE8_MEMBER(shangha3_state::shangha3_coinctrl_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(shangha3_state::heberpop_coinctrl_w)
+void shangha3_state::heberpop_coinctrl_w(uint8_t data)
 {
 	/* the sound ROM bank is selected by the main CPU! */
 	m_oki->set_rom_bank((data >> 3) & 1);
@@ -97,7 +97,7 @@ WRITE8_MEMBER(shangha3_state::heberpop_coinctrl_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(shangha3_state::blocken_coinctrl_w)
+void shangha3_state::blocken_coinctrl_w(uint8_t data)
 {
 	/* the sound ROM bank is selected by the main CPU! */
 	m_okibank->set_entry((data >> 4) & 3);
@@ -109,7 +109,7 @@ WRITE8_MEMBER(shangha3_state::blocken_coinctrl_w)
 }
 
 
-WRITE16_MEMBER(shangha3_state::irq_ack_w)
+void shangha3_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }

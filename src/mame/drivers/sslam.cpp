@@ -292,7 +292,7 @@ void sslam_state::sslam_play(int track, int data)
 	}
 }
 
-WRITE8_MEMBER(sslam_state::sslam_snd_w)
+void sslam_state::sslam_snd_w(uint8_t data)
 {
 	logerror("%s Writing %04x to Sound CPU\n",machine().describe_context(),data);
 	if (data >= 0x40) {
@@ -364,7 +364,7 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 
 
 
-WRITE16_MEMBER(powerbls_state::powerbls_sound_w)
+void powerbls_state::powerbls_sound_w(uint16_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);

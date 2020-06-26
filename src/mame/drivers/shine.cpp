@@ -52,7 +52,7 @@ public:
 private:
 	uint8_t via0_pa_r();
 	void via0_pb_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(floppy_w);
+	void floppy_w(uint8_t data);
 	uint8_t vdg_videoram_r(offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
@@ -196,7 +196,7 @@ void shine_state::via0_pb_w(uint8_t data)
 }
 
 
-WRITE8_MEMBER(shine_state::floppy_w)
+void shine_state::floppy_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

@@ -31,15 +31,15 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port30_w);
-	DECLARE_WRITE8_MEMBER(port31_w);
-	DECLARE_WRITE8_MEMBER(port32_w);
-	DECLARE_WRITE8_MEMBER(port33_w);
-	DECLARE_WRITE8_MEMBER(port34_w);
-	DECLARE_WRITE8_MEMBER(port35_w);
-	DECLARE_WRITE8_MEMBER(port36_w);
-	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void port30_w(uint8_t data);
+	void port31_w(uint8_t data);
+	void port32_w(uint8_t data);
+	void port33_w(uint8_t data);
+	void port34_w(uint8_t data);
+	void port35_w(uint8_t data);
+	void port36_w(uint8_t data);
+	void watchdog_reset_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
 	void ampoker2_palette(palette_device &palette) const;

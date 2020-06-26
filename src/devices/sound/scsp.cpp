@@ -148,7 +148,7 @@ DEFINE_DEVICE_TYPE(SCSP, scsp_device, "scsp", "Yamaha YMF292-F SCSP")
 scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 20, ENDIANNESS_BIG, 16),
+		device_rom_interface(mconfig, *this),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
 		m_BUFPTR(0),
@@ -1457,13 +1457,13 @@ int IRQCB(void *param)
 #endif
 
 
-READ16_MEMBER(scsp_device::read)
+u16 scsp_device::read(offs_t offset)
 {
 	m_stream->update();
 	return r16(offset * 2);
 }
 
-WRITE16_MEMBER(scsp_device::write)
+void scsp_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_stream->update();
 
@@ -1482,11 +1482,9 @@ void scsp_device::midi_in(u8 data)
 	CheckPendingIRQ();
 }
 
-READ16_MEMBER(scsp_device::midi_out_r)
+u16 scsp_device::midi_out_r()
 {
-	u8 val;
-
-	val = m_MidiStack[m_MidiR++];
+	u8 val = m_MidiStack[m_MidiR++];
 	m_MidiR &= 31;
 	return val;
 }

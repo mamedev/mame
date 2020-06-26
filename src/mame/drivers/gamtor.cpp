@@ -47,12 +47,12 @@ public:
 private:
 	void gaminator_map(address_map &map);
 
-	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
+	void gamtor_unk_w(uint32_t data);
 
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
+void gaminator_state::gamtor_unk_w(uint32_t data)
 {
 }
 

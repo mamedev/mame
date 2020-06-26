@@ -87,8 +87,8 @@ public:
 	void meijinsn_map(address_map &map);
 
 private:
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(alpha_mcu_r);
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t alpha_mcu_r(offs_t offset);
 	void meijinsn_palette(palette_device &palette) const;
 	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
@@ -115,13 +115,13 @@ private:
 
 
 
-WRITE16_MEMBER(meijinsn_state::sound_w)
+void meijinsn_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(data & 0xff);
 }
 
-READ16_MEMBER(meijinsn_state::alpha_mcu_r)
+uint16_t meijinsn_state::alpha_mcu_r(offs_t offset)
 {
 	static const uint8_t coinage1[2][2] = {{1,1}, {1,2}};
 	static const uint8_t coinage2[2][2] = {{1,5}, {2,1}};

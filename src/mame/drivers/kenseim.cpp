@@ -213,7 +213,7 @@ private:
 	}
 
 	/* kenseim */
-	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
+	void cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// certain
 
@@ -400,7 +400,7 @@ READ_LINE_MEMBER(kenseim_state::cmd_LVm_r)
 
 /* 68k side COMMS writes */
 
-WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
+void kenseim_state::cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -695,7 +695,7 @@ ROM_END
 
 void kenseim_state::init_kenseim()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16s_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
 
 	init_cps1();
 

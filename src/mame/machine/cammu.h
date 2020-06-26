@@ -227,7 +227,7 @@ protected:
 
 	struct translated_t
 	{
-		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *const cache;
+		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache *const cache;
 		const u32 address;
 	};
 
@@ -240,7 +240,7 @@ protected:
 	struct memory_t
 	{
 		address_space *space;
-		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *cache;
+		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache cache;
 	};
 
 	// address translation
@@ -269,28 +269,28 @@ public:
 
 	void set_cammu_id(const u32 cammu_id) { m_control = cammu_id; }
 
-	DECLARE_READ32_MEMBER(s_pdo_r) { return m_s_pdo; }
-	DECLARE_WRITE32_MEMBER(s_pdo_w) { m_s_pdo = ((m_s_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
-	DECLARE_READ32_MEMBER(u_pdo_r) { return m_u_pdo; }
-	DECLARE_WRITE32_MEMBER(u_pdo_w) { m_u_pdo = ((m_u_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
+	u32 s_pdo_r() { return m_s_pdo; }
+	void s_pdo_w(offs_t offset, u32 data, u32 mem_mask = ~0) { m_s_pdo = ((m_s_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
+	u32 u_pdo_r() { return m_u_pdo; }
+	void u_pdo_w(offs_t offset, u32 data, u32 mem_mask = ~0) { m_u_pdo = ((m_u_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
 
-	virtual DECLARE_READ32_MEMBER(control_r) = 0;
-	virtual DECLARE_WRITE32_MEMBER(control_w) = 0;
+	virtual u32 control_r() = 0;
+	virtual void control_w(offs_t offset, u32 data, u32 mem_mask = ~0) = 0;
 
-	DECLARE_READ32_MEMBER(i_fault_r) { return m_i_fault; }
-	DECLARE_WRITE32_MEMBER(i_fault_w) { m_i_fault = data; }
-	DECLARE_READ32_MEMBER(fault_address_1_r) { return m_fault_address_1; }
-	DECLARE_WRITE32_MEMBER(fault_address_1_w) { m_fault_address_1 = data; }
-	DECLARE_READ32_MEMBER(fault_address_2_r) { return m_fault_address_2; }
-	DECLARE_WRITE32_MEMBER(fault_address_2_w) { m_fault_address_2 = data; }
-	DECLARE_READ32_MEMBER(fault_data_1_lo_r) { return m_fault_data_1_lo; }
-	DECLARE_WRITE32_MEMBER(fault_data_1_lo_w) { m_fault_data_1_lo = data; }
-	DECLARE_READ32_MEMBER(fault_data_1_hi_r) { return m_fault_data_1_hi; }
-	DECLARE_WRITE32_MEMBER(fault_data_1_hi_w) { m_fault_data_1_hi = data; }
-	DECLARE_READ32_MEMBER(fault_data_2_lo_r) { return m_fault_data_2_lo; }
-	DECLARE_WRITE32_MEMBER(fault_data_2_lo_w) { m_fault_data_2_lo = data; }
-	DECLARE_READ32_MEMBER(fault_data_2_hi_r) { return m_fault_data_2_hi; }
-	DECLARE_WRITE32_MEMBER(fault_data_2_hi_w) { m_fault_data_2_hi = data; }
+	u32 i_fault_r() { return m_i_fault; }
+	void i_fault_w(u32 data) { m_i_fault = data; }
+	u32 fault_address_1_r() { return m_fault_address_1; }
+	void fault_address_1_w(u32 data) { m_fault_address_1 = data; }
+	u32 fault_address_2_r() { return m_fault_address_2; }
+	void fault_address_2_w(u32 data) { m_fault_address_2 = data; }
+	u32 fault_data_1_lo_r() { return m_fault_data_1_lo; }
+	void fault_data_1_lo_w(u32 data) { m_fault_data_1_lo = data; }
+	u32 fault_data_1_hi_r() { return m_fault_data_1_hi; }
+	void fault_data_1_hi_w(u32 data) { m_fault_data_1_hi = data; }
+	u32 fault_data_2_lo_r() { return m_fault_data_2_lo; }
+	void fault_data_2_lo_w(u32 data) { m_fault_data_2_lo = data; }
+	u32 fault_data_2_hi_r() { return m_fault_data_2_hi; }
+	void fault_data_2_hi_w(u32 data) { m_fault_data_2_hi = data; }
 
 protected:
 	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -322,14 +322,14 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ32_MEMBER(ram_line_r) { return m_ram_line; }
-	DECLARE_WRITE32_MEMBER(ram_line_w) { m_ram_line = data; }
+	u32 ram_line_r() { return m_ram_line; }
+	void ram_line_w(u32 data) { m_ram_line = data; }
 
-	DECLARE_READ32_MEMBER(htlb_offset_r) { return m_htlb_offset; }
-	DECLARE_WRITE32_MEMBER(htlb_offset_w) { m_htlb_offset = data; }
+	u32 htlb_offset_r() { return m_htlb_offset; }
+	void htlb_offset_w(u32 data) { m_htlb_offset = data; }
 
-	DECLARE_READ32_MEMBER(c4_bus_poll_r) { return m_c4_bus_poll; }
-	DECLARE_WRITE32_MEMBER(c4_bus_poll_w) { m_c4_bus_poll = data; }
+	u32 c4_bus_poll_r() { return m_c4_bus_poll; }
+	void c4_bus_poll_w(u32 data) { m_c4_bus_poll = data; }
 
 	enum control_mask : u32
 	{
@@ -361,27 +361,27 @@ public:
 		CID_C4T = 0x00000000 // unknown
 	};
 
-	virtual DECLARE_READ32_MEMBER(control_r) override { return m_control; }
-	virtual DECLARE_WRITE32_MEMBER(control_w) override { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
-	DECLARE_READ32_MEMBER(bio_control_r) { return m_bio_control; }
-	DECLARE_WRITE32_MEMBER(bio_control_w) { m_bio_control = data; }
-	DECLARE_READ32_MEMBER(bio_address_tag_r) { return m_bio_address_tag; }
-	DECLARE_WRITE32_MEMBER(bio_address_tag_w) { m_bio_address_tag = data; }
+	virtual u32 control_r() override { return m_control; }
+	virtual void control_w(offs_t offset, u32 data, u32 mem_mask = ~0) override { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
+	u32 bio_control_r() { return m_bio_control; }
+	void bio_control_w(u32 data) { m_bio_control = data; }
+	u32 bio_address_tag_r() { return m_bio_address_tag; }
+	void bio_address_tag_w(u32 data) { m_bio_address_tag = data; }
 
-	DECLARE_READ32_MEMBER(cache_data_lo_r) { return m_cache_data_lo; }
-	DECLARE_WRITE32_MEMBER(cache_data_lo_w) { m_cache_data_lo = data; }
-	DECLARE_READ32_MEMBER(cache_data_hi_r) { return m_cache_data_hi; }
-	DECLARE_WRITE32_MEMBER(cache_data_hi_w) { m_cache_data_hi = data; }
-	DECLARE_READ32_MEMBER(cache_cpu_tag_r) { return m_cache_cpu_tag; }
-	DECLARE_WRITE32_MEMBER(cache_cpu_tag_w) { m_cache_cpu_tag = data; }
-	DECLARE_READ32_MEMBER(cache_system_tag_valid_r) { return m_cache_system_tag_valid; }
-	DECLARE_WRITE32_MEMBER(cache_system_tag_valid_w) { m_cache_system_tag_valid = data; }
-	DECLARE_READ32_MEMBER(cache_system_tag_r) { return m_cache_system_tag; }
-	DECLARE_WRITE32_MEMBER(cache_system_tag_w) { m_cache_system_tag = data; }
-	DECLARE_READ32_MEMBER(tlb_va_line_r) { return m_tlb_va_line; }
-	DECLARE_WRITE32_MEMBER(tlb_va_line_w) { m_tlb_va_line = data; }
-	DECLARE_READ32_MEMBER(tlb_ra_line_r) { return m_tlb_ra_line; }
-	DECLARE_WRITE32_MEMBER(tlb_ra_line_w) { m_tlb_ra_line = data; }
+	u32 cache_data_lo_r() { return m_cache_data_lo; }
+	void cache_data_lo_w(u32 data) { m_cache_data_lo = data; }
+	u32 cache_data_hi_r() { return m_cache_data_hi; }
+	void cache_data_hi_w(u32 data) { m_cache_data_hi = data; }
+	u32 cache_cpu_tag_r() { return m_cache_cpu_tag; }
+	void cache_cpu_tag_w(u32 data) { m_cache_cpu_tag = data; }
+	u32 cache_system_tag_valid_r() { return m_cache_system_tag_valid; }
+	void cache_system_tag_valid_w(u32 data) { m_cache_system_tag_valid = data; }
+	u32 cache_system_tag_r() { return m_cache_system_tag; }
+	void cache_system_tag_w(u32 data) { m_cache_system_tag = data; }
+	u32 tlb_va_line_r() { return m_tlb_va_line; }
+	void tlb_va_line_w(u32 data) { m_tlb_va_line = data; }
+	u32 tlb_ra_line_r() { return m_tlb_ra_line; }
+	void tlb_ra_line_w(u32 data) { m_tlb_ra_line = data; }
 
 protected:
 	virtual void device_start() override;
@@ -453,8 +453,8 @@ public:
 		CID_C4IR2 = 0x02000000
 	};
 
-	virtual DECLARE_READ32_MEMBER(control_r) override { return m_control; }
-	virtual DECLARE_WRITE32_MEMBER(control_w) override { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
+	virtual u32 control_r() override { return m_control; }
+	virtual void control_w(offs_t offset, u32 data, u32 mem_mask) override { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
 
 	enum reset_mask : u32
 	{
@@ -467,23 +467,23 @@ public:
 		RESET_FLUSH = 0x40000000, // flush out burst io buffer
 		RESET_CFR   = 0x80000000  // clear fault registers
 	};
-	DECLARE_READ32_MEMBER(reset_r) { return m_reset; }
-	DECLARE_WRITE32_MEMBER(reset_w) { m_reset = data; }
+	u32 reset_r() { return m_reset; }
+	void reset_w(u32 data) { m_reset = data; }
 
-	DECLARE_READ32_MEMBER(clr_s_data_tlb_r) { return m_clr_s_data_tlb; }
-	DECLARE_WRITE32_MEMBER(clr_s_data_tlb_w) { m_clr_s_data_tlb = data; }
-	DECLARE_READ32_MEMBER(clr_u_data_tlb_r) { return m_clr_u_data_tlb; }
-	DECLARE_WRITE32_MEMBER(clr_u_data_tlb_w) { m_clr_u_data_tlb = data; }
-	DECLARE_READ32_MEMBER(clr_s_insn_tlb_r) { return m_clr_s_insn_tlb; }
-	DECLARE_WRITE32_MEMBER(clr_s_insn_tlb_w) { m_clr_s_insn_tlb = data; }
-	DECLARE_READ32_MEMBER(clr_u_insn_tlb_r) { return m_clr_u_insn_tlb; }
-	DECLARE_WRITE32_MEMBER(clr_u_insn_tlb_w) { m_clr_u_insn_tlb = data; }
+	u32 clr_s_data_tlb_r() { return m_clr_s_data_tlb; }
+	void clr_s_data_tlb_w(u32 data) { m_clr_s_data_tlb = data; }
+	u32 clr_u_data_tlb_r() { return m_clr_u_data_tlb; }
+	void clr_u_data_tlb_w(u32 data) { m_clr_u_data_tlb = data; }
+	u32 clr_s_insn_tlb_r() { return m_clr_s_insn_tlb; }
+	void clr_s_insn_tlb_w(u32 data) { m_clr_s_insn_tlb = data; }
+	u32 clr_u_insn_tlb_r() { return m_clr_u_insn_tlb; }
+	void clr_u_insn_tlb_w(u32 data) { m_clr_u_insn_tlb = data; }
 
-	DECLARE_READ32_MEMBER(test_data_r) { return m_test_data; }
-	DECLARE_WRITE32_MEMBER(test_data_w) { m_test_data = data; }
+	u32 test_data_r() { return m_test_data; }
+	void test_data_w(u32 data) { m_test_data = data; }
 
-	DECLARE_READ32_MEMBER(test_address_r) { return m_test_address; }
-	DECLARE_WRITE32_MEMBER(test_address_w) { m_test_address = data; }
+	u32 test_address_r() { return m_test_address; }
+	void test_address_w(u32 data) { m_test_address = data; }
 
 protected:
 	virtual void device_start() override;
@@ -562,7 +562,7 @@ private:
 		u32 ra; // real address field
 		u32 va; // virtual address field
 
-		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *cache;
+		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache cache;
 	};
 	struct tlb_set_t
 	{

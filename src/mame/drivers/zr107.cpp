@@ -208,10 +208,12 @@ public:
 		m_analog1(*this, "ANALOG1"),
 		m_analog2(*this, "ANALOG2"),
 		m_analog3(*this, "ANALOG3"),
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_konppc(*this, "konppc") { }
+		m_konppc(*this, "konppc")
+	{ }
 
 	void zr107(machine_config &config);
 
@@ -227,27 +229,26 @@ protected:
 	required_device<k001005_device> m_k001005;
 	required_device<k001006_device> m_k001006_1;
 	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
+	output_finder<2> m_pcb_digit;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_device<konppc_device> m_konppc;
 
 	std::unique_ptr<uint32_t[]> m_sharc_dataram;
-	uint8_t m_led_reg0;
-	uint8_t m_led_reg1;
 	int m_ccu_vcth;
 	int m_ccu_vctl;
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
-	DECLARE_READ32_MEMBER(dsp_dataram_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
-	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
+	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	uint32_t ccu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ccu_w(uint32_t data);
+	uint32_t dsp_dataram_r(offs_t offset);
+	void dsp_dataram_w(offs_t offset, uint32_t data);
+	void sound_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	WRITE_LINE_MEMBER(vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
@@ -294,7 +295,7 @@ public:
 	void jetwave(machine_config &config);
 
 private:
-	DECLARE_WRITE32_MEMBER(palette_w);
+	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void main_memmap(address_map &map);
 
@@ -312,15 +313,13 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_k001005->draw(bitmap, cliprect);
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(zr107_state::paletteram32_w)
+void zr107_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -353,14 +352,12 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_k001005->draw(bitmap, cliprect);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
 /******************************************************************/
 
-READ8_MEMBER(zr107_state::sysreg_r)
+uint8_t zr107_state::sysreg_r(offs_t offset)
 {
 	uint32_t r = 0;
 
@@ -383,20 +380,19 @@ READ8_MEMBER(zr107_state::sysreg_r)
 			break;
 		case 5: /* Parallel data port */
 			break;
+		default:
+			break;
 	}
 	return r;
 }
 
-WRITE8_MEMBER(zr107_state::sysreg_w)
+void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0: /* LED Register 0 */
-			m_led_reg0 = data;
-			break;
-
-		case 1: /* LED Register 1 */
-			m_led_reg1 = data;
+		case 0: /* 7seg LEDs on PCB */
+		case 1:
+			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
 			break;
 
 		case 2: /* Parallel data register */
@@ -447,10 +443,12 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 				m_watchdog->watchdog_reset();
 			break;
 
+		default:
+			break;
 	}
 }
 
-READ32_MEMBER(zr107_state::ccu_r)
+uint32_t zr107_state::ccu_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	switch (offset)
@@ -475,7 +473,7 @@ READ32_MEMBER(zr107_state::ccu_r)
 	return r;
 }
 
-WRITE32_MEMBER(zr107_state::ccu_w)
+void zr107_state::ccu_w(uint32_t data)
 {
 }
 
@@ -483,6 +481,8 @@ WRITE32_MEMBER(zr107_state::ccu_w)
 
 void zr107_state::machine_start()
 {
+	m_pcb_digit.resolve();
+
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -511,7 +511,7 @@ void midnrun_state::main_memmap(address_map &map)
 }
 
 
-WRITE32_MEMBER(jetwave_state::palette_w)
+void jetwave_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -543,7 +543,7 @@ void jetwave_state::main_memmap(address_map &map)
 
 /**********************************************************************/
 
-WRITE16_MEMBER(zr107_state::sound_ctrl_w)
+void zr107_state::sound_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -568,12 +568,12 @@ void zr107_state::sound_memmap(address_map &map)
 /*****************************************************************************/
 
 
-READ32_MEMBER(zr107_state::dsp_dataram_r)
+uint32_t zr107_state::dsp_dataram_r(offs_t offset)
 {
 	return m_sharc_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(zr107_state::dsp_dataram_w)
+void zr107_state::dsp_dataram_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram[offset] = data;
 }
@@ -851,7 +851,6 @@ void jetwave_state::jetwave(machine_config &config)
 void zr107_state::driver_init()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
-	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
 
 	m_dsp->enable_recompiler();

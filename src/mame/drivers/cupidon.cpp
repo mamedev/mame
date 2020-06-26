@@ -38,7 +38,7 @@ public:
 	void init_cupidon();
 	void init_funnyfm();
 
-	DECLARE_READ32_MEMBER( cupidon_return_ffffffff )
+	uint32_t cupidon_return_ffffffff()
 	{
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
 	};

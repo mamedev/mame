@@ -80,18 +80,18 @@ public:
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	template<uint8_t Which> DECLARE_WRITE8_MEMBER(reel_ram_w);
+	void fg_tile_w(offs_t offset, uint8_t data);
+	void fg_color_w(offs_t offset, uint8_t data);
+	template<uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
 
 	void nmi_and_coins_w(uint8_t data);
 	void lamps_w(uint8_t data);
-	DECLARE_READ8_MEMBER(igs_irqack_r);
-	DECLARE_WRITE8_MEMBER(igs_irqack_w);
-	DECLARE_READ8_MEMBER(expram_r);
+	uint8_t igs_irqack_r();
+	void igs_irqack_w(uint8_t data);
+	uint8_t expram_r(offs_t offset);
 
-	template<uint8_t Which> DECLARE_WRITE8_MEMBER(unk_reg_lo_w);
-	template<uint8_t Which> DECLARE_WRITE8_MEMBER(unk_reg_hi_w);
+	template<uint8_t Which> void unk_reg_lo_w(offs_t offset, uint8_t data);
+	template<uint8_t Which> void unk_reg_hi_w(offs_t offset, uint8_t data);
 	void show_out();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -137,20 +137,20 @@ TILE_GET_INFO_MEMBER(jackie_state::get_fg_tile_info)
 	tileinfo.set(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(jackie_state::fg_tile_w)
+void jackie_state::fg_tile_w(offs_t offset, uint8_t data)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jackie_state::fg_color_w)
+void jackie_state::fg_color_w(offs_t offset, uint8_t data)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 template<uint8_t Which>
-WRITE8_MEMBER(jackie_state::reel_ram_w)
+void jackie_state::reel_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel_ram[Which][offset] = data;
 	m_reel_tilemap[Which]->mark_tile_dirty(offset);
@@ -259,7 +259,7 @@ void jackie_state::show_out()
 }
 
 template<uint8_t Which>
-WRITE8_MEMBER(jackie_state::unk_reg_lo_w)
+void jackie_state::unk_reg_lo_w(offs_t offset, uint8_t data)
 {
 	m_unk_reg[Which][offset] &= 0xff00;
 	m_unk_reg[Which][offset] |= data;
@@ -267,7 +267,7 @@ WRITE8_MEMBER(jackie_state::unk_reg_lo_w)
 }
 
 template<uint8_t Which>
-WRITE8_MEMBER(jackie_state::unk_reg_hi_w)
+void jackie_state::unk_reg_hi_w(offs_t offset, uint8_t data)
 {
 	m_unk_reg[Which][offset] &= 0xff;
 	m_unk_reg[Which][offset] |= data << 8;
@@ -316,20 +316,20 @@ void jackie_state::lamps_w(uint8_t data)
 	show_out();
 }
 
-READ8_MEMBER(jackie_state::igs_irqack_r)
+uint8_t jackie_state::igs_irqack_r()
 {
 	m_irq_enable = 1;
 	return 0;
 }
 
-WRITE8_MEMBER(jackie_state::igs_irqack_w)
+void jackie_state::igs_irqack_w(uint8_t data)
 {
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_out[2] = data;
 	show_out();
 }
 
-READ8_MEMBER(jackie_state::expram_r)
+uint8_t jackie_state::expram_r(offs_t offset)
 {
 	uint8_t *rom = memregion("gfx3")->base();
 

@@ -9,8 +9,9 @@
 #pragma once
 
 #include "meg.h"
+#include "dirom.h"
 
-class swp00_device : public device_t, public device_sound_interface, public device_rom_interface
+class swp00_device : public device_t, public device_sound_interface, public device_rom_interface<25+2, 2, 0, ENDIANNESS_LITTLE>
 {
 public:
 	swp00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 33868800);

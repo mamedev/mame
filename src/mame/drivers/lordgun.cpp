@@ -56,7 +56,7 @@ Notes:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(lordgun_state::lordgun_protection_w)
+void lordgun_state::lordgun_protection_w(offs_t offset, uint16_t data)
 {
 	switch (offset & 0x60)
 	{
@@ -77,7 +77,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_protection_w)
 	}
 }
 
-READ16_MEMBER(lordgun_state::lordgun_protection_r)
+uint16_t lordgun_state::lordgun_protection_r(offs_t offset)
 {
 	switch (offset & 0x60)
 	{
@@ -107,7 +107,7 @@ READ16_MEMBER(lordgun_state::lordgun_protection_r)
 	return 0;
 }
 
-WRITE16_MEMBER(lordgun_state::aliencha_protection_w)
+void lordgun_state::aliencha_protection_w(offs_t offset, uint16_t data)
 {
 	switch (offset & 0x60)
 	{
@@ -120,7 +120,7 @@ WRITE16_MEMBER(lordgun_state::aliencha_protection_w)
 	}
 }
 
-READ16_MEMBER(lordgun_state::aliencha_protection_r)
+uint16_t lordgun_state::aliencha_protection_r(offs_t offset)
 {
 	switch (offset & 0x60)
 	{
@@ -244,33 +244,33 @@ void lordgun_state::aliencha_dip_w(uint8_t data)
 }
 
 // Unknown, always equal to 7 in lordgun, aliencha.
-WRITE16_MEMBER(lordgun_state::priority_w)
+void lordgun_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 }
 
 
-READ16_MEMBER(lordgun_state::lordgun_gun_0_x_r)
+uint16_t lordgun_state::lordgun_gun_0_x_r()
 {
 	return m_gun[0].hw_x;
 }
 
-READ16_MEMBER(lordgun_state::lordgun_gun_0_y_r)
+uint16_t lordgun_state::lordgun_gun_0_y_r()
 {
 	return m_gun[0].hw_y;
 }
 
-READ16_MEMBER(lordgun_state::lordgun_gun_1_x_r)
+uint16_t lordgun_state::lordgun_gun_1_x_r()
 {
 	return m_gun[1].hw_x;
 }
 
-READ16_MEMBER(lordgun_state::lordgun_gun_1_y_r)
+uint16_t lordgun_state::lordgun_gun_1_y_r()
 {
 	return m_gun[1].hw_y;
 }
 
-WRITE16_MEMBER(lordgun_state::soundlatch_w)
+void lordgun_state::soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)     m_soundlatch->write((data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)    m_soundlatch2->write((data >> 8) & 0xff);
@@ -279,7 +279,7 @@ WRITE16_MEMBER(lordgun_state::soundlatch_w)
 }
 
 template<int Layer>
-WRITE16_MEMBER(lordgun_state::vram_w)
+void lordgun_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset/2);

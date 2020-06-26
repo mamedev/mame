@@ -62,12 +62,12 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(fp200_io_r);
-	DECLARE_WRITE8_MEMBER(fp200_io_w);
-	DECLARE_READ8_MEMBER(fp200_lcd_r);
-	DECLARE_WRITE8_MEMBER(fp200_lcd_w);
-	DECLARE_READ8_MEMBER(fp200_keyb_r);
-	DECLARE_WRITE8_MEMBER(fp200_keyb_w);
+	uint8_t fp200_io_r(offs_t offset);
+	void fp200_io_w(offs_t offset, uint8_t data);
+	uint8_t fp200_lcd_r(offs_t offset);
+	void fp200_lcd_w(offs_t offset, uint8_t data);
+	uint8_t fp200_keyb_r(offs_t offset);
+	void fp200_keyb_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
@@ -229,7 +229,7 @@ uint8_t fp200_state::read_lcd_vram(uint16_t X, uint16_t Y)
 	return res;
 }
 
-READ8_MEMBER(fp200_state::fp200_lcd_r)
+uint8_t fp200_state::fp200_lcd_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -298,7 +298,7 @@ void fp200_state::write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(fp200_state::fp200_lcd_w)
+void fp200_state::fp200_lcd_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -328,7 +328,7 @@ WRITE8_MEMBER(fp200_state::fp200_lcd_w)
 	}
 }
 
-READ8_MEMBER(fp200_state::fp200_keyb_r)
+uint8_t fp200_state::fp200_keyb_r(offs_t offset)
 {
 	const char *const keynames[16] = { "KEY0", "KEY1", "KEY2", "KEY3",
 										"KEY4", "KEY5", "KEY6", "KEY7",
@@ -347,7 +347,7 @@ READ8_MEMBER(fp200_state::fp200_keyb_r)
 	return res;
 }
 
-WRITE8_MEMBER(fp200_state::fp200_keyb_w)
+void fp200_state::fp200_keyb_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 		m_keyb_mux = data & 0xf;
@@ -373,7 +373,7 @@ SOD = 1
 0x40 - 0x4f MT.RS-232C control
 0x80 - 0x8f Printer (Centronics)
 */
-READ8_MEMBER(fp200_state::fp200_io_r)
+uint8_t fp200_state::fp200_io_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -387,8 +387,8 @@ READ8_MEMBER(fp200_state::fp200_io_r)
 		switch(offset & 0xf0)
 		{
 			//case 0x00: return;
-			case 0x00: res = fp200_lcd_r(space, offset & 0xf); break;
-			case 0x20: res = fp200_keyb_r(space, offset & 0xf); break;
+			case 0x00: res = fp200_lcd_r(offset & 0xf); break;
+			case 0x20: res = fp200_keyb_r(offset & 0xf); break;
 			default: res = 0; logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type); break;
 		}
 	}
@@ -396,7 +396,7 @@ READ8_MEMBER(fp200_state::fp200_io_r)
 	return res;
 }
 
-WRITE8_MEMBER(fp200_state::fp200_io_w)
+void fp200_state::fp200_io_w(offs_t offset, uint8_t data)
 {
 	if(m_io_type == 0)
 	{
@@ -409,8 +409,8 @@ WRITE8_MEMBER(fp200_state::fp200_io_w)
 	{
 		switch(offset & 0xf0)
 		{
-			case 0x00: fp200_lcd_w(space, offset & 0xf,data); break;
-			case 0x20: fp200_keyb_w(space, offset & 0xf,data); break;
+			case 0x00: fp200_lcd_w(offset & 0xf,data); break;
+			case 0x20: fp200_keyb_w(offset & 0xf,data); break;
 			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
 		}
 	}

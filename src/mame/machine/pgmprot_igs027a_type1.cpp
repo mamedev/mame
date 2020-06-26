@@ -495,7 +495,7 @@ void pgm_arm_type1_state::init_kovqhsgs()
  bp A71A0,1,{d0=0x12;g}
 */
 
-READ16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_r )
+u16 pgm_arm_type1_state::arm7_type1_sim_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -1723,7 +1723,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 	}
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_w )
+void pgm_arm_type1_state::arm7_type1_sim_w(offs_t offset, u16 data)
 {
 	const int pc = m_maincpu->pc();
 
@@ -1789,7 +1789,7 @@ void pgm_arm_type1_state::init_ddp3()
 	pgm_basic_init(false);
 	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 void pgm_arm_type1_state::init_ket()
@@ -1797,7 +1797,7 @@ void pgm_arm_type1_state::init_ket()
 	pgm_basic_init(false);
 	pgm_ket_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 void pgm_arm_type1_state::init_espgal()
@@ -1805,7 +1805,7 @@ void pgm_arm_type1_state::init_espgal()
 	pgm_basic_init(false);
 	pgm_espgal_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 }
 
 
@@ -2090,7 +2090,7 @@ void pgm_arm_type1_state::init_puzzli2()
 
 	pgm_puzzli2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
 
@@ -2219,7 +2219,7 @@ void pgm_arm_type1_state::init_py2k2()
 	pgm_basic_init();
 	pgm_py2k2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 }
 
@@ -2228,7 +2228,7 @@ void pgm_arm_type1_state::init_pgm3in1()
 	pgm_basic_init();
 	pgm_decrypt_pgm3in1(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	m_irq4_disabled = 1; // // doesn't like this irq??
 }
@@ -2248,7 +2248,7 @@ void pgm_arm_type1_state::init_pstar()
 	memset(m_slots, 0, 16 * sizeof(u32));
 
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_pstars;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r)));
 
 	save_item(NAME(m_pstar_e7_value));
@@ -2267,7 +2267,7 @@ void pgm_arm_type1_state::init_kov()
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 }
 
@@ -2281,7 +2281,7 @@ void pgm_arm_type1_state::init_kovboot()
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 
 }
@@ -2294,7 +2294,7 @@ void pgm_arm_type1_state::init_oldsplus()
 	memset(m_extra_ram, 0, 0x100 * sizeof(u16));
 	memset(m_slots, 0, 0x100 * sizeof(u32));
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_oldsplus;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
 	save_item(NAME(m_extra_ram));
 }

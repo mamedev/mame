@@ -20,7 +20,7 @@ void special_state::init_special()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
-	memset(RAM,0x0000,0x3000); // make first page empty by default
+	memset(RAM,0x0000,0x4000); // make first page empty by default
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xc000);
 }
@@ -109,15 +109,23 @@ void special_state::specialist_8255_portc_w(uint8_t data)
 	m_cassette->output(BIT(data, 7) ? 1 : -1);
 
 	m_dac->write(BIT(data, 5)); //beeper
+
+	m_bank1->set_entry(BIT(data, 4));
+}
+
+void special_state::specialistmx_8255_portc_w(uint8_t data)
+{
+	m_specialist_8255_portc = data;
+
+	m_cassette->output(BIT(data, 7) ? 1 : -1);
+
+	m_dac->write(BIT(data, 5)); //beeper
 }
 
 void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-	case TIMER_RESET:
-		m_bank1->set_entry(0);
-		break;
 	case TIMER_PIT8253_GATES:
 		m_pit->write_gate0(0);
 		m_pit->write_gate1(0);
@@ -129,28 +137,21 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-MACHINE_RESET_MEMBER(special_state,special)
-{
-	timer_set(attotime::from_usec(10), TIMER_RESET);
-	m_bank1->set_entry(1);
-}
-
-
 /*
      Specialist MX
 */
-WRITE8_MEMBER( special_state::video_memory_w )
+void special_state::video_memory_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[0x9000 + offset] = data;
 	m_specimx_colorram[offset] = m_specimx_color;
 }
 
-WRITE8_MEMBER( special_state::specimx_video_color_w )
+void special_state::specimx_video_color_w(uint8_t data)
 {
 	m_specimx_color = data;
 }
 
-READ8_MEMBER( special_state::specimx_video_color_r )
+uint8_t special_state::specimx_video_color_r()
 {
 	return m_specimx_color;
 }
@@ -167,7 +168,7 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 	{
 		case 0 :
 			space.install_write_bank(0x0000, 0x8fff, "bank1");
-			space.install_write_handler(0x9000, 0xbfff, write8_delegate(*this, FUNC(special_state::video_memory_w)));
+			space.install_write_handler(0x9000, 0xbfff, write8sm_delegate(*this, FUNC(special_state::video_memory_w)));
 
 			m_bank1->set_base(ram);
 			m_bank2->set_base(ram + 0x9000);
@@ -197,7 +198,7 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( special_state::specimx_select_bank )
+void special_state::specimx_select_bank(offs_t offset, uint8_t data)
 {
 	specimx_set_bank(offset, data);
 }
@@ -213,7 +214,7 @@ MACHINE_RESET_MEMBER(special_state,specimx)
 	timer_set(attotime::zero, TIMER_PIT8253_GATES);
 }
 
-READ8_MEMBER( special_state::specimx_disk_ctrl_r )
+uint8_t special_state::specimx_disk_ctrl_r()
 {
 	return 0xff;
 }
@@ -226,7 +227,7 @@ WRITE_LINE_MEMBER( special_state::fdc_drq )
 	}
 }
 
-WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
+void special_state::specimx_disk_ctrl_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 	floppy_connector *con = m_fdd[m_drive & 1].target();
@@ -340,23 +341,23 @@ MACHINE_RESET_MEMBER(special_state,erik)
 	erik_set_bank();
 }
 
-READ8_MEMBER( special_state::erik_rr_reg_r )
+uint8_t special_state::erik_rr_reg_r()
 {
 	return m_RR_register;
 }
 
-WRITE8_MEMBER( special_state::erik_rr_reg_w )
+void special_state::erik_rr_reg_w(uint8_t data)
 {
 	m_RR_register = data;
 	erik_set_bank();
 }
 
-READ8_MEMBER( special_state::erik_rc_reg_r )
+uint8_t special_state::erik_rc_reg_r()
 {
 	return m_RC_register;
 }
 
-WRITE8_MEMBER( special_state::erik_rc_reg_w )
+void special_state::erik_rc_reg_w(uint8_t data)
 {
 	m_RC_register = data;
 	m_erik_color_1 = m_RC_register & 7;
@@ -364,12 +365,12 @@ WRITE8_MEMBER( special_state::erik_rc_reg_w )
 	m_erik_background = BIT(m_RC_register, 6) + BIT(m_RC_register, 7) * 4;
 }
 
-READ8_MEMBER( special_state::erik_disk_reg_r )
+uint8_t special_state::erik_disk_reg_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( special_state::erik_disk_reg_w )
+void special_state::erik_disk_reg_w(uint8_t data)
 {
 /*
     wd17xx_set_side (m_fdc,data & 1);

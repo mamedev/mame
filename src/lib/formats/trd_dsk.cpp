@@ -32,10 +32,20 @@ const char *trd_format::extensions() const
 }
 
 const trd_format::format trd_format::formats[] = {
-	{   //  5"25 640K double density
+	{   // 5"25 640K 80 track double sided double density
 		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::MFM,
-		// GAP4A - 0(!) bytes, GAP1 - 10 bytes, GAP2 - 22 bytes, GAP3 - 60 bytes, GAP4B - upto track end
-		2000,  16, 80, 2, 256, {}, 1, {}, 10, 22, 60
+		// GAP4A - 0(!!!) bytes, GAP1 - 10 bytes, GAP2 - 22 bytes, GAP3 - 60 bytes, GAP4B - upto track end
+		2000, 16, 80, 2, 256, {}, -1, { 1,9,2,10,3,11,4,12,5,13,6,14,7,15,8,16 }, 10, 22, 60
+	},
+	{   // 5"25 400K 80 track double sided single density
+		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::FM,
+		// GAPs and interleave probably not correct
+		4000, 10, 80, 2, 256, {}, 1, {}, 40, 10, 10
+	},
+	{   // 5"25 280K 80 track double sided single density
+		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::FM,
+		// GAPs and interleave probably not correct
+		4000,  7, 80, 2, 256, {}, 1, {}, 40, 10, 10
 	},
 	{}
 };

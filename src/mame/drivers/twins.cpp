@@ -144,8 +144,8 @@ protected:
 	void twins_map(address_map &map);
 	uint32_t screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
+	uint16_t eeprom_r(offs_t offset, uint16_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
@@ -153,13 +153,13 @@ protected:
 	static constexpr u32 ram_size = 0x10000/2;
 
 	inline u16* get_vram_base();
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(vram_rmw_w);
+	uint16_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_rmw_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 private:
-	DECLARE_WRITE16_MEMBER(access_w);
-	DECLARE_READ16_MEMBER(access_r);
+	void access_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t access_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 
@@ -178,8 +178,8 @@ public:
 
 private:
 	void twinsed1_io(address_map &map);
-	DECLARE_WRITE16_MEMBER(porte_paloff0_w);
-	DECLARE_WRITE16_MEMBER(twins_pal_w);
+	void porte_paloff0_w(uint8_t data);
+	void twins_pal_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 class spider_state : public twins_state
@@ -197,12 +197,12 @@ private:
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void spider_io(address_map &map);
-	DECLARE_WRITE16_MEMBER(spider_paloff0_w);
-	DECLARE_READ16_MEMBER(spider_port_18_r);
-	DECLARE_READ16_MEMBER(spider_port_1e_r);
-	DECLARE_WRITE16_MEMBER(spider_port_1a_w);
-	DECLARE_WRITE16_MEMBER(spider_port_1c_w);
-	DECLARE_WRITE16_MEMBER(spider_pal_w);
+	void spider_paloff0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t spider_port_18_r();
+	uint16_t spider_port_1e_r();
+	void spider_port_1a_w(uint16_t data);
+	void spider_port_1c_w(uint16_t data);
+	void spider_pal_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 void twins_state::video_start()
@@ -278,7 +278,7 @@ void twins_state::machine_start()
 	m_rom8 = memregion("ipl")->base();
 }
 
-READ16_MEMBER(twins_state::eeprom_r)
+uint16_t twins_state::eeprom_r(offs_t offset, uint16_t mem_mask)
 {
 //  printf("%08x: eeprom_r %04x\n", m_maincpu->pc(), mem_mask);
 //  return m_i2cmem->read_sda();// | 0xfffe;
@@ -287,7 +287,7 @@ READ16_MEMBER(twins_state::eeprom_r)
 	return m_i2cmem->read_sda();
 }
 
-WRITE16_MEMBER(twins_state::eeprom_w)
+void twins_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("%08x: eeprom_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	int i2c_clk = BIT(data, 1);
@@ -296,7 +296,7 @@ WRITE16_MEMBER(twins_state::eeprom_w)
 	m_i2cmem->write_sda(i2c_mem);
 }
 
-WRITE16_MEMBER(twinsed1_state::twins_pal_w)
+void twinsed1_state::twins_pal_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[m_paloff]);
 
@@ -320,7 +320,7 @@ WRITE16_MEMBER(twinsed1_state::twins_pal_w)
 }
 
 /* ??? weird ..*/
-WRITE16_MEMBER(twinsed1_state::porte_paloff0_w)
+void twinsed1_state::porte_paloff0_w(uint8_t data)
 {
 //  printf("porte_paloff0_w %04x\n", data);
 	m_paloff = 0;
@@ -331,20 +331,20 @@ inline u16 *twins_state::get_vram_base()
 	return (m_videorambank & 1) ? m_fgvram.get() : m_bgvram.get();
 }
 
-READ16_MEMBER(twins_state::vram_r)
+uint16_t twins_state::vram_r(offs_t offset)
 {
 	u16 *vram = get_vram_base();
 	return vram[offset];
 }
 
-WRITE16_MEMBER(twins_state::vram_w)
+void twins_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	u16 *vram = get_vram_base();
 	COMBINE_DATA(&vram[offset]);
 }
 
 // TODO: confirm this area being present on twins versions
-WRITE16_MEMBER(twins_state::vram_rmw_w)
+void twins_state::vram_rmw_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	u16 *vram = get_vram_base();
 
@@ -371,12 +371,12 @@ WRITE16_MEMBER(twins_state::vram_rmw_w)
 	}
 }
 
-READ16_MEMBER(twins_state::access_r)
+uint16_t twins_state::access_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_overlay->read16(offset, mem_mask);
 }
 
-WRITE16_MEMBER(twins_state::access_w)
+void twins_state::access_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
@@ -401,7 +401,7 @@ WRITE16_MEMBER(twins_state::access_w)
 		m_overlay->write16(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(spider_state::spider_pal_w)
+void spider_state::spider_pal_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ths first write doesn't appear to be a palette value
 	if (m_paloff!=0)
@@ -427,19 +427,19 @@ WRITE16_MEMBER(spider_state::spider_pal_w)
 }
 
 
-WRITE16_MEMBER(spider_state::spider_paloff0_w)
+void spider_state::spider_paloff0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this seems to be video ram banking
 	COMBINE_DATA(&m_videorambank);
 }
 
-WRITE16_MEMBER(spider_state::spider_port_1a_w)
+void spider_state::spider_port_1a_w(uint16_t data)
 {
 	// writes 1
 }
 
 
-WRITE16_MEMBER(spider_state::spider_port_1c_w)
+void spider_state::spider_port_1c_w(uint16_t data)
 {
 	// done before the 'sprite' read / writes
 	// might clear a buffer?
@@ -454,7 +454,7 @@ WRITE16_MEMBER(spider_state::spider_port_1c_w)
 }
 
 
-READ16_MEMBER(spider_state::spider_port_18_r)
+uint16_t spider_state::spider_port_18_r()
 {
 	// read before each blitter command
 	// seems to put the bus in a state where the next 2 bus access offsets (anywhere) are the blitter params
@@ -463,7 +463,7 @@ READ16_MEMBER(spider_state::spider_port_18_r)
 	return 0xff;
 }
 
-READ16_MEMBER(spider_state::spider_port_1e_r)
+uint16_t spider_state::spider_port_1e_r()
 {
 	// done before each sprite pixel 'write'
 	// the data read is the data written, but only reads one pixel??

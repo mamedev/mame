@@ -55,17 +55,17 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	u16 mix_callback(u16 p, u16 p2);
 
-	DECLARE_READ16_MEMBER(sshangha_protection_region_8_146_r);
-	DECLARE_WRITE16_MEMBER(sshangha_protection_region_8_146_w);
-	DECLARE_READ16_MEMBER(sshangha_protection_region_d_146_r);
-	DECLARE_WRITE16_MEMBER(sshangha_protection_region_d_146_w);
-	DECLARE_READ16_MEMBER(deco_71_r);
-	DECLARE_READ16_MEMBER(sshanghab_protection16_r);
+	uint16_t sshangha_protection_region_8_146_r(offs_t offset);
+	void sshangha_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sshangha_protection_region_d_146_r(offs_t offset);
+	void sshangha_protection_region_d_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t deco_71_r();
+	uint16_t sshanghab_protection16_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(sound_shared_r);
-	DECLARE_WRITE8_MEMBER(sound_shared_w);
+	uint8_t sound_shared_r(offs_t offset);
+	void sound_shared_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE16_MEMBER(video_w);
+	void video_w(uint16_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -409,17 +409,17 @@ uint32_t h01x_state::screen_update_h01x(screen_device &screen, bitmap_ind16 &bit
 */
 
 /* Port handlers */
-WRITE8_MEMBER( h01x_state::port_60_w )
+void h01x_state::port_60_w(uint8_t data)
 {
 	// MC6845P idx
 }
 
-WRITE8_MEMBER( h01x_state::port_64_w )
+void h01x_state::port_64_w(uint8_t data)
 {
 	// MC6845P data
 }
 
-WRITE8_MEMBER( h01x_state::port_70_w )
+void h01x_state::port_70_w(uint8_t data)
 {
 	m_bank = data & 0xc0;
 
@@ -431,7 +431,7 @@ WRITE8_MEMBER( h01x_state::port_70_w )
 	m_cassette_data = false;
 }
 
-READ8_MEMBER( h01x_state::port_50_r )
+uint8_t h01x_state::port_50_r()
 {
 	// bit 7, cassette input
 	//return (m_cassette->input() > 0.04) ? 0x7f : 0xff;
@@ -441,28 +441,28 @@ READ8_MEMBER( h01x_state::port_50_r )
 
 
 // 0x0000 --- 0x3FFF
-READ8_MEMBER(h01x_state::mem_0000_r)
+uint8_t h01x_state::mem_0000_r(offs_t offset)
 {
 	return m_rom_ptr[offset];
 }
 
-WRITE8_MEMBER(h01x_state::mem_0000_w)
+void h01x_state::mem_0000_w(uint8_t data)
 {
 }
 
 // 0x4000 --- 0x7FFF
-READ8_MEMBER(h01x_state::mem_4000_r)
+uint8_t h01x_state::mem_4000_r(offs_t offset)
 {
 	return m_ram_ptr[offset];
 }
 
-WRITE8_MEMBER(h01x_state::mem_4000_w)
+void h01x_state::mem_4000_w(offs_t offset, uint8_t data)
 {
 	m_ram_ptr[offset] = data;
 }
 
 // 0x8000 --- 0xBFFF
-READ8_MEMBER(h01x_state::mem_8000_r)
+uint8_t h01x_state::mem_8000_r(offs_t offset)
 {
 	switch (m_bank) {
 	case 0xc0:
@@ -485,7 +485,7 @@ READ8_MEMBER(h01x_state::mem_8000_r)
 	}
 }
 
-WRITE8_MEMBER(h01x_state::mem_8000_w)
+void h01x_state::mem_8000_w(offs_t offset, uint8_t data)
 {
 	if (m_bank == 0x00)
 		m_ram_ptr[offset + 0x4000] = data;
@@ -493,7 +493,7 @@ WRITE8_MEMBER(h01x_state::mem_8000_w)
 
 
 // 0xC000 --- 0xFFFF
-READ8_MEMBER(h01x_state::mem_c000_r)
+uint8_t h01x_state::mem_c000_r(offs_t offset)
 {
 	if (m_bank == 0xc0)
 		return m_hzrom_ptr[offset + 0x4000];
@@ -503,7 +503,7 @@ READ8_MEMBER(h01x_state::mem_c000_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(h01x_state::mem_c000_w)
+void h01x_state::mem_c000_w(offs_t offset, uint8_t data)
 {
 	if (m_bank == 0x40)
 		m_vram_ptr[offset] = (data & 0x0f) | 0xf0;

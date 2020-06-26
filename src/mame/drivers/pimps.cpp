@@ -80,6 +80,8 @@ public:
 	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "roms")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void pimps(machine_config &config);
@@ -89,14 +91,16 @@ private:
 	void mem_map(address_map &map);
 	virtual void machine_reset() override;
 
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 };
 
 
 void pimps_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0xefff).ram();
+	map(0x0000, 0xefff).ram().share("mainram");
 	map(0xf000, 0xffff).rom().region("roms", 0);
 }
 
@@ -114,7 +118,22 @@ INPUT_PORTS_END
 
 void pimps_state::machine_reset()
 {
-	m_maincpu->set_pc(0xf000);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xf7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
 // baud is not documented, we will use 9600
@@ -163,11 +182,11 @@ void pimps_state::pimps(machine_config &config)
 
 /* ROM definition */
 ROM_START( pimps )
-	ROM_REGION( 0x1000, "roms", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "roms", 0 )
 	ROM_LOAD( "pimps.bin", 0x0000, 0x1000, CRC(5da1898f) SHA1(d20e31d0981a1f54c83186dbdfcf4280e49970d0))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY          FULLNAME      FLAGS */
-COMP( 197?, pimps, 0,      0,      pimps,   pimps, pimps_state, empty_init, "Henry Colford", "P.I.M.P.S.", MACHINE_NO_SOUND_HW) // terminal beeps
+COMP( 197?, pimps, 0,      0,      pimps,   pimps, pimps_state, empty_init, "Henry Colford", "P.I.M.P.S.", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE ) // terminal beeps

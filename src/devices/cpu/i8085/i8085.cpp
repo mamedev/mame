@@ -347,10 +347,10 @@ void i8085a_cpu_device::device_start()
 		}
 	}
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_opcode_cache = has_space(AS_OPCODES) ? space(AS_OPCODES).cache<0, 0, ENDIANNESS_LITTLE>() : m_cache;
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cprogram);
+	space(AS_PROGRAM).specific(m_program);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
+	space(AS_IO).specific(m_io);
 
 	/* resolve callbacks */
 	m_in_inta_func.resolve();
@@ -670,7 +670,7 @@ u8 i8085a_cpu_device::read_arg()
 	if (m_in_acknowledge)
 		return read_inta();
 	else
-		return m_cache->read_byte(m_PC.w.l++);
+		return m_cprogram.read_byte(m_PC.w.l++);
 }
 
 PAIR i8085a_cpu_device::read_arg16()
@@ -684,8 +684,8 @@ PAIR i8085a_cpu_device::read_arg16()
 	}
 	else
 	{
-		p.b.l = m_cache->read_byte(m_PC.w.l++);
-		p.b.h = m_cache->read_byte(m_PC.w.l++);
+		p.b.l = m_cprogram.read_byte(m_PC.w.l++);
+		p.b.h = m_cprogram.read_byte(m_PC.w.l++);
 	}
 	return p;
 }
@@ -693,7 +693,7 @@ PAIR i8085a_cpu_device::read_arg16()
 u8 i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
-	return m_opcode_cache->read_byte(m_PC.w.l++);
+	return m_copcodes.read_byte(m_PC.w.l++);
 }
 
 u8 i8085a_cpu_device::read_inta()
@@ -707,28 +707,28 @@ u8 i8085a_cpu_device::read_inta()
 u8 i8085a_cpu_device::read_mem(u32 a)
 {
 	set_status(0x82); // memory read
-	return m_program->read_byte(a);
+	return m_program.read_byte(a);
 }
 
 void i8085a_cpu_device::write_mem(u32 a, u8 v)
 {
 	set_status(0x00); // memory write
-	m_program->write_byte(a, v);
+	m_program.write_byte(a, v);
 }
 
 void i8085a_cpu_device::op_push(PAIR p)
 {
 	set_status(0x04); // stack push
-	m_program->write_byte(--m_SP.w.l, p.b.h);
-	m_program->write_byte(--m_SP.w.l, p.b.l);
+	m_program.write_byte(--m_SP.w.l, p.b.h);
+	m_program.write_byte(--m_SP.w.l, p.b.l);
 }
 
 PAIR i8085a_cpu_device::op_pop()
 {
 	PAIR p;
 	set_status(0x86); // stack pop
-	p.b.l = m_program->read_byte(m_SP.w.l++);
-	p.b.h = m_program->read_byte(m_SP.w.l++);
+	p.b.l = m_program.read_byte(m_SP.w.l++);
+	p.b.h = m_program.read_byte(m_SP.w.l++);
 	return p;
 }
 
@@ -1469,7 +1469,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xd3: // OUT nn
 			set_status(0x10);
 			m_WZ.d = read_arg();
-			m_io->write_byte(m_WZ.d, m_AF.b.h);
+			m_io.write_byte(m_WZ.d, m_AF.b.h);
 			break;
 		case 0xd4: // CNC nnnn
 			op_call(!(m_AF.b.l & CF));
@@ -1505,7 +1505,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xdb: // IN nn
 			set_status(0x42);
 			m_WZ.d = read_arg();
-			m_AF.b.h = m_io->read_byte(m_WZ.d);
+			m_AF.b.h = m_io.read_byte(m_WZ.d);
 			break;
 		case 0xdc: // CC nnnn
 			op_call(m_AF.b.l & CF);

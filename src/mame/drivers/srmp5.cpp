@@ -108,27 +108,27 @@ private:
 #ifdef DEBUG_CHAR
 	std::unique_ptr<uint8_t[]> m_tileduty;
 #endif
-	DECLARE_WRITE32_MEMBER(bank_w);
-	DECLARE_READ32_MEMBER(tileram_r);
-	DECLARE_WRITE32_MEMBER(tileram_w);
-	DECLARE_READ32_MEMBER(spr_r);
-	DECLARE_WRITE32_MEMBER(spr_w);
-	DECLARE_READ32_MEMBER(chrrom_r);
-	DECLARE_WRITE32_MEMBER(input_select_w);
-	DECLARE_READ32_MEMBER(srmp5_inputs_r);
-	DECLARE_WRITE32_MEMBER(cmd1_w);
-	DECLARE_WRITE32_MEMBER(cmd2_w);
-	DECLARE_READ32_MEMBER(cmd_stat32_r);
-	DECLARE_READ32_MEMBER(srmp5_vidregs_r);
-	DECLARE_WRITE32_MEMBER(srmp5_vidregs_w);
-	DECLARE_READ32_MEMBER(irq_ack_clear);
-	DECLARE_READ8_MEMBER(cmd1_r);
-	DECLARE_READ8_MEMBER(cmd2_r);
-	DECLARE_READ8_MEMBER(cmd_stat8_r);
+	void bank_w(uint32_t data);
+	uint32_t tileram_r(offs_t offset);
+	void tileram_w(offs_t offset, uint32_t data);
+	uint32_t spr_r(offs_t offset);
+	void spr_w(offs_t offset, uint32_t data);
+	uint32_t chrrom_r(offs_t offset);
+	void input_select_w(uint32_t data);
+	uint32_t srmp5_inputs_r();
+	void cmd1_w(uint32_t data);
+	void cmd2_w(uint32_t data);
+	uint32_t cmd_stat32_r();
+	uint32_t srmp5_vidregs_r(offs_t offset);
+	void srmp5_vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t irq_ack_clear();
+	uint8_t cmd1_r();
+	uint8_t cmd2_r();
+	uint8_t cmd_stat8_r();
 	virtual void machine_start() override;
 	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(uint8_t data);
 	void srmp5_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);
@@ -267,17 +267,17 @@ void srmp5_state::machine_start()
 	save_item(NAME(m_vidregs));
 }
 
-WRITE32_MEMBER(srmp5_state::bank_w)
+void srmp5_state::bank_w(uint32_t data)
 {
 	m_chrbank = ((data & 0xf0) >> 4) * (0x100000 / sizeof(uint16_t));
 }
 
-READ32_MEMBER(srmp5_state::tileram_r)
+uint32_t srmp5_state::tileram_r(offs_t offset)
 {
 	return m_tileram[offset];
 }
 
-WRITE32_MEMBER(srmp5_state::tileram_w)
+void srmp5_state::tileram_w(offs_t offset, uint32_t data)
 {
 	m_tileram[offset] = data & 0xFFFF; //lower 16bit only
 #ifdef DEBUG_CHAR
@@ -285,27 +285,27 @@ WRITE32_MEMBER(srmp5_state::tileram_w)
 #endif
 }
 
-READ32_MEMBER(srmp5_state::spr_r)
+uint32_t srmp5_state::spr_r(offs_t offset)
 {
 	return m_sprram[offset];
 }
 
-WRITE32_MEMBER(srmp5_state::spr_w)
+void srmp5_state::spr_w(offs_t offset, uint32_t data)
 {
 	m_sprram[offset] = data & 0xFFFF; //lower 16bit only
 }
 
-READ32_MEMBER(srmp5_state::chrrom_r)
+uint32_t srmp5_state::chrrom_r(offs_t offset)
 {
 	return m_chrrom[m_chrbank + offset]; // lower 16bit only
 }
 
-WRITE32_MEMBER(srmp5_state::input_select_w)
+void srmp5_state::input_select_w(uint32_t data)
 {
 	m_input_select = data & 0x0F;
 }
 
-READ32_MEMBER(srmp5_state::srmp5_inputs_r)
+uint32_t srmp5_state::srmp5_inputs_r()
 {
 	uint32_t ret = 0;
 
@@ -329,38 +329,38 @@ READ32_MEMBER(srmp5_state::srmp5_inputs_r)
 }
 
 //almost all cmds are sound related
-WRITE32_MEMBER(srmp5_state::cmd1_w)
+void srmp5_state::cmd1_w(uint32_t data)
 {
 	m_cmd1 = data & 0xFF;
 	logerror("cmd1_w %08X\n", data);
 }
 
-WRITE32_MEMBER(srmp5_state::cmd2_w)
+void srmp5_state::cmd2_w(uint32_t data)
 {
 	m_cmd2 = data & 0xFF;
 	m_cmd_stat = 5;
 	logerror("cmd2_w %08X\n", data);
 }
 
-READ32_MEMBER(srmp5_state::cmd_stat32_r)
+uint32_t srmp5_state::cmd_stat32_r()
 {
 	return m_cmd_stat;
 }
 
-READ32_MEMBER(srmp5_state::srmp5_vidregs_r)
+uint32_t srmp5_state::srmp5_vidregs_r(offs_t offset)
 {
 	logerror("vidregs read  %08X %08X\n", offset << 2, m_vidregs[offset]);
 	return m_vidregs[offset];
 }
 
-WRITE32_MEMBER(srmp5_state::srmp5_vidregs_w)
+void srmp5_state::srmp5_vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[offset]);
 	if(offset != 0x10C / 4)
 		logerror("vidregs write %08X %08X\n", offset << 2, m_vidregs[offset]);
 }
 
-READ32_MEMBER(srmp5_state::irq_ack_clear)
+uint32_t srmp5_state::irq_ack_clear()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
@@ -406,24 +406,24 @@ void srmp5_state::st0016_mem(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-READ8_MEMBER(srmp5_state::cmd1_r)
+uint8_t srmp5_state::cmd1_r()
 {
 	m_cmd_stat = 0;
 	return m_cmd1;
 }
 
-READ8_MEMBER(srmp5_state::cmd2_r)
+uint8_t srmp5_state::cmd2_r()
 {
 	return m_cmd2;
 }
 
-READ8_MEMBER(srmp5_state::cmd_stat8_r)
+uint8_t srmp5_state::cmd_stat8_r()
 {
 	return m_cmd_stat;
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
+void srmp5_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data);
 }

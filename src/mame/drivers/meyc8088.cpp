@@ -66,11 +66,11 @@ private:
 	uint8_t m_status;
 	uint8_t m_common;
 
-	DECLARE_WRITE8_MEMBER(drive_w);
-	DECLARE_WRITE8_MEMBER(video5_flip_w);
-	DECLARE_READ8_MEMBER(video5_flip_r);
-	DECLARE_WRITE8_MEMBER(screen_flip_w);
-	DECLARE_READ8_MEMBER(screen_flip_r);
+	void drive_w(uint8_t data);
+	void video5_flip_w(uint8_t data);
+	uint8_t video5_flip_r();
+	void screen_flip_w(uint8_t data);
+	uint8_t screen_flip_r();
 	uint8_t input_r();
 	uint8_t status_r();
 	void lights1_w(uint8_t data);
@@ -188,7 +188,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(meyc8088_state::heartbeat_callback)
 	m_status |= 0x20;
 }
 
-WRITE8_MEMBER(meyc8088_state::drive_w)
+void meyc8088_state::drive_w(uint8_t data)
 {
 	// drivers go into high-impedance state ~100ms after write (LS374 /OC)
 	m_status &= ~0x20;
@@ -199,25 +199,25 @@ WRITE8_MEMBER(meyc8088_state::drive_w)
 }
 
 // switch screen on/off on $b4000 access
-READ8_MEMBER(meyc8088_state::screen_flip_r)
+uint8_t meyc8088_state::screen_flip_r()
 {
 	m_status ^= 2;
 	return 0;
 }
 
-WRITE8_MEMBER(meyc8088_state::screen_flip_w)
+void meyc8088_state::screen_flip_w(uint8_t data)
 {
 	m_status ^= 2;
 }
 
 // switch video5 (color prom d4) on/off on $b5000 access
-READ8_MEMBER(meyc8088_state::video5_flip_r)
+uint8_t meyc8088_state::video5_flip_r()
 {
 	m_status ^= 4;
 	return 0;
 }
 
-WRITE8_MEMBER(meyc8088_state::video5_flip_w)
+void meyc8088_state::video5_flip_w(uint8_t data)
 {
 	m_status ^= 4;
 }

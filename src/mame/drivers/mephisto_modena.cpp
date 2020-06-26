@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
+// thanks-to:yoyo_chessboard
 /**************************************************************************************************
 
 Mephisto Modena
@@ -24,10 +25,12 @@ Hold Pawn + Knight buttons at boot for test mode.
 #include "mephisto_modena.lh"
 
 
-class mephisto_modena_state : public driver_device
+namespace {
+
+class modena_state : public driver_device
 {
 public:
-	mephisto_modena_state(const machine_config &mconfig, device_type type, const char *tag)
+	modena_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
@@ -52,21 +55,21 @@ private:
 
 	void modena_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digits_w);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	u8 input_r();
+	void digits_w(u8 data);
+	void io_w(u8 data);
+	void led_w(u8 data);
 	void update_display();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
 
-	uint8_t m_board_mux = 0xff;
-	uint8_t m_digits_idx = 0;
-	uint8_t m_io_ctrl = 0;
+	u8 m_board_mux = 0xff;
+	u8 m_digits_idx = 0;
+	u8 m_io_ctrl = 0;
 };
 
-void mephisto_modena_state::machine_start()
+void modena_state::machine_start()
 {
 	m_digits.resolve();
 
@@ -80,14 +83,14 @@ void mephisto_modena_state::machine_start()
     I/O
 ******************************************************************************/
 
-void mephisto_modena_state::update_display()
+void modena_state::update_display()
 {
 	m_display->matrix(m_io_ctrl >> 1 & 7, ~m_board_mux);
 }
 
-READ8_MEMBER(mephisto_modena_state::input_r)
+u8 modena_state::input_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	// read buttons
 	if (~m_io_ctrl & 1)
@@ -101,14 +104,14 @@ READ8_MEMBER(mephisto_modena_state::input_r)
 	return data;
 }
 
-WRITE8_MEMBER(mephisto_modena_state::led_w)
+void modena_state::led_w(u8 data)
 {
 	// d0-d7: chessboard mux, led data
 	m_board_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(mephisto_modena_state::io_w)
+void modena_state::io_w(u8 data)
 {
 	// d0: button select
 	// d1-d3: led select
@@ -119,7 +122,7 @@ WRITE8_MEMBER(mephisto_modena_state::io_w)
 	m_dac->write(BIT(data, 6));
 }
 
-WRITE8_MEMBER(mephisto_modena_state::digits_w)
+void modena_state::digits_w(u8 data)
 {
 	m_digits[m_digits_idx] = data ^ ((m_io_ctrl & 0x10) ? 0xff : 0x00);
 	m_digits_idx = (m_digits_idx + 1) & 3;
@@ -131,13 +134,13 @@ WRITE8_MEMBER(mephisto_modena_state::digits_w)
     Address Maps
 ******************************************************************************/
 
-void mephisto_modena_state::modena_mem(address_map &map)
+void modena_state::modena_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x4000, 0x4000).w(FUNC(mephisto_modena_state::digits_w));
-	map(0x5000, 0x5000).w(FUNC(mephisto_modena_state::led_w));
-	map(0x6000, 0x6000).w(FUNC(mephisto_modena_state::io_w));
-	map(0x7000, 0x7000).r(FUNC(mephisto_modena_state::input_r));
+	map(0x4000, 0x4000).w(FUNC(modena_state::digits_w));
+	map(0x5000, 0x5000).w(FUNC(modena_state::led_w));
+	map(0x6000, 0x6000).w(FUNC(modena_state::io_w));
+	map(0x7000, 0x7000).r(FUNC(modena_state::input_r));
 	map(0x7f00, 0x7fff).nopr(); // dummy read on 6502 absolute X page wrap
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 }
@@ -166,21 +169,24 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void mephisto_modena_state::modena(machine_config &config)
+void modena_state::modena(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, XTAL(4'194'304)); // W65C02SP or RP65C02G
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_modena_state::modena_mem);
+	M65C02(config, m_maincpu, 4.194304_MHz_XTAL); // W65C02SP or RP65C02G
+	m_maincpu->set_addrmap(AS_PROGRAM, &modena_state::modena_mem);
+
 	timer_device &nmi_on(TIMER(config, "nmi_on"));
-	nmi_on.configure_periodic(FUNC(mephisto_modena_state::nmi_on), attotime::from_hz(XTAL(4'194'304) / (1 << 13)));
-	nmi_on.set_start_delay(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975)); // active for 975us
-	TIMER(config, "nmi_off").configure_periodic(FUNC(mephisto_modena_state::nmi_off), attotime::from_hz(XTAL(4'194'304) / (1 << 13)));
+	const attotime nmi_period = attotime::from_hz(4.194304_MHz_XTAL / (1 << 13));
+	nmi_on.configure_periodic(FUNC(modena_state::nmi_on), nmi_period);
+	nmi_on.set_start_delay(nmi_period - attotime::from_usec(975)); // active for 975us
+	TIMER(config, "nmi_off").configure_periodic(FUNC(modena_state::nmi_off), nmi_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
@@ -213,13 +219,15 @@ ROM_START( modenab )
 	ROM_LOAD("modena_4929_270192.u3", 0x0000, 0x8000, CRC(99212677) SHA1(f0565e5441fb38df201176d01793c953886b0303) )
 ROM_END
 
+} // anonymous namespace
+
 
 
 /***************************************************************************
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                   FLAGS */
-CONS( 1992, modena,   0,      0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, modenaa,  modena, 0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, modenab,  modena, 0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY             FULLNAME                   FLAGS */
+CONS( 1992, modena,   0,      0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, modenaa,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, modenab,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

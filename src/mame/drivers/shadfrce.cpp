@@ -149,7 +149,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "speaker.h"
 
 
-WRITE16_MEMBER(shadfrce_state::flip_screen)
+void shadfrce_state::flip_screen(uint16_t data)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -234,7 +234,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 */
 
 
-READ16_MEMBER(shadfrce_state::input_ports_r)
+uint16_t shadfrce_state::input_ports_r(offs_t offset)
 {
 	uint16_t data = 0xffff;
 
@@ -258,7 +258,7 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 }
 
 
-WRITE8_MEMBER(shadfrce_state::screen_brt_w)
+void shadfrce_state::screen_brt_w(uint8_t data)
 {
 	double brt = (data & 0xff) / 255.0;
 
@@ -266,12 +266,12 @@ WRITE8_MEMBER(shadfrce_state::screen_brt_w)
 		m_palette->set_pen_contrast(i, brt);
 }
 
-WRITE16_MEMBER(shadfrce_state::irq_ack_w)
+void shadfrce_state::irq_ack_w(offs_t offset, uint16_t data)
 {
 	m_maincpu->set_input_line(offset ^ 3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(shadfrce_state::irq_w)
+void shadfrce_state::irq_w(uint16_t data)
 {
 	m_irqs_enable = data & 1;   /* maybe, it's set/unset inside every trap instruction which is executed */
 	m_video_enable = data & 8;  /* probably */
@@ -291,7 +291,7 @@ WRITE16_MEMBER(shadfrce_state::irq_w)
 	m_prev_value = data;
 }
 
-WRITE16_MEMBER(shadfrce_state::scanline_w)
+void shadfrce_state::scanline_w(uint16_t data)
 {
 	m_raster_scanline = data;   /* guess, 0 is always written */
 }
@@ -382,7 +382,7 @@ void shadfrce_state::shadfrce_map(address_map &map)
 
 /* and the sound cpu */
 
-WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
+void shadfrce_state::oki_bankswitch_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }

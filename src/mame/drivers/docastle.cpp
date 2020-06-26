@@ -199,14 +199,14 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 }
 
-READ8_MEMBER(docastle_state::idsoccer_adpcm_status_r)
+uint8_t docastle_state::idsoccer_adpcm_status_r()
 {
 	// this is wrong, but the samples work anyway!!
 	m_adpcm_status ^= 0x80;
 	return m_adpcm_status;
 }
 
-WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
+void docastle_state::idsoccer_adpcm_w(uint8_t data)
 {
 	if (data & 0x80)
 	{

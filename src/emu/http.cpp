@@ -2,11 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-http.cpp
+    http.cpp
 
-HTTP server handling
+    HTTP server handling
 
 ***************************************************************************/
+
 #include "emu.h"
 
 #ifdef __sun

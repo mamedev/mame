@@ -112,11 +112,11 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	uint8_t    m_bg_bank;
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
-	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(bogus_w);
+	void fg_ram_w(offs_t offset, uint8_t data);
+	void bg_bank_w(uint8_t data);
+	void calorie_flipscreen_w(uint8_t data);
+	uint8_t calorie_soundlatch_r();
+	void bogus_w(offs_t offset, uint8_t data);
 	void init_calorieb();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -230,13 +230,13 @@ uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(calorie_state::fg_ram_w)
+void calorie_state::fg_ram_w(offs_t offset, uint8_t data)
 {
 	m_fg_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(calorie_state::bg_bank_w)
+void calorie_state::bg_bank_w(uint8_t data)
 {
 	if((m_bg_bank & ~0x10) != (data & ~0x10))
 		m_bg_tilemap->mark_all_dirty();
@@ -244,19 +244,19 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 	m_bg_bank = data;
 }
 
-WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
+void calorie_state::calorie_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(calorie_state::calorie_soundlatch_r)
+uint8_t calorie_state::calorie_soundlatch_r()
 {
 	uint8_t latch = m_soundlatch->read();
 	m_soundlatch->clear_w();
 	return latch;
 }
 
-WRITE8_MEMBER(calorie_state::bogus_w)
+void calorie_state::bogus_w(offs_t offset, uint8_t data)
 {
 	popmessage("written to 3rd sound chip: data = %02X port = %02X", data, offset);
 }

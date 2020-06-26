@@ -83,11 +83,11 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(fdc_aux_r);
-	DECLARE_WRITE8_MEMBER(fdc_aux_w);
+	uint8_t fdc_aux_r(offs_t offset);
+	void fdc_aux_w(offs_t offset, uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE8_MEMBER(vico_w);
+	void vico_w(offs_t offset, uint8_t data);
 
 	uint8_t kbd_get();
 	void kbd_put(u8 data);
@@ -140,8 +140,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia3_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w);
 
-	DECLARE_READ8_MEMBER(waveterm_adc);
-	DECLARE_WRITE8_MEMBER(waveterm_dac);
+	uint8_t waveterm_adc();
+	void waveterm_dac(uint8_t data); // declared but not defined, commented in memory map
 
 	void waveterm(machine_config &config);
 	void waveterm_map(address_map &map);
@@ -161,7 +161,7 @@ protected:
  * b6 -- irq
  * b7 -- drq
  */
-READ8_MEMBER(eurocom2_state::fdc_aux_r)
+uint8_t eurocom2_state::fdc_aux_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -183,7 +183,7 @@ READ8_MEMBER(eurocom2_state::fdc_aux_r)
  * b6 -- nc
  * b7 -- 1 = enable timer interrupt
  */
-WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
+void eurocom2_state::fdc_aux_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -212,7 +212,7 @@ WRITE8_MEMBER(eurocom2_state::fdc_aux_w)
 	LOGDBG("Floppy %d <- %02x\n", offset, data);
 }
 
-WRITE8_MEMBER(eurocom2_state::vico_w)
+void eurocom2_state::vico_w(offs_t offset, uint8_t data)
 {
 	LOG("VICO %d <- %02x\n", offset, data);
 
@@ -294,7 +294,7 @@ void waveterm_state::pia3_pb_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(waveterm_state::waveterm_adc)
+uint8_t waveterm_state::waveterm_adc()
 {
 	return m_screen->frame_number() % 255; // XXX
 }

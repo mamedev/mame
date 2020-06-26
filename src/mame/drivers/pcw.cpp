@@ -229,7 +229,7 @@ uint8_t pcw_state::pcw_keyboard_r(offs_t offset)
 	return m_iptlines[offset]->read();
 }
 
-READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
+uint8_t pcw_state::pcw_keyboard_data_r(offs_t offset)
 {
 	return m_mcu_keyboard_data[offset];
 }
@@ -246,7 +246,7 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	if (bank == 3)
 	{
 		/* when upper 16 bytes are accessed use keyboard read handler */
-		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(*this, FUNC(pcw_state::pcw_keyboard_data_r)));
+		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8sm_delegate(*this, FUNC(pcw_state::pcw_keyboard_data_r)));
 		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	else
@@ -355,7 +355,7 @@ int pcw_state::pcw_get_sys_status()
 		| (m_system_status & 0x20);
 }
 
-READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
+uint8_t pcw_state::pcw_interrupt_counter_r()
 {
 	int data;
 
@@ -373,7 +373,7 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 }
 
 
-WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
+void pcw_state::pcw_bank_select_w(offs_t offset, uint8_t data)
 {
 	LOGBANK("BANK: %2x %x\n", offset, data);
 	m_banks[offset] = data;
@@ -382,7 +382,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 	LOGBANK("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
+void pcw_state::pcw_bank_force_selection_w(uint8_t data)
 {
 	m_bank_force = data;
 
@@ -393,7 +393,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
 }
 
 
-WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
+void pcw_state::pcw_roller_ram_addr_w(uint8_t data)
 {
 	/*
 	Address of roller RAM. b7-5: bank (0-7). b4-1: address / 512. */
@@ -403,19 +403,19 @@ WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
 	LOGRRAM("Roller-RAM: Address set to 0x%05x\n", m_roller_ram_addr);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_pointer_table_top_scan_w)
+void pcw_state::pcw_pointer_table_top_scan_w(uint8_t data)
 {
 	m_roller_ram_offset = data;
 	LOGRRAM("Roller-RAM: offset set to 0x%05x\n", m_roller_ram_offset);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
+void pcw_state::pcw_vdu_video_control_register_w(uint8_t data)
 {
 	m_vdu_video_control_register = data;
 	LOGRRAM("Roller-RAM: control reg set to 0x%02x\n", data);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_system_control_w)
+void pcw_state::pcw_system_control_w(uint8_t data)
 {
 	LOGSYS("SYSTEM CONTROL: %d\n", data);
 
@@ -568,7 +568,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 	}
 }
 
-READ8_MEMBER(pcw_state::pcw_system_status_r)
+uint8_t pcw_state::pcw_system_status_r()
 {
 	/* from Jacob Nevins docs */
 	uint8_t ret = pcw_get_sys_status();
@@ -578,7 +578,7 @@ READ8_MEMBER(pcw_state::pcw_system_status_r)
 
 /* read from expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-READ8_MEMBER(pcw_state::pcw_expansion_r)
+uint8_t pcw_state::pcw_expansion_r(offs_t offset)
 {
 	LOGEXP("pcw expansion r: %04x\n", offset+0x080);
 
@@ -627,7 +627,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 /* write to expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-WRITE8_MEMBER(pcw_state::pcw_expansion_w)
+void pcw_state::pcw_expansion_w(offs_t offset, uint8_t data)
 {
 	LOGEXP("pcw expansion w: %04x %02x\n", offset+0x080, data);
 }
@@ -922,7 +922,7 @@ READ_LINE_MEMBER(pcw_state::mcu_kb_t0_r)
 }
 
 /* TODO: Implement parallel port! */
-READ8_MEMBER(pcw_state::pcw9512_parallel_r)
+uint8_t pcw_state::pcw9512_parallel_r(offs_t offset)
 {
 	if (offset==1)
 	{
@@ -934,7 +934,7 @@ READ8_MEMBER(pcw_state::pcw9512_parallel_r)
 }
 
 /* TODO: Implement parallel port! */
-WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
+void pcw_state::pcw9512_parallel_w(offs_t offset, uint8_t data)
 {
 	LOGPAR("pcw9512 parallel w: offs: %04x data: %02x\n", offset, data);
 }

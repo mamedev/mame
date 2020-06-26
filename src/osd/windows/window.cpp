@@ -1498,14 +1498,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// get the minimum width/height for the current layout
 	m_target->compute_minimum_size(minwidth, minheight);
 
-	// clamp against the absolute minimum
-	propwidth = std::max(propwidth, MIN_WINDOW_DIM);
-	propheight = std::max(propheight, MIN_WINDOW_DIM);
-
-	// clamp against the minimum width and height
-	propwidth = std::max(propwidth, minwidth);
-	propheight = std::max(propheight, minheight);
-
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (fullscreen())
 	{
@@ -1517,12 +1509,24 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 		maxwidth = monitor->usuable_position_size().width() - extrawidth;
 		maxheight = monitor->usuable_position_size().height() - extraheight;
 
-		// further clamp to the maximum width/height in the window
+		// clamp minimum against half of maximum to allow resizing very large targets (eg. SVG screen)
+		minwidth = std::min(minwidth, maxwidth / 2);
+		minheight = std::min(minheight, maxheight / 2);
+
+		// clamp maximum to the maximum width/height in the window
 		if (m_win_config.width != 0)
 			maxwidth = std::min(maxwidth, m_win_config.width + extrawidth);
 		if (m_win_config.height != 0)
 			maxheight = std::min(maxheight, m_win_config.height + extraheight);
 	}
+
+	// clamp against the absolute minimum
+	propwidth = std::max(propwidth, MIN_WINDOW_DIM);
+	propheight = std::max(propheight, MIN_WINDOW_DIM);
+
+	// clamp against the minimum width and height
+	propwidth = std::max(propwidth, minwidth);
+	propheight = std::max(propheight, minheight);
 
 	// clamp to the maximum
 	propwidth = std::min(propwidth, maxwidth);

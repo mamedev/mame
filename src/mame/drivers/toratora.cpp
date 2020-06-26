@@ -80,9 +80,9 @@ private:
 	required_device<pia6821_device> m_pia_u1;
 	required_device<pia6821_device> m_pia_u2;
 	required_device<pia6821_device> m_pia_u3;
-	DECLARE_WRITE8_MEMBER(clear_tv_w);
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_WRITE8_MEMBER(clear_timer_w);
+	void clear_tv_w(uint8_t data);
+	uint8_t timer_r();
+	void clear_timer_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cb2_u2_w);
 	void port_b_u1_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
@@ -151,7 +151,7 @@ uint32_t toratora_state::screen_update_toratora(screen_device &screen, bitmap_rg
 }
 
 
-WRITE8_MEMBER(toratora_state::clear_tv_w)
+void toratora_state::clear_tv_w(uint8_t data)
 {
 	m_clear_tv = 1;
 }
@@ -206,12 +206,12 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }
 
-READ8_MEMBER(toratora_state::timer_r)
+uint8_t toratora_state::timer_r()
 {
 	return m_timer;
 }
 
-WRITE8_MEMBER(toratora_state::clear_timer_w)
+void toratora_state::clear_timer_w(uint8_t data)
 {
 	m_timer = 0;
 	m_maincpu->set_input_line(0, CLEAR_LINE);

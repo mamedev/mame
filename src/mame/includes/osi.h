@@ -55,9 +55,9 @@ protected:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void ctrl_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -115,8 +115,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
-	DECLARE_WRITE8_MEMBER( osi630_sound_w );
+	void osi630_ctrl_w(uint8_t data);
+	void osi630_sound_w(uint8_t data);
 	void c1p_mem(address_map &map);
 
 	required_device<beep_device> m_beeper;
@@ -160,7 +160,7 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
+	void keyboard_w(uint8_t data);
 	void uk101_video(machine_config &config);
 	void uk101_mem(address_map &map);
 };

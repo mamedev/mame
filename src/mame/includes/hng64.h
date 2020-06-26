@@ -326,69 +326,69 @@ private:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	DECLARE_READ32_MEMBER(hng64_com_r);
-	DECLARE_WRITE32_MEMBER(hng64_com_w);
-	DECLARE_WRITE8_MEMBER(hng64_com_share_w);
-	DECLARE_READ8_MEMBER(hng64_com_share_r);
-	DECLARE_WRITE8_MEMBER(hng64_com_share_mips_w);
-	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
-	DECLARE_READ32_MEMBER(hng64_sysregs_r);
-	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
-	DECLARE_READ32_MEMBER(hng64_rtc_r);
-	DECLARE_WRITE32_MEMBER(hng64_rtc_w);
-	DECLARE_READ32_MEMBER(hng64_dmac_r);
-	DECLARE_WRITE32_MEMBER(hng64_dmac_w);
-	DECLARE_READ32_MEMBER(hng64_irqc_r);
-	DECLARE_WRITE32_MEMBER(hng64_irqc_w);
-	DECLARE_WRITE32_MEMBER(hng64_mips_to_iomcu_irq_w);
+	uint32_t hng64_com_r(offs_t offset);
+	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void hng64_com_share_w(offs_t offset, uint8_t data);
+	uint8_t hng64_com_share_r(offs_t offset);
+	void hng64_com_share_mips_w(offs_t offset, uint8_t data);
+	uint8_t hng64_com_share_mips_r(offs_t offset);
+	uint32_t hng64_sysregs_r(offs_t offset, uint32_t mem_mask = ~0);
+	void hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hng64_rtc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void hng64_rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hng64_dmac_r(offs_t offset, uint32_t mem_mask = ~0);
+	void hng64_dmac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hng64_irqc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void hng64_mips_to_iomcu_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(hng64_dualport_r);
-	DECLARE_WRITE8_MEMBER(hng64_dualport_w);
+	uint8_t hng64_dualport_r(offs_t offset);
+	void hng64_dualport_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
-	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
+	uint8_t hng64_fbcontrol_r(offs_t offset);
+	void hng64_fbcontrol_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE16_MEMBER(hng64_fbunkpair_w);
-	DECLARE_WRITE16_MEMBER(hng64_fbscroll_w);
+	void hng64_fbunkpair_w(offs_t offset, uint16_t data);
+	void hng64_fbscroll_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE8_MEMBER(hng64_fbunkbyte_w);
+	void hng64_fbunkbyte_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ32_MEMBER(hng64_fbtable_r);
-	DECLARE_WRITE32_MEMBER(hng64_fbtable_w);
+	uint32_t hng64_fbtable_r(offs_t offset, uint32_t mem_mask = ~0);
+	void hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(hng64_fbram1_r);
-	DECLARE_WRITE32_MEMBER(hng64_fbram1_w);
+	uint32_t hng64_fbram1_r(offs_t offset);
+	void hng64_fbram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(hng64_fbram2_r);
-	DECLARE_WRITE32_MEMBER(hng64_fbram2_w);
+	uint32_t hng64_fbram2_r(offs_t offset);
+	void hng64_fbram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(dl_w);
-	//DECLARE_READ32_MEMBER(dl_r);
-	DECLARE_WRITE32_MEMBER(dl_control_w);
-	DECLARE_WRITE32_MEMBER(dl_upload_w);
-	DECLARE_WRITE32_MEMBER(dl_unk_w);
-	DECLARE_READ32_MEMBER(dl_vreg_r);
+	void dl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	//uint32_t dl_r();
+	void dl_control_w(uint32_t data);
+	void dl_upload_w(uint32_t data);
+	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dl_vreg_r();
 
-	DECLARE_WRITE32_MEMBER(tcram_w);
-	DECLARE_READ32_MEMBER(tcram_r);
+	void tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t tcram_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
-	DECLARE_READ32_MEMBER(hng64_soundram_r);
-	DECLARE_WRITE32_MEMBER(hng64_vregs_w);
+	void hng64_soundram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t hng64_soundram_r(offs_t offset);
+	void hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// not actually used, but left in code so you can turn it and see the (possibly undesired?) behavior, see notes in memory map
-	DECLARE_WRITE32_MEMBER(hng64_soundram2_w);
-	DECLARE_READ32_MEMBER(hng64_soundram2_r);
+	void hng64_soundram2_w(uint32_t data);
+	uint32_t hng64_soundram2_r();
 
-	DECLARE_WRITE32_MEMBER(hng64_soundcpu_enable_w);
+	void hng64_soundcpu_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
-	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
-	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
-	DECLARE_READ8_MEMBER(hng64_comm_space_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
-	DECLARE_READ8_MEMBER(hng64_comm_mmu_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
+	void hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t hng64_comm_space_r(offs_t offset);
+	void hng64_comm_space_w(offs_t offset, uint8_t data);
+	uint8_t hng64_comm_mmu_r(offs_t offset);
+	void hng64_comm_mmu_w(offs_t offset, uint8_t data);
 
 	// shared ram access
 	uint8_t ioport0_r();
@@ -515,19 +515,19 @@ private:
 
 
 
-	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
+	uint16_t hng64_sound_port_0008_r(offs_t offset, uint16_t mem_mask = ~0);
+	void hng64_sound_port_0008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_000a_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_000c_w);
+	void hng64_sound_port_000a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hng64_sound_port_000c_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
+	void hng64_sound_port_0080_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
-	DECLARE_READ16_MEMBER(main_sound_comms_r);
-	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
-	DECLARE_READ16_MEMBER(sound_comms_r);
-	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	void hng64_sound_bank_w(offs_t offset, uint16_t data);
+	uint16_t main_sound_comms_r(offs_t offset);
+	void main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sound_comms_r(offs_t offset);
+	void sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t main_latch[2];
 	uint16_t sound_latch[2];
 	void hng64_audio(machine_config &config);

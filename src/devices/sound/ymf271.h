@@ -5,8 +5,9 @@
 
 #pragma once
 
+#include "dirom.h"
 
-class ymf271_device : public device_t, public device_sound_interface, public device_rom_interface
+class ymf271_device : public device_t, public device_sound_interface, public device_rom_interface<23>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }

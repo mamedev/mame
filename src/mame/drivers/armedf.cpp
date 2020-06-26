@@ -14,7 +14,7 @@ Kozure Ookami
 Crazy Climber 2
 (c)1988 Nichibutsu
 
-Armed Formation
+Armed F (アームドF, not "Formation Armed F")
 (c)1988 Nichibutsu
 
 Sky Robo / Tatakae! Big Fighter
@@ -838,6 +838,7 @@ static INPUT_PORTS_START( legion )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 #else
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )                /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 #endif
 INPUT_PORTS_END
 
@@ -1031,13 +1032,13 @@ static INPUT_PORTS_START( bigfghtr )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Debug 2 (requires Debug On) (P2 Start skip stage, Invulnerability)" ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Debug (P1 Start to pause)" ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1205,7 +1206,7 @@ void armedf_state::armedf(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	video_config(config, 12, 16, 240);
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 
 	/* sound hardware */
@@ -1905,9 +1906,9 @@ void armedf_state::init_legion()
 	/* This is a hack to allow you to use the extra features
 	     of 3 of the "Unused" Dip Switches (see notes above). */
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	RAM[0x0001d6 / 2] = 0x0001;
+	ROM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
-	RAM[0x000488 / 2] = 0x4e71;
+	ROM[0x000488 / 2] = 0x4e71;
 #endif
 
 	m_scroll_type = 2;
@@ -1918,8 +1919,8 @@ void armedf_state::init_legionjb()
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
 	     of 3 of the "Unused" Dip Switches (see notes above). */
-	u16 *RAM = (u16 *)memregion("maincpu")->base();
-	RAM[0x0001d6/2] = 0x0001;
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
+	ROM[0x0001d6/2] = 0x0001;
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
@@ -1956,8 +1957,8 @@ GAME( 1987, kozure,    0,        kozure,    kozure,   armedf_state,   init_kozur
 GAME( 1988, cclimbr2,  0,        cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a, cclimbr2, cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed F (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed F (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, skyrobo,   0,        bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bigfghtr,  skyrobo,  bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

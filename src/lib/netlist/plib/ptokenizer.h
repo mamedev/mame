@@ -8,10 +8,10 @@
 /// \file ptokenizer.h
 ///
 
-#include "plists.h"
 #include "pstream.h"
 #include "pstring.h"
 
+#include "penum.h"
 #include "putil.h" // psource_t
 
 #include <unordered_map>
@@ -39,7 +39,7 @@ namespace plib {
 
 		virtual ~ptokenizer() = default;
 
-		P_ENUM(token_type,
+		PENUM(token_type,
 			IDENTIFIER,
 			NUMBER,
 			TOKEN,

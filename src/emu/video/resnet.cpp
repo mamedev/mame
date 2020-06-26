@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 /*****************************************************************************
 
-    resnet.c
+    resnet.cpp
 
     Compute weights for resistors networks.
 

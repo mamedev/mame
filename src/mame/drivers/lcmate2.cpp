@@ -43,13 +43,13 @@
 class lcmate2_state : public driver_device
 {
 public:
-	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_lcdc(*this, "hd44780"),
-		m_rtc(*this, "rtc"),
-		m_speaker(*this, "speaker"),
-		m_kbdlines(*this, "LINE%u", 0U)
+	lcmate2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "hd44780")
+		, m_rtc(*this, "rtc")
+		, m_speaker(*this, "speaker")
+		, m_kbdlines(*this, "LINE%u", 0U)
 	{ }
 
 	void lcmate2(machine_config &config);
@@ -64,23 +64,23 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_kbdlines;
 
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_WRITE8_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	u8 key_r(offs_t offset);
+	void speaker_w(u8 data);
+	void bankswitch_w(u8 data);
 	void lcmate2_palette(palette_device &palette) const;
-	void lcmate2_io(address_map &map);
-	void lcmate2_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
-WRITE8_MEMBER( lcmate2_state::speaker_w )
+void lcmate2_state::speaker_w(u8 data)
 {
 	m_speaker->level_w(BIT(data, 6));
 }
 
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
-READ8_MEMBER( lcmate2_state::key_r )
+u8 lcmate2_state::key_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -91,12 +91,12 @@ READ8_MEMBER( lcmate2_state::key_r )
 	return data;
 }
 
-WRITE8_MEMBER( lcmate2_state::bankswitch_w )
+void lcmate2_state::bankswitch_w(u8 data)
 {
 	membank("rombank")->set_entry(data&0x0f);
 }
 
-void lcmate2_state::lcmate2_mem(address_map &map)
+void lcmate2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
@@ -104,7 +104,7 @@ void lcmate2_state::lcmate2_mem(address_map &map)
 	map(0x8000, 0x9fff).ram().mirror(0x6000).share("nvram");
 }
 
-void lcmate2_state::lcmate2_io(address_map &map)
+void lcmate2_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write));
@@ -208,10 +208,10 @@ void lcmate2_state::lcmate2_palette(palette_device &palette) const
 
 void lcmate2_state::machine_start()
 {
-	membank("rombank")->configure_entries(0, 0x10, (uint8_t*)memregion("maincpu")->base(), 0x4000);
+	membank("rombank")->configure_entries(0, 0x10, (u8*)memregion("maincpu")->base(), 0x4000);
 }
 
-static const gfx_layout lcmate2_charlayout =
+static const gfx_layout charlayout =
 {
 	5, 8,   /* 5 x 8 characters */
 	256,    /* 256 characters */
@@ -223,7 +223,7 @@ static const gfx_layout lcmate2_charlayout =
 };
 
 static GFXDECODE_START( gfx_lcmate2 )
-	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -231,8 +231,8 @@ void lcmate2_state::lcmate2(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(3'579'545)); // confirmed
-	m_maincpu->set_addrmap(AS_PROGRAM, &lcmate2_state::lcmate2_mem);
-	m_maincpu->set_addrmap(AS_IO, &lcmate2_state::lcmate2_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lcmate2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &lcmate2_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -269,4 +269,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

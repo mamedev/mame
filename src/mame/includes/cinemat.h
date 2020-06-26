@@ -63,13 +63,13 @@ public:
 	rgb_t m_vector_color;
 	int16_t m_lastx;
 	int16_t m_lasty;
-	DECLARE_READ8_MEMBER(inputs_r);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(coin_input_r);
+	uint8_t inputs_r(offs_t offset);
+	uint8_t switches_r(offs_t offset);
+	uint8_t coin_input_r();
 	WRITE_LINE_MEMBER(coin_reset_w);
 	WRITE_LINE_MEMBER(mux_select_w);
-	DECLARE_READ8_MEMBER(speedfrk_wheel_r);
-	DECLARE_READ8_MEMBER(speedfrk_gear_r);
+	uint8_t speedfrk_wheel_r(offs_t offset);
+	uint8_t speedfrk_gear_r(offs_t offset);
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	uint8_t joystick_read();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -121,7 +121,7 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	DECLARE_READ8_MEMBER(sundance_inputs_r);
+	uint8_t sundance_inputs_r(offs_t offset);
 };
 
 
@@ -155,7 +155,7 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	DECLARE_READ8_MEMBER(boxingb_dial_r);
+	uint8_t boxingb_dial_r(offs_t offset);
 };
 
 
@@ -201,9 +201,9 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	DECLARE_READ8_MEMBER(qb3_frame_r);
-	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
-	DECLARE_WRITE8_MEMBER(qb3_sound_fifo_w);
+	uint8_t qb3_frame_r();
+	void qb3_ram_bank_w(uint8_t data);
+	void qb3_sound_fifo_w(uint8_t data);
 
 	virtual void sound_reset() override;
 

@@ -48,15 +48,15 @@ public:
 		, m_gfx2_region(*this, "gfx2")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(irq_3_ctrl_w);
-	DECLARE_WRITE8_MEMBER(sreset_w);
-	DECLARE_WRITE8_MEMBER(freset_w);
-	DECLARE_WRITE8_MEMBER(customio_3_w);
-	DECLARE_READ8_MEMBER(customio_3_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(starfield_control_w);
+	void irq_1_ctrl_w(offs_t offset, uint8_t data);
+	void irq_2_ctrl_w(offs_t offset, uint8_t data);
+	void irq_3_ctrl_w(offs_t offset, uint8_t data);
+	void sreset_w(offs_t offset, uint8_t data);
+	void freset_w(offs_t offset, uint8_t data);
+	void customio_3_w(offs_t offset, uint8_t data);
+	uint8_t customio_3_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	void starfield_control_w(offs_t offset, uint8_t data);
 
 	void gaplus_palette(palette_device &palette) const;
 
@@ -109,6 +109,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_starfield_control[4];
 	int m_total_stars;
+	int m_starfield_framecount;
 	struct star m_stars[MAX_STARS];
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;

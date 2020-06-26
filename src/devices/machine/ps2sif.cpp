@@ -52,7 +52,7 @@ void ps2_sif_device::device_reset()
 	m_fifo_curr[1] = 0;
 }
 
-READ32_MEMBER(ps2_sif_device::ee_r)
+uint32_t ps2_sif_device::ee_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -85,7 +85,7 @@ READ32_MEMBER(ps2_sif_device::ee_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_sif_device::ee_w)
+void ps2_sif_device::ee_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -115,7 +115,7 @@ WRITE32_MEMBER(ps2_sif_device::ee_w)
 	}
 }
 
-READ32_MEMBER(ps2_sif_device::iop_r)
+uint32_t ps2_sif_device::iop_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -148,7 +148,7 @@ READ32_MEMBER(ps2_sif_device::iop_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_sif_device::iop_w)
+void ps2_sif_device::iop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

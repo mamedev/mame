@@ -65,16 +65,16 @@ private:
 	required_device<filter_rc_device> m_filter3;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(ddribble_bankswitch_w);
-	DECLARE_READ8_MEMBER(ddribble_sharedram_r);
-	DECLARE_WRITE8_MEMBER(ddribble_sharedram_w);
-	DECLARE_READ8_MEMBER(ddribble_snd_sharedram_r);
-	DECLARE_WRITE8_MEMBER(ddribble_snd_sharedram_w);
-	DECLARE_WRITE8_MEMBER(ddribble_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(K005885_0_w);
-	DECLARE_WRITE8_MEMBER(K005885_1_w);
-	DECLARE_WRITE8_MEMBER(ddribble_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(ddribble_bg_videoram_w);
+	void ddribble_bankswitch_w(uint8_t data);
+	uint8_t ddribble_sharedram_r(offs_t offset);
+	void ddribble_sharedram_w(offs_t offset, uint8_t data);
+	uint8_t ddribble_snd_sharedram_r(offs_t offset);
+	void ddribble_snd_sharedram_w(offs_t offset, uint8_t data);
+	void ddribble_coin_counter_w(uint8_t data);
+	void K005885_0_w(offs_t offset, uint8_t data);
+	void K005885_1_w(offs_t offset, uint8_t data);
+	void ddribble_fg_videoram_w(offs_t offset, uint8_t data);
+	void ddribble_bg_videoram_w(offs_t offset, uint8_t data);
 	uint8_t ddribble_vlm5030_busy_r();
 	void ddribble_vlm5030_ctrl_w(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);

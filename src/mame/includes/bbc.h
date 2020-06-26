@@ -21,7 +21,6 @@
 #include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
-#include "machine/i8271.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd7002.h"
 #include "machine/mc146818.h"
@@ -92,9 +91,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")
 		, m_fdc(*this, "fdc")
-		, m_i8271(*this, "i8271")
-		, m_wd1770(*this, "wd1770")
-		, m_wd1772(*this, "wd1772")
+		, m_wd_fdc(*this, "wd_fdc")
 		, m_rom(*this, "romslot%u", 0U)
 		, m_cart(*this, "cartslot%u", 1U)
 		, m_region_mos(*this, "mos")
@@ -105,12 +102,12 @@ public:
 		, m_bbcconfig(*this, "BBCCONFIG")
 	{ }
 
-	enum monitor_type_t
+	enum class monitor_type
 	{
-		COLOUR = 0,
-		BLACKWHITE = 1,
-		GREEN = 2,
-		AMBER = 3
+		COLOUR,
+		BLACKWHITE,
+		GREEN,
+		AMBER
 	};
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -145,14 +142,12 @@ public:
 	void bbcmc_paged_w(offs_t offset, uint8_t data);
 	void bbcbp_drive_control_w(uint8_t data);
 	void bbcm_drive_control_w(uint8_t data);
-	void bbcmc_drive_control_w(uint8_t data);
 	void serial_ula_w(uint8_t data);
 	void video_ula_w(offs_t offset, uint8_t data);
 	uint8_t bbc_fe_r() { return 0xfe; };
 
 	DECLARE_VIDEO_START(bbc);
 
-	void bbc_colours(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(tape_timer_cb);
 	TIMER_CALLBACK_MEMBER(reset_timer_cb);
@@ -173,7 +168,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_palette);
+	void update_palette(monitor_type monitor_type);
 
 	void update_acia_rxd();
 	void update_acia_dcd();
@@ -187,8 +183,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	int get_analogue_input(int channel_number);
 	void upd7002_eoc(int data);
@@ -207,7 +201,6 @@ public:
 	void bbca_mem(address_map &map);
 	void bbc_base(address_map &map);
 	void bbcb_mem(address_map &map);
-	void bbcb_nofdc_mem(address_map &map);
 
 	void init_bbc();
 	void init_ltmp();
@@ -218,6 +211,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -252,9 +246,7 @@ protected:
 	optional_device<mc146818_device> m_rtc;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<bbc_fdc_slot_device> m_fdc;
-	optional_device<i8271_device> m_i8271;
-	optional_device<wd1770_device> m_wd1770;
-	optional_device<wd1772_device> m_wd1772;
+	optional_device<wd_fdc_digital_device_base> m_wd_fdc;
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 	optional_device_array<bbc_cartslot_device, 2> m_cart;
 
@@ -265,7 +257,6 @@ protected:
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
 
-	int m_monitortype;      // monitor type (colour, green, amber)
 	int m_romsel;           // This is the latch that holds the sideways ROM bank to read
 	int m_paged_ram;        // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
@@ -355,27 +346,25 @@ protected:
 	int m_vsync;
 
 	uint8_t m_teletext_latch;
+	uint8_t m_vula_ctrl;
 
-	struct {
-		// control register
-		int master_cursor_size;
-		int width_of_cursor;
-		int clock_rate_6845;
-		int characters_per_line;
-		int teletext_normal_select;
-		int flash_colour_select;
-		// inputs
-		int de;
-	} m_video_ula;
+	struct video_nula {
+		uint8_t palette_mode;
+		uint8_t horiz_offset;
+		uint8_t left_blank;
+		uint8_t disable;
+		uint8_t attr_mode;
+		uint8_t attr_text;
+		uint8_t flash[8];
+		uint8_t palette_byte;
+		uint8_t palette_write;
+	} m_vnula;
 
 	int m_pixels_per_byte;
 	int m_cursor_size;
 
-	int m_videoULA_palette0[16];
-	int m_videoULA_palette1[16];
-	int *m_videoULA_palette_lookup;
-
-	rgb_t out_rgb(rgb_t entry);
+	uint8_t m_vula_palette[16];
+	uint8_t m_vula_palette_lookup[16];
 
 	void setvideoshadow(int vdusel);
 	void set_pixel_lookup();
@@ -400,6 +389,8 @@ public:
 
 	void torchf(machine_config &config);
 	void torchh(machine_config &config);
+	void torch301(machine_config &config);
+	void torch725(machine_config &config);
 };
 
 
@@ -441,9 +432,14 @@ public:
 	void daisy(machine_config &config);
 	void discmon(machine_config &config);
 	void discmate(machine_config &config);
+	void mpc800(machine_config& config);
+	void mpc900(machine_config& config);
+	void mpc900gx(machine_config& config);
 	void bbcmc(machine_config &config);
 	void pro128s(machine_config &config);
 	void autoc15(machine_config &config);
+
+	static void mpc_prisma_default(device_t *device);
 
 protected:
 	virtual void machine_start() override;

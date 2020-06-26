@@ -29,11 +29,11 @@ private:
 	uint8_t    m_dial_enable_1;
 	uint8_t    m_dial_enable_2;
 	uint8_t    m_input_select;
-	DECLARE_READ8_MEMBER(input_port_bit_r);
-	DECLARE_READ8_MEMBER(dial_r);
-	DECLARE_WRITE8_MEMBER(port_1_w);
-	DECLARE_WRITE8_MEMBER(port_2_w);
-	DECLARE_WRITE8_MEMBER(input_select_w);
+	uint8_t input_port_bit_r();
+	uint8_t dial_r();
+	void port_1_w(uint8_t data);
+	void port_2_w(uint8_t data);
+	void input_select_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -83,13 +83,13 @@ uint32_t embargo_state::screen_update_embargo(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-READ8_MEMBER(embargo_state::input_port_bit_r)
+uint8_t embargo_state::input_port_bit_r()
 {
 	return (ioport("IN1")->read() << (7 - m_input_select)) & 0x80;
 }
 
 
-READ8_MEMBER(embargo_state::dial_r)
+uint8_t embargo_state::dial_r()
 {
 	uint8_t lo = 0;
 	uint8_t hi = 0;
@@ -139,19 +139,19 @@ READ8_MEMBER(embargo_state::dial_r)
 }
 
 
-WRITE8_MEMBER(embargo_state::port_1_w)
+void embargo_state::port_1_w(uint8_t data)
 {
 	m_dial_enable_1 = data & 0x01; /* other bits unknown */
 }
 
 
-WRITE8_MEMBER(embargo_state::port_2_w)
+void embargo_state::port_2_w(uint8_t data)
 {
 	m_dial_enable_2 = data & 0x01; /* other bits unknown */
 }
 
 
-WRITE8_MEMBER(embargo_state::input_select_w)
+void embargo_state::input_select_w(uint8_t data)
 {
 	m_input_select = data & 0x07;
 }

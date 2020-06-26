@@ -30,9 +30,9 @@ protected:
 	uint16_t m_w60_p2_ctrl_mask;
 	uint8_t m_bankmask;
 
-	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
-	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
-	DECLARE_READ16_MEMBER(wireless60_porta_r);
+	void wireless60_porta_w(uint16_t data);
+	void wireless60_portb_w(uint16_t data);
+	uint16_t wireless60_porta_r();
 
 private:
 };
@@ -58,9 +58,9 @@ protected:
 
 private:
 	virtual void mem_map_z40(address_map &map);
-	DECLARE_READ16_MEMBER(z40_rom_r);
-	DECLARE_READ16_MEMBER(zone40_porta_r);
-	DECLARE_WRITE16_MEMBER(zone40_porta_w);
+	uint16_t z40_rom_r(offs_t offset);
+	uint16_t zone40_porta_r();
+	void zone40_porta_w(uint16_t data);
 	required_region_ptr<uint16_t> m_romregion;
 	uint16_t m_z40_rombase;
 	uint16_t m_porta_dat;
@@ -68,7 +68,7 @@ private:
 };
 
 
-WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
+void wireless60_state::wireless60_porta_w(uint16_t data)
 {
 	//logerror("%s: wireless60_porta_w %04x\n", machine().describe_context(), data);
 
@@ -93,21 +93,21 @@ WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 	}
 }
 
-READ16_MEMBER(wireless60_state::wireless60_porta_r)
+uint16_t wireless60_state::wireless60_porta_r()
 {
 	//logerror("%s: wireless60_porta_r\n", machine().describe_context());
 	return m_w60_porta_data;
 }
 
-WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
+void wireless60_state::wireless60_portb_w(uint16_t data)
 {
 	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
 	switch_bank(data & m_bankmask);
 }
 
-WRITE16_MEMBER(zone40_state::zone40_porta_w)
+void zone40_state::zone40_porta_w(uint16_t data)
 {
-	wireless60_porta_w(space, offset, data);
+	wireless60_porta_w(data);
 
 	m_z40_rombase = (m_z40_rombase & 0xff00) | (data & 0x0ff);
 
@@ -123,15 +123,15 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 
 }
 
-READ16_MEMBER(zone40_state::zone40_porta_r)
+uint16_t zone40_state::zone40_porta_r()
 {
-	uint16_t ret = wireless60_porta_r(space, offset) & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
+	uint16_t ret = wireless60_porta_r() & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
 	ret = (ret & 0xdf00) | (m_porta_dat & 0x20ff);
 	return ret;
 }
 
 
-READ16_MEMBER(zone40_state::z40_rom_r)
+uint16_t zone40_state::z40_rom_r(offs_t offset)
 {
 	// due to granularity of rom bank this manual method is safer
 	return m_romregion[(offset + (m_z40_rombase * 0x20000)) & (m_romsize-1)];

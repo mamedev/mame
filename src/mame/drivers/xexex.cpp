@@ -158,7 +158,7 @@ reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x8000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053247. */
-READ16_MEMBER(xexex_state::k053247_scattered_word_r)
+uint16_t xexex_state::k053247_scattered_word_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0031)
 		return m_spriteram[offset];
@@ -169,7 +169,7 @@ READ16_MEMBER(xexex_state::k053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
+void xexex_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0031)
 		COMBINE_DATA(m_spriteram + offset);
@@ -216,17 +216,17 @@ void xexex_state::xexex_objdma( int limiter )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-READ16_MEMBER(xexex_state::spriteram_mirror_r)
+uint16_t xexex_state::spriteram_mirror_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
+void xexex_state::spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_spriteram + offset);
 }
 
-READ16_MEMBER(xexex_state::xexex_waitskip_r)
+uint16_t xexex_state::xexex_waitskip_r()
 {
 	if (m_maincpu->pc() == 0x1158)
 	{
@@ -255,23 +255,23 @@ void xexex_state::parse_control2(  )
 	m_cur_alpha = !(m_cur_control2 & 0x200);
 }
 
-READ16_MEMBER(xexex_state::control2_r)
+uint16_t xexex_state::control2_r()
 {
 	return m_cur_control2;
 }
 
-WRITE16_MEMBER(xexex_state::control2_w)
+void xexex_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cur_control2);
 	parse_control2();
 }
 
-WRITE16_MEMBER(xexex_state::sound_irq_w)
+void xexex_state::sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
+void xexex_state::sound_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x07);
 }

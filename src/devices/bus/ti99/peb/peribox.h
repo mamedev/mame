@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Peripheral expansion box
-    See peribox.c for documentation
+    See peribox.cpp for documentation
 
     Michael Zapf
 
@@ -16,8 +16,10 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/ioport.h"
+
+#define TI_PERIBOX_TAG     "peb"
+#define TI99_DSRROM        "dsrrom"
 
 namespace bus { namespace ti99 { namespace peb {
 
@@ -35,11 +37,11 @@ public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Next eight methods are called from the console
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	void setaddress_dbin(offs_t offset, int state) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
@@ -173,11 +175,11 @@ class device_ti99_peribox_card_interface : public device_interface
 	friend class peribox_slot_device;
 
 public:
-	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
+	virtual void readz(offs_t offset, uint8_t *value) = 0;
 	virtual void write(offs_t offset, uint8_t data) = 0;
-	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
+	virtual void crureadz(offs_t offset, uint8_t *value) = 0;
 	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
-	virtual DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) { };
+	virtual void setaddress_dbin(offs_t offset, int state) { };
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
 	virtual DECLARE_WRITE_LINE_MEMBER(reset_in) { }
@@ -227,9 +229,9 @@ public:
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Called from the box (direction to card)
-	DECLARE_READ8Z_MEMBER(readz);
+	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	void setaddress_dbin(offs_t offset, int state);
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
@@ -242,7 +244,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( lcp_line );
 	DECLARE_WRITE_LINE_MEMBER( set_ready );
 
-	DECLARE_READ8Z_MEMBER(crureadz);
+	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
 
 	// called from the box itself

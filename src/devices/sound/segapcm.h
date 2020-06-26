@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -16,7 +17,7 @@
 
 class segapcm_device : public device_t,
 					   public device_sound_interface,
-					   public device_rom_interface
+					   public device_rom_interface<21>
 {
 public:
 	static constexpr int BANK_256    = 11;

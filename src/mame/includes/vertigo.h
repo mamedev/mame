@@ -41,12 +41,12 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
-	DECLARE_READ16_MEMBER(vertigo_io_convert);
-	DECLARE_READ16_MEMBER(vertigo_coin_r);
-	DECLARE_WRITE16_MEMBER(vertigo_wsot_w);
-	DECLARE_WRITE16_MEMBER(vertigo_audio_w);
-	DECLARE_READ16_MEMBER(vertigo_sio_r);
-	DECLARE_WRITE16_MEMBER(vertigo_motor_w);
+	uint16_t vertigo_io_convert(offs_t offset);
+	uint16_t vertigo_coin_r();
+	void vertigo_wsot_w(uint16_t data);
+	void vertigo_audio_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vertigo_sio_r();
+	void vertigo_motor_w(uint16_t data);
 	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
 	TIMER_CALLBACK_MEMBER(sound_command_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);

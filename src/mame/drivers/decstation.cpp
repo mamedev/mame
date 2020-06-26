@@ -107,19 +107,19 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(ioga_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(dz_irq_w);
 
-	DECLARE_READ32_MEMBER(cfb_r);
-	DECLARE_WRITE32_MEMBER(cfb_w);
+	uint32_t cfb_r(offs_t offset);
+	void cfb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(kn01_status_r);
-	DECLARE_WRITE32_MEMBER(kn01_control_w);
-	DECLARE_READ32_MEMBER(bt478_palette_r);
-	DECLARE_WRITE32_MEMBER(bt478_palette_w);
-	DECLARE_READ32_MEMBER(pcc_r);
-	DECLARE_WRITE32_MEMBER(pcc_w);
-	DECLARE_WRITE32_MEMBER(planemask_w);
-	DECLARE_WRITE32_MEMBER(vram_w);
+	uint32_t kn01_status_r();
+	void kn01_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t bt478_palette_r(offs_t offset);
+	void bt478_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pcc_r(offs_t offset);
+	void pcc_w(offs_t offset, uint32_t data);
+	void planemask_w(uint32_t data);
+	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(dz_r);
+	uint32_t dz_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -195,7 +195,7 @@ uint32_t decstation_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-READ32_MEMBER(decstation_state::cfb_r)
+uint32_t decstation_state::cfb_r(offs_t offset)
 {
 	uint32_t addr = offset << 2;
 
@@ -217,7 +217,7 @@ READ32_MEMBER(decstation_state::cfb_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(decstation_state::cfb_w)
+void decstation_state::cfb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t addr = offset << 2;
 
@@ -257,24 +257,24 @@ enum
 	PCC_MEMORY  // 3c
 };
 
-READ32_MEMBER(decstation_state::pcc_r)
+uint32_t decstation_state::pcc_r(offs_t offset)
 {
 	return m_pcc_regs[offset];
 }
 
-WRITE32_MEMBER(decstation_state::pcc_w)
+void decstation_state::pcc_w(offs_t offset, uint32_t data)
 {
 	m_pcc_regs[offset] = data & 0xffff;
 }
 
-WRITE32_MEMBER(decstation_state::planemask_w)
+void decstation_state::planemask_w(uint32_t data)
 {
 	// value written is smeared across all 4 byte lanes
 	data &= 0xff;
 	m_planemask = (data) || (data << 8) || (data << 16) || (data << 24);
 }
 
-WRITE32_MEMBER(decstation_state::vram_w)
+void decstation_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	u32 *vram = (u32 *)m_kn01vram.target();
 //  u32 effective_planemask = (m_planemask & mem_mask);
@@ -316,7 +316,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(decstation_state::scanline_timer)
 	}
 }
 
-READ32_MEMBER(decstation_state::bt478_palette_r)
+uint32_t decstation_state::bt478_palette_r(offs_t offset)
 {
 	u8 rv = 0;
 
@@ -366,7 +366,7 @@ READ32_MEMBER(decstation_state::bt478_palette_r)
 	return rv;
 }
 
-WRITE32_MEMBER(decstation_state::bt478_palette_w)
+void decstation_state::bt478_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("VDAC_w: %08x at %08x (mask %08x)\n", data, offset, mem_mask);
 
@@ -463,13 +463,13 @@ void decstation_state::machine_reset()
 	m_kn01_status = 0;
 }
 
-READ32_MEMBER(decstation_state::kn01_status_r)
+uint32_t decstation_state::kn01_status_r()
 {
 	//m_kn01_status ^= 0x200; // fake vint for now
 	return m_kn01_status;
 }
 
-WRITE32_MEMBER(decstation_state::kn01_control_w)
+void decstation_state::kn01_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_kn01_control);
 
@@ -480,7 +480,7 @@ WRITE32_MEMBER(decstation_state::kn01_control_w)
 	}
 }
 
-READ32_MEMBER(decstation_state::dz_r)
+uint32_t decstation_state::dz_r()
 {
 	return 0x8000;
 }

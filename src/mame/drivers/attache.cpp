@@ -176,17 +176,17 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
+	uint8_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(display_command_w);
-	DECLARE_READ8_MEMBER(display_data_r);
-	DECLARE_WRITE8_MEMBER(display_data_w);
-	DECLARE_READ8_MEMBER(dma_mask_r);
-	DECLARE_WRITE8_MEMBER(dma_mask_w);
+	void display_command_w(uint8_t data);
+	uint8_t display_data_r(offs_t offset);
+	void display_data_w(offs_t offset, uint8_t data);
+	uint8_t dma_mask_r();
+	void dma_mask_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(memmap_r);
-	DECLARE_WRITE8_MEMBER(memmap_w);
+	uint8_t memmap_r();
+	void memmap_w(uint8_t data);
 
 	void operation_strobe(uint8_t data);
 	void keyboard_clock_w(bool state);
@@ -265,11 +265,11 @@ private:
 	void x86_comms_w(uint8_t data);
 	uint8_t x86_comms_r();
 	void x86_irq_enable(uint8_t data);
-	DECLARE_WRITE8_MEMBER(x86_iobf_enable_w);
-	DECLARE_READ8_MEMBER(z80_comms_r);
-	DECLARE_WRITE8_MEMBER(z80_comms_w);
-	DECLARE_READ8_MEMBER(z80_comms_status_r);
-	DECLARE_WRITE8_MEMBER(z80_comms_ctrl_w);
+	void x86_iobf_enable_w(offs_t offset, uint8_t data);
+	uint8_t z80_comms_r();
+	void z80_comms_w(uint8_t data);
+	uint8_t z80_comms_status_r();
+	void z80_comms_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ppi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x86_dsr);
 
@@ -416,7 +416,7 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ8_MEMBER(attache_state::rom_r)
+uint8_t attache_state::rom_r(offs_t offset)
 {
 	if(m_rom_active)
 		return m_rom->base()[offset];
@@ -424,7 +424,7 @@ READ8_MEMBER(attache_state::rom_r)
 		return m_ram->pointer()[m_membank1->entry()*0x2000 + offset];
 }
 
-WRITE8_MEMBER(attache_state::rom_w)
+void attache_state::rom_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[m_membank1->entry()*0x2000 + offset] = data;
 }
@@ -646,7 +646,7 @@ void attache_state::pio_portB_w(uint8_t data)
 }
 
 // Display uses A8-A15 placed on the bus by the OUT instruction as an extra parameter
-READ8_MEMBER(attache_state::display_data_r)
+uint8_t attache_state::display_data_r(offs_t offset)
 {
 	uint8_t ret = 0xff;
 	uint8_t param = (offset & 0xff00) >> 8;
@@ -684,7 +684,7 @@ READ8_MEMBER(attache_state::display_data_r)
 	return ret;
 }
 
-WRITE8_MEMBER(attache_state::display_data_w)
+void attache_state::display_data_w(offs_t offset, uint8_t data)
 {
 	uint8_t param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
@@ -719,7 +719,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	}
 }
 
-WRITE8_MEMBER(attache_state::display_command_w)
+void attache_state::display_command_w(uint8_t data)
 {
 	uint8_t cmd = (data & 0xe0) >> 5;
 
@@ -749,12 +749,12 @@ WRITE8_MEMBER(attache_state::display_command_w)
 	}
 }
 
-READ8_MEMBER(attache_state::memmap_r)
+uint8_t attache_state::memmap_r()
 {
 	return m_memmap;
 }
 
-WRITE8_MEMBER(attache_state::memmap_w)
+void attache_state::memmap_w(uint8_t data)
 {
 	// TODO: figure this out properly
 	// Tech manual says that RAM is split into 8kB chunks.
@@ -769,12 +769,12 @@ WRITE8_MEMBER(attache_state::memmap_w)
 	logerror("MEM: write %02x - bank %i, location %i\n",data, bank, loc);
 }
 
-READ8_MEMBER(attache_state::dma_mask_r)
+uint8_t attache_state::dma_mask_r()
 {
 	return m_dma->read(0x0f);
 }
 
-WRITE8_MEMBER(attache_state::dma_mask_w)
+void attache_state::dma_mask_w(uint8_t data)
 {
 	m_dma->write(0x0f,data);
 }
@@ -846,7 +846,7 @@ void attache816_state::x86_irq_enable(uint8_t data)
 	m_x86_irq_enable = data;
 }
 
-WRITE8_MEMBER(attache816_state::x86_iobf_enable_w)
+void attache816_state::x86_iobf_enable_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -867,14 +867,14 @@ WRITE8_MEMBER(attache816_state::x86_iobf_enable_w)
 	}
 }
 
-READ8_MEMBER(attache816_state::z80_comms_r)
+uint8_t attache816_state::z80_comms_r()
 {
 	m_z80_rx_ready = true;
 	m_ppi->pc6_w(0);
 	return m_comms_val;
 }
 
-WRITE8_MEMBER(attache816_state::z80_comms_w)
+void attache816_state::z80_comms_w(uint8_t data)
 {
 	m_comms_val = data;
 	m_z80_tx_ready = true;
@@ -884,7 +884,7 @@ WRITE8_MEMBER(attache816_state::z80_comms_w)
 // Z80 comms status
 // bit 0: set if no data is ready
 // bit 1: set if ready to accept data
-READ8_MEMBER(attache816_state::z80_comms_status_r)
+uint8_t attache816_state::z80_comms_status_r()
 {
 	uint8_t ret = 0xf0;  // low nibble always high?
 
@@ -898,7 +898,7 @@ READ8_MEMBER(attache816_state::z80_comms_status_r)
 
 // Z80 comms controller
 // bit 0: Reset 8086
-WRITE8_MEMBER(attache816_state::z80_comms_ctrl_w)
+void attache816_state::z80_comms_ctrl_w(uint8_t data)
 {
 	m_extcpu->set_input_line(INPUT_LINE_RESET,(data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1094,7 +1094,7 @@ void attache_state::driver_start()
 
 	m_nvram->set_base(m_cmos_ram,64);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff, read8_delegate(*this, FUNC(attache_state::rom_r)), write8_delegate(*this, FUNC(attache_state::rom_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff, read8sm_delegate(*this, FUNC(attache_state::rom_r)), write8sm_delegate(*this, FUNC(attache_state::rom_w)));
 
 	save_pointer(m_char_ram,"Character RAM",128*32);
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);

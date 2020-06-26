@@ -91,11 +91,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 
 	// IO
-	virtual DECLARE_WRITE8_MEMBER( ff20_write );
-	virtual DECLARE_READ8_MEMBER( ff40_read );
-	virtual DECLARE_WRITE8_MEMBER( ff40_write );
-	DECLARE_READ8_MEMBER( ff60_read );
-	DECLARE_WRITE8_MEMBER( ff60_write );
+	virtual void ff20_write(offs_t offset, uint8_t data);
+	virtual uint8_t ff40_read(offs_t offset);
+	virtual void ff40_write(offs_t offset, uint8_t data);
+	uint8_t ff60_read(offs_t offset);
+	void ff60_write(offs_t offset, uint8_t data);
 
 	// PIA0
 	void pia0_pa_w(uint8_t data);

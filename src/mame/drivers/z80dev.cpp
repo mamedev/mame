@@ -37,8 +37,8 @@ public:
 	void z80dev(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_READ8_MEMBER( test_r );
+	void display_w(offs_t offset, uint8_t data);
+	uint8_t test_r();
 
 	virtual void machine_start() override;
 
@@ -49,7 +49,7 @@ private:
 	output_finder<6> m_digits;
 };
 
-WRITE8_MEMBER( z80dev_state::display_w )
+void z80dev_state::display_w(offs_t offset, uint8_t data)
 {
 	// ---- xxxx digit
 	// xxxx ---- ???
@@ -58,7 +58,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 	m_digits[offset] = hex_7seg[data & 0x0f];
 }
 
-READ8_MEMBER( z80dev_state::test_r )
+uint8_t z80dev_state::test_r()
 {
 	return machine().rand();
 }
@@ -143,4 +143,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME         FLAGS */
-COMP( 198?, z80dev, 0,      0,      z80dev,  z80dev, z80dev_state, empty_init, "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)
+COMP( 198?, z80dev, 0,      0,      z80dev,  z80dev, z80dev_state, empty_init, "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

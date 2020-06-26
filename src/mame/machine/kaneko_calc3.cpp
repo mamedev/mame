@@ -140,10 +140,10 @@ void kaneko_calc3_device::mcu_com_w(offs_t offset, uint16_t data, uint16_t mem_m
 	m_mcu_status |= (1 << _n_);
 }
 
-WRITE16_MEMBER(kaneko_calc3_device::mcu_com0_w){ mcu_com_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(kaneko_calc3_device::mcu_com1_w){ mcu_com_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(kaneko_calc3_device::mcu_com2_w){ mcu_com_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(kaneko_calc3_device::mcu_com3_w){ mcu_com_w(offset, data, mem_mask, 3); }
+void kaneko_calc3_device::mcu_com0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 0); }
+void kaneko_calc3_device::mcu_com1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 1); }
+void kaneko_calc3_device::mcu_com2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 2); }
+void kaneko_calc3_device::mcu_com3_w(offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 3); }
 
 
 

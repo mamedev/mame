@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "tms36xx.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 /* NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor */
 
 /* There are two modes for the uPD7759, selected through the !MD pin.
@@ -15,7 +17,7 @@
 
 class upd775x_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface
+	public device_rom_interface<17>
 {
 public:
 	enum : u32 { STANDARD_CLOCK = 640'000 };

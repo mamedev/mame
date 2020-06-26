@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "scspdsp.h"
 
 #define SCSP_FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
@@ -17,7 +18,7 @@
 
 class scsp_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface
+	public device_rom_interface<20, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP / EG incorrections, etc
@@ -28,12 +29,12 @@ public:
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }
 
 	// SCSP register access
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// MIDI I/O access (used for comms on Model 2/3)
 	void midi_in(u8 data);
-	DECLARE_READ16_MEMBER(midi_out_r);
+	u16 midi_out_r();
 
 protected:
 	// device-level overrides

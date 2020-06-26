@@ -35,7 +35,7 @@ likewise a 2 screen game
 
 ***************************************************************************/
 
-WRITE16_MEMBER(xmen_state::eeprom_w)
+void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x: write %04x to 108000\n", m_maincpu->pc(),data);
 	if (ACCESSING_BITS_0_7)
@@ -63,7 +63,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
+void xmen_state::xmen_18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -72,7 +72,7 @@ WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
 	}
 }
 
-WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
+void xmen_state::sound_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x07);
 }

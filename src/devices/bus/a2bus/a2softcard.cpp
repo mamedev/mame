@@ -100,7 +100,7 @@ void a2bus_softcard_device::write_cnxx(uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( a2bus_softcard_device::dma_r )
+uint8_t a2bus_softcard_device::dma_r(offs_t offset)
 {
 	if (m_bEnabled)
 	{
@@ -138,7 +138,7 @@ READ8_MEMBER( a2bus_softcard_device::dma_r )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( a2bus_softcard_device::dma_w )
+void a2bus_softcard_device::dma_w(offs_t offset, uint8_t data)
 {
 	if (m_bEnabled)
 	{

@@ -164,16 +164,16 @@ private:
 	uint8_t m_mcucomm;
 	uint8_t m_mcudata;
 
-	DECLARE_READ16_MEMBER(hvretrace_r);
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_READ16_MEMBER(chewheel_mcu_r);
-	DECLARE_WRITE16_MEMBER(unk_w);
-	DECLARE_WRITE16_MEMBER(chewheel_mcu_w);
-	DECLARE_WRITE16_MEMBER(sc0_vram_w);
-	DECLARE_WRITE16_MEMBER(sc1_vram_w);
-	DECLARE_WRITE16_MEMBER(sc2_vram_w);
-	DECLARE_WRITE16_MEMBER(sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(output_w);
+	uint16_t hvretrace_r();
+	uint16_t unk_r();
+	uint16_t chewheel_mcu_r();
+	void unk_w(offs_t offset, uint16_t data);
+	void chewheel_mcu_w(uint16_t data);
+	void sc0_vram_w(offs_t offset, uint16_t data);
+	void sc1_vram_w(offs_t offset, uint16_t data);
+	void sc2_vram_w(offs_t offset, uint16_t data);
+	void sc3_vram_w(offs_t offset, uint16_t data);
+	void output_w(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
@@ -268,7 +268,7 @@ uint32_t mil4000_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 /*TODO*/
-READ16_MEMBER(mil4000_state::hvretrace_r)
+uint16_t mil4000_state::hvretrace_r()
 {
 	uint16_t res;
 
@@ -289,25 +289,25 @@ READ16_MEMBER(mil4000_state::hvretrace_r)
 }
 
 
-WRITE16_MEMBER(mil4000_state::sc0_vram_w)
+void mil4000_state::sc0_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc0_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(mil4000_state::sc1_vram_w)
+void mil4000_state::sc1_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc1_vram[offset] = data;
 	m_sc1_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(mil4000_state::sc2_vram_w)
+void mil4000_state::sc2_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc2_vram[offset] = data;
 	m_sc2_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(mil4000_state::sc3_vram_w)
+void mil4000_state::sc3_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc3_vram[offset] = data;
 	m_sc3_tilemap->mark_tile_dirty(offset/2);
@@ -325,7 +325,7 @@ WRITE16_MEMBER(mil4000_state::sc3_vram_w)
     ---- ---- ---- --x- Hold 2
     ---- ---- ---- ---x Hold 1
 */
-WRITE16_MEMBER(mil4000_state::output_w)
+void mil4000_state::output_w(uint16_t data)
 {
 	for(int i = 0; i < 3; i++)
 		machine().bookkeeping().coin_counter_w(i, data & 0x2000);
@@ -336,7 +336,7 @@ WRITE16_MEMBER(mil4000_state::output_w)
 //  popmessage("%04x\n",data);
 }
 
-READ16_MEMBER(mil4000_state::chewheel_mcu_r)
+uint16_t mil4000_state::chewheel_mcu_r()
 {
 /*  Damn thing!
     708010-708011 communicate with the MCU.
@@ -416,7 +416,7 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
 	return (machine().rand() & 0x0b);   // otherwise got corrupt gfx...
 }
 
-WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
+void mil4000_state::chewheel_mcu_w(uint16_t data)
 {
 	if ((data == 0x11)||(data == 0x1a)||(data == 0x1b)||(data == 0x1c)||(data == 0x1d)||(data == 0x1e))
 	{
@@ -431,13 +431,13 @@ WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
 }
 
 
-READ16_MEMBER(mil4000_state::unk_r)
+uint16_t mil4000_state::unk_r()
 {
 //  reads:  51000C-0E. touch screen?
 	return 0xff;
 }
 
-WRITE16_MEMBER(mil4000_state::unk_w)
+void mil4000_state::unk_w(offs_t offset, uint16_t data)
 {
 //  writes: 510000-02-04-06-08-0A-0C-0E
 //  logerror("unknown writes from address %04x\n", offset);

@@ -83,19 +83,19 @@ void mikie_state::mikie_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(mikie_state::mikie_videoram_w)
+void mikie_state::mikie_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mikie_state::mikie_colorram_w)
+void mikie_state::mikie_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
+void mikie_state::mikie_palettebank_w(uint8_t data)
 {
 	if (m_palettebank != (data & 0x07))
 	{

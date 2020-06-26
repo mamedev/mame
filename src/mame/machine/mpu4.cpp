@@ -508,7 +508,7 @@ However, there is no evidence to suggest this was ever implemented.
 The controls for it exist however, in the form of the Soundboard PIA CB2 pin, which is
 used in some cabinets instead of the main control.
 */
-WRITE8_MEMBER(mpu4_state::bankswitch_w)
+void mpu4_state::bankswitch_w(uint8_t data)
 {
 //  printf("bankswitch_w %02x\n", data);
 
@@ -518,13 +518,13 @@ WRITE8_MEMBER(mpu4_state::bankswitch_w)
 }
 
 
-READ8_MEMBER(mpu4_state::bankswitch_r)
+uint8_t mpu4_state::bankswitch_r()
 {
 	return m_bank1->entry();
 }
 
 
-WRITE8_MEMBER(mpu4_state::bankset_w)
+void mpu4_state::bankset_w(uint8_t data)
 {
 //  printf("bankset_w %02x\n", data);
 
@@ -1421,7 +1421,7 @@ and t1 is the initial value in clock 1.
 /* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
 calculate the oscillation frequency in advance. We're running the timer for interrupt
 purposes, but the frequency calculation is done by plucking the values out as they are written.*/
-WRITE8_MEMBER(mpu4_state::ic3ss_w)
+void mpu4_state::ic3ss_w(offs_t offset, uint8_t data)
 {
 	m_ptm_ic3ss->write(offset,data);
 
@@ -1891,7 +1891,7 @@ check is bypassed. This may be something to look at for prototype ROMs and hacks
 */
 
 
-WRITE8_MEMBER(mpu4_state::characteriser_w)
+void mpu4_state::characteriser_w(offs_t offset, uint8_t data)
 {
 	int x;
 	int call=data;
@@ -1968,7 +1968,7 @@ WRITE8_MEMBER(mpu4_state::characteriser_w)
 }
 
 
-READ8_MEMBER(mpu4_state::characteriser_r)
+uint8_t mpu4_state::characteriser_r(address_space &space, offs_t offset)
 {
 	if (!m_current_chr_table)
 	{
@@ -2039,7 +2039,7 @@ and two holding the appropriate call and response pairs for the two stages of op
 */
 
 
-WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
+void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
 {
 	int x;
 	int call=data;
@@ -2080,7 +2080,7 @@ WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 	}
 }
 
-READ8_MEMBER(mpu4_state::bwb_characteriser_r)
+uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 {
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 
@@ -2114,12 +2114,12 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 
 /* Common configurations */
 
-WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
+void mpu4_state::mpu4_ym2413_w(offs_t offset, uint8_t data)
 {
 	if (m_ym2413) m_ym2413->write(offset,data);
 }
 
-READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
+uint8_t mpu4_state::mpu4_ym2413_r(offs_t offset)
 {
 //  if (m_ym2413) return m_ym2413->read(offset);
 	return 0xff;
@@ -2128,8 +2128,8 @@ READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 
 void mpu4_state::mpu4_install_mod4yam_space(address_space &space)
 {
-	space.install_read_handler(0x0880, 0x0882, read8_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_r)));
-	space.install_write_handler(0x0880, 0x0881, write8_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_w)));
+	space.install_read_handler(0x0880, 0x0882, read8sm_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_r)));
+	space.install_write_handler(0x0880, 0x0881, write8sm_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_w)));
 }
 
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
@@ -2138,12 +2138,12 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 
 	space.install_readwrite_handler(0x0880, 0x0883, read8sm_delegate(*pia_ic4ss, FUNC(pia6821_device::read)), write8sm_delegate(*pia_ic4ss, FUNC(pia6821_device::write)));
 	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(*m_ptm_ic3ss, FUNC(ptm6840_device::read)));
-	space.install_write_handler(0x08c0, 0x08c7, write8_delegate(*this, FUNC(mpu4_state::ic3ss_w)));
+	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*this, FUNC(mpu4_state::ic3ss_w)));
 }
 
 void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
 {
-	space.install_readwrite_handler(0x0810, 0x0810, read8_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
+	space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
 	mpu4_install_mod4oki_space(space);
 }
 
@@ -2519,8 +2519,8 @@ void mpu4_state::init_m4default_big()
 	else
 	{
 		m_bwb_bank = 1;
-		space.install_write_handler(0x0858, 0x0858, write8_delegate(*this, FUNC(mpu4_state::bankswitch_w)));
-		space.install_write_handler(0x0878, 0x0878, write8_delegate(*this, FUNC(mpu4_state::bankset_w)));
+		space.install_write_handler(0x0858, 0x0858, write8smo_delegate(*this, FUNC(mpu4_state::bankswitch_w)));
+		space.install_write_handler(0x0878, 0x0878, write8smo_delegate(*this, FUNC(mpu4_state::bankset_w)));
 		uint8_t *rom = memregion("maincpu")->base();
 
 		m_numbanks = size / 0x10000;
@@ -2539,12 +2539,12 @@ void mpu4_state::init_m4default_big()
 
 
 
-READ8_MEMBER(mpu4_state::crystal_sound_r)
+uint8_t mpu4_state::crystal_sound_r()
 {
 	return machine().rand();
 }
 //this may be a YMZ280B
-WRITE8_MEMBER(mpu4_state::crystal_sound_w)
+void mpu4_state::crystal_sound_w(uint8_t data)
 {
 	printf("crystal_sound_w %02x\n",data);
 }
@@ -2553,8 +2553,8 @@ void mpu4_state::init_m_frkstn()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	init_m4default_big();
-	space.install_read_handler(0x0880, 0x0880, read8_delegate(*this, FUNC(mpu4_state::crystal_sound_r)));
-	space.install_write_handler(0x0881, 0x0881, write8_delegate(*this, FUNC(mpu4_state::crystal_sound_w)));
+	space.install_read_handler(0x0880, 0x0880, read8smo_delegate(*this, FUNC(mpu4_state::crystal_sound_r)));
+	space.install_write_handler(0x0881, 0x0881, write8smo_delegate(*this, FUNC(mpu4_state::crystal_sound_w)));
 }
 
 // thanks to Project Amber for descramble information

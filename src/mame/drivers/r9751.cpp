@@ -106,14 +106,14 @@ public:
 
 private:
 
-	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
-	DECLARE_READ32_MEMBER(r9751_mmio_ff01_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_ff01_w);
-	DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
-	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
+	uint32_t r9751_mmio_5ff_r(offs_t offset);
+	void r9751_mmio_5ff_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t r9751_mmio_ff01_r(offs_t offset);
+	void r9751_mmio_ff01_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t r9751_mmio_ff05_r(offs_t offset);
+	void r9751_mmio_ff05_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t r9751_mmio_fff8_r(offs_t offset);
+	void r9751_mmio_fff8_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint8_t pdc_dma_r(offs_t offset);
 	void pdc_dma_w(uint8_t data);
@@ -605,7 +605,7 @@ void r9751_state::machine_reset()
 /******************************************************************************
  External board communication registers [0x5FF00000 - 0x5FFFFFFF]
 ******************************************************************************/
-READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
+uint32_t r9751_state::r9751_mmio_5ff_r(offs_t offset)
 {
 	uint32_t data;
 	switch(offset << 2)
@@ -671,7 +671,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 	return data;
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
+void r9751_state::r9751_mmio_5ff_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t data_b0, data_b1;
 
@@ -807,7 +807,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 /******************************************************************************
  CPU board registers [0xFF010000 - 0xFF06FFFF]
 ******************************************************************************/
-READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
+uint32_t r9751_state::r9751_mmio_ff01_r(offs_t offset)
 {
 	u32 data;
 	switch(offset << 2)
@@ -819,7 +819,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 	return data;
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
+void  r9751_state::r9751_mmio_ff01_w (offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
@@ -843,7 +843,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 	}
 }
 
-READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
+uint32_t r9751_state::r9751_mmio_ff05_r(offs_t offset)
 {
 	uint32_t data;
 
@@ -875,7 +875,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 	return data;
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
+void r9751_state::r9751_mmio_ff05_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
@@ -899,7 +899,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 	}
 }
 
-READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
+uint32_t r9751_state::r9751_mmio_fff8_r(offs_t offset)
 {
 	uint32_t data;
 
@@ -916,7 +916,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 	return data;
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
+void r9751_state::r9751_mmio_fff8_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)

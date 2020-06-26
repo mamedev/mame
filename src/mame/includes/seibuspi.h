@@ -132,14 +132,14 @@ protected:
 	void spi_layerbanks_eeprom_w(u8 data);
 	void oki_bank_w(u8 data);
 
-	DECLARE_READ32_MEMBER(senkyu_speedup_r);
-	DECLARE_READ32_MEMBER(senkyua_speedup_r);
-	DECLARE_READ32_MEMBER(batlball_speedup_r);
-	DECLARE_READ32_MEMBER(rdft_speedup_r);
-	DECLARE_READ32_MEMBER(viprp1_speedup_r);
-	DECLARE_READ32_MEMBER(viprp1o_speedup_r);
-	DECLARE_READ32_MEMBER(rf2_speedup_r);
-	DECLARE_READ32_MEMBER(rfjet_speedup_r);
+	u32 senkyu_speedup_r();
+	u32 senkyua_speedup_r();
+	u32 batlball_speedup_r();
+	u32 rdft_speedup_r();
+	u32 viprp1_speedup_r();
+	u32 viprp1o_speedup_r();
+	u32 rf2_speedup_r();
+	u32 rfjet_speedup_r();
 
 	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
 

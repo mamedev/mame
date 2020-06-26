@@ -40,7 +40,7 @@ public:
 	void init_ertictac();
 
 private:
-	DECLARE_READ32_MEMBER(ertictac_podule_r);
+	uint32_t ertictac_podule_r(offs_t offset);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
@@ -48,7 +48,7 @@ private:
 };
 
 
-READ32_MEMBER(ertictac_state::ertictac_podule_r)
+uint32_t ertictac_state::ertictac_podule_r(offs_t offset)
 {
 	archimedes_clear_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 

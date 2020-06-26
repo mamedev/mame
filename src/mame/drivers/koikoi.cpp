@@ -75,9 +75,9 @@ private:
 	int m_inputval;
 	int m_inputlen;
 	int m_ioram[8];
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 	uint8_t input_r();
 	void unknown_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -166,7 +166,7 @@ uint32_t koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-WRITE8_MEMBER(koikoi_state::vram_w)
+void koikoi_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
@@ -213,7 +213,7 @@ void koikoi_state::unknown_w(uint8_t data)
 	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
-READ8_MEMBER(koikoi_state::io_r)
+uint8_t koikoi_state::io_r(offs_t offset)
 {
 	if (!offset)
 		return ioport("IN0")->read() ^ m_ioram[4]; //coin
@@ -221,7 +221,7 @@ READ8_MEMBER(koikoi_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(koikoi_state::io_w)
+void koikoi_state::io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 7 && data == 0)
 		m_inputcnt = 0; //reset read cycle counter

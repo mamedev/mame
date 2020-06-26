@@ -78,14 +78,14 @@ ps2_vif1_device* sonyvu1_device::interface()
 	return m_vif.target();
 }
 
-READ64_MEMBER(sonyvu1_device::vif_r)
+uint64_t sonyvu1_device::vif_r(offs_t offset)
 {
-	return m_vif->mmio_r(space, offset, mem_mask);
+	return m_vif->mmio_r(offset);
 }
 
-WRITE64_MEMBER(sonyvu1_device::vif_w)
+void sonyvu1_device::vif_w(offs_t offset, uint64_t data)
 {
-	m_vif->mmio_w(space, offset, data, mem_mask);
+	m_vif->mmio_w(offset, data);
 }
 
 void sonyvu_device::device_start()
@@ -975,12 +975,12 @@ void sonyvu0_device::device_reset()
 	m_cmsar1 = 0;
 }
 
-READ32_MEMBER(sonyvu0_device::vu1_reg_r)
+uint32_t sonyvu0_device::vu1_reg_r(offs_t offset)
 {
 	return m_vu1_regs[offset];
 }
 
-WRITE32_MEMBER(sonyvu0_device::vu1_reg_w)
+void sonyvu0_device::vu1_reg_w(offs_t offset, uint32_t data)
 {
 	m_vu1_regs[offset] = data;
 }

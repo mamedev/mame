@@ -119,23 +119,23 @@ private:
 	u32 m_tilemap_tile_bank[4];
 	std::unique_ptr<u32[]> m_spritebank32_delayed;
 
-	DECLARE_READ32_MEMBER(randgen_r);
-	DECLARE_WRITE32_MEMBER(srand_w);
-	DECLARE_WRITE8_MEMBER(namconb1_cpureg_w);
-	DECLARE_WRITE8_MEMBER(namconb2_cpureg_w);
-	DECLARE_READ8_MEMBER(namconb1_cpureg_r);
-	DECLARE_READ8_MEMBER(namconb2_cpureg_r);
-	DECLARE_READ32_MEMBER(custom_key_r);
-	DECLARE_READ32_MEMBER(gunbulet_gun_r);
-	DECLARE_READ32_MEMBER(share_r);
-	DECLARE_WRITE32_MEMBER(share_w);
-	DECLARE_WRITE16_MEMBER(mcu_shared_w);
+	u32 randgen_r();
+	void srand_w(u32 data);
+	void namconb1_cpureg_w(offs_t offset, u8 data);
+	void namconb2_cpureg_w(offs_t offset, u8 data);
+	u8 namconb1_cpureg_r(offs_t offset);
+	u8 namconb2_cpureg_r(offs_t offset);
+	u32 custom_key_r(offs_t offset);
+	u32 gunbulet_gun_r(offs_t offset);
+	u32 share_r(offs_t offset);
+	void share_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void mcu_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 port6_r();
 	void port6_w(u8 data);
 	u8 port7_r();
 	template <int Bit> u16 dac_bit_r();
 
-	DECLARE_WRITE32_MEMBER(rozbank32_w);
+	void rozbank32_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

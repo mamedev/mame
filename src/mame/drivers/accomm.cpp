@@ -46,6 +46,7 @@ public:
 	accomm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_maincpu_region(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
 		m_via(*this, "via6522"),
@@ -59,6 +60,8 @@ public:
 	{ }
 
 	void accomm(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,6 +83,7 @@ private:
 
 	// devices
 	required_device<g65816_device> m_maincpu;
+	required_memory_region m_maincpu_region;
 	required_device<beep_device> m_beeper;
 	required_device<ram_device> m_ram;
 	required_device<via6522_device> m_via;
@@ -438,7 +442,7 @@ uint8_t accomm_state::ram_r(offs_t offset)
 
 	if (m_ch00rom_enabled && (offset < 0x10000))
 	{
-		data = memregion("maincpu")->base()[offset];
+		data = m_maincpu_region->base()[offset];
 	}
 	else
 	{
@@ -646,6 +650,11 @@ void accomm_state::main_map(address_map &map)
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0x010000);                                      /* ROM bank 1 (ROM Slot 0) */
 }
 
+INPUT_CHANGED_MEMBER(accomm_state::trigger_reset)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
@@ -716,7 +725,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.11")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')  PORT_CHAR('}')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))       PORT_NAME("Phone")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))        PORT_NAME("Phone")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(ESC))       PORT_NAME("Escape")
 
 	PORT_START("LINE1.12")
@@ -798,9 +807,9 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 
 	PORT_START("LINE2.11")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))       PORT_NAME("Stop")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))      PORT_NAME("Comp")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Calc")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))      PORT_NAME("Calc")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 
 	PORT_START("LINE2.12")
@@ -814,6 +823,9 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("STOP")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, accomm_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 void accomm_state::accomm(machine_config &config)
@@ -969,7 +981,7 @@ ROM_START(accommi)
 	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
 
-COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator",             MACHINE_NOT_WORKING )
-COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
-COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )
+COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator",             MACHINE_NOT_WORKING )
+COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
+COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )

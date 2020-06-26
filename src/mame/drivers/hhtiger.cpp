@@ -90,9 +90,9 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(disable_rom_r);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t disable_rom_r();
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -233,7 +233,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER(hhtiger_state::draw_text)
 }
 
 
-READ8_MEMBER(hhtiger_state::disable_rom_r)
+uint8_t hhtiger_state::disable_rom_r()
 {
 	if (!machine().side_effects_disabled())
 		m_rom_mirror = false;
@@ -241,7 +241,7 @@ READ8_MEMBER(hhtiger_state::disable_rom_r)
 	return 0xff;
 }
 
-READ8_MEMBER(hhtiger_state::read)
+uint8_t hhtiger_state::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -265,7 +265,7 @@ READ8_MEMBER(hhtiger_state::read)
 	return data;
 }
 
-WRITE8_MEMBER(hhtiger_state::write)
+void hhtiger_state::write(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[offset] = data;
 }

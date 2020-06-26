@@ -60,9 +60,9 @@ public:
 private:
 	virtual void video_start() override;
 	void scanline_cb(uint32_t data);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(spriteram_r);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, uint8_t data);
 	void update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -73,7 +73,7 @@ private:
 	void pia1_porta_w(uint8_t data);
 	uint8_t pia1_portb_r();
 
-	DECLARE_READ8_MEMBER(ptm_r);
+	uint8_t ptm_r(offs_t offset);
 
 	void zwackery_map(address_map &map);
 
@@ -272,19 +272,19 @@ void zwackery_state::scanline_cb(uint32_t data)
 	m_ptm->set_c3(1);
 }
 
-WRITE16_MEMBER( zwackery_state::videoram_w )
+void zwackery_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER( zwackery_state::spriteram_r )
+uint8_t zwackery_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE8_MEMBER( zwackery_state::spriteram_w )
+void zwackery_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spriteram[offset] = data;
 }
@@ -459,7 +459,7 @@ uint8_t zwackery_state::pia1_portb_r()
 // It expects D1 to end up between 0 and 5; in order to
 // make this happen, we must assume that reads from the
 // 6840 take 14 additional cycles
-READ8_MEMBER( zwackery_state::ptm_r )
+uint8_t zwackery_state::ptm_r(offs_t offset)
 {
 	m_maincpu->adjust_icount(-14);
 	return m_ptm->read(offset);

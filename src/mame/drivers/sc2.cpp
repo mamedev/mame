@@ -75,10 +75,10 @@ private:
 	u8 m_digit_data;
 
 	void update_display();
-	DECLARE_READ8_MEMBER(pio_port_b_r);
-	DECLARE_WRITE8_MEMBER(pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(pio_port_b_w);
-	template<int State> DECLARE_READ8_MEMBER(speaker_w);
+	u8 pio_port_b_r();
+	void pio_port_a_w(u8 data);
+	void pio_port_b_w(u8 data);
+	template<int State> u8 speaker_w();
 };
 
 void sc2_state::machine_start()
@@ -103,7 +103,7 @@ void sc2_state::update_display()
 	m_display->matrix(~m_inp_mux, m_digit_data);
 }
 
-READ8_MEMBER(sc2_state::pio_port_b_r)
+u8 sc2_state::pio_port_b_r()
 {
 	u8 data = 0;
 
@@ -115,14 +115,14 @@ READ8_MEMBER(sc2_state::pio_port_b_r)
 	return data << 4 | 0xf;
 }
 
-WRITE8_MEMBER(sc2_state::pio_port_a_w)
+void sc2_state::pio_port_a_w(u8 data)
 {
 	// digit segment data
 	m_digit_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(sc2_state::pio_port_b_w)
+void sc2_state::pio_port_b_w(u8 data)
 {
 	// d0-d3: keypad mux(active high), led mux(active low)
 	m_inp_mux = data;
@@ -130,7 +130,7 @@ WRITE8_MEMBER(sc2_state::pio_port_b_w)
 }
 
 template<int State>
-READ8_MEMBER(sc2_state::speaker_w)
+u8 sc2_state::speaker_w()
 {
 	if (!machine().side_effects_disabled())
 		m_dac->write(State);

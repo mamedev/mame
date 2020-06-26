@@ -44,7 +44,7 @@ namespace netlist
 		NETLIB_RESETI() { m_reset = true; }
 	protected:
 		analog_input_t m_I;
-		std::ofstream m_strm;
+		plib::ofstream m_strm;
 		plib::putf8_writer m_writer;
 		bool m_reset;
 	};

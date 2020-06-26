@@ -12,7 +12,7 @@
 #define NLID_PROXY_H_
 
 #include "netlist/analog/nlid_twoterm.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {

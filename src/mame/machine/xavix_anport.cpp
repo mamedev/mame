@@ -33,47 +33,47 @@ void xavix_anport_device::device_reset()
 }
 
 
-READ8_MEMBER(xavix_anport_device::mouse_7b00_r)
+uint8_t xavix_anport_device::mouse_7b00_r()
 {
 	LOG("%s: mouse_7b00_r\n", machine().describe_context());
 	return m_in0_cb();
 
 }
 
-READ8_MEMBER(xavix_anport_device::mouse_7b01_r)
+uint8_t xavix_anport_device::mouse_7b01_r()
 {
 	LOG("%s: mouse_7b01_r\n", machine().describe_context());
 	return m_in1_cb();
 }
 
-READ8_MEMBER(xavix_anport_device::mouse_7b10_r)
+uint8_t xavix_anport_device::mouse_7b10_r()
 {
 	LOG("%s: mouse_7b10_r\n", machine().describe_context());
 	return m_in2_cb();
 }
 
-READ8_MEMBER(xavix_anport_device::mouse_7b11_r)
+uint8_t xavix_anport_device::mouse_7b11_r()
 {
 	LOG("%s: mouse_7b11_r\n", machine().describe_context());
 	return m_in3_cb();
 }
 
-WRITE8_MEMBER(xavix_anport_device::mouse_7b00_w)
+void xavix_anport_device::mouse_7b00_w(uint8_t data)
 {
 	LOG("%s: mouse_7b00_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_anport_device::mouse_7b01_w)
+void xavix_anport_device::mouse_7b01_w(uint8_t data)
 {
 	LOG("%s: mouse_7b01_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_anport_device::mouse_7b10_w)
+void xavix_anport_device::mouse_7b10_w(uint8_t data)
 {
 	LOG("%s: mouse_7b10_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_anport_device::mouse_7b11_w)
+void xavix_anport_device::mouse_7b11_w(uint8_t data)
 {
 	LOG("%s: mouse_7b11_w %02x\n", machine().describe_context(), data);
 }

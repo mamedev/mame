@@ -103,7 +103,7 @@ TIMER_CALLBACK_MEMBER(hec2hrp_state::cassette_clock)
 	m_ck_signal++;
 }
 
-WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
+void hec2hrp_state::minidisc_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -122,7 +122,7 @@ WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
 	membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC);
 }
 
-WRITE8_MEMBER(hec2hrp_state::switch_bank_w)
+void hec2hrp_state::switch_bank_w(offs_t offset, uint8_t data)
 {
 	if (offset==0x00)
 	{
@@ -179,12 +179,12 @@ WRITE8_MEMBER(hec2hrp_state::switch_bank_w)
 	}
 }
 
-WRITE8_MEMBER(hec2hrp_state::keyboard_w)
+void hec2hrp_state::keyboard_w(uint8_t data)
 {
 	/* nothing to do (read function manages the value) */
 }
 
-READ8_MEMBER(hec2hrp_state::keyboard_r)
+uint8_t hec2hrp_state::keyboard_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -253,19 +253,19 @@ READ8_MEMBER(hec2hrp_state::keyboard_r)
 	return m_keyboard[offset]->read();
 }
 
-WRITE8_MEMBER(hec2hrp_state::sn_2000_w)
+void hec2hrp_state::sn_2000_w(offs_t offset, uint8_t data)
 {
 	update_state(0x2000+ offset, data);
-	update_sound(space, data);
+	update_sound(data);
 }
 
-WRITE8_MEMBER(hec2hrp_state::sn_2800_w)
+void hec2hrp_state::sn_2800_w(offs_t offset, uint8_t data)
 {
 	update_state(0x2800+ offset, data);
-	update_sound(space, data);
+	update_sound(data);
 }
 
-READ8_MEMBER(hec2hrp_state::cassette_r)
+uint8_t hec2hrp_state::cassette_r()
 {
 	double level;
 	uint8_t value = 0;
@@ -306,20 +306,20 @@ READ8_MEMBER(hec2hrp_state::cassette_r)
 	}
 	return value;
 }
-WRITE8_MEMBER(hec2hrp_state::sn_3000_w)
+void hec2hrp_state::sn_3000_w(uint8_t data)
 {
 	m_state3000 = data & 0xf8; /* except bit 0 to 2*/
 	if ((data & 7) != m_oldstate3000 )
 	{
 		/* Update sn76477 only when necessary!*/
 		update_state(0x3000, data & 7 );
-		update_sound(space, data & 7);
+		update_sound(data & 7);
 	}
 	m_oldstate3000 = data & 7;
 }
 
 /* Color Interface */
-WRITE8_MEMBER(hec2hrp_state::color_a_w)
+void hec2hrp_state::color_a_w(uint8_t data)
 {
 	if (data & 0x40)
 	{
@@ -367,7 +367,7 @@ WRITE8_MEMBER(hec2hrp_state::color_a_w)
 	m_oldstate1000=data; /* For next step*/
 }
 
-WRITE8_MEMBER(hec2hrp_state::color_b_w)
+void hec2hrp_state::color_b_w(uint8_t data)
 {
 	m_hector_color[1] =  data        & 0x07;
 	m_hector_color[3] = (data >> 3)  & 0x07;
@@ -385,7 +385,7 @@ WRITE8_MEMBER(hec2hrp_state::color_b_w)
 ********************************************************************************/
 
 /*******************  READ PIO 8255 *******************/
-READ8_MEMBER(hec2hrp_state::io_8255_r)
+uint8_t hec2hrp_state::io_8255_r(offs_t offset)
 {
 	/* 8255 in mode 0 */
 	uint8_t data =0;
@@ -432,7 +432,7 @@ READ8_MEMBER(hec2hrp_state::io_8255_r)
 
 /*******************  WRITE PIO 8255 *******************/
 
-WRITE8_MEMBER(hec2hrp_state::io_8255_w)
+void hec2hrp_state::io_8255_w(offs_t offset, uint8_t data)
 {
 	/* 8255 in mode 0 */
 	if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
@@ -487,7 +487,7 @@ WRITE8_MEMBER(hec2hrp_state::io_8255_w)
 
 
 /*******************  PIO write handler for MX40 *******************/
-WRITE8_MEMBER(hec2hrp_state::mx40_io_port_w)
+void hec2hrp_state::mx40_io_port_w(offs_t offset, uint8_t data)
 {
 	/* Bank switching on several address */
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
@@ -504,7 +504,7 @@ WRITE8_MEMBER(hec2hrp_state::mx40_io_port_w)
 }
 
 /*******************  PIO write handlerfor MX80 *******************/
-WRITE8_MEMBER(hec2hrp_state::mx80_io_port_w)
+void hec2hrp_state::mx80_io_port_w(offs_t offset, uint8_t data)
 {
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
 		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
@@ -703,7 +703,7 @@ void hec2hrp_state::init_sn76477()
 	m_val_mixer = 0;
 }
 
-void hec2hrp_state::update_sound(address_space &space, uint8_t data)
+void hec2hrp_state::update_sound(uint8_t data)
 {
 	/* MIXER */
 	m_sn->mixer_a_w(((m_val_mixer & 0x04)==4) ? 1 : 0);
@@ -871,54 +871,54 @@ void hec2hrp_state::hector_disc2_reset()
 
 // Port handling for Z80 Disc II unit
 
-READ8_MEMBER( hec2hrp_state::disc2_io00_port_r)
+uint8_t hec2hrp_state::disc2_io00_port_r()
 {
 	/* Switch Disc 2 to RAM */
 	membank("bank3")->set_entry(DISCII_BANK_RAM);
 	return 0;
 }
-WRITE8_MEMBER( hec2hrp_state::disc2_io00_port_w)
+void hec2hrp_state::disc2_io00_port_w(uint8_t data)
 {
 	/* Switch Disc 2 to RAM */
 	membank("bank3")->set_entry(DISCII_BANK_RAM);
 }
-READ8_MEMBER( hec2hrp_state::disc2_io20_port_r)
+uint8_t hec2hrp_state::disc2_io20_port_r()
 {
 	// TODO: Implement 8251 chip communication
 	return 0;
 }
-WRITE8_MEMBER( hec2hrp_state::disc2_io20_port_w)
+void hec2hrp_state::disc2_io20_port_w(uint8_t data)
 {
 	// TODO: Implement 8251 chip communication
 }
 
-READ8_MEMBER( hec2hrp_state::disc2_io30_port_r)
+uint8_t hec2hrp_state::disc2_io30_port_r()
 {
 	return m_hector_disc2_data_r_ready;
 }
 
-WRITE8_MEMBER( hec2hrp_state::disc2_io30_port_w)
+void hec2hrp_state::disc2_io30_port_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( hec2hrp_state::disc2_io40_port_r) /* Read data sent to Hector by Disc2 */
+uint8_t hec2hrp_state::disc2_io40_port_r() /* Read data sent to Hector by Disc2 */
 {
 	m_hector_disc2_data_r_ready = 0x00;
 	return m_hector_disc2_data_read;
 }
 
-WRITE8_MEMBER( hec2hrp_state::disc2_io40_port_w)    /* Write data sent by Disc2 to Hector */
+void hec2hrp_state::disc2_io40_port_w(uint8_t data)    /* Write data sent by Disc2 to Hector */
 {
 	m_hector_disc2_data_write = data;
 	m_hector_disc2_data_w_ready = 0x80;
 }
 
-READ8_MEMBER( hec2hrp_state::disc2_io50_port_r)
+uint8_t hec2hrp_state::disc2_io50_port_r()
 {
 	return m_hector_disc2_data_w_ready;
 }
 
-WRITE8_MEMBER( hec2hrp_state::disc2_io50_port_w)
+void hec2hrp_state::disc2_io50_port_w(uint8_t data)
 {
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
 	m_upd_connector[0]->get_device()->mon_w(BIT(data, 0));    // FLoppy motor A

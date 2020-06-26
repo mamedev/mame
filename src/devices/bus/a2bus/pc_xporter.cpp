@@ -442,17 +442,17 @@ void a2bus_pcxporter_device::write_c800(uint16_t offset, uint8_t data)
 	}
 }
 
-READ16_MEMBER(a2bus_pcxporter_device::pc_bios_r)
+uint16_t a2bus_pcxporter_device::pc_bios_r(offs_t offset)
 {
 	return m_ram[offset+0xa0000] | (m_ram[offset+0xa0001]<<8);
 }
 
-READ8_MEMBER( a2bus_pcxporter_device::kbd_6502_r )
+uint8_t a2bus_pcxporter_device::kbd_6502_r(offs_t offset)
 {
 	return m_c800_ram[offset+0x60];
 }
 
-WRITE8_MEMBER( a2bus_pcxporter_device::kbd_6502_w )
+void a2bus_pcxporter_device::kbd_6502_w(offs_t offset, uint8_t data)
 {
 	m_c800_ram[offset+0x60] = data;
 }
@@ -463,7 +463,7 @@ WRITE8_MEMBER( a2bus_pcxporter_device::kbd_6502_w )
  *
  *************************************************************************/
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_page_w)
+void a2bus_pcxporter_device::pc_page_w(offs_t offset, uint8_t data)
 {
 	switch(offset % 4)
 	{
@@ -489,7 +489,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma_read_byte )
+uint8_t a2bus_pcxporter_device::pc_dma_read_byte(offs_t offset)
 {
 	if(m_dma_channel == -1)
 		return 0xff;
@@ -499,7 +499,7 @@ READ8_MEMBER( a2bus_pcxporter_device::pc_dma_read_byte )
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma_write_byte )
+void a2bus_pcxporter_device::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	if(m_dma_channel == -1)
 		return;
@@ -510,41 +510,41 @@ WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma_write_byte )
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_1_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_1_dack_r()
 {
 	return m_isabus->dack_r(1);
 }
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_2_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_2_dack_r()
 {
 	return m_isabus->dack_r(2);
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_3_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_3_dack_r()
 {
 	return m_isabus->dack_r(3);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_1_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_1_dack_w(uint8_t data)
 {
 	m_isabus->dack_w(1,data);
 }
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_2_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_2_dack_w(uint8_t data)
 {
 	m_isabus->dack_w(2,data);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_3_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_3_dack_w(uint8_t data)
 {
 	m_isabus->dack_w(3,data);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_0_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_0_dack_w(uint8_t data)
 {
 	m_u73_q2 = 0;
 	m_dma8237->dreq0_w( m_u73_q2 );
@@ -630,7 +630,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_data_w )
  *
  **********************************************************/
 
-WRITE8_MEMBER( a2bus_pcxporter_device::nmi_enable_w )
+void a2bus_pcxporter_device::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enabled = BIT(data,7);
 	if (!m_nmi_enabled)

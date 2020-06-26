@@ -28,9 +28,10 @@ public:
 	}
 
 	void harriet(machine_config &config);
+
 private:
-	DECLARE_READ8_MEMBER(zpram_r);
-	DECLARE_WRITE8_MEMBER(zpram_w);
+	uint8_t zpram_r(offs_t offset);
+	void zpram_w(offs_t offset, uint8_t data);
 
 	void harriet_map(address_map &map);
 
@@ -41,12 +42,12 @@ private:
 	std::unique_ptr<u8[]> m_zpram_data;
 };
 
-READ8_MEMBER(harriet_state::zpram_r)
+uint8_t harriet_state::zpram_r(offs_t offset)
 {
 	return m_zpram_data[offset];
 }
 
-WRITE8_MEMBER(harriet_state::zpram_w)
+void harriet_state::zpram_w(offs_t offset, uint8_t data)
 {
 	m_zpram_data[offset] = data;
 }

@@ -31,11 +31,11 @@ public:
 	void init_naname();
 
 private:
-	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_videoram_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_scrollx_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
+	void ohmygod_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ohmygod_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ohmygod_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ohmygod_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ohmygod_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -76,8 +76,8 @@ private:
 	required_memory_bank m_rombank;
 	required_memory_bank m_vrambank;
 	std::unique_ptr<uint8_t[]> m_vram;
-	DECLARE_WRITE8_MEMBER(dac_adr_s_w);
-	DECLARE_WRITE8_MEMBER(dac_adr_e_w);
+	void dac_adr_s_w(uint8_t data);
+	void dac_adr_e_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(rombank_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(colorbank_w);
@@ -86,9 +86,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vrambank_w);
 	DECLARE_WRITE_LINE_MEMBER(dac_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(input_sel1_w);
-	DECLARE_WRITE8_MEMBER(input_sel2_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void input_sel1_w(uint8_t data);
+	void input_sel2_w(uint8_t data);
+	uint8_t keys_r();
 	TIMER_CALLBACK_MEMBER(dac_callback);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -185,12 +185,12 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 		m_dac_busy = 0;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_s_w)
+void mjsister_state::dac_adr_s_w(uint8_t data)
 {
 	m_dac_adr_s = data;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_e_w)
+void mjsister_state::dac_adr_e_w(uint8_t data)
 {
 	m_dac_adr_e = data;
 	m_dac_adr = m_dac_adr_s << 8;
@@ -243,17 +243,17 @@ WRITE_LINE_MEMBER(mjsister_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel1_w)
+void mjsister_state::input_sel1_w(uint8_t data)
 {
 	m_input_sel1 = data;
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel2_w)
+void mjsister_state::input_sel2_w(uint8_t data)
 {
 	m_input_sel2 = data;
 }
 
-READ8_MEMBER(mjsister_state::keys_r)
+uint8_t mjsister_state::keys_r()
 {
 	int p, i, ret = 0;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };

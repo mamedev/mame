@@ -101,9 +101,9 @@ public:
 	void sraider(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(sraider_8005_r);
-	DECLARE_WRITE8_MEMBER(sraider_misc_w);
-	DECLARE_WRITE8_MEMBER(sraider_io_w);
+	uint8_t sraider_8005_r();
+	void sraider_misc_w(offs_t offset, uint8_t data);
+	void sraider_io_w(uint8_t data);
 	void sraider_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sraider);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);

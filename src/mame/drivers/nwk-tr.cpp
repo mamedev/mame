@@ -307,8 +307,10 @@ public:
 		m_analog3(*this, "ANALOG3"),
 		m_analog4(*this, "ANALOG4"),
 		m_analog5(*this, "ANALOG5"),
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram") { }
+		m_generic_paletteram_32(*this, "paletteram")
+	{ }
 
 	void thrilld(machine_config &config);
 	void nwktr(machine_config &config);
@@ -319,8 +321,6 @@ private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
-	uint8_t m_led_reg0;
-	uint8_t m_led_reg1;
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -332,8 +332,10 @@ private:
 	required_device<adc12138_device> m_adc12138;
 	required_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
+	output_finder<2> m_pcb_digit;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+
 	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
@@ -342,19 +344,19 @@ private:
 	std::unique_ptr<uint8_t[]> m_lanc2_ram;
 	std::unique_ptr<uint32_t[]> m_sharc0_dataram;
 	std::unique_ptr<uint32_t[]> m_sharc1_dataram;
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(sysreg_r);
-	DECLARE_WRITE32_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(lanc1_r);
-	DECLARE_WRITE32_MEMBER(lanc1_w);
-	DECLARE_READ32_MEMBER(lanc2_r);
-	DECLARE_WRITE32_MEMBER(lanc2_w);
-	DECLARE_READ32_MEMBER(dsp_dataram0_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
-	DECLARE_READ32_MEMBER(dsp_dataram1_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	uint32_t lanc1_r(offs_t offset);
+	void lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t lanc2_r(offs_t offset, uint32_t mem_mask = ~0);
+	void lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dsp_dataram0_r(offs_t offset);
+	void dsp_dataram0_w(offs_t offset, uint32_t data);
+	uint32_t dsp_dataram1_r(offs_t offset);
+	void dsp_dataram1_w(offs_t offset, uint32_t data);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_count_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	double adc12138_input_callback(uint8_t input);
@@ -375,7 +377,7 @@ private:
 
 
 
-WRITE32_MEMBER(nwktr_state::paletteram32_w)
+void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -403,8 +405,6 @@ uint32_t nwktr_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 
 
 	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -419,83 +419,73 @@ uint32_t nwktr_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 
 
 	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
 /*****************************************************************************/
 
-READ32_MEMBER(nwktr_state::sysreg_r)
+uint8_t nwktr_state::sysreg_r(offs_t offset)
 {
-	uint32_t r = 0;
-	if (offset == 0)
+	uint8_t r = 0;
+
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= m_in0->read() << 24;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			r |= m_in1->read() << 16;
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			r |= m_in2->read() << 8;
-		}
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
-		}
+		case 0:
+			r = m_in0->read();
+			break;
+		case 1:
+			r = m_in1->read();
+			break;
+		case 2:
+			r = m_in2->read();
+			break;
+		case 3:
+			r = m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
+			break;
+		case 4:
+			r = m_dsw->read();
+			break;
+		default:
+			break;
 	}
-	else if (offset == 1)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= m_dsw->read() << 24;
-		}
-	}
+
 	return r;
 }
 
-WRITE32_MEMBER(nwktr_state::sysreg_w)
+void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 {
-	if( offset == 0 )
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
+		case 0:
+		case 1:
+			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
+			break;
+
+		case 4:
 		{
-			m_led_reg0 = (data >> 24) & 0xff;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			m_led_reg1 = (data >> 16) & 0xff;
-		}
-		return;
-	}
-	if( offset == 1 )
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			int cs = (data >> 27) & 0x1;
-			int conv = (data >> 26) & 0x1;
-			int di = (data >> 25) & 0x1;
-			int sclk = (data >> 24) & 0x1;
+			int cs = (data >> 3) & 0x1;
+			int conv = (data >> 2) & 0x1;
+			int di = (data >> 1) & 0x1;
+			int sclk = data & 0x1;
 
 			m_adc12138->cs_w(cs);
 			m_adc12138->conv_w(conv);
 			m_adc12138->di_w(di);
 			m_adc12138->sclk_w(sclk);
+			break;
 		}
-		if (ACCESSING_BITS_0_7)
-		{
-			if (data & 0x80)    // CG Board 1 IRQ Ack
+
+		case 7:
+			if (data & 0x80) // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-			if (data & 0x40)    // CG Board 0 IRQ Ack
+			if (data & 0x40) // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			m_konppc->set_cgboard_id((data >> 4) & 1);
-		}
-		return;
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -508,7 +498,7 @@ void nwktr_state::lanc2_init()
 	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
 }
 
-READ32_MEMBER(nwktr_state::lanc1_r)
+uint32_t nwktr_state::lanc1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -530,12 +520,12 @@ READ32_MEMBER(nwktr_state::lanc1_r)
 	}
 }
 
-WRITE32_MEMBER(nwktr_state::lanc1_w)
+void nwktr_state::lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
-READ32_MEMBER(nwktr_state::lanc2_r)
+uint32_t nwktr_state::lanc2_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -565,7 +555,7 @@ READ32_MEMBER(nwktr_state::lanc2_r)
 	return r;
 }
 
-WRITE32_MEMBER(nwktr_state::lanc2_w)
+void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -650,7 +640,7 @@ TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
+void nwktr_state::soundtimer_en_w(uint16_t data)
 {
 	if (data & 1)
 	{
@@ -665,7 +655,7 @@ WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(nwktr_state::soundtimer_count_w)
+void nwktr_state::soundtimer_count_w(uint16_t data)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -675,6 +665,8 @@ WRITE16_MEMBER(nwktr_state::soundtimer_count_w)
 
 void nwktr_state::machine_start()
 {
+	m_pcb_digit.resolve();
+
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -719,22 +711,22 @@ void nwktr_state::sound_memmap(address_map &map)
 /*****************************************************************************/
 
 
-READ32_MEMBER(nwktr_state::dsp_dataram0_r)
+uint32_t nwktr_state::dsp_dataram0_r(offs_t offset)
 {
 	return m_sharc0_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(nwktr_state::dsp_dataram0_w)
+void nwktr_state::dsp_dataram0_w(offs_t offset, uint32_t data)
 {
 	m_sharc0_dataram[offset] = data;
 }
 
-READ32_MEMBER(nwktr_state::dsp_dataram1_r)
+uint32_t nwktr_state::dsp_dataram1_r(offs_t offset)
 {
 	return m_sharc1_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(nwktr_state::dsp_dataram1_w)
+void nwktr_state::dsp_dataram1_w(offs_t offset, uint32_t data)
 {
 	m_sharc1_dataram[offset] = data;
 }
@@ -942,7 +934,6 @@ void nwktr_state::init_nwktr()
 
 	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
 	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
-	m_led_reg0 = m_led_reg1 = 0x7f;
 
 	lanc2_init();
 }

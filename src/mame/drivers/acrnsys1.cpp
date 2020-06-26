@@ -78,7 +78,7 @@ private:
 	void acrnsys1_led_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void acrnsys1_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
@@ -181,12 +181,12 @@ void  acrnsys1_state::acrnsys1_led_segment_w(uint8_t data)
     ADDRESS MAPS
 ***************************************************************************/
 
-void acrnsys1_state::acrnsys1_map(address_map &map)
+void acrnsys1_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0e00, 0x0e7f).mirror(0x100).rw("b1", FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io));
 	map(0x0e80, 0x0eff).mirror(0x100).rw("b1", FUNC(ins8154_device::read_ram), FUNC(ins8154_device::write_ram));
-	map(0xf800, 0xf9ff).mirror(0x600).rom();
+	map(0xf800, 0xf9ff).mirror(0x600).rom().region("maincpu",0);
 }
 
 
@@ -267,7 +267,7 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1.008_MHz_XTAL);  /* 1.008 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys1_state::acrnsys1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys1_state::mem_map);
 
 	config.set_default_layout(layout_acrnsys1);
 
@@ -296,8 +296,8 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 ***************************************************************************/
 
 ROM_START( acrnsys1 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("acrnsys1.bin", 0xf800, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
+	ROM_REGION(0x0200, "maincpu", 0)
+	ROM_LOAD("acrnsys1.bin", 0x0000, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
 ROM_END
 
 

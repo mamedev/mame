@@ -136,8 +136,8 @@ private:
 	virtual void machine_reset() override;
 
 	uint8_t random_read();
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	uint16_t protection_r();
+	void scroll_w(uint16_t data);
 	void via_a_out(uint8_t data);
 	void via_b_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
@@ -214,7 +214,7 @@ uint8_t bmcbowl_state::random_read()
 	return machine().rand();
 }
 
-READ16_MEMBER(bmcbowl_state::protection_r)
+uint16_t bmcbowl_state::protection_r()
 {
 	switch(m_maincpu->pcbase())
 	{
@@ -230,7 +230,7 @@ READ16_MEMBER(bmcbowl_state::protection_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bmcbowl_state::scroll_w)
+void bmcbowl_state::scroll_w(uint16_t data)
 {
 	//TODO - scroll
 }

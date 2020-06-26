@@ -17,14 +17,14 @@ public:
 	void dreamlif(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	uint16_t portb_r();
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
-READ16_MEMBER(dreamlif_state::portb_r)
+uint16_t dreamlif_state::portb_r()
 {
 	uint16_t ret = 0x0000;
 	logerror("%s: portb_r\n", machine().describe_context());
@@ -32,7 +32,7 @@ READ16_MEMBER(dreamlif_state::portb_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dreamlif_state::portb_w)
+void dreamlif_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 	m_eeprom->di_write(BIT(data, 2));

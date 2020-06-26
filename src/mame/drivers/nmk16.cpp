@@ -646,7 +646,7 @@ printed on the up-left corner of the screen).
 	}
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(nmk16_state::mcu_shared_r)
+u16 nmk16_state::mcu_shared_r()
 {
 	return nmk16_mcu_shared_ram[offset];
 }

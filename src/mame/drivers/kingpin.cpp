@@ -55,7 +55,7 @@ public:
 	void dealracl(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(sound_nmi_w);
+	void sound_nmi_w(uint8_t data);
 	void kingpin_io_map(address_map &map);
 	void kingpin_program_map(address_map &map);
 	void kingpin_sound_map(address_map &map);
@@ -67,7 +67,7 @@ private:
 };
 
 
-WRITE8_MEMBER(kingpin_state::sound_nmi_w)
+void kingpin_state::sound_nmi_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 // thanks-to:Berger
 /***************************************************************************
 
@@ -30,13 +30,14 @@ Hardware:
 #include "mephisto_mondial68k.lh"
 
 
+namespace {
+
 class mondial68k_state : public driver_device
 {
 public:
 	mondial68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_dac(*this, "dac")
 		, m_board(*this, "board")
 		, m_display(*this, "display")
 		, m_lcd(*this, "lcd")
@@ -52,21 +53,20 @@ protected:
 	void mondial68k_mem(address_map &map);
 
 	void lcd_s_w(u32 data);
-	DECLARE_WRITE8_MEMBER(input_mux_w);
-	DECLARE_WRITE8_MEMBER(board_mux_w);
-	DECLARE_READ8_MEMBER(inputs_r);
+	void input_mux_w(u8 data);
+	void board_mux_w(u8 data);
+	u8 inputs_r();
 	void update_display();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_1bit_device> m_dac;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<pcf2112_device> m_lcd;
 	required_ioport_array<4> m_inputs;
 	output_finder<4> m_digits;
 
-	uint8_t m_input_mux = 0xff;
-	uint8_t m_board_mux = 0xff;
+	u8 m_input_mux = 0xff;
+	u8 m_board_mux = 0xff;
 };
 
 
@@ -96,14 +96,14 @@ void mondial68k_state::lcd_s_w(u32 data)
 		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
-WRITE8_MEMBER(mondial68k_state::board_mux_w)
+void mondial68k_state::board_mux_w(u8 data)
 {
 	// d0-d7: chessboard mux, led data
 	m_board_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(mondial68k_state::input_mux_w)
+void mondial68k_state::input_mux_w(u8 data)
 {
 	// d0-d3: button mux
 	// d6,d7: led select
@@ -111,9 +111,9 @@ WRITE8_MEMBER(mondial68k_state::input_mux_w)
 	update_display();
 }
 
-READ8_MEMBER(mondial68k_state::inputs_r)
+u8 mondial68k_state::inputs_r()
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 
 	// read buttons
 	for (int i=0; i<4; i++)
@@ -194,7 +194,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 	outlatch.q_out_cb<1>().set(m_lcd, FUNC(pcf2112_device::data_w));
 	outlatch.q_out_cb<2>().set(m_lcd, FUNC(pcf2112_device::dlen_w));
 	outlatch.q_out_cb<6>().set_nop(); // another DAC input?
-	outlatch.q_out_cb<7>().set(m_dac, FUNC(dac_1bit_device::write));
+	outlatch.q_out_cb<7>().set("dac", FUNC(dac_1bit_device::write));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -209,7 +209,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
@@ -224,6 +224,8 @@ ROM_START( mondl68k )
 	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
 	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
+
+} // anonymous namespace
 
 
 

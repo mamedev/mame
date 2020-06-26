@@ -74,8 +74,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(a7150_kgs_r);
-	DECLARE_WRITE8_MEMBER(a7150_kgs_w);
+	uint8_t a7150_kgs_r(offs_t offset);
+	void a7150_kgs_w(offs_t offset, uint8_t data);
 
 	void a7150_tmr2_w(int state);
 	void ppi_c_w(uint8_t data);
@@ -262,7 +262,7 @@ void a7150_state::kbd_put(uint8_t data)
 	m_pic8259->ir1_w(ASSERT_LINE);
 }
 
-READ8_MEMBER(a7150_state::a7150_kgs_r)
+uint8_t a7150_state::a7150_kgs_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -285,7 +285,7 @@ READ8_MEMBER(a7150_state::a7150_kgs_r)
 	return data;
 }
 
-WRITE8_MEMBER(a7150_state::a7150_kgs_w)
+void a7150_state::a7150_kgs_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: KGS %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
 			 (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);

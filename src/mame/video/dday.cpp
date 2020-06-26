@@ -20,7 +20,7 @@
 
   Thanks Zwaxy for the timer info. */
 
-READ8_MEMBER(dday_state::dday_countdown_timer_r)
+uint8_t dday_state::dday_countdown_timer_r()
 {
 	return ((m_timer_value / 10) << 4) | (m_timer_value % 10);
 }
@@ -219,44 +219,42 @@ void dday_state::video_start()
 	start_countdown_timer();
 }
 
-WRITE8_MEMBER(dday_state::dday_bgvideoram_w)
+void dday_state::dday_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dday_state::dday_fgvideoram_w)
+void dday_state::dday_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset ^ 0x1f);  /* for flipx case */
 }
 
-WRITE8_MEMBER(dday_state::dday_textvideoram_w)
+void dday_state::dday_textvideoram_w(offs_t offset, uint8_t data)
 {
 	m_textvideoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dday_state::dday_colorram_w)
+void dday_state::dday_colorram_w(offs_t offset, uint8_t data)
 {
-	int i;
-
 	offset &= 0x03e0;
 
 	m_colorram[offset & 0x3e0] = data;
 
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 		m_fg_tilemap->mark_tile_dirty(offset + i);
 }
 
-READ8_MEMBER(dday_state::dday_colorram_r)
+uint8_t dday_state::dday_colorram_r(offs_t offset)
 {
 	return m_colorram[offset & 0x03e0];
 }
 
 
-WRITE8_MEMBER(dday_state::dday_sl_control_w)
+void dday_state::dday_sl_control_w(uint8_t data)
 {
 	if (m_sl_image != data)
 	{
@@ -266,7 +264,7 @@ WRITE8_MEMBER(dday_state::dday_sl_control_w)
 }
 
 
-WRITE8_MEMBER(dday_state::dday_control_w)
+void dday_state::dday_control_w(uint8_t data)
 {
 	//if (data & 0xac)  logerror("Control = %02X\n", data & 0xac);
 

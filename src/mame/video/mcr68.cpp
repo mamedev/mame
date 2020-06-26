@@ -53,10 +53,9 @@ VIDEO_START_MEMBER(mcr68_state,mcr68)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
+void mcr68_state::mcr68_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 

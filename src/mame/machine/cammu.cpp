@@ -196,10 +196,10 @@ void cammu_c3_device::device_start()
 		tlb_set.u = false;
 
 		tlb_set.w.ra = tlb_set.w.va = 0;
-		tlb_set.w.cache = m_memory[ST0].space->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_memory[ST0].space->cache(tlb_set.w.cache);
 
 		tlb_set.x.ra = tlb_set.x.va = 0;
-		tlb_set.x.cache = m_memory[ST0].space->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_memory[ST0].space->cache(tlb_set.x.cache);
 	}
 }
 
@@ -226,7 +226,7 @@ void cammu_device::set_spaces(address_space &main_space, address_space &io_space
 	m_memory[ST7].space = &main_space;
 
 	for (memory_t &memory : m_memory)
-		memory.cache = memory.space->cache<2, 0, ENDIANNESS_LITTLE>();
+		memory.space->cache(memory.cache);
 }
 
 bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address)
@@ -270,24 +270,24 @@ cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const 
 		switch (virtual_address & 0x7000)
 		{
 			// pages 0-3: main space pages 0-3
-		case 0x0000: return { m_memory[ST1].cache, virtual_address & 0x3fff };
-		case 0x1000: return { m_memory[ST2].cache, virtual_address & 0x3fff };
-		case 0x2000: return { m_memory[ST3].cache, virtual_address & 0x3fff };
-		case 0x3000: return { m_memory[ST3].cache, virtual_address & 0x3fff };
+		case 0x0000: return { &m_memory[ST1].cache, virtual_address & 0x3fff };
+		case 0x1000: return { &m_memory[ST2].cache, virtual_address & 0x3fff };
+		case 0x2000: return { &m_memory[ST3].cache, virtual_address & 0x3fff };
+		case 0x3000: return { &m_memory[ST3].cache, virtual_address & 0x3fff };
 
 			// pages 4-5: i/o space pages 0-1
-		case 0x4000: return { m_memory[ST4].cache, virtual_address & 0x1fff };
-		case 0x5000: return { m_memory[ST4].cache, virtual_address & 0x1fff };
+		case 0x4000: return { &m_memory[ST4].cache, virtual_address & 0x1fff };
+		case 0x5000: return { &m_memory[ST4].cache, virtual_address & 0x1fff };
 
 			// pages 6-7: boot space pages 0-1
-		case 0x6000: return { m_memory[ST5].cache, virtual_address & 0x1fff };
-		case 0x7000: return { m_memory[ST5].cache, virtual_address & 0x1fff };
+		case 0x6000: return { &m_memory[ST5].cache, virtual_address & 0x1fff };
+		case 0x7000: return { &m_memory[ST5].cache, virtual_address & 0x1fff };
 		}
 	}
 
 	// if not in mapped mode, use unmapped system tag
 	if ((ssw & SSW_M) == 0)
-		return { m_memory[get_ust_space()].cache, virtual_address };
+		return { &m_memory[get_ust_space()].cache, virtual_address };
 
 	// get the page table entry
 	pte_t pte = get_pte(virtual_address, user);
@@ -343,16 +343,16 @@ cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const 
 
 	// set pte referenced and dirty flags
 	if ((mode & WRITE) && !(pte.entry & PTE_D))
-		m_memory[ST0].cache->write_dword(pte.address, pte.entry | PTE_D | PTE_R);
+		m_memory[ST0].cache.write_dword(pte.address, pte.entry | PTE_D | PTE_R);
 	else if (!(pte.entry & PTE_R))
-		m_memory[ST0].cache->write_dword(pte.address, pte.entry | PTE_R);
+		m_memory[ST0].cache.write_dword(pte.address, pte.entry | PTE_R);
 
 	// translate the address
 	LOGMASKED(LOG_DTU, "%s address translated 0x%08x\n", mode == EXECUTE ? "instruction" : "data",
 		(pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK));
 
 	// return the system tag and translated address
-	return { m_memory[(pte.entry & PTE_ST) >> ST_SHIFT].cache, (pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK) };
+	return { &m_memory[(pte.entry & PTE_ST) >> ST_SHIFT].cache, (pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK) };
 }
 
 cammu_c3_device::tlb_line_t &cammu_c3_device::tlb_lookup(const bool user, const u32 virtual_address, const access_type mode)
@@ -425,24 +425,24 @@ cammu_device::translated_t cammu_c3_device::translate_address(const u32 ssw, con
 		switch (virtual_address & 0x7000)
 		{
 			// pages 0-3: main space pages 0-3
-		case 0x0000: return { m_memory[ST1].cache, virtual_address & 0x3fff };
-		case 0x1000: return { m_memory[ST2].cache, virtual_address & 0x3fff };
-		case 0x2000: return { m_memory[ST3].cache, virtual_address & 0x3fff };
-		case 0x3000: return { m_memory[ST3].cache, virtual_address & 0x3fff };
+		case 0x0000: return { &m_memory[ST1].cache, virtual_address & 0x3fff };
+		case 0x1000: return { &m_memory[ST2].cache, virtual_address & 0x3fff };
+		case 0x2000: return { &m_memory[ST3].cache, virtual_address & 0x3fff };
+		case 0x3000: return { &m_memory[ST3].cache, virtual_address & 0x3fff };
 
 			// pages 4-5: i/o space pages 0-1
-		case 0x4000: return { m_memory[ST4].cache, virtual_address & 0x1fff };
-		case 0x5000: return { m_memory[ST4].cache, virtual_address & 0x1fff };
+		case 0x4000: return { &m_memory[ST4].cache, virtual_address & 0x1fff };
+		case 0x5000: return { &m_memory[ST4].cache, virtual_address & 0x1fff };
 
 			// pages 6-7: boot space pages 0-1
-		case 0x6000: return { m_memory[ST5].cache, virtual_address & 0x1fff };
-		case 0x7000: return { m_memory[ST5].cache, virtual_address & 0x1fff };
+		case 0x6000: return { &m_memory[ST5].cache, virtual_address & 0x1fff };
+		case 0x7000: return { &m_memory[ST5].cache, virtual_address & 0x1fff };
 		}
 	}
 
 	// if not in mapped mode, use unmapped system tag
 	if ((ssw & SSW_M) == 0)
-		return { m_memory[get_ust_space()].cache, virtual_address };
+		return { &m_memory[get_ust_space()].cache, virtual_address };
 
 	// check translation lookaside buffer
 	tlb_line_t &tlbl = tlb_lookup(user, virtual_address, mode);
@@ -519,7 +519,7 @@ cammu_device::translated_t cammu_c3_device::translate_address(const u32 ssw, con
 		if (!(pte.entry & PTE_D))
 		{
 			pte.entry |= PTE_D | PTE_R;
-			m_memory[ST0].cache->write_dword(pte.address, pte.entry);
+			m_memory[ST0].cache.write_dword(pte.address, pte.entry);
 		}
 
 		tlbl.ra |= TLB_RA_D | TLB_RA_R;
@@ -536,7 +536,7 @@ cammu_device::translated_t cammu_c3_device::translate_address(const u32 ssw, con
 		if (!(pte.entry & PTE_R))
 		{
 			pte.entry |= PTE_R;
-			m_memory[ST0].cache->write_dword(pte.address, pte.entry);
+			m_memory[ST0].cache.write_dword(pte.address, pte.entry);
 		}
 
 		tlbl.ra |= TLB_RA_R;
@@ -547,9 +547,9 @@ cammu_device::translated_t cammu_c3_device::translate_address(const u32 ssw, con
 		(tlbl.ra & TLB_RA_RA) | (virtual_address & CAMMU_PAGE_MASK));
 
 	if (tlbl.ra & 0x800)
-		return { m_memory[(tlbl.ra & TLB_RA_ST) >> ST_SHIFT].cache, (tlbl.ra & TLB_RA_RA) | (virtual_address & CAMMU_PAGE_MASK) };
+		return { &m_memory[(tlbl.ra & TLB_RA_ST) >> ST_SHIFT].cache, (tlbl.ra & TLB_RA_RA) | (virtual_address & CAMMU_PAGE_MASK) };
 	else
-		return { tlbl.cache, (tlbl.ra & TLB_RA_RA) | (virtual_address & CAMMU_PAGE_MASK) };
+		return { &tlbl.cache, (tlbl.ra & TLB_RA_RA) | (virtual_address & CAMMU_PAGE_MASK) };
 }
 
 // return the page table entry for a given virtual address
@@ -562,7 +562,7 @@ cammu_device::pte_t cammu_device::get_pte(const u32 va, const bool user)
 	const u32 ptdi = (va & VA_PTDI) >> 20;
 
 	// fetch page table directory entry
-	const u32 ptde = m_memory[ST0].cache->read_dword(pdo | ptdi);
+	const u32 ptde = m_memory[ST0].cache.read_dword(pdo | ptdi);
 
 	LOGMASKED(LOG_DTU, "get_pte pdo 0x%08x ptdi 0x%08x ptde 0x%08x\n", pdo, ptdi, ptde);
 
@@ -577,7 +577,7 @@ cammu_device::pte_t cammu_device::get_pte(const u32 va, const bool user)
 	const u32 pti = (va & VA_PTI) >> 10;
 
 	// fetch page table entry
-	pte_t pte = { m_memory[ST0].cache->read_dword(pto | pti), pto | pti };
+	pte_t pte = { m_memory[ST0].cache.read_dword(pto | pti), pto | pti };
 
 	LOGMASKED(LOG_DTU, "get_pte pto 0x%08x pti 0x%08x pte 0x%08x\n", pto, pti, pte.entry);
 

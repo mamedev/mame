@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    distate.c
+    distate.cpp
 
     Device state interfaces.
 

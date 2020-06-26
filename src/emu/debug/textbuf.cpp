@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    textbuf.c
+    textbuf.cpp
 
     Debugger text buffering engine.
 
@@ -310,4 +310,67 @@ const char *text_buffer_get_seqnum_line(text_buffer *text, u32 seqnum)
 	if (index >= numlines)
 		return nullptr;
 	return &text->buffer[text->lineoffs[(text->linestart + index) % text->linesize]];
+}
+
+text_buffer_lines text_buffer_get_lines(text_buffer *text)
+{
+	return text_buffer_lines(*text);
+}
+
+/*---------------------------------------------------------------------
+    text_buffer_lines::text_buffer_line_iterator::operator*
+    Gets the line that the iterator currently points to.
+-----------------------------------------------------------------------*/
+
+text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
+{
+	const char *line = &m_buffer.buffer[m_buffer.lineoffs[m_lineptr]];
+
+	auto next_lineptr = m_lineptr + 1;
+	if (next_lineptr == m_buffer.linesize)
+		next_lineptr = 0;
+
+	const char *nextline = &m_buffer.buffer[m_buffer.lineoffs[next_lineptr]];
+
+	/* -1 for the '\0' at the end of line */
+
+	ptrdiff_t difference = (nextline - line) - 1;
+
+	if (difference < 0)
+		difference += m_buffer.bufsize;
+
+	return text_buffer_line{ line, (size_t)difference };
+}
+
+/*---------------------------------------------------------------------
+    text_buffer_lines::text_buffer_line_iterator::operator++
+    Moves to the next line.
+-----------------------------------------------------------------------*/
+
+text_buffer_lines::text_buffer_line_iterator &text_buffer_lines::text_buffer_line_iterator::operator++()
+{
+	if (++m_lineptr == m_buffer.linesize)
+		m_lineptr = 0;
+
+	return *this;
+}
+
+/*------------------------------------------------------
+    text_buffer_lines::begin()
+    Returns an iterator that points to the first line.
+--------------------------------------------------------*/
+
+text_buffer_lines::iterator text_buffer_lines::begin() const
+{
+	return text_buffer_line_iterator(m_buffer, m_buffer.linestart);
+}
+
+/*-----------------------------------------------------------
+    text_buffer_lines::begin()
+    Returns an iterator that points just past the last line.
+-------------------------------------------------------------*/
+
+text_buffer_lines::iterator text_buffer_lines::end() const
+{
+	return text_buffer_line_iterator(m_buffer, m_buffer.lineend);
 }

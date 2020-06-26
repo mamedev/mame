@@ -101,10 +101,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 private:
-	DECLARE_READ8_MEMBER(video_vdp_r);
-	DECLARE_WRITE8_MEMBER(video_vdp_w);
-	DECLARE_READ8_MEMBER(video_joy_r);
-	DECLARE_WRITE8_MEMBER(video_joy_w);
+	uint8_t video_vdp_r(offs_t offset);
+	void video_vdp_w(offs_t offset, uint8_t data);
+	uint8_t video_joy_r();
+	void video_joy_w(uint8_t data);
 
 	void external_operation(offs_t offset, uint8_t data);
 
@@ -587,7 +587,7 @@ void tm990189_state::external_operation(offs_t offset, uint8_t data)
     Video Board handling
 */
 
-READ8_MEMBER( tm990189_state::video_vdp_r )
+uint8_t tm990189_state::video_vdp_r(offs_t offset)
 {
 	int reply = 0;
 
@@ -618,7 +618,7 @@ READ8_MEMBER( tm990189_state::video_vdp_r )
 	return reply;
 }
 
-WRITE8_MEMBER( tm990189_state::video_vdp_w )
+void tm990189_state::video_vdp_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -629,7 +629,7 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 	}
 }
 
-READ8_MEMBER( tm990189_state::video_joy_r )
+uint8_t tm990189_state::video_joy_r()
 {
 	uint8_t data = ioport("BUTTONS")->read();
 
@@ -648,7 +648,7 @@ READ8_MEMBER( tm990189_state::video_joy_r )
 	return data;
 }
 
-WRITE8_MEMBER( tm990189_state::video_joy_w )
+void tm990189_state::video_joy_w(uint8_t data)
 {
 	m_joy1x_timer->reset(attotime::from_usec(ioport("JOY1_X")->read()*28+28));
 	m_joy1y_timer->reset(attotime::from_usec(ioport("JOY1_Y")->read()*28+28));

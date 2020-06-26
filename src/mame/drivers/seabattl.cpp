@@ -72,17 +72,17 @@ protected:
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_colorram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_control_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_r);
-	DECLARE_WRITE8_MEMBER(seabattl_collision_clear_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_clear_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(time_display_w);
-	DECLARE_WRITE8_MEMBER(score_display_w);
-	DECLARE_WRITE8_MEMBER(score2_display_w);
+	void seabattl_videoram_w(offs_t offset, uint8_t data);
+	void seabattl_colorram_w(offs_t offset, uint8_t data);
+	void seabattl_control_w(uint8_t data);
+	uint8_t seabattl_collision_r();
+	void seabattl_collision_clear_w(uint8_t data);
+	uint8_t seabattl_collision_clear_r();
+	void sound_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void time_display_w(uint8_t data);
+	void score_display_w(uint8_t data);
+	void score2_display_w(uint8_t data);
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
@@ -146,13 +146,13 @@ TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
 	tileinfo.set(1, code, (color & 0x7), 0);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_videoram_w)
+void seabattl_state::seabattl_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_colorram_w)
+void seabattl_state::seabattl_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -279,13 +279,13 @@ void seabattl_state::seabattl_data_map(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(seabattl_state::seabattl_collision_clear_r), FUNC(seabattl_state::seabattl_collision_clear_w));
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_r)
+uint8_t seabattl_state::seabattl_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_control_w)
+void seabattl_state::seabattl_control_w(uint8_t data)
 {
 	// bit 0: play counter
 	// bit 1: super bonus counter
@@ -298,20 +298,20 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	m_waveenable = BIT(data, 5);
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_clear_r)
+uint8_t seabattl_state::seabattl_collision_clear_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_collision_clear_w )
+void seabattl_state::seabattl_collision_clear_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 }
 
-WRITE8_MEMBER(seabattl_state::sound_w )
+void seabattl_state::sound_w(uint8_t data)
 {
 	// sound effects
 	// bits:
@@ -325,7 +325,7 @@ WRITE8_MEMBER(seabattl_state::sound_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::sound2_w )
+void seabattl_state::sound2_w(uint8_t data)
 {
 	// sound effects
 	// bits:
@@ -339,19 +339,19 @@ WRITE8_MEMBER(seabattl_state::sound2_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::time_display_w )
+void seabattl_state::time_display_w(uint8_t data)
 {
 	m_digits[5]->a_w(data & 0x0f);
 	m_digits[4]->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score_display_w )
+void seabattl_state::score_display_w(uint8_t data)
 {
 	m_digits[3]->a_w(data & 0x0f);
 	m_digits[2]->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score2_display_w )
+void seabattl_state::score2_display_w(uint8_t data)
 {
 	m_digits[1]->a_w(data & 0x0f);
 	m_digits[0]->a_w((data >> 4) & 0x0f);

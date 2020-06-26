@@ -18,7 +18,7 @@ namespace analog
 	solver::matrix_solver_t * NETLIB_NAME(twoterm)::solver() const noexcept
 	{
 		auto *solv(m_P.solver());
-		if (solv)
+		if (solv != nullptr)
 			return solv;
 		return m_N.solver();
 	}
@@ -27,7 +27,7 @@ namespace analog
 	void NETLIB_NAME(twoterm)::solve_now() const
 	{
 		auto *solv(solver());
-		if (solv)
+		if (solv != nullptr)
 			solv->solve_now();
 	}
 

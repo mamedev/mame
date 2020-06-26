@@ -156,6 +156,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 // slot devices
 #include "beta.h"
 #include "beta128.h"
+#include "d40.h"
 #include "intf1.h"
 #include "intf2.h"
 #include "fuller.h"
@@ -178,6 +179,9 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("betav2", SPECTRUM_BETAV2);
 	device.option_add("betav3", SPECTRUM_BETAV3);
 	device.option_add("betaplus", SPECTRUM_BETAPLUS);
+	device.option_add("betaclone", SPECTRUM_BETACLONE);
+	device.option_add("betacbi", SPECTRUM_BETACBI);
+	device.option_add("gamma", SPECTRUM_GAMMA);
 	device.option_add("beta128", SPECTRUM_BETA128);
 	device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
@@ -191,6 +195,9 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("mprint", SPECTRUM_MPRINT);
 	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plusd", SPECTRUM_PLUSD);
+	device.option_add("d40", SPECTRUM_D40);
+	device.option_add("d80", SPECTRUM_D80);
+	device.option_add("d80v2", SPECTRUM_D80V2);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("uslot", SPECTRUM_USLOT);

@@ -81,8 +81,9 @@ private:
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
 	void datum_mem(address_map &map);
-	uint8_t m_keydata;
+	uint8_t m_digit;
 	uint8_t m_seg;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -154,17 +155,23 @@ INPUT_CHANGED_MEMBER( datum_state::trigger_nmi )
 }
 
 
+void datum_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
+
 void datum_state::machine_reset()
 {
-	m_keydata = 0;
+	m_digit = 0;
 	m_seg = 0;
 }
 
 // read keyboard
 uint8_t datum_state::pa_r()
 {
-	if (m_keydata < 4)
-		return m_io_keyboard[m_keydata]->read();
+	if (m_digit < 4)
+		return m_io_keyboard[m_digit]->read();
 
 	return 0xff;
 }
@@ -173,14 +180,14 @@ uint8_t datum_state::pa_r()
 void datum_state::pa_w(uint8_t data)
 {
 	m_seg = bitswap<8>(~data, 7, 0, 5, 6, 4, 2, 1, 3);
-	m_display->matrix(1<<m_keydata, m_seg);
+	m_display->matrix(1<<m_digit, m_seg);
 }
 
 // select keyboard row, select a digit
 void datum_state::pb_w(uint8_t data)
 {
-	m_keydata = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 15;
-	m_display->matrix(1<<m_keydata, m_seg);
+	m_digit = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 15;
+	m_display->matrix(1<<m_digit, m_seg);
 }
 
 
@@ -223,4 +230,4 @@ ROM_START( datum )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW )
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

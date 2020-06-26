@@ -144,8 +144,9 @@ private:
 	// 1 = next opcode is the first half of int firing 'NOP'
 	// 2 = next opcode is the second half of int firing 'CALL 0100'
 	int m_irq_firing;
-	address_space *m_program, *m_data;
-	memory_access_cache<2, -2, ENDIANNESS_BIG> *m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_BIG>::specific m_program;
+	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_data;
 
 protected:
 	devcb_read_line     m_in_int_cb;

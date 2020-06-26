@@ -31,22 +31,22 @@ public:
 	void metalmx(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(unk_r);
-	DECLARE_READ32_MEMBER(watchdog_r);
-	DECLARE_WRITE32_MEMBER(shifter_w);
-	DECLARE_WRITE32_MEMBER(motor_w);
-	DECLARE_WRITE32_MEMBER(reset_w);
-	DECLARE_READ32_MEMBER(sound_data_r);
-	DECLARE_WRITE32_MEMBER(sound_data_w);
-	template<int Chip> DECLARE_WRITE32_MEMBER(dsp32c_w);
-	template<int Chip> DECLARE_READ32_MEMBER(dsp32c_r);
-	DECLARE_WRITE32_MEMBER(host_gsp_w);
-	DECLARE_READ32_MEMBER(host_gsp_r);
-	DECLARE_READ32_MEMBER(host_dram_r);
-	DECLARE_WRITE32_MEMBER(host_dram_w);
-	DECLARE_READ32_MEMBER(host_vram_r);
-	DECLARE_WRITE32_MEMBER(host_vram_w);
-	DECLARE_WRITE32_MEMBER(timer_w);
+	uint32_t unk_r();
+	uint32_t watchdog_r();
+	void shifter_w(uint32_t data);
+	void motor_w(uint32_t data);
+	void reset_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sound_data_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> void dsp32c_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> uint32_t dsp32c_r(offs_t offset, uint32_t mem_mask = ~0);
+	void host_gsp_w(offs_t offset, uint32_t data);
+	uint32_t host_gsp_r(offs_t offset);
+	uint32_t host_dram_r(offs_t offset);
+	void host_dram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t host_vram_r(offs_t offset);
+	void host_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void timer_w(offs_t offset, uint32_t data);
 	void cage_irq_callback(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

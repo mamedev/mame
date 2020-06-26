@@ -252,12 +252,12 @@ void vme_mvme350_card_device::device_reset()
 }
 
 #if 0
-READ16_MEMBER (vme_mvme350_card_device::read16){
+uint16_t vme_mvme350_card_device::read16(){
 	LOG("%s()\n", FUNCNAME);
 	return (uint8_t) 0;
 }
 
-WRITE16_MEMBER (vme_mvme350_card_device::write16){
+void vme_mvme350_card_device::write16(uint16_t data){
 	LOG("%s()\n", FUNCNAME);
 }
 #endif

@@ -19,7 +19,7 @@ namespace netlist
 	NETLIB_OBJECT(74107A)
 	{
 		NETLIB_CONSTRUCTOR(74107A)
-		, m_clk(*this, "CLK", NETLIB_DELEGATE(74107A, clk))
+		, m_clk(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_J(*this, "J")

@@ -2,12 +2,12 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Atari Jaguar "Blitter" device
-	
-	TODO:
+    Atari Jaguar "Blitter" device
+
+    TODO:
     - Stub device, port/rewrite from jagblit;
-	- actual codename/chip part number;
-	- has different revs, encapsulate;
+    - actual codename/chip part number;
+    - has different revs, encapsulate;
 
 ***************************************************************************/
 
@@ -80,7 +80,7 @@ void jag_blitter_device::device_reset()
 {
 	m_command_latch = 0;
 	m_status_idle = true;
-	
+
 	m_command_timer->adjust(attotime::never);
 }
 
@@ -97,12 +97,12 @@ const jag_blitter_device::op_func jag_blitter_device::upda_ops[8] =
 	&jag_blitter_device::op_nop,
 	&jag_blitter_device::op_unemulated, // upda1f
 	&jag_blitter_device::op_upda1,
-	&jag_blitter_device::op_unemulated, // upda1 + upda1f 
+	&jag_blitter_device::op_unemulated, // upda1 + upda1f
 
 	&jag_blitter_device::op_unemulated, // upda2
 	&jag_blitter_device::op_unemulated, // upda1f + upda2
 	&jag_blitter_device::op_unemulated, // upda1 + upda2
-	&jag_blitter_device::op_unemulated	// upda1 + upda1f + upda2
+	&jag_blitter_device::op_unemulated  // upda1 + upda1f + upda2
 };
 
 void jag_blitter_device::op_nop()
@@ -119,7 +119,7 @@ void jag_blitter_device::op_unemulated()
 void jag_blitter_device::op_upda1()
 {
 	// ...
-	
+
 }
 
 inline void jag_blitter_device::command_start()
@@ -135,15 +135,15 @@ inline void jag_blitter_device::command_run()
 {
 	// TODO: need to single step, have different timings between pixel and phrase modes,
 	// calculate collision detection, delay a bit the kickoff due of bus chain requests,
-	// take more time by virtue of using additional steps, be a civilian or not depending 
+	// take more time by virtue of using additional steps, be a civilian or not depending
 	// of BUSHI setting
-	
+
 	printf("%08x\n",m_command_latch);
 	// init
 	m_a1.ptr = m_a1.base;
-	
+
 	// ...
-	
+
 	command_done();
 }
 
@@ -173,41 +173,41 @@ void jag_blitter_device::regs_map(address_map &map)
 	map(0x3c, 0x3f).w(FUNC(jag_blitter_device::count_inner_w)).umask32(0x0000ffff);
 }
 
-WRITE32_MEMBER(jag_blitter_device::a1_base_w)
+void jag_blitter_device::a1_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_a1.base);
 	// align to phrase
 	m_a1.base &= ~7;
 }
 
-WRITE16_MEMBER(jag_blitter_device::a1_xstep_w)
+void jag_blitter_device::a1_xstep_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_a1.xstep);
 }
 
-WRITE16_MEMBER(jag_blitter_device::a1_ystep_w)
+void jag_blitter_device::a1_ystep_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_a1.ystep);
 }
 
-READ32_MEMBER(jag_blitter_device::status_r)
+u32 jag_blitter_device::status_r()
 {
 	// TODO: stopped bit
 	// TODO: diag bits 2-31
 	return m_status_idle;
 }
 
-WRITE32_MEMBER(jag_blitter_device::command_w)
+void jag_blitter_device::command_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_command_latch);
 	// TODO: is it possible from 68k to write on this in byte units?
-	// We may just do so in order to take endianness into account, or just delegate to the overlying bus framework, 
+	// We may just do so in order to take endianness into account, or just delegate to the overlying bus framework,
 	// may be a common problem with ALL video regs for that matter.
 	if (ACCESSING_BITS_0_15)
 		command_start();
 }
 
-WRITE16_MEMBER(jag_blitter_device::count_outer_w)
+void jag_blitter_device::count_outer_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_count_lines);
 	if (m_count_lines == 0)
@@ -218,7 +218,7 @@ WRITE16_MEMBER(jag_blitter_device::count_outer_w)
 	}
 }
 
-WRITE16_MEMBER(jag_blitter_device::count_inner_w)
+void jag_blitter_device::count_inner_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_count_pixels);
 	if (m_count_pixels == 0)

@@ -42,13 +42,13 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
-	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_select_w);
-	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
-	DECLARE_WRITE8_MEMBER(gotcha_oki_bank_w);
+	void gotcha_lamps_w(uint16_t data);
+	void gotcha_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gotcha_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gotcha_gfxbank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gotcha_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gotcha_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gotcha_oki_bank_w(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(gotcha_tilemap_scan);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

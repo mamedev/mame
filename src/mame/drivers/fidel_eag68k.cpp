@@ -235,11 +235,11 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	virtual DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
+	virtual void mux_w(offs_t offset, u8 data);
+	u8 input1_r(offs_t offset);
+	u8 input2_r();
+	void leds_w(offs_t offset, u8 data);
+	void digit_w(offs_t offset, u8 data);
 
 	bool m_rotate;
 	u8 m_select = 0;
@@ -281,9 +281,9 @@ private:
 	void sub_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(reset_subcpu_w);
-	DECLARE_READ8_MEMBER(main_ack_r);
-	DECLARE_READ8_MEMBER(sub_ack_r);
+	void reset_subcpu_w(u8 data);
+	u8 main_ack_r();
+	u8 sub_ack_r();
 };
 
 // Excel 68000
@@ -327,7 +327,7 @@ void eag_state::update_display()
 	m_display->matrix(1 << m_select, m_led_data << 8 | seg_data);
 }
 
-WRITE8_MEMBER(eag_state::mux_w)
+void eag_state::mux_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0: 74259
 	u8 mask = 1 << offset;
@@ -342,7 +342,7 @@ WRITE8_MEMBER(eag_state::mux_w)
 	update_display();
 }
 
-READ8_MEMBER(eag_state::input1_r)
+u8 eag_state::input1_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -364,20 +364,20 @@ READ8_MEMBER(eag_state::input1_r)
 	return (data >> offset & 1) ? 0 : 0x80;
 }
 
-READ8_MEMBER(eag_state::input2_r)
+u8 eag_state::input2_r()
 {
 	// d7: 3 more buttons on EAG
 	return (BIT(m_inputs[1]->read(), m_select)) ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(eag_state::leds_w)
+void eag_state::leds_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0: led data
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-WRITE8_MEMBER(eag_state::digit_w)
+void eag_state::digit_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0(d8): digit segment data
 	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
@@ -387,19 +387,19 @@ WRITE8_MEMBER(eag_state::digit_w)
 
 // EAG V5
 
-WRITE8_MEMBER(eagv5_state::reset_subcpu_w)
+void eagv5_state::reset_subcpu_w(u8 data)
 {
 	// reset subcpu, from trigger to monostable 555 (R1=47K, C1=1uF)
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::from_msec(52));
 }
 
-READ8_MEMBER(eagv5_state::main_ack_r)
+u8 eagv5_state::main_ack_r()
 {
 	// d8,d9: latches ack state
 	return (m_mainlatch->pending_r() << 1 ^ 2) | m_sublatch->pending_r();
 }
 
-READ8_MEMBER(eagv5_state::sub_ack_r)
+u8 eagv5_state::sub_ack_r()
 {
 	// d8,d9: latches ack state
 	return (m_sublatch->pending_r() << 1 ^ 2) | m_mainlatch->pending_r();

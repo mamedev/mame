@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ioport.c
+    ioport.cpp
 
     Input/output port handling.
 
@@ -189,6 +189,7 @@ const struct
 	{ INPUT_STRING_3C_1C, "3 Coins/1 Credit" },
 	{ INPUT_STRING_8C_3C, "8 Coins/3 Credits" },
 	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
+	{ INPUT_STRING_5C_2C, "5 Coins/2 Credits" },
 	{ INPUT_STRING_2C_1C, "2 Coins/1 Credit" },
 	{ INPUT_STRING_5C_3C, "5 Coins/3 Credits" },
 	{ INPUT_STRING_3C_2C, "3 Coins/2 Credits" },
@@ -197,6 +198,7 @@ const struct
 	{ INPUT_STRING_3C_3C, "3 Coins/3 Credits" },
 	{ INPUT_STRING_2C_2C, "2 Coins/2 Credits" },
 	{ INPUT_STRING_1C_1C, "1 Coin/1 Credit" },
+	{ INPUT_STRING_3C_5C, "3 Coins/5 Credits" },
 	{ INPUT_STRING_4C_5C, "4 Coins/5 Credits" },
 	{ INPUT_STRING_3C_4C, "3 Coins/4 Credits" },
 	{ INPUT_STRING_2C_3C, "2 Coins/3 Credits" },
@@ -650,7 +652,10 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 
 void ioport_field::set_value(ioport_value value)
 {
-	m_digital_value = value != 0;
+	if (is_analog())
+		live().analog->set_value(s32(value));
+	else
+		m_digital_value = value != 0;
 }
 
 
@@ -3232,6 +3237,7 @@ analog_field::analog_field(ioport_field &field)
 		m_accum(0),
 		m_previous(0),
 		m_previousanalog(0),
+		m_prog_analog_value(0),
 		m_minimum(INPUT_ABSOLUTE_MIN),
 		m_maximum(INPUT_ABSOLUTE_MAX),
 		m_center(0),
@@ -3246,7 +3252,8 @@ analog_field::analog_field(ioport_field &field)
 		m_autocenter(false),
 		m_single_scale(false),
 		m_interpolate(false),
-		m_lastdigital(false)
+		m_lastdigital(false),
+		m_was_written(false)
 {
 	// compute the shift amount and number of bits
 	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
@@ -3486,6 +3493,17 @@ s32 analog_field::apply_settings(s32 value) const
 
 
 //-------------------------------------------------
+//  set_value - take a new value to be used
+//  at next frame update
+//-------------------------------------------------
+
+void analog_field::set_value(s32 value)
+{
+	m_was_written = true;
+	m_prog_analog_value = value;
+}
+
+//-------------------------------------------------
 //  frame_update - update the internals of a
 //  single analog field periodically
 //-------------------------------------------------
@@ -3502,6 +3520,13 @@ void analog_field::frame_update(running_machine &machine)
 	// get the new raw analog value and its type
 	input_item_class itemclass;
 	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
+
+	// use programmatically set value if avaiable
+	if (m_was_written)
+	{
+		m_was_written = false;
+		rawvalue = m_prog_analog_value;
+	}
 
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)

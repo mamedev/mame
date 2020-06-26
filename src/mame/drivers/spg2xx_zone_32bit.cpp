@@ -16,6 +16,7 @@ public:
 	{ }
 
 	void zon32bit(machine_config& config);
+	void zon32bit_bat(machine_config& config);
 
 	void mem_map_zon32bit(address_map &map);
 
@@ -24,17 +25,19 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-	DECLARE_READ16_MEMBER(z32_rom_r);
+	uint16_t z32_rom_r(offs_t offset);
 
 	required_region_ptr<uint16_t> m_romregion;
 
-	virtual DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_READ16_MEMBER(portc_r);
+	virtual uint16_t porta_r();
+	virtual uint16_t portb_r();
+	virtual uint16_t portc_r();
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	uint16_t an3_r();
 
 	int m_porta_dat;
 	int m_portb_dat;
@@ -54,7 +57,7 @@ public:
 	{ }
 
 protected:
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	virtual void machine_reset() override;
 };
@@ -67,14 +70,12 @@ public:
 	{ }
 
 	void init_oplayer();
-
 	void init_m505neo();
 
-
 protected:
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
-	virtual DECLARE_READ16_MEMBER(portc_r) override;
+	virtual uint16_t porta_r() override;
+	virtual uint16_t portb_r() override;
+	virtual uint16_t portc_r() override;
 };
 
 class denver_200in1_state : public mywicodx_state
@@ -85,16 +86,26 @@ public:
 	{ }
 
 	void init_denver();
+	void init_m521neo();
 
 protected:
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
-	virtual DECLARE_READ16_MEMBER(portc_r) override;
+	virtual uint16_t porta_r() override;
+	virtual uint16_t portb_r() override;
+	virtual uint16_t portc_r() override;
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
+
+uint16_t zon32bit_state::an3_r()
+{
+	int status = ioport("BATT")->read();
+	if (status)
+		return 0xfff;
+	else
+		return 0x000;
+}
 
 void zon32bit_state::device_post_load()
 {
@@ -102,13 +113,13 @@ void zon32bit_state::device_post_load()
 	m_maincpu->invalidate_cache();
 }
 
-READ16_MEMBER(zon32bit_state::porta_r)
+uint16_t zon32bit_state::porta_r()
 {
 	return m_porta_dat;
 }
 
 
-WRITE16_MEMBER(zon32bit_state::porta_w)
+void zon32bit_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (0)
 		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
@@ -142,7 +153,7 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 }
 
 
-WRITE16_MEMBER(mywicodx_state::porta_w)
+void mywicodx_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (0)
 		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
@@ -191,7 +202,7 @@ WRITE16_MEMBER(mywicodx_state::porta_w)
 }
 
 
-WRITE16_MEMBER(denver_200in1_state::porta_w)
+void denver_200in1_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (0)
 	{
@@ -263,7 +274,7 @@ WRITE16_MEMBER(denver_200in1_state::porta_w)
 }
 
 
-READ16_MEMBER(zon32bit_state::portc_r)
+uint16_t zon32bit_state::portc_r()
 {
 	// 0x03ff seem to be inputs for buttons (and some kind of output?)
 	// 0xfc00 gets masked for other reasons (including banking?)
@@ -278,12 +289,12 @@ READ16_MEMBER(zon32bit_state::portc_r)
 }
 
 
-READ16_MEMBER(zon32bit_state::portb_r)
+uint16_t zon32bit_state::portb_r()
 {
 	return m_portb_dat;
 }
 
-WRITE16_MEMBER(zon32bit_state::portb_w)
+void zon32bit_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data != 0x0001)
 		logerror("%s: portb_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
@@ -291,7 +302,7 @@ WRITE16_MEMBER(zon32bit_state::portb_w)
 	m_portb_dat = data;
 }
 
-WRITE16_MEMBER(zon32bit_state::portc_w)
+void zon32bit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// very noisy
 	// is the code actually sending the sound to the remotes?
@@ -339,17 +350,17 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 }
 
 
-READ16_MEMBER(oplayer_100in1_state::portc_r)
+uint16_t oplayer_100in1_state::portc_r()
 {
 	return m_io_p3->read();
 }
 
-READ16_MEMBER(oplayer_100in1_state::portb_r)
+uint16_t oplayer_100in1_state::portb_r()
 {
 	return m_io_p2->read();
 }
 
-READ16_MEMBER(oplayer_100in1_state::porta_r)
+uint16_t oplayer_100in1_state::porta_r()
 {
 	return 0x0ff8 | (machine().rand()&1);
 }
@@ -359,7 +370,7 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 	map(0x000000, 0x3fffff).r(FUNC(zon32bit_state::z32_rom_r));
 }
 
-READ16_MEMBER(zon32bit_state::z32_rom_r)
+uint16_t zon32bit_state::z32_rom_r(offs_t offset)
 {
 	/*
 	    This has upper and lower bank, which can be changed independently.
@@ -390,17 +401,17 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 	return 0x0000;// m_romregion[offset];
 }
 
-READ16_MEMBER(denver_200in1_state::portc_r)
+uint16_t denver_200in1_state::portc_r()
 {
 	return m_io_p3->read();
 }
 
-READ16_MEMBER(denver_200in1_state::portb_r)
+uint16_t denver_200in1_state::portb_r()
 {
 	return m_io_p2->read();
 }
 
-READ16_MEMBER(denver_200in1_state::porta_r)
+uint16_t denver_200in1_state::porta_r()
 {
 	return 0x0ff8 | (machine().rand()&1);
 }
@@ -691,6 +702,11 @@ static INPUT_PORTS_START( oplayer )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("BATT")
+	PORT_CONFNAME( 0x0001,  0x0001, "Battery Status" )
+	PORT_CONFSETTING(       0x0000, "Low" )
+	PORT_CONFSETTING(       0x0001, "High" )
 INPUT_PORTS_END
 
 
@@ -708,6 +724,12 @@ void zon32bit_state::zon32bit(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(zon32bit_state::porta_w));
 	m_maincpu->portb_out().set(FUNC(zon32bit_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(zon32bit_state::portc_w));
+}
+
+void zon32bit_state::zon32bit_bat(machine_config& config)
+{
+	zon32bit(config);
+	m_maincpu->adc_in<3>().set(FUNC(zon32bit_state::an3_r));
 }
 
 ROM_START( mywicodx )
@@ -788,6 +810,29 @@ ROM_START( m505neo )
 	ROM_IGNORE(0x4000000)
 ROM_END
 
+ROM_START( m521neo )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?
+	ROM_LOAD16_WORD_SWAP( "6gu-1cd-a.u2", 0x0000000, 0x800000, CRC(7cb31b4c) SHA1(8de44756747a292c5d39bd491048d6fac4219953) )
+	ROM_CONTINUE(0x01000000, 0x800000)
+	ROM_CONTINUE(0x00800000, 0x800000)
+	ROM_CONTINUE(0x01800000, 0x800000)
+
+	ROM_CONTINUE(0x02000000, 0x800000)
+	ROM_CONTINUE(0x03000000, 0x800000)
+	ROM_CONTINUE(0x02800000, 0x800000)
+	ROM_CONTINUE(0x03800000, 0x800000)
+
+	ROM_CONTINUE(0x04000000, 0x800000)
+	ROM_CONTINUE(0x05000000, 0x800000)
+	ROM_CONTINUE(0x04800000, 0x800000)
+	ROM_CONTINUE(0x05800000, 0x800000)
+
+	ROM_CONTINUE(0x06000000, 0x800000)
+	ROM_CONTINUE(0x07000000, 0x800000)
+	ROM_CONTINUE(0x06800000, 0x800000)
+	ROM_CONTINUE(0x07800000, 0x800000)
+ROM_END
+
 
 void oplayer_100in1_state::init_oplayer()
 {
@@ -839,16 +884,16 @@ void oplayer_100in1_state::init_m505neo()
 		ROM[i] = bitswap<16>(ROM[i],
 									 11,  3,   10,  2,
 									 9,  1,  8,  0,
-			
+
 									 4, 12, 5, 13,
-									 6, 14,  7,  15		
+									 6, 14,  7,  15
 			);
 
 	}
 
 	// TODO: remove these hacks
 	// port a checks when starting the system
-	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot		
+	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank
 }
 
 
@@ -858,20 +903,21 @@ void denver_200in1_state::init_denver()
 
 	// patch checks when booting each bank, similar to oplayer
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	rom[0x175f7 + (0x0000000 / 2)] = 0xf165;
-	rom[0x18f47 + (0x1000000 / 2)] = 0xf165;
-	rom[0x33488 + (0x2000000 / 2)] = 0xf165;
-	rom[0x87f81 + (0x3000000 / 2)] = 0xf165;
-	rom[0x764d9 + (0x4000000 / 2)] = 0xf165;
-	rom[0xb454e + (0x5000000 / 2)] = 0xf165;
-	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot
-	rom[0x1fb00 + (0x7000000 / 2)] = 0xf165;
-
-	// no exit patches required?
+	//rom[0x175f7 + (0x0000000 / 2)] = 0xf165;
+	//rom[0x18f47 + (0x1000000 / 2)] = 0xf165;
+	//rom[0x33488 + (0x2000000 / 2)] = 0xf165;
+	//rom[0x87f81 + (0x3000000 / 2)] = 0xf165;
+	//rom[0x764d9 + (0x4000000 / 2)] = 0xf165;
+	//rom[0xb454e + (0x5000000 / 2)] = 0xf165;
+	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot main bank
+	//rom[0x1fb00 + (0x7000000 / 2)] = 0xf165;
 }
 
-
-
+void denver_200in1_state::init_m521neo()
+{
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot main bank
+}
 
 
 
@@ -883,9 +929,12 @@ CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,   
 CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // issues with 'low battery' always showing, but otherwise functional
-CONS( 200?, oplayer,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, oplayer,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2012, m505neo,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, m505neo,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// a version of this exists with the 'newer' style title screen seen in m505neo
+CONS( 2012, m521neo,   0, 0, zon32bit_bat, oplayer, denver_200in1_state,  init_m521neo, "Millennium 2000 GmbH", "Millennium M521 Arcade Neo 2.0 (Family Sport 220-in-1) ", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /*
 DENVER(r)
@@ -904,6 +953,6 @@ DENMARK
 
 */
 
-CONS( 200?, dnv200fs,   0, 0, zon32bit, oplayer, denver_200in1_state, init_denver, "Denver", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, dnv200fs,   0, 0, zon32bit_bat, oplayer, denver_200in1_state, init_denver, "Denver", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 

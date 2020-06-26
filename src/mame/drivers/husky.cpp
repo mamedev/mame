@@ -67,11 +67,11 @@ private:
 	uint8_t portb_r();
 	uint8_t portc_r();
 	void portc_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(serial_tx_w);
-	DECLARE_WRITE8_MEMBER(cursor_w);
-	DECLARE_WRITE8_MEMBER(curinh_w);
-	DECLARE_WRITE8_MEMBER(irqctrl_w);
-	DECLARE_WRITE8_MEMBER(page_w);
+	void serial_tx_w(uint8_t data);
+	void cursor_w(uint8_t data);
+	void curinh_w(uint8_t data);
+	void irqctrl_w(uint8_t data);
+	void page_w(offs_t offset, uint8_t data);
 	void husky_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
@@ -254,7 +254,7 @@ void husky_state::portc_w(uint8_t data)
 /*
 CURSOR - Output with a number 0-7F for the cursor position on the display
 */
-WRITE8_MEMBER(husky_state::cursor_w)
+void husky_state::cursor_w(uint8_t data)
 {
 	m_cursor = data & 0x7f;
 }
@@ -262,7 +262,7 @@ WRITE8_MEMBER(husky_state::cursor_w)
 /*
 CURINH - Inhibit cursor. BIT0 = 1 : Cursor off, BIT0 = 0 : Cursor on
 */
-WRITE8_MEMBER(husky_state::curinh_w)
+void husky_state::curinh_w(uint8_t data)
 {
 	m_curinh = BIT(data, 0);
 }
@@ -271,7 +271,7 @@ WRITE8_MEMBER(husky_state::curinh_w)
 V24OUT - Directly outputs to the V24 data line signal on bit 0.
 The output is voltage inverted ie. 0 = +ve, 1 = -ve
 */
-WRITE8_MEMBER(husky_state::serial_tx_w)
+void husky_state::serial_tx_w(uint8_t data)
 {
 	m_rs232->write_txd(data & 0x01);
 }
@@ -283,7 +283,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER(husky_state::irqctrl_w)
+void husky_state::irqctrl_w(uint8_t data)
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -297,7 +297,7 @@ WRITE8_MEMBER(husky_state::irqctrl_w)
 /*
 PAGA 16, 17, 18 - Memory paging addresses
 */
-WRITE8_MEMBER(husky_state::page_w)
+void husky_state::page_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x02)
 	{

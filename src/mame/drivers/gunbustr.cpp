@@ -100,7 +100,7 @@ void gunbustr_state::motor_control_w(u32 data)
 
 
 
-READ32_MEMBER(gunbustr_state::gun_r)
+u32 gunbustr_state::gun_r()
 {
 	return (m_io_light_x[0]->read() << 24) | (m_io_light_y[0]->read() << 16) |
 			(m_io_light_x[1]->read() << 8)  |  m_io_light_y[1]->read();
@@ -362,7 +362,7 @@ ROM_START( gunbustrj )
 	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(ef3685a1) SHA1(899b4b6dd2fd78be3a2ce00a2ef1840de9f122c3) )
 ROM_END
 
-READ32_MEMBER(gunbustr_state::main_cycle_r)
+u32 gunbustr_state::main_cycle_r()
 {
 	if (m_maincpu->pc() == 0x55a && (m_ram[0x3acc/4] & 0xff000000) == 0)
 		m_maincpu->spin_until_interrupt();
@@ -373,7 +373,7 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 void gunbustr_state::init_gunbustr()
 {
 	/* Speedup handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32smo_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
 
 	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }

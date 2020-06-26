@@ -764,14 +764,14 @@ void itech32_state::firq_clear_w(u8 data)
  *
  *************************************/
 
-WRITE32_MEMBER(drivedge_state::tms_reset_assert_w)
+void drivedge_state::tms_reset_assert_w(u32 data)
 {
 	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
-WRITE32_MEMBER(drivedge_state::tms_reset_clear_w)
+void drivedge_state::tms_reset_clear_w(u32 data)
 {
 	/* kludge to prevent crash on first boot */
 	if ((m_tms1_ram[0] & 0xff000000) == 0)
@@ -787,7 +787,7 @@ WRITE32_MEMBER(drivedge_state::tms_reset_clear_w)
 }
 
 
-WRITE32_MEMBER(drivedge_state::tms1_68k_ram_w)
+void drivedge_state::tms1_68k_ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
 	if (offset == 0) COMBINE_DATA(m_tms1_boot);
@@ -797,7 +797,7 @@ WRITE32_MEMBER(drivedge_state::tms1_68k_ram_w)
 }
 
 
-WRITE32_MEMBER(drivedge_state::tms2_68k_ram_w)
+void drivedge_state::tms2_68k_ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	if (offset == 0x382 && m_tms_spinning[1]) STOP_TMS_SPINNING(machine(), 1);
@@ -806,28 +806,28 @@ WRITE32_MEMBER(drivedge_state::tms2_68k_ram_w)
 }
 
 
-WRITE32_MEMBER(drivedge_state::tms1_trigger_w)
+void drivedge_state::tms1_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
 	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-WRITE32_MEMBER(drivedge_state::tms2_trigger_w)
+void drivedge_state::tms2_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-READ32_MEMBER(drivedge_state::tms1_speedup_r)
+u32 drivedge_state::tms1_speedup_r(address_space &space)
 {
 	if (m_tms1_ram[0x382] == 0 && m_dsp[0]->pc() == 0xee) START_TMS_SPINNING(0);
 	return m_tms1_ram[0x382];
 }
 
 
-READ32_MEMBER(drivedge_state::tms2_speedup_r)
+u32 drivedge_state::tms2_speedup_r(address_space &space)
 {
 	if (m_tms2_ram[0x382] == 0 && m_dsp[1]->pc() == 0x809808) START_TMS_SPINNING(1);
 	return m_tms2_ram[0x382];
@@ -907,7 +907,7 @@ void itech32_state::bloodstm_map(address_map &map)
 
 #if LOG_DRIVEDGE_UNINIT_RAM
 
-READ32_MEMBER(itech32_state::test1_r)
+u32 itech32_state::test1_r(offs_t offset, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31 && !m_written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+0);
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+1);
@@ -916,7 +916,7 @@ READ32_MEMBER(itech32_state::test1_r)
 	return ((u32 *)m_main_ram)[0x100/4 + offset];
 }
 
-WRITE32_MEMBER(itech32_state::test1_w)
+void itech32_state::test1_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31) m_written[0x100 + offset*4+0] = 1;
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
@@ -925,7 +925,7 @@ WRITE32_MEMBER(itech32_state::test1_w)
 	COMBINE_DATA(&((u32 *)m_main_ram)[0x100/4 + offset]);
 }
 
-READ32_MEMBER(itech32_state::test2_r)
+u32 itech32_state::test2_r(offs_t offset, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31 && !m_written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+0);
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+1);
@@ -934,7 +934,7 @@ READ32_MEMBER(itech32_state::test2_r)
 	return ((u32 *)m_main_ram)[0xc00/4 + offset];
 }
 
-WRITE32_MEMBER(itech32_state::test2_w)
+void itech32_state::test2_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31) m_written[0xc00 + offset*4+0] = 1;
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
@@ -4568,8 +4568,8 @@ void drivedge_state::driver_init()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
-	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
+	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
+	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
 }
 
 

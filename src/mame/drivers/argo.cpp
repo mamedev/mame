@@ -18,6 +18,9 @@ Commands: same as UNIOR
 ToDo:
 - Add remaining devices, most likely 8255.
 - There is no obvious evidence of sound.
+- Need dump of the correct chargen.
+- Find out if "m_eram" is supposed to exist, if so, what is it for?
+- What character should show in the top left corner?
 - our dma doesn't emulate the update_flag, so had to use a hack for the L command
 - cursor is one character further to the right than it should be, used another hack
 
@@ -43,7 +46,8 @@ public:
 	argo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
 		, m_uart(*this, "uart")
 		, m_pit(*this, "pit")
@@ -56,29 +60,26 @@ public:
 
 	void argo(machine_config &config);
 
-	void init_argo();
-
 private:
-	enum
-	{
-		TIMER_BOOT
-	};
-
-	DECLARE_WRITE8_MEMBER(argo_videoram_w);
-	DECLARE_READ8_MEMBER(argo_io_r);
-	DECLARE_WRITE8_MEMBER(argo_io_w);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void argo_videoram_w(offs_t offset, u8 data);
+	u8 argo_io_r(offs_t offset);
+	void argo_io_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(z0_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	void argo_palette(palette_device &palette) const;
-	uint8_t dma_r(offs_t offset);
+	u8 dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_videoram;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<i8251_device> m_uart;
 	required_device<pit8253_device> m_pit;
@@ -87,31 +88,27 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_ioport_array<11> m_io_keyboard;
-	uint8_t m_framecnt;
+	u8 m_framecnt;
 	bool m_ram_ctrl;
-	uint8_t m_scroll_ctrl;
+	u8 m_scroll_ctrl;
 	bool m_txe, m_txd, m_rts, m_casspol;
 	u8 m_cass_data[4];
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	std::unique_ptr<u8[]> m_vram;
+	std::unique_ptr<u8[]> m_eram;
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
-WRITE8_MEMBER(argo_state::argo_videoram_w)
+void argo_state::argo_videoram_w(offs_t offset, u8 data)
 {
-	uint8_t *RAM;
 	if (m_ram_ctrl)
-		m_p_videoram[offset] = data;
+		m_vram[offset] = data;
 	else
-	{
-		RAM = memregion("extraram")->base();
-		RAM[offset] = data;
-	}
+		m_eram[offset] = data;
 }
 
-READ8_MEMBER(argo_state::argo_io_r)
+u8 argo_state::argo_io_r(offs_t offset)
 {
-	uint8_t low_io = offset;
+	u8 low_io = offset;
 
 	switch (low_io)
 	{
@@ -147,7 +144,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	}
 }
 
-WRITE8_MEMBER(argo_state::argo_io_w)
+void argo_state::argo_io_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -181,7 +178,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xE8: // hardware scroll
 		if ((m_scroll_ctrl == 2) & (data == 0xe3))
 		{
-			memmove(m_p_videoram, m_p_videoram+80, 24*80);
+			memmove(m_vram.get(), m_vram.get()+80, 24*80);
 			m_scroll_ctrl = 0;
 		}
 		m_dma->write(8, data);
@@ -204,7 +201,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( argo_state::kansas_r )
 	m_cass_data[1]++;
 	m_cass_data[2]++;
 
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -234,12 +231,12 @@ WRITE_LINE_MEMBER(argo_state::z0_w)
 	// read - incoming 2514Hz
 }
 
-uint8_t argo_state::dma_r(offs_t offset)
+u8 argo_state::dma_r(offs_t offset)
 {
 	if (offset < 0xf800)
 		return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	else
-		return m_p_videoram[offset & 0x7ff];
+		return m_vram[offset & 0x7ff];
 }
 
 WRITE_LINE_MEMBER( argo_state::hrq_w )
@@ -254,7 +251,7 @@ I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
 		m_framecnt++;
 
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
+	u8 gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
 
 	if (vsp)
 		gfx = 0;
@@ -269,7 +266,7 @@ I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
 	if (rvv)
 		gfx ^= 0xff;
 
-	for(uint8_t i=0;i<7;i++)
+	for(u8 i=0;i<7;i++)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 6-i) ? (hlgt ? 2 : 1) : 0];
 }
 
@@ -287,7 +284,7 @@ void argo_state::argo_palette(palette_device &palette) const
 
 
 /* F4 Character Displayer */
-static const gfx_layout argo_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 9,                   /* 8 x 9 characters */
 	512,                    /* 512 characters */
@@ -301,15 +298,14 @@ static const gfx_layout argo_charlayout =
 };
 
 static GFXDECODE_START( gfx_argo )
-	GFXDECODE_ENTRY( "chargen", 0x0000, argo_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 void argo_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0xf7ff).ram();
-	map(0xf800, 0xffff).rom().w(FUNC(argo_state::argo_videoram_w));
+	map(0x0000, 0xf7ff).ram().share("mainram");
+	map(0xf800, 0xffff).rom().region("maincpu", 0).w(FUNC(argo_state::argo_videoram_w));
 }
 
 void argo_state::io_map(address_map &map)
@@ -425,29 +421,41 @@ static INPUT_PORTS_START( argo ) // Keyboard was worked out by trial & error;'F'
 INPUT_PORTS_END
 
 
-void argo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_BOOT:
-		/* after the first 4 bytes have been read from ROM, switch the ram back in */
-		membank("boot")->set_entry(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in argo_state::device_timer");
-	}
-}
 
 void argo_state::machine_reset()
 {
-	membank("boot")->set_entry(1);
-	timer_set(attotime::from_usec(5), TIMER_BOOT);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-void argo_state::init_argo()
+void argo_state::machine_start()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	m_eram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+	save_pointer(NAME(m_eram), 0x0800);
+	save_item(NAME(m_framecnt));
+	save_item(NAME(m_ram_ctrl));
+	save_item(NAME(m_scroll_ctrl));
+	save_item(NAME(m_txe));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_casspol));
+	save_item(NAME(m_cass_data));
 }
 
 
@@ -502,11 +510,8 @@ void argo_state::argo(machine_config &config)
 
 /* ROM definition */
 ROM_START( argo )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "argo.rom", 0xf800, 0x0800, CRC(4c4c045b) SHA1(be2b97728cc190d4a8bd27262ba9423f252d31a3) )
-
-	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASEFF )
-	ROM_REGION( 0x0800, "extraram", ROMREGION_ERASEFF ) // no idea what this is for
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "argo.rom", 0x0000, 0x0800, CRC(4c4c045b) SHA1(be2b97728cc190d4a8bd27262ba9423f252d31a3) )
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
@@ -515,5 +520,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY      FULLNAME  FLAGS */
-COMP( 1986, argo, unior,  0,      argo,    argo,  argo_state, init_argo, "<unknown>", "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT         COMPANY      FULLNAME  FLAGS */
+COMP( 1986, argo, unior,  0,      argo,    argo,  argo_state, empty_init, "<unknown>", "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -81,9 +81,9 @@ private:
 	/* misc */
 	int      m_ay_data;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void sound_data_w(uint8_t data);
+	void sound_control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -96,19 +96,19 @@ private:
 };
 
 
-WRITE8_MEMBER(dynadice_state::videoram_w)
+void dynadice_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_top_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(dynadice_state::sound_data_w)
+void dynadice_state::sound_data_w(uint8_t data)
 {
 	m_ay_data = data;
 }
 
-WRITE8_MEMBER(dynadice_state::sound_control_w)
+void dynadice_state::sound_control_w(uint8_t data)
 {
 /*
     AY 3-8910 :

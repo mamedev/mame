@@ -53,7 +53,7 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-	DECLARE_READ32_MEMBER(buserror_r);
+	u32 buserror_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
 	DECLARE_WRITE_LINE_MEMBER(h4_w);
@@ -131,7 +131,7 @@ void micro20_state::portc_w(u8 data)
 	m_rtc->test_w((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ32_MEMBER(micro20_state::buserror_r)
+u32 micro20_state::buserror_r()
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);

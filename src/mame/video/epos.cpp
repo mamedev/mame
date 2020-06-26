@@ -55,12 +55,12 @@ void epos_state::set_pal_color(palette_device &palette, uint8_t offset, uint8_t 
 }
 
 // later (tristar 9000) games uses a dynamic palette instead of prom
-WRITE8_MEMBER(epos_state::dealer_pal_w)
+void epos_state::dealer_pal_w(offs_t offset, uint8_t data)
 {
 	set_pal_color(*m_palette, offset, data);
 }
 
-WRITE8_MEMBER(epos_state::port_1_w)
+void epos_state::port_1_w(uint8_t data)
 {
 	/* D0 - start light #1
 	   D1 - start light #2

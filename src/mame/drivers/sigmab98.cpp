@@ -181,83 +181,83 @@ public:
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	DECLARE_WRITE8_MEMBER(gegege_regs_w);
-	DECLARE_READ8_MEMBER(gegege_regs_r);
-	DECLARE_WRITE8_MEMBER(gegege_regs2_w);
-	DECLARE_READ8_MEMBER(gegege_regs2_r);
+	void gegege_regs_w(offs_t offset, uint8_t data);
+	uint8_t gegege_regs_r(offs_t offset);
+	void gegege_regs2_w(offs_t offset, uint8_t data);
+	uint8_t gegege_regs2_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(dodghero_regs_w);
-	DECLARE_READ8_MEMBER(dodghero_regs_r);
-	DECLARE_WRITE8_MEMBER(dodghero_regs2_w);
-	DECLARE_READ8_MEMBER(dodghero_regs2_r);
+	void dodghero_regs_w(offs_t offset, uint8_t data);
+	uint8_t dodghero_regs_r(offs_t offset);
+	void dodghero_regs2_w(offs_t offset, uint8_t data);
+	uint8_t dodghero_regs2_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(dashhero_regs2_w);
-	DECLARE_READ8_MEMBER(dashhero_regs2_r);
+	void dashhero_regs2_w(offs_t offset, uint8_t data);
+	uint8_t dashhero_regs2_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(vregs_w);
-	DECLARE_READ8_MEMBER(vregs_r);
-	DECLARE_READ8_MEMBER(d013_r);
-	DECLARE_READ8_MEMBER(d021_r);
+	void vregs_w(offs_t offset, uint8_t data);
+	uint8_t vregs_r(offs_t offset);
+	uint8_t d013_r();
+	uint8_t d021_r();
 
-	DECLARE_WRITE8_MEMBER(c4_w);
-	DECLARE_WRITE8_MEMBER(c6_w);
-	DECLARE_WRITE8_MEMBER(c8_w);
+	void c4_w(uint8_t data);
+	void c6_w(uint8_t data);
+	void c8_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(animalc_rombank_w);
-	DECLARE_READ8_MEMBER(animalc_rombank_r);
-	DECLARE_WRITE8_MEMBER(animalc_rambank_w);
-	DECLARE_READ8_MEMBER(animalc_rambank_r);
+	void animalc_rombank_w(offs_t offset, uint8_t data);
+	uint8_t animalc_rombank_r(offs_t offset);
+	void animalc_rambank_w(offs_t offset, uint8_t data);
+	uint8_t animalc_rambank_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(unk_34_r);
-	DECLARE_WRITE8_MEMBER(vblank_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_READ8_MEMBER(sammymdl_coin_counter_r);
-	DECLARE_WRITE8_MEMBER(sammymdl_coin_counter_w);
-	DECLARE_READ8_MEMBER(sammymdl_leds_r);
-	DECLARE_WRITE8_MEMBER(sammymdl_leds_w);
-	DECLARE_WRITE8_MEMBER(sammymdl_hopper_w);
-	DECLARE_READ8_MEMBER(sammymdl_coin_hopper_r);
+	uint8_t unk_34_r();
+	void vblank_w(uint8_t data);
+	uint8_t vblank_r();
+	uint8_t sammymdl_coin_counter_r();
+	void sammymdl_coin_counter_w(uint8_t data);
+	uint8_t sammymdl_leds_r();
+	void sammymdl_leds_w(uint8_t data);
+	void sammymdl_hopper_w(uint8_t data);
+	uint8_t sammymdl_coin_hopper_r();
 
-	DECLARE_WRITE8_MEMBER(gocowboy_rombank_w);
-	DECLARE_READ8_MEMBER(gocowboy_rombank_r);
-	DECLARE_WRITE8_MEMBER(gocowboy_rambank_w);
-	DECLARE_READ8_MEMBER(gocowboy_rambank_r);
-	DECLARE_WRITE8_MEMBER(gocowboy_4400_w);
-	DECLARE_READ8_MEMBER(gocowboy_4400_r);
-	DECLARE_WRITE8_MEMBER(gocowboy_dc00_w);
-	DECLARE_READ8_MEMBER(gocowboy_dc00_r);
-	DECLARE_WRITE8_MEMBER(gocowboy_leds_w);
+	void gocowboy_rombank_w(offs_t offset, uint8_t data);
+	uint8_t gocowboy_rombank_r(offs_t offset);
+	void gocowboy_rambank_w(offs_t offset, uint8_t data);
+	uint8_t gocowboy_rambank_r(offs_t offset);
+	void gocowboy_4400_w(offs_t offset, uint8_t data);
+	uint8_t gocowboy_4400_r(offs_t offset);
+	void gocowboy_dc00_w(offs_t offset, uint8_t data);
+	uint8_t gocowboy_dc00_r(offs_t offset);
+	void gocowboy_leds_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(haekaka_rombank_w);
-	DECLARE_READ8_MEMBER(haekaka_rombank_r);
-	DECLARE_WRITE8_MEMBER(haekaka_rambank_w);
-	DECLARE_READ8_MEMBER(haekaka_rambank_r);
-	DECLARE_READ8_MEMBER(haekaka_vblank_r);
-	DECLARE_READ8_MEMBER(haekaka_b000_r);
-	DECLARE_WRITE8_MEMBER(haekaka_b000_w);
-	DECLARE_WRITE8_MEMBER(haekaka_leds_w);
-	DECLARE_WRITE8_MEMBER(haekaka_coin_counter_w);
+	void haekaka_rombank_w(offs_t offset, uint8_t data);
+	uint8_t haekaka_rombank_r(offs_t offset);
+	void haekaka_rambank_w(offs_t offset, uint8_t data);
+	uint8_t haekaka_rambank_r(offs_t offset);
+	uint8_t haekaka_vblank_r();
+	uint8_t haekaka_b000_r(offs_t offset);
+	void haekaka_b000_w(offs_t offset, uint8_t data);
+	void haekaka_leds_w(uint8_t data);
+	void haekaka_coin_counter_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(itazuram_rombank_w);
-	DECLARE_READ8_MEMBER(itazuram_rombank_r);
-	DECLARE_WRITE8_MEMBER(itazuram_rambank_w);
-	DECLARE_READ8_MEMBER(itazuram_rambank_r);
-	DECLARE_WRITE8_MEMBER(itazuram_nvram_palette_w);
-	DECLARE_WRITE8_MEMBER(itazuram_palette_w);
-	DECLARE_READ8_MEMBER(itazuram_palette_r);
+	void itazuram_rombank_w(offs_t offset, uint8_t data);
+	uint8_t itazuram_rombank_r(offs_t offset);
+	void itazuram_rambank_w(offs_t offset, uint8_t data);
+	uint8_t itazuram_rambank_r(offs_t offset);
+	void itazuram_nvram_palette_w(offs_t offset, uint8_t data);
+	void itazuram_palette_w(offs_t offset, uint8_t data);
+	uint8_t itazuram_palette_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(tdoboon_rombank_w);
-	DECLARE_READ8_MEMBER(tdoboon_rombank_r);
-	DECLARE_WRITE8_MEMBER(tdoboon_rambank_w);
-	DECLARE_READ8_MEMBER(tdoboon_rambank_r);
-	DECLARE_READ8_MEMBER(tdoboon_c000_r);
-	DECLARE_WRITE8_MEMBER(tdoboon_c000_w);
+	void tdoboon_rombank_w(offs_t offset, uint8_t data);
+	uint8_t tdoboon_rombank_r(offs_t offset);
+	void tdoboon_rambank_w(offs_t offset, uint8_t data);
+	uint8_t tdoboon_rambank_r(offs_t offset);
+	uint8_t tdoboon_c000_r(offs_t offset);
+	void tdoboon_c000_w(offs_t offset, uint8_t data);
 
 	void show_outputs();
 	void show_3_outputs();
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(sammymdl_eeprom_r);
-	DECLARE_WRITE8_MEMBER(sammymdl_eeprom_w);
+	void eeprom_w(uint8_t data);
+	uint8_t sammymdl_eeprom_r();
+	void sammymdl_eeprom_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
@@ -347,13 +347,13 @@ public:
 	int m_dsw_bit;
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
-	DECLARE_WRITE8_MEMBER(lufykzku_regs_w);
-	DECLARE_READ8_MEMBER(lufykzku_regs_r);
-	DECLARE_WRITE8_MEMBER(lufykzku_c4_w);
-	DECLARE_WRITE8_MEMBER(lufykzku_c6_w);
-	DECLARE_READ8_MEMBER(lufykzku_c8_r);
-	DECLARE_WRITE8_MEMBER(lufykzku_c8_w);
-	DECLARE_WRITE8_MEMBER(lufykzku_watchdog_w);
+	void lufykzku_regs_w(offs_t offset, uint8_t data);
+	uint8_t lufykzku_regs_r(offs_t offset);
+	void lufykzku_c4_w(uint8_t data);
+	void lufykzku_c6_w(uint8_t data);
+	uint8_t lufykzku_c8_r();
+	void lufykzku_c8_w(uint8_t data);
+	void lufykzku_watchdog_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(lufykzku);
 	void init_lufykzku();
@@ -656,7 +656,7 @@ uint32_t sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sigmab98_state::vregs_w)
+void sigmab98_state::vregs_w(offs_t offset, uint8_t data)
 {
 	m_vregs[offset] = data;
 
@@ -677,7 +677,7 @@ WRITE8_MEMBER(sigmab98_state::vregs_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::vregs_r)
+uint8_t sigmab98_state::vregs_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -688,7 +688,7 @@ READ8_MEMBER(sigmab98_state::vregs_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::d013_r)
+uint8_t sigmab98_state::d013_r()
 {
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must be set (sprite buffered? triggered by pulsing bit 3 of port C6?)
@@ -696,7 +696,7 @@ READ8_MEMBER(sigmab98_state::d013_r)
 	return (m_screen->vblank() ? 0x20 : 0x01) | 0x04;
 //  return machine().rand();
 }
-READ8_MEMBER(sigmab98_state::d021_r)
+uint8_t sigmab98_state::d021_r()
 {
 	// bit 5 must be 0?
 	return 0;
@@ -715,7 +715,7 @@ READ8_MEMBER(sigmab98_state::d021_r)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::dodghero_regs_w)
+void sigmab98_state::dodghero_regs_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -745,7 +745,7 @@ WRITE8_MEMBER(sigmab98_state::dodghero_regs_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::dodghero_regs_r)
+uint8_t sigmab98_state::dodghero_regs_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -763,7 +763,7 @@ READ8_MEMBER(sigmab98_state::dodghero_regs_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::dodghero_regs2_w)
+void sigmab98_state::dodghero_regs2_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -792,7 +792,7 @@ WRITE8_MEMBER(sigmab98_state::dodghero_regs2_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::dodghero_regs2_r)
+uint8_t sigmab98_state::dodghero_regs2_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -852,7 +852,7 @@ void sigmab98_state::dodghero_io_map(address_map &map)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::gegege_regs_w)
+void sigmab98_state::gegege_regs_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -874,7 +874,7 @@ WRITE8_MEMBER(sigmab98_state::gegege_regs_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::gegege_regs_r)
+uint8_t sigmab98_state::gegege_regs_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -891,7 +891,7 @@ READ8_MEMBER(sigmab98_state::gegege_regs_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::gegege_regs2_w)
+void sigmab98_state::gegege_regs2_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -920,7 +920,7 @@ WRITE8_MEMBER(sigmab98_state::gegege_regs2_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::gegege_regs2_r)
+uint8_t sigmab98_state::gegege_regs2_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -947,7 +947,7 @@ void sigmab98_state::show_outputs()
 }
 
 // Port c0
-WRITE8_MEMBER(sigmab98_state::eeprom_w)
+void sigmab98_state::eeprom_w(uint8_t data)
 {
 	// latch the bit
 	m_eeprom->di_write((data & 0x40) >> 6);
@@ -965,7 +965,7 @@ WRITE8_MEMBER(sigmab98_state::eeprom_w)
 
 // Port c4
 // 10 led?
-WRITE8_MEMBER(sigmab98_state::c4_w)
+void sigmab98_state::c4_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 4);
 
@@ -979,7 +979,7 @@ WRITE8_MEMBER(sigmab98_state::c4_w)
 // 08 buffer sprites?
 // 10 led?
 // 20 led? (starts blinking after coin in)
-WRITE8_MEMBER(sigmab98_state::c6_w)
+void sigmab98_state::c6_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 
@@ -998,7 +998,7 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 // Port c8
 // 01 hopper enable?
 // 02 hopper motor on (active low)?
-WRITE8_MEMBER(sigmab98_state::c8_w)
+void sigmab98_state::c8_w(uint8_t data)
 {
 	m_hopper->motor_w((!(data & 0x02) && (data & 0x01)) ? 0 : 1);
 
@@ -1052,7 +1052,7 @@ void sigmab98_state::gegege_io_map(address_map &map)
 ***************************************************************************/
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::dashhero_regs2_w)
+void sigmab98_state::dashhero_regs2_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1089,7 +1089,7 @@ WRITE8_MEMBER(sigmab98_state::dashhero_regs2_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::dashhero_regs2_r)
+uint8_t sigmab98_state::dashhero_regs2_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1132,7 +1132,7 @@ void sigmab98_state::dashhero_io_map(address_map &map)
 ***************************************************************************/
 
 // romrambank
-WRITE8_MEMBER(lufykzku_state::lufykzku_regs_w)
+void lufykzku_state::lufykzku_regs_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_regs_w)
 	}
 }
 
-READ8_MEMBER(lufykzku_state::lufykzku_regs_r)
+uint8_t lufykzku_state::lufykzku_regs_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1187,13 +1187,13 @@ WRITE_LINE_MEMBER(lufykzku_state::dsw_w)
 }
 
 // Port c0
-WRITE8_MEMBER(lufykzku_state::lufykzku_watchdog_w)
+void lufykzku_state::lufykzku_watchdog_w(uint8_t data)
 {
 	m_watchdog->write_line_ck(BIT(data, 7));
 }
 
 // Port c4
-WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
+void lufykzku_state::lufykzku_c4_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(1, (~data) & 0x20); // 100 yen lockout
 //  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
@@ -1204,7 +1204,7 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 }
 
 // Port c6
-WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
+void lufykzku_state::lufykzku_c6_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01); // 100 yen in
 //  machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
@@ -1220,12 +1220,12 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
 }
 
 // Port c8
-READ8_MEMBER(lufykzku_state::lufykzku_c8_r)
+uint8_t lufykzku_state::lufykzku_c8_r()
 {
 	return 0xbf | (m_dsw_bit ? 0x40 : 0);
 }
 
-WRITE8_MEMBER(lufykzku_state::lufykzku_c8_w)
+void lufykzku_state::lufykzku_c8_w(uint8_t data)
 {
 	// bit 0? on payout button
 	// bit 1? when ending payment
@@ -1279,7 +1279,7 @@ void lufykzku_state::lufykzku_io_map(address_map &map)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
+void sigmab98_state::animalc_rombank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1306,7 +1306,7 @@ WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::animalc_rombank_r)
+uint8_t sigmab98_state::animalc_rombank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1323,7 +1323,7 @@ READ8_MEMBER(sigmab98_state::animalc_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::animalc_rambank_w)
+void sigmab98_state::animalc_rambank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1356,7 +1356,7 @@ WRITE8_MEMBER(sigmab98_state::animalc_rambank_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::animalc_rambank_r)
+uint8_t sigmab98_state::animalc_rambank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1373,12 +1373,12 @@ READ8_MEMBER(sigmab98_state::animalc_rambank_r)
 }
 
 
-READ8_MEMBER(sigmab98_state::sammymdl_eeprom_r)
+uint8_t sigmab98_state::sammymdl_eeprom_r()
 {
 	return m_eeprom->do_read() ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
+void sigmab98_state::sammymdl_eeprom_w(uint8_t data)
 {
 	// latch the bit
 	m_eeprom->di_write((data & 0x40) >> 6);
@@ -1393,20 +1393,20 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
 		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(sigmab98_state::unk_34_r)
+uint8_t sigmab98_state::unk_34_r()
 {
 	// mask 0x01?
 	return 0x01;
 }
 
-READ8_MEMBER(sigmab98_state::vblank_r)
+uint8_t sigmab98_state::vblank_r()
 {
 	// mask 0x04 must be set before writing sprite list
 	// mask 0x10 must be set or irq/00 hangs?
 	return  m_vblank | 0x14;
 }
 
-WRITE8_MEMBER(sigmab98_state::vblank_w)
+void sigmab98_state::vblank_w(uint8_t data)
 {
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
@@ -1427,11 +1427,11 @@ void sigmab98_state::show_3_outputs()
 #endif
 }
 // Port 31
-READ8_MEMBER(sigmab98_state::sammymdl_coin_counter_r)
+uint8_t sigmab98_state::sammymdl_coin_counter_r()
 {
 	return m_out[0];
 }
-WRITE8_MEMBER(sigmab98_state::sammymdl_coin_counter_w)
+void sigmab98_state::sammymdl_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,   data  & 0x01 );  // coin1 in
 	machine().bookkeeping().coin_counter_w(1,   data  & 0x02 );  // coin2 in
@@ -1448,11 +1448,11 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_coin_counter_w)
 }
 
 // Port 32
-READ8_MEMBER(sigmab98_state::sammymdl_leds_r)
+uint8_t sigmab98_state::sammymdl_leds_r()
 {
 	return m_out[1];
 }
-WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
+void sigmab98_state::sammymdl_leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);   // button
 
@@ -1463,7 +1463,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 // Port b0
 // 02 hopper enable?
 // 01 hopper motor on (active low)?
-WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
+void sigmab98_state::sammymdl_hopper_w(uint8_t data)
 {
 	m_hopper->motor_w((!(data & 0x01) && (data & 0x02)) ? 0 : 1);
 
@@ -1471,7 +1471,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
 	show_3_outputs();
 }
 
-READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
+uint8_t sigmab98_state::sammymdl_coin_hopper_r()
 {
 	uint8_t ret = ioport("COIN")->read();
 
@@ -1525,7 +1525,7 @@ void sigmab98_state::animalc_io(address_map &map)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::gocowboy_rombank_w)
+void sigmab98_state::gocowboy_rombank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1586,7 +1586,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_rombank_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::gocowboy_rombank_r)
+uint8_t sigmab98_state::gocowboy_rombank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1604,7 +1604,7 @@ READ8_MEMBER(sigmab98_state::gocowboy_rombank_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::gocowboy_4400_r)
+uint8_t sigmab98_state::gocowboy_4400_r(offs_t offset)
 {
 	switch (m_rombank)
 	{
@@ -1642,7 +1642,7 @@ READ8_MEMBER(sigmab98_state::gocowboy_4400_r)
 			else if ((offset >= 0x2800) && (offset < 0x2880))
 				return m_vtable[offset - 0x2800];
 			else if (offset >= 0x3000 && offset <= 0x3021)
-				return vregs_r(space, offset - 0x3000);
+				return vregs_r(offset - 0x3000);
 			break;
 	}
 
@@ -1650,7 +1650,7 @@ READ8_MEMBER(sigmab98_state::gocowboy_4400_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(sigmab98_state::gocowboy_4400_w)
+void sigmab98_state::gocowboy_4400_w(offs_t offset, uint8_t data)
 {
 	switch (m_rombank)
 	{
@@ -1684,7 +1684,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_4400_w)
 			}
 			else if (offset >= 0x3000 && offset <= 0x3021)
 			{
-				vregs_w(space, offset - 0x3000, data);
+				vregs_w(offset - 0x3000, data);
 				return;
 			}
 			break;
@@ -1694,7 +1694,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_4400_w)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::gocowboy_rambank_w)
+void sigmab98_state::gocowboy_rambank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1725,7 +1725,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_rambank_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::gocowboy_rambank_r)
+uint8_t sigmab98_state::gocowboy_rambank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1741,7 +1741,7 @@ READ8_MEMBER(sigmab98_state::gocowboy_rambank_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::gocowboy_dc00_r)
+uint8_t sigmab98_state::gocowboy_dc00_r(offs_t offset)
 {
 	switch (m_rambank)
 	{
@@ -1756,7 +1756,7 @@ READ8_MEMBER(sigmab98_state::gocowboy_dc00_r)
 	return 0;
 }
 
-WRITE8_MEMBER(sigmab98_state::gocowboy_dc00_w)
+void sigmab98_state::gocowboy_dc00_w(offs_t offset, uint8_t data)
 {
 	switch (m_rambank)
 	{
@@ -1784,7 +1784,7 @@ void sigmab98_state::gocowboy_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
+void sigmab98_state::gocowboy_leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);   // button
 	m_leds[1] = BIT(data, 1);   // coin lockout? (after coining up, but not for service coin)
@@ -1823,7 +1823,7 @@ void sigmab98_state::gocowboy_io(address_map &map)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::haekaka_rombank_w)
+void sigmab98_state::haekaka_rombank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1867,7 +1867,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::haekaka_rombank_r)
+uint8_t sigmab98_state::haekaka_rombank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1884,7 +1884,7 @@ READ8_MEMBER(sigmab98_state::haekaka_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::haekaka_rambank_w)
+void sigmab98_state::haekaka_rambank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1910,7 +1910,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_rambank_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::haekaka_rambank_r)
+uint8_t sigmab98_state::haekaka_rambank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1926,12 +1926,12 @@ READ8_MEMBER(sigmab98_state::haekaka_rambank_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::haekaka_vblank_r)
+uint8_t sigmab98_state::haekaka_vblank_r()
 {
 	return m_screen->vblank() ? 0 : 0x1c;
 }
 
-READ8_MEMBER(sigmab98_state::haekaka_b000_r)
+uint8_t sigmab98_state::haekaka_b000_r(offs_t offset)
 {
 	switch (m_rombank)
 	{
@@ -1967,8 +1967,8 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 			else if (offset >= (0xc000-0xb000) && offset <= (0xc021-0xb000))
 			{
 				if (offset == (0xc013-0xb000))
-					return haekaka_vblank_r(space, 0);
-				return vregs_r(space, offset-(0xc000-0xb000));
+					return haekaka_vblank_r();
+				return vregs_r(offset-(0xc000-0xb000));
 			}
 			break;
 	}
@@ -1977,7 +1977,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
+void sigmab98_state::haekaka_b000_w(offs_t offset, uint8_t data)
 {
 	switch (m_rombank)
 	{
@@ -2002,7 +2002,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 			}
 			else if (offset >= (0xc000-0xb000) && offset <= (0xc021-0xb000))
 			{
-				vregs_w(space, offset-(0xc000-0xb000), data);
+				vregs_w(offset-(0xc000-0xb000), data);
 				return;
 			}
 			break;
@@ -2011,7 +2011,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset+0xb000, data, m_rombank);
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
+void sigmab98_state::haekaka_leds_w(uint8_t data)
 {
 	// All used
 	m_leds[0] = BIT(data, 0);
@@ -2027,7 +2027,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 	show_3_outputs();
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_coin_counter_w)
+void sigmab98_state::haekaka_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,   data & 0x01 );   // medal out
 //                                 data & 0x02 ?
@@ -2069,7 +2069,7 @@ void sigmab98_state::haekaka_io(address_map &map)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
+void sigmab98_state::itazuram_rombank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -2180,7 +2180,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::itazuram_rombank_r)
+uint8_t sigmab98_state::itazuram_rombank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -2201,7 +2201,7 @@ READ8_MEMBER(sigmab98_state::itazuram_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
+void sigmab98_state::itazuram_rambank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -2228,7 +2228,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::itazuram_rambank_r)
+uint8_t sigmab98_state::itazuram_rambank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -2244,7 +2244,7 @@ READ8_MEMBER(sigmab98_state::itazuram_rambank_r)
 	}
 }
 
-WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
+void sigmab98_state::itazuram_nvram_palette_w(offs_t offset, uint8_t data)
 {
 	if (m_rambank == 0x64)
 	{
@@ -2260,7 +2260,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 	}
 }
 
-WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
+void sigmab98_state::itazuram_palette_w(offs_t offset, uint8_t data)
 {
 	if (m_rombank == 0x6c)
 	{
@@ -2273,7 +2273,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::itazuram_palette_r)
+uint8_t sigmab98_state::itazuram_palette_r(offs_t offset)
 {
 	return m_paletteram[offset];
 }
@@ -2328,7 +2328,7 @@ void sigmab98_state::pyenaget_io(address_map &map)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::tdoboon_rombank_w)
+void sigmab98_state::tdoboon_rombank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -2373,7 +2373,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::tdoboon_rombank_r)
+uint8_t sigmab98_state::tdoboon_rombank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg;
@@ -2390,7 +2390,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::tdoboon_rambank_w)
+void sigmab98_state::tdoboon_rambank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -2416,7 +2416,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_rambank_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::tdoboon_rambank_r)
+uint8_t sigmab98_state::tdoboon_rambank_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -2432,7 +2432,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_rambank_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
+uint8_t sigmab98_state::tdoboon_c000_r(offs_t offset)
 {
 	switch (m_rombank)
 	{
@@ -2472,8 +2472,8 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 			if (offset >= (0xc000-0xc000) && offset <= (0xc021-0xc000))
 			{
 				if (offset == (0xc013-0xc000))
-					return haekaka_vblank_r(space, 0);
-				return vregs_r(space, offset-(0xc000-0xc000));
+					return haekaka_vblank_r();
+				return vregs_r(offset-(0xc000-0xc000));
 			}
 			break;
 	}
@@ -2482,7 +2482,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
+void sigmab98_state::tdoboon_c000_w(offs_t offset, uint8_t data)
 {
 	switch (m_rombank)
 	{
@@ -2510,7 +2510,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 		case 0x67:  // VREGS
 			if (offset >= (0xc000-0xc000) && offset <= (0xc021-0xc000))
 			{
-				vregs_w(space, offset-(0xc000-0xc000), data);
+				vregs_w(offset-(0xc000-0xc000), data);
 				return;
 			}
 			break;

@@ -75,7 +75,7 @@ const i960_disassembler::mnemonic_t i960_disassembler::mnem_reg[197] =
 	{ "notbit", 0x580, -3 }, { "and", 0x581, -3 }, { "andnot", 0x582, -3 }, { "setbit", 0x583, -3 }, // 58
 	{ "notand", 0x584, -3 }, { "xor", 0x586, -3 }, { "or", 0x587, -3 },
 	{ "nor", 0x588, -3 }, { "xnor", 0x589, -3 }, { "not", 0x58a, -2 }, { "ornot", 0x58b, -3 },
-	{ "clrbit", 0x58c, -3 }, { "notor", 0x58d, -3 }, { "nand", 0x58e, -3 }, { "alterbit", 0x58f, -3 }, 
+	{ "clrbit", 0x58c, -3 }, { "notor", 0x58d, -3 }, { "nand", 0x58e, -3 }, { "alterbit", 0x58f, -3 },
 
 	{ "addo", 0x590, -3 }, { "addi", 0x591, -3 }, { "subo", 0x592, -3 }, { "subi", 0x593, -3 }, // 59
 	{ "cmpob", 0x594, 2 }, { "cmpib", 0x595, 2 }, { "cmpos", 0x596, 2 }, { "cmpis", 0x597, 2 },
@@ -133,7 +133,7 @@ const i960_disassembler::mnemonic_t i960_disassembler::mnem_reg[197] =
 
 	{ "cvtri", 0x6c0, -20 }, { "cvtril", 0x6c1, -20 }, { "cvtzri", 0x6c2, -20 }, { "cvtzril", 0x6c3, -20 }, // 6c
 	{ "movr", 0x6c9, -20 },
-	
+
 	{ "movrl", 0x6d9, -20 }, // 6d
 
 	{ "movre", 0x6e1, -20 }, { "cpysre", 0x6e2, -30 }, { "cpyrsre", 0x6e3, -30 }, // 6e
@@ -241,7 +241,7 @@ offs_t i960_disassembler::dis_decode_cobr(std::ostream &stream, u32 iCode, u32 i
 	switch(cnt)
 	{
 	case 1: // 1 operand (test*)
-		// For the test-if instructions, only the srcl field is used. Here, this field specifies a destination global or local register (ml is ignored). 
+		// For the test-if instructions, only the srcl field is used. Here, this field specifies a destination global or local register (ml is ignored).
 		util::stream_format(stream, "%-8s%s", mnemonic[op].mnem, regnames[src1]);
 		break;
 	case 3: // 3 operands

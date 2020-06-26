@@ -28,7 +28,7 @@ void ddribble_state::ddribble_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(ddribble_state::K005885_0_w)
+void ddribble_state::K005885_0_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -46,7 +46,7 @@ WRITE8_MEMBER(ddribble_state::K005885_0_w)
 	m_vregs[0][offset] = data;
 }
 
-WRITE8_MEMBER(ddribble_state::K005885_1_w)
+void ddribble_state::K005885_1_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -116,13 +116,13 @@ void ddribble_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(ddribble_state::ddribble_fg_videoram_w)
+void ddribble_state::ddribble_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_bg_videoram_w)
+void ddribble_state::ddribble_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);

@@ -20,30 +20,31 @@ class mz6500_state : public driver_device
 {
 public:
 	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_hgdc(*this, "upd7220"),
-		m_fdc(*this, "upd765"),
-		m_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_hgdc(*this, "upd7220")
+		, m_fdc(*this, "upd765")
+		, m_vram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		{ }
 
 	void mz6500(machine_config &config);
 
 private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
-	DECLARE_READ8_MEMBER(mz6500_vram_r);
-	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
+	u8 vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
-	required_shared_ptr<uint16_t> m_video_ram;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	required_shared_ptr<u16> m_vram;
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void mz6500_io(address_map &map);
-	void mz6500_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	void upd7220_map(address_map &map);
 };
 
@@ -51,11 +52,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int gfx[3];
-	uint8_t i,pen;
+	u8 i,pen;
 
-	gfx[0] = m_video_ram[(address + 0x00000) >> 1];
-	gfx[1] = m_video_ram[(address + 0x10000) >> 1];
-	gfx[2] = m_video_ram[(address + 0x20000) >> 1];
+	gfx[0] = m_vram[(address + 0x00000) >> 1];
+	gfx[1] = m_vram[(address + 0x10000) >> 1];
+	gfx[2] = m_vram[(address + 0x20000) >> 1];
 
 	for(i=0; i<16; i++)
 	{
@@ -66,34 +67,29 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 }
 
 
-void mz6500_state::video_start()
+u8 mz6500_state::vram_r(offs_t offset)
 {
+	return m_vram[offset >> 1] >> ((offset & 1) ? 8 : 0);
 }
 
-
-READ8_MEMBER( mz6500_state::mz6500_vram_r )
-{
-	return m_video_ram[offset >> 1] >> ((offset & 1) ? 8 : 0);
-}
-
-WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
+void mz6500_state::vram_w(offs_t offset, u8 data)
 {
 	int mask = (offset & 1) ? 8 : 0;
 	offset >>= 1;
-	m_video_ram[offset] &= 0xff00 >> mask;
-	m_video_ram[offset] |= data << mask;
+	m_vram[offset] &= 0xff00 >> mask;
+	m_vram[offset] |= data << mask;
 }
 
-void mz6500_state::mz6500_map(address_map &map)
+void mz6500_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
 //  map(0xa0000,0xbffff) kanji/dictionary ROM
-	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
+	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::vram_r), FUNC(mz6500_state::vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
-void mz6500_state::mz6500_io(address_map &map)
+void mz6500_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 //  map(0x0000, 0x000f) i8237 dma
@@ -124,6 +120,10 @@ static INPUT_PORTS_START( mz6500 )
 INPUT_PORTS_END
 
 
+void mz6500_state::machine_start()
+{
+}
+
 void mz6500_state::machine_reset()
 {
 }
@@ -145,7 +145,7 @@ static void mz6500_floppies(device_slot_interface &device)
 
 void mz6500_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram().share("video_ram");
+	map(0x00000, 0x3ffff).ram().share("videoram");
 }
 
 
@@ -153,9 +153,8 @@ void mz6500_state::mz6500(machine_config &config)
 {
 	/* basic machine hardware */
 	I8086(config, m_maincpu, 8000000); //unk clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mz6500_map);
-	m_maincpu->set_addrmap(AS_IO, &mz6500_state::mz6500_io);
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mz6500_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -191,4 +190,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
-COMP( 198?, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

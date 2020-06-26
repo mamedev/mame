@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/*******************************************************************************************
 
-        Okeah-240 (Ocean-240)
+Okeah-240 (Ocean-240).
 
-        28/12/2011 Skeleton driver.
+2011-12-28 Skeleton driver.
 
-        Info from EMU80:
+Info from EMU80:
 
 intctl : K580wn59
   irq[0]=kbd.irq2
@@ -28,26 +28,51 @@ ppaC0 : K580ww55
   portB[4-5]=mm.page
   portC=vid.scroll.x
 
+If you leave out the CPM80 roms, the machine will start up in a machine-language monitor.
+
+Okean240: MONITOR 240/7  known commands:
+A ?
+B ?
+D dump
+F fill
+G go
+L load (via uart)
+M move
+R ?
+S substitute
+W ?
+X registers
+
+Okean240a: Turbo MONITOR by Alex Z. There are several emulation bugs noticed. Known commands:
+H hex arithmetic
+J Jamp (set address?)
+M move
+P ? (locks up)
+R read
+W write
+tab switches between the hex and ascii sides
+^C refresh display
 
 NOTE ABOUT THE TEST ROM (okean240t):
-- You need to press a key every so often.
+- You need to press a key every so often, or hold down Insert.
 
 
 ToDo:
-- Add devices
 - Find out if any unconnected keyboard entries are real keys
+- Arrow keys (used in Turbo Monitor)
 - Colours?
 - Sound? (perhaps port E4 bit 3)
-- Add disks
+- Floppy disks and devices
 - Cassette?
 - Add memory banking (perhaps port C1)
+- 80 column mode (used in Turbo Monitor)
 
-Usage of terminal:
-- okean240 - the keyboard
-- okean240a - not used
-- okean240t - the keyboard & screen
+Keyboard:
+- okean240 - external ascii keyboard
+- okean240a - internal keyboard
+- okean240t - serial keyboard & screen
 
-****************************************************************************/
+**********************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -57,6 +82,7 @@ Usage of terminal:
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -71,190 +97,154 @@ public:
 		, m_scroll(0)
 		, m_tog(0)
 		, m_p_videoram(*this, "videoram")
+		, m_io_keyboard(*this, "X%d", 0)
 		, m_io_modifiers(*this, "MODIFIERS")
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_ppikbd(*this, "ppikbd")
+		, m_pic(*this, "pic")
 	{ }
 
 	void okean240a(machine_config &config);
 	void okean240t(machine_config &config);
 	void okean240(machine_config &config);
 
-	void init_okean240();
-
 private:
-	enum
-	{
-		TIMER_OKEAN_BOOT
-	};
-
-	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
-	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
-	DECLARE_READ8_MEMBER(term_status_r);
-	uint8_t term_r();
-	uint8_t okean240_port40_r();
-	uint8_t okean240_port41_r();
-	void okean240_port42_w(uint8_t data);
-	uint8_t okean240a_port40_r();
-	uint8_t okean240a_port41_r();
-	uint8_t okean240a_port42_r();
+	u8 okean240_port40_r();
+	u8 okean240_port41_r();
+	void okean240_port42_w(u8 data);
+	u8 okean240a_port40_r();
+	u8 okean240a_port41_r();
+	u8 okean240a_port42_r();
+	void okean240_porte2_w(u8 data);
 	void kbd_put(u8 data);
-	void scroll_w(uint8_t data);
-	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void okean240_io(address_map &map);
 	void okean240_mem(address_map &map);
-	void okean240a_io(address_map &map);
-	void okean240t_io(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	uint8_t m_term_data;
-	uint8_t m_j;
-	uint8_t m_scroll;
-	uint8_t m_tog;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
+	u8 m_term_data;
+	u8 m_j;
+	u8 m_scroll;
+	u8 m_tog;
+	bool m_key_pressed;
+	u8 m_kbd_row;
+	required_shared_ptr<u8> m_p_videoram;
+	optional_ioport_array<11> m_io_keyboard;
 	optional_ioport m_io_modifiers;
-	ioport_port *m_io_port[11];
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<i8080_cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<i8255_device> m_ppikbd;
+	required_device<pic8259_device> m_pic;
 };
 
-// okean240 requires bit 4 to change
-READ8_MEMBER(okean240_state::okean240_kbd_status_r)
+
+// okean240/t: process ascii keyboard
+void okean240_state::kbd_put(u8 data)
 {
-	m_tog ^= 0x18;
-	if (m_term_data)
-		return m_tog | 2;
-	else
-		return m_tog & 0x18;
+	m_term_data = data;
+	m_pic->ir1_w(1);
 }
 
-// see if a key is pressed and indicate status
-READ8_MEMBER(okean240_state::okean240a_kbd_status_r)
+// okean240/t: port 40 (get ascii key)
+u8 okean240_state::okean240_port40_r()
 {
-	uint8_t i,j;
-	m_tog ^= 0x18;
-
-	for (i = 0; i < 11; i++)
-	{
-		j = m_io_port[i]->read();
-		if (j)
-			return m_tog | 2;
-	}
-	m_j = 0;
-	return m_tog & 0x18;
+	u8 ret = m_term_data;
+	m_term_data = 0;
+	m_pic->ir1_w(0);
+	return ret;
 }
 
-// for test rom
-READ8_MEMBER(okean240_state::term_status_r)
+// okean240t: port 41 bit 1 (test rom status bit) @E0DB, E0E2
+u8 okean240_state::okean240_port41_r()
 {
-	return (m_term_data) ? 3 : 1;
-}
-
-uint8_t okean240_state::okean240_port40_r()
-{
-	// port 40 (get ascii key value)
-	return term_r();
-}
-
-uint8_t okean240_state::okean240_port41_r()
-{
-	// port 41 bit 1 (test rom status bit)
-	m_tog ^= 6;
+	m_tog ^= 2;
 	return m_tog;
 }
 
-uint8_t okean240_state::okean240a_port40_r()
+// okean240a keyboard routines
+TIMER_DEVICE_CALLBACK_MEMBER( okean240_state::timer_k )
 {
-	// port 40 (get a column)
-	for (uint8_t i = 0; i < 11; i++)
+	if (m_key_pressed)
+		return;
+
+	for (u8 i = 0; i < 11; i++)
 	{
-		uint8_t j = m_io_port[i]->read();
-		if (j)
+		if (m_io_keyboard[i]->read())
 		{
-			if (j==m_j) return 0;
-			m_j=j;
-			return j;
+			m_key_pressed = true;
+			m_kbd_row = i;
+			m_pic->ir1_w(1);
+			return;
 		}
+	}
+}
+
+
+// port 40 (get a single key press)
+u8 okean240_state::okean240a_port40_r()
+{
+	u8 j = m_io_keyboard[m_kbd_row]->read();
+	if (j)
+	{
+		if (j==m_j) return 0;
+		m_j=j;
+		return j;
 	}
 	m_j=0;
 	return 0;
 }
 
-uint8_t okean240_state::okean240a_port41_r()
+// port 41 bits 6&7 (modifier keys)
+u8 okean240_state::okean240a_port41_r()
 {
-	// port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
-	{
-		m_tog ^= 2;
-		return m_tog | m_io_modifiers->read();
-	}
+	return m_io_modifiers->read();
 }
 
-uint8_t okean240_state::okean240a_port42_r()
+// port 42 (get a row)
+u8 okean240_state::okean240a_port42_r()
 {
-	// port 42 (get a row)
-	for (uint8_t i = 0; i < 11; i++)
-	{
-		if (m_io_port[i]->read() )
-			return i;
-	}
-	return 0;
+	return m_kbd_row;
 }
 
 // This is a keyboard acknowledge pulse, it goes high then
 // straightaway low, if reading port 40 indicates a key is pressed.
-void okean240_state::okean240_port42_w(uint8_t data)
+// okean240: data bit 7
+// okean240a: data bit 4
+void okean240_state::okean240_port42_w(u8 data)
 {
-// okean240: port 42 bit 7
-// okean240a: port 42 bit 4
+	m_pic->ir1_w(0);
+	m_key_pressed = false;
 }
 
-// for test rom
-uint8_t okean240_state::term_r()
+void okean240_state::okean240_porte2_w(u8 data)
 {
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
+	m_pic->ir4_w(!BIT(data, 3));
 }
 
-void okean240_state::scroll_w(uint8_t data)
-{
-	m_scroll = data;
-}
 
 void okean240_state::okean240_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0x3fff).ram();
+	map(0x0000, 0x3fff).ram().share("mainram");
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0xbfff).ram();
-	map(0xc000, 0xffff).rom();
+	map(0xc000, 0xffff).rom().region("maincpu", 0);
 }
 
 void okean240_state::okean240_io(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x20, 0x25).nopw();
 	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x80, 0x80).r(FUNC(okean240_state::okean240_kbd_status_r));
-	map(0xa0, 0xa0).r(FUNC(okean240_state::term_r));
-	map(0xa1, 0xa1).r(FUNC(okean240_state::term_status_r));
-	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
-}
-
-void okean240_state::okean240a_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x80, 0x80).r(FUNC(okean240_state::okean240a_kbd_status_r));
+	map(0x80, 0x81).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -270,18 +260,6 @@ void okean240_state::okean240a_io(address_map &map)
 	// map(0xe0, 0xff)=ppaE0.data
 }
 
-void okean240_state::okean240t_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x20, 0x23).nopw();
-	map(0x40, 0x43).rw(m_ppikbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x80, 0x80).r(FUNC(okean240_state::okean240_kbd_status_r));
-	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
-}
 
 /* Input ports */
 static INPUT_PORTS_START( okean240 )
@@ -389,7 +367,7 @@ static INPUT_PORTS_START( okean240a )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)        PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)        PORT_CHAR('0')
 
-	PORT_START("XA")
+	PORT_START("X10")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)        PORT_CHAR('d') PORT_CHAR('D')
@@ -405,65 +383,51 @@ static INPUT_PORTS_START( okean240a )
 INPUT_PORTS_END
 
 
-void okean240_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_OKEAN_BOOT:
-		/* after the first 6 bytes have been read from ROM, switch the ram back in */
-		membank("boot")->set_entry(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in okean240_state::device_timer");
-	}
-}
-
-
 void okean240_state::machine_start()
 {
-	char kbdrow[6];
-
-	for (int i = 0; i < 11; i++)
-	{
-		sprintf(kbdrow,"X%X",i);
-		m_io_port[i] = ioport(kbdrow);
-	}
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_j));
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_tog));
+	save_item(NAME(m_key_pressed));
+	save_item(NAME(m_kbd_row));
 }
 
 
 void okean240_state::machine_reset()
 {
-	timer_set(attotime::from_usec(10), TIMER_OKEAN_BOOT);
-	membank("boot")->set_entry(1);
 	m_term_data = 0;
 	m_j = 0;
 	m_scroll = 0;
+	m_key_pressed = false;
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom+0x2000);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xe7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-void okean240_state::kbd_put(u8 data)
+u32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_term_data = data;
-}
-
-void okean240_state::init_okean240()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
-}
-
-void okean240_state::video_start()
-{
-}
-
-uint32_t okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t gfx,ma; // ma must be 8bit
-	uint16_t x,y;
+	u8 gfx,ma; // ma must be 8bit
+	u16 x,y;
 
 	for (y = 0; y < 256; y++)
 	{
 		ma = y + m_scroll;
-		uint16_t *p = &bitmap.pix16(y);
+		u16 *p = &bitmap.pix16(y);
 
 		for (x = 0; x < 0x4000; x+=0x200)
 		{
@@ -499,11 +463,11 @@ static const gfx_layout okean240_charlayout =
 };
 
 static GFXDECODE_START( gfx_okean240 )
-	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x2c08, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_okean240a )
-	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x2f63, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -512,7 +476,7 @@ void okean240_state::okean240t(machine_config &config)
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(12'000'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &okean240_state::okean240_mem);
-	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240t_io);
+	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240_io);
 	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	i8251_device &uart(I8251(config, "uart", 0));
@@ -531,16 +495,18 @@ void okean240_state::okean240t(machine_config &config)
 	m_ppikbd->out_pc_callback().set(FUNC(okean240_state::okean240_port42_w));
 
 	i8255_device &ppic(I8255(config, "ppic"));
-	ppic.out_pa_callback().set(FUNC(okean240_state::scroll_w));
+	ppic.out_pa_callback().set([this] (u8 data) { m_scroll = data; });
 
-	I8255(config, "ppie");
+	i8255_device &ppie(I8255(config, "ppie"));
+	ppie.out_pc_callback().set(FUNC(okean240_state::okean240_porte2_w));
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<1>(3072000); // artificial rate
 	pit.out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
 
-	PIC8259(config, "pic", 0);
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
@@ -557,50 +523,47 @@ void okean240_state::okean240t(machine_config &config)
 void okean240_state::okean240a(machine_config &config)
 {
 	okean240t(config);
-	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240a_io);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240a);
-	subdevice<rs232_port_device>("rs232")->set_default_option("keyboard");
+	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr); // not used for keyboard
 
 	m_ppikbd->in_pa_callback().set(FUNC(okean240_state::okean240a_port40_r));
 	m_ppikbd->in_pb_callback().set(FUNC(okean240_state::okean240a_port41_r));
 	m_ppikbd->in_pc_callback().set(FUNC(okean240_state::okean240a_port42_r));
 
 	subdevice<pit8253_device>("pit")->set_clk<1>(1536000); // artificial rate
+	TIMER(config, "timer_k").configure_periodic(FUNC(okean240_state::timer_k), attotime::from_hz(300)); // keyb scan
 }
 
 void okean240_state::okean240(machine_config &config)
 {
 	okean240t(config);
-	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240_io);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240);
-	config.device_remove("uart");
-	config.device_remove("rs232");
-	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
+	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr); // not used for keyboard
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));
 }
 
 /* ROM definition */
 ROM_START( okean240 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "monitor.bin", 0xe000, 0x2000, CRC(587799bc) SHA1(1f677afa96722ca4ed2643eaca243548845fc854) )
-	ROM_LOAD( "cpm80.bin",   0xc000, 0x2000, CRC(7378e4f9) SHA1(c3c06c6f2e953546452ca6f82140a79d0e4953b4) )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "monitor.bin", 0x2000, 0x2000, CRC(587799bc) SHA1(1f677afa96722ca4ed2643eaca243548845fc854) )
+	ROM_LOAD( "cpm80.bin",   0x0000, 0x2000, CRC(7378e4f9) SHA1(c3c06c6f2e953546452ca6f82140a79d0e4953b4) )
 ROM_END
 
 ROM_START( okean240a )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "fddmonitor.bin", 0xe000, 0x2000, CRC(bcac5ca0) SHA1(602ab824704d3d5d07b3787f6227ff903c33c9d5) )
-	ROM_LOAD( "fddcpm80.bin",   0xc000, 0x2000, CRC(b89a7e16) SHA1(b8f937c04f430be18e48f296ed3ef37194171204) )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "fddmonitor.bin", 0x2000, 0x2000, CRC(bcac5ca0) SHA1(602ab824704d3d5d07b3787f6227ff903c33c9d5) )
+	ROM_LOAD( "fddcpm80.bin",   0x0000, 0x2000, CRC(b89a7e16) SHA1(b8f937c04f430be18e48f296ed3ef37194171204) )
 ROM_END
 
 ROM_START( okean240t )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "test.bin",    0xe000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577) )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "test.bin",    0x2000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT           COMPANY      FULLNAME              FLAGS
-COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, init_okean240, "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, init_okean240, "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, init_okean240, "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, empty_init, "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, empty_init, "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, empty_init, "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

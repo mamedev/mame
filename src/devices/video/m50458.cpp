@@ -53,12 +53,12 @@ ROM_START( m50458 )
 	ROM_LOAD("m50458_char.bin",  0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) )
 ROM_END
 
-WRITE16_MEMBER( m50458_device::vreg_120_w)
+void m50458_device::vreg_120_w(uint16_t data)
 {
 //  printf("%04x\n",data);
 }
 
-WRITE16_MEMBER( m50458_device::vreg_121_w)
+void m50458_device::vreg_121_w(uint16_t data)
 {
 	/* Horizontal char size for line 0 */
 	m_hsz1 = (data & 0xc0) >> 6;
@@ -71,7 +71,7 @@ WRITE16_MEMBER( m50458_device::vreg_121_w)
 }
 
 
-WRITE16_MEMBER( m50458_device::vreg_122_w)
+void m50458_device::vreg_122_w(uint16_t data)
 {
 	/* Vertical char size for line 0 */
 	m_vsz1 = (data & 0xc0) >> 6;
@@ -84,7 +84,7 @@ WRITE16_MEMBER( m50458_device::vreg_122_w)
 
 }
 
-WRITE16_MEMBER( m50458_device::vreg_123_w)
+void m50458_device::vreg_123_w(uint16_t data)
 {
 	/* fractional part of vertical scrolling */
 	m_scrf = data & 0x1f;
@@ -97,17 +97,17 @@ WRITE16_MEMBER( m50458_device::vreg_123_w)
 //  printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
 }
 
-WRITE16_MEMBER( m50458_device::vreg_124_w)
+void m50458_device::vreg_124_w(uint16_t data)
 {
 }
 
-WRITE16_MEMBER( m50458_device::vreg_125_w)
+void m50458_device::vreg_125_w(uint16_t data)
 {
 	/* blinking cycle */
 	m_blink = data & 4 ? 0x20 : 0x40;
 }
 
-WRITE16_MEMBER( m50458_device::vreg_126_w)
+void m50458_device::vreg_126_w(uint16_t data)
 {
 	/* Raster Color Setting */
 	m_phase = data & 7;
@@ -116,7 +116,7 @@ WRITE16_MEMBER( m50458_device::vreg_126_w)
 }
 
 
-WRITE16_MEMBER( m50458_device::vreg_127_w)
+void m50458_device::vreg_127_w(uint16_t data)
 {
 	if(data & 0x20) // RAMERS, display RAM is erased
 	{

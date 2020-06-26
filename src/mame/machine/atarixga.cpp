@@ -189,7 +189,7 @@ uint16_t atari_136094_0072_device::decipher(uint8_t k, uint16_t c)
  *
  *************************************/
 
-WRITE32_MEMBER(atari_136094_0072_device::write)
+void atari_136094_0072_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (m_mode)
 	{
@@ -221,7 +221,7 @@ WRITE32_MEMBER(atari_136094_0072_device::write)
 	}
 }
 
-READ32_MEMBER(atari_136094_0072_device::read)
+uint32_t atari_136094_0072_device::read(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset << 2)
 	{
@@ -392,13 +392,13 @@ uint16_t atari_136095_0072_device::decipher(uint8_t k, uint16_t c)
 	return p;
 }
 
-WRITE32_MEMBER(atari_136095_0072_device::polylsb_write)
+void atari_136095_0072_device::polylsb_write(offs_t offset, uint32_t data)
 {
 	m_update.addr = offset;
 	m_update.data[offset] = data;
 }
 
-READ32_MEMBER(atari_136095_0072_device::polylsb_read)
+uint32_t atari_136095_0072_device::polylsb_read(offs_t offset, uint32_t mem_mask)
 {
 	if (m_update.addr == offset)
 	{
@@ -414,7 +414,7 @@ READ32_MEMBER(atari_136095_0072_device::polylsb_read)
 	return m_update.data[offset];
 }
 
-WRITE32_MEMBER(atari_136095_0072_device::write)
+void atari_136095_0072_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t address, value = 0;
 
@@ -471,7 +471,7 @@ WRITE32_MEMBER(atari_136095_0072_device::write)
 	}
 }
 
-READ32_MEMBER(atari_136095_0072_device::read)
+uint32_t atari_136095_0072_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint16_t address;
 	uint32_t reply = 0;

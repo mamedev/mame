@@ -102,16 +102,15 @@ public:
 	}
 
 	// mingw treats string constants as char* instead of char[N]
-#if !defined(_WIN32) && !defined(_WIN64)
-	explicit
-#endif
-	pstring_t(const mem_t *string)
+	template<typename C,
+		class = std::enable_if_t<std::is_same<C, const mem_t>::value>>
+	pstring_t(const C *string)
 	: m_str(string)
 	{
 	}
 
 	template<typename C, std::size_t N,
-		class = typename std::enable_if<std::is_same<C, const mem_t>::value>::type>
+		class = std::enable_if_t<std::is_same<C, const mem_t>::value>>
 	pstring_t(C (&string)[N]) noexcept(false)  // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
 		static_assert(N > 0,"pstring from array of length 0");
@@ -132,12 +131,12 @@ public:
 
 	explicit pstring_t(size_type n, code_t code)
 	{
-		while (n--)
+		while (n-- != 0)
 			*this += code;
 	}
 
 	template <typename T,
-		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>
+		class = std::enable_if_t<!std::is_same<T, pstring_t::traits_type>::value>>
 	explicit pstring_t(const pstring_t<T> &string)
 	{
 		m_str.clear();
@@ -149,7 +148,7 @@ public:
 
 
 	template <typename T,
-		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>
+		class = std::enable_if_t<!std::is_same<T, pstring_t::traits_type>::value>>
 	pstring_t &operator=(const pstring_t<T> &string)
 	{
 		m_str.clear();
@@ -211,10 +210,10 @@ public:
 
 	// the following are extensions to <string>
 
+private:
 	// FIXME: remove those
 	size_type mem_t_size() const noexcept { return m_str.size(); }
 
-private:
 	string_type m_str;
 };
 
@@ -232,11 +231,19 @@ struct pu8_traits
 };
 
 // No checking, this may deliver invalid codes
-struct putf8_traits
+
+
+template <std::size_t N, typename CT>
+struct putf_traits
 {
-	using mem_t = char;
+};
+
+template<typename CT>
+struct putf_traits<1, CT>
+{
+	using mem_t = CT;
 	using code_t = char32_t;
-	using string_type = std::string;
+	using string_type = std::basic_string<CT>;
 	static std::size_t len(const string_type &p) noexcept
 	{
 		std::size_t ret = 0;
@@ -327,11 +334,12 @@ struct putf8_traits
 	}
 };
 
-struct putf16_traits
+template<typename CT>
+struct putf_traits<2, CT>
 {
-	using mem_t = char16_t;
+	using mem_t = CT;
 	using code_t = char32_t;
-	using string_type = std::u16string;
+	using string_type = std::basic_string<CT>;
 	static std::size_t len(const string_type &p) noexcept
 	{
 		std::size_t ret = 0;
@@ -392,119 +400,72 @@ struct putf16_traits
 	}
 };
 
-struct pwchar_traits
+template<typename CT>
+struct putf_traits<4, CT>
 {
-	using mem_t = wchar_t;
+	using mem_t = CT;
 	using code_t = char32_t;
-	using string_type = std::wstring;
+	using string_type = std::basic_string<CT>;
 	static std::size_t len(const string_type &p) noexcept
 	{
-		if (sizeof(wchar_t) == 2)
-		{
-			std::size_t ret = 0;
-			auto i = p.begin();
-			while (i != p.end())
-			{
-				// FIXME: check that size is equal
-				auto c = static_cast<uint32_t>(*i++);
-				if (!((c & 0xd800) == 0xd800)) // NOLINT
-					ret++;
-			}
-			return ret;
-		}
-
 		return p.size();
 	}
 
 	static std::size_t codelen(const mem_t *p) noexcept
 	{
-		if (sizeof(wchar_t) == 2)
-		{
-			auto c = static_cast<uint16_t>(static_cast<unsigned char>(*p));
-			return ((c & 0xd800) == 0xd800) ? 2 : 1; // NOLINT
-		}
-
+		plib::unused_var(p);
 		return 1;
 	}
 
 	static std::size_t codelen(const code_t c) noexcept
 	{
-		if (sizeof(wchar_t) == 2)
-			return ((c & 0xd800) == 0xd800) ? 2 : 1; // NOLINT
-
+		plib::unused_var(c);
 		return 1;
 	}
 
 	static code_t code(const mem_t *p)
 	{
-		if (sizeof(wchar_t) == 2)
-		{
-			auto c = static_cast<uint32_t>(static_cast<unsigned char>(*p++));
-			if ((c & 0xd800) == 0xd800) // NOLINT
-			{
-				c = (c - 0xd800) << 10; // NOLINT
-				c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000; // NOLINT
-			}
-			return static_cast<code_t>(c);
-		}
-
 		return static_cast<code_t>(*p);
 	}
 
 	static void encode(code_t c, string_type &s)
 	{
-		if (sizeof(wchar_t) == 2)
-		{
-			auto cu = static_cast<uint32_t>(c);
-			if (c > 0xffff) // NOLINT
-			{ //make a surrogate pair
-				uint32_t t = ((cu - 0x10000) >> 10) + 0xd800; // NOLINT
-				cu = (cu & 0x3ff) + 0xdc00; // NOLINT
-				s += static_cast<mem_t>(t);
-				s += static_cast<mem_t>(cu);
-			}
-			else
-				s += static_cast<mem_t>(cu);
-		}
-		else
-			s += static_cast<wchar_t>(c);
+		s += static_cast<mem_t>(c);
 	}
 	static const mem_t *nthcode(const mem_t *p, const std::size_t n) noexcept
 	{
-		if (sizeof(wchar_t) == 2)
-		{
-			std::size_t i = n;
-			while (i-- > 0)
-				p += codelen(p);
-			return p;
-		}
-
 		return p + n;
 	}
 };
 
+using putf8_traits  = putf_traits<sizeof(char), char>;
+using putf16_traits = putf_traits<sizeof(char16_t), char16_t>;
+using putf32_traits = putf_traits<sizeof(char32_t), char32_t>;
+using pwchar_traits = putf_traits<sizeof(wchar_t), wchar_t>;
+
 extern template struct pstring_t<pu8_traits>;
 extern template struct pstring_t<putf8_traits>;
 extern template struct pstring_t<putf16_traits>;
+extern template struct pstring_t<putf32_traits>;
 extern template struct pstring_t<pwchar_traits>;
 
 #if (PSTRING_USE_STD_STRING)
 using pstring = std::string;
-static inline pstring::size_type pstring_mem_t_size(const pstring &s) { return s.size(); }
 #else
 using pstring = pstring_t<putf8_traits>;
-template <typename T>
-static inline pstring::size_type pstring_mem_t_size(const pstring_t<T> &s) { return s.mem_t_size(); }
 #endif
+using pu8string = pstring_t<pu8_traits>;
 using putf8string = pstring_t<putf8_traits>;
-using pu16string = pstring_t<putf16_traits>;
+using putf16string = pstring_t<putf16_traits>;
+using putf32string = pstring_t<putf32_traits>;
 using pwstring = pstring_t<pwchar_traits>;
 
 // custom specialization of std::hash can be injected in namespace std
 namespace std
 {
 
-	template<typename T> struct hash<pstring_t<T>>
+	template<typename T>
+	struct hash<pstring_t<T>>
 	{
 		using argument_type = pstring_t<T>;
 		using result_type = std::size_t;

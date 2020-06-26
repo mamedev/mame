@@ -26,7 +26,7 @@ void vsmile_base_state::machine_start()
 	m_bankdev->set_bank(bank);
 }
 
-WRITE8_MEMBER(vsmile_base_state::chip_sel_w)
+void vsmile_base_state::chip_sel_w(uint8_t data)
 {
 	const uint16_t cart_offset = m_cart && m_cart->exists() ? 4 : 0;
 	switch (data)
@@ -45,7 +45,7 @@ WRITE8_MEMBER(vsmile_base_state::chip_sel_w)
 	m_maincpu->invalidate_cache();
 }
 
-READ16_MEMBER(vsmile_base_state::bank3_r)
+uint16_t vsmile_base_state::bank3_r(offs_t offset)
 {
 	return ((uint16_t*)m_system_region->base())[offset];
 }
@@ -64,7 +64,7 @@ void vsmile_state::machine_reset()
 	std::fill(std::begin(m_ctrl_select), std::end(m_ctrl_select), false);
 }
 
-WRITE8_MEMBER(vsmile_state::ctrl_tx_w)
+void vsmile_state::ctrl_tx_w(uint8_t data)
 {
 	//printf("Ctrl Tx: %02x\n", data);
 	m_maincpu->uart_rx(data);
@@ -77,25 +77,25 @@ template <int Which> WRITE_LINE_MEMBER(vsmile_state::ctrl_rts_w)
 	m_maincpu->extint_w(Which, state);
 }
 
-WRITE8_MEMBER(vsmile_state::uart_rx)
+void vsmile_state::uart_rx(uint8_t data)
 {
 	//printf("Ctrl Rx: %02x\n", data);
 	m_ctrl[0]->data_w(data);
 	m_ctrl[1]->data_w(data);
 }
 
-READ16_MEMBER(vsmile_state::portb_r)
+uint16_t vsmile_state::portb_r()
 {
 	return VSMILE_PORTB_OFF_SW | VSMILE_PORTB_ON_SW | VSMILE_PORTB_RESET;
 }
 
-WRITE16_MEMBER(vsmile_state::portb_w)
+void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 4))
 		m_cart->set_cs2(BIT(data, 4));
 }
 
-READ16_MEMBER(vsmile_state::portc_r)
+uint16_t vsmile_state::portc_r()
 {
 	uint16_t data = m_dsw_region->read();
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
@@ -106,7 +106,7 @@ READ16_MEMBER(vsmile_state::portc_r)
 	return data;
 }
 
-WRITE16_MEMBER(vsmile_state::portc_w)
+void vsmile_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 8))
 	{
@@ -128,12 +128,12 @@ WRITE16_MEMBER(vsmile_state::portc_w)
  *
  ************************************/
 
-WRITE16_MEMBER(vsmilem_state::porta_w)
+void vsmilem_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("Port A write: %04x & %04x\n", data, mem_mask);
 }
 
-READ16_MEMBER(vsmilem_state::porta_r)
+uint16_t vsmilem_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
 	const uint16_t data = 0xc000;
 	//printf("Port A read: %04x & %04x\n", data, mem_mask);

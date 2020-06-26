@@ -63,16 +63,16 @@ private:
 
 	// I/O handlers
 	void update_leds();
-	DECLARE_WRITE8_MEMBER(leds1_w);
-	DECLARE_WRITE8_MEMBER(leds2_w);
-	DECLARE_WRITE8_MEMBER(select1_w);
-	DECLARE_WRITE8_MEMBER(select2_w);
-	DECLARE_WRITE8_MEMBER(control1_w);
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(control1_r);
-	DECLARE_READ8_MEMBER(control2_r);
-	DECLARE_READ8_MEMBER(chessboard_r);
-	DECLARE_WRITE8_MEMBER(lcd_reset_w);
+	void leds1_w(u8 data);
+	void leds2_w(u8 data);
+	void select1_w(u8 data);
+	void select2_w(u8 data);
+	void control1_w(u8 data);
+	void control2_w(u8 data);
+	u8 control1_r();
+	u8 control2_r();
+	u8 chessboard_r();
+	void lcd_reset_w(u8 data);
 
 	u8 m_control1;
 	u8 m_control2;
@@ -128,21 +128,21 @@ void corona_state::update_leds()
 	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2, true);
 }
 
-WRITE8_MEMBER(corona_state::leds1_w)
+void corona_state::leds1_w(u8 data)
 {
 	// d0-d7: button led data
 	m_led_data1 = data;
 	update_leds();
 }
 
-WRITE8_MEMBER(corona_state::leds2_w)
+void corona_state::leds2_w(u8 data)
 {
 	// d0-d7: chessboard led data
 	m_led_data2 = data;
 	update_leds();
 }
 
-WRITE8_MEMBER(corona_state::select1_w)
+void corona_state::select1_w(u8 data)
 {
 	// d0-d3: chessboard led select
 	// d4-d7: black/white leds
@@ -150,14 +150,14 @@ WRITE8_MEMBER(corona_state::select1_w)
 	update_leds();
 }
 
-WRITE8_MEMBER(corona_state::select2_w)
+void corona_state::select2_w(u8 data)
 {
 	// d0-d3: input mux
 	// d4-d7: lcd data
 	m_select2 = data;
 }
 
-WRITE8_MEMBER(corona_state::control1_w)
+void corona_state::control1_w(u8 data)
 {
 	// d5: button led select
 	m_control1 = data;
@@ -167,7 +167,7 @@ WRITE8_MEMBER(corona_state::control1_w)
 	m_dac->write(data >> 6 & 1);
 }
 
-WRITE8_MEMBER(corona_state::control2_w)
+void corona_state::control2_w(u8 data)
 {
 	// d0,d1: rombank
 	m_rombank->set_bank(data & 3);
@@ -183,7 +183,7 @@ WRITE8_MEMBER(corona_state::control2_w)
 	m_control2 = data;
 }
 
-READ8_MEMBER(corona_state::control1_r)
+u8 corona_state::control1_r()
 {
 	u8 data = 0;
 
@@ -199,7 +199,7 @@ READ8_MEMBER(corona_state::control1_r)
 	return data;
 }
 
-READ8_MEMBER(corona_state::control2_r)
+u8 corona_state::control2_r()
 {
 	u8 data = 0;
 	u8 sel = m_select2 & 0xf;
@@ -211,13 +211,13 @@ READ8_MEMBER(corona_state::control2_r)
 	return data;
 }
 
-READ8_MEMBER(corona_state::chessboard_r)
+u8 corona_state::chessboard_r()
 {
 	// d0-d7: chessboard sensors
 	return ~m_board->read_file(m_select2 & 0xf);
 }
 
-WRITE8_MEMBER(corona_state::lcd_reset_w)
+void corona_state::lcd_reset_w(u8 data)
 {
 	// reset lcd?
 	m_lcd_ready = true;
@@ -283,6 +283,7 @@ void corona_state::corona(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3+8, 8);

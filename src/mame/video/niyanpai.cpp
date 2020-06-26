@@ -15,12 +15,12 @@
 
 
 ******************************************************************************/
-READ16_MEMBER(niyanpai_state::palette_r)
+uint16_t niyanpai_state::palette_r(offs_t offset)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE16_MEMBER(niyanpai_state::palette_w)
+void niyanpai_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b;
 	int offs_h, offs_l;
@@ -333,21 +333,21 @@ void niyanpai_state::gfxdraw(int vram)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(niyanpai_state::blitter_0_w){ blitter_w(0, offset, data); }
-WRITE8_MEMBER(niyanpai_state::blitter_1_w){ blitter_w(1, offset, data); }
-WRITE8_MEMBER(niyanpai_state::blitter_2_w){ blitter_w(2, offset, data); }
+void niyanpai_state::blitter_0_w(offs_t offset, uint8_t data){ blitter_w(0, offset, data); }
+void niyanpai_state::blitter_1_w(offs_t offset, uint8_t data){ blitter_w(1, offset, data); }
+void niyanpai_state::blitter_2_w(offs_t offset, uint8_t data){ blitter_w(2, offset, data); }
 
-READ8_MEMBER(niyanpai_state::blitter_0_r){ return blitter_r(0, offset); }
-READ8_MEMBER(niyanpai_state::blitter_1_r){ return blitter_r(1, offset); }
-READ8_MEMBER(niyanpai_state::blitter_2_r){ return blitter_r(2, offset); }
+uint8_t niyanpai_state::blitter_0_r(offs_t offset){ return blitter_r(0, offset); }
+uint8_t niyanpai_state::blitter_1_r(offs_t offset){ return blitter_r(1, offset); }
+uint8_t niyanpai_state::blitter_2_r(offs_t offset){ return blitter_r(2, offset); }
 
-WRITE8_MEMBER(niyanpai_state::clut_0_w){ clut_w(0, offset, data); }
-WRITE8_MEMBER(niyanpai_state::clut_1_w){ clut_w(1, offset, data); }
-WRITE8_MEMBER(niyanpai_state::clut_2_w){ clut_w(2, offset, data); }
+void niyanpai_state::clut_0_w(offs_t offset, uint8_t data){ clut_w(0, offset, data); }
+void niyanpai_state::clut_1_w(offs_t offset, uint8_t data){ clut_w(1, offset, data); }
+void niyanpai_state::clut_2_w(offs_t offset, uint8_t data){ clut_w(2, offset, data); }
 
-WRITE8_MEMBER(niyanpai_state::clutsel_0_w){ clutsel_w(0, data); }
-WRITE8_MEMBER(niyanpai_state::clutsel_1_w){ clutsel_w(1, data); }
-WRITE8_MEMBER(niyanpai_state::clutsel_2_w){ clutsel_w(2, data); }
+void niyanpai_state::clutsel_0_w(uint8_t data){ clutsel_w(0, data); }
+void niyanpai_state::clutsel_1_w(uint8_t data){ clutsel_w(1, data); }
+void niyanpai_state::clutsel_2_w(uint8_t data){ clutsel_w(2, data); }
 
 /******************************************************************************
 

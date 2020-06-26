@@ -125,7 +125,7 @@ void px8_state::bankswitch()
     gah40m_r - GAH40M read
 -------------------------------------------------*/
 
-READ8_MEMBER( px8_state::gah40m_r )
+uint8_t px8_state::gah40m_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ READ8_MEMBER( px8_state::gah40m_r )
     gah40m_w - GAH40M write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( px8_state::gah40m_w )
+void px8_state::gah40m_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -379,7 +379,7 @@ WRITE8_MEMBER( px8_state::gah40m_w )
     gah40s_r - GAH40S read
 -------------------------------------------------*/
 
-READ8_MEMBER( px8_state::gah40s_r )
+uint8_t px8_state::gah40s_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -405,7 +405,7 @@ READ8_MEMBER( px8_state::gah40s_r )
     gah40s_w - GAH40S write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( px8_state::gah40s_w )
+void px8_state::gah40s_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -448,7 +448,7 @@ WRITE8_MEMBER( px8_state::gah40s_w )
     gah40s_ier_w - interrupt enable register write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( px8_state::gah40s_ier_w )
+void px8_state::gah40s_ier_w(uint8_t data)
 {
 	m_ier = data;
 }
@@ -482,7 +482,7 @@ uint8_t px8_state::krtn_read()
    krtn_0_3_r - keyboard return 0..3 read
 -------------------------------------------------*/
 
-READ8_MEMBER( px8_state::krtn_0_3_r )
+uint8_t px8_state::krtn_0_3_r()
 {
 	return krtn_read() & 0x0f;
 }
@@ -491,7 +491,7 @@ READ8_MEMBER( px8_state::krtn_0_3_r )
    krtn_4_7_r - keyboard return 4..7 read
 -------------------------------------------------*/
 
-READ8_MEMBER( px8_state::krtn_4_7_r )
+uint8_t px8_state::krtn_4_7_r()
 {
 	return krtn_read() >> 4;
 }
@@ -500,7 +500,7 @@ READ8_MEMBER( px8_state::krtn_4_7_r )
    ksc_w - keyboard scan write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( px8_state::ksc_w )
+void px8_state::ksc_w(uint8_t data)
 {
 	m_ksc = data;
 }

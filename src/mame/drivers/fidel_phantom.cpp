@@ -77,14 +77,14 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
 	void update_lcd();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_WRITE8_MEMBER(motors_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(motors_r);
-	DECLARE_READ8_MEMBER(irq_ack_r);
-	DECLARE_READ8_MEMBER(hmotor_ff_clear_r);
-	DECLARE_READ8_MEMBER(vmotor_ff_clear_r);
+	void control_w(offs_t offset, u8 data);
+	void lcd_w(offs_t offset, u8 data);
+	void motors_w(u8 data);
+	u8 input_r(offs_t offset);
+	u8 motors_r(offs_t offset);
+	u8 irq_ack_r();
+	u8 hmotor_ff_clear_r();
+	u8 vmotor_ff_clear_r();
 	void update_pieces_position(int state);
 
 	uint8_t   m_select;
@@ -220,7 +220,7 @@ void phantom_state::update_lcd()
 	m_display->update();
 }
 
-WRITE8_MEMBER(phantom_state::control_w)
+void phantom_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d1: 74259
 	uint8_t mask = 1 << offset;
@@ -238,7 +238,7 @@ WRITE8_MEMBER(phantom_state::control_w)
 	update_lcd();
 }
 
-WRITE8_MEMBER(phantom_state::motors_w)
+void phantom_state::motors_w(u8 data)
 {
 	// bit 0: vertical motor down
 	// bit 1: vertical motor up
@@ -257,7 +257,7 @@ WRITE8_MEMBER(phantom_state::motors_w)
 	m_motors_ctrl = data;
 }
 
-WRITE8_MEMBER(phantom_state::lcd_w)
+void phantom_state::lcd_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0,d2,d4,d6: 4*74259 to lcd digit segments
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
@@ -270,7 +270,7 @@ WRITE8_MEMBER(phantom_state::lcd_w)
 	update_lcd();
 }
 
-READ8_MEMBER(phantom_state::input_r)
+u8 phantom_state::input_r(offs_t offset)
 {
 	uint8_t mux = m_select & 0xf;
 	uint8_t data = 0xff;
@@ -294,7 +294,7 @@ READ8_MEMBER(phantom_state::input_r)
 	return data;
 }
 
-READ8_MEMBER(phantom_state::motors_r)
+u8 phantom_state::motors_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -313,14 +313,14 @@ READ8_MEMBER(phantom_state::motors_r)
 	return data;
 }
 
-READ8_MEMBER(phantom_state::irq_ack_r)
+u8 phantom_state::irq_ack_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(R65C02_IRQ_LINE, CLEAR_LINE);
 	return 0;
 }
 
-READ8_MEMBER(phantom_state::hmotor_ff_clear_r)
+u8 phantom_state::hmotor_ff_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_hmotor_sensor1_ff = m_hmotor_sensor0_ff = false;
@@ -328,7 +328,7 @@ READ8_MEMBER(phantom_state::hmotor_ff_clear_r)
 	return 0;
 }
 
-READ8_MEMBER(phantom_state::vmotor_ff_clear_r)
+u8 phantom_state::vmotor_ff_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_vmotor_sensor1_ff = m_vmotor_sensor0_ff = false;

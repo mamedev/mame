@@ -429,10 +429,10 @@ protected:
 	adsp_core           m_alt;
 
 	// address spaces
-	address_space *     m_program;
-	address_space *     m_data;
-	address_space *     m_io;
-	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<14, 2, -2, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<14, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_io;
 
 	// tables
 	uint8_t               m_condition_table[0x1000];

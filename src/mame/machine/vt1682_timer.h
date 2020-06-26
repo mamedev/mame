@@ -21,16 +21,16 @@ public:
 	// so that we can filter logging, sound timer gets used hundreds of times a frame, so logging it is unwise
 	void set_sound_timer() { m_is_sound_timer = true; }
 
-	DECLARE_READ8_MEMBER(vt1682_timer_preload_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_7_0_w);
+	uint8_t vt1682_timer_preload_7_0_r();
+	void vt1682_timer_preload_7_0_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_timer_preload_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_15_8_w);
+	uint8_t vt1682_timer_preload_15_8_r();
+	void vt1682_timer_preload_15_8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_timer_enable_r);
-	DECLARE_WRITE8_MEMBER(vt1682_timer_enable_w);
+	uint8_t vt1682_timer_enable_r();
+	void vt1682_timer_enable_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(vt1682_timer_irqclear_w);
+	void vt1682_timer_irqclear_w(uint8_t data);
 
 	void change_clock();
 

@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(bbusters_state_base::get_pf_tile_info)
 	tileinfo.set(Gfx,tile&0xfff,tile>>12,0);
 }
 
-WRITE16_MEMBER(bbusters_state_base::video_w)
+void bbusters_state_base::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);

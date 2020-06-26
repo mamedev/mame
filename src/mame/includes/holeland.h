@@ -49,10 +49,10 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	void pal_offs_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void scroll_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 

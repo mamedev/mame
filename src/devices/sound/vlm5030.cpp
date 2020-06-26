@@ -162,7 +162,7 @@ DEFINE_DEVICE_TYPE(VLM5030, vlm5030_device, "vlm5030", "Sanyo VLM5030")
 vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VLM5030, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 16),
+		device_rom_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_coeff(nullptr),
 		m_address(0),

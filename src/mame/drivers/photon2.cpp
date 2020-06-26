@@ -57,10 +57,10 @@ private:
 	uint8_t m_spectrum_port_fe;
 	uint8_t m_nmi_enable;
 
-	DECLARE_WRITE8_MEMBER(membank_w);
-	DECLARE_READ8_MEMBER(fe_r);
-	DECLARE_WRITE8_MEMBER(fe_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	void membank_w(uint8_t data);
+	uint8_t fe_r();
+	void fe_w(uint8_t data);
+	void misc_w(uint8_t data);
 
 	void photon2_palette(palette_device &palette) const;
 
@@ -219,7 +219,7 @@ uint32_t photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-WRITE8_MEMBER(photon2_state::membank_w)
+void photon2_state::membank_w(uint8_t data)
 {
 	int bank = 0;
 	if (data == 0)
@@ -242,18 +242,18 @@ WRITE8_MEMBER(photon2_state::membank_w)
 	membank("mainbank")->set_entry(bank);
 }
 
-READ8_MEMBER(photon2_state::fe_r)
+uint8_t photon2_state::fe_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon2_state::fe_w)
+void photon2_state::fe_w(uint8_t data)
 {
 	m_spectrum_port_fe = data;
 	m_speaker->level_w(BIT(data,4));
 }
 
-WRITE8_MEMBER(photon2_state::misc_w)
+void photon2_state::misc_w(uint8_t data)
 {
 	m_nmi_enable = !BIT(data,5);
 }

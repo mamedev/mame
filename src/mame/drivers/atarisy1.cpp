@@ -220,14 +220,11 @@ void atarisy1_state::video_int_ack_w(uint8_t data)
 
 void atarisy1_state::machine_start()
 {
-	atarigen_state::machine_start();
 }
 
 
 void atarisy1_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-
 	bankselect_w(0);
 
 	if (m_adc.found())
@@ -628,7 +625,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( roadblst )
 	PORT_START("IN0")   // F20000
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
+	PORT_BIT( 0x7f, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_REVERSE
 
 	PORT_START("IN1")   // F40000
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64)
@@ -2484,7 +2481,7 @@ ROM_END
 
 void atarisy1_state::init_marble()
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_trackball_type = 1;   /* rotated */
 }
@@ -2492,7 +2489,7 @@ void atarisy1_state::init_marble()
 
 void atarisy1_state::init_peterpak()
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_trackball_type = 0;   /* none */
 }
@@ -2500,7 +2497,7 @@ void atarisy1_state::init_peterpak()
 
 void atarisy1_state::init_indytemp()
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_trackball_type = 0;   /* none */
 }
@@ -2508,7 +2505,7 @@ void atarisy1_state::init_indytemp()
 
 void atarisy1_state::init_roadrunn()
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_trackball_type = 0;   /* none */
 }
@@ -2516,7 +2513,7 @@ void atarisy1_state::init_roadrunn()
 
 void atarisy1_state::init_roadblst()
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_trackball_type = 2;   /* steering wheel */
 }

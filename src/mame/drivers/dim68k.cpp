@@ -61,28 +61,29 @@ public:
 	void dim68k(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER( dim68k_duart_r );
-	DECLARE_READ16_MEMBER( dim68k_fdc_r );
-	DECLARE_READ16_MEMBER( dim68k_game_switches_r );
-	DECLARE_READ16_MEMBER( dim68k_speaker_r );
-	DECLARE_WRITE16_MEMBER( dim68k_banksw_w );
-	DECLARE_WRITE16_MEMBER( dim68k_duart_w );
-	DECLARE_WRITE16_MEMBER( dim68k_fdc_w );
-	DECLARE_WRITE16_MEMBER( dim68k_printer_strobe_w );
-	DECLARE_WRITE16_MEMBER( dim68k_reset_timers_w );
-	DECLARE_WRITE16_MEMBER( dim68k_speaker_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
+	u16 dim68k_duart_r(offs_t offset);
+	u16 dim68k_fdc_r();
+	u16 dim68k_game_switches_r();
+	u16 dim68k_speaker_r();
+	void dim68k_banksw_w(u16 data);
+	void dim68k_duart_w(u16 data);
+	void dim68k_fdc_w(u16 data);
+	void dim68k_printer_strobe_w(u16 data);
+	void dim68k_reset_timers_w(u16 data);
+	void dim68k_speaker_w(u16 data);
+	void dim68k_video_control_w(u16 data);
+	void dim68k_video_high_w(u16 data);
+	void dim68k_video_reset_w(u16 data);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void dim68k_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	bool m_speaker_bit;
 	u8 m_video_control;
 	u8 m_term_data;
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
@@ -91,7 +92,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-READ16_MEMBER( dim68k_state::dim68k_duart_r )
+u16 dim68k_state::dim68k_duart_r(offs_t offset)
 // Port A is for the keyboard : 300 baud, no parity, 8 bits, 1 stop bit. Port B is for RS232.
 // The device also controls the parallel printer (except the strobe) and the RTC.
 // Device = SCN2681, not emulated. The keyboard is standard ASCII, so we can use the terminal
@@ -103,12 +104,12 @@ READ16_MEMBER( dim68k_state::dim68k_duart_r )
 	return 0;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_fdc_r )
+u16 dim68k_state::dim68k_fdc_r()
 {
 	return 0;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_game_switches_r )
+u16 dim68k_state::dim68k_game_switches_r()
 // Reading the game port switches
 // FFCC11 = switch 0; FFCC13 = switch 1, etc to switch 3
 // FFCC19 = paddle 0; FFCC1B = paddle 1, etc to paddle 3
@@ -116,7 +117,7 @@ READ16_MEMBER( dim68k_state::dim68k_game_switches_r )
 	return 0xffff;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_speaker_r )
+u16 dim68k_state::dim68k_speaker_r()
 // Any read or write of this address will toggle the position of the speaker cone
 {
 	m_speaker_bit ^= 1;
@@ -124,22 +125,22 @@ READ16_MEMBER( dim68k_state::dim68k_speaker_r )
 	return 0;
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_speaker_w )
+void dim68k_state::dim68k_speaker_w(u16 data)
 {
 	m_speaker_bit ^= 1;
 	m_speaker->level_w(m_speaker_bit);
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_fdc_w )
+void dim68k_state::dim68k_fdc_w(u16 data)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_high_w )
+void dim68k_state::dim68k_video_high_w(u16 data)
 // "write high byte of address in memory of start of display buffer"
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
+void dim68k_state::dim68k_video_control_w(u16 data)
 {
 /* D7 0 = Hires/Graphics; 1= Lores/Text [not emulated yet]
    D6 0 = 8 dots per character; 1 = 7 dots [emulated]
@@ -166,30 +167,30 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
 	}
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_reset_w )
+void dim68k_state::dim68k_video_reset_w(u16 data)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_duart_w )
+void dim68k_state::dim68k_duart_w(u16 data)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_reset_timers_w )
+void dim68k_state::dim68k_reset_timers_w(u16 data)
 // reset game port timer before reading paddles
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_printer_strobe_w )
+void dim68k_state::dim68k_printer_strobe_w(u16 data)
 // anything sent here will trigger a one-shot for a strobe pulse
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
+void dim68k_state::dim68k_banksw_w(u16 data)
 // At boot time, the rom and IO occupy 0-FFFF, this moves it to the proper place
 {
 }
 
-void dim68k_state::dim68k_mem(address_map &map)
+void dim68k_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x00feffff).ram().share("ram"); // 16MB RAM / ROM at boot
@@ -310,11 +311,18 @@ void dim68k_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
+void dim68k_state::machine_start()
+{
+	save_item(NAME(m_speaker_bit));
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_term_data));
+}
+
 void dim68k_state::dim68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::dim68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -406,4 +414,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME           FLAGS
-COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

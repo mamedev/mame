@@ -30,12 +30,12 @@ public:
 	void init_prose2k();
 
 private:
-	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_WRITE8_MEMBER(peripheral_w);
-	DECLARE_READ16_MEMBER(dsp_data_r);
-	DECLARE_WRITE16_MEMBER(dsp_data_w);
-	DECLARE_READ16_MEMBER(dsp_status_r);
-	DECLARE_WRITE16_MEMBER(dsp_status_w);
+	uint8_t dsw_r();
+	void peripheral_w(uint8_t data);
+	uint16_t dsp_data_r();
+	void dsp_data_w(uint16_t data);
+	uint16_t dsp_status_r();
+	void dsp_status_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);

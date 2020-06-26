@@ -52,13 +52,13 @@ public:
 	void init_micropin();
 
 private:
-	DECLARE_READ8_MEMBER(pia51_r);
-	DECLARE_WRITE8_MEMBER(pia51_w);
+	uint8_t pia51_r(offs_t offset);
+	void pia51_w(offs_t offset, uint8_t data);
 	uint8_t p51b_r();
-	DECLARE_WRITE8_MEMBER(sol_w);
+	void sol_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(p50ca2_w);
-	DECLARE_WRITE8_MEMBER(sw_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	void sw_w(uint8_t data);
+	void lamp_w(uint8_t data);
 	void p50a_w(uint8_t data);
 	void p50b_w(uint8_t data);
 	void p51a_w(uint8_t data);
@@ -175,18 +175,18 @@ static INPUT_PORTS_START( micropin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
 INPUT_PORTS_END
 
-READ8_MEMBER( micropin_state::pia51_r )
+uint8_t  micropin_state::pia51_r(offs_t offset)
 {
 	return m_pia51->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( micropin_state::pia51_w )
+void micropin_state::pia51_w(offs_t offset, uint8_t data)
 {
 	m_pia51->write(offset, data ^ 0xff);
 }
 
 // lamps and disp strobes
-WRITE8_MEMBER( micropin_state::lamp_w )
+void micropin_state::lamp_w(uint8_t data)
 {
 	m_row = data & 15;
 	m_counter = 0;
@@ -194,12 +194,12 @@ WRITE8_MEMBER( micropin_state::lamp_w )
 }
 
 // solenoids
-WRITE8_MEMBER( micropin_state::sol_w )
+void micropin_state::sol_w(uint8_t data)
 {
 }
 
 // offs 0,5 = solenoids; else lamps
-WRITE8_MEMBER( micropin_state::sw_w )
+void micropin_state::sw_w(uint8_t data)
 {
 }
 

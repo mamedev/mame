@@ -1452,7 +1452,9 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	ident.identify(filename);
 
 	// return the appropriate error code
-	if (ident.matches() == ident.total())
+	if (ident.total() == 0)
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "No files found.\n");
+	else if (ident.matches() == ident.total())
 		return;
 	else if (ident.matches() == ident.total() - ident.nonroms())
 		throw emu_fatalerror(EMU_ERR_IDENT_NONROMS, "Out of %d files, %d matched, %d are not roms.\n", ident.total(), ident.matches(), ident.nonroms());
@@ -1737,6 +1739,6 @@ void cli_frontend::display_help(const char *exename)
 			"        %s -showconfig   to show your current %s.ini\n"
 			"        %s -listmedia    for a full list of supported media\n"
 			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
+			"For usage instructions, please visit https://docs.mamedev.org \n",exename,
 			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
 }

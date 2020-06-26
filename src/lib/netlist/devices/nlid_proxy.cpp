@@ -6,8 +6,10 @@
  */
 
 #include "nlid_proxy.h"
-#include "solver/nld_solver.h"
 #include "nl_errstr.h"
+#include "solver/nld_solver.h"
+
+#include <array>
 
 namespace netlist
 {
@@ -17,6 +19,8 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
+
+	static const std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 		const logic_t *inout_proxied)
@@ -29,31 +33,30 @@ namespace netlist
 			throw nl_exception(MF_NULLPTR_FAMILY_NP("nld_base_proxy"));
 		}
 
-		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
 		bool f = false;
 		for (const auto & pwr_sym : power_syms)
 		{
 			pstring devname = inout_proxied->device().name();
 
-			auto *tp_ct(anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
+			auto *tp_ct(anetlist.setup().find_terminal(devname + "." + pstring(pwr_sym.first),
 					/*detail::terminal_type::INPUT,*/ false));
-			auto *tp_cn(anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
+			auto *tp_cn(anetlist.setup().find_terminal(devname + "." + pstring(pwr_sym.second),
 				/*detail::terminal_type::INPUT,*/ false));
-			if (tp_ct && tp_cn)
+			if ((tp_ct != nullptr) && (tp_cn != nullptr))
 			{
-				if (tp_ct && !tp_ct->is_analog())
+				if (!tp_ct->is_analog())
 					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_ct->name()));
-				if (tp_cn && !tp_cn->is_analog())
+				if (!tp_cn->is_analog())
 					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
 
-				auto *tp_t = static_cast<analog_t* >(tp_ct);
-				auto *tn_t = static_cast<analog_t *>(tp_cn);
+				auto *tp_t = dynamic_cast<analog_t* >(tp_ct);
+				auto *tn_t = dynamic_cast<analog_t *>(tp_cn);
 				if (f && (tp_t != nullptr && tn_t != nullptr))
 					log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
 						m_tp->name(), m_tn->name(),
-						tp_t ? tp_t->name() : "",
-						tn_t ? tn_t->name() : ""));
+						tp_t != nullptr ? tp_t->name() : "",
+						tn_t != nullptr ? tn_t->name() : ""));
 				else if (tp_t != nullptr && tn_t != nullptr)
 				{
 					m_tp = tp_t;
@@ -64,8 +67,8 @@ namespace netlist
 		}
 		if (!f)
 			throw nl_exception(MF_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
-		else
-			log().verbose("D/A Proxy: Found power terminals on device {1}", inout_proxied->device().name());
+
+		log().verbose("D/A Proxy: Found power terminals on device {1}", inout_proxied->device().name());
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -187,7 +190,7 @@ namespace netlist
 							nlconst::zero());
 						break;
 					default:
-						throw nl_exception("unknown state for proxy: this should never happen! %d\n", static_cast<int>(state));
+						plib::terminate("unknown state for proxy: this should never happen!");
 				}
 			});
 			m_last_state = state;

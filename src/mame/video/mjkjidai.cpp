@@ -39,7 +39,7 @@ void mjkjidai_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
+void mjkjidai_state::mjkjidai_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);

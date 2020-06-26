@@ -42,10 +42,10 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_rombank;
 
-	DECLARE_WRITE8_MEMBER(aliens_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(aliens_sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	void aliens_coin_counter_w(uint8_t data);
+	void aliens_sh_irqtrigger_w(uint8_t data);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
 	void aliens_snd_bankswitch_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

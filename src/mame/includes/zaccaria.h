@@ -33,13 +33,13 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_READ8_MEMBER(prot1_r);
-	DECLARE_READ8_MEMBER(prot2_r);
+	uint8_t dsw_r();
+	uint8_t prot1_r(offs_t offset);
+	uint8_t prot2_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(coin_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(attributes_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void attributes_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void dsw_sel_w(uint8_t data);

@@ -70,8 +70,8 @@ private:
 	// address spaces
 	address_space_config m_inst_config;
 	address_space_config m_data_config;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_inst_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_data_cache;
+	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_inst_cache;
+	memory_access<10, 0, 0, ENDIANNESS_LITTLE>::cache m_data_cache;
 
 	// internal state
 	u16 m_pc;

@@ -1365,8 +1365,8 @@ protected:
 
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
+	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
 
 	void witchcrd_palette(palette_device &palette) const;
 	void super21p_palette(palette_device &palette) const;
@@ -1446,8 +1446,8 @@ public:
 	void megadpkr(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
-	DECLARE_WRITE8_MEMBER(mcu_command_w);
+	uint8_t cpubank_decrypt_r(offs_t offset);
+	void mcu_command_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
 	void mcu_portc_w(uint8_t data);
 	void megadpkr_banked_map(address_map &map);
@@ -1468,13 +1468,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_videoram_w)
+void goldnpkr_state::goldnpkr_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_colorram_w)
+void goldnpkr_state::goldnpkr_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -4894,12 +4894,12 @@ void goldnpkr_state::caspoker(machine_config &config)
 *                Blitz System                *
 *********************************************/
 
-READ8_MEMBER(blitz_state::cpubank_decrypt_r)
+uint8_t blitz_state::cpubank_decrypt_r(offs_t offset)
 {
 	return m_cpubank[offset] ^ m_cpubank_xor;
 }
 
-WRITE8_MEMBER(blitz_state::mcu_command_w)
+void blitz_state::mcu_command_w(uint8_t data)
 {
 	m_mcu->pa_w(data);
 	if (BIT(m_portc_data, 0))
@@ -11227,6 +11227,9 @@ ROM_START( witchcdj )
 	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
 	ROM_IGNORE(                 0x0800) /* identical halves */
 
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise the game is not working
+	ROM_LOAD( "witchcdj_nvram.bin", 0x0000, 0x0800, CRC(39766c6a) SHA1(9de4c5886d1ee12898f7d3b0224ab99d49e5e43d) )
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
@@ -12109,7 +12112,7 @@ GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init
 GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
-GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1)",                         0 )
+GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
 
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )

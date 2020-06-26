@@ -84,31 +84,31 @@ private:
 	int m_xcount;
 
 	// in drivers/btoads
-	DECLARE_WRITE16_MEMBER( main_sound_w );
-	DECLARE_READ16_MEMBER( main_sound_r );
-	DECLARE_WRITE8_MEMBER( sound_data_w );
-	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_READ8_MEMBER( sound_ready_to_send_r );
-	DECLARE_READ8_MEMBER( sound_data_ready_r );
-	DECLARE_WRITE8_MEMBER( sound_int_state_w );
-	DECLARE_READ8_MEMBER( bsmt_ready_r );
-	DECLARE_WRITE8_MEMBER( bsmt2000_port_w );
+	void main_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t main_sound_r();
+	void sound_data_w(uint8_t data);
+	uint8_t sound_data_r();
+	uint8_t sound_ready_to_send_r();
+	uint8_t sound_data_ready_r();
+	void sound_int_state_w(uint8_t data);
+	uint8_t bsmt_ready_r();
+	void bsmt2000_port_w(offs_t offset, uint8_t data);
 
 	// in video/btoads
-	DECLARE_WRITE16_MEMBER( misc_control_w );
-	DECLARE_WRITE16_MEMBER( display_control_w );
-	DECLARE_WRITE16_MEMBER( scroll0_w );
-	DECLARE_WRITE16_MEMBER( scroll1_w );
-	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_READ16_MEMBER( paletteram_r );
-	DECLARE_WRITE16_MEMBER( vram_bg0_w );
-	DECLARE_WRITE16_MEMBER( vram_bg1_w );
-	DECLARE_READ16_MEMBER( vram_bg0_r );
-	DECLARE_READ16_MEMBER( vram_bg1_r );
-	DECLARE_WRITE16_MEMBER( vram_fg_display_w );
-	DECLARE_WRITE16_MEMBER( vram_fg_draw_w );
-	DECLARE_READ16_MEMBER( vram_fg_display_r );
-	DECLARE_READ16_MEMBER( vram_fg_draw_r );
+	void misc_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void display_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint16_t data);
+	uint16_t paletteram_r(offs_t offset);
+	void vram_bg0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vram_bg0_r(offs_t offset);
+	uint16_t vram_bg1_r(offs_t offset);
+	void vram_fg_display_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_fg_draw_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vram_fg_display_r(offs_t offset);
+	uint16_t vram_fg_draw_r(offs_t offset);
 	void render_sprite_row(uint16_t *sprite_source, uint32_t address);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

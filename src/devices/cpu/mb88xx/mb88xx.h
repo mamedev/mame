@@ -177,9 +177,10 @@ private:
 	/* IRQ handling */
 	uint8_t m_pending_interrupt;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 7, 0, 0, ENDIANNESS_BIG>::specific m_data;
+
 	int m_icount;
 
 	// For the debugger

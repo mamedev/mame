@@ -216,7 +216,7 @@ private:
 
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(debug_mem_w)
+	void debug_mem_w(offs_t offset, uint8_t data)
 	{
 		m_mainram[offset] = data;
 	};
@@ -273,104 +273,104 @@ private:
 	}
 
 
-	DECLARE_READ8_MEMBER(ioevent_enable_r);
-	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
-	DECLARE_READ8_MEMBER(ioevent_irqstate_r);
-	DECLARE_WRITE8_MEMBER(ioevent_irqack_w);
+	uint8_t ioevent_enable_r();
+	void ioevent_enable_w(uint8_t data);
+	uint8_t ioevent_irqstate_r();
+	void ioevent_irqack_w(uint8_t data);
 	uint8_t m_ioevent_enable;
 	uint8_t m_ioevent_active;
 	void process_ioevent(uint8_t bits);
 
-	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
+	void slotreg_7810_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(rom_dmatrg_w);
+	void rom_dmatrg_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(rom_dmasrc_w);
+	void rom_dmasrc_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(rom_dmadst_w);
-	DECLARE_WRITE8_MEMBER(rom_dmalen_w);
-	DECLARE_READ8_MEMBER(rom_dmastat_r);
+	void rom_dmadst_w(offs_t offset, uint8_t data);
+	void rom_dmalen_w(offs_t offset, uint8_t data);
+	uint8_t rom_dmastat_r();
 
-	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_1_w);
-	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_2_w);
-	DECLARE_WRITE8_MEMBER(spritefragment_dma_trg_w);
-	DECLARE_READ8_MEMBER(spritefragment_dma_status_r);
+	void spritefragment_dma_params_1_w(offs_t offset, uint8_t data);
+	void spritefragment_dma_params_2_w(offs_t offset, uint8_t data);
+	void spritefragment_dma_trg_w(uint8_t data);
+	uint8_t spritefragment_dma_status_r();
 
-	DECLARE_READ8_MEMBER(io0_data_r);
-	DECLARE_READ8_MEMBER(io1_data_r);
-	DECLARE_WRITE8_MEMBER(io0_data_w);
-	DECLARE_WRITE8_MEMBER(io1_data_w);
+	uint8_t io0_data_r();
+	uint8_t io1_data_r();
+	void io0_data_w(uint8_t data);
+	void io1_data_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(io0_direction_r);
-	DECLARE_READ8_MEMBER(io1_direction_r);
-	DECLARE_WRITE8_MEMBER(io0_direction_w);
-	DECLARE_WRITE8_MEMBER(io1_direction_w);
+	uint8_t io0_direction_r();
+	uint8_t io1_direction_r();
+	void io0_direction_w(uint8_t data);
+	void io1_direction_w(uint8_t data);
 
 	uint8_t m_io0_data;
 	uint8_t m_io1_data;
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
 
-	DECLARE_READ8_MEMBER(nmi_vector_lo_r);
-	DECLARE_READ8_MEMBER(nmi_vector_hi_r);
-	DECLARE_READ8_MEMBER(irq_vector_lo_r);
-	DECLARE_READ8_MEMBER(irq_vector_hi_r);
+	uint8_t nmi_vector_lo_r();
+	uint8_t nmi_vector_hi_r();
+	uint8_t irq_vector_lo_r();
+	uint8_t irq_vector_hi_r();
 
-	DECLARE_WRITE8_MEMBER(vector_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
-	DECLARE_WRITE8_MEMBER(nmi_vector_hi_w);
-	DECLARE_WRITE8_MEMBER(irq_vector_lo_w);
-	DECLARE_WRITE8_MEMBER(irq_vector_hi_w);
+	void vector_enable_w(uint8_t data);
+	void nmi_vector_lo_w(uint8_t data);
+	void nmi_vector_hi_w(uint8_t data);
+	void irq_vector_lo_w(uint8_t data);
+	void irq_vector_hi_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(irq_source_r);
-	DECLARE_WRITE8_MEMBER(irq_source_w);
+	uint8_t irq_source_r();
+	void irq_source_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(arena_start_r);
-	DECLARE_WRITE8_MEMBER(arena_start_w);
-	DECLARE_READ8_MEMBER(arena_end_r);
-	DECLARE_WRITE8_MEMBER(arena_end_w);
-	DECLARE_READ8_MEMBER(arena_control_r);
-	DECLARE_WRITE8_MEMBER(arena_control_w);
+	uint8_t arena_start_r();
+	void arena_start_w(uint8_t data);
+	uint8_t arena_end_r();
+	void arena_end_w(uint8_t data);
+	uint8_t arena_control_r();
+	void arena_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(colmix_6ff0_r);
-	DECLARE_WRITE8_MEMBER(colmix_6ff0_w);
+	uint8_t colmix_6ff0_r();
+	void colmix_6ff0_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(colmix_6ff1_w);
-	DECLARE_WRITE8_MEMBER(colmix_6ff2_w);
+	void colmix_6ff1_w(uint8_t data);
+	void colmix_6ff2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
-	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
+	uint8_t dispctrl_6ff8_r();
+	void dispctrl_6ff8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(sound_startstop_r);
-	DECLARE_WRITE8_MEMBER(sound_startstop_w);
-	DECLARE_READ8_MEMBER(sound_updateenv_r);
-	DECLARE_WRITE8_MEMBER(sound_updateenv_w);
+	uint8_t sound_startstop_r(offs_t offset);
+	void sound_startstop_w(offs_t offset, uint8_t data);
+	uint8_t sound_updateenv_r(offs_t offset);
+	void sound_updateenv_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(sound_sta16_r);
-	DECLARE_READ8_MEMBER(sound_75f5_r);
-	DECLARE_READ8_MEMBER(sound_volume_r);
-	DECLARE_WRITE8_MEMBER(sound_volume_w);
+	uint8_t sound_sta16_r(offs_t offset);
+	uint8_t sound_75f5_r();
+	uint8_t sound_volume_r();
+	void sound_volume_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_regbase_w);
+	void sound_regbase_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(sound_75f8_r);
-	DECLARE_WRITE8_MEMBER(sound_75f8_w);
+	uint8_t sound_75f8_r();
+	void sound_75f8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(sound_75f9_r);
-	DECLARE_WRITE8_MEMBER(sound_75f9_w);
+	uint8_t sound_75f9_r();
+	void sound_75f9_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(sound_timer0_r);
-	DECLARE_WRITE8_MEMBER(sound_timer0_w);
-	DECLARE_READ8_MEMBER(sound_timer1_r);
-	DECLARE_WRITE8_MEMBER(sound_timer1_w);
-	DECLARE_READ8_MEMBER(sound_timer2_r);
-	DECLARE_WRITE8_MEMBER(sound_timer2_w);
-	DECLARE_READ8_MEMBER(sound_timer3_r);
-	DECLARE_WRITE8_MEMBER(sound_timer3_w);
+	uint8_t sound_timer0_r();
+	void sound_timer0_w(uint8_t data);
+	uint8_t sound_timer1_r();
+	void sound_timer1_w(uint8_t data);
+	uint8_t sound_timer2_r();
+	void sound_timer2_w(uint8_t data);
+	uint8_t sound_timer3_r();
+	void sound_timer3_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(sound_irqstatus_r);
-	DECLARE_WRITE8_MEMBER(sound_irqstatus_w);
-	DECLARE_WRITE8_MEMBER(sound_75ff_w);
+	uint8_t sound_irqstatus_r();
+	void sound_irqstatus_w(uint8_t data);
+	void sound_75ff_w(uint8_t data);
 	uint8_t m_sound_irqstatus;
 	uint8_t m_soundreg16_0[2];
 	uint8_t m_soundreg16_1[2];
@@ -380,38 +380,38 @@ private:
 	emu_timer *m_sound_timer[4];
 
 
-	DECLARE_READ8_MEMBER(timer_status_r);
-	DECLARE_WRITE8_MEMBER(timer_control_w);
-	DECLARE_READ8_MEMBER(timer_baseval_r);
-	DECLARE_WRITE8_MEMBER(timer_baseval_w);
-	DECLARE_READ8_MEMBER(timer_freq_r);
-	DECLARE_WRITE8_MEMBER(timer_freq_w);
-	DECLARE_READ8_MEMBER(timer_curval_r);
+	uint8_t timer_status_r();
+	void timer_control_w(uint8_t data);
+	uint8_t timer_baseval_r();
+	void timer_baseval_w(uint8_t data);
+	uint8_t timer_freq_r();
+	void timer_freq_w(uint8_t data);
+	uint8_t timer_curval_r();
 	uint8_t m_timer_control;
 	uint8_t m_timer_freq;
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
 	emu_timer *m_freq_timer;
 
-	DECLARE_WRITE8_MEMBER(palram_sh_w);
-	DECLARE_WRITE8_MEMBER(palram_l_w);
-	DECLARE_WRITE8_MEMBER(colmix_sh_w);
-	DECLARE_WRITE8_MEMBER(colmix_l_w);
-	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
-	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
+	void palram_sh_w(offs_t offset, uint8_t data);
+	void palram_l_w(offs_t offset, uint8_t data);
+	void colmix_sh_w(offs_t offset, uint8_t data);
+	void colmix_l_w(offs_t offset, uint8_t data);
+	void bmp_palram_sh_w(offs_t offset, uint8_t data);
+	void bmp_palram_l_w(offs_t offset, uint8_t data);
+	void spriteram_w(offs_t offset, uint8_t data);
 	bool m_sprite_xhigh_ignore_hack;
 
-	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
-	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
-	DECLARE_READ8_MEMBER(tmap1_regs_r);
-	DECLARE_READ8_MEMBER(tmap2_regs_r);
+	void tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t tmap1_regs_r(offs_t offset);
+	uint8_t tmap2_regs_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(spriteregs_w);
+	void spriteregs_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(pal_ntsc_r);
+	uint8_t pal_ntsc_r();
 
-	DECLARE_READ8_MEMBER(xavix_memoryemu_txarray_r);
-	DECLARE_WRITE8_MEMBER(xavix_memoryemu_txarray_w);
+	uint8_t xavix_memoryemu_txarray_r(offs_t offset);
+	void xavix_memoryemu_txarray_w(offs_t offset, uint8_t data);
 	uint8_t m_txarray[3];
 
 	inline uint8_t txarray_r(uint16_t offset)
@@ -453,19 +453,19 @@ private:
 	}
 
 
-	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
-	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
-	DECLARE_READ8_MEMBER(adc2_r) { return m_an_in[2]->read(); };
-	DECLARE_READ8_MEMBER(adc3_r) { return m_an_in[3]->read(); };
-	DECLARE_READ8_MEMBER(adc4_r) { return m_an_in[4]->read(); };
-	DECLARE_READ8_MEMBER(adc5_r) { return m_an_in[5]->read(); };
-	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
-	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
+	uint8_t adc0_r() { return m_an_in[0]->read(); };
+	uint8_t adc1_r() { return m_an_in[1]->read(); };
+	uint8_t adc2_r() { return m_an_in[2]->read(); };
+	uint8_t adc3_r() { return m_an_in[3]->read(); };
+	uint8_t adc4_r() { return m_an_in[4]->read(); };
+	uint8_t adc5_r() { return m_an_in[5]->read(); };
+	uint8_t adc6_r() { return m_an_in[6]->read(); };
+	uint8_t adc7_r() { return m_an_in[7]->read(); };
 
-	DECLARE_READ8_MEMBER(anport0_r) { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport1_r) { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport2_r) { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport3_r) { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport2_r() { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
 
 	void update_irqs();
 	uint8_t m_irqsource;
@@ -502,8 +502,8 @@ private:
 	// raster IRQ
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	emu_timer *m_interrupt_timer;
-	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
-	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
+	void dispctrl_posirq_x_w(uint8_t data);
+	void dispctrl_posirq_y_w(uint8_t data);
 
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_fragment_sprite;
@@ -559,7 +559,7 @@ private:
 	required_device<xavix_sound_device> m_sound;
 
 
-	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+	uint8_t sound_regram_read_cb(offs_t offset);
 
 protected:
 	required_device<xavix_adc_device> m_adc;
@@ -569,15 +569,15 @@ protected:
 
 	uint8_t m_extbusctrl[3];
 
-	virtual DECLARE_READ8_MEMBER(extintrf_790x_r);
-	virtual DECLARE_WRITE8_MEMBER(extintrf_790x_w);
+	virtual uint8_t extintrf_790x_r(offs_t offset);
+	virtual void extintrf_790x_w(offs_t offset, uint8_t data);
 
 	// additional SuperXaviX / XaviX2002 stuff
 	uint8_t m_sx_extended_extbus[3];
 
-	DECLARE_WRITE8_MEMBER(extended_extbus_reg0_w);
-	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
-	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
+	void extended_extbus_reg0_w(uint8_t data);
+	void extended_extbus_reg1_w(uint8_t data);
+	void extended_extbus_reg2_w(uint8_t data);
 };
 
 class xavix_guru_state : public xavix_state
@@ -592,7 +592,7 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
+	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
 
@@ -608,10 +608,10 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(sdb_anport0_r) { return m_mouse0x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport2_r) { return m_mouse1x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport3_r) { return m_mouse1y->read()^0x7f; }
+	uint8_t sdb_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t sdb_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t sdb_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t sdb_anport3_r() { return m_mouse1y->read()^0x7f; }
 
 };
 
@@ -666,10 +666,10 @@ private:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 private:
-	DECLARE_READ8_MEMBER(tam_anport0_r) { return m_mouse0x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport2_r) { return m_mouse1x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport3_r) { return m_mouse1y->read()^0x7f; }
+	uint8_t tam_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t tam_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t tam_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
 
@@ -683,12 +683,12 @@ public:
 	void xavix2002_i2c_jmat(machine_config &config);
 
 private:
-	READ8_MEMBER(read_extended_io0);
-	READ8_MEMBER(read_extended_io1);
-	READ8_MEMBER(read_extended_io2);
-	WRITE8_MEMBER(write_extended_io0);
-	WRITE8_MEMBER(write_extended_io1);
-	WRITE8_MEMBER(write_extended_io2);
+	uint8_t read_extended_io0();
+	uint8_t read_extended_io1();
+	uint8_t read_extended_io2();
+	void write_extended_io0(uint8_t data);
+	void write_extended_io1(uint8_t data);
+	void write_extended_io2(uint8_t data);
 };
 
 
@@ -781,7 +781,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -805,7 +805,7 @@ protected:
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->read_cart(*m_cpuspace, offset);
+				return m_cartslot->read_cart(offset);
 			}
 			else
 			{
@@ -815,19 +815,19 @@ protected:
 	}
 
 	// TODO, use callbacks?
-	virtual DECLARE_READ8_MEMBER(extintrf_790x_r) override
+	virtual uint8_t extintrf_790x_r(offs_t offset) override
 	{
-		return xavix_state::extintrf_790x_r(space,offset,mem_mask);
+		return xavix_state::extintrf_790x_r(offset);
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(extintrf_790x_w) override
+	virtual void extintrf_790x_w(offs_t offset, uint8_t data) override
 	{
-		xavix_state::extintrf_790x_w(space,offset,data, mem_mask);
+		xavix_state::extintrf_790x_w(offset,data);
 
 		if (offset < 3)
 		{
 			if (m_cartslot->has_cart())
-				m_cartslot->write_bus_control(space,offset,data,mem_mask);
+				m_cartslot->write_bus_control(offset,data);
 		}
 	};
 
@@ -836,7 +836,7 @@ protected:
 		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
 		{
 			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
-			return m_cartslot->read_extra(*m_cpuspace, offset);
+			return m_cartslot->read_extra(offset);
 		}
 		else
 		{
@@ -848,7 +848,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -862,13 +862,13 @@ protected:
 		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
 		{
 			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
-			return m_cartslot->write_extra(*m_cpuspace, offset, data);
+			return m_cartslot->write_extra(offset, data);
 		}
 		else
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->write_cart(*m_cpuspace, offset, data);
+				return m_cartslot->write_cart(offset, data);
 			}
 			else
 			{
@@ -891,7 +891,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -911,7 +911,7 @@ protected:
 				{
 					if (m_cartslot->has_cart())
 					{
-						return m_cartslot->read_cart(*m_cpuspace, offset);
+						return m_cartslot->read_cart(offset);
 					}
 					else
 					{
@@ -978,8 +978,8 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 private:
-	DECLARE_READ8_MEMBER(popira2_adc0_r);
-	DECLARE_READ8_MEMBER(popira2_adc1_r);
+	uint8_t popira2_adc0_r();
+	uint8_t popira2_adc1_r();
 
 	required_ioport m_p2;
 };

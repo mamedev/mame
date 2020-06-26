@@ -47,8 +47,8 @@ public:
 	void zapcomp(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(display_7seg_w);
+	uint8_t keyboard_r();
+	void display_7seg_w(offs_t offset, uint8_t data);
 
 	void zapcomp_io(address_map &map);
 	void zapcomp_mem(address_map &map);
@@ -77,7 +77,7 @@ uint8_t zapcomp_state::decode7seg(uint8_t data)
 	return bitswap<8>(patterns[data & 0x0F], 7, 3, 4, 2, 1, 0, 6, 5);
 }
 
-WRITE8_MEMBER( zapcomp_state::display_7seg_w )
+void zapcomp_state::display_7seg_w(offs_t offset, uint8_t data)
 {
 	//Port 0x05 : address HI
 	//Port 0x06 : address LOW
@@ -86,7 +86,7 @@ WRITE8_MEMBER( zapcomp_state::display_7seg_w )
 	m_digits[offset*2+1] = decode7seg(data);
 }
 
-READ8_MEMBER( zapcomp_state::keyboard_r )
+uint8_t zapcomp_state::keyboard_r()
 {
 	uint8_t retval = 0x00;
 	uint8_t special = ioport("X1")->read();

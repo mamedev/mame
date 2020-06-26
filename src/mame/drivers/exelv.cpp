@@ -69,6 +69,9 @@ TODO:
 #include "softlist.h"
 #include "speaker.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 class exelv_state : public driver_device
 {
@@ -90,8 +93,8 @@ private:
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
 
-	DECLARE_READ8_MEMBER( mailbox_wx319_r );
-	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
+	uint8_t mailbox_wx319_r();
+	void mailbox_wx318_w(uint8_t data);
 	uint8_t tms7020_porta_r();
 	void tms7020_portb_w(uint8_t data);
 	uint8_t tms7041_porta_r();
@@ -100,7 +103,7 @@ private:
 	void tms7041_portc_w(uint8_t data);
 	uint8_t tms7041_portd_r();
 	void tms7041_portd_w(uint8_t data);
-	DECLARE_READ8_MEMBER( rom_r );
+	uint8_t rom_r(offs_t offset);
 
 	DECLARE_MACHINE_START(exl100);
 	DECLARE_MACHINE_START(exeltel);
@@ -206,16 +209,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
 */
 
 
-READ8_MEMBER(exelv_state::mailbox_wx319_r)
+uint8_t exelv_state::mailbox_wx319_r()
 {
-	logerror("[TMS7220] reading mailbox %d\n", m_wx319);
+	LOG("[TMS7220] reading mailbox %d\n", m_wx319);
 	return m_wx319;
 }
 
 
-WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
+void exelv_state::mailbox_wx318_w(uint8_t data)
 {
-	logerror("wx318 write 0x%02x\n", data);
+	LOG("wx318 write 0x%02x\n", data);
 	m_wx318 = data;
 }
 
@@ -233,7 +236,7 @@ WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
 */
 uint8_t exelv_state::tms7020_porta_r()
 {
-	logerror("tms7020_porta_r\n");
+	LOG("tms7020_porta_r\n");
 	return ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
 }
 
@@ -251,7 +254,7 @@ uint8_t exelv_state::tms7020_porta_r()
 */
 void exelv_state::tms7020_portb_w(uint8_t data)
 {
-	logerror("tms7020_portb_w: data = 0x%02x\n", data);
+	LOG("tms7020_portb_w: data = 0x%02x\n", data);
 	m_tms7020_portb = data;
 }
 
@@ -283,7 +286,7 @@ uint8_t exelv_state::tms7041_porta_r()
 	// SERIAL PORT
 
 	if (data!=data_last) {
-		logerror("tms7041_porta_r %x\n",data);
+		LOG("tms7041_porta_r %x\n",data);
 	}
 	data_last=data;
 
@@ -304,18 +307,18 @@ uint8_t exelv_state::tms7041_porta_r()
 */
 void exelv_state::tms7041_portb_w(uint8_t data)
 {
-	logerror("tms7041_portb_w: data = 0x%02x\n", data);
+	LOG("tms7041_portb_w: data = 0x%02x\n", data);
 
 	m_tms5220c->wsq_w((data & 0x01) ? 1 : 0);
 	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
 
-	logerror("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
+	LOG("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
 	m_maincpu->set_input_line(TMS7000_INT1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
 	if (!(m_tms7041_portb & 0x40) && (data & 0x40))
 	{
-		logerror("wx319 write 0x%02x\n", m_tms7041_portc);
+		LOG("wx319 write 0x%02x\n", m_tms7041_portc);
 		m_wx319 = m_tms7041_portc;
 	}
 
@@ -329,7 +332,7 @@ void exelv_state::tms7041_portb_w(uint8_t data)
 uint8_t exelv_state::tms7041_portc_r()
 {
 	uint8_t data = 0xff;
-	logerror("tms7041_portc_r\n");
+	LOG("tms7041_portc_r\n");
 
 	/* Check if wx318 output is enabled */
 	if (!(m_tms7041_portb & 0x20))
@@ -341,7 +344,7 @@ uint8_t exelv_state::tms7041_portc_r()
 
 void exelv_state::tms7041_portc_w(uint8_t data)
 {
-	logerror("tms7041_portc_w: data = 0x%02x\n", data);
+	LOG("tms7041_portc_w: data = 0x%02x\n", data);
 	m_tms7041_portc = data;
 }
 
@@ -360,14 +363,14 @@ void exelv_state::tms7041_portc_w(uint8_t data)
 uint8_t exelv_state::tms7041_portd_r()
 {
 	uint8_t data = m_tms5220c->status_r();
-	logerror("tms7041_portd_r: data = 0x%02x\n", data);
+	LOG("tms7041_portd_r: data = 0x%02x\n", data);
 	return data;
 }
 
 
 void exelv_state::tms7041_portd_w(uint8_t data)
 {
-	logerror("tms7041_portd_w: data = 0x%02x\n", data);
+	LOG("tms7041_portd_w: data = 0x%02x\n", data);
 
 	m_tms5220c->data_w(data);
 	m_tms7041_portd = data;
@@ -377,7 +380,7 @@ void exelv_state::tms7041_portd_w(uint8_t data)
 /*
     CARTRIDGE ACCESS
 */
-READ8_MEMBER(exelv_state::rom_r)
+uint8_t exelv_state::rom_r(offs_t offset)
 {
 	if (m_cart && m_cart->exists())
 		return m_cart->read_rom(offset + 0x200);
@@ -417,8 +420,8 @@ void exelv_state::tms7020_mem(address_map &map)
 	map(0x0124, 0x0124).r(m_tms3556, FUNC(tms3556_device::vram_r));
 	map(0x0125, 0x0125).r(m_tms3556, FUNC(tms3556_device::reg_r));
 	map(0x0128, 0x0128).r(m_tms3556, FUNC(tms3556_device::initptr_r));
-	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
-	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
+	map(0x012d, 0x012d).nopr().w(m_tms3556, FUNC(tms3556_device::reg_w));
+	map(0x012e, 0x012e).nopr().w(m_tms3556, FUNC(tms3556_device::vram_w));
 
 	map(0x0130, 0x0130).rw(FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
 	map(0x0200, 0x7fff).r(FUNC(exelv_state::rom_r));
@@ -434,8 +437,8 @@ void exelv_state::tms7040_mem(address_map &map)
 	map(0x0124, 0x0124).r(m_tms3556, FUNC(tms3556_device::vram_r));
 	map(0x0125, 0x0125).r(m_tms3556, FUNC(tms3556_device::reg_r));
 	map(0x0128, 0x0128).r(m_tms3556, FUNC(tms3556_device::initptr_r));
-	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
-	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
+	map(0x012d, 0x012d).nopr().w(m_tms3556, FUNC(tms3556_device::reg_w));
+	map(0x012e, 0x012e).nopr().w(m_tms3556, FUNC(tms3556_device::vram_w));
 	map(0x0130, 0x0130).rw(FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
 	map(0x0200, 0x7fff).bankr("bank1");                                /* system ROM */
 	map(0x8000, 0xbfff).noprw();

@@ -72,15 +72,15 @@ public:
 	void init_slampic();
 
 protected:
-	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
+	void dinopic_layer_w(offs_t offset, uint16_t data);
 
 private:
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(slampic);
 
-	DECLARE_WRITE16_MEMBER(punipic_layer_w);
-	DECLARE_WRITE16_MEMBER(slampic_layer_w);
-	DECLARE_WRITE16_MEMBER(slampic_layer2_w);
+	void punipic_layer_w(offs_t offset, uint16_t data);
+	void slampic_layer_w(offs_t offset, uint16_t data);
+	void slampic_layer2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void punipic_map(address_map &map);
 	void slampic_map(address_map &map);
@@ -98,9 +98,9 @@ public:
 
 private:
 	DECLARE_MACHINE_START(slampic2);
-	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
-	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
-	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
+	uint16_t slampic2_cps_a_r(offs_t offset);
+	void slampic2_sound_w(uint16_t data);
+	void slampic2_sound2_w(uint16_t data);
 	void slampic2_map(address_map &map);
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
@@ -115,7 +115,7 @@ public:
 	void dinopic(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
+	void dinopic_layer2_w(uint16_t data);
 	DECLARE_MACHINE_START(dinopic);
 	void dinopic_map(address_map &map);
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -132,15 +132,15 @@ public:
 	void init_wofpic();
 
 private:
-	DECLARE_WRITE16_MEMBER(wofpic_layer_w);
-	DECLARE_WRITE16_MEMBER(wofpic_layer2_w);
-	DECLARE_WRITE16_MEMBER(wofpic_spr_base_w);
+	void wofpic_layer_w(offs_t offset, uint16_t data);
+	void wofpic_layer2_w(uint16_t data);
+	void wofpic_spr_base_w(uint16_t data);
 	DECLARE_MACHINE_START(wofpic);
 	void wofpic_map(address_map &map);
 };
 
 
-WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer_w)
+void cps1bl_pic_state::dinopic_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -168,12 +168,12 @@ WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(dinopic_state::dinopic_layer2_w)
+void dinopic_state::dinopic_layer2_w(uint16_t data)
 {
 	m_cps_a_regs[0x06 / 2] = data;
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::punipic_layer_w)
+void cps1bl_pic_state::punipic_layer_w(offs_t offset, uint16_t data)
 {
 	m_cps_a_regs[0x08/2] = 0;
 
@@ -224,7 +224,7 @@ WRITE16_MEMBER(cps1bl_pic_state::punipic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::slampic_layer_w)
+void cps1bl_pic_state::slampic_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -234,7 +234,7 @@ WRITE16_MEMBER(cps1bl_pic_state::slampic_layer_w)
 	case 0x03:
 	case 0x04:
 	case 0x05:
-		dinopic_layer_w(space, offset, data);
+		dinopic_layer_w(offset, data);
 		break;
 	case 0x06: // scroll 2 base
 		m_cps_a_regs[0x04/2] = data << 4;
@@ -242,7 +242,7 @@ WRITE16_MEMBER(cps1bl_pic_state::slampic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::slampic_layer2_w)
+void cps1bl_pic_state::slampic_layer2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cps_a_regs[offset]);
 
@@ -256,7 +256,7 @@ WRITE16_MEMBER(cps1bl_pic_state::slampic_layer2_w)
 	}
 }
 
-READ16_MEMBER(slampic2_state::slampic2_cps_a_r)
+uint16_t slampic2_state::slampic2_cps_a_r(offs_t offset)
 {
 	// checks bit 0 of 800132
 	// no sound codes are sent unless this returns true, ready signal from the sound PIC?
@@ -267,17 +267,17 @@ READ16_MEMBER(slampic2_state::slampic2_cps_a_r)
 	return 0;
 }
 
-WRITE16_MEMBER(slampic2_state::slampic2_sound_w)
+void slampic2_state::slampic2_sound_w(uint16_t data)
 {
 	//logerror("Sound command: %04x\n", data);
 }
 
-WRITE16_MEMBER(slampic2_state::slampic2_sound2_w)
+void slampic2_state::slampic2_sound2_w(uint16_t data)
 {
 	//logerror("Sound2 command: %04x\n", data);
 }
 
-WRITE16_MEMBER(wofpic_state::wofpic_layer_w)
+void wofpic_state::wofpic_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -384,12 +384,12 @@ WRITE16_MEMBER(wofpic_state::wofpic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(wofpic_state::wofpic_layer2_w)
+void wofpic_state::wofpic_layer2_w(uint16_t data)
 {
 	m_cps_a_regs[0x06 / 2] = data;
 }
 
-WRITE16_MEMBER(wofpic_state::wofpic_spr_base_w)
+void wofpic_state::wofpic_spr_base_w(uint16_t data)
 {
 	m_sprite_base = data ? 0x3000 : 0x1000;
 }
@@ -770,7 +770,7 @@ void wofpic_state::init_wofpic()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16_delegate(*this, FUNC(wofpic_state::wofpic_spr_base_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16smo_delegate(*this, FUNC(wofpic_state::wofpic_spr_base_w)));
 	init_cps1();
 }
 

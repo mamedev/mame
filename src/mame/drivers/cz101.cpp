@@ -60,11 +60,11 @@ private:
 	void port_b_w(uint8_t data);
 	void port_c_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(led_1_w);
-	DECLARE_WRITE8_MEMBER(led_2_w);
-	DECLARE_WRITE8_MEMBER(led_3_w);
-	DECLARE_WRITE8_MEMBER(led_4_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void led_1_w(uint8_t data);
+	void led_2_w(uint8_t data);
+	void led_3_w(uint8_t data);
+	void led_4_w(uint8_t data);
+	uint8_t keys_r();
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
@@ -262,7 +262,7 @@ HD44780_PIXEL_UPDATE( cz101_state::lcd_pixel_update )
 		bitmap.pix16(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
-WRITE8_MEMBER( cz101_state::led_4_w )
+void cz101_state::led_4_w(uint8_t data)
 {
 	output().set_value("led_0", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_1", BIT(data, 6) ? 0 : 1);
@@ -274,7 +274,7 @@ WRITE8_MEMBER( cz101_state::led_4_w )
 	output().set_value("led_7", BIT(data, 0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( cz101_state::led_3_w )
+void cz101_state::led_3_w(uint8_t data)
 {
 	output().set_value("led_8", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_9", BIT(data, 6) ? 0 : 1);
@@ -286,7 +286,7 @@ WRITE8_MEMBER( cz101_state::led_3_w )
 	output().set_value("led_15", BIT(data, 0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( cz101_state::led_2_w )
+void cz101_state::led_2_w(uint8_t data)
 {
 	output().set_value("led_16", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_17", BIT(data, 6) ? 0 : 1);
@@ -298,7 +298,7 @@ WRITE8_MEMBER( cz101_state::led_2_w )
 	output().set_value("led_23", BIT(data, 0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( cz101_state::led_1_w )
+void cz101_state::led_1_w(uint8_t data)
 {
 	output().set_value("led_24", BIT(data, 7) ? 0 : 1);
 	output().set_value("led_25", BIT(data, 6) ? 0 : 1);
@@ -310,7 +310,7 @@ WRITE8_MEMBER( cz101_state::led_1_w )
 	output().set_value("led_31", BIT(data, 0) ? 0 : 1);
 }
 
-READ8_MEMBER( cz101_state::keys_r )
+uint8_t cz101_state::keys_r()
 {
 	return m_keys[m_port_b & 0x0f]->read();
 }

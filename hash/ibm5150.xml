@@ -443,6 +443,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1049469">
+				<rom name="centipede.mfm" size="1011265" crc="29332053" sha1="d34519a6cd21ac50ada1d78b28be138e77128635"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centipedc" cloneof="centiped">
+		<description>Centipede (cracked)</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="centipede.img" size="163840" crc="fed8d765" sha1="06fa7489e6cab340fc3af554f8f0f244e8833c3e"/>
 			</dataarea>
@@ -803,38 +815,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="eyehorus">
-		<description>Eye of Horus</description>
-		<year>1989</year>
-		<publisher>Fanfare</publisher>
-		<info name="developer" value="Denton Designs" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 1 of 5].img" size="368640" crc="43110255" sha1="bb23967a4a4186a54376a46087c108a76ae3ac8a"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 2 of 5].img" size="368640" crc="8e2e7ca3" sha1="65949b63fb314a7181586d3aea0a6be292765168"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 3 of 5].img" size="368640" crc="16f0aa40" sha1="e8d387ad8c4dbdbde19801cf1d72ad8a16318133"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 4 of 5].img" size="368640" crc="fac37d18" sha1="9d942766c74f57e194e7377b2ad1d31678b48af7"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 5 of 5].img" size="368640" crc="59fb1548" sha1="7dcc454402c154f70a18d1dd53a0920cd0215fac"/>
-			</dataarea>
-		</part>
-	</software>
-	
 	<software name="f15se">
 		<description>F-15 Strike Eagle (CGA/Tandy/EGA/Amstrad, 3.5")</description>
 		<year>1985</year>
@@ -1660,6 +1640,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="551161">
+				<rom name="mspacman.mfm" size="550459" crc="1cc9488e" sha1="4fc2751e7a77ac9a8ccad888109246492617806c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspacmanc" cloneof="mspacman">
+		<description>Ms. Pac-Man (cracked)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
@@ -7468,6 +7460,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="spidermn">
+		<description>The Amazing Spider-Man</description>
+		<year>1990</year>
+		<publisher>Paragon Software</publisher>
+		<info name="developer" value="Oxford Digital" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Amazing Spider-Man [Paragon Software] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="ebc34334" sha1="b929a4e2bc3b4178e245ba77bc4ca95bbb1011dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Amazing Spider-Man [Paragon Software] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="a259af07" sha1="9f2a6b71982cd8d0bc8da1e64290bcac3032c3c1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aaow">
 		<description>The Ancient Art of War</description>
 		<year>1984</year>
@@ -8800,6 +8809,38 @@ has been replaced with an all-zero block. -->
 			<dataarea name="flop" size = "737280">
 				<!-- modified with chklist.ms file -->
 				<rom name="Empire.dsk" size="737280" crc="35b1cdd8" sha1="a99415fb5597197efcfde2a2fd54fa1326e48065" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyehorus">
+		<description>Eye of Horus</description>
+		<year>1989</year>
+		<publisher>Fanfare</publisher>
+		<info name="developer" value="Denton Designs" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye of Horus [FanFare] [1989] [5.25DD] [Disk 1 of 5].img" size="368640" crc="43110255" sha1="bb23967a4a4186a54376a46087c108a76ae3ac8a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye of Horus [FanFare] [1989] [5.25DD] [Disk 2 of 5].img" size="368640" crc="8e2e7ca3" sha1="65949b63fb314a7181586d3aea0a6be292765168"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye of Horus [FanFare] [1989] [5.25DD] [Disk 3 of 5].img" size="368640" crc="16f0aa40" sha1="e8d387ad8c4dbdbde19801cf1d72ad8a16318133"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye of Horus [FanFare] [1989] [5.25DD] [Disk 4 of 5].img" size="368640" crc="fac37d18" sha1="9d942766c74f57e194e7377b2ad1d31678b48af7"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye of Horus [FanFare] [1989] [5.25DD] [Disk 5 of 5].img" size="368640" crc="59fb1548" sha1="7dcc454402c154f70a18d1dd53a0920cd0215fac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11809,24 +11850,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="simlife">
-		<description>SimLife</description>
-		<year>1992</year>
-		<publisher>Maxis Software</publisher>
-		<info name="developer" value="Maxis Software" />
-		<info name="version" value="1.00" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="SimLife (USA) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="2565bba0" sha1="121122ec26a856272259cecf37322118911fc9b6"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="SimLife (USA) [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="7f61828f" sha1="459a4b9d0dc9bdd100d056c45e49f648777668a8"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bartvssm">
 		<description>The Simpsons - Bart vs. the Space Mutants</description>
 		<year>1991</year>
@@ -12587,6 +12610,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wings of Fury (1989)(Broderbund Software).dsk" size="737280" crc="6bd8681a" sha1="43d1e493afb80b25949c5208cd1f7085b40529ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- hangs at black screen -->
+	<software name="wizzardz" supported="no">
+		<description>Wizzardz &amp; War Lordz</description>
+		<year>1985</year>
+		<publisher>Ram-Tek</publisher>
+		<info name="developer" value="James R. Martin" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "304146">
+				<rom name="wizzard.imd" size="304146" crc="05215c36" sha1="05b0fb2dd5ceae97fde46a071da06393e4803cd8"/>
 			</dataarea>
 		</part>
 	</software>

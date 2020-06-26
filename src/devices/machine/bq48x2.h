@@ -13,9 +13,13 @@
 
 #pragma once
 
+#include "dirtc.h"
+
 // ======================> bq48x2_device
 
-class bq48x2_device : public device_t, public device_nvram_interface
+class bq48x2_device : public device_t,
+					  public device_nvram_interface,
+					  public device_rtc_interface
 {
 public:
 	auto interrupt_cb() { return m_interrupt_cb.bind(); }
@@ -60,11 +64,14 @@ protected:
 	void set_watchdog_timer();
 
 private:
+	// Inherited from device_rtc_interface
+	void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	bool rtc_feature_y2k()  const override { return false; }
+	bool rtc_feature_leap_year() const override { return true; }
+	bool rtc_battery_backed() const override { return true; }
+
 	// Sanity-check BCD number
 	bool valid_bcd(uint8_t value, uint8_t min, uint8_t max);
-
-	// Convert to BCD
-	uint8_t to_bcd(uint8_t value);
 
 	// Increment BCD number
 	bool increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min);
@@ -84,6 +91,9 @@ private:
 	// Check bits in register
 	bool is_set(int number, uint8_t flag);
 
+	// Advance
+	void advance_days_bcd();
+
 	// Copy register contents from the internal registers to SRAM or back
 	void transfer_to_int();
 	void transfer_to_access();
@@ -99,9 +109,6 @@ private:
 
 	// Set timers
 	void set_periodic_timer();
-
-	// Get time from system
-	void get_system_time();
 
 	// Get the delay until the next second
 	int get_delay();

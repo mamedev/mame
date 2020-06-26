@@ -27,7 +27,7 @@
 
 /***************************************************************************/
 
-WRITE8_MEMBER(pcktgal_state::bank_w)
+void pcktgal_state::bank_w(uint8_t data)
 {
 	if (data & 1) { membank("bank1")->set_entry(0); }
 	else { membank("bank1")->set_entry(1); }
@@ -36,13 +36,13 @@ WRITE8_MEMBER(pcktgal_state::bank_w)
 	else { membank("bank2")->set_entry(1); }
 }
 
-WRITE8_MEMBER(pcktgal_state::sound_bank_w)
+void pcktgal_state::sound_bank_w(uint8_t data)
 {
 	membank("bank3")->set_entry((data >> 2) & 1);
 	m_msm->reset_w((data & 2) >> 1);
 }
 
-WRITE8_MEMBER(pcktgal_state::sound_w)
+void pcktgal_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -59,12 +59,12 @@ WRITE_LINE_MEMBER(pcktgal_state::adpcm_int)
 		m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(pcktgal_state::adpcm_data_w)
+void pcktgal_state::adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(pcktgal_state::sound_unk_r)
+uint8_t pcktgal_state::sound_unk_r()
 {
 	// POST only? Unknown purpose
 //  m_msm->reset_w(0);

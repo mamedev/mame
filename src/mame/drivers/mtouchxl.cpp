@@ -77,10 +77,10 @@ private:
 	optional_device<ds1205_device> m_multikey;
 	void machine_start() override;
 	void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(coin_r);
+	uint8_t coin_r();
+	void bank_w(uint8_t data);
+	uint8_t key_r();
+	void key_w(uint8_t data);
 	static void cdrom(device_t *device);
 	static void hdd(device_t *device);
 	void at32_io(address_map &map);
@@ -88,22 +88,22 @@ private:
 	void dbank_map(address_map &map);
 };
 
-WRITE8_MEMBER(mtxl_state::bank_w)
+void mtxl_state::bank_w(uint8_t data)
 {
 	m_iocard->set_bank(data & 0x1f);
 }
 
-READ8_MEMBER(mtxl_state::key_r)
+uint8_t mtxl_state::key_r()
 {
 	return m_multikey->read_dq() ? 0xff : 0xdf;
 }
 
-READ8_MEMBER(mtxl_state::coin_r)
+uint8_t mtxl_state::coin_r()
 {
 	return ioport("Coin")->read();
 }
 
-WRITE8_MEMBER(mtxl_state::key_w)
+void mtxl_state::key_w(uint8_t data)
 {
 	m_multikey->write_rst((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_multikey->write_clk((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);

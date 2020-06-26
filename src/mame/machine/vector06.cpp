@@ -59,7 +59,7 @@ void vector06_state::vector06_8255_portb_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( vector06_state::vector06_color_set )
+void vector06_state::vector06_color_set(uint8_t data)
 {
 	uint8_t r = (data & 7) << 5;
 	uint8_t g = ((data >> 3) & 7) << 5;
@@ -124,7 +124,7 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 	}
 }
 
-WRITE8_MEMBER( vector06_state::vector06_disc_w )
+void vector06_state::vector06_disc_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -165,7 +165,7 @@ void vector06_state::update_mem()
 	}
 }
 
-WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
+void vector06_state::vector06_ramdisk_w(uint8_t data)
 {
 	const uint8_t oldbank = m_rambank;
 	m_rambank = data;

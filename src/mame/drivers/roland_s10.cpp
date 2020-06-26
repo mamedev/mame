@@ -11,6 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "audio/bu3905.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8251.h"
@@ -66,6 +67,7 @@ class roland_s220_state : public roland_s10_state
 public:
 	roland_s220_state(const machine_config &mconfig, device_type type, const char *tag)
 		: roland_s10_state(mconfig, type, tag)
+		, m_outctrl(*this, "outctrl")
 	{
 	}
 
@@ -80,6 +82,8 @@ private:
 	void led_latch2_w(u8 data);
 
 	void s220_ext_map(address_map &map);
+
+	required_device<bu3905_device> m_outctrl;
 };
 
 
@@ -136,6 +140,7 @@ void roland_s10_state::led_latch_w(u8 data)
 
 void roland_s220_state::output_control_w(offs_t offset, u8 data)
 {
+	m_outctrl->write(offset, data & 0x0f);
 }
 
 void roland_s220_state::vca_cv_w(offs_t offset, u8 data)
@@ -276,6 +281,8 @@ void roland_s220_state::s220(machine_config &config)
 	subdevice<screen_device>("screen")->set_size(6*16, 8*2);
 	subdevice<screen_device>("screen")->set_visarea_full();
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s220_state::lcd_pixel_update));
+
+	BU3905(config, m_outctrl);
 }
 
 

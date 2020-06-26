@@ -2489,13 +2489,13 @@ CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
 // the spritey low bits are mapped to 1 in every 4 bytes here as if it were a 32-bit bus..which is weird
 // other ram is similar..
 
-WRITE16_MEMBER(setaroul_state::spritecode_w)
+void setaroul_state::spritecode_w(offs_t offset, u16 data)
 {
 	if ((offset & 1) == 1) m_seta001->spritecodelow_w8(offset >> 1, (data & 0xff00) >> 8);
 	if ((offset & 1) == 0) m_seta001->spritecodehigh_w8(offset >> 1, (data & 0xff00) >> 8);
 }
 
-READ16_MEMBER(setaroul_state::spritecode_r)
+u16 setaroul_state::spritecode_r(offs_t offset)
 {
 	u16 ret;
 	if ((offset & 1) == 1)
@@ -2505,18 +2505,18 @@ READ16_MEMBER(setaroul_state::spritecode_r)
 	return ret << 8;
 }
 
-WRITE16_MEMBER(setaroul_state::spriteylow_w)
+void setaroul_state::spriteylow_w(offs_t offset, u16 data)
 {
 	if ((offset & 1) == 0) m_seta001->spriteylow_w8(offset >> 1, (data & 0xff00) >> 8);
 }
 
-WRITE16_MEMBER(setaroul_state::spritectrl_w)
+void setaroul_state::spritectrl_w(offs_t offset, u16 data)
 {
 	if ((offset & 1) == 0) m_seta001->spritectrl_w8(offset >> 1, (data & 0xff00) >> 8);
 }
 
 // RTC (To do: write a D4911C device)
-READ16_MEMBER(setaroul_state::rtc_r)
+u16 setaroul_state::rtc_r(offs_t offset)
 {
 	if (offset >= 7)
 		++offset;
@@ -2525,7 +2525,7 @@ READ16_MEMBER(setaroul_state::rtc_r)
 	return (m_rtc->read(offset / 2) >> ((offset & 1) * 4)) & 0xf;
 }
 
-WRITE16_MEMBER(setaroul_state::rtc_w)
+void setaroul_state::rtc_w(u16 data)
 {
 }
 
@@ -3194,7 +3194,7 @@ void seta_state::crazyfgt_map(address_map &map)
 ***************************************************************************/
 
 // RTC (To do: write a D4911C device)
-READ16_MEMBER(jockeyc_state::rtc_r)
+u16 jockeyc_state::rtc_r(offs_t offset)
 {
 	if (offset >= 7)
 		++offset;
@@ -3203,7 +3203,7 @@ READ16_MEMBER(jockeyc_state::rtc_r)
 	return (m_rtc->read(offset / 2) >> ((offset & 1) * 4)) & 0xf;
 }
 
-WRITE16_MEMBER(jockeyc_state::rtc_w)
+void jockeyc_state::rtc_w(u16 data)
 {
 }
 
@@ -11853,7 +11853,7 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
-READ16_MEMBER(seta_state::twineagl_debug_r)
+u16 seta_state::twineagl_debug_r()
 {
 	/*  At several points in the code, the program checks if four
 	    consecutive bytes in this range are equal to a string, and if they
@@ -11900,13 +11900,13 @@ void seta_state::init_bank6502()
 
 /* Extra RAM ? Check code at 0x00ba90 */
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
-READ16_MEMBER(seta_state::twineagl_200100_r)
+u16 seta_state::twineagl_200100_r(offs_t offset)
 {
 	// protection check at boot
 	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(), offset);
 	return m_twineagl_xram[offset];
 }
-WRITE16_MEMBER(seta_state::twineagl_200100_w)
+void seta_state::twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(), offset,data);
 
@@ -11920,15 +11920,16 @@ void seta_state::init_twineagl()
 {
 	init_bank6502();
 	/* debug? */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(*this, FUNC(seta_state::twineagl_debug_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16smo_delegate(*this, FUNC(seta_state::twineagl_debug_r)));
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200100, 0x20010f, read16_delegate(*this, FUNC(seta_state::twineagl_200100_r)), write16_delegate(*this, FUNC(seta_state::twineagl_200100_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200100, 0x20010f, read16sm_delegate(*this, FUNC(seta_state::twineagl_200100_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200100, 0x20010f, write16s_delegate(*this, FUNC(seta_state::twineagl_200100_w)));
 }
 
 
 /* Protection? NVRAM is handled writing commands here */
-READ16_MEMBER(seta_state::downtown_protection_r)
+u16 seta_state::downtown_protection_r(offs_t offset)
 {
 	const int job = m_downtown_protection[0xf8/2] & 0xff;
 
@@ -11945,7 +11946,7 @@ READ16_MEMBER(seta_state::downtown_protection_r)
 	}
 }
 
-WRITE16_MEMBER(seta_state::downtown_protection_w)
+void seta_state::downtown_protection_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
@@ -11957,11 +11958,12 @@ void seta_state::init_downtown()
 	m_downtown_protection = make_unique_clear<u16[]>(0x200/2);
 	save_pointer(NAME(m_downtown_protection),0x200/2);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(*this, FUNC(seta_state::downtown_protection_r)), write16_delegate(*this, FUNC(seta_state::downtown_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2001ff, read16sm_delegate(*this, FUNC(seta_state::downtown_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x2001ff, write16s_delegate(*this, FUNC(seta_state::downtown_protection_w)));
 }
 
 
-READ16_MEMBER(seta_state::arbalest_debug_r)
+u16 seta_state::arbalest_debug_r()
 {
 	/*  At some points in the code, the program checks if four
 	    consecutive bytes in this range are equal to a string, and if they
@@ -11978,11 +11980,11 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 void seta_state::init_arbalest()
 {
 	init_bank6502();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(*this, FUNC(seta_state::arbalest_debug_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16smo_delegate(*this, FUNC(seta_state::arbalest_debug_r)));
 }
 
 
-READ16_MEMBER(seta_state::metafox_protection_r)
+u16 seta_state::metafox_protection_r(offs_t offset)
 {
 	// very simplified protection simulation
 	// 21c000-21c3ff, 21d000-21d3ff, and 21e000-21e3ff are tested as 8 bit reads/writes
@@ -12007,7 +12009,7 @@ READ16_MEMBER(seta_state::metafox_protection_r)
 void seta_state::init_metafox()
 {
 	init_bank6502();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(*this, FUNC(seta_state::metafox_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16sm_delegate(*this, FUNC(seta_state::metafox_protection_r)));
 }
 
 

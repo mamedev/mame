@@ -13,19 +13,19 @@
 namespace netlist
 {
 	template <typename T>
-	struct uptr : public unique_pool_ptr<T>
+	struct uptr : public device_arena::unique_ptr<T>
 	{
 		uptr() = default;
 
-		using base_type = unique_pool_ptr<T>;
+		using base_type = device_arena::unique_ptr<T>;
 
 		template<typename O, typename... Args>
 		uptr(O &owner, const pstring &name, Args&&... args)
-		: unique_pool_ptr<T>(owner.template make_object<T>(owner, name, std::forward<Args>(args)...))
+		: device_arena::unique_ptr<T>(owner.template make_pool_object<T>(owner, name, std::forward<Args>(args)...))
 		{ }
 
-		C14CONSTEXPR auto operator ()() noexcept -> decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
-		constexpr auto operator ()() const noexcept -> const decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
+		constexpr auto operator ()() noexcept -> decltype((*device_arena::unique_ptr<T>::get())()) { return (*this->get())(); }
+		constexpr auto operator ()() const noexcept -> const decltype((*device_arena::unique_ptr<T>::get())()) { return (*this->get())(); }
 	};
 
 	namespace devices
@@ -36,8 +36,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74125_base)
 		, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
-		, m_A(*this, "A", NETLIB_DELEGATE(74125_base, A))
-		, m_G(*this, pstring(D::invert_g::value ? "GQ" : "G"), NETLIB_DELEGATE(74125_base, G))
+		, m_A(*this, "A", NETLIB_DELEGATE(A))
+		, m_G(*this, pstring(D::invert_g::value ? "GQ" : "G"), NETLIB_DELEGATE(G))
 		, m_Y(*this, "Y", m_TE())
 		//, m_Y(*this, "Y")
 		, m_power_pins(*this)

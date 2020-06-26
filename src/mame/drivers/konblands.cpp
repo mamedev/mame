@@ -47,11 +47,10 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void konblands_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(ldp_r);
-	DECLARE_WRITE8_MEMBER(ldp_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(firq_enable_w);
+	uint8_t ldp_r();
+	void nmi_enable_w(uint8_t data);
+	void irq_enable_w(uint8_t data);
+	void firq_enable_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
@@ -122,27 +121,22 @@ uint32_t konblands_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-READ8_MEMBER(konblands_state::ldp_r)
+uint8_t konblands_state::ldp_r()
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(konblands_state::ldp_w)
-{
-	m_laserdisc->data_w(data);
-}
-
-WRITE8_MEMBER(konblands_state::nmi_enable_w)
+void konblands_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = bool(BIT(data,0));
 }
 
-WRITE8_MEMBER(konblands_state::irq_enable_w)
+void konblands_state::irq_enable_w(uint8_t data)
 {
 	m_irq_enable = bool(BIT(data,0));
 }
 
-WRITE8_MEMBER(konblands_state::firq_enable_w)
+void konblands_state::firq_enable_w(uint8_t data)
 {
 	m_firq_enable = bool(BIT(data,0));
 }
@@ -150,7 +144,7 @@ WRITE8_MEMBER(konblands_state::firq_enable_w)
 void konblands_state::konblands_map(address_map &map)
 {
 	map(0x0000, 0x0000).portr("DSW1").nopw(); // sn latch
-	map(0x0800, 0x0800).portr("DSW2").w(FUNC(konblands_state::ldp_w));
+	map(0x0800, 0x0800).portr("DSW2").w(m_laserdisc, FUNC(pioneer_ldv1000_device::data_w));
 	map(0x1000, 0x1000).nopw().r(FUNC(konblands_state::ldp_r)); // led
 	map(0x1001, 0x1001).nopw(); // coin counter 2
 	map(0x1002, 0x1002).nopw(); // coin counter 1
@@ -170,7 +164,7 @@ void konblands_state::konblands_map(address_map &map)
 void konblands_state::konblandsh_map(address_map &map)
 {
 	map(0x0000, 0x0000).r(FUNC(konblands_state::ldp_r));
-	map(0x0400, 0x0400).w(FUNC(konblands_state::ldp_w));
+	map(0x0400, 0x0400).w(m_laserdisc, FUNC(pioneer_ldv1000_device::data_w));
 	map(0x0802, 0x0802).nopw(); // led
 	map(0x0803, 0x0803).nopw(); // enable overlay transparency
 	map(0x0806, 0x0806).nopr().w(FUNC(konblands_state::irq_enable_w));

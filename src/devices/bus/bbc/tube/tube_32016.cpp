@@ -188,7 +188,7 @@ void bbc_tube_32016_device::host_w(offs_t offset, uint8_t data)
 }
 
 
-READ8_MEMBER(bbc_tube_32016_device::read)
+uint8_t bbc_tube_32016_device::read(offs_t offset)
 {
 	uint16_t data = 0xffff;
 
@@ -200,7 +200,7 @@ READ8_MEMBER(bbc_tube_32016_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_tube_32016_device::write)
+void bbc_tube_32016_device::write(offs_t offset, uint8_t data)
 {
 	/* clear ROM select on first write */
 	if (!machine().side_effects_disabled()) m_rom_enabled = false;

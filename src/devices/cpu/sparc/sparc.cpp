@@ -174,7 +174,7 @@ void sparc_base_device::device_start()
 		{
 			continue;
 		}
-		m_asi[i] = &space(i);
+		space(i).specific(m_asi[i]);
 	}
 
 	memset(m_dbgregs, 0, 24 * sizeof(uint32_t));
@@ -548,13 +548,13 @@ device_memory_interface::space_config_vector sparc_base_device::memory_space_con
 inline uint32_t sparc_base_device::read_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask)
 {
 	assert(asi < 0x10); // We do not currently support ASIs outside the range used by actual Sun machines.
-	return m_asi[asi | 0x10]->read_dword(address, mem_mask);
+	return m_asi[asi | 0x10].read_dword(address, mem_mask);
 }
 
 inline void sparc_base_device::write_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask)
 {
 	assert(asi < 0x10); // We do not currently support ASIs outside the range used by actual Sun machines.
-	return m_asi[asi | 0x10]->write_dword(address, data, mem_mask);
+	return m_asi[asi | 0x10].write_dword(address, data, mem_mask);
 }
 
 

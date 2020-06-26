@@ -5,7 +5,7 @@
 
 // parent class for final handlers which want an address base and a mask
 
-template<int Width, int AddrShift, int Endian> class handler_entry_read_address : public handler_entry_read<Width, AddrShift, Endian>
+template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_address : public handler_entry_read<Width, AddrShift, Endian>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
@@ -22,7 +22,7 @@ protected:
 	offs_t m_address_base, m_address_mask;
 };
 
-template<int Width, int AddrShift, int Endian> class handler_entry_write_address : public handler_entry_write<Width, AddrShift, Endian>
+template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_address : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;

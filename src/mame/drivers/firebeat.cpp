@@ -230,39 +230,39 @@ private:
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
-	DECLARE_READ32_MEMBER(input_r);
-	DECLARE_READ32_MEMBER(sensor_r );
+	uint32_t input_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t sensor_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
-	DECLARE_READ32_MEMBER(ata_command_r);
-	DECLARE_WRITE32_MEMBER(ata_command_w);
-	DECLARE_READ32_MEMBER(ata_control_r);
-	DECLARE_WRITE32_MEMBER(ata_control_w);
-//  DECLARE_READ32_MEMBER(comm_uart_r);
-//  DECLARE_WRITE32_MEMBER(comm_uart_w);
-	DECLARE_READ32_MEMBER(cabinet_r);
-	DECLARE_READ32_MEMBER(keyboard_wheel_r);
-	DECLARE_READ8_MEMBER(midi_uart_r);
-	DECLARE_WRITE8_MEMBER(midi_uart_w);
-	DECLARE_READ32_MEMBER(extend_board_irq_r);
-	DECLARE_WRITE32_MEMBER(extend_board_irq_w);
-	DECLARE_WRITE32_MEMBER(lamp_output_w);
-	DECLARE_WRITE32_MEMBER(lamp_output_kbm_w);
-	DECLARE_WRITE32_MEMBER(lamp_output_ppp_w);
-	DECLARE_WRITE32_MEMBER(lamp_output2_w);
-	DECLARE_WRITE32_MEMBER(lamp_output2_ppp_w);
-	DECLARE_WRITE32_MEMBER(lamp_output3_w);
-	DECLARE_WRITE32_MEMBER(lamp_output3_ppp_w);
-	DECLARE_READ16_MEMBER(spu_unk_r);
-	DECLARE_WRITE16_MEMBER(spu_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(spu_220000_w);
-	DECLARE_WRITE16_MEMBER(spu_sdram_bank_w);
+	uint32_t ata_command_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ata_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ata_control_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ata_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+//  uint32_t comm_uart_r(offs_t offset, uint32_t mem_mask = ~ 0);
+//  void comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cabinet_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t keyboard_wheel_r(offs_t offset);
+	uint8_t midi_uart_r(offs_t offset);
+	void midi_uart_w(offs_t offset, uint8_t data);
+	uint32_t extend_board_irq_r(offs_t offset, uint32_t mem_mask = ~0);
+	void extend_board_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t spu_unk_r();
+	void spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spu_220000_w(uint16_t data);
+	void spu_sdram_bank_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
 	void set_ibutton(uint8_t *data);
 	int ibutton_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(security_w);
-	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
+	void security_w(uint8_t data);
+	void init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3);
 	void init_firebeat();
 	void init_keyboard();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
@@ -292,7 +292,7 @@ uint32_t firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_
 
 /*****************************************************************************/
 
-READ32_MEMBER(firebeat_state::input_r)
+uint32_t firebeat_state::input_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -312,7 +312,7 @@ READ32_MEMBER(firebeat_state::input_r)
 	return r;
 }
 
-READ32_MEMBER(firebeat_state::sensor_r )
+uint32_t firebeat_state::sensor_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -329,7 +329,7 @@ READ32_MEMBER(firebeat_state::sensor_r )
 
 #define BYTESWAP16(x)   ((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
 
-READ32_MEMBER(firebeat_state::ata_command_r )
+uint32_t firebeat_state::ata_command_r(offs_t offset, uint32_t mem_mask)
 {
 	uint16_t r;
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
@@ -345,7 +345,7 @@ READ32_MEMBER(firebeat_state::ata_command_r )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::ata_command_w )
+void firebeat_state::ata_command_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("ata_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
@@ -360,7 +360,7 @@ WRITE32_MEMBER(firebeat_state::ata_command_w )
 }
 
 
-READ32_MEMBER(firebeat_state::ata_control_r )
+uint32_t firebeat_state::ata_control_r(offs_t offset, uint32_t mem_mask)
 {
 	uint16_t r;
 //  printf("ata_control_r: %08X, %08X\n", offset, mem_mask);
@@ -377,7 +377,7 @@ READ32_MEMBER(firebeat_state::ata_control_r )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::ata_control_w )
+void firebeat_state::ata_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -392,47 +392,47 @@ WRITE32_MEMBER(firebeat_state::ata_control_w )
 
 /*****************************************************************************/
 /*
-READ32_MEMBER(firebeat_state::comm_uart_r )
+uint32_t firebeat_state::comm_uart_r(offs_t offset, uint32_t mem_mask)
 {
     uint32_t r = 0;
 
     if (ACCESSING_BITS_24_31)
     {
-        r |= pc16552d_0_r(space, (offset*4)+0) << 24;
+        r |= pc16552d_0_r((offset*4)+0) << 24;
     }
     if (ACCESSING_BITS_16_23)
     {
-        r |= pc16552d_0_r(space, (offset*4)+1) << 16;
+        r |= pc16552d_0_r((offset*4)+1) << 16;
     }
     if (ACCESSING_BITS_8_15)
     {
-        r |= pc16552d_0_r(space, (offset*4)+2) << 8;
+        r |= pc16552d_0_r((offset*4)+2) << 8;
     }
     if (ACCESSING_BITS_0_7)
     {
-        r |= pc16552d_0_r(space, (offset*4)+3) << 0;
+        r |= pc16552d_0_r((offset*4)+3) << 0;
     }
 
     return r;
 }
 
-WRITE32_MEMBER(firebeat_state::comm_uart_w )
+void firebeat_state::comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
     if (ACCESSING_BITS_24_31)
     {
-        pc16552d_0_w(space, (offset*4)+0, (data >> 24) & 0xff);
+        pc16552d_0_w((offset*4)+0, (data >> 24) & 0xff);
     }
     if (ACCESSING_BITS_16_23)
     {
-        pc16552d_0_w(space, (offset*4)+1, (data >> 16) & 0xff);
+        pc16552d_0_w((offset*4)+1, (data >> 16) & 0xff);
     }
     if (ACCESSING_BITS_8_15)
     {
-        pc16552d_0_w(space, (offset*4)+2, (data >> 8) & 0xff);
+        pc16552d_0_w((offset*4)+2, (data >> 8) & 0xff);
     }
     if (ACCESSING_BITS_0_7)
     {
-        pc16552d_0_w(space, (offset*4)+3, (data >> 0) & 0xff);
+        pc16552d_0_w((offset*4)+3, (data >> 0) & 0xff);
     }
 }
 
@@ -449,7 +449,7 @@ static const int cab_data[2] = { 0x0, 0x8 };
 static const int kbm_cab_data[2] = { 0x2, 0x8 };
 static const int ppd_cab_data[2] = { 0x1, 0x9 };
 
-READ32_MEMBER(firebeat_state::cabinet_r )
+uint32_t firebeat_state::cabinet_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -472,7 +472,7 @@ READ32_MEMBER(firebeat_state::cabinet_r )
 
 /*****************************************************************************/
 
-READ32_MEMBER(firebeat_state::keyboard_wheel_r )
+uint32_t firebeat_state::keyboard_wheel_r(offs_t offset)
 {
 	if (offset == 0)        // Keyboard Wheel (P1)
 	{
@@ -486,12 +486,12 @@ READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 	return 0;
 }
 
-READ8_MEMBER(firebeat_state::midi_uart_r )
+uint8_t firebeat_state::midi_uart_r(offs_t offset)
 {
 	return m_duart_midi->read(offset >> 6);
 }
 
-WRITE8_MEMBER(firebeat_state::midi_uart_w )
+void firebeat_state::midi_uart_w(offs_t offset, uint8_t data)
 {
 	m_duart_midi->write(offset >> 6, data);
 }
@@ -599,7 +599,7 @@ TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 // 0x10: ?
 // 0x20: ?
 
-READ32_MEMBER(firebeat_state::extend_board_irq_r)
+uint32_t firebeat_state::extend_board_irq_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -611,7 +611,7 @@ READ32_MEMBER(firebeat_state::extend_board_irq_r)
 	return r;
 }
 
-WRITE32_MEMBER(firebeat_state::extend_board_irq_w )
+void firebeat_state::extend_board_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("extend_board_irq_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
@@ -625,7 +625,7 @@ WRITE32_MEMBER(firebeat_state::extend_board_irq_w )
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(firebeat_state::lamp_output_w )
+void firebeat_state::lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
 	if (ACCESSING_BITS_0_7)
@@ -643,9 +643,9 @@ WRITE32_MEMBER(firebeat_state::lamp_output_w )
 //  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output_kbm_w )
+void firebeat_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output_w(space, offset, data, mem_mask);
+	lamp_output_w(offset, data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -662,9 +662,9 @@ WRITE32_MEMBER(firebeat_state::lamp_output_kbm_w )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output_ppp_w )
+void firebeat_state::lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output_w(space, offset, data, mem_mask);
+	lamp_output_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00000100 Left
@@ -704,14 +704,14 @@ WRITE32_MEMBER(firebeat_state::lamp_output_ppp_w )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output2_w )
+void firebeat_state::lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("lamp_output2_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output2_ppp_w )
+void firebeat_state::lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output2_w(space, offset, data, mem_mask);
+	lamp_output2_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Top LED 0
@@ -738,14 +738,14 @@ WRITE32_MEMBER(firebeat_state::lamp_output2_ppp_w )
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output3_w )
+void firebeat_state::lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("lamp_output3_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
-WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
+void firebeat_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	lamp_output3_w(space, offset, data, mem_mask);
+	lamp_output3_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Lamp 0
@@ -776,7 +776,7 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
     IRQ6: ATA
 */
 
-READ16_MEMBER(firebeat_state::spu_unk_r)
+uint16_t firebeat_state::spu_unk_r()
 {
 	// dipswitches?
 
@@ -787,7 +787,7 @@ READ16_MEMBER(firebeat_state::spu_unk_r)
 	return r;
 }
 
-WRITE16_MEMBER(firebeat_state::spu_irq_ack_w)
+void firebeat_state::spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -800,12 +800,12 @@ WRITE16_MEMBER(firebeat_state::spu_irq_ack_w)
 	}
 }
 
-WRITE16_MEMBER(firebeat_state::spu_220000_w)
+void firebeat_state::spu_220000_w(uint16_t data)
 {
 	// IRQ2 handler 5 sets all bits
 }
 
-WRITE16_MEMBER(firebeat_state::spu_sdram_bank_w)
+void firebeat_state::spu_sdram_bank_w(uint16_t data)
 {
 }
 
@@ -1363,7 +1363,7 @@ int firebeat_state::ibutton_w(uint8_t data)
 	return r;
 }
 
-WRITE8_MEMBER(firebeat_state::security_w)
+void firebeat_state::security_w(uint8_t data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
@@ -1372,11 +1372,11 @@ WRITE8_MEMBER(firebeat_state::security_w)
 
 /*****************************************************************************/
 
-void firebeat_state::init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3)
+void firebeat_state::init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3)
 {
-	if(out1.isnull()) out1 = write32_delegate(*this, FUNC(firebeat_state::lamp_output_w));
-	if(out2.isnull()) out2 = write32_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
-	if(out3.isnull()) out3 = write32_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
+	if(out1.isnull()) out1 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output_w));
+	if(out2.isnull()) out2 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
+	if(out3.isnull()) out3 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
@@ -1395,23 +1395,23 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(firebeat_state::security_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
 
 	set_ibutton(rom);
 
-	init_lights(write32_delegate(*this), write32_delegate(*this), write32_delegate(*this));
+	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_state::init_ppp()
 {
 	init_firebeat();
-	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
+	init_lights(write32s_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 }
 
 void firebeat_state::init_ppd()
 {
 	init_firebeat();
-	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
+	init_lights(write32s_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 
 	m_cur_cab_data = ppd_cab_data;
 }
@@ -1426,7 +1426,7 @@ void firebeat_state::init_keyboard()
 void firebeat_state::init_kbm()
 {
 	init_firebeat();
-	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_kbm_w)), write32_delegate(*this), write32_delegate(*this));
+	init_lights(write32s_delegate(*this, FUNC(firebeat_state::lamp_output_kbm_w)), write32s_delegate(*this), write32s_delegate(*this));
 
 	init_keyboard();
 

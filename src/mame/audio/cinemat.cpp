@@ -1678,7 +1678,7 @@ void demon_state::demon_sound(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(qb3_state::qb3_sound_fifo_w)
+void qb3_state::qb3_sound_fifo_w(uint8_t data)
 {
 	uint16_t rega = m_maincpu->state_int(ccpu_cpu_device::CCPU_A);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qb3_state::synced_sound_w), this), rega & 0x0f);

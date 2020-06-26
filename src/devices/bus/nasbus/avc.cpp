@@ -80,7 +80,7 @@ void nascom_avc_device::device_reset()
 {
 	io_space().install_write_handler(0xb0, 0xb0, write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
 	io_space().install_readwrite_handler(0xb1, 0xb1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
-	io_space().install_write_handler(0xb2, 0xb2, write8_delegate(*this, FUNC(nascom_avc_device::control_w)));
+	io_space().install_write_handler(0xb2, 0xb2, write8smo_delegate(*this, FUNC(nascom_avc_device::control_w)));
 }
 
 
@@ -124,7 +124,7 @@ MC6845_UPDATE_ROW( nascom_avc_device::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( nascom_avc_device::control_w )
+void nascom_avc_device::control_w(uint8_t data)
 {
 	logerror("nascom_avc_device::control_w: 0x%02x\n", data);
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER( nascom_avc_device::control_w )
 	if (((m_control & 0x07) == 0) && (data & 0x07))
 	{
 		ram_disable_w(0);
-		program_space().install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(nascom_avc_device::vram_r)), write8_delegate(*this, FUNC(nascom_avc_device::vram_w)));
+		program_space().install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(nascom_avc_device::vram_r)), write8sm_delegate(*this, FUNC(nascom_avc_device::vram_w)));
 	}
 	else if ((data & 0x07) == 0)
 	{
@@ -143,7 +143,7 @@ WRITE8_MEMBER( nascom_avc_device::control_w )
 	m_control = data;
 }
 
-READ8_MEMBER( nascom_avc_device::vram_r )
+uint8_t nascom_avc_device::vram_r(offs_t offset)
 {
 	// manual says only one plane can be read, i assume this is the order
 	if (BIT(m_control, 0)) return m_r_ram[offset];
@@ -154,7 +154,7 @@ READ8_MEMBER( nascom_avc_device::vram_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( nascom_avc_device::vram_w )
+void nascom_avc_device::vram_w(offs_t offset, uint8_t data)
 {
 	// all planes can be written at the same time
 	if (BIT(m_control, 0)) m_r_ram[offset] = data;

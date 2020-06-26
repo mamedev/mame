@@ -6,7 +6,7 @@
 
 
 
-WRITE16_MEMBER(spbactn_state::bg_videoram_w)
+void spbactn_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset&0x1fff);
@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
 }
 
 
-WRITE16_MEMBER(spbactn_state::fg_videoram_w)
+void spbactn_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset&0x1fff);
@@ -62,42 +62,42 @@ VIDEO_START_MEMBER(spbactn_state,spbactnp)
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactn_state::get_extra_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 }
 
-WRITE16_MEMBER( spbactn_state::spbatnp_90006_w )
+void spbactn_state::spbatnp_90006_w(uint16_t data)
 {
 	//printf("spbatnp_90006_w %04x\n",data);
 }
 
 
-WRITE16_MEMBER( spbactn_state::spbatnp_9000c_w )
+void spbactn_state::spbatnp_9000c_w(uint16_t data)
 {
 	//printf("spbatnp_9000c_w %04x\n",data);
 }
 
-WRITE16_MEMBER( spbactn_state::spbatnp_9000e_w )
+void spbactn_state::spbatnp_9000e_w(uint16_t data)
 {
 	//printf("spbatnp_9000e_w %04x\n",data);
 }
 
-WRITE16_MEMBER( spbactn_state::spbatnp_9000a_w )
+void spbactn_state::spbatnp_9000a_w(uint16_t data)
 {
 	//printf("spbatnp_9000a_w %04x\n",data);
 }
 
-WRITE16_MEMBER( spbactn_state::spbatnp_90124_w )
+void spbactn_state::spbatnp_90124_w(uint16_t data)
 {
 	//printf("spbatnp_90124_w %04x\n",data);
 	m_bg_tilemap->set_scrolly(0, data);
 
 }
 
-WRITE16_MEMBER( spbactn_state::spbatnp_9012c_w )
+void spbactn_state::spbatnp_9012c_w(uint16_t data)
 {
 	//printf("spbatnp_9012c_w %04x\n",data);
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
 
-WRITE8_MEMBER(spbactn_state::extraram_w)
+void spbactn_state::extraram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);

@@ -38,11 +38,11 @@ protected:
 	address_space_config m_data_config;
 
 private:
-	address_space                                *m_data;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	inline u8 read_byte(offs_t a) { return m_cache->read_byte(a); }
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	inline u8 read_byte(offs_t a) { return m_cache.read_byte(a); }
 	inline u16 read_word(offs_t a) { return read_byte(a) | (read_byte(a + 1) << 8); }
-	inline void write_byte(offs_t a, u8 d) { m_data->write_byte(a, d); }
+	inline void write_byte(offs_t a, u8 d) { m_data.write_byte(a, d); }
 	inline void write_word(offs_t a, u16 d) { write_byte(a, d & 0xff); write_byte(a + 1, (d >> 8) & 0xff); }
 
 	enum class env_state_t32 : u8

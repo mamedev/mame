@@ -82,8 +82,8 @@ protected:
 	required_ioport_array<6> m_keyboard;
 	required_ioport_array<2> m_joysticks;
 
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
+	uint8_t io_read(offs_t offset);
+	void io_write(offs_t offset, uint8_t data);
 	uint8_t bus_read();
 	void bus_write(uint8_t data);
 	uint8_t p1_read();
@@ -112,8 +112,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void p2_write(uint8_t data);
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
+	uint8_t io_read(offs_t offset);
+	void io_write(offs_t offset, uint8_t data);
 	void i8243_p4_w(uint8_t data);
 	void i8243_p5_w(uint8_t data);
 	void i8243_p6_w(uint8_t data);
@@ -342,7 +342,7 @@ void g7400_state::machine_reset()
 
 /****** External RAM ******************************/
 
-READ8_MEMBER(odyssey2_state::io_read)
+uint8_t odyssey2_state::io_read(offs_t offset)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
@@ -357,7 +357,7 @@ READ8_MEMBER(odyssey2_state::io_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::io_write)
+void odyssey2_state::io_write(offs_t offset, uint8_t data)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -365,7 +365,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 		if (offset & 0x80)
 		{
 			logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1);
-			m_cart->io_write(space, offset, data);
+			m_cart->io_write(offset, data);
 		}
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
@@ -375,7 +375,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 }
 
 
-READ8_MEMBER(g7400_state::io_read)
+uint8_t g7400_state::io_read(offs_t offset)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
@@ -394,7 +394,7 @@ READ8_MEMBER(g7400_state::io_read)
 }
 
 
-WRITE8_MEMBER(g7400_state::io_write)
+void g7400_state::io_write(offs_t offset, uint8_t data)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -402,7 +402,7 @@ WRITE8_MEMBER(g7400_state::io_write)
 		if (offset & 0x80)
 		{
 			logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1);
-			m_cart->io_write(space, offset, data);
+			m_cart->io_write(offset, data);
 		}
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))

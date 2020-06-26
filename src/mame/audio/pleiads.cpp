@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "audio/pleiads.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #define VMIN    0
 #define VMAX    32767
 
@@ -575,7 +578,7 @@ void pleiads_sound_device::control_a_w(uint8_t data)
 	if (data == m_sound_latch_a)
 		return;
 
-	logerror("pleiads_sound_control_b_w $%02x\n", data);
+	LOG("pleiads_sound_control_a_w $%02x\n", data);
 
 	m_channel->update();
 	m_sound_latch_a = data;
@@ -594,7 +597,7 @@ void pleiads_sound_device::control_b_w(uint8_t data)
 	if (data == m_sound_latch_b)
 		return;
 
-	logerror("pleiads_sound_control_b_w $%02x\n", data);
+	LOG("pleiads_sound_control_b_w $%02x\n", data);
 
 	if (pitch == 3)
 		pitch = 2;  /* 2 and 3 are the same */
@@ -611,7 +614,7 @@ void pleiads_sound_device::control_c_w(uint8_t data)
 	if (data == m_sound_latch_c)
 		return;
 
-	logerror("pleiads_sound_control_c_w $%02x\n", data);
+	LOG("pleiads_sound_control_c_w $%02x\n", data);
 	m_channel->update();
 	m_sound_latch_c = data;
 }

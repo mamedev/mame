@@ -61,7 +61,7 @@ void k001006_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ32_MEMBER( k001006_device::read )
+uint32_t k001006_device::read(offs_t offset)
 {
 	if (offset == 1)
 	{
@@ -92,7 +92,7 @@ READ32_MEMBER( k001006_device::read )
 	return 0;
 }
 
-WRITE32_MEMBER( k001006_device::write )
+void k001006_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{

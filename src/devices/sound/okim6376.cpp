@@ -116,7 +116,7 @@ DEFINE_DEVICE_TYPE(OKIM6650, okim6650_device, "okim6650", "OKI MSM6650 ADPCM")
 okim6376_device::okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, addrbits, ENDIANNESS_BIG, 8),
+		device_rom_interface(mconfig, *this),
 		//m_command[OKIM6376_VOICES],
 		m_latch(0),
 		//m_stage[OKIM6376_VOICES],
@@ -132,6 +132,7 @@ okim6376_device::okim6376_device(const machine_config &mconfig, device_type type
 		m_ch2_update(0),
 		m_st_update(0)
 {
+	override_address_width(addrbits);
 }
 
 okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

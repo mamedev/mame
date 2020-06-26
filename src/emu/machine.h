@@ -119,8 +119,8 @@ class dummy_space_device : public device_t,
 public:
 	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	void dummy(address_map &map);
 protected:
@@ -264,6 +264,10 @@ private:
 public:
 	// debugger-related information
 	u32                     debug_flags;        // the current debug flags
+	bool debug_enabled() { return (debug_flags & DEBUG_FLAG_ENABLED) != 0; }
+
+	// used by debug_console to take ownership of the debug.log file
+	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
 
 private:
 	class side_effects_disabler {
@@ -346,7 +350,8 @@ private:
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
 	int                     m_sample_rate;          // the digital audio sample rate
-	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
+	std::unique_ptr<emu_file>  m_logfile;           // pointer to the active error.log file
+	std::unique_ptr<emu_file>  m_debuglogfile;      // pointer to the active debug.log file
 
 	// load/save management
 	enum class saveload_schedule

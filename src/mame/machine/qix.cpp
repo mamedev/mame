@@ -60,11 +60,11 @@ WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(zookeep_state::bankswitch_w)
+void zookeep_state::bankswitch_w(uint8_t data)
 {
 	m_vidbank->set_entry(BIT(data, 2));
 	/* not necessary, but technically correct */
-	qix_palettebank_w(space, offset, data);
+	qix_palettebank_w(data);
 }
 
 
@@ -75,19 +75,19 @@ WRITE8_MEMBER(zookeep_state::bankswitch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::qix_data_firq_w)
+void qix_state::qix_data_firq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(qix_state::qix_data_firq_ack_w)
+void qix_state::qix_data_firq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(qix_state::qix_data_firq_r)
+uint8_t qix_state::qix_data_firq_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -95,7 +95,7 @@ READ8_MEMBER(qix_state::qix_data_firq_r)
 }
 
 
-READ8_MEMBER(qix_state::qix_data_firq_ack_r)
+uint8_t qix_state::qix_data_firq_ack_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
@@ -110,19 +110,19 @@ READ8_MEMBER(qix_state::qix_data_firq_ack_r)
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::qix_video_firq_w)
+void qix_state::qix_video_firq_w(uint8_t data)
 {
 	m_videocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(qix_state::qix_video_firq_ack_w)
+void qix_state::qix_video_firq_ack_w(uint8_t data)
 {
 	m_videocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(qix_state::qix_video_firq_r)
+uint8_t qix_state::qix_video_firq_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_videocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -130,7 +130,7 @@ READ8_MEMBER(qix_state::qix_video_firq_r)
 }
 
 
-READ8_MEMBER(qix_state::qix_video_firq_ack_r)
+uint8_t qix_state::qix_video_firq_ack_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_videocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);

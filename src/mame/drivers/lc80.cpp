@@ -25,7 +25,7 @@
 
 
     ToDo:
-    - Most characters are lost when pasting (lc80, sc80).
+    - Most characters are lost when pasting (lc80, lc80e).
 
 ****************************************************************************/
 
@@ -36,7 +36,7 @@
     - HALT led
     - KSD11 switch
     - banking for ROM 4-5
-    - Schachcomputer SC-80
+    - lc80e
     - CTC clock inputs
 
 */
@@ -59,7 +59,7 @@ void lc80_state::lc80_mem(address_map &map)
 }
 
 #if 0
-void lc80_state::sc80_mem(address_map &map)
+void lc80_state::lc80e_mem(address_map &map)
 {
 	lc80_mem(map);
 	map(0xc000, 0xcfff).rom();
@@ -406,12 +406,12 @@ void lc80_state::lc80_2(machine_config &config)
 }
 
 #if 0
-void lc80_state::sc80(machine_config &config)
+void lc80_state::lc80e(machine_config &config)
 {
 	lc80_2(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::sc80_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80e_mem);
 }
 #endif
 
@@ -431,7 +431,7 @@ ROM_START( lc80_2 )
 	ROM_LOAD( "lc80_2.bin", 0x0000, 0x1000, CRC(2e06d768) SHA1(d9cddaf847831e4ab21854c0f895348b7fda20b8) )
 ROM_END
 
-ROM_START( sc80 )
+ROM_START( lc80e )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "lc80e-0000-schach.rom", 0x0000, 0x1000, CRC(e3cca61d) SHA1(f2be3f2a9d3780d59657e49b3abeffb0fc13db89) )
 	ROM_LOAD( "lc80e-1000-schach.rom", 0x1000, 0x1000, CRC(b0323160) SHA1(0ea019b0944736ae5b842bf9aa3537300f259b98) )
@@ -441,6 +441,6 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80e,  lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (export)", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "hack (Eckart Buschendorf)", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )

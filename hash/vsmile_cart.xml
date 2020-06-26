@@ -338,8 +338,8 @@ Regular game cartridges
 |        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (rev. 103, yellow label)                                      |
 |   XX   | 80-092304(GE)     | Bob der Baumeister - Bobs Spannender Arbeitstag                                                |
 |   XX   | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag (rev. 104, 52-092304-104(GER) on back label)   |
-|        | 80-092305(FR)     | Bob le Bricoleur: Les P'tits Chantiers de Bob                                                  |
-|        | 80-092305-105(FR) | Bob le Bricoleur: Les P'tits Chantiers de Bob (rev. 105, ever released?)                       |
+|   XX   | 80-092305(FR)     | Bob le Bricoleur - Les P'tits Chantiers de Bob                                                 |
+|        | 80-092305-105(FR) | Bob le Bricoleur - Les P'tits Chantiers de Bob (rev. 105, ever released?)                      |
 |        | 80-092306(PT)     | Bob o Construtor - Um dia Atarefado (92316 on cart)                                            |
 |   XX   | 80-092307(SP)     | Bob y sus Amigos - Un día de trabajo                                                           |
 |   XX   | 80-092313(DK)     | Byggemand Bob - Bobs travle dag                                                                |
@@ -460,7 +460,7 @@ Regular game cartridges
 |        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |   XX   | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
-|        | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                        |
+|   XX   | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                    |
@@ -1119,6 +1119,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092304-104 - Bob der Baumeister - Bobs spannender Arbeitstag (GER).bin" size="8388608" crc="b0623371" sha1="9c5d7cfbdf21495b8a461408a1969f5095d4d914" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdayf" cloneof="bobbday">
+		<description>Bob le Bricoleur - Les P'tits chantiers de Bob (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092305(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092305 - BobLeBricoleur (FR).bin" size="8388608" crc="608c9a0e" sha1="30ceea73edb0ecea4c1d9ebd29eb8cdeee052a1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2265,7 +2280,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="lbratzs">
+	<software name="lbratzf">
+		<description>Lil' Bratz Au Top de la Mode - Complices, Cools et Class' (France)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092627(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092625 - Bratz (FR).bin" size="8388608" crc="ca0ff497" sha1="69f95c84d31423451aa580f196270e3cabab165b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lbratzs" cloneof="lbratzf">
 		<description>Lil' Bratz Estrellas De La Moda - Amigos, Moda y Diversión (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>

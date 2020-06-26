@@ -348,7 +348,7 @@ void z80netf_state::machine_start()
 ******************************************************************************/
 
 /* LX.383 - LX.384 HEX keyboard and display */
-READ8_MEMBER(z80ne_state::lx383_r)
+uint8_t z80ne_state::lx383_r()
 {
 	/*
 	 * Keyboard scanning
@@ -370,7 +370,7 @@ READ8_MEMBER(z80ne_state::lx383_r)
 	return m_lx383_key[m_lx383_scan_counter];
 }
 
-WRITE8_MEMBER(z80ne_state::lx383_w)
+void z80ne_state::lx383_w(offs_t offset, uint8_t data)
 {
 	/*
 	 * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
@@ -454,7 +454,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
     pin 2 for an old PMOS UART.
  *
  */
-READ8_MEMBER(z80ne_state::lx385_ctrl_r)
+uint8_t z80ne_state::lx385_ctrl_r()
 {
 	/* set unused bits high */
 	uint8_t data = 0xc0;
@@ -553,14 +553,14 @@ uint8_t z80net_state::lx388_mc6847_videoram_r(offs_t offset)
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(z80net_state::lx387_data_r)
+uint8_t z80net_state::lx387_data_r()
 {
 	uint8_t data = m_lx387_kr2376->data_r() & 0x7f;
 	data |= m_lx387_kr2376->get_output_pin(kr2376_device::KR2376_SO) << 7;
 	return data;
 }
 
-READ8_MEMBER(z80net_state::lx388_read_field_sync)
+uint8_t z80net_state::lx388_read_field_sync()
 {
 	return m_vdg->fs_r() << 7;
 }
@@ -574,7 +574,7 @@ READ8_MEMBER(z80net_state::lx388_read_field_sync)
  *
  */
 
-WRITE8_MEMBER(z80netf_state::lx390_motor_w)
+void z80netf_state::lx390_motor_w(uint8_t data)
 {
 	/* Selection of drive and parameters
 	 A write also causes the selected drive motor to turn on for about 3 seconds.
@@ -613,7 +613,7 @@ WRITE8_MEMBER(z80netf_state::lx390_motor_w)
 	}
 }
 
-READ8_MEMBER(z80netf_state::lx390_reset_bank)
+uint8_t z80netf_state::lx390_reset_bank()
 {
 	offs_t pc;
 
@@ -631,7 +631,7 @@ READ8_MEMBER(z80netf_state::lx390_reset_bank)
 	return 0xff;
 }
 
-READ8_MEMBER(z80netf_state::lx390_fdc_r)
+uint8_t z80netf_state::lx390_fdc_r(offs_t offset)
 {
 	uint8_t d;
 
@@ -655,7 +655,7 @@ READ8_MEMBER(z80netf_state::lx390_fdc_r)
 		break;
 	case 6:
 		d = 0xff;
-		lx390_reset_bank(space, 0);
+		lx390_reset_bank();
 		break;
 	case 7:
 		d = m_wd1771->data_r() ^ 0xff;
@@ -667,11 +667,9 @@ READ8_MEMBER(z80netf_state::lx390_fdc_r)
 	return d;
 }
 
-WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
+void z80netf_state::lx390_fdc_w(offs_t offset, uint8_t data)
 {
-	uint8_t d;
-
-	d = data;
+	uint8_t d = data;
 	switch(offset)
 	{
 	case 0:
@@ -696,7 +694,7 @@ WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
 		break;
 	case 6:
 		LOG("lx390_fdc_w, motor_w:   %02x\n", d);
-		lx390_motor_w(space, 0, d);
+		lx390_motor_w(d);
 		break;
 	case 7:
 		LOG("lx390_fdc_w, WD17xx data7, force:   %02x\n", d);

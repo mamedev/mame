@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "emumem_hep.h"
 
-template<int Width, int AddrShift, int Endian> handler_entry_read_passthrough<Width, AddrShift, Endian>::~handler_entry_read_passthrough()
+template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_passthrough<Width, AddrShift, Endian>::~handler_entry_read_passthrough()
 {
 	if(m_next) {
 		m_mph.remove_handler(this);
@@ -12,7 +12,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_read_passthrough<Wi
 	}
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read_passthrough<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read_passthrough<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	if(!m_next->is_passthrough())
 		return;
@@ -27,7 +27,7 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read_passthrou
 		np->detach(handlers);
 }
 
-template<int Width, int AddrShift, int Endian> handler_entry_write_passthrough<Width, AddrShift, Endian>::~handler_entry_write_passthrough()
+template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_passthrough<Width, AddrShift, Endian>::~handler_entry_write_passthrough()
 {
 	if(m_next) {
 		m_mph.remove_handler(this);
@@ -35,7 +35,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_write_passthrough<W
 	}
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write_passthrough<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_passthrough<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	if(!m_next->is_passthrough())
 		return;

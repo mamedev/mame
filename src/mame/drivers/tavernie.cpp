@@ -13,16 +13,15 @@
     IFD09 includes WD1795
 
 ToDo:
-    - Attributes ram
     - Graphics
     - Character rom is not dumped
     - Graphics rom is not dumped
+        (note 2020-05-29: added what are thought to be the correct roms, but the proper
+                          operation is uncertain).
     - 3x 7611 proms not dumped
     - Test FDC
-    - Need software
-    - Cassette is coded correctly, but slight timing differences mean a byte
-      here and there gets corrupted on load. The file loads correctly on the
-      super80.
+    - Need software (there are floppy images, but they are not yet in a supported format)
+
 
 List of commands (must be in UPPERCASE):
 A - Memory transfer
@@ -31,7 +30,7 @@ C - call a user subroutine
 D - Dump memory (^X to break)
 G - coding of indexed addresses
 I - memory initialisation
-L - Load cassette
+L - Load cassette (Use L 0), where the number is an offset from the original address.
 M - examine/modify memory
 N - terminal adaptation (??)
 O - calculation of displacements
@@ -71,83 +70,103 @@ Z - more scan lines per row (cursor is bigger)
 #include "screen.h"
 #include "speaker.h"
 
-#include "tavernie.lh"
-
-class tavernie_state : public driver_device
+class cpu09_state : public driver_device
 {
 public:
-	tavernie_state(const machine_config &mconfig, device_type type, const char *tag)
+	cpu09_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_pia0(*this, "pia0")
+		, m_acia(*this, "acia")
+		, m_ptm(*this, "ptm")
+	{ }
+
+	void cpu09(machine_config &config);
+
+protected:
+	DECLARE_READ_LINE_MEMBER(ca1_r);
+	u8 pa_r();
+	void pa_w(u8 data);
+	void pb_w(u8 data);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	void cpu09_mem(address_map &map);
+	u8 m_pa;
+	bool m_cassold;
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_device<pia6821_device> m_pia0;
+	required_device<acia6850_device> m_acia;
+	required_device<ptm6840_device> m_ptm;
+
+private:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+};
+
+class ivg09_state : public cpu09_state
+{
+public:
+	ivg09_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cpu09_state(mconfig, type, tag)
 		, m_pia1(*this, "pia1")
+		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_beep(*this, "beeper")
-		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+	{ }
 
 	void ivg09(machine_config &config);
-	void cpu09(machine_config &config);
 
 private:
-	DECLARE_READ_LINE_MEMBER(ca1_r);
-	uint8_t pa_r();
-	void pa_w(uint8_t data);
-	void pb_w(uint8_t data);
-	void pa_ivg_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	uint8_t pb_ivg_r();
-	void kbd_put(u8 data);
-	DECLARE_WRITE8_MEMBER(ds_w);
-	DECLARE_MACHINE_RESET(cpu09);
-	DECLARE_MACHINE_RESET(ivg09);
-	MC6845_UPDATE_ROW(crtc_update_row);
-
-	void cpu09_mem(address_map &map);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void ivg09_palette(palette_device &palette) const;
 	void ivg09_mem(address_map &map);
-
-	uint8_t m_term_data;
-	uint8_t m_pa;
-	bool m_cassold;
-	optional_shared_ptr<uint8_t> m_p_videoram;
-	required_device<cassette_image_device> m_cass;
-	required_device<pia6821_device> m_pia0;
-	optional_device<pia6821_device> m_pia1;
-	optional_device<fd1795_device> m_fdc;
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<beep_device> m_beep;
-	required_device<cpu_device> m_maincpu;
-	optional_device<palette_device> m_palette;
-	optional_region_ptr<u8> m_p_chargen;
+	void pa_ivg_w(u8 data);
+	u8 pb_ivg_r();
+	void vram_w(offs_t offset, u8 data);
+	u8 vram_r(offs_t offset);
+	void kbd_put(u8 data);
+	void ds_w(u8 data);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	u8 m_term_data;
+	u8 m_ivg_pa;
+	u8 m_flashcnt;
+	std::unique_ptr<u16[]> m_vram; // 12x 4044
+	required_device<pia6821_device> m_pia1;
+	required_device<mc6845_device> m_crtc;
+	required_device<wd2795_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<beep_device> m_beep;
+	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
-void tavernie_state::cpu09_mem(address_map &map)
+void cpu09_state::cpu09_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x1000, 0x2081).noprw();
 	map(0xeb00, 0xeb03).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0xeb04, 0xeb05).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xeb08, 0xeb0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xec00, 0xefff).ram(); // 1Kx8 RAM MK4118
 	map(0xf000, 0xffff).rom().region("roms", 0);
 }
 
-void tavernie_state::ivg09_mem(address_map &map)
+void ivg09_state::ivg09_mem(address_map &map)
 {
 	map.unmap_value_high();
 	cpu09_mem(map);
-	map(0x1000, 0x1fff).ram().share("videoram");
+	map(0x1000, 0x1fff).rw(FUNC(ivg09_state::vram_r), FUNC(ivg09_state::vram_w));
 	map(0x2000, 0x2003).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2080, 0x2080).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x2081, 0x2081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe000, 0xe003).rw(m_fdc, FUNC(fd1795_device::read), FUNC(fd1795_device::write));
-	map(0xe080, 0xe080).w(FUNC(tavernie_state::ds_w));
+	map(0x2080, 0x2080).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x2081, 0x2081).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe000, 0xe003).rw(m_fdc, FUNC(wd2795_device::read), FUNC(wd2795_device::write));
+	map(0xe080, 0xe080).w(FUNC(ivg09_state::ds_w));
 }
 
 
@@ -182,16 +201,33 @@ static INPUT_PORTS_START( ivg09 )
 	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( tavernie_state, cpu09)
+void cpu09_state::machine_reset()
 {
-	m_term_data = 0;
 }
 
-MACHINE_RESET_MEMBER( tavernie_state, ivg09)
+void ivg09_state::machine_reset()
 {
 	m_beep->set_state(1);
 	m_term_data = 0;
 	m_pia1->cb1_w(1);
+}
+
+void cpu09_state::machine_start()
+{
+	save_item(NAME(m_pa));
+	save_item(NAME(m_cassold));
+}
+
+void ivg09_state::machine_start()
+{
+	// 4 bits of attribute ram
+	m_vram = make_unique_clear<u16[]>(0x1000);
+	save_pointer(NAME(m_vram), 0x1000);
+	save_item(NAME(m_pa));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_ivg_pa));
+	save_item(NAME(m_flashcnt));  // not essential
 }
 
 static void ifd09_floppies(device_slot_interface &device)
@@ -200,7 +236,7 @@ static void ifd09_floppies(device_slot_interface &device)
 }
 
 // can support 3 drives
-WRITE8_MEMBER( tavernie_state::ds_w )
+void ivg09_state::ds_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 1) floppy = m_floppy0->get_device();
@@ -216,41 +252,37 @@ WRITE8_MEMBER( tavernie_state::ds_w )
 	}
 }
 
-
-MC6845_UPDATE_ROW( tavernie_state::crtc_update_row )
+// Attributes when high: 0 = alpha rom; 1 = flash; 2 = reverse video; 3 = highlight off
+MC6845_UPDATE_ROW( ivg09_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx=0;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	u8 gfx,attr;
+	u16 mem,x;
+	u32 *p = &bitmap.pix32(y);
+	m_flashcnt++;
 
 	for (x = 0; x < x_count; x++)
 	{
-		uint8_t inv=0;
-		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0xfff;
-		if (ra > 7)
-			gfx = inv;  // some blank spacing lines
-		else
-		{
-			chr = m_p_videoram[mem];
-			gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
-		}
+		attr = m_vram[mem] >> 8;
+		u8 inv = ((x == cursor_x) ^ (BIT(attr, 2)) ^ (BIT(attr, 1) && BIT(m_flashcnt, 6))) ? 0xff : 0;
+		gfx = m_p_chargen[((m_vram[mem] & 0x1ff)<<4) | ra] ^ inv;   // takes care of attr bit 0 too
+		u8 pen = BIT(attr, 3) ? 1 : 2;
 
 		/* Display a scanline of a character */
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		*p++ = palette[BIT(gfx, 0)];
+		*p++ = palette[BIT(gfx, 7) ? pen : 0];
+		*p++ = palette[BIT(gfx, 6) ? pen : 0];
+		*p++ = palette[BIT(gfx, 5) ? pen : 0];
+		*p++ = palette[BIT(gfx, 4) ? pen : 0];
+		*p++ = palette[BIT(gfx, 3) ? pen : 0];
+		*p++ = palette[BIT(gfx, 2) ? pen : 0];
+		*p++ = palette[BIT(gfx, 1) ? pen : 0];
+		*p++ = palette[BIT(gfx, 0) ? pen : 0];
 	}
 }
 
 
-uint8_t tavernie_state::pa_r()
+u8 cpu09_state::pa_r()
 {
 	return ioport("DSW")->read() | m_pa;
 }
@@ -264,36 +296,37 @@ d5: S3
 d6: S4
 d7: cassout
 */
-void tavernie_state::pa_w(uint8_t data)
+void cpu09_state::pa_w(u8 data)
 {
 	m_pa = data & 0x9f;
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // centronics
-void tavernie_state::pb_w(uint8_t data)
+void cpu09_state::pb_w(u8 data)
 {
 }
 
 // cass in
-READ_LINE_MEMBER( tavernie_state::ca1_r )
+READ_LINE_MEMBER( cpu09_state::ca1_r )
 {
 	return m_cassold;
 }
 
-uint8_t tavernie_state::pb_ivg_r()
+u8 ivg09_state::pb_ivg_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-void tavernie_state::pa_ivg_w(uint8_t data)
+void ivg09_state::pa_ivg_w(u8 data)
 {
 // bits 0-3 are attribute bits
+	m_ivg_pa = data & 15;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( tavernie_state::kansas_r )
+TIMER_DEVICE_CALLBACK_MEMBER( cpu09_state::kansas_r )
 {
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
 		return;
@@ -306,7 +339,49 @@ TIMER_DEVICE_CALLBACK_MEMBER( tavernie_state::kansas_r )
 	}
 }
 
-void tavernie_state::kbd_put(u8 data)
+void ivg09_state::vram_w(offs_t offset, u8 data)
+{
+	m_vram[offset] = data | (m_ivg_pa << 8);
+}
+
+// return character; attributes cannot be read
+u8 ivg09_state::vram_r(offs_t offset)
+{
+	return m_vram[offset] & 0xff;
+}
+
+static constexpr rgb_t ivg09_pens[3] =
+{
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xa0, 0xa0, 0xa0 }, // white
+	{ 0xff, 0xff, 0xff }  // highlight
+};
+
+void ivg09_state::ivg09_palette(palette_device &palette) const
+{
+	palette.set_pen_colors(0, ivg09_pens);
+}
+
+
+/* F4 Character Displayer */
+static const gfx_layout charlayout =
+{
+	8, 13,                   /* 8 x 9 characters */
+	512,                    /* number of characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8 },
+	8*16                    /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( ivg09_gfx )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
+GFXDECODE_END
+
+void ivg09_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_pia1->cb1_w(0);
@@ -322,12 +397,11 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-void tavernie_state::cpu09(machine_config &config)
+void cpu09_state::cpu09(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tavernie_state::cpu09_mem);
-	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cpu09_state::cpu09_mem);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -336,25 +410,25 @@ void tavernie_state::cpu09(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, "kansas_r").configure_periodic(FUNC(tavernie_state::kansas_r), attotime::from_hz(10000));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(cpu09_state::kansas_r), attotime::from_hz(19200));
 
 	PIA6821(config, m_pia0, 0);
-	m_pia0->readpa_handler().set(FUNC(tavernie_state::pa_r));
-	m_pia0->readca1_handler().set(FUNC(tavernie_state::ca1_r));
-	m_pia0->writepa_handler().set(FUNC(tavernie_state::pa_w));
-	m_pia0->writepb_handler().set(FUNC(tavernie_state::pb_w));
+	m_pia0->readpa_handler().set(FUNC(cpu09_state::pa_r));
+	m_pia0->readca1_handler().set(FUNC(cpu09_state::ca1_r));
+	m_pia0->writepa_handler().set(FUNC(cpu09_state::pa_w));
+	m_pia0->writepb_handler().set(FUNC(cpu09_state::pb_w));
 
-	ptm6840_device &ptm(PTM6840(config, "ptm", 4_MHz_XTAL / 4));
+	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
 	// all i/o lines connect to the 40-pin expansion connector
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set("acia", FUNC(acia6850_device::write_txc));
-	ptm.o1_callback().append("acia", FUNC(acia6850_device::write_rxc));
-	ptm.o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
-	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o1_callback().set("acia", FUNC(acia6850_device::write_txc));
+	m_ptm->o1_callback().append("acia", FUNC(acia6850_device::write_rxc));
+	m_ptm->o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_ptm->irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
-	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
@@ -362,12 +436,11 @@ void tavernie_state::cpu09(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
-void tavernie_state::ivg09(machine_config &config)
+void ivg09_state::ivg09(machine_config &config)
 {
 	cpu09(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tavernie_state::ivg09_mem);
-	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, ivg09)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ivg09_state::ivg09_mem);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -376,28 +449,30 @@ void tavernie_state::ivg09(machine_config &config)
 	screen.set_size(80*8, 25*10);
 	screen.set_visarea(0, 80*8-1, 0, 25*10-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	config.set_default_layout(layout_tavernie);
+	GFXDECODE(config, "gfxdecode", m_palette, ivg09_gfx);
+	PALETTE(config, m_palette, FUNC(ivg09_state::ivg09_palette), 3);
 
 	/* sound hardware */
 	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(tavernie_state::kbd_put));
+	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // unknown clock
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(tavernie_state::crtc_update_row));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(ivg09_state::kbd_put));
+
+	MC6845(config, m_crtc, 1008000); // unknown clock
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(ivg09_state::crtc_update_row));
 
 	PIA6821(config, m_pia1, 0);
-	m_pia1->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));
-	m_pia1->writepa_handler().set(FUNC(tavernie_state::pa_ivg_w));
+	m_pia1->readpb_handler().set(FUNC(ivg09_state::pb_ivg_r));
+	m_pia1->writepa_handler().set(FUNC(ivg09_state::pa_ivg_w));
 	m_pia1->cb2_handler().set(m_beep, FUNC(beep_device::set_state));
 
-	FD1795(config, m_fdc, 8_MHz_XTAL / 8);
+	WD2795(config, m_fdc, 8_MHz_XTAL / 8);
 	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 }
 
@@ -414,13 +489,14 @@ ROM_START( ivg09 )
 	ROM_LOAD_OPTIONAL( "promon.bin",   0x1000, 0x0800, CRC(43256bf2) SHA1(e81acb5b659d50d7b019b97ad5d2a8f129da39f6) )
 	ROM_LOAD_OPTIONAL( "boottav.bin",  0x1800, 0x01f0, CRC(ae1a858d) SHA1(ab2144a00afd5b75c6dcb15c2c3f9d6910a159ae) )
 
-	// charrom is missing, using one from 'c10' for now
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_LOAD( "big.bin",   0x0000, 0x1000, CRC(f27f6bfe) SHA1(d9509c6e1d10e042ad3cdfaec31114148dee9ff4)) // first half is rubbish
+	ROM_CONTINUE(0x0000, 0x1000) // big
+	ROM_LOAD( "small.bin", 0x1000, 0x1000, CRC(16e25eed) SHA1(5d31f127fe635be4bca06840b15a1bd77f971492)) // small
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY         FULLNAME                      FLAGS
-COMP( 1982, cpu09, 0,      0,      cpu09,   cpu09, tavernie_state, empty_init, "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
-COMP( 1983, ivg09, cpu09,  0,      ivg09,   ivg09, tavernie_state, empty_init, "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )
+COMP( 1982, cpu09, 0,      0,      cpu09,   cpu09, cpu09_state, empty_init, "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
+COMP( 1983, ivg09, cpu09,  0,      ivg09,   ivg09, ivg09_state, empty_init, "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )

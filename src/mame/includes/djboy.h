@@ -86,12 +86,12 @@ private:
 	required_device<generic_latch_8_device> m_slavelatch;
 	required_device<generic_latch_8_device> m_beastlatch;
 
-	DECLARE_READ8_MEMBER(beast_status_r);
-	DECLARE_WRITE8_MEMBER(trigger_nmi_on_mastercpu);
-	DECLARE_WRITE8_MEMBER(mastercpu_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(slavecpu_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_bankswitch_w);
+	uint8_t beast_status_r();
+	void trigger_nmi_on_mastercpu(uint8_t data);
+	void mastercpu_bankswitch_w(uint8_t data);
+	void slavecpu_bankswitch_w(uint8_t data);
+	void coin_count_w(uint8_t data);
+	void soundcpu_bankswitch_w(uint8_t data);
 	uint8_t beast_p0_r();
 	void beast_p0_w(uint8_t data);
 	uint8_t beast_p1_r();
@@ -100,10 +100,10 @@ private:
 	void beast_p2_w(uint8_t data);
 	uint8_t beast_p3_r();
 	void beast_p3_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(djboy_scrollx_w);
-	DECLARE_WRITE8_MEMBER(djboy_scrolly_w);
-	DECLARE_WRITE8_MEMBER(djboy_videoram_w);
-	DECLARE_WRITE8_MEMBER(djboy_paletteram_w);
+	void djboy_scrollx_w(uint8_t data);
+	void djboy_scrolly_w(uint8_t data);
+	void djboy_videoram_w(offs_t offset, uint8_t data);
+	void djboy_paletteram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

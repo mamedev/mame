@@ -57,6 +57,7 @@ private:
 
 	uint8_t m_digit;
 	uint8_t m_seg;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
@@ -162,6 +163,12 @@ uint8_t savia84_state::savia84_8255_portc_r() // IN FA - read keyboard
 		return 0xff;
 }
 
+void savia84_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
+
 void savia84_state::savia84(machine_config &config)
 {
 	/* basic machine hardware */
@@ -194,4 +201,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
-COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "J.T. Hyan", "Savia 84", MACHINE_NO_SOUND_HW)
+COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "J.T. Hyan", "Savia 84", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

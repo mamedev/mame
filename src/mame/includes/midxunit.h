@@ -32,20 +32,20 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(midxunit_cmos_r);
-	DECLARE_WRITE16_MEMBER(midxunit_cmos_w);
-	DECLARE_WRITE16_MEMBER(midxunit_io_w);
-	DECLARE_WRITE16_MEMBER(midxunit_unknown_w);
+	uint16_t midxunit_cmos_r(offs_t offset);
+	void midxunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midxunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midxunit_unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
-	DECLARE_READ16_MEMBER(midxunit_status_r);
-	DECLARE_READ16_MEMBER(midxunit_uart_r);
-	DECLARE_WRITE16_MEMBER(midxunit_uart_w);
-	DECLARE_READ16_MEMBER(midxunit_security_r);
-	DECLARE_WRITE16_MEMBER(midxunit_security_w);
-	DECLARE_WRITE16_MEMBER(midxunit_security_clock_w);
-	DECLARE_READ16_MEMBER(midxunit_sound_r);
-	DECLARE_READ16_MEMBER(midxunit_sound_state_r);
-	DECLARE_WRITE16_MEMBER(midxunit_sound_w);
+	uint16_t midxunit_status_r();
+	uint16_t midxunit_uart_r(offs_t offset);
+	void midxunit_uart_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midxunit_security_r();
+	void midxunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midxunit_security_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midxunit_sound_r();
+	uint16_t midxunit_sound_state_r();
+	void midxunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(midxunit_dcs_output_full);
 
 	void main_map(address_map &map);

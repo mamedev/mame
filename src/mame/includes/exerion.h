@@ -77,9 +77,9 @@ private:
 	required_device<palette_device> m_palette;
 
 	uint8_t exerion_protection_r(offs_t offset);
-	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
-	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
-	DECLARE_READ8_MEMBER(exerion_video_timing_r);
+	void exerion_videoreg_w(uint8_t data);
+	void exerion_video_latch_w(offs_t offset, uint8_t data);
+	uint8_t exerion_video_timing_r();
 	uint8_t exerion_porta_r();
 	void exerion_portb_w(uint8_t data);
 	virtual void machine_start() override;

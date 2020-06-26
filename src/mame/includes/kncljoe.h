@@ -62,9 +62,9 @@ private:
 
 	void sound_cmd_w(uint8_t data);
 	void sound_irq_ack_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(kncljoe_videoram_w);
-	DECLARE_WRITE8_MEMBER(kncljoe_control_w);
-	DECLARE_WRITE8_MEMBER(kncljoe_scroll_w);
+	void kncljoe_videoram_w(offs_t offset, uint8_t data);
+	void kncljoe_control_w(uint8_t data);
+	void kncljoe_scroll_w(offs_t offset, uint8_t data);
 	void m6803_port1_w(uint8_t data);
 	void m6803_port2_w(uint8_t data);
 	uint8_t m6803_port1_r();

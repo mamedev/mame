@@ -78,12 +78,12 @@ private:
 	std::unique_ptr<uint8_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_colorram;
 
-	DECLARE_READ8_MEMBER(hitpoker_vram_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_vram_w);
-	DECLARE_READ8_MEMBER(hitpoker_cram_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_cram_w);
-	DECLARE_READ8_MEMBER(hitpoker_paletteram_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_paletteram_w);
+	uint8_t hitpoker_vram_r(offs_t offset);
+	void hitpoker_vram_w(offs_t offset, uint8_t data);
+	uint8_t hitpoker_cram_r(offs_t offset);
+	void hitpoker_cram_w(offs_t offset, uint8_t data);
+	uint8_t hitpoker_paletteram_r(offs_t offset);
+	void hitpoker_paletteram_w(offs_t offset, uint8_t data);
 	uint8_t hitpoker_pic_r(offs_t offset);
 	void hitpoker_pic_w(offs_t offset, uint8_t data);
 	virtual void video_start() override;
@@ -131,7 +131,7 @@ uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
+uint8_t hitpoker_state::hitpoker_vram_r(offs_t offset)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -141,7 +141,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
 		return ROM[offset+0x8000];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
+void hitpoker_state::hitpoker_vram_w(offs_t offset, uint8_t data)
 {
 //  uint8_t *ROM = memregion("maincpu")->base();
 
@@ -149,7 +149,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 	m_videoram[offset] = data;
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_cram_r)
+uint8_t hitpoker_state::hitpoker_cram_r(offs_t offset)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -159,12 +159,12 @@ READ8_MEMBER(hitpoker_state::hitpoker_cram_r)
 		return ROM[offset+0xc000];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_cram_w)
+void hitpoker_state::hitpoker_cram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_paletteram_r)
+uint8_t hitpoker_state::hitpoker_paletteram_r(offs_t offset)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -174,7 +174,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_paletteram_r)
 		return ROM[offset+0xe000];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_paletteram_w)
+void hitpoker_state::hitpoker_paletteram_w(offs_t offset, uint8_t data)
 {
 	int r,g,b,datax;
 	m_paletteram[offset] = data;
@@ -217,7 +217,7 @@ void hitpoker_state::hitpoker_pic_w(offs_t offset, uint8_t data)
 }
 
 #if 0
-READ8_MEMBER(hitpoker_state::test_r)
+uint8_t hitpoker_state::test_r()
 {
 	return machine().rand();
 }

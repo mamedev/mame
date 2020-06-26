@@ -42,7 +42,7 @@ namespace factory {
 	{
 	}
 
-	void list_t::add(plib::unique_ptr<element_t> &&factory)
+	void list_t::add(host_arena::unique_ptr<element_t> &&factory)
 	{
 		for (auto & e : *this)
 			if (e->name() == factory->name())
@@ -66,19 +66,17 @@ namespace factory {
 	}
 
 	// -----------------------------------------------------------------------------
-	// factory_lib_entry_t: factory class to wrap macro based chips/elements
+	// library_element_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	unique_pool_ptr<core_device_t> library_element_t::make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name)
+	library_element_t::library_element_t(const pstring &name, properties &&props)
+	: element_t(name, std::move(properties(props).set_type(element_type::MACRO)))
 	{
-		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
 	}
 
-	void library_element_t::macro_actions(nlparse_t &nparser, const pstring &name)
+	device_arena::unique_ptr<core_device_t> library_element_t::make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name)
 	{
-		nparser.namespace_push(name);
-		nparser.include(this->name());
-		nparser.namespace_pop();
+		return plib::make_unique<NETLIB_NAME(wrapper)>(pool, anetlist, name);
 	}
 
 

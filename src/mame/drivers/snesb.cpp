@@ -177,21 +177,21 @@ private:
 	std::unique_ptr<int8_t[]> m_shared_ram;
 	uint8_t m_cnt;
 	std::unique_ptr<int8_t[]> m_shared_ram2;
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
-	DECLARE_READ8_MEMBER(sb2b_75bd37_r);
-	DECLARE_READ8_MEMBER(sb2b_6a6xxx_r);
-	DECLARE_READ8_MEMBER(sb2b_7xxx_r);
-	DECLARE_READ8_MEMBER(endless_580xxx_r);
-	DECLARE_READ8_MEMBER(endless_624b7f_r);
-	DECLARE_READ8_MEMBER(endless_800b_r);
-	DECLARE_READ8_MEMBER(rushbets_75axxx_r);
-	DECLARE_READ8_MEMBER(rushbets_5b8e3c_r);
-	DECLARE_READ8_MEMBER(sharedram2_r);
-	DECLARE_WRITE8_MEMBER(sharedram2_w);
-	DECLARE_READ8_MEMBER(snesb_dsw1_r);
-	DECLARE_READ8_MEMBER(snesb_dsw2_r);
-	DECLARE_READ8_MEMBER(snesb_coin_r);
+	uint8_t sharedram_r(offs_t offset);
+	void sharedram_w(offs_t offset, uint8_t data);
+	uint8_t sb2b_75bd37_r();
+	uint8_t sb2b_6a6xxx_r(offs_t offset);
+	uint8_t sb2b_7xxx_r(offs_t offset);
+	uint8_t endless_580xxx_r(offs_t offset);
+	uint8_t endless_624b7f_r();
+	uint8_t endless_800b_r(offs_t offset);
+	uint8_t rushbets_75axxx_r(offs_t offset);
+	uint8_t rushbets_5b8e3c_r();
+	uint8_t sharedram2_r(offs_t offset);
+	void sharedram2_w(offs_t offset, uint8_t data);
+	uint8_t snesb_dsw1_r();
+	uint8_t snesb_dsw2_r();
+	uint8_t snesb_coin_r();
 	DECLARE_MACHINE_RESET(ffight2b);
 	void mcu_io_map(address_map &map);
 	void snesb_map(address_map &map);
@@ -200,24 +200,24 @@ private:
 
 
 /* Killer Instinct */
-READ8_MEMBER(snesb_state::sharedram_r)
+uint8_t snesb_state::sharedram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER(snesb_state::sharedram_w)
+void snesb_state::sharedram_w(offs_t offset, uint8_t data)
 {
 	m_shared_ram[offset]=data;
 }
 
 /* Sonic Blast Man 2 Special Turbo */
-READ8_MEMBER(snesb_state::sb2b_75bd37_r)
+uint8_t snesb_state::sb2b_75bd37_r()
 {
 	/* protection check */
 	return ++m_cnt;
 }
 
-READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
+uint8_t snesb_state::sb2b_6a6xxx_r(offs_t offset)
 {
 	/* protection checks */
 	switch(offset)
@@ -235,14 +235,14 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 	return 0;
 }
 
-READ8_MEMBER(snesb_state::sb2b_7xxx_r)
+uint8_t snesb_state::sb2b_7xxx_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(0xc07000 + offset);
 }
 
 
 /* Endless Duel */
-READ8_MEMBER(snesb_state::endless_580xxx_r)
+uint8_t snesb_state::endless_580xxx_r(offs_t offset)
 {
 	/* protection checks */
 	switch(offset)
@@ -259,13 +259,13 @@ READ8_MEMBER(snesb_state::endless_580xxx_r)
 	return 0;
 }
 
-READ8_MEMBER(snesb_state::endless_624b7f_r)
+uint8_t snesb_state::endless_624b7f_r()
 {
 	/* protection check */
 	return ++m_cnt;
 }
 
-READ8_MEMBER(snesb_state::endless_800b_r)
+uint8_t snesb_state::endless_800b_r(offs_t offset)
 {
 	if (!offset)
 	{
@@ -275,19 +275,19 @@ READ8_MEMBER(snesb_state::endless_800b_r)
 	return 0xe8;
 }
 
-READ8_MEMBER(snesb_state::sharedram2_r)
+uint8_t snesb_state::sharedram2_r(offs_t offset)
 {
 	return m_shared_ram2[offset];
 }
 
-WRITE8_MEMBER(snesb_state::sharedram2_w)
+void snesb_state::sharedram2_w(offs_t offset, uint8_t data)
 {
 	m_shared_ram2[offset]=data;
 }
 
 /* Rushing Beat Shura */
 
-READ8_MEMBER(snesb_state::rushbets_75axxx_r)
+uint8_t snesb_state::rushbets_75axxx_r(offs_t offset)
 {
 /* protection checks */
 	switch(offset)
@@ -304,24 +304,24 @@ READ8_MEMBER(snesb_state::rushbets_75axxx_r)
 	return 0;
 }
 
-READ8_MEMBER(snesb_state::rushbets_5b8e3c_r)
+uint8_t snesb_state::rushbets_5b8e3c_r()
 {
 	/* protection check */
 	return ++m_cnt;
 }
 
 /* Generic read handlers for Dip Switches and coins inputs */
-READ8_MEMBER(snesb_state::snesb_dsw1_r)
+uint8_t snesb_state::snesb_dsw1_r()
 {
 	return ioport("DSW1")->read();
 }
 
-READ8_MEMBER(snesb_state::snesb_dsw2_r)
+uint8_t snesb_state::snesb_dsw2_r()
 {
 	return ioport("DSW2")->read();
 }
 
-READ8_MEMBER(snesb_state::snesb_coin_r)
+uint8_t snesb_state::snesb_coin_r()
 {
 	return ioport("COIN")->read();
 }
@@ -859,12 +859,12 @@ void snesb_state::init_kinstb()
 	}
 
 	m_shared_ram = std::make_unique<int8_t[]>(0x100);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x7810ff, read8_delegate(*this, FUNC(snesb_state::sharedram_r)), write8_delegate(*this, FUNC(snesb_state::sharedram_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x7810ff, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes_hirom();
 }
@@ -904,9 +904,9 @@ void snesb_state::init_ffight2b()
 	rom[0x7ffc] = 0x54;
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes();
 }
@@ -928,9 +928,9 @@ void snesb_state::init_iron()
 	}
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes();
 }
@@ -958,9 +958,9 @@ void snesb_state::init_denseib()
 	rom[0xfffd] = 0xf7;
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes_hirom();
 }
@@ -1020,9 +1020,9 @@ void snesb_state::init_denseib2()
 	dst[0xfffd] = 0xf7;
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes_hirom();
 }
@@ -1052,9 +1052,9 @@ void snesb_state::init_legendsb()
 	rom[0x7ffd] = 0x80;
 
 	// extra inputs
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes();
 }
@@ -1111,16 +1111,16 @@ void snesb_state::init_sblast2b()
 	dst[0xfffd] = 0x7a;
 
 	/*  protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75bd37, 0x75bd37, read8_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6a6000, 0x6a6fff, read8_delegate(*this, FUNC(snesb_state::sb2b_6a6xxx_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75bd37, 0x75bd37, read8smo_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6a6000, 0x6a6fff, read8sm_delegate(*this, FUNC(snesb_state::sb2b_6a6xxx_r)));
 
 	/* handler to read boot code */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x007000, 0x007fff, read8_delegate(*this, FUNC(snesb_state::sb2b_7xxx_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x007000, 0x007fff, read8sm_delegate(*this, FUNC(snesb_state::sb2b_7xxx_r)));
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes_hirom();
 }
@@ -1179,21 +1179,21 @@ void snesb_state::init_endless()
 	dst[0x7ffd] = 0x80;
 
 	/* protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x580000, 0x580fff, read8_delegate(*this, FUNC(snesb_state::endless_580xxx_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x624b7f, 0x624b7f, read8_delegate(*this, FUNC(snesb_state::endless_624b7f_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x580000, 0x580fff, read8sm_delegate(*this, FUNC(snesb_state::endless_580xxx_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x624b7f, 0x624b7f, read8smo_delegate(*this, FUNC(snesb_state::endless_624b7f_r)));
 
 	/* work around missing content */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800b, 0x800c, read8_delegate(*this, FUNC(snesb_state::endless_800b_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800b, 0x800c, read8sm_delegate(*this, FUNC(snesb_state::endless_800b_r)));
 
 	m_shared_ram = std::make_unique<int8_t[]>(0x22);
 	m_shared_ram2 = std::make_unique<int8_t[]>(0x22);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8_delegate(*this, FUNC(snesb_state::sharedram_r)), write8_delegate(*this, FUNC(snesb_state::sharedram_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8_delegate(*this, FUNC(snesb_state::sharedram2_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes();
 }
@@ -1257,15 +1257,15 @@ void snesb_state::init_rushbets()
 	}
 
 	/* protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75a000, 0x75afff, read8_delegate(*this, FUNC(snesb_state::rushbets_75axxx_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5b8e3c, 0x5b8e3c, read8_delegate(*this, FUNC(snesb_state::rushbets_5b8e3c_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75a000, 0x75afff, read8sm_delegate(*this, FUNC(snesb_state::rushbets_75axxx_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5b8e3c, 0x5b8e3c, read8smo_delegate(*this, FUNC(snesb_state::rushbets_5b8e3c_r)));
 
 	m_shared_ram = std::make_unique<int8_t[]>(0x10);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x785000, 0x78500f, read8_delegate(*this, FUNC(snesb_state::sharedram_r)), write8_delegate(*this, FUNC(snesb_state::sharedram_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x785000, 0x78500f, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	// boot vector
 	dst[0xfffc] = 0xec;
@@ -1343,13 +1343,13 @@ void snesb_state::init_venom()
 
 	m_shared_ram = std::make_unique<int8_t[]>(0x22);
 	m_shared_ram2 = std::make_unique<int8_t[]>(0x22);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8_delegate(*this, FUNC(snesb_state::sharedram_r)), write8_delegate(*this, FUNC(snesb_state::sharedram_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8_delegate(*this, FUNC(snesb_state::sharedram2_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
 
 	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
 
 	init_snes();
 }

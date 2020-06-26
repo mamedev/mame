@@ -48,11 +48,11 @@ protected:
 	int m_bgcharbank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	DECLARE_WRITE16_MEMBER(tigeroad_soundcmd_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_videoram_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_videoctrl_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_scroll_w);
-	DECLARE_WRITE8_MEMBER(msm5205_w);
+	void tigeroad_soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tigeroad_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tigeroad_videoctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tigeroad_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void msm5205_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
@@ -98,9 +98,9 @@ public:
 	void bballs(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(mcu_comm_r);
-	DECLARE_WRITE16_MEMBER(pushman_mcu_comm_w);
-	DECLARE_WRITE16_MEMBER(bballs_mcu_comm_w);
+	uint16_t mcu_comm_r(offs_t offset, uint16_t mem_mask = ~0);
+	void pushman_mcu_comm_w(offs_t offset, uint16_t data);
+	void bballs_mcu_comm_w(uint16_t data);
 
 	void mcu_pa_w(uint8_t data);
 	void mcu_pb_w(uint8_t data);
@@ -137,10 +137,10 @@ private:
 
 	void out3_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mcu_shared_r);
-	DECLARE_WRITE8_MEMBER(mcu_shared_w);
+	uint8_t mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE16_MEMBER(blktiger_to_mcu_w);
+	void blktiger_to_mcu_w(uint16_t data);
 
 	required_device<i8751_device> m_mcu;
 	uint8_t m_old_p3;

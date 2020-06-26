@@ -114,7 +114,7 @@ void adam_spi_device::adamnet_reset_w(int state)
 //  p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_spi_device::p2_r )
+uint8_t adam_spi_device::p2_r()
 {
 	/*
 
@@ -141,7 +141,7 @@ READ8_MEMBER( adam_spi_device::p2_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_spi_device::p2_w )
+void adam_spi_device::p2_w(uint8_t data)
 {
 	/*
 

@@ -123,8 +123,8 @@ private:
 
 	// I/O handlers
 	void lcd_q_w(u32 data) { m_lcd_q = data; }
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_READ8_MEMBER(nvram_r);
+	void nvram_w(offs_t offset, u8 data);
+	u8 nvram_r(offs_t offset);
 	void input_w(u8 data);
 	u8 input_r();
 	void control_w(u8 data);
@@ -152,14 +152,14 @@ void ssystem3_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(ssystem3_state::nvram_w)
+void ssystem3_state::nvram_w(offs_t offset, u8 data)
 {
 	// nvram is only d0-d3
 	if (m_inputs[5]->read() & 1)
 		m_nvram[offset] = data & 0x0f;
 }
 
-READ8_MEMBER(ssystem3_state::nvram_r)
+u8 ssystem3_state::nvram_r(offs_t offset)
 {
 	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
 }

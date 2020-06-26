@@ -102,18 +102,18 @@ private:
 
 	required_region_ptr<uint8_t> m_n7751_data;
 
-	DECLARE_READ8_MEMBER(unk_87_r);
-	DECLARE_WRITE8_MEMBER(unk_8a_w);
-	DECLARE_WRITE8_MEMBER(unk_8c_w);
-	DECLARE_READ8_MEMBER(unk_8c_r);
-	DECLARE_READ8_MEMBER(sound_ack_r);
-	DECLARE_WRITE8_MEMBER(unk_8f_w);
-	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(ay_select_w);
-	DECLARE_WRITE8_MEMBER(ack_w);
-	DECLARE_WRITE8_MEMBER(ay_address_w);
-	DECLARE_WRITE8_MEMBER(ay_data_w);
+	uint8_t unk_87_r();
+	void unk_8a_w(uint8_t data);
+	void unk_8c_w(uint8_t data);
+	uint8_t unk_8c_r();
+	uint8_t sound_ack_r();
+	void unk_8f_w(uint8_t data);
+	void tilebank_w(uint8_t data);
+	uint8_t latch_r();
+	void ay_select_w(uint8_t data);
+	void ack_w(uint8_t data);
+	void ay_address_w(uint8_t data);
+	void ay_data_w(uint8_t data);
 	uint8_t n7751_rom_r();
 	uint8_t n7751_command_r();
 	void n7751_p2_w(uint8_t data);
@@ -172,13 +172,13 @@ void othello_state::main_map(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-READ8_MEMBER(othello_state::unk_87_r)
+uint8_t othello_state::unk_87_r()
 {
 	/* n7751_status_r ?  bit 7 = ack/status from device connected  to port 8a? */
 	return machine().rand();
 }
 
-WRITE8_MEMBER(othello_state::unk_8a_w)
+void othello_state::unk_8a_w(uint8_t data)
 {
 	/*
 	m_n7751_command = (data & 0x07);
@@ -190,27 +190,27 @@ WRITE8_MEMBER(othello_state::unk_8a_w)
 	logerror("8a -> %x\n", data);
 }
 
-WRITE8_MEMBER(othello_state::unk_8c_w)
+void othello_state::unk_8c_w(uint8_t data)
 {
 	logerror("8c -> %x\n", data);
 }
 
-READ8_MEMBER(othello_state::unk_8c_r)
+uint8_t othello_state::unk_8c_r()
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(othello_state::sound_ack_r)
+uint8_t othello_state::sound_ack_r()
 {
 	return m_ack_data;
 }
 
-WRITE8_MEMBER(othello_state::unk_8f_w)
+void othello_state::unk_8f_w(uint8_t data)
 {
 	logerror("8f -> %x\n", data);
 }
 
-WRITE8_MEMBER(othello_state::tilebank_w)
+void othello_state::tilebank_w(uint8_t data)
 {
 	m_tile_bank = (data == 0x0f) ? 0x100 : 0x00;
 	logerror("tilebank -> %x\n", data);
@@ -232,30 +232,30 @@ void othello_state::main_portmap(address_map &map)
 	map(0x8f, 0x8f).w(FUNC(othello_state::unk_8f_w));
 }
 
-READ8_MEMBER(othello_state::latch_r)
+uint8_t othello_state::latch_r()
 {
 	int retval = m_soundlatch->read();
 	m_soundlatch->clear_w();
 	return retval;
 }
 
-WRITE8_MEMBER(othello_state::ay_select_w)
+void othello_state::ay_select_w(uint8_t data)
 {
 	m_ay_select = data;
 }
 
-WRITE8_MEMBER(othello_state::ack_w)
+void othello_state::ack_w(uint8_t data)
 {
 	m_ack_data = data;
 }
 
-WRITE8_MEMBER(othello_state::ay_address_w)
+void othello_state::ay_address_w(uint8_t data)
 {
 	if (m_ay_select & 1) m_ay[0]->address_w(data);
 	if (m_ay_select & 2) m_ay[1]->address_w(data);
 }
 
-WRITE8_MEMBER(othello_state::ay_data_w)
+void othello_state::ay_data_w(uint8_t data)
 {
 	if (m_ay_select & 1) m_ay[0]->data_w(data);
 	if (m_ay_select & 2) m_ay[1]->data_w(data);

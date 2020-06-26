@@ -118,7 +118,7 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 #include "speaker.h"
 
 
-READ8_MEMBER(mainsnk_state::sound_ack_r)
+uint8_t mainsnk_state::sound_ack_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;

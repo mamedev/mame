@@ -105,13 +105,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 ***************************************************************************/
 
-WRITE8_MEMBER(shocking_state::sound_bank_w)
+void shocking_state::sound_bank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 3);
 }
 
 template<int Layer>
-WRITE16_MEMBER(yunsun16_state::vram_w)
+void yunsun16_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
@@ -159,7 +159,7 @@ void shocking_state::main_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(magicbub_state::magicbub_sound_command_w)
+void magicbub_state::magicbub_sound_command_w(uint8_t data)
 {
 	// HACK: the game continuously sends this. It'll play the oki sample number 0 on each voice. That sample is 00000-00000.
 	if ((data & 0xff) != 0x3a)

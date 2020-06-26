@@ -96,8 +96,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_WRITE8_MEMBER(bg_vram_w);
-	DECLARE_WRITE8_MEMBER(fg_vram_w);
+	void bg_vram_w(offs_t offset, u8 data);
+	void fg_vram_w(offs_t offset, u8 data);
 
 	void init_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -205,13 +205,13 @@ u32 lbeach_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 }
 
 
-WRITE8_MEMBER(lbeach_state::bg_vram_w)
+void lbeach_state::bg_vram_w(offs_t offset, u8 data)
 {
 	m_bg_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lbeach_state::fg_vram_w)
+void lbeach_state::fg_vram_w(offs_t offset, u8 data)
 {
 	m_fg_vram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

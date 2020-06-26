@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+    GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
-	GPL16250 is the GeneralPlus / SunPlus part number
-	GPAC800 is the JAKKS Pacific codename
-	GMC384 / GCM420 is what is printed on the die
+    GPL16250 is the GeneralPlus / SunPlus part number
+    GPAC800 is the JAKKS Pacific codename
+    GMC384 / GCM420 is what is printed on the die
 
-	----
+    ----
 
-	GPL16250 games using ROM + RAM configuration
+    GPL16250 games using ROM + RAM configuration
 */
 
 #include "emu.h"
@@ -193,23 +193,23 @@ INPUT_PORTS_END
 
 
 
-READ16_MEMBER(wrlshunt_game_state::cs0_r)
+uint16_t wrlshunt_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & m_romwords_mask];
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
+void wrlshunt_game_state::cs0_w(offs_t offset, uint16_t data)
 {
 	logerror("cs0_w write to ROM?\n");
 	//m_romregion[offset & 0x3ffffff] = data;
 }
 
-READ16_MEMBER(wrlshunt_game_state::cs1_r)
+uint16_t wrlshunt_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & 0x3fffff];
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
+void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
 {
 	m_sdram[offset & 0x3fffff] = data;
 }
@@ -227,7 +227,7 @@ void wrlshunt_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(1);
+	//m_maincpu->set_paldisplaybank_high_hack(1);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
@@ -309,13 +309,62 @@ void jak_s500_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(0);
+	//m_maincpu->set_paldisplaybank_high_hack(0);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
+void lazertag_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	//m_maincpu->set_pal_sprites_hack(0x800);
+}
+
+void paccon_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16smo_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
+//  install_speedup_hack(0x6593, 0x30033);
+}
+
+void jak_pf_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0001, 0x0001, read16smo_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x13dd, 0x13dd, read16smo_delegate(*this, FUNC(jak_pf_game_state::jak_pf_speedup_hack2_r)));
+}
+
+void jak_prft_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	//m_maincpu->set_alt_tile_addressing_hack(0);
+	m_maincpu->set_alt_extrasprite_hack(1);
+}
 
 
+uint16_t paccon_game_state::paccon_speedup_hack_r()
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x30033)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x6593);
+}
+
+uint16_t jak_pf_game_state::jak_pf_speedup_hack_r()
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x30010)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x0001);
+}
+
+uint16_t jak_pf_game_state::jak_pf_speedup_hack2_r()
+{
+	u32 const pc = m_maincpu->pc();
+	if (pc == 0x2611b4)
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(2000));
+	return m_maincpu->get_ram_addr(0x13dd);
+}
 
 ROM_START( paccon )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -482,17 +531,19 @@ which is also found in the Wireless Air 60 ROM.
 */
 
 
-// also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
-CONS(2012, paccon, 0, 0, paccon, paccon, jak_s500_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2008, lazertag, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
+CONS(2012, paccon, 0, 0, paccon, paccon, paccon_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2008, lazertag, 0, 0, wrlshunt, jak_s500, lazertag_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
+CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
 CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
-CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

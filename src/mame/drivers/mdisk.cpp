@@ -55,7 +55,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(uart1_txrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_motor_w);
-	DECLARE_WRITE8_MEMBER(fdc_side_w);
+	void fdc_side_w(uint8_t data);
 
 	void update_irq(uint8_t vector);
 
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(mdisk_state::fdc_motor_w)
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 }
 
-WRITE8_MEMBER(mdisk_state::fdc_side_w)
+void mdisk_state::fdc_side_w(uint8_t data)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(BIT(data, 0));
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(BIT(data, 0));

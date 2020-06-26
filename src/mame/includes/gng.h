@@ -33,13 +33,13 @@ public:
 	void diamond(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
+	void gng_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ym_reset_w);
-	DECLARE_READ8_MEMBER(diamond_hack_r);
-	DECLARE_WRITE8_MEMBER(gng_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(gng_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
-	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
+	uint8_t diamond_hack_r();
+	void gng_fgvideoram_w(offs_t offset, uint8_t data);
+	void gng_bgvideoram_w(offs_t offset, uint8_t data);
+	void gng_bgscrollx_w(offs_t offset, uint8_t data);
+	void gng_bgscrolly_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

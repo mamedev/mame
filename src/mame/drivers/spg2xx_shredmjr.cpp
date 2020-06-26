@@ -20,8 +20,8 @@ public:
 	void init_taikeegr();
 
 protected:
-	DECLARE_READ16_MEMBER(porta_r);
-	virtual  DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t porta_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	uint16_t m_porta_data;
@@ -30,8 +30,8 @@ private:
 };
 
 
-// Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multplexed bit
-WRITE16_MEMBER(shredmjr_game_state::porta_w)
+// Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multiplexed bit
+void shredmjr_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data != m_porta_data)
 	{
@@ -77,7 +77,7 @@ WRITE16_MEMBER(shredmjr_game_state::porta_w)
 	m_porta_data = data;
 }
 
-READ16_MEMBER(shredmjr_game_state::porta_r)
+uint16_t shredmjr_game_state::porta_r()
 {
 	//logerror("porta_r with shift amount %d \n", m_shiftamount);
 	uint16_t ret = 0x0000;

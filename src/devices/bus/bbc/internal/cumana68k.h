@@ -34,11 +34,11 @@ public:
 	// construction/destruction
 	bbc_cumana68k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(pia_rtc_pb_w);
-	DECLARE_WRITE8_MEMBER(pia_sasi_pb_w);
+	void pia_rtc_pb_w(uint8_t data);
+	void pia_sasi_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mem6502_r);
-	DECLARE_WRITE8_MEMBER(mem6502_w);
+	uint8_t mem6502_r(offs_t offset);
+	void mem6502_w(offs_t offset, uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

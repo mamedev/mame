@@ -52,19 +52,19 @@ void xavix_adc_device::device_reset()
 }
 
 
-READ8_MEMBER(xavix_adc_device::adc_7b80_r)
+uint8_t xavix_adc_device::adc_7b80_r()
 {
 	LOG("%s: adc_7b80_r\n", machine().describe_context());
 	return m_adc_inlatch;
 }
 
-WRITE8_MEMBER(xavix_adc_device::adc_7b80_w)
+void xavix_adc_device::adc_7b80_w(uint8_t data)
 {
 	// is the latch writeable?
 	LOG("%s: adc_7b80_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_adc_device::adc_7b81_w)
+void xavix_adc_device::adc_7b81_w(uint8_t data)
 {
 //  m_irqsource &= ~0x04;
 //  update_irqs();
@@ -91,7 +91,7 @@ WRITE8_MEMBER(xavix_adc_device::adc_7b81_w)
 //  m_adc_timer->adjust(attotime::from_usec(200));
 }
 
-READ8_MEMBER(xavix_adc_device::adc_7b81_r)
+uint8_t xavix_adc_device::adc_7b81_r()
 {
 //  has_wamg polls this if interrupt is enabled
 	return machine().rand();

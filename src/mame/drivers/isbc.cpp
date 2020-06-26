@@ -64,12 +64,12 @@ private:
 //  DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	uint8_t get_slave_ack(offs_t offset);
 	void ppi_c_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(upperen_w);
-	DECLARE_READ16_MEMBER(bioslo_r);
-	DECLARE_WRITE16_MEMBER(bioslo_w);
+	void upperen_w(uint8_t data);
+	uint16_t bioslo_r(offs_t offset);
+	void bioslo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(edge_intr_clear_w);
-	DECLARE_WRITE8_MEMBER(status_register_w);
+	void edge_intr_clear_w(uint8_t data);
+	void status_register_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out2_w);
@@ -267,12 +267,12 @@ void isbc_state::ppi_c_w(uint8_t data)
 		m_pic_1->ir7_w(0);
 }
 
-WRITE8_MEMBER(isbc_state::upperen_w)
+void isbc_state::upperen_w(uint8_t data)
 {
 	m_upperen = true;
 }
 
-READ16_MEMBER(isbc_state::bioslo_r)
+uint16_t isbc_state::bioslo_r(offs_t offset)
 {
 	if(m_upperen)
 		return m_biosram[offset];
@@ -281,7 +281,7 @@ READ16_MEMBER(isbc_state::bioslo_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(isbc_state::bioslo_w)
+void isbc_state::bioslo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_upperen)
 		COMBINE_DATA(&m_biosram[offset]);
@@ -295,12 +295,12 @@ WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 }
 #endif
 
-WRITE8_MEMBER(isbc_state::edge_intr_clear_w)
+void isbc_state::edge_intr_clear_w(uint8_t data)
 {
 	// reset U32 flipflop
 }
 
-WRITE8_MEMBER(isbc_state::status_register_w)
+void isbc_state::status_register_w(uint8_t data)
 {
 	m_megabyte_page = (data & 0xf0) << 16;
 	m_statuslatch->write_bit(data & 0x07, BIT(data, 3));

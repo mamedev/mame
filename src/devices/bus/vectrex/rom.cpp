@@ -64,7 +64,7 @@ void vectrex_rom64k_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(vectrex_rom_device::read_rom)
+uint8_t vectrex_rom_device::read_rom(offs_t offset)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -73,7 +73,7 @@ READ8_MEMBER(vectrex_rom_device::read_rom)
 }
 
 
-READ8_MEMBER(vectrex_rom64k_device::read_rom)
+uint8_t vectrex_rom64k_device::read_rom(offs_t offset)
 {
 	return m_rom[(offset + m_bank * 0x8000) & (m_rom_size - 1)];
 }
@@ -83,7 +83,7 @@ void vectrex_rom64k_device::write_bank(uint8_t data)
 	m_bank = data >> 6;
 }
 
-WRITE8_MEMBER(vectrex_sram_device::write_ram)
+void vectrex_sram_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_rom[offset & (m_rom_size - 1)] = data;
 }

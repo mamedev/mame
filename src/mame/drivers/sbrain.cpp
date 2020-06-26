@@ -111,10 +111,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(external_rxc_w);
 	DECLARE_WRITE_LINE_MEMBER(internal_txc_rxc_w);
 
-	void sbrain_io(address_map &map);
-	void sbrain_mem(address_map &map);
-	void sbrain_subio(address_map &map);
-	void sbrain_submem(address_map &map);
+	void main_io_map(address_map &map);
+	void main_mem_map(address_map &map);
+	void sub_io_map(address_map &map);
+	void sub_mem_map(address_map &map);
 
 	bool m_busak;
 	u8 m_keydown;
@@ -144,12 +144,12 @@ private:
 	required_ioport m_serial_sw;
 };
 
-void sbrain_state::sbrain_mem(address_map &map)
+void sbrain_state::main_mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(sbrain_state::mem_r), FUNC(sbrain_state::mem_w));
 }
 
-void sbrain_state::sbrain_io(address_map &map)
+void sbrain_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x41).mirror(6).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -160,13 +160,13 @@ void sbrain_state::sbrain_io(address_map &map)
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void sbrain_state::sbrain_submem(address_map &map)
+void sbrain_state::sub_mem_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0xf000).rom().region("subcpu", 0);
 	map(0x8800, 0x8bff).mirror(0x7400).ram().share("buffer");
 }
 
-void sbrain_state::sbrain_subio(address_map &map)
+void sbrain_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0x1f);
 	map(0x08, 0x0b).mirror(4).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
@@ -585,6 +585,15 @@ void sbrain_state::machine_start()
 	std::fill_n(m_ram->pointer(), m_ram->size(), 0x00);
 
 	m_usart[0]->write_cts(0);
+
+	save_item(NAME(m_busak));
+	save_item(NAME(m_keydown));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_portc));
+	save_item(NAME(m_port10));
+	save_item(NAME(m_key_data));
+	save_item(NAME(m_framecnt));
 }
 
 static void sbrain_floppies(device_slot_interface &device)
@@ -674,12 +683,12 @@ void sbrain_state::sbrain(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sbrain_state::sbrain_mem);
-	m_maincpu->set_addrmap(AS_IO, &sbrain_state::sbrain_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbrain_state::main_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sbrain_state::main_io_map);
 
 	Z80(config, m_subcpu, 16_MHz_XTAL / 4);
-	m_subcpu->set_addrmap(AS_PROGRAM, &sbrain_state::sbrain_submem);
-	m_subcpu->set_addrmap(AS_IO, &sbrain_state::sbrain_subio);
+	m_subcpu->set_addrmap(AS_PROGRAM, &sbrain_state::sub_mem_map);
+	m_subcpu->set_addrmap(AS_IO, &sbrain_state::sub_io_map);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
@@ -761,4 +770,4 @@ ROM_START( sbrain )
 	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, empty_init, "Intertec Data Systems", "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, empty_init, "Intertec Data Systems", "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

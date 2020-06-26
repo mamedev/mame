@@ -81,7 +81,7 @@
  *
  *************************************/
 
-READ8_MEMBER(astrof_state::irq_clear_r)
+uint8_t astrof_state::irq_clear_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -270,21 +270,21 @@ void astrof_state::tomahawk_get_pens( pen_t *pens )
 }
 
 
-WRITE8_MEMBER(astrof_state::astrof_videoram_w)
+void astrof_state::astrof_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = *m_astrof_color & 0x0e;
 }
 
 
-WRITE8_MEMBER(astrof_state::tomahawk_videoram_w)
+void astrof_state::tomahawk_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = (*m_astrof_color & 0x0e) | ((*m_astrof_color & 0x01) << 4);
 }
 
 
-WRITE8_MEMBER(astrof_state::video_control_1_w)
+void astrof_state::video_control_1_w(uint8_t data)
 {
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
@@ -312,7 +312,7 @@ void astrof_state::astrof_set_video_control_2( uint8_t data )
 	/* D4-D7 - not connected */
 }
 
-WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
+void astrof_state::astrof_video_control_2_w(uint8_t data)
 {
 	astrof_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -330,7 +330,7 @@ void astrof_state::spfghmk2_set_video_control_2( uint8_t data )
 	/* D3-D7 - not connected */
 }
 
-WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
+void astrof_state::spfghmk2_video_control_2_w(uint8_t data)
 {
 	spfghmk2_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -347,7 +347,7 @@ void astrof_state::tomahawk_set_video_control_2( uint8_t data )
 	m_red_on = (data & 0x08) ? true : false;
 }
 
-WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
+void astrof_state::tomahawk_video_control_2_w(uint8_t data)
 {
 	tomahawk_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -429,28 +429,28 @@ uint32_t astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-READ8_MEMBER(astrof_state::shoot_r)
+uint8_t astrof_state::shoot_r()
 {
 	/* not really sure about this */
 	return machine().rand() & 8;
 }
 
 
-READ8_MEMBER(astrof_state::abattle_coin_prot_r)
+uint8_t astrof_state::abattle_coin_prot_r()
 {
 	m_abattle_count = (m_abattle_count + 1) % 0x0101;
 	return m_abattle_count ? 0x07 : 0x00;
 }
 
 
-READ8_MEMBER(astrof_state::afire_coin_prot_r)
+uint8_t astrof_state::afire_coin_prot_r()
 {
 	m_abattle_count = m_abattle_count ^ 0x01;
 	return m_abattle_count ? 0x07 : 0x00;
 }
 
 
-READ8_MEMBER(astrof_state::tomahawk_protection_r)
+uint8_t astrof_state::tomahawk_protection_r()
 {
 	/* flip the byte */
 	return bitswap<8>(*m_tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -1341,8 +1341,8 @@ void astrof_state::init_abattle()
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 
@@ -1353,8 +1353,8 @@ void astrof_state::init_afire()
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::afire_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::afire_coin_prot_r)));
 }
 
 
@@ -1365,15 +1365,15 @@ void astrof_state::init_sstarbtl()
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 void astrof_state::init_acombat3()
 {
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 

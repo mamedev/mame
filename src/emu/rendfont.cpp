@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    rendfont.c
+    rendfont.cpp
 
     Rendering system font management.
 

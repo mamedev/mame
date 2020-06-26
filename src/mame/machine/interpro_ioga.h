@@ -97,8 +97,8 @@ public:
 
 		IRQ_ENABLE_SERDMA   = 0x0e00,
 	};
-	DECLARE_READ16_MEMBER(hardint_r) { return m_hwicr[offset]; }
-	DECLARE_WRITE16_MEMBER(hardint_w);
+	u16 hardint_r(offs_t offset) { return m_hwicr[offset]; }
+	void hardint_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	enum nmictrl_mask
 	{
@@ -110,11 +110,11 @@ public:
 
 		NMI_IE      = NMI_ENABLE1 | NMI_ENABLE2
 	};
-	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
-	DECLARE_WRITE8_MEMBER(nmictrl_w);
+	u8 nmictrl_r() { return m_nmictrl; }
+	void nmictrl_w(u8 data);
 
-	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
-	DECLARE_WRITE8_MEMBER(softint_w);
+	u8 softint_r() { return m_softint; }
+	void softint_w(u8 data);
 
 	// dma request lines
 	DECLARE_WRITE_LINE_MEMBER(drq_plotter) { drq(state, DMA_PLOTTER); }
@@ -142,30 +142,30 @@ public:
 
 		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields (quad not writable for floppy/plotter?)
 	};
-	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, DMA_PLOTTER); }
-	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, DMA_PLOTTER); }
-	DECLARE_READ32_MEMBER(dma_scsi_r) { return dma_r(space, offset, mem_mask, DMA_SCSI); }
-	DECLARE_WRITE32_MEMBER(dma_scsi_w) { dma_w(space, offset, data, mem_mask, DMA_SCSI); }
-	DECLARE_READ32_MEMBER(dma_floppy_r) { return dma_r(space, offset, mem_mask, DMA_FLOPPY); }
-	DECLARE_WRITE32_MEMBER(dma_floppy_w) { dma_w(space, offset, data, mem_mask, DMA_FLOPPY); }
+	u32 dma_plotter_r(offs_t offset) { return dma_r(offset, DMA_PLOTTER); }
+	void dma_plotter_w(offs_t offset, u32 data, u32 mem_mask = ~0) { dma_w(offset, data, mem_mask, DMA_PLOTTER); }
+	u32 dma_scsi_r(offs_t offset) { return dma_r(offset, DMA_SCSI); }
+	void dma_scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0) { dma_w(offset, data, mem_mask, DMA_SCSI); }
+	u32 dma_floppy_r(offs_t offset) { return dma_r(offset, DMA_FLOPPY); }
+	void dma_floppy_w(offs_t offset, u32 data, u32 mem_mask = ~0) { dma_w(offset, data, mem_mask, DMA_FLOPPY); }
 
-	DECLARE_READ32_MEMBER(serial_dma0_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 0); }
-	DECLARE_WRITE32_MEMBER(serial_dma0_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 0); }
-	DECLARE_READ32_MEMBER(serial_dma0_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 0); }
-	DECLARE_WRITE32_MEMBER(serial_dma0_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 0); }
+	u32 serial_dma0_addr_r() { return serial_dma_addr_r(0); }
+	void serial_dma0_addr_w(offs_t offset, u32 data, u32 mem_mask = ~0) { serial_dma_addr_w(offset, data, mem_mask, 0); }
+	u32 serial_dma0_ctrl_r() { return serial_dma_ctrl_r(0); }
+	void serial_dma0_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) { serial_dma_ctrl_w(offset, data, mem_mask, 0); }
 
-	DECLARE_READ32_MEMBER(serial_dma1_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 1); }
-	DECLARE_WRITE32_MEMBER(serial_dma1_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 1); }
-	DECLARE_READ32_MEMBER(serial_dma1_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 1); }
-	DECLARE_WRITE32_MEMBER(serial_dma1_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 1); }
+	u32 serial_dma1_addr_r() { return serial_dma_addr_r(1); }
+	void serial_dma1_addr_w(offs_t offset, u32 data, u32 mem_mask = ~0) { serial_dma_addr_w(offset, data, mem_mask, 1); }
+	u32 serial_dma1_ctrl_r() { return serial_dma_ctrl_r(1); }
+	void serial_dma1_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) { serial_dma_ctrl_w(offset, data, mem_mask, 1); }
 
-	DECLARE_READ32_MEMBER(serial_dma2_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 2); }
-	DECLARE_WRITE32_MEMBER(serial_dma2_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 2); }
-	DECLARE_READ32_MEMBER(serial_dma2_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 2); }
-	DECLARE_WRITE32_MEMBER(serial_dma2_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 2); }
+	u32 serial_dma2_addr_r() { return serial_dma_addr_r(2); }
+	void serial_dma2_addr_w(offs_t offset, u32 data, u32 mem_mask = ~0) { serial_dma_addr_w(offset, data, mem_mask, 2); }
+	u32 serial_dma2_ctrl_r() { return serial_dma_ctrl_r(2); }
+	void serial_dma2_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) { serial_dma_ctrl_w(offset, data, mem_mask, 2); }
 
-	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) { return m_dma_plotter_eosl; }
-	DECLARE_WRITE32_MEMBER(dma_plotter_eosl_w) { m_dma_plotter_eosl = data ^ 0xffff0000; }
+	u32 dma_plotter_eosl_r() { return m_dma_plotter_eosl; }
+	void dma_plotter_eosl_w(u32 data) { m_dma_plotter_eosl = data ^ 0xffff0000; }
 
 	// bus arbitration and control
 	enum arbctl_mask
@@ -180,8 +180,8 @@ public:
 		ARBCTL_BGR_ETHB = 0x0080,
 		ARBCTL_BGR_ETHA = 0x0100
 	};
-	DECLARE_READ16_MEMBER(arbctl_r) { return m_arbctl; }
-	DECLARE_WRITE16_MEMBER(arbctl_w);
+	u16 arbctl_r() { return m_arbctl; }
+	void arbctl_w(u16 data);
 
 	enum error_businfo_mask
 	{
@@ -200,16 +200,16 @@ public:
 		BINFO_BG_DCAMMU   = 0x0800,
 		BINFO_BG_SRMASTER = 0x0c00
 	};
-	DECLARE_READ32_MEMBER(error_businfo_r);
-	DECLARE_READ32_MEMBER(error_address_r) { return m_error_address; }
-	DECLARE_READ32_MEMBER(bus_timeout_r) { return m_bus_timeout; }
-	DECLARE_WRITE32_MEMBER(bus_timeout_w) { m_bus_timeout = data; }
+	u32 error_businfo_r();
+	u32 error_address_r() { return m_error_address; }
+	u32 bus_timeout_r() { return m_bus_timeout; }
+	void bus_timeout_w(u32 data) { m_bus_timeout = data; }
 
 	void bus_error(offs_t offset, u32 data);
 
 	// timers
-	DECLARE_READ32_MEMBER(timer0_r);
-	DECLARE_WRITE32_MEMBER(timer0_w);
+	u32 timer0_r(offs_t offset, u32 mem_mask = ~0);
+	void timer0_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	enum timer1_mask
 	{
@@ -217,11 +217,11 @@ public:
 		TIMER1_START   = 0x00010000,
 		TIMER1_EXPIRED = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(timer1_r);
-	DECLARE_WRITE32_MEMBER(timer1_w);
+	u32 timer1_r(offs_t offset, u32 mem_mask = ~0);
+	void timer1_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(prescaler_r);
-	DECLARE_WRITE32_MEMBER(prescaler_w);
+	u32 prescaler_r();
+	void prescaler_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// mouse
 	enum mouse_status_mask
@@ -234,7 +234,7 @@ public:
 
 		MOUSE_BUTTONS = 0x00070000
 	};
-	DECLARE_READ32_MEMBER(mouse_status_r);
+	u32 mouse_status_r(offs_t offset, u32 mem_mask = ~0);
 	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
@@ -243,7 +243,7 @@ protected:
 	virtual void device_reset() override;
 
 	required_address_space m_memory_space;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_memory;
 
 	// callbacks
 	devcb_write_line m_out_nmi_func;
@@ -288,8 +288,8 @@ private:
 	void drq(int state, int channel);
 	void serial_drq(int state, int channel);
 
-	u32 dma_r(address_space &space, offs_t offset, u32 mem_mask, dma_channel channel) const;
-	void dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, dma_channel channel);
+	u32 dma_r(offs_t offset, dma_channel channel) const;
+	void dma_w(offs_t offset, u32 data, u32 mem_mask, dma_channel channel);
 
 	enum serial_dma_ctrl_mask : u32
 	{
@@ -304,10 +304,10 @@ private:
 
 		SDMA_1000    = 0x10000000, // set on Sapphire systems?
 	};
-	u32 serial_dma_addr_r(address_space &space, offs_t offset, u32 mem_mask, int channel) const { return m_serial_dma_channel[channel].address; }
-	void serial_dma_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
-	u32 serial_dma_ctrl_r(address_space &space, offs_t offset, u32 mem_mask, int channel) const { return m_serial_dma_channel[channel].control; }
-	void serial_dma_ctrl_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
+	u32 serial_dma_addr_r(int channel) const { return m_serial_dma_channel[channel].address; }
+	void serial_dma_addr_w(offs_t offset, u32 data, u32 mem_mask, int channel);
+	u32 serial_dma_ctrl_r(int channel) const { return m_serial_dma_channel[channel].control; }
+	void serial_dma_ctrl_w(offs_t offset, u32 data, u32 mem_mask, int channel);
 
 	// interrupt state
 	int m_nmi_state;
@@ -381,8 +381,8 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE16_MEMBER(eth_w);
-	DECLARE_READ16_MEMBER(eth_r);
+	void eth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 eth_r(offs_t offset, u16 mem_mask = ~0);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
@@ -391,8 +391,8 @@ protected:
 	{
 		ETH_BASE_MASK = 0xffe00000
 	};
-	DECLARE_READ32_MEMBER(eth_base_r) { return m_eth_base; }
-	DECLARE_WRITE32_MEMBER(eth_base_w);
+	u32 eth_base_r() { return m_eth_base; }
+	void eth_base_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	enum eth_control_mask
 	{
@@ -408,8 +408,8 @@ protected:
 
 		//ETH_MASK     = 0x4ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ16_MEMBER(eth_control_r) { return m_eth_control; }
-	DECLARE_WRITE16_MEMBER(eth_control_w);
+	u16 eth_control_r() { return m_eth_control; }
+	void eth_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 private:
 	u32 m_eth_base;
@@ -423,8 +423,8 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE16_MEMBER(eth_w);
-	DECLARE_READ16_MEMBER(eth_r);
+	void eth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 eth_r(offs_t offset, u16 mem_mask = ~0);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
@@ -433,8 +433,8 @@ protected:
 	{
 		ETH_BASE_MASK = 0xffe00000
 	};
-	DECLARE_READ32_MEMBER(eth_base_r) { return m_eth_base; }
-	DECLARE_WRITE32_MEMBER(eth_base_w);
+	u32 eth_base_r() { return m_eth_base; }
+	void eth_base_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	enum eth_control_mask
 	{
@@ -450,8 +450,8 @@ protected:
 
 		//ETH_MASK     = 0x4ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ16_MEMBER(eth_control_r) { return m_eth_control; }
-	DECLARE_WRITE16_MEMBER(eth_control_w);
+	u16 eth_control_r() { return m_eth_control; }
+	void eth_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 private:
 	u32 m_eth_base;
@@ -467,13 +467,13 @@ public:
 
 	virtual TIMER_CALLBACK_MEMBER(timer_60hz) override;
 
-	DECLARE_WRITE16_MEMBER(eth_w);
-	DECLARE_READ16_MEMBER(eth_r);
+	void eth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 eth_r(offs_t offset, u16 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(timer2_count_r);
-	DECLARE_WRITE32_MEMBER(timer2_count_w);
-	DECLARE_READ32_MEMBER(timer2_value_r);
-	DECLARE_WRITE32_MEMBER(timer2_value_w);
+	u32 timer2_count_r(offs_t offset, u32 mem_mask = ~0);
+	void timer2_count_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 timer2_value_r(offs_t offset, u32 mem_mask = ~0);
+	void timer2_value_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	enum timer3_mask
 	{
@@ -481,12 +481,12 @@ public:
 		TIMER3_START   = 0x40000000,
 		TIMER3_EXPIRED = 0x80000000
 	};
-	DECLARE_READ32_MEMBER(timer3_r);
-	DECLARE_WRITE32_MEMBER(timer3_w);
+	u32 timer3_r(offs_t offset, u32 mem_mask = ~0);
+	void timer3_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 
-	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
-	DECLARE_WRITE16_MEMBER(softint_vector_w);
+	u16 softint_vector_r(offs_t offset) { return m_swicr[offset]; }
+	void softint_vector_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	virtual IRQ_CALLBACK_MEMBER(acknowledge_interrupt) override;
 
@@ -507,8 +507,8 @@ protected:
 		ETH_CHA_RTAG   = 0x00000e00,
 		ETH_REMAP_ADDR = 0xfffff000
 	};
-	DECLARE_READ32_MEMBER(eth_remap_r) { return m_eth_remap; }
-	DECLARE_WRITE32_MEMBER(eth_remap_w);
+	u32 eth_remap_r() { return m_eth_remap; }
+	void eth_remap_w(u32 data);
 
 	enum eth_mappg_mask
 	{
@@ -519,8 +519,8 @@ protected:
 		ETH_CHB_RTAG  = 0x00000e00,
 		ETH_MAPPG     = 0xfffff000
 	};
-	DECLARE_READ32_MEMBER(eth_mappg_r) { return m_eth_mappg; }
-	DECLARE_WRITE32_MEMBER(eth_mappg_w);
+	u32 eth_mappg_r() { return m_eth_mappg; }
+	void eth_mappg_w(u32 data);
 
 	enum eth_control_mask
 	{
@@ -536,8 +536,8 @@ protected:
 
 		ETH_MASK     = 0x00004ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ32_MEMBER(eth_control_r);
-	DECLARE_WRITE32_MEMBER(eth_control_w);
+	u32 eth_control_r();
+	void eth_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	TIMER_CALLBACK_MEMBER(timer2) {}
 	TIMER_CALLBACK_MEMBER(timer3);

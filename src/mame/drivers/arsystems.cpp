@@ -88,7 +88,7 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
+	void arcadia_multibios_change_game(uint16_t data);
 	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 	void arcadia_cia_0_portb_w(uint8_t data);
@@ -116,12 +116,12 @@ private:
  *
  *************************************/
 
-WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
+void arcadia_amiga_state::arcadia_multibios_change_game(uint16_t data)
 {
 	if (data == 0)
-		space.install_read_bank(0x800000, 0x97ffff, "bank2");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x97ffff, "bank2");
 	else
-		space.nop_read(0x800000, 0x97ffff);
+		m_maincpu->space(AS_PROGRAM).nop_read(0x800000, 0x97ffff);
 }
 
 

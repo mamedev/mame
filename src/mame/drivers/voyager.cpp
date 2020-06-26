@@ -57,7 +57,7 @@ private:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 
@@ -238,7 +238,7 @@ void voyager_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uin
 	}
 }
 
-WRITE32_MEMBER(voyager_state::bios_ram_w)
+void voyager_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 			if (m_mtxc_config_reg[0x63] & 0x50)

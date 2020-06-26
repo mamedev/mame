@@ -38,18 +38,18 @@ class corcomp_fdc_device : public device_t, public device_ti99_peribox_card_inte
 	friend class ccfdc_palu12_device;
 
 public:
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	void setaddress_dbin(offs_t offset, int state) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_hld_w );
-	DECLARE_READ8_MEMBER( tms9901_input );
+	uint8_t tms9901_input(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( select_dsk );
 	DECLARE_WRITE_LINE_MEMBER( side_select );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );

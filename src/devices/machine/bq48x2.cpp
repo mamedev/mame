@@ -17,9 +17,6 @@
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 #include "logmacro.h"
 
-// Need to check whether these chips really support leap year handling
-#define DOLEAPYEARS 1
-
 // device type definition
 DEFINE_DEVICE_TYPE(BQ4842, bq4842_device, "bq4842", "Benchmarq BQ4842 RTC")
 DEFINE_DEVICE_TYPE(BQ4852, bq4852_device, "bq4852", "Benchmarq BQ4852 RTC")
@@ -65,6 +62,7 @@ enum
 bq48x2_device::bq48x2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int memsize)
 	: device_t(mconfig, type, tag, owner, 0),
 	  device_nvram_interface(mconfig, *this),
+	  device_rtc_interface(mconfig, *this),
 	  m_interrupt_cb(*this),
 	  m_resetout_cb(*this),
 	  m_memsize(memsize)
@@ -85,6 +83,21 @@ bq4842_device::bq4842_device(const machine_config &mconfig, const char *tag, dev
 bq4852_device::bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bq48x2_device(mconfig, BQ4852, tag, owner, 512*1024)
 {
+}
+
+/*
+    Inherited from device_rtc_interface. The date and time is given as integer
+    and must be converted to BCD.
+*/
+void bq48x2_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_intreg[reg_hours] = convert_to_bcd(hour);
+	m_intreg[reg_minutes] = convert_to_bcd(minute);
+	m_intreg[reg_seconds] = convert_to_bcd(second);
+	m_intreg[reg_year] = convert_to_bcd(year);
+	m_intreg[reg_month] = convert_to_bcd(month);
+	m_intreg[reg_date] = convert_to_bcd(day);
+	m_intreg[reg_days] = convert_to_bcd(day_of_week);
 }
 
 bool bq48x2_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min)
@@ -114,16 +127,12 @@ bool bq48x2_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min
 	return false;
 }
 
+// TODO: Remove; the real clock cannot verify BCD numbers.
 bool bq48x2_device::valid_bcd(uint8_t value, uint8_t min, uint8_t max)
 {
 	bool valid = ((value>=min) && (value<=max) && ((value&0x0f)<=9));
 	if (!valid) LOGMASKED(LOG_WARN, "Invalid BCD number %02x\n", value);
 	return valid;
-}
-
-uint8_t bq48x2_device::to_bcd(uint8_t value)
-{
-	return (((value / 10) << 4) & 0xf0) | (value % 10);
 }
 
 // ----------------------------------------------------
@@ -134,13 +143,6 @@ uint8_t bq48x2_device::to_bcd(uint8_t value)
 */
 TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_clock_cb)
 {
-	// BCD-encoded numbers
-	static const int days_in_month_table[12] =
-	{
-		0x31,0x28,0x31, 0x30,0x31,0x30,
-		0x31, 0x31, 0x30, 0x31, 0x30, 0x31
-	};
-
 	// Just for debugging
 	static const char* dow[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
@@ -152,6 +154,7 @@ TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_clock_cb)
 		return;
 
 	// When the timer ticks, the 100ths are 0.
+	// TODO: Verify this with a real chip
 	m_intreg[reg_100ths] = 0;
 
 	if (carry)
@@ -163,32 +166,18 @@ TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_clock_cb)
 		carry = increment_bcd(m_intreg[reg_minutes], 0x59, 0);
 
 	if (carry)
-		carry = increment_bcd(m_intreg[reg_hours], 0x23, 0);
-
-	if (carry)
 	{
-		uint8_t month = m_intreg[reg_month];
-		uint8_t days = 30;
-
-		if (valid_bcd(month, 0x01, 0x12))
-			days = days_in_month_table[month-1];
-
-		// Are leap years considered?
-		#if DOLEAPYEARS
-		if ((month==2)
-			&& ((m_intreg[reg_year]%4)==0)
-			&& ((m_intreg[reg_year]%100)!=0
-			   || (m_intreg[reg_year]%400)==0))
-			days = 0x29;
-		#endif
-
-		increment_bcd(m_intreg[reg_days], 7, 1);   // increment the day-of-week (no carry)
-		carry = increment_bcd(m_intreg[reg_date], days, 1);  // and now the day
+		increment_bcd(m_intreg[reg_hours], 0xff, 0);
+		if (m_intreg[reg_hours] == 0x24)
+		{
+			m_intreg[reg_hours] = 0;
+			carry = true;
+		}
 	}
 	if (carry)
-		carry = increment_bcd(m_intreg[reg_month], 0x12, 1);
-	if (carry)
-		carry = increment_bcd(m_intreg[reg_year], 0x99, 0);
+	{
+		advance_days_bcd();
+	}
 
 	LOGMASKED(LOG_CLOCK, "%s 20%02x-%02x-%02x %02x:%02x:%02x\n",
 		dow[m_intreg[reg_days]-1], m_intreg[reg_year], m_intreg[reg_month], m_intreg[reg_date],
@@ -210,6 +199,40 @@ TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_clock_cb)
 		{
 			set_register(reg_flags, FLAG_AF, true);
 			m_interrupt_cb(intrq_r());
+		}
+	}
+}
+void bq48x2_device::advance_days_bcd()
+{
+	bool carry = false;
+
+	// BCD-encoded numbers
+	static const int days_in_month_table[12] =
+	{
+		0x31, 0x28, 0x31, 0x30, 0x31, 0x30,
+		0x31, 0x31, 0x30, 0x31, 0x30, 0x31
+	};
+
+	uint8_t month = bcd_to_integer(m_intreg[reg_month]);
+	if (month > 12) month = 12;
+
+	// if (!valid_bcd(month, 0x01, 0x12)) month = 1;
+	uint8_t days = days_in_month_table[month-1];
+
+	// Leap years are indeed handled (but the year is only 2-digit)
+	if ((month==2) && ((m_intreg[reg_year]%4)==0))
+		days = 0x29;
+
+	increment_bcd(m_intreg[reg_days], 7, 1);  // Increment the day-of-week (without carry)
+	carry = increment_bcd(m_intreg[reg_date], days, 1);
+
+	if (carry)
+	{
+		increment_bcd(m_intreg[reg_month], 0xff, 1);
+		if (m_intreg[reg_month] == 0x13)
+		{
+			m_intreg[reg_month] = 0x01;
+			increment_bcd(m_intreg[reg_year], 0xff, 0);
 		}
 	}
 }
@@ -251,6 +274,7 @@ void bq48x2_device::transfer_to_int()
 		m_intreg[i] = get_register(i, regmask[i]);
 
 	// If we set the 100ths not to be 0, the next second will occur earlier
+	// TODO: Check this with the real chip
 	if (hds != m_intreg[reg_100ths])
 		m_clock_timer->adjust(attotime::from_msec(get_delay()), 0, attotime::from_seconds(1));
 }
@@ -475,21 +499,6 @@ void bq48x2_device::connect_osc(bool conn)
 	}
 }
 
-void bq48x2_device::get_system_time()
-{
-	// Set time from system time
-	system_time systime;
-	machine().current_datetime(systime);
-	m_intreg[reg_hours] = to_bcd(systime.local_time.hour);
-	m_intreg[reg_minutes] = to_bcd(systime.local_time.minute);
-	m_intreg[reg_seconds] = to_bcd(systime.local_time.second);
-	m_intreg[reg_year] = to_bcd(systime.local_time.year%100);
-	m_intreg[reg_month] = to_bcd(systime.local_time.month+1);
-	m_intreg[reg_date] = to_bcd(systime.local_time.mday);
-	m_intreg[reg_days] = to_bcd(systime.local_time.weekday+1);
-	m_intreg[reg_100ths] = 0;
-}
-
 int bq48x2_device::get_delay()
 {
 	int hds = ((m_intreg[reg_100ths] & 0xf0)>>16) * 10 + (m_intreg[reg_100ths] & 0x0f);
@@ -522,7 +531,6 @@ void bq48x2_device::device_start()
 	save_pointer(NAME(m_intreg), 8);
 
 	// Start clock
-	get_system_time();
 	connect_osc(true);
 }
 
@@ -537,7 +545,6 @@ void bq48x2_device::nvram_read(emu_file &file)
 {
 	file.read(m_sram.get(), m_memsize);
 
-	get_system_time();
 	transfer_to_access();  // Transfer the system time into the readable registers
 
 	// Clear the saved flags

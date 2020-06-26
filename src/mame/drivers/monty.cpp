@@ -75,7 +75,7 @@ private:
 	template<int N> void lcd_output_w(offs_t offset, u64 data) { m_lcd_data[N << 4 | offset] = data; } // buffer for screen_update
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(offs_t offset, u8 data);
 	void lcd_w(offs_t offset, u8 data) { m_lcd[m_lcd_cs]->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER(halt_changed) { m_halt = state; }
 
@@ -117,7 +117,7 @@ u32 monty_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, cons
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(monty_state::control_w)
+void monty_state::control_w(offs_t offset, u8 data)
 {
 	// a0: speaker out
 	m_dac->write(BIT(offset, 0));

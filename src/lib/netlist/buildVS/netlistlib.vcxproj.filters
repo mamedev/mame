@@ -162,9 +162,6 @@
     <ClCompile Include="..\devices\nld_7485.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_2716.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_tms4800.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -219,16 +216,10 @@
     <ClCompile Include="..\devices\nld_7474.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_82S126.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nlid_truthtable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_tristate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_82S123.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_legacy.cpp">
@@ -268,6 +259,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74393.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_74163.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_roms.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_74125.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_74377.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\nlm_roms.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -474,9 +480,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nlid_cmos.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_4013.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_4020.h">

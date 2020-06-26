@@ -106,7 +106,7 @@ private:
 	optional_shared_ptr<uint16_t> m_mainram, m_extram, m_vram;
 	required_device<icm7170_device> m_rtc;
 
-	DECLARE_READ16_MEMBER(buserr_r)
+	uint16_t buserr_r()
 	{
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -240,7 +240,7 @@ void wxstar4k_state::wxstar4k(machine_config &config)
 	m_gfxsubcpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::vidbd_sub);
 	m_gfxsubcpu->set_addrmap(AS_IO, &wxstar4k_state::vidbd_sub_io);
 
-	I8051(config, m_datacpu, XTAL(7'372'800));  // 7.3728 MHz crystal connected directly to the CPU
+	I8344(config, m_datacpu, XTAL(7'372'800));  // 7.3728 MHz crystal connected directly to the CPU
 	m_datacpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::databd_main);
 	m_datacpu->set_addrmap(AS_IO, &wxstar4k_state::databd_main_io);
 

@@ -1,14 +1,12 @@
-
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_4013.c
+ * nld_4013.cpp
  *
  */
 
-#include "nld_4013.h"
 #include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_factory.h"
 
 namespace netlist
 {
@@ -21,7 +19,7 @@ namespace netlist
 		, m_D(*this, "DATA")
 		, m_RESET(*this, "RESET")
 		, m_SET(*this, "SET")
-		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(CD4013, clk))
+		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)

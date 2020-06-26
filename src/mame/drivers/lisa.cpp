@@ -147,7 +147,7 @@ void lisa_state::lisa(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(lisa_state::nvram_init));
 
 	/* devices */
-	IWM(config, m_fdc, &lisa2_fdc_interface);
+	LEGACY_IWM(config, m_fdc, &lisa2_fdc_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
 
 	/* software lists */

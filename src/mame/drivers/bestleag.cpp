@@ -60,10 +60,10 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE16_MEMBER(txram_w);
-	DECLARE_WRITE16_MEMBER(bgram_w);
-	DECLARE_WRITE16_MEMBER(fgram_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void txram_w(offs_t offset, uint16_t data);
+	void bgram_w(offs_t offset, uint16_t data);
+	void fgram_w(offs_t offset, uint16_t data);
+	void oki_bank_w(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -227,25 +227,25 @@ uint32_t bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE16_MEMBER(bestleag_state::txram_w)
+void bestleag_state::txram_w(offs_t offset, uint16_t data)
 {
 	m_txram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bestleag_state::bgram_w)
+void bestleag_state::bgram_w(offs_t offset, uint16_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bestleag_state::fgram_w)
+void bestleag_state::fgram_w(offs_t offset, uint16_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bestleag_state::oki_bank_w)
+void bestleag_state::oki_bank_w(uint16_t data)
 {
 	m_oki->set_rom_bank((data - 1) & 3);
 }

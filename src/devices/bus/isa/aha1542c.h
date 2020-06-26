@@ -33,8 +33,8 @@ public:
 	// construction/destruction
 	aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ8_MEMBER( aha1542_r );
-	DECLARE_WRITE8_MEMBER( aha1542_w );
+	u8 aha1542_r(offs_t offset);
+	void aha1542_w(offs_t offset, u8 data);
 
 protected:
 	aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

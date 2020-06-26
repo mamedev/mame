@@ -1158,7 +1158,7 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 	}
 }
 
-READ8_MEMBER(lisa_state::lisa_fdc_io_r)
+uint8_t lisa_state::lisa_fdc_io_r(offs_t offset)
 {
 	int answer=0;
 
@@ -1185,7 +1185,7 @@ READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 	return answer;
 }
 
-WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
+void lisa_state::lisa_fdc_io_w(offs_t offset, uint8_t data)
 {
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1213,7 +1213,7 @@ WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 	}
 }
 
-READ16_MEMBER(lisa_state::lisa_r)
+uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 {
 	int answer=0;
 
@@ -1310,7 +1310,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 			break;
 
 		case IO:
-			answer = lisa_IO_r(space, (address & 0x00ffff) >> 1, mem_mask);
+			answer = lisa_IO_r((address & 0x00ffff) >> 1, mem_mask);
 
 			break;
 
@@ -1386,7 +1386,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 	return answer;
 }
 
-WRITE16_MEMBER(lisa_state::lisa_w)
+void lisa_state::lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* segment register set */
 	int the_seg = m_seg;
@@ -1555,7 +1555,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 			break;
 
 		case IO:
-			lisa_IO_w(space, (address & 0x00ffff) >> 1, data, mem_mask);
+			lisa_IO_w((address & 0x00ffff) >> 1, data, mem_mask);
 			break;
 
 		case RAM_stack_r:   /* read-only */
@@ -1659,7 +1659,7 @@ WRITE_LINE_MEMBER(lisa_state::hdmsk_w)
 		set_parity_error_pending(0);
 }
 
-READ16_MEMBER(lisa_state::lisa_IO_r)
+uint16_t lisa_state::lisa_IO_r(offs_t offset, uint16_t mem_mask)
 {
 	int answer=0;
 
@@ -1784,7 +1784,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 	return answer;
 }
 
-WRITE16_MEMBER(lisa_state::lisa_IO_w)
+void lisa_state::lisa_IO_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch ((offset & 0x7000) >> 12)
 	{

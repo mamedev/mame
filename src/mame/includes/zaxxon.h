@@ -89,21 +89,21 @@ private:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
-	DECLARE_READ8_MEMBER(razmataz_counter_r);
-	DECLARE_WRITE8_MEMBER(zaxxon_control_w);
+	uint8_t razmataz_counter_r();
+	void zaxxon_control_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_a_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_b_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(bg_position_w);
+	void bg_position_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(bg_color_w);
 	DECLARE_WRITE_LINE_MEMBER(bg_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(congo_fg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(congo_color_bank_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_videoram_w);
-	DECLARE_WRITE8_MEMBER(congo_colorram_w);
-	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);
+	void zaxxon_videoram_w(offs_t offset, uint8_t data);
+	void congo_colorram_w(offs_t offset, uint8_t data);
+	void congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);

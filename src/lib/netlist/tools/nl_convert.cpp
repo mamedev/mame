@@ -11,6 +11,12 @@
 #include <unordered_map>
 #include <vector>
 
+namespace netlist
+{
+
+namespace convert
+{
+
 // FIXME: temporarily defined here - should be in a file
 // FIXME: family logic in netlist is convoluted, create
 //        define a model param on core device
@@ -43,7 +49,7 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
 static lib_map_t read_lib_map(const pstring &lm)
 {
-	auto reader = plib::putf8_reader(plib::make_unique<std::istringstream>(lm));
+	auto reader = plib::putf8_reader(std::make_unique<std::istringstream>(lm));
 	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
 	pstring line;
@@ -106,7 +112,7 @@ nl_convert_base_t::~nl_convert_base_t()
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
 	pstring pname = devname + "." + name;
-	m_pins.emplace(pname, plib::make_unique<pin_alias_t>(pname, devname + "." + alias));
+	m_pins.emplace(pname, plib::make_unique<pin_alias_t, arena>(pname, devname + "." + alias));
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
@@ -119,7 +125,7 @@ void nl_convert_base_t::add_ext_alias(const pstring &alias, const pstring &net)
 	m_ext_alias.emplace_back(alias, net);
 }
 
-void nl_convert_base_t::add_device(plib::unique_ptr<dev_t> dev)
+void nl_convert_base_t::add_device(arena::unique_ptr<dev_t> dev)
 {
 	for (auto & d : m_devs)
 		if (d->name() == dev->name())
@@ -132,15 +138,15 @@ void nl_convert_base_t::add_device(plib::unique_ptr<dev_t> dev)
 
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, const pstring &amodel)
 {
-	add_device(plib::make_unique<dev_t>(atype, aname, amodel));
+	add_device(plib::make_unique<dev_t, arena>(atype, aname, amodel));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, double aval)
 {
-	add_device(plib::make_unique<dev_t>(atype, aname, aval));
+	add_device(plib::make_unique<dev_t, arena>(atype, aname, aval));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 {
-	add_device(plib::make_unique<dev_t>(atype, aname));
+	add_device(plib::make_unique<dev_t, arena>(atype, aname));
 }
 
 void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname)
@@ -155,7 +161,7 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname
 		net = m_nets[netname].get();
 	else
 	{
-		auto nets = plib::make_unique<net_t>(netname);
+		auto nets = plib::make_unique<net_t, arena>(netname);
 		net = nets.get();
 		m_nets.emplace(netname, std::move(nets));
 	}
@@ -239,6 +245,7 @@ void nl_convert_base_t::dump_nl()
 	}
 
 	std::vector<size_t> sorted;
+	sorted.reserve(m_devs.size());
 	for (size_t i=0; i < m_devs.size(); i++)
 		sorted.push_back(i);
 	std::sort(sorted.begin(), sorted.end(),
@@ -430,7 +437,7 @@ static int npoly(const pstring &s)
 
 void nl_convert_spice_t::process_line(const pstring &line)
 {
-	if (line != "")
+	if (!line.empty())
 	{
 		//printf("// %s\n", line.c_str());
 		std::vector<pstring> tt(plib::psplit(line, " ", true));
@@ -751,7 +758,7 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg)
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
 
-	tokenizer tok(*this, plib::putf8_reader(plib::make_unique<std::istringstream>(contents)));
+	tokenizer tok(*this, plib::putf8_reader(std::make_unique<std::istringstream>(contents)));
 	tok.stream().stream().imbue(std::locale::classic());
 
 	out("NETLIST_START(dummy)\n");
@@ -898,7 +905,7 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg)
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
-	tokenizer tok(*this, plib::putf8_reader(plib::make_unique<std::istringstream>(contents)));
+	tokenizer tok(*this, plib::putf8_reader(std::make_unique<std::istringstream>(contents)));
 	tok.stream().stream().imbue(std::locale::classic());
 	auto lm = read_lib_map(s_lib_map);
 
@@ -970,7 +977,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			pstring sim = attr["Simulation"];
 			pstring val = attr["Value"];
 			pstring com = attr["Comment"];
-			if (val == "")
+			if (val.empty())
 				val = com;
 
 			if (sim == "CAP")
@@ -1092,3 +1099,6 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 	}
 
 }
+
+} // namespace convert
+} // namespace netlist

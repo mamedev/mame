@@ -23,7 +23,7 @@
 #define OS9_DC5 5
 
 
-READ8_MEMBER(swtpc09_state::unmapped_r)
+uint8_t swtpc09_state::unmapped_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled()) {
 		logerror("%s Unmapped read from addr %04x\n", machine().describe_context(), offset);
@@ -31,7 +31,7 @@ READ8_MEMBER(swtpc09_state::unmapped_r)
 	return 0;
 }
 
-WRITE8_MEMBER(swtpc09_state::unmapped_w)
+void swtpc09_state::unmapped_w(offs_t offset, uint8_t data)
 {
 	logerror("%s Unmapped write to addr %04x with data %02x\n", machine().describe_context(), offset, data);
 }
@@ -229,7 +229,7 @@ uint8_t swtpc09_state::validate_fdc_sector_size(uint8_t cmd)
 /*   DMAF2 Floppy Controller Board                                    */
 /*********************************************************************/
 
-READ8_MEMBER( swtpc09_state::dmaf2_fdc_r )
+uint8_t swtpc09_state::dmaf2_fdc_r(offs_t offset)
 {
 	// TODO Does access to the dmaf2 fdc also trigger the motor timer?
 	if (!machine().side_effects_disabled())
@@ -237,7 +237,7 @@ READ8_MEMBER( swtpc09_state::dmaf2_fdc_r )
 	return m_fdc->fd1797_device::read(offset);
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf2_fdc_w )
+void swtpc09_state::dmaf2_fdc_w(offs_t offset, uint8_t data)
 {
 	// TODO Does access to the dmaf2 fdc also trigger the motor timer.
 	floppy_motor_trigger();
@@ -253,14 +253,14 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_fdc_w )
 
 /* DMAF2 dma extended address register latch. */
 
-READ8_MEMBER ( swtpc09_state::dmaf2_dma_address_reg_r )
+uint8_t swtpc09_state::dmaf2_dma_address_reg_r()
 {
 	// This does not appear to be readable.
 	logerror("%s Unexpected read of DMAF2 DMA address reg\n", machine().describe_context());
 	return 0x00;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf2_dma_address_reg_w )
+void swtpc09_state::dmaf2_dma_address_reg_w(uint8_t data)
 {
 	// This latch appears to be write-only, there is no reader function.
 	// The DMAF2 has a single latch for the high address bits, so it would
@@ -278,14 +278,14 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_dma_address_reg_w )
 }
 
 /* DMAF2 fdc control register */
-READ8_MEMBER ( swtpc09_state::dmaf2_control_reg_r )
+uint8_t swtpc09_state::dmaf2_control_reg_r()
 {
 	// TODO is this readable?
 	logerror("%s Unexpected read from DMAF2 control reg\n", machine().describe_context());
 	return m_fdc_status;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf2_control_reg_w )
+void swtpc09_state::dmaf2_control_reg_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -412,7 +412,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_sso_w )
 /*   DMAF3 Board                                                      */
 /*********************************************************************/
 
-READ8_MEMBER( swtpc09_state::dmaf3_fdc_r )
+uint8_t swtpc09_state::dmaf3_fdc_r(offs_t offset)
 {
 	// TODO Does access to the fdc also trigger the motor timer.
 	if (!machine().side_effects_disabled())
@@ -420,7 +420,7 @@ READ8_MEMBER( swtpc09_state::dmaf3_fdc_r )
 	return m_fdc->fd1797_device::read(offset);
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_fdc_w )
+void swtpc09_state::dmaf3_fdc_w(offs_t offset, uint8_t data)
 {
 	// TODO Does access to the fdc also trigger the motor timer.
 	floppy_motor_trigger();
@@ -482,14 +482,14 @@ WRITE_LINE_MEMBER( swtpc09_state::dmaf3_via_irq )
 }
 
 /* DMAF3 dma extended address register */
-READ8_MEMBER ( swtpc09_state::dmaf3_dma_address_reg_r )
+uint8_t swtpc09_state::dmaf3_dma_address_reg_r()
 {
 	// TODO is this readable?
 	logerror("%s Unexpected read of DMAF3 DMA address reg\n", machine().describe_context());
 	return 0x00;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_dma_address_reg_w )
+void swtpc09_state::dmaf3_dma_address_reg_w(uint8_t data)
 {
 	// Based on source code comments it appears that there are four high
 	// address latches, one for each DMA channel. TODO check hardware or a
@@ -502,14 +502,14 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_dma_address_reg_w )
 }
 
 /* DMAF3 fdc control register */
-READ8_MEMBER ( swtpc09_state::dmaf3_control_reg_r )
+uint8_t swtpc09_state::dmaf3_control_reg_r()
 {
 	// TODO is this readable?
 	logerror("%s Unexpected read from DMAF3 control reg\n", machine().describe_context());
 	return m_fdc_status;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_control_reg_w )
+void swtpc09_state::dmaf3_control_reg_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -564,46 +564,46 @@ WRITE_LINE_MEMBER( swtpc09_state::dmaf3_hdc_drq_w )
 		m6844_hdc_dma_transfer(1);
 }
 
-READ8_MEMBER( swtpc09_state::dmaf3_hdc_control_r )
+uint8_t swtpc09_state::dmaf3_hdc_control_r()
 {
 	// TODO head load toggle?
 	return 0;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_hdc_control_w )
+void swtpc09_state::dmaf3_hdc_control_w(uint8_t data)
 {
 	// TODO head load toggle?
 }
 
-READ8_MEMBER( swtpc09_state::dmaf3_hdc_reset_r )
+uint8_t swtpc09_state::dmaf3_hdc_reset_r()
 {
 	// TODO reset?
 	return 0;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_hdc_reset_w )
+void swtpc09_state::dmaf3_hdc_reset_w(uint8_t data)
 {
 	// TODO reset
 }
 
-READ8_MEMBER( swtpc09_state::dmaf3_archive_reset_r )
+uint8_t swtpc09_state::dmaf3_archive_reset_r()
 {
 	// TODO
 	return 0;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_archive_reset_w )
+void swtpc09_state::dmaf3_archive_reset_w(uint8_t data)
 {
 	// TODO
 }
 
-READ8_MEMBER( swtpc09_state::dmaf3_archive_clear_r )
+uint8_t swtpc09_state::dmaf3_archive_clear_r()
 {
 	// TODO
 	return 0;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_archive_clear_w )
+void swtpc09_state::dmaf3_archive_clear_w(uint8_t data)
 {
 	// TODO
 }
@@ -620,7 +620,7 @@ offs_t swtpc09_state::dat_translate(offs_t offset) const
 	return offs_t(m_dat[offset >> 12] ^ 0x0f) << 12 | (offset & 0x0fff);
 }
 
-READ8_MEMBER(swtpc09_state::main_r)
+uint8_t swtpc09_state::main_r(offs_t offset)
 {
 	if (offset < 0xff00)
 		return m_banked_space->read_byte(dat_translate(offset));
@@ -630,7 +630,7 @@ READ8_MEMBER(swtpc09_state::main_r)
 		return m_banked_space->read_byte(offset | 0xfff00);
 }
 
-WRITE8_MEMBER(swtpc09_state::main_w)
+void swtpc09_state::main_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0xff00)
 		m_banked_space->write_byte(dat_translate(offset), data);
@@ -745,7 +745,7 @@ void swtpc09_state::m6844_hdc_dma_transfer(uint8_t channel)
 	}
 }
 
-READ8_MEMBER( swtpc09_state::m6844_r )
+uint8_t swtpc09_state::m6844_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -828,7 +828,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 }
 
 
-WRITE8_MEMBER( swtpc09_state::m6844_w )
+void swtpc09_state::m6844_w(offs_t offset, uint8_t data)
 {
 	int i;
 

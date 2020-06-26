@@ -55,7 +55,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 	}
 	case 0x02:
 	{
-		// register decoding could be incorrect here
 		// Ext Push/Pop
 		if (ximm & 0x8000)
 		{
@@ -67,9 +66,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if ((rx - (size - 1)) >= 0)
 			{
-				//logerror("(Ext) push %s, %s to [%s]\n",
-				//  extregs[rx - size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-
 				while (size--)
 				{
 					push(m_core->m_r[(rx--) + 8], &m_core->m_r[rb]);
@@ -94,16 +90,11 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if ((rx - (size - 1)) >= 0)
 			{
-				//logerror("(Ext) pop %s, %s from [%s]\n",
-				//  extregs[rx - size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 				int realrx = 7 - rx;
 
 				while (size--)
 				{
-					if (rb & 0x8)
-						m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[(rb & 0x07) + 8]);
-					else
-						m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[rb & 0x07]);
+					m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[rb]);
 				}
 			}
 			else
@@ -226,6 +217,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint8_t use_ds = BIT(ximm, 5);
 		uint8_t form = (ximm & 0x0018) >> 3;
 
+		r0 = m_core->m_r[rx];
+
 		switch (form)
 		{
 			case 0x0: // Rx, [<ds:>Ry]
@@ -238,7 +231,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				if (aluop != 0x0d)
 					r1 = read16(r2);
 				m_core->m_r[ry] = (uint16_t)(m_core->m_r[ry] - 1);
-				if (m_core->m_r[ry] == 0xffff)
+				if (m_core->m_r[ry] == 0xffff && use_ds)
 					m_core->m_r[REG_SR] -= 0x0400;
 				break;
 			case 0x2: // Rx, [<ds:>Ry++]
@@ -246,7 +239,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				if (aluop != 0x0d)
 					r1 = read16(r2);
 				m_core->m_r[ry] = (uint16_t)(m_core->m_r[ry] + 1);
-				if (m_core->m_r[ry] == 0x0000)
+				if (m_core->m_r[ry] == 0x0000 && use_ds)
 					m_core->m_r[REG_SR] += 0x0400;
 				break;
 			case 0x3: // Rx, [<ds:>++Ry]
@@ -259,8 +252,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				break;
 		}
 
-		const bool write = do_basic_alu_ops(aluop, lres, r0, r1, r2, (aluop != 7) ? true : false);
-		if (write)
+		if (do_basic_alu_ops(aluop, lres, r0, r1, r2, (aluop != 7) ? true : false))
 		{
 			m_core->m_r[rx] = (uint16_t)lres;
 		}

@@ -103,14 +103,14 @@ ROM checksum program:
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::read )
+u8 abc80_state::read(offs_t offset)
 {
-	uint8_t data = 0xff;
-	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+	u8 data = 0xff;
+	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
-		data = m_bus->xmemfl_r(space, offset);
+		data = m_bus->xmemfl_r(offset);
 	}
 	else if (!(mmu & MMU_ROM))
 	{
@@ -133,13 +133,13 @@ READ8_MEMBER( abc80_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc80_state::write )
+void abc80_state::write(offs_t offset, u8 data)
 {
-	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
-		m_bus->xmemw_w(space, offset, data);
+		m_bus->xmemw_w(offset, data);
 	}
 	else if (mmu & MMU_VRAMS)
 	{
@@ -161,7 +161,7 @@ WRITE8_MEMBER( abc80_state::write )
 //  csg_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc80_state::csg_w )
+void abc80_state::csg_w(u8 data)
 {
 	m_csg->enable_w(!BIT(data, 0));
 	m_csg->vco_voltage_w(BIT(data, 1) ? 2.5 : 0);
@@ -219,7 +219,7 @@ void abc80_state::abc80_io(address_map &map)
 //  Z80PIO
 //-------------------------------------------------
 
-uint8_t abc80_state::pio_pa_r()
+u8 abc80_state::pio_pa_r()
 {
 	/*
 
@@ -238,7 +238,7 @@ uint8_t abc80_state::pio_pa_r()
 
 	*/
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	//data |= m_kb->data_r();
 	data |= m_key_data;
@@ -247,7 +247,7 @@ uint8_t abc80_state::pio_pa_r()
 	return data;
 }
 
-uint8_t abc80_state::pio_pb_r()
+u8 abc80_state::pio_pb_r()
 {
 	/*
 
@@ -264,7 +264,7 @@ uint8_t abc80_state::pio_pb_r()
 
 	*/
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	// receive data
 	data |= m_rs232->rxd_r();
@@ -283,7 +283,7 @@ uint8_t abc80_state::pio_pb_r()
 	return data;
 }
 
-void abc80_state::pio_pb_w(uint8_t data)
+void abc80_state::pio_pb_w(u8 data)
 {
 	/*
 
@@ -362,7 +362,7 @@ void abc80_state::kbd_w(u8 data)
 	m_key_data = data;
 	m_key_strobe = 1;
 
-	uint8_t pio_data = 0x80 | data;
+	u8 pio_data = 0x80 | data;
 	m_pio->port_a_write(pio_data);
 
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
@@ -462,7 +462,7 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
 	if (LOG) logerror("BOFA %04x\n",address);
 
-	std::vector<uint8_t> data;
+	std::vector<u8> data;
 	data.resize(quickload_size);
 	image.fread(&data[0], quickload_size);
 	for (int i = 1; i < quickload_size; i++)

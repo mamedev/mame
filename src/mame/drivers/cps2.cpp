@@ -706,7 +706,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
  *
  *************************************/
 
-WRITE16_MEMBER( cps2_state::cps2_eeprom_port_w )
+void cps2_state::cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -797,7 +797,7 @@ TIMER_CALLBACK_MEMBER(cps2_state::cps2_update_digital_volume)
 	m_qsound->set_output_gain(1, m_cps2digitalvolumelevel / 39.0);
 }
 
-READ16_MEMBER(cps2_state::cps2_qsound_volume_r)
+uint16_t cps2_state::cps2_qsound_volume_r()
 {
 	static const uint16_t cps2_vol_states[40] =
 	{
@@ -831,12 +831,12 @@ READ16_MEMBER(cps2_state::cps2_qsound_volume_r)
  *
  *************************************/
 
-READ16_MEMBER(cps2_state::kludge_r)
+uint16_t cps2_state::kludge_r()
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(cps2_state::joy_or_paddle_r)
+uint16_t cps2_state::joy_or_paddle_r()
 {
 	if (m_readpaddle != 0)
 	{
@@ -848,7 +848,7 @@ READ16_MEMBER(cps2_state::joy_or_paddle_r)
 	}
 }
 
-READ16_MEMBER(cps2_state::joy_or_paddle_ecofghtr_r)
+uint16_t cps2_state::joy_or_paddle_ecofghtr_r()
 {
 	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // ignore bit if spinner not enabled
 	{
@@ -10011,7 +10011,7 @@ void cps2_state::init_pzloop2()
 
 	save_item(NAME(m_readpaddle));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(*this, FUNC(cps2_state::joy_or_paddle_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16smo_delegate(*this, FUNC(cps2_state::joy_or_paddle_r)));
 }
 
 void cps2_state::init_singbrd()
@@ -10023,12 +10023,12 @@ void cps2_state::init_singbrd()
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
-READ16_MEMBER( cps2_state::gigaman2_dummyqsound_r )
+uint16_t cps2_state::gigaman2_dummyqsound_r(offs_t offset)
 {
 	return m_gigaman2_dummyqsound_ram[offset];
 }
 
-WRITE16_MEMBER( cps2_state::gigaman2_dummyqsound_w )
+void cps2_state::gigaman2_dummyqsound_w(offs_t offset, uint16_t data)
 {
 	m_gigaman2_dummyqsound_ram[offset] = data;
 }
@@ -10059,7 +10059,7 @@ void cps2_state::init_gigaman2()
 	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
-	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_r)), write16_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_w))); // no qsound..
+	space.install_readwrite_handler(0x618000, 0x619fff, read16sm_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_r)), write16sm_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_w))); // no qsound..
 
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base()+0x200000, 0x200000);
 
@@ -10076,7 +10076,7 @@ void cps2_state::init_ecofghtr()
 
 	save_item(NAME(m_readpaddle));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(*this, FUNC(cps2_state::joy_or_paddle_ecofghtr_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16smo_delegate(*this, FUNC(cps2_state::joy_or_paddle_ecofghtr_r)));
 
 }
 

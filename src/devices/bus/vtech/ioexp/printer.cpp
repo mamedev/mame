@@ -64,8 +64,8 @@ void vtech_printer_interface_device::device_start()
 
 void vtech_printer_interface_device::device_reset()
 {
-	io_space().install_read_handler(0x00, 0x00, read8_delegate(*this, FUNC(vtech_printer_interface_device::busy_r)));
-	io_space().install_write_handler(0x0d, 0x0d, write8_delegate(*this, FUNC(vtech_printer_interface_device::strobe_w)));
+	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(*this, FUNC(vtech_printer_interface_device::busy_r)));
+	io_space().install_write_handler(0x0d, 0x0d, write8smo_delegate(*this, FUNC(vtech_printer_interface_device::strobe_w)));
 	io_space().install_write_handler(0x0e, 0x0e, write8smo_delegate(*m_latch, FUNC(output_latch_device::write)));
 }
 
@@ -79,12 +79,12 @@ WRITE_LINE_MEMBER( vtech_printer_interface_device::busy_w )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( vtech_printer_interface_device::busy_r )
+uint8_t vtech_printer_interface_device::busy_r()
 {
 	return 0xfe | m_centronics_busy;
 }
 
-WRITE8_MEMBER( vtech_printer_interface_device::strobe_w )
+void vtech_printer_interface_device::strobe_w(uint8_t data)
 {
 	m_centronics->write_strobe(1);
 	m_centronics->write_strobe(0);

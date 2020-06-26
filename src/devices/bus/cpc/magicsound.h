@@ -41,11 +41,11 @@ public:
 	// construction/destruction
 	al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(dmac_r);
-	DECLARE_WRITE8_MEMBER(dmac_w);
-	DECLARE_WRITE8_MEMBER(timer_w);
-	DECLARE_WRITE8_MEMBER(volume_w);
-	DECLARE_WRITE8_MEMBER(mapper_w);
+	uint8_t dmac_r(offs_t offset);
+	void dmac_w(offs_t offset, uint8_t data);
+	void timer_w(offs_t offset, uint8_t data);
+	void volume_w(offs_t offset, uint8_t data);
+	void mapper_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -57,8 +57,8 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(da0_w);
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	uint8_t dma_read_byte(offs_t offset);
+	void dma_write_byte(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);

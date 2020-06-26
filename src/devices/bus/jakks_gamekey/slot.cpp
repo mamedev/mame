@@ -204,18 +204,18 @@ std::string jakks_gamekey_slot_device::get_default_card_software(get_default_car
  read
  -------------------------------------------------*/
 
-READ16_MEMBER(jakks_gamekey_slot_device::read_cart)
+uint16_t jakks_gamekey_slot_device::read_cart(offs_t offset)
 {
-	return m_cart->read_cart(space, offset);
+	return m_cart->read_cart(offset);
 }
 
 /*-------------------------------------------------
  write
  -------------------------------------------------*/
 
-WRITE16_MEMBER(jakks_gamekey_slot_device::write_cart)
+void jakks_gamekey_slot_device::write_cart(offs_t offset, uint16_t data)
 {
-	m_cart->write_cart(space, offset, data);
+	m_cart->write_cart(offset, data);
 }
 
 /*-------------------------------------------------
@@ -231,7 +231,7 @@ uint8_t jakks_gamekey_slot_device::read_cart_seeprom(void)
  write seeprom
  -------------------------------------------------*/
 
-WRITE16_MEMBER(jakks_gamekey_slot_device::write_cart_seeprom)
+void jakks_gamekey_slot_device::write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_cart->write_cart_seeprom(space, offset, data);
+	m_cart->write_cart_seeprom(offset, data);
 }

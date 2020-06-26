@@ -309,8 +309,8 @@ namespace analog
 
 	NETLIB_UPDATE(QBJT_switch)
 	{
-		auto solv(m_RB.solver());
-		if (solv)
+		auto *solv(m_RB.solver());
+		if (solv != nullptr)
 			solv->solve_now();
 		else
 			m_RC.solver()->solve_now();
@@ -373,8 +373,8 @@ namespace analog
 
 	NETLIB_UPDATE(QBJT_EB)
 	{
-		auto solv(m_D_EB.solver());
-		if (solv)
+		auto *solv(m_D_EB.solver());
+		if (solv != nullptr)
 			solv->solve_now();
 		else
 			m_D_CB.solver()->solve_now();

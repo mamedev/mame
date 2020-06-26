@@ -58,11 +58,11 @@ public:
 	void k1003(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(disp_1_w);
-	DECLARE_WRITE8_MEMBER(disp_2_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
+	uint8_t port2_r();
+	uint8_t key_r();
+	void disp_1_w(uint8_t data);
+	void disp_2_w(uint8_t data);
+	void disp_w(uint8_t data);
 
 	void k1003_io(address_map &map);
 	void k1003_mem(address_map &map);
@@ -87,23 +87,23 @@ void k1003_state::k1003_mem(address_map &map)
 	map(0x3000, 0x3aff).rom();
 }
 
-READ8_MEMBER( k1003_state::port2_r )
+uint8_t k1003_state::port2_r()
 {
 	return 0x00;
 }
 
-READ8_MEMBER( k1003_state::key_r )
+uint8_t k1003_state::key_r()
 {
 	return 0x00;
 }
 
 
-WRITE8_MEMBER( k1003_state::disp_1_w )
+void k1003_state::disp_1_w(uint8_t data)
 {
 	m_disp_1 = data;
 }
 
-WRITE8_MEMBER( k1003_state::disp_2_w )
+void k1003_state::disp_2_w(uint8_t data)
 {
 	m_disp_2 = data;
 }
@@ -121,7 +121,7 @@ uint8_t k1003_state::bit_to_dec(uint8_t val)
 	return 0;
 }
 
-WRITE8_MEMBER( k1003_state::disp_w )
+void k1003_state::disp_w(uint8_t data)
 {
 	m_digits[bit_to_dec(data)*2] = m_disp_1;
 	m_digits[bit_to_dec(data)*2+1] = m_disp_2;

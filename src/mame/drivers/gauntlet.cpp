@@ -548,28 +548,28 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 void gauntlet_state::gauntlet(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic_device, 104, true);
+	SLAPSTIC(config, m_slapstic, 104, true);
 }
 
 
 void gauntlet_state::gaunt2p(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic_device, 107, true);
+	SLAPSTIC(config, m_slapstic, 107, true);
 }
 
 
 void gauntlet_state::gauntlet2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic_device, 106, true);
+	SLAPSTIC(config, m_slapstic, 106, true);
 }
 
 
 void gauntlet_state::vindctr2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic_device, 118, true);
+	SLAPSTIC(config, m_slapstic, 118, true);
 }
 
 
@@ -1654,7 +1654,7 @@ void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 void gauntlet_state::common_init(int vindctr2)
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 
 	// swap the top and bottom halves of the main CPU ROM images
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);

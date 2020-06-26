@@ -219,9 +219,9 @@ void hp_hybrid_cpu_device::device_start()
 		state_add(HPHYBRID_I,      "I",        m_reg_I).noshow();
 	}
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_reg_A));
 	save_item(NAME(m_reg_B));
@@ -1029,7 +1029,7 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 			m_stm_func(m_curr_cycle | CYCLE_RD_MASK);
 			m_curr_cycle = 0;
 		}
-		return m_cache->read_word(addr);
+		return m_cache.read_word(addr);
 	}
 }
 
@@ -1152,7 +1152,7 @@ void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 			m_stm_func(m_curr_cycle | CYCLE_WR_MASK);
 			m_curr_cycle = 0;
 		}
-		m_program->write_word(addr , v);
+		m_program.write_word(addr , v);
 	}
 }
 
@@ -1375,13 +1375,13 @@ void hp_hybrid_cpu_device::enter_isr()
 uint16_t hp_hybrid_cpu_device::RIO(uint8_t pa , uint8_t ic)
 {
 	m_icount -= IO_RW_CYCLES;
-	return m_io->read_word(HP_MAKE_IOADDR(pa, ic));
+	return m_io.read_word(HP_MAKE_IOADDR(pa, ic));
 }
 
 void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 {
 	m_icount -= IO_RW_CYCLES;
-	m_io->write_word(HP_MAKE_IOADDR(pa, ic) , v);
+	m_io.write_word(HP_MAKE_IOADDR(pa, ic) , v);
 }
 
 uint8_t hp_hybrid_cpu_device::do_dec_shift_r(uint8_t d1 , uint64_t& mantissa)
@@ -1625,7 +1625,7 @@ bool hp_5061_3011_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_pc
 					// Extend address, form byte address
 					uint16_t mask = BIT(tmp_addr , 0) ? 0x00ff : 0xff00;
 					tmp_addr = add_mae(AEC_CASE_C , tmp_addr >> 1);
-					m_program->write_word(tmp_addr , tmp , mask);
+					m_program.write_word(tmp_addr , tmp , mask);
 					m_icount -= m_w_cycles;
 				}
 			} else {
@@ -1992,7 +1992,7 @@ bool hp_09825_67907_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_
 						m_curr_cycle = 0;
 					}
 					uint16_t mask = BIT(*ptr_reg , 15) ? 0xff00 : 0x00ff;
-					m_program->write_word(tmp_addr , tmp , mask);
+					m_program.write_word(tmp_addr , tmp , mask);
 					m_icount -= m_w_cycles;
 				}
 			} else {

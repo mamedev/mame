@@ -76,15 +76,15 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_READ8_MEMBER(fgcpu_comm_flags_r);
-	DECLARE_WRITE8_MEMBER(fgram_w);
+	uint8_t fgcpu_comm_flags_r();
+	void fgram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(spritecpu_port00_w);
+	void spritecpu_port00_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(rozcpu_bank_w);
-	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_wrap_enable_w);
-	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_enable_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
+	void rozcpu_bank_w(uint8_t data);
+	template<int Chip> void rozcpu_wrap_enable_w(uint8_t data);
+	template<int Chip> void rozcpu_enable_w(uint8_t data);
+	void rozcpu_pal_w(uint8_t data);
 	void divebomb_fgcpu_iomap(address_map &map);
 	void divebomb_fgcpu_map(address_map &map);
 	void divebomb_rozcpu_iomap(address_map &map);

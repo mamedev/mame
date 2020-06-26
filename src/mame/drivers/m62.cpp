@@ -85,7 +85,7 @@ other supported games as well.
 /* that to select the ROM. The only exception I make is a special case used in */
 /* service mode to test the ROMs. */
 
-READ8_MEMBER(m62_state::ldrun2_bankswitch_r)
+uint8_t m62_state::ldrun2_bankswitch_r()
 {
 	if (m_ldrun2_bankswap)
 	{
@@ -98,7 +98,7 @@ READ8_MEMBER(m62_state::ldrun2_bankswitch_r)
 	return 0;
 }
 
-WRITE8_MEMBER(m62_state::ldrun2_bankswitch_w)
+void m62_state::ldrun2_bankswitch_w(offs_t offset, uint8_t data)
 {
 	static const int banks[30] =
 	{
@@ -133,41 +133,41 @@ WRITE8_MEMBER(m62_state::ldrun2_bankswitch_w)
 /* Lode Runner 3 has, it seems, a poor man's protection consisting of a PAL */
 /* (I think; it's included in the ROM set) which is read at certain times, */
 /* and the game crashes if it doesn't match the expected values. */
-READ8_MEMBER(m62_state::ldrun3_prot_5_r)
+uint8_t m62_state::ldrun3_prot_5_r()
 {
 	return 5;
 }
 
-READ8_MEMBER(m62_state::ldrun3_prot_7_r)
+uint8_t m62_state::ldrun3_prot_7_r()
 {
 	return 7;
 }
 
 
-WRITE8_MEMBER(m62_state::ldrun4_bankswitch_w)
+void m62_state::ldrun4_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(m62_state::kidniki_bankswitch_w)
+void m62_state::kidniki_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
-WRITE8_MEMBER(m62_state::spelunkr_bankswitch_w)
+void m62_state::spelunkr_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(m62_state::spelunk2_bankswitch_w)
+void m62_state::spelunk2_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry((data & 0xc0) >> 6);
 	membank("bank2")->set_entry((data & 0x3c) >> 2);
 }
 
-WRITE8_MEMBER(m62_state::youjyudn_bankswitch_w)
+void m62_state::youjyudn_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }

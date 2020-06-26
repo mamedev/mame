@@ -270,8 +270,8 @@ private:
 	int m_ICount;     /* cycle count */
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
-	address_space *m_program;
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_program;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
 	// ports

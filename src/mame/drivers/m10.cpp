@@ -201,7 +201,7 @@ MACHINE_RESET_MEMBER(m10_state,m10)
  *              0x06: SAUCER HIT
  */
 
-WRITE8_MEMBER(m10_state::m10_ctrl_w)
+void m10_state::m10_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0x40)
@@ -276,7 +276,7 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m11_ctrl_w)
+void m10_state::m11_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0x4c)
@@ -307,7 +307,7 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m15_ctrl_w)
+void m10_state::m15_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0xf0)
@@ -333,7 +333,7 @@ WRITE8_MEMBER(m10_state::m15_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m10_a500_w)
+void m10_state::m10_a500_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0xfc)
@@ -341,7 +341,7 @@ WRITE8_MEMBER(m10_state::m10_a500_w)
 #endif
 }
 
-WRITE8_MEMBER(m10_state::m11_a100_w)
+void m10_state::m11_a100_w(uint8_t data)
 {
 	int raising_bits = data & ~m_last;
 	//int falling_bits = ~data & m_last;
@@ -375,7 +375,7 @@ WRITE8_MEMBER(m10_state::m11_a100_w)
 
 }
 
-WRITE8_MEMBER(m10_state::m15_a100_w)
+void m10_state::m15_a100_w(uint8_t data)
 {
 	//int raising_bits = data & ~m_last;
 	int falling_bits = ~data & m_last;
@@ -432,7 +432,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 	m_last = data;
 }
 
-READ8_MEMBER(m10_state::m10_a700_r)
+uint8_t m10_state::m10_a700_r()
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
@@ -441,7 +441,7 @@ READ8_MEMBER(m10_state::m10_a700_r)
 	return 0x00;
 }
 
-READ8_MEMBER(m10_state::m11_a700_r)
+uint8_t m10_state::m11_a700_r()
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);

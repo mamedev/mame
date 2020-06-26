@@ -470,11 +470,11 @@ void i8086_common_cpu_device::device_start()
 	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
 
 	if(m_opcodes->data_width() == 8) {
-		auto cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_opcodes->cache(m_cache8);
+		m_or8 = [this](offs_t address) -> u8 { return m_cache8.read_byte(address); };
 	} else {
-		auto cache = m_opcodes->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_opcodes->cache(m_cache16);
+		m_or8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
 	m_io = &space(AS_IO);
 
@@ -2266,10 +2266,10 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(NEGNOT_R8,NEGNOT_M8);
 					break;
 				case 0x18:  /* NEG */
-					m_CarryVal = (tmp!=0) ? 1 : 0;
-					tmp = (~tmp)+1;
-					set_SZPF_Byte(tmp);
-					PutbackRMByte(tmp&0xff);
+					m_dst = 0;
+					m_src = tmp;
+					set_CFB(SUBB());
+					PutbackRMByte(m_dst);
 					CLKM(NEGNOT_R8,NEGNOT_M8);
 					break;
 				case 0x20:  /* MUL */
@@ -2356,10 +2356,10 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(NEGNOT_R16,NEGNOT_M16);
 					break;
 				case 0x18:  /* NEG */
-					m_CarryVal = (tmp!=0) ? 1 : 0;
-					tmp = (~tmp) + 1;
-					set_SZPF_Word(tmp);
-					PutbackRMWord(tmp);
+					m_dst = 0;
+					m_src = tmp;
+					set_CFW(SUBX());
+					PutbackRMWord(m_dst);
 					CLKM(NEGNOT_R16,NEGNOT_M16);
 					break;
 				case 0x20:  /* MUL */

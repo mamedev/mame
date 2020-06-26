@@ -98,7 +98,7 @@ READ_LINE_MEMBER(hp82937_io_card_device::t0_r)
 	return m_iatn;
 }
 
-READ8_MEMBER(hp82937_io_card_device::p1_r)
+uint8_t hp82937_io_card_device::p1_r()
 {
 	uint8_t res = 0;
 
@@ -147,13 +147,13 @@ READ8_MEMBER(hp82937_io_card_device::p1_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp82937_io_card_device::p1_w)
+void hp82937_io_card_device::p1_w(uint8_t data)
 {
 	update_signals();
 	update_data_out();
 }
 
-READ8_MEMBER(hp82937_io_card_device::dio_r)
+uint8_t hp82937_io_card_device::dio_r()
 {
 	if (m_dio_out) {
 		return 0xff;
@@ -162,17 +162,17 @@ READ8_MEMBER(hp82937_io_card_device::dio_r)
 	}
 }
 
-WRITE8_MEMBER(hp82937_io_card_device::dio_w)
+void hp82937_io_card_device::dio_w(uint8_t data)
 {
 	update_data_out();
 }
 
-READ8_MEMBER(hp82937_io_card_device::switch_r)
+uint8_t hp82937_io_card_device::switch_r()
 {
 	return m_sw1->read() | 0xc0;
 }
 
-WRITE8_MEMBER(hp82937_io_card_device::latch_w)
+void hp82937_io_card_device::latch_w(uint8_t data)
 {
 	LOG("latch=%02x\n" , data);
 	m_latch = data;

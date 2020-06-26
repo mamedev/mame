@@ -48,12 +48,12 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(hex_display_w);
+	u8 keyboard_r();
+	void hex_display_w(offs_t offset, u8 data);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	uint8_t convert_key(uint8_t data);
+	u8 convert_key(u8 data);
 	bool m_cassinbit, m_cassoutbit, m_cassold;
 	u8 m_cass_data[4];
 
@@ -69,14 +69,19 @@ private:
 void elekscmp_state::machine_start()
 {
 	m_digit.resolve();
+
+	save_item(NAME(m_cassinbit));
+	save_item(NAME(m_cassoutbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cass_data));
 }
 
-WRITE8_MEMBER(elekscmp_state::hex_display_w)
+void elekscmp_state::hex_display_w(offs_t offset, u8 data)
 {
 	m_digit[offset & 0x7] = data;
 }
 
-uint8_t elekscmp_state::convert_key(uint8_t data)
+u8 elekscmp_state::convert_key(u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
@@ -85,7 +90,7 @@ uint8_t elekscmp_state::convert_key(uint8_t data)
 	return 0xff;
 }
 
-READ8_MEMBER(elekscmp_state::keyboard_r)
+u8 elekscmp_state::keyboard_r()
 {
 	u8 data = m_io_keyboard[0]->read();
 	if (data)
@@ -214,7 +219,7 @@ void elekscmp_state::elekscmp(machine_config &config)
 
 /* ROM definition */
 ROM_START( elekscmp )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0600, "maincpu", 0 )
 	ROM_LOAD( "elbug.001", 0x0000, 0x0200, CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
 	ROM_LOAD( "elbug.002", 0x0200, 0x0200, CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
 	ROM_LOAD( "elbug.003", 0x0400, 0x0200, CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
@@ -223,4 +228,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS */
-COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", 0 )
+COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", MACHINE_SUPPORTS_SAVE )

@@ -87,10 +87,10 @@ private:
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
 
-	DECLARE_WRITE16_MEMBER(mjmux_w);
-	DECLARE_READ16_MEMBER(mjmux_r);
-	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
-	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
+	void mjmux_w(uint16_t data);
+	uint16_t mjmux_r();
+	void okim1_rombank_w(uint16_t data);
+	void okim0_rombank_w(uint16_t data);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	virtual void machine_start() override;
@@ -124,12 +124,12 @@ uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 }
 
 
-WRITE16_MEMBER(miragemj_state::mjmux_w)
+void miragemj_state::mjmux_w(uint16_t data)
 {
 	m_mux_data = data & 0x1f;
 }
 
-READ16_MEMBER(miragemj_state::mjmux_r)
+uint16_t miragemj_state::mjmux_r()
 {
 	switch (m_mux_data & 0x1f)
 	{
@@ -143,12 +143,12 @@ READ16_MEMBER(miragemj_state::mjmux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(miragemj_state::okim1_rombank_w)
+void miragemj_state::okim1_rombank_w(uint16_t data)
 {
 	m_oki_sfx->set_rom_bank(data & 0x3);
 }
 
-WRITE16_MEMBER(miragemj_state::okim0_rombank_w)
+void miragemj_state::okim0_rombank_w(uint16_t data)
 {
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 4));

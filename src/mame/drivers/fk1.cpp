@@ -53,12 +53,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out2);
-	DECLARE_WRITE8_MEMBER(fk1_intr_w);
-	DECLARE_READ8_MEMBER(fk1_bank_ram_r);
-	DECLARE_READ8_MEMBER(fk1_bank_rom_r);
-	DECLARE_WRITE8_MEMBER(fk1_disk_w);
-	DECLARE_READ8_MEMBER(fk1_mouse_r);
-	DECLARE_WRITE8_MEMBER(fk1_reset_int_w);
+	void fk1_intr_w(uint8_t data);
+	uint8_t fk1_bank_ram_r();
+	uint8_t fk1_bank_rom_r();
+	void fk1_disk_w(uint8_t data);
+	uint8_t fk1_mouse_r();
+	void fk1_reset_int_w(uint8_t data);
 	uint8_t m_video_rol;
 	uint8_t m_int_vector;
 	virtual void machine_reset() override;
@@ -250,12 +250,12 @@ WRITE_LINE_MEMBER( fk1_state::fk1_pit_out2 )
     8 any interruption allowed.
 */
 
-WRITE8_MEMBER( fk1_state::fk1_intr_w )
+void fk1_state::fk1_intr_w(uint8_t data)
 {
 	logerror("fk1_intr_w %02x\n",data);
 }
 
-READ8_MEMBER( fk1_state::fk1_bank_ram_r )
+uint8_t fk1_state::fk1_bank_ram_r()
 {
 	address_space &space_mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t *ram = m_ram->pointer();
@@ -266,7 +266,7 @@ READ8_MEMBER( fk1_state::fk1_bank_ram_r )
 	return 0;
 }
 
-READ8_MEMBER( fk1_state::fk1_bank_rom_r )
+uint8_t fk1_state::fk1_bank_rom_r()
 {
 	address_space &space_mem = m_maincpu->space(AS_PROGRAM);
 	space_mem.unmap_write(0x0000, 0x3fff);
@@ -284,7 +284,7 @@ READ8_MEMBER( fk1_state::fk1_bank_rom_r )
     Functions are allowed in one.
 */
 
-WRITE8_MEMBER( fk1_state::fk1_disk_w )
+void fk1_state::fk1_disk_w(uint8_t data)
 {
 //  logerror("fk1_disk_w %02x\n",data);
 }
@@ -299,7 +299,7 @@ WRITE8_MEMBER( fk1_state::fk1_disk_w )
 0 - / AX, X-axis
 */
 
-READ8_MEMBER( fk1_state::fk1_mouse_r )
+uint8_t fk1_state::fk1_mouse_r()
 {
 //  logerror("fk1_mouse_r\n");
 	return 0;
@@ -307,7 +307,7 @@ READ8_MEMBER( fk1_state::fk1_mouse_r )
 
 /*Write to port 70 resets the interrupt from the system clock of 50 Hz. */
 
-WRITE8_MEMBER( fk1_state::fk1_reset_int_w )
+void fk1_state::fk1_reset_int_w(uint8_t data)
 {
 	logerror("fk1_reset_int_w\n");
 }

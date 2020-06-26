@@ -70,11 +70,11 @@ private:
 	void hx20_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( ksc_w );
-	DECLARE_READ8_MEMBER( krtn07_r );
-	DECLARE_READ8_MEMBER( krtn89_r );
-	DECLARE_WRITE8_MEMBER( lcd_cs_w );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
+	void ksc_w(uint8_t data);
+	uint8_t krtn07_r();
+	uint8_t krtn89_r();
+	void lcd_cs_w(uint8_t data);
+	void lcd_data_w(uint8_t data);
 
 	uint8_t main_p1_r();
 	void main_p1_w(uint8_t data);
@@ -96,7 +96,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( optrom_load );
-	DECLARE_READ8_MEMBER( optrom_r );
+	uint8_t optrom_r(offs_t offset);
 
 	void update_interrupt();
 

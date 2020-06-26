@@ -157,17 +157,17 @@ protected:
 private:
 	void istrebiteli_palette(palette_device &palette) const;
 	void motogonki_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(ppi0_r);
-	DECLARE_WRITE8_MEMBER(ppi0_w);
-	DECLARE_READ8_MEMBER(ppi1_r);
-	DECLARE_WRITE8_MEMBER(ppi1_w);
+	uint8_t ppi0_r(offs_t offset);
+	void ppi0_w(offs_t offset, uint8_t data);
+	uint8_t ppi1_r(offs_t offset);
+	void ppi1_w(offs_t offset, uint8_t data);
 	void sound_w(uint8_t data);
 	void spr0_ctrl_w(uint8_t data);
 	void spr1_ctrl_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(spr_xy_w);
-	DECLARE_WRITE8_MEMBER(moto_spr_xy_w);
-	DECLARE_WRITE8_MEMBER(tileram_w);
-	DECLARE_WRITE8_MEMBER(moto_tileram_w);
+	void spr_xy_w(offs_t offset, uint8_t data);
+	void moto_spr_xy_w(offs_t offset, uint8_t data);
+	void tileram_w(offs_t offset, uint8_t data);
+	void moto_tileram_w(offs_t offset, uint8_t data);
 	void road_ctrl_w(uint8_t data);
 	DECLARE_VIDEO_START(moto);
 
@@ -349,14 +349,14 @@ uint32_t istrebiteli_state::moto_screen_update(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::tileram_w)
+void istrebiteli_state::tileram_w(offs_t offset, uint8_t data)
 {
 	offset ^= 15;
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(istrebiteli_state::moto_tileram_w)
+void istrebiteli_state::moto_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data ^ 0xff;
 	m_tilemap->mark_tile_dirty(offset);
@@ -367,19 +367,19 @@ void istrebiteli_state::road_ctrl_w(uint8_t data)
 	m_road_scroll = data;
 }
 
-READ8_MEMBER(istrebiteli_state::ppi0_r)
+uint8_t istrebiteli_state::ppi0_r(offs_t offset)
 {
 	return m_ppi0->read(offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi0_w)
+void istrebiteli_state::ppi0_w(offs_t offset, uint8_t data)
 {
 	m_ppi0->write(offset ^ 3, data ^ 0xff);
 }
-READ8_MEMBER(istrebiteli_state::ppi1_r)
+uint8_t istrebiteli_state::ppi1_r(offs_t offset)
 {
 	return m_ppi1->read(offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi1_w)
+void istrebiteli_state::ppi1_w(offs_t offset, uint8_t data)
 {
 	m_ppi1->write(offset ^ 3, data ^ 0xff);
 }
@@ -406,12 +406,12 @@ void istrebiteli_state::spr1_ctrl_w(uint8_t data)
 		m_spr_collision[1] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
+void istrebiteli_state::spr_xy_w(offs_t offset, uint8_t data)
 {
 	m_spr_xy[offset ^ 7] = data;
 }
 
-WRITE8_MEMBER(istrebiteli_state::moto_spr_xy_w)
+void istrebiteli_state::moto_spr_xy_w(offs_t offset, uint8_t data)
 {
 	m_spr_xy[offset] = data;
 }

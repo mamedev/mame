@@ -8,11 +8,10 @@
 /// \file poptions.h
 ///
 
-#include "plists.h"
+#include "pfmtlog.h"
 #include "pstonum.h"
 #include "pstring.h"
 #include "putil.h"
-#include "pfmtlog.h"
 
 namespace plib {
 
@@ -137,7 +136,7 @@ namespace plib {
 
 			if (raw != plib::container::npos)
 			{
-				m_val = static_cast<T>(raw);
+				m_val = narrow_cast<T>(raw);
 				return 0;
 			}
 
@@ -238,7 +237,7 @@ namespace plib {
 		PCOPYASSIGNMOVE(options, delete)
 
 		void register_option(option_base *opt);
-		int parse(int argc, char **argv);
+		std::size_t parse(const std::vector<putf8string> &argv);
 
 		pstring help(const pstring &description, const pstring &usage,
 				unsigned width = 72, unsigned indent = 20) const;

@@ -129,15 +129,15 @@ private:
 	void update_reset(ioport_value state);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(beeper_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digit_select_w);
-	DECLARE_WRITE8_MEMBER(digit_data_w);
-	DECLARE_READ8_MEMBER(digit_data_r);
+	u8 beeper_r(offs_t offset);
+	void input_w(u8 data);
+	u8 input_r();
+	void digit_select_w(u8 data);
+	void digit_data_w(u8 data);
+	u8 digit_data_r();
 
-	DECLARE_WRITE8_MEMBER(input_digit_select_w) { input_w(space, offset, data); digit_select_w(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(input_digit_data_w) { input_w(space, offset, data); digit_data_w(space, offset, data); }
+	void input_digit_select_w(u8 data) { input_w(data); digit_select_w(data); }
+	void input_digit_data_w(u8 data) { input_w(data); digit_data_w(data); }
 
 	u8 m_inp_mux;
 	u8 m_digit_select;
@@ -181,7 +181,7 @@ void cmpchess_state::update_reset(ioport_value state)
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(cmpchess_state::beeper_r)
+u8 cmpchess_state::beeper_r(offs_t offset)
 {
 	// cncchess: trigger beeper
 	if (!machine().side_effects_disabled() && m_beeper != nullptr)
@@ -205,32 +205,32 @@ void cmpchess_state::update_display()
 	m_display->matrix(m_digit_select, bstate << 8 | digit_data);
 }
 
-WRITE8_MEMBER(cmpchess_state::digit_data_w)
+void cmpchess_state::digit_data_w(u8 data)
 {
 	// digit segment data
 	m_digit_data = data;
 	update_display();
 }
 
-READ8_MEMBER(cmpchess_state::digit_data_r)
+u8 cmpchess_state::digit_data_r()
 {
 	return m_digit_data;
 }
 
-WRITE8_MEMBER(cmpchess_state::digit_select_w)
+void cmpchess_state::digit_select_w(u8 data)
 {
 	// d0-d3: digit select (active low)
 	m_digit_select = ~data & 0xf;
 	update_display();
 }
 
-WRITE8_MEMBER(cmpchess_state::input_w)
+void cmpchess_state::input_w(u8 data)
 {
 	// input matrix is shared with either digit_data_w, or digit_select_w
 	m_inp_mux = data;
 }
 
-READ8_MEMBER(cmpchess_state::input_r)
+u8 cmpchess_state::input_r()
 {
 	u8 data = m_inp_mux;
 

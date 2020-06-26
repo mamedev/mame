@@ -105,7 +105,7 @@ const tiny_rom_entry *tvc_hbf_device::device_rom_region() const
 /*-------------------------------------------------
     read
 -------------------------------------------------*/
-READ8_MEMBER(tvc_hbf_device::read)
+uint8_t tvc_hbf_device::read(offs_t offset)
 {
 	if (offset>=0x1000)
 		return m_ram[offset& 0x0fff];
@@ -117,7 +117,7 @@ READ8_MEMBER(tvc_hbf_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(tvc_hbf_device::write)
+void tvc_hbf_device::write(offs_t offset, uint8_t data)
 {
 	if (offset>=0x1000)
 		m_ram[offset & 0x0fff] = data;
@@ -130,7 +130,7 @@ WRITE8_MEMBER(tvc_hbf_device::write)
 //  IO read
 //-------------------------------------------------
 
-READ8_MEMBER(tvc_hbf_device::io_read)
+uint8_t tvc_hbf_device::io_read(offs_t offset)
 {
 	switch((offset>>2) & 0x03)
 	{
@@ -147,7 +147,7 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 //  IO write
 //-------------------------------------------------
 
-WRITE8_MEMBER(tvc_hbf_device::io_write)
+void tvc_hbf_device::io_write(offs_t offset, uint8_t data)
 {
 	switch((offset>>2) & 0x03)
 	{

@@ -68,14 +68,14 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( drvslt_w );
-	DECLARE_WRITE8_MEMBER( rom_enable_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( nmi_r );
-	DECLARE_WRITE8_MEMBER( nmi_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
+	void drvslt_w(uint8_t data);
+	void rom_enable_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t rtc_r();
+	uint8_t nmi_r();
+	void nmi_w(uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( de_w );
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 	uint8_t pio_pa_r();
@@ -157,8 +157,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER( ual_w );
-	DECLARE_WRITE8_MEMBER( tcl_w );
+	void ual_w(uint8_t data);
+	void tcl_w(uint8_t data);
 
 	void trs80m16(machine_config &config);
 	void m16_z80_io(address_map &map);

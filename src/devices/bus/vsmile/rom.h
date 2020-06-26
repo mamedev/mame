@@ -16,10 +16,10 @@ public:
 	vsmile_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(bank0_r) override { return m_rom[m_bank_offset + 0x000000 + offset]; }
-	virtual DECLARE_READ16_MEMBER(bank1_r) override { return m_rom[m_bank_offset + 0x100000 + offset]; }
-	virtual DECLARE_READ16_MEMBER(bank2_r) override { return m_rom[m_bank_offset + 0x200000 + offset]; }
-	virtual DECLARE_READ16_MEMBER(bank3_r) override { return m_rom[m_bank_offset + 0x300000 + offset]; }
+	virtual uint16_t bank0_r(offs_t offset) override { return m_rom[m_bank_offset + 0x000000 + offset]; }
+	virtual uint16_t bank1_r(offs_t offset) override { return m_rom[m_bank_offset + 0x100000 + offset]; }
+	virtual uint16_t bank2_r(offs_t offset) override { return m_rom[m_bank_offset + 0x200000 + offset]; }
+	virtual uint16_t bank3_r(offs_t offset) override { return m_rom[m_bank_offset + 0x300000 + offset]; }
 
 	// banking
 	virtual void set_cs2(bool cs2) override;
@@ -43,8 +43,8 @@ public:
 	// construction/destruction
 	vsmile_rom_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(bank2_r) override;
-	virtual DECLARE_WRITE16_MEMBER(bank2_w) override;
+	virtual uint16_t bank2_r(offs_t offset) override;
+	virtual void bank2_w(offs_t offset, uint16_t data) override;
 
 protected:
 	vsmile_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

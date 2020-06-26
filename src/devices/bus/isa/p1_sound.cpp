@@ -93,42 +93,42 @@ p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-READ8_MEMBER(p1_sound_device::d14_r)
+uint8_t p1_sound_device::d14_r(offs_t offset)
 {
 	return m_d14->read(offset >> 1);
 }
 
-WRITE8_MEMBER(p1_sound_device::d14_w)
+void p1_sound_device::d14_w(offs_t offset, uint8_t data)
 {
 	m_d14->write(offset >> 1, data);
 }
 
-READ8_MEMBER(p1_sound_device::d16_r)
+uint8_t p1_sound_device::d16_r(offs_t offset)
 {
 	return m_d16->read(offset >> 1);
 }
 
-WRITE8_MEMBER(p1_sound_device::d16_w)
+void p1_sound_device::d16_w(offs_t offset, uint8_t data)
 {
 	m_d16->write(offset >> 1, data);
 }
 
-READ8_MEMBER(p1_sound_device::d17_r)
+uint8_t p1_sound_device::d17_r(offs_t offset)
 {
 	return m_d17->read(offset >> 1);
 }
 
-WRITE8_MEMBER(p1_sound_device::d17_w)
+void p1_sound_device::d17_w(offs_t offset, uint8_t data)
 {
 	m_d17->write(offset >> 1, data);
 }
 
-READ8_MEMBER(p1_sound_device::adc_r)
+uint8_t p1_sound_device::adc_r(offs_t offset)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(p1_sound_device::dac_w)
+void p1_sound_device::dac_w(offs_t offset, uint8_t data)
 {
 //  logerror("DAC write: %02x <- %02x\n", offset>>1, data);
 	m_dac_data[offset >> 1] = data;
@@ -161,8 +161,8 @@ void p1_sound_device::device_start()
 	// EFC00 -- ADC output
 
 	m_isa->install_memory(0xea000, 0xea01f,
-			read8_delegate(*this, FUNC(p1_sound_device::adc_r)), // XXX not really
-			write8_delegate(*this, FUNC(p1_sound_device::dac_w)));
+			read8sm_delegate(*this, FUNC(p1_sound_device::adc_r)), // XXX not really
+			write8sm_delegate(*this, FUNC(p1_sound_device::dac_w)));
 
 	m_isa->install_memory(0xee000, 0xee000,
 			read8smo_delegate(*m_midi, FUNC(i8251_device::data_r)),
@@ -173,16 +173,16 @@ void p1_sound_device::device_start()
 
 	// sync generator
 	m_isa->install_memory(0xef000, 0xef007,
-			read8_delegate(*this, FUNC(p1_sound_device::d14_r)),
-			write8_delegate(*this, FUNC(p1_sound_device::d14_w)));
+			read8sm_delegate(*this, FUNC(p1_sound_device::d14_r)),
+			write8sm_delegate(*this, FUNC(p1_sound_device::d14_w)));
 
 	// 6 music channels
 	m_isa->install_memory(0xef400, 0xef407,
-			read8_delegate(*this, FUNC(p1_sound_device::d16_r)),
-			write8_delegate(*this, FUNC(p1_sound_device::d16_w)));
+			read8sm_delegate(*this, FUNC(p1_sound_device::d16_r)),
+			write8sm_delegate(*this, FUNC(p1_sound_device::d16_w)));
 	m_isa->install_memory(0xef800, 0xef807,
-			read8_delegate(*this, FUNC(p1_sound_device::d17_r)),
-			write8_delegate(*this, FUNC(p1_sound_device::d17_w)));
+			read8sm_delegate(*this, FUNC(p1_sound_device::d17_r)),
+			write8sm_delegate(*this, FUNC(p1_sound_device::d17_w)));
 }
 
 

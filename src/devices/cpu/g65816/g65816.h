@@ -233,9 +233,10 @@ protected:
 	unsigned m_fastROM;       /* SNES specific */
 	unsigned m_ir;            /* Instruction Register */
 	unsigned m_irq_delay;     /* delay 1 instruction before checking irq */
-	address_space *m_data_space;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_program_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_opcode;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+
 	unsigned m_stopped;       /* Sets how the CPU is stopped */
 	const opcode_func* m_opcodes;
 	get_reg_func m_get_reg;
@@ -1539,6 +1540,13 @@ protected:
 };
 
 
+class g65802_device : public g65816_device
+{
+public:
+	g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class _5a22_device : public g65816_device
 {
 public:
@@ -1570,6 +1578,7 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(G65816, g65816_device)
+DECLARE_DEVICE_TYPE(G65802, g65802_device)
 DECLARE_DEVICE_TYPE(_5A22,  _5a22_device)
 
 

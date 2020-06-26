@@ -7,6 +7,7 @@
     Core MAME screen device.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_SCREEN_H
 #define MAME_EMU_SCREEN_H
 

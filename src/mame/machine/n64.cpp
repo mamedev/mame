@@ -158,6 +158,7 @@ void n64_periphs::device_reset()
 	vi_vburst = 0;
 	vi_xscale = 0;
 	vi_yscale = 0;
+	field = 0;
 
 	ai_timer->adjust(attotime::never);
 	memset(ai_fifo, 0, sizeof(ai_fifo));
@@ -307,7 +308,7 @@ void n64_periphs::device_reset()
 #define MI_MODE_EBUS            0x0100      /* Bit  8: ebus test mode */
 #define MI_MODE_RDRAM           0x0200      /* Bit  9: RDRAM reg mode */
 
-READ32_MEMBER( n64_periphs::mi_reg_r )
+uint32_t n64_periphs::mi_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -336,7 +337,7 @@ READ32_MEMBER( n64_periphs::mi_reg_r )
 	return ret;
 }
 
-WRITE32_MEMBER( n64_periphs::mi_reg_w )
+void n64_periphs::mi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -445,7 +446,7 @@ void n64_periphs::clear_rcp_interrupt(int interrupt)
 	check_interrupts();
 }
 
-READ32_MEMBER( n64_periphs::is64_r )
+uint32_t n64_periphs::is64_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -469,7 +470,7 @@ READ32_MEMBER( n64_periphs::is64_r )
 	}
 }
 
-WRITE32_MEMBER( n64_periphs::is64_w )
+void n64_periphs::is64_w(offs_t offset, uint32_t data)
 {
 	int i = 0;
 
@@ -495,14 +496,14 @@ WRITE32_MEMBER( n64_periphs::is64_w )
 	}
 }
 
-READ32_MEMBER( n64_periphs::open_r )
+uint32_t n64_periphs::open_r(offs_t offset)
 {
 	uint32_t retval = (offset << 2) & 0x0000ffff;
 	retval = ((retval + 2) << 16) | retval;
 	return retval;
 }
 
-WRITE32_MEMBER( n64_periphs::open_w )
+void n64_periphs::open_w(uint32_t data)
 {
 	// Do nothing
 }
@@ -520,7 +521,7 @@ WRITE32_MEMBER( n64_periphs::open_w )
 #define RDRAM_ADDR_SELECT   (8)
 #define RDRAM_DEVICE_MANUF  (9)
 
-READ32_MEMBER( n64_periphs::rdram_reg_r )
+uint32_t n64_periphs::rdram_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	if(offset > 0x24/4)
 	{
@@ -530,7 +531,7 @@ READ32_MEMBER( n64_periphs::rdram_reg_r )
 	return rdram_regs[offset];
 }
 
-WRITE32_MEMBER( n64_periphs::rdram_reg_w )
+void n64_periphs::rdram_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(offset > 0x24/4)
 	{
@@ -1028,7 +1029,7 @@ void n64_periphs::vi_recalculate_resolution()
 	screen().configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
 }
 
-READ32_MEMBER( n64_periphs::vi_reg_r )
+uint32_t n64_periphs::vi_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -1097,7 +1098,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 	return ret;
 }
 
-WRITE32_MEMBER( n64_periphs::vi_reg_w )
+void n64_periphs::vi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//n64_state *state = machine().driver_data<n64_state>();
 
@@ -1307,7 +1308,7 @@ void n64_periphs::ai_timer_tick()
 	}
 }
 
-READ32_MEMBER( n64_periphs::ai_reg_r )
+uint32_t n64_periphs::ai_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -1343,7 +1344,7 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 	return ret;
 }
 
-WRITE32_MEMBER( n64_periphs::ai_reg_w )
+void n64_periphs::ai_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1476,7 +1477,7 @@ void n64_periphs::pi_dma_tick()
 	pi_dma_timer->adjust(attotime::never);
 }
 
-READ32_MEMBER( n64_periphs::pi_reg_r )
+uint32_t n64_periphs::pi_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -1533,7 +1534,7 @@ READ32_MEMBER( n64_periphs::pi_reg_r )
 	return ret;
 }
 
-WRITE32_MEMBER( n64_periphs::pi_reg_w )
+void n64_periphs::pi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1639,7 +1640,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 // RDRAM Interface
 
-READ32_MEMBER( n64_periphs::ri_reg_r )
+uint32_t n64_periphs::ri_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	if(offset == 0x0C/4) // RI_SELECT
 	{
@@ -1652,7 +1653,7 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 		time recommended for letting the SI devices settle after startup.
 		This allows the initialization routines for the SI to see that a
 		proper amount of time has passed since system startup. */
-		m_vr4300->burn_cycles(93750000/2);
+		m_vr4300->adjust_icount(-93750000/2);
 	}
 
 	if(offset > 0x1c/4)
@@ -1663,7 +1664,7 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 	return ri_regs[offset];
 }
 
-WRITE32_MEMBER( n64_periphs::ri_reg_w )
+void n64_periphs::ri_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(offset > 0x1c/4)
 	{
@@ -2145,7 +2146,7 @@ void n64_periphs::pif_dma(int direction)
 	}
 }
 
-READ32_MEMBER( n64_periphs::si_reg_r )
+uint32_t n64_periphs::si_reg_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -2160,7 +2161,7 @@ READ32_MEMBER( n64_periphs::si_reg_r )
 	return ret;
 }
 
-WRITE32_MEMBER( n64_periphs::si_reg_w )
+void n64_periphs::si_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -2397,7 +2398,7 @@ void n64_periphs::dd_read_C2()
 	return;
 }
 
-READ32_MEMBER( n64_periphs::dd_reg_r )
+uint32_t n64_periphs::dd_reg_r(offs_t offset)
 {
 	if(offset < 0x400/4)
 	{
@@ -2473,7 +2474,7 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 	return ret;
 }
 
-WRITE32_MEMBER( n64_periphs::dd_reg_w )
+void n64_periphs::dd_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("dd_reg_w: %08X, %08X, %08X\n", data, offset << 2, mem_mask);
 
@@ -2679,7 +2680,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 	}
 }
 
-READ32_MEMBER( n64_periphs::pif_ram_r )
+uint32_t n64_periphs::pif_ram_r(offs_t offset, uint32_t mem_mask)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -2695,7 +2696,7 @@ READ32_MEMBER( n64_periphs::pif_ram_r )
 	return ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & mem_mask;
 }
 
-WRITE32_MEMBER( n64_periphs::pif_ram_w )
+void n64_periphs::pif_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if( ACCESSING_BITS_24_31 )
 	{

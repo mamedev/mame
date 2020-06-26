@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(cvs_state::write_s2650_flag)
 	m_s2650_flag = state;
 }
 
-READ8_MEMBER(cvs_state::cvs_video_or_color_ram_r)
+uint8_t cvs_state::cvs_video_or_color_ram_r(offs_t offset)
 {
 	if (m_s2650_flag)
 		return m_video_ram[offset];
@@ -128,7 +128,7 @@ READ8_MEMBER(cvs_state::cvs_video_or_color_ram_r)
 		return m_color_ram[offset];
 }
 
-WRITE8_MEMBER(cvs_state::cvs_video_or_color_ram_w)
+void cvs_state::cvs_video_or_color_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_s2650_flag)
 		m_video_ram[offset] = data;
@@ -137,7 +137,7 @@ WRITE8_MEMBER(cvs_state::cvs_video_or_color_ram_w)
 }
 
 
-READ8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_r)
+uint8_t cvs_state::cvs_bullet_ram_or_palette_r(offs_t offset)
 {
 	if (m_s2650_flag)
 		return m_palette_ram[offset & 0x0f];
@@ -145,7 +145,7 @@ READ8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_r)
 		return m_bullet_ram[offset];
 }
 
-WRITE8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_w)
+void cvs_state::cvs_bullet_ram_or_palette_w(offs_t offset, uint8_t data)
 {
 	if (m_s2650_flag)
 		m_palette_ram[offset & 0x0f] = data;
@@ -154,7 +154,7 @@ WRITE8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_w)
 }
 
 
-READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
+uint8_t cvs_state::cvs_s2636_0_or_character_ram_r(offs_t offset)
 {
 	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
@@ -162,7 +162,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 		return m_s2636[0]->read_data(offset);
 }
 
-WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
+void cvs_state::cvs_s2636_0_or_character_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_s2650_flag)
 	{
@@ -175,7 +175,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 }
 
 
-READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
+uint8_t cvs_state::cvs_s2636_1_or_character_ram_r(offs_t offset)
 {
 	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
@@ -183,7 +183,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 		return m_s2636[1]->read_data(offset);
 }
 
-WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
+void cvs_state::cvs_s2636_1_or_character_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_s2650_flag)
 	{
@@ -196,7 +196,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 }
 
 
-READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
+uint8_t cvs_state::cvs_s2636_2_or_character_ram_r(offs_t offset)
 {
 	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
@@ -204,7 +204,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 		return m_s2636[2]->read_data(offset);
 }
 
-WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
+void cvs_state::cvs_s2636_2_or_character_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_s2650_flag)
 	{
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(cvs_state::cvs_input_r)
+uint8_t cvs_state::cvs_input_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -309,7 +309,7 @@ void cvs_state::start_393hz_timer()
  *
  *************************************/
 
-WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
+void cvs_state::cvs_4_bit_dac_data_w(offs_t offset, uint8_t data)
 {
 	uint8_t dac_value;
 	static int old_data[4] = {0,0,0,0};
@@ -331,7 +331,7 @@ WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 	m_dac2->write(dac_value);
 }
 
-WRITE8_MEMBER(cvs_state::cvs_unknown_w)
+void cvs_state::cvs_unknown_w(offs_t offset, uint8_t data)
 {
 	/* offset 2 is used in 8ball
 	 * offset 0 is used in spacefrt
@@ -356,21 +356,21 @@ WRITE8_MEMBER(cvs_state::cvs_unknown_w)
  *************************************/
 
 
-WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_lo_w)
+void cvs_state::cvs_speech_rom_address_lo_w(uint8_t data)
 {
 	/* assuming that d0-d2 are cleared here */
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
 	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
-WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_hi_w)
+void cvs_state::cvs_speech_rom_address_hi_w(uint8_t data)
 {
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
 	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
 
-READ8_MEMBER(cvs_state::cvs_speech_command_r)
+uint8_t cvs_state::cvs_speech_command_r()
 {
 	/* FIXME: this was by observation on board ???
 	 *          -bit 7 is TMS status (active LO) */
@@ -378,7 +378,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 }
 
 
-WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
+void cvs_state::cvs_tms5110_ctl_w(offs_t offset, uint8_t data)
 {
 	uint8_t ctl;
 	/*
@@ -396,7 +396,7 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 }
 
 
-WRITE8_MEMBER(cvs_state::cvs_tms5110_pdc_w)
+void cvs_state::cvs_tms5110_pdc_w(offs_t offset, uint8_t data)
 {
 	uint8_t out = ((~data) >> 7) & 1;
 	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
@@ -426,7 +426,7 @@ READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
  *
  *************************************/
 
-WRITE8_MEMBER(cvs_state::audio_command_w)
+void cvs_state::audio_command_w(uint8_t data)
 {
 	LOG(("data %02x\n", data));
 	/* cause interrupt on audio CPU if bit 7 set */
@@ -1547,7 +1547,7 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(cvs_state::huncholy_prot_r)
+uint8_t cvs_state::huncholy_prot_r(offs_t offset)
 {
 	if (offset == 1)
 	{
@@ -1561,7 +1561,7 @@ READ8_MEMBER(cvs_state::huncholy_prot_r)
 
 void cvs_state::init_huncholy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8sm_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
 
 	save_item(NAME(m_protection_counter));
 }
@@ -1576,7 +1576,7 @@ void cvs_state::init_hunchbaka()
 }
 
 
-READ8_MEMBER(cvs_state::superbik_prot_r)
+uint8_t cvs_state::superbik_prot_r()
 {
 	m_protection_counter++;
 	if ((m_protection_counter & 0x0f) == 0x02) return 0;
@@ -1586,13 +1586,13 @@ READ8_MEMBER(cvs_state::superbik_prot_r)
 void cvs_state::init_superbik()
 {
 	m_protection_counter = 0;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(*this, FUNC(cvs_state::superbik_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8smo_delegate(*this, FUNC(cvs_state::superbik_prot_r)));
 
 	save_item(NAME(m_protection_counter));
 }
 
 
-READ8_MEMBER(cvs_state::hero_prot_r)
+uint8_t cvs_state::hero_prot_r(offs_t offset)
 {
 	u8 *ROM = memregion("maincpu")->base() + 0x73f0;
 
@@ -1619,7 +1619,7 @@ READ8_MEMBER(cvs_state::hero_prot_r)
 
 void cvs_state::init_hero()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(*this, FUNC(cvs_state::hero_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8sm_delegate(*this, FUNC(cvs_state::hero_prot_r)));
 }
 
 

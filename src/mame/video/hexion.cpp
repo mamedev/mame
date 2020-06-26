@@ -63,7 +63,7 @@ void hexion_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hexion_state::bankswitch_w)
+void hexion_state::bankswitch_w(uint8_t data)
 {
 	/* bits 0-3 select ROM bank */
 	membank("bank1")->set_entry(data & 0x0f);
@@ -85,7 +85,7 @@ if (data & 0x30)
 //logerror("%s: bankswitch_w %02x\n",m_maincpu->pc(),data);
 }
 
-READ8_MEMBER(hexion_state::bankedram_r)
+uint8_t hexion_state::bankedram_r(offs_t offset)
 {
 	if (m_gfxrom_select && offset < 0x1000)
 	{
@@ -106,7 +106,7 @@ READ8_MEMBER(hexion_state::bankedram_r)
 	}
 }
 
-WRITE8_MEMBER(hexion_state::bankedram_w)
+void hexion_state::bankedram_w(offs_t offset, uint8_t data)
 {
 	if (m_bankctrl == 3 && offset == 0 && (data & 0xfe) == 0)
 	{
@@ -138,13 +138,13 @@ WRITE8_MEMBER(hexion_state::bankedram_w)
 logerror("%s: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",m_maincpu->pc(),offset,data,m_bankctrl);
 }
 
-WRITE8_MEMBER(hexion_state::bankctrl_w)
+void hexion_state::bankctrl_w(uint8_t data)
 {
 //logerror("%s: bankctrl_w %02x\n",m_maincpu->pc(),data);
 	m_bankctrl = data;
 }
 
-WRITE8_MEMBER(hexion_state::gfxrom_select_w)
+void hexion_state::gfxrom_select_w(uint8_t data)
 {
 //logerror("%s: gfxrom_select_w %02x\n",m_maincpu->pc(),data);
 	m_gfxrom_select = data;

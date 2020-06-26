@@ -95,7 +95,7 @@
 // Info for bank switcher
 struct bank_info_entry
 {
-	void (dgn_beta_state::*func)(address_space &, offs_t, u8, u8);  // pointer to write handler
+	void (dgn_beta_state::*func)(offs_t, u8);                       // pointer to write handler
 	char const *name;                                               // write handler name
 	offs_t start;                                                   // offset of start of block
 	offs_t end;                                                     // offset of end of block
@@ -180,7 +180,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 				readbank = &m_ram->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
-			write8_delegate func(*this, bank_info[Page].func, bank_info[Page].name);
+			write8sm_delegate func(*this, bank_info[Page].func, bank_info[Page].name);
 			space_0.install_write_handler(bank_start, bank_end, func);
 			space_1.install_write_handler(bank_start, bank_end, func);
 		}
@@ -249,7 +249,7 @@ void dgn_beta_state::SetDefaultTask()
 }
 
 // Return the value of a page register
-READ8_MEMBER(dgn_beta_state::dgn_beta_page_r)
+uint8_t dgn_beta_state::dgn_beta_page_r(offs_t offset)
 {
 	return m_PageRegs[m_PIATaskReg][offset].value;
 }
@@ -258,7 +258,7 @@ READ8_MEMBER(dgn_beta_state::dgn_beta_page_r)
 // if memory banking is active, if it is, it calls UpdateBanks, to actually
 // setup the mappings.
 
-WRITE8_MEMBER(dgn_beta_state::dgn_beta_page_w )
+void dgn_beta_state::dgn_beta_page_w(offs_t offset, uint8_t data)
 {
 	m_PageRegs[m_PIATaskReg][offset].value=data;
 
@@ -279,87 +279,87 @@ void dgn_beta_state::dgn_beta_bank_memory(int offset, int data, int bank)
 	m_PageRegs[m_TaskReg][bank].memory[offset]=data;
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b0_w )
+void dgn_beta_state::dgnbeta_ram_b0_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,0);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b1_w )
+void dgn_beta_state::dgnbeta_ram_b1_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,1);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b2_w )
+void dgn_beta_state::dgnbeta_ram_b2_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,2);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b3_w )
+void dgn_beta_state::dgnbeta_ram_b3_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,3);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b4_w )
+void dgn_beta_state::dgnbeta_ram_b4_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,4);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b5_w )
+void dgn_beta_state::dgnbeta_ram_b5_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,5);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b6_w )
+void dgn_beta_state::dgnbeta_ram_b6_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,6);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b7_w )
+void dgn_beta_state::dgnbeta_ram_b7_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,7);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b8_w )
+void dgn_beta_state::dgnbeta_ram_b8_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,8);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b9_w )
+void dgn_beta_state::dgnbeta_ram_b9_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,9);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bA_w )
+void dgn_beta_state::dgnbeta_ram_bA_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,10);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bB_w )
+void dgn_beta_state::dgnbeta_ram_bB_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,11);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bC_w )
+void dgn_beta_state::dgnbeta_ram_bC_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,12);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bD_w )
+void dgn_beta_state::dgnbeta_ram_bD_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,13);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bE_w )
+void dgn_beta_state::dgnbeta_ram_bE_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,14);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bF_w )
+void dgn_beta_state::dgnbeta_ram_bF_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,15);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bG_w )
+void dgn_beta_state::dgnbeta_ram_bG_w(offs_t offset, uint8_t data)
 {
 	dgn_beta_bank_memory(offset,data,16);
 }
@@ -812,12 +812,12 @@ WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_drq_w )
 	cpu1_recalc_firq(state);
 }
 
-READ8_MEMBER( dgn_beta_state::dgnbeta_wd2797_r )
+uint8_t dgn_beta_state::dgnbeta_wd2797_r(offs_t offset)
 {
 	return m_fdc->read(offset & 0x03);
 }
 
-WRITE8_MEMBER( dgn_beta_state::dgnbeta_wd2797_w )
+void dgn_beta_state::dgnbeta_wd2797_w(offs_t offset, uint8_t data)
 {
 	m_wd2797_written = 1;
 	m_fdc->write(offset & 0x03, data);

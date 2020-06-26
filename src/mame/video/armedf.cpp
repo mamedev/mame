@@ -372,7 +372,6 @@ u32 armedf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
 			m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 			break;
-
 	}
 
 	screen.priority().fill(0, cliprect);

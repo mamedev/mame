@@ -142,11 +142,11 @@ void vr0sound_device::device_start()
 	m_irq_cb.resolve_safe();
 
 	// Find our direct access
-	m_texcache = space(AS_TEXTURE).cache<1, 0, ENDIANNESS_LITTLE>();
-	m_fbcache = space(AS_FRAME).cache<1, 0, ENDIANNESS_LITTLE>();
-	m_texcache_ctrl = m_fbcache;
+	space(AS_TEXTURE).cache(m_texcache);
+	space(AS_FRAME).cache(m_fbcache);
+	m_texcache_ctrl = &m_fbcache;
 	for (auto &elem : m_channel)
-		elem.Cache = m_fbcache;
+		elem.Cache = &m_fbcache;
 
 	m_stream = stream_alloc(0, 2, clock() / 972); // TODO : Correct source / divider?
 
@@ -229,7 +229,7 @@ void vr0sound_device::channel_w(offs_t offset, u16 data, u16 mem_mask)
 	m_channel[(offset >> 4) & 0x1f].write(offset & 0xf, data, mem_mask);
 	if ((old_mode ^ channel->Modes) & MODE_TEXTURE)
 	{
-		channel->Cache = (channel->Modes & MODE_TEXTURE) ? m_texcache_ctrl : m_fbcache;
+		channel->Cache = (channel->Modes & MODE_TEXTURE) ? m_texcache_ctrl : &m_fbcache;
 	}
 }
 
@@ -356,7 +356,7 @@ void vr0sound_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	const u16 old_ctrl = m_Ctrl;
 	COMBINE_DATA(&m_Ctrl);
 	if ((old_ctrl ^ m_Ctrl) & CTRL_TM)
-		m_texcache_ctrl = (m_Ctrl & CTRL_TM) ? m_texcache : m_fbcache;
+		m_texcache_ctrl = (m_Ctrl & CTRL_TM) ? &m_texcache : &m_fbcache;
 }
 
 /*

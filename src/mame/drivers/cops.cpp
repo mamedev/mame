@@ -81,20 +81,19 @@ protected:
 	virtual void video_start() override;
 
 public:
-	DECLARE_WRITE8_MEMBER(io1_w);
-	DECLARE_READ8_MEMBER(io1_r);
-	DECLARE_READ8_MEMBER(io1_lm_r);
-	DECLARE_WRITE8_MEMBER(io2_w);
-	DECLARE_READ8_MEMBER(io2_r);
-	DECLARE_READ8_MEMBER(ldstatus_r);
+	void io1_w(offs_t offset, uint8_t data);
+	uint8_t io1_r(offs_t offset);
+	uint8_t io1_lm_r(offs_t offset);
+	void io2_w(offs_t offset, uint8_t data);
+	uint8_t io2_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(dacia_irq);
 	DECLARE_WRITE_LINE_MEMBER(ld_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq);
 	void dacia_receive(uint8_t data);
 	void update_dacia_irq();
-	DECLARE_WRITE8_MEMBER(dacia_w);
-	DECLARE_READ8_MEMBER(dacia_r);
+	void dacia_w(offs_t offset, uint8_t data);
+	uint8_t dacia_r(offs_t offset);
 	void via1_b_w(uint8_t data);
 	void via1_cb1_w(uint8_t data);
 	void cdrom_data_w(uint8_t data);
@@ -229,15 +228,10 @@ uint8_t cops_state::cdrom_data_r()
  *
  *************************************/
 
-READ8_MEMBER(cops_state::ldstatus_r)
-{
-	return m_ld->status_r();
-}
-
 TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
 {
 	m_dacia_receiver_full = 1;
- int m_ld_command_total_bytes =8;
+	int m_ld_command_total_bytes =8;
 
 	if ( m_ld_command_current_byte < m_ld_command_total_bytes )
 	{
@@ -366,7 +360,7 @@ uint8_t cops_state::generate_isr2()
 	return isr2;
 }
 
-READ8_MEMBER(cops_state::dacia_r)
+uint8_t cops_state::dacia_r(offs_t offset)
 {
 	switch(offset & 0x07)
 	{
@@ -431,7 +425,7 @@ READ8_MEMBER(cops_state::dacia_r)
 	}
 }
 
-WRITE8_MEMBER(cops_state::dacia_w)
+void cops_state::dacia_w(offs_t offset, uint8_t data)
 {
 	switch(offset & 0x07)
 	{
@@ -588,7 +582,7 @@ WRITE8_MEMBER(cops_state::dacia_w)
  *
  *************************************/
 
-READ8_MEMBER(cops_state::io1_r)
+uint8_t cops_state::io1_r(offs_t offset)
 {
 	switch( offset & 0x0f )
 	{
@@ -604,7 +598,7 @@ READ8_MEMBER(cops_state::io1_r)
 	}
 }
 
-READ8_MEMBER(cops_state::io1_lm_r)
+uint8_t cops_state::io1_lm_r(offs_t offset)
 {
 	switch( offset & 0x0f )
 	{
@@ -622,7 +616,7 @@ READ8_MEMBER(cops_state::io1_lm_r)
 	}
 }
 
-WRITE8_MEMBER(cops_state::io1_w)
+void cops_state::io1_w(offs_t offset, uint8_t data)
 {
 	int i;
 	char output_name[16];
@@ -697,7 +691,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 	}
 }
 
-READ8_MEMBER(cops_state::io2_r)
+uint8_t cops_state::io2_r(offs_t offset)
 {
 	switch( offset & 0x0f )
 	{
@@ -709,7 +703,7 @@ READ8_MEMBER(cops_state::io2_r)
 	}
 }
 
-WRITE8_MEMBER(cops_state::io2_w)
+void cops_state::io2_w(offs_t offset, uint8_t data)
 {
 	switch( offset & 0x0f )
 	{

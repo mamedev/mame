@@ -64,12 +64,12 @@ private:
 
 	/* misc */
 	int            m_ticket;
-	DECLARE_WRITE16_MEMBER(mid_videoram_w);
-	DECLARE_WRITE16_MEMBER(txt_videoram_w);
-	DECLARE_WRITE16_MEMBER(ticket_w);
-	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void mid_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void txt_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ticket_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void video_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void oki_bank_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_txt_tile_info);
 	virtual void machine_start() override;
@@ -173,19 +173,19 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE16_MEMBER(pzletime_state::mid_videoram_w)
+void pzletime_state::mid_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_videoram[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(pzletime_state::txt_videoram_w)
+void pzletime_state::txt_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_videoram[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(pzletime_state::eeprom_w)
+void pzletime_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -195,13 +195,13 @@ WRITE16_MEMBER(pzletime_state::eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(pzletime_state::ticket_w)
+void pzletime_state::ticket_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ticket = data & 1;
 }
 
-WRITE16_MEMBER(pzletime_state::video_regs_w)
+void pzletime_state::video_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_regs[offset]);
 
@@ -214,7 +214,7 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 	}
 }
 
-WRITE16_MEMBER(pzletime_state::oki_bank_w)
+void pzletime_state::oki_bank_w(uint16_t data)
 {
 	m_oki->set_rom_bank(data & 0x3);
 }

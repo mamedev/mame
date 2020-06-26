@@ -103,7 +103,7 @@ png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap);
 
 png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
 
-png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate);
+png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, unsigned rate);
 png_error mng_capture_frame(util::core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
 png_error mng_capture_stop(util::core_file &fp);
 

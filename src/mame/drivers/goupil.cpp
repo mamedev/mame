@@ -144,8 +144,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
 
-	DECLARE_READ8_MEMBER(visu24x80_ram_r);
-	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
+	uint8_t visu24x80_ram_r(offs_t offset);
+	void visu24x80_ram_w(offs_t offset, uint8_t data);
 
 	void goupil_g2(machine_config &config);
 
@@ -507,14 +507,14 @@ MC6845_ON_UPDATE_ADDR_CHANGED(goupil_g2_state::crtc_update_addr_changed)
 {
 }
 
-WRITE8_MEMBER( goupil_g2_state::visu24x80_ram_w )
+void goupil_g2_state::visu24x80_ram_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: write visu24x80_ram_w mem : 0x%.4X <- 0x%X\n",machine().describe_context(),offset,data);
 
 	m_visu24x80_ram->pointer()[offset] = data;
 }
 
-READ8_MEMBER( goupil_g2_state::visu24x80_ram_r )
+uint8_t goupil_g2_state::visu24x80_ram_r(offs_t offset)
 {
 	uint8_t data;
 

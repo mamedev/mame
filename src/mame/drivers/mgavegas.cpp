@@ -130,14 +130,14 @@ private:
 	uint8_t m_mc;
 	uint8_t m_mr;
 
-	DECLARE_READ8_MEMBER(start_read);
+	uint8_t start_read();
 
-	DECLARE_WRITE8_MEMBER(w_a0);
-	DECLARE_READ8_MEMBER(r_a0);
-	DECLARE_WRITE8_MEMBER(cso1_w);
-	DECLARE_WRITE8_MEMBER(cso2_w);
-	DECLARE_WRITE8_MEMBER(csoki_w);
-	DECLARE_READ8_MEMBER(csoki_r);
+	void w_a0(offs_t offset, uint8_t data);
+	uint8_t r_a0(offs_t offset);
+	void cso1_w(uint8_t data);
+	void cso2_w(uint8_t data);
+	void csoki_w(offs_t offset, uint8_t data);
+	uint8_t csoki_r(offs_t offset);
 
 	uint8_t ay8910_a_r();
 	uint8_t ay8910_b_r();
@@ -269,7 +269,7 @@ uint64_t tmp;
 }
 
 
-READ8_MEMBER( mgavegas_state::start_read )
+uint8_t mgavegas_state::start_read()
 {
 //  in HW it look for /IOREQ going down to clear the IRQ line
 	if (m_int){
@@ -284,7 +284,7 @@ READ8_MEMBER( mgavegas_state::start_read )
 /****************************
 *    Read/Write Handlers    *
 ****************************/
-READ8_MEMBER(mgavegas_state::r_a0)
+uint8_t mgavegas_state::r_a0(offs_t offset)
 {
 uint8_t ret=0;
 
@@ -305,7 +305,7 @@ uint8_t ret=0;
 	return ret;
 }
 
-WRITE8_MEMBER(mgavegas_state::w_a0)
+void mgavegas_state::w_a0(offs_t offset, uint8_t data)
 {
 	if (LOG_AY8910)
 		logerror("write to %04X data = %02X \n",offset+0xa000,data);
@@ -335,16 +335,16 @@ WRITE8_MEMBER(mgavegas_state::w_a0)
 
 
 
-READ8_MEMBER(mgavegas_state::csoki_r)
+uint8_t mgavegas_state::csoki_r(offs_t offset)
 {
-uint8_t ret=0;
+	uint8_t ret=0;
 
 	if (LOG_MSM5205)
 		logerror("read from %04X return %02X\n",offset+0xc800,ret);
 	return ret;
 }
 
-WRITE8_MEMBER(mgavegas_state::csoki_w)
+void mgavegas_state::csoki_w(offs_t offset, uint8_t data)
 {
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
@@ -353,7 +353,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 }
 
 
-WRITE8_MEMBER(mgavegas_state::cso1_w)
+void mgavegas_state::cso1_w(uint8_t data)
 {
 	if (LOG_CSO1)
 		logerror("write to CSO1 data = %02X\n",data);
@@ -372,7 +372,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 	m_ticket->motor_w(m_hop);
 }
 
-WRITE8_MEMBER(mgavegas_state::cso2_w)
+void mgavegas_state::cso2_w(uint8_t data)
 {
 	if (LOG_CSO2)
 		logerror("write to CSO2 data = %02X\n",data);
@@ -557,13 +557,13 @@ void mgavegas_state::machine_reset()
 void mgavegas_state::init_mgavegas21()
 {
 	//hack to clear the irq on reti instruction
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00ea, 0x00ea, read8_delegate(*this, FUNC(mgavegas_state::start_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00ea, 0x00ea, read8smo_delegate(*this, FUNC(mgavegas_state::start_read)));
 }
 
 void mgavegas_state::init_mgavegas()
 {
 	//hack to clear the irq on reti instruction
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e2, 0x00e2, read8_delegate(*this, FUNC(mgavegas_state::start_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e2, 0x00e2, read8smo_delegate(*this, FUNC(mgavegas_state::start_read)));
 }
 
 
@@ -577,7 +577,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mgavegas_state::int_0 )
 void mgavegas_state::init_mgavegas133()
 {
 	//hack to clear the irq on reti instruction
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00dd, 0x00dd, read8_delegate(*this, FUNC(mgavegas_state::start_read)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00dd, 0x00dd, read8smo_delegate(*this, FUNC(mgavegas_state::start_read)));
 }
 
 /*************************

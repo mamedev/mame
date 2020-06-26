@@ -39045,7 +39045,7 @@ license:CC0
 
 	<software name="ttoonadv">
 		<description>Tiny Toon Adventures (Euro)</description>
-		<year>1993</year>
+		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-NI (NOE/SCN)"/>
 		<info name="release" value="19921022"/>
@@ -46949,7 +46949,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NAT-JL"/>
 		<info name="release" value="19900810"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="闇の仕事人KAGE"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -47339,14 +47339,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A1" />
 			<feature name="vrc2-pin4" value="PRG A0" />
-			<feature name="vrc2-pin21" value ="CHR A10" />
-			<feature name="vrc2-pin22" value ="CHR A16" />
-			<feature name="vrc2-pin23" value ="CHR A11" />
-			<feature name="vrc2-pin24" value ="CHR A13" />
-			<feature name="vrc2-pin25" value ="CHR A14" />
-			<feature name="vrc2-pin26" value ="CHR A12" />
-			<feature name="vrc2-pin27" value ="CHR A15" />
-			<feature name="vrc2-pin28" value ="NC" />
+			<feature name="vrc2-pin21" value="CHR A10" />
+			<feature name="vrc2-pin22" value="CHR A16" />
+			<feature name="vrc2-pin23" value="CHR A11" />
+			<feature name="vrc2-pin24" value="CHR A13" />
+			<feature name="vrc2-pin25" value="CHR A14" />
+			<feature name="vrc2-pin26" value="CHR A12" />
+			<feature name="vrc2-pin27" value="CHR A15" />
+			<feature name="vrc2-pin28" value="NC" />
 			<dataarea name="chr" size="131072">
 				<rom name="mad city (japan) (beta).chr" size="131072" crc="028dc0ef" sha1="1212b249bfc2c13e76a337d4ceedc5f78d1d5be6" offset="00000" status="baddump" />
 			</dataarea>
@@ -47610,7 +47610,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FMT-7800"/>
 		<info name="release" value="19900406"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="女神転生Ⅱ デジタルデビル物語"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
@@ -49876,7 +49876,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Capcom</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value="19861224"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="闘いの挽歌"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
@@ -50292,14 +50292,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A1" />
 			<feature name="vrc2-pin4" value="PRG A0" />
-			<feature name="vrc2-pin21" value ="CHR A10" />
-			<feature name="vrc2-pin22" value ="CHR A16" />
-			<feature name="vrc2-pin23" value ="CHR A11" />
-			<feature name="vrc2-pin24" value ="CHR A13" />
-			<feature name="vrc2-pin25" value ="CHR A14" />
-			<feature name="vrc2-pin26" value ="CHR A12" />
-			<feature name="vrc2-pin27" value ="CHR A15" />
-			<feature name="vrc2-pin28" value ="NC" />
+			<feature name="vrc2-pin21" value="CHR A10" />
+			<feature name="vrc2-pin22" value="CHR A16" />
+			<feature name="vrc2-pin23" value="CHR A11" />
+			<feature name="vrc2-pin24" value="CHR A13" />
+			<feature name="vrc2-pin25" value="CHR A14" />
+			<feature name="vrc2-pin26" value="CHR A12" />
+			<feature name="vrc2-pin27" value="CHR A15" />
+			<feature name="vrc2-pin28" value="NC" />
 			<dataarea name="chr" size="131072">
 				<rom name="twinbee 3 - poko poko dai maou (japan) (beta).chr" size="131072" crc="22a2268f" sha1="a930b56984f1bf8cc08050a52a8e2ed2484619cf" offset="00000" status="baddump" />
 			</dataarea>

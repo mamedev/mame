@@ -28,8 +28,8 @@ public:
 	virtual void set_mapping(uint8_t type) override;
 	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint8_t input_r();
+	void output_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(button_red_w);
 	DECLARE_INPUT_CHANGED_MEMBER(button_black_w);
 

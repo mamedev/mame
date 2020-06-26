@@ -46,11 +46,11 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(scroll_x_lsb_w);
-	DECLARE_WRITE8_MEMBER(scroll_x_msb_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void scroll_x_lsb_w(uint8_t data);
+	void scroll_x_msb_w(uint8_t data);
+	void scroll_y_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

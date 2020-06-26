@@ -33,12 +33,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "speaker.h"
 
 
-WRITE16_MEMBER(magmax_state::cpu_irq_ack_w)
+void magmax_state::cpu_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-READ8_MEMBER(magmax_state::sound_r)
+uint8_t magmax_state::sound_r()
 {
 	return (m_soundlatch->read() << 1) | m_LS74_q;
 }
@@ -169,7 +169,7 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 	m_ay[2]->set_output_gain(2, percent);
 }
 
-WRITE16_MEMBER(magmax_state::vreg_w)
+void magmax_state::vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* VRAM CONTROL REGISTER */
 	/* bit0 - coin counter 1    */

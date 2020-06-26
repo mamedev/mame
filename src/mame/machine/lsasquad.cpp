@@ -10,17 +10,17 @@
 
 ***************************************************************************/
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_disable_w)
+void lsasquad_state::lsasquad_sh_nmi_disable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(0);
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_enable_w)
+void lsasquad_state::lsasquad_sh_nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(1);
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_sound_status_r)
+uint8_t lsasquad_state::lsasquad_sound_status_r()
 {
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
@@ -28,14 +28,14 @@ READ8_MEMBER(lsasquad_state::lsasquad_sound_status_r)
 }
 
 
-READ8_MEMBER(lsasquad_state::daikaiju_sound_status_r)
+uint8_t lsasquad_state::daikaiju_sound_status_r()
 {
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
 	return (m_soundlatch->pending_r() ? 2 : 1);
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
+uint8_t lsasquad_state::lsasquad_mcu_status_r()
 {
 	int res = ioport("MCU")->read();
 
@@ -53,7 +53,7 @@ READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
 	return res;
 }
 
-READ8_MEMBER(lsasquad_state::daikaiju_mcu_status_r)
+uint8_t lsasquad_state::daikaiju_mcu_status_r()
 {
 	int res = ioport("MCU")->read();
 

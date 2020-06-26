@@ -27,7 +27,8 @@ public:
 	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_config_port(*this, "CNF")
-		, m_read_bank(*this, "bankr0")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
 		, m_maincpu(*this, "maincpu")
 		, m_dma(*this, "dma")
@@ -57,13 +58,13 @@ private:
 	void zorba_mem(address_map &map);
 
 	// Memory banking control
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
+	uint8_t ram_r();
+	void ram_w(uint8_t data);
+	uint8_t rom_r();
+	void rom_w(uint8_t data);
 
 	// Interrupt vectoring glue
-	DECLARE_WRITE8_MEMBER(intmask_w);
+	void intmask_w(uint8_t data);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(tx_rx_rdy_w);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq_w);
 
@@ -91,7 +92,8 @@ private:
 
 	required_ioport                     m_config_port;
 
-	required_memory_bank                m_read_bank;
+	required_region_ptr<u8>             m_rom;
+	required_shared_ptr<u8>             m_ram;
 	required_region_ptr<uint8_t>        m_p_chargen;
 
 	required_device<cpu_device>         m_maincpu;
@@ -122,6 +124,7 @@ private:
 	int     m_printer_select;
 
 	uint8_t m_term_data;
+	bool m_rom_in_map;
 };
 
 #endif // MAME_INCLUDES_ZORBA_H

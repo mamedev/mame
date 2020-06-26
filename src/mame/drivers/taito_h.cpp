@@ -161,7 +161,7 @@ some kind of zoom table?
 
 ***************************************************************************/
 
-READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
+u8 taitoh_state::syvalion_input_bypass_r()
 {
 	/* Bypass TC0040IOC controller for analog input */
 

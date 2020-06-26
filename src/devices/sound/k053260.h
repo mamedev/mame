@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -18,8 +20,8 @@
 // ======================> k053260_device
 
 class k053260_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+					   public device_sound_interface,
+					   public device_rom_interface<21>
 {
 public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

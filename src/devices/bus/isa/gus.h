@@ -98,23 +98,23 @@ public:
 	uint8_t dma_channel1() { return m_dma_channel1; }
 	uint8_t dma_channel2() { if(m_dma_combine == 0) return m_dma_channel2; else return m_dma_channel1; }
 
-	DECLARE_READ8_MEMBER(global_reg_select_r);
-	DECLARE_WRITE8_MEMBER(global_reg_select_w);
-	DECLARE_READ8_MEMBER(global_reg_data_r);
-	DECLARE_WRITE8_MEMBER(global_reg_data_w);
-	DECLARE_READ8_MEMBER(dram_r);
-	DECLARE_WRITE8_MEMBER(dram_w);
-	DECLARE_READ8_MEMBER(adlib_r);
-	DECLARE_WRITE8_MEMBER(adlib_w);
-	DECLARE_READ8_MEMBER(adlib_cmd_r);
-	DECLARE_WRITE8_MEMBER(adlib_cmd_w);
-	DECLARE_READ8_MEMBER(mix_ctrl_r);
-	DECLARE_WRITE8_MEMBER(mix_ctrl_w);
-	DECLARE_READ8_MEMBER(stat_r);
-	DECLARE_WRITE8_MEMBER(stat_w);
-	DECLARE_READ8_MEMBER(sb_r);
-	DECLARE_WRITE8_MEMBER(sb_w);
-	DECLARE_WRITE8_MEMBER(sb2x6_w);
+	uint8_t global_reg_select_r(offs_t offset);
+	void global_reg_select_w(offs_t offset, uint8_t data);
+	uint8_t global_reg_data_r(offs_t offset);
+	void global_reg_data_w(offs_t offset, uint8_t data);
+	uint8_t dram_r(offs_t offset);
+	void dram_w(offs_t offset, uint8_t data);
+	uint8_t adlib_r(offs_t offset);
+	void adlib_w(offs_t offset, uint8_t data);
+	uint8_t adlib_cmd_r(offs_t offset);
+	void adlib_cmd_w(offs_t offset, uint8_t data);
+	uint8_t mix_ctrl_r(offs_t offset);
+	void mix_ctrl_w(offs_t offset, uint8_t data);
+	uint8_t stat_r();
+	void stat_w(uint8_t data);
+	uint8_t sb_r(offs_t offset);
+	void sb_w(offs_t offset, uint8_t data);
+	void sb2x6_w(uint8_t data);
 
 	// DMA signals
 	uint8_t dack_r(int line);
@@ -231,14 +231,14 @@ public:
 	void set_midi_irq(uint8_t source);
 	void reset_midi_irq(uint8_t source);
 
-	DECLARE_READ8_MEMBER(board_r);
-	DECLARE_READ8_MEMBER(synth_r);
-	DECLARE_WRITE8_MEMBER(board_w);
-	DECLARE_WRITE8_MEMBER(synth_w);
-	DECLARE_READ8_MEMBER(adlib_r);
-	DECLARE_WRITE8_MEMBER(adlib_w);
-	DECLARE_READ8_MEMBER(joy_r);
-	DECLARE_WRITE8_MEMBER(joy_w);
+	uint8_t board_r(offs_t offset);
+	uint8_t synth_r(offs_t offset);
+	void board_w(offs_t offset, uint8_t data);
+	void synth_w(offs_t offset, uint8_t data);
+	uint8_t adlib_r(offs_t offset);
+	void adlib_w(offs_t offset, uint8_t data);
+	uint8_t joy_r(offs_t offset);
+	void joy_w(offs_t offset, uint8_t data);
 
 	// DMA overrides
 	virtual uint8_t dack_r(int line) override;

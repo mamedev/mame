@@ -658,7 +658,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 								}
 
 								newcode.field[fieldnum] = &field;
-								if (m_keycode_map.end() == found) 
+								if (m_keycode_map.end() == found)
 								{
 									keycode_map_list map_list;
 									map_list.emplace_back(newcode);
@@ -881,8 +881,8 @@ const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t 
 {
 	keycode_map::const_iterator const found(m_keycode_map.find(ch));
 	if (m_keycode_map.end() == found) return nullptr;
-	for(const keycode_map_entry &entry : found->second)
-	{	
+	for (keycode_map_entry const &entry : found->second)
+	{
 		if (entry.condition.eval())
 			return &entry;
 	}
@@ -912,7 +912,7 @@ void natural_keyboard::dump(std::ostream &str) const
 		{
 			// identify the keys used
 			for (std::size_t field = 0; (entry.field.size() > field) && entry.field[field]; ++field)
-			    util::stream_format(str, "%s'%s'", first ? "" : ", ", entry.field[field]->name());
+				util::stream_format(str, "%s'%s'", first ? "" : ", ", entry.field[field]->name());
 
 			// carriage return
 			str << '\n';

@@ -119,7 +119,7 @@ void iop_spu_device::port_write(int bank, uint16_t data)
 		core.m_curr_port_addr = 0x2800 >> 1;
 }
 
-READ16_MEMBER(iop_spu_device::read)
+uint16_t iop_spu_device::read(offs_t offset, uint16_t mem_mask)
 {
 	return reg_read(BIT(offset, 9), (offset << 1) & 0x3ff, mem_mask);
 }
@@ -171,7 +171,7 @@ uint16_t iop_spu_device::reg_read(int bank, uint32_t offset, uint16_t mem_mask)
 	return ret;
 }
 
-WRITE16_MEMBER(iop_spu_device::write)
+void iop_spu_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	reg_write(BIT(offset, 9), (offset << 1) & 0x3ff, data, mem_mask);
 }

@@ -23,13 +23,13 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)         (m_cache->read_byte(a))
+#define READOP(a)         (m_cache.read_byte(a))
 
-#define RDMEM(a)          (m_data->read_word((a) & 0xfff))
-#define WRMEM(a,v)        (m_data->write_word((a), (v)))
+#define RDMEM(a)          (m_data.read_word((a) & 0xfff))
+#define WRMEM(a,v)        (m_data.write_word((a), (v)))
 
-#define READPORT(a)       (m_io->read_byte(a))
-#define WRITEPORT(a,v)    (m_io->write_byte((a), (v)))
+#define READPORT(a)       (m_io.read_byte(a))
+#define WRITEPORT(a,v)    (m_io.write_byte((a), (v)))
 
 #define SET_A0           do { m_a0flag = m_A; } while (0)
 #define SET_CMP_VAL(x)    do { m_cmpacc = *m_acc; m_cmpval = (x) & 0xfff; } while (0)
@@ -107,10 +107,10 @@ void ccpu_cpu_device::device_start()
 	m_vector_callback.resolve();
 	assert(!m_vector_callback.isnull());
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_PC));
 	save_item(NAME(m_A));

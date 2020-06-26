@@ -127,13 +127,13 @@ void labyrunr_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(labyrunr_state::labyrunr_vram1_w)
+void labyrunr_state::labyrunr_vram1_w(offs_t offset, uint8_t data)
 {
 	m_videoram1[offset] = data;
 	m_layer0->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
+void labyrunr_state::labyrunr_vram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_layer1->mark_tile_dirty(offset & 0x3ff);

@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
 }
 
 // FIRQ, related to the sample playback?
-READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
+uint8_t maygay1b_state::m1_firq_trg_r()
 {
 	if (m_msm6376)
 	{
@@ -128,7 +128,7 @@ READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 	return 0xff;
 }
 
-READ8_MEMBER( maygay1b_state::m1_firq_clr_r )
+uint8_t maygay1b_state::m1_firq_clr_r()
 {
 	cpu0_firq(0);
 	return 0xff;
@@ -297,7 +297,7 @@ void maygay1b_state::machine_start()
 	m_triacs.resolve();
 }
 
-WRITE8_MEMBER(maygay1b_state::reel12_w)
+void maygay1b_state::reel12_w(uint8_t data)
 {
 	m_reels[0]->update( data     & 0x0F);
 	m_reels[1]->update((data>>4) & 0x0F);
@@ -306,7 +306,7 @@ WRITE8_MEMBER(maygay1b_state::reel12_w)
 	awp_draw_reel(machine(),"reel2", *m_reels[1]);
 }
 
-WRITE8_MEMBER(maygay1b_state::reel34_w)
+void maygay1b_state::reel34_w(uint8_t data)
 {
 	m_reels[2]->update( data     & 0x0F);
 	m_reels[3]->update((data>>4) & 0x0F);
@@ -315,7 +315,7 @@ WRITE8_MEMBER(maygay1b_state::reel34_w)
 	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
-WRITE8_MEMBER(maygay1b_state::reel56_w)
+void maygay1b_state::reel56_w(uint8_t data)
 {
 	m_reels[4]->update( data     & 0x0F);
 	m_reels[5]->update((data>>4) & 0x0F);
@@ -382,14 +382,14 @@ WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
 	m_bank1->set_entry(state);
 }
 
-WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
+void maygay1b_state::latch_ch2_w(uint8_t data)
 {
 	m_msm6376->write(data&0x7f);
 	m_msm6376->ch2_w(data&0x80);
 }
 
 //A strange setup this, the address lines are used to move st to the right level
-READ8_MEMBER(maygay1b_state::latch_st_hi)
+uint8_t maygay1b_state::latch_st_hi()
 {
 	if (m_msm6376)
 	{
@@ -398,7 +398,7 @@ READ8_MEMBER(maygay1b_state::latch_st_hi)
 	return 0xff;
 }
 
-READ8_MEMBER(maygay1b_state::latch_st_lo)
+uint8_t maygay1b_state::latch_st_lo()
 {
 	if (m_msm6376)
 	{
@@ -407,7 +407,7 @@ READ8_MEMBER(maygay1b_state::latch_st_lo)
 	return 0xff;
 }
 
-READ8_MEMBER(maygay1b_state::m1_meter_r)
+uint8_t maygay1b_state::m1_meter_r()
 {
 	//TODO: Can we just return the AY port A data?
 	return m_meter;
@@ -473,7 +473,7 @@ void maygay1b_state::m1_memmap(address_map &map)
  *  NEC uPD7759 handling (used as OKI replacement)
  *
  *************************************************/
-READ8_MEMBER(maygay1b_state::m1_firq_nec_r)
+uint8_t maygay1b_state::m1_firq_nec_r()
 {
 	int busy = m_upd7759->busy_r();
 	if (!busy)
@@ -483,14 +483,14 @@ READ8_MEMBER(maygay1b_state::m1_firq_nec_r)
 	return 0xff;
 }
 
-READ8_MEMBER(maygay1b_state::nec_reset_r)
+uint8_t maygay1b_state::nec_reset_r()
 {
 	m_upd7759->reset_w(0);
 	m_upd7759->reset_w(1);
 	return 0xff;
 }
 
-WRITE8_MEMBER(maygay1b_state::nec_bank0_w)
+void maygay1b_state::nec_bank0_w(uint8_t data)
 {
 	m_upd7759->set_rom_bank(0);
 	m_upd7759->port_w(data);
@@ -498,7 +498,7 @@ WRITE8_MEMBER(maygay1b_state::nec_bank0_w)
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
+void maygay1b_state::nec_bank1_w(uint8_t data)
 {
 	m_upd7759->set_rom_bank(1);
 	m_upd7759->port_w(data);
@@ -610,7 +610,7 @@ void maygay1b_state::lamp_data_2_w(uint8_t data)
 
 // MCU hookup not yet working
 
-WRITE8_MEMBER(maygay1b_state::main_to_mcu_0_w)
+void maygay1b_state::main_to_mcu_0_w(uint8_t data)
 {
 	// we trigger the 2nd, more complex interrupt on writes here
 
@@ -619,7 +619,7 @@ WRITE8_MEMBER(maygay1b_state::main_to_mcu_0_w)
 }
 
 
-WRITE8_MEMBER(maygay1b_state::main_to_mcu_1_w)
+void maygay1b_state::main_to_mcu_1_w(uint8_t data)
 {
 	// we trigger the 1st interrupt on writes here
 	// the 1st interrupt (03h) is a very simple one
@@ -805,7 +805,7 @@ void maygay1b_state::maygay_m1_nec(machine_config &config)
 	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
+void maygay1b_state::m1ab_no_oki_w(uint8_t data)
 {
 	popmessage("write to OKI, but no OKI rom");
 }
@@ -858,6 +858,6 @@ void maygay1b_state::init_m1()
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
 	if (m_oki_region == nullptr) {
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(*this, FUNC(maygay1b_state::m1ab_no_oki_w)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8smo_delegate(*this, FUNC(maygay1b_state::m1ab_no_oki_w)));
 	}
 }

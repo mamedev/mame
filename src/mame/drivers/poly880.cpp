@@ -45,7 +45,7 @@ void poly880_state::update_display()
 			m_digits[7 - i] = m_segment;
 }
 
-WRITE8_MEMBER( poly880_state::cldig_w )
+void poly880_state::cldig_w(uint8_t data)
 {
 	m_digit = data;
 
@@ -141,7 +141,7 @@ WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
 
 /* Z80-PIO Interface */
 
-WRITE8_MEMBER( poly880_state::pio1_pa_w )
+void poly880_state::pio1_pa_w(uint8_t data)
 {
 	/*
 
@@ -163,7 +163,7 @@ WRITE8_MEMBER( poly880_state::pio1_pa_w )
 	update_display();
 }
 
-READ8_MEMBER( poly880_state::pio1_pb_r )
+uint8_t poly880_state::pio1_pb_r()
 {
 	/*
 
@@ -196,7 +196,7 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( poly880_state::pio1_pb_w )
+void poly880_state::pio1_pb_w(uint8_t data)
 {
 	/*
 

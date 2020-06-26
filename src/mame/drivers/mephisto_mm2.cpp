@@ -124,9 +124,9 @@ private:
 	required_ioport_array<8> m_key2;
 	output_finder<4> m_digits;
 
-	DECLARE_WRITE8_MEMBER(write_lcd);
-	DECLARE_WRITE8_MEMBER(mephisto_nmi_w);
-	DECLARE_READ8_MEMBER(read_keys);
+	void write_lcd(uint8_t data);
+	void mephisto_nmi_w(uint8_t data);
+	uint8_t read_keys(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(write_led7);
 	uint8_t m_lcd_shift_counter;
 	uint8_t m_led7;
@@ -179,7 +179,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(mephisto_state::write_lcd)
+void mephisto_state::write_lcd(uint8_t data)
 {
 	if (m_led7 == 0)
 		m_digits[m_lcd_shift_counter] = data; // 0x109 MM IV // 0x040 MM V
@@ -190,12 +190,12 @@ WRITE8_MEMBER(mephisto_state::write_lcd)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mephisto_state::mephisto_nmi_w)
+void mephisto_state::mephisto_nmi_w(uint8_t data)
 {
 	m_allowNMI = 1;
 }
 
-READ8_MEMBER(mephisto_state::read_keys)
+uint8_t mephisto_state::read_keys(offs_t offset)
 {
 	uint8_t data = 0;
 

@@ -38,12 +38,12 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(iqblock_prot_w);
-	DECLARE_WRITE8_MEMBER(grndtour_prot_w);
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgscroll_w);
+	void iqblock_prot_w(uint8_t data);
+	void grndtour_prot_w(uint8_t data);
+	void irqack_w(uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgscroll_w(offs_t offset, uint8_t data);
 	void port_C_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);

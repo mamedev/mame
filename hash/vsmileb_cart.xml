@@ -59,7 +59,7 @@ VTech V.Smile Baby cartridges
 |        | 80-099100(US)     | Noah's Ark Animal Adventure                                                |
 |        | 80-099102(NL)     | De ark van Noach                                                           |
 |        | 80-099103(UK)     | Noah's Ark Animal Adventure                                                |
-|        | 80-099105(FR)     | L'arche de Noé - L'aventure des animaux                                    |
+|   XX   | 80-099105(FR)     | L'arche de Noé - L'aventure des animaux                                    |
 +========+===================+============================================================================+
 |        | 80-099120(US)     | Barney - Let's Go to a Party                                               |
 +========+===================+============================================================================+
@@ -70,7 +70,7 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |        | 80-099160(US)     | Discovery with Baby Mickey and Friends                                     |
 |        | 80-099163(UK)     | Discovery with Baby Mickey and Friends                                     |
-|        | 80-099165(UK)     | Les decouvertes de Mickey et ses amis                                      |
+|   XX   | 80-099165(UK)     | Les découvertes de Mickey et ses amis                                      |
 +========+===================+============================================================================+
 |        | 80-099180(US)     | Bailey Goes To Town (Included Bailey Plush Bear Controller)                |
 |        | 80-099183(UK)     | Bailey Goes To Town (Included Bailey Plush Bear Controller)                |
@@ -143,6 +143,19 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
+	<software name="dbabymif" supported="no">
+		<description>Les découvertes de Mickey et ses amis (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099165(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="099165 - MickeyEtSesAmis (BABY) (FR).bin" size="8388608" crc="2d1e5884" sha1="9b3b00e8a7c29155ce2dfab28c6bc09b0ffa11b8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- "Learn and Discover Home" -->
 	<software name="learndhg" supported="no">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
@@ -169,6 +182,19 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" />
 			<dataarea name="rom" size="8388608">
 				<rom name="099005 - La Maison Des Animaux (BABY) (FR).bin" size="8388608" crc="4ab4d311" sha1="584a5b359010636286de626a51c71c0c5bdcb864" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noaharkf" supported="no">
+		<description>L'arche de Noé - L'aventure des animaux (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="099105 - ArcheDeNoe (BABY) (FR).bin" size="8388608" crc="745f97b3" sha1="a1d82044e215730a4c8ad7440360ee6336e01b01" />
 			</dataarea>
 		</part>
 	</software>

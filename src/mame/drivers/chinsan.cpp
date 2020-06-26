@@ -61,11 +61,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info);
 
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void adpcm_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	void ctrl_w(uint8_t data);
 	void init_chinsan();
 
 	void chinsan(machine_config &config);
@@ -400,7 +400,7 @@ TILE_GET_INFO_MEMBER( chinsan_state::tile_info )
 //  AUDIO
 //**************************************************************************
 
-WRITE8_MEMBER( chinsan_state::adpcm_w )
+void chinsan_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_pos = data << 8;
 	m_adpcm_idle = 0;
@@ -442,7 +442,7 @@ INTERRUPT_GEN_MEMBER( chinsan_state::vblank_int )
 		device.execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-WRITE8_MEMBER( chinsan_state::ctrl_w )
+void chinsan_state::ctrl_w(uint8_t data)
 {
 	// 76------  rom bank
 	// --5432--  unknown

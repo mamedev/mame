@@ -219,6 +219,7 @@ private:
 		TRACK_DONE,
 
 		INITIAL_RESTORE,
+		DUMMY,
 
 		// Live states
 
@@ -302,9 +303,6 @@ private:
 	uint8_t format_last_byte;
 	int format_last_byte_count;
 	std::string format_description_string;
-
-	static std::string tts(const attotime &t);
-	std::string ttsn();
 
 	void delay_cycles(emu_timer *tm, int cycles);
 

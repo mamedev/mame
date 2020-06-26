@@ -335,30 +335,30 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mappy_state::superpac_videoram_w)
+void mappy_state::superpac_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(mappy_state::mappy_videoram_w)
+void mappy_state::mappy_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
+void mappy_state::superpac_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(mappy_state::superpac_flipscreen_r)
+uint8_t mappy_state::superpac_flipscreen_r()
 {
 	flip_screen_set(1);
 	return 0xff;
 }
 
-WRITE8_MEMBER(mappy_state::mappy_scroll_w)
+void mappy_state::mappy_scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll = offset >> 3;
 }

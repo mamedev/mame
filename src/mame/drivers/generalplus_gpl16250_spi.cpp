@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+    GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
-	GPL16250 is the GeneralPlus / SunPlus part number
-	GPAC800 is the JAKKS Pacific codename
-	GMC384 / GCM420 is what is printed on the die
+    GPL16250 is the GeneralPlus / SunPlus part number
+    GPAC800 is the JAKKS Pacific codename
+    GMC384 / GCM420 is what is printed on the die
 
-	----
+    ----
 
-	GPL16250 games using SPI Flash + RAM configuration
+    GPL16250 games using SPI Flash + RAM configuration
 */
 
 #include "emu.h"
@@ -64,7 +64,7 @@ void generalplus_gpspispi_game_state::machine_reset()
 {
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(0);
+	//m_maincpu->set_paldisplaybank_high_hack(0);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 

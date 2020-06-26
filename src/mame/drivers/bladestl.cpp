@@ -57,7 +57,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
  *
  *************************************/
 
-READ8_MEMBER(bladestl_state::trackball_r)
+uint8_t bladestl_state::trackball_r(offs_t offset)
 {
 	int curr = m_trackball[offset]->read();
 	int delta = (curr - m_last_track[offset]) & 0xff;
@@ -66,7 +66,7 @@ READ8_MEMBER(bladestl_state::trackball_r)
 	return (delta & 0x80) | (curr >> 1);
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
+void bladestl_state::bladestl_bankswitch_w(uint8_t data)
 {
 	/* bits 0 & 1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -101,12 +101,12 @@ void bladestl_state::bladestl_port_B_w(uint8_t data)
 	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
-READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
+uint8_t bladestl_state::bladestl_speech_busy_r()
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
+void bladestl_state::bladestl_speech_ctrl_w(uint8_t data)
 {
 	m_upd7759->reset_w(data & 1);
 	m_upd7759->start_w(data & 2);

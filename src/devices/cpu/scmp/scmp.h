@@ -58,8 +58,8 @@ private:
 	uint8_t   m_ER;
 	uint8_t   m_SR;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	int                 m_icount;
 
 	devcb_write8       m_flag_out_func;

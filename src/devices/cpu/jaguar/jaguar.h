@@ -82,18 +82,18 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
-	
+
 	// I/Os (common)
-	DECLARE_READ32_MEMBER(flags_r);
-	DECLARE_WRITE32_MEMBER(flags_w);
-	DECLARE_WRITE32_MEMBER(matrix_control_w);
-	DECLARE_WRITE32_MEMBER(matrix_address_w);
-	DECLARE_WRITE32_MEMBER(end_w);
-	DECLARE_WRITE32_MEMBER(pc_w);
-	DECLARE_READ32_MEMBER(status_r);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(div_remainder_r);
-	DECLARE_WRITE32_MEMBER(div_control_w);
+	u32 flags_r();
+	void flags_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void matrix_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void matrix_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void pc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 status_r();
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 div_remainder_r();
+	void div_control_w(u32 data);
 
 	// defines
 	inline void CLR_Z();
@@ -138,9 +138,9 @@ protected:
 	int         m_icount;
 	int         m_bankswitch_icount;
 	devcb_write_line m_cpu_interrupt;
-	address_space *m_program;
-	address_space *m_io;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 8, 2, 0, ENDIANNESS_BIG>::specific m_io;
 
 	u32      m_internal_ram_start;
 	u32      m_internal_ram_end;
@@ -243,7 +243,7 @@ protected:
 	u32 m_io_status;
 	u32 m_io_mtxc;
 	u32 m_io_mtxa;
-	
+
 	u32 m_pc;
 	u32 m_flags;
 	bool m_imask;
@@ -256,7 +256,7 @@ protected:
 	bool m_bus_hog;
 	u32 m_div_remainder;
 	bool m_div_offset;
-	
+
 	// GPU specific
 	u32 m_hidata;
 	static const op_func gpu_op_table[64];
@@ -278,8 +278,8 @@ protected:
 	virtual void execute_run() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	DECLARE_WRITE32_MEMBER(hidata_w);
-	DECLARE_READ32_MEMBER(hidata_r);
+	void hidata_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 hidata_r();
 };
 
 
@@ -296,9 +296,9 @@ protected:
 	virtual void execute_run() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	DECLARE_WRITE32_MEMBER(modulo_w);
-	DECLARE_WRITE32_MEMBER(dsp_end_w);
-	DECLARE_READ32_MEMBER(high_accum_r);
+	void modulo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void dsp_end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 high_accum_r();
 };
 
 

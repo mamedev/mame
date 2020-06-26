@@ -15,10 +15,10 @@ namespace netlist
 	NETLIB_OBJECT(82S16)
 	{
 		NETLIB_CONSTRUCTOR(82S16)
-		, m_A(*this, {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7"}, NETLIB_DELEGATE(82S16, addr))
-		, m_CE1Q(*this, "CE1Q", NETLIB_DELEGATE(82S16, enq))
-		, m_CE2Q(*this, "CE2Q", NETLIB_DELEGATE(82S16, enq))
-		, m_CE3Q(*this, "CE3Q", NETLIB_DELEGATE(82S16, enq))
+		, m_A(*this, {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7"}, NETLIB_DELEGATE(addr))
+		, m_CE1Q(*this, "CE1Q", NETLIB_DELEGATE(enq))
+		, m_CE2Q(*this, "CE2Q", NETLIB_DELEGATE(enq))
+		, m_CE3Q(*this, "CE3Q", NETLIB_DELEGATE(enq))
 		, m_WEQ(*this, "WEQ")
 		, m_DIN(*this, "DIN")
 		, m_DOUTQ(*this, "DOUTQ")
@@ -52,7 +52,7 @@ namespace netlist
 		}
 		NETLIB_HANDLERI(enq)
 		{
-			const auto last = m_enq;
+			const decltype(m_enq)::value_type last = m_enq;
 			m_enq = m_CE1Q() || m_CE2Q() || m_CE3Q();
 			if (!last && m_enq)
 			{
@@ -127,7 +127,7 @@ namespace netlist
 	{
 		if (!m_enq)
 		{
-			const auto adr(m_addr);
+			const decltype(m_addr)::value_type adr(m_addr);
 			if (!m_WEQ())
 			{
 				m_ram[adr >> 6] = (m_ram[adr >> 6]

@@ -114,18 +114,18 @@ private:
 		uint32_t          pc;
 	};
 
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ32_MEMBER(ad1847_r);
-	DECLARE_WRITE32_MEMBER(ad1847_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
+	uint32_t disp_ctrl_r(offs_t offset);
+	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t memory_ctrl_r(offs_t offset);
+	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t biu_ctrl_r(offs_t offset);
+	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t parallel_port_r(offs_t offset, uint32_t mem_mask = ~0);
+	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ad1847_r(offs_t offset);
+	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t io20_r(offs_t offset);
+	void io20_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
@@ -415,7 +415,7 @@ uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ32_MEMBER(mediagx_state::disp_ctrl_r)
+uint32_t mediagx_state::disp_ctrl_r(offs_t offset)
 {
 	uint32_t r = m_disp_ctrl_reg[offset];
 
@@ -437,19 +437,19 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 	return r;
 }
 
-WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
+void mediagx_state::disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
-READ32_MEMBER(mediagx_state::memory_ctrl_r)
+uint32_t mediagx_state::memory_ctrl_r(offs_t offset)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
+void mediagx_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
@@ -482,7 +482,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 
 
 
-READ32_MEMBER(mediagx_state::biu_ctrl_r)
+uint32_t mediagx_state::biu_ctrl_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -491,7 +491,7 @@ READ32_MEMBER(mediagx_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
+void mediagx_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -503,12 +503,12 @@ WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(mediagx_state::bios_ram_w)
+void mediagx_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 #endif
 
-READ8_MEMBER(mediagx_state::io20_r)
+uint8_t mediagx_state::io20_r(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -523,7 +523,7 @@ READ8_MEMBER(mediagx_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(mediagx_state::io20_w)
+void mediagx_state::io20_w(offs_t offset, uint8_t data)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -536,7 +536,7 @@ WRITE8_MEMBER(mediagx_state::io20_w)
 	}
 }
 
-READ32_MEMBER(mediagx_state::parallel_port_r)
+uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -570,7 +570,7 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 	return r;
 }
 
-WRITE32_MEMBER(mediagx_state::parallel_port_w)
+void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_parport );
 
@@ -704,7 +704,7 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 	}
 }
 
-READ32_MEMBER(mediagx_state::ad1847_r)
+uint32_t mediagx_state::ad1847_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -714,7 +714,7 @@ READ32_MEMBER(mediagx_state::ad1847_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mediagx_state::ad1847_w)
+void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{

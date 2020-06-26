@@ -63,12 +63,12 @@ Press one of the start buttons to exit.
 #include "speaker.h"
 
 
-WRITE8_MEMBER(wc90_state::bankswitch_w)
+void wc90_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90_state::bankswitch1_w)
+void wc90_state::bankswitch1_w(uint8_t data)
 {
 	m_subbank->set_entry(data >> 3);
 }

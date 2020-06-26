@@ -53,10 +53,10 @@ protected:
 private:
 	void set_rdy(int state);
 
-	DECLARE_READ8_MEMBER( memory_read_byte );
-	DECLARE_WRITE8_MEMBER( memory_write_byte );
-	DECLARE_READ8_MEMBER( io_read_byte );
-	DECLARE_WRITE8_MEMBER( io_write_byte );
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
@@ -64,18 +64,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
 
-	DECLARE_READ8_MEMBER( sasi_status_r );
-	DECLARE_WRITE8_MEMBER( stat_w );
-	DECLARE_READ8_MEMBER( out_r );
-	DECLARE_WRITE8_MEMBER( inp_w );
-	DECLARE_READ8_MEMBER( sasi_data_r );
-	DECLARE_WRITE8_MEMBER( sasi_data_w );
-	DECLARE_READ8_MEMBER( rdy_reset_r );
-	DECLARE_WRITE8_MEMBER( rdy_reset_w );
-	DECLARE_READ8_MEMBER( sasi_sel_r );
-	DECLARE_WRITE8_MEMBER( sasi_sel_w );
-	DECLARE_READ8_MEMBER( sasi_rst_r );
-	DECLARE_WRITE8_MEMBER( sasi_rst_w );
+	uint8_t sasi_status_r();
+	void stat_w(uint8_t data);
+	uint8_t out_r();
+	void inp_w(uint8_t data);
+	uint8_t sasi_data_r();
+	void sasi_data_w(uint8_t data);
+	uint8_t rdy_reset_r();
+	void rdy_reset_w(uint8_t data);
+	uint8_t sasi_sel_r();
+	void sasi_sel_w(uint8_t data);
+	uint8_t sasi_rst_r();
+	void sasi_rst_w(uint8_t data);
 
 	void luxor_55_21056_io(address_map &map);
 	void luxor_55_21056_mem(address_map &map);

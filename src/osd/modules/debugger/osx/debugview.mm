@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
 #include "modules/lib/osdobj_common.h"
@@ -871,7 +872,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)insertNewline:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step();
 }
 
 

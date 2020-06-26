@@ -56,18 +56,18 @@ public:
 
 	void init_witch();
 
-	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
-	DECLARE_READ8_MEMBER(gfx1_vram_r);
-	DECLARE_READ8_MEMBER(gfx1_cram_r);
+	void gfx0_vram_w(offs_t offset, uint8_t data);
+	void gfx0_cram_w(offs_t offset, uint8_t data);
+	void gfx1_vram_w(offs_t offset, uint8_t data);
+	void gfx1_cram_w(offs_t offset, uint8_t data);
+	uint8_t gfx1_vram_r(offs_t offset);
+	uint8_t gfx1_cram_r(offs_t offset);
 	uint8_t read_a000();
 	void write_a002(uint8_t data);
 	void write_a006(uint8_t data);
-	DECLARE_WRITE8_MEMBER(main_write_a008);
-	DECLARE_WRITE8_MEMBER(sub_write_a008);
-	DECLARE_READ8_MEMBER(prot_read_700x);
+	void main_write_a008(uint8_t data);
+	void sub_write_a008(uint8_t data);
+	uint8_t prot_read_700x(offs_t offset);
 	void xscroll_w(uint8_t data);
 	void yscroll_w(uint8_t data);
 
@@ -130,7 +130,7 @@ private:
 	void keirinou_sub_map(address_map &map);
 
 	void write_keirinou_a002(uint8_t data);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	void palette_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_keirinou_gfx1_tile_info);
 
 	virtual void video_start() override;

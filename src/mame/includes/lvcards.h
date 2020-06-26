@@ -28,8 +28,8 @@ public:
 protected:
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -61,9 +61,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(control_port_2_w);
-	DECLARE_WRITE8_MEMBER(control_port_2a_w);
-	DECLARE_READ8_MEMBER(payout_r);
+	void control_port_2_w(uint8_t data);
+	void control_port_2a_w(uint8_t data);
+	uint8_t payout_r();
 
 	void lvpoker_map(address_map &map);
 	void ponttehk_map(address_map &map);

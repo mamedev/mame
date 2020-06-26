@@ -88,8 +88,8 @@ protected:
 private:
 	void goori_map(address_map& map);
 
-	DECLARE_WRITE16_MEMBER(goori_300008_w);
-	DECLARE_WRITE16_MEMBER(goori_30000e_w);
+	void goori_300008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -101,12 +101,12 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	tilemap_t* m_bg_tilemap;
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
-WRITE16_MEMBER(goori_state::bg_videoram_w)
+void goori_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
@@ -165,12 +165,12 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 	return 0;
 }
 
-WRITE16_MEMBER(goori_state::goori_300008_w)
+void goori_state::goori_300008_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//popmessage("goori_300008_w %04x %04x\n", data, mem_mask); // possibly display disable?
 }
 
-WRITE16_MEMBER(goori_state::goori_30000e_w)
+void goori_state::goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// eeprom writes?
 	logerror("%06x goori_30000e_w %04x %04x\n", machine().describe_context(), data, mem_mask); // startup only?

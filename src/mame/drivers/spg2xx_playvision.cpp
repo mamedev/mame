@@ -27,9 +27,9 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	uint16_t m_portcdata;
@@ -53,12 +53,12 @@ void pvmil_state::machine_start()
 }
 
 
-WRITE16_MEMBER(pvmil_state::porta_w)
+void pvmil_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: pvmil_porta_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(pvmil_state::portb_w)
+void pvmil_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: pvmil_portb_w %04x\n", machine().describe_context(), data);
 }
@@ -70,7 +70,7 @@ READ_LINE_MEMBER(pvmil_state::pvmil_p4buttons_r)
 }
 
 
-WRITE16_MEMBER(pvmil_state::portc_w)
+void pvmil_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ---- -432 1--- r-?c
 	// 4,3,2,1 = player controller LEDs

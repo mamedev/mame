@@ -103,23 +103,23 @@ void xerox820ii_state::bankswitch(int bank)
 	}
 }
 
-READ8_MEMBER( xerox820_state::fdc_r )
+uint8_t xerox820_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( xerox820_state::fdc_w )
+void xerox820_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER( xerox820_state::scroll_w )
+void xerox820_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll = (offset >> 8) & 0x1f;
 }
 
 #ifdef UNUSED_CODE
-WRITE8_MEMBER( xerox820_state::x120_system_w )
+void xerox820_state::x120_system_w(uint8_t data)
 {
 	/*
 
@@ -138,27 +138,27 @@ WRITE8_MEMBER( xerox820_state::x120_system_w )
 }
 #endif
 
-WRITE8_MEMBER( xerox820ii_state::bell_w )
+void xerox820ii_state::bell_w(offs_t offset, uint8_t data)
 {
 	m_speaker->level_w(offset);
 }
 
-WRITE8_MEMBER( xerox820ii_state::slden_w )
+void xerox820ii_state::slden_w(offs_t offset, uint8_t data)
 {
 	m_fdc->dden_w(offset);
 }
 
-WRITE8_MEMBER( xerox820ii_state::chrom_w )
+void xerox820ii_state::chrom_w(offs_t offset, uint8_t data)
 {
 	m_chrom = offset;
 }
 
-WRITE8_MEMBER( xerox820ii_state::lowlite_w )
+void xerox820ii_state::lowlite_w(uint8_t data)
 {
 	m_lowlite = data;
 }
 
-WRITE8_MEMBER( xerox820ii_state::sync_w )
+void xerox820ii_state::sync_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 	{
@@ -236,7 +236,7 @@ TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
 
 /* Z80 PIO */
 
-READ8_MEMBER( xerox820_state::kbpio_pa_r )
+uint8_t xerox820_state::kbpio_pa_r()
 {
 	/*
 
@@ -265,7 +265,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
+void xerox820_state::kbpio_pa_w(uint8_t data)
 {
 	/*
 
@@ -315,9 +315,9 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 	bankswitch(BIT(data, 7));
 }
 
-WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
+void bigboard_state::kbpio_pa_w(uint8_t data)
 {
-	xerox820_state::kbpio_pa_w(space, offset, data);
+	xerox820_state::kbpio_pa_w(data);
 
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
@@ -328,7 +328,7 @@ WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
 	m_bit5 = BIT(data, 5);
 }
 
-READ8_MEMBER( xerox820_state::kbpio_pb_r )
+uint8_t xerox820_state::kbpio_pb_r()
 {
 	/*
 
@@ -348,7 +348,7 @@ READ8_MEMBER( xerox820_state::kbpio_pb_r )
 	return m_kb->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
+void xerox820ii_state::rdpio_pb_w(uint8_t data)
 {
 	/*
 

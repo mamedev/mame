@@ -24,11 +24,11 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(7497)
 		, m_B(*this, {"B5", "B4", "B3", "B2", "B1", "B0"})
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(7497, clk_strb))
-		, m_STRBQ(*this, "STRBQ", NETLIB_DELEGATE(7497, clk_strb))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk_strb))
+		, m_STRBQ(*this, "STRBQ", NETLIB_DELEGATE(clk_strb))
 		, m_ENQ(*this, "ENQ")
-		, m_UNITYQ(*this, "UNITYQ", NETLIB_DELEGATE(7497, unity))
-		, m_CLR(*this, "CLR", NETLIB_DELEGATE(7497, clr))
+		, m_UNITYQ(*this, "UNITYQ", NETLIB_DELEGATE(unity))
+		, m_CLR(*this, "CLR", NETLIB_DELEGATE(clr))
 		, m_Y(*this, "Y")
 		, m_ZQ(*this, "ZQ")
 		, m_ENOUTQ(*this, "ENOUTQ")
@@ -56,7 +56,7 @@ namespace netlist
 		NETLIB_HANDLERI(clk_strb);
 
 		friend class NETLIB_NAME(7497_dip);
-	private:
+
 		object_array_t<logic_input_t, 6> m_B;
 		logic_input_t m_CLK;
 		logic_input_t m_STRBQ;

@@ -24,6 +24,7 @@ public:
 	virtual bool is_target() const = 0;
 	virtual uint16_t width() const = 0;
 	virtual uint16_t height() const = 0;
+	virtual uint16_t rowpixels() const = 0;
 };
 
 #endif // __DRAWBGFX_TEXTURE_HANDLE_PROVIDER__

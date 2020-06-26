@@ -75,9 +75,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void mux_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
 	u8 m_mux_data = 0;
 	u8 m_led_select = 0;
@@ -114,7 +114,7 @@ void delta1_state::update_display()
 	m_display->matrix(m_led_select, (m_blink && m_7seg_rc) ? 0 : m_7seg_data);
 }
 
-WRITE8_MEMBER(delta1_state::mux_w)
+void delta1_state::mux_w(u8 data)
 {
 	// IO00-02: MC14028B A-C (D to GND)
 	// MC14028B Q3-Q7: input mux
@@ -127,7 +127,7 @@ WRITE8_MEMBER(delta1_state::mux_w)
 	m_mux_data = data;
 }
 
-READ8_MEMBER(delta1_state::input_r)
+u8 delta1_state::input_r()
 {
 	u8 data = 0;
 
@@ -140,7 +140,7 @@ READ8_MEMBER(delta1_state::input_r)
 	return data << 4 | m_mux_data | 8;
 }
 
-WRITE8_MEMBER(delta1_state::digit_w)
+void delta1_state::digit_w(u8 data)
 {
 	// IO17: R/C circuit to segment commons (for automated blinking)
 	// IO10-16: digit segments A-G

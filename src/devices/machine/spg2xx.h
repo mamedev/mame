@@ -82,7 +82,7 @@ protected:
 
 	void internal_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(fiq_vector_w);
+	void fiq_vector_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audiochirq_w);
@@ -92,7 +92,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(ffreq1_w);
 	DECLARE_WRITE_LINE_MEMBER(ffreq2_w);
 
-	DECLARE_READ16_MEMBER(space_r);
+	uint16_t space_r(offs_t offset);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -100,8 +100,8 @@ protected:
 	// TODO: these are fixed values, put them in relevant devices?
 	uint16_t m_sprite_limit;
 	uint16_t m_pal_flag;
-	DECLARE_READ16_MEMBER(get_sprlimit) { return m_sprite_limit; }
-	DECLARE_READ16_MEMBER(get_pal_ntsc) { return m_pal_flag; }
+	uint16_t get_sprlimit() { return m_sprite_limit; }
+	uint16_t get_pal_ntsc() { return m_pal_flag; }
 
 	devcb_write16 m_porta_out;
 	devcb_write16 m_portb_out;
@@ -110,7 +110,7 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16::array<2> m_adc_in;
+	devcb_read16::array<4> m_adc_in;
 
 	devcb_read16 m_guny_in;
 	devcb_read16 m_gunx_in;
@@ -131,22 +131,22 @@ protected:
 
 	void configure_spg_io(spg2xx_io_device* io);
 
-	DECLARE_READ16_MEMBER(guny_in_r) { return m_guny_in(); }
-	DECLARE_READ16_MEMBER(gunx_in_r) { return m_gunx_in(); }
-	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); }
-	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); }
-	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); }
-	DECLARE_WRITE16_MEMBER(porta_w) { m_porta_out(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); }
-	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); }
+	uint16_t guny_in_r() { return m_guny_in(); }
+	uint16_t gunx_in_r() { return m_gunx_in(); }
+	uint16_t porta_r() { return m_porta_in(); }
+	uint16_t portb_r() { return m_portb_in(); }
+	uint16_t portc_r() { return m_portc_in(); }
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_porta_out(offset, data, mem_mask); }
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portb_out(offset, data, mem_mask); }
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portc_out(offset, data, mem_mask); }
+	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 
-	DECLARE_WRITE8_MEMBER(eepromx_w) { m_i2c_w(offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER(eepromx_r) { return m_i2c_r(); };
+	void eepromx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_i2c_w(offset, data, mem_mask); }
+	uint8_t eepromx_r() { return m_i2c_r(); };
 
-	DECLARE_WRITE8_MEMBER(uart_tx_w) { m_uart_tx(offset, data, mem_mask); }
+	void uart_tx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_uart_tx(offset, data, mem_mask); }
 	DECLARE_WRITE_LINE_MEMBER(spi_tx_w) { m_spi_tx(state); }
-	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); }
+	void cs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_chip_sel(offset, data, mem_mask); }
 };
 
 class spg24x_device : public spg2xx_device

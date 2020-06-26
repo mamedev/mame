@@ -105,8 +105,8 @@ private:
 	void mpc3000_io_map(address_map &map);
 	void mpc3000_sub_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
-	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
+	uint16_t dsp_0008_hack_r();
+	void dsp_0008_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dma_memr_cb(offs_t offset);
 	void dma_memw_cb(offs_t offset, uint16_t data);
 	void mpc3000_palette(palette_device &palette) const;
@@ -127,16 +127,16 @@ void mpc3000_state::mpc3000_map(address_map &map)
 	map(0x500000, 0x500fff).ram(); // actually 8-bit battery-backed RAM
 }
 
-WRITE16_MEMBER(mpc3000_state::dsp_0008_hack_w)
+void mpc3000_state::dsp_0008_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is related to the DSP's DMA capability.  The DSP
 	// connects to the V53's DMA3 channel on both the MPCs and HNG64.
 	m_maincpu->dreq_w<3>(data&0x1);
-	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
+	m_dsp->l7a1045_sound_w(8/2,data,mem_mask);
 }
 
 
-READ16_MEMBER(mpc3000_state::dsp_0008_hack_r)
+uint16_t mpc3000_state::dsp_0008_hack_r()
 {
 	// read in irq5
 	return 0;

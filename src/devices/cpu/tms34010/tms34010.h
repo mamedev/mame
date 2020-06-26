@@ -105,8 +105,8 @@ enum
 
 #define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms340x0_device::display_params *params)
 #define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms340x0_device::display_params *params)
-#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
-#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
+#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)
+#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)
 
 
 class tms340x0_device : public cpu_device,
@@ -126,8 +126,8 @@ public:
 
 	typedef device_delegate<void (screen_device &screen, bitmap_ind16 &bitmap, int scanline, const display_params *params)> scanline_ind16_cb_delegate;
 	typedef device_delegate<void (screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const display_params *params)> scanline_rgb32_cb_delegate;
-	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> shiftreg_in_cb_delegate;
-	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> shiftreg_out_cb_delegate;
+	typedef device_delegate<void (memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)> shiftreg_in_cb_delegate;
+	typedef device_delegate<void (memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t address, uint16_t *shiftreg)> shiftreg_out_cb_delegate;
 
 	void set_halt_on_reset(bool halt_on_reset) { m_halt_on_reset = halt_on_reset; }
 	void set_pixel_clock(uint32_t pixclock) { m_pixclock = pixclock; }
@@ -281,8 +281,8 @@ protected:
 	typedef uint32_t (tms340x0_device::*pixel_op_func)(uint32_t, uint32_t, uint32_t);
 	typedef void (tms340x0_device::*pixblt_op_func)(int, int);
 	typedef void (tms340x0_device::*pixblt_b_op_func)(int);
-	typedef void (tms340x0_device::*word_write_func)(address_space &space, offs_t offset,uint16_t data);
-	typedef uint16_t (tms340x0_device::*word_read_func)(address_space &space, offs_t offset);
+	typedef void (tms340x0_device::*word_write_func)(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset,uint16_t data);
+	typedef uint16_t (tms340x0_device::*word_read_func)(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
 
 	static const wfield_func s_wfield_functions[32];
 	static const rfield_func s_rfield_functions[64];
@@ -318,8 +318,8 @@ protected:
 	uint8_t            m_hblank_stable;
 	uint8_t            m_external_host_access;
 	uint8_t            m_executing;
-	address_space *m_program;
-	memory_access_cache<1, 3, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific m_program;
 	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
@@ -892,11 +892,11 @@ protected:
 	int compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_b_cycles(int left_partials, int right_partials, int full_words, int rows, int op_timing, int bpp);
-	void memory_w(address_space &space, offs_t offset,uint16_t data);
-	uint16_t memory_r(address_space &space, offs_t offset);
-	void shiftreg_w(address_space &space, offs_t offset, uint16_t data);
-	uint16_t shiftreg_r(address_space &space, offs_t offset);
-	uint16_t dummy_shiftreg_r(address_space &space, offs_t offset);
+	void memory_w(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset,uint16_t data);
+	uint16_t memory_r(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
+	void shiftreg_w(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset, uint16_t data);
+	uint16_t shiftreg_r(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
+	uint16_t dummy_shiftreg_r(memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific &space, offs_t offset);
 	uint32_t pixel_op00(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	uint32_t pixel_op01(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	uint32_t pixel_op02(uint32_t dstpix, uint32_t mask, uint32_t srcpix);

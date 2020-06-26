@@ -56,9 +56,9 @@ private:
 	required_memory_bank m_prgbank;
 	required_memory_bank m_nvram_bank;
 	std::vector<uint8_t> m_nvram_mem;
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_READ8_MEMBER(audio_r);
+	void bank1_w(uint8_t data);
+	void bank2_w(uint8_t data);
+	uint8_t audio_r(offs_t offset);
 	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -79,7 +79,7 @@ void pcat_dyn_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memcpy(base, memregion("nvram")->base(), size);
 }
 
-READ8_MEMBER(pcat_dyn_state::audio_r)
+uint8_t pcat_dyn_state::audio_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -89,12 +89,12 @@ READ8_MEMBER(pcat_dyn_state::audio_r)
 	return 0;
 }
 
-WRITE8_MEMBER(pcat_dyn_state::bank1_w)
+void pcat_dyn_state::bank1_w(uint8_t data)
 {
 	m_prgbank->set_entry(data);
 }
 
-WRITE8_MEMBER(pcat_dyn_state::bank2_w)
+void pcat_dyn_state::bank2_w(uint8_t data)
 {
 	m_nvram_bank->set_entry(data & 1);
 }

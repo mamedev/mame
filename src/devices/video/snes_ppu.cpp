@@ -1886,7 +1886,7 @@ void snes_ppu_device::update_video_mode()
 	}
 }
 
-uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wrio_bit7)
+uint8_t snes_ppu_device::read(uint32_t offset, uint8_t wrio_bit7)
 {
 	uint8_t value;
 
@@ -1935,7 +1935,7 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 			}
 		case SLHV:      /* Software latch for H/V counter */
 			set_latch_hv(screen().hpos(), screen().vpos());
-			return m_openbus_cb(space, 0);       /* Return value is meaningless */
+			return m_openbus_cb(0);       /* Return value is meaningless */
 
 		case ROAMDATA:  /* Read data from OAM (DR) */
 		{
@@ -2029,11 +2029,11 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 	}
 
 	/* note: remaining registers (Namely TM in Super Kick Boxing) returns MDR open bus, not PPU Open Bus! */
-	return m_openbus_cb(space, 0);
+	return m_openbus_cb(0);
 }
 
 
-void snes_ppu_device::write(address_space &space, uint32_t offset, uint8_t data)
+void snes_ppu_device::write(uint32_t offset, uint8_t data)
 {
 	switch (offset)
 	{

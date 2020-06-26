@@ -101,8 +101,8 @@ private:
 	WRITE_LINE_MEMBER( tape_interrupt );
 	WRITE_LINE_MEMBER(ti990_set_int13);
 	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
-	READ8_MEMBER( ti990_panel_read );
-	WRITE8_MEMBER( ti990_panel_write );
+	uint8_t ti990_panel_read(offs_t offset);
+	void ti990_panel_write(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(clear_load);
 
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
     F: flag (according to 990 handbook)
 */
 
-READ8_MEMBER( ti990_10_state::ti990_panel_read )
+uint8_t ti990_10_state::ti990_panel_read(offs_t offset)
 {
 	if (offset == 1)
 		return 0x48;
@@ -238,7 +238,7 @@ READ8_MEMBER( ti990_10_state::ti990_panel_read )
 	return 0;
 }
 
-WRITE8_MEMBER( ti990_10_state::ti990_panel_write )
+void ti990_10_state::ti990_panel_write(uint8_t data)
 {
 }
 

@@ -210,18 +210,18 @@ private:
 	void vblank_irq();
 	void mouse_callback();
 
-	DECLARE_READ16_MEMBER ( ram_r );
-	DECLARE_WRITE16_MEMBER ( ram_w );
-	DECLARE_READ16_MEMBER ( ram_600000_r );
-	DECLARE_WRITE16_MEMBER ( ram_600000_w );
-	DECLARE_READ16_MEMBER ( mac_via_r );
-	DECLARE_WRITE16_MEMBER ( mac_via_w );
-	DECLARE_READ16_MEMBER ( mac_autovector_r );
-	DECLARE_WRITE16_MEMBER ( mac_autovector_w );
-	DECLARE_READ16_MEMBER ( mac_iwm_r );
-	DECLARE_WRITE16_MEMBER ( mac_iwm_w );
-	DECLARE_READ16_MEMBER ( macplus_scsi_r );
-	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ram_600000_r(offs_t offset);
+	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
+	uint16_t mac_via_r(offs_t offset);
+	void mac_via_w(offs_t offset, uint16_t data);
+	uint16_t mac_autovector_r(offs_t offset);
+	void mac_autovector_w(offs_t offset, uint16_t data);
+	uint16_t mac_iwm_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t macplus_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
+	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
@@ -294,7 +294,7 @@ void mac128_state::machine_reset()
 		m_via->write_pb6(0);
 }
 
-READ16_MEMBER(mac128_state::ram_r)
+uint16_t mac128_state::ram_r(offs_t offset)
 {
 	if (m_overlay)
 	{
@@ -304,7 +304,7 @@ READ16_MEMBER(mac128_state::ram_r)
 	return m_ram_ptr[offset & m_ram_mask];
 }
 
-WRITE16_MEMBER(mac128_state::ram_w)
+void mac128_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_overlay)
 	{
@@ -312,12 +312,12 @@ WRITE16_MEMBER(mac128_state::ram_w)
 	}
 }
 
-READ16_MEMBER(mac128_state::ram_600000_r)
+uint16_t mac128_state::ram_600000_r(offs_t offset)
 {
 	return m_ram_ptr[offset & m_ram_mask];
 }
 
-WRITE16_MEMBER(mac128_state::ram_600000_w)
+void mac128_state::ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
 }
@@ -439,7 +439,7 @@ WRITE_LINE_MEMBER(mac128_state::mac_scsi_irq)
 {
 }
 
-READ16_MEMBER ( mac128_state::macplus_scsi_r )
+uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -453,7 +453,7 @@ READ16_MEMBER ( mac128_state::macplus_scsi_r )
 	return m_ncr5380->ncr5380_read_reg(reg)<<8;
 }
 
-WRITE16_MEMBER ( mac128_state::macplus_scsi_w )
+void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -603,7 +603,7 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	}
 }
 
-READ16_MEMBER ( mac128_state::mac_iwm_r )
+uint16_t mac128_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 {
 	/* The first time this is called is in a floppy test, which goes from
 	 * $400104 to $400126.  After that, all access to the floppy goes through
@@ -623,7 +623,7 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( mac128_state::mac_iwm_w )
+void mac128_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
@@ -640,7 +640,7 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
-READ16_MEMBER ( mac128_state::mac_via_r )
+uint16_t mac128_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -656,7 +656,7 @@ READ16_MEMBER ( mac128_state::mac_via_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac128_state::mac_via_w )
+void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -669,7 +669,7 @@ WRITE16_MEMBER ( mac128_state::mac_via_w )
 	m_maincpu->adjust_icount(m_via_cycles);
 }
 
-WRITE16_MEMBER ( mac128_state::mac_autovector_w )
+void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_w: offset=0x%08x data=0x%04x\n", offset, data);
@@ -679,7 +679,7 @@ WRITE16_MEMBER ( mac128_state::mac_autovector_w )
 	/* Not yet implemented */
 }
 
-READ16_MEMBER ( mac128_state::mac_autovector_r )
+uint16_t mac128_state::mac_autovector_r(offs_t offset)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_r: offset=0x%08x\n", offset);
@@ -997,7 +997,7 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
-	IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
+	LEGACY_IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
 	SCC85C30(config, m_scc, C7M);

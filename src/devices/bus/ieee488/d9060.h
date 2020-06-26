@@ -54,16 +54,16 @@ protected:
 private:
 	inline void update_ieee_signals();
 
-	DECLARE_READ8_MEMBER( dio_r );
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_READ8_MEMBER( riot1_pa_r );
-	DECLARE_WRITE8_MEMBER( riot1_pa_w );
-	DECLARE_READ8_MEMBER( riot1_pb_r );
-	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
+	uint8_t dio_r();
+	void dio_w(uint8_t data);
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
-	DECLARE_WRITE8_MEMBER( scsi_data_w );
+	void scsi_data_w(uint8_t data);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6502_device> m_hdccpu;

@@ -39,8 +39,6 @@ protected:
 	virtual void peripheral_w(uint8_t data) override;
 
 private:
-	DECLARE_READ32_MEMBER(pixel_r);
-
 	required_device<sms_control_port_device> m_subctrl1_port;
 	required_device<sms_control_port_device> m_subctrl2_port;
 	required_device<sms_control_port_device> m_subctrl3_port;

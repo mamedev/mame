@@ -230,7 +230,7 @@ void fm7_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
  *   bit 7 - SYNDET
  *
  */
-WRITE8_MEMBER(fm7_state::fm7_irq_mask_w)
+void fm7_state::fm7_irq_mask_w(uint8_t data)
 {
 	m_irq_mask = data;
 	logerror("IRQ mask set: 0x%02x\n",m_irq_mask);
@@ -249,7 +249,7 @@ WRITE8_MEMBER(fm7_state::fm7_irq_mask_w)
  *   bit 6 - buzzer on for 205ms
  *   bit 7 - buzzer on/off
  */
-READ8_MEMBER(fm7_state::fm7_irq_cause_r)
+uint8_t fm7_state::fm7_irq_cause_r()
 {
 	uint8_t ret = ~m_irq_flags;
 
@@ -271,7 +271,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_beeper_off)
 	logerror("timed beeper off\n");
 }
 
-WRITE8_MEMBER(fm7_state::fm7_beeper_w)
+void fm7_state::fm7_beeper_w(uint8_t data)
 {
 	m_speaker_active = data & 0x01;
 
@@ -306,7 +306,7 @@ WRITE8_MEMBER(fm7_state::fm7_beeper_w)
  *  Sub CPU: port 0xd403 (read-only)
  *  On read: timed buzzer sound
  */
-READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
+uint8_t fm7_state::fm7_sub_beeper_r()
 {
 	if(m_speaker_active)
 	{
@@ -317,7 +317,7 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 	return 0xff;
 }
 
-READ8_MEMBER(fm7_state::vector_r)
+uint8_t fm7_state::vector_r(offs_t offset)
 {
 	uint32_t init_size = m_rom_ptr.bytes();
 
@@ -334,7 +334,7 @@ READ8_MEMBER(fm7_state::vector_r)
 	}
 }
 
-WRITE8_MEMBER(fm7_state::vector_w)
+void fm7_state::vector_w(offs_t offset, uint8_t data)
 {
 	if(m_type == SYS_FM7)
 		m_ram_ptr[0xfff0+offset] = data;
@@ -348,7 +348,7 @@ WRITE8_MEMBER(fm7_state::vector_w)
  *  bit 0 - attention IRQ active, clears flag when read.
  *  bit 1 - break key active
  */
-READ8_MEMBER(fm7_state::fm7_fd04_r)
+uint8_t fm7_state::fm7_fd04_r()
 {
 	uint8_t ret = 0xff;
 
@@ -370,7 +370,7 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  *  On read, enables BASIC ROM at 0x8000 (default)
  *  On write, disables BASIC ROM, enables RAM (if more than 32kB)
  */
-READ8_MEMBER(fm7_state::fm7_rom_en_r)
+uint8_t fm7_state::fm7_rom_en_r(address_space &space)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -388,7 +388,7 @@ READ8_MEMBER(fm7_state::fm7_rom_en_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
+void fm7_state::fm7_rom_en_w(address_space &space, uint8_t data)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 
@@ -408,7 +408,7 @@ WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
  *  Port is write-only.  Initiate ROM is on by default.
  *
  */
-WRITE8_MEMBER(fm7_state::fm7_init_en_w)
+void fm7_state::fm7_init_en_w(address_space &space, uint8_t data)
 {
 	if(data & 0x02)
 	{
@@ -436,7 +436,7 @@ WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
 	m_fdc_drq_flag = state;
 }
 
-READ8_MEMBER(fm7_state::fm7_fdc_r)
+uint8_t fm7_state::fm7_fdc_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -469,7 +469,7 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_fdc_w)
+void fm7_state::fm7_fdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -533,7 +533,7 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
  *  CPU clock speed in bit 0 (0 = 1.2MHz, 1 = 2MHz)
  *  Clears keyboard IRQ flag
  */
-READ8_MEMBER(fm7_state::fm7_keyboard_r)
+uint8_t fm7_state::fm7_keyboard_r(offs_t offset)
 {
 	uint8_t ret;
 	switch(offset)
@@ -550,7 +550,7 @@ READ8_MEMBER(fm7_state::fm7_keyboard_r)
 	}
 }
 
-READ8_MEMBER(fm7_state::fm7_sub_keyboard_r)
+uint8_t fm7_state::fm7_sub_keyboard_r(offs_t offset)
 {
 	uint8_t ret;
 	switch(offset)
@@ -591,7 +591,7 @@ READ8_MEMBER(fm7_state::fm7_sub_keyboard_r)
  *
  *  ACK is received after 5us.
  */
-READ8_MEMBER(fm7_state::fm77av_key_encoder_r)
+uint8_t fm7_state::fm77av_key_encoder_r(offs_t offset)
 {
 	uint8_t ret = 0xff;
 	switch(offset)
@@ -727,7 +727,7 @@ void fm7_state::fm77av_encoder_handle_command()
 	m_encoder.position = 0;
 }
 
-WRITE8_MEMBER(fm7_state::fm77av_key_encoder_w)
+void fm7_state::fm77av_key_encoder_w(offs_t offset, uint8_t data)
 {
 	m_encoder.ack = 0;
 	if(offset == 0) // data register
@@ -776,7 +776,7 @@ WRITE_LINE_MEMBER(fm7_state::write_centronics_perror)
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
+uint8_t fm7_state::fm7_cassette_printer_r()
 {
 	// bit 7: cassette input
 	// bit 5: printer DET2
@@ -802,7 +802,7 @@ READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 	return ret;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
+void fm7_state::fm7_cassette_printer_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -831,7 +831,7 @@ WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
  *  Main CPU: 0xfd0b
  *   - bit 0: Boot mode: 0=BASIC, 1=DOS
  */
-READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
+uint8_t fm7_state::fm77av_boot_mode_r()
 {
 	uint8_t ret = 0xff;
 
@@ -904,36 +904,36 @@ void fm7_state::fm7_update_psg()
 	}
 }
 
-READ8_MEMBER(fm7_state::fm7_psg_select_r)
+uint8_t fm7_state::fm7_psg_select_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_psg_select_w)
+void fm7_state::fm7_psg_select_w(uint8_t data)
 {
 	m_psg_regsel = data & 0x03;
 	fm7_update_psg();
 }
 
-WRITE8_MEMBER(fm7_state::fm77av_ym_select_w)
+void fm7_state::fm77av_ym_select_w(uint8_t data)
 {
 	m_psg_regsel = data & 0x0f;
 	fm7_update_psg();
 }
 
-READ8_MEMBER(fm7_state::fm7_psg_data_r)
+uint8_t fm7_state::fm7_psg_data_r()
 {
 //  fm7_update_psg();
 	return m_psg_data;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_psg_data_w)
+void fm7_state::fm7_psg_data_w(uint8_t data)
 {
 	m_psg_data = data;
 //  fm7_update_psg();
 }
 
-WRITE8_MEMBER(fm7_state::fm77av_bootram_w)
+void fm7_state::fm77av_bootram_w(offs_t offset, uint8_t data)
 {
 	if(!(m_mmr.mode & 0x01))
 		return;
@@ -941,7 +941,7 @@ WRITE8_MEMBER(fm7_state::fm77av_bootram_w)
 }
 
 // Shared RAM is only usable on the main CPU if the sub CPU is halted
-READ8_MEMBER(fm7_state::fm7_main_shared_r)
+uint8_t fm7_state::fm7_main_shared_r(offs_t offset)
 {
 	if(m_video.sub_halt != 0)
 		return m_shared_ram[offset];
@@ -949,13 +949,13 @@ READ8_MEMBER(fm7_state::fm7_main_shared_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_main_shared_w)
+void fm7_state::fm7_main_shared_w(offs_t offset, uint8_t data)
 {
 	if(m_video.sub_halt != 0)
 		m_shared_ram[offset] = data;
 }
 
-READ8_MEMBER(fm7_state::fm7_fmirq_r)
+uint8_t fm7_state::fm7_fmirq_r()
 {
 	uint8_t ret = 0xff;
 
@@ -965,7 +965,7 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 	return ret;
 }
 
-READ8_MEMBER(fm7_state::fm7_unknown_r)
+uint8_t fm7_state::fm7_unknown_r()
 {
 	// Port 0xFDFC is read by Dig Dug.  Controller port, perhaps?
 	// Must return 0xff for it to read the keyboard.
@@ -988,7 +988,7 @@ READ8_MEMBER(fm7_state::fm7_unknown_r)
  *              - bit 0: boot RAM read-write/read-only
  *
  */
-READ8_MEMBER(fm7_state::fm7_mmr_r)
+uint8_t fm7_state::fm7_mmr_r(offs_t offset)
 {
 	if(offset < 0x10)
 	{
@@ -1159,7 +1159,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 }
 
-WRITE8_MEMBER(fm7_state::fm7_mmr_w)
+void fm7_state::fm7_mmr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if(offset < 0x10)
 	{
@@ -1200,7 +1200,7 @@ WRITE8_MEMBER(fm7_state::fm7_mmr_w)
  *
  *  Kanji ROM is visible at 0x20000 (first half only?)
  */
-READ8_MEMBER(fm7_state::fm7_kanji_r)
+uint8_t fm7_state::fm7_kanji_r(offs_t offset)
 {
 	uint8_t* KROM = m_kanji->base();
 	uint32_t addr = m_kanji_address << 1;
@@ -1221,7 +1221,7 @@ READ8_MEMBER(fm7_state::fm7_kanji_r)
 	}
 }
 
-WRITE8_MEMBER(fm7_state::fm7_kanji_w)
+void fm7_state::fm7_kanji_w(offs_t offset, uint8_t data)
 {
 	uint16_t addr;
 

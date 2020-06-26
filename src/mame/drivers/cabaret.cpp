@@ -48,10 +48,10 @@ public:
 		, m_led(*this, "led6")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
+	void bg_scroll_w(offs_t offset, uint8_t data);
+	void bg_tile_w(offs_t offset, uint8_t data);
+	void fg_tile_w(offs_t offset, uint8_t data);
+	void fg_color_w(offs_t offset, uint8_t data);
 	void nmi_and_coins_w(uint8_t data);
 	void ppi2_b_w(uint8_t data);
 	void ppi2_c_w(uint8_t data);
@@ -93,13 +93,13 @@ protected:
 
 
 
-WRITE8_MEMBER(cabaret_state::bg_scroll_w)
+void cabaret_state::bg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_scroll[offset] = data;
 	m_bg_tilemap->set_scrolly(offset,data);
 }
 
-WRITE8_MEMBER(cabaret_state::bg_tile_w)
+void cabaret_state::bg_tile_w(offs_t offset, uint8_t data)
 {
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -118,13 +118,13 @@ TILE_GET_INFO_MEMBER(cabaret_state::get_fg_tile_info)
 	tileinfo.set(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(cabaret_state::fg_tile_w)
+void cabaret_state::fg_tile_w(offs_t offset, uint8_t data)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cabaret_state::fg_color_w)
+void cabaret_state::fg_color_w(offs_t offset, uint8_t data)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

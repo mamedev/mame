@@ -104,9 +104,9 @@ public:
 	{ }
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE16_MEMBER(tx_vram_w);
+	void output_w(uint8_t data);
+	void sound_cmd_w(uint8_t data);
+	void tx_vram_w(offs_t offset, uint16_t data);
 
 	void blackt96_soundio_port_a_w(uint8_t data);
 	uint8_t blackt96_soundio_port_b_r();
@@ -114,7 +114,7 @@ public:
 	uint8_t blackt96_soundio_port_c_r();
 	void blackt96_soundio_port_c_w(uint8_t data);
 
-	DECLARE_READ16_MEMBER( random_r ) // todo, get rid of this once we work out where reads are from
+	uint16_t random_r() // todo, get rid of this once we work out where reads are from
 	{
 		return machine().rand();
 	}
@@ -188,7 +188,7 @@ uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_in
 }
 
 
-WRITE8_MEMBER(blackt96_state::sound_cmd_w)
+void blackt96_state::sound_cmd_w(uint8_t data)
 {
 	//logerror("sound_cmd_w %02x\n", data);
 	m_soundcmd = data;
@@ -220,7 +220,7 @@ void blackt96_state::machine_reset()
 	m_txt_bank = 0;
 }
 
-WRITE8_MEMBER(blackt96_state::output_w)
+void blackt96_state::output_w(uint8_t data)
 {
 	// -bbb 8-21
 	// 1 - coin counter 1
@@ -237,7 +237,7 @@ WRITE8_MEMBER(blackt96_state::output_w)
 //  printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
 }
 
-WRITE16_MEMBER(blackt96_state::tx_vram_w)
+void blackt96_state::tx_vram_w(offs_t offset, uint16_t data)
 {
 	m_tilemapram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset/2);

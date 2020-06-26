@@ -18,6 +18,7 @@
 
 #include <array>
 #include <fstream>
+#include <fstream>
 #include <ios>
 #include <iostream>
 #include <sstream>
@@ -45,7 +46,7 @@ public:
 	{
 	}
 
-	putf8_reader(plib::unique_ptr<std::istream> &&rhs) noexcept
+	putf8_reader(std::unique_ptr<std::istream> &&rhs) noexcept
 	: m_strm(std::move(rhs))
 	{
 	}
@@ -103,7 +104,7 @@ public:
 
 	std::istream &stream() { return *m_strm; }
 private:
-	plib::unique_ptr<std::istream> m_strm;
+	std::unique_ptr<std::istream> m_strm;
 	putf8string m_linebuf;
 };
 
@@ -193,7 +194,7 @@ public:
 	void write(const pstring &s)
 	{
 		const auto *const sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
-		const auto sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
+		const auto sl(static_cast<std::streamsize>(std::char_traits<std::ostream::char_type>::length(sm)));
 		write(sl);
 		m_strm.write(sm, sl);
 	}
@@ -203,7 +204,7 @@ public:
 	{
 		const auto sz(static_cast<std::streamsize>(val.size()));
 		write(sz);
-		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * static_cast<std::streamsize>(sizeof(T)));
+		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * gsl::narrow<std::streamsize>(sizeof(T)));
 	}
 
 private:
@@ -224,7 +225,7 @@ public:
 	template <typename T>
 	void read(T &val)
 	{
-		m_strm.read(reinterpret_cast<std::istream::char_type *>(&val), sizeof(T));
+		m_strm.read(reinterpret_cast<std::istream::char_type *>(&val), gsl::narrow<std::streamsize>(sizeof(T)));
 	}
 
 	void read( pstring &s)
@@ -243,7 +244,7 @@ public:
 		std::size_t sz = 0;
 		read(sz);
 		val.resize(sz);
-		m_strm.read(reinterpret_cast<std::istream::char_type *>(val.data()), static_cast<std::streamsize>(sizeof(T) * sz));
+		m_strm.read(reinterpret_cast<std::istream::char_type *>(val.data()), gsl::narrow<std::streamsize>(sizeof(T) * sz));
 	}
 
 private:
@@ -260,6 +261,40 @@ inline void copystream(std::ostream &dest, std::istream &src)
 		dest.write(buf.data(), 1);
 	}
 }
+
+///
+/// \brief utf8 filename aware ifstream wrapper
+///
+class ifstream : public std::ifstream
+{
+public:
+
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
+		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
+
+	template <typename T>
+	explicit ifstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::in)
+	: std::ifstream(filename_type(name).c_str(), mode)
+	{
+	}
+};
+
+///
+/// \brief utf8 filename aware ofstream wrapper
+///
+class ofstream : public std::ofstream
+{
+public:
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
+		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
+
+	template <typename T>
+	explicit ofstream(const pstring_t<T> name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	: std::ofstream(filename_type(name).c_str(), mode)
+	{
+	}
+};
+
 
 struct perrlogger
 {

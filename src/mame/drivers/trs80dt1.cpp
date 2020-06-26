@@ -57,7 +57,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_nvram(*this,"nvram")
 		, m_io_keyboard(*this, "X%u", 0)
-		, m_beep(*this, "beeper")
+		, m_buzzer(*this, "buzzer")
 		, m_7474(*this, "7474")
 		, m_rs232(*this, "rs232")
 		, m_centronics(*this, "centronics")
@@ -66,10 +66,10 @@ public:
 	void trs80dt1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(dma_r);
-	DECLARE_READ8_MEMBER(key_r);
+	u8 dma_r(offs_t offset);
+	u8 key_r(offs_t offset);
 	u8 port1_r();
-	DECLARE_WRITE8_MEMBER(store_w);
+	void store_w(u8 data);
 	void port1_w(u8 data);
 	void port3_w(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
@@ -88,7 +88,7 @@ private:
 	required_device<i8276_device> m_crtc;
 	required_device<x2210_device> m_nvram;
 	required_ioport_array<9> m_io_keyboard;
-	required_device<beep_device> m_beep;
+	required_device<beep_device> m_buzzer;
 	required_device<ttl7474_device> m_7474;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
@@ -103,13 +103,14 @@ void trs80dt1_state::machine_reset()
 	m_nvram->recall(0);
 }
 
-READ8_MEMBER( trs80dt1_state::dma_r )
+u8 trs80dt1_state::dma_r(offs_t offset)
 {
-	m_crtc->dack_w(m_p_videoram[offset]); // write to /BS pin
+	if (!machine().side_effects_disabled())
+		m_crtc->dack_w(m_p_videoram[offset]); // write to /BS pin
 	return 0x7f;
 }
 
-READ8_MEMBER( trs80dt1_state::key_r )
+u8 trs80dt1_state::key_r(offs_t offset)
 {
 	offset &= 15;
 	if (offset < 9)
@@ -118,7 +119,7 @@ READ8_MEMBER( trs80dt1_state::key_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( trs80dt1_state::store_w )
+void trs80dt1_state::store_w(u8 data)
 {
 	// line is active low in the real chip
 	m_nvram->store(1);
@@ -154,7 +155,7 @@ d5 : Printer enable */
 void trs80dt1_state::port3_w(u8 data)
 {
 	m_rs232->write_txd(BIT(data, 1));
-	m_beep->set_state(BIT(data, 4));
+	m_buzzer->set_state(BIT(data, 4));
 }
 
 void trs80dt1_state::prg_map(address_map &map)
@@ -283,6 +284,9 @@ void trs80dt1_state::machine_start()
 	m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00)); // black
 	m_palette->set_pen_color(1, rgb_t(0x00,0xa0,0x00)); // normal
 	m_palette->set_pen_color(2, rgb_t(0x00,0xff,0x00)); // highlight
+
+	save_item(NAME(m_bow));
+	save_item(NAME(m_cent_busy));
 }
 
 const gfx_layout trs80dt1_charlayout =
@@ -329,7 +333,7 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 void trs80dt1_state::trs80dt1(machine_config &config)
 {
 	/* basic machine hardware */
-	I8051(config, m_maincpu, 7372800);
+	I8051(config, m_maincpu, 7.3728_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80dt1_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &trs80dt1_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(trs80dt1_state::port1_w));
@@ -346,7 +350,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_trs80dt1);
 
-	I8276(config, m_crtc, 12480000 / 8);
+	I8276(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(trs80dt1_state::crtc_update_row));
 	m_crtc->drq_wr_callback().set_inputline(m_maincpu, MCS51_INT0_LINE); // BRDY pin goes through inverter to /INT0, so we don't invert
@@ -364,8 +368,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000);
-	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_buzzer, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);
@@ -380,7 +383,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 ROM_START( trs80dt1 )
 
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "trs80dt1.u12", 0x0000, 0x1000, CRC(04e8a53f) SHA1(7b5d5047319ef8f230b82684d97a918b564d466e) )
 	ROM_FILL(0x9a,1,0xd4) // fix for timer0 problem
 
@@ -388,4 +391,5 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1", 0 )
+COMP( 1982, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1 Data Terminal", MACHINE_SUPPORTS_SAVE )
+

@@ -193,8 +193,10 @@ protected:
 		uint32_t m_ine;
 		uint32_t m_pri;
 
-		uint32_t m_divq_active;
+		uint32_t m_divq_bit;
 		uint32_t m_divq_dividend;
+		uint32_t m_divq_divisor;
+		uint32_t m_divq_a;
 
 		uint32_t m_arg0;
 		uint32_t m_arg1;
@@ -207,14 +209,14 @@ protected:
 	internal_unsp_state* m_core;
 
 protected:
-	uint16_t read16(uint32_t address) { return m_program->read_word(address); }
+	uint16_t read16(uint32_t address) { return m_program.read_word(address); }
 
 	void write16(uint32_t address, uint16_t data)
 	{
 	#if UNSP_LOG_REGS
 		log_write(address, data);
 	#endif
-		m_program->write_word(address, data);
+		m_program.write_word(address, data);
 	}
 
 	void add_lpc(const int32_t offset)
@@ -285,9 +287,8 @@ private:
 
 
 	address_space_config m_program_config;
-	address_space *m_program;
-	std::function<u16 (offs_t)> m_pr16;
-	std::function<const void * (offs_t)> m_prptr;
+	memory_access<23, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<23, 1, -1, ENDIANNESS_BIG>::specific m_program;
 
 	uint32_t m_debugger_temp;
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
@@ -298,7 +299,7 @@ private:
 	inline void trigger_irq(int line);
 	void check_irqs();
 
-	drc_cache m_cache;
+	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<unsp_frontend> m_drcfe;
 	uint32_t m_drcoptions;

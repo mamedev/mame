@@ -12,27 +12,27 @@ device_pccard_interface::device_pccard_interface(const machine_config &mconfig, 
 {
 }
 
-READ16_MEMBER( device_pccard_interface::read_memory )
+uint16_t device_pccard_interface::read_memory(offs_t offset, uint16_t mem_mask)
 {
 	if (VERBOSE & LOG_GENERAL)
 		device().logerror("unhandled memory read %08x %04x\n", offset, mem_mask);
 	return 0xffff;
 }
 
-WRITE16_MEMBER( device_pccard_interface::write_memory )
+void device_pccard_interface::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE & LOG_GENERAL)
 		device().logerror("unhandled memory write %08x %04x %04x\n", offset, data, mem_mask);
 }
 
-READ16_MEMBER( device_pccard_interface::read_reg )
+uint16_t device_pccard_interface::read_reg(offs_t offset, uint16_t mem_mask)
 {
 	if (VERBOSE & LOG_GENERAL)
 		device().logerror("unhandled register read %08x %04x\n", offset, mem_mask);
 	return 0xffff;
 }
 
-WRITE16_MEMBER( device_pccard_interface::write_reg )
+void device_pccard_interface::write_reg(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE & LOG_GENERAL)
 		device().logerror("unhandled register write %08x %04x %04x\n", offset, data, mem_mask);
@@ -57,30 +57,30 @@ READ_LINE_MEMBER(pccard_slot_device::read_line_inserted)
 	return m_pccard ? 1 : 0;
 }
 
-READ16_MEMBER( pccard_slot_device::read_memory )
+uint16_t pccard_slot_device::read_memory(offs_t offset, uint16_t mem_mask)
 {
 	if (m_pccard)
-		return m_pccard->read_memory(space, offset, mem_mask);
+		return m_pccard->read_memory(offset, mem_mask);
 	else
 		return 0xffff;
 }
 
-WRITE16_MEMBER( pccard_slot_device::write_memory )
+void pccard_slot_device::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_pccard)
-		m_pccard->write_memory(space, offset, data, mem_mask);
+		m_pccard->write_memory(offset, data, mem_mask);
 }
 
-READ16_MEMBER( pccard_slot_device::read_reg )
+uint16_t pccard_slot_device::read_reg(offs_t offset, uint16_t mem_mask)
 {
 	if (m_pccard)
-		return m_pccard->read_reg(space, offset, mem_mask);
+		return m_pccard->read_reg(offset, mem_mask);
 	else
 		return 0xffff;
 }
 
-WRITE16_MEMBER( pccard_slot_device::write_reg )
+void pccard_slot_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_pccard)
-		m_pccard->write_reg(space, offset, data, mem_mask);
+		m_pccard->write_reg(offset, data, mem_mask);
 }

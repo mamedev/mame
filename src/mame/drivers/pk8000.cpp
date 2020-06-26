@@ -33,35 +33,27 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
+		, m_banks(*this, "bank%u", 0U)
 		, m_io_joy1(*this, "JOY1")
 		, m_io_joy2(*this, "JOY2")
-		, m_keyboard(*this, "LINE%u", 0)
+		, m_keyboard(*this, "LINE%u", 0U)
 	{ }
 
 	void pk8000(machine_config &config);
 
 private:
-	uint8_t m_keyboard_line;
+	u8 m_keyboard_line;
 
-	uint8_t joy_1_r();
-	uint8_t joy_2_r();
-	void _80_porta_w(uint8_t data);
-	uint8_t _80_portb_r();
-	void _80_portc_w(uint8_t data);
+	u8 joy_1_r();
+	u8 joy_2_r();
+	void _80_porta_w(u8 data);
+	u8 _80_portb_r();
+	void _80_portc_w(u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -73,88 +65,81 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
-	required_memory_bank m_bank5;
-	required_memory_bank m_bank6;
-	required_memory_bank m_bank7;
-	required_memory_bank m_bank8;
+	required_memory_bank_array<8> m_banks;
 	required_ioport m_io_joy1;
 	required_ioport m_io_joy2;
 	required_ioport_array<10> m_keyboard;
 
-	void set_bank(uint8_t data);
+	void set_bank(u8 data);
 };
 
 
 
-void pk8000_state::set_bank(uint8_t data)
+void pk8000_state::set_bank(u8 data)
 {
-	uint8_t *rom = m_region_maincpu->base();
-	uint8_t *ram = m_ram->pointer();
-	uint8_t block1 = data & 3;
-	uint8_t block2 = (data >> 2) & 3;
-	uint8_t block3 = (data >> 4) & 3;
-	uint8_t block4 = (data >> 6) & 3;
+	u8 *rom = m_region_maincpu->base();
+	u8 *ram = m_ram->pointer();
+	u8 block1 = data & 3;
+	u8 block2 = (data >> 2) & 3;
+	u8 block3 = (data >> 4) & 3;
+	u8 block4 = (data >> 6) & 3;
 
 	switch(block1) {
 		case 0:
-				m_bank1->set_base(rom + 0x10000);
-				m_bank5->set_base(ram);
+				m_banks[0]->set_base(rom);
+				m_banks[4]->set_base(ram);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				m_bank1->set_base(ram);
-				m_bank5->set_base(ram);
+				m_banks[0]->set_base(ram);
+				m_banks[4]->set_base(ram);
 				break;
 	}
 
 	switch(block2) {
 		case 0:
-				m_bank2->set_base(rom + 0x14000);
-				m_bank6->set_base(ram + 0x4000);
+				m_banks[1]->set_base(rom + 0x4000);
+				m_banks[5]->set_base(ram + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				m_bank2->set_base(ram + 0x4000);
-				m_bank6->set_base(ram + 0x4000);
+				m_banks[1]->set_base(ram + 0x4000);
+				m_banks[5]->set_base(ram + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
-				m_bank3->set_base(rom + 0x18000);
-				m_bank7->set_base(ram + 0x8000);
+				m_banks[2]->set_base(rom + 0x8000);
+				m_banks[6]->set_base(ram + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				m_bank3->set_base(ram + 0x8000);
-				m_bank7->set_base(ram + 0x8000);
+				m_banks[2]->set_base(ram + 0x8000);
+				m_banks[6]->set_base(ram + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
-				m_bank4->set_base(rom + 0x1c000);
-				m_bank8->set_base(ram + 0xc000);
+				m_banks[3]->set_base(rom + 0xc000);
+				m_banks[7]->set_base(ram + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				m_bank4->set_base(ram + 0xc000);
-				m_bank8->set_base(ram + 0xc000);
+				m_banks[3]->set_base(ram + 0xc000);
+				m_banks[7]->set_base(ram + 0xc000);
 				break;
 	}
 }
-void pk8000_state::_80_porta_w(uint8_t data)
+void pk8000_state::_80_porta_w(u8 data)
 {
 	set_bank(data);
 }
 
-uint8_t pk8000_state::_80_portb_r()
+u8 pk8000_state::_80_portb_r()
 {
 	if(m_keyboard_line>9) {
 		return 0xff;
@@ -162,7 +147,7 @@ uint8_t pk8000_state::_80_portb_r()
 	return m_keyboard[m_keyboard_line]->read();
 }
 
-void pk8000_state::_80_portc_w(uint8_t data)
+void pk8000_state::_80_portc_w(u8 data)
 {
 	m_keyboard_line = data & 0x0f;
 
@@ -172,15 +157,15 @@ void pk8000_state::_80_portc_w(uint8_t data)
 	m_cassette->output((BIT(data, 6)) ? +1.0 : 0.0);
 }
 
-uint8_t pk8000_state::joy_1_r()
+u8 pk8000_state::joy_1_r()
 {
-	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
+	u8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy1->read() & 0x7f;
 	return retVal;
 }
-uint8_t pk8000_state::joy_2_r()
+u8 pk8000_state::joy_2_r()
 {
-	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
+	u8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy2->read() & 0x7f;
 	return retVal;
 }
@@ -188,10 +173,10 @@ uint8_t pk8000_state::joy_2_r()
 void pk8000_state::pk8000_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
-	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
-	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
-	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+	map(0x0000, 0x3fff).bankr("bank0").bankw("bank4");
+	map(0x4000, 0x7fff).bankr("bank1").bankw("bank5");
+	map(0x8000, 0xbfff).bankr("bank2").bankw("bank6");
+	map(0xc000, 0xffff).bankr("bank3").bankw("bank7");
 }
 
 void pk8000_state::pk8000_io(address_map &map)
@@ -207,6 +192,11 @@ void pk8000_state::pk8000_io(address_map &map)
 	map(0x92, 0x92).rw(FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
 	map(0x93, 0x93).rw(FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
 	map(0xa0, 0xbf).rw(FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
+	// extras for pk8002
+	//map(0x8c, 0x8f).   // cassette in   2x KR1533KP11
+	//map(0x94, 0x97).   // video colour
+	//map(0x98, 0x9b).w  // audio  KR1533TM9, KR572PA1A, 2x KR555IR8
+	//map(0x9c, 0x9f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // part of the audio
 }
 
 /*   Input ports */
@@ -335,15 +325,6 @@ IRQ_CALLBACK_MEMBER(pk8000_state::irq_callback)
 void pk8000_state::machine_start()
 {
 	save_item(NAME(m_keyboard_line));
-}
-
-void pk8000_state::machine_reset()
-{
-	set_bank(0);
-}
-
-void pk8000_state::video_start()
-{
 	save_item(NAME(m_text_start));
 	save_item(NAME(m_chargen_start));
 	save_item(NAME(m_video_start));
@@ -354,7 +335,12 @@ void pk8000_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-uint32_t pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void pk8000_state::machine_reset()
+{
+	set_bank(0);
+}
+
+u32 pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
@@ -362,7 +348,7 @@ uint32_t pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void pk8000_state::pk8000(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 1780000);
+	I8080(config, m_maincpu, 1780000); // pk8002 = 10'220'000 / 8
 	m_maincpu->set_addrmap(AS_PROGRAM, &pk8000_state::pk8000_mem);
 	m_maincpu->set_addrmap(AS_IO, &pk8000_state::pk8000_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pk8000_state::interrupt));
@@ -385,9 +371,9 @@ void pk8000_state::pk8000(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(pk8000_state::_80_portc_w));
 
 	i8255_device &ppi2(I8255(config, "ppi8255_2"));
-	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
-	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
-	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
+	ppi2.in_pa_callback().set(FUNC(pk8000_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_state::_84_portc_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
@@ -404,23 +390,24 @@ void pk8000_state::pk8000(machine_config &config)
 
 /* ROM definition */
 ROM_START( vesta )
-	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "vesta.rom", 0x10000, 0x4000, CRC(fbf7e2cc) SHA1(4bc5873066124bd926c3c6aa2fd1a062c87af339))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vesta.rom", 0x0000, 0x4000, CRC(fbf7e2cc) SHA1(4bc5873066124bd926c3c6aa2fd1a062c87af339))
 ROM_END
 
 ROM_START( hobby )
-	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hobby.rom", 0x10000, 0x4000, CRC(a25b4b2c) SHA1(0d86e6e4be8d1aa389bfa9dd79e3604a356729f7))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "hobby.rom", 0x0000, 0x4000, CRC(a25b4b2c) SHA1(0d86e6e4be8d1aa389bfa9dd79e3604a356729f7))
 ROM_END
 
 ROM_START( pk8002 )
-	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "pk8002.rom", 0x10000, 0x4000, CRC(07b9ae71) SHA1(2137a41cc095c7aba58b7b109fce63f30a4568b2))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	// there is actually 1 rom 0000-07ff (U3) mirrored to 0800,1000,1800, then another rom 2000-27ff (U4) mirrored to 2800,3000,3800
+	ROM_LOAD( "pk8002.rom", 0x0000, 0x4000, CRC(07b9ae71) SHA1(2137a41cc095c7aba58b7b109fce63f30a4568b2))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME             FLAGS */
-COMP( 1987, vesta,  0,      0,      pk8000,  pk8000, pk8000_state, empty_init, "BP EVM",    "PK8000 Vesta",      0 )
-COMP( 1987, hobby,  vesta,  0,      pk8000,  pk8000, pk8000_state, empty_init, "BP EVM",    "PK8000 Sura/Hobby", 0 )
-COMP( 1987, pk8002, vesta,  0,      pk8000,  pk8000, pk8000_state, empty_init, "<unknown>", "PK8002 Elf",        MACHINE_NOT_WORKING )
+COMP( 1987, vesta,  0,      0,      pk8000,  pk8000, pk8000_state, empty_init, "BP EVM",    "PK8000 Vesta",      MACHINE_SUPPORTS_SAVE )
+COMP( 1987, hobby,  vesta,  0,      pk8000,  pk8000, pk8000_state, empty_init, "BP EVM",    "PK8000 Sura/Hobby", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pk8002, vesta,  0,      pk8000,  pk8000, pk8000_state, empty_init, "<unknown>", "PK8002 Elf",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

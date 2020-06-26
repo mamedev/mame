@@ -294,7 +294,7 @@ void artmagic_state::execute_blit()
 }
 
 
-READ16_MEMBER(artmagic_state::blitter_r)
+uint16_t artmagic_state::blitter_r()
 {
 	/*
 	    bit 1 is a busy flag; loops tightly if clear
@@ -310,7 +310,7 @@ READ16_MEMBER(artmagic_state::blitter_r)
 }
 
 
-WRITE16_MEMBER(artmagic_state::blitter_w)
+void artmagic_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_data[offset]);
 

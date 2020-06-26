@@ -57,20 +57,16 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(pix1_w);
-	DECLARE_WRITE8_MEMBER(pix2_w);
-	DECLARE_READ8_MEMBER(pix2_r);
-	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_READ8_MEMBER(fortyl_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
-	DECLARE_READ8_MEMBER(fortyl_pixram_r);
-	DECLARE_WRITE8_MEMBER(fortyl_pixram_w);
-	DECLARE_WRITE8_MEMBER(fortyl_bg_videoram_w);
-	DECLARE_READ8_MEMBER(fortyl_bg_videoram_r);
-	DECLARE_WRITE8_MEMBER(fortyl_bg_colorram_w);
-	DECLARE_READ8_MEMBER(fortyl_bg_colorram_r);
-	DECLARE_WRITE8_MEMBER(pix1_mcu_w);
+	void bank_select_w(uint8_t data);
+	uint8_t snd_flag_r();
+	uint8_t fortyl_mcu_status_r();
+	void fortyl_pixram_sel_w(uint8_t data);
+	uint8_t fortyl_pixram_r(offs_t offset);
+	void fortyl_pixram_w(offs_t offset, uint8_t data);
+	void fortyl_bg_videoram_w(offs_t offset, uint8_t data);
+	uint8_t fortyl_bg_videoram_r(offs_t offset);
+	void fortyl_bg_colorram_w(offs_t offset, uint8_t data);
+	uint8_t fortyl_bg_colorram_r(offs_t offset);
 	void sound_control_0_w(uint8_t data);
 	void sound_control_1_w(uint8_t data);
 	void sound_control_2_w(uint8_t data);
@@ -113,8 +109,6 @@ private:
 
 	/* misc */
 	int         m_pix_color[4];
-	uint8_t       m_pix1;
-	uint8_t       m_pix2[2];
 	int         m_vol_ctrl[16];
 	uint8_t       m_snd_ctrl0;
 	uint8_t       m_snd_ctrl1;

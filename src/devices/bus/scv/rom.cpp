@@ -122,25 +122,25 @@ void scv_rom128ram4_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(scv_rom8_device::read_cart)
+uint8_t scv_rom8_device::read_cart(offs_t offset)
 {
 	return m_rom[offset & 0x1fff];
 }
 
 
-READ8_MEMBER(scv_rom16_device::read_cart)
+uint8_t scv_rom16_device::read_cart(offs_t offset)
 {
 	return m_rom[offset & 0x3fff];
 }
 
 
-READ8_MEMBER(scv_rom32_device::read_cart)
+uint8_t scv_rom32_device::read_cart(offs_t offset)
 {
 	return m_rom[offset];
 }
 
 
-READ8_MEMBER(scv_rom32ram8_device::read_cart)
+uint8_t scv_rom32ram8_device::read_cart(offs_t offset)
 {
 	if (m_ram_enabled && offset >= 0x6000)
 		return m_ram[offset & 0x1fff];
@@ -148,7 +148,7 @@ READ8_MEMBER(scv_rom32ram8_device::read_cart)
 	return m_rom[offset];
 }
 
-WRITE8_MEMBER(scv_rom32ram8_device::write_cart)
+void scv_rom32ram8_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_ram_enabled && offset >= 0x6000)
 		m_ram[offset & 0x1fff] = data;
@@ -160,7 +160,7 @@ void scv_rom32ram8_device::write_bank(uint8_t data)
 }
 
 
-READ8_MEMBER(scv_rom64_device::read_cart)
+uint8_t scv_rom64_device::read_cart(offs_t offset)
 {
 	return m_rom[offset + (m_bank_base * 0x8000)];
 }
@@ -171,7 +171,7 @@ void scv_rom64_device::write_bank(uint8_t data)
 }
 
 
-READ8_MEMBER(scv_rom128_device::read_cart)
+uint8_t scv_rom128_device::read_cart(offs_t offset)
 {
 	return m_rom[offset + (m_bank_base * 0x8000)];
 }
@@ -182,7 +182,7 @@ void scv_rom128_device::write_bank(uint8_t data)
 }
 
 
-READ8_MEMBER(scv_rom128ram4_device::read_cart)
+uint8_t scv_rom128ram4_device::read_cart(offs_t offset)
 {
 	if (m_ram_enabled && offset >= 0x7000)
 		return m_ram[offset & 0xfff];
@@ -190,7 +190,7 @@ READ8_MEMBER(scv_rom128ram4_device::read_cart)
 	return m_rom[offset + (m_bank_base * 0x8000)];
 }
 
-WRITE8_MEMBER(scv_rom128ram4_device::write_cart)
+void scv_rom128ram4_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_ram_enabled && offset >= 0x7000)
 		m_ram[offset & 0xfff] = data;

@@ -75,9 +75,9 @@ private:
 	int m_ctrl;
 	emu_timer *m_interrupt_timer;
 
-	DECLARE_WRITE8_MEMBER(hd46505_0_w);
-	DECLARE_WRITE8_MEMBER(hd46505_1_w);
-	DECLARE_WRITE8_MEMBER(score_w);
+	void hd46505_0_w(offs_t offset, uint8_t data);
+	void hd46505_1_w(offs_t offset, uint8_t data);
+	void score_w(offs_t offset, uint8_t data);
 	uint8_t input_r();
 	void ctrl_w(uint8_t data);
 
@@ -125,21 +125,21 @@ void tugboat_state::tugboat_palette(palette_device &palette) const
 
 
 
-/* see mc6845.c. That file is only a placeholder, I process the writes here
+/* see mc6845.cpp. That file is only a placeholder, I process the writes here
    because I need the start_addr register to handle scrolling */
-WRITE8_MEMBER(tugboat_state::hd46505_0_w)
+void tugboat_state::hd46505_0_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0) m_reg0 = data & 0x0f;
 	else if (m_reg0 < 18) m_hd46505_0_reg[m_reg0] = data;
 }
-WRITE8_MEMBER(tugboat_state::hd46505_1_w)
+void tugboat_state::hd46505_1_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0) m_reg1 = data & 0x0f;
 	else if (m_reg1 < 18) m_hd46505_1_reg[m_reg1] = data;
 }
 
 
-WRITE8_MEMBER(tugboat_state::score_w)
+void tugboat_state::score_w(offs_t offset, uint8_t data)
 {
 		if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
 		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;

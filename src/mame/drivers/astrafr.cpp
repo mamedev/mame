@@ -59,11 +59,11 @@ private:
 
 
 
-	DECLARE_READ32_MEMBER(astrafr_mem_r);
-	DECLARE_WRITE32_MEMBER(astrafr_mem_w);
+	uint32_t astrafr_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void astrafr_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(astrafr_slave_mem_r);
-	DECLARE_WRITE32_MEMBER(astrafr_slave_mem_w);
+	uint32_t astrafr_slave_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void astrafr_slave_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 
 	// ports move above from game to game..
@@ -71,7 +71,7 @@ private:
 	uint16_t fgpa_first_read_addr;
 	uint16_t fgpa_after_rom_write_addr;
 
-	DECLARE_READ8_MEMBER( astra_fgpa_r )
+	uint8_t astra_fgpa_r(offs_t offset)
 	{
 		if (offset==fgpa_first_read_addr)
 		{
@@ -84,7 +84,7 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER( astra_fgpa_w )
+	void astra_fgpa_w(offs_t offset, uint8_t data)
 	{
 		if (offset==fgpa_rom_write_addr)
 		{
@@ -98,7 +98,7 @@ private:
 	}
 
 	/* 2nd copy for the 2nd board (assume same addresses for now */
-	DECLARE_READ8_MEMBER( astra_fgpa_slave_r )
+	uint8_t astra_fgpa_slave_r(offs_t offset)
 	{
 		if (offset==fgpa_first_read_addr)
 		{
@@ -111,7 +111,7 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER( astra_fgpa_slave_w )
+	void astra_fgpa_slave_w(offs_t offset, uint8_t data)
 	{
 		if (offset==fgpa_rom_write_addr)
 		{
@@ -141,7 +141,7 @@ private:
 
 
 
-READ32_MEMBER(astrafr_state::astrafr_mem_r)
+uint32_t astrafr_state::astrafr_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	int cs = m_maincpu->get_cs(offset * 4);
 
@@ -167,7 +167,7 @@ READ32_MEMBER(astrafr_state::astrafr_mem_r)
 
 
 
-WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
+void astrafr_state::astrafr_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int address = offset * 4;
 	int cs = m_maincpu->get_cs(address);
@@ -179,10 +179,10 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 		case 3:
 			address &= 0xfffff;
 
-			if (ACCESSING_BITS_24_31) astra_fgpa_w(space, address+0, data >> 24);
-			if (ACCESSING_BITS_16_23) astra_fgpa_w(space, address+1, data >> 16);
-			if (ACCESSING_BITS_8_15) astra_fgpa_w(space, address+2, data >> 8);
-			if (ACCESSING_BITS_0_7) astra_fgpa_w(space, address+3, data >> 0);
+			if (ACCESSING_BITS_24_31) astra_fgpa_w(address+0, data >> 24);
+			if (ACCESSING_BITS_16_23) astra_fgpa_w(address+1, data >> 16);
+			if (ACCESSING_BITS_8_15) astra_fgpa_w(address+2, data >> 8);
+			if (ACCESSING_BITS_0_7) astra_fgpa_w(address+3, data >> 0);
 			break;
 
 		case 2:
@@ -196,7 +196,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 	}
 }
 
-READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
+uint32_t astrafr_state::astrafr_slave_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	int cs = m_slavecpu->get_cs(offset * 4);
 
@@ -220,7 +220,7 @@ READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
+void astrafr_state::astrafr_slave_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int address = offset * 4;
 	int cs = m_slavecpu->get_cs(address);
@@ -228,14 +228,14 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 
 	switch ( cs )
 	{
-		case 0: // some sets end up writng the FGPA data with CS0, I guess the CS logic is wrong??
+		case 0: // some sets end up writing the FGPA data with CS0, I guess the CS logic is wrong??
 		case 3:
 			address &= 0xfffff;
 
-			if (ACCESSING_BITS_24_31) astra_fgpa_slave_w(space, address+0, data >> 24);
-			if (ACCESSING_BITS_16_23) astra_fgpa_slave_w(space, address+1, data >> 16);
-			if (ACCESSING_BITS_8_15) astra_fgpa_slave_w(space, address+2, data >> 8);
-			if (ACCESSING_BITS_0_7) astra_fgpa_slave_w(space, address+3, data >> 0);
+			if (ACCESSING_BITS_24_31) astra_fgpa_slave_w(address+0, data >> 24);
+			if (ACCESSING_BITS_16_23) astra_fgpa_slave_w(address+1, data >> 16);
+			if (ACCESSING_BITS_8_15) astra_fgpa_slave_w(address+2, data >> 8);
+			if (ACCESSING_BITS_0_7) astra_fgpa_slave_w(address+3, data >> 0);
 			break;
 
 		case 2:

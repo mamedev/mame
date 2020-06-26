@@ -159,8 +159,8 @@ public:
 	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~es5506_device() {}
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 	void voice_bank_w(int voice, int bank);
 
 protected:
@@ -205,8 +205,8 @@ class es5505_device : public es550x_device
 public:
 	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void voice_bank_w(int voice, int bank);
 
 protected:

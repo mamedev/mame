@@ -133,7 +133,7 @@ u8 metro_state::irq_cause_r(offs_t offset)
 
 	*/
 
-	uint8_t res = 0;
+	u8 res = 0;
 	for (int i = 0; i < 8; i++)
 		res |= (m_requested_int[i] << i);
 
@@ -145,12 +145,12 @@ u8 metro_state::irq_cause_r(offs_t offset)
 void metro_state::update_irq_state()
 {
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
-	uint8_t irq = irq_cause_r(0) & ~*m_irq_enable;
+	u8 irq = irq_cause_r(0) & ~*m_irq_enable;
 
 	if (m_irq_line == -1)    /* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
 		/*  This is for games that supply an *IRQ Vector* on the data bus together with an IRQ level for each possible IRQ source */
-		uint8_t irq_level[8] = { 0 };
+		u8 irq_level[8] = { 0 };
 		int i;
 
 		for (i = 0; i < 8; i++)
@@ -172,7 +172,7 @@ void metro_state::update_irq_state()
 
 
 /* For games that supply an *IRQ Vector* on the data bus */
-uint8_t metro_state::irq_vector_r(offs_t offset)
+u8 metro_state::irq_vector_r(offs_t offset)
 {
 	// logerror("%s: irq callback returns %04X\n", machine().describe_context(), m_irq_vectors[offset]);
 	return m_irq_vectors[offset] & 0xff;
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 	}
 }
 
-WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
+void metro_state::mouja_irq_timer_ctrl_w(uint16_t data)
 {
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2; /* 0xff=58Hz, 0x80=116Hz? */
 
@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 
 READ_LINE_MEMBER(metro_state::rxd_r)
 {
-	uint8_t data = m_sound_data;
+	u8 data = m_sound_data;
 
 	// TODO: shift on SCK falling edges
 	m_sound_data >>= 1;
@@ -310,7 +310,7 @@ READ_LINE_MEMBER(metro_state::rxd_r)
 
 }
 
-WRITE8_MEMBER(metro_state::sound_data_w)
+void metro_state::sound_data_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(metro_state::sound_data_sync), this), data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen rxd_r
@@ -323,7 +323,7 @@ TIMER_CALLBACK_MEMBER(metro_state::sound_data_sync)
 }
 
 
-READ8_MEMBER(metro_state::soundstatus_r)
+u8 metro_state::soundstatus_r()
 {
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
@@ -333,29 +333,29 @@ READ_LINE_MEMBER(metro_state::custom_soundstatus_r)
 	return (m_busy_sndcpu ? 1 : 0);
 }
 
-WRITE8_MEMBER(metro_state::soundstatus_w)
+void metro_state::soundstatus_w(u8 data)
 {
 	m_soundstatus = data & 0x01;
 }
 
 template<int Mask>
-void metro_state::upd7810_rombank_w(uint8_t data)
+void metro_state::upd7810_rombank_w(u8 data)
 {
 	m_audiobank->set_entry((data >> 4) & Mask);
 }
 
 
-uint8_t metro_state::upd7810_porta_r()
+u8 metro_state::upd7810_porta_r()
 {
 	return m_porta;
 }
 
-void metro_state::upd7810_porta_w(uint8_t data)
+void metro_state::upd7810_porta_w(u8 data)
 {
 	m_porta = data;
 }
 
-void metro_state::upd7810_portb_w(uint8_t data)
+void metro_state::upd7810_portb_w(u8 data)
 {
 	/* port B layout:
 	   7 !clock latch for message to main CPU
@@ -404,7 +404,7 @@ void metro_state::upd7810_portb_w(uint8_t data)
 }
 
 
-void metro_state::daitorid_portb_w(uint8_t data)
+void metro_state::daitorid_portb_w(u8 data)
 {
 	/* port B layout:
 	   7 !clock latch for message to main CPU
@@ -468,7 +468,7 @@ void metro_state::daitorid_portb_w(uint8_t data)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(metro_state::coin_lockout_1word_w)
+void metro_state::coin_lockout_1word_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -478,7 +478,7 @@ WRITE8_MEMBER(metro_state::coin_lockout_1word_w)
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
 // TODO: maybe the counter also controls lockout?
-WRITE16_MEMBER(metro_state::coin_lockout_4words_w)
+void metro_state::coin_lockout_4words_w(offs_t offset, uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
@@ -528,7 +528,7 @@ void metro_state::ymf278_map(address_map &map)
 ***************************************************************************/
 
 /* Really weird way of mapping 3 DSWs */
-READ16_MEMBER(metro_state::balcube_dsw_r)
+uint16_t metro_state::balcube_dsw_r(offs_t offset)
 {
 	uint16_t dsw1 = ioport("DSW0")->read() >> 0;
 	uint16_t dsw2 = ioport("DSW0")->read() >> 8;
@@ -800,20 +800,20 @@ void metro_state::gakusai_oki_bank_set()
 	m_oki->set_rom_bank(bank);
 }
 
-WRITE8_MEMBER(metro_state::gakusai_oki_bank_hi_w)
+void metro_state::gakusai_oki_bank_hi_w(u8 data)
 {
 	m_gakusai_oki_bank_hi = data;
 	gakusai_oki_bank_set();
 }
 
-WRITE8_MEMBER(metro_state::gakusai_oki_bank_lo_w)
+void metro_state::gakusai_oki_bank_lo_w(u8 data)
 {
 	m_gakusai_oki_bank_lo = data;
 	gakusai_oki_bank_set();
 }
 
 
-READ16_MEMBER(metro_state::gakusai_input_r)
+uint16_t metro_state::gakusai_input_r()
 {
 	uint16_t input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
@@ -825,12 +825,12 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 	return 0xffff;
 }
 
-READ8_MEMBER(metro_state::gakusai_eeprom_r)
+u8 metro_state::gakusai_eeprom_r()
 {
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
+void metro_state::gakusai_eeprom_w(u8 data)
 {
 	// latch the bit
 	m_eeprom->di_write(BIT(data, 0));
@@ -894,7 +894,7 @@ void metro_state::gakusai2_map(address_map &map)
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-READ8_MEMBER(metro_state::dokyusp_eeprom_r)
+u8 metro_state::dokyusp_eeprom_r()
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write(CLEAR_LINE);
@@ -903,7 +903,7 @@ READ8_MEMBER(metro_state::dokyusp_eeprom_r)
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE8_MEMBER(metro_state::dokyusp_eeprom_bit_w)
+void metro_state::dokyusp_eeprom_bit_w(u8 data)
 {
 	// latch the bit
 	m_eeprom->di_write(BIT(data, 0));
@@ -913,7 +913,7 @@ WRITE8_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 	m_eeprom->clk_write(ASSERT_LINE);
 }
 
-WRITE8_MEMBER(metro_state::dokyusp_eeprom_reset_w)
+void metro_state::dokyusp_eeprom_reset_w(u8 data)
 {
 	// reset line asserted: reset.
 	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
@@ -1084,7 +1084,7 @@ void metro_state::toride2g_map(address_map &map)
                             Blazing Tornado
 ***************************************************************************/
 
-WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
+void metro_state::blzntrnd_sh_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry(data & 0x07);
 }
@@ -1129,7 +1129,7 @@ void metro_state::blzntrnd_map(address_map &map)
                                     Mouja
 ***************************************************************************/
 
-WRITE8_MEMBER(metro_state::mouja_sound_rombank_w)
+void metro_state::mouja_sound_rombank_w(u8 data)
 {
 	m_okibank->set_entry((data >> 3) & 0x07);
 }
@@ -1183,7 +1183,7 @@ private:
 	required_ioport port;
 	int ce, clk;
 	int cur_bit;
-	uint8_t value;
+	u8 value;
 };
 
 DEFINE_DEVICE_TYPE(PUZZLET_IO, puzzlet_io_device, "puzzlet_io", "Puzzlet Coin/Start I/O")
@@ -1238,7 +1238,7 @@ WRITE_LINE_MEMBER(puzzlet_io_device::clk_w)
 }
 
 
-WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
+void metro_state::puzzlet_irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		*m_irq_enable = data ^ 0xffff;
@@ -1286,7 +1286,7 @@ void metro_state::puzzlet_io_map(address_map &map)
                                 Varia Metal
 ***************************************************************************/
 
-WRITE8_MEMBER(metro_state::vmetal_control_w)
+void metro_state::vmetal_control_w(u8 data)
 {
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
@@ -1310,7 +1310,7 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER(metro_state::es8712_reset_w)
+void metro_state::es8712_reset_w(u8 data)
 {
 	m_essnd->reset();
 }
@@ -5591,7 +5591,7 @@ void metro_state::init_karatour()
 /* Unscramble the GFX ROMs */
 void metro_state::init_balcube()
 {
-	uint8_t *ROM       = memregion("vdp2")->base();
+	u8 *ROM       = memregion("vdp2")->base();
 	const unsigned len = memregion("vdp2")->bytes();
 
 	for (unsigned i = 0; i < len; i+=2)
@@ -5606,10 +5606,10 @@ void metro_state::init_balcube()
 
 void metro_state::init_dharmak()
 {
-	uint8_t *src = memregion("vdp2")->base();
+	u8 *src = memregion("vdp2")->base();
 	for (int i = 0; i < 0x200000; i += 4)
 	{
-		uint8_t dat = src[i + 1];
+		u8 dat = src[i + 1];
 		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 

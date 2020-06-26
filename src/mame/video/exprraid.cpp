@@ -4,19 +4,19 @@
 #include "includes/exprraid.h"
 
 
-WRITE8_MEMBER(exprraid_state::exprraid_videoram_w)
+void exprraid_state::exprraid_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_colorram_w)
+void exprraid_state::exprraid_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
+void exprraid_state::exprraid_flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -25,7 +25,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_bgselect_w)
+void exprraid_state::exprraid_bgselect_w(offs_t offset, uint8_t data)
 {
 	if (m_bg_index[offset] != data)
 	{
@@ -34,12 +34,12 @@ WRITE8_MEMBER(exprraid_state::exprraid_bgselect_w)
 	}
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_scrollx_w)
+void exprraid_state::exprraid_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(offset, data);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_scrolly_w)
+void exprraid_state::exprraid_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }

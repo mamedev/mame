@@ -391,7 +391,7 @@ uint8_t mcs48_cpu_device::opcode_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_cache->read_byte(address);
+	return m_program.read_byte(address);
 }
 
 
@@ -404,7 +404,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_cache->read_byte(address);
+	return m_program.read_byte(address);
 }
 
 
@@ -1114,10 +1114,10 @@ void mcs48_cpu_device::device_start()
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
-	m_io = (m_feature_mask & EXT_BUS_FEATURE) != 0 ? &space(AS_IO) : nullptr;
+	space(AS_PROGRAM).cache(m_program);
+	space(AS_DATA).specific(m_data);
+	if(m_feature_mask & EXT_BUS_FEATURE)
+		space(AS_IO).specific(m_io);
 
 	// resolve callbacks
 	m_port_in_cb.resolve_all_safe(0xff);
@@ -1243,7 +1243,7 @@ int mcs48_cpu_device::check_irqs()
 
 		// force JNI to be taken (hack)
 		if (m_irq_polled)
-			m_pc = ((m_pc - 1) & 0xf00) | m_cache->read_byte(m_pc - 1);
+			m_pc = ((m_pc - 1) & 0xf00) | m_program.read_byte(m_pc - 1);
 
 		/* transfer to location 0x03 */
 		push_pc_psw();

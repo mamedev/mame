@@ -106,20 +106,20 @@ private:
 	emu_timer *m_blitter_timer;
 
 	// common
-	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
+	uint8_t ff_r();
+	void clut_w(offs_t offset, uint8_t data);
+	void blitter_w(offs_t offset, uint8_t data);
+	void scrolly_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag2_w);
-	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag3_w);
-	DECLARE_WRITE8_MEMBER(mjsikaku_romsel_w);
-	DECLARE_WRITE8_MEMBER(secolove_romsel_w);
-	DECLARE_WRITE8_MEMBER(crystalg_romsel_w);
-	DECLARE_WRITE8_MEMBER(seiha_romsel_w);
-	DECLARE_WRITE8_MEMBER(HD61830B_both_instr_w);
-	DECLARE_WRITE8_MEMBER(HD61830B_both_data_w);
-	DECLARE_WRITE8_MEMBER(barline_output_w);
+	void mjsikaku_gfxflag2_w(uint8_t data);
+	void mjsikaku_gfxflag3_w(uint8_t data);
+	void mjsikaku_romsel_w(uint8_t data);
+	void secolove_romsel_w(uint8_t data);
+	void crystalg_romsel_w(uint8_t data);
+	void seiha_romsel_w(uint8_t data);
+	void HD61830B_both_instr_w(uint8_t data);
+	void HD61830B_both_data_w(uint8_t data);
+	void barline_output_w(uint8_t data);
 
 	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
 	void mbmj8688_12bit(palette_device &palette) const;

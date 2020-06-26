@@ -33,9 +33,9 @@ protected:
 	a2000_kbd_g80_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	// MCU I/O
-	DECLARE_READ8_MEMBER(mcu_bus_r);
-	DECLARE_WRITE8_MEMBER(mcu_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu_p2_w);
+	u8 mcu_bus_r(offs_t offset);
+	void mcu_p1_w(u8 data);
+	void mcu_p2_w(u8 data);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;

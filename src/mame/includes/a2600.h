@@ -94,12 +94,12 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(cart_over_tia_w);
+	void cart_over_tia_w(address_space &space, offs_t offset, uint8_t data);
 	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
-	DECLARE_READ8_MEMBER(cart_over_riot_r);
-	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
-	DECLARE_READ8_MEMBER(cart_over_all_r);
-	DECLARE_WRITE8_MEMBER(cart_over_all_w);
+	uint8_t cart_over_riot_r(address_space &space, offs_t offset);
+	void cart_over_riot_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t cart_over_all_r(address_space &space, offs_t offset);
+	void cart_over_all_w(address_space &space, offs_t offset, uint8_t data);
 
 	void a2600_cartslot(machine_config &config);
 

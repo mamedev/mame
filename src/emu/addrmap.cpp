@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    addrmap.c
+    addrmap.cpp
 
     Macros and helper functions for handling address map definitions.
 

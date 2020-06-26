@@ -137,8 +137,8 @@ private:
 	int m_immediate_vector;
 	int  m_immediate_pri;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	int m_icount;
 

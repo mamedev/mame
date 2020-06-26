@@ -35,8 +35,8 @@ private:
 	uint8_t sensors2_r();
 	void lamp_w(uint8_t data);
 	void coin_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(vram_fg_w);
-	DECLARE_WRITE8_MEMBER(vram_bg_w);
+	void vram_fg_w(offs_t offset, uint8_t data);
+	void vram_bg_w(offs_t offset, uint8_t data);
 	void scroll_x_w(uint8_t data);
 	void scroll_y_w(uint8_t data);
 	void gfxbank_w(uint8_t data);

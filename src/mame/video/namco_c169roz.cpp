@@ -252,22 +252,22 @@ void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-READ16_MEMBER( namco_c169roz_device::control_r )
+uint16_t namco_c169roz_device::control_r(offs_t offset)
 {
 	return m_control[offset];
 }
 
-WRITE16_MEMBER( namco_c169roz_device::control_w )
+void namco_c169roz_device::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control[offset]);
 }
 
-READ16_MEMBER( namco_c169roz_device::videoram_r )
+uint16_t namco_c169roz_device::videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-WRITE16_MEMBER( namco_c169roz_device::videoram_w )
+void namco_c169roz_device::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	for (auto & elem : m_tilemap)

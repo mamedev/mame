@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvbpoints.c
+    dvbpoints.cpp
 
     Breakpoint debugger view.
 
@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "dvbpoints.h"
+#include "points.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -18,62 +19,62 @@
 
 
 // Sorting functors for the qsort function
-static bool cIndexAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cIndexAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return a->index() < b->index();
 }
 
-static bool cIndexDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cIndexDescending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return cIndexAscending(b, a);
 }
 
-static bool cEnabledAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cEnabledAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return !a->enabled() && b->enabled();
 }
 
-static bool cEnabledDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cEnabledDescending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return cEnabledAscending(b, a);
 }
 
-static bool cCpuAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cCpuAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return strcmp(a->debugInterface()->device().tag(), b->debugInterface()->device().tag()) < 0;
 }
 
-static bool cCpuDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cCpuDescending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return cCpuAscending(b, a);
 }
 
-static bool cAddressAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cAddressAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return a->address() < b->address();
 }
 
-static bool cAddressDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cAddressDescending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return cAddressAscending(b, a);
 }
 
-static bool cConditionAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cConditionAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return strcmp(a->condition(), b->condition()) < 0;
 }
 
-static bool cConditionDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cConditionDescending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return cConditionAscending(b, a);
 }
 
-static bool cActionAscending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cActionAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return strcmp(a->action(), b->action()) < 0;
 }
 
-static bool cActionDescending(const device_debug::breakpoint *a, const device_debug::breakpoint *b)
+static bool cActionDescending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
 	return cActionAscending(b, a);
 }
@@ -169,7 +170,7 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 			return;
 
 		// Enable / disable
-		const_cast<device_debug::breakpoint &>(*m_buffer[bpIndex]).setEnabled(!m_buffer[bpIndex]->enabled());
+		const_cast<debug_breakpoint &>(*m_buffer[bpIndex]).setEnabled(!m_buffer[bpIndex]->enabled());
 
 		machine().debug_view().update_all(DVT_DISASSEMBLY);
 	}
@@ -195,8 +196,8 @@ void debug_view_breakpoints::gather_breakpoints()
 	{
 		// Collect
 		device_debug &debugInterface = *source->device()->debug();
-		for (const device_debug::breakpoint &bp : debugInterface.breakpoint_list())
-			m_buffer.push_back(&bp);
+		for (const auto &bpp : debugInterface.breakpoint_list())
+			m_buffer.push_back(bpp.second.get());
 	}
 
 	// And now for the sort
@@ -270,7 +271,7 @@ void debug_view_breakpoints::view_update()
 		int bpi = row + m_topleft.y - 1;
 		if ((bpi < m_buffer.size()) && (bpi >= 0))
 		{
-			const device_debug::breakpoint *const bp = m_buffer[bpi];
+			const debug_breakpoint *const bp = m_buffer[bpi];
 
 			linebuf.clear();
 			linebuf.rdbuf()->clear();

@@ -47,7 +47,7 @@ void speedbal_state::machine_start()
 	save_item(NAME(m_leds_shiftreg));
 }
 
-WRITE8_MEMBER(speedbal_state::coincounter_w)
+void speedbal_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
@@ -66,9 +66,9 @@ void speedbal_state::main_cpu_map(address_map &map)
 	map(0xff00, 0xffff).ram().share("spriteram");
 }
 
-WRITE8_MEMBER(speedbal_state::maincpu_50_w)
+void speedbal_state::maincpu_50_w(uint8_t data)
 {
-	//logerror("%s: maincpu_50_w %02x\n", this->machine().describe_context(), data);
+	//logerror("%s: maincpu_50_w %02x\n", machine().describe_context(), data);
 }
 
 void speedbal_state::main_cpu_io_map(address_map &map)
@@ -91,7 +91,7 @@ void speedbal_state::sound_cpu_map(address_map &map)
 
 
 
-WRITE8_MEMBER(speedbal_state::leds_output_block)
+void speedbal_state::leds_output_block(uint8_t data)
 {
 	if (!m_leds_start)
 		return;
@@ -107,13 +107,13 @@ WRITE8_MEMBER(speedbal_state::leds_output_block)
 	m_digits[10 * block + 2] = ~m_leds_shiftreg >> 16 & 0xff;
 }
 
-WRITE8_MEMBER(speedbal_state::leds_start_block)
+void speedbal_state::leds_start_block(uint8_t data)
 {
 	m_leds_shiftreg = 0;
 	m_leds_start = true;
 }
 
-WRITE8_MEMBER(speedbal_state::leds_shift_bit)
+void speedbal_state::leds_shift_bit(uint8_t data)
 {
 	m_leds_shiftreg <<= 1;
 	m_leds_shiftreg |= (data & 1);

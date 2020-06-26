@@ -57,15 +57,15 @@ private:
 	void lamp1_w(uint8_t data) { }
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE8_MEMBER(sol2_w) { } // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w);
+	void sol2_w(uint8_t data) { } // solenoids 8-15
+	void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(dac_w) { }
+	void dac_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	uint8_t dmd_status_r();
 
-//  DECLARE_READ8_MEMBER(sound_latch_r);
-//  DECLARE_WRITE8_MEMBER(sample_bank_w);
+//  uint8_t sound_latch_r();
+//  void sample_bank_w(uint8_t data);
 
 	// devcb callbacks
 	uint8_t display_r(offs_t offset);
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( de_3 )
 INPUT_PORTS_END
 
 // 6821 PIA at 0x2000
-WRITE8_MEMBER( de_3_state::sol3_w )
+void de_3_state::sol3_w(uint8_t data)
 {
 }
 
@@ -898,6 +898,23 @@ ROM_START(lw3_200)
 ROM_END
 
 /*-------------------------------------------------------------
+/ Michael Jordan - CPU Rev 3 / DMD Type 2 512K Rom - 64K CPU Rom
+/------------------------------------------------------------*/
+
+ROM_START(mj_130)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mjcpuc5.bin", 0x0000, 0x10000, CRC(311ab1d1) SHA1(062b02aab851f9f2ca64c24b8faa7dd293cacd22))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("mjdsp0.bin", 0x00000, 0x80000, CRC(1e2f27e8) SHA1(bfc567d6d3a7cecf7623ceb383350c78c14baef3))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("mjsndu7.bin", 0x0000, 0x10000, CRC(a32237f5) SHA1(0fc106429af320c4a30a99c67b45f44cb9a45644))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("mjsndu17.bin", 0x000000, 0x80000, CRC(8b11d7b9) SHA1(bb84b1650b253a433e947137256e4bc34a6ceac4))
+	ROM_LOAD("mjsndu21.bin", 0x080000, 0x80000, CRC(addfe20e) SHA1(3a6862640f81493da1beddca11011090d8b7cab0))
+ROM_END
+
+/*-------------------------------------------------------------
 / Star Trek - CPU Rev 3 /DMD Type 1 128K Rom - 64K CPU Rom
 /------------------------------------------------------------*/
 ROM_START(trek_201)
@@ -1086,6 +1103,20 @@ ROM_START(stwr_102)
 	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "gfx3", 0)
 	ROM_LOAD("sw4mrom.a15", 0x00000, 0x80000, CRC(00c87952) SHA1(cd2f491f03fcb3e3ceff7ee7f678aa1957a5d14b))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("s-wars.u7", 0x8000, 0x8000, CRC(cefa19d5) SHA1(7ddf9cc85ab601514305bc46083a07a3d087b286))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("s-wars.u17", 0x000000, 0x80000, CRC(7950a147) SHA1(f5bcd5cf6b35f9e4f14d62b084495c3a743d92a1))
+	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
+ROM_END
+
+ROM_START(stwr_101)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("starcpu.101", 0x0000, 0x10000, CRC(6efc7b14) SHA1(f669669fbd8733d06b386ea352fdb2041bf98362))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("stardisp_u14.102", 0x00000, 0x40000, CRC(f8087364) SHA1(4cd66b72cf430018cfb7ac8306b96a8499d41896))
+	ROM_LOAD("stardisp_u12.102", 0x40000, 0x40000, CRC(fde126c6) SHA1(0a3eacfd4589ee0f26c4212ba9948dff061f3338))
 	ROM_REGION(0x010000, "soundcpu", 0)
 	ROM_LOAD("s-wars.u7", 0x8000, 0x8000, CRC(cefa19d5) SHA1(7ddf9cc85ab601514305bc46083a07a3d087b286))
 	ROM_REGION(0x1000000, "bsmt", 0)
@@ -1348,6 +1379,7 @@ GAME(1992,  lw3_207c,  lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1992,  lw3_205,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.05)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_203,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.03)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_200,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.00)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  mj_130,    0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Michael Jordan (1.30)",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_201,  0,        de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (2.01)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_200,  trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (2.00)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_120,  trek_201, de_3_dmd1, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Trek 25th Anniversary (1.20)",                MACHINE_IS_SKELETON_MECHANICAL)
@@ -1362,6 +1394,7 @@ GAME(1992,  stwr_103,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1992,  stwr_g11,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01 Germany)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_a14,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (Display Rev.1.04)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_102,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.02)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_101,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.01)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_e12,  stwr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Star Wars (1.02 England)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_303,  0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Tales From the Crypt (3.03)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_302,  tftc_303, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Tales From the Crypt (3.02 Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)

@@ -6,7 +6,7 @@
  */
 
 #include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_factory.h"
 
 template <typename N, typename T>
 constexpr bool TOR(N n, T &a)
@@ -31,12 +31,12 @@ namespace netlist
 			NETLIB_CONSTRUCTOR(generic_prom)
 			, m_enabled(*this, "m_enabled", true)
 			, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
-			, m_A(*this, 0, "A{}", NETLIB_DELEGATE(generic_prom, addr))
+			, m_A(*this, 0, "A{}", NETLIB_DELEGATE(addr))
 			, m_CEQ(*this, 1,
 				D::chip_enable_mask::value ^ static_cast<size_t>(0xffff), pstring("CE{}"),
-				std::array<nldelegate, 3>{ NETLIB_DELEGATE(generic_prom, ce<0>),
-				  NETLIB_DELEGATE(generic_prom, ce<1>),
-				  NETLIB_DELEGATE(generic_prom, ce<2>)})
+				std::array<nldelegate, 3>{ NETLIB_DELEGATE(ce<0>),
+				  NETLIB_DELEGATE(ce<1>),
+				  NETLIB_DELEGATE(ce<2>)})
 			, m_O(*this, D::data_name_offset::value, "O{}", m_TE())
 			, m_ROM(*this, "ROM")
 			, m_power_pins(*this)

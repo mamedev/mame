@@ -62,6 +62,7 @@ private:
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
+	virtual void machine_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio_1;
 	required_device<z80pio_device> m_pio_2;
@@ -217,6 +218,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 		m_pio_2->strobe(0, 1);
 }
 
+void babbage_state::machine_start()
+{
+	save_item(NAME(m_seg));
+	save_item(NAME(m_key));
+	save_item(NAME(m_prev_key));
+	save_item(NAME(m_step));
+}
 
 /***************************************************************************
 
@@ -270,4 +278,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME       FLAGS
-COMP( 1986, babbage, 0,      0,      babbage, babbage, babbage_state, empty_init, "Mr Takafumi Aihara", "Babbage-2nd", MACHINE_NO_SOUND_HW )
+COMP( 1986, babbage, 0,      0,      babbage, babbage, babbage_state, empty_init, "Mr Takafumi Aihara", "Babbage-2nd", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

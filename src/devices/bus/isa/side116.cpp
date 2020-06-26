@@ -121,7 +121,7 @@ void side116_device::device_reset()
 
 	// install io access
 	if ((m_config->read() & 0x20) == 0x20)
-		m_isa->install_device(0x360, 0x36f, read8_delegate(*this, FUNC(side116_device::read)), write8_delegate(*this, FUNC(side116_device::write)));
+		m_isa->install_device(0x360, 0x36f, read8sm_delegate(*this, FUNC(side116_device::read)), write8sm_delegate(*this, FUNC(side116_device::write)));
 }
 
 
@@ -129,7 +129,7 @@ void side116_device::device_reset()
 //  IDE INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( side116_device::read )
+uint8_t side116_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -155,7 +155,7 @@ READ8_MEMBER( side116_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( side116_device::write )
+void side116_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

@@ -116,7 +116,7 @@ void ecbbus_device::add_card(device_ecbbus_card_interface &card, int pos)
 //  mem_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ecbbus_device::mem_r )
+uint8_t ecbbus_device::mem_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -136,7 +136,7 @@ READ8_MEMBER( ecbbus_device::mem_r )
 //  mem_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecbbus_device::mem_w )
+void ecbbus_device::mem_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_ecbbus_device)
 	{
@@ -152,7 +152,7 @@ WRITE8_MEMBER( ecbbus_device::mem_w )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ecbbus_device::io_r )
+uint8_t ecbbus_device::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -172,7 +172,7 @@ READ8_MEMBER( ecbbus_device::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ecbbus_device::io_w )
+void ecbbus_device::io_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_ecbbus_device)
 	{

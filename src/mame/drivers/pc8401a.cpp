@@ -169,7 +169,7 @@ void pc8401a_state::bankswitch(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( pc8401a_state::mmr_w )
+void pc8401a_state::mmr_w(uint8_t data)
 {
 	/*
 
@@ -194,12 +194,12 @@ WRITE8_MEMBER( pc8401a_state::mmr_w )
 	m_mmr = data;
 }
 
-READ8_MEMBER( pc8401a_state::mmr_r )
+uint8_t pc8401a_state::mmr_r()
 {
 	return m_mmr;
 }
 
-READ8_MEMBER( pc8401a_state::rtc_r )
+uint8_t pc8401a_state::rtc_r()
 {
 	/*
 
@@ -219,7 +219,7 @@ READ8_MEMBER( pc8401a_state::rtc_r )
 	return (m_rtc->data_out_r() << 1) | (m_rtc->tp_r() << 2);
 }
 
-WRITE8_MEMBER( pc8401a_state::rtc_cmd_w )
+void pc8401a_state::rtc_cmd_w(uint8_t data)
 {
 	/*
 
@@ -242,7 +242,7 @@ WRITE8_MEMBER( pc8401a_state::rtc_cmd_w )
 	m_rtc->data_in_w(BIT(data, 3));
 }
 
-WRITE8_MEMBER( pc8401a_state::rtc_ctrl_w )
+void pc8401a_state::rtc_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -264,13 +264,13 @@ WRITE8_MEMBER( pc8401a_state::rtc_ctrl_w )
 	m_rtc->clk_w(BIT(data, 2));
 }
 
-READ8_MEMBER( pc8401a_state::io_rom_data_r )
+uint8_t pc8401a_state::io_rom_data_r()
 {
 	//logerror("I/O ROM read from %05x\n", m_io_addr);
 	return m_io_cart->read_rom(m_io_addr);
 }
 
-WRITE8_MEMBER( pc8401a_state::io_rom_addr_w )
+void pc8401a_state::io_rom_addr_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -292,7 +292,7 @@ WRITE8_MEMBER( pc8401a_state::io_rom_addr_w )
 	}
 }
 
-READ8_MEMBER( pc8401a_state::port70_r )
+uint8_t pc8401a_state::port70_r()
 {
 	/*
 
@@ -312,17 +312,17 @@ READ8_MEMBER( pc8401a_state::port70_r )
 	return 0x10 | m_key_strobe;
 }
 
-READ8_MEMBER( pc8401a_state::port71_r )
+uint8_t pc8401a_state::port71_r()
 {
 	return m_key_latch;
 }
 
-WRITE8_MEMBER( pc8401a_state::port70_w )
+void pc8401a_state::port70_w(uint8_t data)
 {
 	m_key_strobe = 0;
 }
 
-WRITE8_MEMBER( pc8401a_state::port71_w )
+void pc8401a_state::port71_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 

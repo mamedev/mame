@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "includes/slapstic.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -54,10 +54,10 @@ protected:
 	emu_timer *m_interrupt_timer;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(slapstic_r);
-	DECLARE_WRITE8_MEMBER(coincount_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void irq_ack_w(uint8_t data);
+	uint8_t slapstic_r(address_space &space, offs_t offset);
+	void coincount_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);

@@ -34,18 +34,18 @@ TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(msisaac_state::sound_command_w)
+void msisaac_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(msisaac_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(msisaac_state::nmi_disable_w)
+void msisaac_state::nmi_disable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(msisaac_state::nmi_enable_w)
+void msisaac_state::nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -56,18 +56,18 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 }
 
 #if 0
-WRITE8_MEMBER(msisaac_state::flip_screen_w)
+void msisaac_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_coin_counter_w)
+void msisaac_state::msisaac_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 
-WRITE8_MEMBER(msisaac_state::ms_unknown_w)
+void msisaac_state::ms_unknown_w(uint8_t data)
 {
 	if (data != 0x08)
 		popmessage("CPU #0 write to 0xf0a3 data=%2x", data);
@@ -82,7 +82,7 @@ WRITE8_MEMBER(msisaac_state::ms_unknown_w)
 
 
 
-READ8_MEMBER(msisaac_state::msisaac_mcu_r)
+uint8_t msisaac_state::msisaac_mcu_r(offs_t offset)
 {
 #ifdef USE_MCU
 	return m_bmcu->buggychl_mcu_r(offset);
@@ -154,7 +154,7 @@ MCU simulation TODO:
 #endif
 }
 
-READ8_MEMBER(msisaac_state::msisaac_mcu_status_r)
+uint8_t msisaac_state::msisaac_mcu_status_r(offs_t offset)
 {
 #ifdef USE_MCU
 	return m_bmcu->buggychl_mcu_status_r(offset);
@@ -163,7 +163,7 @@ READ8_MEMBER(msisaac_state::msisaac_mcu_status_r)
 #endif
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
+void msisaac_state::msisaac_mcu_w(offs_t offset, uint8_t data)
 {
 #ifdef USE_MCU
 	m_bmcu->buggychl_mcu_w(offset,data);
@@ -214,7 +214,7 @@ void msisaac_state::msisaac_map(address_map &map)
 //  map(0xfc03, 0xfc04).w(FUNC(msisaac_state::msisaac_coin_counter_w));
 }
 
-WRITE8_MEMBER(msisaac_state::sound_control_0_w)
+void msisaac_state::sound_control_0_w(uint8_t data)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
@@ -235,7 +235,7 @@ WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 //  m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 //  m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
-WRITE8_MEMBER(msisaac_state::sound_control_1_w)
+void msisaac_state::sound_control_1_w(uint8_t data)
 {
 	m_snd_ctrl1 = data & 0xff;
 	//popmessage("SND1 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);

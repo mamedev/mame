@@ -1246,18 +1246,18 @@ png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t const &
 ********************************************************************************/
 
 /**
- * @fn  png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
+ * @fn  png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, unsigned rate)
  *
  * @brief   Mng capture start.
  *
  * @param [in,out]  fp      If non-null, the fp.
  * @param [in,out]  bitmap  The bitmap.
- * @param   rate            The rate.
+ * @param   rate            The framerate.
  *
  * @return  A png_error.
  */
 
-png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
+png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, unsigned rate)
 {
 	uint8_t mhdr[28];
 

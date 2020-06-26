@@ -60,21 +60,21 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
 	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
 
-	DECLARE_READ8_MEMBER( nmi_io_r );
-	DECLARE_WRITE8_MEMBER( nmi_io_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_WRITE8_MEMBER( stat_w );
-	DECLARE_READ8_MEMBER( led_r );
-	DECLARE_WRITE8_MEMBER( led_w );
-	DECLARE_READ16_MEMBER( dskctl_r );
-	DECLARE_WRITE16_MEMBER( dskctl_w );
+	uint8_t nmi_io_r(address_space &space, offs_t offset);
+	void nmi_io_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t stat_r();
+	void stat_w(uint8_t data);
+	uint8_t led_r();
+	void led_w(uint8_t data);
+	uint16_t dskctl_r();
+	void dskctl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER( scsi_r );
-	DECLARE_WRITE8_MEMBER( scsi_w );
-	DECLARE_READ16_MEMBER( mmu_r );
-	DECLARE_WRITE16_MEMBER( mmu_w );
-	DECLARE_READ16_MEMBER( mem_r );
-	DECLARE_WRITE16_MEMBER( mem_w );
+	uint8_t scsi_r(offs_t offset);
+	void scsi_w(offs_t offset, uint8_t data);
+	uint16_t mmu_r(offs_t offset);
+	void mmu_w(offs_t offset, uint16_t data);
+	uint16_t mem_r(address_space &space, offs_t offset);
+	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 		m_speaker->level_w(state);
 }
 
-READ8_MEMBER( pcd_state::nmi_io_r )
+uint8_t pcd_state::nmi_io_r(address_space &space, offs_t offset)
 {
 	if(machine().side_effects_disabled())
 		return 0;
@@ -167,7 +167,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 	return 0;
 }
 
-WRITE8_MEMBER( pcd_state::nmi_io_w )
+void pcd_state::nmi_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if(machine().side_effects_disabled())
 		return;
@@ -176,22 +176,22 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER( pcd_state::stat_r )
+uint8_t pcd_state::stat_r()
 {
 	return m_stat;
 }
 
-WRITE8_MEMBER( pcd_state::stat_w )
+void pcd_state::stat_w(uint8_t data)
 {
 	m_stat &= ~data;
 }
 
-READ16_MEMBER( pcd_state::dskctl_r )
+uint16_t pcd_state::dskctl_r()
 {
 	return m_dskctl;
 }
 
-WRITE16_MEMBER( pcd_state::dskctl_w )
+void pcd_state::dskctl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -216,7 +216,7 @@ WRITE16_MEMBER( pcd_state::dskctl_w )
 	m_fdc->dden_w((m_dskctl & 0x10) ? 1 : 0);
 }
 
-READ8_MEMBER( pcd_state::led_r )
+uint8_t pcd_state::led_r()
 {
 	// DIPs?
 	// 0x01 no mmu
@@ -225,7 +225,7 @@ READ8_MEMBER( pcd_state::led_r )
 	return 0x01;
 }
 
-WRITE8_MEMBER( pcd_state::led_w )
+void pcd_state::led_w(uint8_t data)
 {
 	for(int i = 0; i < 6; i++)
 		logerror("%c", (data & (1 << i)) ? '-' : '*');
@@ -233,7 +233,7 @@ WRITE8_MEMBER( pcd_state::led_w )
 	m_led = data;
 }
 
-READ16_MEMBER( pcd_state::mmu_r )
+uint16_t pcd_state::mmu_r(offs_t offset)
 {
 	uint16_t data = m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)];
 	//logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
@@ -249,7 +249,7 @@ READ16_MEMBER( pcd_state::mmu_r )
 	return 0;
 }
 
-WRITE16_MEMBER( pcd_state::mmu_w )
+void pcd_state::mmu_w(offs_t offset, uint16_t data)
 {
 	//logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
@@ -263,7 +263,7 @@ WRITE16_MEMBER( pcd_state::mmu_w )
 	}
 }
 
-READ8_MEMBER(pcd_state::scsi_r)
+uint8_t pcd_state::scsi_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -285,7 +285,7 @@ READ8_MEMBER(pcd_state::scsi_r)
 	return ret;
 }
 
-WRITE8_MEMBER(pcd_state::scsi_w)
+void pcd_state::scsi_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 	check_scsi_irq();
 }
 
-WRITE16_MEMBER(pcd_state::mem_w)
+void pcd_state::mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *ram = (uint16_t *)m_ram->pointer();
 	if((m_mmu.ctl & 0x20) && m_mmu.type)
@@ -380,7 +380,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
-			nmi_io_w(space, offset, data, mem_mask);
+			nmi_io_w(space, offset, data);
 			return;
 		}
 		offset = ((reg << 3) & 0x7fc00) | (offset & 0x3ff);
@@ -388,7 +388,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 	COMBINE_DATA(&ram[offset]);
 }
 
-READ16_MEMBER(pcd_state::mem_r)
+uint16_t pcd_state::mem_r(address_space &space, offs_t offset)
 {
 	uint16_t *ram = (uint16_t *)m_ram->pointer();
 	if((m_mmu.ctl & 0x20) && m_mmu.type)
@@ -402,7 +402,7 @@ READ16_MEMBER(pcd_state::mem_r)
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
-			return nmi_io_r(space, offset, mem_mask);
+			return nmi_io_r(space, offset);
 		}
 		offset = ((reg << 3) & 0x7fc00) | (offset & 0x3ff);
 	}

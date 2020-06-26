@@ -97,7 +97,7 @@ Notes:
 #include "emu.h"
 #include "includes/tmc600.h"
 
-READ8_MEMBER( tmc600_state::rtc_r )
+uint8_t tmc600_state::rtc_r()
 {
 	m_rtc_int = m_vismac_reg_latch >> 3;
 

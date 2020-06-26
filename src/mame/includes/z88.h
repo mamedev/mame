@@ -72,14 +72,14 @@ private:
 	UPD65031_SCREEN_UPDATE(lcd_update);
 
 	// cartridges read/write
-	DECLARE_READ8_MEMBER(bank0_cart_r);
-	DECLARE_READ8_MEMBER(bank1_cart_r);
-	DECLARE_READ8_MEMBER(bank2_cart_r);
-	DECLARE_READ8_MEMBER(bank3_cart_r);
-	DECLARE_WRITE8_MEMBER(bank0_cart_w);
-	DECLARE_WRITE8_MEMBER(bank1_cart_w);
-	DECLARE_WRITE8_MEMBER(bank2_cart_w);
-	DECLARE_WRITE8_MEMBER(bank3_cart_w);
+	uint8_t bank0_cart_r(offs_t offset);
+	uint8_t bank1_cart_r(offs_t offset);
+	uint8_t bank2_cart_r(offs_t offset);
+	uint8_t bank3_cart_r(offs_t offset);
+	void bank0_cart_w(offs_t offset, uint8_t data);
+	void bank1_cart_w(offs_t offset, uint8_t data);
+	void bank2_cart_w(offs_t offset, uint8_t data);
+	void bank3_cart_w(offs_t offset, uint8_t data);
 
 	// defined in video/z88.c
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color);

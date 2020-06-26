@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    MESS Driver for TI-99/4 and TI-99/4A Home Computers.
+    MAME Driver for TI-99/4 and TI-99/4A Home Computers.
     TI99/4 info:
 
     Similar to TI99/4a, except for the following:
@@ -15,7 +15,7 @@
     * early TI99/4 prototypes were designed for a tms9985, not a tms9900.
 
     Emulation architecture:
-    (also see datamux.c, peribox.c)
+    (also see datamux.cpp, peribox.cpp)
 
               +---- video (upper 8 bits of databus)
               |
@@ -44,7 +44,6 @@
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/datamux.h"
 #include "bus/ti99/gromport/gromport.h"
 #include "bus/ti99/internal/evpcconn.h"
@@ -55,6 +54,10 @@
 
 #include "softlist.h"
 #include "speaker.h"
+
+#define TI99_CONSOLEGROM     "cons_grom"
+#define TI99_TMS9901_TAG     "tms9901"
+#define TI99_SCREEN_TAG      "screen"
 
 // Debugging
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -86,12 +89,12 @@ public:
 		m_int2(0),
 		m_int12(0),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, TI99_TMS9901_TAG),
 		m_gromport(*this, TI99_GROMPORT_TAG),
 		m_ioport(*this, TI99_IOPORT_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
 		m_datamux(*this, TI99_DATAMUX_TAG),
-		m_video(*this, TI_VDP_TAG),
+		m_video(*this, TI99_VDP_TAG),
 		m_cassette1(*this, "cassette1"),
 		m_cassette2(*this, "cassette2"),
 		m_keyboard(*this, "COL%u", 0U),
@@ -948,7 +951,7 @@ void ti99_4x_state::ti99_4(machine_config& config)
 
 	// Sound hardware (not in EVPC variant)
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	sn94624_device& soundgen(SN94624(config, TI99_SOUNDCHIP_TAG, 3579545/8));
 	soundgen.ready_cb().set(FUNC(ti99_4x_state::console_ready_sound));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
@@ -967,9 +970,9 @@ void ti99_4x_state::ti99_4_60hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /*
@@ -982,9 +985,9 @@ void ti99_4x_state::ti99_4_50hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /**********************************************************************
@@ -1009,7 +1012,7 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 
 	// Sound hardware (not in EVPC variant)
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	sn94624_device& soundgen(SN94624(config, TI99_SOUNDCHIP_TAG, 3579545/8));
 	soundgen.ready_cb().set(FUNC(ti99_4x_state::console_ready_sound));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
@@ -1027,9 +1030,9 @@ void ti99_4x_state::ti99_4a_60hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /*
@@ -1042,9 +1045,9 @@ void ti99_4x_state::ti99_4a_50hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /************************************************************************
@@ -1069,9 +1072,9 @@ void ti99_4x_state::ti99_4qi_60hz(machine_config &config)
 	m_video->set_vram_size(0x4000);
 	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
-	m_video->set_screen(TI_SCREEN_TAG);
+	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /************************************************************************

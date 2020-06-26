@@ -141,6 +141,12 @@ bool hle_device_base::hil_write(uint16_t *pdata)
 		return true;
 		break;
 
+	case HPHIL_DKA:
+	case HPHIL_EK1:
+	case HPHIL_EK2:
+		hil_typematic(data);
+		break;
+
 	default:
 		LOG("command %02X unknown\n", data);
 		break;

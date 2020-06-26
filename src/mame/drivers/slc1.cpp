@@ -73,8 +73,8 @@ public:
 	void slc1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -82,7 +82,7 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	uint8_t m_digit = 0;
+	u8 m_digit = 0;
 	bool m_kbd_type = false;
 
 	required_device<cpu_device> m_maincpu;
@@ -99,7 +99,7 @@ private:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( slc1_state::io_w )
+void slc1_state::io_w(offs_t offset, u8 data)
 {
 	bool const segonoff = BIT(data, 7);
 	bool const busyled = BIT(data, 4);
@@ -115,9 +115,9 @@ WRITE8_MEMBER( slc1_state::io_w )
 	else if (offset == 0x2f07)
 		return;
 
-	uint8_t segdata = m_display[m_digit];
-	uint8_t const segnum  = offset & 7;
-	uint8_t const segmask = 1 << segnum;
+	u8 segdata = m_display[m_digit];
+	u8 const segnum  = offset & 7;
+	u8 const segmask = 1 << segnum;
 
 	if (segonoff)
 		segdata |= segmask;
@@ -139,9 +139,9 @@ WRITE8_MEMBER( slc1_state::io_w )
 
 ***************************************************************************/
 
-READ8_MEMBER( slc1_state::io_r )
+u8 slc1_state::io_r(offs_t offset)
 {
-	uint8_t data = 0xff, upper = (offset >> 8) & 7;
+	u8 data = 0xff, upper = (offset >> 8) & 7;
 
 	if (m_kbd_type)
 	{ // Trainer
@@ -294,7 +294,7 @@ void slc1_state::slc1(machine_config &config)
 ***************************************************************************/
 
 ROM_START(slc1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x1000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "bios0", "SLC-1")
 	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "bios1", "SC-1 v2")
@@ -305,4 +305,4 @@ ROM_END
 
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY               FULLNAME */
-COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", 0 )
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", MACHINE_SUPPORTS_SAVE )

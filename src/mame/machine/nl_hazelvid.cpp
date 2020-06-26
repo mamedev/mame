@@ -31,11 +31,11 @@ NETLIST_START(hazelvid)
 	MAINCLOCK(video_clk, 16632000.0)
 
 	/* Character line counter, divide-by-9 */
-	TTL_74161(u88, high, high, high, low, high, u87_6.Q, video_clk, high, high)
+	TTL_74161_FIXME(u88, high, high, high, low, high, u87_6.Q, video_clk, high, high)
 
-	TTL_7404_INVERT(u87_6, u88.RCO)
+	TTL_7404_INVERT(u87_6, u88.RC)
 
-	TTL_74175(u81, video_clk, u88.RCO, u81.Q1, low, u88.QC, high)
+	TTL_74175(u81, video_clk, u88.RC, u81.Q1, low, u88.QC, high)
 
 	TTL_7404_INVERT(u87_5, u81.Q1)
 	ALIAS(ndot, u87_5.Q)
@@ -45,10 +45,10 @@ NETLIST_START(hazelvid)
 	/* Character bucket counter */
 
 	/* least significant 4 bits */
-	TTL_74161(u70, low, low, low, low, high, u59_5.Q, u81.Q2Q, high, high)
+	TTL_74161_FIXME(u70, low, low, low, low, high, u59_5.Q, u81.Q2Q, high, high)
 
 	/* most significant 4 bits */
-	TTL_74161(u69, low, low, low, low, high, u59_5.Q, u81.Q2Q, u70.RCO, u70.RCO)
+	TTL_74161_FIXME(u69, low, low, low, low, high, u59_5.Q, u81.Q2Q, u70.RC, u70.RC)
 	/* Horizontal/Vertical timing signals */
 
 	/* signal lookup PROM */
@@ -71,7 +71,7 @@ NETLIST_START(hazelvid)
 	ALIAS(char_line_clk, u83_1.Q)
 
 	/* Character line counter */
-	TTL_74161(u84, low, low, low, low, high, u83_3.Q, char_line_clk, high, high)
+	TTL_74161_FIXME(u84, low, low, low, low, high, u83_3.Q, char_line_clk, high, high)
 	ALIAS(lc20, u84.QA)
 	ALIAS(lc21, u84.QB)
 	ALIAS(lc22, u84.QC)
@@ -82,7 +82,7 @@ NETLIST_START(hazelvid)
 	TTL_7410_NAND(u89_3, u90.QD, u90.QC, u90.QA)
 
 	/* Character row counter */
-	TTL_74161(u90, low, low, low, low, high, u89_3.Q, u92_3.Q, high, high)
+	TTL_74161_FIXME(u90, low, low, low, low, high, u89_3.Q, u92_3.Q, high, high)
 	TTL_7404_INVERT(u92_3, u84.QD)
 	TTL_7404_INVERT(u92_1, u90.QB)
 

@@ -82,13 +82,13 @@ private:
 	void p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
 	void bus_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void io_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 	uint8_t p1_r();
 	uint8_t p2_r();
 	uint8_t bus_r();
-	DECLARE_READ8_MEMBER(io_r);
+	uint8_t io_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void drw80pkr_palette(palette_device &palette) const;
@@ -139,7 +139,7 @@ void drw80pkr_state::bus_w(uint8_t data)
 	m_bus = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::io_w)
+void drw80pkr_state::io_w(offs_t offset, uint8_t data)
 {
 	uint16_t n_offs;
 
@@ -219,7 +219,7 @@ uint8_t drw80pkr_state::bus_r()
 	return m_bus;
 }
 
-READ8_MEMBER(drw80pkr_state::io_r)
+uint8_t drw80pkr_state::io_r(offs_t offset)
 {
 	uint8_t ret;
 	uint16_t kbdin;

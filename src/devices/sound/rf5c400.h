@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -15,14 +17,14 @@
 // ======================> rf5c400_device
 
 class rf5c400_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+					   public device_sound_interface,
+					   public device_rom_interface<25, 1, 0, ENDIANNESS_LITTLE>
 {
 public:
 	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( rf5c400_r );
-	DECLARE_WRITE16_MEMBER( rf5c400_w );
+	uint16_t rf5c400_r(offs_t offset, uint16_t mem_mask = ~0);
+	void rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides

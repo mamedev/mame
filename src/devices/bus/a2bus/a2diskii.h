@@ -50,15 +50,6 @@ public:
 	a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class a2bus_iwmflop_device: public a2bus_floppy_device
-{
-public:
-	a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-};
-
 class a2bus_agat7flop_device: public a2bus_floppy_device
 {
 public:
@@ -77,7 +68,6 @@ public:
 
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_DISKII,    a2bus_diskii_device)
-DECLARE_DEVICE_TYPE(A2BUS_IWM_FDC,   a2bus_iwmflop_device)
 DECLARE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device)
 DECLARE_DEVICE_TYPE(A2BUS_AGAT9_FDC, a2bus_agat9flop_device)
 

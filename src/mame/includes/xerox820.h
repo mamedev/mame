@@ -75,13 +75,13 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_WRITE8_MEMBER( scroll_w );
-	//DECLARE_WRITE8_MEMBER( x120_system_w );
-	DECLARE_READ8_MEMBER( kbpio_pa_r );
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
-	DECLARE_READ8_MEMBER( kbpio_pb_r );
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+	//void x120_system_w(uint8_t data);
+	uint8_t kbpio_pa_r();
+	void kbpio_pa_w(uint8_t data);
+	uint8_t kbpio_pb_r();
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
@@ -138,7 +138,7 @@ public:
 		, m_beeper(*this, "beeper")
 	{ }
 
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
+	void kbpio_pa_w(uint8_t data);
 
 	void bigboard(machine_config &config);
 protected:
@@ -161,13 +161,13 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER( bell_w );
-	DECLARE_WRITE8_MEMBER( slden_w );
-	DECLARE_WRITE8_MEMBER( chrom_w );
-	DECLARE_WRITE8_MEMBER( lowlite_w );
-	DECLARE_WRITE8_MEMBER( sync_w );
+	void bell_w(offs_t offset, uint8_t data);
+	void slden_w(offs_t offset, uint8_t data);
+	void chrom_w(offs_t offset, uint8_t data);
+	void lowlite_w(uint8_t data);
+	void sync_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
+	void rdpio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
 
 	void xerox168(machine_config &config);

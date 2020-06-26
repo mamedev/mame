@@ -131,26 +131,26 @@ private:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER(mode_byte_w);
+	void mode_byte_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_10ms_exp);
 
-	DECLARE_READ8_MEMBER(kb_r);
-	DECLARE_WRITE8_MEMBER(kb_prev_w);
-	DECLARE_WRITE8_MEMBER(kb_reset_w);
-	DECLARE_READ8_MEMBER(switches_ah_r);
-	DECLARE_READ8_MEMBER(switches_jr_r);
-	DECLARE_READ8_MEMBER(switches_sz_r);
-	DECLARE_READ8_MEMBER(datacomm_sw_r);
-	DECLARE_WRITE8_MEMBER(kb_led_w);
+	uint8_t kb_r(offs_t offset);
+	void kb_prev_w(uint8_t data);
+	void kb_reset_w(uint8_t data);
+	uint8_t switches_ah_r();
+	uint8_t switches_jr_r();
+	uint8_t switches_sz_r();
+	uint8_t datacomm_sw_r();
+	void kb_led_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
-	DECLARE_WRITE8_MEMBER(cx_w);
-	DECLARE_WRITE8_MEMBER(cy_w);
+	void cx_w(uint8_t data);
+	void cy_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_cursor_blink_inh);
 
-	DECLARE_READ8_MEMBER(async_status_r);
-	DECLARE_WRITE8_MEMBER(async_control_w);
+	uint8_t async_status_r();
+	void async_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
@@ -291,7 +291,7 @@ IRQ_CALLBACK_MEMBER(hp2645_state::irq_callback)
 	return res;
 }
 
-WRITE8_MEMBER(hp2645_state::mode_byte_w)
+void hp2645_state::mode_byte_w(uint8_t data)
 {
 	if (BIT(m_mode_byte , 0) && !BIT(data , 0)) {
 		m_timer_10ms->reset();
@@ -314,53 +314,53 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_10ms_exp)
 	}
 }
 
-READ8_MEMBER(hp2645_state::kb_r)
+uint8_t hp2645_state::kb_r(offs_t offset)
 {
 	ioport_value k = m_io_key[ offset / 4 ]->read();
 
 	return uint8_t(k >> (8 * (offset % 4)));
 }
 
-WRITE8_MEMBER(hp2645_state::kb_prev_w)
+void hp2645_state::kb_prev_w(uint8_t data)
 {
 	// This port is used to set the threshold in key sense circuit for hysteresis.
 	// We can safely ignore all writes.
 }
 
-WRITE8_MEMBER(hp2645_state::kb_reset_w)
+void hp2645_state::kb_reset_w(uint8_t data)
 {
 	// TODO: enabled/disable CPU reset
 }
 
-READ8_MEMBER(hp2645_state::switches_ah_r)
+uint8_t hp2645_state::switches_ah_r()
 {
 	uint8_t res = m_io_sw_ah->read();
 	LOG("SW AH=%02x\n" , res);
 	return res;
 }
 
-READ8_MEMBER(hp2645_state::switches_jr_r)
+uint8_t hp2645_state::switches_jr_r()
 {
 	uint8_t res = m_io_sw_jr->read();
 	LOG("SW JR=%02x\n" , res);
 	return res;
 }
 
-READ8_MEMBER(hp2645_state::switches_sz_r)
+uint8_t hp2645_state::switches_sz_r()
 {
 	uint8_t res = m_io_sw_sz->read();
 	LOG("SW SZ=%02x\n" , res);
 	return res;
 }
 
-READ8_MEMBER(hp2645_state::datacomm_sw_r)
+uint8_t hp2645_state::datacomm_sw_r()
 {
 	uint8_t res = m_io_comm->read();
 	LOG("COM SW=%02x\n" , res);
 	return res;
 }
 
-WRITE8_MEMBER(hp2645_state::kb_led_w)
+void hp2645_state::kb_led_w(uint8_t data)
 {
 	if (BIT(data , 7)) {
 		m_beep->set_state(1);
@@ -402,14 +402,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::scanline_timer)
 	}
 }
 
-WRITE8_MEMBER(hp2645_state::cx_w)
+void hp2645_state::cx_w(uint8_t data)
 {
 	m_cursor_x = data & 0x7f;
 	m_cursor_blink_inh = true;
 	m_timer_cursor_blink_inh->adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
 }
 
-WRITE8_MEMBER(hp2645_state::cy_w)
+void hp2645_state::cy_w(uint8_t data)
 {
 	m_blanking = BIT(data , 7);
 	m_cursor_y = data & 0x1f;
@@ -439,7 +439,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_cursor_blink_inh)
 	m_cursor_blink_inh = false;
 }
 
-READ8_MEMBER(hp2645_state::async_status_r)
+uint8_t hp2645_state::async_status_r()
 {
 	uint8_t res = 0;
 
@@ -467,7 +467,7 @@ READ8_MEMBER(hp2645_state::async_status_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp2645_state::async_control_w)
+void hp2645_state::async_control_w(uint8_t data)
 {
 	update_async_control(data);
 }

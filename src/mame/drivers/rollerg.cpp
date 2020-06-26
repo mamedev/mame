@@ -24,7 +24,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
+void rollerg_state::rollerg_0010_w(uint8_t data)
 {
 	logerror("%04x: write %02x to 0010\n",m_maincpu->pc(), data);
 
@@ -41,7 +41,7 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 	/* other bits unknown */
 }
 
-READ8_MEMBER(rollerg_state::rollerg_k051316_r)
+uint8_t rollerg_state::rollerg_k051316_r(offs_t offset)
 {
 	if (m_readzoomroms)
 		return m_k051316->rom_r(offset);
@@ -49,7 +49,7 @@ READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 		return m_k051316->read(offset);
 }
 
-WRITE8_MEMBER(rollerg_state::soundirq_w)
+void rollerg_state::soundirq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -66,13 +66,13 @@ void rollerg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
+void rollerg_state::sound_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmi_timer->adjust(attotime::from_usec(50));   /* kludge until the K053260 is emulated correctly */
 }
 
-READ8_MEMBER(rollerg_state::pip_r)
+uint8_t rollerg_state::pip_r()
 {
 	return 0x7f;
 }

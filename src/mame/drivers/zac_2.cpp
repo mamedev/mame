@@ -28,10 +28,9 @@ public:
 	void zac_2(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t ctrl_r();
+	void ctrl_w(uint8_t data);
+	void data_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
@@ -71,7 +70,7 @@ void zac_2_state::zac_2_io(address_map &map)
 void zac_2_state::zac_2_data(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).portr("DSW").w(FUNC(zac_2_state::data_w));
 }
 
 static INPUT_PORTS_START( zac_2 )
@@ -149,7 +148,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-READ8_MEMBER( zac_2_state::ctrl_r )
+uint8_t zac_2_state::ctrl_r()
 {
 	if (m_input_line < 6)
 		return m_row[m_input_line]->read();
@@ -157,17 +156,12 @@ READ8_MEMBER( zac_2_state::ctrl_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( zac_2_state::ctrl_w )
+void zac_2_state::ctrl_w(uint8_t data)
 {
 	m_input_line = data & 7;
 }
 
-READ8_MEMBER( zac_2_state::data_r )
-{
-	return ioport("DSW")->read();
-}
-
-WRITE8_MEMBER( zac_2_state::data_w )
+void zac_2_state::data_w(uint8_t data)
 {
 // writes to lines HS0-7, no idea what they do
 }

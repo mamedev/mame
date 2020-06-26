@@ -59,11 +59,11 @@ private:
 	//u8 m_queue[64];
 	//int m_qfront;
 	//int m_qstate;
-	DECLARE_WRITE8_MEMBER(kicknrun_sub_output_w);
-	virtual  DECLARE_WRITE8_MEMBER(main_f008_w);
+	void kicknrun_sub_output_w(uint8_t data);
+	virtual void main_f008_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(main_bankswitch_w);
-	DECLARE_READ8_MEMBER(kiki_ym2203_r);
+	void main_bankswitch_w(uint8_t data);
+	uint8_t kiki_ym2203_r(offs_t offset);
 
 	virtual INTERRUPT_GEN_MEMBER(kikikai_interrupt);
 
@@ -86,22 +86,22 @@ private:
 	uint8_t    m_port3_out;
 	uint8_t    m_port4_out;
 
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr1_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr1_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr2_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr2_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr3_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr3_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr4_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr4_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port1_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port2_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port2_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port3_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port3_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port4_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port4_w);
+	uint8_t kikikai_mcu_ddr1_r();
+	void kikikai_mcu_ddr1_w(uint8_t data);
+	uint8_t kikikai_mcu_ddr2_r();
+	void kikikai_mcu_ddr2_w(uint8_t data);
+	uint8_t kikikai_mcu_ddr3_r();
+	void kikikai_mcu_ddr3_w(uint8_t data);
+	uint8_t kikikai_mcu_ddr4_r();
+	void kikikai_mcu_ddr4_w(uint8_t data);
+	uint8_t kikikai_mcu_port1_r();
+	void kikikai_mcu_port1_w(uint8_t data);
+	uint8_t kikikai_mcu_port2_r();
+	void kikikai_mcu_port2_w(uint8_t data);
+	uint8_t kikikai_mcu_port3_r();
+	void kikikai_mcu_port3_w(uint8_t data);
+	uint8_t kikikai_mcu_port4_r();
+	void kikikai_mcu_port4_w(uint8_t data);
 };
 
 class mexico86_state : public kikikai_state
@@ -121,7 +121,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(main_f008_w) override;
+	virtual void main_f008_w(uint8_t data) override;
 
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
 	void mexico86_68705_port_a_w(u8 data);
@@ -153,7 +153,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(main_f008_w) override;
+	virtual void main_f008_w(uint8_t data) override;
 
 	virtual INTERRUPT_GEN_MEMBER(kikikai_interrupt) override;
 

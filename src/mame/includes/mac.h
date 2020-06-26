@@ -303,7 +303,7 @@ private:
 
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
-	DECLARE_READ32_MEMBER(rom_switch_r);
+	uint32_t rom_switch_r(offs_t offset);
 
 	bool m_snd_enable;
 	bool m_main_buffer;
@@ -399,64 +399,64 @@ private:
 	void set_adb_line(int linestate);
 	void update_volume();
 
-	DECLARE_READ16_MEMBER ( mac_via_r );
-	DECLARE_WRITE16_MEMBER ( mac_via_w );
-	DECLARE_READ16_MEMBER ( mac_via2_r );
-	DECLARE_WRITE16_MEMBER ( mac_via2_w );
-	DECLARE_READ16_MEMBER ( mac_autovector_r );
-	DECLARE_WRITE16_MEMBER ( mac_autovector_w );
-	DECLARE_READ16_MEMBER ( mac_iwm_r );
-	DECLARE_WRITE16_MEMBER ( mac_iwm_w );
-	DECLARE_READ16_MEMBER ( mac_scc_r );
-	DECLARE_WRITE16_MEMBER ( mac_scc_w );
-	DECLARE_WRITE16_MEMBER ( mac_scc_2_w );
-	DECLARE_READ16_MEMBER ( macplus_scsi_r );
-	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
-	DECLARE_WRITE16_MEMBER ( macii_scsi_w );
-	DECLARE_READ32_MEMBER (macii_scsi_drq_r);
-	DECLARE_WRITE32_MEMBER (macii_scsi_drq_w);
+	uint16_t mac_via_r(offs_t offset);
+	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_via2_r(offs_t offset);
+	void mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_autovector_r(offs_t offset);
+	void mac_autovector_w(offs_t offset, uint16_t data);
+	uint16_t mac_iwm_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_scc_r(offs_t offset);
+	void mac_scc_w(offs_t offset, uint16_t data);
+	void mac_scc_2_w(offs_t offset, uint16_t data);
+	uint16_t macplus_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
+	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t macii_scsi_drq_r(offs_t offset, uint32_t mem_mask = ~0);
+	void macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER( rbv_ramdac_r );
-	DECLARE_WRITE32_MEMBER( rbv_ramdac_w );
-	DECLARE_WRITE32_MEMBER( ariel_ramdac_w );
-	DECLARE_READ8_MEMBER( mac_sonora_vctl_r );
-	DECLARE_WRITE8_MEMBER( mac_sonora_vctl_w );
-	DECLARE_READ8_MEMBER ( mac_rbv_r );
-	DECLARE_WRITE8_MEMBER ( mac_rbv_w );
+	uint32_t rbv_ramdac_r();
+	void rbv_ramdac_w(offs_t offset, uint32_t data);
+	void ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t mac_sonora_vctl_r(offs_t offset);
+	void mac_sonora_vctl_w(offs_t offset, uint8_t data);
+	uint8_t mac_rbv_r(offs_t offset);
+	void mac_rbv_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ32_MEMBER(mac_read_id);
+	uint32_t mac_read_id();
 
-	DECLARE_READ16_MEMBER(mac_config_r);
+	uint16_t mac_config_r();
 
-	DECLARE_READ32_MEMBER(biu_r);
-	DECLARE_WRITE32_MEMBER(biu_w);
-	DECLARE_READ8_MEMBER(oss_r);
-	DECLARE_WRITE8_MEMBER(oss_w);
-	DECLARE_READ32_MEMBER(buserror_r);
-	DECLARE_READ8_MEMBER(swimiop_r);
-	DECLARE_WRITE8_MEMBER(swimiop_w);
-	DECLARE_READ8_MEMBER(scciop_r);
-	DECLARE_WRITE8_MEMBER(scciop_w);
+	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t oss_r(offs_t offset);
+	void oss_w(offs_t offset, uint8_t data);
+	uint32_t buserror_r();
+	uint8_t swimiop_r(offs_t offset);
+	void swimiop_w(offs_t offset, uint8_t data);
+	uint8_t scciop_r(offs_t offset);
+	void scciop_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(hmc_r);
-	DECLARE_WRITE8_MEMBER(hmc_w);
-	DECLARE_READ8_MEMBER(amic_dma_r);
-	DECLARE_WRITE8_MEMBER(amic_dma_w);
-	DECLARE_READ8_MEMBER(pmac_diag_r);
+	uint8_t hmc_r();
+	void hmc_w(offs_t offset, uint8_t data);
+	uint8_t amic_dma_r();
+	void amic_dma_w(offs_t offset, uint8_t data);
+	uint8_t pmac_diag_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(mac_gsc_r);
-	DECLARE_WRITE8_MEMBER(mac_gsc_w);
+	uint8_t mac_gsc_r(offs_t offset);
+	void mac_gsc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(offs_t offset);
+	void mac_5396_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ32_MEMBER(dafb_r);
-	DECLARE_WRITE32_MEMBER(dafb_w);
-	DECLARE_READ32_MEMBER(dafb_dac_r);
-	DECLARE_WRITE32_MEMBER(dafb_dac_w);
+	uint32_t dafb_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dafb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dafb_dac_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(macwd_r);
-	DECLARE_WRITE32_MEMBER(macwd_w);
+	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);

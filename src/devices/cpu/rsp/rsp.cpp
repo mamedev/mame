@@ -78,7 +78,7 @@ DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "Nintendo & SGI Reality Signal Proces
 #define CLEAR_ZERO_FLAG(x)      { m_vflag[ZERO][x & 7] = 0; }
 #define CLEAR_CLIP2_FLAG(x)     { m_vflag[CLIP2][x & 7] = 0; }
 
-#define ROPCODE(pc)     m_program->read_dword(pc)
+#define ROPCODE(pc)     m_pcache.read_dword(pc)
 
 
 /***************************************************************************
@@ -232,7 +232,7 @@ uint8_t rsp_device::READ8(uint32_t address)
 {
 	uint8_t ret;
 	address &= 0xfff;
-	ret = m_program->read_byte(address);
+	ret = m_program.read_byte(address);
 	//printf("R8:%08x=%02x\n", address, ret);
 	return ret;
 }
@@ -242,7 +242,7 @@ uint16_t rsp_device::READ16(uint32_t address)
 	uint16_t ret;
 	address &= 0xfff;
 
-	ret = (m_program->read_byte(address) << 8) | (m_program->read_byte(address + 1) & 0xff);
+	ret = (m_program.read_byte(address) << 8) | (m_program.read_byte(address + 1) & 0xff);
 
 	//printf("R16:%08x=%04x\n", address, ret);
 	return ret;
@@ -253,10 +253,10 @@ uint32_t rsp_device::READ32(uint32_t address)
 	uint32_t ret;
 	address &= 0xfff;
 
-	ret =   (m_program->read_byte(address) << 24) |
-			(m_program->read_byte(address + 1) << 16) |
-			(m_program->read_byte(address + 2) << 8) |
-			(m_program->read_byte(address + 3) << 0);
+	ret =   (m_program.read_byte(address) << 24) |
+			(m_program.read_byte(address + 1) << 16) |
+			(m_program.read_byte(address + 2) << 8) |
+			(m_program.read_byte(address + 3) << 0);
 
 	//printf("R32:%08x=%08x\n", address, ret);
 	return ret;
@@ -265,7 +265,7 @@ uint32_t rsp_device::READ32(uint32_t address)
 void rsp_device::WRITE8(uint32_t address, uint8_t data)
 {
 	address &= 0xfff;
-	m_program->write_byte(address, data);
+	m_program.write_byte(address, data);
 	//printf("W8:%08x=%02x\n", address, data);
 }
 
@@ -273,8 +273,8 @@ void rsp_device::WRITE16(uint32_t address, uint16_t data)
 {
 	address &= 0xfff;
 
-	m_program->write_byte(address, data >> 8);
-	m_program->write_byte(address + 1, data & 0xff);
+	m_program.write_byte(address, data >> 8);
+	m_program.write_byte(address + 1, data & 0xff);
 	//printf("W16:%08x=%04x\n", address, data);
 }
 
@@ -282,10 +282,10 @@ void rsp_device::WRITE32(uint32_t address, uint32_t data)
 {
 	address &= 0xfff;
 
-	m_program->write_byte(address, data >> 24);
-	m_program->write_byte(address + 1, (data >> 16) & 0xff);
-	m_program->write_byte(address + 2, (data >> 8) & 0xff);
-	m_program->write_byte(address + 3, data & 0xff);
+	m_program.write_byte(address, data >> 24);
+	m_program.write_byte(address + 1, (data >> 16) & 0xff);
+	m_program.write_byte(address + 2, (data >> 8) & 0xff);
+	m_program.write_byte(address + 3, data & 0xff);
 	//printf("W32:%08x=%08x\n", address, data);
 }
 
@@ -381,8 +381,8 @@ void rsp_device::device_start()
 	if (LOG_INSTRUCTION_EXECUTION)
 		m_exec_output = fopen("rsp_execute.txt", "wt");
 
-	m_program = &space(AS_PROGRAM);
-	m_pcache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_pcache);
+	space(AS_PROGRAM).specific(m_program);
 	resolve_cb();
 
 	if (m_isdrc)

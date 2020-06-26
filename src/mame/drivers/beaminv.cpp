@@ -81,9 +81,9 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	DECLARE_READ8_MEMBER(v128_r);
-	DECLARE_WRITE8_MEMBER(controller_select_w);
-	DECLARE_READ8_MEMBER(controller_r);
+	uint8_t v128_r();
+	void controller_select_w(uint8_t data);
+	uint8_t controller_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -204,7 +204,7 @@ uint32_t beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb3
 }
 
 
-READ8_MEMBER(beaminv_state::v128_r)
+uint8_t beaminv_state::v128_r()
 {
 	return (m_screen->vpos() >> 7) & 0x01;
 }
@@ -221,14 +221,14 @@ READ8_MEMBER(beaminv_state::v128_r)
 #define P2_CONTROL_PORT_TAG ("CONTP2")
 
 
-WRITE8_MEMBER(beaminv_state::controller_select_w)
+void beaminv_state::controller_select_w(uint8_t data)
 {
 	/* 0x01 (player 1) or 0x02 (player 2) */
 	m_controller_select = data;
 }
 
 
-READ8_MEMBER(beaminv_state::controller_r)
+uint8_t beaminv_state::controller_r()
 {
 	return ioport((m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG)->read();
 }

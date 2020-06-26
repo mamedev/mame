@@ -93,7 +93,7 @@ uint8_t* z88_32k_ram_device::get_cart_base()
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(z88_32k_ram_device::read)
+uint8_t z88_32k_ram_device::read(offs_t offset)
 {
 	return m_ram[offset & (get_cart_size() - 1)];
 }
@@ -102,7 +102,7 @@ READ8_MEMBER(z88_32k_ram_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(z88_32k_ram_device::write)
+void z88_32k_ram_device::write(offs_t offset, uint8_t data)
 {
 	m_ram[offset & (get_cart_size() - 1)] = data;
 }

@@ -59,7 +59,7 @@ m6509_device::mi_6509::mi_6509(m6509_device *_base)
 
 uint8_t m6509_device::mi_6509::read(uint16_t adr)
 {
-	uint8_t res = program->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = program.read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -69,7 +69,7 @@ uint8_t m6509_device::mi_6509::read(uint16_t adr)
 
 uint8_t m6509_device::mi_6509::read_sync(uint16_t adr)
 {
-	uint8_t res = scache->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = csprogram.read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -79,7 +79,7 @@ uint8_t m6509_device::mi_6509::read_sync(uint16_t adr)
 
 uint8_t m6509_device::mi_6509::read_arg(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = cprogram.read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -89,7 +89,7 @@ uint8_t m6509_device::mi_6509::read_arg(uint16_t adr)
 
 uint8_t m6509_device::mi_6509::read_9(uint16_t adr)
 {
-	uint8_t res = program->read_byte(base->adr_in_bank_y(adr));
+	uint8_t res = program.read_byte(base->adr_in_bank_y(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -99,7 +99,7 @@ uint8_t m6509_device::mi_6509::read_9(uint16_t adr)
 
 void m6509_device::mi_6509::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(base->adr_in_bank_i(adr), val);
+	program.write_byte(base->adr_in_bank_i(adr), val);
 	if(adr == 0x0000)
 		base->bank_i_w(val);
 	else if(adr == 0x0001)
@@ -108,7 +108,7 @@ void m6509_device::mi_6509::write(uint16_t adr, uint8_t val)
 
 void m6509_device::mi_6509::write_9(uint16_t adr, uint8_t val)
 {
-	program->write_byte(base->adr_in_bank_y(adr), val);
+	program.write_byte(base->adr_in_bank_y(adr), val);
 	if(adr == 0x0000)
 		base->bank_i_w(val);
 	else if(adr == 0x0001)

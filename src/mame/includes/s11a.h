@@ -22,7 +22,7 @@ public:
 
 	void init_s11a();
 
-	DECLARE_WRITE8_MEMBER(bgbank_w);
+	void bgbank_w(uint8_t data);
 	void dig0_w(uint8_t data);
 
 private:

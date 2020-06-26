@@ -414,18 +414,18 @@ private:
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
 
-	DECLARE_READ8_MEMBER(wd1772_r);
-	DECLARE_WRITE8_MEMBER(wd1772_w);
-	DECLARE_READ8_MEMBER(seqdosram_r);
-	DECLARE_WRITE8_MEMBER(seqdosram_w);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_WRITE8_MEMBER(analog_w);
+	uint8_t wd1772_r(offs_t offset);
+	void wd1772_w(offs_t offset, uint8_t data);
+	uint8_t seqdosram_r(offs_t offset);
+	void seqdosram_w(offs_t offset, uint8_t data);
+	void mapper_w(uint8_t data);
+	void analog_w(offs_t offset, uint8_t data);
 
 	void duart_output(uint8_t data);
 
 	uint8_t esq1_adc_read();
 
-	DECLARE_READ8_MEMBER(es5503_sample_r);
+	uint8_t es5503_sample_r(offs_t offset);
 
 	int m_mapper_state;
 	int m_seq_bank;
@@ -443,7 +443,7 @@ private:
 	uint8_t m_adc_value[6] = { 0,0,128,0,0,0 }; // VALV,PEDV,PITV,MODV,FILV,BATV
 };
 
-READ8_MEMBER( esq1_state::es5503_sample_r )
+uint8_t esq1_state::es5503_sample_r(offs_t offset)
 {
 	return m_es5503_rom[offset + (((m_es5503->get_channel_strobe() & 8)>>3) * 0x20000)];
 }
@@ -468,24 +468,24 @@ void esq1_state::machine_reset()
 	kpc_calibrated = false;
 }
 
-READ8_MEMBER(esq1_state::wd1772_r)
+uint8_t esq1_state::wd1772_r(offs_t offset)
 {
 	return m_fdc->read(offset&3);
 }
 
-WRITE8_MEMBER(esq1_state::wd1772_w)
+void esq1_state::wd1772_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset&3, data);
 }
 
-WRITE8_MEMBER(esq1_state::mapper_w)
+void esq1_state::mapper_w(uint8_t data)
 {
 	m_mapper_state = (data & 1);
 
 //    printf("mapper_state = %d\n", data ^ 1);
 }
 
-WRITE8_MEMBER(esq1_state::analog_w)
+void esq1_state::analog_w(offs_t offset, uint8_t data)
 {
 	if(!(offset & 8))
 		m_filters->set_vfc(offset & 7, data);
@@ -497,7 +497,7 @@ WRITE8_MEMBER(esq1_state::analog_w)
 		m_filters->set_vca(offset & 7, data);
 }
 
-READ8_MEMBER(esq1_state::seqdosram_r)
+uint8_t esq1_state::seqdosram_r(offs_t offset)
 {
 	if (m_mapper_state)
 	{
@@ -509,7 +509,7 @@ READ8_MEMBER(esq1_state::seqdosram_r)
 	}
 }
 
-WRITE8_MEMBER(esq1_state::seqdosram_w)
+void esq1_state::seqdosram_w(offs_t offset, uint8_t data)
 {
 	if (m_mapper_state)
 	{

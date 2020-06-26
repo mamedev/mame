@@ -97,9 +97,9 @@ protected:
 
 	// I/O handlers
 	void update_lcd();
-	virtual DECLARE_WRITE8_MEMBER(control_w);
-	virtual DECLARE_WRITE8_MEMBER(lcd_w);
-	virtual DECLARE_READ8_MEMBER(input_r);
+	virtual void control_w(offs_t offset, u8 data);
+	virtual void lcd_w(offs_t offset, u8 data);
+	virtual u8 input_r(offs_t offset);
 
 	u8 m_select = 0;
 	u32 m_lcd_data = 0;
@@ -138,7 +138,7 @@ private:
 	void fdes2325_map(address_map &map);
 
 	// I/O handlers, slightly different (control_w is d0 instead of d7)
-	virtual DECLARE_WRITE8_MEMBER(control_w) override { desdis_state::control_w(space, offset, data << 7); }
+	virtual void control_w(offs_t offset, u8 data) override { desdis_state::control_w(offset, data << 7); }
 };
 
 void desmas_state::init_fdes2265()
@@ -174,7 +174,7 @@ void desdis_state::update_lcd()
 	m_display->update();
 }
 
-WRITE8_MEMBER(desdis_state::control_w)
+void desdis_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: 74259
 	u8 mask = 1 << offset;
@@ -199,7 +199,7 @@ WRITE8_MEMBER(desdis_state::control_w)
 	update_lcd();
 }
 
-WRITE8_MEMBER(desdis_state::lcd_w)
+void desdis_state::lcd_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0-d3: 4*74259 to lcd digit segments
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
@@ -212,7 +212,7 @@ WRITE8_MEMBER(desdis_state::lcd_w)
 	update_lcd();
 }
 
-READ8_MEMBER(desdis_state::input_r)
+u8 desdis_state::input_r(offs_t offset)
 {
 	u8 sel = m_select >> 4 & 0xf;
 	u8 data = 0;

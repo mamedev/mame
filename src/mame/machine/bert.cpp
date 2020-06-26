@@ -16,7 +16,6 @@ DEFINE_DEVICE_TYPE(BERT, bert_device, "ncd_bert_asic", "NCD BERT ASIC")
 bert_device::bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, BERT, tag, owner, clock)
 	, m_memory_space(*this, finder_base::DUMMY_TAG, 24, 16)
-	, m_memory(nullptr)
 {
 }
 
@@ -27,7 +26,7 @@ void bert_device::device_start()
 	save_item(NAME(m_step));
 	save_item(NAME(m_qlc_mode));
 	save_item(NAME(m_qlc_src));
-	m_memory = m_memory_space->cache<1, 0, ENDIANNESS_BIG>();
+	m_memory_space->cache(m_memory);
 }
 
 void bert_device::device_reset()
@@ -57,7 +56,7 @@ u16 bert_device::read(offs_t offset)
 	}
 
 	constexpr u16 type = 0x00ca;
-	u16 data = m_memory->read_word(offset << 1);
+	u16 data = m_memory.read_word(offset << 1);
 	u16 res;
 
 	if(type & (1 << (((m_control >> 8) & 0xc) | m_step))) {
@@ -82,12 +81,12 @@ void bert_device::write(offs_t offset, u16 data, u16 mem_mask)
 	if(m_qlc_mode) {
 		u32 dest = offset << 1;
 		for(u32 i=0; i<512; i+=2)
-			m_memory->write_word(dest + i, m_memory->read_word(m_qlc_src + i));
+			m_memory.write_word(dest + i, m_memory.read_word(m_qlc_src + i));
 		return;
 	}
 
 	m_step = 0;
-	m_memory->write_word(offset << 1, data, mem_mask);
+	m_memory.write_word(offset << 1, data, mem_mask);
 	if(!offset) {
 		COMBINE_DATA(&m_control);
 		m_step = 0;

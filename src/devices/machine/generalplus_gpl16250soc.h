@@ -34,10 +34,15 @@ public:
 		m_spg_video(*this, "spgvideo"),
 		m_spg_audio(*this, "spgaudio"),
 		m_internalrom(*this, "internal"),
+		m_mainram(*this, "mainram"),
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_portc_in(*this),
+		m_portd_in(*this),
 		m_porta_out(*this),
+		m_portb_out(*this),
+		m_portc_out(*this),
+		m_portd_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
 		m_romtype(0),
@@ -53,8 +58,12 @@ public:
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
+	auto portd_in() { return m_portd_in.bind(); }
 
 	auto porta_out() { return m_porta_out.bind(); }
+	auto portb_out() { return m_portb_out.bind(); }
+	auto portc_out() { return m_portc_out.bind(); }
+	auto portd_out() { return m_portd_out.bind(); }
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
@@ -73,9 +82,15 @@ public:
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
-	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
+	//void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
+	//void set_pal_sprites_hack(int pal_sprites) { m_spg_video->set_pal_sprites(pal_sprites); }
+	//void set_pal_back_hack(int pal_back) { m_spg_video->set_pal_back(pal_back); }
+	void set_alt_extrasprite_hack(int alt_extrasprite_hack) { m_spg_video->set_alt_extrasprite(alt_extrasprite_hack); }
+
 	void set_romtype(int romtype) { m_romtype = romtype; }
+
+	inline uint16_t get_ram_addr(uint32_t addr) { return m_mainram[addr]; }
 
 protected:
 
@@ -91,14 +106,20 @@ protected:
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 	optional_memory_region m_internalrom;
+	required_shared_ptr<u16> m_mainram;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
+	devcb_read16 m_portd_in;
 
 	devcb_write16 m_porta_out;
+	devcb_write16 m_portb_out;
+	devcb_write16 m_portc_out;
+	devcb_write16 m_portd_out;
 
 	uint16_t m_dma_params[8][4];
+	bool m_dma_latched[4];
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -109,7 +130,6 @@ protected:
 
 	uint16_t m_7816;
 	uint16_t m_7817;
-
 
 	uint16_t m_7819;
 
@@ -129,12 +149,16 @@ protected:
 	uint16_t m_786a_portb_direction;
 	uint16_t m_786b_portb_attribute;
 
+	uint16_t m_7872_portc_direction;
+	uint16_t m_7873_portc_attribute;
+
+	uint16_t m_787a_portd_direction;
+	uint16_t m_787b_portd_attribute;
+
 	uint16_t m_7870;
 
 	//uint16_t m_7871;
 
-	uint16_t m_7872_portc_direction;
-	uint16_t m_7873_portc_attribute;
 
 	uint16_t m_7882;
 	uint16_t m_7883;
@@ -170,149 +194,164 @@ protected:
 	devcb_read16 m_nand_read_cb;
 	int m_csbase;
 
-	DECLARE_READ16_MEMBER(internalrom_lower32_r);
+	uint16_t internalrom_lower32_r(offs_t offset);
 
 	address_space* m_cs_space;
 
-	DECLARE_READ16_MEMBER(cs_space_r);
-	DECLARE_WRITE16_MEMBER(cs_space_w);
-	DECLARE_READ16_MEMBER(cs_bank_space_r);
-	DECLARE_WRITE16_MEMBER(cs_bank_space_w);
+	uint16_t cs_space_r(offs_t offset);
+	void cs_space_w(offs_t offset, uint16_t data);
+	uint16_t cs_bank_space_r(offs_t offset);
+	void cs_bank_space_w(offs_t offset, uint16_t data);
 	int m_romtype;
 
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
 
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_WRITE16_MEMBER(unk_w);
+	uint16_t unk_r(offs_t offset);
+	void unk_w(offs_t offset, uint16_t data);
 
-	void write_dma_params(int channel, int offset, uint16_t data, address_space& space);
+	void write_dma_params(int channel, int offset, uint16_t data);
 	uint16_t read_dma_params(int channel, int offset);
-	void trigger_systemm_dma(address_space &space, int channel);
+	void trigger_systemm_dma(int channel);
 
-	DECLARE_READ16_MEMBER(system_dma_params_channel0_r);
-	DECLARE_WRITE16_MEMBER(system_dma_params_channel0_w);
-	DECLARE_READ16_MEMBER(system_dma_params_channel1_r);
-	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
-	DECLARE_READ16_MEMBER(system_dma_params_channel2_r);
-	DECLARE_WRITE16_MEMBER(system_dma_params_channel2_w);
-	DECLARE_READ16_MEMBER(system_dma_params_channel3_r);
-	DECLARE_WRITE16_MEMBER(system_dma_params_channel3_w);
-	DECLARE_READ16_MEMBER(system_dma_status_r);
-	DECLARE_WRITE16_MEMBER(system_dma_7abf_unk_w);
-	DECLARE_READ16_MEMBER(system_dma_memtype_r);
-	DECLARE_WRITE16_MEMBER(system_dma_memtype_w);
+	uint16_t system_dma_params_channel0_r(offs_t offset);
+	void system_dma_params_channel0_w(offs_t offset, uint16_t data);
+	uint16_t system_dma_params_channel1_r(offs_t offset);
+	void system_dma_params_channel1_w(offs_t offset, uint16_t data);
+	uint16_t system_dma_params_channel2_r(offs_t offset);
+	void system_dma_params_channel2_w(offs_t offset, uint16_t data);
+	uint16_t system_dma_params_channel3_r(offs_t offset);
+	void system_dma_params_channel3_w(offs_t offset, uint16_t data);
+	uint16_t system_dma_status_r();
+	void system_dma_7abf_unk_w(uint16_t data);
+	uint16_t system_dma_memtype_r();
+	void system_dma_memtype_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
-	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
+	uint16_t unkarea_780f_status_r();
+	uint16_t unkarea_78fb_status_r();
 
-	DECLARE_READ16_MEMBER(unkarea_7803_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7803_w);
+	uint16_t unkarea_7803_r();
+	void unkarea_7803_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_7807_w);
+	void unkarea_7807_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(waitmode_enter_780c_w);
+	void waitmode_enter_780c_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(membankswitch_7810_r);
-	DECLARE_WRITE16_MEMBER(membankswitch_7810_w);
+	uint16_t membankswitch_7810_r();
+	void membankswitch_7810_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_7816_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7817_w);
+	void unkarea_7816_w(uint16_t data);
+	void unkarea_7817_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_7819_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7819_w);
+	uint16_t unkarea_7819_r();
+	void unkarea_7819_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(chipselect_csx_memory_device_control_w);
+	void chipselect_csx_memory_device_control_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_7835_w);
+	void unkarea_7835_w(uint16_t data);
+
+	uint16_t unkarea_782d_r();
+	void unkarea_782d_w(uint16_t data);
 
 	// Port A
-	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
-	DECLARE_READ16_MEMBER(ioarea_7861_porta_buffer_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7861_porta_buffer_w);
-	DECLARE_READ16_MEMBER(ioarea_7862_porta_direction_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7862_porta_direction_w);
-	DECLARE_READ16_MEMBER(ioarea_7863_porta_attribute_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7863_porta_attribute_w);
+	uint16_t ioarea_7860_porta_r();
+	void ioarea_7860_porta_w(uint16_t data);
+	uint16_t ioarea_7861_porta_buffer_r();
+	void ioarea_7861_porta_buffer_w(uint16_t data);
+	uint16_t ioarea_7862_porta_direction_r();
+	void ioarea_7862_porta_direction_w(uint16_t data);
+	uint16_t ioarea_7863_porta_attribute_r();
+	void ioarea_7863_porta_attribute_w(uint16_t data);
 
 	// Port B
-	DECLARE_READ16_MEMBER(ioarea_7868_portb_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7868_portb_w);
-	DECLARE_READ16_MEMBER(ioarea_7869_portb_buffer_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7869_portb_buffer_w);
-	DECLARE_READ16_MEMBER(ioarea_786a_portb_direction_r);
-	DECLARE_WRITE16_MEMBER(ioarea_786a_portb_direction_w);
-	DECLARE_READ16_MEMBER(ioarea_786b_portb_attribute_r);
-	DECLARE_WRITE16_MEMBER(ioarea_786b_portb_attribute_w);
+	uint16_t ioarea_7868_portb_r();
+	void ioarea_7868_portb_w(uint16_t data);
+	uint16_t ioarea_7869_portb_buffer_r();
+	void ioarea_7869_portb_buffer_w(uint16_t data);
+	uint16_t ioarea_786a_portb_direction_r();
+	void ioarea_786a_portb_direction_w(uint16_t data);
+	uint16_t ioarea_786b_portb_attribute_r();
+	void ioarea_786b_portb_attribute_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_782d_r);
-	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
+	// Port C
+	uint16_t ioarea_7870_portc_r();
+	void ioarea_7870_portc_w(uint16_t data);
+	uint16_t ioarea_7871_portc_buffer_r();
+	void ioarea_7871_portc_buffer_w(uint16_t data);
+	uint16_t ioarea_7872_portc_direction_r();
+	void ioarea_7872_portc_direction_w(uint16_t data);
+	uint16_t ioarea_7873_portc_attribute_r();
+	void ioarea_7873_portc_attribute_w(uint16_t data);
 
+	// Port D
+	uint16_t ioarea_7878_portd_r();
+	void ioarea_7878_portd_w(uint16_t data);
+	uint16_t ioarea_7879_portd_buffer_r();
+	void ioarea_7879_portd_buffer_w(uint16_t data);
+	uint16_t ioarea_787a_portd_direction_r();
+	void ioarea_787a_portd_direction_w(uint16_t data);
+	uint16_t ioarea_787b_portd_attribute_r();
+	void ioarea_787b_portd_attribute_w(uint16_t data);
 
+	uint16_t unkarea_7882_r();
+	void unkarea_7882_w(uint16_t data);
+	uint16_t unkarea_7883_r();
+	void unkarea_7883_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(ioarea_7870_portc_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7870_portc_w);
+	void unkarea_78a0_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(ioarea_7871_portc_buffer_r);
+	uint16_t unkarea_78a0_r();
+	uint16_t unkarea_78a1_r();
 
-	DECLARE_READ16_MEMBER(ioarea_7872_portc_direction_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7872_portc_direction_w);
-	DECLARE_READ16_MEMBER(ioarea_7873_portc_attribute_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7873_portc_attribute_w);
+	void unkarea_78a4_w(uint16_t data);
+	void unkarea_78a5_w(uint16_t data);
+	void unkarea_78a6_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_7882_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7882_w);
-	DECLARE_READ16_MEMBER(unkarea_7883_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7883_w);
+	void unkarea_78a8_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_78a0_w);
+	void unkarea_78b0_w(uint16_t data);
+	void unkarea_78b1_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_78a0_r);
-	DECLARE_READ16_MEMBER(unkarea_78a1_r);
+	uint16_t unkarea_78b2_r();
+	void unkarea_78b2_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_78a4_w);
-	DECLARE_WRITE16_MEMBER(unkarea_78a5_w);
-	DECLARE_WRITE16_MEMBER(unkarea_78a6_w);
+	void unkarea_78b8_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_78a8_w);
+	uint16_t unkarea_78d0_r();
+	uint16_t unkarea_78d8_r();
 
-	DECLARE_WRITE16_MEMBER(unkarea_78b0_w);
-	DECLARE_WRITE16_MEMBER(unkarea_78b1_w);
+	void unkarea_78f0_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_78b2_r);
-	DECLARE_WRITE16_MEMBER(unkarea_78b2_w);
+	uint16_t unkarea_7904_r();
 
-	DECLARE_WRITE16_MEMBER(unkarea_78b8_w);
+	uint16_t unkarea_7934_r();
+	void unkarea_7934_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_78d0_r);
-	DECLARE_READ16_MEMBER(unkarea_78d8_r);
+	uint16_t unkarea_7935_r();
+	void unkarea_7935_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(unkarea_78f0_w);
+	uint16_t unkarea_7936_r();
+	void unkarea_7936_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_7934_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7934_w);
+	uint16_t spi_7944_rxdata_r();
+	uint16_t spi_7945_misc_control_reg_r();
+	void spi_7942_txdata_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(unkarea_7935_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7935_w);
-
-	DECLARE_READ16_MEMBER(unkarea_7936_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
-
-	DECLARE_READ16_MEMBER(spi_7944_rxdata_r);
-	DECLARE_READ16_MEMBER(spi_7945_misc_control_reg_r);
-	DECLARE_WRITE16_MEMBER(spi_7942_txdata_w);
-
-	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
-	DECLARE_READ16_MEMBER(unkarea_7961_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7961_w);
+	void unkarea_7960_w(uint16_t data);
+	uint16_t unkarea_7961_r();
+	void unkarea_7961_w(uint16_t data);
 
 
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
-	DECLARE_READ16_MEMBER(system_7a3a_r);
+	uint16_t system_7a35_r();
+	uint16_t system_7a37_r();
+	uint16_t system_7a39_r();
+	uint16_t system_7a3a_r();
+	uint16_t system_7a46_r();
+	uint16_t system_7a54_r();
 
 	void checkirq6();
 
@@ -365,20 +404,20 @@ protected:
 private:
 	void recalculate_calculate_effective_nand_address();
 
-	DECLARE_READ16_MEMBER(nand_7850_status_r);
-	DECLARE_READ16_MEMBER(nand_7854_r);
-	DECLARE_WRITE16_MEMBER(nand_dma_ctrl_w);
-	DECLARE_WRITE16_MEMBER(nand_7850_w);
-	DECLARE_WRITE16_MEMBER(nand_command_w);
-	DECLARE_WRITE16_MEMBER(nand_addr_low_w);
-	DECLARE_WRITE16_MEMBER(nand_addr_high_w);
-	DECLARE_READ16_MEMBER(nand_ecc_low_byte_error_flag_1_r);
-	DECLARE_WRITE16_MEMBER(nand_7856_type_w);
-	DECLARE_WRITE16_MEMBER(nand_7857_w);
-	DECLARE_WRITE16_MEMBER(nand_785b_w);
-	DECLARE_WRITE16_MEMBER(nand_785c_w);
-	DECLARE_WRITE16_MEMBER(nand_785d_w);
-	DECLARE_READ16_MEMBER(nand_785e_r);
+	uint16_t nand_7850_status_r();
+	uint16_t nand_7854_r();
+	void nand_dma_ctrl_w(uint16_t data);
+	void nand_7850_w(uint16_t data);
+	void nand_command_w(uint16_t data);
+	void nand_addr_low_w(uint16_t data);
+	void nand_addr_high_w(uint16_t data);
+	uint16_t nand_ecc_low_byte_error_flag_1_r();
+	void nand_7856_type_w(uint16_t data);
+	void nand_7857_w(uint16_t data);
+	void nand_785b_w(uint16_t data);
+	void nand_785c_w(uint16_t data);
+	void nand_785d_w(uint16_t data);
+	uint16_t nand_785e_r();
 
 	uint16_t m_nandcommand;
 
@@ -418,7 +457,7 @@ protected:
 	//virtual void device_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(spi_unk_7943_r);
+	uint16_t spi_unk_7943_r();
 };
 
 

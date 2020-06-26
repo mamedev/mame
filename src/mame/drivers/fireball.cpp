@@ -58,14 +58,14 @@ public:
 	void fireball(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(io_00_w);
-	DECLARE_READ8_MEMBER(io_00_r);
-	DECLARE_WRITE8_MEMBER(io_02_w);
-	DECLARE_READ8_MEMBER(io_02_r);
-	DECLARE_WRITE8_MEMBER(io_04_w);
-	DECLARE_READ8_MEMBER(io_04_r);
-	DECLARE_WRITE8_MEMBER(io_06_w);
-	DECLARE_READ8_MEMBER(io_06_r);
+	void io_00_w(uint8_t data);
+	uint8_t io_00_r();
+	void io_02_w(uint8_t data);
+	uint8_t io_02_r();
+	void io_04_w(uint8_t data);
+	uint8_t io_04_r();
+	void io_06_w(uint8_t data);
+	uint8_t io_06_r();
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p3_r();
@@ -95,7 +95,7 @@ private:
 ****************************/
 
 
-READ8_MEMBER(fireball_state::io_00_r)
+uint8_t fireball_state::io_00_r()
 {
 	uint8_t tmp=0;
 
@@ -106,7 +106,7 @@ READ8_MEMBER(fireball_state::io_00_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_00_w)
+void fireball_state::io_00_w(uint8_t data)
 {
 	m_display_data= m_display_data&0x7f;
 	if (LOG_DISPLAY)
@@ -133,7 +133,7 @@ WRITE8_MEMBER(fireball_state::io_00_w)
 	output().set_value("Hopper3", BIT(data, 6));
 }
 
-READ8_MEMBER(fireball_state::io_02_r)
+uint8_t fireball_state::io_02_r()
 {
 	uint8_t tmp=0;
 
@@ -144,7 +144,7 @@ READ8_MEMBER(fireball_state::io_02_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_02_w)
+void fireball_state::io_02_w(uint8_t data)
 {
 	if (LOG_OUTPUT)
 		logerror("write to 0x00 IO (X7-X9) %02X\n",data);
@@ -159,7 +159,7 @@ WRITE8_MEMBER(fireball_state::io_02_w)
 	output().set_value("RV", BIT(data, 7));
 }
 
-READ8_MEMBER(fireball_state::io_04_r)
+uint8_t fireball_state::io_04_r()
 {   //contraves per mod prog
 	uint8_t tmp=0;
 
@@ -170,7 +170,7 @@ READ8_MEMBER(fireball_state::io_04_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_04_w)
+void fireball_state::io_04_w(uint8_t data)
 {//display data
 	if (LOG_DISPLAY)
 		logerror("display datat write %02X\n",data);
@@ -179,17 +179,17 @@ WRITE8_MEMBER(fireball_state::io_04_w)
 
 
 
-READ8_MEMBER(fireball_state::io_06_r)
+uint8_t fireball_state::io_06_r()
 {
 	if (LOG_AY8912)
 		logerror("read from 0x06 IO\n");
 
 	return 0xbe;
 				//bit 0x01 is NC
-				//bit 0x40 is used to detect is the unit is powerd up!!! related to eeprom store?
+				//bit 0x40 is used to detect is the unit is powered up!!! related to eeprom store?
 }
 
-WRITE8_MEMBER(fireball_state::io_06_w)
+void fireball_state::io_06_w(uint8_t data)
 {
 	if (LOG_AY8912)
 		logerror("write to 0x06 data =%02X\n",data);

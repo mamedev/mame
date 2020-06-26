@@ -92,7 +92,7 @@ void zx_state::recalc_hsync()
 	m_ula_hsync->adjust(m_maincpu->cycles_to_attotime(delta));
 }
 
-READ8_MEMBER(zx_state::ula_low_r)
+uint8_t zx_state::ula_low_r(offs_t offset)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 	if(machine().side_effects_disabled())
@@ -110,7 +110,7 @@ READ8_MEMBER(zx_state::ula_low_r)
 	return cdata;
 }
 
-READ8_MEMBER(zx_state::ula_high_r)
+uint8_t zx_state::ula_high_r(offs_t offset)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 

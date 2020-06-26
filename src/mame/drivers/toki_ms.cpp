@@ -313,15 +313,15 @@ private:
 	TILE_GET_INFO_MEMBER(get_bk2_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER(bk1vram_w);
-	DECLARE_WRITE16_MEMBER(bk2vram_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void bk1vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bk2vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	tilemap_t *m_bk1_tilemap;
 	tilemap_t *m_bk2_tilemap;
 	tilemap_t *m_tx_tilemap;
 
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	u8 palette_r(offs_t offset);
+	void palette_w(offs_t offset, u8 data);
 	std::unique_ptr<u8 []> m_paletteram;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -329,9 +329,9 @@ private:
 	void tokims_map(address_map &map);
 	void audio_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	u8 sound_status_r();
+	void sound_command_w(u8 data);
+	void adpcm_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	u8 m_adpcm_data;
 };
@@ -457,30 +457,30 @@ uint32_t toki_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE16_MEMBER(toki_ms_state::bk1vram_w)
+void toki_ms_state::bk1vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bk1vram[offset]);
 	m_bk1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_ms_state::bk2vram_w)
+void toki_ms_state::bk2vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bk2vram[offset]);
 	m_bk2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_ms_state::vram_w)
+void toki_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(toki_ms_state::palette_r)
+u8 toki_ms_state::palette_r(offs_t offset)
 {
 	return m_paletteram[offset];
 }
 
-WRITE8_MEMBER(toki_ms_state::palette_w)
+void toki_ms_state::palette_w(offs_t offset, u8 data)
 {
 	m_paletteram[offset] = data;
 	// xBGR444 over an 8-bit bus
@@ -493,7 +493,7 @@ WRITE8_MEMBER(toki_ms_state::palette_w)
 	m_palette->set_pen_color(pal_entry, pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-READ8_MEMBER(toki_ms_state::sound_status_r)
+u8 toki_ms_state::sound_status_r()
 {
 	// if non-zero skips new command, either soundlatch readback or audiocpu handshake
 	return 0;
@@ -501,7 +501,7 @@ READ8_MEMBER(toki_ms_state::sound_status_r)
 
 // TODO: remove this trampoline after confirming it just writes to the sound latch
 // (definitely it isn't tied to irq 0)
-WRITE8_MEMBER(toki_ms_state::sound_command_w)
+void toki_ms_state::sound_command_w(u8 data)
 {
 	m_soundlatch->write(data & 0xff);
 }
@@ -524,7 +524,7 @@ void toki_ms_state::tokims_map(address_map &map)
 	map(0x0c000e, 0x0c000f).rw(FUNC(toki_ms_state::sound_status_r), FUNC(toki_ms_state::sound_command_w)).umask16(0x00ff);
 }
 
-WRITE8_MEMBER(toki_ms_state::adpcm_w)
+void toki_ms_state::adpcm_w(u8 data)
 {
 //  membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
 	m_msm->reset_w(BIT(data, 4));
@@ -811,13 +811,13 @@ ROM_END
 void toki_ms_state::init_tokims()
 {
 	// copied verbatim from toki.cpp
-	uint8_t temp[0x20000];
+	u8 temp[0x20000];
 
 	int len = memregion("gfx3")->bytes();
-	uint8_t *rom = memregion("gfx3")->base();
+	u8 *rom = memregion("gfx3")->base();
 	for (int offs = 0; offs < len; offs += 0x20000)
 	{
-		uint8_t *base = &rom[offs];
+		u8 *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
 		for (int i = 0; i < 16; i++)
 		{
@@ -832,7 +832,7 @@ void toki_ms_state::init_tokims()
 	rom = memregion("gfx4")->base();
 	for (int offs = 0; offs < len; offs += 0x20000)
 	{
-		uint8_t *base = &rom[offs];
+		u8 *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
 		for (int i = 0; i < 16; i++)
 		{

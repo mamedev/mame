@@ -68,7 +68,8 @@ protected:
 	u8 pb_r();
 	u8 m_digit;
 	u8 m_seg;
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
@@ -222,6 +223,11 @@ void mkit09_state::machine_reset()
 	m_digit = 0;
 }
 
+void mkit09_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
 // read keyboard
 u8 mkit09_state::pa_r()
 {
@@ -348,5 +354,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                    FLAGS
-COMP( 1983, mkit09,  0,      0,      mkit09,  mkit09,  mkit09_state,  empty_init, "Multitech", "Microkit09",               MACHINE_NO_SOUND_HW )
-COMP( 1983, mkit09a, mkit09, 0,      mkit09a, mkit09a, mkit09a_state, empty_init, "Multitech", "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, mkit09,  0,      0,      mkit09,  mkit09,  mkit09_state,  empty_init, "Multitech", "Microkit09",               MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, mkit09a, mkit09, 0,      mkit09a, mkit09a, mkit09a_state, empty_init, "Multitech", "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -78,8 +78,8 @@ private:
 	uint8_t serial_r();
 	void serial_w(uint8_t data);
 	void mikrolab_serial_w(uint8_t data);
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
 
 	void ics8080_mem(address_map &map);
 	void mikrolab_io(address_map &map);
@@ -111,12 +111,12 @@ void tk80_state::machine_start()
 	save_item(NAME(m_ppi_portc));
 }
 
-READ8_MEMBER( tk80_state::display_r )
+uint8_t tk80_state::display_r(offs_t offset)
 {
 	return m_digit[offset & 0x7];
 }
 
-WRITE8_MEMBER( tk80_state::display_w )
+void tk80_state::display_w(offs_t offset, uint8_t data)
 {
 	m_digit[offset & 0x7] = data;
 }

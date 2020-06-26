@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(amu880_state::keyboard_tick)
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( amu880_state::keyboard_r )
+uint8_t amu880_state::keyboard_r(offs_t offset)
 {
 	/*
 

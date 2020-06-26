@@ -287,17 +287,17 @@ void msx_state::msx_psg_port_b_w(uint8_t data)
 ** RTC functions
 */
 
-WRITE8_MEMBER( msx2_state::msx_rtc_latch_w )
+void msx2_state::msx_rtc_latch_w(uint8_t data)
 {
 	m_rtc_latch = data & 15;
 }
 
-WRITE8_MEMBER( msx2_state::msx_rtc_reg_w )
+void msx2_state::msx_rtc_reg_w(uint8_t data)
 {
 	m_rtc->write(m_rtc_latch, data);
 }
 
-READ8_MEMBER( msx2_state::msx_rtc_reg_r )
+uint8_t msx2_state::msx_rtc_reg_r()
 {
 	return m_rtc->read(m_rtc_latch);
 }
@@ -426,17 +426,17 @@ void msx_state::msx_memory_map_all ()
 		msx_memory_map_page (i);
 }
 
-READ8_MEMBER( msx_state::msx_mem_read )
+uint8_t msx_state::msx_mem_read(offs_t offset)
 {
 	return m_current_page[offset >> 14]->read(offset);
 }
 
-WRITE8_MEMBER( msx_state::msx_mem_write )
+void msx_state::msx_mem_write(offs_t offset, uint8_t data)
 {
 	m_current_page[offset >> 14]->write(offset, data);
 }
 
-WRITE8_MEMBER( msx_state::msx_sec_slot_w )
+void msx_state::msx_sec_slot_w(uint8_t data)
 {
 	int slot = m_primary_slot >> 6;
 	if (m_slot_expanded[slot])
@@ -451,7 +451,7 @@ WRITE8_MEMBER( msx_state::msx_sec_slot_w )
 		m_current_page[3]->write(0xffff, data);
 }
 
-READ8_MEMBER( msx_state::msx_sec_slot_r )
+uint8_t msx_state::msx_sec_slot_r()
 {
 	int slot = m_primary_slot >> 6;
 
@@ -465,7 +465,7 @@ READ8_MEMBER( msx_state::msx_sec_slot_r )
 	}
 }
 
-READ8_MEMBER( msx_state::msx_kanji_r )
+uint8_t msx_state::msx_kanji_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -480,7 +480,7 @@ READ8_MEMBER( msx_state::msx_kanji_r )
 	return result;
 }
 
-WRITE8_MEMBER( msx_state::msx_kanji_w )
+void msx_state::msx_kanji_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 		m_kanji_latch = (m_kanji_latch & 0x007E0) | ((data & 0x3f) << 11);
@@ -488,7 +488,7 @@ WRITE8_MEMBER( msx_state::msx_kanji_w )
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-READ8_MEMBER( msx2_state::msx_switched_r )
+uint8_t msx2_state::msx_switched_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -500,7 +500,7 @@ READ8_MEMBER( msx2_state::msx_switched_r )
 	return data;
 }
 
-WRITE8_MEMBER( msx2_state::msx_switched_w )
+void msx2_state::msx_switched_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < m_switched.size(); i++)
 	{

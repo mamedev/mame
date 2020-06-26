@@ -63,24 +63,24 @@ class intellec4_state : public driver_device
 public:
 	void bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 data);
 
-	DECLARE_READ8_MEMBER(pm_read);
-	DECLARE_WRITE8_MEMBER(pm_write);
+	u8 pm_read(offs_t offset);
+	void pm_write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(rom0_in);
-	DECLARE_READ8_MEMBER(rom2_in);
-	DECLARE_READ8_MEMBER(rom3_in);
-	DECLARE_READ8_MEMBER(rome_in);
-	DECLARE_READ8_MEMBER(romf_in);
+	u8 rom0_in();
+	u8 rom2_in();
+	u8 rom3_in();
+	u8 rome_in();
+	u8 romf_in();
 
-	DECLARE_WRITE8_MEMBER(rom0_out);
-	DECLARE_WRITE8_MEMBER(rom1_out);
-	DECLARE_WRITE8_MEMBER(rom2_out);
-	DECLARE_WRITE8_MEMBER(rom3_out);
-	DECLARE_WRITE8_MEMBER(rome_out);
-	DECLARE_WRITE8_MEMBER(romf_out);
+	void rom0_out(u8 data);
+	void rom1_out(u8 data);
+	void rom2_out(u8 data);
+	void rom3_out(u8 data);
+	void rome_out(u8 data);
+	void romf_out(u8 data);
 
-	DECLARE_WRITE8_MEMBER(ram0_out);
-	DECLARE_WRITE8_MEMBER(ram1_out);
+	void ram0_out(u8 data);
+	void ram1_out(u8 data);
 
 	// universal slot outputs
 	DECLARE_WRITE_LINE_MEMBER(bus_reset_4002);
@@ -377,7 +377,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
   Program memory access handlers
 ----------------------------------*/
 
-READ8_MEMBER(intellec4_state::pm_read)
+u8 intellec4_state::pm_read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -390,7 +390,7 @@ READ8_MEMBER(intellec4_state::pm_read)
 	return m_ram_data & 0x0fU;
 }
 
-WRITE8_MEMBER(intellec4_state::pm_write)
+void intellec4_state::pm_write(offs_t offset, u8 data)
 {
 	// always causes data to be latched
 	u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
@@ -407,83 +407,83 @@ WRITE8_MEMBER(intellec4_state::pm_write)
   I/O port handlers
 ----------------------------------*/
 
-READ8_MEMBER(intellec4_state::rom0_in)
+u8 intellec4_state::rom0_in()
 {
 	// bit 0 of this port is ANDed with the TTY input
 	return m_tty->rxd_r() ? 0x0eU : 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::rom2_in)
+u8 intellec4_state::rom2_in()
 {
 	// lower nybble of PROM programmer data
 	return m_prom_programmer->do_r() & 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::rom3_in)
+u8 intellec4_state::rom3_in()
 {
 	// upper nybble of PROM programmer data
 	return (m_prom_programmer->do_r() >> 4) & 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::rome_in)
+u8 intellec4_state::rome_in()
 {
 	// upper nybble of RAM data latch
 	return (m_ram_data >> 4) & 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::romf_in)
+u8 intellec4_state::romf_in()
 {
 	// lower nybble of RAM data latch
 	return m_ram_data & 0x0fU;
 }
 
-WRITE8_MEMBER(intellec4_state::rom0_out)
+void intellec4_state::rom0_out(u8 data)
 {
 	// lower nybble of PROM programmer address
 	m_prom_addr = (m_prom_addr & 0xf0U) | (data & 0x0fU);
 	m_prom_programmer->a_w(m_prom_addr);
 }
 
-WRITE8_MEMBER(intellec4_state::rom1_out)
+void intellec4_state::rom1_out(u8 data)
 {
 	// upper nybble of PROM programmer address
 	m_prom_addr = (m_prom_addr & 0x0fU) | ((data << 4) & 0xf0U);
 	m_prom_programmer->a_w(m_prom_addr);
 }
 
-WRITE8_MEMBER(intellec4_state::rom2_out)
+void intellec4_state::rom2_out(u8 data)
 {
 	// lower nybble of PROM programmer data
 	m_prom_data = (m_prom_data & 0xf0U) | (data & 0x0fU);
 	m_prom_programmer->di_w(m_prom_data);
 }
 
-WRITE8_MEMBER(intellec4_state::rom3_out)
+void intellec4_state::rom3_out(u8 data)
 {
 	// upper nybble of PROM programmer data
 	m_prom_data = (m_prom_data & 0x0fU) | ((data << 4) & 0xf0U);
 	m_prom_programmer->di_w(m_prom_data);
 }
 
-WRITE8_MEMBER(intellec4_state::rome_out)
+void intellec4_state::rome_out(u8 data)
 {
 	// bit 0 of this port enables program memory write
 	m_ram_write = BIT(data, 0);
 }
 
-WRITE8_MEMBER(intellec4_state::romf_out)
+void intellec4_state::romf_out(u8 data)
 {
 	// sets the program memory page for read/write operations
 	m_ram_page = data & 0x0fU;
 }
 
-WRITE8_MEMBER(intellec4_state::ram0_out)
+void intellec4_state::ram0_out(u8 data)
 {
 	// bit 0 of this port controls the TTY current loop
 	m_tty->write_txd(BIT(data, 0));
 }
 
-WRITE8_MEMBER(intellec4_state::ram1_out)
+void intellec4_state::ram1_out(u8 data)
 {
 	// bit 0 of this port controls the paper tape motor (0 = stop, 1 = run)
 	m_tty->write_rts(BIT(~data, 0));

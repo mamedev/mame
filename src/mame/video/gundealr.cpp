@@ -66,19 +66,19 @@ void gundealr_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gundealr_state::bg_videoram_w)
+void gundealr_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(gundealr_state::fg_videoram_w)
+void gundealr_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(gundealr_state::paletteram_w)
+void gundealr_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	int r,g,b,val;
 

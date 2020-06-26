@@ -39,13 +39,13 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER( cause_r );
-	DECLARE_WRITE8_MEMBER( task_w );
-	DECLARE_READ8_MEMBER( segment_r );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( page_r );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_WRITE8_MEMBER( dmamap_w );
+	uint8_t cause_r();
+	void task_w(offs_t offset, uint8_t data);
+	uint8_t segment_r(offs_t offset);
+	void segment_w(offs_t offset, uint8_t data);
+	uint8_t page_r(offs_t offset);
+	void page_w(offs_t offset, uint8_t data);
+	void dmamap_w(offs_t offset, uint8_t data);
 
 	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
 	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
@@ -84,8 +84,8 @@ private:
 		DMAMAP_R0_HI
 	};
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	int get_current_task(offs_t offset);
 	offs_t get_segment_address(offs_t offset);
@@ -94,8 +94,8 @@ private:
 	uint8_t read_user_memory(offs_t offset);
 	void write_user_memory(offs_t offset, uint8_t data);
 	int get_fc();
-	uint8_t read_supervisor_memory(address_space &space, offs_t offset);
-	void write_supervisor_memory(address_space &space, offs_t offset, uint8_t data);
+	uint8_t read_supervisor_memory(offs_t offset);
+	void write_supervisor_memory(offs_t offset, uint8_t data);
 	offs_t get_dma_address(int index, uint16_t offset);
 	uint8_t dma_mreq_r(int index, uint16_t offset);
 	void dma_mreq_w(int index, uint16_t offset, uint8_t data);

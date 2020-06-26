@@ -158,8 +158,8 @@ private:
 	// I/O handlers
 	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
-	DECLARE_WRITE8_MEMBER(main_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(main_firq_clear_w);
+	void main_irq_clear_w(u8 data);
+	void main_firq_clear_w(u8 data);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
 	void cg_motor_tick(int i);
 	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
@@ -279,12 +279,12 @@ WRITE_LINE_MEMBER(cgang_state::main_firq_w)
 	m_main_firq = state;
 }
 
-WRITE8_MEMBER(cgang_state::main_irq_clear_w)
+void cgang_state::main_irq_clear_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cgang_state::main_firq_clear_w)
+void cgang_state::main_firq_clear_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }

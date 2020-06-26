@@ -48,10 +48,10 @@ public:
 	void rowamet(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(mute_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t sound_r();
+	void mute_w(uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void rowamet_map(address_map &map);
 	void rowamet_sub_io(address_map &map);
@@ -173,22 +173,22 @@ static INPUT_PORTS_START( rowamet )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( rowamet_state::sound_r )
+uint8_t rowamet_state::sound_r()
 {
 	return m_sndcmd;
 }
 
-WRITE8_MEMBER( rowamet_state::mute_w )
+void rowamet_state::mute_w(uint8_t data)
 {
 	machine().sound().system_enable(data ? 0 : 1);
 }
 
-READ8_MEMBER( rowamet_state::io_r )
+uint8_t rowamet_state::io_r(offs_t offset)
 {
 	return m_io[offset];
 }
 
-WRITE8_MEMBER( rowamet_state::io_w )
+void rowamet_state::io_w(offs_t offset, uint8_t data)
 {
 	m_io[offset] = data;
 

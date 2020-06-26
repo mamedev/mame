@@ -19,7 +19,7 @@
     DEVICE
 ***************************************************************************/
 
-DECLARE_DEVICE_TYPE(SWIM, swim_device)
+DECLARE_DEVICE_TYPE(LEGACY_SWIM, swim_device)
 
 class swim_device : public applefdc_base_device
 {

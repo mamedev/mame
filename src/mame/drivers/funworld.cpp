@@ -732,7 +732,7 @@ void funworld_state::funworld_map(address_map &map)
 
 static uint8_t funquiz_question_bank = 0x80;
 
-READ8_MEMBER(funworld_state::questions_r)
+uint8_t funworld_state::questions_r(offs_t offset)
 {
 	uint8_t* quiz = memregion("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
@@ -743,7 +743,7 @@ READ8_MEMBER(funworld_state::questions_r)
 	return quiz[offset + extraoffset];
 }
 
-WRITE8_MEMBER(funworld_state::question_bank_w)
+void funworld_state::question_bank_w(uint8_t data)
 {
 //  printf("question bank write %02x\n", data);
 	funquiz_question_bank = data;
@@ -803,7 +803,7 @@ void funworld_state::cuoreuno_map(address_map &map)
 }
 
 
-READ8_MEMBER(chinatow_state::chinatow_r_32f0)
+uint8_t chinatow_state::chinatow_r_32f0(offs_t offset)
 {
 	logerror("read from 0x32f0 at offset %02X\n", offset);
 	switch (offset)
@@ -3195,11 +3195,11 @@ void funworld_state::fw_brick_2(machine_config &config)
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
 }
 
-READ8_MEMBER(royalcrdf_state::royalcrdf_opcode_r)
+uint8_t royalcrdf_state::royalcrdf_opcode_r(offs_t offset)
 {
 	// address-based data bitswap; 4 address bits are involved, but only
 	// 5 different bitswaps exist, with clear regularities, so the
-	// hardware is probably selecting the appropiate one by
+	// hardware is probably selecting the appropriate one by
 	// applying passive logic to the address bits; we encode it
 	// indexed by all the involved address bits instead. A notable fact is that
 	// all the permutations in royalcrdf & multiwin are odd-parity ones,
@@ -3276,7 +3276,7 @@ void royalcrdf_state::royalcrdf(machine_config &config)
 }
 
 
-READ8_MEMBER(multiwin_state::multiwin_opcode_r)
+uint8_t multiwin_state::multiwin_opcode_r(offs_t offset)
 {
 	// same general encryption scheme than the one used by the EVONA Royald Card set;
 	// 4 address bits determine which bitswap+xor is applied to the opcodes; in this case,
@@ -3340,12 +3340,12 @@ public:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(powercrd_opcode_r);
+	uint8_t powercrd_opcode_r(offs_t offset);
 
 	void powercrd_opcodes_map(address_map& map);
 };
 
-READ8_MEMBER(powercrd_state::powercrd_opcode_r)
+uint8_t powercrd_state::powercrd_opcode_r(offs_t offset)
 {
 	// encryption controlled by the lower two bits of the address; no clear structure is
 	// seen in the tables, so it looks like a lookup into randomly or pseudorandomly
@@ -3458,12 +3458,12 @@ public:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(megacard_opcode_r);
+	uint8_t megacard_opcode_r(offs_t offset);
 
 	void megacard_opcodes_map(address_map& map);
 };
 
-READ8_MEMBER(megacard_state::megacard_opcode_r)
+uint8_t megacard_state::megacard_opcode_r(offs_t offset)
 {
 	// all opcodes in the [c000, fc80) range are believed to be covered by these tables;
 	// errors could be lurking in the least used opcodes
@@ -3573,12 +3573,12 @@ public:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(jokercrd_opcode_r);
+	uint8_t jokercrd_opcode_r(offs_t offset);
 
 	void jokercrd_opcodes_map(address_map& map);
 };
 
-READ8_MEMBER(jokercrd_state::jokercrd_opcode_r)
+uint8_t jokercrd_state::jokercrd_opcode_r(offs_t offset)
 {
 	// even when errors could be lurking in the least used opcodes,
 	// all of them in the [8050,b369) & [c000, f063) ranges are believed

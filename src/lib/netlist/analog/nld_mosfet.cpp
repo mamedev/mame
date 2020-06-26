@@ -364,7 +364,7 @@ namespace analog
 		state_var<nl_fptype> m_Vgd;
 		fet_model_t m_modacc;
 
-		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> cap,
+		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> &cap,
 			nl_fptype capval, nl_fptype V,
 			nl_fptype &g11, nl_fptype &g12, nl_fptype &g21, nl_fptype &g22,
 			nl_fptype &I1, nl_fptype &I2) const
@@ -415,8 +415,8 @@ namespace analog
 				else
 				{
 					// linear
-					const auto Sqr1(static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
-					const auto Sqr2(static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
+					const auto Sqr1(plib::narrow_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
+					const auto Sqr2(plib::narrow_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
 					Cgb = 0;
 					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::two_thirds();
 					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::two_thirds();

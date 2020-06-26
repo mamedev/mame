@@ -252,17 +252,24 @@ void apf_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case APF_BASIC:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(*m_cart, FUNC(apf_cart_slot_device::extra_rom)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8sm_delegate(*m_cart, FUNC(apf_cart_slot_device::extra_rom)));
 				break;
 			case APF_SPACEDST:
 				m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x9800, 0x9fff);
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(*m_cart, FUNC(apf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(apf_cart_slot_device::write_ram)));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8sm_delegate(*m_cart, FUNC(apf_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(apf_cart_slot_device::write_ram)));
 				m_has_cart_ram = true;
 				break;
 		}
 
 		m_cart->save_ram();
 	}
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_keyboard_data));
+	save_item(NAME(m_pad_data));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_ca2));
+	save_item(NAME(m_has_cart_ram));
 }
 
 
@@ -612,5 +619,5 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME
-COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )
+COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", MACHINE_SUPPORTS_SAVE )

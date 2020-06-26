@@ -21,8 +21,8 @@
 /* Address maps */
 void special_state::specialist_mem(address_map &map)
 {
-	map(0x0000, 0x2fff).bankrw("bank1"); // First bank
-	map(0x3000, 0x8fff).ram();  // RAM
+	map(0x0000, 0x3fff).bankrw("bank1"); // First bank, hacky, upon reset c000-ffff area should be mirrored at 0000, 4000 and 8000
+	map(0x4000, 0x8fff).ram();  // RAM
 	map(0x9000, 0xbfff).ram().share("videoram"); // Video RAM
 	map(0xc000, 0xefff).rom();  // System ROM
 	map(0xf800, 0xf803).mirror(0x7fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -30,8 +30,8 @@ void special_state::specialist_mem(address_map &map)
 
 void special_state::specialp_mem(address_map &map)
 {
-	map(0x0000, 0x2fff).bankrw("bank1"); // First bank
-	map(0x3000, 0x7fff).ram();  // RAM
+	map(0x0000, 0x3fff).bankrw("bank1"); // First bank
+	map(0x4000, 0x7fff).ram();  // RAM
 	map(0x8000, 0xbfff).ram().share("videoram"); // Video RAM
 	map(0xc000, 0xefff).rom();  // System ROM
 	map(0xf800, 0xf803).mirror(0x7fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -370,8 +370,6 @@ void special_state::special(machine_config &config)
 	I8080(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::specialist_mem);
 
-	MCFG_MACHINE_RESET_OVERRIDE(special_state, special )
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -463,7 +461,7 @@ void special_state::specimx(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(special_state::specimx_8255_portb_r));
 	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
 	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
-	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialistmx_8255_portc_w));
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
@@ -514,7 +512,7 @@ void special_state::erik(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(special_state::specialist_8255_portb_r));
 	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
 	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
-	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialistmx_8255_portc_w));
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));

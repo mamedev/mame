@@ -14,6 +14,9 @@ Hardware notes:
 
 I/O is similar to supercon
 
+TODO:
+- add power-off NMI? does nothing, it will just go into an infinite loop
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -73,21 +76,17 @@ private:
 	// I/O handlers
 	void update_display();
 	void lcd_output_w(u64 data);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	void mux_w(u8 data);
+	void control_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void cforte_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
@@ -131,14 +130,14 @@ void cforte_state::update_display()
 	m_display->matrix_partial(0, 3, m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(cforte_state::mux_w)
+void cforte_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(cforte_state::control_w)
+void cforte_state::control_w(u8 data)
 {
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
@@ -147,7 +146,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_lcd->clk_w(data >> 1 & 1);
 	m_lcd->lcd_w(data >> 2 & 1);
 
-	// d3: unused?
+	// d3: ? (goes high at power-off NMI)
 
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
@@ -157,7 +156,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(cforte_state::input1_r)
+u8 cforte_state::input1_r()
 {
 	u8 data = 0;
 
@@ -169,7 +168,7 @@ READ8_MEMBER(cforte_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(cforte_state::input2_r)
+u8 cforte_state::input2_r()
 {
 	u8 data = 0;
 
@@ -260,6 +259,7 @@ void cforte_state::cforte(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	HLCD0538(config, m_lcd).write_cols().set(FUNC(cforte_state::lcd_output_w));

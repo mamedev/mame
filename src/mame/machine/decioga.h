@@ -15,7 +15,7 @@
 class dec_ioga_device : public device_t
 {
 public:
-	dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void map(address_map &map);
 
@@ -37,14 +37,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	DECLARE_READ32_MEMBER(csr_r);
-	DECLARE_WRITE32_MEMBER(csr_w);
-	DECLARE_READ32_MEMBER(intr_r);
-	DECLARE_WRITE32_MEMBER(intr_w);
-	DECLARE_READ32_MEMBER(imsk_r);
-	DECLARE_WRITE32_MEMBER(imsk_w);
-	DECLARE_READ32_MEMBER(dmaptr_r);
-	DECLARE_WRITE32_MEMBER(dmaptr_w);
+	u32 csr_r();
+	void csr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 intr_r();
+	void intr_w(u32 data);
+	u32 imsk_r();
+	void imsk_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 dmaptr_r(offs_t offset);
+	void dmaptr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	address_space *m_maincpu_space;
 

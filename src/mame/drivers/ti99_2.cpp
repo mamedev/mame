@@ -163,17 +163,16 @@
 */
 
 #include "emu.h"
-#include "bus/ti99/ti99defs.h"
 #include "cpu/tms9900/tms9995.h"
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/hexbus/hexbus.h"
 
-#define TI992_SCREEN_TAG      "screen"
-#define TI992_ROM          "rom_region"
-#define TI992_RAM_TAG      "ram_region"
 #define TI992_IO_TAG       "io"
+#define TI992_RAM_TAG      "ram_region"
+#define TI992_ROM          "rom_region"
+#define TI992_SCREEN_TAG   "screen"
 
 #define LOG_WARN           (1U<<1)   // Warnings
 #define LOG_CRU            (1U<<2)   // CRU activities
@@ -192,8 +191,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_videoctrl(*this, TI992_VDC_TAG),
 		m_io992(*this, TI992_IO_TAG),
-		m_cassette(*this, TI_CASSETTE),
+		m_cassette(*this, TI992_CASSETTE),
 		m_ram(*this, TI992_RAM_TAG),
+		m_expport(*this, TI992_EXPPORT_TAG),
 		m_otherbank(false),
 		m_rom(nullptr),
 		m_ram_start(0xf000),
@@ -209,7 +209,7 @@ public:
 	void driver_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(intflag_write);
+	void intflag_write(offs_t offset, uint8_t data);
 
 	uint8_t mem_read(offs_t offset);
 	void mem_write(offs_t offset, uint8_t data);
@@ -230,6 +230,8 @@ private:
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+
+	required_device<bus::ti99::internal::ti992_expport_device> m_expport;
 
 	bool m_otherbank;
 
@@ -288,7 +290,7 @@ void ti99_2_state::crumap(address_map &map)
     These CRU addresses are actually inside the 9995 CPU, but they are
     propagated to the outside world, so we can watch the changes.
 */
-WRITE8_MEMBER(ti99_2_state::intflag_write)
+void ti99_2_state::intflag_write(offs_t offset, uint8_t data)
 {
 	int addr = 0x1ee0 | (offset<<1);
 	switch (addr)
@@ -323,6 +325,7 @@ WRITE8_MEMBER(ti99_2_state::intflag_write)
 */
 uint8_t ti99_2_state::mem_read(offs_t offset)
 {
+	uint8_t value = 0;
 	if (m_maincpu->is_onchip(offset)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
 
 	int page = offset >> 12;
@@ -330,22 +333,23 @@ uint8_t ti99_2_state::mem_read(offs_t offset)
 	if (page>=0 && page<4)
 	{
 		// ROM, unbanked
-		return m_rom[offset];
+		value = m_rom[offset];
 	}
 	if (page>=4 && page<6)
 	{
 		// ROM, banked on 32K version
 		if (m_otherbank) offset = (offset & 0x1fff) | 0x10000;
-		return m_rom[offset];
+		value = m_rom[offset];
 	}
 
 	if ((page >= m_first_ram_page) && (page < 15))
 	{
-		return m_ram->pointer()[offset - m_ram_start];
+		value = m_ram->pointer()[offset - m_ram_start];
 	}
 
-	LOGMASKED(LOG_WARN, "Unmapped read access at %04x\n", offset);
-	return 0;
+	m_expport->readz(offset, &value);
+
+	return value;
 }
 
 void ti99_2_state::mem_write(offs_t offset, uint8_t data)
@@ -371,7 +375,7 @@ void ti99_2_state::mem_write(offs_t offset, uint8_t data)
 		return;
 	}
 
-	LOGMASKED(LOG_WARN, "Unmapped write access at %04x\n", offset);
+	m_expport->write(offset, data);
 }
 
 /*
@@ -470,7 +474,10 @@ void ti99_2_state::ti99_2(machine_config& config)
 	CASSETTE(config, "cassette", 0);
 
 	// Hexbus
-	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
+	HEXBUS(config, TI992_HEXBUS_TAG, 0, hexbus_options, nullptr);
+
+	// Expansion port (backside)
+	TI992_EXPPORT(config, m_expport, 0, ti992_expport_options, nullptr);
 }
 
 /*

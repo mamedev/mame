@@ -86,9 +86,9 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(ff_r);
+	uint8_t status_r();
+	uint8_t key_r();
+	uint8_t ff_r();
 
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
@@ -161,7 +161,7 @@ void jupiter3_state::jupiter3_io(address_map &map)
 	map(0xb2, 0xb2).r(FUNC(jupiter3_state::key_r));
 }
 
-READ8_MEMBER( jupiter3_state::ff_r )
+uint8_t jupiter3_state::ff_r()
 {
 	return 0xfd;
 }
@@ -177,14 +177,14 @@ READ8_MEMBER( jupiter3_state::ff_r )
 static INPUT_PORTS_START( jupiter )
 INPUT_PORTS_END
 
-READ8_MEMBER( jupiter3_state::key_r )
+uint8_t jupiter3_state::key_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( jupiter3_state::status_r )
+uint8_t jupiter3_state::status_r()
 {
 	return (m_term_data) ? 0x80 : 0x00;
 }

@@ -94,8 +94,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
+	uint8_t ldp_read();
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
@@ -152,16 +151,10 @@ uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitma
 
 /* MEMORY HANDLERS */
 /* Main Z80 R/W */
-READ8_MEMBER(lgp_state::ldp_read)
+uint8_t lgp_state::ldp_read()
 {
 	return m_laserdisc->status_r();
 }
-
-WRITE8_MEMBER(lgp_state::ldp_write)
-{
-	m_laserdisc->data_w(data);
-}
-
 
 /* Sound Z80 R/W */
 
@@ -174,7 +167,7 @@ void lgp_state::main_program_map(address_map &map)
 	map(0xe400, 0xe7ff).ram().share("tile_ctrl_ram");
 
 //  map(0xef00, 0xef00).portr("IN_TEST");
-	map(0xef80, 0xef80).rw(FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
+	map(0xef80, 0xef80).r(FUNC(lgp_state::ldp_read)).w(m_laserdisc, FUNC(pioneer_ldv1000_device::data_w));
 	map(0xefb8, 0xefb8).nopr(); // watchdog
 	map(0xefc0, 0xefc0).portr("DSWA");    /* Not tested */
 	map(0xefc8, 0xefc8).portr("DSWB");

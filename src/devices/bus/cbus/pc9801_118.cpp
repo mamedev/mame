@@ -114,7 +114,7 @@ void pc9801_118_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_118_device::device_start()
 {
-	m_bus->install_io(0xa460, 0xa463, read8_delegate(*this, FUNC(pc9801_118_device::id_r)), write8_delegate(*this, FUNC(pc9801_118_device::ext_w)));
+	m_bus->install_io(0xa460, 0xa463, read8sm_delegate(*this, FUNC(pc9801_118_device::id_r)), write8sm_delegate(*this, FUNC(pc9801_118_device::ext_w)));
 
 	save_item(NAME(m_ext_reg));
 }
@@ -128,7 +128,7 @@ void pc9801_118_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008b, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(*this, FUNC(pc9801_118_device::opn3_r)), write8_delegate(*this, FUNC(pc9801_118_device::opn3_w)));
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8sm_delegate(*this, FUNC(pc9801_118_device::opn3_r)), write8sm_delegate(*this, FUNC(pc9801_118_device::opn3_w)));
 	m_ext_reg = 1; // TODO: enabled or disabled?
 }
 
@@ -138,7 +138,7 @@ void pc9801_118_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_118_device::opn3_r)
+uint8_t pc9801_118_device::opn3_r(offs_t offset)
 {
 	if(((offset & 5) == 0) || m_ext_reg)
 		return m_opn3->read(offset >> 1);
@@ -150,7 +150,7 @@ READ8_MEMBER(pc9801_118_device::opn3_r)
 }
 
 
-WRITE8_MEMBER(pc9801_118_device::opn3_w)
+void pc9801_118_device::opn3_w(offs_t offset, uint8_t data)
 {
 	if(((offset & 5) == 0) || m_ext_reg)
 		m_opn3->write(offset >> 1,data);
@@ -158,7 +158,7 @@ WRITE8_MEMBER(pc9801_118_device::opn3_w)
 	//  printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
-READ8_MEMBER( pc9801_118_device::id_r )
+uint8_t pc9801_118_device::id_r(offs_t offset)
 {
 	if(offset == 0)
 	{
@@ -170,7 +170,7 @@ READ8_MEMBER( pc9801_118_device::id_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc9801_118_device::ext_w )
+void pc9801_118_device::ext_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{

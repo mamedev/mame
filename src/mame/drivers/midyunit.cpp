@@ -139,7 +139,7 @@ Notes:
  *
  *************************************/
 
-WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
+void midyunit_state::yawdim_oki_bank_w(uint8_t data)
 {
 	if (data & 4)
 		m_oki->set_rom_bank(data & 3);

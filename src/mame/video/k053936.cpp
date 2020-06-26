@@ -266,22 +266,22 @@ void k053936_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE16_MEMBER( k053936_device::ctrl_w )
+void k053936_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset]);
 }
 
-READ16_MEMBER( k053936_device::ctrl_r )
+uint16_t k053936_device::ctrl_r(offs_t offset)
 {
 	return m_ctrl[offset];
 }
 
-WRITE16_MEMBER( k053936_device::linectrl_w )
+void k053936_device::linectrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_linectrl[offset]);
 }
 
-READ16_MEMBER( k053936_device::linectrl_r )
+uint16_t k053936_device::linectrl_r(offs_t offset)
 {
 	return m_linectrl[offset];
 }

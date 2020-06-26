@@ -12,9 +12,8 @@
 /// For w==1 we will do the classic Gauss-Seidel approach
 ///
 
-#include "nld_matrix_solver.h"
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
-#include "nld_solver.h"
 
 #include <algorithm>
 

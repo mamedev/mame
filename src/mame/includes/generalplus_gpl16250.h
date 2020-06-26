@@ -32,16 +32,16 @@ public:
 
 	void cs_map_base(address_map &map);
 
-	virtual DECLARE_READ16_MEMBER(cs0_r);
-	virtual DECLARE_WRITE16_MEMBER(cs0_w);
-	virtual DECLARE_READ16_MEMBER(cs1_r);
-	virtual DECLARE_WRITE16_MEMBER(cs1_w);
-	virtual DECLARE_READ16_MEMBER(cs2_r);
-	virtual DECLARE_WRITE16_MEMBER(cs2_w);
-	virtual DECLARE_READ16_MEMBER(cs3_r);
-	virtual DECLARE_WRITE16_MEMBER(cs3_w);
-	virtual DECLARE_READ16_MEMBER(cs4_r);
-	virtual DECLARE_WRITE16_MEMBER(cs4_w);
+	virtual uint16_t cs0_r(offs_t offset);
+	virtual void cs0_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs1_r(offs_t offset);
+	virtual void cs1_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs2_r(offs_t offset);
+	virtual void cs2_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs3_r(offs_t offset);
+	virtual void cs3_w(offs_t offset, uint16_t data);
+	virtual uint16_t cs4_r(offs_t offset);
+	virtual void cs4_w(offs_t offset, uint16_t data);
 
 	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
@@ -86,29 +86,31 @@ public:
 
 protected:
 
-	/*
-	virtual DECLARE_READ16_MEMBER(porta_r) override
-	{
-	    return machine().rand();
-	}
-
-	virtual DECLARE_READ16_MEMBER(portb_r) override
-	{
-	    return machine().rand();
-	}
-
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override
-	{
-	}
-	*/
+	virtual void machine_reset() override;
 
 private:
+	int m_upperbase;
 
-	virtual DECLARE_READ16_MEMBER(cs0_r) override
-	{
-		return m_romregion[offset & 0x3ffffff];
-	}
+	virtual uint16_t cs0_r(offs_t offset) override;
+
+	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
+
+class gormiti_game_state : public gcm394_game_state
+{
+public:
+	gormiti_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+
+protected:
+
+	virtual void machine_reset() override;
+
+private:
+};
 
 #endif

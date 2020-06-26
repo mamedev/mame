@@ -79,11 +79,11 @@ private:
 
 	MC6845_UPDATE_ROW(update_row);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE16_MEMBER(charram_w);
+	void charram_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
-	DECLARE_WRITE8_MEMBER(p7c_w);
+	void dmapg_w(uint8_t data);
+	void p7c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	uint8_t memory_read_byte(offs_t offset);
@@ -149,7 +149,7 @@ uint8_t peoplepc_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE16_MEMBER(peoplepc_state::charram_w)
+void peoplepc_state::charram_w(offs_t offset, uint16_t data)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
@@ -167,12 +167,12 @@ WRITE_LINE_MEMBER(peoplepc_state::kbd_clock_tick_w)
 	m_8251key->write_rxc(state);
 }
 
-WRITE8_MEMBER(peoplepc_state::dmapg_w)
+void peoplepc_state::dmapg_w(uint8_t data)
 {
 	m_dma0pg = data;
 }
 
-WRITE8_MEMBER(peoplepc_state::p7c_w)
+void peoplepc_state::p7c_w(uint8_t data)
 {
 	m_p7c = data;
 	m_crtc->set_hpixels_per_column(BIT(data, 1) ? 16 : 8);

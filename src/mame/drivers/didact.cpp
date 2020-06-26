@@ -551,8 +551,8 @@ class modulab_state : public didact_state
 	virtual void machine_start() override;
 	void modulab(machine_config &config);
 protected:
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 private:
 	void modulab_map(address_map &map);
@@ -585,7 +585,7 @@ WRITE_LINE_MEMBER( modulab_state::da_w )
 	m_da = state == CLEAR_LINE ? 0 : 1; // Capture data available signal
 }
 
-READ8_MEMBER(modulab_state::io_r)
+uint8_t modulab_state::io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -603,7 +603,7 @@ READ8_MEMBER(modulab_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(modulab_state::io_w)
+void modulab_state::io_w(offs_t offset, u8 data)
 {
 	LOG("--->%s()\n", FUNCNAME);
 	uint8_t b = data & 1;

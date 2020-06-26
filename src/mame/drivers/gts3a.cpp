@@ -49,12 +49,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 private:
-	DECLARE_WRITE8_MEMBER(segbank_w);
+	void segbank_w(offs_t offset, uint8_t data);
 	uint8_t u4a_r();
 	uint8_t u4b_r();
 	void u4b_w(uint8_t data);
-	DECLARE_READ8_MEMBER(dmd_r);
-	DECLARE_WRITE8_MEMBER(dmd_w);
+	uint8_t dmd_r();
+	void dmd_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init(palette_device &palette);
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER( gts3a_state::nmi_w )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
 
-WRITE8_MEMBER( gts3a_state::segbank_w )
+void gts3a_state::segbank_w(offs_t offset, uint8_t data)
 { // this is all wrong
 	uint32_t seg1,seg2;
 	m_segment[offset] = data;
@@ -302,12 +302,12 @@ void gts3a_state::init_gts3a()
 	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
 
-READ8_MEMBER( gts3a_state::dmd_r )
+uint8_t gts3a_state::dmd_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( gts3a_state::dmd_w )
+void gts3a_state::dmd_w(uint8_t data)
 {
 	m_dmd = data;
 	membank("bank1")->set_entry(data & 0x1f);

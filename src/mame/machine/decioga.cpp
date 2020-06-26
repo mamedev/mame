@@ -27,7 +27,7 @@ void dec_ioga_device::map(address_map &map)
 	map(0x040120, 0x040123).rw(FUNC(dec_ioga_device::imsk_r), FUNC(dec_ioga_device::imsk_w));
 }
 
-dec_ioga_device::dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dec_ioga_device::dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DECSTATION_IOGA, tag, owner, clock),
 	m_irq_out_cb(*this)
 {
@@ -47,12 +47,12 @@ void dec_ioga_device::device_reset()
 	m_csr = m_intr = m_imsk = 0;
 }
 
-READ32_MEMBER(dec_ioga_device::csr_r)
+u32 dec_ioga_device::csr_r()
 {
 	return m_csr;
 }
 
-WRITE32_MEMBER(dec_ioga_device::csr_w)
+void dec_ioga_device::csr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_csr);
 #if 0
@@ -65,9 +65,9 @@ WRITE32_MEMBER(dec_ioga_device::csr_w)
 #endif
 }
 
-READ32_MEMBER(dec_ioga_device::intr_r)
+u32 dec_ioga_device::intr_r()
 {
-	uint32_t rv = m_intr;
+	u32 rv = m_intr;
 	m_intr &= ~0x20;        // 5000/133 boot ROM tests that reading clears this bit
 	return rv;
 }
@@ -84,27 +84,27 @@ void dec_ioga_device::recalc_irq()
 	}
 }
 
-WRITE32_MEMBER(dec_ioga_device::intr_w)
+void dec_ioga_device::intr_w(u32 data)
 {
 	m_intr &= ~data;    // clear bits on write
 }
 
-READ32_MEMBER(dec_ioga_device::imsk_r)
+u32 dec_ioga_device::imsk_r()
 {
 	return m_imsk;
 }
 
-WRITE32_MEMBER(dec_ioga_device::imsk_w)
+void dec_ioga_device::imsk_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_imsk);
 }
 
-READ32_MEMBER(dec_ioga_device::dmaptr_r)
+u32 dec_ioga_device::dmaptr_r(offs_t offset)
 {
 	return m_dmaptrs[offset/4];
 }
 
-WRITE32_MEMBER(dec_ioga_device::dmaptr_w)
+void dec_ioga_device::dmaptr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_dmaptrs[offset/4]);
 	LOGMASKED(LOG_DMA, "DECIOGA: %08x to DMA pointer %x (addr %x)\n", data, offset/4, offset*4);

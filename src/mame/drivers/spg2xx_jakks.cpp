@@ -24,11 +24,11 @@ public:
 
 private:
 	void mem_map_2m_mkram(address_map& map);
-	DECLARE_WRITE16_MEMBER(portc_w) override;
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 
-WRITE16_MEMBER(jakks_state::portc_w)
+void jakks_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));

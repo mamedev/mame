@@ -175,7 +175,7 @@ Notes:
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
-#include "cpu/tlcs900/tlcs900.h"
+#include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
 
@@ -556,6 +556,7 @@ public:
 	void init_batlgr2();
 	void init_pwrshovl();
 	void init_batlgear();
+	void init_dendego3();
 	void init_landhigh();
 	void init_landhigha();
 	void init_raizpin();
@@ -571,14 +572,14 @@ private:
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
 
-	DECLARE_READ64_MEMBER(ppc_common_r);
-	DECLARE_WRITE64_MEMBER(ppc_common_w);
-	DECLARE_READ64_MEMBER(ieee1394_r);
-	DECLARE_WRITE64_MEMBER(ieee1394_w);
-	DECLARE_READ64_MEMBER(video_chip_r);
-	DECLARE_WRITE64_MEMBER(video_chip_w);
-	DECLARE_READ64_MEMBER(video_fifo_r);
-	DECLARE_WRITE64_MEMBER(video_fifo_w);
+	uint64_t ppc_common_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ieee1394_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ieee1394_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t video_chip_r(offs_t offset, uint64_t mem_mask = ~0);
+	void video_chip_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t video_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void video_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	std::unique_ptr<uint32_t[]> m_screen_ram;
 	std::unique_ptr<uint32_t[]> m_frame_ram;
@@ -596,10 +597,10 @@ private:
 
 	const char *m_hdd_serial_number;
 
-	DECLARE_READ8_MEMBER(tlcs_common_r);
-	DECLARE_WRITE8_MEMBER(tlcs_common_w);
-	DECLARE_READ8_MEMBER(tlcs_rtc_r);
-	DECLARE_WRITE8_MEMBER(tlcs_rtc_w);
+	uint8_t tlcs_common_r(offs_t offset);
+	void tlcs_common_w(offs_t offset, uint8_t data);
+	uint8_t tlcs_rtc_r(offs_t offset);
+	void tlcs_rtc_w(offs_t offset, uint8_t data);
 
 	uint8_t m_rtcdata[8];
 
@@ -613,8 +614,8 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
-	DECLARE_READ16_MEMBER(tlcs_ide0_r);
-	DECLARE_READ16_MEMBER(tlcs_ide1_r);
+	uint16_t tlcs_ide0_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t tlcs_ide1_r(offs_t offset, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void draw_tile(uint32_t pos, uint32_t tile);
 	uint32_t video_mem_r(uint32_t address);
@@ -1648,7 +1649,7 @@ void taitotz_state::video_reg_w(uint32_t reg, uint32_t data)
 	}
 }
 
-READ64_MEMBER(taitotz_state::video_chip_r)
+uint64_t taitotz_state::video_chip_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	uint32_t reg = offset * 8;
@@ -1697,7 +1698,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitotz_state::video_chip_w)
+void taitotz_state::video_chip_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t reg = offset * 8;
 	uint32_t regdata;
@@ -1772,7 +1773,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 	}
 }
 
-READ64_MEMBER(taitotz_state::video_fifo_r)
+uint64_t taitotz_state::video_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	if (ACCESSING_BITS_32_63)
@@ -1789,7 +1790,7 @@ READ64_MEMBER(taitotz_state::video_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitotz_state::video_fifo_w)
+void taitotz_state::video_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int command = (m_video_reg >> 28) & 0xf;
 	if (command == 0xb)
@@ -1882,7 +1883,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 	//COMBINE_DATA(m_video_fifo_mem + offset);
 }
 
-READ64_MEMBER(taitotz_state::ieee1394_r)
+uint64_t taitotz_state::ieee1394_r(offs_t offset, uint64_t mem_mask)
 {
 	if (offset == 4)
 	{
@@ -1893,7 +1894,7 @@ READ64_MEMBER(taitotz_state::ieee1394_r)
 	return 0;
 }
 
-WRITE64_MEMBER(taitotz_state::ieee1394_w)
+void taitotz_state::ieee1394_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	//logerror("ieee1394_w: %08X, %08X%08X, %08X%08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	if (ACCESSING_BITS_32_63)
@@ -1904,7 +1905,7 @@ WRITE64_MEMBER(taitotz_state::ieee1394_w)
 	}
 }
 
-READ64_MEMBER(taitotz_state::ppc_common_r)
+uint64_t taitotz_state::ppc_common_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t res = 0;
 
@@ -1920,7 +1921,7 @@ READ64_MEMBER(taitotz_state::ppc_common_r)
 	return res;
 }
 
-WRITE64_MEMBER(taitotz_state::ppc_common_w)
+void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
@@ -2080,7 +2081,7 @@ void taitotz_state::ppc603e_mem(address_map &map)
 
 
 
-READ8_MEMBER(taitotz_state::tlcs_common_r)
+uint8_t taitotz_state::tlcs_common_r(offs_t offset)
 {
 	if (offset & 1)
 	{
@@ -2092,7 +2093,7 @@ READ8_MEMBER(taitotz_state::tlcs_common_r)
 	}
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_common_w)
+void taitotz_state::tlcs_common_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -2139,8 +2140,8 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 	}
 }
 
-// RTC could be Epson RTC-64613, same as taitopjc.c
-READ8_MEMBER(taitotz_state::tlcs_rtc_r)
+// RTC could be Epson RTC-64613, same as taitopjc.cpp
+uint8_t taitotz_state::tlcs_rtc_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -2164,7 +2165,7 @@ READ8_MEMBER(taitotz_state::tlcs_rtc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
+void taitotz_state::tlcs_rtc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2185,7 +2186,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 	}
 }
 
-READ16_MEMBER(taitotz_state::tlcs_ide0_r)
+uint16_t taitotz_state::tlcs_ide0_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t d = m_ata->cs0_r(offset, mem_mask);
 	if (offset == 7)
@@ -2194,7 +2195,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 	return d;
 }
 
-READ16_MEMBER(taitotz_state::tlcs_ide1_r)
+uint16_t taitotz_state::tlcs_ide1_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t d = m_ata->cs1_r(offset, mem_mask);
 	if (offset == 6)
@@ -2660,6 +2661,15 @@ static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
+void taitotz_state::init_dendego3()
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = nullptr; // serial is in the CHD metadata
+
+	m_scr_base = 0x1e0000;
+}
+
 void taitotz_state::init_landhigh()
 {
 	init_taitotz_152();
@@ -2961,6 +2971,27 @@ ROM_START( styphp )
 	DISK_IMAGE( "styphp", 0, SHA1(c232d3460e37523346132544b8e23a5f9b447150) )
 ROM_END
 
+ROM_START( dendego3 )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e85-01.ic14", 0x000000, 0x020000, CRC(e16eba2a) SHA1(bd45117bb39cb98d93cdeb17dc72815e6000196b) )
+	ROM_LOAD16_BYTE( "e85-02.ic15", 0x000001, 0x020000, CRC(aa44e992) SHA1(9d176c150c18b085e2c2058507a34151214c1a02) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_LOAD( "e85-03.ic2", 0x000000, 0x020000, CRC(47712427) SHA1(69756f0331ae0a47214d430bc8942937878ddee4) ) // located on the I/O PCB
+
+	ROM_REGION( 0x20000, "oki1", 0 )
+	ROM_LOAD( "e74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
+
+	DISK_REGION( "ata:0:hdd:image" ) // Fujitsu MPF3102AT
+	DISK_IMAGE( "ddg3", 0, SHA1(468d699e02ef0a0242de4e7038613cc5d0545591) )
+ROM_END
+
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -2969,6 +3000,7 @@ GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshov
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 2000, dendego3,  taitotz,  taitotz,  taitotz,  taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (V2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
 GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

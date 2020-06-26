@@ -133,7 +133,7 @@ ROM_END
 qsound_device::qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, QSOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_dsp(*this, "dsp"), m_stream(nullptr)
 	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_new_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
 	, m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
@@ -141,7 +141,7 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 }
 
 
-WRITE8_MEMBER(qsound_device::qsound_w)
+void qsound_device::qsound_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -169,7 +169,7 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_device::qsound_r)
+u8 qsound_device::qsound_r()
 {
 	return m_dsp_ready ? 0x80 : 0x00;
 }
@@ -279,7 +279,7 @@ void qsound_device::dsp_io_map(address_map &map)
 }
 
 
-READ16_MEMBER(qsound_device::dsp_sample_r)
+u16 qsound_device::dsp_sample_r(offs_t offset)
 {
 	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
 	m_old = old;
 }
 
-WRITE16_MEMBER(qsound_device::dsp_pio_w)
+void qsound_device::dsp_pio_w(offs_t offset, u16 data)
 {
 	// PDX0 is used for QSound ROM offset, and PDX1 is used for ADPCM ROM offset
 	// this prevents spurious PSEL transitions between sending samples to the DAC
@@ -340,7 +340,7 @@ WRITE16_MEMBER(qsound_device::dsp_pio_w)
 }
 
 
-READ16_MEMBER(qsound_device::dsp_pio_r)
+u16 qsound_device::dsp_pio_r()
 {
 	LOGCOMMAND(
 			"QSound: DSP PIO read returning %s = %04X\n",

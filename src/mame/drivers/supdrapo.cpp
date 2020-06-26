@@ -99,12 +99,12 @@ private:
 
 	uint8_t m_wdog;
 
-	DECLARE_READ8_MEMBER(rng_r);
-	DECLARE_WRITE8_MEMBER(wdog8000_w);
-	DECLARE_WRITE8_MEMBER(debug8004_w);
-	DECLARE_WRITE8_MEMBER(debug7c00_w);
-	DECLARE_WRITE8_MEMBER(coinin_w);
-	DECLARE_WRITE8_MEMBER(payout_w);
+	uint8_t rng_r();
+	void wdog8000_w(uint8_t data);
+	void debug8004_w(uint8_t data);
+	void debug7c00_w(uint8_t data);
+	void coinin_w(uint8_t data);
+	void payout_w(uint8_t data);
 	void ay8910_outputa_w(uint8_t data);
 	void ay8910_outputb_w(uint8_t data);
 
@@ -182,12 +182,12 @@ void supdrapo_state::supdrapo_palette(palette_device &palette) const
                             R/W Handlers
 **********************************************************************/
 
-READ8_MEMBER(supdrapo_state::rng_r)
+uint8_t supdrapo_state::rng_r()
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(supdrapo_state::wdog8000_w)
+void supdrapo_state::wdog8000_w(uint8_t data)
 {
 /*  Kind of state watchdog alternating 0x00 & 0x01 writes.
     Used when exit the test mode (writes 2 consecutive 0's).
@@ -226,7 +226,7 @@ WRITE8_MEMBER(supdrapo_state::wdog8000_w)
 }
 
 
-WRITE8_MEMBER(supdrapo_state::debug8004_w)
+void supdrapo_state::debug8004_w(uint8_t data)
 {
 /*  Writes 0x00 each time the machine is initialized */
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER(supdrapo_state::debug8004_w)
 //  popmessage("written : %02X", data);
 }
 
-WRITE8_MEMBER(supdrapo_state::debug7c00_w)
+void supdrapo_state::debug7c00_w(uint8_t data)
 {
 /*  This one write 0's constantly when the input test mode is running */
 	logerror("debug7c00: %02X\n", data);
@@ -245,12 +245,12 @@ WRITE8_MEMBER(supdrapo_state::debug7c00_w)
                          Coin I/O Counters
 **********************************************************************/
 
-WRITE8_MEMBER(supdrapo_state::coinin_w)
+void supdrapo_state::coinin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin In */
 }
 
-WRITE8_MEMBER(supdrapo_state::payout_w)
+void supdrapo_state::payout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Payout */
 }

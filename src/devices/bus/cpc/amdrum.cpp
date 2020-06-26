@@ -51,7 +51,7 @@ void cpc_amdrum_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
-	space.install_write_handler(0xff00,0xffff, write8_delegate(*this, FUNC(cpc_amdrum_device::dac_w)));
+	space.install_write_handler(0xff00,0xffff, write8smo_delegate(*this, FUNC(cpc_amdrum_device::dac_w)));
 }
 
 //-------------------------------------------------
@@ -63,7 +63,7 @@ void cpc_amdrum_device::device_reset()
 	// TODO
 }
 
-WRITE8_MEMBER(cpc_amdrum_device::dac_w)
+void cpc_amdrum_device::dac_w(uint8_t data)
 {
 	m_dac->write(data);
 }

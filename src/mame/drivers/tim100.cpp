@@ -43,8 +43,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void tim100_io(address_map &map);
-	void tim100_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_start() override;
 
@@ -56,7 +56,7 @@ private:
 	required_device<i8276_device> m_crtc;
 };
 
-void tim100_state::tim100_mem(address_map &map)
+void tim100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 2764 at U16
@@ -67,7 +67,7 @@ void tim100_state::tim100_mem(address_map &map)
 	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
-void tim100_state::tim100_io(address_map &map)
+void tim100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -96,9 +96,10 @@ static const rgb_t tim100_palette[3] = {
 void tim100_state::machine_start()
 {
 	m_palette->set_pen_colors(0, tim100_palette);
+	save_item(NAME(m_dma_adr));
 }
 
-const gfx_layout tim100_charlayout =
+const gfx_layout charlayout =
 {
 	12, 16,             /* 8x16 characters */
 	256,                /* 128 characters */
@@ -111,7 +112,7 @@ const gfx_layout tim100_charlayout =
 };
 
 static GFXDECODE_START( gfx_tim100 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, tim100_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -162,8 +163,8 @@ void tim100_state::tim100(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(4'915'200)); // divider unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &tim100_state::tim100_mem);
-	m_maincpu->set_addrmap(AS_IO, &tim100_state::tim100_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tim100_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &tim100_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -233,4 +234,4 @@ ROM_START( tim100 )
 ROM_END
 
 /* Driver */
-COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

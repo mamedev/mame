@@ -45,7 +45,7 @@ void cgc7900_state::cgc7900_palette(palette_device &palette) const
     cgc7900_z_mode_r - Z mode read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::z_mode_r )
+u16 cgc7900_state::z_mode_r()
 {
 	return 0;
 }
@@ -54,7 +54,7 @@ READ16_MEMBER( cgc7900_state::z_mode_r )
     cgc7900_z_mode_w - Z mode write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::z_mode_w )
+void cgc7900_state::z_mode_w(u16 data)
 {
 }
 
@@ -62,7 +62,7 @@ WRITE16_MEMBER( cgc7900_state::z_mode_w )
     cgc7900_color_status_w - color status write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::color_status_w )
+void cgc7900_state::color_status_w(u16 data)
 {
 }
 
@@ -70,7 +70,7 @@ WRITE16_MEMBER( cgc7900_state::color_status_w )
     cgc7900_sync_r - sync information read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::sync_r )
+u16 cgc7900_state::sync_r()
 {
 	u16 data = 0xffff;
 
@@ -115,11 +115,11 @@ void cgc7900_state::update_clut()
 {
 	for (int i = 0; i < 256; i++)
 	{
-		uint16_t addr = i * 2;
-		uint32_t data = (m_clut_ram[addr + 1] << 16) | m_clut_ram[addr];
-		uint8_t b = data & 0xff;
-		uint8_t g = (data >> 8) & 0xff;
-		uint8_t r = (data >> 16) & 0xff;
+		u16 addr = i * 2;
+		u32 data = (m_clut_ram[addr + 1] << 16) | m_clut_ram[addr];
+		u8 b = data & 0xff;
+		u8 g = (data >> 8) & 0xff;
+		u8 r = (data >> 16) & 0xff;
 
 		m_clut[i] = rgb_t(r, g, b);
 	}
@@ -147,9 +147,9 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 
 		for (int sx = 0; sx < 85; sx++)
 		{
-			uint16_t addr = (sy * 170) + (sx * 2);
-			uint32_t cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
-			uint8_t data = m_char_rom->base()[(OVERLAY_DATA << 3) | line];
+			u16 addr = (sy * 170) + (sx * 2);
+			u32 cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
+			u8 data = m_char_rom->base()[(OVERLAY_DATA << 3) | line];
 			int fg = (cell >> 8) & 0x07;
 			int bg = (cell >> 16) & 0x07;
 
@@ -187,7 +187,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)
 	m_blink = !m_blink;
 }
 
-uint32_t cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_clut();
 	draw_bitmap(&screen, bitmap);

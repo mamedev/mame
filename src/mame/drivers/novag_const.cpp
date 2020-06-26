@@ -52,7 +52,6 @@ Super Constellation:
 - 2*32KB ROM custom label
 
 TODO:
-- ssensor4 nvram doesn't work, at boot it always starts a new game
 - is Dynamic S a program update of ssensor4 or identical?
 - verify IRQ active time for ssensor4
 
@@ -91,6 +90,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+
 	// machine configs
 	void nconst(machine_config &config);
 	void nconst36(machine_config &config);
@@ -103,6 +104,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { m_power = true; }
 
 private:
 	// devices/pointers
@@ -124,24 +126,31 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	void mux_w(u8 data);
+	void control_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	void power_off();
+	bool m_power = false;
+
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void const_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
+	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
+}
+
+void const_state::power_off()
+{
+	// NMI at power-off (ssensor4 prepares nvram for next power-on)
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_power = false;
 }
 
 void const_state::init_const()
@@ -162,16 +171,17 @@ void const_state::update_display()
 	m_display->matrix(m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(const_state::mux_w)
+void const_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(const_state::control_w)
+void const_state::control_w(u8 data)
 {
-	// d0-d3: ?
+	// d0-d2: ?
+	// d3: ? (goes high at power-off NMI)
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
 	update_display();
@@ -180,7 +190,7 @@ WRITE8_MEMBER(const_state::control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(const_state::input1_r)
+u8 const_state::input1_r()
 {
 	u8 data = 0;
 
@@ -192,7 +202,7 @@ READ8_MEMBER(const_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(const_state::input2_r)
+u8 const_state::input2_r()
 {
 	u8 data = 0;
 
@@ -298,6 +308,9 @@ static INPUT_PORTS_START( ssensor4 )
 
 	PORT_MODIFY("IN.6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
+
+	PORT_START("POWER") // needs to be triggered for nvram to work
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nconstq )
@@ -320,6 +333,9 @@ static INPUT_PORTS_START( sconst )
 	PORT_MODIFY("IN.5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Form Size")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
+
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 
@@ -361,6 +377,7 @@ void const_state::ssensor4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_novag_ssensor4);
 }
@@ -431,6 +448,7 @@ void const_state::sconst(machine_config &config)
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_nsec(10200)); // irq active for 10.2us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_novag_supercon);
 }

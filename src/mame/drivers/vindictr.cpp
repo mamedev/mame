@@ -59,7 +59,7 @@ void vindictr_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(vindictr_state::port1_r)
+uint16_t vindictr_state::port1_r()
 {
 	int result = ioport("260010")->read();
 	result ^= 0x0010;

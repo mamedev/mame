@@ -127,12 +127,12 @@ protected:
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_READ8_MEMBER(mc6845_r);
-	DECLARE_WRITE8_MEMBER(mc6845_w);
+	uint8_t mc6845_r(offs_t offset);
+	void mc6845_w(offs_t offset, uint8_t data);
 	void output_a_w(uint8_t data);
 	void output_b_w(uint8_t data);
 	void output_c_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	void vram_w(offs_t offset, uint8_t data);
 	uint8_t lpt_status_r();
 	void lpt_data_w(uint8_t data);
 	void rtc_control_w(uint8_t data);
@@ -216,7 +216,7 @@ void amusco_state::mem_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
-READ8_MEMBER( amusco_state::mc6845_r)
+uint8_t amusco_state::mc6845_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_crtc->register_r();
@@ -224,7 +224,7 @@ READ8_MEMBER( amusco_state::mc6845_r)
 	return m_crtc->status_r(); // not a plain 6845, requests update bit here ...
 }
 
-WRITE8_MEMBER( amusco_state::mc6845_w)
+void amusco_state::mc6845_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 	{
@@ -304,7 +304,7 @@ void amusco_state::output_c_w(uint8_t data)
 //  logerror("Writing %02Xh to PPI output C\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::vram_w)
+void amusco_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[m_video_update_address * 2 + offset] = data;
 	m_bg_tilemap->mark_tile_dirty(m_video_update_address);

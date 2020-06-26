@@ -34,12 +34,12 @@ public:
 
 	void lw700i(machine_config &config);
 
-	DECLARE_READ16_MEMBER(status_r) { return 0x8080; }  // "ready"
-	DECLARE_WRITE16_MEMBER(data_w) { }
+	uint16_t status_r() { return 0x8080; }  // "ready"
+	void data_w(uint16_t data) { }
 
-	DECLARE_READ8_MEMBER(p7_r);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t p7_r();
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
 
 private:
 	virtual void machine_reset() override;
@@ -64,7 +64,7 @@ private:
 	uint8_t m_keyrow;
 };
 
-READ8_MEMBER(lw700i_state::p7_r)
+uint8_t lw700i_state::p7_r()
 {
 	//("Read P7 (PC=%x)\n", m_maincpu->pc());
 	// must be non-zero; f0 = French, fe = German, ff = English
@@ -81,12 +81,12 @@ READ8_MEMBER(lw700i_state::p7_r)
 	return 0xff;
 }
 
-READ8_MEMBER(lw700i_state::pb_r)
+uint8_t lw700i_state::pb_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(lw700i_state::pb_w)
+void lw700i_state::pb_w(uint8_t data)
 {
 	//printf("%x to keyboard row\n", data);
 	m_keyrow = data;

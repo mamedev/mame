@@ -58,15 +58,15 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( enrg_w );
-	DECLARE_WRITE8_MEMBER( tvtl_w );
-	DECLARE_READ8_MEMBER( ust_a_r );
-	DECLARE_READ8_MEMBER( ust_b_r );
+	void enrg_w(uint8_t data);
+	void tvtl_w(uint8_t data);
+	uint8_t ust_a_r();
+	uint8_t ust_b_r();
 
 	void cop_g_w(uint8_t data);
 	uint8_t cop_g_r();

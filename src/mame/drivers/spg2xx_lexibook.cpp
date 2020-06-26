@@ -35,8 +35,27 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
+
+class spg2xx_vsplus_game_state : public spg2xx_lexizeus_game_state
+{
+public:
+	spg2xx_vsplus_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_lexizeus_game_state(mconfig, type, tag)
+	{ }
+
+	void vsplus(machine_config &config);
+
+	void init_vsplus();
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
 
 
 static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I accidentally entered a secret test mode before that seemed to indicate 6, but can't get there again
@@ -196,9 +215,30 @@ static INPUT_PORTS_START( lexiseal )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vsplus )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pause")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Rapid A")
+	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Rapid B")
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 
-WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
+void spg2xx_lexiseal_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 
@@ -212,6 +252,17 @@ WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
 		switch_bank(2);
 }
 
+
+void spg2xx_vsplus_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0x0080)
+	{
+		if (data & 0x0080)
+			switch_bank(1);
+		else
+			switch_bank(0);
+	}
+}
 
 void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 {
@@ -230,6 +281,20 @@ void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
 }
+
+void spg2xx_vsplus_game_state::vsplus(machine_config &config)
+{
+	non_spg_base(config);
+	m_maincpu->portb_out().set(FUNC(spg2xx_vsplus_game_state::portb_w));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+
+	// output was PAL when connected to TV at least
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
+
 
 void spg2xx_lexizeus_game_state::init_zeus()
 {
@@ -259,11 +324,22 @@ void spg2xx_lexizeus_game_state::init_zeus()
 	}
 }
 
+void spg2xx_vsplus_game_state::init_vsplus()
+{
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
 
+	decrypt_ac_ff(ROM, size);
+}
 
 ROM_START( lexizeus )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "lexibook1g900us.bin", 0x0000, 0x800000, CRC(c2370806) SHA1(cbb599c29c09b62b6a9951c724cd9fc496309cf9))
+ROM_END
+
+ROM_START( vsplus )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vsplus.bin", 0x0000, 0x1000000, CRC(2b13d2cc) SHA1(accae7606d83a313b8ec0232d2d67b63c9c617af) )
 ROM_END
 
 ROM_START( lexiseal )
@@ -331,6 +407,9 @@ ROM_END
 // these all have the same ROM scrambling
 
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+
+CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown>", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // there are versions of the Seal that actually show Lexibook on the boot screen rather than just the unit

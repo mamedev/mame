@@ -50,6 +50,8 @@ public:
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_pcg(*this, "pcg")
 		, m_cassette1(*this, "cassette1")
 		, m_cassette2(*this, "cassette2")
 		, m_uart(*this, "uart")
@@ -59,8 +61,6 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_dma(*this, "dma")
-		, m_fdc(*this, "fdc")
-		, m_fdc2(*this, "fdc2")
 		, m_fdc3(*this, "fdc3")
 		, m_fdc4(*this, "fdc4")
 		, m_floppy20(*this, "fdc2:0")
@@ -81,71 +81,42 @@ public:
 	void sorcerer(machine_config &config);
 	void sorcerera(machine_config &config);
 	void sorcererb(machine_config &config);
-	void sorcererd(machine_config &config);
 
-	void init_sorcerer();
-
-private:
+protected:
 	enum
 	{
 		TIMER_SERIAL,
 		TIMER_CASSETTE,
-		TIMER_RESET
 	};
 
-	DECLARE_READ8_MEMBER(port_fd_r);
-	DECLARE_READ8_MEMBER(port_fe_r);
-	DECLARE_WRITE8_MEMBER(port2c_w);
-	DECLARE_READ8_MEMBER(port34_r);
-	DECLARE_WRITE8_MEMBER(port34_w);
-	DECLARE_READ8_MEMBER(port48_r);
-	DECLARE_WRITE8_MEMBER(port48_w);
-	DECLARE_WRITE8_MEMBER(port_fd_w);
-	DECLARE_WRITE8_MEMBER(port_fe_w);
-	DECLARE_WRITE8_MEMBER(port_ff_w);
-	DECLARE_WRITE_LINE_MEMBER(intrq2_w);
-	DECLARE_WRITE_LINE_MEMBER(drq2_w);
-	DECLARE_WRITE_LINE_MEMBER(intrq4_w);
-	DECLARE_MACHINE_START(sorcererd);
+	u8 portfd_r();
+	u8 portfe_r();
+	void portfd_w(u8 data);
+	void portfe_w(u8 data);
+	void portff_w(u8 data);
 	TIMER_CALLBACK_MEMBER(cassette_tc);
 	TIMER_CALLBACK_MEMBER(serial_tc);
-	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	uint8_t memory_read_byte(offs_t offset);
-	void memory_write_byte(offs_t offset, uint8_t data);
-	uint8_t io_read_byte(offs_t offset);
-	void io_write_byte(offs_t offset, uint8_t data);
-	void machine_start_common(u16 endmem);
+	void machine_start_common(offs_t endmem);
+	void machine_reset_common();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sorcerer_mem(address_map &map);
 	void sorcererb_mem(address_map &map);
-	void sorcererd_mem(address_map &map);
 	void sorcerer_io(address_map &map);
 	void sorcerera_io(address_map &map);
 	void sorcererb_io(address_map &map);
-	void sorcererd_io(address_map &map);
 
-	bool m_wait;
-	bool m_drq_off;
-	bool m_intrq_off;
-	bool m_halt;
-	uint8_t m_2c;
-	uint8_t m_fe;
-	uint8_t m_keyboard_line;
-	u8 m_port48;
-	u8 m_port34;
-	const uint8_t *m_p_videoram;
+	u8 m_portfe;
+	u8 m_keyboard_line;
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_pcg;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 	required_device<ay31015_device> m_uart;
@@ -155,8 +126,6 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	optional_device<z80dma_device> m_dma;
-	optional_device<micropolis_device> m_fdc;
-	optional_device<fd1793_device> m_fdc2;
 	optional_device<fd1793_device> m_fdc3;
 	optional_device<wd2793_device> m_fdc4;
 	optional_device<floppy_connector> m_floppy20;
@@ -172,6 +141,52 @@ private:
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
 	required_ioport_array<16> m_iop_x;
+	memory_passthrough_handler *m_rom_shadow_tap;
+
+private:
+	u8 m_port48;
+	u8 m_port34;
+	u8 port34_r();
+	u8 port48_r();
+	void port34_w(u8 data);
+	void port48_w(u8 data);
+	void intrq4_w(bool state);
+	bool m_halt;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void busreq_w(bool state);
+	u8 memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, u8 data);
+	u8 io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, u8 data);
 };
+
+class sorcererd_state : public sorcerer_state
+{
+public:
+	sorcererd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sorcerer_state(mconfig, type, tag)
+		, m_fdc(*this, "fdc")
+		, m_fdc2(*this, "fdc2")
+		{ }
+
+	void sorcererd(machine_config &config);
+
+private:
+	void sorcererd_mem(address_map &map);
+	void sorcererd_io(address_map &map);
+	void port2c_w(u8 data);
+	void intrq2_w(bool state);
+	void drq2_w(bool state);
+	u8 m_port2c;
+	bool m_wait;
+	bool m_drq_off;
+	bool m_intrq_off;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	optional_device<micropolis_device> m_fdc;
+	optional_device<fd1793_device> m_fdc2;
+};
+
 
 #endif // MAME_INCLUDES_SORCERER_H

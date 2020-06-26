@@ -73,27 +73,27 @@ private:
 	uint8_t m_irq;
 	uint16_t m_kb_matrix;
 
-	DECLARE_READ8_MEMBER( modem_r );
-	DECLARE_WRITE8_MEMBER( modem_w );
+	uint8_t modem_r();
+	void modem_w(uint8_t data);
 
 	void lcd_w(uint16_t offset, int column, uint8_t data);
 	uint8_t lcd_r(uint16_t offset, int column);
-	DECLARE_READ8_MEMBER( lcd_right_r );
-	DECLARE_WRITE8_MEMBER( lcd_right_w );
-	DECLARE_READ8_MEMBER( lcd_left_r );
-	DECLARE_WRITE8_MEMBER( lcd_left_w );
+	uint8_t lcd_right_r(offs_t offset);
+	void lcd_right_w(offs_t offset, uint8_t data);
+	uint8_t lcd_left_r(offs_t offset);
+	void lcd_left_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( bank1_r );
-	DECLARE_WRITE8_MEMBER( bank1_w );
-	DECLARE_READ8_MEMBER( bank2_r );
-	DECLARE_WRITE8_MEMBER( bank2_w );
+	uint8_t bank1_r(offs_t offset);
+	void bank1_w(offs_t offset, uint8_t data);
+	uint8_t bank2_r(offs_t offset);
+	void bank2_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( battery_status_r );
-	DECLARE_WRITE8_MEMBER( port2_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_WRITE8_MEMBER( kb_w );
-	DECLARE_READ8_MEMBER( irq_r );
-	DECLARE_WRITE8_MEMBER( irq_w );
+	uint8_t battery_status_r();
+	void port2_w(uint8_t data);
+	uint8_t kb_r();
+	void kb_w(uint8_t data);
+	uint8_t irq_r();
+	void irq_w(uint8_t data);
 	void refresh_ints();
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
@@ -108,12 +108,12 @@ private:
 };
 
 
-READ8_MEMBER( mstation_state::modem_r )
+uint8_t mstation_state::modem_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( mstation_state::modem_w )
+void mstation_state::modem_w(uint8_t data)
 {
 }
 
@@ -138,10 +138,10 @@ uint8_t mstation_state::lcd_r(uint16_t offset, int column)
 		return m_screen_column % 20;
 }
 
-READ8_MEMBER ( mstation_state::lcd_left_r )  {  return lcd_r(offset, m_screen_column);  }
-WRITE8_MEMBER( mstation_state::lcd_left_w )  {  lcd_w(offset, m_screen_column, data);   }
-READ8_MEMBER ( mstation_state::lcd_right_r ) {  return lcd_r(offset, m_screen_column + 20); }
-WRITE8_MEMBER( mstation_state::lcd_right_w ) {  lcd_w(offset, m_screen_column + 20, data);  }
+uint8_t mstation_state::lcd_left_r(offs_t offset) {  return lcd_r(offset, m_screen_column);  }
+void mstation_state::lcd_left_w(offs_t offset, uint8_t data) {  lcd_w(offset, m_screen_column, data);   }
+uint8_t mstation_state::lcd_right_r(offs_t offset) {  return lcd_r(offset, m_screen_column + 20); }
+void mstation_state::lcd_right_w(offs_t offset, uint8_t data) {  lcd_w(offset, m_screen_column + 20, data);  }
 
 uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -166,24 +166,24 @@ uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  Bankswitch
 //***************************************************************************/
 
-READ8_MEMBER( mstation_state::bank1_r )
+uint8_t mstation_state::bank1_r(offs_t offset)
 {
 	return m_bank1[offset];
 }
 
-READ8_MEMBER( mstation_state::bank2_r )
+uint8_t mstation_state::bank2_r(offs_t offset)
 {
 	return m_bank2[offset];
 }
 
-WRITE8_MEMBER( mstation_state::bank1_w )
+void mstation_state::bank1_w(offs_t offset, uint8_t data)
 {
 	m_bank1[offset] = data;
 
 	m_bankdev1->set_bank(((m_bank1[1] & 0x07) << 8) | m_bank1[0]);
 }
 
-WRITE8_MEMBER( mstation_state::bank2_w )
+void mstation_state::bank2_w(offs_t offset, uint8_t data)
 {
 	m_bank2[offset] = data;
 
@@ -192,7 +192,7 @@ WRITE8_MEMBER( mstation_state::bank2_w )
 
 
 
-WRITE8_MEMBER( mstation_state::port2_w )
+void mstation_state::port2_w(uint8_t data)
 {
 	m_port2 = data;
 
@@ -220,19 +220,19 @@ void mstation_state::refresh_ints()
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER( mstation_state::irq_r )
+uint8_t mstation_state::irq_r()
 {
 	return m_irq;
 }
 
-WRITE8_MEMBER( mstation_state::irq_w )
+void mstation_state::irq_w(uint8_t data)
 {
 	m_irq &= data;
 
 	refresh_ints();
 }
 
-READ8_MEMBER( mstation_state::battery_status_r )
+uint8_t mstation_state::battery_status_r()
 {
 	/*
 	  bit 0-3 - unknown
@@ -241,12 +241,12 @@ READ8_MEMBER( mstation_state::battery_status_r )
 	return 0xf0;
 }
 
-WRITE8_MEMBER( mstation_state::kb_w )
+void mstation_state::kb_w(uint8_t data)
 {
 	m_kb_matrix = (m_kb_matrix & 0x300) | data;
 }
 
-READ8_MEMBER( mstation_state::kb_r )
+uint8_t mstation_state::kb_r()
 {
 	uint8_t data = 0xff;
 

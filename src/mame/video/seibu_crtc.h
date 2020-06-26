@@ -33,16 +33,16 @@ public:
 	auto layer_scroll_base_callback() { return m_layer_scroll_base_cb.bind(); }
 
 	// I/O operations
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_WRITE16_MEMBER( write_alt );
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_READ16_MEMBER( read_alt );
-	DECLARE_WRITE16_MEMBER(decrypt_key_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_READ16_MEMBER(reg_1a_r);
-	DECLARE_WRITE16_MEMBER(reg_1a_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_base_w);
+	void write(offs_t offset, uint16_t data);
+	void write_alt(offs_t offset, uint16_t data);
+	uint16_t read(offs_t offset);
+	uint16_t read_alt(offs_t offset);
+	void decrypt_key_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_en_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t reg_1a_r();
+	void reg_1a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_scroll_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void seibu_crtc_vregs(address_map &map);
 protected:

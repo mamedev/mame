@@ -1661,7 +1661,9 @@ ROM_END
 void msx_state::canonv20(machine_config &config)
 {
 	msx1(TMS9929A, config);
+	// XTAL: 1431818(Z80/PSG) + 10.6875(VDP)
 	// YM2149
+	// TMS9929ANL
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
@@ -3397,7 +3399,8 @@ ROM_END
 void msx_state::hb10p(machine_config &config)
 {
 	msx1(TMS9929A, config);
-	// AY8910/YM2149?
+	// XTAL: 3.579545 + 22.168(VDP)
+	// YM2149 (in S3527 MSX-Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// T6950
@@ -5878,6 +5881,7 @@ ROM_END
 void msx2_state::nms8245(machine_config &config)
 {
 	msx2_pal(config);
+	// XTAL: 21328.1 (different from default)
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots

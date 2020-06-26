@@ -375,36 +375,36 @@ void debug_imgui::handle_keys()
 		else
 		{
 			m_machine->schedule_soft_reset();
-			m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+			m_machine->debugger().console().get_visible_cpu()->debug()->go();
 		}
 	}
 
 	if(ImGui::IsKeyPressed(ITEM_ID_F5,false))
 	{
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		m_machine->debugger().console().get_visible_cpu()->debug()->go();
 		m_running = true;
 	}
 	if(ImGui::IsKeyPressed(ITEM_ID_F6,false))
 	{
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+		m_machine->debugger().console().get_visible_cpu()->debug()->go_next_device();
 		m_running = true;
 	}
 	if(ImGui::IsKeyPressed(ITEM_ID_F7,false))
 	{
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+		m_machine->debugger().console().get_visible_cpu()->debug()->go_interrupt();
 		m_running = true;
 	}
 	if(ImGui::IsKeyPressed(ITEM_ID_F8,false))
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+		m_machine->debugger().console().get_visible_cpu()->debug()->go_vblank();
 	if(ImGui::IsKeyPressed(ITEM_ID_F9,false))
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+		m_machine->debugger().console().get_visible_cpu()->debug()->single_step_out();
 	if(ImGui::IsKeyPressed(ITEM_ID_F10,false))
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+		m_machine->debugger().console().get_visible_cpu()->debug()->single_step_over();
 	if(ImGui::IsKeyPressed(ITEM_ID_F11,false))
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+		m_machine->debugger().console().get_visible_cpu()->debug()->single_step();
 	if(ImGui::IsKeyPressed(ITEM_ID_F12,false))
 	{
-		m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		m_machine->debugger().console().get_visible_cpu()->debug()->go();
 		m_hide = true;
 	}
 
@@ -484,7 +484,7 @@ void debug_imgui::handle_console(running_machine* machine)
 		// if console input is empty, then do a single step
 		if(strlen(view_main_console->console_input) == 0)
 		{
-			m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+			m_machine->debugger().console().get_visible_cpu()->debug()->single_step();
 			view_main_console->exec_cmd = false;
 			history_pos = view_main_console->console_history.size();
 			return;
@@ -1248,33 +1248,33 @@ void debug_imgui::draw_console()
 				ImGui::Separator();
 				if(ImGui::MenuItem("Run", "F5"))
 				{
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+					m_machine->debugger().console().get_visible_cpu()->debug()->go();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Go to next CPU", "F6"))
 				{
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+					m_machine->debugger().console().get_visible_cpu()->debug()->go_next_device();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Run until next interrupt", "F7"))
 				{
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+					m_machine->debugger().console().get_visible_cpu()->debug()->go_interrupt();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Run until VBLANK", "F8"))
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+					m_machine->debugger().console().get_visible_cpu()->debug()->go_vblank();
 				if(ImGui::MenuItem("Run and hide debugger", "F12"))
 				{
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+					m_machine->debugger().console().get_visible_cpu()->debug()->go();
 					m_hide = true;
 				}
 				ImGui::Separator();
 				if(ImGui::MenuItem("Single step", "F11"))
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+					m_machine->debugger().console().get_visible_cpu()->debug()->single_step();
 				if(ImGui::MenuItem("Step over", "F10"))
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+					m_machine->debugger().console().get_visible_cpu()->debug()->single_step_over();
 				if(ImGui::MenuItem("Step out", "F9"))
-					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+					m_machine->debugger().console().get_visible_cpu()->debug()->single_step_out();
 
 				ImGui::EndMenu();
 			}

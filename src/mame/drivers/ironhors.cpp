@@ -40,7 +40,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
+void ironhors_state::sh_irqtrigger_w(uint8_t data)
 {
 	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }

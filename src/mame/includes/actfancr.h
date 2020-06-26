@@ -40,7 +40,7 @@ public:
 
 	void triothep_control_select_w(uint8_t data);
 	uint8_t triothep_control_r();
-	DECLARE_WRITE8_MEMBER(buffer_spriteram_w);
+	void buffer_spriteram_w(uint8_t data);
 	DECLARE_MACHINE_START(triothep);
 	DECLARE_MACHINE_RESET(triothep);
 	virtual void video_start() override;

@@ -114,14 +114,14 @@ protected:
 	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	void hector_reset(int hr, int with_d2);
 
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(sn_2000_w);
-	DECLARE_WRITE8_MEMBER(sn_2800_w);
-	DECLARE_READ8_MEMBER(cassette_r);
-	DECLARE_WRITE8_MEMBER(sn_3000_w);
-	DECLARE_WRITE8_MEMBER(color_a_w);
-	DECLARE_WRITE8_MEMBER(color_b_w);
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+	void sn_2000_w(offs_t offset, uint8_t data);
+	void sn_2800_w(offs_t offset, uint8_t data);
+	uint8_t cassette_r();
+	void sn_3000_w(uint8_t data);
+	void color_a_w(uint8_t data);
+	void color_b_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -129,25 +129,25 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	DECLARE_WRITE8_MEMBER(minidisc_control_w);
+	void minidisc_control_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(switch_bank_w);
-	DECLARE_READ8_MEMBER(io_8255_r);
-	DECLARE_WRITE8_MEMBER(io_8255_w);
-	DECLARE_WRITE8_MEMBER(mx40_io_port_w);
-	DECLARE_WRITE8_MEMBER(mx80_io_port_w);
+	void switch_bank_w(offs_t offset, uint8_t data);
+	uint8_t io_8255_r(offs_t offset);
+	void io_8255_w(offs_t offset, uint8_t data);
+	void mx40_io_port_w(offs_t offset, uint8_t data);
+	void mx80_io_port_w(offs_t offset, uint8_t data);
 
 	// disc2 handling
-	DECLARE_READ8_MEMBER(  disc2_io00_port_r);
-	DECLARE_WRITE8_MEMBER( disc2_io00_port_w);
-	DECLARE_READ8_MEMBER(  disc2_io20_port_r);
-	DECLARE_WRITE8_MEMBER( disc2_io20_port_w);
-	DECLARE_READ8_MEMBER(  disc2_io30_port_r);
-	DECLARE_WRITE8_MEMBER( disc2_io30_port_w);
-	DECLARE_READ8_MEMBER(  disc2_io40_port_r);
-	DECLARE_WRITE8_MEMBER( disc2_io40_port_w);
-	DECLARE_READ8_MEMBER(  disc2_io50_port_r);
-	DECLARE_WRITE8_MEMBER( disc2_io50_port_w);
+	uint8_t disc2_io00_port_r();
+	void disc2_io00_port_w(uint8_t data);
+	uint8_t disc2_io20_port_r();
+	void disc2_io20_port_w(uint8_t data);
+	uint8_t disc2_io30_port_r();
+	void disc2_io30_port_w(uint8_t data);
+	uint8_t disc2_io40_port_r();
+	void disc2_io40_port_w(uint8_t data);
+	uint8_t disc2_io50_port_r();
+	void disc2_io50_port_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS(minidisc_formats);
 
@@ -219,7 +219,7 @@ private:
 	int is_extended();
 	void update_state(int Adresse, int Value );
 	void init_sn76477();
-	void update_sound(address_space &space, uint8_t data);
+	void update_sound(uint8_t data);
 	void init_palette();
 	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	/*----------- defined in machine/hecdisk2.c -----------*/

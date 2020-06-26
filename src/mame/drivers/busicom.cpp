@@ -23,12 +23,12 @@ uint8_t busicom_state::get_bit_selected(uint32_t val,int num)
 	return 0;
 }
 
-READ8_MEMBER(busicom_state::keyboard_r)
+uint8_t busicom_state::keyboard_r()
 {
 	return m_input_lines[get_bit_selected(m_keyboard_shifter & 0x3ff, 10)]->read();
 }
 
-READ8_MEMBER(busicom_state::printer_r)
+uint8_t busicom_state::printer_r()
 {
 	uint8_t retVal = 0;
 	if (m_drum_index==0) retVal |= 1;
@@ -37,7 +37,7 @@ READ8_MEMBER(busicom_state::printer_r)
 }
 
 
-WRITE8_MEMBER(busicom_state::shifter_w)
+void busicom_state::shifter_w(uint8_t data)
 {
 	// FIXME: detect edges, maybe make 4003 shifter a device
 	if (BIT(data,0)) {
@@ -50,7 +50,7 @@ WRITE8_MEMBER(busicom_state::shifter_w)
 	}
 }
 
-WRITE8_MEMBER(busicom_state::printer_w)
+void busicom_state::printer_w(uint8_t data)
 {
 	int i,j;
 	if (BIT(data,0)) {
@@ -85,7 +85,7 @@ WRITE8_MEMBER(busicom_state::printer_w)
 
 	}
 }
-WRITE8_MEMBER(busicom_state::status_w)
+void busicom_state::status_w(uint8_t data)
 {
 #if 0
 	uint8_t mem_lamp = BIT(data,0);
@@ -95,7 +95,7 @@ WRITE8_MEMBER(busicom_state::status_w)
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
 
-WRITE8_MEMBER(busicom_state::printer_ctrl_w)
+void busicom_state::printer_ctrl_w(uint8_t data)
 {
 }
 

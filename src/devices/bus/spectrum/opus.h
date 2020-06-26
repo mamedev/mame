@@ -50,8 +50,8 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(pia_out_a);
-	DECLARE_WRITE8_MEMBER(pia_out_b);
+	void pia_out_a(uint8_t data);
+	void pia_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 
 	required_ioport m_joy;

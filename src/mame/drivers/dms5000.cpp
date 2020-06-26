@@ -28,8 +28,8 @@ public:
 
 	void dms5000(machine_config &config);
 private:
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	uint8_t status_r(offs_t offset);
+	void brightness_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -41,7 +41,7 @@ private:
 };
 
 
-READ8_MEMBER(dms5000_state::status_r)
+uint8_t dms5000_state::status_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -56,7 +56,7 @@ READ8_MEMBER(dms5000_state::status_r)
 	}
 }
 
-WRITE8_MEMBER(dms5000_state::brightness_w)
+void dms5000_state::brightness_w(uint8_t data)
 {
 }
 

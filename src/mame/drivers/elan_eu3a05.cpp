@@ -304,7 +304,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
+	//uint8_t random_r() { return machine().rand(); }
 	uint8_t porta_r();
 	void portb_w(uint8_t data);
 

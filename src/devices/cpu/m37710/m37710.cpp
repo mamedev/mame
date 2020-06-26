@@ -211,6 +211,7 @@ void m37710_cpu_device::irq_register_map(address_map &map)
 // (M37702E2: same with EPROM instead of mask ROM)
 void m37702m2_device::map(address_map &map)
 {
+	map(0x000000, 0x00007f).noprw();
 	map(0x000002, 0x000015).rw(FUNC(m37702m2_device::port_r<0>), FUNC(m37702m2_device::port_w<0>)).umask16(0x00ff);
 	map(0x000002, 0x000011).rw(FUNC(m37702m2_device::port_r<1>), FUNC(m37702m2_device::port_w<1>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37702m2_device::proc_mode_r), FUNC(m37702m2_device::proc_mode_w));
@@ -229,6 +230,7 @@ void m37702m2_device::map(address_map &map)
 // M37702S1: 512 bytes internal RAM, no internal ROM
 void m37702s1_device::map(address_map &map)
 {
+	map(0x000000, 0x00007f).noprw();
 	map(0x000002, 0x000015).rw(FUNC(m37702s1_device::port_r<0>), FUNC(m37702s1_device::port_w<0>)).umask16(0x00ff);
 	map(0x000002, 0x000011).rw(FUNC(m37702s1_device::port_r<1>), FUNC(m37702s1_device::port_w<1>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37702s1_device::proc_mode_r), FUNC(m37702s1_device::proc_mode_w));
@@ -246,6 +248,8 @@ void m37702s1_device::map(address_map &map)
 // M37710S4: 2048 bytes internal RAM, no internal ROM
 void m37710s4_device::map(address_map &map)
 {
+	map(0x000000, 0x000001).noprw();
+	map(0x00000a, 0x00007f).noprw();
 	map(0x00000a, 0x000015).rw(FUNC(m37710s4_device::port_r<4>), FUNC(m37710s4_device::port_w<4>)).umask16(0x00ff);
 	map(0x00000a, 0x000011).rw(FUNC(m37710s4_device::port_r<5>), FUNC(m37710s4_device::port_w<5>)).umask16(0xff00);
 	map(0x00001a, 0x00001d).w(FUNC(m37710s4_device::da_reg_w)).umask16(0x00ff);
@@ -265,6 +269,8 @@ void m37710s4_device::map(address_map &map)
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
 void m37720s1_device::map(address_map &map)
 {
+	map(0x000000, 0x000001).noprw();
+	map(0x00000a, 0x00007f).noprw();
 	map(0x00000a, 0x000019).rw(FUNC(m37720s1_device::port_r<4>), FUNC(m37720s1_device::port_w<4>)).umask16(0x00ff);
 	map(0x00000a, 0x000015).rw(FUNC(m37720s1_device::port_r<5>), FUNC(m37720s1_device::port_w<5>)).umask16(0xff00);
 	map(0x00001a, 0x00001d).w(FUNC(m37720s1_device::pulse_output_w)).umask16(0x00ff);
@@ -290,6 +296,8 @@ void m37720s1_device::map(address_map &map)
 // M37730S2: 1024 bytes internal RAM, no internal ROM
 void m37730s2_device::map(address_map &map)
 {
+	map(0x000000, 0x000001).noprw();
+	map(0x00000a, 0x00007f).noprw();
 	map(0x00000a, 0x000015).rw(FUNC(m37730s2_device::port_r<4>), FUNC(m37730s2_device::port_w<4>)).umask16(0x00ff);
 	map(0x00000a, 0x00000d).rw(FUNC(m37730s2_device::port_r<5>), FUNC(m37730s2_device::port_w<5>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37730s2_device::proc_mode_r), FUNC(m37730s2_device::proc_mode_w));
@@ -1307,8 +1315,8 @@ void m37710_cpu_device::device_start()
 	m_watchdog_freq = 0;
 	std::fill(std::begin(m_int_control), std::end(m_int_control), 0);
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();

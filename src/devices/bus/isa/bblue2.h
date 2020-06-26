@@ -25,10 +25,10 @@ public:
 	// construction/destruction
 	isa8_babyblue2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(z80_control_r);
-	DECLARE_WRITE8_MEMBER(z80_control_w);
-	DECLARE_READ8_MEMBER(z80_ram_r) { return m_ram->read(offset); }
-	DECLARE_WRITE8_MEMBER(z80_ram_w) { m_ram->write(offset,data); }
+	uint8_t z80_control_r(offs_t offset);
+	void z80_control_w(offs_t offset, uint8_t data);
+	uint8_t z80_ram_r(offs_t offset) { return m_ram->read(offset); }
+	void z80_ram_w(offs_t offset, uint8_t data) { m_ram->write(offset,data); }
 
 	DECLARE_WRITE_LINE_MEMBER(port1_irq) { m_isa->irq4_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(port2_irq) { m_isa->irq3_w(state); }

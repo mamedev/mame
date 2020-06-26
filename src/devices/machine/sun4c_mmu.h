@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 
-#define SUN4CMMU_LOG_MEM_ACCESSES	(0)
+#define SUN4CMMU_LOG_MEM_ACCESSES   (0)
 
 class sun4_mmu_base_device : public device_t, public sparc_mmu_interface
 {

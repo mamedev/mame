@@ -471,12 +471,12 @@ private:
 
 	uint8_t m_nmi_mask;
 
-	DECLARE_READ8_MEMBER(epm_code_r);
-	DECLARE_READ8_MEMBER(touchm_r);
-	DECLARE_WRITE8_MEMBER(touchm_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(unk80_w);
+	uint8_t epm_code_r();
+	uint8_t touchm_r();
+	void touchm_w(uint8_t data);
+	void rombank_w(uint8_t data);
+	void nmi_mask_w(uint8_t data);
+	void unk80_w(uint8_t data);
 
 	void out_a_w(uint8_t data);
 	void out_c_w(uint8_t data);
@@ -598,27 +598,27 @@ void amaticmg_state::amaticmg2_palette(palette_device &palette) const
 /************************************
 *       Read/Write Handlers         *
 ************************************/
-READ8_MEMBER( amaticmg_state::epm_code_r )
+uint8_t amaticmg_state::epm_code_r()
 {
 	return 0x65;
 }
 
-READ8_MEMBER( amaticmg_state::touchm_r )
+uint8_t amaticmg_state::touchm_r()
 {
 	return m_tch->read() & 1;
 }
 
-WRITE8_MEMBER( amaticmg_state::touchm_w )
+void amaticmg_state::touchm_w(uint8_t data)
 {
 	m_tch->write(data & 1);
 }
 
-WRITE8_MEMBER( amaticmg_state::rombank_w )
+void amaticmg_state::rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER( amaticmg_state::nmi_mask_w )
+void amaticmg_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_mask = (data & 1) ^ 1;
 }
@@ -666,7 +666,7 @@ void amaticmg_state::out_c_w(uint8_t data)
 	logerror("port C: %2X\n", data);
 }
 
-WRITE8_MEMBER( amaticmg_state::unk80_w )
+void amaticmg_state::unk80_w(uint8_t data)
 {
 //  m_dac->write(BIT(data, 0));       /* Sound DAC */
 }

@@ -39,16 +39,16 @@ public:
 	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// zorro slot
-	DECLARE_READ16_MEMBER( shared_ram_r );
-	DECLARE_WRITE16_MEMBER( shared_ram_w );
-	DECLARE_READ16_MEMBER( irq_ack_r );
-	DECLARE_WRITE16_MEMBER( irq_ack_w );
-	DECLARE_READ16_MEMBER( reset_low_r );
-	DECLARE_WRITE16_MEMBER( reset_low_w );
-	DECLARE_READ16_MEMBER( irq_r );
-	DECLARE_WRITE16_MEMBER( irq_w );
-	DECLARE_READ16_MEMBER( reset_high_r );
-	DECLARE_WRITE16_MEMBER( reset_high_w );
+	uint16_t shared_ram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void shared_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t irq_ack_r();
+	void irq_ack_w(uint16_t data);
+	uint16_t reset_low_r();
+	void reset_low_w(uint16_t data);
+	uint16_t irq_r();
+	void irq_w(uint16_t data);
+	uint16_t reset_high_r(offs_t offset, uint16_t mem_mask = ~0);
+	void reset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void iocpu_map(address_map &map);
 
@@ -65,19 +65,19 @@ protected:
 
 private:
 	// cpu
-	WRITE8_MEMBER( int2_w );
-	WRITE8_MEMBER( irq_ack8_w );
+	void int2_w(uint8_t data);
+	void irq_ack8_w(uint8_t data);
 
 	// acia
-	template<int N> DECLARE_READ8_MEMBER( acia_r );
-	template<int N> DECLARE_WRITE8_MEMBER( acia_w );
+	template<int N> uint8_t acia_r(offs_t offset);
+	template<int N> void acia_w(offs_t offset, uint8_t data);
 
 	// cia
-	DECLARE_READ8_MEMBER( cia_port_a_r );
-	DECLARE_READ8_MEMBER( cia_port_b_r );
-	DECLARE_WRITE8_MEMBER( cia_port_b_w );
-	DECLARE_READ8_MEMBER( cia_r );
-	DECLARE_WRITE8_MEMBER( cia_w );
+	uint8_t cia_port_a_r();
+	uint8_t cia_port_b_r();
+	void cia_port_b_w(uint8_t data);
+	uint8_t cia_r(offs_t offset);
+	void cia_w(offs_t offset, uint8_t data);
 
 	// rs232
 	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );

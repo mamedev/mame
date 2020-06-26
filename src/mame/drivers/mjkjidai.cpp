@@ -32,7 +32,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(mjkjidai_state::adpcm_w)
+void mjkjidai_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_pos = (data & 0x07) * 0x1000 * 2;
 	m_adpcm_end = m_adpcm_pos + 0x1000 * 2;

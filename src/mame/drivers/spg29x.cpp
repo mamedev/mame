@@ -6,6 +6,18 @@
 
         08/17/2013 Skeleton driver by Sandro Ronco
 
+        HyperScan TODO:
+        - Various graphics glitches
+        - Sound
+        - X-Men hangs after the first match
+        - USB
+
+        Hyperscan has a hidden test menu that can be accessed with a specific inputs sequence:
+        - During boot press and hold Select + Left Shoulder + Green until 'PLEASE WAIT' is shown on the screen
+        - Press and release Red, Red, Green, Green, Yellow, Blue
+
+****************************************************************************
+
         SPG290 Interrupt:
 
         Vector      Source
@@ -60,10 +72,14 @@
 
 #include "emu.h"
 #include "cpu/score/score.h"
+#include "machine/spg290_cdservo.h"
+#include "machine/spg290_i2c.h"
+#include "machine/spg290_ppu.h"
+#include "machine/spg290_timer.h"
+#include "machine/hyperscan_card.h"
+#include "machine/hyperscan_ctrl.h"
 #include "screen.h"
 #include "softlist_dev.h"
-
-#define LOG_SPG290_REGISTER_ACCESS  (1)
 
 
 
@@ -72,9 +88,17 @@ class spg29x_game_state : public driver_device
 public:
 	spg29x_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_ppu(*this, "ppu"),
+		m_i2c(*this, "i2c"),
+		m_timers(*this, "timer%u", 0U),
+		m_hyperscan_card(*this, "card"),
+		m_hyperscan_ctrl(*this, "ctrl%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void spg29x(machine_config &config);
 	void hyperscan(machine_config &config);
 
 protected:
@@ -84,89 +108,32 @@ protected:
 private:
 
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER(spg290_regs_r);
-	DECLARE_WRITE32_MEMBER(spg290_regs_w);
-	void spg290_timers_update();
-	DECLARE_WRITE_LINE_MEMBER(spg290_vblank_irq);
-	inline uint32_t spg290_read_mem(uint32_t offset);
-	inline void spg290_write_mem(uint32_t offset, uint32_t data);
-	void spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb);
-	void spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t rgb, uint32_t transrgb);
-	void spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, uint32_t *palettes, uint32_t buf_start);
-	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
-	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
 	void spg290_mem(address_map &map);
+	void spg290_bios_mem(address_map &map);
 
-	static const device_timer_id TIMER_SPG290 = 0;
-	static const device_timer_id TIMER_I2C = 1;
+	void space_byte_w(offs_t offset, uint8_t data) { return m_maincpu->space(AS_PROGRAM).write_byte(offset, data); }
+	uint32_t space_dword_r(offs_t offset)          { return m_maincpu->space(AS_PROGRAM).read_dword(offset); }
 
-	struct spg290_miu
-	{
-		uint32_t  status;
-	};
+	uint16_t i2c_r(offs_t offset);
 
-	struct spg290_ppu
-	{
-		uint32_t  control;
-		uint32_t  irq_control;
-		uint32_t  irq_status;
-		uint32_t  sprite_max;
-		uint32_t  sprite_buf_start;
-		uint32_t  frame_buff[3];
-		uint32_t  palettes[0x200];
-		uint32_t  tx_hoffset[0x200];
-		uint32_t  tx_hcomp[0x200];
-		uint32_t  transrgb;
+	required_device<screen_device> m_screen;
+	required_device<spg290_ppu_device> m_ppu;
+	required_device<spg290_i2c_device> m_i2c;
+	required_device_array<spg290_timer_device, 6> m_timers;
+	optional_device<hyperscan_card_device> m_hyperscan_card;
+	optional_device_array<hyperscan_ctrl_device, 2> m_hyperscan_ctrl;
+	output_finder<8> m_leds;
 
-		struct ppu_spite
-		{
-			uint32_t  control;
-			uint32_t  attribute;
-		} sprites[0x200];
+	void tve_control_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void gpio_out_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void timers_clk_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-		struct ppu_tx
-		{
-			uint32_t  control;
-			uint32_t  attribute;
-			uint32_t  posx;
-			uint32_t  posy;
-			uint32_t  nptr;
-			uint32_t  buf_start[3];
-		} txs[3];
-	};
-
-	struct spg290_timer
-	{
-		uint32_t  control;
-		uint32_t  control2;
-		uint16_t  preload;
-		uint16_t  counter;
-	};
-
-	struct spg290_i2c
-	{
-		uint32_t  config;
-		uint32_t  irq_control;
-		uint32_t  clock;
-		uint8_t   count;
-		uint32_t  id;
-		uint32_t  port_addr;
-		uint32_t  wdata;
-		uint32_t  rdata;
-	};
-
-	spg290_miu      m_miu;
-	spg290_ppu      m_ppu;
-	spg290_timer    m_timers[6];
-	spg290_i2c      m_i2c;
-	emu_timer *     m_update_timer;
-	emu_timer *     m_i2c_timer;
-
-
+	uint16_t m_tve_control;
+	uint8_t  m_tve_fade_offset;
+	uint16_t m_gpio_out;
 };
 
 class spg29x_nand_game_state : public spg29x_game_state
@@ -188,443 +155,176 @@ private:
 	int m_firstvector;
 };
 
-
-
-#if LOG_SPG290_REGISTER_ACCESS
-static void log_spg290_regs(device_t *device,uint8_t module, uint16_t reg, uint32_t mem_mask, bool write, uint32_t data=0)
+class spg29x_zone3d_game_state : public spg29x_game_state
 {
-	static const char *const modules_name[] =
-	{
-		"CSI", "PPU", "JPG", "TV", "LCD", "SPU", "CD", "MIU", "APBDMA", "BUFCTL","IRQCTL", "GPUBUF", "LDMDMA",
-		"BLNDMA", "TPGBUF", "AHBDEC", "GPIO", "SPI", "SIO", "I2C", "I2S", "UART", "TIMERS/RTC", "WDOG", "SD",
-		"FLASH", "ADC", "USB device", "USB host", "Reserved", "Reserved", "Reserved", "SFTCFG", "CKG", "MP4",
-		"MIU2", "ECC"
-	};
+public:
+	spg29x_zone3d_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg29x_game_state(mconfig, type, tag)
+	{ }
 
-	if (module < 0x25)
-		device->logerror("SPG: %-10s", modules_name[module]);
-	else
-		device->logerror("SPG: mod 0x%02x  ", module);
+	void init_zone3d();
 
-	if (!write)
-		device->logerror(" R 0x%04x", reg);
-	else
-		device->logerror(" W 0x%04x = 0x%08x", reg, data);
+protected:
+	void machine_reset() override;
 
-	if (mem_mask != 0xffffffffu)
-		device->logerror(" (0x%08x)\n",  mem_mask);
-	else
-		device->logerror("\n");
-}
-#endif
+private:
+};
 
 
-READ32_MEMBER(spg29x_game_state::spg290_regs_r)
+
+
+
+void spg29x_game_state::timers_clk_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t addr = offset << 2;
-	uint32_t data = 0;
+	auto clock = 27_MHz_XTAL / ((data & 0xff) + 1);
 
-	if (addr == 0x010000)           // PPU Control
+	uint32_t mask = 0x100;
+	for(int i=0; i<m_timers.size(); i++)
 	{
-		data = m_ppu.control;
-	}
-	else if (addr == 0x010084)      // PPU IRQ Status
-	{
-		data = m_ppu.irq_status;
-	}
-	if (addr == 0x07006c)           // MIU Status
-	{
-		data = m_miu.status;
-	}
-	else if ((addr & 0xff0fff) == 0x160000)   // Timer X Status
-	{
-		int idx = (offset>>10) & 0x0f;
-		data = m_timers[idx].control;
-	}
-	else if(addr == 0x130024)       // I2C interrupt
-	{
-		data = m_i2c.irq_control;
-	}
-	else if(addr == 0x130034)       // I2C write data
-	{
-		data = m_i2c.wdata;
-	}
-	else if(addr == 0x130038)       // I2C data data
-	{
-		data = m_i2c.rdata;
-	}
-
-#if LOG_SPG290_REGISTER_ACCESS
-	//else
-	{
-		if (!machine().side_effects_disabled())
-			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
-	}
-#endif
-
-	return data;
-}
-
-WRITE32_MEMBER(spg29x_game_state::spg290_regs_w)
-{
-	uint32_t addr = offset << 2;
-
-	if (addr == 0x010000)               // PPU Control
-	{
-		COMBINE_DATA(&m_ppu.control);
-	}
-	else if (addr == 0x010008)          // PPU Max Sprites
-	{
-		COMBINE_DATA(&m_ppu.sprite_max);
-	}
-	else if (addr == 0x010010)          // PPU Max Sprites
-	{
-		COMBINE_DATA(&m_ppu.transrgb);
-	}
-	else if (addr == 0x0100d0)          // Sprites buffer start
-	{
-		COMBINE_DATA(&m_ppu.sprite_buf_start);
-	}
-	else if (addr == 0x010020 || addr == 0x01003c || addr == 0x010058)   // Text Layers x pos
-	{
-		int idx = (((offset>>3) & 3) | ((offset>>4) & 1)) - 1;
-		COMBINE_DATA(&m_ppu.txs[idx].posx);
-	}
-	else if (addr == 0x010024 || addr == 0x010040 || addr == 0x01005c)   // Text Layers y pos
-	{
-		int idx = (((offset>>3) & 3) | ((offset>>4) & 1)) - 1;
-		COMBINE_DATA(&m_ppu.txs[idx].posy);
-	}
-	else if (addr == 0x010028 || addr == 0x010044 || addr == 0x010060)   // Text Layers attribute
-	{
-		int idx = ((offset>>3) & 3) - 1;
-		COMBINE_DATA(&m_ppu.txs[idx].attribute);
-	}
-	else if (addr == 0x01002c || addr == 0x010048 || addr == 0x010064)   // Text Layers control
-	{
-		int idx = ((offset>>3) & 3) - 1;
-		COMBINE_DATA(&m_ppu.txs[idx].control);
-	}
-	else if (addr == 0x010030 || addr == 0x01004c || addr == 0x010068)   // Text Layers number ptr
-	{
-		int idx = ((offset>>3) & 3) - 1;
-		COMBINE_DATA(&m_ppu.txs[idx].nptr);
-	}
-	else if (addr == 0x010080)          // PPU IRQ Control
-	{
-		COMBINE_DATA(&m_ppu.irq_control);
-	}
-	else if (addr == 0x010084)          // PPU IRQ ack
-	{
-		if (ACCESSING_BITS_0_7)
-			m_ppu.irq_status &= ~data;
-	}
-	else if (addr >= 0x0100a0 && addr <= 0x0100a8)          // Tx1 buffer start
-	{
-		COMBINE_DATA(&m_ppu.txs[0].buf_start[offset & 3]);
-	}
-	else if (addr >= 0x0100ac && addr <= 0x0100b4)          // Tx2 buffer start
-	{
-		COMBINE_DATA(&m_ppu.txs[1].buf_start[(offset+1) & 3]);
-	}
-	else if (addr >= 0x0100b8 && addr <= 0x0100c0)          // Tx3 buffer starts
-	{
-		COMBINE_DATA(&m_ppu.txs[2].buf_start[(offset+2) & 3]);
-	}
-	else if ((addr & 0xfff000) == 0x011000)                 // Palettes
-	{
-		COMBINE_DATA(&m_ppu.palettes[offset & 0x01ff]);
-	}
-	else if ((addr & 0xfff000) == 0x012000)                 // Tx horizontal offset
-	{
-		COMBINE_DATA(&m_ppu.tx_hoffset[offset & 0x01ff]);
-	}
-	else if ((addr & 0xfff000) == 0x013000)                 // Tx horizontal compression
-	{
-		COMBINE_DATA(&m_ppu.tx_hcomp[offset & 0x01ff]);
-	}
-	else if ((addr & 0xfff000) == 0x014000)                 // Sprite Control Registers
-	{
-		int idx = (offset>>1) & 0x1ff;
-		if (offset & 1)
-			COMBINE_DATA(&m_ppu.sprites[idx].attribute);
+		if (data & mask)
+			m_timers[i]->set_clock(32.768_kHz_XTAL);
 		else
-			COMBINE_DATA(&m_ppu.sprites[idx].control);
-	}
-	else if (addr == 0x07005c)                  // MIU Status
-	{
-		COMBINE_DATA(&m_miu.status);
-	}
-	else if ((addr & 0xff0fff) == 0x160000)     // Timer X Control 1
-	{
-		int idx = (offset>>10) & 0x07;
-		COMBINE_DATA(&m_timers[idx].control);
+			m_timers[i]->set_clock(clock);
 
-		if (ACCESSING_BITS_24_31)
-			m_timers[idx].control &= ~(data & 0x04000000);  // Timers IRQ ack
+		mask <<= 1;
 	}
-	else if ((addr & 0xff0fff) == 0x160004)     // Timer X Control 2
-	{
-		int idx = (offset>>10) & 0x07;
-		COMBINE_DATA(&m_timers[idx].control2);
-	}
-	else if ((addr & 0xff0fff) == 0x160008)     // Timer X Preload
-	{
-		int idx = (offset>>10) & 0x07;
-		COMBINE_DATA(&m_timers[idx].preload);
-	}
-	else if (addr == 0x2100e4)                  // Timer Source Clock Selection
-	{
-		const auto timers_clk = XTAL(27'000'000) / ((data & 0xff) + 1);
-		m_update_timer->adjust(attotime::from_hz(timers_clk), 0, attotime::from_hz(timers_clk));
-	}
-	else if(addr == 0x130020)                   // I2C configuration
-	{
-		COMBINE_DATA(&m_i2c.config);
-	}
-	else if(addr == 0x130024)                   // I2C interrupt
-	{
-		COMBINE_DATA(&m_i2c.irq_control);
-
-		if (ACCESSING_BITS_0_7)
-			m_i2c.irq_control &= ~(data & 0x00000001);  // I2C IRQ ack
-	}
-	else if(addr == 0x130028)                   // I2C clock setting
-	{
-		COMBINE_DATA(&m_i2c.clock);
-		const auto i2c_clk = XTAL(27'000'000) / ((m_i2c.clock & 0x3ff) + 1);
-		m_i2c_timer->adjust(attotime::from_hz(i2c_clk), 0, attotime::from_hz(i2c_clk));
-	}
-	else if(addr == 0x13002c)                   // I2C ID
-	{
-		COMBINE_DATA(&m_i2c.id);
-	}
-	else if(addr == 0x130030)                   // I2C port address
-	{
-		COMBINE_DATA(&m_i2c.port_addr);
-	}
-	else if(addr == 0x130034)                   // I2C write data
-	{
-		COMBINE_DATA(&m_i2c.wdata);
-	}
-	else if(addr == 0x130038)                   // I2C data data
-	{
-		COMBINE_DATA(&m_i2c.rdata);
-	}
-	else if(addr == 0x150000)                   // UART data
-	{
-		if (ACCESSING_BITS_0_7)
-			printf("%c", data & 0xff);
-	}
-
-#if LOG_SPG290_REGISTER_ACCESS
-	//else
-	{
-		if (!machine().side_effects_disabled())
-			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
-	}
-#endif
 }
 
-inline uint32_t spg29x_game_state::spg290_read_mem(uint32_t offset)
+void spg29x_game_state::tve_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	return m_maincpu->space(0).read_dword(offset);
-}
-
-inline void spg29x_game_state::spg290_write_mem(uint32_t offset, uint32_t data)
-{
-	return m_maincpu->space(0).write_dword(offset, data);
-}
-
-void spg29x_game_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb)
-{
-	if (!(argb & 0x8000) && cliprect.contains(posx, posy))
+	COMBINE_DATA(&m_tve_control);
+	rectangle visarea;
+	switch(m_tve_control & 0xc)
 	{
-		rgb_t color = rgb_t(pal5bit(argb >> 10), pal5bit(argb >> 5), pal5bit(argb >> 0));
-		bitmap.pix32(posy, posx) = color;
+	case 0x0: // QVGA
+		visarea.set(0, 320-1, 0, 240-1);
+		break;
+	case 0x4: // VGA
+		visarea.set(0, 640-1, 0, 480-1);
+		break;
+	case 0x8: // HVGA
+		visarea.set(0, 640-1, 0, 240-1);
+		break;
 	}
+
+	int interlaced = m_tve_control & 1;
+	if (m_tve_control & 2)
+		m_screen->configure(864, 625, visarea, HZ_TO_ATTOSECONDS(27_MHz_XTAL) * 864 * 625 * (interlaced ? 2 : 1));      // PAL
+	else
+		m_screen->configure(858, 525, visarea, HZ_TO_ATTOSECONDS(27_MHz_XTAL) * 858 * 525 * (interlaced ? 2 : 1));      // NTSC
 }
 
-void spg29x_game_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t rgb, uint32_t transrgb)
+void spg29x_game_state::gpio_out_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if ((!(transrgb & 0x10000) || (transrgb & 0xffff) != rgb) && cliprect.contains(posx, posy))
-	{
-		rgb_t color = rgb_t(pal5bit(rgb >> 11), pal6bit(rgb >> 5), pal5bit(rgb >> 0));
-		bitmap.pix32(posy, posx) = color;
-	}
+	COMBINE_DATA(&m_gpio_out);
+
+	if (ACCESSING_BITS_0_7)
+		m_hyperscan_card->write(BIT(m_gpio_out,1));
+
+	for(int i=0; i<8; i++)
+		m_leds[i] = BIT(m_gpio_out, 5 + i);
 }
 
-void spg29x_game_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, uint32_t *palettes, uint32_t buf_start)
+uint16_t spg29x_game_state::i2c_r(offs_t offset)
 {
-	uint32_t sprite_base = buf_start + ((control & 0xffff) << 8);
-	uint16_t sprite_x    = (control >> 16) & 0x3ff;
-	uint16_t sprite_y    = (attribute >> 16) & 0x3ff;
-	uint8_t sprite_hsize = 8 << ((attribute >> 4) & 0x03);
-	uint8_t sprite_vsize = 8 << ((attribute >> 6) & 0x03);
-	uint8_t bit_pixel    = ((attribute & 3) + 1) << 1;
-	uint8_t pixel_word   = 32 / bit_pixel;
-	uint8_t word_line    = sprite_hsize / pixel_word;
-	uint8_t sprite_flip  = (attribute >> 2) & 0x03;
+	int port = (offset >> 4) & 0x0f;
 
-	for (int y=0; y < sprite_vsize; y++)
-		for (int x=0; x < word_line; x++)
-		{
-			uint32_t data = spg290_read_mem(sprite_base + (y * pixel_word + x) * 4);
+	if (port < 2)
+		return m_hyperscan_ctrl[port]->read(offset);
 
-			for (int b=0; b < pixel_word; b++)
-			{
-				uint16_t pen = ((data >> (b * bit_pixel)) & ((1 << bit_pixel) - 1));
-				uint16_t posx;
-				if (sprite_flip & 0x01)
-					posx = sprite_x + (sprite_hsize - (x * word_line + b));
-				else
-					posx = sprite_x + x * (word_line) + b;
-
-				uint16_t posy;
-				if (sprite_flip & 0x02)
-					posy = sprite_y + (sprite_vsize - y);
-				else
-					posy = sprite_y + y;
-
-				spg290_argb1555(bitmap, cliprect, posy, posx, palettes[pen]);
-			}
-		}
+	return 0xffff;
 }
-
-void spg29x_game_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
-{
-	for (int y=0; y<512; y++)
-	{
-		int line = (control & 0x04) ? 0 : y;
-		uint32_t tx_start = spg290_read_mem(nptr + (posy + line) * 4);
-
-		for (int x=0; x < 1024>>1; x++)
-		{
-			uint32_t data = spg290_read_mem(buf_start + (tx_start + posx) * 2 + x * 4);
-
-			for (int b=0; b < 2; b++)
-			{
-				uint16_t posx = x * 2 + b;
-				uint16_t posy = y;
-				uint16_t pix = (data >> (b*16)) & 0xffff;
-
-				if (control & 0x0080)
-					spg290_argb1555(bitmap, cliprect, posy, posx, pix);
-				if (control & 0x1000)
-					spg290_rgb565(bitmap, cliprect, posy, posx, pix, transrgb);
-			}
-		}
-	}
-}
-
-void spg29x_game_state::spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
-{
-	// TODO
-}
-
 
 uint32_t spg29x_game_state::spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_ppu.control & 0x1000)
-	{
-		for (int depth=0; depth<4; depth++)
-		{
-			// draw the bitmap/text layers
-			for (int l=0; l<3; l++)
-				if ((m_ppu.txs[l].control & 0x08) && ((m_ppu.txs[l].attribute >> 13) & 3) == depth)
-				{
-					if (m_ppu.txs[l].control & 0x01)
-						spg290_blit_bitmap(bitmap, cliprect, m_ppu.txs[l].control, m_ppu.txs[l].attribute, m_ppu.txs[l].posy & 0x1ff, m_ppu.txs[l].posx & 0x1ff, m_ppu.txs[l].nptr, m_ppu.txs[l].buf_start[0], m_ppu.transrgb);
-					else
-						spg290_blit_character(bitmap, cliprect, m_ppu.txs[l].control, m_ppu.txs[l].attribute, m_ppu.txs[l].posy & 0x1ff, m_ppu.txs[l].posx & 0x1ff, m_ppu.txs[l].nptr, m_ppu.txs[l].buf_start[0], m_ppu.transrgb);
-				}
+	m_ppu->screen_update(screen, bitmap, cliprect);
 
-			// draw the sprites
-			for (int i=0; i<=(m_ppu.sprite_max & 0x1ff); i++)
-			{
-				if (((m_ppu.sprites[i].attribute >> 13) & 3) == depth)
-					spg290_blit_sprite(bitmap, cliprect, m_ppu.sprites[i].control, m_ppu.sprites[i].attribute, m_ppu.palettes, m_ppu.sprite_buf_start);
-			}
-		}
-	}
-	else
+	if (m_tve_fade_offset)
 	{
-		bitmap.fill(rgb_t::black(), cliprect);
+		int fade_offset = 255 - m_tve_fade_offset;
+		for (int y=0; y <= cliprect.max_y; y++)
+			for (int x=0; x <= cliprect.max_x; x++)
+			{
+				auto pix = rgb_t(bitmap.pix32(y, x));
+				bitmap.pix32(y, x) = rgb_t(pix.r() * fade_offset / 255, pix.g() * fade_offset / 255, pix.b() * fade_offset / 255);
+			}
 	}
 
 	return 0;
-}
-
-void spg29x_game_state::spg290_timers_update()
-{
-	for(auto & elem : m_timers)
-		if (elem.control & 0x80000000)
-		{
-			if (((elem.control2 >> 30) & 0x03) == 0x00)
-			{
-				if (elem.counter == 0xffff)
-				{
-					elem.counter = elem.preload;
-					if (elem.control & 0x08000000)
-					{
-						elem.control |= 0x04000000;
-						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56); // SCORE7
-					}
-				}
-				else
-					elem.counter++;
-			}
-			else
-			{
-				// TODO: capture, comparison and PWM mode
-
-			}
-		}
-}
-
-WRITE_LINE_MEMBER(spg29x_game_state::spg290_vblank_irq)
-{
-	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
-	{
-		m_ppu.irq_status |= 0x01;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
-	}
-	else if (!state && m_ppu.irq_control & 0x02) // VBlanking End IRQ
-	{
-		m_ppu.irq_status |= 0x02;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
-	}
-}
-
-
-void spg29x_game_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_SPG290:
-		spg290_timers_update();
-		break;
-	case TIMER_I2C:
-		if ((m_i2c.config & 0x40) && (m_i2c.config & 0x01))
-		{
-			// TODO: replace with real I2C emulation
-			m_i2c.rdata = 0;
-
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39); // SCORE7
-		}
-		break;
-	}
 }
 
 void spg29x_game_state::spg290_mem(address_map &map)
 {
 	map.global_mask(0x1fffffff);
 	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
-	map(0x08000000, 0x09ffffff).rw(FUNC(spg29x_game_state::spg290_regs_r), FUNC(spg29x_game_state::spg290_regs_w));
+
+	map(0x08030000, 0x08030003).w(FUNC(spg29x_game_state::tve_control_w)).lr32(NAME([this](uint32_t data) { return m_tve_control; }));
+	map(0x0803000c, 0x0803000f).lw32(NAME([this](uint32_t data) { m_tve_fade_offset = data & 0xff; }));
+	map(0x0807006c, 0x0807006f).lr32(NAME([]() { return 0x01;}));               // MUI Status: SDRAM is in the self-refresh mode
+	//map(0x08150000, 0x08150000).lw8(NAME([this](uint8_t data) { printf("%c", data); })); // UART
+	map(0x082100e4, 0x082100e7).w(FUNC(spg29x_game_state::timers_clk_sel_w));       // Timer Source Clock Selection
+	map(0x08240000, 0x0824000f).noprw();
+
+	//map(0x08000000, 0x0800ffff);  // CSI
+	map(0x08010000, 0x0801ffff).m("ppu", FUNC(spg290_ppu_device::map));
+	//map(0x08020000, 0x0802ffff);  // JPG
+	//map(0x08030000, 0x0803ffff);  // TV
+	//map(0x08040000, 0x0804ffff);  // LCD
+	//map(0x08050000, 0x0805ffff);  // SPU
+	map(0x08060000, 0x0806ffff).rw("cdservo", FUNC(spg290_cdservo_device::read), FUNC(spg290_cdservo_device::write));
+	//map(0x08070000, 0x0807ffff);  // MIU
+	//map(0x08080000, 0x0808ffff);  // APBDMA
+	//map(0x08090000, 0x0809ffff);  // BUFCTL
+	//map(0x080a0000, 0x080affff);  // IRQCTL
+	//map(0x080b0000, 0x080bffff);  // GPUBUF
+	//map(0x080c0000, 0x080cffff);  // LDMDMA
+	//map(0x080d0000, 0x080dffff);  // BLNDMA
+	//map(0x080e0000, 0x080effff);  // TPGBUF
+	//map(0x080f0000, 0x080fffff);  // AHBDEC
+	//map(0x08100000, 0x0810ffff);  // GPIO
+	//map(0x08110000, 0x0811ffff);  // SPI
+	//map(0x08120000, 0x0812ffff);  // SIO
+	map(0x08130000, 0x0813ffff).rw("i2c", FUNC(spg290_i2c_device::read), FUNC(spg290_i2c_device::write));
+	//map(0x08140000, 0x0814ffff);  // I2S
+	//map(0x08150000, 0x0815ffff);  // UART
+	map(0x08160000, 0x08160fff).rw(m_timers[0], FUNC(spg290_timer_device::read), FUNC(spg290_timer_device::write));
+	map(0x08161000, 0x08161fff).rw(m_timers[1], FUNC(spg290_timer_device::read), FUNC(spg290_timer_device::write));
+	map(0x08162000, 0x08162fff).rw(m_timers[2], FUNC(spg290_timer_device::read), FUNC(spg290_timer_device::write));
+	map(0x08163000, 0x08163fff).rw(m_timers[3], FUNC(spg290_timer_device::read), FUNC(spg290_timer_device::write));
+	map(0x08164000, 0x08164fff).rw(m_timers[4], FUNC(spg290_timer_device::read), FUNC(spg290_timer_device::write));
+	map(0x08165000, 0x08165fff).rw(m_timers[5], FUNC(spg290_timer_device::read), FUNC(spg290_timer_device::write));
+	//map(0x08166000, 0x08166fff);  // RTC
+	//map(0x08170000, 0x0817ffff);  // WDOG
+	//map(0x08180000, 0x0818ffff);  // SD
+	//map(0x08190000, 0x0819ffff);  // FLASH
+	//map(0x081a0000, 0x081affff);  // ADC
+	//map(0x081b0000, 0x081bffff);  // USB device
+	//map(0x081c0000, 0x081cffff);  // USB host
+	//map(0x081d0000, 0x081dffff);  // reserved
+	//map(0x081e0000, 0x081effff);  // Reserved
+	//map(0x081f0000, 0x081fffff);  // reserved
+	//map(0x08200000, 0x0820ffff);  // SFTCFG
+	//map(0x08210000, 0x0821ffff);  // CKG
+	map(0x0821006c, 0x0821006f).w(m_timers[0], FUNC(spg290_timer_device::control_w));
+	map(0x08210070, 0x08210073).w(m_timers[1], FUNC(spg290_timer_device::control_w));
+	map(0x08210074, 0x08210077).w(m_timers[2], FUNC(spg290_timer_device::control_w));
+	map(0x08210078, 0x0821007b).w(m_timers[3], FUNC(spg290_timer_device::control_w));
+	map(0x0821007c, 0x0821007f).w(m_timers[4], FUNC(spg290_timer_device::control_w));
+	map(0x08210080, 0x08210083).w(m_timers[5], FUNC(spg290_timer_device::control_w));
+	//map(0x08220000, 0x0822ffff);  // MP4
+	//map(0x08230000, 0x0823ffff);  // MIU2
+	//map(0x08240000, 0x0824ffff);  // ECC
+
 	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
 	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
-	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);
-	map(0x11000000, 0x110fffff).rom().region("bios", 0).mirror(0x0e000000);
+}
+
+void spg29x_game_state::spg290_bios_mem(address_map& map)
+{
+	spg290_mem(map);
+	map(0x08200024, 0x08200027).w(FUNC(spg29x_game_state::gpio_out_w)).lr32(NAME([this]() { return m_gpio_out; }));
+	map(0x08200068, 0x0820006b).lr32(NAME([this]() { return m_hyperscan_card->read(); }));
+	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0ff00000);
 }
 
 /* Input ports */
@@ -634,16 +334,18 @@ INPUT_PORTS_END
 
 void spg29x_game_state::machine_start()
 {
-	m_update_timer = timer_alloc(TIMER_SPG290);
-	m_i2c_timer = timer_alloc(TIMER_I2C);
+	m_leds.resolve();
+
+	save_item(NAME(m_tve_control));
+	save_item(NAME(m_tve_fade_offset));
+	save_item(NAME(m_gpio_out));
 }
 
 void spg29x_game_state::machine_reset()
 {
-	memset(&m_ppu, 0, sizeof(spg290_ppu));
-	memset(&m_miu, 0, sizeof(spg290_miu));
-	memset(&m_i2c, 0, sizeof(m_i2c));
-	m_i2c_timer->adjust(attotime::never, 0, attotime::never);
+	m_tve_control = 0;
+	m_tve_fade_offset = 0;
+	m_gpio_out = 0;
 
 	// disable JTAG
 	m_maincpu->set_state_int(SCORE_CR + 29, 0x20000000);
@@ -675,25 +377,72 @@ void spg29x_nand_game_state::machine_reset()
 }
 
 
-void spg29x_game_state::hyperscan(machine_config &config)
+void spg29x_zone3d_game_state::machine_reset()
 {
-	/* basic machine hardware */
-	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // 108MHz S+core 7
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg29x_game_state::spg290_mem);
+	spg29x_game_state::machine_reset();
 
-	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
+	uint8_t* rom = memregion("spi")->base();
+	int size = memregion("spi")->bytes();
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(spg29x_game_state::spg290_screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.screen_vblank().set(FUNC(spg29x_game_state::spg290_vblank_irq));
+	uint32_t destaddr = 0x1dc;
+	for (uint32_t addr = 0; addr < size; addr++)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		uint8_t byte = rom[addr];
+		mem.write_byte(addr+destaddr, byte);
+	}
+
+	m_maincpu->set_state_int(SCORE_PC, 0x1000);
 }
 
 
+void spg29x_game_state::spg29x(machine_config &config)
+{
+	/* basic machine hardware */
+	SCORE7(config, m_maincpu, 27_MHz_XTAL * 4);   // 108MHz S+core 7
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg29x_game_state::spg290_mem);
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(27_MHz_XTAL, 858, 0, 640, 525, 0, 480);
+	m_screen->set_screen_update(FUNC(spg29x_game_state::spg290_screen_update));
+	m_screen->screen_vblank().set(m_ppu, FUNC(spg290_ppu_device::screen_vblank));
+
+	for (int i=0; i<6; i++)
+	{
+		SPG290_TIMER(config, m_timers[i], 27_MHz_XTAL);
+		m_timers[i]->irq_cb().set_inputline(m_maincpu, 56);
+	}
+
+	SPG290_PPU(config, m_ppu, 27_MHz_XTAL, m_screen);
+	m_ppu->vblank_irq_cb().set_inputline(m_maincpu, 53);
+	m_ppu->space_read_cb().set(FUNC(spg29x_game_state::space_dword_r));
+
+	spg290_cdservo_device &cdservo(SPG290_CDSERVO(config, "cdservo", 27_MHz_XTAL, "cdrom"));
+	cdservo.irq_cb().set_inputline(m_maincpu, 60);
+	cdservo.space_write_cb().set(FUNC(spg29x_game_state::space_byte_w));
+
+	SPG290_I2C(config, m_i2c, 27_MHz_XTAL);
+	m_i2c->irq_cb().set_inputline(m_maincpu, 39);
+}
+
+void spg29x_game_state::hyperscan(machine_config &config)
+{
+	spg29x(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg29x_game_state::spg290_bios_mem);
+
+	m_i2c->i2c_read_cb().set(FUNC(spg29x_game_state::i2c_r));
+
+	CDROM(config, "cdrom").set_interface("cdrom");
+
+	HYPERSCAN_CTRL(config, m_hyperscan_ctrl[0], 0);
+	HYPERSCAN_CTRL(config, m_hyperscan_ctrl[1], 0);
+
+	HYPERSCAN_CARD(config, m_hyperscan_card, 0);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
+	SOFTWARE_LIST(config, "card_list").set_original("hyperscan_card");
+}
 
 void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -742,6 +491,10 @@ void spg29x_nand_game_state::nand_jak_bbsf()
 	m_firstvector = 0x8;
 }
 
+void spg29x_zone3d_game_state::init_zone3d()
+{
+
+}
 
 
 /* ROM definition */
@@ -755,8 +508,6 @@ ROM_END
 
 
 ROM_START( jak_bbh )
-	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x4200000, "nand", 0 ) // ID returned C25A, read as what appears to be a compatible type.
 	ROM_LOAD("bigbuckhunterpro_as_hy27us0812a_c25a.bin", 0x000000, 0x4200000, CRC(e2627540) SHA1(c8c6e5fbc4084fa695390bbb4e1e52e671f050da) )
 
@@ -766,10 +517,40 @@ ROM_END
 
 
 ROM_START( jak_bbsf )
-	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x4200000, "nand", 0 )
 	ROM_LOAD("bigbucksafari.bin", 0x000000, 0x4200000, CRC(dc5f9bf1) SHA1(27893c396d62f353ced52ef88fd9ade5c051598f) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
+ROM_START( zone3d )
+	ROM_REGION( 0x100000, "spi", 0 )
+	ROM_LOAD("zone_25l8006e_c22014.bin", 0x000000, 0x100000, CRC(8c571771) SHA1(cdb46850286d31bf58d45b75ffc396ed774ac4fd) )
+
+	/*
+	model: Lexar SD
+	revision: LX01
+	serial number: 00000000XL10
+
+	size: 362.00 MiB (741376 sectors * 512 bytes)
+	unk1: 0000000000000007
+	unk2: 00000000000000fa
+	unk3: 01
+
+	The SD card has no label, but there's some printing on the back:
+	MMAGF0380M3085-WY
+	TC00201106 by Taiwan
+
+	--
+	Dumped with hardware write blocker, so this image is correct, and hasn't been corrupted by Windows
+
+	Image contains a FAT filesystem with a number of compressed? programs that presumably get loaded into RAM by
+	the bootloader in the serial flash ROM
+	*/
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE( "zone3d", 0, SHA1(77971e2dbfb2ceac12f482d72539c2e042fd9108) )
 
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
@@ -783,7 +564,12 @@ COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state,
 
 // There were 1 player and 2 player versions for these JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player verisons being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-COMP( 2009, jak_bbh,    0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
-COMP( 2011, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
+COMP( 2009, jak_bbh,    0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
+COMP( 2011, jak_bbsf,   0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
+// ends up doing the fllowing, which causes a jump to 0xbf000024, where we have nothing mapped (internal ROM related, or thinks it's loaded code there?  This is the area Hyperscan uses as 'BIOS' not Internal ROM so could be RAM here)
+// 000011D4: ldis r8, 0xbf00
+// 000011D8: ori r8, 0x0024
+// 000011DC: br r8
+COMP( 201?, zone3d,    0,      0,      spg29x, hyperscan, spg29x_zone3d_game_state, init_zone3d,"Zone", "Zone 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

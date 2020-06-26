@@ -49,20 +49,20 @@ The driver has been updated accordingly.
  *
  *************************************/
 
-READ8_MEMBER(matmania_state::maniach_mcu_status_r)
+uint8_t matmania_state::maniach_mcu_status_r()
 {
 	return
 			((CLEAR_LINE == m_mcu->mcu_semaphore_r()) ? 0x01 : 0x00) |
 			((CLEAR_LINE == m_mcu->host_semaphore_r()) ? 0x02 : 0x00);
 }
 
-WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
+void matmania_state::matmania_sh_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
+void matmania_state::maniach_sh_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);

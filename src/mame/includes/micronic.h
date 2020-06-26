@@ -59,18 +59,18 @@ protected:
 private:
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	DECLARE_READ8_MEMBER( keypad_r );
-	DECLARE_READ8_MEMBER( status_flag_r );
-	DECLARE_WRITE8_MEMBER( status_flag_w );
-	DECLARE_WRITE8_MEMBER( kp_matrix_w );
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_READ8_MEMBER( irq_flag_r );
-	DECLARE_WRITE8_MEMBER( port_2c_w );
-	DECLARE_WRITE8_MEMBER( bank_select_w );
-	DECLARE_WRITE8_MEMBER( lcd_contrast_w );
-	DECLARE_WRITE8_MEMBER( rtc_address_w );
-	DECLARE_READ8_MEMBER( rtc_data_r );
-	DECLARE_WRITE8_MEMBER( rtc_data_w );
+	uint8_t keypad_r();
+	uint8_t status_flag_r();
+	void status_flag_w(uint8_t data);
+	void kp_matrix_w(uint8_t data);
+	void beep_w(uint8_t data);
+	uint8_t irq_flag_r();
+	void port_2c_w(uint8_t data);
+	void bank_select_w(uint8_t data);
+	void lcd_contrast_w(uint8_t data);
+	void rtc_address_w(uint8_t data);
+	uint8_t rtc_data_r();
+	void rtc_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
 
 	void micronic_palette(palette_device &palette) const;

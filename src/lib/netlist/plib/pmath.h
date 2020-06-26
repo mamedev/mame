@@ -15,9 +15,7 @@
 #include <cmath>
 #include <type_traits>
 
-#if (PUSE_FLOAT128)
-#include <quadmath.h>
-#endif
+// quadmath.h included by ptypes.h
 
 namespace plib
 {
@@ -97,7 +95,7 @@ namespace plib
 	/// \return reciprocal of argument
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	reciprocal(T v) noexcept
 	{
 		return constants<T>::one() / v;
@@ -110,7 +108,7 @@ namespace plib
 	/// \return absolute value of argument
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	abs(T v) noexcept
 	{
 		return std::abs(v);
@@ -123,7 +121,7 @@ namespace plib
 	/// \return absolute value of argument
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	sqrt(T v) noexcept
 	{
 		return std::sqrt(v);
@@ -137,7 +135,7 @@ namespace plib
 	/// \return sqrt(v1*v1+v2*v2)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	hypot(T v1, T v2) noexcept
 	{
 		return std::hypot(v1, v2);
@@ -150,7 +148,7 @@ namespace plib
 	/// \return exp(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	exp(T v) noexcept
 	{
 		return std::exp(v);
@@ -163,7 +161,7 @@ namespace plib
 	/// \return log(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	log(T v) noexcept
 	{
 		return std::log(v);
@@ -176,7 +174,7 @@ namespace plib
 	/// \return tanh(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	tanh(T v) noexcept
 	{
 		return std::tanh(v);
@@ -189,7 +187,7 @@ namespace plib
 	/// \return floor(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	floor(T v) noexcept
 	{
 		return std::floor(v);
@@ -202,7 +200,7 @@ namespace plib
 	/// \return log(1 + v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	log1p(T v) noexcept
 	{
 		return std::log1p(v);
@@ -215,7 +213,7 @@ namespace plib
 	/// \return sin(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	sin(T v) noexcept
 	{
 		return std::sin(v);
@@ -228,7 +226,7 @@ namespace plib
 	/// \return cos(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	cos(T v) noexcept
 	{
 		return std::cos(v);
@@ -241,7 +239,7 @@ namespace plib
 	/// \return trunc(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	trunc(T v) noexcept
 	{
 		return std::trunc(v);
@@ -255,7 +253,7 @@ namespace plib
 	/// \return signum(v)
 	///
 	template <typename T>
-	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	static inline constexpr std::enable_if_t<std::is_floating_point<T>::value, T>
 	signum(T v, T r = static_cast<T>(1))
 	{
 		constexpr const auto z(static_cast<T>(0));
@@ -377,7 +375,7 @@ namespace plib
 	///
 	template<typename T>
 	constexpr
-	typename std::enable_if<plib::is_integral<T>::value && plib::is_signed<T>::value, T>::type
+	std::enable_if_t<plib::is_integral<T>::value && plib::is_signed<T>::value, T>
 	abs(T v) noexcept
 	{
 		return v < 0 ? -v : v;
@@ -391,7 +389,7 @@ namespace plib
 	///
 	template<typename T>
 	constexpr
-	typename std::enable_if<plib::is_integral<T>::value && plib::is_unsigned<T>::value, T>::type
+	std::enable_if_t<plib::is_integral<T>::value && plib::is_unsigned<T>::value, T>
 	abs(T v) noexcept
 	{
 		return v;
