@@ -253,14 +253,13 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				u32 addr = channel->addr & 0x1ffff;
 				while (channel->counter <= channel->step) // result : clock / (4 * (512 - frequency))
 				{
-					bool loop = false;
-					if (BIT(read_sample(i, addr), 7) || addr >= m_pcmlimit)
+					if (BIT(read_sample(i, addr++), 7) || addr >= m_pcmlimit)
 					{
 						// end of sample
 						if (BIT(m_wreg[13], i))
 						{
 							/* loop to the beginning */
-							loop = true;
+							addr = channel->start;
 						}
 						else
 						{
@@ -270,7 +269,6 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						}
 					}
 					channel->counter += (0x200 - channel->step);
-					addr = loop ? channel->start : (addr + 1);
 				}
 				channel->addr = addr;
 
