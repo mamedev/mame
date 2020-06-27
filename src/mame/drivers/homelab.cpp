@@ -52,6 +52,7 @@ public:
 	homelab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
 		, m_p_chargen(*this, "chargen")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
@@ -65,6 +66,7 @@ protected:
 	u8 m_rows;
 	u8 m_cols;
 	required_device<cpu_device> m_maincpu;
+	required_memory_bank    m_bank1;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
@@ -107,7 +109,6 @@ public:
 private:
 	u8 exxx_r(offs_t offset);
 	std::unique_ptr<u8[]> m_ram;
-	bool m_ramhere;
 	void port7f_w(u8 data);
 	void portff_w(u8 data);
 	void machine_start() override;
@@ -166,17 +167,17 @@ u8 homelab2_state::cass2_r()
 
 void homelab3_state::machine_reset()
 {
-	m_ramhere = true;
+	m_bank1->set_entry(1);
 }
 
 void homelab3_state::port7f_w(u8 data)
 {
-	m_ramhere = true;
+	m_bank1->set_entry(1);
 }
 
 void homelab3_state::portff_w(u8 data)
 {
-	m_ramhere = false;
+	m_bank1->set_entry(0);
 }
 
 READ_LINE_MEMBER( homelab3_state::cass3_r )
@@ -230,7 +231,7 @@ void homelab2_state::homelab2_mem(address_map &map)
 	map(0x3c00, 0x3dff).w(FUNC(homelab2_state::mem3c00_w));
 	map(0x3e00, 0x3fff).w(FUNC(homelab2_state::mem3e00_w));
 	map(0x4000, 0x7fff).ram();
-	map(0xc000, 0xc3ff).mirror(0xc00).lr8(NAME([this] (offs_t offset) { return m_vram[offset]; })).lw8(NAME([this] (offs_t offset, u8 data) { m_vram[offset]=data; }));
+	map(0xc000, 0xc3ff).mirror(0xc00).bankrw("bank1");
 	map(0xe000, 0xffff).r(FUNC(homelab2_state::cass2_r));
 }
 
@@ -239,8 +240,7 @@ void homelab3_state::homelab3_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xcfff).ram();
 	map(0xe800, 0xefff).r(FUNC(homelab3_state::exxx_r));
-	map(0xf800, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_ramhere) return m_ram[offset]; else return m_vram[offset]; }))
-					   .lw8(NAME([this] (offs_t offset, u8 data) { if(m_ramhere) m_ram[offset]=data; else m_vram[offset]=data; }));
+	map(0xf800, 0xffff).bankrw("bank1");
 }
 
 void homelab3_state::homelab3_io(address_map &map)
@@ -597,19 +597,22 @@ void homelab2_state::machine_start()
 	save_item(NAME(m_cols));
 	m_vram = make_unique_clear<u8[]>(0x800);
 	save_pointer(NAME(m_vram), 0x800);
+	m_bank1->configure_entry(0, m_vram.get());
+	m_bank1->set_entry(0);
 	m_rows = 25;
 	m_cols = 40;
 }
 
 void homelab3_state::machine_start()
 {
-	save_item(NAME(m_ramhere));
 	save_item(NAME(m_rows));
 	save_item(NAME(m_cols));
 	m_vram = make_unique_clear<u8[]>(0x800);
 	save_pointer(NAME(m_vram), 0x800);
 	m_ram = make_unique_clear<u8[]>(0x800);
 	save_pointer(NAME(m_ram), 0x800);
+	m_bank1->configure_entry(0, m_vram.get());
+	m_bank1->configure_entry(1, m_ram.get());
 	m_rows = 32;
 	m_cols = 64;
 }
