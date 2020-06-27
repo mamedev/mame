@@ -72,8 +72,8 @@ ToDo:
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().share("mainram").bankr("bank1");
-	map(0x4000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x3fff).bankr("bank1");
 }
 
 

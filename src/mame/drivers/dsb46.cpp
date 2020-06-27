@@ -42,6 +42,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 	{ }
 
 	void dsb46(machine_config &config);
@@ -52,16 +53,16 @@ private:
 	void port1a_w(u8 data);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	bool m_rom_in_map;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 };
 
 void dsb46_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
-	map(0x0800, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x07ff).bankr("bank1");
 }
 
 void dsb46_state::io_map(address_map &map)
@@ -83,17 +84,18 @@ INPUT_PORTS_END
 
 void dsb46_state::machine_start()
 {
-	save_item(NAME(m_rom_in_map));
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void dsb46_state::machine_reset()
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 }
 
 void dsb46_state::port1a_w(u8 data)
 {
-	m_rom_in_map = BIT(~data, 0);
+	m_bank1->set_entry(BIT(~data, 0));
 }
 
 static const z80_daisy_config daisy_chain[] =
