@@ -1195,11 +1195,29 @@ render_texture *layout_element::state_texture(int state)
 	{
 		m_elemtex[state].m_element = this;
 		m_elemtex[state].m_state = state;
-		m_elemtex[state].m_texture = machine().render().texture_alloc(element_scale, &m_elemtex[state]);
+		m_elemtex[state].m_texture = machine().render().texture_alloc(element_scale, &m_elemtex[state], element_dirty);
 	}
 	return m_elemtex[state].m_texture;
 }
 
+
+//-------------------------------------------------
+//  element_dirty - return whether or not any
+//  given components in the element needs an
+//  update
+//-------------------------------------------------
+
+bool layout_element::element_dirty(void *dirty_param)
+{
+	texture* elemtex = (texture *)dirty_param;
+
+	// iterate over components that are part of the current state
+	for (auto& curcomp : elemtex->m_element->m_complist)
+		if (curcomp->is_dirty())
+			return true;
+
+	return false;
+}
 
 //-------------------------------------------------
 //  element_scale - scale an element by rendering
@@ -1327,6 +1345,8 @@ public:
 		m_videofile = env.get_attribute_string(compnode, "file", "");
 		m_file = std::make_unique<emu_file>(env.machine().options().art_path(), OPEN_FLAG_READ);
 	}
+
+	bool is_dirty() const override { return true; }
 
 protected:
 	// overrides

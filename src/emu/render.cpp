@@ -314,7 +314,7 @@ render_texture::~render_texture()
 //  it has been re-allocated
 //-------------------------------------------------
 
-void render_texture::reset(render_manager &manager, texture_scaler_func scaler, void *param)
+void render_texture::reset(render_manager &manager, texture_scaler_func scaler, void *param, texture_dirty_func dirty)
 {
 	m_manager = &manager;
 	if (scaler != nullptr)
@@ -323,6 +323,7 @@ void render_texture::reset(render_manager &manager, texture_scaler_func scaler, 
 		m_scaler = scaler;
 		m_param = param;
 	}
+	m_dirty = dirty;
 	m_old_id = m_id;
 	m_id = ~0L;
 }
@@ -463,7 +464,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 			if (-1 == lowest)
 				throw emu_fatalerror("render_texture::get_scaled: Too many live texture instances!");
 
-			// throw out any existing entries
+			// throw out any existing entries or update the current one if dirty
 			scaled = &m_scaled[lowest];
 			if (scaled->bitmap != nullptr)
 			{
@@ -473,6 +474,14 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 
 			// allocate a new bitmap
 			scaled->bitmap = global_alloc(bitmap_argb32(dwidth, dheight));
+			scaled->seqid = ++m_curseq;
+
+			// let the scaler do the work
+			(*m_scaler)(*scaled->bitmap, srcbitmap, m_sbounds, m_param);
+		}
+		else if (m_dirty && (*m_dirty)(m_param))
+		{
+			scaled = &m_scaled[scalenum];
 			scaled->seqid = ++m_curseq;
 
 			// let the scaler do the work
@@ -3095,11 +3104,11 @@ float render_manager::ui_aspect(render_container *rc)
 //  texture_alloc - allocate a new texture
 //-------------------------------------------------
 
-render_texture *render_manager::texture_alloc(texture_scaler_func scaler, void *param)
+render_texture *render_manager::texture_alloc(texture_scaler_func scaler, void *param, texture_dirty_func dirty)
 {
 	// allocate a new texture and reset it
 	render_texture *tex = m_texture_allocator.alloc();
-	tex->reset(*this, scaler, param);
+	tex->reset(*this, scaler, param, dirty);
 	tex->set_id(m_texture_id);
 	m_texture_id++;
 	m_live_textures++;

@@ -164,7 +164,10 @@ constexpr u32 PRIMFLAG_GET_VECTORBUF(u32 x) { return (x & PRIMFLAG_VECTORBUF_MAS
 //**************************************************************************
 
 // texture scaling callback
-typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+typedef void (*texture_scaler_func)(bitmap_argb32& dest, bitmap_argb32& source, const rectangle& sbounds, void* param);
+
+// texture scaling callback
+typedef bool (*texture_dirty_func)(void* dirty_param);
 
 // render_bounds - floating point bounding rectangle
 struct render_bounds
@@ -372,7 +375,7 @@ class render_texture
 	~render_texture();
 
 	// reset before re-use
-	void reset(render_manager &manager, texture_scaler_func scaler = nullptr, void *param = nullptr);
+	void reset(render_manager &manager, texture_scaler_func scaler = nullptr, void *param = nullptr, texture_dirty_func dirty = nullptr);
 
 	// release resources when freed
 	void release();
@@ -419,6 +422,9 @@ private:
 	void *              m_param;                    // scaling callback parameter
 	u32                 m_curseq;                   // current sequence number
 	scaled_texture      m_scaled[MAX_TEXTURE_SCALES];// array of scaled variants of this texture
+
+	// dirty state
+	texture_dirty_func  m_dirty;                    // dirty callback
 };
 
 
@@ -598,6 +604,7 @@ private:
 		const render_bounds &bounds() const { return m_bounds; }
 		const render_color &color() const { return m_color; }
 		const char* artname() const { return m_artname; }
+		virtual bool is_dirty() const { return false; }
 
 		// operations
 		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
@@ -661,6 +668,7 @@ private:
 	typedef std::map<std::string, make_component_func> make_component_map;
 
 	// internal helpers
+	static bool element_dirty(void* dirty_param);
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname);
 	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *artname, const char *dirname);
@@ -1082,7 +1090,7 @@ public:
 	render_container &ui_container() const { assert(m_ui_container != nullptr); return *m_ui_container; }
 
 	// textures
-	render_texture *texture_alloc(texture_scaler_func scaler = nullptr, void *param = nullptr);
+	render_texture *texture_alloc(texture_scaler_func scaler = nullptr, void *param = nullptr, texture_dirty_func dirty = nullptr);
 	void texture_free(render_texture *texture);
 
 	// fonts
