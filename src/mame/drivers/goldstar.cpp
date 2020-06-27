@@ -15712,7 +15712,7 @@ ROM_START( noved )
 	ROM_IGNORE(           0x20000 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "w27c512 winbond eeprom u27.bin", 0x06000, 0x02000, CRC(8a98dfab) SHA1(3c850d1a212295aef5922547c11712a59c1ba5f8) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "w27c512 winbond eeprom u27.bin", 0x00000, 0x08000, CRC(8a98dfab) SHA1(3c850d1a212295aef5922547c11712a59c1ba5f8) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x8000 )
 
 	// taken from new fruit bonus '96, might be wrong
