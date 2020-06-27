@@ -261,8 +261,12 @@ end
 		"wdlfft",
 		ext_lib("jpeg"),
 		"7z",
+	}
+if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	links {
 		"asmjit",
 	}
+end
 if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
