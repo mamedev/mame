@@ -810,6 +810,19 @@ ROM_START(lah_106c)
 	ROM_LOAD("lahsnd.u21", 0x080000, 0x40000, CRC(4571dc2e) SHA1(a1068cb080c30dbc07d164eddfc5dfd0afd52d3b))
 ROM_END
 
+ROM_START(lah_107)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("lah_c5_a107.rom", 0x0000, 0x10000, CRC(f777fc1b) SHA1(a1a645df907e1e88123113823d3edf12c4e1e5df))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("lahdispa.106", 0x00000, 0x80000, CRC(ca6cfec5) SHA1(5e2081387d76bed17c14120cd347d6aaf435276b))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("lahsnd.u7", 0x0000, 0x10000, CRC(0279c45b) SHA1(14daf6b711d1936352209e90240f51812ebe76e0))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("lahsnd.u17", 0x000000, 0x80000, CRC(d0c15fa6) SHA1(5dcd13b578fa53c82353cda5aa774ca216c5ddfe))
+	ROM_LOAD("lahsnd.u21", 0x080000, 0x40000, CRC(4571dc2e) SHA1(a1068cb080c30dbc07d164eddfc5dfd0afd52d3b))
+ROM_END
+
 /*----------------------------------------------------------------
 / Lethal Weapon 3 - CPU Rev 3 /DMD  Type 2 512K Rom - 64K CPU Rom
 /---------------------------------------------------------------*/
@@ -1373,6 +1386,7 @@ GAME(1993,  lah_l104,  lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1993,  lah_l108,  lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Last Action Hero (1.08 Spain)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  lah_110,   lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Last Action Hero (1.10)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  lah_106c,  lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Last Action Hero (1.06 Canada)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  lah_107,   lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Last Action Hero (1.07)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_208,   0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.08)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_207,   lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.07)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  lw3_207c,  lw3_208,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Lethal Weapon 3 (2.07 Canada)",    MACHINE_IS_SKELETON_MECHANICAL)
