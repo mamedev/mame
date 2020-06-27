@@ -3053,7 +3053,7 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom5" interface="cdrom">
-		  <feature name="part_id" value="IRIX 6.5.15 Base Documentation"/>
+			<feature name="part_id" value="IRIX 6.5.15 Base Documentation"/>
 			<feature name="part_number" value="812-0779-015"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
