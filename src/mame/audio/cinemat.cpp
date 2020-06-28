@@ -334,7 +334,7 @@ void barrier_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(SPEED_FREAK_AUDIO, speedfrk_audio_device, "speedfrk_audio", "Speed Freak Sound Board")
 
 speedfrk_audio_device::speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x10)
+	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x9f)
 {
 }
 
@@ -376,7 +376,19 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 
 void speedfrk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
-#if !SPEEDFRK_USE_NETLIST
+#if SPEEDFRK_USE_NETLIST
+	static attotime last;
+	attotime cur = machine().scheduler().time();
+	if (cur - last > attotime::from_msec(5))
+	{
+		uint16_t sr = shiftreg16_accum();
+		printf("shiftreg = %04X\n", sr);
+	}
+	last = cur;
+
+	if (falling_edge(curvals, oldvals, 3))
+		shiftreg16_clock((~curvals >> 2) & 1);
+#else
 	// on the falling edge of bit 3, clock the inverse of bit 2 into the top of the shiftreg
 	if (falling_edge(curvals, oldvals, 3))
 		shiftreg16_clock((~curvals >> 2) & 1);
@@ -955,30 +967,12 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 		.set_source(NETLIST_NAME(starcas))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-#if STARCAS_NETLIST_SHIFTREG
-
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
-
-#else
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_0", "I_SHIFTREG_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_1", "I_SHIFTREG_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_2", "I_SHIFTREG_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_3", "I_SHIFTREG_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_4", "I_SHIFTREG_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_5", "I_SHIFTREG_5.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_6", "I_SHIFTREG_6.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_7", "I_SHIFTREG_7.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
-
-#endif
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0, 0.0);
 
@@ -1008,12 +1002,7 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 
 void starcas_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
-#if STARCAS_USE_NETLIST && STARCAS_NETLIST_SHIFTREG
-
-	// logging
-	if ((curvals ^ oldvals) & 0x91) printf("%s L=%d C=%d D=%d\n", machine().scheduler().time().as_string(9), BIT(curvals, 0), BIT(curvals, 4), BIT(curvals, 7));
-
-#else
+#if !STARCAS_USE_NETLIST
 
 	// on the rising edge of bit 0, latch the shift register
 	if (rising_edge(curvals, oldvals, 0))
@@ -1022,10 +1011,6 @@ void starcas_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 	// on the rising edge of bit 4, clock bit 7 into the shift register
 	if (rising_edge(curvals, oldvals, 4))
 		shiftreg_clock(curvals >> 7);
-
-#endif
-
-#if !STARCAS_USE_NETLIST
 
 	// loud explosion - falling edge
 	if (falling_edge(curvals, oldvals, 1))
@@ -1392,20 +1377,15 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 	//
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(starcas))
+		.set_source(NETLIST_NAME(wotw))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_0", "I_SHIFTREG_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_1", "I_SHIFTREG_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_2", "I_SHIFTREG_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_3", "I_SHIFTREG_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_4", "I_SHIFTREG_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_5", "I_SHIFTREG_5.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_6", "I_SHIFTREG_6.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_7", "I_SHIFTREG_7.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0, 0.0);
 

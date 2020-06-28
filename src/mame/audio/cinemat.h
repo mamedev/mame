@@ -56,6 +56,8 @@ protected:
 
 	virtual u8 shiftreg_swizzle(u8 rawvals);
 
+	u16 shiftreg16_accum() const { return m_shiftreg16_accum; }
+
 	optional_device<samples_device> m_samples;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_out_input;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_shiftreg_input;
