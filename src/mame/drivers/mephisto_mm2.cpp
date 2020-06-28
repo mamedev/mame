@@ -78,6 +78,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "machine/74259.h"
 #include "machine/mmboard.h"
@@ -86,6 +87,8 @@ TODO:
 #include "sound/volt_reg.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
