@@ -47,23 +47,26 @@ namespace devices
 		NETLIB_RESETI();
 		// NETLIB_UPDATE_PARAMI();
 
+		//using solver_ptr = device_arena::unique_ptr<solver::matrix_solver_t>;
+		using solver_ptr = host_arena::unique_ptr<solver::matrix_solver_t>;
+
 	private:
 		logic_input_t m_fb_step;
 		logic_output_t m_Q_step;
 
 		// FIXME: these should be created in device space
-		std::vector<host_arena::unique_ptr<solver::matrix_solver_t>> m_mat_solvers;
+		std::vector<solver_ptr> m_mat_solvers;
 		std::vector<solver::matrix_solver_t *> m_mat_solvers_all;
 		std::vector<solver::matrix_solver_t *> m_mat_solvers_timestepping;
 
 		solver::solver_parameters_t m_params;
 
 		template <typename FT, int SIZE>
-		host_arena::unique_ptr<solver::matrix_solver_t> create_solver(std::size_t size,
+		solver_ptr create_solver(std::size_t size,
 			const pstring &solvername, analog_net_t::list_t &nets);
 
 		template <typename FT>
-		host_arena::unique_ptr<solver::matrix_solver_t> create_solvers(
+		solver_ptr create_solvers(
 			const pstring &sname, analog_net_t::list_t &nets);
 	};
 

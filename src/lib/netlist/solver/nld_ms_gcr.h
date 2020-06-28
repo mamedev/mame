@@ -200,9 +200,11 @@ namespace solver
 
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
-			const auto &nzbd = this->m_terms[i].m_nzbd;
+			//const auto &nzbd = this->m_terms[i].m_nzbd;
+			const auto *nzbd = mat.nzbd(i);
+			const auto nzbd_count = mat.nzbd_count(i);
 
-			if (!nzbd.empty())
+			if (nzbd_count > 0)
 			{
 				std::size_t pi = mat.diag[i];
 
@@ -212,8 +214,9 @@ namespace solver
 				const std::size_t piie = mat.row_idx[i+1];
 
 				//for (auto & j : nzbd)
-				for (std::size_t j : nzbd)
+				for (std::size_t jj = 0; jj < nzbd_count; jj++)
 				{
+					std::size_t j = nzbd[jj];
 					// proceed to column i
 					std::size_t pj = mat.row_idx[j];
 

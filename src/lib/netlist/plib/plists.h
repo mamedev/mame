@@ -98,9 +98,6 @@ namespace plib {
 	protected:
 
 	private:
-
-		// ensure proper alignment
-		PALIGNAS_VECTOROPT()
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
 		unsigned m_initialized;
 	};

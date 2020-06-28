@@ -185,7 +185,7 @@ namespace solver
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
 		using fptype = nl_fptype;
-		using arena_type = plib::mempool_arena<plib::aligned_arena>;
+		using arena_type = plib::mempool_arena<plib::aligned_arena, PALIGN_VECTOROPT>;
 
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.

@@ -81,17 +81,20 @@ namespace devices
 		}
 	}
 
+	//using solver_ptr = host_arena::unique_ptr<solver::matrix_solver_t>;
+
 	// FIXME: should be created in device space
 	template <class C>
-	host_arena::unique_ptr<solver::matrix_solver_t> create_it(netlist_state_t &nl, pstring name,
+	NETLIB_NAME(solver)::solver_ptr create_it(netlist_state_t &nl, pstring name,
 		analog_net_t::list_t &nets,
 		solver::solver_parameters_t &params, std::size_t size)
 	{
 		return plib::make_unique<C, host_arena>(nl, name, nets, &params, size);
+		//return nl.make_pool_object<C>(nl, name, nets, &params, size);
 	}
 
 	template <typename FT, int SIZE>
-	host_arena::unique_ptr<solver::matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size,
+	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solver(std::size_t size,
 		const pstring &solvername,
 		analog_net_t::list_t &nets)
 	{
@@ -124,11 +127,11 @@ namespace devices
 				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 #endif
 		}
-		return host_arena::unique_ptr<solver::matrix_solver_t>();
+		return solver_ptr();
 	}
 
 	template <typename FT>
-	host_arena::unique_ptr<solver::matrix_solver_t> NETLIB_NAME(solver)::create_solvers(
+	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solvers(
 		const pstring &sname,
 		analog_net_t::list_t &nets)
 	{
@@ -137,8 +140,10 @@ namespace devices
 		{
 			case 1:
 				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, host_arena>(state(), sname, nets, &m_params);
+				//return state().make_pool_object<solver::matrix_solver_direct1_t<FT>>(state(), sname, nets, &m_params);
 			case 2:
 				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, host_arena>(state(), sname, nets, &m_params);
+				//return state().make_pool_object<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
 			case 3:
 				return create_solver<FT, 3>(3, sname, nets);
 			case 4:
@@ -291,7 +296,7 @@ namespace devices
 		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 		for (auto & grp : splitter.groups)
 		{
-			host_arena::unique_ptr<solver::matrix_solver_t> ms;
+			solver_ptr ms;
 			pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
 			switch (m_params.m_fp_type())

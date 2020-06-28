@@ -1372,7 +1372,7 @@ namespace netlist
 	protected:
 		void changed() noexcept override
 		{
-			stream()->read(reinterpret_cast<std::istream::char_type *>(&m_data[0]),1<<AW);
+			plib::istream_read(*stream(), m_data.data(), 1<<AW);
 		}
 
 	private:
@@ -1940,11 +1940,12 @@ namespace netlist
 		devices::NETLIB_NAME(solver) *      m_solver;
 
 		// mostly rw
-		PALIGNAS_CACHELINE()
+		//PALIGNAS(16)
 		netlist_time_ext                    m_time;
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
 
-		PALIGNAS_CACHELINE()
+		//PALIGNAS_CACHELINE()
+		//PALIGNAS(16)
 		detail::queue_t                     m_queue;
 		bool                                m_use_stats;
 		// performance
@@ -2552,7 +2553,7 @@ namespace netlist
 		auto f = stream();
 		if (f != nullptr)
 		{
-			f->read(reinterpret_cast<std::istream::char_type *>(&m_data[0]),1<<AW);
+			plib::istream_read(*f, m_data.data(), 1<<AW);
 			// FIXME: check for failbit if not in validation.
 		}
 		else

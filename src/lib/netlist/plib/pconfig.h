@@ -41,7 +41,7 @@
 /// Set this to one if you want to use aligned storage optimizations.
 ///
 #ifndef PUSE_ALIGNED_OPTIMIZATIONS
-#define PUSE_ALIGNED_OPTIMIZATIONS (0)
+#define PUSE_ALIGNED_OPTIMIZATIONS (1)
 #endif
 
 /// \brief Use aligned allocations.
@@ -63,14 +63,27 @@
 
 /// \brief Number of bytes for cache line alignment
 ///
-#define PALIGN_CACHELINE        (16)
+#define PALIGN_CACHELINE        (64)
 
 /// \brief Number of bytes for vector alignment
 ///
-#define PALIGN_VECTOROPT        (16)
+#define PALIGN_VECTOROPT        (32)
+
+#define PALIGN_MIN_SIZE			(16)
 
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
+
+/// brief default minimum alignment of mempool_arena
+///
+/// 256 is the best compromise between logic applications like MAME
+/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
+///
+/// Best performance for pong is achieved with a value of 16, but this degrades
+/// kidniki performance by ~10%.
+///
+/// More work is needed here.
+#define PMEMPOOL_ALIGN			(256)
 
 // FIXME: Breaks mame build on windows mingw due to -Wattribute
 //        also triggers -Wattribute on ARM
