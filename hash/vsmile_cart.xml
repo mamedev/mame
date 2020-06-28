@@ -263,7 +263,7 @@ Regular game cartridges
 |        | 80-092180(US)     | Care Bears - A Lesson in Caring                                                                |
 |        | 80-092183(UK)     | Care Bears - A Lesson in Caring                                                                |
 |        | 80-092184(GE)     | Gluecksbarchis  <- existence not proven                                                        |
-|        | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
+|   XX   | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
 |   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB)                                             |
 +========+===================+================================================================================================+
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
@@ -398,7 +398,7 @@ Regular game cartridges
 |        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                   |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms (rev. 1)                                          |
-|        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
+|   XX   | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
 |   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)                    |
 +========+===================+================================================================================================+
 |        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
@@ -506,11 +506,11 @@ Regular game cartridges
 |   XX   | 80-092844(GE)     | Wall-E                                                                                         |
 |   XX   | 80-092845(FR)     | Wall-E                                                                                         |
 |   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label)                                                               |
+|   XX   | 80-092848(CN)     | 瓦力                                                                                           |
 |        |          (DK)     | Wall-E                                                                                         |
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
 |        |          (NO)     | Wall-E                                                                                         |
 |        |          (FI)     | Wall-E                                                                                         |
-|        |          (CN)     | 瓦力                                                                                           |
 +========+===================+================================================================================================+
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure (alt)                                           |
@@ -1189,7 +1189,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="carebears"> <!-- Will be clone of "carebear" once found and dumped. -->
+	<software name="carebearf"> <!-- Will be clone of "carebear" once found and dumped. -->
+		<description>Les Bisounours - Le monde merveilleux des Bisounours (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092185(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92185 - LesBisounours (FR).bin" size="8388608" crc="7de5716b" sha1="463fb552790ce25cdd4adecb8218ba3766446efa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carebears" cloneof="carebearf"> <!-- Will be clone of "carebear" once found and dumped. -->
 		<description>Osos Amorosos - Una Lección de Amor (Spain)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -3793,6 +3808,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="spongebf" cloneof="spongeb">
+		<description>Nickelodeon Bob L'éponge - Une journée dans la vie d'une éponge (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092445(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92445 - BobEponge (FR).bin" size="8388608" crc="0434bd33" sha1="64cd5ef60474da4304966a03e5c3c9a34417642b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spongebs" cloneof="spongeb">
 		<description>Nickelodeon Bob Esponja - Un día en la vida de una esponja (Spain)</description>
 		<year>2006</year>
@@ -4229,6 +4258,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- No inputs -->
+	<software name="wallecn" cloneof="wallei" supported="no">
+		<description>Disney/Pixar Wall-E (China)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092848(CN)" />
+		<info name="alt_title" value="Disney/Pixar 瓦力"/>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Wall-E_52-092848_CN).bin" size="8388608" crc="7008c01f" sha1="504d2cfab90f63ae95bf6cb2806932ca5009e2ba" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="wallesw" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (Sweden)</description>
