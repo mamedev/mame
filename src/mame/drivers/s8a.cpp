@@ -358,7 +358,7 @@ void s8a_state::s8a(machine_config &config)
 	m_pias->readpa_handler().set(FUNC(s8a_state::sound_r));
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 }
 
 

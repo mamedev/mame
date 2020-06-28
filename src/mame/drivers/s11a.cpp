@@ -251,7 +251,7 @@ void s11a_state::s11a(machine_config &config)
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
 	m_pias->irqa_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, XTAL(8'000'000) / 4); // MC68B09E

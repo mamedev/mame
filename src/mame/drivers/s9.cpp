@@ -396,7 +396,7 @@ void s9_state::s9(machine_config &config)
 	m_pias->ca2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 }
 
 /*-----------------------------

@@ -468,7 +468,7 @@ void s11_state::s11(machine_config &config)
 	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, 8000000 / 4); // MC68B09E
