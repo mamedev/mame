@@ -233,6 +233,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="eurlang_1_1">
+		<description>European Language Module 1.1</description>
+		<year>1993</year> <!-- 10/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0241-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="european_language_module_1_1" sha1="0fb2bcfd2796d24baf4328bc12bce8571f992253" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="eurlang_1_2">
 		<description>European Language Module 1.2</description>
 		<year>1994</year> <!-- 05/94 -->
