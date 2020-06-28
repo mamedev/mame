@@ -391,28 +391,50 @@ void spg2xx_game_marc250_state::init_m527()
 	// same for xracing 3
 	rom[((22 * 0x800000) / 2) | 0x00eb2a] = 0x4241; 
 
+	uint16_t ident2[6] = { 0x9512, 0x2862, 0xa70a, 0x0002, 0xd71b, 0x2862 };
+
+	for (int i = 0; i < (0x10000000 / 2) - 6; i++)
+	{
+		bool found = true;
+		for (int j = 0; j < 6; j++)
+		{
+			uint16_t cmp1 = ident2[j];
+			uint16_t cmp2 = rom[i + j];
+
+			if (cmp1 != cmp2)
+				found = false;
+		}
+
+		if (found)
+		{
+			printf("found at %08x\n", i + 3);
+			rom[i + 3] = 0x0003;
+		}
+	}
 
 	// this turns the IRQ off, code looks a bit like smarttv code..  is SoC IRQ handling wrong?
 	
+	// pass maze road
+	//rom[((12 * 0x800000) / 2) | 0x0284b5] = 0x0003;
+	// learn numbers
+	//rom[((13 * 0x800000) / 2) | 0x00c055] = 0x0003;
 	// bowling
-	rom[((17 * 0x800000) / 2) | 0x015e58] = 0x0003;
+	//rom[((17 * 0x800000) / 2) | 0x015e58] = 0x0003;
 	// cliff overhang / gym dancing 
-	rom[((18 * 0x800000) / 2) | 0x01cab4] = 0x0003;
+	//rom[((18 * 0x800000) / 2) | 0x01cab4] = 0x0003;
 	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff;
 	// jump chess
-	rom[((19 * 0x800000) / 2) | 0x012c3a] = 0x0003;
+	//rom[((19 * 0x800000) / 2) | 0x012c3a] = 0x0003;
 	// boxing, basketball etc.
-	rom[((23 * 0x800000) / 2) | 0x00c1bd] = 0x0003;
+	//rom[((23 * 0x800000) / 2) | 0x00c1bd] = 0x0003;
 	// dash motor
-	rom[((24 * 0x800000) / 2) | 0x00d62c] = 0x0003;
+	//rom[((24 * 0x800000) / 2) | 0x00d62c] = 0x0003;
 	// same for curling
-	rom[((25 * 0x800000) / 2) | 0x0103c5] = 0x0003;
+	//rom[((25 * 0x800000) / 2) | 0x0103c5] = 0x0003;
 	// balloon puyo
-	rom[((26 * 0x800000) / 2) | 0x0084dd] = 0x0003;
+	//rom[((26 * 0x800000) / 2) | 0x0084dd] = 0x0003;
 	// 4 score
-	rom[((27 * 0x800000) / 2) | 0x145cdd] = 0x0003;
-
-	
+	//rom[((27 * 0x800000) / 2) | 0x145cdd] = 0x0003;
 }
 
 void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
