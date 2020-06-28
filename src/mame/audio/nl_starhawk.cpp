@@ -26,13 +26,21 @@
 #include "nl_cinemat_common.h"
 
 
-//
-// The final amplifier is documented but not emulated.
-//
-#define EMULATE_FINAL_AMP	0
+NETLIST_START(starhawk)
 
+	SOLVER(Solver, 48000)
 
-NETLIST_START(StarHawk_schematics)
+	TTL_INPUT(I_OUT_0, 0)				// active high
+	TTL_INPUT(I_OUT_1, 0)				// active high
+	TTL_INPUT(I_OUT_2, 0)				// active high
+	TTL_INPUT(I_OUT_3, 0)				// active high
+	TTL_INPUT(I_OUT_4, 0)				// active high
+	TTL_INPUT(I_OUT_7, 0)				// active high
+
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
+
+	CINEMAT_LOCAL_MODELS
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
@@ -59,12 +67,12 @@ NETLIST_START(StarHawk_schematics)
 	RES(R17, RES_K(510))
 	RES(R18, RES_K(10))
 	RES(R19, RES_K(33))
-	RES(R20, 150)
-	RES(R21, RES_K(22))
+//	RES(R20, 150)		-- part of final amp (not emulated)
+//	RES(R21, RES_K(22))	-- part of final amp (not emulated)
 	RES(R22, RES_K(1))
-	RES(R23, RES_K(10))
-	RES(R24, 150)
-	POT(R25, RES_K(100))
+//	RES(R23, RES_K(10))	-- part of final amp (not emulated)
+//	RES(R24, 150)		-- part of final amp (not emulated)
+//	POT(R25, RES_K(100))-- part of final amp (not emulated)
 	RES(R26, RES_K(1))
 	RES(R27, RES_K(1))
 	RES(R28, RES_K(510))
@@ -116,10 +124,10 @@ NETLIST_START(StarHawk_schematics)
 	CAP(C13, CAP_U(0.0033))
 	CAP(C14, CAP_U(0.0047))
 	CAP(C15, CAP_U(1))
-	CAP(C16, CAP_P(470))
+//	CAP(C16, CAP_P(470))	-- part of final amp (not emulated)
 	CAP(C17, CAP_U(22))
-	CAP(C18, CAP_P(470))
-	CAP(C19, CAP_P(470))
+//	CAP(C18, CAP_P(470))	-- part of final amp (not emulated)
+//	CAP(C19, CAP_P(470))	-- part of final amp (not emulated)
 	CAP(C20, CAP_U(1))
 	CAP(C21, CAP_U(22))
 	CAP(C22, CAP_U(0.1))
@@ -143,10 +151,8 @@ NETLIST_START(StarHawk_schematics)
 	D_1N914(CR10)
 
 	Q_2N3906(Q1)			// PNP
-#if EMULATE_FINAL_AMP
-	Q_2N6292(Q2)			// NPN
-	Q_2N6107(Q3)			// PNP
-#endif
+//	Q_2N6292(Q2)			// NPN -- part of final amp (not emulated)
+//	Q_2N6107(Q3)			// PNP -- part of final amp (not emulated)
 	Q_2N3904(Q4)			// NPN
 	Q_2N3904(Q5)			// NPN
 
@@ -167,9 +173,9 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(IC4B.4, I_VM15)
 	NET_C(IC4B.7, I_V15)
 
-	TL081_DIP(IC4C)			// Op. Amp.
-	NET_C(IC4C.4, I_VM15)
-	NET_C(IC4C.7, I_V15)
+//	TL081_DIP(IC4C)			// Op. Amp. -- part of final amp (not emulated)
+//	NET_C(IC4C.4, I_VM15)
+//	NET_C(IC4C.7, I_V15)
 
 	TTL_74LS393_DIP(IC4E)	// Dual 4-Stage Binary Counter
 	NET_C(IC4E.7, GND)
@@ -367,23 +373,8 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(R37.2, IC5A.6, CR5.K)
 
 	NET_C(IC3A.13, R22.1)
-	NET_C(R22.2, IC4C.2, C16.1, R23.1)
-	NET_C(IC4C.3, GND)
-	NET_C(IC4C.6, C16.2)
-	NET_C(R23.2, R25.1)
-	NET_C(R25.2, R25.3)
-#if EMULATE_FINAL_AMP
-	NET_C(IC4C.6, R20.1, R21.1, R24.2)
-	NET_C(R20.2, Q2.B, C18.1)
-	NET_C(C18.2, I_V25, Q2.C)
-	NET_C(R24.1, C19.2, Q3.B)
-	NET_C(C19.1, Q3.C, I_VM25)
-	NET_C(R21.2, Q2.E, Q3.E, R25.3)
-	ALIAS(OUTPUT, R21.2)
-#else
-	ALIAS(OUTPUT, R25.3)
-	NET_C(GND, C18.1, C18.2, C19.1, C19.2, R20.1, R20.2, R21.1, R21.2, R24.1, R24.2)
-#endif
+	NET_C(R22.2, GND)
+	ALIAS(OUTPUT, R22.1)
 
 	//
 	// K exit
@@ -490,30 +481,8 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(R57.2, R58.2, R59.2, R60.2, R55.1)
 
 	//
-	// Unconnected
+	// Unconnected inputs
 	//
 
 	NET_C(GND, IC5D.8, IC5D.9, IC5D.10, IC5D.12, IC5D.13, IC7C.3, IC7C.5, IC9E.3, IC9E.4, IC9E.5, IC9E.6)
-NETLIST_END()
-
-
-NETLIST_START(starhawk)
-
-	SOLVER(Solver, 48000)
-
-	TTL_INPUT(I_OUT_0, 0)				// active high
-	TTL_INPUT(I_OUT_1, 0)				// active high
-	TTL_INPUT(I_OUT_2, 0)				// active high
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
-	TTL_INPUT(I_OUT_7, 0)				// active high
-
-	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
-	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
-
-	CINEMAT_LOCAL_MODELS
-
-	LOCAL_SOURCE(StarHawk_schematics)
-	INCLUDE(StarHawk_schematics)
-
 NETLIST_END()
