@@ -997,7 +997,7 @@ static NETLIST_START(TTL_74377_DIP)
 		C.Q,  /*    Q2 |6           15| Q5   */ F.Q,
 		C.D,  /*    D2 |7           14| D5   */ F.D,
 		D.D,  /*    D3 |8           13| D4   */ E.D,
-		D.Q,  /*    Q3 |9           12| Q4   */ E.D,
+		D.Q,  /*    Q3 |9           12| Q4   */ E.Q,
 		A.GND,/*   GND |10          11| CP   */ A.CP
 			  /*       +--------------+      */
 	)
