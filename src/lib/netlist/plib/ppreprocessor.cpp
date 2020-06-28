@@ -5,6 +5,7 @@
 #include "palloc.h"
 #include "pstonum.h"
 #include "putil.h"
+#include "pstrutil.h"
 
 namespace plib {
 

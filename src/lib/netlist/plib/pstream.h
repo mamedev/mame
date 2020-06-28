@@ -9,12 +9,10 @@
 /// \file pstream.h
 ///
 
-#include "palloc.h"
 #include "pconfig.h"
-#include "pexception.h"
 #include "pfmtlog.h"
 #include "pstring.h"
-#include "pstrutil.h"
+#include "pgsl.h"
 
 #include <array>
 #include <fstream>
@@ -34,7 +32,6 @@ namespace plib {
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "istream_read sizeof issue");
-		// FIXME: throw on
 		return is.read(reinterpret_cast<ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
 
@@ -45,7 +42,6 @@ namespace plib {
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "ostream_write sizeof issue");
-		// FIXME: throw on
 		return os.write(reinterpret_cast<const ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
 
@@ -155,7 +151,8 @@ public:
 	{
 		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
 		const putf8string conv_utf8(text);
-		m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str())));
+		//m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str()	)));
+		ostream_write(*m_strm, conv_utf8.c_str(), string_info<pstring>::mem_size(conv_utf8));
 	}
 
 	void write(const pstring::value_type c) const

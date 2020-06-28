@@ -29,7 +29,7 @@ namespace solver
 		using float_type = FT;
 
 		matrix_solver_direct2_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params)
 		: matrix_solver_direct_t<FT, 2>(anetlist, name, nets, params, 2)
 		{}

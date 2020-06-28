@@ -13,9 +13,9 @@
 #include "plib/ppreprocessor.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
-#include "plib/putil.h"
 
 #include "nl_config.h"
+// FIXME: avoid including factory
 #include "nl_factory.h"
 #include "nltypes.h"
 
@@ -134,25 +134,6 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 namespace netlist
 {
 
-	namespace detail {
-		class core_terminal_t;
-		class net_t;
-	} // namespace detail
-
-	namespace devices {
-		class nld_base_proxy;
-		class nld_netlistparams;
-	} // namespace devices
-
-	class core_device_t;
-	class param_t;
-	class nlparse_t;
-	class setup_t;
-	class netlist_state_t;
-	class netlist_t;
-	class logic_family_desc_t;
-	class terminal_t;
-
 	// -----------------------------------------------------------------------------
 	// truthtable desc
 	// -----------------------------------------------------------------------------
@@ -189,32 +170,6 @@ namespace netlist
 	private:
 		core_device_t *m_device;
 		param_t *m_param;
-	};
-
-	// ----------------------------------------------------------------------------------------
-	// Specific netlist psource_t implementations
-	// ----------------------------------------------------------------------------------------
-
-	class source_netlist_t : public plib::psource_t
-	{
-	public:
-
-		source_netlist_t() = default;
-
-		PCOPYASSIGNMOVE(source_netlist_t, delete)
-		~source_netlist_t() noexcept override = default;
-
-		virtual bool parse(nlparse_t &setup, const pstring &name);
-	};
-
-	class source_data_t : public plib::psource_t
-	{
-	public:
-
-		source_data_t() = default;
-
-		PCOPYASSIGNMOVE(source_data_t, delete)
-		~source_data_t() noexcept override = default;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -500,8 +455,30 @@ namespace netlist
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// base sources
+	// Specific netlist psource_t implementations
 	// ----------------------------------------------------------------------------------------
+
+	class source_netlist_t : public plib::psource_t
+	{
+	public:
+
+		source_netlist_t() = default;
+
+		PCOPYASSIGNMOVE(source_netlist_t, delete)
+		~source_netlist_t() noexcept override = default;
+
+		virtual bool parse(nlparse_t &setup, const pstring &name);
+	};
+
+	class source_data_t : public plib::psource_t
+	{
+	public:
+
+		source_data_t() = default;
+
+		PCOPYASSIGNMOVE(source_data_t, delete)
+		~source_data_t() noexcept override = default;
+	};
 
 	class source_string_t : public source_netlist_t
 	{

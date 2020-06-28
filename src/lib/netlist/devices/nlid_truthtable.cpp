@@ -1,6 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
+#include "plib/pstonum.h"
+#include "plib/pstrutil.h"
+
 #include "nl_base.h"
 #include "nl_factory.h"
 #include "nlid_truthtable.h"

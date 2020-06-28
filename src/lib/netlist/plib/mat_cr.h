@@ -249,8 +249,8 @@ namespace plib
 				A[k] = src.A[k];
 		}
 
-		index_type * nzbd(index_type row) { return m_nzbd[row]; }
-		index_type nzbd_count(index_type row) { return m_nzbd.colcount(row) - 1; }
+		index_type * nzbd(std::size_t row) { return m_nzbd[row]; }
+		std::size_t nzbd_count(std::size_t row) { return m_nzbd.colcount(row) - 1; }
 	protected:
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
@@ -320,14 +320,9 @@ namespace plib
 				std::size_t pi = base::diag[i];
 				auto f = reciprocal(base::A[pi++]);
 				const std::size_t piie = base::row_idx[i+1];
-#if 0
-				const auto &nz = base::m_nzbd[i];
 
-				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
-#else
 				const auto *nz = base::m_nzbd[i];
 				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
-#endif
 				{
 					// proceed to column i
 

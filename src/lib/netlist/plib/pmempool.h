@@ -10,10 +10,10 @@
 
 #include "palloc.h"
 #include "pconfig.h"
-#include "pstream.h"
-#include "pstring.h"
+#include "pstream.h"  // perrlogger
+//#include "pstring.h"
 #include "ptypes.h"
-#include "putil.h"
+//#include "putil.h"
 
 #include <algorithm>
 #include <memory>
@@ -27,13 +27,13 @@ namespace plib {
 	//  Memory pool
 	//============================================================
 
-	template <typename BASEARENA, std::size_t MINALIGN = PMEMPOOL_ALIGN>
-	class mempool_arena : public arena_base<mempool_arena<BASEARENA>, false, false>
+	template <typename BASEARENA, std::size_t MINALIGN = PALIGN_MIN_SIZE>
+	class mempool_arena : public arena_base<mempool_arena<BASEARENA, MINALIGN>, false, false>
 	{
 	public:
 
 		using size_type = typename BASEARENA::size_type;
-		using base_type = arena_base<mempool_arena<BASEARENA>, false, false>;
+		using base_type = arena_base<mempool_arena<BASEARENA, MINALIGN>, false, false>;
 		template <class T>
 		using base_allocator_type = typename BASEARENA::template allocator_type<T>;
 

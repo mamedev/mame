@@ -55,7 +55,7 @@ namespace solver
 		static constexpr const std::size_t storage_N = 100;
 
 		matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
 		, m_cnt(0)

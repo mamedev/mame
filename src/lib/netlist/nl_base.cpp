@@ -8,6 +8,7 @@
 #include "plib/pfmtlog.h"
 #include "plib/pmempool.h"
 #include "plib/putil.h"
+#include "plib/pdynlib.h"
 
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
@@ -25,9 +26,9 @@ namespace netlist
 	// callbacks_t
 	// ----------------------------------------------------------------------------------------
 
-	host_arena::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
+	std::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
 	{
-		return plib::make_unique<plib::dynlib_static, host_arena>(nullptr);
+		return std::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 	// ----------------------------------------------------------------------------------------

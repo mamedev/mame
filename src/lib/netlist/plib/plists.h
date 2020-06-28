@@ -8,9 +8,7 @@
 /// \file plists.h
 ///
 
-#include "palloc.h"
-#include "pchrono.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <array>

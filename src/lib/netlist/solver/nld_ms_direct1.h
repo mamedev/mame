@@ -25,7 +25,7 @@ namespace solver
 		using base_type = matrix_solver_direct_t<FT, 1>;
 
 		matrix_solver_direct1_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params)
 			: matrix_solver_direct_t<FT, 1>(anetlist, name, nets, params, 1)
 			{}

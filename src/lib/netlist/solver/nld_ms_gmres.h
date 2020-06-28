@@ -35,7 +35,7 @@ namespace solver
 		// This is already preconditioning.
 
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name,
-			analog_net_t::list_t &nets,
+			matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params,
 			const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)

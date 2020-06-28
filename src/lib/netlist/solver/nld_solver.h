@@ -49,6 +49,7 @@ namespace devices
 
 		//using solver_ptr = device_arena::unique_ptr<solver::matrix_solver_t>;
 		using solver_ptr = host_arena::unique_ptr<solver::matrix_solver_t>;
+		using net_list_t = solver::matrix_solver_t::net_list_t;
 
 	private:
 		logic_input_t m_fb_step;
@@ -63,11 +64,11 @@ namespace devices
 
 		template <typename FT, int SIZE>
 		solver_ptr create_solver(std::size_t size,
-			const pstring &solvername, analog_net_t::list_t &nets);
+			const pstring &solvername, net_list_t &nets);
 
 		template <typename FT>
 		solver_ptr create_solvers(
-			const pstring &sname, analog_net_t::list_t &nets);
+			const pstring &sname, net_list_t &nets);
 	};
 
 } // namespace devices

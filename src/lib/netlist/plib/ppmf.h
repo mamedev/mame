@@ -34,7 +34,6 @@
 
 #include "pconfig.h"
 #include "ptypes.h"
-#include "putil.h"
 
 #include <algorithm>
 #include <cstdint> // uintptr_t

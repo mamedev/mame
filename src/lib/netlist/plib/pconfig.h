@@ -74,17 +74,6 @@
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
 
-/// brief default minimum alignment of mempool_arena
-///
-/// 256 is the best compromise between logic applications like MAME
-/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
-///
-/// Best performance for pong is achieved with a value of 16, but this degrades
-/// kidniki performance by ~10%.
-///
-/// More work is needed here.
-#define PMEMPOOL_ALIGN			(256)
-
 // FIXME: Breaks mame build on windows mingw due to -Wattribute
 //        also triggers -Wattribute on ARM
 //        This is fixed on mingw version 10

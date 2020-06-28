@@ -186,6 +186,7 @@ namespace solver
 		using list_t = std::vector<matrix_solver_t *>;
 		using fptype = nl_fptype;
 		using arena_type = plib::mempool_arena<plib::aligned_arena, PALIGN_VECTOROPT>;
+		using net_list_t =  plib::aligned_vector<analog_net_t *>;
 
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.
@@ -266,7 +267,7 @@ namespace solver
 
 	protected:
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const net_list_t &nets,
 			const solver_parameters_t *params);
 
 		virtual void vsolve_non_dynamic() = 0;
@@ -289,7 +290,7 @@ namespace solver
 	private:
 
 		// base setup - called from constructor
-		void setup_base(setup_t &setup, const analog_net_t::list_t &nets) noexcept(false);
+		void setup_base(setup_t &setup, const net_list_t &nets) noexcept(false);
 
 		void sort_terms(matrix_sort_type_e sort);
 

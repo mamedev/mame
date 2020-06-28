@@ -13,17 +13,12 @@
 #endif
 
 #include "plib/palloc.h" // owned_ptr
-#include "plib/pdynlib.h"
-#include "plib/pexception.h"
-#include "plib/pfmtlog.h"
 #include "plib/pfunction.h"
 #include "plib/plists.h"
 #include "plib/pmempool.h"
 #include "plib/ppmf.h"
-#include "plib/pstate.h"
-#include "plib/pstonum.h"
 #include "plib/pstream.h"
-#include "plib/ptime.h"
+#include "plib/pstate.h"
 #include "plib/ptimed_queue.h"
 #include "plib/ptypes.h"
 
@@ -90,7 +85,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 ///  #NETLIB_OBJECT for an example.
 #define NETLIB_CONSTRUCTOR(cname)                                              \
 	using this_type = NETLIB_NAME(cname);                                      \
-	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name)\
 		: base_type(owner, name)
 
 /// \brief Used to define the constructor of a netlist device and define a default model.
@@ -203,54 +198,12 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 
 namespace netlist
 {
+
 	/// \brief Delegate type for device notification.
 	///
 	using nldelegate = plib::pmfp<void>;
 	using nldelegate_ts = plib::pmfp<void, nl_fptype>;
 	using nldelegate_dyn = plib::pmfp<void>;
-
-	// -----------------------------------------------------------------------------
-	// forward definitions
-	// -----------------------------------------------------------------------------
-
-	namespace devices
-	{
-		class NETLIB_NAME(solver);
-		class NETLIB_NAME(mainclock);
-		class NETLIB_NAME(base_proxy);
-		class NETLIB_NAME(base_d_to_a_proxy);
-		class NETLIB_NAME(base_a_to_d_proxy);
-	} // namespace devices
-
-	namespace solver
-	{
-		class matrix_solver_t;
-	} // namespace solver
-
-	class logic_output_t;
-	class logic_input_t;
-	class analog_net_t;
-	class logic_net_t;
-	class setup_t;
-	class nlparse_t;
-	class netlist_t;
-	class netlist_state_t;
-	class core_device_t;
-	class device_t;
-
-	template <class CX>
-	class delegator_t : public CX
-	{
-	protected:
-		using base_type = delegator_t<CX>;
-		using delegated_type = CX;
-		using delegated_type::delegated_type;
-	};
-
-	namespace detail
-	{
-		class net_t;
-	} // namespace detail
 
 	//============================================================
 	//  Exceptions
@@ -263,7 +216,7 @@ namespace netlist
 	{
 	public:
 		/// \brief Constructor.
-		///  Allows a descriptive text to be assed to the exception
+		///  Allows a descriptive text to be passed to the exception
 
 		explicit nl_exception(const pstring &text //!< text to be passed
 				)
@@ -996,8 +949,6 @@ namespace netlist
 	{
 	public:
 
-		using list_t =  plib::aligned_vector<analog_net_t *>;
-
 		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
 
 		nl_fptype Q_Analog() const noexcept { return m_cur_Analog; }
@@ -1482,8 +1433,8 @@ namespace netlist
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
 	protected:
 
-		NETLIB_UPDATEI() { }
-		NETLIB_UPDATE_TERMINALSI() { }
+		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
 	};
@@ -1513,11 +1464,11 @@ namespace netlist
 		~device_t() noexcept override = default;
 
 		//nldelegate default_delegate() { return nldelegate(&device_t::update, this); }
-		nldelegate default_delegate() { return { &device_t::update, this }; }
+		nldelegate default_delegate() { return { &core_device_t::update, dynamic_cast<core_device_t *>(this) }; }
 	protected:
 
-		NETLIB_UPDATEI() { }
-		NETLIB_UPDATE_TERMINALSI() { }
+		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
 		param_model_t m_model;
@@ -1799,8 +1750,8 @@ namespace netlist
 		device_arena                               m_pool; // must be deleted last!
 
 		device_arena::unique_ptr<netlist_t>        m_netlist;
-		host_arena::unique_ptr<plib::dynlib_base>  m_lib;
-		plib::state_manager_t               m_state;
+		std::unique_ptr<plib::dynlib_base>         m_lib;
+		plib::state_manager_t                      m_state;
 		host_arena::unique_ptr<callbacks_t>        m_callbacks;
 		log_type                                   m_log;
 
@@ -2205,13 +2156,6 @@ namespace netlist
 	// logic_input_t
 	// -----------------------------------------------------------------------------
 
-#if 0
-	template <class D>
-	logic_input_t::logic_input_t(D &dev, const pstring &aname)
-			: logic_input_t(dev, aname, STATE_INP_ACTIVE, nldelegate(&D :: update, &dev))
-	{
-	}
-#endif
 	inline void logic_input_t::inactivate() noexcept
 	{
 		if (!is_state(STATE_INP_PASSIVE))

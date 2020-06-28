@@ -86,7 +86,7 @@ namespace devices
 	// FIXME: should be created in device space
 	template <class C>
 	NETLIB_NAME(solver)::solver_ptr create_it(netlist_state_t &nl, pstring name,
-		analog_net_t::list_t &nets,
+		NETLIB_NAME(solver)::net_list_t &nets,
 		solver::solver_parameters_t &params, std::size_t size)
 	{
 		return plib::make_unique<C, host_arena>(nl, name, nets, &params, size);
@@ -96,7 +96,7 @@ namespace devices
 	template <typename FT, int SIZE>
 	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solver(std::size_t size,
 		const pstring &solvername,
-		analog_net_t::list_t &nets)
+		NETLIB_NAME(solver)::net_list_t &nets)
 	{
 		switch (m_params.m_method())
 		{
@@ -133,7 +133,7 @@ namespace devices
 	template <typename FT>
 	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solvers(
 		const pstring &sname,
-		analog_net_t::list_t &nets)
+		net_list_t &nets)
 	{
 		std::size_t net_count = nets.size();
 		switch (net_count)
@@ -200,7 +200,7 @@ namespace devices
 					auto &n = dynamic_cast<analog_net_t &>(*net);
 					if (!already_processed(n))
 					{
-						groupspre.emplace_back(analog_net_t::list_t());
+						groupspre.emplace_back(NETLIB_NAME(solver)::net_list_t());
 						process_net(netlist, n);
 					}
 				}
@@ -210,7 +210,7 @@ namespace devices
 					groups.push_back(g);
 		}
 
-		std::vector<analog_net_t::list_t> groups;
+		std::vector<NETLIB_NAME(solver)::net_list_t> groups;
 
 	private:
 
@@ -280,7 +280,7 @@ namespace devices
 			}
 		}
 
-		std::vector<analog_net_t::list_t> groupspre;
+		std::vector<NETLIB_NAME(solver)::net_list_t> groupspre;
 	};
 
 	void NETLIB_NAME(solver)::post_start()

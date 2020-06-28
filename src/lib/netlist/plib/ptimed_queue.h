@@ -8,10 +8,9 @@
 /// \file ptimed_queue.h
 ///
 
-#include "palloc.h"
 #include "pchrono.h"
 #include "pmulti_threading.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <mutex>

@@ -10,8 +10,7 @@
 
 #include "pconfig.h"
 #include "pgsl.h"
-#include "pmath.h"
-#include "pstring.h"
+#include "pmath.h"  // FIXME: only uses lcm ... move to ptypes.
 #include "ptypes.h"
 
 #include <algorithm>
@@ -253,6 +252,8 @@ namespace plib {
 		{ }
 
 		//~arena_allocator() noexcept = default;
+
+		PCOPYASSIGNMOVE(arena_allocator, default)
 
 		explicit arena_allocator(arena_type & a) noexcept : m_a(a)
 		{
