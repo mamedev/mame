@@ -1,6 +1,8 @@
 // license:CC0
 // copyright-holders:Aaron Giles,Couriersud
 
+//NL_CONTAINS spacewar barrier
+
 //
 // Netlist for Space Wars/Barrier
 //
@@ -45,12 +47,6 @@
 
 
 //
-// The final amplifier is documented but not emulated.
-//
-#define EMULATE_FINAL_AMP	0
-
-
-//
 // Now include ourselves twice, once for Space Wars and
 // once for Barrier
 //
@@ -74,16 +70,33 @@
 //
 
 #if (SOUND_VARIANT == VARIANT_SPACEWARS)
-NETLIST_START(SpaceWars_schematics)
+NETLIST_START(spacewar)
 #else // (SOUND_VARIANT == VARIANT_BARRIER)
-NETLIST_START(Barrier_schematics)
+NETLIST_START(barrier)
 #endif
+
+	SOLVER(Solver, 48000)
+
+	TTL_INPUT(I_OUT_0, 0)				// active high
+	TTL_INPUT(I_OUT_1, 0)				// active high
+	TTL_INPUT(I_OUT_2, 0)				// active high
+#if (SOUND_VARIANT == VARIANT_SPACEWARS)
+	TTL_INPUT(I_OUT_3, 0)				// active high
+	TTL_INPUT(I_OUT_4, 0)				// active high
+#endif
+
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC)
+#if (SOUND_VARIANT == VARIANT_SPACEWARS)
+	NET_C(GND, I_OUT_3.GND, I_OUT_4.GND)
+	NET_C(I_V5, I_OUT_3.VCC, I_OUT_4.VCC)
+#endif
+
+	CINEMAT_LOCAL_MODELS
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
 	ANALOG_INPUT(I_VM15, -15)
-	ANALOG_INPUT(I_V25, 25)
-	ANALOG_INPUT(I_VM25, -25)
 
 	RES(R1, RES_K(18))
 	RES(R2, 470)
@@ -110,26 +123,16 @@ NETLIST_START(Barrier_schematics)
 	RES(R18, RES_K(47))
 	RES(R19, 820)
 //	POT(R20, RES_K(10))		// don't understand this
-#if (SOUND_VARIANT == VARIANT_SPACEWARS)
-	RES(R21, 0)				// doesn't exist on Space Wars
-	RES(R22, 0)				// doesn't exist on Space Wars
-	RES(R23, 0)				// doesn't exist on Space Wars
-#else // (SOUND_VARIANT == VARIANT_BARRIER)
-	RES(R21, 150)
-	RES(R22, 1.35)
-	RES(R23, 1.35)
-#endif
+//	RES(R21, 150)			-- part of final amp (not emulated), not present on Space Wars
+//	RES(R22, 1.35)			-- part of final amp (not emulated), not present on Space Wars
+//	RES(R23, 1.35)			-- part of final amp (not emulated), not present on Space Wars
 	RES(R24, RES_K(47))
 	RES(R25, 150)
 	RES(R26, RES_K(160))
 	RES(R27, 750)
-	RES(R28, RES_K(150))	// completely illegible on Space Wars
-#if (SOUND_VARIANT == VARIANT_SPACEWARS)
-	POT(R29, RES_K(50))
-#else // (SOUND_VARIANT == VARIANT_BARRIER)
-	POT(R29, RES_K(10))
-#endif
-	RES(R30, 470)
+//	RES(R28, RES_K(150))	-- part of final amp (not emulated), illegible on Space Wars
+//	POT(R29, RES_K(10))		-- part of final amp (not emulated), 50k on Space Wars?
+//	RES(R30, 470)			-- part of final amp (not emulated)
 	RES(R31, 470)
 	RES(R32, RES_K(1))
 	RES(R33, RES_K(39))
@@ -159,15 +162,15 @@ NETLIST_START(Barrier_schematics)
 	CAP(C9, CAP_U(0.1))
 	CAP(C10, CAP_P(220))
 	CAP(C11, CAP_U(0.1))
-	CAP(C12, CAP_U(0.01))
-	CAP(C13, CAP_P(470))
-	CAP(C14, CAP_P(470))
-//	CAP(C15, CAP_U(50))		// not needed
-//	CAP(C16, CAP_U(2.2))	// not needed
+//	CAP(C12, CAP_U(0.01))	-- part of final amp (not emulated)
+//	CAP(C13, CAP_P(470))	-- part of final amp (not emulated)
+//	CAP(C14, CAP_P(470))	-- part of final amp (not emulated)
+//	CAP(C15, CAP_U(50))		-- not needed
+//	CAP(C16, CAP_U(2.2))	-- not needed
 	CAP(C17, CAP_U(0.01))
 	CAP(C18, CAP_U(15))		// Space Wars might be 33?
-//	CAP(C19, CAP_U(50))		// not needed
-//	CAP(C20, CAP_U(2.2))	// not needed
+//	CAP(C19, CAP_U(50))		-- not needed
+//	CAP(C20, CAP_U(2.2))	-- not needed
 	CAP(C21, CAP_U(0.02))
 	CAP(C22, CAP_U(0.1))
 #if (SOUND_VARIANT == VARIANT_SPACEWARS)
@@ -209,9 +212,9 @@ NETLIST_START(Barrier_schematics)
 	NET_C(U5.8, GND)
 	NET_C(U5.9, I_VM15)
 
-	TL081_DIP(U6)			// Op. Amp.
-	NET_C(U6.4, I_VM15)
-	NET_C(U6.7, I_V15)
+//	TL081_DIP(U6)			// Op. Amp. -- part of final amp (not emulated)
+//	NET_C(U6.4, I_VM15)
+//	NET_C(U6.7, I_V15)
 
 //	TTL_7915_DIP(U7)		// -15V Regulator -- not needed
 
@@ -353,70 +356,18 @@ NETLIST_START(Barrier_schematics)
 	NET_C(R15.2, R17.2, C11.1)
 #endif
 	NET_C(R17.1, GND)
-	NET_C(C11.2, R18.2, R19.2, U6.3)
+	NET_C(C11.2, R18.2, R19.2)
 	NET_C(R18.1, GND)
-	NET_C(R19.1, C12.2)
-	NET_C(C12.1, U6.2, R29.2)
-	NET_C(U6.6, R21.1)
-	NET_C(R29.1, R30.2)
-	NET_C(R30.1, GND)
-#if EMULATE_FINAL_AMP
-	NET_C(R21.2, C13.1, C14.2, Q4.B, Q5.B)
-	NET_C(C13.2, Q4.C, I_V25)
-	NET_C(C14.1, Q5.C, I_VM25)
-	NET_C(R29.3, R28.1)
-	NET_C(Q4.E, R22.2)
-	NET_C(Q5.E, R23.1)
-	NET_C(R22.1, R23.2, R28.2)
-	ALIAS(OUTPUT, R28.2)
-#else
-	ALIAS(OUTPUT, R29.3)
-	NET_C(GND, C13.1, C13.2, C14.1, C14.2, R21.2, R22.1, R22.2, R23.1, R23.2, R28.2, R28.1)
-#endif
+	NET_C(R19.1, GND)
+	ALIAS(OUTPUT, R18.2)
 
 	//
-	// Unconnected
+	// Unconnected inputs
 	//
 
 	NET_C(GND, U2.3, U2.5, U2.11)
 #if (SOUND_VARIANT == VARIANT_BARRIER)
 	NET_C(GND, U5.1, U5.2, U5.5, U2.1)
-#endif
-
-NETLIST_END()
-
-
-#if (SOUND_VARIANT == VARIANT_SPACEWARS)
-NETLIST_START(spacewar)
-#else // (SOUND_VARIANT == VARIANT_BARRIER)
-NETLIST_START(barrier)
-#endif
-
-	SOLVER(Solver, 48000)
-
-	TTL_INPUT(I_OUT_0, 0)				// active high
-	TTL_INPUT(I_OUT_1, 0)				// active high
-	TTL_INPUT(I_OUT_2, 0)				// active high
-#if (SOUND_VARIANT == VARIANT_SPACEWARS)
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
-#endif
-
-	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND)
-	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC)
-#if (SOUND_VARIANT == VARIANT_SPACEWARS)
-	NET_C(GND, I_OUT_3.GND, I_OUT_4.GND)
-	NET_C(I_V5, I_OUT_3.VCC, I_OUT_4.VCC)
-#endif
-
-	CINEMAT_LOCAL_MODELS
-
-#if (SOUND_VARIANT == VARIANT_SPACEWARS)
-	LOCAL_SOURCE(SpaceWars_schematics)
-	INCLUDE(SpaceWars_schematics)
-#else // (SOUND_VARIANT == VARIANT_BARRIER)
-	LOCAL_SOURCE(Barrier_schematics)
-	INCLUDE(Barrier_schematics)
 #endif
 
 NETLIST_END()
