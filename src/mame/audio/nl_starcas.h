@@ -5,9 +5,7 @@
 
 #pragma once
 
-// experiment: emulate the shift register in the netlist instead of HLE
-#define STARCAS_NETLIST_SHIFTREG	(0)
-
 NETLIST_EXTERNAL(starcas)
+NETLIST_EXTERNAL(wotw)
 
 #endif // MAME_AUDIO_NL_STARCAS_H

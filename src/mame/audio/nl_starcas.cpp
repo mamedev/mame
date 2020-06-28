@@ -1,6 +1,8 @@
 // license:CC0
 // copyright-holders:Aaron Giles,Couriersud
 
+//NL_CONTAINS starcas wotw
+
 //
 // Netlist for Star Castle/War of the Worlds
 //
@@ -32,22 +34,66 @@
 
 
 //
-// The final amplifier is documented but not emulated.
+// Initial compilation includes this section.
 //
-#define EMULATE_FINAL_AMP	0
+
+#ifndef SOUND_VARIANT
+
+
+//
+// Now include ourselves twice, once for Star Castle and
+// once for War of the Worlds
+//
+
+#define VARIANT_STARCASTLE 	0
+#define VARIANT_WOTW		1
+
+#define SOUND_VARIANT		(VARIANT_STARCASTLE)
+#include "nl_starcas.cpp"
+
+#undef SOUND_VARIANT
+#define SOUND_VARIANT 		(VARIANT_WOTW)
+#include "nl_starcas.cpp"
+
+
+#else
 
 
 //
 // Substitutes/models
 //
 
-static NETLIST_START(StarCastle_schematics)
+#if (SOUND_VARIANT == VARIANT_STARCASTLE)
+NETLIST_START(starcas)
+#else // (SOUND_VARIANT == VARIANT_WOTW)
+NETLIST_START(wotw)
+#endif
+
+	// 192k is not high enough to make the laser and background pitches high enough
+	SOLVER(Solver, 384000)
+//	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
+//	PARAM(Solver.VNTOL, 1e-4) // works and is sufficient
+//	PARAM(Solver.DYNAMIC_LTE, 1e-1) // Aggressive timestepping
+//	PARAM(Solver.METHOD, "MAT_CR")
+//	PARAM(Solver.DYNAMIC_TS, 1)
+//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2.5e-6)
+//	PARAM(NETLIST.USE_DEACTIVATE, 1)
+
+	TTL_INPUT(I_OUT_0, 0)		// active low
+	TTL_INPUT(I_OUT_1, 1)		// active low
+	TTL_INPUT(I_OUT_2, 1)		// active low
+	TTL_INPUT(I_OUT_3, 1)		// active low
+	TTL_INPUT(I_OUT_4, 0)		// active low
+	TTL_INPUT(I_OUT_7, 0)		// active low
+
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
+
+	CINEMAT_LOCAL_MODELS
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
 	ANALOG_INPUT(I_VM15, -15)
-	ANALOG_INPUT(I_V25, 25)
-	ANALOG_INPUT(I_VM25, -25)
 
 	RES(R1, RES_K(1))
     RES(R2, 160)
@@ -167,11 +213,11 @@ static NETLIST_START(StarCastle_schematics)
 	RES(R117, RES_K(5.1))
 	RES(R118, RES_K(820))
 	RES(R119, RES_K(100))
-    RES(R120, RES_K(390))
-	RES(R121, RES_K(15))
-	RES(R122, 150)
-	RES(R123, RES_K(22))
-	RES(R124, 150)
+//  RES(R120, RES_K(390)) -- part of final amp (not emulated)
+//	RES(R121, RES_K(15))  -- part of final amp (not emulated)
+//	RES(R122, 150)        -- part of final amp (not emulated)
+//	RES(R123, RES_K(22))  -- part of final amp (not emulated)
+//	RES(R124, 150)        -- part of final amp (not emulated)
 	RES(R125, RES_K(8.2))
 	RES(R126, RES_K(20))
     RES(R127, RES_K(30))
@@ -215,11 +261,11 @@ static NETLIST_START(StarCastle_schematics)
 	CAP(C40, CAP_U(0.1))	// film
 	CAP(C41, CAP_U(0.01))	// disk
 	CAP(C42, CAP_U(0.1))	// film
-	CAP(C43, CAP_U(0.68))	// film
-	CAP(C44, CAP_P(470))	// disk
-	CAP(C45, CAP_P(470))	// disk
-	CAP(C46, CAP_P(470))	// disk
-	CAP(C47, CAP_U(0.005))	// disk
+//	CAP(C43, CAP_U(0.68))	// film -- part of final amp (not emulated)
+//	CAP(C44, CAP_P(470))	// disk -- part of final amp (not emulated)
+//	CAP(C45, CAP_P(470))	// disk -- part of final amp (not emulated)
+//	CAP(C46, CAP_P(470))	// disk -- part of final amp (not emulated)
+//	CAP(C47, CAP_U(0.005))	// disk -- part of final amp (not emulated)
 	CAP(C48, CAP_U(0.33))	// film
 
 //	D_1N4003(D1)			// not needed
@@ -249,12 +295,8 @@ static NETLIST_START(StarCastle_schematics)
 	Q_2N3906(Q14)		// PNP
 	Q_2N3906(Q15)		// PNP
 	Q_2N3906(Q16)		// PNP
-#if EMULATE_FINAL_AMP
-	Q_2N6107(Q17)		// PNP
-	Q_2N6292(Q18)		// NPN
-#endif
-
-#if STARCAS_NETLIST_SHIFTREG
+//	Q_2N6107(Q17)		// PNP -- part of final amp (not emulated)
+//	Q_2N6292(Q18)		// NPN -- part of final amp (not emulated)
 
 	TTL_7414_DIP(IC1)		// Hex Inverter
 	NET_C(IC1.7, GND)
@@ -267,8 +309,6 @@ static NETLIST_START(StarCastle_schematics)
 	TTL_74LS377_DIP(IC3)	// Octal D Flip Flop
 	NET_C(IC3.10, GND)
 	NET_C(IC3.20, I_V5)
-
-#endif
 
 //	TTL_7815_DIP(IC4)		// +15V Regulator -- not needed
 //	TTL_7915_DIP(IC5)		// -15V Regulator -- not needed
@@ -337,9 +377,9 @@ static NETLIST_START(StarCastle_schematics)
 
 	LM555_DIP(IC24)			// Timer
 
-	TL081_DIP(IC25)			// Op. Amp.
-	NET_C(IC25.7, I_V15)
-	NET_C(IC25.4, I_VM15)
+//	TL081_DIP(IC25)			// Op. Amp. -- part of final amp (not emulated)
+//	NET_C(IC25.7, I_V15)
+//	NET_C(IC25.4, I_VM15)
 
 	TL081_DIP(IC26)			// Op. Amp.
 	NET_C(IC26.7, I_V15)
@@ -359,8 +399,6 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(I_V5, R1.1)
 	ALIAS(HI, R1.2)
-
-#if STARCAS_NETLIST_SHIFTREG
 
 	NET_C(R1.2, IC2.9, IC2.2)
 	NET_C(I_OUT_7, IC1.13)
@@ -383,6 +421,8 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(IC2.13, IC3.18)
 	NET_C(GND, IC3.1)
 
+#if (SOUND_VARIANT == VARIANT_STARCASTLE)
+
 	ALIAS(FIREBALL_EN, IC3.2)
 	ALIAS(SHIELD_EN, IC3.5)
 	ALIAS(STAR_EN, IC3.6)
@@ -392,16 +432,20 @@ static NETLIST_START(StarCastle_schematics)
 	ALIAS(BL1, IC3.16)
 	ALIAS(BL0, IC3.19)
 
-#else
+#else // (SOUND_VARIANT == VARIANT_WOTW)
 
-	ALIAS(FIREBALL_EN, I_SHIFTREG_7)
-	ALIAS(SHIELD_EN, I_SHIFTREG_6)
-	ALIAS(STAR_EN, I_SHIFTREG_5)
-	ALIAS(THRUST_EN, I_SHIFTREG_4)
-	ALIAS(BACKGROUND_EN, I_SHIFTREG_3)
-	ALIAS(BL2, I_SHIFTREG_2)
-	ALIAS(BL1, I_SHIFTREG_1)
-	ALIAS(BL0, I_SHIFTREG_0)
+	ALIAS(BACKGROUND_EN, IC3.2)
+	ALIAS(BL2, IC3.6)
+	ALIAS(BL1, IC3.6)
+	ALIAS(BL0, IC3.6)
+	ALIAS(SHIELD_EN, IC3.9)
+	ALIAS(FIREBALL_EN, IC3.12)
+	RES(REXTRA, RES_K(1))
+	NET_C(IC3.16, IC6.3)
+	NET_C(IC6.4, REXTRA.1)
+	NET_C(REXTRA.2, I_V5)
+	ALIAS(STAR_EN, IC6.4)
+	ALIAS(THRUST_EN, IC3.19)
 
 #endif
 
@@ -650,83 +694,17 @@ static NETLIST_START(StarCastle_schematics)
 	// Sheet 2, final amp
 	//
 
-#if EMULATE_FINAL_AMP
-	NET_C(GND, C43.2, C47.2)
-	NET_C(I_V25, C45.1, Q17.C)
-	NET_C(I_VM25, C46.2, Q18.C)
-	NET_C(C43.1, R121.1)
-	NET_C(R121.2, IC25.2, C44.1, R120.1)
-	NET_C(R120.2, Q17.E, Q18.E, R123.2)				// SPEAKER
-	NET_C(C44.2, IC25.6, R122.1, R123.1, R124.1)
-	NET_C(C47.1, IC25.3, R128.2)
-	NET_C(R122.2, C45.2, Q17.B)
-	NET_C(R124.2, C46.1, Q18.B)
-	ALIAS(OUTPUT, Q18.E)
-#else
-	NET_C(GND, C47.2)
-	NET_C(C47.1, R128.2)
-	NET_C(GND, C46.1, C43.2, C45.2, C45.1, R124.1, R122.1, R121.1, R124.2, R120.1, R120.2, R121.2, R123.1, C43.1, IC25.3, R123.2, C46.2, C44.2, C44.1, R122.2, IC25.2)
-	ALIAS(OUTPUT, C47.1)
+	ALIAS(OUTPUT, R126.2)
+
+	//
+	// Unconnected inputs
+	//
+
+	NET_C(GND, IC28.8, IC28.9, IC28.10, IC28.11)
+#if (SOUND_VARIANT == VARIANT_STARCASTLE)
+	NET_C(GND, IC6.3)
 #endif
-
-	//
-	// Unconnected pins
-	//
-
-	NET_C(GND, IC6.3, IC28.8, IC28.9, IC28.10, IC28.11)
 
 NETLIST_END()
 
-
-NETLIST_START(starcas)
-
-	// 192k is not high enough to make the laser and background pitches high enough
-	SOLVER(Solver, 384000)
-//	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
-//	PARAM(Solver.VNTOL, 1e-4) // works and is sufficient
-//	PARAM(Solver.DYNAMIC_LTE, 1e-1) // Aggressive timestepping
-//	PARAM(Solver.METHOD, "MAT_CR")
-//	PARAM(Solver.DYNAMIC_TS, 1)
-//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2.5e-6)
-//	PARAM(NETLIST.USE_DEACTIVATE, 1)
-
-#if STARCAS_NETLIST_SHIFTREG
-
-	TTL_INPUT(I_OUT_0, 0)		// active low
-	TTL_INPUT(I_OUT_1, 1)		// active low
-	TTL_INPUT(I_OUT_2, 1)		// active low
-	TTL_INPUT(I_OUT_3, 1)		// active low
-	TTL_INPUT(I_OUT_4, 0)		// active low
-	TTL_INPUT(I_OUT_7, 0)		// active low
-
-	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
-	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
-
-#else
-
-	TTL_INPUT(I_SHIFTREG_0, 0)      // active high
-	TTL_INPUT(I_SHIFTREG_1, 0)      // active high
-	TTL_INPUT(I_SHIFTREG_2, 0)      // active high
-	TTL_INPUT(I_SHIFTREG_3, 1)      // active low
-	TTL_INPUT(I_SHIFTREG_4, 1)      // active low
-	TTL_INPUT(I_SHIFTREG_5, 0)      // active high
-	TTL_INPUT(I_SHIFTREG_6, 1)      // active low
-	TTL_INPUT(I_SHIFTREG_7, 1)      // active low
-
-	TTL_INPUT(I_OUT_1, 1)           // active low
-	TTL_INPUT(I_OUT_2, 1)           // active low
-	TTL_INPUT(I_OUT_3, 1)           // active low
-
-	NET_C(GND, I_SHIFTREG_0.GND, I_SHIFTREG_1.GND, I_SHIFTREG_2.GND, I_SHIFTREG_3.GND, I_SHIFTREG_4.GND, I_SHIFTREG_5.GND, I_SHIFTREG_6.GND, I_SHIFTREG_7.GND)
-	NET_C(I_V5, I_SHIFTREG_0.VCC, I_SHIFTREG_1.VCC, I_SHIFTREG_2.VCC, I_SHIFTREG_3.VCC, I_SHIFTREG_4.VCC, I_SHIFTREG_5.VCC, I_SHIFTREG_6.VCC, I_SHIFTREG_7.VCC)
-	NET_C(GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND)
-	NET_C(I_V5, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC)
-
 #endif
-
-	CINEMAT_LOCAL_MODELS
-
-	LOCAL_SOURCE(StarCastle_schematics)
-	INCLUDE(StarCastle_schematics)
-
-NETLIST_END()
