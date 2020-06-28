@@ -1369,6 +1369,9 @@ static INPUT_PORTS_START( vegas_analog )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED  )
+
 INPUT_PORTS_END
 
 /*************************************
