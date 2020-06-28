@@ -128,6 +128,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deskse_1_0">
+		<description>Desktop Special Edition 1.0</description>
+		<year>1995</year> <!-- 8/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0410-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="Desktop_Special_Edition_1_0" sha1="4ed0c83fd7d53112da5e3ec210d767cf3d29f41b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="deskse_1_1">
 		<description>Desktop Special Edition 1.1</description>
 		<year>1995</year> <!-- 11/95 -->
@@ -242,6 +256,20 @@ license:CC0
 			<diskarea name="cdrom">
 				<!-- Dumped with Plextor, without C2 errors -->
 				<disk name="European_Language_Module_1_3" sha1="9d4ef603308722130a8bf548f1e227c842690885" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="eurlang_1_3_1">
+		<description>European Language Module 1.3.1</description>
+		<year>1995</year> <!-- 9/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3.1" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0241-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="European_Language_Module_1_3_1" sha1="9c4931ef0d3030ed4998f2992c6c3a70338136f7" />
 			</diskarea>
 		</part>
 	</software>
