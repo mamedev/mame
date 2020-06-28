@@ -37,7 +37,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-		const analog_net_t::list_t &nets,
+		const net_list_t &nets,
 		const solver_parameters_t *params)
 		: device_t(anetlist, name)
 		, m_params(*params)
@@ -67,7 +67,7 @@ namespace solver
 		return &state().setup().get_connected_terminal(*term)->net();
 	}
 
-	void matrix_solver_t::setup_base(setup_t &setup, const analog_net_t::list_t &nets)
+	void matrix_solver_t::setup_base(setup_t &setup, const net_list_t &nets)
 	{
 		log().debug("New solver setup\n");
 		std::vector<core_device_t *> step_devices;

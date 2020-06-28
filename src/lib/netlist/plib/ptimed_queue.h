@@ -8,10 +8,9 @@
 /// \file ptimed_queue.h
 ///
 
-#include "palloc.h"
 #include "pchrono.h"
 #include "pmulti_threading.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <mutex>
@@ -217,7 +216,6 @@ namespace plib {
 		using lock_guard_type  = std::lock_guard<mutex_type>;
 
 		mutex_type               m_lock;
-		PALIGNAS_CACHELINE()
 		T *                      m_end;
 		aligned_vector<T>        m_list;
 

@@ -8,9 +8,7 @@
 /// \file plists.h
 ///
 
-#include "palloc.h"
-#include "pchrono.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <array>
@@ -98,9 +96,6 @@ namespace plib {
 	protected:
 
 	private:
-
-		// ensure proper alignment
-		PALIGNAS_VECTOROPT()
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
 		unsigned m_initialized;
 	};

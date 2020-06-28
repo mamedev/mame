@@ -15690,6 +15690,40 @@ ROM_START( carb2003 )
 	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, BAD_DUMP CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
 ROM_END
 
+ROM_START( noved )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w27c512 winbond eeprom u53.bin", 0x02000, 0x1000, CRC(46b91997) SHA1(8edd36c25cf3a8a77b170a3c7fca14d57c7a7e4c) ) // ok
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x0000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "w29c020 winbond flash u20.bin", 0x10000, 0x08000, CRC(ad4faff8) SHA1(1ab37486c1cc7f961959cf5a0a3e8daba89f68e9) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE( 0x10000, 0x8000 ) // identical to the above 0x8000
+	ROM_CONTINUE( 0x08000, 0x8000 )
+	ROM_CONTINUE( 0x00000, 0x8000 )
+	ROM_IGNORE(           0x20000 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "w27c512 winbond eeprom u27.bin", 0x00000, 0x08000, CRC(8a98dfab) SHA1(3c850d1a212295aef5922547c11712a59c1ba5f8) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x8000 )
+
+	// taken from new fruit bonus '96, might be wrong
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "proms2", 0 ) // colours again?
+	ROM_LOAD( "w27c512 winbond eeprom u57.bin", 0x00000, 0x100, CRC(84256478) SHA1(90c1abe26487682712d4514b113311400bf37ff3) ) // BADADDR        --------xxxxxxxx
+	ROM_IGNORE( 0x0ff00 )
+ROM_END
 
 ROM_START( nfm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -19268,13 +19302,14 @@ GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp96
 /* these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
    some sets are messy and appear to have mismatched graphic roms, they need to be sorted out properly
 */
-/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT            ROT    COMPANY    FULLNAME                                                                   FLAGS  */
-GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
-GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    MACHINE_WRONG_COLORS ) // encrypted program
-GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", MACHINE_WRONG_COLORS )
-GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 4, v97-3.3c English)",    MACHINE_WRONG_COLORS )
-GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
-GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT            ROT   COMPANY          FULLNAME                                                                    FLAGS  */
+GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg",       "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
+GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb96sea,  ROT0, "bootleg",       "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    MACHINE_WRONG_COLORS ) // encrypted program
+GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg",       "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", MACHINE_WRONG_COLORS )
+GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg",       "New Fruit Bonus '96 Special Edition (bootleg set 4, v97-3.3c English)",    MACHINE_WRONG_COLORS )
+GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg",       "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
+GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg",       "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
+GAME( 2006, noved,     nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg (Kon)", "Nove Diamante (bootleg)",                                                  MACHINE_NOT_WORKING ) // needs correct gfx2 region decode, controls, etc
 
 GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-07A)",         MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
 GAME( 2003, nfma,      nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-01A)",         MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode

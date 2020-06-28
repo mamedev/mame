@@ -100,6 +100,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
 		, m_fdc (*this, "fdc")
@@ -149,7 +150,6 @@ private:
 	//bool m_intrq;
 	bool m_hsync;
 	bool m_vsync;
-	bool m_rom_in_map;
 	std::unique_ptr<u8[]> m_vram;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	memory_passthrough_handler *m_rom_shadow_tap;
@@ -157,6 +157,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
@@ -190,7 +191,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 void amust_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0xf800, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0xf800, 0xffff).bankr("bank1");
 }
 
 void amust_state::io_map(address_map &map)
@@ -412,7 +413,7 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 
 void amust_state::machine_reset()
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 	m_port04 = 0;
 	m_port06 = 0;
 	m_port08 = 0;
@@ -456,7 +457,8 @@ void amust_state::machine_start()
 	//save_item(NAME(m_intrq));
 	save_item(NAME(m_hsync));
 	save_item(NAME(m_vsync));
-	save_item(NAME(m_rom_in_map));
+	m_bank1->configure_entry(0, m_ram+0xf800);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void amust_state::amust(machine_config &config)

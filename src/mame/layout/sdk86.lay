@@ -23,7 +23,7 @@ copyright-holders:Robbbert
 
 		<!-- Background -->
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="362" bottom="69" />
 		</screen>
 		<bezel element="background">
 			<bounds left="0" top="0" right="362" bottom="69" />

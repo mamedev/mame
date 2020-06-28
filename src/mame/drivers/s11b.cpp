@@ -262,6 +262,7 @@ void s11b_state::s11b(machine_config &config)
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
 	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
@@ -278,6 +279,7 @@ void s11b_state::s11b(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
+	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s11a_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s11b_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
@@ -293,6 +295,7 @@ void s11b_state::s11b(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
 	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
 	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
@@ -323,12 +326,13 @@ void s11b_state::s11b(machine_config &config)
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, XTAL(8'000'000) / 4); // MC68B09E

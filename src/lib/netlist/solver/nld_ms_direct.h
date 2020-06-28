@@ -30,7 +30,7 @@ namespace solver
 		using float_type = FT;
 
 		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, std::size_t size);
 
 		void reset() override { matrix_solver_t::reset(); }
@@ -189,7 +189,7 @@ namespace solver
 
 	template <typename FT, int SIZE>
 	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
-		const analog_net_t::list_t &nets,
+		const matrix_solver_t::net_list_t &nets,
 		const solver_parameters_t *params,
 		std::size_t size)
 	: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)

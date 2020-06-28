@@ -154,6 +154,8 @@ namespace plib
 			m_v.resize(N); //FIXME
 		}
 
+		PCOPYASSIGNMOVE(pmatrix2d_vrl, default)
+
 		void resize(size_type N, size_type M)
 		{
 			m_N = N;
@@ -214,7 +216,12 @@ namespace plib
 			return m_row[r] + c;
 		}
 
-		std::size_t tx() const { return m_v.size(); }
+		size_type colcount(size_type row) const noexcept
+		{
+			return m_row[row + 1] - m_row[row];
+		}
+
+		size_type tx() const { return m_v.size(); }
 	private:
 
 		size_type m_N;

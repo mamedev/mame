@@ -44,6 +44,17 @@
 #define NL_USE_MEMPOOL               (1)
 #endif
 
+/// brief default minimum alignment of mempool_arena
+///
+/// 256 is the best compromise between logic applications like MAME
+/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
+///
+/// Best performance for pong is achieved with a value of 16, but this degrades
+/// kidniki performance by ~10%.
+///
+/// More work is needed here.
+#define NL_MEMPOOL_ALIGN			(16)
+
 /// \brief  Enable queue statistics.
 ///
 /// Queue statistics come at a performance cost. Although

@@ -11765,6 +11765,7 @@ jupk_501                        //
 jupk_513                        //
 jupk_g51                        //
 lah_106c                        //
+lah_107                         //
 lah_110                         //
 lah_112                         //
 lah_l104                        //
@@ -14741,6 +14742,8 @@ jak_car2
 jak_gtg
 jak_sspop
 jak_hmhsm
+jak_hmg2
+jak_hsmg2
 jak_umdf
 jak_duck
 jak_swc
@@ -15236,6 +15239,7 @@ nfb96sec                        // bootleg
 nfb96txt                        // (c) 2000 Amcoe
 nfm                             // bootleg
 nfma                            // bootleg
+noved                           // bootleg
 ns8lines                        // unknown
 ns8linew                        // unknown
 ns8linewa                       // unknown
@@ -19951,6 +19955,7 @@ mastboyia                       // (c) 1991 - No Ref on the PCB
 mastboyo                        // (c) 1987 - No Ref on the PCB
 mastboyoa                       // (c) 1987 - No Ref on the PCB
 mastboyob
+mastboyoc
 
 @source:matmania.cpp
 excthour                        // TA-0015 (c) 1985 + Taito license
@@ -37657,6 +37662,8 @@ vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wiwi18                          //
 foxsport
 lexifit
+marc101
+marc250
 
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60

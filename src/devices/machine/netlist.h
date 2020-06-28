@@ -111,7 +111,7 @@ protected:
 	virtual void device_pre_save() override;
 	virtual void device_clock_changed() override;
 
-	netlist::host_arena::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
+	std::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
 	attotime m_cur_time;
 	attotime m_attotime_per_clock;

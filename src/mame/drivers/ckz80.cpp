@@ -57,6 +57,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_terminal(*this, "terminal")
 		, m_fdc(*this, "fdc")
 	{ }
@@ -76,11 +77,11 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 m_term_data;
-	bool m_rom_in_map;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	memory_passthrough_handler *m_rom_shadow_tap;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
@@ -88,7 +89,7 @@ private:
 
 void ckz80_state::port40_w(u8 data)
 {
-	m_rom_in_map = !BIT(data, 1);
+	m_bank1->set_entry(BIT(~data, 1));
 }
 
 u8 ckz80_state::port80_r()
@@ -106,7 +107,7 @@ u8 ckz80_state::port81_r()
 void ckz80_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0xe000, 0xffff).lr8(NAME([this] (offs_t offset) { if (m_rom_in_map) return m_rom[offset]; else return m_ram[offset+0xe000]; } ));
+	map(0xe000, 0xffff).bankr("bank1");
 }
 
 void ckz80_state::io_map(address_map &map)
@@ -153,8 +154,9 @@ WRITE_LINE_MEMBER( ckz80_state::ctc_z2_w )
 
 void ckz80_state::machine_start()
 {
+	m_bank1->configure_entry(0, m_ram+0xe000);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_rom_in_map));
 }
 
 void ckz80_state::machine_reset()
@@ -176,7 +178,7 @@ void ckz80_state::machine_reset()
 		return data;
 	});
 
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 }
 
 static void ckz80_floppies(device_slot_interface &device)

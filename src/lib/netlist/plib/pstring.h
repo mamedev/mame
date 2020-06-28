@@ -209,10 +209,9 @@ public:
 	static constexpr const size_type npos = static_cast<size_type>(-1);
 
 	// the following are extensions to <string>
-
-private:
 	// FIXME: remove those
 	size_type mem_t_size() const noexcept { return m_str.size(); }
+private:
 
 	string_type m_str;
 };
@@ -254,6 +253,7 @@ struct putf_traits<1, CT>
 		}
 		return ret;
 	}
+
 	static std::size_t codelen(const mem_t *p) noexcept
 	{
 		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
@@ -459,6 +459,28 @@ using putf8string = pstring_t<putf8_traits>;
 using putf16string = pstring_t<putf16_traits>;
 using putf32string = pstring_t<putf32_traits>;
 using pwstring = pstring_t<pwchar_traits>;
+
+namespace plib
+{
+	template<class T>
+	struct string_info
+	{
+	};
+
+	template<typename T>
+	struct string_info<pstring_t<T>>
+	{
+		using mem_t = typename T::mem_t;
+		static std::size_t mem_size(const pstring_t<T> &s) { return s.mem_t_size(); }
+	};
+
+	template<typename T>
+	struct string_info<std::basic_string<T>>
+	{
+		using mem_t = T;
+		static std::size_t mem_size(const std::string &s) { return s.size(); }
+	};
+} // namespace plib
 
 // custom specialization of std::hash can be injected in namespace std
 namespace std

@@ -13,9 +13,9 @@
 #include "plib/ppreprocessor.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
-#include "plib/putil.h"
 
 #include "nl_config.h"
+// FIXME: avoid including factory
 #include "nl_factory.h"
 #include "nltypes.h"
 
@@ -61,7 +61,7 @@
 		setup.defparam(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
-		setup.register_param(# name ".HINT_" # val, "1");
+		setup.register_hint(# name ".HINT_" # val);
 
 #define NETDEV_PARAMI(name, param, val)                                        \
 		setup.register_param(# name "." # param, val);
@@ -134,25 +134,6 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 namespace netlist
 {
 
-	namespace detail {
-		class core_terminal_t;
-		class net_t;
-	} // namespace detail
-
-	namespace devices {
-		class nld_base_proxy;
-		class nld_netlistparams;
-	} // namespace devices
-
-	class core_device_t;
-	class param_t;
-	class nlparse_t;
-	class setup_t;
-	class netlist_state_t;
-	class netlist_t;
-	class logic_family_desc_t;
-	class terminal_t;
-
 	// -----------------------------------------------------------------------------
 	// truthtable desc
 	// -----------------------------------------------------------------------------
@@ -189,32 +170,6 @@ namespace netlist
 	private:
 		core_device_t *m_device;
 		param_t *m_param;
-	};
-
-	// ----------------------------------------------------------------------------------------
-	// Specific netlist psource_t implementations
-	// ----------------------------------------------------------------------------------------
-
-	class source_netlist_t : public plib::psource_t
-	{
-	public:
-
-		source_netlist_t() = default;
-
-		PCOPYASSIGNMOVE(source_netlist_t, delete)
-		~source_netlist_t() noexcept override = default;
-
-		virtual bool parse(nlparse_t &setup, const pstring &name);
-	};
-
-	class source_data_t : public plib::psource_t
-	{
-	public:
-
-		source_data_t() = default;
-
-		PCOPYASSIGNMOVE(source_data_t, delete)
-		~source_data_t() noexcept override = default;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -279,6 +234,7 @@ namespace netlist
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 			// lifetime control only - can be cleared before run
 			std::vector<std::pair<pstring, pstring>>    m_defparams;
+			std::unordered_map<pstring, bool>           m_hints;
 		};
 
 		nlparse_t(log_type &log, abstract_t &abstract);
@@ -297,6 +253,8 @@ namespace netlist
 		{
 			register_dev(classname, name, std::vector<pstring>());
 		}
+
+		void register_hint(const pstring &name);
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
@@ -500,8 +458,30 @@ namespace netlist
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// base sources
+	// Specific netlist psource_t implementations
 	// ----------------------------------------------------------------------------------------
+
+	class source_netlist_t : public plib::psource_t
+	{
+	public:
+
+		source_netlist_t() = default;
+
+		PCOPYASSIGNMOVE(source_netlist_t, delete)
+		~source_netlist_t() noexcept override = default;
+
+		virtual bool parse(nlparse_t &setup, const pstring &name);
+	};
+
+	class source_data_t : public plib::psource_t
+	{
+	public:
+
+		source_data_t() = default;
+
+		PCOPYASSIGNMOVE(source_data_t, delete)
+		~source_data_t() noexcept override = default;
+	};
 
 	class source_string_t : public source_netlist_t
 	{
