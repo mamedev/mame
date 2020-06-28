@@ -128,6 +128,9 @@ private:
 
 	int command_31_write_type;
 
+	// py2k2 protection related
+	u16 m_py2k2_sprite_pos;
+	u16 m_py2k2_sprite_base;
 
 	// the maximum level size returned or read by the device appears to be this size
 	u16 level_structure[8][10];
