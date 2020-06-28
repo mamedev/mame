@@ -1240,7 +1240,7 @@ namespace netlist
 		}
 	protected:
 		virtual void changed() noexcept;
-		pstring str() const noexcept { pstring ret = *m_param; return ret;}
+		pstring str() const noexcept { return *m_param; }
 	private:
 		host_arena::unique_ptr<pstring> m_param;
 	};

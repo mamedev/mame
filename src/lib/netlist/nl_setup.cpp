@@ -434,6 +434,13 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in)
 
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
+	// when get_intial_param_val is called the parameter <name> is already registered
+	// and the value (valstr()) is set to the default value, e.g. "74XX"
+	// If thus $(IC5E.A.MODEL) is given for name=="IC5E.A.MODEL" valstr() below
+	// will return the default.
+	// FIXME: It may be more explicit and stable to test if pattern==name and return
+	// def in this case.
+
 	auto i = m_abstract.m_param_values.find(name);
 	auto found_pat(false);
 	pstring v = (i == m_abstract.m_param_values.end()) ? def : i->second;
@@ -1440,7 +1447,7 @@ void setup_t::prepare_to_run()
 		m_parser.register_dynamic_log_devices(loglist);
 	}
 
-	// create defparams!
+	// create defparams first!
 
 	for (auto & e : m_abstract.m_defparams)
 	{
