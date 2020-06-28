@@ -546,6 +546,23 @@ ROM_START( jak_hmhsm )
 ROM_END
 
 
+ROM_START( jak_hsmg2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hsm_as_hy27ys08121a_9876.bin", 0x0000, 0x4200000, CRC(4da61056) SHA1(d6c529a6df2703dd55b864e9d7c655203206f8b6) )
+ROM_END
+
+ROM_START( jak_hmg2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hm_as_hy27us08121a_9876_fixed.bin", 0x0000, 0x4200000, BAD_DUMP CRC(ba97fcd6) SHA1(c02a6878910b1312009b21220d51d7c1c3adb767) ) // 4 blocks had to be fixed using data from jak_hmhsm
+ROM_END
+
+
 ROM_START( jak_umdf )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -816,7 +833,9 @@ CONS(200?, jak_gtg,    0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gp
 CONS(200?, jak_car2,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(2010, jak_tsm,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,           "JAKKS Pacific Inc / Schell Games",         "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(2009, jak_sspop,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Sing Scene Pop (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe 2-in-1 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2008, jak_hmg2,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jul 9 2008 11:50:08
+CONS(2008, jak_hsmg2,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "High School Musical G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jun 25 2008 14:53:14
+CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe - Two in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
 CONS(2008, jak_umdf,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Handheld Games",       "Ultimotion - Disney Fairies Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // Ultimotion Swing Zone is SPG29xx instead
 

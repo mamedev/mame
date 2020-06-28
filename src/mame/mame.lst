@@ -14742,6 +14742,8 @@ jak_car2
 jak_gtg
 jak_sspop
 jak_hmhsm
+jak_hmg2
+jak_hsmg2
 jak_umdf
 jak_duck
 jak_swc
@@ -37660,6 +37662,8 @@ vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wiwi18                          //
 foxsport
 lexifit
+marc101
+marc250
 
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
