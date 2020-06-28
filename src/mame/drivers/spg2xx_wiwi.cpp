@@ -392,15 +392,25 @@ void spg2xx_game_marc250_state::init_m527()
 	rom[((22 * 0x800000) / 2) | 0x00eb2a] = 0x4241; 
 
 
-	// this turns the IRQ off, code looks a bit like smarttv code.. (jump chess) is SoC IRQ handling wrong? it s
-	rom[((19 * 0x800000) / 2) | 0x012c3a] = 0x0003;
-	// same for curling
-	rom[((25 * 0x800000) / 2) | 0x0103c5] = 0x0003;
+	// this turns the IRQ off, code looks a bit like smarttv code..  is SoC IRQ handling wrong?
+	
+	// bowling
+	rom[((17 * 0x800000) / 2) | 0x015e58] = 0x0003;
 	// cliff overhang / gym dancing 
 	rom[((18 * 0x800000) / 2) | 0x01cab4] = 0x0003;
 	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff;
+	// jump chess
+	rom[((19 * 0x800000) / 2) | 0x012c3a] = 0x0003;
 	// boxing, basketball etc.
 	rom[((23 * 0x800000) / 2) | 0x00c1bd] = 0x0003;
+	// dash motor
+	rom[((24 * 0x800000) / 2) | 0x00d62c] = 0x0003;
+	// same for curling
+	rom[((25 * 0x800000) / 2) | 0x0103c5] = 0x0003;
+	// balloon puyo
+	rom[((26 * 0x800000) / 2) | 0x0084dd] = 0x0003;
+	// 4 score
+	rom[((27 * 0x800000) / 2) | 0x145cdd] = 0x0003;
 
 	
 }
@@ -469,10 +479,10 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 		// bits 0x1804 aren't set as an output, but clearly need to be treated as output
 		switch (data & 0x1807)
 		{
-		case 0x0000: switch_bank(0); break;
-		case 0x0001: switch_bank(1); break;
-		case 0x0002: switch_bank(2); break;
-		case 0x0003: switch_bank(3); break;
+		case 0x0000: switch_bank(0); break; // unused
+		case 0x0001: switch_bank(1); break; // unused
+		case 0x0002: switch_bank(2); break; // unused
+		case 0x0003: switch_bank(3); break; // unused
 
 		case 0x1000: switch_bank(4); break; // unused
 		case 0x1001: switch_bank(5); break; // unused
@@ -487,7 +497,7 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 		case 0x1800: switch_bank(12); break; // pass maze road
 		case 0x1801: switch_bank(13); break; // learn number
 		case 0x1802: switch_bank(14); break; // final race, motor race
-		case 0x1803: switch_bank(15); break;
+		case 0x1803: switch_bank(15); break; // unused
 
 		case 0x0004: switch_bank(16); break; // thunder race, speed race, night shooter
 		case 0x0005: switch_bank(17); break; // rescue bees
@@ -501,7 +511,7 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 
 		case 0x0804: switch_bank(24); break; // button jumper  dash motor
 		case 0x0805: switch_bank(25); break; // cross river
-		case 0x0806: switch_bank(26); break; // balloon pupu
+		case 0x0806: switch_bank(26); break; // balloon puyu
 		case 0x0807: switch_bank(27); break; // 4 Score
 
 		case 0x1804: switch_bank(28); break; // bubble, malibu
