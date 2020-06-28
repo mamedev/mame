@@ -18,9 +18,27 @@ public:
 
 	void init_wiwi18();
 
+protected:
+
 private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
+
+class spg2xx_game_marc101_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_marc101_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void init_m489();
+
+protected:
+
+private:
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
 
 static INPUT_PORTS_START( wiwi18 )
 	PORT_START("P1")
@@ -228,6 +246,26 @@ static INPUT_PORTS_START( lexifit )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( m489 )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // acts as Button 1 autofire (not connected on unit?)
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 void spg2xx_game_wiwi18_state::init_wiwi18()
 {
@@ -242,9 +280,7 @@ void spg2xx_game_wiwi18_state::init_wiwi18()
 
 }
 
-
-
-void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
@@ -274,6 +310,58 @@ void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t me
 
 }
 
+void spg2xx_game_marc101_state::init_m489()
+{
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+
+	// bypass a call that turns unit off after about 2 seconds, maybe it's a battery check?
+	if (rom[0x6460]==0x4240) rom[0x6460] = 0x4241; 
+}
+
+void spg2xx_game_marc101_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (m_maincpu->pc() < 0x2000)
+	{
+		logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+	}
+
+	
+	if (m_maincpu->pc() < 0x2000)
+	{
+		// bit 0x1000 isn't set as an output, but clearly needs to be treated as one
+		switch (data & 0x1003)
+		{
+		case 0x0000: switch_bank(7); break;
+		case 0x0001: switch_bank(6); break; // good - heroic pilot
+		case 0x0002: switch_bank(5); break; // good - horrific collapser
+		case 0x0003: switch_bank(4); break; // good - under sea war
+		case 0x1000: switch_bank(3); break; // good - roadman etc.
+		case 0x1001: switch_bank(2); break; // good - santa etc
+		case 0x1002: switch_bank(1); break;
+		case 0x1003: switch_bank(0); break;
+		}
+	}
+}
+
+
+
+
 ROM_START( foxsport )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "foxsports.bin", 0x000000, 0x1000000, CRC(a5092f49) SHA1(feb4d432486b17d6cd2aed8cefd3d084f77c1733) ) // only a tiny amount of data in the 2nd half, what's it used for (if anything)
@@ -289,6 +377,12 @@ ROM_START( lexifit )
 	ROM_LOAD16_WORD_SWAP( "lexibook_tv_fitness_center.bin", 0x000000, 0x1000000, CRC(38021230) SHA1(2b949d723a475bfac23d9da4d1a30ea71b332ccb) )
 ROM_END
 
+ROM_START( marc101 )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "m489.u6", 0x0000000, 0x4000000, CRC(0a01695f) SHA1(1a13c5eb9dffdc91fc68a98e8f35bd8a019a8373) )
+	ROM_IGNORE(0x4000000) // 2nd half is just random fill unrelated to the game, ROM was twice needed capacity
+ROM_END
+
 // box marked 'Wireless game console' 'Drahtlose Spielekonsole' 87 Sports games included : 18 hyper sports games, 69 arcade games.
 // Unit marked 'Hamy System' 'WiWi'
 // actually a cartridge, but all hardware is in the cart, overriding any internal hardware entirely.  see nes_vt.cp 'mc_sp69' for the '69 arcade game' part
@@ -299,3 +393,5 @@ CONS( 2009, lexifit,  0,        0, rad_skat, lexifit, spg2xx_game_wiwi18_state, 
 CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Excalibur Electronics", "Fox Sports 7 in 1 Sports Games Plug n' Play", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
+
+CONS( 200?, marc101,     0,        0, spg2xx, m489,  spg2xx_game_marc101_state, init_m489, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
