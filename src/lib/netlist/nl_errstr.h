@@ -14,6 +14,7 @@ namespace netlist
 {
 
 	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+	static constexpr const char sHINT_NC[] = ".HINT_NC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	static constexpr const char sPowerGND[] = "GND"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	static constexpr const char sPowerVCC[] = "VCC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 
@@ -56,6 +57,8 @@ namespace netlist
 	PERRMSGV(MF_UNABLE_TO_PARSE_MODEL_1,            1, "Unable to parse model: {1}")
 	PERRMSGV(MF_MODEL_ALREADY_EXISTS_1,             1, "Model already exists: {1}")
 	PERRMSGV(MF_DEVICE_ALREADY_EXISTS_1,            1, "Device already exists: {1}")
+	PERRMSGV(MF_UNUSED_HINT_1,                      1, "Error hint {1} is not used")
+	PERRMSGV(MF_ADDING_HINT_1,                      1, "Error adding hint {1} to hint list")
 	PERRMSGV(MF_ADDING_ALI1_TO_ALIAS_LIST,          1, "Error adding alias {1} to alias list")
 	PERRMSGV(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1, 1,"You must pass an equal number of pins to DIPPINS {1}")
 	PERRMSGV(MF_PARAM_COUNT_MISMATCH_2,             2, "Parameter count mismatch for {1} - only found {2}")

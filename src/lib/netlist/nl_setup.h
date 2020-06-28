@@ -61,7 +61,7 @@
 		setup.defparam(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
-		setup.register_param(# name ".HINT_" # val, "1");
+		setup.register_hint(# name ".HINT_" # val);
 
 #define NETDEV_PARAMI(name, param, val)                                        \
 		setup.register_param(# name "." # param, val);
@@ -234,6 +234,7 @@ namespace netlist
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 			// lifetime control only - can be cleared before run
 			std::vector<std::pair<pstring, pstring>>    m_defparams;
+			std::unordered_map<pstring, bool>           m_hints;
 		};
 
 		nlparse_t(log_type &log, abstract_t &abstract);
@@ -252,6 +253,8 @@ namespace netlist
 		{
 			register_dev(classname, name, std::vector<pstring>());
 		}
+
+		void register_hint(const pstring &name);
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);

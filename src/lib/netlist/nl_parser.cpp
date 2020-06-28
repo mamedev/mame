@@ -375,10 +375,10 @@ void parser_t::netdev_defparam()
 void parser_t::netdev_hint()
 {
 	require_token(m_tok_paren_left);
-	pstring dev(get_identifier());
+	pstring id(get_identifier());
 	require_token(m_tok_comma);
 	pstring hint(get_identifier());
-	m_setup.register_param_val(dev + ".HINT_" + hint, 1);
+	m_setup.register_hint(id + ".HINT_" + hint);
 	require_token(m_tok_paren_right);
 }
 

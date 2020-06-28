@@ -150,6 +150,15 @@ namespace netlist
 			*felem = f;
 	}
 
+	void nlparse_t::register_hint(const pstring &name)
+	{
+		if (!m_abstract.m_hints.insert({name, false}).second)
+		{
+			log().fatal(MF_ADDING_HINT_1(name));
+			throw nl_exception(MF_ADDING_HINT_1(name));
+		}
+	}
+
 	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
 	{
 		register_link_fqn(build_fqn(sin), build_fqn(sout));
@@ -307,7 +316,6 @@ namespace netlist
 			log().fatal(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
 			throw nl_exception(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
 		}
-
 	}
 
 	void nlparse_t::register_link_fqn(const pstring &sin, const pstring &sout)
@@ -1078,31 +1086,47 @@ void setup_t::resolve_inputs()
 	for (auto & i : m_terminals)
 	{
 		detail::core_terminal_t *term = i.second;
-		bool is_nc(dynamic_cast< devices::NETLIB_NAME(nc_pin) *>(&term->device()) != nullptr);
-		if (term->has_net() && is_nc)
+		const pstring name_da = de_alias(term->name());
+		bool is_nc_pin(dynamic_cast< devices::NETLIB_NAME(nc_pin) *>(&term->device()) != nullptr);
+		bool is_nc_flagged(false);
+
+		auto hnc = m_abstract.m_hints.find(name_da + sHINT_NC);
+		if (hnc != m_abstract.m_hints.end())
 		{
-			log().error(ME_NC_PIN_1_WITH_CONNECTIONS(term->name()));
+			hnc->second = true; // mark as used
+			is_nc_flagged = true;
+		}
+
+		if (term->has_net() && is_nc_pin)
+		{
+			log().error(ME_NC_PIN_1_WITH_CONNECTIONS(name_da));
 			err = true;
 		}
-		else if (is_nc)
+		else if (is_nc_pin)
 		{
 			/* ignore */
 		}
 		else if (!term->has_net())
 		{
-			log().error(ME_TERMINAL_1_WITHOUT_NET(de_alias(term->name())));
+			log().error(ME_TERMINAL_1_WITHOUT_NET(name_da));
 			err = true;
 		}
 		else if (!term->net().has_connections())
 		{
 			if (term->is_logic_input())
-				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(term->name()));
+				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(name_da));
 			else if (term->is_logic_output())
-				log().info(MI_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS(term->name()));
+			{
+				if (!is_nc_flagged)
+					log().info(MI_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS(name_da));
+			}
 			else if (term->is_analog_output())
-				log().info(MI_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS(term->name()));
+			{
+				if (!is_nc_flagged)
+					log().info(MI_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS(name_da));
+			}
 			else
-				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(term->name()));
+				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(name_da));
 		}
 	}
 	log().verbose("checking tristate consistency  ...");
@@ -1498,21 +1522,8 @@ void setup_t::prepare_to_run()
 		auto f = m_params.find(p.first);
 		if (f == m_params.end())
 		{
-			if (plib::endsWith(p.first, sHINT_NO_DEACTIVATE))
-			{
-				// FIXME: get device name, check for device
-				auto *dev = m_nlstate.find_device(plib::replace_all(p.first, sHINT_NO_DEACTIVATE, ""));
-				if (dev == nullptr)
-				{
-					log().error(ME_DEVICE_NOT_FOUND_FOR_HINT(p.first));
-					errcnt++;
-				}
-			}
-			else
-			{
-				log().error(ME_UNKNOWN_PARAMETER(p.first));
-				errcnt++;
-			}
+			log().error(ME_UNKNOWN_PARAMETER(p.first));
+			errcnt++;
 		}
 	}
 
@@ -1520,28 +1531,17 @@ void setup_t::prepare_to_run()
 
 	for (auto &d : m_nlstate.devices())
 	{
-		if (use_deactivate)
+		auto p = m_abstract.m_hints.find(d.second->name() + sHINT_NO_DEACTIVATE);
+		if (p != m_abstract.m_hints.end())
 		{
-			auto p = m_abstract.m_param_values.find(d.second->name() + sHINT_NO_DEACTIVATE);
-			if (p != m_abstract.m_param_values.end())
-			{
-				//FIXME: check for errors ...
-				bool err(false);
-				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
-				if (err || plib::abs(v - plib::floor(v)) > nlconst::magic(1e-6) )
-				{
-					log().error(ME_HND_VAL_NOT_SUPPORTED(p->second));
-					errcnt++;
-				}
-				else
-				{
-					// FIXME comparison with zero
-					d.second->set_hint_deactivate(v == nlconst::zero());
-				}
-			}
+			p->second = true; // mark as used
+			if (use_deactivate)
+				d.second->set_hint_deactivate(false);
+			else
+				d.second->set_hint_deactivate(true);
 		}
 		else
-			d.second->set_hint_deactivate(false);
+			d.second->set_hint_deactivate(true);
 	}
 
 	if (errcnt > 0)
@@ -1563,6 +1563,16 @@ void setup_t::prepare_to_run()
 			remove_terminal(t->setup_N().net(), t->setup_N());
 			remove_terminal(t->setup_P().net(), t->setup_P());
 			m_nlstate.remove_device(t);
+		}
+	}
+
+	log().verbose("looking for unused hints ...");
+	for (auto &h : m_abstract.m_hints)
+	{
+		if (!h.second)
+		{
+			log().fatal(MF_UNUSED_HINT_1(h.first));
+			throw nl_exception(MF_UNUSED_HINT_1(h.first));
 		}
 	}
 
