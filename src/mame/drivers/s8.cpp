@@ -341,6 +341,7 @@ void s8_state::s8(machine_config &config)
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
 	m_pia21->readpa_handler().set(FUNC(s8_state::sound_r));
+	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->readca1_handler().set(FUNC(s8_state::pia21_ca1_r));
 	m_pia21->writepa_handler().set(FUNC(s8_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s8_state::sol2_w));
@@ -366,6 +367,7 @@ void s8_state::s8(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s8_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s8_state::switch_w));
 	m_pia30->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia30->irqb_handler().set(FUNC(s8_state::pia_irq));
@@ -384,6 +386,7 @@ void s8_state::s8(machine_config &config)
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s8_state::sound_r));
+	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);

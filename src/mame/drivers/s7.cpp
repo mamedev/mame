@@ -485,6 +485,7 @@ void s7_state::s7(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s7_state::dips_r));
+	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s7_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s7_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s7_state::pia28_ca2_w));
@@ -494,6 +495,7 @@ void s7_state::s7(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s7_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s7_state::switch_w));
 	m_pia30->ca2_handler().set(FUNC(s7_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s7_state::pia30_cb2_w));

@@ -474,6 +474,7 @@ void s3_state::s3(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s3_state::dips_r));
+	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->readca1_handler().set(FUNC(s3_state::pia28_ca1_r));
 	m_pia28->readcb1_handler().set(FUNC(s3_state::pia28_cb1_r));
 	m_pia28->writepa_handler().set(FUNC(s3_state::dig0_w));
@@ -485,6 +486,7 @@ void s3_state::s3(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s3_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s3_state::switch_w));
 	m_pia30->ca2_handler().set(FUNC(s3_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s3_state::pia30_cb2_w));
