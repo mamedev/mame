@@ -25,7 +25,7 @@ public:
 		, nvram(*this, "nvram")
 		, lamp(*this, "lamp")
 		, out(*this, "out")
-		, swarray(*this, "SW.%u", 0)
+		, swarray(*this, "SW.%u", 0U)
 	{ }
 
 	void wpc_dcs(machine_config &config);
