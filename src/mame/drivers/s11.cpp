@@ -152,10 +152,10 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		{
 #ifndef S11_W15
 			// W14 jumper present (Q7), W15 absent (Q10)
-			m_timer_irq_active = (BIT(m_timer_count, 7) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9)); 
+			m_timer_irq_active = (BIT(m_timer_count, 7) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
 #else
 			// W14 jumper absent (Q7), W15 present (Q10)
-			m_timer_irq_active = (BIT(m_timer_count, 10) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9)); 
+			m_timer_irq_active = (BIT(m_timer_count, 10) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
 #endif
 		}
 
@@ -419,7 +419,7 @@ void s11_state::s11(machine_config &config)
 	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
 	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
-	m_pia21->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<1>));
+	m_pia21->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<1>));
 	m_pia21->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia24, 0);
