@@ -30,7 +30,7 @@ Language:
 |   XX   | 80-084002(NL)     | Sports Games                                                                              |
 |        | 80-084003(UK)     | Action Mania                                                                              |
 |   XX   | 80-084004(GE)     | Sportskanone                                                                              |
-|        | 80-084005(FR)     | Sporti Folies                                                                             |
+|   XX   | 80-084005(FR)     | Sporti'Folies                                                                             |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                                              |
 |   XX   | 80-084007(SP)     | Action Manía                                                                              |
 +========+===================+===========================================================================================+
@@ -40,7 +40,7 @@ Language:
 |        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                                           |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (Rev. 2)                                                  |
-|        | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano                             |
+|   XX   | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mécano                             |
 |        | 80-084026(PT)     | Dora : em busca das pecas perdidas                                                        |
 |        | 80-084027(SP)     | Dora : La Aventura arregla-todo de Dora                                                   |
 +========+===================+===========================================================================================+
@@ -66,7 +66,7 @@ Language:
 |        | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
 |        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda                                                         |
 |   XX   | 80-084124(GE)     | Kung Fu Panda - Der Weg des Panda                                                         |
-|        | 80-084125(FR)     | Kung Fu Panda - La mission de Po                                                          |
+|   XX   | 80-084125(FR)     | Kung Fu Panda - La mission de Po                                                          |
 +========+===================+===========================================================================================+
 |        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)|
 |        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                                    |
@@ -112,12 +112,12 @@ Language:
 |        | 80-084282(NL)     | Water-sport Games                                                                         |
 |        | 80-084283(UJ)     | Wild Waves                                                                                |
 |        | 80-084284(GE)     | Dolphis Wasser-abenteuer                                                                  |
-|        | 80-084285(FR)     | Martin le Dauphin                                                                         |
+|   XX   | 80-084285(FR)     | Martin le Dauphin                                                                         |
 +========+===================+===========================================================================================+
 |        | 80-084300(US)     | Soccer Challenge                                                                          |
 |        | 80-084303(UK)     | Football Challenge                                                                        |
 |   XX   | 80-084304(GE)     | Fussball Meisterschaft                                                                    |
-|        | 80-084305(FR)     | Football Challenge                                                                        |
+|   XX   | 80-084305(FR)     | Football Challenge                                                                        |
 |        | 80-084306(PT)     | Football Challenge  (cart#??)                                                             |
 |        | 80-084307(SP)     | Campeonato de Fútbol                                                                      |
 +========+===================+===========================================================================================+
@@ -167,7 +167,7 @@ Language:
 |        | 80-084422(NL)     | Toy Story 3                                                                               |
 |        | 80-084423(UK)     | Toy Story 3                                                                               |
 |   XX   | 80-084424(GE)     | Toy Story 3                                                                               |
-|        | 80-084425(FR)     | Toy Story 3                                                                               |
+|   XX   | 80-084425(FR)     | Toy Story 3                                                                               |
 |   XX   | 80-084427(SP)     | Toy Story 3                                                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084440(US)     | Monsters vs. Aliens                                                                       |
@@ -208,7 +208,7 @@ Language:
 |        | 80-084581(US)     | Cars 2  (pocket version)                                                                  |
 |        | 80-084583(UK)     | Cars 2                                                                                    |
 |   XX   | 80-084584(GE)     | Cars 2                                                                                    |
-|        | 80-084585(FR)     | Cars 2                                                                                    |
+|   XX   | 80-084585(FR)     | Cars 2                                                                                    |
 |        | 80-084587(SP)     | Cars 2                                                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)               |
@@ -278,13 +278,24 @@ Language:
 		<description>Sportskanone (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084007(SP)" />
+		<info name="serial" value="80-084004(GER)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="pcb" value="708201" />
-			<feature name="pcb_model" value="708201-4" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="80-084004 - Sportskanone (GER) (Motion).bin" size="8388608" crc="004ad4e5" sha1="7cbc9e5a27fac455ea2b03cebad7f1694937f790" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnmniamf" cloneof="actnmniam" supported="no">
+		<description>Sporti'Folies (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084005 - SportiFolies (MOTION) (FR).bin" size="8388608" crc="c6aee288" sha1="b8d96d0b1c0e8e41ab39d9d6bc1fc39060af4f26" />
 			</dataarea>
 		</part>
 	</software>
@@ -351,7 +362,7 @@ Language:
 		<description>Disney/Pixar Cars 2 (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084404(GE)" />
+		<info name="serial" value="80-084584(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-3" />
@@ -359,6 +370,20 @@ Language:
 			<dataarea name="rom" size="0x1000000">
 				<rom name="cars2_low.bin" size="0x0800000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" offset="0x0000000" />
 				<rom name="cars2_high.bin" size="0x0800000" crc="7a5b9ead" sha1="8c01a52ed392b50f2a7e91ae628ae4f6f06a5fc3" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Crashes MAME -->
+	<software name="cars2mf" supported="no">
+		<description>Disney/Pixar Cars 2 (France)</description>
+		<year>2011?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084585(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="084585 - Cars 2 (MOTION) (FR).bin size="0x1000000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" />
 			</dataarea>
 		</part>
 	</software>
@@ -460,6 +485,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="doramf" cloneof="doram" supported="no">
+		<description>Nickelodeon Dora L'Exploratrice - Les adventures de Dora Apprentie Mécano (France)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084025(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084025 - Dora (MOTION) (FR).bin" size="8388608" crc="f8b731f2" sha1="1deaff6b5b7c6bea2e627015f875ef60e3b09d38" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="findnemomf" supported="no">
 		<description>Le Monde de Nemo - Nemo à la decourverte de l'océan (France)</description>
 		<year>2010</year>
@@ -524,6 +562,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kfpandamf" supported="no" cloneof="kfpandamg">
+		<description>DreamWorks Kung Fu Panda - La mission de Po (France)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084125(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084125 - KungFuPanda (MOTION) (FR).bin" size="8388608" crc="58d7ad17" sha1="f854a42b64a90ab9b8ea08ebfb57264654f108a8" />
 			</dataarea>
 		</part>
 	</software>
@@ -955,6 +1006,20 @@ Language:
 		</part>
 	</software>
 
+	<!-- Soccer Challenge -->
+	<software name="soccerchmf" supported="no" cloneof="soccerchmg">
+		<description>Football Challenge (France)</description>
+		<year>20??</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084305(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084305 - FootballChallenge (MOTION) (FR).bin" size="8388608" crc="bca67fe6" sha1="9949f36d4584290371b0126b59b7bd0b96a7c77b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spidermnmg" supported="no">
 		<description>Marvel Spider-Man &amp; Freunde - Geheime Missionen (Germany)</description>
 		<year>2010</year>
@@ -1068,6 +1133,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="toystor3mf" cloneof="toystor3mg" supported="no">
+		<description>Toy Story 3 (France)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084425(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="084425 - Toy Story 3 (MOTION) (FR).bin" size="0x1000000" crc="2cb9d987" sha1="1ba5162181b29757335ab92451c3e164919e9c74" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toystor3ms" cloneof="toystor3mg" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Spain)</description>
 		<year>2010</year>
@@ -1167,6 +1245,18 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x0800000">
 				<rom name="80-084087 - Wall-E (SP) (Motion).bin" size="0x0800000" crc="f2782e64" sha1="09ccd0f5184b47ae730f1803c3a4373bca571b85" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wldwavesmf" supported="no">
+		<description>Martin Le Dauphin (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084285(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="084285 - MartinLeDauphin (MOTION) (FR).bin" size="8388608" crc="0b224331" sha1="1f93ddd81648058312640c95682069267e06de9e" />
 			</dataarea>
 		</part>
 	</software>
