@@ -2686,6 +2686,28 @@ ROM_START( mkyawdim2 )
 
 	ROM_LOAD ( "c-1.bin",  0x400000, 0x100000, CRC(de27c4c3) SHA1(a7760d239749c7463808adec72795f9785f553ec) )
 	ROM_LOAD ( "c-2.bin",  0x500000, 0x100000, CRC(d99203f3) SHA1(46ea21cbedfd42838562594b9bdc5d80360b7e5e) )
+
+	ROM_REGION( 0x900, "plds", 0 )
+	ROM_LOAD( "22v10.p1",  0x000, 0x2dd, CRC(15c24092) SHA1(7bbd1453c9a230dfa641239f15abb5aec93eb0dd) )  // unsecured
+	ROM_LOAD( "22v10.p2",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p3",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "16v8.p4",   0x000, 0x117, NO_DUMP )                                                       // secured, registered
+	ROM_LOAD( "22v10.p5",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "16v8.p6",   0x000, 0x117, NO_DUMP )                                                       // secured, registered
+	ROM_LOAD( "16v8.p7",   0x300, 0x117, CRC(fbbdc832) SHA1(8fe5448dad6025f98c70a9dd9aa7d07a75a6762c) )  // secured but bruteforced ok
+	ROM_LOAD( "16v8.p8",   0x500, 0x117, CRC(8c573ab4) SHA1(9f16936c34cbaaa89b56356353f2a76fd4f28605) )  // secured but bruteforced ok
+	ROM_LOAD( "22v10.p9",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p10",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p11",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p12", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p13", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p14", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p15", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p16",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p17",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p18", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "16v8.p19",  0x700, 0x117, CRC(0346b5fc) SHA1(0cc1e1dcd6017de2e80eb1d40ac3a591e589b030) )  // unsecured
+	// also u130: ti TPC1020AFN-084C PLCC84, unattempted
 ROM_END
 
 
