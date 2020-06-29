@@ -66,7 +66,7 @@ VTech V.Smile Baby cartridges
 |        | 80-099140(US)     | Teletubbies                                                                |
 |        | 80-099142(NL)     | Teletubbies                                                                |
 |        | 80-099143(UK)     | Teletubbies                                                                |
-|        | 80-099145(FR)     | Teletubbies                                                                |
+|   XX   | 80-099145(FR)     | Teletubbies                                                                |
 +========+===================+============================================================================+
 |        | 80-099160(US)     | Discovery with Baby Mickey and Friends                                     |
 |        | 80-099163(UK)     | Discovery with Baby Mickey and Friends                                     |
@@ -222,6 +222,18 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="99034.u4" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teletubf" supported="no">
+		<description>Teletubbies (France)</description>
+		<year>1996</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099145(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="099145 - Teletubbies (BABY) (FR).bin" size="8388608" crc="374cc936" sha1="462bf0a16eb16bd4ca008d9e57a914f88986920b" />
 			</dataarea>
 		</part>
 	</software>
