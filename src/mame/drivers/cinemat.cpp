@@ -1095,8 +1095,8 @@ WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
 void cinemat_state::speedfrk(machine_config &config)
 {
 	cinemat_nojmi_8k(config);
-	SPEED_FREAK_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x1c);
-	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
+	SPEED_FREAK_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
+//	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
 }
 
 void cinemat_state::starhawk(machine_config &config)
