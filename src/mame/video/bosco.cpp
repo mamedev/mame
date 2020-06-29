@@ -252,10 +252,10 @@ uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_starfield->draw_starfield(bitmap,bg_clip,flip);
 
+	draw_sprites(bitmap,bg_clip,flip);
+
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0,0);
-
-	draw_sprites(bitmap,bg_clip,flip);
 
 	/* draw the high priority characters */
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1,0);
