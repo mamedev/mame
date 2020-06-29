@@ -1614,7 +1614,21 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- IndyZone -->
+	<!-- IndiZone -->
+
+	<software name="indizone_1">
+		<description>IndiZone</description>
+		<year>1993</year>
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8102-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="indizone_1" sha1="7dfed1d5b5efb7c773244372d0a24823cf4d5cc4" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="indizone">
 		<description>IndiZone</description>
