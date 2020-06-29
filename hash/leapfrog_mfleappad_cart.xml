@@ -5,6 +5,21 @@ license:CC0
 -->
 <softwarelist name="leapfrog_mfleappad_cart" description="LeapFrog My First LeapPad cartridges">
 
+	<software name="carss" supported="no">
+		<description>Disney/Pixar Cars (Spain)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12148"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000-003-7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12148 - Cars (SPA).bin" size="0x400000" crc="6ace95ff" sha1="d272646c0a06876a3e39907e6e6e65b45339f53a" />
+			</dataarea>
+		</part>
+	</software>.
+
 	<software name="thomasst" supported="no">
 		<description>Thomas &amp; Friends - Thomas and the School Trip (UK)</description>
 		<year>2002</year>
