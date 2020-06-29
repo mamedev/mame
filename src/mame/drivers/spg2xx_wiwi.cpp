@@ -252,7 +252,8 @@ void spg2xx_game_marc250_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 
 	// ff - failure (causes blank screen / shutdown + inf loop)
 
-	// function is at 04D918 in xracer 3, and fails at the moment (runs in vblank instead?)
+	// function is at 04D918 in x-racer 3 (values tweaked to pass)
+	// but x-racer 3 also seems to need faster CPU or it randomly corrupts (or its an IRQ problem?)
 
 	if ((data & 0x1000) != (m_prev_porta & 0x1000))
 	{
@@ -260,8 +261,8 @@ void spg2xx_game_marc250_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 		{
 			// these values stop the marc250 menu from failing, but not the games
 			//printf("pulse / timer reset\n");
-			m_pulse_timer->adjust(attotime::from_hz(8), 0, attotime::from_hz(8));
-			m_pulse_timer2->adjust(attotime::from_hz(16), 0, attotime::from_hz(16));
+			m_pulse_timer->adjust(attotime::from_hz(6), 0, attotime::from_hz(6));
+			m_pulse_timer2->adjust(attotime::from_hz(12), 0, attotime::from_hz(12));
 		}
 	}
 
