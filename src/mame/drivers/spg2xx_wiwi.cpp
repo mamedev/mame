@@ -252,6 +252,8 @@ void spg2xx_game_marc250_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 
 	// ff - failure (causes blank screen / shutdown + inf loop)
 
+	// function is at 04D918 in xracer 3, and fails at the moment (runs in vblank instead?)
+
 	if ((data & 0x1000) != (m_prev_porta & 0x1000))
 	{
 		if (!(data & 0x1000))
