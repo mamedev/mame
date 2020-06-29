@@ -5,108 +5,18 @@
 
    Driver by Ville Linde
 
-
-Landing High Japan PCB info
-===========================
-
-Taito Landing High
-
-Top board
-    silkscreened        TYPE-ZERO MOTHER PCB
-
-    stickered       298100308
-                K11X0886A
-                JC101
-
-.5  29LV400BC-90        stamped E68-05-1
-.6  29LV400BC-90        stamped E68-04-1
-.24 PALV 18V8-10JC      stamped E68-06
-
-
-IC30    Taito TCG020AGP
-IC26    IDT7024 S35J V9928P
-IC10    IBM EMPPC603eBG-100
-IC53    ADV7120KP30 9926 F101764.1
-IC16,17         M54256V32A-10
-IC15,25,31,39,45,49,44  48D4811650GF-A10-9BT
-IC27,36         D4564163G5-A10n-9JF
-IC 41,46,42,47      D4516161AG5-A10B-9F
-IC43            QSV991-7JRI
-66.6667 Oscillator near IC43
-
-Bottom board
-    silkscreened        JC101 DAUGHTER PCB
-
-    stickered       K91J0775A
-                LANDING H.JAPAN
-
-                299100308
-
-                M43J0741A
-                LANDING H.JAPAN
-
-.14 27c1001     stickered   E82
-                    03*
-
-.15 27c1001     stickered   E82
-                    04*
-
-.44 PALCE16V8H  stamped     E82-01
-
-.45 PALCE22V10H stamped     E82-02
-
-IC40    Toshiba TMP95C063F
-IC55    Panasonic MN89306
-EPSON 9X5C oscillator near IC55
-IC56    HY57V161610D TC-10
-IC22    ID7133 SA70J
-25.000 oscillator near IC22
-IC11    Xilinx XC9572
-IC5 HY5118164C JC-60
-IC10    ZOOM ZSG-2
-IC20    ZOOM ZFX 2 HD 96NE2VJ
-IC26    TM TECH  UA4464V T224162B-28J
-IC7 Panasonic MN1020819DA E68-01
-20.000 oscillator near IC7
-
-
-
-Power Shovel additional I/O PCB info
-====================================
-
-TMP95C063F
-OKI 6295 x 2 each with a 1.056MHz resonator
-
-6.2MHz OSC
-18.4320MHz OSC
-
-HIN239CB (+5v Powered RS-232 Transmitter/Receiver - 120kbps)
-LC321664AM-80 (1Meg (65536 words x 16bits) DRAM)
-74HC4040A (12-Stage Binary Ripple Counter)
-
-E74-07.IC6 & E74-08.IC8 are the OKI samples and are identical
-E74-06.IC2 is the TMP95C063 program code.
-
-
-
-Rizing Ping Pong
-Taito 2002
-
-This game runs on Taito Type Zero hardware.
-
 PCB Layout
 ----------
 
 TYPE ZERO MOTHER PCB
 K11X0878A
 J1100365A
-K11X0951A (Sticker)
 |-----------------------------------------------------------|
-|   D4811650 D4811650 D4811650 D4811650 D4811650  E87-02.IC6|
+|   D4811650 D4811650 D4811650 D4811650 D4811650  29LV400BC |
 |   D4811650 D4811650 D4811650                              |
 |                                                           |
 |G                                     M54V25632            |
-|                        |-----------|            E87-01.IC5|
+|                        |-----------|            29LV400BC |
 |   AD8073               | TAITO     |                      |
 |                        | TCG020AGP | M54V25632            |
 |        HY57V161610     |           |                      |
@@ -123,21 +33,51 @@ K11X0951A (Sticker)
 |                                  |       |      |-------| |
 |                                  |IDT7024|      |PPC603E| |
 |                                  |       |      |       | |
-|                                  |-------|      |-------| |
-|                                                           |
+|P1    MD8402A     MD8412A         |-------|      |-------| |
+|P0                                                       |
 |-----------------------------------------------------------|
+
+Notes:
+29LV400BC: 29LV400BC-90 4M CMOS Flash ROM
+PAL16V8: PAL stamped 'E68-06'
+TCG020AGP: Taito custom graphics unit (see below)
+IDT7024: IDT IDT7024 4K x 16 Dual-port SRAM
+PPC603E: IBM EMPPC603EBG-100 (PowerPC 603E based)
+ADV7120KP30: CMOS 80 MHz, Triple 8-Bit Video DAC
+M54V25632: 256K x 32 SGRAM
+D4811650: 16M SGRAM
+V54C365164: 4M x 16 SDRAM
+HY57V161610: 16M SDRAM
+QS5V991: IDT QS5V991-7JR1 Programmable Skew PLL Clock Driver w/ 66.6667 MHz Oscillator
+AD8073: Triple video amplifier
+
+Specific to batlgear and batlgr2:
+MD8402A: Fujifilm MD8402 IEEE 1394 'Firewire' Physical Channel Interface IC
+MD8412A: Fujifilm MD8412 IEEE 1394 'Firewire' Link Layer Controller IC
+P0/P1: Firewire ports; There is another unused FW port labeled 'P2'.
+
+GPU Notes: A fixed-function engine jointly researched and developed with the University of Aizu. It is implemented as a semi-custom ASIC consisting of about 1 million gate logic elements.
+-Texture mapping with perspective collection
+-Bilinear filtering with texelFetch
+-Translucent processing
+-Phong shading with a single parallel light source
+ *It was a ground-breaking feature at the time when gouraud shading was the mainstream. The calculation elements during shading diffuse reflection light, specular reflection light, self-emission, and ambient light.
+ *The only other graphical hardware capable of phong shading at the time was the Sega Hikaru.
+-Pseudosphere environment mapping
+-Bump mapping
+-Quadrangle polygon operation
+ *This directly processes polygons without breaking it down into 3 corners (follows OpenGL specifications).
+-Fogging
 
 
 TYPE ZERO DAUGHTER PCB
 K9100745A
 J9100491A
-RIZINGPINGPONG K91J0905A (Sticker)
-RIZINGPINGPONG M43J0775A (Sticker)
 |-----------------------------------------------------------|
 |RESET_SW  5.5V        RTC64613                             |
-|          SUPERCAP  MB3790               F14-02.IC15       |
+|          SUPERCAP  MB3790               27C1001           |
 |DS14C239              LC3564                               |
-|                                         F14-01.IC14       |
+|                                         27C1001           |
 |        IDC40       LC321664                               |
 |TD62064                                               20MHz|
 |          TOSHIBA            IDT7133         MN1020819     |
@@ -158,16 +98,67 @@ RIZINGPINGPONG M43J0775A (Sticker)
 |                                 GM71C17403  GM71C17403    |
 |                                                           |
 |-----------------------------------------------------------|
-Notes:
-      Connectors C (daughter) and G (main) join to filter board
-      IDC40 - IDE HDD connector for Quantum Fireball LCT 4.3AT LA04A011 Rev 01-A
-              Serial number 691934013492 DGPXX
-              Sticker on HDD reads.....
-              4.3GB QUANTUM
-              QML04300LA-A
-              RIZING PING PONG EXP
-              M9005557A VER. 2.01O  (note '01O' is slightly scratched and could be incorrect)
 
+Notes:
+27C1001: 128Kx8bit EPROM 
+PAL16V8: PAL labeled 'E82-03'
+TMP95C063F: Toshiba TLCS-900 based MCU
+ID7133: IDT 2K x 16 Dual-port SRAM
+XC9572: Xilinx CPLD labeled 'E88-02'
+HY5118164: 16M DRAM
+ZSG-2: Zoom Corp ZSG-2 audio chip
+ZFX-2: Zoom Corp ZFX-2 Sound DSP (a rebadged TMS57002)
+V53C16258: 256K x 16 DRAM 
+MN1020819DA: Panasonic Sound CPU labeled 'E68-01' w/ 20.000 MHz osc
+DS14C239: RS-232 transciever
+
+
+JC101 DAUGHTER PCB (only used with landhigh)
+K91J0775A
+M43J0741A
+
+Notes:
+IC14,15: 27C1001 128Kx8bit EPROM 
+IC44: PALCE16V8H stamped 'E82-01'
+IC45: PALCE22V10H stamped 'E82-02'
+IC40: Toshiba TMP95C063F (TLCS-900 based MCU)
+IC55: Panasonic MN89306 LCD display controller w/osc between 15 MHz and 33 MHz
+IC56: HY57V161610D 512K x 16 Bit x 2 SDRAM
+IC22: ID7133 2K x 16 Dual-port SRAM
+25.000 oscillator near IC22
+IC11: Xilinx XC9572 CPLD labeled 'E88-02-1'
+IC5: HY5118164C 16M DRAM
+IC10: Zoom Corp ZSG-2 audio chip
+IC20: Zoom Corp ZFX-2 Sound DSP (a rebadged TMS57002)
+IC26: T224162B-28J 256K x 16 DRAM
+IC7: Panasonic MN1020819DA Sound CPU labeled 'E68-01' w/ 20.000 MHz osc
+
+IDC40: IDE HDD connector for Quantum Fireball LCT 4.3AT LA04A011 Rev 01-A
+       Serial number 691934013492 DGPXX
+       Sticker on HDD reads.....
+       4.3GB QUANTUM
+       QML04300LA-A
+       [GAME NAME]
+       [SERIAL NUMBER] VER. [X.XXX]
+       
+Connectors C (daughter) and G (main) join to filter board
+
+
+Power Shovel and Densha De Go 3 additional I/O PCB info
+=======================================================
+
+TMP95C063F
+OKI 6295 x 2 each with a 1.056MHz resonator
+
+6.2MHz OSC
+18.4320MHz OSC
+
+HIN239CB (+5v Powered RS-232 Transmitter/Receiver - 120kbps)
+LC321664AM-80 (1Meg (65536 words x 16bits) DRAM)
+74HC4040A (12-Stage Binary Ripple Counter)
+
+E74-07.IC6 & E74-08.IC8 are the OKI samples and are identical; dendego3 only uses IC6
+E74-06.IC2 is the TMP95C063 program code.
 
 */
 
@@ -184,7 +175,7 @@ Notes:
 
     0x40080400...0x400807fc: PPC Interrupt handler table for TLCS900 interrupts (called from 0x4002ea80)
         0x40080440 (0x10): 0x4003b274       (0xfc06f7 on TLCS sets 0x1000)
-        0x400804c0 (0x30): 0x4003f1e4       (INT1 handler on TLCS sets 0x3010)  (comms, could be IEEE1394)
+        0x400804c0 (0x30): 0x4003f1e4       (INT1 handler on TLCS sets 0x3010)  (IEEE 1394/Firewire)
         0x40080500 (0x40): 0x4002ed94       (debug/trace)
         0x40080504 (0x41): 0x4002ede4       (debug/break)
         0x40080540 (0x50): 0x4003c21c                                                           0x5001: sets 0x00000001 in 0x40049c58
@@ -212,8 +203,8 @@ Notes:
         0x7003:            0x4003d508()
         0x7004:            0x4003d554()
         0x7005:            0x4003d168()
-        0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
-        0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
+        0x8000:            ?                                        Used by vibration (force feedback) on pwrshovl
+        0xa000:            ?                                        Used by vibration (force feedback) on pwrshovl
         0xf000:            0x4002f328() TLCS_Init
         0xf010:            0x4002f074()                             Enables TLCS watchdog timer
         0xf011:            0x4002f0a8()                             Disables TLCS watchdog
@@ -234,7 +225,7 @@ Notes:
                                                                         0x30:   VENDER
                                                                         0xff:   ERROR
                                                                         0x??:   UNKNOWN
-        0x3010:            0xfc071c() int1 handler                  Comm IRQ, IEEE1394
+        0x3010:            0xfc071c() int1 handler                  IEEE 1394 IRQ
         0x40xx:            ?                                        Debug
         0x41xx:            ?                                        Debug
         0x5001:            ?                                        RTC?
@@ -2073,9 +2064,9 @@ void taitotz_state::ppc603e_mem(address_map &map)
 	map(0x00000000, 0x0000001f).rw(FUNC(taitotz_state::video_chip_r), FUNC(taitotz_state::video_chip_w));
 	map(0x10000000, 0x1000001f).rw(FUNC(taitotz_state::video_fifo_r), FUNC(taitotz_state::video_fifo_w));
 	map(0x40000000, 0x40ffffff).ram().share("work_ram");                // Work RAM
-	map(0xa4000000, 0xa40000ff).rw(FUNC(taitotz_state::ieee1394_r), FUNC(taitotz_state::ieee1394_w));       // IEEE1394 network
-	map(0xa8000000, 0xa8003fff).rw(FUNC(taitotz_state::ppc_common_r), FUNC(taitotz_state::ppc_common_w));   // Common RAM (with TLCS-900)
-	map(0xac000000, 0xac0fffff).rom().region("user1", 0);               // Apparently this should be flash ROM read/write access
+	map(0xa4000000, 0xa40000ff).rw(FUNC(taitotz_state::ieee1394_r), FUNC(taitotz_state::ieee1394_w)); // IEEE 1394/Firewire
+	map(0xa8000000, 0xa8003fff).rw(FUNC(taitotz_state::ppc_common_r), FUNC(taitotz_state::ppc_common_w)); // Common RAM (with TLCS-900)
+	map(0xac000000, 0xac0fffff).rom().region("user1", 0); // Apparently this should be flash ROM read/write access
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -2146,14 +2137,14 @@ uint8_t taitotz_state::tlcs_rtc_r(offs_t offset)
 	switch (offset)
 	{
 		// NOTE: bcd numbers
-		case 0x00:      return m_rtcdata[0];        // milliseconds?
-		case 0x01:      return m_rtcdata[1];        // seconds
-		case 0x02:      return m_rtcdata[2];        // minutes
-		case 0x03:      return m_rtcdata[3];        // hours
-		case 0x04:      return m_rtcdata[4];        // day of the week
-		case 0x05:      return m_rtcdata[5];        // day
-		case 0x06:      return m_rtcdata[6];        // month
-		case 0x07:      return m_rtcdata[7];        // year
+		case 0x00:      return m_rtcdata[0]; // milliseconds?
+		case 0x01:      return m_rtcdata[1]; // seconds
+		case 0x02:      return m_rtcdata[2]; // minutes
+		case 0x03:      return m_rtcdata[3]; // hours
+		case 0x04:      return m_rtcdata[4]; // day of the week
+		case 0x05:      return m_rtcdata[5]; // day
+		case 0x06:      return m_rtcdata[6]; // month
+		case 0x07:      return m_rtcdata[7]; // year
 
 		case 0x0e:      return 0;
 
@@ -2190,8 +2181,8 @@ uint16_t taitotz_state::tlcs_ide0_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t d = m_ata->cs0_r(offset, mem_mask);
 	if (offset == 7)
-		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
-						// The status check explicitly checks for 0x50 (drive ready, seek complete).
+		d &= ~0x2; // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
+			   // The status check explicitly checks for 0x50 (drive ready, seek complete).
 	return d;
 }
 
@@ -2199,8 +2190,8 @@ uint16_t taitotz_state::tlcs_ide1_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t d = m_ata->cs1_r(offset, mem_mask);
 	if (offset == 6)
-		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
-						// The status check explicitly checks for 0x50 (drive ready, seek complete).
+		d &= ~0x2; // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
+			   // The status check explicitly checks for 0x50 (drive ready, seek complete).
 	return d;
 }
 
@@ -2210,7 +2201,7 @@ uint16_t taitotz_state::tlcs_ide1_r(offs_t offset, uint16_t mem_mask)
 // 0xfc0120:    NMI             -
 // 0xfc0120:    INTWD           -
 // 0xfc0122:    INT0            PPC communication
-// 0xfc0137:    INT1            IEEE1394?
+// 0xfc0137:    INT1            IEEE 1394/Firewire
 // 0xfc013c:    INT2            IDE
 // 0xfc0141:    INT3            VBlank? Drives a counter on PPC side
 // 0xfc0146:    INT4            -
@@ -2231,11 +2222,11 @@ uint16_t taitotz_state::tlcs_ide1_r(offs_t offset, uint16_t mem_mask)
 
 void taitotz_state::tlcs900h_mem(address_map &map)
 {
-	map(0x010000, 0x02ffff).ram();                                                     // Work RAM
-	map(0x040000, 0x041fff).ram().share("nvram");                                   // Backup RAM
+	map(0x010000, 0x02ffff).ram(); // Work RAM
+	map(0x040000, 0x041fff).ram().share("nvram"); // Backup RAM
 	map(0x044000, 0x04400f).rw(FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
 	map(0x060000, 0x061fff).rw(FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
-	map(0x064000, 0x064fff).ram().share("mbox_ram");                                // MBox
+	map(0x064000, 0x064fff).ram().share("mbox_ram"); // MBox
 	map(0x068000, 0x06800f).w(m_ata, FUNC(ata_interface_device::cs0_w)).r(FUNC(taitotz_state::tlcs_ide0_r));
 	map(0x06c000, 0x06c00f).w(m_ata, FUNC(ata_interface_device::cs1_w)).r(FUNC(taitotz_state::tlcs_ide1_r));
 	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
@@ -2243,11 +2234,11 @@ void taitotz_state::tlcs900h_mem(address_map &map)
 
 void taitotz_state::landhigh_tlcs900h_mem(address_map &map)
 {
-	map(0x200000, 0x21ffff).ram();                                                     // Work RAM
-	map(0x400000, 0x401fff).ram().share("nvram");                                   // Backup RAM
+	map(0x200000, 0x21ffff).ram();  // Work RAM
+	map(0x400000, 0x401fff).ram().share("nvram"); // Backup RAM
 	map(0x404000, 0x40400f).rw(FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
 	map(0x900000, 0x901fff).rw(FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
-	map(0x910000, 0x910fff).ram().share("mbox_ram");                                // MBox
+	map(0x910000, 0x910fff).ram().share("mbox_ram"); // MBox
 	map(0x908000, 0x90800f).w(m_ata, FUNC(ata_interface_device::cs0_w)).r(FUNC(taitotz_state::tlcs_ide0_r));
 	map(0x918000, 0x91800f).w(m_ata, FUNC(ata_interface_device::cs1_w)).r(FUNC(taitotz_state::tlcs_ide1_r));
 	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
@@ -2258,7 +2249,7 @@ void taitotz_state::landhigh_tlcs900h_mem(address_map &map)
 static INPUT_PORTS_START( taitotz )
 	PORT_START("INPUTS1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2267,8 +2258,8 @@ static INPUT_PORTS_START( taitotz )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin A
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )                                    // Coin B
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin A
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin B
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2278,21 +2269,21 @@ static INPUT_PORTS_START( taitotz )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(1)      // Trig1 / U
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)   // Trig2 / D
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)  // Trig3 / R
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)   // Trig4 / L
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(1) // Trig1 / U
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // Trig2 / D
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) // Trig3 / R
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // Trig4 / L
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 )                                  // View 3
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON6 )                                  // View 4
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON7 )                                  // View 5
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON8 )                                  // View 6
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View 1
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // View 2
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Select 1
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Select 2
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 ) // View 3
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON6 ) // View 4
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON7 ) // View 5
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON8 ) // View 6
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) // View 1
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 ) // View 2
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Select 1
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Select 2
 
 	PORT_START("ANALOG1")
 	PORT_START("ANALOG2")
@@ -2307,7 +2298,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( landhigh )
 	PORT_START("INPUTS1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2316,7 +2307,7 @@ static INPUT_PORTS_START( landhigh )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2327,17 +2318,17 @@ static INPUT_PORTS_START( landhigh )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // Speak
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // Help
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Flap Up
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Flap Down
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Speak
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Help
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Flap Up
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Flap Down
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 )                                  // ID Button
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 ) // ID Button
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON6 )                                  // Lever Sync
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )                                   // Start
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON6 ) // Lever Sync
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )  // Start
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2366,7 +2357,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( batlgr2 )
 	PORT_START("INPUTS1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2375,7 +2366,7 @@ static INPUT_PORTS_START( batlgr2 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2386,9 +2377,9 @@ static INPUT_PORTS_START( batlgr2 )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Shift Down
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Shift Up
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Shift Down
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Shift Up
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 ) // View
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2399,16 +2390,16 @@ static INPUT_PORTS_START( batlgr2 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 )                                   // Start
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 ) // Start
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ANALOG1")       // Steering
+	PORT_START("ANALOG1") // Steering
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG2")       // Gas Pedal
+	PORT_START("ANALOG2") // Gas Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")       // Brake Pedal
+	PORT_START("ANALOG3") // Brake Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG4")
@@ -2421,7 +2412,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pwrshovl )
 	PORT_START("INPUTS1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2430,7 +2421,7 @@ static INPUT_PORTS_START( pwrshovl )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin A
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin A
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2441,51 +2432,51 @@ static INPUT_PORTS_START( pwrshovl )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1)                   // P1-Foot-Sw: Left-Down
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)                  // P1-Foot-Sw: Left-Up
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)                  // P1-Foot-Sw: Right-Down
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)                  // P1-Foot-Sw: Right-Up
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) // P1-Foot-Sw: Left-Down
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // P1-Foot-Sw: Left-Up
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) // P1-Foot-Sw: Right-Down
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) // P1-Foot-Sw: Right-Up
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Left-Down
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Left-Up
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Right-Down
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Right-Up
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                   // P1 View
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)                   // P2 View
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 )                                   // P1 Start
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START2 )                                   // P2 Start
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) // P2-Foot-Sw: Left-Down
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) // P2-Foot-Sw: Left-Up
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) // P2-Foot-Sw: Right-Down
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) // P2-Foot-Sw: Right-Up
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // P1 View
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)  // P2 View
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 ) // P1 Start
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START2 ) // P2 Start
 
-	PORT_START("ANALOG1")       // P1-Lever Left-X
+	PORT_START("ANALOG1") // P1-Lever Left-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG2")       // P1-Lever Left-Y
+	PORT_START("ANALOG2") // P1-Lever Left-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")       // P1-Lever Right-X
+	PORT_START("ANALOG3") // P1-Lever Right-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG4")       // P1_Lever Right-Y
+	PORT_START("ANALOG4") // P1_Lever Right-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG5")       // P2-Lever Left-X
+	PORT_START("ANALOG5") // P2-Lever Left-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(3) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG6")       // P2-Lever Left-Y
+	PORT_START("ANALOG6") // P2-Lever Left-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(3) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG7")       // P2-Lever Right-X
+	PORT_START("ANALOG7") // P2-Lever Right-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(4) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG8")       // P2_Lever Right-Y
+	PORT_START("ANALOG8") // P2_Lever Right-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(4) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( styphp )
 	PORT_START("INPUTS1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2494,7 +2485,7 @@ static INPUT_PORTS_START( styphp )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2505,10 +2496,10 @@ static INPUT_PORTS_START( styphp )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Shift Down
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Shift Up
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // Side Brake
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Shift Down
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Shift Up
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 ) // View
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Side Brake
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
@@ -2518,16 +2509,16 @@ static INPUT_PORTS_START( styphp )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 )                                   // Start
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 ) // Start
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ANALOG1")       // Steering
+	PORT_START("ANALOG1") // Steering
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG2")       // Gas Pedal
+	PORT_START("ANALOG2") // Gas Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")       // Brake Pedal
+	PORT_START("ANALOG3") // Brake Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG4")
@@ -2553,10 +2544,10 @@ void taitotz_state::machine_reset()
 
 void taitotz_state::machine_start()
 {
-	/* set conservative DRC options */
+	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
+	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x40000000, 0x40ffffff, false, m_work_ram);
 }
 
@@ -2573,12 +2564,12 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 
 void taitotz_state::taitotz(machine_config &config)
 {
-	/* IBM EMPPC603eBG-100 */
+	// IBM EMPPC603eBG-100
 	PPC603E(config, m_maincpu, 100000000);
 	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitotz_state::ppc603e_mem);
 
-	/* TMP95C063F I/O CPU */
+	// TMP95C063F I/O CPU
 	TMP95C063(config, m_iocpu, 25000000);
 	m_iocpu->port9_read().set_ioport("INPUTS1");
 	m_iocpu->portb_read().set_ioport("INPUTS2");
@@ -2595,7 +2586,7 @@ void taitotz_state::taitotz(machine_config &config)
 	m_iocpu->set_addrmap(AS_PROGRAM, &taitotz_state::tlcs900h_mem);
 	m_iocpu->set_vblank_int("screen", FUNC(taitotz_state::taitotz_vbi));
 
-	/* MN1020819DA sound CPU */
+	// MN1020819DA sound CPU
 
 	config.set_maximum_quantum(attotime::from_hz(120));
 
@@ -2623,12 +2614,12 @@ void taitotz_state::landhigh(machine_config &config)
 void taitotz_state::init_taitotz_152()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	rom[(0x2c87c^4)/4] = 0x38600000;    // skip sound load timeout...
-//  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
+	rom[(0x2c87c^4)/4] = 0x38600000; // skip sound load timeout...
+//  rom[(0x2c620^4)/4] = 0x48000014; // ID check skip (not needed with correct serial number)
 
 #if 0
-	rom[(0x2c164^4)/4] = 0x39600001;        // enable game debug output
-	rom[(0x2c174^4)/4] = 0x39200001;        // enable game debug output
+	rom[(0x2c164^4)/4] = 0x39600001; // enable game debug output
+	rom[(0x2c174^4)/4] = 0x39200001; // enable game debug output
 	rom[(0x2c978^4)/4] = 0x48000028;
 #endif
 }
@@ -2637,28 +2628,28 @@ void taitotz_state::init_taitotz_152()
 void taitotz_state::init_taitotz_111a()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
+	rom[(0x2b748^4)/4] = 0x480000b8; // skip sound load timeout
 }
 
-static const char LANDHIGH_HDD_SERIAL[] =           // "824915746386        "
+static const char LANDHIGH_HDD_SERIAL[] =  // "824915746386        "
 	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x36, 0x33, 0x38, 0x36, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
-static const char LANDHIGHA_HDD_SERIAL[] =          // "824915546750        "
+static const char LANDHIGHA_HDD_SERIAL[] = // "824915546750        "
 	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x35, 0x34, 0x36, 0x37, 0x35, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
-static const char BATLGR2_HDD_SERIAL[] =            // "            05412842"
+static const char BATLGR2_HDD_SERIAL[] =   // "            05412842"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x32, 0x38, 0x34, 0x32 };
 
-static const char BATLGR2A_HDD_SERIAL[] =           // "            05411645"
+static const char BATLGR2A_HDD_SERIAL[] =  // "            05411645"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x31, 0x36, 0x34, 0x35 };
 
-static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
+static const char RAIZPIN_HDD_SERIAL[] =   // "691934013492        "
 	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
-static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
+static const char RAIZPINJ_HDD_SERIAL[] =  // "824915745143        "
 	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x35, 0x31, 0x34, 0x33, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
-static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
+static const char STYPHP_HDD_SERIAL[] =    // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
 void taitotz_state::init_dendego3()
@@ -2770,14 +2761,14 @@ ROM_START( taitotz )
 	TAITOTZ_BIOS_V152
 
 	ROM_REGION16_LE( 0x40000, "io_cpu", ROMREGION_ERASE00 )
-	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) // Internal ROM :(
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
 	DISK_REGION( "ata:0:hdd:image" )
 ROM_END
 
 /*
 
-The official drive for (at least) Raizin Ping Pong and Power Shovel is
+The official drive (for at least Raizin Ping Pong and Power Shovel) is
 
 Quantum Fireball 4.3AT
 
@@ -2793,7 +2784,7 @@ Buffer Size     128K
 
 */
 
-ROM_START( landhigh )
+ROM_START( landhigh ) // Main board labels: K11X0886A JC101, 299100308; Daughter board labels: K91J0775A LANDING H.JAPAN, 299100308, M43J0741A LANDING H.JAPAN
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
@@ -2801,7 +2792,7 @@ ROM_START( landhigh )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
 	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION( 0x500, "plds", 0 )
@@ -2821,7 +2812,7 @@ ROM_START( landhigha )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
 	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION( 0x500, "plds", 0 )
@@ -2841,7 +2832,7 @@ ROM_START( batlgear )
 	ROM_LOAD16_BYTE( "e68-07.ic14",  0x000000, 0x020000, CRC(554c6fd7) SHA1(9f203dead81c7ccf73d7fd462cab147cd17f890f) )
 	ROM_LOAD16_BYTE( "e68-08.ic15",  0x000001, 0x020000, CRC(f1932380) SHA1(64d12e858af15a9ba8254917da13863ac7c9c050) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2856,7 +2847,7 @@ ROM_START( batlgr2 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
 	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2871,7 +2862,7 @@ ROM_START( batlgr2a )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
 	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2886,7 +2877,7 @@ ROM_START( pwrshovl )
 	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
 	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
@@ -2910,7 +2901,7 @@ ROM_START( pwrshovla )
 	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
 	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
@@ -2926,7 +2917,7 @@ ROM_START( pwrshovla )
 	DISK_IMAGE( "power shovel ver.2.07j", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
 ROM_END
 
-ROM_START( raizpin )
+ROM_START( raizpin ) // Main board label: K11X0951A; Daughter board labels: K91J0905A, M43J0775A
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
@@ -2934,10 +2925,10 @@ ROM_START( raizpin )
 	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
 	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd:image" ) // HDD label: RIZING PING PONG EXP M9005557A VER. 2.01O
 	DISK_IMAGE( "raizpin", 0, SHA1(883ebcda03026df31da1cdb95af521e100c171ed) )
 ROM_END
 
@@ -2949,7 +2940,7 @@ ROM_START( raizpinj )
 	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
 	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2964,7 +2955,7 @@ ROM_START( styphp )
 	ROM_LOAD16_BYTE( "e98-01.ic14", 0x000000, 0x020000, CRC(479b37ad) SHA1(a0e59d990665244a7919a104dc4b6869ccf90be1) )
 	ROM_LOAD16_BYTE( "e98-02.ic15", 0x000001, 0x020000, CRC(d8da590f) SHA1(b33a67d81e388d7863adaf03041911c7f84d193b) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2979,7 +2970,7 @@ ROM_START( dendego3 )
 	ROM_LOAD16_BYTE( "e85-01.ic14", 0x000000, 0x020000, CRC(e16eba2a) SHA1(bd45117bb39cb98d93cdeb17dc72815e6000196b) )
 	ROM_LOAD16_BYTE( "e85-02.ic15", 0x000001, 0x020000, CRC(aa44e992) SHA1(9d176c150c18b085e2c2058507a34151214c1a02) )
 
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM :(
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
