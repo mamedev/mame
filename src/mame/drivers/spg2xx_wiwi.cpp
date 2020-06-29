@@ -41,15 +41,17 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	void device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr) override;
+	virtual void device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr) override;
 
-private:
-	uint16_t porta_r();
-	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual uint16_t porta_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
 	uint16_t m_prev_porta;
 	bool m_toggle;
 	emu_timer *m_pulse_timer;
+
+private:
 
 };
 
@@ -57,21 +59,25 @@ class spg2xx_game_marc250_state : public spg2xx_game_marc101_state
 {
 public:
 	spg2xx_game_marc250_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spg2xx_game_marc101_state(mconfig, type, tag)
+		spg2xx_game_marc101_state(mconfig, type, tag),
+		m_toggle2(false)
 	{ }
 
 	void init_m527();
 
 protected:
-	void machine_reset() override
-	{
-		spg2xx_game_marc101_state::machine_reset();
-		switch_bank(31);
-		m_maincpu->reset();
-	}
+	void machine_start() override;
+	void machine_reset() override;
+
+	virtual void device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr) override;
+
+	virtual uint16_t porta_r() override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
-	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	bool m_toggle2;
+	emu_timer *m_pulse_timer2;
 };
 
 void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -84,6 +90,23 @@ void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id i
 		break;
 	}
 }
+
+void spg2xx_game_marc250_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case 0:
+		m_toggle = !m_toggle;
+		//printf("toggle\n");
+		break;
+
+	case 1:
+		m_toggle2 = !m_toggle2;
+		//printf("toggle\n");
+		break;
+	}
+}
+
 
 void spg2xx_game_marc101_state::machine_start()
 {
@@ -101,6 +124,25 @@ void spg2xx_game_marc101_state::machine_reset()
 	m_toggle = false;
 }
 
+void spg2xx_game_marc250_state::machine_start()
+{
+	spg2xx_game_marc101_state::machine_start();
+	m_pulse_timer2 = timer_alloc(1);
+	m_pulse_timer2->adjust(attotime::never);
+
+}
+
+void spg2xx_game_marc250_state::machine_reset()
+{
+	spg2xx_game_marc101_state::machine_reset();
+	switch_bank(31);
+	m_maincpu->reset();
+
+	m_pulse_timer2->adjust(attotime::never);
+	m_toggle2 = false;
+}
+
+
 void spg2xx_game_marc101_state::marc101(machine_config &config)
 {
 	spg2xx(config);
@@ -111,6 +153,10 @@ void spg2xx_game_marc101_state::marc101(machine_config &config)
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_marc101_state::porta_r));
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_marc101_state::porta_w));
 }
+
+
+// are these Port A behaviors related to IO A Special mode on the SoC?
+// the bits being tested do seem to be 'ExtClk2 / ExtClk1'
 
 uint16_t spg2xx_game_marc101_state::porta_r()
 {
@@ -155,6 +201,65 @@ void spg2xx_game_marc101_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 		{
 			//logerror("pulse / timer reset\n");
 			m_pulse_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
+		}
+	}
+
+	m_prev_porta = data;
+}
+
+uint16_t spg2xx_game_marc250_state::porta_r()
+{
+	uint16_t ret = m_io_p1->read() &~ 0x6000;
+	ret |= m_toggle ? 0x2000 : 0x0000;
+	ret |= m_toggle2 ? 0x4000 : 0x0000;
+//	printf("porta %04x\n", ret);
+
+	return ret;
+}
+
+
+void spg2xx_game_marc250_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	// see function at 8AB2 (marc250 menu)
+	// it has several states
+	// 00 - wait a while
+	// 01 - clear 0x1000 in port a
+	// 02 - wait a while
+	// 05 - check rate of port a bit 0x4000
+
+	// 06 - wait a while
+	// 07 - clear 0x1000 in port a
+	// 08 - wait a while
+	// 09 - check rate of port a bit 0x2000
+
+	// ff - failure (causes blank screen / shutdown + inf loop)
+
+	if ((data & 0x1000) != (m_prev_porta & 0x1000))
+	{
+		if (!(data & 0x1000))
+		{
+			// these values stop the marc250 menu from failing, but not the games
+			//printf("pulse / timer reset\n");
+			m_pulse_timer->adjust(attotime::from_hz(8), 0, attotime::from_hz(8));
+			m_pulse_timer2->adjust(attotime::from_hz(16), 0, attotime::from_hz(16));
 		}
 	}
 
@@ -433,10 +538,6 @@ void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t me
 
 void spg2xx_game_marc101_state::init_m489()
 {
-	//uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-
-	// bypass a call that turns unit off after about 2 seconds, maybe it's a battery check?
-	//if (rom[0x6460]==0x4240) rom[0x6460] = 0x4241; 
 }
 
 void spg2xx_game_marc101_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -484,11 +585,16 @@ void spg2xx_game_marc250_state::init_m527()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
-	// bypass a call that turns unit off after about 10 seconds, maybe it's a battery check?
+	// bypass a call that turns unit off after about 10 seconds, seems to be checking an external timer?
 	//rom[((31 * 0x800000) / 2) | 0x004ea5] = 0x4241; 
 	
 	// same for xracing 3
 	//rom[((22 * 0x800000) / 2) | 0x00eb2a] = 0x4241; 
+
+
+
+	// this code turns the IRQ off, code looks a bit like smarttv code..  is SoC IRQ handling wrong?
+	// or is this more security, or something else? games don't run with the IRQ off...
 
 	uint16_t ident2[6] = { 0x9512, 0x2862, 0xa70a, 0x0002, 0xd71b, 0x2862 };
 
@@ -511,7 +617,6 @@ void spg2xx_game_marc250_state::init_m527()
 		}
 	}
 
-	// this turns the IRQ off, code looks a bit like smarttv code..  is SoC IRQ handling wrong?
 	
 	// pass maze road
 	//rom[((12 * 0x800000) / 2) | 0x0284b5] = 0x0003;
@@ -521,7 +626,7 @@ void spg2xx_game_marc250_state::init_m527()
 	//rom[((17 * 0x800000) / 2) | 0x015e58] = 0x0003;
 	// cliff overhang / gym dancing 
 	//rom[((18 * 0x800000) / 2) | 0x01cab4] = 0x0003;
-	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff;
+	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff; // secondary 'turn off'
 	// jump chess
 	//rom[((19 * 0x800000) / 2) | 0x012c3a] = 0x0003;
 	// boxing, basketball etc.
