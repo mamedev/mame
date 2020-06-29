@@ -251,7 +251,8 @@ license:CC0
 		<year>1994</year> <!-- 05/94 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0739-003"/>
+			<!-- Also distributed with P/N 812-0739-003 and identical contents -->
+			<feature name="part_number" value="812-0241-002"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="european_language_module_1_2" sha1="ae869fd7623d2624b569b365239cfa173788a481" />
