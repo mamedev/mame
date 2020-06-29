@@ -26,6 +26,14 @@
 #pragma once
 
 
+#ifdef MAME_DEBUG
+#define SPEAKER_TRACK_MAX_SAMPLE (1)
+#else
+#define SPEAKER_TRACK_MAX_SAMPLE (0)
+#endif
+
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -81,7 +89,7 @@ protected:
 	double              m_z;
 
 	// internal state
-#ifdef MAME_DEBUG
+#if SPEAKER_TRACK_MAX_SAMPLE
 	s32                 m_max_sample;           // largest sample value we've seen
 	s32                 m_clipped_samples;      // total number of clipped samples
 	s32                 m_total_samples;        // total number of samples
