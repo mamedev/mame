@@ -187,7 +187,7 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(150000.0, 0.0);
 
 #else
 
@@ -283,7 +283,7 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(200000.0, 0.0);
 
 #else
 
@@ -355,7 +355,7 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(12000.0, 0.0);
 
 #else
 
@@ -376,19 +376,7 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 
 void speedfrk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
-#if SPEEDFRK_USE_NETLIST
-	static attotime last;
-	attotime cur = machine().scheduler().time();
-	if (cur - last > attotime::from_msec(5))
-	{
-		uint16_t sr = shiftreg16_accum();
-		printf("shiftreg = %04X\n", sr);
-	}
-	last = cur;
-
-	if (falling_edge(curvals, oldvals, 3))
-		shiftreg16_clock((~curvals >> 2) & 1);
-#else
+#if !SPEEDFRK_USE_NETLIST
 	// on the falling edge of bit 3, clock the inverse of bit 2 into the top of the shiftreg
 	if (falling_edge(curvals, oldvals, 3))
 		shiftreg16_clock((~curvals >> 2) & 1);
@@ -974,7 +962,7 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
 
 #else
 
@@ -1387,7 +1375,7 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
 
 #else
 
