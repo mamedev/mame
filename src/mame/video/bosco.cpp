@@ -249,14 +249,14 @@ uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &b
 	fg_clip &= cliprect;
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_starfield->draw_starfield(bitmap,bg_clip,flip);
+	m_starfield->draw_starfield(bitmap, bg_clip, flip);
 
-	draw_sprites(bitmap,bg_clip,flip);
+	draw_sprites(bitmap, bg_clip, flip);
 
-	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0);
-	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip);
 
-	draw_bullets(bitmap,cliprect,flip);
+	draw_bullets(bitmap, cliprect, flip);
 
 	/* It looks like H offsets 221-223 are skipped over, moving the radar tilemap
 	   (including the 'bullets' on it) 3 pixels to the left */
