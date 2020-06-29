@@ -593,7 +593,7 @@ void spg2xx_game_marc250_state::init_m527()
 	// the code being patched turns the IRQ off, code looks a bit like smarttv code..  is SoC IRQ handling wrong?
 	// or is this more security, or something else? games don't run with the IRQ off...
 #if 1
-	//uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	uint16_t ident2[6] = { 0x9512, 0x2862, 0xa70a, 0x0002, 0xd71b, 0x2862 };
 
