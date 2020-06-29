@@ -71,6 +71,7 @@ CPUS["SPC700"] = true
 CPUS["E1"] = true
 CPUS["I860"] = true
 CPUS["I960"] = true
+CPUS["H16"] = true
 CPUS["H8"] = true
 CPUS["H8500"] = true
 CPUS["V810"] = true
@@ -2697,6 +2698,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/korgdvp1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgws.cpp",
 	MAME_DIR .. "src/mame/drivers/korgz3.cpp",
 	MAME_DIR .. "src/mame/drivers/microkorg.cpp",
 	MAME_DIR .. "src/mame/drivers/poly800.cpp",
