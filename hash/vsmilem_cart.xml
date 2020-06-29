@@ -374,16 +374,15 @@ Language:
 		</part>
 	</software>
 
-	<!-- Crashes MAME -->
 	<software name="cars2mf" supported="no">
 		<description>Disney/Pixar Cars 2 (France)</description>
-		<year>2011?</year>
+		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084585(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="0x1000000">
-				<rom name="084585 - Cars 2 (MOTION) (FR).bin size="0x1000000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" />
+				<rom name="084585 - Cars 2 (MOTION) (FR).bin" size="0x1000000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" />
 			</dataarea>
 		</part>
 	</software>
