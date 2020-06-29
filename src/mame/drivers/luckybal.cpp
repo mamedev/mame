@@ -349,9 +349,9 @@ void luckybal_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x0a).nopr().nopw();;  // Z180 Internal registers.
+	map(0x00, 0x0a).nopr().nopw();  // Z180 Internal registers.
 	map(0x0b, 0x0b).nopr().w(FUNC(luckybal_state::z180_trdr_w));
-	map(0x0c, 0x3f).nopr().nopw();;  // Z180 Internal registers.
+	map(0x0c, 0x3f).nopr().nopw();  // Z180 Internal registers.
 
 	map(0x90, 0x90).w(FUNC(luckybal_state::port90_bitswap_w));
 	map(0xc0, 0xc3).rw(FUNC(luckybal_state::ppi_bitswap_r), FUNC(luckybal_state::ppi_bitswap_w));

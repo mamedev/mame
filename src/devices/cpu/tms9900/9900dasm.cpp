@@ -210,7 +210,7 @@ const enum tms9900_disassembler::opcodes tms9900_disassembler::ops_001c_002f_s0[
 inline uint16_t tms9900_disassembler::readop_arg(const data_buffer &params, offs_t &PC)
 {
 	uint16_t result = params.r16(PC);
-	PC += 2;;
+	PC += 2;
 	return result;
 }
 

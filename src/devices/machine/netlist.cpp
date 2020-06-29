@@ -848,7 +848,7 @@ void netlist_mame_stream_output_device::pre_parse_action(netlist::nlparse_t &par
 
 	const auto lambda = [this](auto &in, netlist::nl_fptype val)
 	{
-		this->process(in.exec().time(), val);;
+		this->process(in.exec().time(), val);
 	};
 
 	using lb_t = decltype(lambda);
