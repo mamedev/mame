@@ -9,10 +9,8 @@
 //
 // Known problems/issues:
 //
-//    * Compiles but not yet really tested.
-//
-//    * Redrawn from updated schematics; still not working but
-//       at least stands a chance now.
+//    * Works pretty well. Needs more detailed comparison with clean
+//       audio recordings from PCBs, but it's pretty close.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -36,9 +34,6 @@ NETLIST_START(speedfrk)
 	CINEMAT_LOCAL_MODELS
 
 	ANALOG_INPUT(I_V5, 5)
-	ANALOG_INPUT(I_VM5, -5)
-	ANALOG_INPUT(I_V15, 15)
-	ANALOG_INPUT(I_VM15, -15)
 
 //	RES(R1, 2.7)
 //	RES(R2, 2.7)
@@ -200,9 +195,9 @@ NETLIST_START(speedfrk)
 	NET_C(U24.14, I_V5)
 
 	//
-	// 78kHz coming from the logic PCB
+	// 76kHz coming from the logic PCB
 	//
-	CLOCK(J4_2, 78000)
+	CLOCK(J4_2, 76000)
 	NET_C(J4_2.GND, GND)
 	NET_C(J4_2.VCC, I_V5)
 
@@ -293,11 +288,10 @@ NETLIST_START(speedfrk)
 	NET_C(U19.9, R39.1)
 
 	NET_C(I_OUT_7, U2.9)
-	NET_C(U2.8, U17.10)
+	NET_C(U2.8, U17.10, U17.13)
 	NET_C(U17.8, U17.11, U17.1, U17.4, R34.1)
 	NET_C(R34.2, I_V5)
 	NET_C(U17.5, R25.1)
-	NET_C(U17.6, U17.13)
 	NET_C(U17.3, R26.1)
 
 	NET_C(R44.2, U22.7, R45.1, R46.2)
@@ -376,7 +370,54 @@ NETLIST_START(speedfrk)
 	ALIAS(OUTPUT, R20.2)
 
 	//
-	// Unconnected pins
+	// Unconnected outputs
 	//
+
+	HINT(U4.11, NC)		// Q3
+	HINT(U4.12, NC)		// Q2
+	HINT(U4.13, NC)		// Q1
+	HINT(U5.5, NC)		// Q2
+	HINT(U7.14, NC)		// Q0
+	HINT(U8.11, NC)		// Q3
+	HINT(U8.12, NC)		// Q2
+	HINT(U8.13, NC)		// Q1
+	HINT(U8.14, NC)		// Q0
+	HINT(U9.11, NC)		// Q3
+	HINT(U9.12, NC)		// Q2
+	HINT(U9.13, NC)		// Q1
+	HINT(U9.14, NC)		// Q0
+	HINT(U10.2, NC)		// QQ1 -- part of 2MHz clock gen
+	HINT(U10.4, NC)		// QQ2 -- part of 2MHz clock gen
+	HINT(U10.6, NC)		// QQ3 -- part of 2MHz clock gen
+	HINT(U12.1, NC)		// QQ0
+	HINT(U12.8, NC)		// QQ3
+	HINT(U12.11, NC)	// QQ2
+	HINT(U12.14, NC)	// QQ1
+	HINT(U15.11, NC)	// Q3
+	HINT(U15.12, NC)	// Q2
+	HINT(U15.13, NC)	// Q1
+	HINT(U15.14, NC)	// Q0
+	HINT(U17.2, NC)		// QQ1
+	HINT(U17.6, NC)		// QQ2
+	HINT(U18.3, NC)		// Q0
+	HINT(U18.4, NC)		// Q1
+	HINT(U18.5, NC)		// Q2
+	HINT(U18.9, NC)		// Q2
+	HINT(U20.3, NC)		// Q0
+	HINT(U20.4, NC)		// Q1
+	HINT(U20.5, NC)		// Q2
+	HINT(U20.6, NC)		// Q3
+	HINT(U20.10, NC)	// Q4
+	HINT(U20.11, NC)	// Q5
+	HINT(U23.11, NC)	// Q3
+	HINT(U23.12, NC)	// Q2
+	HINT(U23.13, NC)	// Q1
+	HINT(U23.14, NC)	// Q0
+	HINT(U24.3, NC)		// Q0
+	HINT(U24.4, NC)		// Q1
+	HINT(U24.5, NC)		// Q2
+	HINT(U24.6, NC)		// Q3
+	HINT(U24.10, NC)	// Q4
+	HINT(U24.11, NC)	// Q5
 
 NETLIST_END()
