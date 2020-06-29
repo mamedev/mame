@@ -28,22 +28,36 @@ class spg2xx_game_marc101_state : public spg2xx_game_state
 {
 public:
 	spg2xx_game_marc101_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spg2xx_game_state(mconfig, type, tag)
+		spg2xx_game_state(mconfig, type, tag),
+		m_prev_porta(0),
+		m_toggle(false)
 	{ }
+
+	void marc101(machine_config &config);
 
 	void init_m489();
 
 protected:
+	void machine_start() override;
+	void machine_reset() override;
+
+	void device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr) override;
 
 private:
+	uint16_t porta_r();
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	uint16_t m_prev_porta;
+	bool m_toggle;
+	emu_timer *m_pulse_timer;
+
 };
 
-class spg2xx_game_marc250_state : public spg2xx_game_state
+class spg2xx_game_marc250_state : public spg2xx_game_marc101_state
 {
 public:
 	spg2xx_game_marc250_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spg2xx_game_state(mconfig, type, tag)
+		spg2xx_game_marc101_state(mconfig, type, tag)
 	{ }
 
 	void init_m527();
@@ -51,7 +65,7 @@ public:
 protected:
 	void machine_reset() override
 	{
-		spg2xx_game_state::machine_reset();
+		spg2xx_game_marc101_state::machine_reset();
 		switch_bank(31);
 		m_maincpu->reset();
 	}
@@ -60,6 +74,92 @@ private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
+void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case 0:
+		m_toggle = !m_toggle;
+		//printf("toggle\n");
+		break;
+	}
+}
+
+void spg2xx_game_marc101_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+	m_pulse_timer = timer_alloc(0);
+	m_pulse_timer->adjust(attotime::never);
+
+}
+
+void spg2xx_game_marc101_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+	m_pulse_timer->adjust(attotime::never);
+	m_prev_porta = 0;
+	m_toggle = false;
+}
+
+void spg2xx_game_marc101_state::marc101(machine_config &config)
+{
+	spg2xx(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_marc101_state::porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_marc101_state::porta_w));
+}
+
+uint16_t spg2xx_game_marc101_state::porta_r()
+{
+	uint16_t ret = m_io_p1->read() &~ 0x2000;
+
+	ret |= m_toggle ? 0x2000 : 0x0000;
+
+	return ret;
+}
+
+
+void spg2xx_game_marc101_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	// see function at 053E19 (marc101)
+	// it has several states
+	// 00 - wait a while
+	// 01 - set 0x0400 in port a high
+	// 02 - clear 0x0400 in port a
+	// 07 - measure number of times 0x2000 on port a changes, with min/max acceptable values and a timeout 
+	// ff - failure (causes blank screen / shutdown + inf loop)
+	if ((data & 0x0400) != (m_prev_porta & 0x0400))
+	{
+		if (!(data & 0x0400))
+		{
+			//logerror("pulse / timer reset\n");
+			m_pulse_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
+		}
+	}
+
+	m_prev_porta = data;
+}
 
 
 static INPUT_PORTS_START( wiwi18 )
@@ -302,7 +402,7 @@ void spg2xx_game_wiwi18_state::init_wiwi18()
 
 }
 
-	void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
@@ -329,15 +429,14 @@ void spg2xx_game_wiwi18_state::init_wiwi18()
 		else
 			switch_bank(0);
 	}
-
 }
 
 void spg2xx_game_marc101_state::init_m489()
 {
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	//uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	// bypass a call that turns unit off after about 2 seconds, maybe it's a battery check?
-	if (rom[0x6460]==0x4240) rom[0x6460] = 0x4241; 
+	//if (rom[0x6460]==0x4240) rom[0x6460] = 0x4241; 
 }
 
 void spg2xx_game_marc101_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -386,10 +485,10 @@ void spg2xx_game_marc250_state::init_m527()
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	// bypass a call that turns unit off after about 10 seconds, maybe it's a battery check?
-	rom[((31 * 0x800000) / 2) | 0x004ea5] = 0x4241; 
+	//rom[((31 * 0x800000) / 2) | 0x004ea5] = 0x4241; 
 	
 	// same for xracing 3
-	rom[((22 * 0x800000) / 2) | 0x00eb2a] = 0x4241; 
+	//rom[((22 * 0x800000) / 2) | 0x00eb2a] = 0x4241; 
 
 	uint16_t ident2[6] = { 0x9512, 0x2862, 0xa70a, 0x0002, 0xd71b, 0x2862 };
 
@@ -439,9 +538,9 @@ void spg2xx_game_marc250_state::init_m527()
 
 void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (m_maincpu->pc() == 0x18)
+	if (m_maincpu->pc() < 0x2000)
 	{
-		printf("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context().c_str(), data, mem_mask,
+		logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
 			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
 			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
@@ -496,9 +595,10 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 	// bank 30 = (used) 'ROM 2 64M'
 	// bank 31 = (used) menu (no bank number check)
 
-	if ((m_maincpu->pc() == 0x18) && (data != 0x00ff))
+	// bits 0x1804 aren't set as an output, but clearly need to be treated as output, also bad values of 0x00ff and 0x0000 are written on startup, with direction bits set!
+	// this seems similar to issues with banking in some other units.
+	if ((m_maincpu->pc() < 0x2000) && (data != 0x00ff) && (data != 0x0000))
 	{
-		// bits 0x1804 aren't set as an output, but clearly need to be treated as output
 		switch (data & 0x1807)
 		{
 		case 0x0000: switch_bank(0); break; // unused
@@ -583,6 +683,6 @@ CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, 
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 
-CONS( 200?, marc101,     0,        0, spg2xx, m489,  spg2xx_game_marc101_state, init_m489, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, init_m489, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, marc250,     0,        0, spg2xx, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
