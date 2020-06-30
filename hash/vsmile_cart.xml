@@ -18,12 +18,12 @@ Language:
 ********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
 ********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
 ********7 = Spain             (Green labels on back)
+********8 = China
 *******10 = Korea
 *******13 = Denmark           Distributed by the company 'Top Toy A/S'
 *******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
 *******?? = Finland
-*******?? = China
 
 
 Addons (w/ yellow Smartridges)
@@ -53,7 +53,7 @@ Addons (w/ yellow Smartridges)
 |   XX   | 80-067022(SP)     | V.Smile Estudio de Arte (yellow)                                           |
 |        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |
 |        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
-|        |          (CN)     | 智乐学习通小画室                                                            |
+|        | 80-067058(CN)     | 智乐学习通小画室                                                            |
 +========+===================+============================================================================+
 |        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
@@ -146,8 +146,8 @@ Regular game cartridges
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
 |   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB)                          |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent blue cart, no # on label)                         |
+|        | 80-092008(CN)     | 英语乐园                                                                                        |
 |        |          (KOR)    | Alphabet Park Adventure - 알파벳 공원 대탐험                                                     |
-|        |          (CN)     | 英语乐园                                                                                        |
 +========+===================+================================================================================================+
 |        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                       |
 |        | 80-092023(UK)     | The Adventures of Little Red Riding Hood (no # on label, but box says 'colours')               |
@@ -172,6 +172,7 @@ Regular game cartridges
 |   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (rev. 105                                        |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
 |   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)                            |
+|        | 80-092068(CN)     | 小熊维尼                                                                                        |
 |   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (rev. 122, 092067-1 on PCB)                   |
 |   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                     |
 |   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                      |
@@ -179,7 +180,6 @@ Regular game cartridges
 |        |          (NO)     | Ole Brumm - Honningjakten                                                                      |
 |        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                  |
 |        |          (KOR)    | Winnie The Pooh: The Honey Hunt - 푸우와 함께하는 꿀사냥놀이                                      |
-|        |          (CN)     | 小熊维尼                                                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                    |
@@ -189,12 +189,12 @@ Regular game cartridges
 |   XX   | 80-092085(FR)     | Mickey - Mickey à la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
 |   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB)                            |
+|        | 80-092088(CN)     | 米奇魔幻历险记                                                                                   |
 |        |          (DK)     | Mickey                                                                                         |
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                            |
 |        |          (NO)     | Mickey                                                                                         |
 |        |          (FI)     | Mickey                                                                                         |
 |        |          (KOR)    | Mickey Mouse - Mickey's Magical Adventure - 미키마우스의 신비한 마술여행                           |
-|        |          (CN)     | 米奇魔幻历险记                                                                                   |
 +========+===================+================================================================================================+
 |   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                          |
 |   XX   | 80-092101(IT)     | Il Re Leone - La Grande Avventura di Simba                                                     |
@@ -204,12 +204,12 @@ Regular game cartridges
 |   XX   | 80-092105(FR)     | Le Roi Lion - Simba Découvre la Jungle                                                         |
 |        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                                        |
 |   XX   | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba (no # on label, 92187 on PCB)                          |
+|        | 80-092108(CN)     | 狮子王辛巴成长历险记                                                                              |
 |        |          (KOR)    | The Lion King - Simba's Big Adventure                                                          |
 |   XX   | 80-092113(DK)     | Løvernes Konge - Simbas store eventyr                                                          |
 |   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                                             |
 |        |          (NO)     | Løvenes konge - Simbas store eventyr                                                           |
 |        |          (FI)     | Leijona kuningas - Simban suuri seikkailu                                                      |
-|        |          (CN)     | 狮子王辛巴成长历险记                                                                              |
 +========+===================+================================================================================================+
 |        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                  |
 |   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                      |
@@ -219,12 +219,12 @@ Regular game cartridges
 |   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                 |
 |        | 80-092126(PT)     |                                                                                                |
 |   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label)                                     |
+|        | 80-092128(CN)     | 美人鱼梦幻之旅                                                                                   |
 |   XX   | 80-092133(DK)     | Den Lille Havfrue - Ariels majestætiske rejse!                                                 |
 |   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                              |
 |        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                |
 |        |          (FI)     | Pieni Merenneito - Arielin majesteettinen matka                                                |
 |        |          (KOR)    | The Little Mermaid - Ariel's Majestic Journey - 인어공주의 신나는 탐험여행                        |
-|        |          (CN)     | 美人鱼梦幻之旅                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                         |
 |   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (rev. 101)                                              |
@@ -283,11 +283,11 @@ Regular game cartridges
 |   XX   | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                               |
 |   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label)                                 |
+|        | 80-092228(CN)     | 玩具总动员 2 - 营救胡迪                                                                           |
 |        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                            |
 |   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                          |
 |        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                           |
 |        |          (FI)     | Toy Story 2                                                                                    |
-|        |          (CN)     | 玩具总动员 2 - 营救胡迪                                                                           |
 +========+===================+================================================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                         |
 |   XX   | 80-092251(IT)     | Cenerentola - I desideri magici di Cenerentola                                                 |
@@ -307,11 +307,11 @@ Regular game cartridges
 |   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
 |   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 122, white/light pink cart label background)
 |   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 222, no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
+|        | 80-092248(CN)     | 仙蒂                                                                                            |
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
 |        |          (FI)     | Cinderella - Tuhkimon Taikatoiveet                                                             |
-|        |          (CN)     | 仙蒂                                                                                            |
 +========+===================+================================================================================================+
 |        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                          |
 |   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                         |
@@ -375,7 +375,7 @@ Regular game cartridges
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                              |
 |   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label)                                     |
-|        |          (CN)     | 我的外星人同学                                                                                   |
+|        | 80-092368(CN)     | 我的外星人同学                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe                                                              |
 |        | 80-092383(UK)     | Barney - The Land of Make Believe                                                              |
@@ -414,7 +414,7 @@ Regular game cartridges
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
 |   XX   | 80-092485(FR)     | The Batman - Panique à Gotham City                                                             |
 |   XX   | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                            |
-|        |          (CN)     | 蝙蝠侠 - 拯救城市                                                                                |
+|   XX   | 80-092488(CN)     | 蝙蝠侠 - 拯救城市                                                                                |
 +========+===================+================================================================================================+
 |        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                    |
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                            |
@@ -424,8 +424,8 @@ Regular game cartridges
 |   XX   | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
 |   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label)                                              |
+|        | 80-092508(CN)     | 数学快车                                                                                        |
 |        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
-|        |          (CN)     | 数学快车                                                                                        |
 +========+===================+================================================================================================+
 |        | 80-092520(US)     | Spider-Man & Friends - Doc Ock's Challenge                                                     |
 |   XX   | 80-092531(IT)     | Spider-Man & Friends - La Sfida del Dottor Ock                                                 |
@@ -468,7 +468,7 @@ Regular game cartridges
 |   XX   | 80-092644(GE)     | Superman - Der Superheld                                                                       |
 |   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                                    |
 |   XX   | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
-|        |          (CN)     | 超人 - 超级英雄                                                                                  |
+|        | 80-092648(CN)     | 超人 - 超级英雄                                                                                  |
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (rev. 201)                                                |
@@ -480,12 +480,12 @@ Regular game cartridges
 |   XX   | 80-092665-105(FR) | Cars - Quatre Roues (rev. 105)                                                                 |
 |        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                          |
 |   XX   | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
+|        | 80-092668(CN)     | 汽车总动员                                                                                      |
 |   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                 |
 |   XX   | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping                                                                |
 |        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                                             |
 |        |          (NO)     | Biler - Full gass i Radiator By                                                                |
 |        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä                                                             |
-|        |          (CN)     | 汽车总动员                                                                                      |
 +========+===================+================================================================================================+
 |        | 80-092680(US)     | <Unknown>                                                                                      |
 |        | 80-092800(US)     | <Unknown>                                                                                      |
@@ -976,6 +976,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="batmang">
+		<description>The Batman - Rettung von Gotham City (Germany)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092484(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="8388608" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanf" cloneof="batmanuk">
 		<description>The Batman - Panique à Gotham City (France)</description>
 		<year>2006</year> <!-- (s06) -->
@@ -1006,19 +1023,17 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="batmang">
-		<description>The Batman - Rettung von Gotham City (Germany)</description>
+	<software name="batmancn" cloneof="batmanuk">
+		<description>Bianfuxia - Zhengjiu Chengshi (China)</description>
 		<year>2006</year> <!-- (s06) -->
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092484(GER)" />
+		<info name="serial" value="80-092488(CN)" />
+		<info name="alt_title" value="蝙蝠侠 - 拯救城市"/>
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="8388608" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
+				<rom name="Batman - Gotham City Rescue (CN).bin" size="8388608" crc="1b8f118a" sha1="b921dfe8fdb8694f11b575a18b529e2d9de66160" />
 			</dataarea>
 		</part>
 	</software>
