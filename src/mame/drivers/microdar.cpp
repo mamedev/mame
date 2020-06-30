@@ -59,15 +59,16 @@ IC10 = Hitachi HD74HC244P
 **************************************************************************
 
 Known machines using this hardware:
-___________________________________________________________________________________________________________
-|Dumped | Name       | Manufacturer | Notes                                                               |
-|-------|------------|--------------|---------------------------------------------------------------------|
-|  NO   | Sagitario  | CIC Play     | CPU silkscreened "REF 0034 9115S", without manufacturer logos       |
-|  YES  | Unknown    | Bifuca       | Added as "microdar". Standard Microdar SPD with Philips REF34VA     |
-|  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   |
-|  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs |
-|  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          |
-|_______|____________|______________|_____________________________________________________________________|
+_______________________________________________________________________________________________________________________________________________
+|Dumped | Name       | Manufacturer | Notes                                                               | Machine type                       |
+|-------|------------|--------------|---------------------------------------------------------------------|------------------------------------|
+|  NO   | Sagitario  | CIC Play     | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                              |
+|  YES  | Unknown    | Bifuca       | Added as "microdar". Standard Microdar SPD with Philips REF34VA     | Darts                              |
+|  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                              |
+|  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                              |
+|  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          | Darts                              |
+|  YES  | Far West   | Compumatic   | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting machine | 
+|_______|____________|______________|_____________________________________________________________________|____________________________________|
 
 There's a later revision of the Compumatic Microdar PCB (V5), smaller, with a standard Atmel AT89S51
 instead of the REF34 CPU.
@@ -220,4 +221,99 @@ ROM_START(microdar)
 	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, CRC(1cae70db) SHA1(575d4c787fd65950417e85fdb34d2961fc327c74))
 ROM_END
 
+ROM_START(cfarwest)
+	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD("ref34va_k8v2873_phr9920_0.ic12", 0x0000, 0x1000, NO_DUMP)
+	// Fills copied from 'microdar' without checking
+	ROM_FILL(0x0000, 1, 0x02) // temporary LJMP to external init code
+	ROM_FILL(0x0001, 1, 0x10)
+	ROM_FILL(0x0002, 1, 0x1b)
+	ROM_FILL(0x000b, 1, 0x02) // temporary LJMP to interrupt handler
+	ROM_FILL(0x000c, 1, 0x10)
+	ROM_FILL(0x000d, 1, 0x15)
+	ROM_FILL(0x001b, 1, 0x02) // temporary LJMP to interrupt handler
+	ROM_FILL(0x001c, 1, 0x10)
+	ROM_FILL(0x001d, 1, 0x18)
+	ROM_FILL(0x0058, 1, 0x32) // RETI stubs
+	ROM_FILL(0x00af, 1, 0x32)
+	ROM_FILL(0x00c9, 1, 0x02) // temporary LJMP to end of interrupt handler
+	ROM_FILL(0x00ca, 1, 0x12)
+	ROM_FILL(0x00cb, 1, 0xd1)
+	ROM_FILL(0x0135, 1, 0x22) // RET stubs
+	ROM_FILL(0x0163, 1, 0x22)
+	ROM_FILL(0x0185, 1, 0x22)
+	ROM_FILL(0x01cf, 1, 0x22)
+	ROM_FILL(0x02de, 1, 0x22)
+	ROM_FILL(0x02fa, 1, 0x22)
+	ROM_FILL(0x0308, 1, 0x22)
+	ROM_FILL(0x0313, 1, 0x22)
+	ROM_FILL(0x037d, 1, 0x22)
+	ROM_FILL(0x03be, 1, 0x22)
+	ROM_FILL(0x0496, 1, 0x22)
+	ROM_FILL(0x04ce, 1, 0x22)
+	ROM_FILL(0x0514, 1, 0x22)
+	ROM_FILL(0x0520, 1, 0x22)
+	ROM_FILL(0x0550, 1, 0x22)
+	ROM_FILL(0x0574, 1, 0x22)
+	ROM_FILL(0x05b4, 1, 0x22)
+	ROM_FILL(0x05bb, 1, 0x22)
+	ROM_FILL(0x05ca, 1, 0x22)
+	ROM_FILL(0x05d8, 1, 0x22)
+	ROM_FILL(0x0605, 1, 0x22)
+	ROM_FILL(0x0638, 1, 0x22)
+	ROM_FILL(0x068a, 1, 0x22)
+	ROM_FILL(0x06a2, 1, 0x22)
+	ROM_FILL(0x06bd, 1, 0x22)
+	ROM_FILL(0x06db, 1, 0x22)
+	ROM_FILL(0x0708, 1, 0x22)
+	ROM_FILL(0x0715, 1, 0x22)
+	ROM_FILL(0x072d, 1, 0x22)
+	ROM_FILL(0x0744, 1, 0x22)
+	ROM_FILL(0x0751, 1, 0x22)
+	ROM_FILL(0x0767, 1, 0x22)
+	ROM_FILL(0x0772, 1, 0x22)
+	ROM_FILL(0x077d, 1, 0x22)
+	ROM_FILL(0x07a4, 1, 0x22)
+	ROM_FILL(0x07c2, 1, 0x22)
+	ROM_FILL(0x0802, 1, 0x22)
+	ROM_FILL(0x0836, 1, 0x22)
+	ROM_FILL(0x087d, 1, 0x22)
+	ROM_FILL(0x0893, 1, 0x22)
+	ROM_FILL(0x0930, 1, 0x22)
+	ROM_FILL(0x094a, 1, 0x22)
+	ROM_FILL(0x095a, 1, 0x22)
+	ROM_FILL(0x096a, 1, 0x22)
+	ROM_FILL(0x097b, 1, 0x22)
+	ROM_FILL(0x098f, 1, 0x22)
+	ROM_FILL(0x09a3, 1, 0x22)
+	ROM_FILL(0x09c0, 1, 0x22)
+	ROM_FILL(0x0a21, 1, 0x22)
+	ROM_FILL(0x0a54, 1, 0x22)
+	ROM_FILL(0x0a63, 1, 0x22)
+	ROM_FILL(0x0a73, 1, 0x22)
+	ROM_FILL(0x0a90, 1, 0x22)
+	ROM_FILL(0x0ae8, 1, 0x22)
+	ROM_FILL(0x0abf, 1, 0x22)
+	ROM_FILL(0x0ac7, 1, 0x22)
+	ROM_FILL(0x0b11, 1, 0x22)
+	ROM_FILL(0x0b7f, 1, 0x22)
+	ROM_FILL(0x0bf1, 1, 0x22)
+	ROM_FILL(0x0bf6, 1, 0x22)
+	ROM_FILL(0x0c4a, 1, 0x22)
+	ROM_FILL(0x0c59, 1, 0x22)
+	ROM_FILL(0x0c64, 1, 0x22)
+	ROM_FILL(0x0c99, 1, 0x22)
+	ROM_FILL(0x0ca8, 1, 0x22)
+	ROM_FILL(0x0cbd, 1, 0x22)
+	ROM_FILL(0x0dac, 1, 0x22)
+	ROM_FILL(0x0dca, 1, 0x22)
+	ROM_FILL(0x0e6a, 1, 0x22)
+
+	ROM_REGION(0x20000, "program", 0)
+	ROM_LOAD("farwest_pistola.ic3", 0x00000, 0x20000, CRC(ad68a0e8) SHA1(157a6a84f31e05d289e2fc67099fcff2887a84b9))
+
+	// No EEPROM on this PCB
+ROM_END
+
 GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West",     MACHINE_IS_SKELETON_MECHANICAL)
