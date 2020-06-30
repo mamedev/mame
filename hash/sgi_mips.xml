@@ -2229,6 +2229,19 @@ license:CC0
 	</software>
 
 	<software name="irix_5_2_a" cloneof="irix_5_2">
+		<description>IRIX 5.2 for Indy R4600PC and Challenge SX</description>
+		<year>1994</year> <!-- 04/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0279-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_5_2_for_indy_r4600pc_and_challenge_sx" sha1="972cffffe22668cf2383a335718afd3083cb5965" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_b" cloneof="irix_5_2">
 		<description>IRIX 5.2 for Indy R4600SC/XZ and Presenter</description>
 		<year>1994</year> <!-- 08/94 -->
 		<publisher>Silicon Graphics</publisher>
