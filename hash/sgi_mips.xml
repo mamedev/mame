@@ -1617,7 +1617,7 @@ license:CC0
 	<!-- IndiZone -->
 
 	<software name="indizone_1">
-		<description>IndiZone</description>
+		<description>IndiZone 1.0</description>
 		<year>1993</year>
 		<publisher>Silicon Graphics</publisher>
 		<info name="version" value="1.0" />
@@ -1630,15 +1630,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="indizone">
-		<description>IndiZone</description>
+	<software name="indizone_1_1">
+		<description>IndiZone 1.1</description>
 		<year>1993</year>
 		<publisher>Silicon Graphics</publisher>
 		<info name="version" value="1.1" />
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: archive.org; reconstructed from a tarball, needs redump -->
 			<diskarea name="cdrom">
-				<disk name="indizone" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" />
+				<disk name="indizone_1_1" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" />
 			</diskarea>
 		</part>
 	</software>
