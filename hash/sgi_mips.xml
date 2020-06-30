@@ -718,15 +718,41 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="onc3nfs_1">
+		<description>ONC3/NFS for IRIX 6.2 Version 1</description>
+		<year>1996</year> <!-- 03/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0305-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="onc3_nfs_for_irix_6_2_version_1" sha1="e2e85307864dff08189d5271fbc66b2ae3fae954" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="onc3nfs_with_indigo2_impact_10000_1">
+		<description>ONC3/NFS for IRIX 6.2 with Indigo2 IMPACT 10000 Version 1</description>
+		<year>1996</year> <!-- 06/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0305-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="onc3_nfs_for_irix_6_2_with_indigo2_impact_10000_version_1" sha1="49171c4968606047af96fbce7fbde5f685c8d130" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="onc3nfs_1_2">
-		<description>NFS/ONC3 for IRIX 6.2 Version 1.2</description>
+		<description>ONC3/NFS for IRIX 6.2 Version 1.2</description>
 		<year>1996</year> <!-- 08/96 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="813-0305-006"/>
+			<feature name="part_number" value="812-0305-006"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
-				<disk name="nfs_onc3_for_irix_6_2_version_1_2" sha1="86f44b190dbbe8b8a55f6a8250e7a9d42905b70a" />
+				<disk name="onc3_nfs_for_irix_6_2_version_1_2" sha1="86f44b190dbbe8b8a55f6a8250e7a9d42905b70a" />
 			</diskarea>
 		</part>
 	</software>
