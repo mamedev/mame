@@ -18,7 +18,7 @@ license:CC0
 				<rom name="500-12148 - Cars (SPA).bin" size="0x400000" crc="6ace95ff" sha1="d272646c0a06876a3e39907e6e6e65b45339f53a" />
 			</dataarea>
 		</part>
-	</software>.
+	</software>
 
 	<software name="thomasst" supported="no">
 		<description>Thomas &amp; Friends - Thomas and the School Trip (UK)</description>
