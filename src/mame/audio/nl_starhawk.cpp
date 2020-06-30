@@ -26,9 +26,16 @@
 #include "nl_cinemat_common.h"
 
 
+#define LLE_LAZER_CLK (0)
+
+
 NETLIST_START(starhawk)
 
+#if LLE_LAZER_CLK
+	SOLVER(Solver, 4800000)
+#else
 	SOLVER(Solver, 48000)
+#endif
 
 	TTL_INPUT(I_OUT_0, 0)				// active high
 	TTL_INPUT(I_OUT_1, 0)				// active high
@@ -153,8 +160,10 @@ NETLIST_START(starhawk)
 	Q_2N3906(Q1)			// PNP
 //	Q_2N6292(Q2)			// NPN -- part of final amp (not emulated)
 //	Q_2N6107(Q3)			// PNP -- part of final amp (not emulated)
+#if (LLE_LAZER_CLK)
 	Q_2N3904(Q4)			// NPN
 	Q_2N3904(Q5)			// NPN
+#endif
 
 	TL182_DIP(IC3A)			// Analog switch
 	NET_C(IC3A.6, I_V15)
@@ -412,6 +421,7 @@ NETLIST_START(starhawk)
 	NET_C(IC7C.8, R39.1)
 	NET_C(R39.2, C22.2, CR7.K)
 	NET_C(C22.1, GND)
+#if (LLE_LAZER_CLK)
 	NET_C(CR7.A, IC6F.3, CR8.K, R43.1)
 	NET_C(CR8.A, GND)
 	NET_C(IC6F.2, C23.2, R40.1)
@@ -423,6 +433,35 @@ NETLIST_START(starhawk)
 	NET_C(Q4.C, R42.1, IC6C.9)
 	NET_C(R42.2, I_V5)
 	NET_C(IC6C.8, IC7E.1)
+#else
+	//
+	// This VCO is very difficult to simulate without cranking the speed up
+	// and killing performance. So instead, we have created a mapping
+	// from the voltage at C22 to the clock period at 7E.1. A decent mapping
+	// needs a 5th order polynomial (V is the voltage at C22):
+	//
+	//    7e-10*V^5 - 2e-8*V^4 + 2e-7*V^3 - 7e-7*V^2 +5e-6*V + 8e-6
+	//
+	// Unfortunately, when we cut out the circuitry between C22 and 7E, the
+	// feedback is gone and the voltage curve at C22 becomes linear with a
+	// much smaller amplitude. We can map from this linear curve to the
+	// original C22 voltage with:
+	//
+	//   -349.04*V^2 + 201.54*V - 16.552
+	//
+	// Taking this mapping and re-generating the first equation above using
+	// the linear ramp, gives us a nice linear (wrong) voltage to period
+	// mapping of:
+	//
+	//   0.0005*V - 0.00004
+	//
+	VARCLOCK(LAZER1CLK, "max(0.0000001,0.0005*A0-0.00004)")
+	NET_C(LAZER1CLK.GND, GND)
+	NET_C(LAZER1CLK.VCC, I_V5)
+	NET_C(LAZER1CLK.Q, IC7E.1)
+	NET_C(LAZER1CLK.A0, C22.2)
+	NET_C(GND, CR7.A, C23.1, C23.2, IC6F.2, IC6F.3, CR8.A, CR8.K, R43.1, R43.2, R40.1, R40.2, R41.1, R41.2, R44.1, R44.2, R42.1, R42.2, IC6C.9)
+#endif
 	NET_C(IC7E.2, IC7E.12, GND)
 	NET_C(IC7E.3, IC8E.7)
 	NET_C(IC7E.4, IC8E.4)
@@ -452,6 +491,7 @@ NETLIST_START(starhawk)
 	NET_C(IC7C.12, R46.1)
 	NET_C(R46.2, C24.2, CR9.K)
 	NET_C(C24.1, GND)
+#if (LLE_LAZER_CLK)
 	NET_C(CR9.A, IC6E.3, CR10.K, R48.1)
 	NET_C(CR10.A, GND)
 	NET_C(IC6E.2, C25.2, R45.1)
@@ -463,6 +503,17 @@ NETLIST_START(starhawk)
 	NET_C(Q5.C, R50.1, IC6C.13)
 	NET_C(R50.2, I_V5)
 	NET_C(IC6C.12, IC4E.1)
+#else
+	//
+	// This VCO is identical to the one above, just using different components
+	//
+	VARCLOCK(LAZER2CLK, "max(0.0000001,0.0005*A0-0.00004)")
+	NET_C(LAZER2CLK.GND, GND)
+	NET_C(LAZER2CLK.VCC, I_V5)
+	NET_C(LAZER2CLK.Q, IC4E.1)
+	NET_C(LAZER2CLK.A0, C24.2)
+	NET_C(GND, CR9.A, C25.1, C25.2, IC6E.2, IC6E.3, CR10.A, CR10.K, R48.1, R48.2, R45.1, R45.2, R47.1, R47.2, R49.1, R49.2, R50.1, R50.2, IC6C.13)
+#endif
 	NET_C(IC4E.2, IC4E.12, GND)
 	NET_C(IC4E.3, IC5E.7)
 	NET_C(IC4E.4, IC5E.4)
