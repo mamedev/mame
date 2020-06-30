@@ -147,7 +147,7 @@ license:CC0
 		<year>1995</year> <!-- 11/95 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="813-0410-002"/>
+			<feature name="part_number" value="812-0410-002"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="desktop_special_edition_1_1" sha1="4f740d11eb60da5fadcd4a3003aca88ff81d7ae3" />
