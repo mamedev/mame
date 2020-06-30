@@ -75,6 +75,18 @@ private:
 	int m_rombase;
 };
 
+class nes_clone_vtvppong_state : public nes_clone_state
+{
+public:
+	nes_clone_vtvppong_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_clone_state(mconfig, type, tag)
+	{ }
+	void nes_clone_vtvppong(machine_config& config);
+
+private:
+	void nes_clone_vtvppong_map(address_map& map);
+};
+
 
 void nes_clone_state::sprite_dma_w(address_space &space, uint8_t data)
 {
@@ -249,14 +261,11 @@ void nes_clone_dnce2000_state::nes_clone_dnce2000(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_dnce2000_state::nes_clone_dnce2000_map);
 }
 
-
-
 void nes_clone_dnce2000_state::nes_clone_dnce2000_map(address_map& map)
 {
 	nes_clone_basemap(map);
 	map(0x8000, 0xffff).rw(FUNC(nes_clone_dnce2000_state::rom_r), FUNC(nes_clone_dnce2000_state::bank_w));
 }
-
 
 void nes_clone_dnce2000_state::machine_reset()
 {
@@ -280,6 +289,19 @@ void nes_clone_dnce2000_state::bank_w(uint8_t data)
 	m_rombase = data;
 }
 
+void nes_clone_vtvppong_state::nes_clone_vtvppong(machine_config& config)
+{
+	nes_clone_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvppong_state::nes_clone_vtvppong_map);
+}
+
+void nes_clone_vtvppong_state::nes_clone_vtvppong_map(address_map& map)
+{
+	nes_clone_basemap(map);
+	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
+}
+
+
 ROM_START( pjoypj001 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "powerjoy_pj001_lh28f008sc_89a6.bin", 0x00000, 0x100000, CRC(e655e0aa) SHA1(c96d3422e26451c366fee2151fedccb95014cbc7) )
@@ -298,6 +320,13 @@ ROM_START( dnce2000 ) // use Mapper 241 if you want to run this in a NES emulato
 	ROM_LOAD( "dance.bin", 0x00000, 0x40000, CRC(0982bb50) SHA1(bd608159d7e624ea345f2a188de51cb1aa116421) )
 ROM_END
 
+ROM_START( vtvppong )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // high bit is never set in the first 0x28000 bytes of this ROM, probably 7-bit sound data? code might need opcode bits swapping
+	ROM_LOAD( "vtvpongcpu.bin", 0x00000, 0x40000, CRC(52df95fa) SHA1(3015bcc90eee862b3568f122b402c9defa566aab) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "vtvpongppu.bin", 0x00000, 0x20000, CRC(474dfc0c) SHA1(4d0afab111e40172ae0b31e94f1b74b73a18385f) )
+ROM_END
 
 void nes_clone_state::init_nes_clone()
 {
@@ -307,5 +336,8 @@ CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clo
 
 // "Flashback Mini 7800 uses normal NES-style hardware, together with a mapper chipset similar to the Waixing kk33xx cartridges (NES 2.0 Mapper 534)"
 CONS( 2004, afbm7800,  0,  0,  nes_clone,    nes_clone, nes_clone_state, init_nes_clone, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
+
+CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_nes_clone, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
+
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, init_nes_clone, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
