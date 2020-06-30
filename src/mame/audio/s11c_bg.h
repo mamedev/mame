@@ -23,8 +23,8 @@ public:
 	// construction/destruction
 	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void bg_speech_clock_w(uint8_t data);
-	void bg_speech_digit_w(uint8_t data);
+	void bg_cvsd_clock_set_w(uint8_t data);
+	void bg_cvsd_digit_clock_clear_w(uint8_t data);
 	void bgbank_w(uint8_t data);
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);

@@ -53,7 +53,7 @@ public:
 		, m_pia30(*this, "pia30")
 		, m_pia34(*this, "pia34")
 		, m_pia40(*this, "pia40")
-		, m_ym(*this, "ym2151")
+		, m_ym2151(*this, "ym2151")
 		, m_bg(*this, "bgm")
 		, m_digits(*this, "digit%u", 0U)
 		, m_swarray(*this, "SW.%u", 0U)
@@ -122,7 +122,7 @@ protected:
 	required_device<pia6821_device> m_pia30;
 	required_device<pia6821_device> m_pia34;
 	optional_device<pia6821_device> m_pia40;
-	optional_device<ym2151_device> m_ym;
+	optional_device<ym2151_device> m_ym2151;
 	optional_device<s11c_bg_device> m_bg;
 	output_finder<63> m_digits;
 	required_ioport_array<8> m_swarray;

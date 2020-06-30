@@ -29,8 +29,8 @@ public:
 	void pia2c_pb_w(uint8_t data);
 	void pia34_pa_w(uint8_t data);
 
-	void bg_speech_clock_w(uint8_t data);
-	void bg_speech_digit_w(uint8_t data);
+	void bg_cvsd_clock_set_w(uint8_t data);
+	void bg_cvsd_digit_clock_clear_w(uint8_t data);
 
 protected:
 	void set_invert(bool inv) { m_invert = inv; }
