@@ -793,7 +793,7 @@ void es5510_device::execute_run() {
 			// --- RAM cycle N-2 (if a Read cycle): data read from bus is stored in DIL
 			if (ram_pp.cycle != RAM_CYCLE_WRITE) {
 				if (ram_pp.io) { // read from I/O and store into DIL
-					dil = 0; // read_io(ram_pp.address);;
+					dil = 0; // read_io(ram_pp.address);
 				} else { // read from DRAM and store into DIL
 					dil = dram_r(ram_pp.address) << 8;
 					LOG_EXEC(("  . RAM: read %x (%d) from address %x\n", dil, dil, ram_pp.address));

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    atarirle.c
+    atarirle.cpp
 
     RLE sprite handling for early-to-mid 90's Atari raster games.
 

@@ -1802,7 +1802,7 @@ void nemesis_state::gx400(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
@@ -1932,7 +1932,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??

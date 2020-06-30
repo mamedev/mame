@@ -910,8 +910,8 @@ void sc4_state::sc4_common(machine_config &config)
 	m_duart->set_clocks(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8);
 	m_duart->irq_cb().set(FUNC(sc4_state::bfm_sc4_duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(sc4_state::bfm_sc4_duart_txa));
-	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));;
-	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));;
+	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));
+	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 

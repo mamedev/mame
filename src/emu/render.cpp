@@ -1441,7 +1441,7 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 
 bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
-	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);;
+	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);
 }
 
 

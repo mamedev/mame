@@ -455,4 +455,39 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Spanish carts -->
+
+	<software name="srlionkngs" supported="no">
+		<description>Disney El Rey León (Spain)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="El Rey Leon (SPA).bin" size="0x100000" crc="5bf23272" sha1="e9b3e232eb34834677741d33037397d8d2136fa0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpeterpns" supported="no">
+		<description>Walt Disney Peter Pan (Spain)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Peter Pan (SPA).bin" size="0x100000" crc="3a2c5e66" sha1="7f0c3d3118a47949d9bf14579b6c16d11e334736" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srsnowwhts" supported="no">
+		<description>Disney Blanca Nieves y los siete enanos (Spain)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="Blanca Nieves y los siete enanos (SPA).bin" size="0x100000" crc="b263a480" sha1="f6f30118e69b371e8fd25adef745d132da17d9f0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

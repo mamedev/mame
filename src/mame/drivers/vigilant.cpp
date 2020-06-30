@@ -584,7 +584,7 @@ void vigilant_state::buccanrs(machine_config &config)
 	ym1.add_route(3, "lspeaker",  0.50);
 	ym1.add_route(3, "rspeaker", 0.50);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 18432000/6));;
+	ym2203_device &ym2(YM2203(config, "ym2", 18432000/6));
 	ym2.add_route(0, "lspeaker",  0.35);
 	ym2.add_route(0, "rspeaker", 0.35);
 	ym2.add_route(1, "lspeaker",  0.35);

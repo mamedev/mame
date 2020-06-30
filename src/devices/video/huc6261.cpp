@@ -275,7 +275,7 @@ uint16_t huc6261_device::read(offs_t offset)
 					break;
 
 				case 0x09:
-					data = m_priority[0] | ( m_priority[1] << 4 ) | ( m_priority[2] << 8 ) | ( m_priority[3] << 12 );;
+					data = m_priority[0] | ( m_priority[1] << 4 ) | ( m_priority[2] << 8 ) | ( m_priority[3] << 12 );
 					break;
 			}
 			break;

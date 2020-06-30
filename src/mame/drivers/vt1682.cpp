@@ -3482,7 +3482,7 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
-		set_dma_dt_addr(dstaddr);;
+		set_dma_dt_addr(dstaddr);
 		set_dma_sr_addr(srcaddr);
 	}
 }
@@ -4301,7 +4301,7 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 			bytes_in = 2;
 		}
 
-		int xbase = x;;
+		int xbase = x;
 
 		for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
 		{

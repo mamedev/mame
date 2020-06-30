@@ -69,7 +69,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		while (length--)
 		{
-			*buf++ = wave_ptr[addr++ & 0x3fff] << 7;
+			*buf++ = wave_ptr[addr++ & 0x3fff] << 6;
 		}
 
 		m_segment_cnt = (m_segment_cnt & ~mask) | addr;
@@ -228,11 +228,11 @@ void cmi01a_device::run_voice()
 
 	int m_tune = m_cmi02_pia[0]->b_output();
 	LOG("CH%d running voice: Tuning = %02x\n", m_channel, (uint8_t)m_tune);
-	double mfreq = (double)(0xf00 | m_tune) * (MASTER_OSCILLATOR.dvalue() / 2.0) / 4096.0;
-	LOG("CH%d running voice: mfreq = %f (%03x * %f)\n", m_channel, mfreq, 0xf00 | m_tune, (MASTER_OSCILLATOR / 2.0 / 4096.0).dvalue());
+	double mfreq = (double)(0xf00 | m_tune) * ((MASTER_OSCILLATOR.dvalue() / 2.0) / 4096.0);
+	LOG("CH%d running voice: mfreq = %f (%03x * %f)\n", m_channel, mfreq, 0xf00 | m_tune, (MASTER_OSCILLATOR.dvalue() / 2.0) / 4096.0);
 
 	double cfreq = ((double)(0x800 | (pitch << 1)) * mfreq) / 4096.0;
-	LOG("CH%d running voice: cfreq = %f (%04x * %f) / 4096.0\n", m_channel, mfreq, 0x800 | (pitch << 1), mfreq, cfreq);
+	LOG("CH%d running voice: cfreq = %f (%04x * %f) / 4096.0\n", m_channel, cfreq, 0x800 | (pitch << 1), mfreq, cfreq);
 
 	if (cfreq > MASTER_OSCILLATOR.dvalue())
 	{
@@ -242,10 +242,10 @@ void cmi01a_device::run_voice()
 
 	LOG("CH%d Running voice\n", m_channel);
 	/* Octave register enabled? */
-	if (!(o_val & 0x8))
-		cfreq /= 2 << ((7 ^ o_val) & 7);
+	if (!BIT(o_val, 3))
+		cfreq /= (double)(2 << ((7 ^ o_val) & 7));
 
-	cfreq /= 16.0f;
+	cfreq /= 16.0;
 
 	m_freq = cfreq;
 
@@ -260,6 +260,7 @@ void cmi01a_device::run_voice()
 	if (m_status & CHANNEL_STATUS_LOAD)
 	{
 		int samples = 0x4000 - (m_segment_cnt & 0x3fff);
+		LOG("CH%d voice is %04x samples long\n", m_channel, samples);
 		m_eosi_timer->adjust(attotime::from_ticks(samples, cfreq));
 	}
 }

@@ -18938,6 +18938,11 @@ korgm1p1                        //
 korgm1r                         //
 korgm1rex                       //
 
+@source:korgws.cpp
+korgwsad                        //
+korgwsex                        //
+korgwssr                        //
+
 @source:korgz3.cpp
 korgz3                          //
 

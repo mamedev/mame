@@ -6940,11 +6940,11 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="4dboxing">
-		<description>4D Boxing (US)</description>
+		<description>4D Boxing (USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="version" value="1.0" />
-		<info name="developer" value="Distinctive Software, Inc." />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="4D Boxing (US) [Electronic Arts] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="9c28c0c8" sha1="5b324abec67baa90a44c04bb9cc82ba50f4fb962"/>
@@ -6960,9 +6960,9 @@ has been replaced with an all-zero block. -->
 	<software name="4dsboxin" cloneof="4dboxing">
 		<description>4D Sports Boxing (Euro)</description>
 		<year>1991</year>
-		<publisher>Mindscape International Ltd.</publisher>
+		<publisher>Mindscape International</publisher>
 		<info name="version" value="1.0" />
-		<info name="developer" value="Distinctive Software, Inc." />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="4D Sports Boxing (Euro) [Mindscape] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="08fe612c" sha1="55a47b3da60cc4962b536a177c8b091feeea6b1a"/>
@@ -6973,9 +6973,9 @@ has been replaced with an all-zero block. -->
 	<software name="4dsboxina" cloneof="4dboxing">
 		<description>4D Sports Boxing (Euro, Alt)</description>
 		<year>1991</year>
-		<publisher>Mindscape International Ltd.</publisher>
+		<publisher>Mindscape International</publisher>
 		<info name="version" value="1.0" />
-		<info name="developer" value="Distinctive Software, Inc." />
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="4D Sports Boxing (Europe) (3.5'').img" size="737280" crc="a464aacf" sha1="6f7b2171faedb74c8f328795cef72e348182b477"/>
@@ -9739,6 +9739,25 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="lsl">
+		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Ver. 1.00 6/1/87" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2159416">
+				<rom name="Leisure Suit Larry [Sierra] [1987] [5.25DD] [Disk 1 of 2].mfm" size="2159416" crc="95c59a20" sha1="7c00ffe84e46b327b33e275df1df4842d8aa6c64"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry [Sierra] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="15ef74ed" sha1="e9e8789721364c63ab279c2db4d44a0835f9b452"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="lsl2">
 		<description>Leisure Suit Larry Goes Looking for Love (In Several Wrong Places)</description>
 		<year>1988</year>
@@ -10349,6 +10368,29 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="andretti">
+		<description>Mario Andretti's Racing Challenge</description>
+		<year>1991</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Career Disk].img" size="737280" crc="affe5fe6" sha1="74e2fe67f71ef56e9104c72c89cabec4a2f57f66"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Program Control Disk].img" size="737280" crc="7c6dab1f" sha1="c9447f411da447af0190c61312271221990818ab"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mario Andretti's Racing Challenge [Electronic Arts] [1991] [3.5DD] [Race Disk].img" size="737280" crc="eb3ab737" sha1="01c291ec3086c1d621fee6d65fee804ef7930432"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="martmemo">
 		<description>Martian Memorandum</description>
 		<year>1991</year>
@@ -12526,6 +12568,58 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+
+	<software name="tvsbbv">
+		<description>TV Sports Basketball (5.25", UK, VGA version)</description>
+		<year>1990</year>
+		<publisher>Cinemaware</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="TVS BasketBall (UK) [Cinemaware] [1990] [5.25DD] [VGA Disk 1 of 2].img" size="368640" crc="3fddbc38" sha1="358f09f1c1b96f5f72775257ee32ea898e10cd59"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="TVS BasketBall (UK) [Cinemaware] [1990] [5.25DD] [VGA Disk 2 of 2].img" size="368640" crc="b47edc73" sha1="cc59befe5f2175dc4b6f6a510320f73702d4bd9b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="tvsbbe" cloneof="tvsbbv">
+		<description>TV Sports Basketball (5.25", UK, EGA/TANDY version)</description>
+		<year>1990</year>
+		<publisher>Cinemaware</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="TVS BasketBall (UK) [Cinemaware] [1990] [5.25DD] [EGA-Tandy Disk 1 of 2].img" size="368640" crc="e9c5f52c" sha1="a873b6044e9526f0f6e18ef541aee1f3dc2a7586"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="TVS BasketBall (UK) [Cinemaware] [1990] [5.25DD] [EGA-Tandy Disk 2 of 2].img" size="368640" crc="15a6a3ef" sha1="324a0e17f213f6b4674159aad9b5fb75e89288da"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="tvsbbv35" cloneof="tvsbbv">
+		<description>TV Sports Basketball (3.5", USA, VGA version)</description>
+		<year>1990</year>
+		<publisher>Cinemaware</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="TVS BasketBall (USA) [Cinemaware] [1990] [3.5DD] [VGA Disk 1 of 1].img" size="737280" crc="4749a24f" sha1="ecc52dcb80eab1bc03b18dd98fe860f2e10830dd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="tvsbbe35" cloneof="tvsbbv">
+		<description>TV Sports Basketball (3.5", USA, EGA/TANDY version)</description>
+		<year>1990</year>
+		<publisher>Cinemaware</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="TVS BasketBall (USA) [Cinemaware] [1990] [3.5DD] [EGA-Tandy Disk 1 of 1].img" size="737280" crc="047e2e5a" sha1="002bf754975b1d7ad472b139e77e036e7053a7ae"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="ums2pe">
 		<description>UMS II: Nations at War - Planet Editor</description>
 		<year>1992</year>

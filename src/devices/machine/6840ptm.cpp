@@ -324,17 +324,18 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 	if (m_control_reg[counter] & INTERNAL_CLK_EN)
 	{
 		clk = static_cast<double>(clock());
-		LOGMASKED(LOG_COUNTERS, "Timer #%d internal clock freq %f \n", counter + 1, clk);
 	}
 	else
 	{
 		clk = m_external_clock[counter];
-		if (counter == 2)
-		{
-			clk /= m_t3_divisor;
-		}
-		LOGMASKED(LOG_COUNTERS, "Timer #%d external clock freq %f \n", counter + 1, clk);
 	}
+
+	if (counter == 2)
+	{
+		clk /= m_t3_divisor;
+	}
+	LOGMASKED(LOG_COUNTERS, "Timer #%d %s clock freq %f \n", counter + 1, (m_control_reg[counter] & INTERNAL_CLK_EN) ? "internal" : "external", clk);
+
 	// See how many are left
 	int remaining = (m_timer[counter]->remaining() * clk).as_double();
 
@@ -346,6 +347,7 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 		int lsb = remaining % divisor;
 		remaining = (msb << 8) | lsb;
 	}
+
 	LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %d\n", counter + 1, remaining);
 	return remaining;
 }
@@ -506,9 +508,9 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 		{
 			int idx = (offset == 1) ? 1 : (m_control_reg[1] & CR1_SELECT) ? 0 : 2;
 			uint8_t diffs = data ^ m_control_reg[idx];
-			m_t3_divisor = (m_control_reg[2] & T3_PRESCALE_EN) ? 8 : 1;
 			m_mode[idx] = (data >> 3) & 0x07;
 			m_control_reg[idx] = data;
+			m_t3_divisor = (m_control_reg[2] & T3_PRESCALE_EN) ? 8 : 1;
 
 			LOGMASKED(LOG_CONTROL, "Control register #%d selected\n", idx + 1);
 			LOGMASKED(LOG_CONTROL, "operation mode   = %s\n", opmode[m_mode[idx]]);

@@ -485,4 +485,4 @@ CONS( 1988, smondial2,  0,        0,      smondial2, smondial2, mephisto_montec_
 
 CONS( 1987, montec,     0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, monteca,    montec,   0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, monteciv,   montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, monteciv,   0,        0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
