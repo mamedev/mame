@@ -193,7 +193,7 @@ void rf5c400_device::device_start()
 void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int i, ch;
-	uint32_t end, loop;
+	uint64_t end, loop;
 	uint64_t pos;
 	uint8_t vol, lvol, rvol, type;
 	uint8_t env_phase;
@@ -209,8 +209,8 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		stream_sample_t *buf1 = outputs[1];
 
 //      start = ((channel->startH & 0xFF00) << 8) | channel->startL;
-		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
-		loop = ((channel->endHloopH & 0xFF00) << 8) | channel->loopL;
+		end = ((((channel->endHloopH & 0xFF) << 16) | channel->endL) << 16) | 0xffffULL;
+		loop = ((((channel->endHloopH & 0xFF00) << 8) | channel->loopL) << 16);
 		pos = channel->pos;
 		vol = channel->volume & 0xFF;
 		lvol = channel->pan & 0xFF;
@@ -296,10 +296,10 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			*buf1++ += sample * pan_table[rvol];
 
 			pos += channel->step;
-			if ((pos>>16) > end)
+			if (pos > end)
 			{
-				pos -= loop<<16;
-				pos &= 0xFFFFFF0000U;
+				pos -= loop;
+				pos &= ~0xffffULL;
 			}
 
 		}
