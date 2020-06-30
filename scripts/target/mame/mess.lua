@@ -856,6 +856,7 @@ BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
 BUSES["M5"] = true
+BUSES["MACKBD"] = true
 BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
@@ -1736,8 +1737,6 @@ files {
 	MAME_DIR .. "src/mame/machine/macadb.h",
 	MAME_DIR .. "src/mame/machine/macrtc.cpp",
 	MAME_DIR .. "src/mame/machine/macrtc.h",
-	MAME_DIR .. "src/mame/machine/mackbd.cpp",
-	MAME_DIR .. "src/mame/machine/mackbd.h",
 	MAME_DIR .. "src/mame/machine/swim.cpp",
 	MAME_DIR .. "src/mame/machine/swim.h",
 	MAME_DIR .. "src/mame/video/mac.cpp",

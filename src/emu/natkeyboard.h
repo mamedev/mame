@@ -76,8 +76,8 @@ private:
 		unsigned                                    shift;
 		ioport_condition                        condition;
 	};
-	typedef std::list<keycode_map_entry> keycode_map_list;
-	typedef std::unordered_map<char32_t, keycode_map_list> keycode_map;
+	typedef std::vector<keycode_map_entry> keycode_map_entries;
+	typedef std::unordered_map<char32_t, keycode_map_entries> keycode_map;
 
 	// internal helpers
 	void build_codes(ioport_manager &manager);

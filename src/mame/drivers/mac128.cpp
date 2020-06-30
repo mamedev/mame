@@ -80,15 +80,14 @@ c0   8 data bits, Rx disabled
 
 #include "emu.h"
 
-#include "machine/mackbd.h"
 #include "machine/macrtc.h"
 
+#include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/powerpc/ppc.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/ncr5380.h"
@@ -151,7 +150,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_iwm(*this, "fdc"),
-		m_mackbd(*this, "mackbd"),
+		m_mackbd(*this, "kbd"),
 		m_rtc(*this,"rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
@@ -176,7 +175,7 @@ private:
 	required_device<ram_device> m_ram;
 	optional_device<ncr5380_device> m_ncr5380;
 	required_device<applefdc_base_device> m_iwm;
-	required_device<mackbd_device> m_mackbd;
+	required_device<mac_keyboard_port_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -967,12 +966,12 @@ void mac128_state::mac512ke(machine_config &config)
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a));
 	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b));
-	m_via->cb2_handler().set(m_mackbd, FUNC(mackbd_device::datain_w));
+	m_via->cb2_handler().set(m_mackbd, FUNC(mac_keyboard_port_device::data_w));
 	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
-	MACKBD(config, m_mackbd, 0);
-	m_mackbd->dataout_handler().set(m_via, FUNC(via6522_device::write_cb2));
-	m_mackbd->clkout_handler().set(m_via, FUNC(via6522_device::write_cb1)).invert();
+	MAC_KEYBOARD_PORT(config, m_mackbd, mac_keyboard_devices, "pad");
+	m_mackbd->clock_cb().set(m_via, FUNC(via6522_device::write_cb1)).invert();
+	m_mackbd->data_cb().set(m_via, FUNC(via6522_device::write_cb2));
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -997,6 +996,8 @@ void mac128_state::macplus(machine_config &config)
 {
 	mac512ke(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macplus_map);
+
+	m_mackbd->set_default_option("plus");
 
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
