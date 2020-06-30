@@ -86,6 +86,8 @@ namespace plib {
 				{ rc.m_cmd = DIV; stk -= 1; }
 			else if (cmd == "pow")
 				{ rc.m_cmd = POW; stk -= 1; }
+			else if (cmd == "log")
+				{ rc.m_cmd = LOG; stk -= 0; }
 			else if (cmd == "sin")
 				{ rc.m_cmd = SIN; stk -= 0; }
 			else if (cmd == "cos")
@@ -324,6 +326,7 @@ namespace plib {
 				OP(SUB,  1, ST2 - ST1)
 				OP(DIV,  1, ST2 / ST1)
 				OP(POW,  1, plib::pow(ST2, ST1))
+				OP(LOG,  0, plib::log(ST2))
 				OP(SIN,  0, plib::sin(ST2))
 				OP(COS,  0, plib::cos(ST2))
 				OP(MAX,  1, std::max(ST2, ST1))

@@ -33,6 +33,7 @@ namespace plib {
 			SUB,
 			DIV,
 			POW,
+			LOG,
 			SIN,
 			COS,
 			MIN,
