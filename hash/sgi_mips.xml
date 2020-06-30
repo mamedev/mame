@@ -1907,6 +1907,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="patch_5_1_1_2">
+		<description>IRIX Patch 5.1.1.2</description>
+		<year>1993</year> <!-- 11/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0238-002"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_patch_5_1_1_2" sha1="29092ce7dd4682393e1ac0d2ffbbd8d0f9a6e90b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="patch_5_3_sep_97">
 		<description>IRIX 5.3 Recommended/Required Patches September 1997</description>
 		<year>1997</year>
