@@ -788,6 +788,6 @@ CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, 
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 
-CONS( 200?, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, init_m489, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, init_m489, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

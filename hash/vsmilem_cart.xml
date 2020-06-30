@@ -100,7 +100,7 @@ Language:
 +========+===================+===========================================================================================+
 |   XX   | 80-084240(US)     | Ni Hao Kai Lan                                                                            |
 |   XX   | 80-084245(FR)     | Ni Hao Kai Lan - Joyeux Nouvel an chinois!                                                |
-+========+===================+===========================================================================================+
++========+===================+===========================================================================================+	
 |        | 80-084260(US)     | My Pet Puppy (unreleased in USA? UK version plays OK on NTSC console)                     |
 |   XX   | 80-084262(NL)     | Mijn Puppy!                                                                               |
 |        | 80-084263(UK)     | My Pet Puppy                                                                              |
@@ -258,6 +258,18 @@ Language:
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="actnmniamb" cloneof="actnmniam" supported="no">
+		<description>Action Mania (USA)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vmotion80-084000.bin" size="0x0800000" crc="c3ca971e" sha1="5c63215280ec3fdb01e8b4a0c151496718b6bc0a" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="actnmniamnl" cloneof="actnmniam" supported="no">
 		<description>Sport Games (Netherlands)</description>
@@ -990,7 +1002,19 @@ Language:
 	</software>
 
 	<!-- Soccer Challenge -->
-	<software name="soccerchmg" supported="no">
+	<software name="soccerchm" supported="no">
+		<description>Soccer Challenge (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+	
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vmotion80-084300.bin" size="0x0800000" crc="4d0dd939" sha1="b5411b036fa91daf56f654be4ce71b4ac15541ca" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="soccerchmg" cloneof="soccerchm" supported="no">
 		<description>Fussball Meisterschaft (Germany)</description>
 		<year>20??</year>
 		<publisher>VTech</publisher>
@@ -1005,8 +1029,7 @@ Language:
 		</part>
 	</software>
 
-	<!-- Soccer Challenge -->
-	<software name="soccerchmf" supported="no" cloneof="soccerchmg">
+	<software name="soccerchmf" cloneof="soccerchm" supported="no">
 		<description>Football Challenge (France)</description>
 		<year>20??</year>
 		<publisher>VTech</publisher>
@@ -1019,7 +1042,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="spidermnmg" supported="no">
+
+	<software name="spidermnm" supported="no">
+		<description>Marvel Spider-Man &amp; Friends - Secret Missions (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+	
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vmotion80-084140.bin" size="0x0800000" crc="be4f9c32" sha1="9f7d77f1cdf64ab993a5d07b91d435a861c91758" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermnmg" cloneof="spidermnm" supported="no">
 		<description>Marvel Spider-Man &amp; Freunde - Geheime Missionen (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -1034,7 +1070,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="spidermnmf" cloneof="spidermnmg" supported="no">
+	<software name="spidermnmf" cloneof="spidermnm" supported="no">
 		<description>Marvel Spider-Man &amp; ses amis - Missions Secrètes (France)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1115,7 +1151,18 @@ Language:
 		</part>
 	</software>
 
-	<software name="toystor3mg" supported="no">
+	<software name="toystor3" supported="no">
+		<description>Toy Story 3 (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vmotion80-084420.bin" size="0x1000000" crc="c0500151" sha1="265d55fd723ff7698154165719ff9cfe6c3bf0c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor3mg" cloneof="toystor3" supported="no">
 		<description>Toy Story 3 (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -1132,7 +1179,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="toystor3mf" cloneof="toystor3mg" supported="no">
+	<software name="toystor3mf" cloneof="toystor3" supported="no">
 		<description>Toy Story 3 (France)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -1145,7 +1192,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="toystor3ms" cloneof="toystor3mg" supported="no">
+	<software name="toystor3ms" cloneof="toystor3" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Spain)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -1286,5 +1333,5 @@ Language:
 			</dataarea>
 		</part>
 	</software>
-
+	
 </softwarelist>
