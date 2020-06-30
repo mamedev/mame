@@ -49,10 +49,10 @@
     * 0x10: Permission to send
       Peripheral responds immediately with data if avaiblable.  If no
       data is available, peripheral waits for data and responds when it
-      becomes available.  If no data is availabel after 250ms, the
+      becomes available.  If no data is available after 250ms, the
       peripheral responds with 0x7b to hand control back to the host.
     * 0x14: Request to send
-      Peripheral responds immediately with data or 0x7b if no data is
+      Peripheral responds immediately with data, or 0x7b if no data is
       available.
     * 0x16: Reset and identify
       Peripheral responds with identification code.
@@ -73,6 +73,7 @@
     host.
 
     TODO:
+    * Dump/emulate newer versions of Apple keyboards (GI PIC1657 based)
     * Emulate Music Publisher music notation input pad
     * Emulate Assimilation Process keypad (and trackball)
 
