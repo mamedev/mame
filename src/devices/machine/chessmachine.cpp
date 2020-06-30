@@ -131,7 +131,7 @@ void chessmachine_device::main_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("ram");
 	map(0x00000000, 0x0000007f).r(FUNC(chessmachine_device::bootstrap_r));
-	map(0x00400000, 0x00400000).mirror(0x003ffffc).rw(FUNC(chessmachine_device::internal_r), FUNC(chessmachine_device::internal_w));
+	map(0x00400000, 0x007fffff).rw(FUNC(chessmachine_device::internal_r), FUNC(chessmachine_device::internal_w)).umask32(0x000000ff);
 	map(0x01800000, 0x01800003).r(FUNC(chessmachine_device::disable_bootstrap_r));
 }
 
