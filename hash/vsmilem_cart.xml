@@ -382,7 +382,7 @@ Language:
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="0x1000000">
-				<rom name="084585 - Cars 2 (MOTION) (FR).bin" size="0x1000000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" />
+				<rom name="084585 - Cars 2 (MOTION) (FR).bin" size="0x1000000" crc="9455eff9" sha1="0ff3fe336369f95dec640a5ca691daabacbc5332" />
 			</dataarea>
 		</part>
 	</software>
