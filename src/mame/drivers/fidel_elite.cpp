@@ -180,7 +180,7 @@ void elite_state::machine_reset()
 
 void elite_state::set_cpu_freq()
 {
-	// known official CPU speeds: 3MHz(EAS/EAS-B?), 3.57MHz(PC/Privat), 4MHz(PC/EAS-C)
+	// known official CPU speeds: 3MHz(EAS/EWC?), 3.57MHz(PC/Privat), 4MHz(PC/EAS-C)
 	u8 inp = ioport("FAKE")->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 4_MHz_XTAL : ((inp & 1) ? 3.579545_MHz_XTAL : 3_MHz_XTAL));
 	div_refresh();

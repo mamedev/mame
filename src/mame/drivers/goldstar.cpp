@@ -18412,7 +18412,7 @@ void wingco_state::init_super972()
 		m_decrypted_opcodes[i] = rom [i];
 
 	for (int i = 0xc000; i < 0xe000; i++)
-		m_decrypted_opcodes[i] = bitswap<8>(m_decrypted_opcodes[i], 7, 4, 5, 6, 3, 0, 1, 2);;
+		m_decrypted_opcodes[i] = bitswap<8>(m_decrypted_opcodes[i], 7, 4, 5, 6, 3, 0, 1, 2);
 
 	for (int i = 0xc000; i < 0xe000; i++)
 		rom[i] = bitswap<8>(rom[i], 7, 2, 5, 0, 3, 6, 1, 4);

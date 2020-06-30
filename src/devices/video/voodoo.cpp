@@ -156,7 +156,7 @@ bits(7:4) and bit(24)), X, and Y:
  *************************************/
 
 #define DEBUG_DEPTH         (0)
-#define DEBUG_LOD           (0)
+#define DEBUG_BACKBUF       (0)
 
 #define LOG_VBLANK_SWAP     (0)
 #define LOG_FIFO            (0)
@@ -910,7 +910,7 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 
 	/* debugging! */
-	if (machine().input().code_pressed(KEYCODE_L))
+	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
 		drawbuf = fbi.backbuf;
 
 	/* copy from the current front buffer */

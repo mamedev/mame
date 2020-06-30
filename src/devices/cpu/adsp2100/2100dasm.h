@@ -24,7 +24,7 @@ private:
 	static const char *const mac_xop[];
 	static const char *const mac_yop[];
 	static const char *const mac_dst[];
-	static const char *const shift_xop[];;
+	static const char *const shift_xop[];
 	static const char *const reg_grp[][16];
 	static const char *const dual_xreg[];
 	static const char *const dual_yreg[];

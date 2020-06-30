@@ -611,7 +611,7 @@ void mtech_state::init_mt_crt()
 	uint8_t* pin = memregion("sms_pin")->base();
 	init_mt_slot();
 
-	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
+	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;
 }
 
 

@@ -884,7 +884,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
 	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
-	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));;
+	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));
 	ppi.in_pb_callback().set(FUNC(mz2000_state::mz2000_portb_r));
 	ppi.out_pb_callback().set(FUNC(mz2000_state::mz2000_portb_w));
 	ppi.in_pc_callback().set(FUNC(mz2000_state::mz2000_portc_r));

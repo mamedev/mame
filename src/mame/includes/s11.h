@@ -13,6 +13,7 @@
 #include "audio/s11c_bg.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
+#include "machine/input_merger.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "sound/ym2151.h"
@@ -23,9 +24,14 @@
 
 // Length of time in cycles between IRQs on the main 6808 CPU
 // This length is determined by the settings of the W14 and W15 jumpers
-// It can be 0x300, 0x380, 0x700 or 0x780 cycles long.
-// IRQ length is always 32 cycles
-#define S11_IRQ_CYCLES 0x380
+// IRQ pulse width is always 32 cycles
+// All machines I've looked at so far have W14 present and W15 absent
+// which makes the timer int fire every 0x380 E-clocks (1MHz/0x380, ~1.116KHz)
+// It is possible to have W15 present and W14 absent instead,
+// which makes the timer fire every 0x700 E-clocks (1MHz/0x700, ~558Hz)
+// but I am unaware of any games which make use of this feature.
+// define the define below to enable the W15-instead-of-W14 feature.
+#undef S11_W15
 
 class s11_state : public genpin_class
 {
@@ -33,7 +39,10 @@ public:
 	s11_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainirq(*this, "mainirq")
+		, m_piairq(*this, "piairq")
 		, m_audiocpu(*this, "audiocpu")
+		, m_audioirq(*this, "audioirq")
 		, m_bgcpu(*this, "bgcpu")
 		, m_hc55516(*this, "hc55516")
 		, m_pias(*this, "pias")
@@ -85,6 +94,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	DECLARE_WRITE_LINE_MEMBER(main_irq);
 
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
@@ -98,7 +108,10 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_mainirq;
+	required_device<input_merger_device> m_piairq;
 	optional_device<m6802_cpu_device> m_audiocpu;
+	optional_device<input_merger_device> m_audioirq;
 	optional_device<cpu_device> m_bgcpu;
 	optional_device<hc55516_device> m_hc55516;
 	optional_device<pia6821_device> m_pias;
@@ -137,8 +150,10 @@ private:
 	uint8_t m_diag;
 	uint32_t m_segment1;
 	uint32_t m_segment2;
+	uint32_t m_timer_count;
 	emu_timer* m_irq_timer;
-	bool m_irq_active;
+	bool m_timer_irq_active;
+	bool m_pia_irq_active;
 };
 
 #endif // MAME_INCLUDES_S11_H

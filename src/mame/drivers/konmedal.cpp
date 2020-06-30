@@ -632,7 +632,7 @@ void konmedal_state::tsukande(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));;
+	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
@@ -675,7 +675,7 @@ void konmedal_state::ddboy(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));;
+	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
@@ -820,7 +820,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::shuri_scanline), "screen", 0, 1);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));;
+	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */

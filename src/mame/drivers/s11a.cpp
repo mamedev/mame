@@ -176,6 +176,8 @@ void s11a_state::s11a(machine_config &config)
 	M6808(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
+	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
+	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 
 	/* Video */
 	config.set_default_layout(layout_s11a);
@@ -191,15 +193,15 @@ void s11a_state::s11a(machine_config &config)
 	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
 	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
-	m_pia21->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia21->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia21->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<1>));
+	m_pia21->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia24, 0);
 	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
-	m_pia24->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia24->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia24->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<3>));
+	m_pia24->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<4>));
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
@@ -208,29 +210,29 @@ void s11a_state::s11a(machine_config &config)
 	m_pia28->writepb_handler().set(FUNC(s11_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
 	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
-	m_pia28->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia28->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
+	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
 	PIA6821(config, m_pia2c, 0);
 	m_pia2c->writepa_handler().set(FUNC(s11_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11_state::pia2c_pb_w));
-	m_pia2c->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia2c->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
+	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
 	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
-	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia30->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
+	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
-	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
+	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -238,6 +240,7 @@ void s11a_state::s11a(machine_config &config)
 	M6802(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_ram_enable(false);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_audio_map);
+	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -254,8 +257,8 @@ void s11a_state::s11a(machine_config &config)
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
-	m_pias->irqa_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
-	m_pias->irqb_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
+	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
+	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
 
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, XTAL(8'000'000) / 4); // MC68B09E

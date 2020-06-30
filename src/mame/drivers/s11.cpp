@@ -10,7 +10,6 @@
 
 ToDo:
 - Can coin up but not start
-- Doesn't react to the Advance button very well
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
     - Road Kings: press 'Up' (the direction key) and Q, and press "1" after inserting 1 or more credits.
@@ -140,26 +139,30 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	switch(id)
 	{
 	case TIMER_IRQ:
-		if(param == 1)
+		// handle the cd4020 14-bit timer irq counter; this timer fires on the rising and falling edges of Q5, every 32 clocks
+		m_timer_count += 0x20;
+		m_timer_count &= 0x3fff;
+		// handle the reset case (happens on the high level of Eclock, so supersedes the firing of the timer int)
+		if (BIT(m_timer_count, 5) && (m_timer_irq_active || m_pia_irq_active))
 		{
-			m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-			if(m_pias)
-				m_pias->cb1_w(0);
-			m_irq_active = true;
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+			m_timer_count = 0;
+			m_timer_irq_active = false;
 		}
-		else
+		else // handle the timer int firing case
 		{
-			m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-			if(m_pias)
-				m_pias->cb1_w(1);
-			m_irq_active = false;
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
+#ifndef S11_W15
+			// W14 jumper present (Q7), W15 absent (Q10)
+			m_timer_irq_active = (BIT(m_timer_count, 7) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
+#else
+			// W14 jumper absent (Q7), W15 present (Q10)
+			m_timer_irq_active = (BIT(m_timer_count, 10) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
+#endif
 		}
+
+		m_mainirq->in_w<0>(m_timer_irq_active);
+		if(m_pias)
+			m_pias->cb1_w(m_timer_irq_active);
+		m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 		break;
 	}
 }
@@ -187,19 +190,24 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 
 WRITE_LINE_MEMBER( s11_state::pia_irq )
 {
+	m_pia_irq_active = state;
+	m_mainirq->in_w<1>(state);
+}
+
+WRITE_LINE_MEMBER( s11_state::main_irq )
+{
+	// handle the fact that the Advance and Up/Down switches are gated by the combined timer/pia irq signal
 	if(state == CLEAR_LINE)
 	{
-		// restart IRQ timer
-		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-		m_irq_active = false;
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 	else
 	{
-		// disable IRQ timer while other IRQs are being handled
-		// (counter is reset every 32 cycles while a PIA IRQ is handled)
-		m_irq_timer->adjust(attotime::zero);
-		m_irq_active = true;
+		m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+		m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
 	}
+	m_maincpu->set_input_line(M6802_IRQ_LINE, state);
 }
 
 void s11_state::sol3_w(uint8_t data)
@@ -222,7 +230,6 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 
 void s11_state::lamp0_w(uint8_t data)
 {
-	m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
 void s11_state::dig0_w(uint8_t data)
@@ -382,9 +389,11 @@ void s11_state::init_s11()
 	membank("bank1")->configure_entries(0, 2, &ROM[0x18000], 0x4000);
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
+	m_timer_count = 0;
 	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-	m_irq_active = false;
+	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
+	m_timer_irq_active = false;
+	m_pia_irq_active = false;
 }
 
 void s11_state::s11(machine_config &config)
@@ -393,6 +402,8 @@ void s11_state::s11(machine_config &config)
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
+	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
+	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 
 	/* Video */
 	config.set_default_layout(layout_s11);
@@ -408,15 +419,15 @@ void s11_state::s11(machine_config &config)
 	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
 	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
-	m_pia21->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia21->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia21->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<1>));
+	m_pia21->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia24, 0);
 	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
-	m_pia24->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia24->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia24->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<3>));
+	m_pia24->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<4>));
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
@@ -425,35 +436,36 @@ void s11_state::s11(machine_config &config)
 	m_pia28->writepb_handler().set(FUNC(s11_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
 	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
-	m_pia28->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia28->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
+	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
 	PIA6821(config, m_pia2c, 0);
 	m_pia2c->writepa_handler().set(FUNC(s11_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11_state::pia2c_pb_w));
-	m_pia2c->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia2c->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
+	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
 	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
-	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia30->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
+	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
-	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
+	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	M6808(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
+	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
@@ -471,8 +483,8 @@ void s11_state::s11(machine_config &config)
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
-	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
-	m_pias->irqb_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
+	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
+	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
 
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, 8000000 / 4); // MC68B09E

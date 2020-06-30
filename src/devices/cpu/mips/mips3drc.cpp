@@ -1247,6 +1247,8 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 			UML_CALLC(block, cfunc_printf_debug, this);                            // callc   printf_debug
 		}
 		UML_EXH(block, *m_tlb_mismatch, 0);                      // exh     tlb_mismatch,0
+		// Unconditional tlb exception, no point going further
+		return;
 	}
 
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
@@ -1280,6 +1282,8 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 				UML_CALLC(block, cfunc_printf_debug, this);                        // callc   printf_debug
 			}
 			UML_EXH(block, *m_tlb_mismatch, 0);                  // exh     tlb_mismatch,0
+			// Unconditional tlb exception, no point going further
+			return;
 		}
 	}
 
@@ -1331,7 +1335,7 @@ void mips3_device::generate_delay_slot_and_branch(drcuml_block &block, compiler_
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
 		generate_update_cycles(block, compiler_temp, desc->targetpc, true); // <subtract cycles>
-		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+		if (!(m_drcoptions & MIPS3DRC_DISABLE_INTRABLOCK) && desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 		{
 			UML_JMP(block, desc->targetpc | 0x80000000);                            // jmp     desc->targetpc | 0x80000000
 		}
