@@ -2118,9 +2118,6 @@ files {
 createMESSProjects(_target, _subtarget, "ddr")
 files {
 	MAME_DIR .. "src/mame/drivers/ac1.cpp",
-	MAME_DIR .. "src/mame/includes/ac1.h",
-	MAME_DIR .. "src/mame/machine/ac1.cpp",
-	MAME_DIR .. "src/mame/video/ac1.cpp",
 	MAME_DIR .. "src/mame/drivers/bcs3.cpp",
 	MAME_DIR .. "src/mame/drivers/c80.cpp",
 	MAME_DIR .. "src/mame/includes/c80.h",
