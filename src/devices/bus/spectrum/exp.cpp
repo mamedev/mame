@@ -161,6 +161,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "intf2.h"
 #include "fuller.h"
 #include "kempjoy.h"
+#include "kempdisc.h"
 #include "melodik.h"
 #include "mface.h"
 #include "mgt.h"
@@ -188,6 +189,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("intf2", SPECTRUM_INTF2);
 	device.option_add("fuller", SPECTRUM_FULLER);
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
+	device.option_add("kempdisc", SPECTRUM_KEMPDISC);
 	device.option_add("melodik", SPECTRUM_MELODIK);
 	device.option_add("mface1", SPECTRUM_MFACE1);
 	device.option_add("mface128", SPECTRUM_MFACE128);
