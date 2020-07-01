@@ -11,8 +11,8 @@
 
 #include "pconfig.h"
 #include "pfmtlog.h"
-#include "pstring.h"
 #include "pgsl.h"
+#include "pstring.h"
 
 #include <array>
 #include <fstream>
@@ -151,7 +151,7 @@ public:
 	{
 		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
 		const putf8string conv_utf8(text);
-		//m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str()	)));
+		//m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str()  )));
 		ostream_write(*m_strm, conv_utf8.c_str(), string_info<pstring>::mem_size(conv_utf8));
 	}
 

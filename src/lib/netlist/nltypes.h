@@ -15,9 +15,9 @@
 #include "nl_config.h"
 
 //#include "plib/pchrono.h"
-#include "plib/ptypes.h"
 #include "plib/pstring.h"
 #include "plib/ptime.h"
+#include "plib/ptypes.h"
 
 #include <memory>
 
@@ -35,7 +35,7 @@ namespace plib
 	class plog_base;
 
 	struct plog_level;
-}
+} // namespace plib
 
 namespace netlist
 {
@@ -58,6 +58,8 @@ namespace netlist
 	class logic_family_desc_t;
 	class terminal_t;
 
+	class models_t;
+
 	namespace devices
 	{
 		class nld_solver;
@@ -75,6 +77,7 @@ namespace netlist
 
 	namespace detail
 	{
+		struct abstract_t;
 		class core_terminal_t;
 		class net_t;
 	} // namespace detail

@@ -3,8 +3,8 @@
 
 #include "plib/palloc.h"
 #include "plib/pstonum.h"
-#include "plib/putil.h"
 #include "plib/pstrutil.h"
+#include "plib/putil.h"
 
 #include "nl_convert.h"
 

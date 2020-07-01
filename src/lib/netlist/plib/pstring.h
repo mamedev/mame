@@ -53,8 +53,8 @@ public:
 	constexpr bool operator==(const pstring_const_iterator& rhs) const noexcept { return p == rhs.p; }
 	constexpr bool operator!=(const pstring_const_iterator& rhs) const noexcept { return p != rhs.p; }
 
-	reference operator*() const noexcept { return *reinterpret_cast<pointer>(&(*p)); }
-	pointer operator->() const noexcept { return reinterpret_cast<pointer>(&(*p)); }
+	reference operator*() const noexcept { return *reinterpret_cast<pointer>(&(*p)); } // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	pointer operator->() const noexcept { return reinterpret_cast<pointer>(&(*p)); }   // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 
 private:
 	template <typename G> friend struct pstring_t;
@@ -204,7 +204,7 @@ public:
 		return ostrm;
 	}
 
-	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); }
+	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); } // NOLINT(cppcoreguidelines-pro-type-reinterpret
 
 	static constexpr const size_type npos = static_cast<size_type>(-1);
 
@@ -256,7 +256,7 @@ struct putf_traits<1, CT>
 
 	static std::size_t codelen(const mem_t *p) noexcept
 	{
-		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
+		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret
 		if ((*p1 & 0xE0) == 0xC0) // NOLINT
 			return 2;
 		if ((*p1 & 0xF0) == 0xE0) // NOLINT
@@ -283,7 +283,7 @@ struct putf_traits<1, CT>
 
 	static code_t code(const mem_t *p) noexcept
 	{
-		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
+		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret
 		if ((*p1 & 0x80) == 0x00) // NOLINT
 			return *p1;
 		if ((*p1 & 0xE0) == 0xC0) // NOLINT

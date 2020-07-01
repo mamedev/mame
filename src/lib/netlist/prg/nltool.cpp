@@ -10,11 +10,12 @@
 // ***************************************************************************
 
 #include "netlist/plib/pdynlib.h"
-#include "netlist/plib/pmain.h"
+#include "netlist/core/setup.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_setup.h"
+#include "netlist/plib/pmain.h"
 #include "netlist/plib/pstrutil.h"
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"

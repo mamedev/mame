@@ -85,7 +85,7 @@ namespace plib {
 			}
 			b->m_free -= rs;
 			b->m_num_alloc++;
-			void *ret = reinterpret_cast<void *>(b->m_data + b->m_cur);
+			void *ret = reinterpret_cast<void *>(b->m_data + b->m_cur); // NOLINT(cppcoreguidelines-pro-type-reinterpret
 			auto capacity(rs);
 			ret = std::align(align, size, ret, capacity);
 			m_info.insert({ ret, info(b, b->m_cur)});
@@ -142,7 +142,7 @@ namespace plib {
 				m_data_allocated = static_cast<std::uint8_t *>(mp.base_arena().allocate(mp.m_block_align, m_bytes_allocated));
 				void *r = m_data_allocated;
 				std::align(mp.m_block_align, min_bytes, r, m_bytes_allocated);
-				m_data  = reinterpret_cast<std::uint8_t *>(r);
+				m_data  = reinterpret_cast<std::uint8_t *>(r); // NOLINT(cppcoreguidelines-pro-type-reinterpret
 			}
 			~block()
 			{
