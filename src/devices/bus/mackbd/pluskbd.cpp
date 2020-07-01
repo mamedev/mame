@@ -129,6 +129,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override
 	{
 		I8048(config, m_mpu, 6_MHz_XTAL); // NEC 8048HC517 341-0332-A with ceramic resonator
+		m_mpu->set_addrmap(AS_IO, &m0110a_device::mpu_io);
 		m_mpu->p1_out_cb().set(FUNC(m0110a_device::p1_w));
 		m_mpu->p2_in_cb().set_ioport("P2");
 		m_mpu->p2_out_cb().set(FUNC(m0110a_device::p2_w));
@@ -189,6 +190,12 @@ private:
 		}
 		LOGMATRIX("read matrix: row drive = %X, result = %X\n", m_row_drive, result);
 		return result;
+	}
+
+	void mpu_io(address_map &map)
+	{
+		// MPU writes 0xff to these addresses before reading columns to ensure the bus pins aren't pulled down
+		map(0x2a, 0x33).nopw();
 	}
 
 	TIMER_CALLBACK_MEMBER(update_host_data)
