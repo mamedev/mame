@@ -28,14 +28,20 @@ public:
 
 	void zerozone(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	// in drivers/zerozone.cpp
-	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	// in video/zerozone.cpp
 	void tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void tilebank_w(uint16_t data);
+	void tilebank_w(uint8_t data);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -47,21 +53,16 @@ private:
 	// currently this driver uses generic palette handling
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	// state
+
 	// video-related
-	uint16_t         m_tilebank;
-	tilemap_t     *m_zz_tilemap;
+	uint8_t m_tilebank;
+	tilemap_t *m_zz_tilemap;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 	TILE_GET_INFO_MEMBER(get_zerozone_tile_info);
 };
 
