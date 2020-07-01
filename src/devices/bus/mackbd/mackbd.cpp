@@ -153,12 +153,13 @@ void device_mac_keyboard_interface::interface_validity_check(validity_checker &v
 
 void mac_keyboard_devices(device_slot_interface &device)
 {
-	device.option_add("us",   MACKBD_M0110);
-	device.option_add("gb",   MACKBD_M0110B);
-	device.option_add("fr",   MACKBD_M0110F);
-	device.option_add("it",   MACKBD_M0110T);
+	device.option_add("us",    MACKBD_M0110);
+	device.option_add("gb",    MACKBD_M0110B);
+	device.option_add("fr",    MACKBD_M0110F);
+	device.option_add("it",    MACKBD_M0110T);
 
-	device.option_add("pad",  MACKBD_M0120);
+	device.option_add("pad",   MACKBD_M0120);
+	device.option_add("eupad", MACKBD_M0120P);
 
-	device.option_add("plus", MACKBD_M0110A);
+	device.option_add("plus",  MACKBD_M0110A);
 }

@@ -18,5 +18,6 @@ DECLARE_DEVICE_TYPE(MACKBD_M0110F, device_mac_keyboard_interface)
 DECLARE_DEVICE_TYPE(MACKBD_M0110T, device_mac_keyboard_interface)
 
 DECLARE_DEVICE_TYPE(MACKBD_M0120,  device_mac_keyboard_interface)
+DECLARE_DEVICE_TYPE(MACKBD_M0120P, device_mac_keyboard_interface)
 
 #endif // MAME_BUS_MACKBD_KEYBOARD_H

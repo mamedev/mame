@@ -92,10 +92,16 @@
     * M0110B (British - ISO)
     * M0110F (French - ISO)
     * M0110T (Italian - ISO)
+    * M0120 (keypad - English)
+    * M0120P (keypad - European)
+
+    ISO keyboards and the European keypad use icons rather than English
+    text for Backspace, Tab, Caps Lock, Shift, Return, Shift, Option,
+    Enter and Clear (all variants use icons for command and the cursor
+    arrows).
 
     Also known to exist:
     * Japanese - ANSI (U.S. with different key caps)
-    * M0120P - keypad, icons for Clear/Enter rather than English text
 
     TODO:
     * Determine whether P00 or P01 actually feeds the keypad watchdog
@@ -348,6 +354,8 @@ protected:
 		save_item(NAME(m_keyboard_data_in));
 	}
 
+	required_device<mac_keyboard_port_device> m_keyboard_port;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_out_w)
 	{
@@ -377,8 +385,6 @@ private:
 	{
 		m_keyboard_data_in = param ? 0x01U : 0x00U;
 	}
-
-	required_device<mac_keyboard_port_device> m_keyboard_port;
 
 	u8  m_keyboard_data_out = 0x01U;        // data line drive to keyboard (idle high)
 	u8  m_keyboard_clock_in = 0x01U;        // clock line driver from keyboard (idle high)
@@ -716,6 +722,16 @@ INPUT_PORTS_START(keypad)
 	PORT_BIT(0x0c, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, columns_r)
 INPUT_PORTS_END
 
+INPUT_PORTS_START(keypad_eu)
+	PORT_INCLUDE(keypad)
+
+	PORT_MODIFY("ROW1")
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) PORT_NAME("Keypad . (Down)")
+
+	PORT_MODIFY("ROW2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   PORT_NAME("Keypad ,")
+INPUT_PORTS_END
+
 
 class m0120_device : public keypad_base
 {
@@ -732,6 +748,28 @@ protected:
 	}
 };
 
+class m0120p_device : public keypad_base
+{
+public:
+	m0120p_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: keypad_base(mconfig, MACKBD_M0120P, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override
+	{
+		keypad_base::device_add_mconfig(config);
+
+		m_keyboard_port->set_default_option("fr");
+	}
+
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(keypad_eu);
+	}
+};
+
 } // anonymous namespace
 
 
@@ -740,4 +778,5 @@ DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110B, device_mac_keyboard_interface, m0110b_
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110F, device_mac_keyboard_interface, m0110f_device, "mackbd_m0110f", "Macintosh Keyboard (French - M0110F)")
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110T, device_mac_keyboard_interface, m0110t_device, "mackbd_m0110t", "Macintosh Keyboard (Italian - M0110T)")
 
-DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0120,  device_mac_keyboard_interface, m0120_device,  "mackbd_m0120",  "Macintosh Numeric Keypad (M0120)")
+DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0120,  device_mac_keyboard_interface, m0120_device,  "mackbd_m0120",  "Macintosh Numeric Keypad (English - M0120)")
+DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0120P, device_mac_keyboard_interface, m0120p_device, "mackbd_m0120p", "Macintosh Numeric Keypad (European - M0120P)")

@@ -117,7 +117,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override
 	{
-		I8048(config, m_mpu, 6'000'000); // clock frequency unconfirmed
+		I8048(config, m_mpu, 6_MHz_XTAL); // NEC 8048HC517 341-0332-A with ceramic resonator
 		m_mpu->p1_out_cb().set(FUNC(m0110a_device::p1_w));
 		m_mpu->p2_in_cb().set_ioport("P2");
 		m_mpu->p2_out_cb().set(FUNC(m0110a_device::p2_w));
