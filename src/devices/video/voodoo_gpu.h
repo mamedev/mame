@@ -30,6 +30,9 @@ using DirectX::XMFLOAT4;
 ////////////////////////////////////
 // Defines for 3dfx configuration //
 ////////////////////////////////////
+// Use dynamic buffers
+//#define USE_MAPPED
+
 // Number of texture mapping units (TMUs)
 #define NUM_TEX 2
 
