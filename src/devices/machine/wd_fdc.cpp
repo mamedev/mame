@@ -203,11 +203,13 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		intrq_cond = 0;
 		live_abort();
 	} else if(state && !mr) {
-		// trigger a restore after everything else is reset too, in particular the floppy device itself
-		// CHECKME: WD1770/72 supposedly may not perform RESTORE after reset
-		status |= S_BUSY;
-		sub_state = INITIAL_RESTORE;
-		t_gen->adjust(attotime::zero);
+		// WD1770/72 (supposedly) not perform RESTORE after reset
+		if (motor_control) {
+			// trigger a restore after everything else is reset too, in particular the floppy device itself
+			status |= S_BUSY;
+			sub_state = INITIAL_RESTORE;
+			t_gen->adjust(attotime::zero);
+		}
 		mr = true;
 	}
 }
