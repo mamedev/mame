@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		live_abort();
 	} else if(state && !mr) {
 		// WD1770/72 (supposedly) not perform RESTORE after reset
-		if (motor_control) {
+		if (!motor_control) {
 			// trigger a restore after everything else is reset too, in particular the floppy device itself
 			status |= S_BUSY;
 			sub_state = INITIAL_RESTORE;
