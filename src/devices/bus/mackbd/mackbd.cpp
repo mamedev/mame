@@ -65,6 +65,15 @@
     * 0x36: Perform self test
       Peripheral responds with 0x7d (pass) or 0x77 (failure).
 
+    Responses to polling commands 0x10 and 0x14 have the first bit clear
+    for key down events or set for key up events.
+
+    The keypad passes polling commands 0x10 and 0x14 on to the keyboard
+    if it has no response to send.  If the keypad has a key transition
+    to report, it responds with the octet 0x79.  After receiving this
+    response, the host should send command 0x10 to receive the key
+    transition event from the keypad.
+
     Additionally, if bit 5 of the octet sent to the peripheral is set
     (0x40), the octet is passed on to a daisy-chained peripheral with
     this bit cleared.  The response from the daisy-chained peripheral is
