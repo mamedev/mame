@@ -458,6 +458,15 @@ ROM_START( wlsair60 )
 	ROM_LOAD( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
+ROM_START( kiugames )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x21000000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hy27084g2m.u2", 0x0000, 0x21000000, CRC(65cc3864) SHA1(b759ec9816fe98a33ee7d5e12e5492f0160c5b31) )
+ROM_END
+
+
 ROM_START( jak_gtg )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -729,7 +738,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		*/
 
 		// probably more bytes are used
-		int dest = m_strippedrom[0x15] << 8;
+		int dest = m_strippedrom[0x15] << 8 | (m_strippedrom[0x16] << 16);
 
 		// copy a block of code from the NAND to RAM
 		for (int i = 0; i < m_initial_copy_words; i++)
@@ -795,6 +804,13 @@ void generalplus_gpac800_game_state::nand_wlsair60()
 	m_initial_copy_words = 0x2800;
 }
 
+void generalplus_gpac800_game_state::nand_kiugames()
+{
+	nand_init840();
+	m_initial_copy_words = 0x10000;
+}
+
+
 void generalplus_gpac800_game_state::nand_vbaby()
 {
 	nand_init840();
@@ -828,6 +844,7 @@ CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gp
 CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, kiugames,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 
 CONS(200?, jak_gtg,    0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
