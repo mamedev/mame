@@ -7,6 +7,15 @@
     This keyboard was only available in U.S./ANSI layout.  International
     markets continued to receive the M0110/M0120 keyboard/keypad.
 
+    A version was made with katakana labels on the key caps in addition
+    to the Latin labels, ¥ (Yen) replacing \ (backslash), and カナ
+    (kana) replacing Caps Lock.  It is still has the ANSI "typewriter
+    shift" arrangement for Latin characters and ASCII punctuation (it
+    doesn't use the JIS "bit shift" arrangement), all keys are in the
+    same positions, and there are no additional keys.  It's functionally
+    identical to the U.S. version (including the kana key mechanically
+    locking like Caps Lock).
+
     Emulation based entirely on examining the MPU program and observing
     behaviour.  There may be additional hardware in the keyboard that is
     not emulated (e.g. a watchdog timer).
