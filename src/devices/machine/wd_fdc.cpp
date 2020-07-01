@@ -979,6 +979,8 @@ void wd_fdc_device_base::interrupt_start()
 
 	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
 	{
+		motor_timeout = 0;
+
 		if (head_control)
 			set_hld();
 
