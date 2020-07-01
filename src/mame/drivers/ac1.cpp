@@ -45,12 +45,16 @@ public:
 	void ac1(machine_config &config);
 	void ac1_32(machine_config &config);
 	void ac1scch(machine_config &config);
+	void init_upper();
+	void init_lower();
 
 private:
 	u32 screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u8 ac1_port_b_r();
 	u8 ac1_port_a_r();
+	bool has_lowercase;
+	void machine_start() override;
 	void ac1_port_a_w(u8 data);
 	void ac1_port_b_w(u8 data);
 
@@ -79,56 +83,64 @@ u8 ac1_state::ac1_port_b_r()
 	return data;
 }
 
-#define BNOT(x) ((x) ? 0 : 1)
-
+// standard ascii keyboard with bit 7 high
 u8 ac1_state::ac1_port_a_r()
 {
-	u8 line0 = m_io_line[0]->read();
-	u8 line1 = m_io_line[1]->read();
-	u8 line2 = m_io_line[2]->read();
-	u8 line3 = m_io_line[3]->read();
-	u8 line4 = m_io_line[4]->read();
-	u8 line5 = m_io_line[5]->read();
-	u8 line6 = m_io_line[6]->read();
+	u8 line[7] = { 0,0,0,0,0,0,0} ;
 
-	u8 SH    = BNOT(BIT(line6,0));
-	u8 CTRL  = BNOT(BIT(line6,1));
-	u8 SPACE = BIT(line6,2);
-	u8 ENTER = BIT(line6,3);
-	u8 BACK  = BIT(line6,4);
-
-	u8 all = line0 | line1 | line2 | line3 | line4 | line5;
-	u8 s1 = BNOT(BIT(all,0));u8 z1 = (line0 !=0) ? 0 : 1;
-	u8 s2 = BNOT(BIT(all,1));u8 z2 = (line1 !=0) ? 0 : 1;
-	u8 s3 = BNOT(BIT(all,2));u8 z3 = (line2 !=0) ? 0 : 1;
-	u8 s4 = BNOT(BIT(all,3));u8 z4 = (line3 !=0) ? 0 : 1;
-	u8 s5 = BNOT(BIT(all,4));u8 z5 = (line4 !=0) ? 0 : 1;
-	u8 s6 = BNOT(BIT(all,5));u8 z6 = (line5 !=0) ? 0 : 1;
-	u8 s7 = BNOT(BIT(all,6));
-	u8 s8 = BNOT(BIT(all,7));
-	u8 tast,td0,td1,td2,td3,td4,td5,td6,dg5;
-
-	/* Additional double keys */
-	if (SPACE) {
-		z1 = 0; s1 = 0; SH = 0;
-	}
-	if (ENTER) {
-		z4 = 0; s6 = 0; CTRL = 0;
-	}
-	if (BACK) {
-		z4 = 0; s1 = 0; CTRL = 0;
+	line[6] = m_io_line[6]->read();
+	if (BIT(line[6], 2,3))
+	{
+		if (BIT(line[6], 2))
+			return 0xa0;  // space
+		if (BIT(line[6], 3))
+			return 0x8d;  // enter
+		if (BIT(line[6], 4))
+			return 0x88;  // backspace
 	}
 
-	tast = BNOT(s1 & s2 & s3 & s4 & s5 &s6 & s7 & s8);
-	td0  = BNOT(s2 & s4 & s6 & s8);
-	td1  = BNOT(s3 & s4 & s7 & s8);
-	td2  = BNOT(s5 & s6 & s7 & s8);
-	td3  = BNOT(z2 & z4 & z6);
-	td4  = BNOT(BNOT(BNOT(z1 & z2) & SH) & z5 & z6);
-	dg5  = BNOT(z3 & z4 & z5 & z6);
-	td5  = BNOT(BNOT(dg5 & BNOT(SH)) & z1 & z2);
-	td6  = (dg5 & CTRL);
-	return td0 + (td1 << 1) +(td2 << 2) +(td3 << 3) +(td4 << 4) +(td5 << 5) +(td6 << 6) +(tast << 7);
+	bool SH = BIT(line[6],0);
+	u8 i;
+
+	line[0] = m_io_line[0]->read();
+	if (line[0])
+		for (i = 0; i < 8; i++)
+			if (BIT(line[0], i))
+				return (SH) ? 0xa0+i : 0xb0+i;
+
+	line[1] = m_io_line[1]->read();
+	if (line[1])
+	{
+		for (i = 0; i < 4; i++)
+			if (BIT(line[1], i))
+				return (SH) ? 0xa8+i : 0xb8+i;
+		for (i = 4; i < 8; i++)
+			if (BIT(line[1], i))
+				return (SH) ? 0xb8+i : 0xa8+i;
+	}
+
+	bool CTRL = BIT(line[6],1);
+
+	line[2] = m_io_line[2]->read();
+	line[3] = m_io_line[3]->read();
+	line[4] = m_io_line[4]->read();
+	line[5] = m_io_line[5]->read();
+
+	if (!has_lowercase)
+	{
+		SH = false;
+		CTRL = false;
+	}
+
+	for (u8 j = 2; j < 6; j++)
+		for (i = 0; i < 8; i++)
+			if (BIT(line[j], i))
+			{
+				u8 k = 0x70 + i + j*8;
+				return (CTRL) ? k : ((SH) ? k+0x60 : k+0x40);
+			}
+
+	return 0; // no key pressed
 }
 
 void ac1_state::ac1_port_a_w(u8 data)
@@ -202,11 +214,11 @@ static INPUT_PORTS_START( ac1 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR('<') PORT_CHAR(',')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('=') PORT_CHAR('-')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('>') PORT_CHAR('.')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?') PORT_CHAR('/')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("LINE.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('@') PORT_CHAR('`')
@@ -242,11 +254,11 @@ static INPUT_PORTS_START( ac1 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR(']')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_CHAR('^') PORT_CHAR('~')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR('_') PORT_CHAR(127)
 
 	PORT_START("LINE.6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -289,6 +301,22 @@ u32 ac1_state::screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap,
 
 	return 0;
 }
+
+void ac1_state::machine_start()
+{
+	save_item(NAME(has_lowercase));
+}
+
+void ac1_state::init_upper()
+{
+	has_lowercase = false;
+}
+
+void ac1_state::init_lower()
+{
+	has_lowercase = true;
+}
+
 
 void ac1_state::ac1(machine_config &config)
 {
@@ -400,9 +428,9 @@ ROM_END
 
 // Driver
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY         FULLNAME                                 FLAGS
-COMP( 1984, ac1,     0,      0,      ac1,     ac1,   ac1_state, empty_init, "Frank Heyder", "Amateurcomputer AC1 Berlin",            MACHINE_SUPPORTS_SAVE )
-COMP( 1984, ac1_32,  ac1,    0,      ac1_32,  ac1,   ac1_state, empty_init, "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, ac1scch, ac1,    0,      ac1scch, ac1,   ac1_state, empty_init, "Frank Heyder", "Amateurcomputer AC1 SCCH", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ac1,     0,      0,      ac1,     ac1,   ac1_state, init_upper, "Frank Heyder", "Amateurcomputer AC1 Berlin",            MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ac1_32,  ac1,    0,      ac1_32,  ac1,   ac1_state, init_lower, "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ac1scch, ac1,    0,      ac1scch, ac1,   ac1_state, init_lower, "Frank Heyder", "Amateurcomputer AC1 SCCH", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 // ac1_2010
 // ac1_2017
 
