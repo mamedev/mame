@@ -37626,7 +37626,11 @@ mgt20in1
 
 @source:spg2xx_pdc.cpp
 pdc100
+pdc50
+pdc40t
 tmntpdc
+dorapdc
+vjpp2
 
 @source:spg2xx_playvision.cpp
 pvmil                           //
