@@ -35,6 +35,7 @@ public:
 	void nand_vbaby();
 	void nand_tsm();
 	void nand_beambox();
+	void nand_kiugames();
 
 protected:
 	virtual void machine_start() override;

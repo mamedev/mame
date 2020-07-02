@@ -323,8 +323,21 @@ ROM_END
 
 ROM_START( vsmilem )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5) ) // from a Spanish unit (but doesn't seem region specific)
+	ROM_SYSTEM_BIOS( 0, "bios0", "bios0" )
+	ROMX_LOAD( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) ) // from a Spanish unit (but doesn't seem region specific)
+
+	/* This ROM doesn't show the 'Motion' logo at all, but was dumped from a Motion unit
+
+		Console says "Vtech V.Smile V-motion Active Learning System"
+		"FCC ID 62R-0788, IC 1135D-0788" "53-36600-056-080" 
+		melted into plastic "VT8281"
+		The PCB has the code 35-078800-001-103_708979-2.	
+	*/
+	ROM_SYSTEM_BIOS( 1, "bios1", "bios1" )
+	ROMX_LOAD( "vmotionbios.bin", 0x000000, 0x200000, CRC(427087ea) SHA1(dc9eaa55f4a0047b6069ef73beea86d26f0f5394), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // from a US unit
+
 ROM_END
+
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
 CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
