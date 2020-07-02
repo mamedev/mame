@@ -26,17 +26,13 @@ protected:
 
 	uint16_t touch_xpos_r()
 	{ // >= 0x800 = right of screen
-	//	printf("0\n");
 		uint16_t ret = ioport("AD1")->read();
-		printf("x read %04x\n", ret);
 		return ret;
 	}
 
 	uint16_t touch_ypos_r()
 	{ // >= 0x800 = top of screen
-	//	printf("1\n");
 		uint16_t ret = ioport("AD2")->read();
-		printf("y read %04x\n", ret);
 		return ret;
 	}
 
@@ -94,7 +90,7 @@ static INPUT_PORTS_START( pdc_tactile )
 	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("AD1")
-	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0f, 0.0f, 0) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.10f, -0.05f, 0) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("AD2")
 	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_Y) PORT_INVERT PORT_CROSSHAIR(Y, 1.14f, -0.1f, 0) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -240,7 +236,7 @@ CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, emp
 // interestingly this is newer than the PDC100 above, despite containing fewer games
 CONS( 2010, pdc50,   0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init , "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2011, pdc40t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc100_game_state, init_pdc40t, "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
+CONS( 2011, pdc40t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc100_game_state, init_pdc40t, "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
 
 CONS( 2013, tmntpdc, 0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init,  "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
