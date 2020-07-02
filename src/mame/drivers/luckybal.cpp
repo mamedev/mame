@@ -32,10 +32,10 @@
 
   PCB specs:
 
-  Sikscreened: 'PCB Ver 1.5'
-  Sikscreened: 'SIELCON GAMES'
-  Sikscreened: 'Copyright 1996'
-  Sikscreened: 'MADE IN ARGENTINA'
+  Silkscreened: 'PCB Ver 1.5'
+  Silkscreened: 'SIELCON GAMES'
+  Silkscreened: 'Copyright 1996'
+  Silkscreened: 'MADE IN ARGENTINA'
 
   1x Unknown sanded PLCC68 IC (identified as Zilog Z180).
   1x unknown sanded DIL24 IC labeled PLD-01.
@@ -244,7 +244,7 @@
   '---------'                 '---------'                               '---------'
 
 
-  TOUCH = For iButton inplementation. Not present in the current PCBs.
+  TOUCH = For iButton implementation. Not present in the current PCBs.
 
 
 *********************************************************************
@@ -304,6 +304,9 @@ public:
 	void init_luckybala();
 	void init_luckybald();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void z180_trdr_w(uint8_t data);
 	void port90_bitswap_w(uint8_t data);
@@ -329,9 +332,17 @@ private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	output_finder<38> m_lamps;
 };
+
+
+void luckybal_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_trdr));
+	save_item(NAME(m_led_on));
+}
 
 
 /**************************************
@@ -567,7 +578,7 @@ INPUT_PORTS_END
 
 void luckybal_state::luckybal(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80180(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckybal_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &luckybal_state::main_io);
@@ -584,17 +595,17 @@ void luckybal_state::luckybal(machine_config &config)
 
 	CD4099(config, "latch3", 0);
 
-	/* nvram */
+	// nvram
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
