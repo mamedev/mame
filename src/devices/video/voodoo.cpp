@@ -1086,7 +1086,7 @@ void voodoo_device::tmu_state::init(uint8_t vdt, tmu_shared_state &share, voodoo
 	ram = reinterpret_cast<uint8_t *>(memory);
 	mask = tmem - 1;
 	reg = r;
-	regdirty = true;
+	regdirty = false;
 	bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
@@ -3395,16 +3395,21 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case texBaseAddr_1:
 		case texBaseAddr_2:
 		case texBaseAddr_3_8:
-			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (chips & 2)
 			{
-				vd->tmu[0].reg[regnum].u = data;
-				vd->tmu[0].regdirty = true;
+				if (vd->tmu[0].reg[regnum].u != data) {
+					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->tmu[0].regdirty = true;
+					vd->tmu[0].reg[regnum].u = data;
+				}
 			}
 			if (chips & 4)
 			{
-				vd->tmu[1].reg[regnum].u = data;
-				vd->tmu[1].regdirty = true;
+				if (vd->tmu[1].reg[regnum].u != data) {
+					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->tmu[1].regdirty = true;
+					vd->tmu[1].reg[regnum].u = data;
+				}
 			}
 			break;
 
