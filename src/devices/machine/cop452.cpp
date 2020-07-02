@@ -17,7 +17,7 @@
 #include "logmacro.h"
 
 // Device type definition
-DEFINE_DEVICE_TYPE(COP452, cop452_device, "COP452", "National Semiconductor COP452 frequency generator")
+DEFINE_DEVICE_TYPE(COP452, cop452_device, "cop452", "National Semiconductor COP452 frequency generator")
 
 cop452_device::cop452_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 : device_t(mconfig , COP452 , tag , owner , clock)
