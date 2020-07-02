@@ -11,6 +11,7 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_factory.h"
 #include "netlist/plib/prandom.h"
+#include "netlist/plib/pstonum.h"
 #include "netlist/plib/putil.h"
 
 #include <random>

@@ -36,7 +36,7 @@ namespace solver
 		using fptype = typename base_type::fptype;
 
 		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
 		, mat(static_cast<typename mat_type::index_type>(size))
@@ -200,9 +200,11 @@ namespace solver
 
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
-			const auto &nzbd = this->m_terms[i].m_nzbd;
+			//const auto &nzbd = this->m_terms[i].m_nzbd;
+			const auto *nzbd = mat.nzbd(i);
+			const auto nzbd_count = mat.nzbd_count(i);
 
-			if (!nzbd.empty())
+			if (nzbd_count > 0)
 			{
 				std::size_t pi = mat.diag[i];
 
@@ -212,8 +214,9 @@ namespace solver
 				const std::size_t piie = mat.row_idx[i+1];
 
 				//for (auto & j : nzbd)
-				for (std::size_t j : nzbd)
+				for (std::size_t jj = 0; jj < nzbd_count; jj++)
 				{
+					std::size_t j = nzbd[jj];
 					// proceed to column i
 					std::size_t pj = mat.row_idx[j];
 

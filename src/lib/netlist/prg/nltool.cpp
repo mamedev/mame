@@ -9,11 +9,13 @@
 //
 // ***************************************************************************
 
-#include "netlist/plib/pmain.h"
+#include "netlist/plib/pdynlib.h"
+#include "netlist/core/setup.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_setup.h"
+#include "netlist/plib/pmain.h"
 #include "netlist/plib/pstrutil.h"
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
@@ -222,17 +224,17 @@ public:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
 
-	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const override
+	std::unique_ptr<plib::dynlib_base> static_solver_lib() const override
 	{
 		if (m_boostlib == "builtin")
-			return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nl_static_solver_syms);
+			return std::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 		if (m_boostlib == "generic")
-			return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nullptr);
+			return std::make_unique<plib::dynlib_static>(nullptr);
 		if (NL_DISABLE_DYNAMIC_LOAD)
 			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
 
 		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		return plib::make_unique<plib::dynlib, netlist::host_arena>(m_boostlib);
+		return std::make_unique<plib::dynlib>(m_boostlib);
 	}
 
 private:

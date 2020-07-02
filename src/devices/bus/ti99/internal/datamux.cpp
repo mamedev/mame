@@ -312,14 +312,14 @@ void datamux_device::debugger_write(uint16_t addr, uint16_t data)
 			if ((addrb & 0xe000)==0x6000)
 			{
 				m_gromport->romgq_line(ASSERT_LINE);
-				m_gromport->write(addr+1, data & 0xff);
-				m_gromport->write(addr, (data>>8) & 0xff);
+				m_gromport->write(addrb+1, data & 0xff);
+				m_gromport->write(addrb, (data>>8) & 0xff);
 				m_gromport->romgq_line(m_romgq_state);  // reset to previous state
 			}
 
 			m_ioport->memen_in(ASSERT_LINE);
-			m_ioport->write(addr+1, data & 0xff);
-			m_ioport->write(addr,  (data>>8) & 0xff);
+			m_ioport->write(addrb+1, data & 0xff);
+			m_ioport->write(addrb,  (data>>8) & 0xff);
 			m_ioport->memen_in(m_memen_state);   // reset to previous state
 		}
 	}

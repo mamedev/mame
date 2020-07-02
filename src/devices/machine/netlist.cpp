@@ -19,6 +19,9 @@
 //#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
+#include "netlist/plib/pmempool.h"
+#include "netlist/plib/pdynlib.h"
+#include "netlist/plib/pstonum.h"
 
 #include "debugger.h"
 #include "romload.h"
@@ -63,7 +66,7 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-extern plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::dynlib_static_sym nl_static_solver_syms[];
 
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {
@@ -116,10 +119,10 @@ protected:
 		}
 	}
 
-	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	std::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
 		//return plib::make_unique<plib::dynlib_static>(nullptr);
-		return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nl_static_solver_syms);
+		return std::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 	}
 
 private:
@@ -159,9 +162,9 @@ protected:
 		}
 	}
 
-	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	std::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
-		return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nullptr);
+		return std::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 private:
@@ -845,7 +848,7 @@ void netlist_mame_stream_output_device::pre_parse_action(netlist::nlparse_t &par
 
 	const auto lambda = [this](auto &in, netlist::nl_fptype val)
 	{
-		this->process(in.exec().time(), val);;
+		this->process(in.exec().time(), val);
 	};
 
 	using lb_t = decltype(lambda);
@@ -966,11 +969,11 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 	}
 }
 
-netlist::host_arena::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
+std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
 {
 	try
 	{
-		auto lnetlist = plib::make_unique<netlist::netlist_state_t, netlist::host_arena>("netlist",
+		auto lnetlist = std::make_unique<netlist::netlist_state_t>("netlist",
 			plib::make_unique<netlist_validate_callbacks_t, netlist::host_arena>());
 		// enable validation mode
 		lnetlist->set_extended_validation(true);
@@ -1002,7 +1005,7 @@ netlist::host_arena::unique_ptr<netlist::netlist_state_t> netlist_mame_device::b
 	{
 		osd_printf_error("%s\n", err.what());
 	}
-	return netlist::host_arena::unique_ptr<netlist::netlist_state_t>(nullptr);
+	return std::unique_ptr<netlist::netlist_state_t>(nullptr);
 }
 
 void netlist_mame_device::device_validity_check(validity_checker &valid) const

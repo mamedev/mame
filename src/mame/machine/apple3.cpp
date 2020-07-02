@@ -480,7 +480,8 @@ void apple3_state::apple3_c0xx_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(apple3_state::vbl_w)
 {
-	if ((state) && (m_charwrt))
+	// do the font upload at the end of VBL, not the start
+	if ((!state) && (m_charwrt))
 	{
 		apple3_write_charmem();
 	}

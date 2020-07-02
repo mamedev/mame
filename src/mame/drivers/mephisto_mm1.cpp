@@ -37,6 +37,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -44,6 +45,8 @@ TODO:
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork

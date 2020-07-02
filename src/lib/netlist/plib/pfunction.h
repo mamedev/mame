@@ -10,7 +10,6 @@
 
 #include "pmath.h"
 #include "pstring.h"
-#include "putil.h"
 
 #include <vector>
 
@@ -33,6 +32,13 @@ namespace plib {
 			MULT,
 			SUB,
 			DIV,
+			EQ,
+			NE,
+			LT,
+			GT,
+			LE,
+			GE,
+			IF,
 			POW,
 			SIN,
 			COS,

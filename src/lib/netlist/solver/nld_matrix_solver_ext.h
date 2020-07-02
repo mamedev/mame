@@ -25,7 +25,7 @@ namespace solver
 		using float_type = FT;
 
 		matrix_solver_ext_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+			const net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_t(anetlist, name, nets, params)
 		, m_new_V(size)

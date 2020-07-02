@@ -1,7 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 
 // MAME Reference driver for Grant Searle's Simple Z80 Computer
 // http://www.searle.wales/
-// Written by Frank Palazzolo - frank@avoidspikes.com
 
 // All the common emulator stuff is here
 #include "emu.h"

@@ -144,7 +144,7 @@ pen_t s97269pb_device::choose_pen(uint8_t x, uint8_t y, pen_t back_pen)
 
 			case 0x4:
 				// black-to-blue
-				return rgb_t(0, 0, (gradient_flags & 0x0f) * 0x11);;
+				return rgb_t(0, 0, (gradient_flags & 0x0f) * 0x11);
 				break;
 
 			case 0xf:

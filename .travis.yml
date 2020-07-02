@@ -1,20 +1,23 @@
 language: cpp
-compiler:
-  - gcc
-  - clang
-os:
-  - linux
-  - osx
 dist: bionic
-osx_image: xcode11.5
-matrix:
-  exclude:
+jobs:
+  include:
     - os: osx
-      compiler: gcc
-    - os: linux
+      osx_image: xcode11.5
       compiler: clang
-env:
-  - SUBTARGET=tiny   MAME=mametiny64
+      env: SUBTARGET=tiny   MAME=mametiny64
+    - os: linux
+      arch: amd64
+      compiler: gcc
+      env: SUBTARGET=tiny   MAME=mametiny64
+    - os: linux
+      arch: arm64
+      compiler: gcc
+      env: SUBTARGET=tiny   MAME=mametiny
+    - os: linux
+      arch: s390x
+      compiler: gcc
+      env: SUBTARGET=tiny   MAME=mametiny64
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then

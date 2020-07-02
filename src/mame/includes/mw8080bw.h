@@ -379,19 +379,14 @@ class zzzap_state : public mw8080bw_state
 {
 public:
 	zzzap_state(machine_config const &mconfig, device_type type, char const *tag) :
-		mw8080bw_state(mconfig, type, tag),
-		m_soundboard(*this, "soundboard")
+		mw8080bw_state(mconfig, type, tag)
 	{
 	}
 
 	void zzzap(machine_config &config);
 
 private:
-	void io_w(offs_t offset, u8 data);
-
 	void io_map(address_map &map);
-
-	required_device<zzzap_audio_device> m_soundboard;
 };
 
 

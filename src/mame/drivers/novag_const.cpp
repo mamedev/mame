@@ -41,7 +41,10 @@ Super Sensor IV:
 - MOS MPS6502A @ 2MHz
 - 1KB battery-backed RAM (2*TC5514AP-3)
 - 8KB ROM (TMM2364P)
-- 2 ROM sockets unpopulated
+- 2 ROM sockets for expansion (blue @ u6, white @ u5)
+
+Known Super Sensor IV expansion ROMs:
+- Quartz Chess Clock (came with the clock accessory)
 
 Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
 basically a low-budget version of it with peripheral ports removed.
@@ -58,6 +61,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"
@@ -66,6 +70,10 @@ TODO:
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -226,9 +234,12 @@ u8 const_state::input2_r()
 void const_state::ssensor4_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("nvram");
+	map(0x2000, 0x2000).nopw(); // accessory?
+	map(0x4000, 0x4000).nopw(); // "
 	map(0x6000, 0x6000).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x8000, 0x8000).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
-	map(0xa000, 0xffff).rom();
+	map(0xc000, 0xdfff).r("exrom", FUNC(generic_slot_device::read_rom));
+	map(0xe000, 0xffff).rom();
 }
 
 void const_state::const_map(address_map &map)
@@ -242,8 +253,8 @@ void const_state::const_map(address_map &map)
 void const_state::sconst_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1c00, 0x1c00).nopw(); // printer/clock?
-	map(0x1d00, 0x1d00).nopw(); // printer/clock?
+	map(0x1c00, 0x1c00).nopw(); // accessory?
+	map(0x1d00, 0x1d00).nopw(); // "
 	map(0x1e00, 0x1e00).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x1f00, 0x1f00).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
 	map(0x2000, 0xffff).rom();
@@ -380,6 +391,10 @@ void const_state::ssensor4(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_novag_ssensor4);
+
+	/* expansion */
+	GENERIC_CARTSLOT(config, "exrom", generic_plain_slot, "novag_ssensor4");
+	SOFTWARE_LIST(config, "cart_list").set_original("novag_ssensor4");
 }
 
 void const_state::nconst36(machine_config &config)
@@ -460,7 +475,7 @@ void const_state::sconst(machine_config &config)
 ******************************************************************************/
 
 ROM_START( ssensor4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("5611_1i_orange.u4", 0xe000, 0x2000, CRC(f4ee99d1) SHA1(f44144a26b92c51f4350da85858470e6c3b66fc1) ) // TMM2364P
 ROM_END
 

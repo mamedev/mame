@@ -1427,7 +1427,7 @@ public:
 	stw_t(const stw_t& other) = default;
 	stw_t &operator=(const stw_t& other) = default;
 
-	void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s, t); m_w = _mm_set1_pd(w); }
+	void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s << 8, t << 8); m_w = _mm_set1_pd(w); }
 	int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
 	void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const
 	{
@@ -1445,7 +1445,7 @@ public:
 	{
 		__m128d tmp = _mm_div_pd(m_st, m_w);
 		// Allow for 8 bits of decimal in integer
-		tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
+		//tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
 		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
 #ifdef __SSE4_1__
 		sow = _mm_extract_epi32(tmp2, 1);

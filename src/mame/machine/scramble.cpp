@@ -448,7 +448,7 @@ void scramble_state::init_hustler()
 	{
 		int bits[8];
 		for (int i = 0;i < 8;i++)
-			bits[i] = BIT(A, i);;
+			bits[i] = BIT(A, i);
 
 		uint8_t xormask = 0xff;
 		if (bits[0] ^ bits[1]) xormask ^= 0x01;

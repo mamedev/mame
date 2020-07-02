@@ -1195,6 +1195,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/mdos_dsk.h,FORMATS["MDOS_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["MDOS_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/mdos_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/mdos_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/mfm_hd.h,FORMATS["MFM_HD"] = true
 --------------------------------------------------
 

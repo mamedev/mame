@@ -29,13 +29,10 @@ Note that T is also a tilt, but it may take 3 hits to activate it.
 A number of games are multiball therefore they either cannot start or the outhole
 is ineffective/unknown. All games can coin up.
 
-Note: fpwr2_l2 can be started by holding down D (left ball ramp) and F (ball shooter trough) when pressing start.
-
-
 Game              Outhole   Tilt        Notes
 ----------------------------------------------------------------------------------
 Black Knight      L Z C     U           To start, hold down LZC and press 1.
-Firepower II      S D                   To start, hold down SD and press 1.
+Firepower II      S D [D F]             To start, hold down SD or DF and press 1.
 Defender          rs I O                To start, hold down IO and Right-Shift, then press 1.
 Pharoah           Right Up              To start, hold down Right and Down, and press 1
 Starlight         S D                   To start, hold down SD and press 1.
@@ -485,6 +482,7 @@ void s7_state::s7(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s7_state::dips_r));
+	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s7_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s7_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s7_state::pia28_ca2_w));
@@ -494,6 +492,7 @@ void s7_state::s7(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s7_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s7_state::switch_w));
 	m_pia30->ca2_handler().set(FUNC(s7_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s7_state::pia30_cb2_w));

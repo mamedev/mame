@@ -11765,6 +11765,7 @@ jupk_501                        //
 jupk_513                        //
 jupk_g51                        //
 lah_106c                        //
+lah_107                         //
 lah_110                         //
 lah_112                         //
 lah_l104                        //
@@ -11775,6 +11776,7 @@ lw3_205                         //
 lw3_207                         //
 lw3_207c                        //
 lw3_208                         //
+mj_130                          //
 rab_103                         //
 rab_130                         //
 rab_320                         //
@@ -13037,6 +13039,7 @@ emma2                           // 1979 L.J.Technical Systems
 emu2                            //
 
 @source:emu3.cpp
+emax2                           //
 emu3                            //
 
 @source:enigma2.cpp
@@ -13299,6 +13302,7 @@ yukon1                          // (c) 1989
 attckexd                        // (c) 1977 Exidy
 attckexd2                       // (c) 1977 Exidy
 deathrac                        // (c) 1976 Exidy
+destdrby                        // (c) 1976 Exidy
 rhunting                        // bootleg of deathrac
 
 @source:exp85.cpp
@@ -14734,10 +14738,13 @@ mobigo2
 
 @source:generalplus_gpl16250_nand.cpp
 wlsair60                        // Wireless Air 60
+kiugames
 jak_car2
 jak_gtg
 jak_sspop
 jak_hmhsm
+jak_hmg2
+jak_hsmg2
 jak_umdf
 jak_duck
 jak_swc
@@ -15233,6 +15240,7 @@ nfb96sec                        // bootleg
 nfb96txt                        // (c) 2000 Amcoe
 nfm                             // bootleg
 nfma                            // bootleg
+noved                           // bootleg
 ns8lines                        // unknown
 ns8linew                        // unknown
 ns8linewa                       // unknown
@@ -18670,6 +18678,9 @@ ksp10                           //
 @source:kawai_r100.cpp
 r100                            //
 
+@source:kawai_sx240.cpp
+sx240                           //
+
 @source:kaypro.cpp
 kaypro1                         // Kaypro 1
 kaypro10                        // Kaypro 10/83
@@ -18927,6 +18938,11 @@ korgm1ex                        //
 korgm1p1                        //
 korgm1r                         //
 korgm1rex                       //
+
+@source:korgws.cpp
+korgwsad                        //
+korgwsex                        //
+korgwssr                        //
 
 @source:korgz3.cpp
 korgz3                          //
@@ -19945,6 +19961,7 @@ mastboyia                       // (c) 1991 - No Ref on the PCB
 mastboyo                        // (c) 1987 - No Ref on the PCB
 mastboyoa                       // (c) 1987 - No Ref on the PCB
 mastboyob
+mastboyoc
 
 @source:matmania.cpp
 excthour                        // TA-0015 (c) 1985 + Taito license
@@ -31645,6 +31662,7 @@ nespal                          // Nintendo Entertainment System PAL
 pjoypj001
 afbm7800
 dnce2000
+vtvppong
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -35223,6 +35241,7 @@ frpwr_t6                        //
 grgar_l1                        //
 grgar_t1                        //
 lzbal_l2                        //
+lzbal_l2sp                      //
 lzbal_t2                        //
 scrpn_l1                        //
 scrpn_t1                        //
@@ -37608,7 +37627,11 @@ mgt20in1
 
 @source:spg2xx_pdc.cpp
 pdc100
+pdc50
+pdc40t
 tmntpdc
+dorapdc
+vjpp2
 
 @source:spg2xx_playvision.cpp
 pvmil                           //
@@ -37650,6 +37673,8 @@ vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wiwi18                          //
 foxsport
 lexifit
+marc101
+marc250
 
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60

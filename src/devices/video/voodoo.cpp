@@ -156,7 +156,7 @@ bits(7:4) and bit(24)), X, and Y:
  *************************************/
 
 #define DEBUG_DEPTH         (0)
-#define DEBUG_LOD           (0)
+#define DEBUG_BACKBUF       (0)
 
 #define LOG_VBLANK_SWAP     (0)
 #define LOG_FIFO            (0)
@@ -915,7 +915,7 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 
 	/* debugging! */
-	if (machine().input().code_pressed(KEYCODE_L))
+	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
 		drawbuf = fbi.backbuf;
 
 	/* copy from the current front buffer */
@@ -1091,7 +1091,7 @@ void voodoo_device::tmu_state::init(uint8_t vdt, tmu_shared_state &share, voodoo
 	ram = reinterpret_cast<uint8_t *>(memory);
 	mask = tmem - 1;
 	reg = r;
-	regdirty = true;
+	regdirty = false;
 	bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
@@ -3446,16 +3446,21 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case texBaseAddr_1:
 		case texBaseAddr_2:
 		case texBaseAddr_3_8:
-			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (chips & 2)
 			{
-				vd->tmu[0].reg[regnum].u = data;
-				vd->tmu[0].regdirty = true;
+				if (vd->tmu[0].reg[regnum].u != data) {
+					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->tmu[0].regdirty = true;
+					vd->tmu[0].reg[regnum].u = data;
+				}
 			}
 			if (chips & 4)
 			{
-				vd->tmu[1].reg[regnum].u = data;
-				vd->tmu[1].regdirty = true;
+				if (vd->tmu[1].reg[regnum].u != data) {
+					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->tmu[1].regdirty = true;
+					vd->tmu[1].reg[regnum].u = data;
+				}
 			}
 			break;
 

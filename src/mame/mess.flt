@@ -462,6 +462,7 @@ kawai_k4.cpp
 kawai_k5.cpp
 kawai_ksp10.cpp
 kawai_r100.cpp
+kawai_sx240.cpp
 kaypro.cpp
 kc.cpp
 kdt6.cpp
@@ -472,6 +473,7 @@ korgdss1.cpp
 korgdvp1.cpp
 korgdw8k.cpp
 korgm1.cpp
+korgws.cpp
 korgz3.cpp
 kramermc.cpp
 krokha.cpp

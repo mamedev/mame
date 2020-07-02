@@ -1,7 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 
 // MAME driver for Grant Searle's Simple 6502 Computer
 // http://www.searle.wales/
-// Written by Frank Palazzolo - frank@avoidspikes.com
 
 #include "emu.h"
 

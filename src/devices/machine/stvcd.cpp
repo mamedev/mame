@@ -882,7 +882,7 @@ void stvcd_device::cmd_seek_disc()
 		if (cr2 >> 8)
 		{
 			cd_stat = CD_STAT_PAUSE;
-			cur_track = cr2>>8;;
+			cur_track = cr2>>8;
 			cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
 			m_cdda->pause_audio(1);
 			// (index is cr2 low byte)

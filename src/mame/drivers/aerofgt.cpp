@@ -1979,7 +1979,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, XTAL(20'000'000)/4); /* 5 MHz verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);;
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)

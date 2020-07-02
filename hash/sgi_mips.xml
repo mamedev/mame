@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="sgi_mips" description="Sgi MIPS/IRIX software">
+<softwarelist name="sgi_mips" description="SGI MIPS/IRIX software">
 
 	<!-- Apps and utilities -->
 
@@ -128,12 +128,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deskse_1_0">
+		<description>Desktop Special Edition 1.0</description>
+		<year>1995</year> <!-- 8/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0410-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="Desktop_Special_Edition_1_0" sha1="4ed0c83fd7d53112da5e3ec210d767cf3d29f41b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="deskse_1_1">
 		<description>Desktop Special Edition 1.1</description>
 		<year>1995</year> <!-- 11/95 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="813-0410-002"/>
+			<feature name="part_number" value="812-0410-002"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="desktop_special_edition_1_1" sha1="4f740d11eb60da5fadcd4a3003aca88ff81d7ae3" />
@@ -219,12 +233,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="eurlang_1_1">
+		<description>European Language Module 1.1</description>
+		<year>1993</year> <!-- 10/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0241-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="european_language_module_1_1" sha1="0fb2bcfd2796d24baf4328bc12bce8571f992253" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="eurlang_1_2">
 		<description>European Language Module 1.2</description>
 		<year>1994</year> <!-- 05/94 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0739-003"/>
+			<!-- Also distributed with P/N 812-0739-003 and identical contents -->
+			<feature name="part_number" value="812-0241-002"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="european_language_module_1_2" sha1="ae869fd7623d2624b569b365239cfa173788a481" />
@@ -242,6 +270,20 @@ license:CC0
 			<diskarea name="cdrom">
 				<!-- Dumped with Plextor, without C2 errors -->
 				<disk name="European_Language_Module_1_3" sha1="9d4ef603308722130a8bf548f1e227c842690885" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="eurlang_1_3_1">
+		<description>European Language Module 1.3.1</description>
+		<year>1995</year> <!-- 9/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3.1" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0241-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="European_Language_Module_1_3_1" sha1="9c4931ef0d3030ed4998f2992c6c3a70338136f7" />
 			</diskarea>
 		</part>
 	</software>
@@ -676,15 +718,41 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="onc3nfs_1">
+		<description>ONC3/NFS for IRIX 6.2 Version 1</description>
+		<year>1996</year> <!-- 03/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0305-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="onc3_nfs_for_irix_6_2_version_1" sha1="e2e85307864dff08189d5271fbc66b2ae3fae954" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="onc3nfs_ind">
+		<description>ONC3/NFS for IRIX 6.2 with Indigo2 IMPACT 10000 Version 1</description>
+		<year>1996</year> <!-- 06/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0305-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="onc3_nfs_for_irix_6_2_with_indigo2_impact_10000_version_1" sha1="49171c4968606047af96fbce7fbde5f685c8d130" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="onc3nfs_1_2">
-		<description>NFS/ONC3 for IRIX 6.2 Version 1.2</description>
+		<description>ONC3/NFS for IRIX 6.2 Version 1.2</description>
 		<year>1996</year> <!-- 08/96 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="813-0305-006"/>
+			<feature name="part_number" value="812-0305-006"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
-				<disk name="nfs_onc3_for_irix_6_2_version_1_2" sha1="86f44b190dbbe8b8a55f6a8250e7a9d42905b70a" />
+				<disk name="onc3_nfs_for_irix_6_2_version_1_2" sha1="86f44b190dbbe8b8a55f6a8250e7a9d42905b70a" />
 			</diskarea>
 		</part>
 	</software>
@@ -1572,17 +1640,31 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- IndyZone -->
+	<!-- IndiZone -->
 
-	<software name="indizone">
-		<description>IndiZone</description>
+	<software name="indizone_1">
+		<description>IndiZone 1.0</description>
+		<year>1993</year>
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8102-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="indizone_1" sha1="7dfed1d5b5efb7c773244372d0a24823cf4d5cc4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="indizone_1_1">
+		<description>IndiZone 1.1</description>
 		<year>1993</year>
 		<publisher>Silicon Graphics</publisher>
 		<info name="version" value="1.1" />
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: archive.org; reconstructed from a tarball, needs redump -->
 			<diskarea name="cdrom">
-				<disk name="indizone" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" />
+				<disk name="indizone_1_1" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" />
 			</diskarea>
 		</part>
 	</software>
@@ -1821,6 +1903,19 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="812_0238_001_irix_patch_5_1_1_1_sep1993" sha1="769fef8f67a42049541eb1f9e8357e7e769377a2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_5_1_1_2">
+		<description>IRIX Patch 5.1.1.2</description>
+		<year>1993</year> <!-- 11/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0238-002"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_patch_5_1_1_2" sha1="29092ce7dd4682393e1ac0d2ffbbd8d0f9a6e90b" />
 			</diskarea>
 		</part>
 	</software>
@@ -2134,6 +2229,19 @@ license:CC0
 	</software>
 
 	<software name="irix_5_2_a" cloneof="irix_5_2">
+		<description>IRIX 5.2 for Indy R4600PC and Challenge SX</description>
+		<year>1994</year> <!-- 04/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0279-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_5_2_for_indy_r4600pc_and_challenge_sx" sha1="972cffffe22668cf2383a335718afd3083cb5965" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_b" cloneof="irix_5_2">
 		<description>IRIX 5.2 for Indy R4600SC/XZ and Presenter</description>
 		<year>1994</year> <!-- 08/94 -->
 		<publisher>Silicon Graphics</publisher>
@@ -3053,7 +3161,7 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom5" interface="cdrom">
-		  <feature name="part_id" value="IRIX 6.5.15 Base Documentation"/>
+			<feature name="part_id" value="IRIX 6.5.15 Base Documentation"/>
 			<feature name="part_number" value="812-0779-015"/>
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">

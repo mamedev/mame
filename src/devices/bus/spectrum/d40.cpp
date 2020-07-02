@@ -5,10 +5,11 @@
     Didaktik D40/D80 disk interface
     (C) 1991 Didaktik Skalica
 
-	useful commands:
-	 CAT - files list
-	 LIST * - system information
-	 LOAD *"filename" - load program
+    useful commands:
+     RUN - boot disc
+     CAT - files list
+     LIST * - system information
+     LOAD *"filename" - load program
 
 **********************************************************************/
 
@@ -32,6 +33,14 @@ DEFINE_DEVICE_TYPE(SPECTRUM_D80V2, spectrum_d80v2_device, "spectrum_d80v2", "Did
 INPUT_PORTS_START(d40)
 	PORT_START("BUTTON")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_d40base_device, snapshot_button, 0)
+
+	PORT_START("JOY")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -94,6 +103,7 @@ void spectrum_d40_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "525dd", spectrum_d40_device::floppy_formats).enable_sound(true);
 
 	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("JOY");
 
 	/* software list */
 	//SOFTWARE_LIST(config, "flop_list").set_original("spectrum_d40_flop");

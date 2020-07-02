@@ -11,10 +11,13 @@
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/input_merger.h"
 
 #define ENV_DIR_DOWN            0
 #define ENV_DIR_UP              1
 
+#define CHANNEL_STATUS_LOAD		1
+#define CHANNEL_STATUS_RUN		2
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
@@ -41,7 +44,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static const device_timer_id TIMER_ZX = 0;
+	static const device_timer_id TIMER_EOSI = 1;
 
+	required_device<input_merger_device> m_irq_merger;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<ptm6840_device> m_ptm;
 
@@ -53,6 +58,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cmi01a_irq);
 
 	void zx_timer_cb();
+	void eosi_timer_cb();
 	void run_voice();
 	void update_wave_addr(int inc);
 
@@ -61,18 +67,21 @@ private:
 	uint8_t     m_zx_flag;
 	uint8_t     m_zx_ff;
 
+	emu_timer * m_eosi_timer;
+
 	std::unique_ptr<uint8_t[]>    m_wave_ram;
 	uint16_t  m_segment_cnt;
 	uint8_t   m_new_addr;     // Flag
 	uint8_t   m_env_dir_ctrl;
 	uint8_t   m_vol_latch;
 	uint8_t   m_flt_latch;
-	uint8_t m_rp;
-	uint8_t m_ws;
+	uint8_t	m_rp;
+	uint8_t	m_ws;
 	int     m_dir;
+	int     m_pia0_cb2_state;
 
 	double  m_freq;
-	bool    m_active;
+	uint8_t m_status;
 
 	int     m_ptm_o1;
 
@@ -90,6 +99,7 @@ private:
 	void pia_1_b_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
+	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 };
 
 // device type definition

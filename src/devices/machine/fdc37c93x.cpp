@@ -491,7 +491,7 @@ void fdc37c93x_device::write(offs_t offset, uint8_t data)
 		if (config_index < 0x30)
 			write_global_configuration_register(config_index, byt);
 		else
-			write_logical_configuration_register(config_index, byt);;
+			write_logical_configuration_register(config_index, byt);
 	}
 	else
 		return;
@@ -882,12 +882,12 @@ void fdc37c93x_device::write_auxio_configuration_register(int index, int data)
 	if (index == 0xe8)
 	{
 		if (data & 16)
-			logerror("GP20 used as 8042 P20 keyboard reset line\n");;
+			logerror("GP20 used as 8042 P20 keyboard reset line\n");
 	}
 	if (index == 0xed)
 	{
 		if (data & 8)
-			logerror("GP25 used as GATEA20 line\n");;
+			logerror("GP25 used as GATEA20 line\n");
 	}
 }
 

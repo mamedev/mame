@@ -3509,6 +3509,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/mackbd/mackbd.h,BUSES["MACKBD"] = true
+---------------------------------------------------
+
+if (BUSES["MACKBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mackbd/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/mackbd/keyboard.h",
+		MAME_DIR .. "src/devices/bus/mackbd/mackbd.cpp",
+		MAME_DIR .. "src/devices/bus/mackbd/mackbd.h",
+		MAME_DIR .. "src/devices/bus/mackbd/pluskbd.cpp",
+		MAME_DIR .. "src/devices/bus/mackbd/pluskbd.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/macpds/macpds.h,BUSES["MACPDS"] = true
 ---------------------------------------------------
 if (BUSES["MACPDS"]~=null) then
@@ -3748,6 +3764,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/fuller.h",
 		MAME_DIR .. "src/devices/bus/spectrum/kempjoy.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/kempjoy.h",
+		MAME_DIR .. "src/devices/bus/spectrum/kempdisc.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/kempdisc.h",
 		MAME_DIR .. "src/devices/bus/spectrum/melodik.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/melodik.h",
 		MAME_DIR .. "src/devices/bus/spectrum/mface.cpp",

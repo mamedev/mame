@@ -9,8 +9,6 @@
 ///
 
 #include "pstring.h"
-#include "pstrutil.h"
-#include "putil.h"
 
 namespace plib
 {

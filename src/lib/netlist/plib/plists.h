@@ -8,9 +8,7 @@
 /// \file plists.h
 ///
 
-#include "palloc.h"
-#include "pchrono.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <array>
@@ -83,24 +81,21 @@ namespace plib {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[N]); }
+		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0] + N); }
 
 	protected:
 
 	private:
-
-		// ensure proper alignment
-		PALIGNAS_VECTOROPT()
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
 		unsigned m_initialized;
 	};

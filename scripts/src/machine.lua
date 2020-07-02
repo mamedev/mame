@@ -133,6 +133,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cop452.h,MACHINES["COP452"] = true
+---------------------------------------------------
+
+if (MACHINES["COP452"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cop452.cpp",
+		MAME_DIR .. "src/devices/machine/cop452.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/machine/cr511b.h,MACHINES["CR511B"] = true
 ---------------------------------------------------
 

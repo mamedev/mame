@@ -62,6 +62,8 @@
 #include "formats/flex_dsk.h"
 #include "formats/uniflex_dsk.h"
 
+#include "formats/mdos_dsk.h"
+
 
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
@@ -112,7 +114,9 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_OS9_FORMAT,
 
 	FLOPPY_FLEX_FORMAT,
-	FLOPPY_UNIFLEX_FORMAT
+	FLOPPY_UNIFLEX_FORMAT,
+
+	FLOPPY_MDOS_FORMAT
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)

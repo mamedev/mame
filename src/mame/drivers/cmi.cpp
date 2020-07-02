@@ -12,7 +12,6 @@
 
     To do:
     * V12 system software reports that it can't load MIDI support and then hangs.
-    * V19 system software simply hangs.
 
     Information from:
 
@@ -161,7 +160,7 @@
 
 static const int ch_int_levels[8] =
 {
-	0xc ^ 7, 0x8 ^ 7, 0xd ^ 7, 0x9 ^ 7, 0xe ^ 7, 0xa ^ 7, 0xf ^ 7, 0xb ^ 7
+	12 ^ 7, 8 ^ 7, 13 ^ 7, 9 ^ 7, 14 ^ 7, 10 ^ 7, 15 ^ 7, 11  ^ 7
 };
 
 #define IRQ_PERRINT_LEVEL       (0 ^ 7)
@@ -251,6 +250,9 @@ public:
 	template<int cpunum> uint8_t perr_r(offs_t offset);
 	template<int cpunum> void perr_w(offs_t offset, uint8_t data);
 
+	uint16_t m_aic_ad565_in[16];
+	uint8_t m_aic_mux_latch;
+
 	uint8_t aic_ad574_r();
 	template<int Dac> void aic_dac_w(uint8_t data);
 	void aic_mux_latch_w(uint8_t data);
@@ -319,7 +321,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( cmi02_pia2_ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_cb2_w );
 
-	// ???
 	uint8_t cmi07_r();
 	void cmi07_w(uint8_t data);
 
@@ -397,8 +398,7 @@ private:
 
 	// Video
 	void hblank();
-	void update_video_pos(int y, int x, int byte_size);
-	void video_write(int offset);
+	template <int Y, int X, bool ByteSize> void update_video_pos();
 
 	// Floppy
 	void dma_fdc_rom();
@@ -409,6 +409,7 @@ private:
 	uint8_t *m_q133_rom;
 
 	uint16_t  m_int_state[2];
+	uint8_t   m_lp_int;
 	uint8_t   m_hp_int;
 	std::unique_ptr<uint8_t[]>    m_shared_ram;
 	std::unique_ptr<uint8_t[]>    m_scratch_ram[2];
@@ -461,7 +462,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 {
 	const pen_t *pen = m_palette->pens();
 	uint8_t y_scroll = m_q219_pia->a_output();
-	uint8_t invert = (!BIT(m_q219_pia->b_output(), 3)) & 1;
+	uint8_t invert = BIT(~m_q219_pia->b_output(), 3);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -502,12 +503,8 @@ void cmi_state::hblank()
 
 		if (v == m_lp_y_port->read())
 		{
-			if (_touch)
-				m_q219_b_touch = 1 << 5;
-			else
-				m_q219_b_touch = 0;
-
-			m_q219_pia->ca1_w(_touch ? 1 : 0);
+			m_q219_b_touch = _touch ? 0 : (1 << 5);
+			m_q219_pia->ca1_w(_touch ? 0 : 1);
 
 			if (!_touch || !_tfh)
 			{
@@ -528,11 +525,24 @@ void cmi_state::hblank()
 
 }
 
-void cmi_state::update_video_pos(int y, int x, int byte_size)
+template void cmi_state::update_video_pos< 0,  0, false>();
+template void cmi_state::update_video_pos< 0,  1, false>();
+template void cmi_state::update_video_pos< 0, -1, false>();
+template void cmi_state::update_video_pos< 0,  0, true>();
+template void cmi_state::update_video_pos< 1,  0, false>();
+template void cmi_state::update_video_pos< 1,  1, false>();
+template void cmi_state::update_video_pos< 1, -1, false>();
+template void cmi_state::update_video_pos< 1,  0, true>();
+template void cmi_state::update_video_pos<-1,  0, false>();
+template void cmi_state::update_video_pos<-1,  1, false>();
+template void cmi_state::update_video_pos<-1, -1, false>();
+template void cmi_state::update_video_pos<-1,  0, true>();
+
+template <int Y, int X, bool ByteSize> void cmi_state::update_video_pos()
 {
 	uint8_t *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
-	if (byte_size)
+	if (ByteSize)
 	{
 		*video_addr = m_video_data;
 	}
@@ -544,35 +554,8 @@ void cmi_state::update_video_pos(int y, int x, int byte_size)
 		*video_addr |= m_video_data & bit_mask;
 	}
 
-	if (y > 0)
-		m_y_pos = (m_y_pos + 1) & 0xff;
-	else if (y < 0)
-		m_y_pos = (m_y_pos - 1) & 0xff;
-
-	if (x > 0)
-		m_x_pos = (m_x_pos + 1) & 0x1ff;
-	else if (x < 0)
-		m_x_pos = (m_x_pos - 1) & 0x1ff;
-}
-
-void cmi_state::video_write(int offset)
-{
-	switch (offset)
-	{
-		case 0x0: update_video_pos( 0,  0, 0); break;
-		case 0x1: update_video_pos( 0,  1, 0); break;
-		case 0x2: update_video_pos( 0, -1, 0); break;
-		case 0x3: update_video_pos( 0,  0, 1); break;
-		case 0x4: update_video_pos( 1,  0, 0); break;
-		case 0x5: update_video_pos( 1,  1, 0); break;
-		case 0x6: update_video_pos( 1, -1, 0); break;
-		case 0x7: update_video_pos( 1,  0, 1); break;
-		case 0x8: update_video_pos(-1,  0, 0); break;
-		case 0x9: update_video_pos(-1,  1, 0); break;
-		case 0xa: update_video_pos(-1, -1, 0); break;
-		case 0xb: update_video_pos(-1,  0, 1); break;
-//      default: osd_printf_debug("Video Write %x %x\n", offset, m_video_data);
-	}
+	m_y_pos = (m_y_pos + Y) & 0xff;
+	m_x_pos = (m_x_pos + X) & 0x1ff;
 }
 
 uint8_t cmi_state::video_r(offs_t offset)
@@ -582,7 +565,23 @@ uint8_t cmi_state::video_r(offs_t offset)
 
 	m_video_data = m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
-	video_write(offset);
+	switch (offset & 0x0f)
+	{
+		case 0x0: update_video_pos< 0,  0, false>(); break;
+		case 0x1: update_video_pos< 0,  1, false>(); break;
+		case 0x2: update_video_pos< 0, -1, false>(); break;
+		case 0x3: update_video_pos< 0,  0, true>(); break;
+		case 0x4: update_video_pos< 1,  0, false>(); break;
+		case 0x5: update_video_pos< 1,  1, false>(); break;
+		case 0x6: update_video_pos< 1, -1, false>(); break;
+		case 0x7: update_video_pos< 1,  0, true>(); break;
+		case 0x8: update_video_pos<-1,  0, false>(); break;
+		case 0x9: update_video_pos<-1,  1, false>(); break;
+		case 0xa: update_video_pos<-1, -1, false>(); break;
+		case 0xb: update_video_pos<-1,  0, true>(); break;
+		default: break;
+	}
+
 	return m_video_data;
 }
 
@@ -603,7 +602,23 @@ uint8_t cmi_state::pia_q219_b_r()
 void cmi_state::video_w(offs_t offset, uint8_t data)
 {
 	m_video_data = data;
-	video_write(offset);
+
+	switch (offset & 0x0f)
+	{
+		case 0x0: update_video_pos< 0,  0, false>(); break;
+		case 0x1: update_video_pos< 0,  1, false>(); break;
+		case 0x2: update_video_pos< 0, -1, false>(); break;
+		case 0x3: update_video_pos< 0,  0, true>(); break;
+		case 0x4: update_video_pos< 1,  0, false>(); break;
+		case 0x5: update_video_pos< 1,  1, false>(); break;
+		case 0x6: update_video_pos< 1, -1, false>(); break;
+		case 0x7: update_video_pos< 1,  0, true>(); break;
+		case 0x8: update_video_pos<-1,  0, false>(); break;
+		case 0x9: update_video_pos<-1,  1, false>(); break;
+		case 0xa: update_video_pos<-1, -1, false>(); break;
+		case 0xb: update_video_pos<-1,  0, true>(); break;
+		default: break;
+	}
 }
 
 void cmi_state::vscroll_w(uint8_t data)
@@ -689,8 +704,7 @@ template<int cpunum> uint8_t cmi_state::vector_r(offs_t offset)
 
 template<int cpunum> uint8_t cmi_state::map_r()
 {
-	uint8_t data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
-	return data;
+	return (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
 }
 
 template<int cpunum> void cmi_state::map_w(uint8_t data)
@@ -706,7 +720,7 @@ template<int cpunum> uint8_t cmi_state::irq_ram_r(offs_t offset)
 	if (m_m6809_bs_hack_cnt[cpunum] > 0)
 	{
 		m_m6809_bs_hack_cnt[cpunum]--;
-		LOG("CPU%d IRQ vector byte %d (offset %d): %02x\n", cpunum, 1 - m_m6809_bs_hack_cnt[cpunum], offset, m_irq_address[cpunum][offset]);
+		LOG("CPU%d IRQ vector byte %d (offset %d): %02x\n", cpunum + 1, 1 - m_m6809_bs_hack_cnt[cpunum], offset, m_irq_address[cpunum][offset]);
 		return m_irq_address[cpunum][offset];
 	}
 	return m_scratch_ram[cpunum][0xf8 + offset];
@@ -761,7 +775,6 @@ void cmi_state::cpufunc_w(uint8_t data)
 		case 0: set_interrupt(cpunum, IRQ_IPI2_LEVEL, bit ? ASSERT_LINE : CLEAR_LINE);
 				break;
 		case 2: // TODO: Hardware trace
-				osd_printf_debug("TODO: Hardware trace %02x\n", data);
 				break;
 		case 4: m_cpu_map_switch[cpunum] = bit;
 				break;
@@ -919,7 +932,7 @@ static INPUT_PORTS_START( cmi2x )
 	PORT_BIT( 0xffff, VBLANK_START/2, IPT_LIGHTGUN_Y) PORT_NAME ("Lightpen Y") PORT_MINMAX(0, VBLANK_START - 1) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START("LP_TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME ( "Lightpen Touch" ) PORT_CODE( MOUSECODE_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME ( "Lightpen Touch" ) PORT_CODE( MOUSECODE_BUTTON1 )
 INPUT_PORTS_END
 
 bool cmi_state::map_is_active(int cpunum, int map, uint8_t *map_info)
@@ -1029,6 +1042,12 @@ void cmi_state::cmi07_w(uint8_t data)
 {
 	LOG("%s: cmi07_w: %02x\n", machine().describe_context(), data);
 
+	if (true)
+	{
+		return;
+	}
+
+	const uint8_t prev = m_cmi07_ctrl;
 	m_cmi07_ctrl = data;
 
 	m_cmi07cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
@@ -1039,6 +1058,10 @@ void cmi_state::cmi07_w(uint8_t data)
 	/* We need to update the address spaces */
 	uint8_t map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
 	update_address_space(0, map_info);
+
+	/* CPU 2 space is untouched by this update */
+	if (BIT(prev & data, 7))
+		return;
 
 	map_info = (m_cpu_active_space[1] == MAPPING_A) ? m_map_sel[MAPSEL_P2_A] : m_map_sel[MAPSEL_P2_B];
 	update_address_space(1, map_info);
@@ -1340,31 +1363,39 @@ uint8_t cmi_state::cmi02_r(offs_t offset)
 	}
 	else
 	{
-		LOG("%s: CMI02 R: %x\n", machine().describe_context(), offset);
-
+		uint8_t data = 0;
 		switch (offset)
 		{
 			case 0x20: case 0x21: case 0x22: case 0x23:
-				return m_cmi02_pia[0]->read(offset & 3);
+				data = m_cmi02_pia[0]->read(offset & 3);
+				LOG("%s: CMI02 PIA 1 read (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
+				return data;
 
 			case 0x26:
 				m_maincpu2->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				/* LS123 one-shot with 10n and 150k */
 				m_jam_timeout_timer->adjust(attotime::from_usec(675));
+				LOG("%s: CMI02 Jam Timeout timer trigger read: %02x\n", machine().describe_context(), 0xff);
 				return 0xff;
 
 			case 0x27:
 				m_maincpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+				LOG("%s: CMI02 CPU2 Unhalt read: %02x\n", machine().describe_context(), 0xff);
 				return 0xff;
 
 			case 0x28: case 0x29: case 0x2a: case 0x2b:
-				return m_cmi02_pia[1]->read(offset & 3);
+				data = m_cmi02_pia[1]->read(offset & 3);
+				LOG("%s: CMI02 PIA 2 read (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
+				return data;
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				return m_cmi02_ptm->read(offset & 7);
+				data = m_cmi02_ptm->read(offset & 7);
+				LOG("%s: CMI02 PTM read (offset %d): %02x\n", machine().describe_context(), offset & 7, data);
+				return data;
 
 			default:
-				return 0;
+				LOG("%s: CMI02 Unknown read (offset %02x): %02x\n", machine().describe_context(), offset, 0x00);
+				return data;
 		}
 	}
 }
@@ -1383,44 +1414,44 @@ void cmi_state::cmi02_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		if (offset == 0x30)
-		{
-			LOG("%s: CMI02 W: %x %x, clearing IRQ merger bit 1\n", machine().describe_context(), offset, data);
-		}
-		else
-		{
-			LOG("%s: CMI02 W: %x %x\n", machine().describe_context(), offset, data);
-		}
-
 		switch (offset)
 		{
 			case 0x20: case 0x21: case 0x22: case 0x23:
+				LOG("%s: CMI02 PIA 1 write (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
 				m_cmi02_pia[0]->write(offset & 3, data);
 				break;
 
 			case 0x28: case 0x29: case 0x2a: case 0x2b:
+				LOG("%s: CMI02 PIA 2 write (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
 				m_cmi02_pia[1]->write(offset & 3, data);
 				break;
 
 			case 0x30:
-				m_maincpu1_irq_merger->in_w<1>(0);
+				LOG("%s: CMI02 PICU 3 B/SGS write (clearing main CPU IRQ merger, clearing high-prio IRQ): %02x\n", machine().describe_context(), data);
 				m_hp_int = 0;
+				m_maincpu1_irq_merger->in_w<1>(0);
+				//if (m_lp_int == 0)
+				//	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 				m_i8214[2]->b_sgs_w(~(data & 0xf));
 				break;
 
 			case 0x31: case 0x32:
+				LOG("%s: CMI02 INTP1 %s write: %02x\n", machine().describe_context(), (offset & 2) ? "clear" : "set", data);
 				set_interrupt(0, IRQ_INTP1_LEVEL, (offset & 2) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			case 0x33: case 0x34:
+				LOG("%s: CMI02 INTP2 %s write: %02x\n", machine().describe_context(), (offset & 4) ? "clear" : "set", data);
 				set_interrupt(1, IRQ_INTP2_LEVEL, (offset & 4) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+				LOG("%s: CMI02 PTM write (offset %d): %02x\n", machine().describe_context(), offset & 7, data);
 				m_cmi02_ptm->write(offset & 7, data);
 				break;
 
 			default:
+				LOG("%s: CMI02 Unknown write (offset %02x): %02x\n", machine().describe_context(), offset, data);
 				break;
 		}
 	}
@@ -1441,8 +1472,11 @@ void cmi_state::install_video_ram(int cpunum)
 
 void cmi_state::i8214_cpu1_w(uint8_t data)
 {
-	LOG("%s: i8214_cpu1_w, clearing IRQ merger bit 0: %02x\n", machine().describe_context(), data);
+	//LOG("%s: i8214_cpu1_w, clearing IRQ merger bit 0: %02x\n", machine().describe_context(), data);
 	m_maincpu1_irq_merger->in_w<0>(0);
+	m_lp_int = 0;
+	//if (m_hp_int == 0)
+	//	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_i8214[0]->b_sgs_w(~(data & 0xf));
 }
 
@@ -1469,7 +1503,6 @@ template<int cpunum> void cmi_state::perr_w(offs_t offset, uint8_t data)
 	m_q256_ram[BIT(ram_index, 7)][(ram_index & 0x7f) * PAGE_SIZE + offset % PAGE_SIZE] = data;
 }
 
-// TODO: replace with share()
 uint8_t cmi_state::shared_ram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
@@ -1477,15 +1510,16 @@ uint8_t cmi_state::shared_ram_r(offs_t offset)
 
 void cmi_state::shared_ram_w(offs_t offset, uint8_t data)
 {
-	//logerror("shared_ram_w: %04x = %02x\n", 0xfe00 + offset, data);
 	m_shared_ram[offset] = data;
 }
 
 uint8_t cmi_state::aic_ad574_r()
 {
-	LOG("%s: AIC AD574 read\n", machine().describe_context());
-	// To Do
-	return 0;
+	const bool adca = BIT(m_aic_mux_latch, 5); // false - MSB, true - LSB
+	const uint16_t val = m_aic_ad565_in[m_aic_mux_latch & 0x07];
+	const uint8_t data = adca ? ((uint8_t)val) : (val >> 8);
+	LOG("%s: AIC AD574 read: %02x\n", machine().describe_context(), data);
+	return data;
 }
 
 template<int Dac> void cmi_state::aic_dac_w(uint8_t data)
@@ -1497,20 +1531,35 @@ template<int Dac> void cmi_state::aic_dac_w(uint8_t data)
 void cmi_state::aic_mux_latch_w(uint8_t data)
 {
 	LOG("%s: AIC mux latch write: %02x\n", machine().describe_context(), data);
-	set_interrupt(CPU_1, IRQ_AIC_LEVEL, (BIT(data, 6) && BIT(data, 7)) ? ASSERT_LINE : CLEAR_LINE);
-	// To Do
+	set_interrupt(CPU_1, IRQ_AIC_LEVEL, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	if (data & 0x07)
+	{
+		m_aic_mux_latch = data;
+	}
+	else
+	{
+		m_aic_mux_latch &= 0x07;
+		m_aic_mux_latch |= data & 0xf8;
+	}
+	if (!BIT(data, 6))
+	{
+		LOG("%s: ADCR is 0, initiating ADC conversion request\n", machine().describe_context());
+		m_aic_ad565_in[m_aic_mux_latch & 0x07] = 0;
+	}
 }
 
 void cmi_state::aic_ad565_msb_w(uint8_t data)
 {
-	LOG("%s: AIC AD565 MSB write: %02x\n", machine().describe_context(), data);
-	// To Do
+	m_aic_ad565_in[m_aic_mux_latch & 0x07] &= 0x00ff;
+	m_aic_ad565_in[m_aic_mux_latch & 0x07] |= (uint16_t)data << 8;
+	LOG("%s: AIC AD565 MSB write: %02x, input %04x\n", machine().describe_context(), data, m_aic_ad565_in[m_aic_mux_latch & 0x07]);
 }
 
 void cmi_state::aic_ad565_lsb_w(uint8_t data)
 {
 	LOG("%s: AIC AD565 LSB write: %02x\n", machine().describe_context(), data);
-	// To Do
+	m_aic_ad565_in[m_aic_mux_latch & 0x07] &= 0xff00;
+	m_aic_ad565_in[m_aic_mux_latch & 0x07] |= data;
 }
 
 void cmi_state::install_peripherals(int cpunum)
@@ -1540,7 +1589,7 @@ void cmi_state::install_peripherals(int cpunum)
 	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::write)));
 	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::read)), write8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::write)));
 
-	space->install_write_handler(0xfca0, 0xfca0, write8smo_delegate(*this, FUNC(cmi_state::midi_latch_w)));
+	//space->install_write_handler(0xfca0, 0xfca0, write8smo_delegate(*this, FUNC(cmi_state::midi_latch_w)));
 
 	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8smo_delegate(*this, FUNC(cmi_state::cmi07_r)), write8smo_delegate(*this, FUNC(cmi_state::cmi07_w)));
 
@@ -1603,6 +1652,10 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu1_interrupt_callback )
 
 		LOG("%s: CPU1 interrupt, will be pushing address %02x%02x\n", machine().describe_context(), m_irq_address[CPU_1][0], m_irq_address[CPU_1][1]);
 	}
+	else
+	{
+		LOG("%s: Some other CPU1 interrupt, line %d\n", irqline);
+	}
 
 	return 0;
 }
@@ -1646,9 +1699,6 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 	{
 		m_i8214[1]->r_all_w(~m_int_state[cpunum]);
 	}
-
-	//i8214_device *i8214 = ((cpunum == CPU_2) ? m_i8214[1] : (level < 8 ? m_i8214[2] : m_i8214[0]));
-	//i8214->r_w(level & 7, state ? 0 : 1);
 }
 
 WRITE_LINE_MEMBER( cmi_state::maincpu1_irq_w )
@@ -1668,7 +1718,8 @@ WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
 	LOG("%s: i8214_1_int_w %d%s\n", machine().describe_context(), state, state ? ", setting IRQ merger bit 0" : "");
 	if (state)
 	{
-		m_hp_int = 0;
+		m_lp_int = 1;
+		//m_maincpu1->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_maincpu1_irq_merger->in_w<0>(state);
 	}
 }
@@ -1688,6 +1739,9 @@ WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
 		m_hp_int = 1;
 		m_maincpu1_irq_merger->in_w<1>(state);
 	}
+	//m_hp_int = 1;
+	//m_maincpu1->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	//m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1814,11 +1868,24 @@ void cmi_state::machine_reset()
 	m_cmi07_ctrl = 0;
 	m_cmi07cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
+	// SMIDI
+	m_midicpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
 	m_cmi02_ptm_irq = 0;
+	m_cmi02_ptm->set_c2(1);
+	m_cmi02_ptm->set_g1(0);
+	m_cmi02_ptm->set_g2(0);
+	m_cmi02_ptm->set_g3(0);
 	m_m6809_bs_hack_cnt[0] = 0;
 	m_m6809_bs_hack_cnt[1] = 0;
 
 	memset(m_map_sel, 0, 16);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_q133_acia[i]->write_dsr(0);
+		m_q133_acia[i]->write_dcd(0);
+	}
 }
 
 void cmi_state::machine_start()
@@ -1947,7 +2014,8 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi02_pia[1]->readca1_handler().set(FUNC(cmi_state::cmi02_pia2_ca1_r));
 	m_cmi02_pia[1]->cb2_handler().set(FUNC(cmi_state::cmi02_pia2_cb2_w));
 
-	PTM6840(config, m_cmi02_ptm, SYSTEM_CAS_CLOCK); // ptm_cmi02_config, clock is incorrect
+	PTM6840(config, m_cmi02_ptm, SYSTEM_CAS_CLOCK);
+	m_cmi02_ptm->set_external_clocks(0, 0, 0);
 	m_cmi02_ptm->o2_callback().set(FUNC(cmi_state::cmi02_ptm_o2));
 	m_cmi02_ptm->irq_callback().set(FUNC(cmi_state::cmi02_ptm_irq));
 

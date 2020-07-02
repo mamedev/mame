@@ -1,7 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 
 // MAME driver for Grant Searle's Simple CP/M Computer
-// http://searle.x10host.com/cpm/index.html
-// Written by Frank Palazzolo - frank@avoidspikes.com
+// http://www.searle.wales/
 
 // This driver uses a compact flash card as a hard disk device.
 // To create a virtual disk file, use the following (for a 128MB card):
@@ -81,39 +82,35 @@ void gscpm_state::cflash_w(offs_t offset, uint8_t data)
 
 uint8_t gscpm_state::sio_r(offs_t offset)
 {
-	switch(offset & 3)
+	switch (offset & 3)
 	{
-		case 0x00:
-			return m_sio->da_r();
-		break;
-		case 0x01:
-			return m_sio->db_r();
-		break;
-		case 0x02:
-			return m_sio->ca_r();
-		break;
-		case 0x03:
-			return m_sio->cb_r();
-		break;
+	case 0x00:
+		return m_sio->da_r();
+	case 0x01:
+		return m_sio->db_r();
+	case 0x02:
+		return m_sio->ca_r();
+	case 0x03:
+		return m_sio->cb_r();
 	}
 	return 0x00; // can't happen
 }
 
 void gscpm_state::sio_w(offs_t offset, uint8_t data)
 {
-	switch(offset & 3)
+	switch (offset & 3)
 	{
-		case 0x00:
-			m_sio->da_w(data);
+	case 0x00:
+		m_sio->da_w(data);
 		break;
-		case 0x01:
-			m_sio->db_w(data);
+	case 0x01:
+		m_sio->db_w(data);
 		break;
-		case 0x02:
-			m_sio->ca_w(data);
+	case 0x02:
+		m_sio->ca_w(data);
 		break;
-		case 0x03:
-			m_sio->cb_w(data);
+	case 0x03:
+		m_sio->cb_w(data);
 		break;
 	}
 }

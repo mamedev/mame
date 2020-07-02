@@ -593,6 +593,23 @@ if (CPUS["G65816"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Hitachi H16
+--@src/devices/cpu/h16/hd641016.h,CPUS["H16"] = true
+--------------------------------------------------
+
+if (CPUS["H16"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/h16/hd641016.cpp",
+		MAME_DIR .. "src/devices/cpu/h16/hd641016.h",
+	}
+end
+
+if (CPUS["H16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h16/h16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h16/h16dasm.h")
+end
+
+--------------------------------------------------
 -- Hitachi H8 (16/32-bit H8/300, H8/300H, H8S2000 and H8S2600 series)
 --@src/devices/cpu/h8/h8.h,CPUS["H8"] = true
 --------------------------------------------------

@@ -13,6 +13,7 @@ Hold Pawn + Knight buttons at boot for test mode.
 #include "emu.h"
 
 #include "cpu/m6502/m65c02.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
@@ -24,6 +25,8 @@ Hold Pawn + Knight buttons at boot for test mode.
 
 #include "mephisto_modena.lh"
 
+
+namespace {
 
 class modena_state : public driver_device
 {
@@ -58,9 +61,6 @@ private:
 	void io_w(u8 data);
 	void led_w(u8 data);
 	void update_display();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
 
 	u8 m_board_mux = 0xff;
 	u8 m_digits_idx = 0;
@@ -173,11 +173,8 @@ void modena_state::modena(machine_config &config)
 	M65C02(config, m_maincpu, 4.194304_MHz_XTAL); // W65C02SP or RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &modena_state::modena_mem);
 
-	timer_device &nmi_on(TIMER(config, "nmi_on"));
-	const attotime nmi_period = attotime::from_hz(4.194304_MHz_XTAL / (1 << 13));
-	nmi_on.configure_periodic(FUNC(modena_state::nmi_on), nmi_period);
-	nmi_on.set_start_delay(nmi_period - attotime::from_usec(975)); // active for 975us
-	TIMER(config, "nmi_off").configure_periodic(FUNC(modena_state::nmi_off), nmi_period);
+	clock_device &nmi_clock(CLOCK(config, "nmi_clock", 4.194304_MHz_XTAL / (1 << 13))); // active for 975us
+	nmi_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -216,6 +213,8 @@ ROM_START( modenab )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD("modena_4929_270192.u3", 0x0000, 0x8000, CRC(99212677) SHA1(f0565e5441fb38df201176d01793c953886b0303) )
 ROM_END
+
+} // anonymous namespace
 
 
 

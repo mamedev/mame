@@ -474,6 +474,7 @@ void s3_state::s3(machine_config &config)
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s3_state::dips_r));
+	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->readca1_handler().set(FUNC(s3_state::pia28_ca1_r));
 	m_pia28->readcb1_handler().set(FUNC(s3_state::pia28_cb1_r));
 	m_pia28->writepa_handler().set(FUNC(s3_state::dig0_w));
@@ -485,6 +486,7 @@ void s3_state::s3(machine_config &config)
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s3_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s3_state::switch_w));
 	m_pia30->ca2_handler().set(FUNC(s3_state::pia30_ca2_w));
 	m_pia30->cb2_handler().set(FUNC(s3_state::pia30_cb2_w));
@@ -601,7 +603,7 @@ ROM_START(pkrno_l1)
 	ROM_LOAD("white2.716",   0x1800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 
 	ROM_REGION(0x0800, "audioroms", 0)
-	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("488_s0_pokerino.716",   0x0000, 0x0800, CRC(5de02e62) SHA1(f838439a731511a264e508a576ae7193d9fed1af))
 ROM_END
 
 GAME( 1977, httip_l1, 0, s3,  s3, s3_state, empty_init, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

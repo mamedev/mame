@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="novag_ssensor4" description="Super Sensor IV expansion ROMs">
+
+<!-- Expansion ROMs available separately, 2 ROM sockets on PCB accessible via hatch on the bottom -->
+
+	<software name="clock" supported="no">
+		<description>Quartz Chess Clock</description>
+		<year>1981</year>
+		<publisher>Novag</publisher>
+		<part name="exrom" interface="novag_ssensor4">
+			<dataarea name="rom" size="0x1000">
+				<rom name="5613_1j_blue" size="0x1000" crc="51ee10f2" sha1="d0e4b8a0e5df1a81958e9c290e21ec6ada0811f1" /> <!-- TMM2332P -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

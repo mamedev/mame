@@ -5,13 +5,12 @@
 /// \file pfmtlog.h
 ///
 
-#ifndef PFMT_H_
-#define PFMT_H_
+#ifndef PFMTLOG_H_
+#define PFMTLOG_H_
 
 #include "penum.h"
 #include "pstring.h"
 #include "ptypes.h"
-#include "putil.h"
 
 #include <limits>
 #include <locale>
@@ -423,4 +422,4 @@ namespace plib {
 template<typename T>
 plib::pfmt& operator<<(plib::pfmt &p, T&& val) { return p(std::forward<T>(val)); }
 
-#endif // PSTRING_H_
+#endif // PFMT_LOG_H_

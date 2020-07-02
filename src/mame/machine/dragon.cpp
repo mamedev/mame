@@ -111,10 +111,8 @@ void dragon64_state::pia1_pb_changed(uint8_t data)
 	if (ddr & 0x04)
 	{
 		page_rom(data & 0x04 ? true : false);
-		logerror("pia1_pb_changed\n");
 	}
 }
-
 
 
 //-------------------------------------------------
@@ -135,6 +133,26 @@ void dragon64_state::page_rom(bool romswitch)
 		: 1;   // This is the 64k mode basic(64)/basic rom(alpha)
 	m_rombank[0]->set_entry(bank);      // 0x8000-0x9FFF
 	m_rombank[1]->set_entry(bank);      // 0xA000-0xBFFF
+}
+
+
+/***************************************************************************
+  DRAGON200-E
+***************************************************************************/
+
+uint8_t dragon200e_state::sam_read(offs_t offset)
+{
+	uint8_t data = sam().display_read(offset);
+	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
+	m_vdg->intext_w(data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
+	m_vdg->inv_w(m_lk1->read() ? ASSERT_LINE : CLEAR_LINE);
+	return data;
+}
+
+MC6847_GET_CHARROM_MEMBER(dragon200e_state::char_rom_r)
+{
+	uint16_t addr = (line << 8) | (BIT(pia_1().b_output(), 4) << 7) | ch;
+	return m_char_rom->base()[addr & 0xfff];
 }
 
 

@@ -71,6 +71,7 @@ CPUS["SPC700"] = true
 CPUS["E1"] = true
 CPUS["I860"] = true
 CPUS["I960"] = true
+CPUS["H16"] = true
 CPUS["H8"] = true
 CPUS["H8500"] = true
 CPUS["V810"] = true
@@ -473,6 +474,7 @@ MACHINES["CDP1879"] = true
 MACHINES["CHESSMACHINE"] = true
 MACHINES["CMOS40105"] = true
 MACHINES["COM8116"] = true
+MACHINES["COP452"] = true
 MACHINES["CR589"] = true
 MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
@@ -855,6 +857,7 @@ BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
 BUSES["M5"] = true
+BUSES["MACKBD"] = true
 BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
@@ -1735,8 +1738,6 @@ files {
 	MAME_DIR .. "src/mame/machine/macadb.h",
 	MAME_DIR .. "src/mame/machine/macrtc.cpp",
 	MAME_DIR .. "src/mame/machine/macrtc.h",
-	MAME_DIR .. "src/mame/machine/mackbd.cpp",
-	MAME_DIR .. "src/mame/machine/mackbd.h",
 	MAME_DIR .. "src/mame/machine/swim.cpp",
 	MAME_DIR .. "src/mame/machine/swim.h",
 	MAME_DIR .. "src/mame/video/mac.cpp",
@@ -1966,7 +1967,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mikro80.cpp",
 	MAME_DIR .. "src/mame/includes/mikro80.h",
 	MAME_DIR .. "src/mame/machine/mikro80.cpp",
-	MAME_DIR .. "src/mame/video/mikro80.cpp",
 	MAME_DIR .. "src/mame/drivers/okean240.cpp",
 	MAME_DIR .. "src/mame/drivers/pk8000.cpp",
 	MAME_DIR .. "src/mame/includes/pk8000.h",
@@ -2118,9 +2118,6 @@ files {
 createMESSProjects(_target, _subtarget, "ddr")
 files {
 	MAME_DIR .. "src/mame/drivers/ac1.cpp",
-	MAME_DIR .. "src/mame/includes/ac1.h",
-	MAME_DIR .. "src/mame/machine/ac1.cpp",
-	MAME_DIR .. "src/mame/video/ac1.cpp",
 	MAME_DIR .. "src/mame/drivers/bcs3.cpp",
 	MAME_DIR .. "src/mame/drivers/c80.cpp",
 	MAME_DIR .. "src/mame/includes/c80.h",
@@ -2667,6 +2664,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_ksp10.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_r100.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_sx240.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")
@@ -2696,6 +2694,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/korgdvp1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgws.cpp",
 	MAME_DIR .. "src/mame/drivers/korgz3.cpp",
 	MAME_DIR .. "src/mame/drivers/microkorg.cpp",
 	MAME_DIR .. "src/mame/drivers/poly800.cpp",
@@ -3206,9 +3205,6 @@ files {
 	MAME_DIR .. "src/mame/includes/galeb.h",
 	MAME_DIR .. "src/mame/video/galeb.cpp",
 	MAME_DIR .. "src/mame/drivers/orao.cpp",
-	MAME_DIR .. "src/mame/includes/orao.h",
-	MAME_DIR .. "src/mame/machine/orao.cpp",
-	MAME_DIR .. "src/mame/video/orao.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "philips")

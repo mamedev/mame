@@ -145,7 +145,7 @@ void spg290_cdservo_device::device_timer(emu_timer &timer, device_timer_id id, i
 		m_irq_cb(ASSERT_LINE);
 	}
 
-	if (m_cur_sector < m_seek_lba + SPG290_LEADIN_LEN and m_cur_sector < m_tot_sectors)
+	if ((m_cur_sector < m_seek_lba + SPG290_LEADIN_LEN) && (m_cur_sector < m_tot_sectors))
 		m_cur_sector++;
 }
 
