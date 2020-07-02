@@ -731,7 +731,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="onc3nfs_with_indigo2_impact_10000_1">
+	<software name="onc3nfs_ind">
 		<description>ONC3/NFS for IRIX 6.2 with Indigo2 IMPACT 10000 Version 1</description>
 		<year>1996</year> <!-- 06/96 -->
 		<publisher>Silicon Graphics</publisher>
