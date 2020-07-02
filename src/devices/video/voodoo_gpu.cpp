@@ -521,10 +521,15 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 	
 	// Pixel buffer
 	ZeroMemory(&bd, sizeof(bd));
+#ifdef USE_MAPPED
 	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+#else
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.CPUAccessFlags = 0;
+#endif
 	bd.ByteWidth = sizeof(ShaderPoint) * DEPTH_PIXEL_BUFFER;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	if (FAILED(m_gpu->CreateBuffer(&bd, NULL, &m_pixelBuffer)))
 		return false;
 
@@ -1198,7 +1203,7 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 	// Copy vertex buffer over
 #ifdef USE_MAPPED
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	//	Disable GPU access to the vertex buffer data.
 	m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
@@ -1292,7 +1297,7 @@ void voodoo_gpu::DrawTriangle()
 	// Copy vertex buffer over
 #ifdef USE_MAPPED
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	//	Disable GPU access to the vertex buffer data.
 	m_context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//m_context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
@@ -1387,7 +1392,7 @@ void voodoo_gpu::DrawPixels()
 	// Copy pixel point buffer over
 #ifdef USE_MAPPED
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	//	Disable GPU access to the vertex buffer data.
 	m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
@@ -1476,7 +1481,7 @@ void voodoo_gpu::DrawLfbWrites()
 	// Copy pixel point buffer over
 #ifdef USE_MAPPED
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	//	Disable GPU access to the vertex buffer data.
 	m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//m_context->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
@@ -1920,6 +1925,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 			m_texMap.erase(m_texHist.front());
 			m_texHist.pop_front();
 		}
+		//printf("voodoo_gpu::CreateTexture mapIndex: %08X\n", mapIndex);
 		// Create the new entries
 		// Create gpu texture
 		D3D11_TEXTURE2D_DESC texDesc;
@@ -1980,6 +1986,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		uint32_t *srcBuff;
 		uint32_t texel0;
 		uint32_t result;
+		//uint32_t size = 0;
 		for (size_t mipLevel = minLod; mipLevel <= 8; mipLevel++)
 		{
 			uint32_t texbase = desc.texBase[mipLevel];
@@ -1991,6 +1998,11 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 			srcBuff = new uint32_t[width * height];
 			// Copy data if lod is defined
 			if (desc.lodMask & (1 << mipLevel)) {
+				
+				//if (desc.texFormat < 8)
+				//	size += width * height;
+				//else
+				//	size += (width * height) * 2;
 				for (size_t loc = 0; loc < width * height; loc++)
 				{
 					/* fetch texel data */
@@ -2019,7 +2031,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		// Add the new data to the map
 		m_texMap[mapIndex] = new_map;
 		m_texHist.push_back(mapIndex);
-		//printf("New texture(%d): base: %08x lod: %08x count: %d\n", index, desc.texBase[minLod], texLod, int(m_texHist.size()));
+		//printf("New texture(%d): base: %08x size: %5d lodMin: %.2f lodMax: %.2f totalTex: %d\n", index, desc.texBase[minLod], size, double(texLod&0x3f)/4.0, double(texLod & 0xfc0)/256.0, int(m_texHist.size()));
 	}
 
 	// Update cb tex control
