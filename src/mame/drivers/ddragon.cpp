@@ -1539,16 +1539,16 @@ ROM_END
  */
 ROM_START( ddragon6809 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
-	ROM_LOAD( "6809_16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
-	ROM_LOAD( "6809_17.bin",   0x10000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
+	ROM_LOAD( "6809_20.bin",   0x08000, 0x08000, CRC(67e3b4f1) SHA1(4945d76b0694299f2f4739ebfba98da6d96fe4cb) )
+	ROM_LOAD( "6809_19.bin",   0x10000, 0x08000, CRC(090e2baf) SHA1(29b775c59c7a4d30a33e3d10e736cd1a83baf3bb) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "6809_18.bin",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
-	ROM_LOAD( "6809_19.bin",   0x20000, 0x08000, CRC(090e2baf) SHA1(29b775c59c7a4d30a33e3d10e736cd1a83baf3bb) ) /* banked at 0x4000-0x8000 */
+	ROM_LOAD( "6809_17.bin",   0x20000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "6809_20.bin",   0x8000, 0x8000, CRC(67e3b4f1) SHA1(4945d76b0694299f2f4739ebfba98da6d96fe4cb) )
+	ROM_LOAD( "21.bin",      0x08000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
-	ROM_LOAD( "21.bin",      0x08000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
+	ROM_LOAD( "6809_16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 
 	/* all the gfx roms are scrambled on this set */
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_ERASEFF )
