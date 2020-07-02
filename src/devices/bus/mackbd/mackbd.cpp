@@ -170,5 +170,7 @@ void mac_keyboard_devices(device_slot_interface &device)
 	device.option_add("pad",   MACKBD_M0120);
 	device.option_add("eupad", MACKBD_M0120P);
 
-	device.option_add("plus",  MACKBD_M0110A);
+	device.option_add("usp",   MACKBD_M0110A);
+	device.option_add("frp",   MACKBD_M0110A_F);
+	device.option_add("jpp",   MACKBD_M0110A_J);
 }

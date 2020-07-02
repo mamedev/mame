@@ -970,7 +970,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
 	MAC_KEYBOARD_PORT(config, m_mackbd, mac_keyboard_devices, "pad");
-	m_mackbd->clock_cb().set(m_via, FUNC(via6522_device::write_cb1)).invert();
+	m_mackbd->clock_cb().set(m_via, FUNC(via6522_device::write_cb1));
 	m_mackbd->data_cb().set(m_via, FUNC(via6522_device::write_cb2));
 
 	/* internal ram */
@@ -997,7 +997,7 @@ void mac128_state::macplus(machine_config &config)
 	mac512ke(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macplus_map);
 
-	m_mackbd->set_default_option("plus");
+	m_mackbd->set_default_option("usp");
 
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));

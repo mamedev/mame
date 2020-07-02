@@ -12,6 +12,8 @@
 
 #include "mackbd.h"
 
-DECLARE_DEVICE_TYPE(MACKBD_M0110A, device_mac_keyboard_interface)
+DECLARE_DEVICE_TYPE(MACKBD_M0110A,   device_mac_keyboard_interface)
+DECLARE_DEVICE_TYPE(MACKBD_M0110A_F, device_mac_keyboard_interface)
+DECLARE_DEVICE_TYPE(MACKBD_M0110A_J, device_mac_keyboard_interface)
 
 #endif // MAME_BUS_MACKBD_PLUSKBD_H
