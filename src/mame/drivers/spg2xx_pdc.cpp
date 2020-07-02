@@ -24,9 +24,20 @@ protected:
 
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
-	uint16_t unkrand_r()
-	{
-		return machine().rand();
+	uint16_t touch_xpos_r()
+	{ // >= 0x800 = right of screen
+	//	printf("0\n");
+		uint16_t ret = ioport("AD1")->read();
+		printf("x read %04x\n", ret);
+		return ret;
+	}
+
+	uint16_t touch_ypos_r()
+	{ // >= 0x800 = top of screen
+	//	printf("1\n");
+		uint16_t ret = ioport("AD2")->read();
+		printf("y read %04x\n", ret);
+		return ret;
 	}
 
 private:
@@ -55,6 +66,47 @@ static INPUT_PORTS_START( pdc100 )
 
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pdc_tactile )
+	PORT_START("P1")
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Touch")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0038, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // if this bit flips you get black screen (soft power off?)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0600, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("AD1")
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0f, 0.0f, 0) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("AD2")
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_Y) PORT_INVERT PORT_CROSSHAIR(Y, 1.14f, -0.1f, 0) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("AD3")
+	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unk, causes powerdown
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unk, causes powerdown
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unk, causes powerdown
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unk, causes powerdown
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unk, causes powerdown
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unk, causes powerdown
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vjpp2 )
@@ -92,9 +144,10 @@ void spg2xx_pdc100_game_state::porta_w(offs_t offset, uint16_t data, uint16_t me
 {
 	// pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
 	if (data & 0xff00)
+	{
 		switch_bank(data & (m_numbanks - 1));
+	}
 }
-
 
 void spg2xx_pdc100_game_state::pdc100(machine_config &config)
 {
@@ -110,10 +163,13 @@ void spg2xx_pdc100_game_state::pdc_tactile(machine_config& config)
 {
 	pdc100(config);
 
-	m_maincpu->adc_in<0>().set(FUNC(spg2xx_pdc100_game_state::unkrand_r));
-	m_maincpu->adc_in<1>().set(FUNC(spg2xx_pdc100_game_state::unkrand_r));
-	m_maincpu->adc_in<2>().set(FUNC(spg2xx_pdc100_game_state::unkrand_r));
-	m_maincpu->adc_in<3>().set(FUNC(spg2xx_pdc100_game_state::unkrand_r));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+
+	m_maincpu->adc_in<0>().set(FUNC(spg2xx_pdc100_game_state::touch_xpos_r));
+	m_maincpu->adc_in<1>().set(FUNC(spg2xx_pdc100_game_state::touch_ypos_r));
+	m_maincpu->adc_in<2>().set_ioport("AD3");
 }
 
 
@@ -125,8 +181,9 @@ void spg2xx_pdc100_game_state::init_pdc40t()
 	std::vector<u8> buffer(len);
 
 	for (int i = 0; i < len; i++)
-		buffer[i] = src[bitswap<26>(i, 18, 20, 16, 17, 25, 24, 19, 23, 22, 21, 5, 6, 7, 8, 13, 15, 14, 9, 10, 12, 11, 1, 2, 3, 4, 0)];
-				
+	{
+		buffer[i] = src[bitswap<26>(i, 18, 20, 16, 17, 24, 25, 19, 23, 22, 21, 5, 6, 7, 8, 13, 15, 14, 9, 10, 12, 11, 1, 2, 3, 4, 0)];
+	}
 	std::copy(buffer.begin(), buffer.end(), &src[0]);
 }
 
@@ -183,7 +240,7 @@ CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, emp
 // interestingly this is newer than the PDC100 above, despite containing fewer games
 CONS( 2010, pdc50,   0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init , "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2011, pdc40t,  0,        0, pdc_tactile, pdc100,  spg2xx_pdc100_game_state, init_pdc40t, "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
+CONS( 2011, pdc40t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc100_game_state, init_pdc40t, "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
 
 CONS( 2013, tmntpdc, 0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init,  "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
