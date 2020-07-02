@@ -3204,9 +3204,6 @@ files {
 	MAME_DIR .. "src/mame/includes/galeb.h",
 	MAME_DIR .. "src/mame/video/galeb.cpp",
 	MAME_DIR .. "src/mame/drivers/orao.cpp",
-	MAME_DIR .. "src/mame/includes/orao.h",
-	MAME_DIR .. "src/mame/machine/orao.cpp",
-	MAME_DIR .. "src/mame/video/orao.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "philips")
