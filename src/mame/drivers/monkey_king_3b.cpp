@@ -25,16 +25,35 @@ The typical configuration of the Monkey King SoCs (other than the
 3.6) is with 8/16MB of SDRAM, NOR flash for the firmware and
 built-in games, and a SD card for additional games.
 
-The RS-70 is notable for having a debug UART on the USB port 
+The RS-70 is notable for having a debug UART on the USB port
 (serial TX on D+, 115200). It prints the following messages on boot:
 
 	EXEC: Executing 'boot' with 0 args (ZLib ON)...
 	EXEC: Loading 'boot' at 0x18000000...
-	EXEC: Loaded 372272 bytes of 2097152 available.	
+	EXEC: Loaded 372272 bytes of 2097152 available.
 
 This is different from the serial output that this emulation model
 currently produces. Perhaps one of the unimplemented IO is causing
-it to go into some kind of 
+it to go into some kind of debug mode. The log output produced by
+this machine is:
+
+	Modes:0x00000000
+	PUT: Setting joystick to mode 0x0, timer to 250us
+
+	******************************************************
+	 MK FIRMWARE INFORMATION
+	 Mode:       0xB4
+	 Build Time: May  8 2019 14:09:21
+	 CPU Clock:  240MHz
+	 TFS Start:  0x8070000
+	 Video Buf:  0x6000000
+	 Stack Top:  0x3001EE8
+	 IWRAM Size: 32kB
+	 EVRAM Size: 16384kB
+	 Heap Size:  6144kB at 0x18200000
+	 Video Mode: 0
+	 Video Size: 1280x720x16bpp
+	******************************************************
 
 There are other strings in the ROM that imply there may be more serial
 debug possibilities.
@@ -132,7 +151,7 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 {
 	// type unknown (should actually have VFP?)
 	// debug output suggests 240MHz clock
-	ARM920T(config, m_maincpu, 240000000); 
+	ARM920T(config, m_maincpu, 240000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk3b_soc_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -163,6 +182,8 @@ void mk3b_soc_state::io4_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 uint32_t mk3b_soc_state::io7_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset) {
+		case 0x21: // video size
+			return (1280 << 16) | (720);
 		default:
 			logerror("%s: IO 0x07 read 0x%04X\n", machine().describe_context(), offset);
 			return 0x00;
