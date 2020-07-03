@@ -21,12 +21,12 @@ NETLIST_START(speedfrk)
 
 	SOLVER(Solver, 48000)
 
-	TTL_INPUT(I_OUT_0, 1)		// active low
-	TTL_INPUT(I_OUT_1, 1)		// active low
-	TTL_INPUT(I_OUT_2, 1)		// active low
-	TTL_INPUT(I_OUT_3, 1)		// active low
-	TTL_INPUT(I_OUT_4, 1)		// active low
-	TTL_INPUT(I_OUT_7, 1)		// active low
+	TTL_INPUT(I_OUT_0, 1)	// active low
+	TTL_INPUT(I_OUT_1, 1)	// active low
+	TTL_INPUT(I_OUT_2, 1)	// active low
+	TTL_INPUT(I_OUT_3, 1)	// active low
+	TTL_INPUT(I_OUT_4, 1)	// active low
+	TTL_INPUT(I_OUT_7, 1)	// active low
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
@@ -39,48 +39,48 @@ NETLIST_START(speedfrk)
 //	RES(R2, 2.7)
 //	RES(R3, 2.7)
 //	RES(R4, 2.7)
-//	RES(R5, 150)
+//	RES(R5, 150)			// PCB verified
 //	RES(R6, 150)
-//	RES(R7, RES_K(10))
-//	RES(R8, RES_K(68))
-//	RES(R9, RES_K(2.2))
-//	RES(R10, 820)
-//	RES(R11, RES_K(47))
+//	RES(R7, RES_K(10))		// PCB verified
+//	RES(R8, RES_K(68))		// PCB verified
+//	RES(R9, RES_K(2.2))		// PCB verified
+//	RES(R10, 820)			// PCB verified
+//	RES(R11, RES_K(47))		// PCB verified
 //	RES(R12, RES_K(1))	 ??
 	RES(R13, 150)
-	RES(R14, RES_K(2.2))
-	RES(R15, RES_K(10))
-	RES(R16, RES_K(2.2))
-	RES(R17, RES_K(1))
-	RES(R18, RES_K(8.2))
-	RES(R19, RES_K(3.9))
-	RES(R20, RES_K(4.7))
-	RES(R21, RES_K(3.3))
-	RES(R22, RES_K(10))
-	RES(R23, RES_K(4.7))
+	RES(R14, RES_K(2.2))	// PCB verified
+	RES(R15, RES_K(10))		// PCB verified
+	RES(R16, RES_K(2.2))	// PCB verified
+	RES(R17, RES_K(1))		// PCB verified
+	RES(R18, RES_K(8.2))	// PCB verified
+	RES(R19, RES_K(3.9))	// PCB verified
+	RES(R20, RES_K(4.7))	// PCB verified
+	RES(R21, RES_K(3.3))	// PCB verified
+	RES(R22, RES_K(10))		// PCB verified
+	RES(R23, RES_K(4.7))	// PCB verified
 	RES(R24, RES_K(10))
-	RES(R25, RES_K(18))
-	RES(R26, RES_K(18))
-	RES(R27, RES_K(6.8))
-	RES(R28, RES_K(10))
-	RES(R29, RES_K(2.2))
-	RES(R30, 330)
-	RES(R31, 330)
-	RES(R32, RES_K(1))
-	RES(R33, RES_K(1))
-	RES(R34, RES_K(1))
-//	RES(R35, 0)			// not populated
-	RES(R36, RES_K(1))
-	RES(R37, RES_K(1))
-	RES(R38, RES_K(1))
-	RES(R39, RES_K(1))
-	RES(R40, RES_K(1))
-	RES(R41, RES_K(1))
-	RES(R42, RES_K(1))
-	RES(R43, RES_K(1))
-	RES(R44, RES_K(30))
-	RES(R45, RES_K(4.7))
-	RES(R46, RES_K(10))
+	RES(R25, RES_K(18))		// PCB verified
+	RES(R26, RES_K(18))		// PCB verified
+	RES(R27, RES_K(6.8))	// PCB verified
+	RES(R28, RES_K(10))		// PCB verified
+	RES(R29, RES_K(2.2))	// PCB verified
+	RES(R30, 330)			// PCB verified
+	RES(R31, 330)			// PCB verified
+	RES(R32, RES_K(1))		// PCB verified
+	RES(R33, RES_K(1))		// PCB verified
+	RES(R34, RES_K(1))		// PCB verified
+//	RES(R35, 0)				// PCB verified: not populated
+	RES(R36, RES_K(1))		// PCB verified
+	RES(R37, RES_K(1))		// PCB verified
+	RES(R38, RES_K(1))		// PCB verified
+	RES(R39, RES_K(1))		// PCB verified
+	RES(R40, RES_K(1))		// PCB verified
+	RES(R41, RES_K(1))		// PCB verified
+	RES(R42, RES_K(1))		// PCB verified
+	RES(R43, RES_K(1))		// PCB verified
+	RES(R44, RES_K(30))		// PCB verified
+	RES(R45, RES_K(4.7))	// PCB verified
+	RES(R46, RES_K(10))		// PCB verified
 
 //	CAP(C4, CAP_U(4.7))
 //	CAP(C5, CAP_U(4.7))
