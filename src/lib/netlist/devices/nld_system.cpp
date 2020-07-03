@@ -63,7 +63,7 @@ namespace devices
 	NETLIB_DEVICE_IMPL(function,            "AFUNC",                  "N,FUNC")
 	NETLIB_DEVICE_IMPL(analog_input,        "ANALOG_INPUT",           "IN")
 	NETLIB_DEVICE_IMPL(clock,               "CLOCK",                  "FREQ")
-	NETLIB_DEVICE_IMPL(varclock,            "VARCLOCK",               "FUNC")
+	NETLIB_DEVICE_IMPL(varclock,            "VARCLOCK",               "N,FUNC")
 	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
 	NETLIB_DEVICE_IMPL(sys_dsw1,            "SYS_DSW",                "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(sys_dsw2,            "SYS_DSW2",               "")
