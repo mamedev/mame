@@ -1846,6 +1846,42 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sadvantage_10_94">
+		<description>Support Advantage 10/94</description>
+		<year>1994</year> <!-- 10/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4024-001"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 10/94"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_Support_Libraries_10_94" sha1="643371e46dffed73f1d493a623d920233d79c5b1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_6_95">
+		<description>Support Advantage 6/95</description>
+		<year>1995</year> <!-- 6/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-4024-004"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 6/95"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_Support_Libraries_6_95" sha1="e24c4af01b54bf1a6ccae6a6291df53b116ffbcd" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0290-004"/>
+			<feature name="part_id" value="Support Advantage IRIX Patches 6/95"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_IRIX_Patches_6_95" sha1="e458a0076039d4fb1fe2cc5f6475670a86025087" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sadvantage_9_95">
 		<description>Support Advantage 9/95</description>
 		<year>1995</year> <!-- 9/95 -->
