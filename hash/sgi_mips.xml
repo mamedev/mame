@@ -1651,7 +1651,7 @@ license:CC0
 			<feature name="part_number" value="812-8102-001"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="indizone_1" sha1="7dfed1d5b5efb7c773244372d0a24823cf4d5cc4" />
+				<disk name="indizone_1" sha1="1ea7db165ddba9f91e6ad46c9c12ab842a366c5c" />
 			</diskarea>
 		</part>
 	</software>
