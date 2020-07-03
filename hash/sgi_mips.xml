@@ -1772,11 +1772,29 @@ license:CC0
 		<description>SupportFolio 10/96</description>
 		<year>1996</year> <!-- 10/96 -->
 		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
+		<info name="version" value="1.2" /> <!-- as printed on the CDs -->
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0508-003"/>
+			<feature name="part_id" value="SupportFolio Information Resources 10/96"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_information_resources_10_96" sha1="d01876973667216e044bb8a959f6530575fdd70e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0603-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 10/96"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="supportfolio_irix_6_2_patches_10_96" sha1="55209bec451eb43fa27e8c65fe90d4b2c3157b73" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0604-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.1 Patches 10/96"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_and_6_1_patches_10_96" sha1="0f1d18a85a85fc97cfc69aaf8f6d1a8f8b500d71" />
 			</diskarea>
 		</part>
 	</software>
