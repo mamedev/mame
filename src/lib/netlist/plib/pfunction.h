@@ -40,6 +40,7 @@ namespace plib {
 			GE,
 			IF,
 			POW,
+			LOG,
 			SIN,
 			COS,
 			MIN,
