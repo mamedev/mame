@@ -56,7 +56,8 @@ public:
 		m_iram7(*this, "iram7"),
 		m_iram10(*this, "iram10"),
 		m_sdram(*this, "sdram"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen")
 	{ }
 
 	void mk3b_soc(machine_config &config);
@@ -67,9 +68,13 @@ private:
 	required_shared_ptr<uint32_t> m_iram0, m_iram3, m_iram7, m_iram10;
 	required_shared_ptr<uint32_t> m_sdram;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	uint32_t io4_r(offs_t offset, uint32_t mem_mask = ~0);
+	void io4_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
 	uint32_t screen_update_mk3b_soc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void map(address_map &map);
 };
@@ -86,6 +91,8 @@ void mk3b_soc_state::map(address_map &map)
 	map(0x10000000, 0x1000FFFF).ram().share("iram10");
 	// 16MB of external SDRAM
 	map(0x18000000, 0x18FFFFFF).ram().share("sdram");
+	// IO is totally unknown
+	map(0x04000000, 0x0400FFFF).rw(FUNC(mk3b_soc_state::io4_r), FUNC(mk3b_soc_state::io4_w));
 }
 
 static INPUT_PORTS_START( mk3b_soc )
@@ -116,14 +123,31 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 	ARM920T(config, m_maincpu, 200000000); // type + clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk3b_soc_state::map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(1280, 720);
-	screen.set_visarea(0, 1280-1, 0, 720-1);
-	screen.set_screen_update(FUNC(mk3b_soc_state::screen_update_mk3b_soc));
-
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(1280, 720);
+	m_screen->set_visarea(0, 1280-1, 0, 720-1);
+	m_screen->set_screen_update(FUNC(mk3b_soc_state::screen_update_mk3b_soc));
 }
+
+uint32_t mk3b_soc_state::io4_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+		case 0x01:
+			return m_screen->vblank(); // who knows? seems to need to toggle between 0 and 1
+		default:
+			logerror("%s: IO 0x04 read 0x%04X\n", machine().describe_context(), offset);
+			return 0x00;
+	}
+}
+
+void mk3b_soc_state::io4_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	logerror("%s: IO 0x04 write 0x%04X 0x%08X & 0x%08X\n", machine().describe_context(), offset, data, mem_mask);
+}
+
 
 void mk3b_soc_state::init_rs70()
 {
@@ -135,6 +159,11 @@ void mk3b_soc_state::init_rs70()
 	{
 		std::swap(ROM[i], ROM[i + (size / 2)]);
 	}
+	// FIXME: Work around missing FPU for now
+	ROM[0x32f24] = 0x00;
+	ROM[0x32f25] = 0x00;
+	ROM[0x32f26] = 0x00;
+	ROM[0x32f27] = 0x00;
 }
 
 
