@@ -31,6 +31,10 @@
 
 extern const plib::dynlib_static_sym nl_static_solver_syms[];
 
+// Forward declarations
+
+class netlist_tool_t;
+
 class tool_app_t : public plib::app
 {
 public:
@@ -47,6 +51,7 @@ public:
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
 		opt_prepro(*this,   "",  "prepro",                  "output preprocessor output to stderr"),
+		opt_progress(*this, "",  "progress",                "show progress bar on longer operations"),
 
 		opt_files(*this, "files to process"),
 
@@ -118,6 +123,7 @@ private:
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_prepro;
+	plib::option_bool   opt_progress;
 	plib::option_args   opt_files;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
@@ -162,6 +168,8 @@ private:
 	};
 
 	using compile_map = std::map<pstring, compile_map_entry>;
+
+	void run_with_progress(netlist_tool_t &nt, netlist::netlist_time_ext nlstart, netlist::netlist_time_ext ttr);
 
 	void run();
 	void validate();
@@ -404,6 +412,36 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	return ret;
 }
 
+void tool_app_t::run_with_progress(netlist_tool_t &nt, netlist::netlist_time_ext nlstart, netlist::netlist_time_ext ttr)
+{
+	if (!opt_progress())
+		nt.exec().process_queue(ttr);
+	else
+	{
+		auto now = nt.exec().time();
+		auto end = now + ttr;
+		// run to next_sec
+		while (now < end)
+		{
+			auto elapsed = now - nlstart;
+			auto elapsed_sec = elapsed.in_sec() + 1;
+
+			auto next_sec = nlstart + netlist::netlist_time_ext::from_sec(elapsed_sec);
+			if (end < next_sec)
+			{
+				nt.exec().process_queue(end - now);
+			}
+			else
+			{
+				nt.exec().process_queue(next_sec - now);
+				pout("progress {1:4}s : {2}\r", elapsed_sec, pstring(elapsed_sec, '*'));
+				pout.flush();
+			}
+			now = nt.exec().time();
+		}
+	}
+}
+
 void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
@@ -470,14 +508,14 @@ void tool_app_t::run()
 				&& inps[pos].m_time < ttr
 				&& inps[pos].m_time >= nlt)
 		{
-			nt.exec().process_queue(inps[pos].m_time - nlt);
+			run_with_progress(nt, nlstart, inps[pos].m_time - nlt);
 			inps[pos].setparam();
 			nlt = inps[pos].m_time;
 			pos++;
 		}
 
 		if (ttr > nlt)
-			nt.exec().process_queue(ttr - nlt);
+			run_with_progress(nt, nlstart, ttr - nlt);
 		else
 		{
 			pout("end time {1:.6f} less than saved time {2:.6f}\n",
@@ -499,6 +537,8 @@ void tool_app_t::run()
 	}
 	nt.exec().stop();
 
+	if (opt_progress())
+		pout("\n");
 	auto emutime(t.as_seconds<netlist::nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
 			(ttr - nlstart).as_fp<netlist::nl_fptype>(), emutime,
