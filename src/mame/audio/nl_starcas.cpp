@@ -34,6 +34,14 @@
 
 
 //
+// Optimizations
+//
+
+#define HLE_BACKGROUND_VCO (1)
+#define HLE_LASER_VCO (1)
+
+
+//
 // Initial compilation includes this section.
 //
 
@@ -70,14 +78,11 @@ NETLIST_START(wotw)
 #endif
 
 	// 192k is not high enough to make the laser and background pitches high enough
-	SOLVER(Solver, 384000)
-//	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
-//	PARAM(Solver.VNTOL, 1e-4) // works and is sufficient
-//	PARAM(Solver.DYNAMIC_LTE, 1e-1) // Aggressive timestepping
-//	PARAM(Solver.METHOD, "MAT_CR")
-//	PARAM(Solver.DYNAMIC_TS, 1)
-//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2.5e-6)
-//	PARAM(NETLIST.USE_DEACTIVATE, 1)
+#if (HLE_BACKGROUND_VCO && HLE_LASER_VCO)
+	SOLVER(Solver, 48000)
+#else
+	SOLVER(Solver, 4800000)
+#endif
 
 	TTL_INPUT(I_OUT_0, 0)		// active low
 	TTL_INPUT(I_OUT_1, 1)		// active low
@@ -279,24 +284,24 @@ NETLIST_START(wotw)
 	D_1N914B(D9)
 	D_1N914B(D10)
 
-	Q_2N3904(Q1)		// NPN
-	Q_2N3904(Q2)		// NPN
-	Q_2N3906(Q3)		// PNP
-	Q_2N3904(Q4)		// NPN
-	Q_2N3904(Q5)		// NPN
-	Q_2N3906(Q6)		// PNP
-	Q_2N3906(Q7)		// PNP
-	Q_2N3906(Q8)		// PNP
-	Q_2N3906(Q9)		// PNP
-	Q_2N3906(Q10)		// PNP
-	Q_2N3906(Q11)		// PNP
-	Q_2N3906(Q12)		// PNP
-	Q_2N3906(Q13)		// PNP
-	Q_2N3906(Q14)		// PNP
-	Q_2N3906(Q15)		// PNP
-	Q_2N3906(Q16)		// PNP
-//	Q_2N6107(Q17)		// PNP -- part of final amp (not emulated)
-//	Q_2N6292(Q18)		// NPN -- part of final amp (not emulated)
+	Q_2N3904(Q1)			// NPN
+	Q_2N3904(Q2)			// NPN
+	Q_2N3906(Q3)			// PNP
+	Q_2N3904(Q4)			// NPN
+	Q_2N3904(Q5)			// NPN
+	Q_2N3906(Q6)			// PNP
+	Q_2N3906(Q7)			// PNP
+	Q_2N3906(Q8)			// PNP
+	Q_2N3906(Q9)			// PNP
+	Q_2N3906(Q10)			// PNP
+	Q_2N3906(Q11)			// PNP
+	Q_2N3906(Q12)			// PNP
+	Q_2N3906(Q13)			// PNP
+	Q_2N3906(Q14)			// PNP
+	Q_2N3906(Q15)			// PNP
+	Q_2N3906(Q16)			// PNP
+//	Q_2N6107(Q17)			// PNP -- part of final amp (not emulated)
+//	Q_2N6292(Q18)			// NPN -- part of final amp (not emulated)
 
 	TTL_7414_DIP(IC1)		// Hex Inverter
 	NET_C(IC1.7, GND)
@@ -325,7 +330,9 @@ NETLIST_START(wotw)
 	NET_C(IC8.7, I_V15)
 	NET_C(IC8.4, I_VM15)
 
+#if (!HLE_BACKGROUND_VCO)
 	LM566_DIP(IC9)			// 566 VCO
+#endif
 
 	TTL_74LS163_DIP(IC10)	// Binary Counter (schems say can sub a 74161)
 	NET_C(IC10.8, GND)
@@ -351,7 +358,9 @@ NETLIST_START(wotw)
 
 	LM555_DIP(IC16)			// Timer
 
+#if (!HLE_LASER_VCO)
 	LM566_DIP(IC17)			// 566 VCO
+#endif
 
 	CA3080_DIP(IC18)		// Trnscndt. Op. Amp.
 	NET_C(IC18.7, I_V15)
@@ -453,10 +462,9 @@ NETLIST_START(wotw)
 	// Sheet 1, BACKGROUND (top portion)
 	//
 
-	NET_C(GND, D5.A, D6.K, D7.A, D8.A, R13.1, R16.1, R17.1, IC7.3, IC9.8)
-	NET_C(I_V5, R20.1)
+	NET_C(GND, D5.A, D6.K, R13.1, R16.1, R17.1, IC7.3)
 	NET_C(I_V15, R2.1)
-	NET_C(I_VM15, C13.2, R12.1, R18.1, R21.1, IC9.1)
+	NET_C(I_VM15, R12.1, R18.1)
 	NET_C(R2.2, D5.K, R3.1, R5.1, R7.1)
 	NET_C(BL2, IC6.9)
 	NET_C(IC6.8, R3.2, R4.1)
@@ -470,6 +478,32 @@ NETLIST_START(wotw)
 	NET_C(R12.2, R13.2, IC8.3)
 	NET_C(IC8.6, C11.2, R11.2, R14.1)
 	NET_C(R14.2, D6.A, R15.1)
+
+#if (HLE_BACKGROUND_VCO)
+	//
+	// The background clock is a VCO controlled via a 566 timer.
+	// Getting the frequency high enough to not miss clocking
+	// the downstream dividers requires increasing the solver
+	// frequency too much for realtime.
+	//
+	// Instead, clip out the circuit from the control voltage
+	// coming into IC9 (pin 5), through the TTL converter, and
+	// directly output the clock into IC10 pin 2. The equation
+	// for the clock frequency is computed from running the
+	// full emulation at 1000x frequency and fitting a curve
+	// to the resulting dataset.
+	//
+	VARCLOCK(BGCLK, 1, "(0.00000215073*A0*A0*A0*A0) + (0.0000224782*A0*A0*A0) + (0.000090697*A0*A0) + (0.000175878*A0) + 0.000163685")
+	NET_C(BGCLK.GND, GND)
+	NET_C(BGCLK.VCC, I_V5)
+	NET_C(R17.2, R15.2, R18.2, BGCLK.A0, C12.2)
+	NET_C(C12.1, R16.2)
+	ALIAS(CLK, BGCLK.Q)
+	NET_C(C13.1, C13.2, C14.1, C14.2, R19.1, R19.2, R20.1, R20.2, R21.1, R21.2, D7.A, D7.K, D8.A, D8.K, GND)
+#else
+	NET_C(GND, IC9.8, D7.A, D8.A)
+	NET_C(I_V5, R20.1)
+	NET_C(I_VM15, IC9.1, C13.2, R21.1)
 	NET_C(R17.2, R15.2, R18.2, IC9.5, C12.2)
 	NET_C(C13.1, IC9.7)
 	NET_C(C12.1, IC9.6, R16.2)
@@ -479,6 +513,7 @@ NETLIST_START(wotw)
 	NET_C(Q1.E, R21.2, D8.K)
 	NET_C(Q1.C, R20.2)
 	ALIAS(CLK, R20.2)
+#endif
 
 	//
 	// Sheet 1, BACKGROUND (bottom portion)
@@ -536,24 +571,48 @@ NETLIST_START(wotw)
 	// Sheet 2, LASER VCO
 	//
 
-	NET_C(GND, C22.2, C24.2, D9.A, D10.A, Q4.E, R38.1, R42.1, R50.1, IC17.1)
-	NET_C(I_V5, R34.1, R36.1, R45.1, Q3.E)
-	NET_C(I_V15, R39.1, R43.1, IC17.8)
-	NET_C(I_VM15, R37.1, R46.1)
+	NET_C(GND, C22.2, C24.2, Q4.E, R38.1, R42.1, R50.1)
+	NET_C(I_V5, R34.1, R36.1, Q3.E)
+	NET_C(I_V15, R39.1, R43.1)
+	NET_C(I_VM15, R37.1)
 	NET_C(I_OUT_3, IC6.5, IC12.2)
 	NET_C(IC6.6, R36.2, R35.1)
 	NET_C(R35.2, Q3.B, R34.2)
 	NET_C(Q3.C, R37.2, R38.2, R40.1)
 	NET_C(R40.2, Q4.B)
-	NET_C(R39.2, R41.1, C22.1, R42.2, C23.2, IC17.5)
+	NET_C(R39.2, R41.1, C22.1, R42.2, C23.2)
 	NET_C(Q4.C, R41.2)
-	NET_C(C23.1, IC17.6, R43.2)
-	NET_C(IC17.3, C25.1)
+	NET_C(C23.1, R43.2)
+
+#if (HLE_LASER_VCO)
+	//
+	// The laser VCO is the same story as the background VCO,
+	// requiring a large multiplier to the solver frequency
+	// to clock downstream gates. Again, just replace it
+	// with a VARCLOCK tuned based on output from running
+	// the full simulation.
+	//
+	VARCLOCK(LASERCLK, 1, "(0.00000385462*A0*A0*A0*A0) + (0-0.000195567*A0*A0*A0) + (0.00372371*A0*A0) + (0-0.0315254*A0) + 0.100119")
+	NET_C(LASERCLK.GND, GND)
+	NET_C(LASERCLK.VCC, I_V5)
+	NET_C(C23.2, LASERCLK.A0)
+	NET_C(LASERCLK.Q, IC12.1)
+	NET_C(GND, C24.1, C25.1, C25.2, D9.A, D9.K, D10.A, D10.K, R44.1, R44.2, R45.1, R45.2, R46.1, R46.2)
+#else
+	NET_C(GND, D9.A, D10.A, IC17.1)
+	NET_C(I_V15, IC17.8)
+	NET_C(C23.2, IC17.5)
+	NET_C(C23.1, IC17.6)
 	NET_C(C24.1, IC17.7)
+	NET_C(IC17.3, C25.1)
 	NET_C(C25.2, D9.K, R44.1)
 	NET_C(R44.2, Q5.B)
+	NET_C(I_VM15, R46.1)
 	NET_C(Q5.E, D10.K, R46.2)
+	NET_C(I_V5, R45.1)
 	NET_C(Q5.C, R45.2, IC12.1)
+#endif
+
 	NET_C(IC12.3, R47.1)
 	NET_C(IC12.4, R48.1)
 	NET_C(IC12.6, R49.1)
