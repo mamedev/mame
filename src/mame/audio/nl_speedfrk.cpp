@@ -1,11 +1,15 @@
-// license:CC0
-// copyright-holders:Aaron Giles,Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 
 //
 // Netlist for Speed Freak
 //
-// Derived from the schematics and parts list in the Speed Freak
-// manual.
+// Derived from the utterly terrible schematics in the Speed Freak
+// manual. Newly-drawn schematics are available upon request.
+//
+// Special thanks to:
+//    * Frank Palazzolo for helping to verify connections and parts
+//    * Brian Tarachi for supplying his corrected schematics
 //
 // Known problems/issues:
 //

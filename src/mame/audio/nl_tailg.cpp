@@ -1,5 +1,5 @@
-// license:CC0
-// copyright-holders:Aaron Giles,Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 
 //
 // Netlist for Tail Gunner

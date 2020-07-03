@@ -1,5 +1,5 @@
-// license:CC0
-// copyright-holders:Aaron Giles,Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 
 //NL_CONTAINS starcas wotw
 
@@ -11,6 +11,10 @@
 //
 // War of the Worlds uses effectively the same sound board, but
 // with a swizzled set of inputs.
+//
+// Special thanks to:
+//    * Frank Palazzolo for creating a schematic of the War of the
+//       Worlds signal mapping
 //
 // Known problems/issues:
 //
@@ -59,7 +63,7 @@
 
 
 //
-// Substitutes/models
+// Main netlist
 //
 
 #if (SOUND_VARIANT == VARIANT_STARCASTLE)

@@ -1,11 +1,9 @@
-// license:CC0
+// license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 #ifndef MAME_AUDIO_NL_SPEEDFRK_H
 #define MAME_AUDIO_NL_SPEEDFRK_H
 
 #pragma once
-
-#include "netlist/nl_setup.h"
 
 NETLIST_EXTERNAL(speedfrk)
 

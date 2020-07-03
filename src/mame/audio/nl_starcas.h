@@ -1,4 +1,4 @@
-// license:CC0
+// license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 #ifndef MAME_AUDIO_NL_STARCAS_H
 #define MAME_AUDIO_NL_STARCAS_H

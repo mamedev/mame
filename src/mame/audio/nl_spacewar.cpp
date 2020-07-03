@@ -1,5 +1,5 @@
-// license:CC0
-// copyright-holders:Aaron Giles,Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 
 //NL_CONTAINS spacewar barrier
 
@@ -37,6 +37,7 @@
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
+#include "nl_spacewar.h"
 
 
 //
@@ -249,8 +250,6 @@ NETLIST_START(barrier)
 	NET_C(Q1.C, Q2.E, C1.1)
 	NET_C(Q2.C, GND)
 #else
-	NET_C(GND, R1.1, R1.2, R2.1, R2.2, CR1.A, CR1.K, CR2.A, CR2.K)
-
 	CLOCK(NOISE_CLOCK, 2000)
 	NET_C(NOISE_CLOCK.GND, GND)
 	NET_C(NOISE_CLOCK.VCC, I_V5)
@@ -259,6 +258,8 @@ NETLIST_START(barrier)
 	NET_C(NOISE.I, NOISE_CLOCK.Q)
 	NET_C(NOISE.1, I_V15)
 	NET_C(NOISE.2, C1.1)
+
+	NET_C(GND, R1.1, R1.2, R2.1, R2.2, CR1.A, CR1.K, CR2.A, CR2.K)
 #endif
 
 	NET_C(C1.2, R3.2, U1.3)
