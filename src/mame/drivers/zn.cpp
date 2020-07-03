@@ -3998,6 +3998,23 @@ ROM_START( doapp )
 	ROM_LOAD( "mg05", 0x000000, 0x000008, CRC(5748a4ca) SHA1(c88d73f6a646a9ddefdfd84cba70d591759c069f) )
 ROM_END
 
+ROM_START( doappk )
+	TPS_BIOS
+
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "doapp_u0119.119", 0x0000001, 0x100000, CRC(9084704e) SHA1(616b3e65a32768767209ae77c48ad34d11b31754) )
+	ROM_LOAD16_BYTE( "doapp_u0120.120", 0x0000000, 0x100000, CRC(720a6983) SHA1(d38783110440ffa00036b86f97bff5edb6a5673f) )
+	ROM_LOAD( "doapp-0.216",         0x0400000, 0x400000, CRC(acc6c539) SHA1(a744567a3d75634098b1749103307981be9acbdd) )
+	ROM_LOAD( "doapp-1.217",         0x0800000, 0x400000, CRC(14b961c4) SHA1(3fae1fcb4665ba8bad391881b26c2d087718d42f) )
+	ROM_LOAD( "doapp-2.218",         0x0c00000, 0x400000, CRC(134f698f) SHA1(6422972cf5d30a0f09f0c20f042691d5969207b4) )
+	ROM_LOAD( "doapp-3.219",         0x1000000, 0x400000, CRC(1c6540f3) SHA1(8631fde93a1da6325d7b31c7edf12c964f0ac4fc) )
+	ROM_LOAD( "doapp-4.220",         0x1400000, 0x400000, CRC(f83bacf7) SHA1(5bd66da993f0db966581dde80dd7e5b377754412) )
+	ROM_LOAD( "doapp-5.221",         0x1800000, 0x400000, CRC(e11e8b71) SHA1(b1d1b9532b5f074ce216a603436d5674d136865d) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "mg05", 0x000000, 0x000008, CRC(5748a4ca) SHA1(c88d73f6a646a9ddefdfd84cba70d591759c069f) )
+ROM_END
+
 ROM_START( tondemo )
 	TPS_BIOS
 
@@ -5258,6 +5275,7 @@ GAME( 1997, glpracr2,  coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_in
 GAME( 1997, glpracr2j, glpracr2, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Gallop Racer 2 (Japan)",             MACHINE_IMPERFECT_SOUND )
 GAME( 1997, glpracr2l, glpracr2, coh1002ml,   zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Gallop Racer 2 Link HW (Japan)",     MACHINE_IMPERFECT_SOUND )
 GAME( 1998, doapp,     coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Dead Or Alive ++ (Japan)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1998, doappk,    doapp,    coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Dead Or Alive ++ (Korea)",           MACHINE_IMPERFECT_SOUND )
 GAME( 1998, cbaj,      coh1002m, cbaj,        zn,       cbaj_state,     empty_init, ROT0, "UEP Systems",            "Cool Boarders Arcade Jam",           MACHINE_IMPERFECT_SOUND )
 GAME( 1998, shngmtkb,  coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Sunsoft / Activision",   "Shanghai Matekibuyuu",               MACHINE_IMPERFECT_SOUND )
 GAME( 1999, tondemo,   coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Tondemo Crisis (Japan)",             MACHINE_IMPERFECT_SOUND )
