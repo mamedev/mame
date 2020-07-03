@@ -2843,7 +2843,12 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t 
 	}
 	else
 	{
+#if ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
+		// Extra shift by 8 due to how sse class is stored
+		iterstw.get_st_shiftr(s, t, (14 + 10 + 8));
+#else
 		iterstw.get_st_shiftr(s, t, (14 + 10));
+#endif
 	}
 
 	/* clamp W */

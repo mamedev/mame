@@ -55,7 +55,7 @@ void s11a_state::s11a_audio_map(address_map &map)
 void s11a_state::s11a_bg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x7800, 0x7fff).w(FUNC(s11a_state::bgbank_w));
 	map(0x8000, 0xffff).bankr("bgbank");
@@ -265,9 +265,9 @@ void s11a_state::s11a(machine_config &config)
 	m_bgcpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_bg_map);
 
 	SPEAKER(config, "bg").front_center();
-	YM2151(config, m_ym, XTAL(3'579'545));
-	m_ym->irq_handler().set(FUNC(s11a_state::ym2151_irq_w));
-	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
+	YM2151(config, m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(s11a_state::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
 
 	MC1408(config, "dac1", 0).add_route(ALL_OUTPUTS, "bg", 0.25);
 

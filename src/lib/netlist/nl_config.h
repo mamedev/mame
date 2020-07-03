@@ -53,7 +53,7 @@
 /// kidniki performance by ~10%.
 ///
 /// More work is needed here.
-#define NL_MEMPOOL_ALIGN			(16)
+#define NL_MEMPOOL_ALIGN            (16)
 
 /// \brief  Enable queue statistics.
 ///

@@ -81,17 +81,17 @@ namespace plib {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[N]); }
+		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0] + N); }
 
 	protected:
 

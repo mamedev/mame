@@ -14,11 +14,11 @@
 #include "parray.h"
 #include "pconfig.h"
 #include "pmath.h"
+#include "pmatrix2d.h"
 #include "pomp.h"
 #include "pstate.h"
 #include "ptypes.h"
 #include "putil.h"
-#include "pmatrix2d.h"
 
 #include <algorithm>
 #include <array>

@@ -14230,6 +14230,7 @@ spacempr                        // bootleg
 spactrai                        //
 spcdrag                         // bootleg
 spcdraga                        // bootleg
+spctrek                         // bootleg
 spctbird                        // (c) Fortrek
 spdcoin                         // (c) 1984 Stern
 sstarcrs                        // Taito (Brazil)
@@ -14738,6 +14739,7 @@ mobigo2
 
 @source:generalplus_gpl16250_nand.cpp
 wlsair60                        // Wireless Air 60
+kiugames
 jak_car2
 jak_gtg
 jak_sspop
@@ -31661,6 +31663,7 @@ nespal                          // Nintendo Entertainment System PAL
 pjoypj001
 afbm7800
 dnce2000
+vtvppong
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -37625,7 +37628,11 @@ mgt20in1
 
 @source:spg2xx_pdc.cpp
 pdc100
+pdc50
+pdc40t
 tmntpdc
+dorapdc
+vjpp2
 
 @source:spg2xx_playvision.cpp
 pvmil                           //

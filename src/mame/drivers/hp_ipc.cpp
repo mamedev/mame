@@ -11,12 +11,11 @@ Driver to-do list
 - keyboard: NMI generation
 - RTC chip: proper month, day (possibly a different chip, 82167)
 - HP-IL printer
-- sound (needs dump of COP452)
 
 QA
 + diagnstc.td0: display test
 - diagnstc.td0: complete keyboard test [second connector not implemented]
-- diagnstc.td0: speaker test
++ diagnstc.td0: speaker test
 - diagnstc.td0: printer test
 + diagnstc.td0: auto: floppy disc test
 + diagnstc.td0: auto: ram test
@@ -370,6 +369,10 @@ Software to look for
 #include "video/hp1ll3.h"
 #include "machine/tms9914.h"
 #include "bus/ieee488/ieee488.h"
+#include "machine/cop452.h"
+#include "speaker.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -386,6 +389,8 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_gpu(*this , "gpu")
 		, m_screen(*this, "screen")
+		, m_spkr(*this , "spkr")
+		, m_dac(*this , "dac")
 	{ }
 
 	void hp_ipc_base(machine_config &config);
@@ -404,6 +409,7 @@ private:
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t trap_r(offs_t offset, uint16_t mem_mask);
 	void trap_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void spkr_w(offs_t offset, uint16_t data);
 
 	uint8_t floppy_id_r();
 	void floppy_id_w(uint8_t data);
@@ -431,6 +437,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<hp1ll3_device> m_gpu;
 	required_device<screen_device> m_screen;
+	required_device<cop452_device> m_spkr;
+	required_device<dac_1bit_device> m_dac;
 
 	uint32_t m_mmu[4], m_lowest_ram_addr;
 	uint16_t *m_internal_ram;
@@ -498,7 +506,8 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::read) , FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
-	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
+	map(0x0670000, 0x067FFFF).w(FUNC(hp_ipc_state::spkr_w));    // Speaker (NatSemi COP 452)
+	map(0x0670000, 0x067FFFF).nopr();   // Speaker (NatSemi COP 452)
 	map(0x0680000, 0x068FFFF).noprw();       // 'SIMON (98628) fast HP-IB card' -- sys/simon.h
 	map(0x0700000, 0x07FFFFF).unmaprw();     // External I/O
 	map(0x0800000, 0x0FFFFFF).rw(FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
@@ -569,6 +578,12 @@ void hp_ipc_state::trap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
+void hp_ipc_state::spkr_w(offs_t offset, uint16_t data)
+{
+	m_spkr->cs_w(!BIT(data , 0));
+	m_spkr->sk_w(BIT(data , 1));
+	m_spkr->di_w(BIT(data , 2));
+}
 
 uint16_t hp_ipc_state::ram_r(offs_t offset, uint16_t mem_mask)
 {
@@ -710,6 +725,9 @@ void hp_ipc_state::machine_start()
 void hp_ipc_state::machine_reset()
 {
 	m_floppy = nullptr;
+	m_spkr->cs_w(1);
+	m_spkr->sk_w(0);
+	m_spkr->di_w(0);
 }
 
 
@@ -783,6 +801,14 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	ieee.ren_callback().set("hpib" , FUNC(tms9914_device::ren_w));
 	IEEE488_SLOT(config , "ieee_rem" , 0 , remote488_devices , nullptr);
 
+	// Beeper
+	COP452(config , m_spkr , 2_MHz_XTAL);
+	SPEAKER(config, "mono").front_center();
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	m_spkr->oa_w().set(m_dac , FUNC(dac_1bit_device::write));
+
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
 }
 
@@ -855,5 +881,5 @@ ROM_END
 #define rom_hp9808a rom_hp_ipc
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
-COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", MACHINE_NO_SOUND)
+COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", 0)
 COMP( 1985, hp9808a, 0,      0,      hp9808a, hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)

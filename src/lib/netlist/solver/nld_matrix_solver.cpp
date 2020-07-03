@@ -2,6 +2,7 @@
 // copyright-holders:Couriersud
 
 #include "nld_matrix_solver.h"
+#include "core/setup.h"
 #include "nl_setup.h"
 #include "plib/putil.h"
 

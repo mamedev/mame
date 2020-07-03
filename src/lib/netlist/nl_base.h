@@ -17,12 +17,13 @@
 #include "plib/plists.h"
 #include "plib/pmempool.h"
 #include "plib/ppmf.h"
-#include "plib/pstream.h"
 #include "plib/pstate.h"
+#include "plib/pstream.h"
 #include "plib/ptimed_queue.h"
 #include "plib/ptypes.h"
 
 #include "nl_errstr.h"
+#include "nl_factory.h"
 #include "nltypes.h"
 
 #include <initializer_list>

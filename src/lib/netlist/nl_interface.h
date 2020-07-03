@@ -12,6 +12,7 @@
 
 #include "nl_base.h"
 #include "nl_setup.h"
+#include "core/setup.h"
 
 #include <memory>
 #include <array>

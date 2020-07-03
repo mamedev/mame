@@ -50,6 +50,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/nl_setup.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_setup.h",
 		MAME_DIR .. "src/lib/netlist/nl_types.h",
+		MAME_DIR .. "src/lib/netlist/core/setup.h",
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
 		MAME_DIR .. "src/lib/netlist/plib/pchrono.h",

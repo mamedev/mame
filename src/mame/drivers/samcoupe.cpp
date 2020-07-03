@@ -565,8 +565,8 @@ void samcoupe_state::samcoupe(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("samcoupe_cass");
 
 	WD1772(config, m_fdc, SAMCOUPE_XTAL_X1/3);
-	FLOPPY_CONNECTOR(config, "wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("samcoupe_flop");
 
 	/* internal ram */

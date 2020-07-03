@@ -126,6 +126,11 @@ public:
 	void init_marvland();
 	void init_rthun2();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 
 enum
@@ -202,7 +207,6 @@ enum
 	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
-	virtual void video_start() override;
 	void video_start_luckywld();
 	void video_start_metlhawk();
 	void video_start_sgunner();
@@ -218,9 +222,6 @@ enum
 	uint16_t gfx_ctrl_r();
 	void gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	void create_shadow_table();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
 
@@ -230,7 +231,6 @@ enum
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	optional_shared_ptr<uint16_t> m_spriteram;
 	uint16_t m_gfx_ctrl;
-	uint16_t m_serial_comms_ctrl[0x8];
 	unsigned m_finallap_prot_count;
 	int m_sendval;
 
@@ -241,11 +241,11 @@ enum
 	uint16_t namcos2_68k_key_r(offs_t offset);
 	void namcos2_68k_key_w(offs_t offset, uint16_t data);
 	uint16_t namcos2_finallap_prot_r(offs_t offset);
-	void GollyGhostUpdateLED_c4( int data );
-	void GollyGhostUpdateLED_c6( int data );
-	void GollyGhostUpdateLED_c8( int data );
-	void GollyGhostUpdateLED_ca( int data );
-	void GollyGhostUpdateDiorama_c0( int data );
+	void GollyGhostUpdateLED_c4(int data);
+	void GollyGhostUpdateLED_c6(int data);
+	void GollyGhostUpdateLED_c8(int data);
+	void GollyGhostUpdateLED_ca(int data);
+	void GollyGhostUpdateDiorama_c0(int data);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void TilemapCB_finalap2(uint16_t code, int *tile, int *mask);
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);

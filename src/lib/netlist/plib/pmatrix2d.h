@@ -23,7 +23,7 @@ namespace plib
 	public:
 		using size_type = std::size_t;
 		using arena_type = A;
-		using allocator_type = typename A::template allocator_type<T>;
+		using allocator_type = typename A::template allocator_type<T, PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<allocator_type>::align_size;
 		static constexpr const size_type stride_size = align_traits<allocator_type>::stride_size;
@@ -138,10 +138,11 @@ namespace plib
 		using size_type = std::size_t;
 		using value_type = T;
 		using arena_type = A;
-		using allocator_type = typename A::template allocator_type<T>;
+		using allocator_type = typename A::template allocator_type<T, PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<allocator_type>::align_size;
 		static constexpr const size_type stride_size = align_traits<allocator_type>::stride_size;
+
 		pmatrix2d_vrl() noexcept
 		: m_N(0), m_M(0), m_v()
 		{
@@ -155,6 +156,7 @@ namespace plib
 		}
 
 		PCOPYASSIGNMOVE(pmatrix2d_vrl, default)
+		~pmatrix2d_vrl() = default;
 
 		void resize(size_type N, size_type M)
 		{

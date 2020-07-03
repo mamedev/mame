@@ -241,7 +241,7 @@ namespace plib {
 	public:
 		using value_type = T;
 		using pointer = T *;
-		static /*constexpr*/ const std::size_t align_size = (ALIGN < 16) ? 16 : ALIGN;
+		static /*constexpr*/ const std::size_t align_size = ALIGN;
 		using arena_type = ARENA;
 
 		static_assert(align_size >= alignof(T),
@@ -438,12 +438,13 @@ namespace plib {
 			//unused_var(size);
 			dec_alloc_stat(size);
 			#if (PUSE_ALIGNED_ALLOCATION)
-			#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+				#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 				_aligned_free(ptr);
-			#else
-			// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
+				#else
+				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 				::free(ptr);
-			#endif
+				#endif
 			#else
 				::operator delete(ptr);
 			#endif

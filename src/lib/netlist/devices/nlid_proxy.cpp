@@ -6,6 +6,7 @@
  */
 
 #include "nlid_proxy.h"
+#include "core/setup.h"
 #include "nl_errstr.h"
 #include "solver/nld_solver.h"
 

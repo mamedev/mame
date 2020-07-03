@@ -5,11 +5,12 @@
 #include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
+#include "plib/pdynlib.h"
 #include "plib/pfmtlog.h"
 #include "plib/pmempool.h"
 #include "plib/putil.h"
-#include "plib/pdynlib.h"
 
+#include "core/setup.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
 #include "macro/nlm_base.h"

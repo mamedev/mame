@@ -988,6 +988,15 @@ static NETLIST_START(TTL_74377_DIP)
 	NET_C(A.CP, B.CP, C.CP, D.CP, E.CP, F.CP, G.CP, H.CP)
 	NET_C(A.E, B.E, C.E, D.E, E.E, F.E, G.E, H.E)
 
+	HINT(A.QQ, NC)
+	HINT(B.QQ, NC)
+	HINT(C.QQ, NC)
+	HINT(D.QQ, NC)
+	HINT(E.QQ, NC)
+	HINT(F.QQ, NC)
+	HINT(G.QQ, NC)
+	HINT(H.QQ, NC)
+
 	DIPPINS(  /*       +--------------+      */
 		A.E,  /*    /E |1     ++    20| VCC  */ A.VCC,
 		A.Q,  /*    Q0 |2           19| Q7   */ H.Q,

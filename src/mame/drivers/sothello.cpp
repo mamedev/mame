@@ -60,6 +60,10 @@ public:
 
 	void sothello(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void bank_w(uint8_t data);
 	uint8_t subcpu_halt_set();
@@ -80,9 +84,6 @@ private:
 	void soundcpu_io_map(address_map &map);
 	void soundcpu_mem_map(address_map &map);
 	void subcpu_mem_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	int m_subcpu_status;
 	int m_soundcpu_busy;
@@ -186,11 +187,11 @@ void sothello_state::maincpu_io_map(address_map &map)
 	map(0x40, 0x4f).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x50, 0x50).w(FUNC(sothello_state::bank_w));
 	map(0x60, 0x61).mirror(0x02).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-						/* not sure, but the A1 line is ignored, code @ $8b8 */
+						// not sure, but the A1 line is ignored, code @ $8b8
 	map(0x70, 0x73).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 
-/* sound Z80 */
+// sound Z80
 
 void sothello_state::msm_cfg_w(uint8_t data)
 {
@@ -241,7 +242,7 @@ void sothello_state::soundcpu_io_map(address_map &map)
 	map(0x05, 0x05).w(FUNC(sothello_state::soundcpu_int_clear_w));
 }
 
-/* sub 6809 */
+// sub 6809
 
 void sothello_state::unlock_shared_ram()
 {
@@ -270,7 +271,7 @@ void sothello_state::subcpu_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(sothello_state::subcpu_status_r), FUNC(sothello_state::subcpu_status_w));
 	map(0x2000, 0x77ff).ram();
-	map(0x7800, 0x7fff).ram().share("mainsub");  /* upper 0x800 of 6264 is shared with main cpu */
+	map(0x7800, 0x7fff).ram().share("mainsub");  // upper 0x800 of 6264 is shared with main cpu
 	map(0x8000, 0xffff).rom().region("subcpu", 0);
 }
 
@@ -328,7 +329,7 @@ static INPUT_PORTS_START( sothello )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x30, 0x10, "Matta" ) /* undo moves */
+	PORT_DIPNAME( 0x30, 0x10, "Matta" ) // undo moves
 	PORT_DIPSETTING(    0x30, "0" )
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
@@ -342,7 +343,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
-	/* only 4 bits are used */
+	// only 4 bits are used
 	m_msm->data_w(m_msm_data & 0x0f);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
@@ -356,7 +357,7 @@ void sothello_state::machine_reset()
 
 void sothello_state::sothello(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(21'477'272) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sothello_state::maincpu_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sothello_state::maincpu_io_map);
@@ -370,14 +371,14 @@ void sothello_state::sothello(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	/* video hardware */
+	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", XTAL(21'477'272)));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -392,8 +393,8 @@ void sothello_state::sothello(machine_config &config)
 	ymsnd.add_route(3, "mono", 0.50);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(sothello_state::adpcm_int));  /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* changed on the fly */
+	m_msm->vck_legacy_callback().set(FUNC(sothello_state::adpcm_int));  // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // changed on the fly
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -417,4 +418,4 @@ ROM_START( sothello )
 	ROM_LOAD( "6.7f",   0x0000, 0x8000, CRC(ee80fc78) SHA1(9a9d7925847d7a36930f0761c70f67a9affc5e7c) )
 ROM_END
 
-GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state, empty_init, ROT0, "Success / Fujiwara", "Super Othello", 0 )
+GAME( 1986, sothello, 0, sothello, sothello, sothello_state, empty_init, ROT0, "Success / Fujiwara", "Super Othello", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // long time regression, see MT06033

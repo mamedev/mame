@@ -4,8 +4,8 @@
 #include "ppreprocessor.h"
 #include "palloc.h"
 #include "pstonum.h"
-#include "putil.h"
 #include "pstrutil.h"
+#include "putil.h"
 
 namespace plib {
 

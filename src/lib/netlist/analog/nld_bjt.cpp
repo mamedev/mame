@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 
 #include "netlist/solver/nld_solver.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_base.h"
 #include "nlid_twoterm.h"
 
 // FIXME: Remove QBJT_switch - no more use
