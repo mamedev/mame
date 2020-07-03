@@ -1548,6 +1548,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hotmix_5">
+		<description>Hot Mix 5</description>
+		<year>1993</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_5" sha1="06e221fda5bb09c0ffcd23cbffa73cc1b503a980" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_7">
+		<description>Hot Mix 7</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-007"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_7" sha1="cd2af0d9d29c288c85c3308ec5c2a6cc25b698cc" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmix_8">
 		<description>Hot Mix Volume 8</description>
 		<year>1994</year>
