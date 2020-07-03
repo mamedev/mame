@@ -11,30 +11,32 @@
 //
 // Known problems/issues:
 //
-//    * Laser waveform PROM dump needs to be verified. Triggering
-//       these sounds requires setting a tiny solver step to
-//       get convergence and thus it is very painful to do so.
+//    * The VCOs require high solver frequencies (100x+) to reach the
+//       correct pitches. For this reason, HLE'ed versions are
+//       provided that work correctly even at 48kHz.
 //
-//    * Lots of extraneous noise/clipping during playback.
-//
-//    * The spaceship enter/leave sounds need further
-//       investigation as they aren't quite right, and
-//       totally kill performance.
+//    * The spaceship sound is close but not quite right? Still
+//       working on verification.
 //
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
 
 
-#define LLE_LAZER_CLK (0)
+//
+// Optimizations
+//
+
+#define HLE_SHIP_VCO (1)
+#define HLE_LAZER_VCOS (1)
 
 
 NETLIST_START(starhawk)
 
-#if LLE_LAZER_CLK
-	SOLVER(Solver, 4800000)
-#else
+#if (HLE_LAZER_VCOS && HLE_SHIP_VCO)
 	SOLVER(Solver, 48000)
+#else
+	SOLVER(Solver, 48000000)
 #endif
 
 	TTL_INPUT(I_OUT_0, 0)				// active high
@@ -52,8 +54,6 @@ NETLIST_START(starhawk)
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
 	ANALOG_INPUT(I_VM15, -15)
-	ANALOG_INPUT(I_V25, 25)
-	ANALOG_INPUT(I_VM25, -25)
 
 	RES(R1, RES_K(10))
 	RES(R2, RES_K(10))
@@ -83,10 +83,10 @@ NETLIST_START(starhawk)
 	RES(R26, RES_K(1))
 	RES(R27, RES_K(1))
 	RES(R28, RES_K(510))
-	RES(R29, RES_K(10))
+	RES(R29, RES_K(10))		// PCB verified
 //	RES(R30, ???)
-	RES(R31, RES_K(47))
-	RES(R32, RES_M(3.3))
+	RES(R31, RES_K(47))		// PCB verified
+	RES(R32, RES_M(3.3))	// PCB verified
 	RES(R33, RES_M(1))
 	RES(R34, RES_K(47))
 	RES(R35, RES_M(1))
@@ -136,7 +136,7 @@ NETLIST_START(starhawk)
 //	CAP(C18, CAP_P(470))	-- part of final amp (not emulated)
 //	CAP(C19, CAP_P(470))	-- part of final amp (not emulated)
 	CAP(C20, CAP_U(1))
-	CAP(C21, CAP_U(22))
+	CAP(C21, CAP_U(0.22)) 	// PCB verified
 	CAP(C22, CAP_U(0.1))
 	CAP(C23, CAP_U(0.0027))
 	CAP(C24, CAP_U(0.1))
@@ -160,7 +160,7 @@ NETLIST_START(starhawk)
 	Q_2N3906(Q1)			// PNP
 //	Q_2N6292(Q2)			// NPN -- part of final amp (not emulated)
 //	Q_2N6107(Q3)			// PNP -- part of final amp (not emulated)
-#if (LLE_LAZER_CLK)
+#if (!HLE_LAZER_VCOS)
 	Q_2N3904(Q4)			// NPN
 	Q_2N3904(Q5)			// NPN
 #endif
@@ -372,6 +372,39 @@ NETLIST_START(starhawk)
 	NET_C(C14.2, R18.2, IC4A.6, R19.1)
 	NET_C(R19.2, IC3A.14, IC6A.6)
 
+#if (HLE_SHIP_VCO)
+	//
+	// This VCO is tricky to simulate, as there is both a frequency aspect
+	// and an envelope aspect. The frequency is relatively straightforward.
+	// Pick up the voltage from the anode of CR4 and map to a frequency
+	// with a polynominal derived from the LLE implementation.
+	//
+	VARCLOCK(SHIPCLK, 1, "((0-0.0000010694*A0*A0*A0)-(0.0000046884*A0*A0)-(0.0003031968*A0)+0.0001198733)/2")
+	NET_C(SHIPCLK.GND, GND)
+	NET_C(SHIPCLK.VCC, I_V5)
+	NET_C(SHIPCLK.A0, CR4.A)
+	//
+	// The envelope is trickier. When the signal is OFF (3A pin 5 is HIGH),
+	// the envelope tracks the voltage from CR4. When the signal is ON
+	// (3A pin 5 is LOW), the raw clock from SHIPCLK is clamped to -1..1
+	// and scaled down by a constant factor with a small additional
+	// envelope from the CR4 anode voltage.
+	//
+	// A2 is either 4(off) or 0.1(on)
+	// convert to -1(off) or 0(on) by ((0.1-A2)/3.9)
+	// convert to  0(off) or 1(on) by ((4.0-A2)/3.9)
+	//
+	// this could be written nicer as: if(A2,2,0-A1,(0.07-(0.005*A1))*(2*logical(A0,2)-1)
+	AFUNC(SHIPENV, 3, "(((0.1-A2)/3.9)*A1) + (((4.0-A2)/3.9)*(0.07-(0.005*A1))*min(max(A0-2+A2,0-2),1))")
+	NET_C(SHIPENV.A0, SHIPCLK.Q)
+	NET_C(SHIPENV.A1, CR4.A)
+	NET_C(SHIPENV.A2, IC3A.5)
+	NET_C(SHIPENV.Q, IC3A.2)
+	NET_C(R34.2, R35.1)
+	NET_C(R35.2, CR4.K)
+	NET_C(R36.1, IC5B.6, R38.2, CR4.A)
+	NET_C(GND, IC4B.2, IC4B.3, IC5A.2, IC5A.3, CR5.A, CR5.K, R34.1, R36.2, R37.1, R37.2, C9.1, C9.2)
+#else
 	NET_C(IC3A.2, C9.2)
 	NET_C(C9.1, IC4B.2, R34.1)
 	NET_C(IC4B.6, R34.2, R35.1)
@@ -380,6 +413,7 @@ NETLIST_START(starhawk)
 	NET_C(R36.2, IC5A.2, R37.1)
 	NET_C(IC5A.3, GND)
 	NET_C(R37.2, IC5A.6, CR5.K)
+#endif
 
 	NET_C(IC3A.13, R22.1)
 	NET_C(R22.2, GND)
@@ -405,6 +439,7 @@ NETLIST_START(starhawk)
 	NET_C(R32.2, C27.2)
 	NET_C(C21.2, GND)
 	NET_C(IC5B.3, GND)
+	NET_C(IC5D.7, GND)
 
 	// pin 5 (OUTPUT) of the 555 timer is not connected;
 	// use this kludge to simulate that
@@ -421,19 +456,7 @@ NETLIST_START(starhawk)
 	NET_C(IC7C.8, R39.1)
 	NET_C(R39.2, C22.2, CR7.K)
 	NET_C(C22.1, GND)
-#if (LLE_LAZER_CLK)
-	NET_C(CR7.A, IC6F.3, CR8.K, R43.1)
-	NET_C(CR8.A, GND)
-	NET_C(IC6F.2, C23.2, R40.1)
-	NET_C(C23.1, GND)
-	NET_C(IC6F.6, R40.2, R43.2, R41.1)
-	NET_C(R41.2, R44.2, Q4.B)
-	NET_C(R44.1, GND)
-	NET_C(Q4.E, GND)
-	NET_C(Q4.C, R42.1, IC6C.9)
-	NET_C(R42.2, I_V5)
-	NET_C(IC6C.8, IC7E.1)
-#else
+#if (HLE_LAZER_VCOS)
 	//
 	// This VCO is very difficult to simulate without cranking the speed up
 	// and killing performance. So instead, we have created a mapping
@@ -455,12 +478,24 @@ NETLIST_START(starhawk)
 	//
 	//   0.0005*V - 0.00004
 	//
-	VARCLOCK(LAZER1CLK, "max(0.0000001,0.0005*A0-0.00004)")
+	VARCLOCK(LAZER1CLK, 1, "max(0.0000001,(0.0005223624*A0-0.0000443414)/2)")
 	NET_C(LAZER1CLK.GND, GND)
 	NET_C(LAZER1CLK.VCC, I_V5)
 	NET_C(LAZER1CLK.Q, IC7E.1)
 	NET_C(LAZER1CLK.A0, C22.2)
 	NET_C(GND, CR7.A, C23.1, C23.2, IC6F.2, IC6F.3, CR8.A, CR8.K, R43.1, R43.2, R40.1, R40.2, R41.1, R41.2, R44.1, R44.2, R42.1, R42.2, IC6C.9)
+#else
+	NET_C(CR7.A, IC6F.3, CR8.K, R43.1)
+	NET_C(CR8.A, GND)
+	NET_C(IC6F.2, C23.2, R40.1)
+	NET_C(C23.1, GND)
+	NET_C(IC6F.6, R40.2, R43.2, R41.1)
+	NET_C(R41.2, R44.2, Q4.B)
+	NET_C(R44.1, GND)
+	NET_C(Q4.E, GND)
+	NET_C(Q4.C, R42.1, IC6C.9)
+	NET_C(R42.2, I_V5)
+	NET_C(IC6C.8, IC7E.1)
 #endif
 	NET_C(IC7E.2, IC7E.12, GND)
 	NET_C(IC7E.3, IC8E.7)
@@ -491,7 +526,17 @@ NETLIST_START(starhawk)
 	NET_C(IC7C.12, R46.1)
 	NET_C(R46.2, C24.2, CR9.K)
 	NET_C(C24.1, GND)
-#if (LLE_LAZER_CLK)
+#if (HLE_LAZER_VCOS)
+	//
+	// This VCO is identical to the one above, just using different components
+	//
+	VARCLOCK(LAZER2CLK, 1, "max(0.0000001,(0.0005223624*A0-0.0000443414)/2)")
+	NET_C(LAZER2CLK.GND, GND)
+	NET_C(LAZER2CLK.VCC, I_V5)
+	NET_C(LAZER2CLK.Q, IC4E.1)
+	NET_C(LAZER2CLK.A0, C24.2)
+	NET_C(GND, CR9.A, C25.1, C25.2, IC6E.2, IC6E.3, CR10.A, CR10.K, R48.1, R48.2, R45.1, R45.2, R47.1, R47.2, R49.1, R49.2, R50.1, R50.2, IC6C.13)
+#else
 	NET_C(CR9.A, IC6E.3, CR10.K, R48.1)
 	NET_C(CR10.A, GND)
 	NET_C(IC6E.2, C25.2, R45.1)
@@ -503,16 +548,6 @@ NETLIST_START(starhawk)
 	NET_C(Q5.C, R50.1, IC6C.13)
 	NET_C(R50.2, I_V5)
 	NET_C(IC6C.12, IC4E.1)
-#else
-	//
-	// This VCO is identical to the one above, just using different components
-	//
-	VARCLOCK(LAZER2CLK, "max(0.0000001,0.0005*A0-0.00004)")
-	NET_C(LAZER2CLK.GND, GND)
-	NET_C(LAZER2CLK.VCC, I_V5)
-	NET_C(LAZER2CLK.Q, IC4E.1)
-	NET_C(LAZER2CLK.A0, C24.2)
-	NET_C(GND, CR9.A, C25.1, C25.2, IC6E.2, IC6E.3, CR10.A, CR10.K, R48.1, R48.2, R45.1, R45.2, R47.1, R47.2, R49.1, R49.2, R50.1, R50.2, IC6C.13)
 #endif
 	NET_C(IC4E.2, IC4E.12, GND)
 	NET_C(IC4E.3, IC5E.7)
@@ -536,4 +571,43 @@ NETLIST_START(starhawk)
 	//
 
 	NET_C(GND, IC5D.8, IC5D.9, IC5D.10, IC5D.12, IC5D.13, IC7C.3, IC7C.5, IC9E.3, IC9E.4, IC9E.5, IC9E.6)
+
+	//
+	// Unconnected outputs
+	//
+
+	HINT(IC4E.9, NC)	// Q3
+#if (HLE_LAZER_VCOS)
+	HINT(IC6C.8, NC)	// QD
+	HINT(IC6C.12, NC)	// QF
+#endif
+	HINT(IC7C.4, NC)	// QB
+	HINT(IC7C.6, NC)	// QC
+	HINT(IC7E.9, NC)	// Q3
+	HINT(IC8C.4, NC)	// Q1
+	HINT(IC8C.5, NC)	// Q2
+	HINT(IC8C.6, NC)	// Q3
+	HINT(IC8C.10, NC)	// Q4
+	HINT(IC8C.11, NC)	// Q5
+	HINT(IC8C.12, NC)	// Q6
+	HINT(IC8D.5, NC)	// Q2
+	HINT(IC8D.6, NC)	// Q3
+	HINT(IC8D.10, NC)	// Q4
+	HINT(IC8D.11, NC)	// Q5
+	HINT(IC8D.12, NC)	// Q6
+	HINT(IC9C.3, NC)	// Q0
+	HINT(IC9C.4, NC)	// Q1
+	HINT(IC9C.5, NC)	// Q2
+	HINT(IC9C.6, NC)	// Q3
+	HINT(IC9C.11, NC)	// Q5
+	HINT(IC9D.3, NC)	// Q0
+	HINT(IC9D.4, NC)	// Q1
+	HINT(IC9D.5, NC)	// Q2
+	HINT(IC9D.6, NC)	// Q3
+	HINT(IC9D.11, NC)	// Q5
+	HINT(IC9E.11, NC)	// Q3
+	HINT(IC9E.12, NC)	// Q2
+	HINT(IC9E.13, NC)	// Q1
+	HINT(IC9E.14, NC)	// Q0
+
 NETLIST_END()
