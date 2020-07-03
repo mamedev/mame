@@ -1799,6 +1799,53 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sfolio_2_97">
+		<description>SupportFolio 2/97</description>
+		<year>1997</year> <!-- 2/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3" /> <!-- as printed on the CDs -->
+		<!-- CD 1 "SupportFolio Information Resources 2/97" missing -->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0603-002"/>
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 2/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_6_2_patches_2_97" sha1="4687cdc28d14a4d59a1887a6873119805a1c64aa" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0638-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.3/6.4 Patches 2/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_2_97" sha1="42eefd43f7377ae1e2a0d318b8118a67ae56b2df" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sfolio_4_97">
+		<description>SupportFolio 4/97</description>
+		<year>1997</year> <!-- 4/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<!-- CD 1 "SupportFolio Information Resources 4/97" missing -->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0603-003" />
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 4/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_6_2_patches_4_97" sha1="36a7630cc2b50cdbf059a3d167a04eb4d3aec6d2" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0638-002"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.3/6.4 Patches 4/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_4_97" sha1="b33cc43486fe375d126b8e39178f69072b0310d3" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sadvantage_9_95">
 		<description>Support Advantage 9/95</description>
 		<year>1995</year> <!-- 9/95 -->
