@@ -51,8 +51,10 @@ class mk3b_soc_state : public driver_device
 public:
 	mk3b_soc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_iram0(*this, "iram0"),
 		m_iram3(*this, "iram3"),
 		m_iram7(*this, "iram7"),
+		m_iram10(*this, "iram10"),
 		m_sdram(*this, "sdram"),
 		m_maincpu(*this, "maincpu")
 	{ }
@@ -62,7 +64,7 @@ public:
 	void init_rs70();
 
 private:
-	required_shared_ptr<uint32_t> m_iram3, m_iram7;
+	required_shared_ptr<uint32_t> m_iram0, m_iram3, m_iram7, m_iram10;
 	required_shared_ptr<uint32_t> m_sdram;
 	required_device<cpu_device> m_maincpu;
 
@@ -76,14 +78,12 @@ private:
 void mk3b_soc_state::map(address_map &map)
 {
 	// 64MB external NOR flash
-	// We assume that the lower 32MB is mirrored to 0x00000000
-	// solely so the vectors end up in the right place. This may
-	// well not be correct.
-	map(0x08000000, 0x0BFFFFFF).rom().share("norflash");
-	map(0x00000000, 0x01FFFFFF).rom().share("norflash");
+	map(0x08000000, 0x0BFFFFFF).rom().share("norflash").region("norflash", 0x0);;
 	// unknown amount and configuration of internal RAM
+	map(0x00000000, 0x0000FFFF).ram().share("iram0");
 	map(0x03000000, 0x0300FFFF).ram().share("iram3");
 	map(0x07000000, 0x0700FFFF).ram().share("iram7");
+	map(0x10000000, 0x1000FFFF).ram().share("iram10");
 	// 16MB of external SDRAM
 	map(0x18000000, 0x18FFFFFF).ram().share("sdram");
 }
@@ -98,6 +98,11 @@ void mk3b_soc_state::video_start()
 
 void mk3b_soc_state::machine_reset()
 {
+	// In practice, this will probably be done by a small
+	// internal boot ROM.
+	m_iram0[0] = 0xe59f0000; // ldr r0, [pc]
+	m_iram0[1] = 0xe12fff10; // bx, r0
+	m_iram0[2] = 0x08000000; // target address
 }
 
 uint32_t mk3b_soc_state::screen_update_mk3b_soc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -123,8 +128,8 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 void mk3b_soc_state::init_rs70()
 {
 	// Uppermost address bit seems to be inverted
-	uint8_t *ROM = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
+	uint8_t *ROM = memregion("norflash")->base();
+	int size = memregion("norflash")->bytes();
 
 	for (int i = 0; i < (size / 2); i++)
 	{
@@ -134,7 +139,7 @@ void mk3b_soc_state::init_rs70()
 
 
 ROM_START( rs70_748in1 )
-	ROM_REGION(0x04000000, "maincpu", 0)
+	ROM_REGION(0x04000000, "norflash", 0)
 	ROM_LOAD("s29gl512p.bin", 0x000000, 0x04000000, CRC(cb452bd7) SHA1(0b19a13a3d0b829725c10d64d7ff852ff5202ed0) )
 ROM_END
 
