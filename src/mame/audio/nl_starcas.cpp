@@ -14,18 +14,9 @@
 //
 // Known problems/issues:
 //
-//    * It's very slow, due to needing to run the solver at 384kHz
-//       in order to get close to accurate shot and background sounds.
-//       These sounds are both derived from 566 timers, so perhaps
-//       there is something deficient about the current 566
-//       implementation. Schematics state that the background VCO
-//       should range from 7.5kHz -> 23.3kHz, while the laser VCO
-//       should be either 22kHz or 5.8kHz.
-//
-//    * Even at 384kHz, the highest frequency background sound is not
-//       quite as high pitched as some videos I've seen. The best spot
-//       to listen for background pitch is immediately after the
-//       player dies.
+//    * The VCOs require high solver frequencies (100x+) to reach the
+//       correct pitches. For this reason, HLE'ed versions are
+//       provided that work correctly even at 48kHz.
 //
 
 #include "netlist/devices/net_lib.h"
