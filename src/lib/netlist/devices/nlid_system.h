@@ -88,14 +88,27 @@ namespace devices
 	NETLIB_OBJECT(varclock)
 	{
 		NETLIB_CONSTRUCTOR(varclock)
+		, m_N(*this, "N", 1)
+		, m_func(*this,"FUNC", "T")
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
-		, m_func(*this,"FUNC", "")
 		, m_compiled(*this, "m_compiled")
-		, m_funcparam({nlconst::zero()})
+		, m_supply(*this)
 		{
 			if (!m_func().empty())
-				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+			{
+				std::vector<pstring> inps;
+				inps.push_back(pstring("T"));
+				m_vals.push_back(nlconst::zero());
+				for (int i=0; i < m_N(); i++)
+				{
+					pstring inpname = plib::pfmt("A{1}")(i);
+					m_I.push_back(state().make_pool_object<analog_input_t>(*this, inpname));
+					inps.push_back(inpname);
+					m_vals.push_back(nlconst::zero());
+				}
+				m_compiled->compile(m_func(), inps);
+			}
 			connect(m_feedback, m_Q);
 		}
 		//NETLIB_RESETI();
@@ -103,18 +116,27 @@ namespace devices
 
 		NETLIB_UPDATEI()
 		{
-			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
-			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_funcparam));
+			m_vals[0] = exec().time().as_fp<nl_fptype>();
+			for (std::size_t i = 0; i < static_cast<unsigned>(m_N()); i++)
+			{
+				m_vals[i+1] = (*m_I[i])();
+			}
+			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_vals));
 			m_Q.push(m_feedback() ^ 1, m_inc);
 		}
 
 	private:
+		using pf_type = plib::pfunction<nl_fptype>;
+		param_int_t m_N;
+		param_str_t m_func;
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
+		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
-		param_str_t m_func;
-		state_var<plib::pfunction<nl_fptype>> m_compiled;
-		std::vector<nl_fptype> m_funcparam;
+		pf_type::values_container m_vals;
+		state_var<pf_type> m_compiled;
+
+		NETLIB_NAME(power_pins) m_supply;
 	};
 
 	// -----------------------------------------------------------------------------
