@@ -3202,8 +3202,6 @@ files {
 createMESSProjects(_target, _subtarget, "pel")
 files {
 	MAME_DIR .. "src/mame/drivers/galeb.cpp",
-	MAME_DIR .. "src/mame/includes/galeb.h",
-	MAME_DIR .. "src/mame/video/galeb.cpp",
 	MAME_DIR .. "src/mame/drivers/orao.cpp",
 }
 
