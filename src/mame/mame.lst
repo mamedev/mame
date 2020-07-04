@@ -23148,6 +23148,9 @@ momokoe                         // (c) 1986 Jaleco (English text)
 monacogp                        // (c) 1980 Sega
 monacogpa                       // (c) 1980 Sega
 
+@source:monkey_king_3b.cpp
+rs70_648                        //
+
 @source:monon_color.cpp
 mononcol                        // (c) 2011 M&D
 
@@ -42156,6 +42159,7 @@ coh1002e                        //
 coh1002m                        //
 coh3002c                        //
 doapp                           // Dead Or Alive ++ (JAPAN)
+doappk                          // Dead Or Alive ++ (Korea)
 flamegun                        // Flame Gunner (USA)
 flamegunj                       // Flame Gunner (JAPAN)
 ftimpact                        // Fighters' Impact (Ver 2.02O)

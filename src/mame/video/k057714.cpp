@@ -40,6 +40,8 @@ void k057714_device::device_reset()
 	m_fb_origin_x = 0;
 	m_fb_origin_y = 0;
 
+	m_reg_6c = 0;
+
 	for (auto & elem : m_frame)
 	{
 		elem.base = 0;

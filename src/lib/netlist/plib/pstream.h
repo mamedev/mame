@@ -161,6 +161,7 @@ public:
 		write(t);
 	}
 
+	void flush() { m_strm->flush(); }
 private:
 	std::ostream *m_strm;
 };
