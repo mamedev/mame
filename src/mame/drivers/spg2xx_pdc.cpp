@@ -17,6 +17,7 @@ public:
 	void pdc_tactile(machine_config& config);
 
 	void init_pdc40t();
+	void init_pdc150t();
 
 protected:
 	virtual void machine_start() override;
@@ -141,7 +142,12 @@ void spg2xx_pdc100_game_state::porta_w(offs_t offset, uint16_t data, uint16_t me
 	// pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
 	if (data & 0xff00)
 	{
-		switch_bank(data & (m_numbanks - 1));
+		int bank = data & 0x7;
+		bank |= (data & 0x100) ? 8 : 0;
+
+		bank &= (m_numbanks - 1);
+
+		switch_bank(bank);
 	}
 }
 
@@ -184,6 +190,49 @@ void spg2xx_pdc100_game_state::init_pdc40t()
 }
 
 
+void spg2xx_pdc100_game_state::init_pdc150t()
+{
+	uint16_t *src = (uint16_t*)memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < len/2; i++)
+	{
+		src[i] = bitswap<16>(src[i], 3^8,11^8,2^8,10^8,1^8,9^8,0^8,8^8, 12^8,4^8,13^8,5^8,14^8,6^8,15^8,7^8 );
+	}
+
+#if 0
+	{
+		for (int bank = 0; bank < 16; bank++)
+		{
+			const int length = 0x800000 - 0x10;
+			const int start = (0x800000 * bank) + 0x10;
+			const uint8_t* rom = memregion("maincpu")->base();
+
+			uint32_t checksum = 0x00000000;
+			// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
+			for (int i = start; i < start + length; i++)
+			{
+				checksum += rom[i];
+			}
+
+			printf("Calculated Byte Sum of bytes is %08x)\n", checksum);
+
+
+			FILE *fp;
+			char filename[256];
+			sprintf(filename,"decrypted_%s_%d", machine().system().name, bank);
+			fp=fopen(filename, "w+b");
+			if (fp)
+			{
+				fwrite(&rom[0x800000*bank], 0x800000, 1, fp);
+				fclose(fp);
+			}
+		}
+	}
+#endif
+}
+
+
 ROM_START( pdc100 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	// only 1st half of this is used "Jumper resistor (0 ohm) that short A25 to ground"
@@ -206,6 +255,12 @@ ROM_START( pdc40t )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "pdc_5060.bin", 0x000000, 0x4000000, CRC(28e0c16e) SHA1(fef4af00c737fab2716eef550badbbe0628f26a8) )
 ROM_END
+
+ROM_START( pdc150t )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pdc5070.bin", 0x000000, 0x8000000, CRC(b10e9f29) SHA1(551d62a9ffc18159f7ace12e4363223e0c5cf3c8) )
+ROM_END
+
 
 ROM_START( tmntpdc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -237,6 +292,8 @@ CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, emp
 CONS( 2010, pdc50,   0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init , "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2011, pdc40t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc100_game_state, init_pdc40t, "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
+
+CONS( 2011, pdc150t, 0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc100_game_state, init_pdc150t, "Conny / VideoJet", "PDC150 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
 
 CONS( 2013, tmntpdc, 0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init,  "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
