@@ -1,37 +1,62 @@
-// license:CC0
-// copyright-holders:Aaron Giles,Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 
 //
 // Netlist for Sundance
 //
 // Derived from the schematics in the Sundance manual.
 //
-// Second pass completed over all components and connections for
-// verification against schematics.
-//
 // Known problems/issues:
 //
-//    * Not tested at all, just compiles. Crashes upon execution,
-//       both in MAME and in nltool.
+//    * The "whoosh" sound is close to correct, though there may
+//       be some missing harmonics in the HLE.
+//
+//    * The "wideband noise generator" is simulated with a generic
+//       noise source. This seems to work fine and doesn't sound
+//       too different from recordings.
+//
+//    * The pitch of the pings and bongs seems a little lower than
+//       some recordings, though it's hard to say if this is due
+//       to aging as the frequencies are controlled by 555 timers
+//       and RC networks.
 //
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
+#include "nl_sundance.h"
 
 
 //
-// The final amplifier is documented but not emulated.
+// Optimizations
 //
-#define EMULATE_FINAL_AMP	0
+
+#define HLE_NOISE_GEN (1)
+#define HLE_WHOOSH_MOD (1)
 
 
-static NETLIST_START(Sundance_schematics)
+//
+// Main netlist
+//
+
+NETLIST_START(sundance)
+
+	SOLVER(Solver, 48000)
+
+	TTL_INPUT(I_OUT_0, 1)		// active low
+	TTL_INPUT(I_OUT_1, 1)		// active low
+	TTL_INPUT(I_OUT_2, 1)		// active low
+	TTL_INPUT(I_OUT_3, 1)		// active low
+	TTL_INPUT(I_OUT_4, 1)		// active low
+	TTL_INPUT(I_OUT_7, 1)		// active low
+
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
+
+	CINEMAT_LOCAL_MODELS
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
 	ANALOG_INPUT(I_VM15, -15)
-	ANALOG_INPUT(I_V25, 25)
-	ANALOG_INPUT(I_VM25, -25)
 
 	RES(R1, RES_M(1))
 	RES(R2, 470)
@@ -97,9 +122,9 @@ static NETLIST_START(Sundance_schematics)
 	RES(R62, RES_K(2.7))
 	RES(R63, RES_K(2.7))
 	RES(R64, 470)
-	RES(R65, 150)
-	RES(R66, RES_K(22))
-	RES(R67, 150)
+//	RES(R65, 150)       -- part of final amp (not emulated)
+//	RES(R66, RES_K(22)) -- part of final amp (not emulated)
+//	RES(R67, 150)       -- part of final amp (not emulated)
 	RES(R68, 330)
 	RES(R69, RES_K(390))
 	RES(R70, RES_K(15))
@@ -107,9 +132,9 @@ static NETLIST_START(Sundance_schematics)
 	RES(R72, RES_K(68))
 	RES(R73, RES_K(2.7))
 	RES(R74, RES_K(2.7))
-	RES(R75, RES_K(10))
-	POT(R76, RES_K(100))
-	PARAM(R76.DIAL, 0.500000)
+//	RES(R75, RES_K(10)) -- part of final amp (not emulated)
+//	POT(R76, RES_K(100)) -- part of final amp (not emulated)
+//	PARAM(R76.DIAL, 0.500000) -- part of final amp (not emulated)
 	RES(R77, 330)
 	RES(R78, RES_K(220))
 
@@ -144,9 +169,9 @@ static NETLIST_START(Sundance_schematics)
 	CAP(C29, CAP_U(0.1))
 	CAP(C30, CAP_U(0.01))
 	CAP(C31, CAP_U(0.1))
-	CAP(C32, CAP_P(470))
-	CAP(C33, CAP_P(470))
-	CAP(C34, CAP_P(470))
+//	CAP(C32, CAP_P(470)) -- part of final amp (not emulated)
+//	CAP(C33, CAP_P(470)) -- part of final amp (not emulated)
+//	CAP(C34, CAP_P(470)) -- part of final amp (not emulated)
 	CAP(C35, CAP_U(0.15))
 	CAP(C36, CAP_U(0.1))
 	CAP(C37, CAP_U(0.01))
@@ -163,10 +188,8 @@ static NETLIST_START(Sundance_schematics)
 	Q_2N3906(Q4)			// PNP
 	Q_2N3906(Q5)			// PNP
 	Q_2N3906(Q6)			// PNP
-#if EMULATE_FINAL_AMP
-	Q_2N6292(Q7)			// NPN
-	Q_2N6107(Q9)			// PNP
-#endif
+//	Q_2N6292(Q7)			// NPN -- part of final amp (not emulated)
+//	Q_2N6107(Q9)			// PNP -- part of final amp (not emulated)
 	Q_2N3906(Q8)			// PNP
 	Q_2N3906(Q10)			// PNP
 
@@ -235,10 +258,24 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(IC20.7, I_V15)
 	NET_C(IC20.4, I_VM15)
 
+#if (HLE_NOISE_GEN)
 	//
-	// Wideband noise gen
+	// The "wideband noise gen"
 	//
+	CLOCK(NOISE_CLOCK, 10000)
+	NET_C(NOISE_CLOCK.GND, GND)
+	NET_C(NOISE_CLOCK.VCC, I_V15)
 
+	SYS_NOISE_MT_N(NOISE, 0.5)
+	NET_C(NOISE.I, NOISE_CLOCK.Q)
+	NET_C(NOISE.1, I_V15)
+	NET_C(NOISE.2, R27.2, R36.1, R43.1)
+
+	NET_C(GND, C1.1, C1.2, C2.1, C2.2, C3.1, C3.2, C4.1, C4.2, C5.1, C5.2)
+	NET_C(GND, D1.A, D1.K, D2.A, D2.K, D3.A, D3.K)
+	NET_C(GND, R1.1, R1.2, R3.1, R3.2, R4.1, R4.2, R5.1, R5.2, R6.1, R6.2, R7.1, R7.2, R8.1, R8.2, R9.1, R9.2, R10.1, R10.2)
+	NET_C(GND, IC1.2, IC1.3, IC1.7, IC2.2, IC2.3, IC3.2, IC3.3)
+#else
 	NET_C(C1.1, C2.2, R1.1, R3.1, C5.2, GND)
 	NET_C(C1.2, C2.1, D1.K, R5.1, IC1.7)
 	NET_C(R1.2, C3.1, D1.A)
@@ -253,6 +290,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R9.2, R10.1, IC3.2)
 	NET_C(IC3.3, GND)
 	NET_C(IC3.6, R10.2, R43.1, R27.2, R36.1)
+#endif
 
 	NET_C(I_OUT_1, R2.1, IC11.2)
 	NET_C(R2.2, I_V5)
@@ -264,7 +302,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(C13.1, GND)
 
 	NET_C(R35.2, R17.1, IC4.13)
-	NET_C(R11.1, R14.1, R17.2, IC4.14)
+	NET_C(R11.1, R14.1, R17.2, IC4.9)
 	NET_C(R11.2, IC4.3)
 	NET_C(R12.1, IC4.2)
 	NET_C(R12.2, R16.2, R18.2, Q2.C, R22.2, I_V15)
@@ -287,12 +325,28 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R36.2, C14.1)
 	NET_C(C14.2, R37.2, R40.2, C15.1)
 	NET_C(R37.1, GND)
+
+#if (HLE_WHOOSH_MOD)
+	//
+	// The "whoosh" sound has a noise modulator that is a steady
+	// clock ~64.5Hz, generated by an LM3900 and an RC network.
+	// When run at 48kHz, this network does not clock at the
+	// correct frequency, so HLE this with a basic clock.
+	//
+	CLOCK(WHOOSH_CLK, 64.5)
+	NET_C(WHOOSH_CLK.GND, GND)
+	NET_C(WHOOSH_CLK.VCC, I_V15)
+	NET_C(WHOOSH_CLK.Q, R40.1)
+	NET_C(GND, C21.1, C21.2, R38.1, R38.2, R39.1, R39.2, R47.1, R47.2, R48.1, R48.2, IC4.11, IC4.12)
+#else
 	NET_C(R40.1, R38.2, IC4.10, R48.2)
 	NET_C(C21.2, R38.1, R39.2)
 	NET_C(C21.1, GND)
 	NET_C(R39.1, IC4.11)
 	NET_C(I_V15, R47.1)
 	NET_C(R47.2, IC4.12, R48.1)
+#endif
+
 	NET_C(C15.2, R41.2, IC12.2)
 	NET_C(R41.1, R42.1, GND)
 	NET_C(R42.2, IC12.3)
@@ -405,59 +459,16 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R74.1, GND)
 	NET_C(R74.2, IC19.3)
 
-	NET_C(R64.2, C32.1, IC20.2, R75.1)
-	NET_C(IC20.3, GND)
-	NET_C(R75.2, R76.1)
-	NET_C(R76.2, R76.3)
-	NET_C(IC20.6, C32.2)
-#if EMULATE_FINAL_AMP
-	NET_C(IC20.6, R65.1, R66.1, R67.2)
-	NET_C(R65.2, C33.1, Q7.B)
-	NET_C(C33.2, I_V25, Q7.C)
-	NET_C(R67.1, Q9.B, C34.1)
-	NET_C(C34.2, Q9.C, I_VM25)
-	NET_C(R66.2, Q7.E, Q9.E, R76.3)
-	ALIAS(OUTPUT, Q7.E)
-#else
-	ALIAS(OUTPUT, R76.3)
-	NET_C(GND, R65.1, R65.2, R66.1, R66.2, R67.1, R67.2, C33.1, C33.2, C34.1, C34.2)
-#endif
+	ALIAS(OUTPUT, R64.1)
+	NET_C(R64.2, GND)
 
 
 	//
 	// Unconnected pins
 	//
 
+	NET_C(GND, IC20.2, IC20.3)	// part of final amp
+
 //	NET_C(GND, IC6.3, IC28.8, IC28.9, IC28.10, IC28.11)
-
-NETLIST_END()
-
-
-NETLIST_START(sundance)
-
-	// 192k is not high enough to make the laser and background pitches high enough
-	SOLVER(Solver, 48000)
-//	PARAM(Solver.ACCURACY, 1e-10)
-//	PARAM(Solver.NR_LOOPS, 300)
-//	PARAM(Solver.METHOD, "MAT_CR")
-//	PARAM(Solver.PARALLEL, 0)
-//	PARAM(Solver.DYNAMIC_TS, 0)
-//	PARAM(Solver.DYNAMIC_LTE, 5e-4)
-//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
-
-	TTL_INPUT(I_OUT_0, 1)		// active low
-	TTL_INPUT(I_OUT_1, 1)		// active low
-	TTL_INPUT(I_OUT_2, 1)		// active low
-	TTL_INPUT(I_OUT_3, 1)		// active low
-	TTL_INPUT(I_OUT_4, 1)		// active low
-	TTL_INPUT(I_OUT_7, 1)		// active low
-
-	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
-	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
-
-	CINEMAT_LOCAL_MODELS
-
-	LOCAL_SOURCE(Sundance_schematics)
-	INCLUDE(Sundance_schematics)
 
 NETLIST_END()
