@@ -308,7 +308,10 @@ void arm_iomd_device::device_reset()
 
 	m_sound_dma_on = false;
 	for (i=0; i<sounddma_ch_size; i++)
+	{
 		m_sndbuffer_ok[i] = false;
+		m_sndcur_reg[i] = 0;
+	}
 
 	// ...
 }
