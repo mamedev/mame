@@ -315,5 +315,5 @@ ROM_START(cfarwest)
 	// No EEPROM on this PCB
 ROM_END
 
-GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)", MACHINE_IS_SKELETON_MECHANICAL)
