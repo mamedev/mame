@@ -253,7 +253,7 @@ void s8_state::dig1_w(uint8_t data)
 
 uint8_t s8_state::switch_r()
 {
-	char retval = 0xff;
+	uint8_t retval = 0xff;
 	// scan all 8 input columns, since multiple can be selected at once
 	for (int i = 0; i < 7; i++)
 	{
