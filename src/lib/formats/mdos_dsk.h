@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:68bit
 /*
- * mdos_dsk.h
+ * mdos_dsk.h  -  Motorola MDOS compatible disk images
  */
 #ifndef MAME_FORMATS_MDOS_DSK_H
 #define MAME_FORMATS_MDOS_DSK_H
