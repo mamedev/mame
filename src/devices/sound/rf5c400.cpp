@@ -299,7 +299,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if ((pos>>16) > end)
 			{
 				pos -= loop<<16;
-				pos &= 0xFFFFFF0000U;
+				pos &= 0xFFFFFF0000ULL;
 			}
 
 		}
