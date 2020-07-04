@@ -295,6 +295,8 @@ namespace plib {
 			postfix.push_back(opstk.top());
 			opstk.pop();
 		}
+		//for (auto &e : postfix)
+		//	printf("\t %s\n", e.c_str());
 		compile_postfix(inputs, postfix, expr);
 	}
 
@@ -320,9 +322,9 @@ namespace plib {
 		return narrow_cast<NT>(lfsr);
 	}
 
+	#define ST0 stack[ptr+1]
 	#define ST1 stack[ptr]
 	#define ST2 stack[ptr-1]
-	#define ST3 stack[ptr-2]
 
 	#define OP(OP, ADJ, EXPR) \
 	case OP: \
@@ -350,7 +352,7 @@ namespace plib {
 				OP(LT,   1, ST2 < ST1 ? 1.0 : 0.0)
 				OP(LE,   1, ST2 <= ST1 ? 1.0 : 0.0)
 				OP(GE,   1, ST2 >= ST1 ? 1.0 : 0.0)
-				OP(IF,   1, (ST3 != 0.0) ? ST2 : ST1)
+				OP(IF,   2, (ST2 != 0.0) ? ST1 : ST0)
 				OP(POW,  1, plib::pow(ST2, ST1))
 				OP(LOG,  0, plib::log(ST2))
 				OP(SIN,  0, plib::sin(ST2))
