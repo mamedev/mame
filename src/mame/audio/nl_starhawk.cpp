@@ -392,7 +392,6 @@ NETLIST_START(starhawk)
 	// with a polynominal derived from the LLE implementation.
 	//
 	VARCLOCK(SHIPCLK, 1, "(0.00000359952*A0*A0) - (0.000132079*A0) + 0.000078653")
-//	VARCLOCK(SHIPCLK, 1, "((0-0.0000010694*A0*A0*A0)-(0.0000046884*A0*A0)-(0.0003031968*A0)+0.0001198733)/2")
 	NET_C(SHIPCLK.GND, GND)
 	NET_C(SHIPCLK.VCC, I_V5)
 	NET_C(SHIPCLK.A0, CR4.A)
@@ -403,14 +402,7 @@ NETLIST_START(starhawk)
 	// and scaled down by a constant factor with a small additional
 	// envelope from the CR4 anode voltage.
 	//
-	// A2 is either 4(off) or 0.1(on)
-	// convert to -1(off) or 0(on) by ((0.1-A2)/3.9)
-	// convert to  0(off) or 1(on) by ((4.0-A2)/3.9)
-	//
-	// this could be written nicer as: if(A2,2,0-A1,(0.07-(0.005*A1))*(2*logical(A0,2)-1)
-	AFUNC(SHIPENV, 3, "if(A2>2.5, 0-A1, (0.07-(0.005*A1))*min(max(A0-2+A2,0-2),1))")
-//	AFUNC(SHIPENV, 3, "if(A2>2.5, 0-A1, (0.07-(0.005*A1))*if(A0>2.5,1,-1))")
-//	AFUNC(SHIPENV, 3, "(((0.1-A2)/3.9)*A1) + (((4.0-A2)/3.9)*(0.07-(0.005*A1))*min(max(A0-2+A2,0-2),1))")
+	AFUNC(SHIPENV, 3, "if(A2>2.5, 0-A1, (0.07-(0.005*A1))*if(A0>2.5,1,0-1))")
 	NET_C(SHIPENV.A0, SHIPCLK.Q)
 	NET_C(SHIPENV.A1, CR4.A)
 	NET_C(SHIPENV.A2, IC3A.5)
