@@ -37,7 +37,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(74125_base)
 		, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
 		, m_A(*this, "A", NETLIB_DELEGATE(A))
-		, m_G(*this, pstring(D::invert_g::value ? "GQ" : "G"), NETLIB_DELEGATE(G))
+		, m_G(*this, pstring(D::invert_g::value ? "G" : "GQ"), NETLIB_DELEGATE(G))
 		, m_Y(*this, "Y", m_TE())
 		//, m_Y(*this, "Y")
 		, m_power_pins(*this)
@@ -78,7 +78,7 @@ namespace netlist
 
 	struct desc_74125 : public desc_base
 	{
-		using invert_g = desc_const<1>;
+		using invert_g = desc_const<0>;
 		using ts_off_on = time_ns<11>;
 		using ts_on_off = time_ns<13>;
 		using sig_off_on = time_ns<8>;
@@ -87,7 +87,7 @@ namespace netlist
 
 	struct desc_74126 : public desc_74125
 	{
-		using invert_g = desc_const<0>;
+		using invert_g = desc_const<1>;
 	};
 
 	using NETLIB_NAME(74125) = NETLIB_NAME(74125_base)<desc_74125>;
