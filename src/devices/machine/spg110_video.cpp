@@ -564,6 +564,9 @@ void spg110_video_device::device_reset()
 	m_bg_scrolly = 0;
 	m_2036_scroll = 0;
 
+	std::fill(std::begin(tmap0_regs), std::end(tmap0_regs), 0);
+	std::fill(std::begin(tmap1_regs), std::end(tmap1_regs), 0);
+
 	// is there actually an enable register here?
 	m_video_irq_enable = 0xffff;
 	m_video_irq_status = 0x0000;
