@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: 68bit
 /*
- * mdos_dsk.c  -  MDOS compatible disk images
+ * mdos_dsk.c  -  Motorola MDOS compatible disk images
  *
  * The format is largely IBM 3740 compatible, with 77 tracks, and 26 sectors
  * per track, and a sector size of 128 bytes. Single sided disks were initially
@@ -9,6 +9,40 @@
  * cylinder. The sectors are numbered from one, and the sectors indexes on the
  * second side continue from the first side rather than starting again at
  * one.
+ *
+ * The disk drives run at 360rpm, and the bit clock frequency at 500kHz.  This
+ * gives 6 revs per second, and 500000 / 6 = 83333 cells per track. MAME uses
+ * disk rotation position units of 1/200000000 of a turn and the cells size in
+ * this unit is 200000000 / (500000 / 6) = 2400.
+ *
+ * The M68SFDC2 user guide details the format gaps. "The Post-Index Gap is
+ * defined as the 32 bytes between Index Address Mark and the ID Address Mark
+ * for sector 1 (excluding the address mark bytes). This gap is always 32 bytes
+ * in length and is not affect by any up-dating process. The ID Gap consists of
+ * 17 bytes between the ID Field and the Data Field. This gap may vary in size
+ * slightly after the Data Field has been updated. The Data Gap consists of 33
+ * bytes between the Data Field and the next ID File. This gap may also vary
+ * slightly after the Data Field has been updated. The Pre-Index Gap is a space
+ * of 320 bytes between the last data field on the track and the Index Address
+ * Mark. This gap may also vary in length."
+ *
+ * These gaps do appear to include the leading zero bytes before the sync
+ * marks, in contrast to the gaps defined in the formats below so corrections
+ * have been applied. The trailing gap has been checked and it close to the 320
+ * bytes expected.
+ *
+ * The MDOS 3.05 FORMAT command with (the current emulator timing) varies from
+ * the above slightly. An index marker has been added, 106 bytes after the
+ * start of the track - a 100 byte gap and then 6 bytes of zeros and an index
+ * marker 0xf77a. This index marker does not appear to be used. The post-index
+ * marker gap is 30 bytes between the index marker and the address marker - a
+ * gap of 24 bytes and then 6 bytes of zeros and then the address marker
+ * 0xf57e. The ID Gap consist of roughly 18 bytes between the ID Field and the
+ * Data file - 12 bytes gap and 6 bytes of zero, and then the data marker
+ * 0xf565. The Data Gap consists of 33 bytes - a gap of 27 bytes and 6 bytes of
+ * zeros and then the address marker 0xf57e. The Pre-Index gap is a space of
+ * 209 bytes, but this now extends to the start of the track to the index
+ * marker.
  *
  * TODO The MDOS 3 FORMAT command writes a zero in the address mark 'head'
  * field irrespective of the disk head and the software ignores this field when
@@ -30,7 +64,7 @@ const char *mdos_format::name() const
 
 const char *mdos_format::description() const
 {
-	return "MDOS compatible disk image";
+	return "Motorola MDOS compatible disk image";
 }
 
 const char *mdos_format::extensions() const
@@ -228,11 +262,11 @@ const wd177x_format::format &mdos_format::get_track_format(const format &f, int 
 const mdos_format::format mdos_format::formats[] = {
 	{ // 55 250.25K 8 inch single sided single density
 		floppy_image::FF_8, floppy_image::SSSD, floppy_image::FM,
-		2000, 26, 77, 1, 128, {}, 1, {}, 32, 17, 33
+		2400, 26, 77, 1, 128, {}, 1, {}, 32-6, 17-6, 33-6
 	},
 	{ // 57 500.5K 8 inch double sided single density
 		floppy_image::FF_8, floppy_image::DSSD, floppy_image::FM,
-		2000, 26, 77, 2, 128, {}, 1, {}, 32, 17, 33
+		2400, 26, 77, 2, 128, {}, 1, {}, 32-6, 17-6, 33-6
 	},
 	{}
 };
@@ -242,7 +276,7 @@ const mdos_format::format mdos_format::formats_head1[] = {
 	},
 	{ // 57 500.5K 8 inch double sided single density
 		floppy_image::FF_8, floppy_image::DSSD, floppy_image::FM,
-		2000, 26, 77, 2, 128, {}, 27, {}, 32, 17, 33
+		2400, 26, 77, 2, 128, {}, 27, {}, 32-6, 17-6, 33-6
 	},
 	{}
 };
