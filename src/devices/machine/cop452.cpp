@@ -180,12 +180,9 @@ void cop452_device::device_reset()
 
 void cop452_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	attotime target = attotime::never;
-
 	switch (m_mode) {
 	case MODE_DUAL_FREQ:
 		toggle_n_reload(id);
-		target = counts_to_attotime(m_cnt[ id ]);
 		break;
 
 	case MODE_TRIG_PULSE:
@@ -195,7 +192,6 @@ void cop452_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	case MODE_NUMBER_PULSES:
 		if (id == 0) {
 			toggle_n_reload(0);
-			target = counts_to_attotime(m_cnt[ 0 ]);
 			if (!m_out[ 0 ]) {
 				// It seems that cnt B decrements each time OA goes low
 				if (m_cnt[ 1 ] != 0) {
@@ -204,7 +200,6 @@ void cop452_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					// End of pulse train
 					toggle_n_reload(1);
 					m_mode = MODE_RESET;
-					target = attotime::never;
 				}
 			}
 		}
@@ -256,7 +251,7 @@ void cop452_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 	}
 
-	timer.adjust(target);
+	set_timer(id);
 }
 
 attotime cop452_device::counts_to_attotime(unsigned counts) const
