@@ -50,6 +50,8 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 
 	PTM6840(config, m_ptm, DERIVED_CLOCK(1, 1)); // ptm_cmi01a_config
 	m_ptm->o1_callback().set(FUNC(cmi01a_device::ptm_o1));
+	m_ptm->o2_callback().set(FUNC(cmi01a_device::ptm_o2));
+	m_ptm->o3_callback().set(FUNC(cmi01a_device::ptm_o3));
 	m_ptm->irq_callback().set(FUNC(cmi01a_device::ptm_irq));
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq_merger).output_handler().set(FUNC(cmi01a_device::cmi01a_irq));
@@ -115,11 +117,15 @@ void cmi01a_device::device_reset()
 	m_ws = 0;
 	m_dir = 0;
 	m_pia0_cb2_state = 1;
+	m_zx_flag = 0;
 
 	m_freq = 0.0;
 	m_status = 0;
 
 	m_ptm_o1 = 0;
+	m_ptm_o2 = 0;
+	m_ptm_o3 = 0;
+	m_eclk = false;
 
 	m_zx_timer->adjust(attotime::never);
 	m_eosi_timer->adjust(attotime::never);
@@ -186,33 +192,60 @@ void cmi01a_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void cmi01a_device::eosi_timer_cb()
 {
-	m_pia[1]->cb1_w(0);
+	m_segment_cnt &= ~0x4000;
 
 //	printf("End of sound\n");
 }
 
 void cmi01a_device::zx_timer_cb()
 {
-	/* Set ZX */
-	if (m_zx_flag == 0)
-		m_pia[1]->ca1_w(1);
-	else
-		m_pia[1]->ca1_w(0);
-
+	// Toggle ZX
 	m_zx_flag ^= 1;
 
+	// Update ZX input to PIA 1
+	m_pia[1]->ca1_w(m_zx_flag);
+
+	// 74LS74 A12 (1) is clocked by /ZX, so a 1->0 transition of the ZX flag is a positive clock transition
 	if (m_zx_flag == 0)
 	{
-		/* Low to high transition - clock flip flop */
-		int op = m_ptm_o1;
-
-		/* Set /ZCINT */
-		if (op != m_zx_ff)
+		// Pulse /ZCINT if the O1 output of the PTM has changed
+		if (m_ptm_o1 != m_zx_ff)
 			m_pia[0]->ca1_w(0);
 
-		m_zx_ff = op;
+		m_zx_ff = m_ptm_o1;
 		m_pia[0]->ca1_w(1);
+
+		// Update ECLK
+		bool eclk = (m_ptm_o2 && m_zx_ff) || (m_ptm_o3 && !m_zx_ff);
+		set_eclk(eclk);
 	}
+}
+
+void cmi01a_device::tick_ediv()
+{
+}
+
+void cmi01a_device::set_eclk(bool eclk)
+{
+	bool old_eclk = m_eclk;
+	m_eclk = eclk;
+
+	if (old_eclk == m_eclk)
+		return;
+
+	tick_ediv();
+
+	//	A	B	!(A && B)	!A || !B
+	//	0	0	1			1
+	//	0	1	1			1
+	//	1	0	1			1
+	//	1	1	0			0
+
+	//const bool load = (m_status & CHANNEL_STATUS_LOAD);
+	//const bool a = !load || !eclk;
+	//const bool b =  load || m_ediv_out;
+
+	//const bool div_clk = !a || !b;
 }
 
 void cmi01a_device::run_voice()
@@ -253,7 +286,8 @@ void cmi01a_device::run_voice()
 
 	m_stream->set_sample_rate(cfreq);
 
-	// Set timers and things?
+	// Set timers and things
+	m_zx_flag = 0;
 	attotime zx_period = attotime::from_ticks(64, cfreq);
 	m_zx_timer->adjust(zx_period, 0, zx_period);
 
@@ -324,17 +358,16 @@ void cmi01a_device::update_wave_addr(int inc)
 		++m_segment_cnt;
 
 	/* Update end of sound interrupt flag */
-	m_pia[1]->cb1_w((m_segment_cnt & 0x4000) >> 14);
+	//m_pia[1]->cb1_w((m_segment_cnt & 0x4000) >> 14);
 
 	/* TODO Update zero crossing flag */
-	m_pia[1]->ca1_w((m_segment_cnt & 0x40) >> 6);
+	//m_pia[1]->ca1_w((m_segment_cnt & 0x40) >> 6);
 
 	/* Clock a latch on a transition */
 	if ((old_cnt & 0x40) && !(m_segment_cnt & 0x40))
 	{
-		// TODO: ECLK
-		m_pia[1]->ca2_w(1);
-		m_pia[1]->ca2_w(0);
+		//m_pia[1]->ca2_w(1);
+		//m_pia[1]->ca2_w(0);
 	}
 
 	/* Zero crossing interrupt is a pulse */
@@ -348,11 +381,24 @@ WRITE_LINE_MEMBER( cmi01a_device::ptm_irq )
 WRITE_LINE_MEMBER( cmi01a_device::ptm_o1 )
 {
 	m_ptm_o1 = state;
+	// TODO: Update ECLK
+}
+
+WRITE_LINE_MEMBER( cmi01a_device::ptm_o2 )
+{
+	m_ptm_o2 = state;
+	// TODO: Update ECLK
+}
+
+WRITE_LINE_MEMBER( cmi01a_device::ptm_o3 )
+{
+	m_ptm_o3 = state;
+	// TODO: Update ECLK
 }
 
 READ_LINE_MEMBER( cmi01a_device::eosi_r )
 {
-	return (m_segment_cnt & 0x4000) >> 14;
+	return BIT(m_segment_cnt, 14);
 }
 
 READ_LINE_MEMBER( cmi01a_device::zx_r )

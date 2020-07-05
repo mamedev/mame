@@ -569,7 +569,7 @@ ROM_START( simpsons2pa ) /* Asia 2 Player */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "072-g02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) ) /* Same as both world 2p sets */
 	ROM_LOAD( "072-p01.17c", 0x20000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) ) /* Same as both world 2p sets */
-	ROM_LOAD( "072-113.13c", 0x40000, 0x20000, CRC(8781105a) SHA1(ef2f16f7a56d3715536511c674df4b3aab1be2bd) ) /* Same as world set simpsn2p */
+	ROM_LOAD( "072-113.13c", 0x40000, 0x20000, CRC(8781105a) SHA1(ef2f16f7a56d3715536511c674df4b3aab1be2bd) ) /* Same as world set simpsons2p */
 	ROM_LOAD( "072-112.15c", 0x60000, 0x20000, CRC(3bd69404) SHA1(e055fed7e9bde8315ae2f9b2d35bc05fece6b80b) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */

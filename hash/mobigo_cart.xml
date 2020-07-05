@@ -21,7 +21,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="braveg" supported="no">
+	<software name="brave" supported="no">
+		<description>Disney/Pixar Brave (USA)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252600(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252600 - Brave (US).bin" size="0x1000000" crc="cbf91103" sha1="39ba554528ff070e39d737233ad4b85937ccb9e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="braveg" cloneof="brave" supported="no">
 		<description>Disney/Pixar Merida - Legende der Highlands (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -81,26 +93,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="penmad" supported="no">
-		<description>DreamWorks/Nickelodeon The Penguins of Madagascar - Mission Madness (USA)</description>
-		<year>2010</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-250300(US)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_250300_2.bin" size="0x1000000" crc="b3f0fd02" sha1="ef896a26820ea6f4f79e0c7d9debf6f23c6d10fb"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="penmadg" cloneof="penmad" supported="no">
-		<description>DreamWorks/Nickelodeon Die Pinguine aus Madagascar - Operation Krone (Germany)</description>
+	<software name="elmoabby" supported="no">
+		<description>Sesame Street - Elmo and Abby - Nature Explorers (USA)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-250304(GER)"/>
+		<info name="serial" value="80-251400(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="80-250304 - die pinguine aus madagascar - operation krone (ger).bin" size="0x1000000" crc="847620f3" sha1="0cc8449ba6fabb1b5dc6045171e978d25fcff1c8"/>
+				<rom name="80-251400 - Sesame Street - Elmo and Abby - Nature Explorers (US).bin" size="0x1000000" crc="73095ec6" sha1="884b7025f19b1a566d76ccac144b7be19e1e7c0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,6 +129,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dprincesalt" cloneof="dprinces" supported="no">
+		<description>Disney Princess (USA, alt)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251100(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251100 - Disney Princess (US).bin" size="0x1000000" crc="fd9d04fc" sha1="af9ae160faf3087eb4d3a375c484e569465d4fc4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dprincesg" cloneof="dprinces" supported="no">
 		<description>Disney Princess (Germany)</description>
 		<year>2011</year>
@@ -153,18 +165,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fishrekg" supported="no">
-		<description>DreamWorks Für immer Shrek (Germany)</description>
-		<year>201?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-250004(GER)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="80-250004 - fur immer shrek (ger).bin" size="0x1000000" crc="812a3f90" sha1="1cbd4728201c76b4fb26a8523b080330515153d5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hkittyg" supported="no">
 		<description>Hello Kitty - Hello Kitty feiert Geburtstag! (Germany)</description>
 		<year>2012</year>
@@ -185,6 +185,18 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="mobigo_252800.bin" size="0x1000000" crc="afb1288c" sha1="355358492787020668daf2cf7cf56fadf3da2710"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jakenevalt" cloneof="jakenev" supported="no">
+		<description>Disney Jake and the Neverland Pirates (USA, alt)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252800(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252800 - Jake and the Neverland Pirates (US).bin" size="0x1000000" crc="eebe529e" sha1="7a8dc059e6713470937631b2b4d65cf87f9d3d20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -260,6 +272,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="penmad" supported="no">
+		<description>DreamWorks/Nickelodeon The Penguins of Madagascar - Mission Madness (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250300(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigo_250300_2.bin" size="0x1000000" crc="b3f0fd02" sha1="ef896a26820ea6f4f79e0c7d9debf6f23c6d10fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penmadg" cloneof="penmad" supported="no">
+		<description>DreamWorks/Nickelodeon Die Pinguine aus Madagascar - Operation Krone (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250304(GER)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250304 - die pinguine aus madagascar - operation krone (ger).bin" size="0x1000000" crc="847620f3" sha1="0cc8449ba6fabb1b5dc6045171e978d25fcff1c8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="planesg" supported="no">
 		<description>Disney Planes (Germany)</description>
 		<year>2013</year>
@@ -292,6 +328,30 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251603 - Scooby-Doo - Mystery Town (UK).bin" size="0x1000000" crc="dcc4a1ee" sha1="678e4c83bb120db028ffdd170f4bcfb3aa9d5229"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekfa" supported="no">
+		<description>Dreamworks Shrek - Forever After (US)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250000(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250000 - Shrek - Forever After (US).bin" size="0x1000000" crc="c8bdb5f6" sha1="f376884717907cfd96d23085a26350bc5589bdb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekfag" cloneof="shrekfa" supported="no">
+		<description>DreamWorks Für immer Shrek (Germany)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250004(GER)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250004 - fur immer shrek (ger).bin" size="0x1000000" crc="812a3f90" sha1="1cbd4728201c76b4fb26a8523b080330515153d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -410,7 +470,7 @@ license:CC0
 		<info name="serial" value="80-250900(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_250522.bin" size="0x1000000" crc="40b659c4" sha1="8e864ed29c3e3f4d5f1904082e920e92ceeb37fd"/>
+				<rom name="mobigo_250900.bin" size="0x1000000" crc="0e26b761" sha1="a0f1ccb048990e4144801f05c143d4f38f9cbf44"/>
 			</dataarea>
 		</part>
 	</software>

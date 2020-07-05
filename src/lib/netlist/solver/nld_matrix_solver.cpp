@@ -428,7 +428,7 @@ namespace solver
 
 	void matrix_solver_t::reset()
 	{
-		m_last_step = netlist_time_ext::zero();
+		//m_last_step = netlist_time_ext::zero();
 	}
 
 	void matrix_solver_t::step(netlist_time delta) noexcept

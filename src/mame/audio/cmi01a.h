@@ -57,6 +57,9 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(cmi01a_irq);
 
+	void tick_ediv();
+	void set_eclk(bool eclk);
+
 	void zx_timer_cb();
 	void eosi_timer_cb();
 	void run_voice();
@@ -84,6 +87,11 @@ private:
 	uint8_t m_status;
 
 	int     m_ptm_o1;
+	int     m_ptm_o2;
+	int     m_ptm_o3;
+
+	bool 	m_eclk;
+	bool	m_ediv_out;
 
 	devcb_write_line m_irq_cb;
 
@@ -99,6 +107,8 @@ private:
 	void pia_1_b_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o2 );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o3 );
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 };
 

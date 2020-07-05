@@ -1169,6 +1169,7 @@ spbactn.cpp
 spcforce.cpp
 spdheat.cpp
 spdodgeb.cpp
+special_gambl.cpp
 spectra.cpp
 speedatk.cpp
 speedbal.cpp

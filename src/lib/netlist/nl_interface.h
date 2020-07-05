@@ -149,14 +149,13 @@ namespace netlist
 			, m_param_offsets(*this, 0, "OFFSET{}", 0.0)
 			{
 				connect(m_feedback, m_Q);
+				for (auto & elem : m_buffers)
+					elem = nullptr;
 			}
 
 		protected:
 			NETLIB_RESETI()
 			{
-				m_pos = 0;
-				for (auto & elem : m_buffers)
-					elem = nullptr;
 			}
 
 			NETLIB_UPDATEI()
@@ -232,8 +231,8 @@ namespace netlist
 			object_array_t<param_str_t, MAX_INPUT_CHANNELS> m_param_names;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_mults;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_offsets;
-			std::array<param_fp_t *, MAX_INPUT_CHANNELS>             m_params;
-			std::array<T *, MAX_INPUT_CHANNELS>                               m_buffers;
+			std::array<param_fp_t *, MAX_INPUT_CHANNELS>    m_params;
+			std::array<T *, MAX_INPUT_CHANNELS>             m_buffers;
 		};
 
 	} // namespace interface

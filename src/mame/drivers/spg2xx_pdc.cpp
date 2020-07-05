@@ -5,10 +5,10 @@
 #include "includes/spg2xx.h"
 
 
-class spg2xx_pdc100_game_state : public spg2xx_game_state
+class spg2xx_pdc_game_state : public spg2xx_game_state
 {
 public:
-	spg2xx_pdc100_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+	spg2xx_pdc_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
 		m_numbanks(-1)
 	{ }
@@ -17,6 +17,8 @@ public:
 	void pdc_tactile(machine_config& config);
 
 	void init_pdc40t();
+	void init_pdc150t();
+	void init_pdc200();
 
 protected:
 	virtual void machine_start() override;
@@ -36,10 +38,30 @@ protected:
 		return ret;
 	}
 
-private:
 	int m_numbanks;
 };
 
+class spg2xx_pdc150t_game_state : public spg2xx_pdc_game_state
+{
+public:
+	spg2xx_pdc150t_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_pdc_game_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
+class spg2xx_pdc200_game_state : public spg2xx_pdc_game_state
+{
+public:
+	spg2xx_pdc200_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_pdc_game_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
 
 static INPUT_PORTS_START( pdc100 )
 	PORT_START("P1")
@@ -123,39 +145,66 @@ static INPUT_PORTS_START( vjpp2 )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-void spg2xx_pdc100_game_state::machine_start()
+void spg2xx_pdc_game_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
 	m_numbanks = memregion("maincpu")->bytes() / 0x800000;
 }
 
-void spg2xx_pdc100_game_state::machine_reset()
+void spg2xx_pdc_game_state::machine_reset()
 {
 	m_current_bank = -1;
 	switch_bank(m_numbanks - 1); // pdc100 must boot from upper bank
 	m_maincpu->reset();
 }
 
-void spg2xx_pdc100_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+// pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
+// pdc200 does similar
+// direction bits don't appear to be being set correctly on port writes (similar issue to many other systems)
+
+void spg2xx_pdc_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
-	if (data & 0xff00)
+	if ((m_maincpu->pc() < 0x2800) && (data & 0xff00))
 	{
-		switch_bank(data & (m_numbanks - 1));
+		int bank = data & 0x7;
+		bank &= (m_numbanks - 1);
+		switch_bank(bank);
 	}
 }
 
-void spg2xx_pdc100_game_state::pdc100(machine_config &config)
+void spg2xx_pdc150t_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if ((m_maincpu->pc() < 0x2800) && (data & 0xff00))
+	{
+		int bank = data & 0x7;
+		bank |= (data & 0x0100) ? 8 : 0;
+		bank &= (m_numbanks - 1);
+		switch_bank(bank);
+	}
+}
+
+void spg2xx_pdc200_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if ((m_maincpu->pc() < 0x2800) && (data & 0xff00))
+	{
+		int bank = data & 0x7;
+		bank |= (data & 0x8000) ? 8 : 0;
+		bank &= (m_numbanks - 1);
+		switch_bank(bank);
+	}
+}
+
+void spg2xx_pdc_game_state::pdc100(machine_config &config)
 {
 	non_spg_base(config);
-	m_maincpu->porta_out().set(FUNC(spg2xx_pdc100_game_state::porta_w));
+	m_maincpu->porta_out().set(FUNC(spg2xx_pdc_game_state::porta_w));
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3"); // not used?
 
 }
 
-void spg2xx_pdc100_game_state::pdc_tactile(machine_config& config)
+void spg2xx_pdc_game_state::pdc_tactile(machine_config& config)
 {
 	pdc100(config);
 
@@ -163,13 +212,13 @@ void spg2xx_pdc100_game_state::pdc_tactile(machine_config& config)
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
 
-	m_maincpu->adc_in<0>().set(FUNC(spg2xx_pdc100_game_state::touch_xpos_r));
-	m_maincpu->adc_in<1>().set(FUNC(spg2xx_pdc100_game_state::touch_ypos_r));
+	m_maincpu->adc_in<0>().set(FUNC(spg2xx_pdc_game_state::touch_xpos_r));
+	m_maincpu->adc_in<1>().set(FUNC(spg2xx_pdc_game_state::touch_ypos_r));
 	m_maincpu->adc_in<2>().set_ioport("AD3");
 }
 
 
-void spg2xx_pdc100_game_state::init_pdc40t()
+void spg2xx_pdc_game_state::init_pdc40t()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -182,6 +231,51 @@ void spg2xx_pdc100_game_state::init_pdc40t()
 	}
 	std::copy(buffer.begin(), buffer.end(), &src[0]);
 }
+
+
+void spg2xx_pdc_game_state::init_pdc150t()
+{
+	uint16_t *src = (uint16_t*)memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < len/2; i++)
+	{
+		src[i] = bitswap<16>(src[i], 3^8,11^8,2^8,10^8,1^8,9^8,0^8,8^8, 12^8,4^8,13^8,5^8,14^8,6^8,15^8,7^8 );
+	}
+
+#if 0
+	{
+		for (int bank = 0; bank < 16; bank++)
+		{
+			const int length = 0x800000 - 0x10;
+			const int start = (0x800000 * bank) + 0x10;
+			const uint8_t* rom = memregion("maincpu")->base();
+
+			uint32_t checksum = 0x00000000;
+			// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
+			for (int i = start; i < start + length; i++)
+			{
+				checksum += rom[i];
+			}
+
+			printf("Calculated Byte Sum of bytes is %08x)\n", checksum);
+
+
+			FILE *fp;
+			char filename[256];
+			sprintf(filename,"decrypted_%s_%d", machine().system().name, bank);
+			fp=fopen(filename, "w+b");
+			if (fp)
+			{
+				fwrite(&rom[0x800000*bank], 0x800000, 1, fp);
+				fclose(fp);
+			}
+		}
+	}
+#endif
+}
+
+
 
 
 ROM_START( pdc100 )
@@ -200,12 +294,21 @@ ROM_START( pdc50 )
 	ROM_RELOAD(0x3000000,0x1000000)
 ROM_END
 
-
+ROM_START( pdc200 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pdc200.bin", 0x000000, 0x8000000, CRC(9da99f0f) SHA1(0dda8a3deb794e493685d3d41790ee371f9b736e) )
+ROM_END
 
 ROM_START( pdc40t )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "pdc_5060.bin", 0x000000, 0x4000000, CRC(28e0c16e) SHA1(fef4af00c737fab2716eef550badbbe0628f26a8) )
 ROM_END
+
+ROM_START( pdc150t )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pdc5070.bin", 0x000000, 0x8000000, CRC(b10e9f29) SHA1(551d62a9ffc18159f7ace12e4363223e0c5cf3c8) )
+ROM_END
+
 
 ROM_START( tmntpdc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -228,18 +331,23 @@ ROM_END
 // Other known units
 // PDC 30
 // PDC 40
-// PDC 200
+// PDC 20 Sports
+// + more
 
 // This was dumped from an Anncia branded unit, although there's no ingame branding, so ROM is probably the same for all PDC100 units
-CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init,  "Conny / Anncia",   "PDC100 - Pocket Dream Console (Anncia, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, pdc100,  0,         0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / Anncia",   "PDC100 - Pocket Dream Console (Anncia, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // interestingly this is newer than the PDC100 above, despite containing fewer games
-CONS( 2010, pdc50,   0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init , "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, pdc50,    0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2011, pdc40t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc100_game_state, init_pdc40t, "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
+CONS( 2012, pdc200,   0,        0, pdc100,      pdc100,       spg2xx_pdc200_game_state,  init_pdc150t, "Conny / VideoJet", "PDC200 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2013, tmntpdc, 0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init,  "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, pdc40t,   0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc_game_state,     init_pdc40t,  "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
 
-CONS( 2013, dorapdc, 0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init,  "Conny / VideoJet", "Dora l'exploratrice - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, pdc150t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc150t_game_state, init_pdc150t, "Conny / VideoJet", "PDC150 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
 
-CONS( 200?, vjpp2,   0,        0, pdc100, vjpp2,   spg2xx_pdc100_game_state, empty_init,  "Conny / VideoJet", "Plug Play TV Games 2 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2013, tmntpdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2013, dorapdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Dora l'exploratrice - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, vjpp2,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 2 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

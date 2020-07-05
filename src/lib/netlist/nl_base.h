@@ -691,7 +691,7 @@ namespace netlist
 
 			virtual ~net_t() noexcept = default;
 
-			void reset() noexcept;
+			virtual void reset() noexcept;
 
 			void toggle_new_Q() noexcept { m_new_Q = (m_cur_Q ^ 1);   }
 
@@ -951,6 +951,8 @@ namespace netlist
 	public:
 
 		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
+
+		void reset() noexcept override;
 
 		nl_fptype Q_Analog() const noexcept { return m_cur_Analog; }
 		void set_Q_Analog(nl_fptype v) noexcept { m_cur_Analog = v; }
@@ -1744,7 +1746,13 @@ namespace netlist
 		///
 		void print_stats(stats_info &si) const;
 
+		/// \brief call reset on all netlist components
+		///
 		void reset();
+
+		/// \brief prior to running free no longer needed resources
+		///
+		void free_setup_resources();
 
 	private:
 
@@ -1785,10 +1793,7 @@ namespace netlist
 				m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 			}
 
-			NETLIB_RESETI()
-			{
-				m_Q.net().set_next_scheduled_time(netlist_time_ext::zero());
-			}
+			NETLIB_RESETI();
 
 			NETLIB_UPDATE_PARAMI()
 			{
@@ -2146,6 +2151,14 @@ namespace netlist
 		analog_input_t m_VCC;
 		analog_input_t m_GND;
 	};
+
+	namespace devices
+	{
+		inline NETLIB_RESET(mainclock)
+		{
+			m_Q.net().set_next_scheduled_time(exec().time());
+		}
+	} // namespace devices
 
 	// -----------------------------------------------------------------------------
 	// Hot section

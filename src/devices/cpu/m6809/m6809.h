@@ -332,5 +332,6 @@ enum
 
 #define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
+#define M6809_SWI       2   /* Virtual SWI line to be used during SWI acknowledge cycle */
 
 #endif // MAME_CPU_M6809_M6809_H

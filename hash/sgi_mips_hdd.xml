@@ -18,6 +18,17 @@ license:CC0
 	corresponding sgi_mips sets.
 	-->
 
+	<software name="irix_5_2">
+		<description>IRIX 5.2</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_5_2" sha1="e32910287c9f9ca5b4efe6a328a7c71bdbaed235" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="irix_5_3">
 		<description>IRIX 5.3</description>
 		<year>1994</year>

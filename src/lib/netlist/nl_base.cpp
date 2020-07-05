@@ -272,19 +272,24 @@ namespace netlist
 		log().debug("Searching for solver\n");
 		m_solver = m_state.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 
-		m_time = netlist_time_ext::zero();
+		// Don't reset time
+		//m_time = netlist_time_ext::zero();
 		m_queue.clear();
 		if (m_mainclock != nullptr)
-			m_mainclock->m_Q.net().set_next_scheduled_time(netlist_time_ext::zero());
+			m_mainclock->m_Q.net().set_next_scheduled_time(m_time);
 		//if (m_solver != nullptr)
 		//  m_solver->reset();
 
 		m_state.reset();
 	}
 
-	void netlist_state_t::reset()
+	void netlist_state_t::free_setup_resources()
 	{
 		m_setup = nullptr;
+	}
+
+	void netlist_state_t::reset()
+	{
 		// Reset all nets once !
 		log().verbose("Call reset on all nets:");
 		for (auto & n : nets())
@@ -637,7 +642,7 @@ namespace netlist
 
 	void detail::net_t::reset() noexcept
 	{
-		m_next_scheduled_time = netlist_time_ext::zero();
+		m_next_scheduled_time = exec().time();
 		m_in_queue = queue_status::DELIVERED;
 
 		m_new_Q = 0;
@@ -680,6 +685,11 @@ namespace netlist
 	{
 	}
 
+	void analog_net_t::reset() noexcept
+	{
+		net_t::reset();
+		m_cur_Analog = nlconst::zero();
+	}
 	// ----------------------------------------------------------------------------------------
 	// core_terminal_t
 	// ----------------------------------------------------------------------------------------
