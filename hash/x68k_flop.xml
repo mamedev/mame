@@ -12227,107 +12227,107 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<!-- boot OK -->
-	<software name="shangrli" supported="yes">
-		<description>Shangrlia</description>
+	<software name="shangril" supported="yes">
+		<description>Shangrila</description>
 		<year>1991</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="シャングリラ" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia (1991)(elf)(disk 1 of 4)(disk a).dim" size="1261824" crc="1d5cb53b" sha1="00ba3c24bc7d83390c25f925a513098e873f65d0" offset="000000" />
+				<rom name="shangrila (1991)(elf)(disk 1 of 4)(disk a).dim" size="1261824" crc="1d5cb53b" sha1="00ba3c24bc7d83390c25f925a513098e873f65d0" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia (1991)(elf)(disk 2 of 4)(disk b).dim" size="1261824" crc="83d15d11" sha1="c6694f8ff8200578346dbb446da783c3d2645507" offset="000000" />
+				<rom name="shangrila (1991)(elf)(disk 2 of 4)(disk b).dim" size="1261824" crc="83d15d11" sha1="c6694f8ff8200578346dbb446da783c3d2645507" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia (1991)(elf)(disk 3 of 4)(disk c).dim" size="1261824" crc="a3f55779" sha1="780a6b624fee5de6ac98c84b4437959321bfaf17" offset="000000" />
+				<rom name="shangrila (1991)(elf)(disk 3 of 4)(disk c).dim" size="1261824" crc="a3f55779" sha1="780a6b624fee5de6ac98c84b4437959321bfaf17" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia (1991)(elf)(disk 4 of 4)(disk d).dim" size="1261824" crc="25194753" sha1="39ace8354079d77665e8a65fc7029585bfdae598" offset="000000" />
+				<rom name="shangrila (1991)(elf)(disk 4 of 4)(disk d).dim" size="1261824" crc="25194753" sha1="39ace8354079d77665e8a65fc7029585bfdae598" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shangr2">
-		<description>Shangrlia 2</description>
+		<description>Shangrila 2</description>
 		<year>1993</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="シャングリラ2" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 1 of 8)(disk a).dim" size="1261824" crc="c0d2fd8b" sha1="28293e89da0a02c6b2bf83d3b9777f9065b907fd" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 1 of 8)(disk a).dim" size="1261824" crc="c0d2fd8b" sha1="28293e89da0a02c6b2bf83d3b9777f9065b907fd" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 2 of 8)(disk b).dim" size="1261824" crc="5fba3d5a" sha1="30a9ebc1433431ea61739573241b113c269668b3" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 2 of 8)(disk b).dim" size="1261824" crc="5fba3d5a" sha1="30a9ebc1433431ea61739573241b113c269668b3" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 3 of 8)(disk c).dim" size="1261824" crc="e3f0b1e7" sha1="f527bea77adf94f64887b7d372127a897419cc95" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 3 of 8)(disk c).dim" size="1261824" crc="e3f0b1e7" sha1="f527bea77adf94f64887b7d372127a897419cc95" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 4 of 8)(disk d).dim" size="1261824" crc="cf94b781" sha1="d9dbeb86062ffc3e1928dc3d0bedfd97188ec7b6" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 4 of 8)(disk d).dim" size="1261824" crc="cf94b781" sha1="d9dbeb86062ffc3e1928dc3d0bedfd97188ec7b6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 5 of 8)(disk e).dim" size="1261824" crc="0fe67ea5" sha1="e63a8843018950b1b5f4f71998ecc9c3109002d0" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 5 of 8)(disk e).dim" size="1261824" crc="0fe67ea5" sha1="e63a8843018950b1b5f4f71998ecc9c3109002d0" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 6 of 8)(disk f).dim" size="1261824" crc="895994c0" sha1="9430ced6ebc792affe12bea8ca8450e5da2b5b60" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 6 of 8)(disk f).dim" size="1261824" crc="895994c0" sha1="9430ced6ebc792affe12bea8ca8450e5da2b5b60" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk G" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 7 of 8)(disk g).dim" size="1261824" crc="8a83493a" sha1="ef99b0deb3df905dd163153adc958657e8cc7cc6" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 7 of 8)(disk g).dim" size="1261824" crc="8a83493a" sha1="ef99b0deb3df905dd163153adc958657e8cc7cc6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="Disk H" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 (1993)(elf)(disk 8 of 8)(disk h).dim" size="1261824" crc="bbe352a7" sha1="deddbb3aaabf25861e399953bf99fd4fb10de638" offset="000000" />
+				<rom name="shangrila 2 (1993)(elf)(disk 8 of 8)(disk h).dim" size="1261824" crc="bbe352a7" sha1="deddbb3aaabf25861e399953bf99fd4fb10de638" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shangr2s">
-		<description>Shangrlia 2 Special</description>
+		<description>Shangrila 2 Special</description>
 		<year>1993</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="シャングリラ2 スペシャルディスク" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 special (1993)(elf)(disk 1 of 2).dim" size="1261824" crc="2f189cfd" sha1="36aa2a36f296bbe5db22bd5c972bbd3a757534e9" offset="000000" />
+				<rom name="shangrila 2 special (1993)(elf)(disk 1 of 2).dim" size="1261824" crc="2f189cfd" sha1="36aa2a36f296bbe5db22bd5c972bbd3a757534e9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="shangrlia 2 special (1993)(elf)(disk 2 of 2).dim" size="1261824" crc="6138db72" sha1="92c2f40a97b4dd4817b581d6fd798fbb7e8315ac" offset="000000" />
+				<rom name="shangrila 2 special (1993)(elf)(disk 2 of 2).dim" size="1261824" crc="6138db72" sha1="92c2f40a97b4dd4817b581d6fd798fbb7e8315ac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
