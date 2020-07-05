@@ -35,7 +35,7 @@ ToDo:
 void ondra_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0xdfff).bankrw("bank2");
+	map(0x4000, 0xdfff).ram();
 	map(0xe000, 0xffff).bankrw("bank3");
 }
 

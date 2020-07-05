@@ -118,7 +118,6 @@ void ondra_state::machine_reset()
 	m_bank_status = 0;
 	m_bank_old = 0xff;
 	update_banks();
-	m_bank2->set_base(m_ram->pointer() + 0x4000);
 }
 
 void ondra_state::machine_start()

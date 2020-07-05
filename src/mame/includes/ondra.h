@@ -24,7 +24,6 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "maincpu")
 		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_beep(*this, "beeper")
 		, m_io_keyboard(*this, "LINE%u", 0U)
@@ -58,7 +57,6 @@ private:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_device<beep_device> m_beep;
 	required_ioport_array<10> m_io_keyboard;
