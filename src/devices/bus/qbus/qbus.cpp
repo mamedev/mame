@@ -57,6 +57,7 @@ qbus_slot_device::qbus_slot_device(const machine_config &mconfig, const char *ta
 	m_write_birq6(*this),
 	m_write_birq7(*this),
 	m_write_bdmr(*this),
+	m_card(nullptr),
 	m_bus(*this, DEVICE_SELF_OWNER)
 {
 }
