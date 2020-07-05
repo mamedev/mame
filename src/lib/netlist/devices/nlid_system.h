@@ -582,12 +582,35 @@ namespace devices
 		state_var<netlist_sig_t> m_last_state;
 	};
 
+	///
+	/// \brief  noise source
+	///
+	/// An externally clocked noise source. The noise acts as a voltage source
+	/// with internal resistance RI.
+	///
+	/// Typical application:
+	///
+	///             VCC
+	///              |
+	///              R
+	///              R
+	///              R
+	///              |
+	///              +-----> Output
+	///              |
+	///         +-------+
+	///         |    1  |
+	///     --->| I     |
+	///         |    2  |
+	///         +-------+
+	///              |
+	///              R
+	///              R
+	///              R
+	///              |
+	///             GND
+	///
 	// -----------------------------------------------------------------------------
-	// nld_sys_noise - noise source
-	//
-	// An externally clocked noise source.
-	// -----------------------------------------------------------------------------
-
 	template <typename E, template<class> class D>
 	NETLIB_OBJECT(sys_noise)
 	{
