@@ -3166,6 +3166,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tsb12lv01a.h,MACHINES["TSB12LV01A"] = true
+---------------------------------------------------
+
+if (MACHINES["TSB12LV01A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tsb12lv01a.cpp",
+		MAME_DIR .. "src/devices/machine/tsb12lv01a.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tube.h,MACHINES["TUBE"] = true
 ---------------------------------------------------
 

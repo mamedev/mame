@@ -35,6 +35,8 @@ The Grid         v1.2   10/18/2000
 #include "audio/dcs.h"
 #include "machine/nvram.h"
 
+#include "machine/tsb12lv01a.h"
+
 #include "crusnexo.lh"
 
 #define LOG_FW        (0)
@@ -52,6 +54,7 @@ public:
 	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midzeus_state(mconfig, type, tag)
 		, m_zeus(*this, "zeus2")
+		, m_fwlinklayer(*this, "fwlinklayer")
 		, m_leds(*this, "led%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -79,6 +82,7 @@ private:
 	}
 
 	required_device<zeus2_device> m_zeus;
+	required_device<tsb12lv01a_device> m_fwlinklayer;
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;
 };
@@ -452,86 +456,6 @@ void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 	}
 }
 
-
-
-/*************************************
- *
- *  Firewire/IEEE 1394 access (Zeus 2 only)
- *
- *  Hardware: TSB12LV01A link layer controller and IBM IBM21S851 physical layer (PHY) transceiver.
- *
- *************************************/
-
-uint32_t midzeus_state::firewire_r(offs_t offset)
-{
-	uint32_t retVal = 0;
-	if (offset < 0x40)
-		retVal = m_firewire[offset / 4];
-
-	switch (offset) {
-	case 0:
-		// Version
-		retVal = 0x30313042;
-		break;
-	case 0x0c:
-		// Interrupt
-		retVal = 0xf4000000;// &m_firewire[0x10 / 4];
-		break;
-	case 0x30:
-		// Asynchronous Transmit FIFO Status
-		// 8:0 space available
-		retVal = 0x1ff;
-		break;
-	case 0x3c:
-		// General Rx FIFO Status
-		// 0x80000000 = Empty
-		// 0x40000000 = Control Data
-		// 0x20000000 = Packet Complete
-		retVal = 0x80000000;
-		break;
-	case 0xc0:
-		// General Rx FIFO
-		retVal = 0x0;
-		break;
-	}
-	if LOG_FW logerror("%06X:firewire_r(%02X)=%08X\n", m_maincpu->pc(), offset, retVal);
-	return retVal;
-}
-
-void midzeus_state::firewire_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	// 0x08 // Control
-	// Bit 0: Flush bad packets from Rx FIFO
-	// Bit 6: IRP2En
-	// Bit 7: IRP1En
-	// Bit 8: TrgEn
-	// Bit 20: Reset Rx
-	// Bit 21: Reset Tx
-	// Bit 22: Enable Acknowledge
-	// Bit 23: Iso Rx Enable
-	// Bit 24: Iso Rx Enable
-	// Bit 25: Async Rx Enable
-	// Bit 26: Async Tx Enable
-	// Bit 30: Rx Self ID packets
-	// Bit 31: Rx Packets addressed to phy
-	// 0x00200000 Reset Tx
-	// 0x00100000 Reset Rx
-	// 0x1c // FIFO Control
-	// Bit 0:8: ITF Size
-	// Bit 9:17: ATF Size
-	// Bit 18:26 Trigger Size
-	// Bit 29: Clear GRF
-	// Bit 32: Clear ATF
-	// 0x20 // Diagnostics
-	// Bit 31: Enable Snooping
-
-	if (offset < 0x40)
-		COMBINE_DATA(&m_firewire[offset / 4]);
-	if LOG_FW logerror("%06X:firewire_w(%02X) = %08X\n", m_maincpu->pc(),  offset, data);
-}
-
-
-
 /*************************************
  *
  *  TMS32031 I/O accesses
@@ -739,12 +663,11 @@ void midzeus_state::zeus_map(address_map &map)
 	map(0x880000, 0x8803ff).rw(FUNC(midzeus_state::zeus_r), FUNC(midzeus_state::zeus_w)).share("zeusbase");
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus_state::disk_asic_jr_r), FUNC(midzeus_state::disk_asic_jr_w));
 	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x9e0000, 0x9e0000).nopw();        // watchdog?
+	map(0x9e0000, 0x9e0000).nopw(); // watchdog?
 	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus_state::cmos_r), FUNC(midzeus_state::cmos_w)).share("nvram");
 	map(0x9f8000, 0x9f8000).w(FUNC(midzeus_state::cmos_protect_w));
 	map(0xa00000, 0xffffff).rom().region("user1", 0);
 }
-
 
 void midzeus2_state::zeus2_map(address_map &map)
 {
@@ -753,13 +676,14 @@ void midzeus2_state::zeus2_map(address_map &map)
 	map(0x400000, 0x43ffff).ram();
 	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32031_control_r), FUNC(midzeus2_state::tms32031_control_w)).share("tms32031_ctl");
 	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
-	map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
+	map(0x8a0000, 0x8a00c3).rw(m_fwlinklayer, FUNC(tsb12lv01a_device::regs_r), FUNC(tsb12lv01a_device::regs_w)); // TSB12LV01A IEEE 1394 link regs
+//	map(0x8b0000, 0x8cffff).ram(); //possibly for IBM21S850/1 PHY layer
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus2_state::disk_asic_jr_r), FUNC(midzeus2_state::disk_asic_jr_w));
 	map(0x900000, 0x91ffff).rw(FUNC(midzeus2_state::zpram_r), FUNC(midzeus2_state::zpram_w)).share("nvram").mirror(0x020000);
 	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
 	map(0x9c0000, 0x9c000f).rw(FUNC(midzeus2_state::analog_r), FUNC(midzeus2_state::analog_w));
 	map(0x9d0000, 0x9d000f).rw(FUNC(midzeus2_state::disk_asic_r), FUNC(midzeus2_state::disk_asic_w));
-	map(0x9e0000, 0x9e0000).nopw();        // watchdog?
+	map(0x9e0000, 0x9e0000).nopw(); // watchdog?
 	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus2_state::zeus2_timekeeper_r), FUNC(midzeus2_state::zeus2_timekeeper_w));
 	map(0x9f8000, 0x9f8000).w(FUNC(midzeus2_state::cmos_protect_w));
 	map(0xa00000, 0xbfffff).rom().region("user1", 0);
@@ -1093,11 +1017,11 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1")      /* View 1 */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2")      /* View 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3")      /* View 3 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 4")     /* View 4 */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1st Gear")    /* Gear 1 */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2nd Gear")    /* Gear 2 */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("3rd Gear")    /* Gear 3 */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("4th Gear")    /* Gear 4 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1st Gear")    /* Gear 1 */
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2nd Gear")    /* Gear 2 */
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("3rd Gear")    /* Gear 3 */
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("4th Gear")    /* Gear 4 */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
@@ -1329,6 +1253,8 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
+	
+	TSB12LV01A(config, m_fwlinklayer, 0);
 }
 
 void midzeus2_state::crusnexo(machine_config &config)
@@ -1340,7 +1266,7 @@ void midzeus2_state::crusnexo(machine_config &config)
 void midzeus2_state::thegrid(machine_config &config)
 {
 	midzeus2(config);
-	PIC16C57(config, "pic", 8000000).disabled();  // unverified clock, not hooked up
+	PIC16C57(config, "pic", 8000000).disabled(); // unverified clock, not hooked up
 	m_ioasic->set_upper(474/* or 491 */);
 }
 
@@ -1712,10 +1638,10 @@ GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state,  init_mk4,  
 GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

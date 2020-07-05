@@ -69,7 +69,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_ram_base(*this, "ram_base"),
-		m_firewire(*this, "firewire"),
 		m_tms32031_control(*this, "tms32031_ctl"),
 		m_zeusbase(*this, "zeusbase"),
 		m_m48t35(*this, "m48t35"),
@@ -95,7 +94,6 @@ public:
 
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
-	optional_shared_ptr<uint32_t> m_firewire;
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_zeusbase;
 
@@ -108,8 +106,6 @@ public:
 	void disk_asic_w(offs_t offset, uint32_t data);
 	uint32_t disk_asic_jr_r(offs_t offset);
 	void disk_asic_jr_w(offs_t offset, uint32_t data);
-	uint32_t firewire_r(offs_t offset);
-	void firewire_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t tms32031_control_r(offs_t offset);
 	void tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void keypad_select_w(offs_t offset, uint32_t data);
