@@ -20,6 +20,8 @@
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
 
+#include "plib/ptests.h"
+
 #include <cstdio> // scanf
 #include <iomanip> // scanf
 #include <ios>
@@ -44,7 +46,7 @@ public:
 		m_errors(0),
 
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader"}), "run|validate|convert|listdevices|static|header|docheader"),
+		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader","tests"}), "run|validate|convert|listdevices|static|header|docheader|tests"),
 		opt_includes(*this, "I", "include",                 "Add the directory to the list of directories to be searched for header files. This option may be specified repeatedly."),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
@@ -94,7 +96,9 @@ public:
 		opt_ex3(*this,     "nltool --cmd=header --tab-width=8 --line-width=80",
 				"Create the header file needed for including netlists as code."),
 		opt_ex4(*this,     "nltool --cmd static --output src/lib/netlist/generated/static_solvers.cpp src/mame/audio/nl_*.cpp src/mame/machine/nl_*.cpp",
-				"Create static solvers for the MAME project.")
+				"Create static solvers for the MAME project."),
+		opt_ex5(*this,     "nltool --cmd tests",
+			"Run unit tests. In case the unit tests are not linked in, this will do nothing.")
 		{}
 
 	int execute() override;
@@ -158,6 +162,7 @@ private:
 	plib::option_example opt_ex2;
 	plib::option_example opt_ex3;
 	plib::option_example opt_ex4;
+	plib::option_example opt_ex5;
 
 	struct compile_map_entry
 	{
@@ -1267,6 +1272,10 @@ int tool_app_t::execute()
 			create_docheader();
 		else if (cmd == "convert")
 			convert();
+		else if (cmd == "tests")
+		{
+			return RUN_ALL_TESTS();
+		}
 		else
 		{
 			perr("Unknown command {}\n", cmd.c_str());

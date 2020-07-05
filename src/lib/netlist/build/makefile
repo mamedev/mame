@@ -103,6 +103,7 @@ TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
 NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
+TESTOBJ = $(OBJ)/tests
 
 DEPEND = $(OBJ)/.depend
 
@@ -113,12 +114,13 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
 
-OBJS = $(POBJS) $(NLOBJS)
+OBJS = $(POBJS) $(NLOBJS) $(TESTOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
@@ -212,6 +214,9 @@ NLOBJS := \
 	$(NLOBJ)/macro/nlm_roms.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
 
+TESTOBJS := \
+	$(TESTOBJ)/test_pfunction.o \
+
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
 	$(VSBUILD/netlistlib.vcxproj.user \
@@ -234,7 +239,7 @@ ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy runtests
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -244,7 +249,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend 
+.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend runtests
 
 #-------------------------------------------------
 # all
@@ -327,6 +332,9 @@ nvcc:
 		--ftemplate-depth 1024  \
 		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
 		DEPENDCC=g++
+
+runtests:
+	./nltool$(EXESUFFIX) -c tests
 
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 
