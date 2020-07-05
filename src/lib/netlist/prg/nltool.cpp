@@ -478,6 +478,7 @@ void tool_app_t::run()
 
 		// Inputs must be read before reset -> will clear setup and parser
 		inps = read_input(nt.setup(), opt_inp());
+		nt.free_setup_resources();
 		nt.exec().reset();
 
 		ttr = netlist::netlist_time_ext::from_fp(opt_ttr());
@@ -608,6 +609,7 @@ void tool_app_t::compile_one_and_add_to_map(const pstring &file,
 
 		// need to reset ...
 
+		nt.free_setup_resources();
 		nt.exec().reset();
 
 		auto mp(nt.exec().solver()->create_solver_code(target));

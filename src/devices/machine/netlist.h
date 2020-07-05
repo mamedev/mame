@@ -127,6 +127,7 @@ private:
 	std::unique_ptr<netlist_mame_t> m_netlist;
 
 	func_type m_setup_func;
+	bool m_device_reset_called;
 };
 
 // ----------------------------------------------------------------------------------------

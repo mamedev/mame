@@ -126,6 +126,14 @@ namespace analog
 			m_N.set_go_gt_I(a21, a22, rhs2);
 		}
 
+		void clear_mat() const noexcept
+		{
+			const auto z = nlconst::zero();
+			//               GO,  GT,     I
+			m_P.set_go_gt_I(z, z, z);
+			m_N.set_go_gt_I(z, z, z);
+		}
+
 		/// \brief Get a const reference to the m_P terminal
 		///
 		/// This is typically called during initialization to connect
@@ -317,6 +325,7 @@ namespace analog
 		NETLIB_RESETI()
 		{
 			m_cap.setparams(exec().gmin());
+			clear_mat();
 		}
 
 		/// \brief Set capacitance
