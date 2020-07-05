@@ -98,7 +98,9 @@ namespace plib {
 				{ rc.m_cmd = GE; stk -= 1; }
 			else if (cmd == "if")
 				{ rc.m_cmd = IF; stk -= 2; }
-			else if (cmd == "pow")
+			else if (cmd == "neg")
+				{ rc.m_cmd = NEG; stk -= 0; }
+			else if (cmd == "pow" || cmd == "^")
 				{ rc.m_cmd = POW; stk -= 1; }
 			else if (cmd == "log")
 				{ rc.m_cmd = LOG; stk -= 0; }
@@ -149,25 +151,43 @@ namespace plib {
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
-			throw pexception(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
+			throw pexception(plib::pfmt("pfunction: stack count {1] different to one on <{2}>")(stk, expr));
+	}
+
+	static bool is_number(const pstring &n)
+	{
+		if (n.empty())
+			return false;
+		const auto l = n.substr(0,1);
+		return (l >= "0" && l <= "9");
+	}
+
+	static bool is_id(const pstring &n)
+	{
+		if (n.empty())
+			return false;
+		const auto l = n.substr(0,1);
+		return ((l >= "a" && l <= "z") || (l >= "A" && l <= "Z"));
 	}
 
 	static int get_prio(const pstring &v)
 	{
-		if (v == "(" || v == ")")
-			return 1;
+		if (v == "neg")
+			return 25;
 		if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
 			return 0;
-		if (v == "^")
-			return 30;
-		if (v == "*" || v == "/")
-			return 20;
-		if (v == "+" || v == "-")
-			return 10;
-		if (v == "<" || v == ">" || v == "<=" || v == ">=")
-			return 9;
+		if (v == "(" || v == ")")
+			return 1;
 		if (v == "==" || v == "!=")
 			return 8;
+		if (v == "<" || v == ">" || v == "<=" || v == ">=")
+			return 9;
+		if (v == "+" || v == "-")
+			return 10;
+		if (v == "*" || v == "/")
+			return 20;
+		if (v == "^")
+			return 30;
 
 		return -1;
 	}
@@ -186,52 +206,55 @@ namespace plib {
 	{
 		// Shunting-yard infix parsing
 		std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^", "<=", ">=", "==", "!=", "<", ">"};
-		std::vector<pstring> sexpr1(plib::psplit(plib::replace_all(expr, " ", ""), sep));
+		std::vector<pstring> sexpr2(plib::psplit(plib::replace_all(expr, " ", ""), sep));
 		std::stack<pstring> opstk;
 		std::vector<pstring> postfix;
+		std::vector<pstring> sexpr1;
 		std::vector<pstring> sexpr;
 
 		// FIXME: We really need to switch to ptokenizer and fix negative number
 		//        handling in ptokenizer.
 
-		// Fix numbers
-		for (std::size_t i = 0; i < sexpr1.size(); )
+		// Fix numbers exponential numbers
+		for (std::size_t i = 0; i < sexpr2.size(); )
 		{
-			if ((i == 0) && (sexpr1.size() > 1) && (sexpr1[0] == "-")
-				&& (plib::left(sexpr1[1],1) >= "0") && (plib::left(sexpr1[1],1) <= "9"))
+			if (i + 2 < sexpr2.size() && sexpr2[i].length() > 1)
 			{
-				if (sexpr1.size() < 4)
-				{
-					sexpr.push_back(sexpr1[0] + sexpr1[1]);
-					i+=2;
-				}
-				else
-				{
-					auto r(plib::right(sexpr1[1], 1));
-					auto ne(sexpr1[2]);
-					if ((r == "e" || r == "E") && (ne == "-" || ne == "+"))
-					{
-						sexpr.push_back(sexpr1[0] + sexpr1[1] + ne + sexpr1[3]);
-						i+=4;
-					}
-					else
-					{
-						sexpr.push_back(sexpr1[0] + sexpr1[1]);
-						i+=2;
-					}
-				}
-			}
-			else if (i + 2 < sexpr1.size() && sexpr1[i].length() > 1)
-			{
-				auto l(plib::left(sexpr1[i], 1));
-				auto r(plib::right(sexpr1[i], 1));
-				auto ne(sexpr1[i+1]);
-				if ((l >= "0") && (l <= "9")
+				auto r(plib::right(sexpr2[i], 1));
+				auto ne(sexpr2[i+1]);
+				if ((is_number(sexpr2[i]))
 					&& (r == "e" || r == "E")
 					&& (ne == "-" || ne == "+"))
 				{
-					sexpr.push_back(sexpr1[i] + ne + sexpr1[i+2]);
+					sexpr1.push_back(sexpr2[i] + ne + sexpr2[i+2]);
 					i+=3;
+				}
+				else
+					sexpr1.push_back(sexpr2[i++]);
+			}
+			else
+				sexpr1.push_back(sexpr2[i++]);
+		}
+		// Fix numbers with unary minus/plus
+		for (std::size_t i = 0; i < sexpr1.size(); )
+		{
+			if (sexpr1[i]=="-" && (i+1 < sexpr1.size()) && is_number(sexpr1[i+1]))
+			{
+				if (i==0 || !(is_number(sexpr1[i-1]) || sexpr1[i-1] == ")" || is_id(sexpr1[i-1])))
+				{
+					sexpr.push_back("-" + sexpr1[i+1]);
+					i+=2;
+				}
+				else
+					sexpr.push_back(sexpr1[i++]);
+			}
+			else if (sexpr1[i]=="-" && (i+1 < sexpr1.size()) && (is_id(sexpr1[i+1]) || sexpr1[i+1] == "("))
+			{
+				if (i==0 || !(is_number(sexpr1[i-1]) || sexpr1[i-1] == ")" || is_id(sexpr1[i-1])))
+				{
+					sexpr.push_back("neg");
+					sexpr.push_back(sexpr1[i+1]);
+					i+=2;
 				}
 				else
 					sexpr.push_back(sexpr1[i++]);
@@ -296,7 +319,7 @@ namespace plib {
 			opstk.pop();
 		}
 		//for (auto &e : postfix)
-		//	printf("\t %s\n", e.c_str());
+		//	printf("\t%s\n", e.c_str());
 		compile_postfix(inputs, postfix, expr);
 	}
 
@@ -353,6 +376,7 @@ namespace plib {
 				OP(LE,   1, ST2 <= ST1 ? 1.0 : 0.0)
 				OP(GE,   1, ST2 >= ST1 ? 1.0 : 0.0)
 				OP(IF,   2, (ST2 != 0.0) ? ST1 : ST0)
+				OP(NEG,  0, -ST2)
 				OP(POW,  1, plib::pow(ST2, ST1))
 				OP(LOG,  0, plib::log(ST2))
 				OP(SIN,  0, plib::sin(ST2))

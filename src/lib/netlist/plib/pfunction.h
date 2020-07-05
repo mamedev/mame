@@ -39,6 +39,7 @@ namespace plib {
 			LE,
 			GE,
 			IF,
+			NEG,	// unary minus
 			POW,
 			LOG,
 			SIN,
