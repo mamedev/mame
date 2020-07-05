@@ -360,7 +360,8 @@ void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios
 	// default is applied by the device at config complete time
 	if (specbios && *specbios && core_stricmp(specbios, "default"))
 	{
-		bool found(false);
+		bool found_system_bios = false;
+		bool found_a_bios = false;
 		for (const rom_entry &rom : device.rom_region_vector())
 		{
 			if (ROMENTRY_ISSYSTEM_BIOS(&rom))
@@ -368,12 +369,13 @@ void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios
 				char const *const biosname = ROM_GETNAME(&rom);
 				int const bios_flags = ROM_GETBIOSFLAGS(&rom);
 				char bios_number[20];
+				found_a_bios = true;
 
 				// Allow '-bios n' to still be used
 				sprintf(bios_number, "%d", bios_flags - 1);
 				if (!core_stricmp(bios_number, specbios) || !core_stricmp(biosname, specbios))
 				{
-					found = true;
+					found_system_bios = true;
 					device.set_system_bios(bios_flags);
 					break;
 				}
@@ -381,10 +383,13 @@ void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios
 		}
 
 		// if we got neither an empty string nor 'default' then warn the user
-		if (!found)
+		if (!found_system_bios)
 		{
-			m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
-			m_warnings++;
+			if (found_a_bios)
+				m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
+			else
+				m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", no BIOS required\n", device.tag(), specbios));
+			m_biosmismatch = true;
 		}
 	}
 

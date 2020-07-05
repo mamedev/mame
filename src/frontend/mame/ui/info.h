@@ -74,7 +74,7 @@ public:
 	machine_info(running_machine &machine);
 
 	// text generators
-	std::string warnings_string() const;
+	std::string warnings_string(bool first_game) const;
 	std::string game_info_string() const;
 	std::string get_screen_desc(screen_device &screen) const;
 
