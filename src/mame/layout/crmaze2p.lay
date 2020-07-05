@@ -18,11 +18,11 @@ license:CC0
 		</disk>
 		<text string="ESCAPE" state="0">
 			<color red="0.5" green="0.0" blue="0.0" />
-			<bounds x="2" y="1.5" width="4" height="4" />
+			<bounds x="1.7" y="1.5" width="4" height="4" />
 		</text>
 		<text string="ESCAPE" state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
-			<bounds x="2" y="1.5" width="4" height="4" />
+			<bounds x="1.7" y="1.5" width="4" height="4" />
 		</text>
 	</element>
 

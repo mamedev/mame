@@ -170,10 +170,7 @@ TODO:
       - Get the BwB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
-      - Find out what causes the games to hang/reset in service mode
-        Probably down to AVDC interrupt timing, there seem to be a number of race conditions re: masks
-        that need sorting out with proper blank handling, etc. I'm using a scanline timer to drive an
-        approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
+      - EF9369 colour palette is still wrong in test modes.
  ***********************************************************************************************************/
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -237,6 +234,7 @@ public:
 	void crmaze(machine_config &config);
 	void bwbvid5(machine_config &config);
 	void mating(machine_config &config);
+	void vid_oki(machine_config &config);
 
 	void init_crmazea();
 	void init_v4barqst2();
@@ -303,6 +301,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t vram_r(offs_t offset);
+	void ic3ss_vid_w(offs_t offset, uint8_t data);
 
 	void bwbvid5_68k_map(address_map &map);
 	void bwbvid_68k_map(address_map &map);
@@ -708,18 +707,18 @@ static INPUT_PORTS_START( mating )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill/Meter Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Yellow")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Red")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Red")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Left Yellow")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Yellow")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Red")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Right Yellow")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Right Red")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("100p Service?")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
@@ -1155,7 +1154,7 @@ void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
-	m_mod_number=4; //No AY chip
+	m_mod_number=2;
 	/* setup communications */
 	m_link7a_connected = 1;
 }
@@ -1186,8 +1185,8 @@ void mpu4vid_state::mpu4_68k_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 //  map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
@@ -1203,14 +1202,14 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 //  map(0x640000, 0x7fffff).noprw(); /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xffa040, 0xffa04f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0x00ff);  // 6840PTM on sampled sound board
-	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
 	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 //  map(0xfff000, 0xffffff).noprw(); /* Possible bug, reads and writes here */
@@ -1222,8 +1221,8 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00000, 0xa0000f).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)); //Some games use this
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
@@ -1239,8 +1238,8 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff); //BT RAMDAC?
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
@@ -1249,7 +1248,7 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
-	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
 }
 
@@ -1272,11 +1271,64 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 }
 
 
+//Sampled sound timer
+/*
+Unlike the standard setup, in MPU4 Video, the E clock is used for computation, so the chip frequency
+freq = (1000000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
+where [] means rounded up integer,
+t3L is the LSB of Clock 3,
+t3H is the MSB of Clock 3,
+and t1 is the initial value in clock 1.
+*/
+
+//O3 -> G1  O1 -> c2 o2 -> c1
+
+/* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
+calculate the oscillation frequency in advance. We're running the timer for interrupt
+purposes, but the frequency calculation is done by plucking the values out as they are written.*/
+void mpu4vid_state::ic3ss_vid_w(offs_t offset, uint8_t data)
+{
+	m_ptm_ic3ss->write(offset,data);
+
+	if (offset == 3)
+	{
+		m_t1 = data;
+	}
+	if (offset == 6)
+	{
+		m_t3h = data;
+	}
+	if (offset == 7)
+	{
+		m_t3l = data;
+	}
+
+	// E clock = VIDEO_MASTER_CLOCK / 10
+	
+	float num = (1000000/((m_t3l + 1)*(m_t3h + 1)));
+	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
+
+	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
+	int freq=num*denom2;
+
+	if (freq)
+	{
+		m_msm6376->set_unscaled_clock(freq);
+	}
+}
+
 
 void mpu4vid_state::mpu4_vid(machine_config &config)
 {
 	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_6809_map);
+
+
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
@@ -1300,7 +1352,6 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
 	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
 
-//  config.set_maximum_quantum(attotime::from_hz(960));
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 
@@ -1339,14 +1390,33 @@ void mpu4vid_state::crmaze(machine_config &config)
 	m_pia5->writepb_handler().set_nop();
 }
 
+void mpu4vid_state::vid_oki(machine_config &config)
+{
+	//On MPU4 Video, the sound board is clocked via the 68k E clock,
+	//and all samples are adjusted to fit the different clock speed.
+	PTM6840(config, m_ptm_ic3ss, VIDEO_MASTER_CLOCK / 10);
+	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
+	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
+	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
+	//m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
+	//m_ptm_ic3ss->irq_callback().set(FUNC(mpu4_state::cpu1_ptm_irq));
+
+	pia6821_device &pia_ic4ss(PIA6821(config, "pia_ic4ss", 0));
+	pia_ic4ss.readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
+	pia_ic4ss.writepa_handler().set(FUNC(mpu4vid_state::pia_gb_porta_w));
+	pia_ic4ss.writepb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_w));
+	pia_ic4ss.ca2_handler().set(FUNC(mpu4vid_state::pia_gb_ca2_w));
+	pia_ic4ss.cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
+}
+
 void mpu4vid_state::mating(machine_config &config)
 {
 	crmaze(config);
+	vid_oki(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4oki_68k_map);
 
-	mpu4_common2(config);
 
-	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //?
+	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //Adjusted by IC3 on sound board
 	msm6376.add_route(0, "lspeaker", 0.5);
 	msm6376.add_route(1, "rspeaker", 0.5);
 }
@@ -1584,15 +1654,15 @@ static mpu4_chr_table quidgrid_data[64] = {
 };
 
 static mpu4_chr_table blank_data[72] = {
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
 };
 
 
@@ -3618,7 +3688,10 @@ ROM_END
 /* Complete sets */
 /* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger (not emulated) to record more information about the game operation, for security etc.
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
-The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
+The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994, despite
+the copyright dates recorded. 
+TODO: Sort these better given the wide variation in dates/versions/core code (SWP version id, for one thing).
+*/
 
 GAME(  199?, v4bios,     0,        mod2,       mpu4,     mpu4_state,    empty_init,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
@@ -3626,22 +3699,25 @@ GAME(  199?, v4bios,     0,        mod2,       mpu4,     mpu4_state,    empty_in
 
 GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
-GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
 GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
+GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
+
 
 GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
 GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
 GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
 GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
+GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
+
 GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
+
+GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 
 GAME(  199?, v4turnov,   v4bios,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
 
