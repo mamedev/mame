@@ -37548,7 +37548,6 @@ mattelcs                        //
 comil                           //
 abltenni                        //
 totspies
-guitrbus
 fordrace
 tvsprt10                        //
 decathln
@@ -37681,6 +37680,7 @@ foxsport
 lexifit
 marc101
 marc250
+guitrbus
 
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
