@@ -4,41 +4,62 @@
 //
 // Netlist for Tail Gunner
 //
-// Derived from the schematics and in the Star Hawk manual.
+// Derived from the schematics and parts list in the
+// Tail Gunner manual.
 //
 // Known problems/issues:
 //
-//    * In progress:
-//       - all component values verified from parts list
-//       - connections still need to be verified
+//    * The diodes (D8/D9) connected to LS123 Rext/Cext pins
+//       cause major performance issues. Snipping them out
+//       seems to have no effect apart from giving back all
+//       the lost performance.
 //
-//    * Runs into infinite warnings:
-//       WARNING: NEWTON_LOOPS exceeded on net Solver_0... reschedule
-//       WARNING: NEWTON_LOOPS exceeded on net Solver_0... reschedule
-//       WARNING: NEWTON_LOOPS exceeded on net Solver_9... reschedule
-//       WARNING: NEWTON_LOOPS exceeded on net Solver_9... reschedule
-//
-//    * Waiting on a true tri-state buffer LS125 implementation.
-//       For now this is just cheesed up with an 7408 AND gate!
+//    * The "wideband noise generator" is simulated with a generic
+//       noise source. This seems to work fine and doesn't sound
+//       too different from recordings.
 //
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
+#include "nl_tailg.h"
 
 
 //
-// The final amplifier is documented but not emulated.
+// Optimizations
 //
-#define EMULATE_FINAL_AMP	0
+
+#define HLE_NOISE_GEN (1)
+#define HLE_HYPERSPACE_VCO (1)
+#define HLE_LASER_VCO (1)
+#define REMOVE_LS123_DIODES (1)
 
 
-NETLIST_START(TailGunner_schematics)
+//
+// Main netlist
+//
+
+NETLIST_START(tailg)
+
+#if (HLE_HYPERSPACE_VCO && HLE_LASER_VCO)
+	SOLVER(Solver, 48000)
+#else
+	SOLVER(Solver, 48000000)
+#endif
+
+	TTL_INPUT(I_OUT_0, 0)				// active high
+	TTL_INPUT(I_OUT_1, 0)				// active high
+	TTL_INPUT(I_OUT_2, 0)				// active high
+	TTL_INPUT(I_OUT_3, 0)				// active high
+	TTL_INPUT(I_OUT_4, 0)				// active high
+
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC)
+
+	CINEMAT_LOCAL_MODELS
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
 	ANALOG_INPUT(I_VM15, -15)
-	ANALOG_INPUT(I_V25, 25)
-	ANALOG_INPUT(I_VM25, -25)
 
 	RES(R1, RES_M(1))
 	RES(R2, RES_K(470))
@@ -110,12 +131,12 @@ NETLIST_START(TailGunner_schematics)
 	RES(R68, RES_K(20))
 	RES(R69, RES_K(30))
 	RES(R70, 470)
-	RES(R71, 150)
-	RES(R72, RES_K(22))
-	RES(R73, 150)
-	RES(R74, RES_K(47))
-	POT(R75, RES_K(100))
-	PARAM(R75.DIAL, 0.5)
+//	RES(R71, 150)        -- part of final amp (not emulated)
+//	RES(R72, RES_K(22))  -- part of final amp (not emulated)
+//	RES(R73, 150)        -- part of final amp (not emulated)
+//	RES(R74, RES_K(47))  -- part of final amp (not emulated)
+//	POT(R75, RES_K(100)) -- part of final amp (not emulated)
+//	PARAM(R75.DIAL, 0.5) -- part of final amp (not emulated)
 	RES(R76, RES_K(47))
 	RES(R77, RES_K(47))
 	RES(R78, RES_K(2.7))
@@ -159,9 +180,9 @@ NETLIST_START(TailGunner_schematics)
 	CAP(C31, CAP_U(0.05))
 	CAP(C32, CAP_U(0.1))
 	CAP(C33, CAP_U(0.1))
-	CAP(C34, CAP_P(470))
-	CAP(C35, CAP_P(470))
-	CAP(C36, CAP_P(470))
+//	CAP(C34, CAP_P(470)) -- part of final amp (not emulated)
+//	CAP(C35, CAP_P(470)) -- part of final amp (not emulated)
+//	CAP(C36, CAP_P(470)) -- part of final amp (not emulated)
 //	CAP(C37, CAP_U(3.3))
 //	CAP(C38, CAP_U(3.3))
 //	CAP(C39, CAP_U(3.3))
@@ -186,15 +207,13 @@ NETLIST_START(TailGunner_schematics)
 	Q_2N3906(Q3)			// PNP
 	Q_2N3906(Q4)			// PNP
 	Q_2N3906(Q5)			// PNP
-#if EMULATE_FINAL_AMP
-	Q_2N6292(Q6)			// NPN
-	Q_2N6107(Q7)			// PNP
-#endif
+//	Q_2N6292(Q6)			// NPN -- part of final amp (not emulated)
+//	Q_2N6107(Q7)			// PNP -- part of final amp (not emulated)
 	Q_2N3906(Q8)			// PNP
 
 	TL081_DIP(IC1)			// Op. Amp.
+//	NET_C(IC1.7, I_V15)		// (indirectly via R5)
 	NET_C(IC1.4, I_VM15)
-	NET_C(IC1.7, I_V15)
 
 	TL081_DIP(IC2)			// Op. Amp.
 	NET_C(IC2.4, I_VM15)
@@ -275,10 +294,30 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(IC23.8, GND)
 	NET_C(IC23.16, I_V5)
 
+#if (HLE_NOISE_GEN)
 	//
-	// Wideband noise
+	// The "wideband noise gen" relies on properties
+	// of the components to create noise. Not only
+	// does this simulate poorly, but it would be too
+	// slow for realtime, so HLE it with some quality
+	// noise.
 	//
+	// Note that Sundance has the exact same circuit.
+	//
+	CLOCK(NOISE_CLOCK, 10000)
+	NET_C(NOISE_CLOCK.GND, GND)
+	NET_C(NOISE_CLOCK.VCC, I_V15)
 
+	SYS_NOISE_MT_N(NOISE, 0.5)
+	NET_C(NOISE.I, NOISE_CLOCK.Q)
+	NET_C(NOISE.1, I_V15)
+	NET_C(NOISE.2, R9.2, R23.2, R55.2, R76.1)
+
+	NET_C(GND, C1.1, C1.2, C2.1, C2.2, C3.1, C3.2, C4.1, C4.2, C5.1, C5.2)
+	NET_C(GND, D1.A, D1.K, D2.A, D2.K, D3.A, D3.K)
+	NET_C(GND, R1.1, R1.2, R2.1, R2.2, R3.1, R3.2, R4.1, R4.2, R5.1, R5.2, R6.1, R6.2, R7.1, R7.2, R8.1, R8.2, R9.1, R9.2)
+	NET_C(GND, IC1.2, IC1.3, IC1.7, IC2.2, IC2.3, IC3.2, IC3.3)
+#else
 	NET_C(C1.1, GND)
 	NET_C(C1.2, C2.2, D1.K, IC1.7, R5.1)
 	NET_C(C2.1, GND)
@@ -298,6 +337,18 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(R8.2, IC3.2, R9.1)
 	NET_C(IC3.3, GND)
 	NET_C(IC3.6, R9.2, R23.2, R55.2, R76.1)
+#endif
+
+	//
+	// Input mux
+	//
+
+	NET_C(I_OUT_0, IC23.1)
+	NET_C(I_OUT_1, IC23.2)
+	NET_C(I_OUT_2, IC23.3)
+	NET_C(I_OUT_3, IC23.13)
+	NET_C(I_OUT_4, IC23.14)
+	NET_C(IC23.15, I_V5)
 
 	NET_C(R23.1, R24.1, C9.2)
 	NET_C(C9.1, GND)
@@ -318,8 +369,23 @@ NETLIST_START(TailGunner_schematics)
 
 	NET_C(IC23.4, IC12.1)
 	NET_C(IC12.14, C15.2)
+
+#if (REMOVE_LS123_DIODES)
+	//
+	// The diodes connected to the Rext/Cext pins on the
+	// LS123 (monostable multivibrators) absolutely tank
+	// performance for reasons yet not understood. Their
+	// purpose is unclear, and removing them seems to have
+	// no effect on the sound, while fixing the performance
+	// so we'll just snip them out for now.
+	//
+	NET_C(IC12.15, C15.1, R39.1)
+	NET_C(GND, D8.A, D8.K)
+#else
 	NET_C(IC12.15, D8.K)
 	NET_C(D8.A, C15.1, R39.1)
+#endif
+
 	NET_C(R39.2, IC12.2, IC12.3, I_V5)
 	NET_C(IC12.13, Q3.E)
 	NET_C(Q3.B, R42.2)
@@ -374,7 +440,7 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(C29.2, GND)
 	NET_C(R62.2, IC17.3)
 	NET_C(IC17.7, R61.2, R63.2)
-	NET_C(R61.1, IC17.4, IC17.8)
+	NET_C(R61.1, IC17.4, IC17.8, I_V15)
 	NET_C(R63.1, IC17.6, IC17.2, C31.2)
 	NET_C(C31.1, IC17.1, C30.1, GND)
 	NET_C(C30.2, IC17.5)
@@ -392,6 +458,39 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(R10.2, I_V5)
 	NET_C(R11.2, D4.K, C6.1)
 	NET_C(C6.2, GND)
+
+#if (HLE_HYPERSPACE_VCO)
+	//
+	// The hyperspace VCO is troublesome to emulate without
+	// cranking up the solver frequency, so model it instead.
+	// Take the voltage at C6.1 and map it to the TTL
+	// frequency at IC8.13, then remove the circuit in favor
+	// of a variable clock.
+	//
+	// Here is the mapping I get for C6.1 vs IC8.13 half-period:
+	//    R2 = 0.99934: HP = (0.000064123*A0) + 0.000064294
+	//    R2 = 0.99935: HP = (0.000000358639*A0*A0) + (0.000063181*A0) + 0.000064706
+	//    R2 = 0.99936: HP = (0.000000521447*A0*A0*A0) - (0.00000156339*A0*A0) + (0.000065089*A0) + 0.000064320
+	//    R2 = 0.99936: HP = (0-0.000000893243*A0*A0*A0*A0) + (0.00000478018*A0*A0*A0) - 	//(0.0000081276*A0*A0) + (0.000068587*A0) + 0.000063911
+	//    R2 = 0.99937: HP = (0.00000182395*A0*A0*A0*A0*A0) - (0.0000115745*A0*A0*A0*A0) + (0.0000271008*A0*A0*A0) - (0.0000278400*A0*A0) + (0.000075193*A0) + 0.000063406
+	//
+	// However, when we clip the circuit, the C6.1 values change,
+	// so here is a mapping for the clipped C6.1 vs. the original
+	// IC8.13 half-period:
+	//    R2 = 0.99860: HP = (0.000942268*A0) + 0.000067064
+	//    R2 = 0.99927: HP = (0-0.000690750*A0*A0) + (0.00106376*A0) + 0.000063501
+	//    R2 = 0.99933: HP = (0-0.00571692*A0*A0*A0) + (0.000723923*A0*A0) + (0.000969446*A0) + 0.000064782
+	//    R2 = 0.99936: HP = (0-0.111272*A0*A0*A0*A0) + (0.0299287*A0*A0*A0) - (0.00296815*A0*A0) + (0.00110168*A0) + 0.000063742
+	//    R2 = 0.99936: HP = (0.274791*A0*A0*A0*A0*A0) - (0.219442*A0*A0*A0*A0) + (0.0451240*A0*A0*A0) - (0.00387031*A0*A0) + (0.00112201*A0) + 0.000063638
+	//
+	VARCLOCK(HYPERCLK, 1, "max(0.0000001,(0-0.00571692*A0*A0*A0) + (0.000723923*A0*A0) + (0.000969446*A0) + 0.000064782)")
+	NET_C(HYPERCLK.GND, GND)
+	NET_C(HYPERCLK.VCC, I_V5)
+	NET_C(HYPERCLK.Q, IC8.13)
+	NET_C(HYPERCLK.A0, C6.1)
+	NET_C(GND, R12.1, R12.2, R13.1, R13.2, R14.1, R14.2, R15.1, R15.2, R16.1, R16.2, C7.1, C7.2, D4.A, D5.A, D5.K, IC7.2, IC7.3, IC5.1)
+	HINT(IC5.2, NC)
+#else
 	NET_C(D4.A, IC7.3, D5.K, R13.1)
 	NET_C(IC7.2, C7.2, R12.1)
 	NET_C(C7.1, GND)
@@ -403,6 +502,8 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(Q1.C, R16.1, IC5.1)
 	NET_C(R16.2, I_V5)
 	NET_C(IC5.2, IC8.13)
+#endif
+
 	NET_C(IC8.9, R17.1)
 	NET_C(IC8.8, R18.1)
 	NET_C(IC8.10, R19.1)
@@ -422,6 +523,36 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(IC6.4, R29.1)
 	NET_C(R29.2, D6.K, C13.2)
 	NET_C(C13.1, GND)
+
+#if (HLE_LASER_VCO)
+	//
+	// The laser VCO is almost identical to the hyperspace VCO,
+	// apart from the component values. The same approach is used
+	// for HLE.
+	//
+	// Here is the mapping I get for C13.2 vs IC8.1 half-period:
+	//    R2 = 0.87093: HP = (0.000090572*A0) - 0.000129835
+	//    R2 = 0.95870: HP = (0.0000092064*A0*A0) - (0.0000492985*A0) + 0.000138807
+	//    R2 = 0.98473: HP = (0.00000147858*A0*A0*A0) - (0.0000230421*A0*A0) + (0.000128083*A0) - 0.0000242364
+	//    R2 = 0.99374: HP = (0.000000252084*A0*A0*A0*A0) - (0.00000573966*A0*A0*A0) + (0.0000418189*A0*A0) - (0.000062038*A0) + 0.000080858
+	//    R2 = 0.99735: HP = (0.0000000459344*A0*A0*A0*A0*A0) - (0.00000138006*A0*A0*A0*A0) + (0.0000146048*A0*A0*A0) - (0.000062417*A0*A0) + (0.000130449*A0) + 0.0000090861
+	//
+	// And here is the mapping for the clipped C13.2 vs the original
+	// IC8.1 half-period:
+	//    R2 = 0.90030: HP = (0.00247455*A0) + 0.000176535
+	//    R2 = 0.99814: HP = (0-0.00515374*A0*A0) + (0.00532454*A0) + 0.0000216141
+	//    R2 = 0.99815: HP = (0-0.000164444*A0*A0*A0) - (0.00500849*A0*A0) + (0.00529368*A0) + 0.0000224761
+	//    R2 = 0.99982: HP = (0.0250648*A0*A0*A0*A0) - (0.0305235*A0*A0*A0) + (0.00627463*A0*A0) + (0.00399628*A0) + 0.0000451018
+	//    R2 = 0.99982: HP = (0.000448383*A0*A0*A0*A0*A0) + (0.0243751*A0*A0*A0*A0) - (0.0301561*A0*A0*A0) + (0.00619598*A0*A0) + (0.00400203*A0) + 0.0000450320
+	//
+	VARCLOCK(LASERCLK, 1, "(0-0.000164444*A0*A0*A0) - (0.00500849*A0*A0) + (0.00529368*A0) + 0.0000224761")
+	NET_C(LASERCLK.GND, GND)
+	NET_C(LASERCLK.VCC, I_V5)
+	NET_C(LASERCLK.Q, IC8.1)
+	NET_C(LASERCLK.A0, C13.2)
+	NET_C(GND, R30.1, R30.2, R31.1, R31.2, R32.1, R32.2, R33.1, R33.2, R34.1, R34.2, C14.1, C14.2, D6.A, D7.A, D7.K, IC11.2, IC11.3, IC5.3)
+	HINT(IC5.4, NC)
+#else
 	NET_C(D6.A, IC11.3, D7.K, R31.1)
 	NET_C(D7.A, GND)
 	NET_C(IC11.2, C14.2, R30.1)
@@ -433,6 +564,8 @@ NETLIST_START(TailGunner_schematics)
 	NET_C(Q2.C, R34.1, IC5.3)
 	NET_C(R34.2, I_V5)
 	NET_C(IC5.4, IC8.1)
+#endif
+
 	NET_C(IC8.5, R35.1)
 	NET_C(IC8.6, R36.1)
 	NET_C(IC8.4, R37.1)
@@ -478,8 +611,19 @@ NETLIST_START(TailGunner_schematics)
 
 	NET_C(IC23.9, IC12.9)
 	NET_C(IC12.6, C43.2)
+
+#if (REMOVE_LS123_DIODES)
+	//
+	// A second instance of problematic diode; see above
+	// comment for an explanation.
+	//
 	NET_C(C43.1, D9.A, R80.1)
 	NET_C(D9.K, IC12.7)
+#else
+	NET_C(C43.1, R80.1, IC12.7)
+	NET_C(GND, D9.A, D9.K)
+#endif
+
 	NET_C(R80.2, IC12.10, IC12.11, I_V5)
 
 	NET_C(IC12.12, IC4.10)
@@ -498,60 +642,33 @@ NETLIST_START(TailGunner_schematics)
 	// Final amp
 	//
 
-	NET_C(R70.2, R74.1)
-	NET_C(R74.2, R75.1)
-	NET_C(R75.3, R75.2)
-#if EMULATE_FINAL_AMP
-	NET_C(R70.2, IC19.2, C34.1)
-	NET_C(IC19.3, GND)
-	NET_C(IC19.6, C34.2, R71.1, R73.2, R72.1)
-	NET_C(R71.2, Q6.B, C35.1)
-	NET_C(C35.2, I_V25, Q6.C)
-	NET_C(R73.1, Q7.B, C36.1)
-	NET_C(C36.2, I_VM25, Q7.C)
-	NET_C(Q7.E, R72.2, Q6.E, R75.3)
-#else
-	NET_C(GND, R71.1, R71.2, R72.1, R72.2, R73.1, R73.2, C34.1, C34.2, C35.1, C35.2, C36.1, C36.2, IC19.2, IC19.3)
-#endif
-	ALIAS(OUTPUT, R75.3)
+	ALIAS(OUTPUT, R70.1)
+	NET_C(R70.2, GND)
 
 	//
-	// Input mux
+	// Unconnected inputs
 	//
 
-	NET_C(I_OUT_0, IC23.1)
-	NET_C(I_OUT_1, IC23.2)
-	NET_C(I_OUT_2, IC23.3)
-	NET_C(I_OUT_3, IC23.13)
-	NET_C(I_OUT_4, IC23.14)
-	NET_C(IC23.15, I_V5)
-
-	//
-	// Unconnected
-	//
-
+	NET_C(GND, IC19.2, IC19.3)	// part of final amp
 	NET_C(GND, IC5.9, IC5.11, IC5.13, IC6.9, IC6.11, IC6.13)
 
-NETLIST_END()
+	//
+	// Unconnected outputs
+	//
 
-
-NETLIST_START(tailg)
-
-	SOLVER(Solver, 48000)
-	PARAM(Solver.DYNAMIC_TS, 1)
-
-	TTL_INPUT(I_OUT_0, 0)				// active high
-	TTL_INPUT(I_OUT_1, 0)				// active high
-	TTL_INPUT(I_OUT_2, 0)				// active high
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
-
-	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND)
-	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC)
-
-	CINEMAT_LOCAL_MODELS
-
-	LOCAL_SOURCE(TailGunner_schematics)
-	INCLUDE(TailGunner_schematics)
+	HINT(IC5.8, NC)		// QC
+	HINT(IC5.10, NC)	// QD
+	HINT(IC5.12, NC)	// QE
+	HINT(IC6.8, NC)		// QC
+	HINT(IC6.10, NC)	// QD
+	HINT(IC6.12, NC)	// QE
+	HINT(IC12.4, NC)	// /QA
+	HINT(IC12.5, NC)	// QB
+	HINT(IC18.3, NC)	// Q0A
+	HINT(IC18.5, NC)	// Q2A
+	HINT(IC18.9, NC)	// Q2B
+	HINT(IC18.10, NC)	// Q1B
+	HINT(IC23.11, NC)	// Q6
+	HINT(IC23.12, NC)	// Q7
 
 NETLIST_END()
