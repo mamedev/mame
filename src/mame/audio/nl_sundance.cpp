@@ -260,7 +260,14 @@ NETLIST_START(sundance)
 
 #if (HLE_NOISE_GEN)
 	//
-	// The "wideband noise gen"
+	// The "wideband noise gen" relies on properties
+	// of the components to create noise. Not only
+	// does this simulate poorly, but it would be too
+	// slow for realtime, so HLE it with some quality
+	// noise.
+	//
+	// Note that Tail Gunner has the exact same
+	// circuit.
 	//
 	CLOCK(NOISE_CLOCK, 10000)
 	NET_C(NOISE_CLOCK.GND, GND)
