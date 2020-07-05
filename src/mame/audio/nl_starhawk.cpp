@@ -391,7 +391,14 @@ NETLIST_START(starhawk)
 	// Pick up the voltage from the anode of CR4 and map to a frequency
 	// with a polynominal derived from the LLE implementation.
 	//
-	VARCLOCK(SHIPCLK, 1, "(0.00000359952*A0*A0) - (0.000132079*A0) + 0.000078653")
+	// Here is the mapping I get for CR4.A vs. IC3A.5 (using a -0.1-0.1 threshold):
+	//    R2 = 0.99832: HP = (0-0.000160539*A0) + 0.0000331984
+	//    R2 = 0.99927: HP = (0.00000397232*A0*A0) - (0.000129210*A0) + 0.000083240
+	//    R2 = 0.99927: HP = (0-0.000000185528*A0*A0*A0) + (0.00000154157*A0*A0) - (0.000138889*A0) + 0.000071961
+	//    R2 = 0.99929: HP = (0-0.000000215021*A0*A0*A0*A0) - (0.00000393775*A0*A0*A0) - (0.0000213646*A0*A0) - (0.000196307*A0) + 0.0000221998
+	//    R2 = 0.99931: HP = (0.000000153378*A0*A0*A0*A0*A0) + (0.00000317059*A0*A0*A0*A0) + (0.0000244935*A0*A0*A0) + (0.000091436*A0*A0) + (0.0000138241*A0) + 0.000169151
+	//
+	VARCLOCK(SHIPCLK, 1, "(0.00000397232*A0*A0) - (0.000129210*A0) + 0.000083240")
 	NET_C(SHIPCLK.GND, GND)
 	NET_C(SHIPCLK.VCC, I_V5)
 	NET_C(SHIPCLK.A0, CR4.A)
@@ -472,11 +479,26 @@ NETLIST_START(starhawk)
 	// a VARCLOCK that directly drives the counter at 7E, skipping the analog
 	// to TTL conversion logic after the VCO.
 	//
+	// Here is the mapping I get for C22.2 vs. IC7E.1 half-period:
+	//
+	//    R2 = 0.97399: HP = (0.00000249069*A0) + 0.00000439991
+	//    R2 = 0.99638: HP = (0.000000142614*A0*A0) + (0.00000104196*A0) + 0.00000471406
+	//    R2 = 0.99932: HP = (0.0000000174880*A0*A0*A0) - (0.000000159311*A0*A0) + (0.00000222025*A0) + 0.00000455815
+	//    R2 = 0.99978: HP = (0.00000000229608*A0*A0*A0*A0) - (0.0000000377974*A0*A0*A0) + (0.000000245492*A0*A0) + (0.00000134883*A0) + 0.00000465357
+	//    R2 = 0.99985: HP = (0.000000000286259*A0*A0*A0*A0*A0) - (0.00000000650969*A0*A0*A0*A0) + (0.0000000560876*A0*A0*A0) - (0.000000154720*A0*A0) + (0.00000190838*A0) + 0.0000045976
+	//
 	// One additional wrinkle is that when we clip the circuit, the voltage
 	// input to the VCO changes from a curve to linear, so to compute the
 	// mapping below, we had to map the C22.2 value from the clipped circuit
 	// against the frequency. Fortunately, the relationship still held, and
 	// in fact became almost linear.
+	//
+	// Here is the mapping for the clipped C22.2 vs. the original IC7E.1:
+	//    R2 = 0.99947: HP = (0.000226684*A0) - 0.0000178774
+	//    R2 = 0.99947: HP = (0-0.0000111790*A0*A0) + (0.000230333*A0) - 0.0000181329
+	//    R2 = 0.99958: HP = (0-0.00124814*A0*A0*A0) + (0.000641071*A0*A0) + (0.000124020*A0) - 0.0000127688
+	//    R2 = 0.99976: HP = (0.0197918*A0*A0*A0*A0) - (0.0148601*A0*A0*A0) + (0.00399181*A0*A0) - (0.000225308*A0) + 0.000000287255
+	//    R2 = 0.99979: HP = (0-0.095062*A0*A0*A0*A0*A0) + (0.093556*A0*A0*A0*A0) - (0.0361209*A0*A0*A0) + (0.00677578*A0*A0) - (0.000384926*A0) + 0.00000324102
 	//
 	VARCLOCK(LAZER1CLK, 1, "max(0.0000001,((0.000226684*A0) - 0.0000178774))")
 	NET_C(LAZER1CLK.GND, GND)
