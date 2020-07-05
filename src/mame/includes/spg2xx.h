@@ -34,12 +34,14 @@ public:
 	{ }
 
 	void spg2xx_base(machine_config &config);
+	void spg2xx(machine_config &config);
+	void spg2xx_pal(machine_config &config);
+
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
 	void rad_sktv(machine_config &config);
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
-	void spg2xx(machine_config &config);
 	void comil(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
