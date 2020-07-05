@@ -684,6 +684,26 @@ static INPUT_PORTS_START( totspies )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( guitrbus )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Red / Do")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Yellow / Re")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Purple / Mi")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green / Fa")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Blue / Sol")
+
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Logo
+
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Whammy Bar")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Strum")
+
+
+INPUT_PORTS_END
+
 CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
 {
 	return ioport("WHEEL_REAL")->read() >> 1;
@@ -1515,6 +1535,11 @@ ROM_START( totspies )
 	ROM_LOAD16_WORD_SWAP( "w321tg.u2", 0x000000, 0x400000, CRC(76152ad7) SHA1(b37ea950670eb927f3f0ab5e38d0e2a5f3ca7904) )
 ROM_END
 
+ROM_START( guitrbus )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "winfunguitar.bin", 0x000000, 0x400000, CRC(17419a27) SHA1(19377fcd18b08d3ae8e20de0244b3aaef1b5a66a) )
+ROM_END
+
 ROM_START( ablkickb )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ablkickboxing.bin", 0x000000, 0x800000,  CRC(61394c45) SHA1(291d28a39edcb32a8f5d776a5e5c05e6fd0abece) )
@@ -1691,13 +1716,18 @@ CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,   
 CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
 // ABL TV Games
-CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",                           "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
 CONS( 2007, lxspidaj,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",												 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// has the following strings at the start of the ROM
+// "Copyright(C) 2009-2012 ShenZhen Multi-Content Software CO., LTD"
+// "LisencedTo: MCS"
+CONS( 2012, guitrbus,   0,        0, spg2xx,    guitrbus,  spg2xx_game_state,          empty_init,    "WinFun",                                                 "Guitar Buster",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

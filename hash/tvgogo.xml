@@ -9,7 +9,7 @@ Dumped | Dumped | Name       |Notes
 _(EU)__|__(US)__|____________|_____________________________________
   Y*   |   Y    | 4 in 1     |No controller
   Y    |   Y    | Whac-A-Mole|Hammer-shaped IR motion controller
-  Y    |   -    | Basketball |Ball-shaped motion controller
+  Y    |   Y    | Basketball |Ball-shaped motion controller
   Y    |        | Tennis     |Racquet-shaped IR motion controller
        |   Y    | Dodgeball  |Motion controller
        |   Y    | Baseball   |Baseball Bat shaped motion controller
@@ -115,5 +115,16 @@ _(EU)__|__(US)__|____________|_____________________________________
       </dataarea>
     </part>
   </software>
+  
+  <software name="basketbalu" cloneof="basketbal" supported="no">
+    <description>Basketball (US)</description>
+    <year>2005</year>
+    <publisher>Toyquest</publisher>
+    <part name="cart" interface="tvgogo_cart">
+      <dataarea name="rom" size="0x400000">
+        <rom name="gogobasketball_m5m29gt320_001c0020.bin" size="0x400000" crc="dfdec0c6" sha1="7b3cc68f54b43e839beac8ed0806a005919f61b1"/>
+      </dataarea>
+    </part>
+  </software>  
 
 </softwarelist>
