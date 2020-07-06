@@ -164,9 +164,12 @@ void s11a_state::bgbank_w(uint8_t data)
 
 void s11a_state::init_s11a()
 {
-	uint8_t *BGROM = memregion("bgcpu")->base();
-	membank("bgbank")->configure_entries(0, 4, &BGROM[0x10000], 0x8000);
-	membank("bgbank")->set_entry(0);
+	if (m_bgcpu)
+	{
+		uint8_t *BGROM = memregion("bgcpu")->base();
+		membank("bgbank")->configure_entries(0, 4, &BGROM[0x10000], 0x8000);
+		membank("bgbank")->set_entry(0);
+	}
 	s11_state::init_s11();
 }
 
