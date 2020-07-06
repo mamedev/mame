@@ -10,15 +10,6 @@
 #include "netlist/nl_setup.h"
 #include "sound/samples.h"
 
-#define SPACEWAR_USE_NETLIST		(1)
-#define BARRIER_USE_NETLIST			(1)
-#define SPEEDFRK_USE_NETLIST		(1)
-#define STARHAWK_USE_NETLIST		(1)
-#define SUNDANCE_USE_NETLIST		(1)
-#define TAILG_USE_NETLIST			(1)
-#define STARCAS_USE_NETLIST			(1)
-#define WOTW_USE_NETLIST			(1)
-
 // log to cinemat.csv for nltool playback/analysis
 #define ENABLE_NETLIST_LOGGING		(1)
 
@@ -100,8 +91,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -112,8 +101,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -124,11 +111,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-#if !SPEEDFRK_USE_NETLIST
-	virtual void shiftreg16_changed(u16 newvals, u16 oldvals) override;
-#endif
 };
 
 
@@ -139,8 +121,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -151,8 +131,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -163,9 +141,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -214,18 +189,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals) override;
-
-private:
-
-#if !STARCAS_USE_NETLIST
-	u64 m_last_frame = 0;
-	u32 m_current_pitch = 0x10000;
-#endif
-
 };
 
 
@@ -270,19 +233,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals) override;
-	virtual u8 shiftreg_swizzle(u8 rawvals) override;
-
-private:
-
-#if !WOTW_USE_NETLIST
-	u64 m_last_frame = 0;
-	u32 m_current_pitch = 0x10000;
-#endif
-
 };
 
 

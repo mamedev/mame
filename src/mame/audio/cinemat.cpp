@@ -175,8 +175,6 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-#if SPACEWAR_USE_NETLIST
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(spacewar))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -188,70 +186,6 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(150000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*spacewar",
-		"explode1",
-		"fire1",
-		"idle",
-		"thrust1",
-		"thrust2",
-		"pop",
-		"explode2",
-		"fire2",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
-}
-
-void spacewar_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !SPACEWAR_USE_NETLIST
-
-	// Explosion - rising edge
-	if (rising_edge(curvals, oldvals, 0))
-		m_samples->start(0, (machine().rand() & 1) ? 0 : 6);
-
-	// Fire sound - rising edge
-	if (rising_edge(curvals, oldvals, 1))
-		m_samples->start(1, (machine().rand() & 1) ? 1 : 7);
-
-	// Player 1 thrust - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(3, 3, true);
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->stop(3);
-
-	// Player 2 thrust - 0=on, 1-off
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(4, 4, true);
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->stop(4);
-
-	// Mute - 0=off, 1=on
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(2, 2, true); // play idle sound
-	if (rising_edge(curvals, oldvals, 4))
-	{
-		// turn off all but the idle sound
-		for (int i = 0; i < 5; i++)
-			if (i != 2)
-				m_samples->stop(i);
-
-		// Pop when board is shut off
-		m_samples->start(2, 5);
-	}
-
-#endif
 }
 
 
@@ -273,8 +207,6 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-#if BARRIER_USE_NETLIST
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(barrier))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -284,43 +216,6 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(200000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*barrier",
-		"playrdie",
-		"playmove",
-		"enemmove",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(3);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
-}
-
-void barrier_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !BARRIER_USE_NETLIST
-
-	// Player die - rising edge
-	if (rising_edge(curvals, oldvals, 0))
-		m_samples->start(0, 0);
-
-	// Player move - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(1, 1);
-
-	// Enemy move - falling edge
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(2, 2);
-
-#endif
 }
 
 
@@ -342,8 +237,6 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-#if SPEEDFRK_USE_NETLIST
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(speedfrk))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -356,47 +249,8 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(12000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*speedfrk",
-		"offroad",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
 }
 
-void speedfrk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !SPEEDFRK_USE_NETLIST
-	// on the falling edge of bit 3, clock the inverse of bit 2 into the top of the shiftreg
-	if (falling_edge(curvals, oldvals, 3))
-		shiftreg16_clock((~curvals >> 2) & 1);
-
-	// off-road - 1=on, 0=off
-	if (rising_edge(curvals, oldvals, 4))
-		m_samples->start(0, 0, true);
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->stop(0);
-#endif
-}
-
-#if !SPEEDFRK_USE_NETLIST
-
-void speedfrk_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
-{
-	// not actually wired up
-}
-
-#endif
 
 
 /*************************************
@@ -416,8 +270,6 @@ void starhawk_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-#if STARHAWK_USE_NETLIST
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(starhawk))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -430,64 +282,6 @@ void starhawk_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(50000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*starhawk",
-		"explode",
-		"rlaser",
-		"llaser",
-		"k",
-		"master",
-		"kexit",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
-}
-
-void starhawk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !STARHAWK_USE_NETLIST
-
-	// explosion - falling edge
-	if (falling_edge(curvals, oldvals, 0))
-		m_samples->start(0, 0);
-
-	// right laser - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(1, 1);
-
-	// left laser - falling edge
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(2, 2);
-
-	// K - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(3, 3, true);
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->stop(3);
-
-	// master - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(4, 4, true);
-	if (rising_edge(curvals, oldvals, 0))
-		m_samples->stop(4);
-
-	// K exit - 1=on, 0=off
-	if (rising_edge(curvals, oldvals, 7) && (curvals & 0x08) == 0)
-		m_samples->start(3, 5, true);
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->stop(3);
-
-#endif
 }
 
 
@@ -509,8 +303,6 @@ void sundance_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-#if SUNDANCE_USE_NETLIST
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(sundance))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -523,58 +315,6 @@ void sundance_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*sundance",
-		"bong",
-		"whoosh",
-		"explsion",
-		"ping1",
-		"ping2",
-		"hatch",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
-}
-
-void sundance_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !SUNDANCE_USE_NETLIST
-
-	// bong - falling edge
-	if (falling_edge(curvals, oldvals, 0))
-		m_samples->start(0, 0);
-
-	// whoosh - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(1, 1);
-
-	// explosion - falling edge
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(2, 2);
-
-	// ping - falling edge
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(3, 3);
-
-	// ping - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(4, 4);
-
-	// hatch - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(5, 5);
-
-#endif
 }
 
 
@@ -596,8 +336,6 @@ void tailg_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-#if TAILG_USE_NETLIST
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(tailg))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -609,78 +347,6 @@ void tailg_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(75000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*tailg",
-		"sexplode",
-		"thrust1",
-		"slaser",
-		"shield",
-		"bounce",
-		"hypersp",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
-}
-
-void tailg_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !TAILG_USE_NETLIST
-
-	// the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07
-	if (falling_edge(curvals, oldvals, 4))
-		shiftreg_set(curvals & 7, (curvals >> 3) & 1);
-
-#endif
-}
-
-void tailg_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-#if !TAILG_USE_NETLIST
-
-	// explosion - falling edge
-	if (falling_edge(curvals, oldvals, 0))
-		m_samples->start(0, 0);
-
-	// rumble - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(1, 1, true);
-	if (rising_edge(curvals, oldvals, 1))
-		m_samples->stop(1);
-
-	// laser - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(2, 2, true);
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->stop(2);
-
-	// shield - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(3, 3, true);
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->stop(3);
-
-	// bounce - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(4, 4);
-
-	// hyperspace - falling edge
-	if (falling_edge(curvals, oldvals, 5))
-		m_samples->start(5, 5);
-
-	// LED
-//	m_led = BIT(curvals, 6);
-
-#endif
 }
 
 
@@ -935,21 +601,9 @@ starcas_audio_device::starcas_audio_device(const machine_config &mconfig, const 
 {
 }
 
-void starcas_audio_device::device_start()
-{
-	cinemat_audio_device::device_start();
-
-#if !STARCAS_USE_NETLIST
-	save_item(NAME(m_last_frame));
-	save_item(NAME(m_current_pitch));
-#endif
-}
-
 void starcas_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-
-#if STARCAS_USE_NETLIST
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(starcas))
@@ -963,105 +617,6 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*starcas",
-		"cfire",
-		"shield",
-		"star",
-		"thrust",
-		"drone",
-		"lexplode",
-		"sexplode",
-		"pfire",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
-
-#endif
-}
-
-void starcas_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-#if !STARCAS_USE_NETLIST
-
-	// on the rising edge of bit 0, latch the shift register
-	if (rising_edge(curvals, oldvals, 0))
-		shiftreg_latch();
-
-	// on the rising edge of bit 4, clock bit 7 into the shift register
-	if (rising_edge(curvals, oldvals, 4))
-		shiftreg_clock(curvals >> 7);
-
-	// loud explosion - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(5, 5);
-
-	// soft explosion - falling edge
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(6, 6);
-
-	// player fire - falling edge
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(7, 7);
-
-#endif
-}
-
-void starcas_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-#if !STARCAS_USE_NETLIST
-
-	// fireball - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(0, 0);
-
-	// shield hit - falling edge
-	if (falling_edge(curvals, oldvals, 6))
-		m_samples->start(1, 1);
-
-	// star sound - 0=off, 1=on
-	if (rising_edge(curvals, oldvals, 5))
-		m_samples->start(2, 2, true);
-	if (falling_edge(curvals, oldvals, 5))
-		m_samples->stop(2);
-
-	// thrust sound - 1=off, 0=on
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(3, 3, true);
-	if (rising_edge(curvals, oldvals, 4))
-		m_samples->stop(3);
-
-	// drone - 1=off, 0=on
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(4, 4, true);
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->stop(4);
-
-	// latch the drone pitch
-	u32 target_pitch = (curvals & 7) + ((curvals & 2) << 2);
-	target_pitch = 0x5800 + (target_pitch << 12);
-
-	// once per frame slide the pitch toward the target
-	u64 curframe = framenum();
-	if (curframe > m_last_frame)
-	{
-		if (m_current_pitch > target_pitch)
-			m_current_pitch -= 225;
-		if (m_current_pitch < target_pitch)
-			m_current_pitch += 150;
-		m_samples->set_frequency(4, m_current_pitch);
-		m_last_frame = curframe;
-	}
-
-#endif
 }
 
 
@@ -1343,26 +898,9 @@ wotw_audio_device::wotw_audio_device(const machine_config &mconfig, const char *
 {
 }
 
-void wotw_audio_device::device_start()
-{
-	cinemat_audio_device::device_start();
-
-#if !WOTW_USE_NETLIST
-	save_item(NAME(m_last_frame));
-	save_item(NAME(m_current_pitch));
-#endif
-}
-
 void wotw_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-
-#if WOTW_USE_NETLIST
-
-	//
-	// Sound board is bascially Star Castle, with some input swizzling, so
-	// just use the Star Castle board
-	//
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(wotw))
@@ -1376,123 +914,6 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
-
-#else
-
-	static const char *const sample_names[] =
-	{
-		"*wotw",
-		"cfire",
-		"shield",
-		"star",
-		"thrust",
-		"drone",
-		"lexplode",
-		"sexplode",
-		"pfire",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-#endif
-}
-
-u8 wotw_audio_device::shiftreg_swizzle(u8 rawvals)
-{
-	//
-	// Thanks to Frank Palazzolo for figuring out this mapping, based
-	// on board photos and the information provided here:
-	//
-	// http://zonn.com/Cinematronics/wotw-hack.htm
-	//
-
-	u8 starcas_bits = 0;
-	if (BIT(rawvals, 0)) starcas_bits |= 0x10;
-	if (!BIT(rawvals, 1)) starcas_bits |= 0x20;
-	if (BIT(rawvals, 3)) starcas_bits |= 0x80;
-	if (BIT(rawvals, 4)) starcas_bits |= 0x40;
-	if (BIT(rawvals, 5)) starcas_bits |= 0x07;
-	if (BIT(rawvals, 7)) starcas_bits |= 0x08;
-	return starcas_bits;
-}
-
-void wotw_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-	// on the rising edge of bit 0, latch the shift register
-	if (rising_edge(curvals, oldvals, 0))
-		shiftreg_latch();
-
-	// on the rising edge of bit 4, clock bit 7 into the shift register
-	if (rising_edge(curvals, oldvals, 4))
-		shiftreg_clock(curvals >> 7);
-
-#if !WOTW_USE_NETLIST
-
-	// loud explosion - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(5, 5);
-
-	// soft explosion - falling edge
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(6, 6);
-
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(7, 7);
-
-#endif
-}
-
-void wotw_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-#if !WOTW_USE_NETLIST
-
-	// fireball - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(0, 0);
-
-	// shield hit - falling edge
-	if (falling_edge(curvals, oldvals, 6))
-		m_samples->start(1, 1);
-
-	// star sound - 0=off, 1=on
-	if (rising_edge(curvals, oldvals, 5))
-		m_samples->start(2, 2, true);
-	if (falling_edge(curvals, oldvals, 5))
-		m_samples->stop(2);
-
-	// thrust sound - 1=off, 0=on
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(3, 3, true);
-	if (rising_edge(curvals, oldvals, 4))
-		m_samples->stop(3);
-
-	// drone - 1=off, 0=on
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(4, 4, true);
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->stop(4);
-
-	// latch the drone pitch
-	u32 target_pitch = (curvals & 7) + ((curvals & 2) << 2);
-	target_pitch = 0x10000 + (target_pitch << 12);
-
-	// once per frame slide the pitch toward the target
-	u64 curframe = framenum();
-	if (curframe > m_last_frame)
-	{
-		if (m_current_pitch > target_pitch)
-			m_current_pitch -= 300;
-		if (m_current_pitch < target_pitch)
-			m_current_pitch += 200;
-		m_samples->set_frequency(4, m_current_pitch);
-		m_last_frame = curframe;
-	}
-
-#endif
 }
 
 
