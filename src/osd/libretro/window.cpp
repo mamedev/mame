@@ -279,7 +279,7 @@ void retro_window_info::toggle_full_screen()
 
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();
 
-	set_renderer(osd_renderer::make_for_type(video_config.mode, shared_from_this()));
+	set_renderer(std::make_unique<renderer_retro>(window));
 
 	// toggle the window mode
 	set_fullscreen(!fullscreen());
@@ -386,7 +386,7 @@ int retro_window_info::window_init()
 	// add us to the list
 	osd_common_t::s_window_list.push_back(std::static_pointer_cast<retro_window_info>(shared_from_this()));
 
-	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
+	set_renderer(std::make_unique<renderer_retro>(static_cast<osd_window*>(this)->shared_from_this()));
 
 	// load the layout
 	m_target = m_machine.render().target_alloc();

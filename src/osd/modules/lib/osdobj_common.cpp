@@ -256,10 +256,13 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 #endif
 #else
- 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
+	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 #endif
+
+#ifndef __LIBRETRO__
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
 	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);
+#endif
 	REGISTER_MODULE(m_mod_man, NETDEV_NONE);
 
 #ifndef NO_USE_MIDI

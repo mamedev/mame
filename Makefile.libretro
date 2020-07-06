@@ -62,6 +62,10 @@ endif
 #
 ###########################################################################
 
+ifeq (,$(findstring x86,$(LIBRETRO_CPU)))
+	FORCE_DRC_C_BACKEND = 1
+endif
+
 ifeq ($(platform), android)
 	#PTR64 = 0
 	# FIXME: Pass these to GENie and test...
