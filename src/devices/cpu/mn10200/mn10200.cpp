@@ -1706,7 +1706,7 @@ void mn10200_device::execute_run()
 //  internal i/o
 //-------------------------------------------------
 
-WRITE8_MEMBER(mn10200_device::io_control_w)
+void mn10200_device::io_control_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2109,7 +2109,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 }
 
 
-READ8_MEMBER(mn10200_device::io_control_r)
+uint8_t mn10200_device::io_control_r(offs_t offset)
 {
 	switch (offset)
 	{

@@ -572,7 +572,7 @@ vanguard_sound_device::vanguard_sound_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE8_MEMBER(vanguard_sound_device::sound_w)
+void vanguard_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -660,7 +660,7 @@ WRITE8_MEMBER(vanguard_sound_device::sound_w)
 	}
 }
 
-WRITE8_MEMBER(vanguard_sound_device::speech_w)
+void vanguard_sound_device::speech_w(uint8_t data)
 {
 	static const uint16_t vanguard_table[16] =
 	{
@@ -757,7 +757,7 @@ fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, device
 {
 }
 
-WRITE8_MEMBER(fantasy_sound_device::sound_w)
+void fantasy_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -857,7 +857,7 @@ WRITE8_MEMBER(fantasy_sound_device::sound_w)
 	}
 }
 
-WRITE8_MEMBER(fantasy_sound_device::speech_w)
+void fantasy_sound_device::speech_w(uint8_t data)
 {
 	static const uint16_t fantasy_table[16] =
 	{
@@ -969,7 +969,7 @@ sasuke_sound_device::sasuke_sound_device(const machine_config &mconfig, const ch
 {
 }
 
-WRITE8_MEMBER(sasuke_sound_device::sound_w)
+void sasuke_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1118,7 +1118,7 @@ satansat_sound_device::satansat_sound_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE8_MEMBER(satansat_sound_device::sound_w)
+void satansat_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

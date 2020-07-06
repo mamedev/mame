@@ -60,7 +60,7 @@ namespace plib {
 		{
 			if (m_stack.size() == 1)
 				trail = trail_first;
-			s = trail + plib::pfmt("{1}:{2}:0\n")(m_stack.back().m_name, m_stack.back().m_lineno) + s;
+			s = plib::pfmt("{1}{2}:{3}:0\n{4}")(trail, m_stack.back().m_name, m_stack.back().m_lineno, s);
 			m_stack.pop_back();
 		}
 		throw pexception("\n" + s + e + " " + m_line + "\n");

@@ -28,6 +28,7 @@
 #include "nl_errstr.h"
 #include "nltypes.h"
 
+#include <initializer_list>
 #include <unordered_map>
 #include <vector>
 #include <initializer_list>
@@ -187,6 +188,8 @@ namespace netlist
 	/// \brief Delegate type for device notification.
 	///
 	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	// -----------------------------------------------------------------------------
 	// forward definitions
@@ -257,7 +260,7 @@ namespace netlist
 	public:
 		logic_family_desc_t();
 
-		COPYASSIGNMOVE(logic_family_desc_t, delete)
+		PCOPYASSIGNMOVE(logic_family_desc_t, delete)
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
@@ -302,7 +305,7 @@ namespace netlist
 	{
 	public:
 		logic_family_t() : m_logic_family(nullptr) {}
-		COPYASSIGNMOVE(logic_family_t, delete)
+		PCOPYASSIGNMOVE(logic_family_t, delete)
 
 		const logic_family_desc_t *logic_family() const noexcept { return m_logic_family; }
 		void set_logic_family(const logic_family_desc_t *fam) noexcept { m_logic_family = fam; }
@@ -423,34 +426,36 @@ namespace netlist
 		template <typename C, typename T>
 		struct property_store_t
 		{
-			static void add(const C *obj, const T &aname) noexcept
+			using value_type = T;
+			using key_type = const C *;
+			static void add(key_type obj, const value_type &aname) noexcept
 			{
 				store().insert({obj, aname});
 			}
 
-			static const T &get(const C *obj) noexcept
+			static value_type *get(key_type obj) noexcept
 			{
 				try
 				{
 					auto ret(store().find(obj));
 					nl_assert(ret != store().end());
-					return ret->second;
+					return &ret->second;
 				}
 				catch (...)
 				{
 					nl_assert_always(true, "exception in property_store_t.get()");
-					return *static_cast<T *>(nullptr);
+					return static_cast<value_type *>(nullptr);
 				}
 			}
 
-			static void remove(const C *obj) noexcept
+			static void remove(key_type obj) noexcept
 			{
 				store().erase(store().find(obj));
 			}
 
-			static std::unordered_map<const C *, T> &store() noexcept
+			static std::unordered_map<key_type, value_type> &store() noexcept
 			{
-				static std::unordered_map<const C *, T> lstore;
+				static std::unordered_map<key_type, value_type> lstore;
 				return lstore;
 			}
 
@@ -481,14 +486,14 @@ namespace netlist
 				props::add(this, aname);
 			}
 
-			COPYASSIGNMOVE(object_t, delete)
+			PCOPYASSIGNMOVE(object_t, delete)
 			/// \brief return name of the object
 			///
 			/// \returns name of the object.
 
 			const pstring &name() const noexcept
 			{
-				return props::get(this);
+				return *props::get(this);
 			}
 
 		protected:
@@ -504,20 +509,21 @@ namespace netlist
 		private:
 		};
 
-		struct netlist_ref
+		class netlist_object_t : public object_t
 		{
-			explicit netlist_ref(netlist_t &nl);
+		public:
+			explicit netlist_object_t(netlist_t &nl, const pstring &name)
+			: object_t(name)
+			, m_netlist(nl)
+			{ }
 
-			COPYASSIGNMOVE(netlist_ref, delete)
+			PCOPYASSIGNMOVE(netlist_object_t, delete)
 
 			netlist_state_t & state() noexcept;
 			const netlist_state_t & state() const noexcept;
 
 			netlist_t & exec() noexcept { return m_netlist; }
 			const netlist_t & exec() const noexcept { return m_netlist; }
-
-		protected:
-			~netlist_ref() noexcept = default; // prohibit polymorphic destruction
 
 		private:
 			netlist_t & m_netlist;
@@ -598,7 +604,7 @@ namespace netlist
 					state_e state, nldelegate delegate = nldelegate());
 			virtual ~core_terminal_t() noexcept = default;
 
-			COPYASSIGNMOVE(core_terminal_t, delete)
+			PCOPYASSIGNMOVE(core_terminal_t, delete)
 
 			/// \brief The object type.
 			/// \returns type of the object
@@ -637,7 +643,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -654,9 +660,7 @@ namespace netlist
 		// net_t
 		// -----------------------------------------------------------------------------
 
-		class net_t :
-				public object_t,
-				public netlist_ref
+		class net_t : public netlist_object_t
 		{
 		public:
 
@@ -669,7 +673,7 @@ namespace netlist
 
 			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal = nullptr);
 
-			COPYASSIGNMOVE(net_t, delete)
+			PCOPYASSIGNMOVE(net_t, delete)
 
 			virtual ~net_t() noexcept = default;
 
@@ -692,10 +696,10 @@ namespace netlist
 			netlist_time_ext next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
-			bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
+			bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
 			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
 
-			std::size_t num_cons() const noexcept { return m_core_terms.size(); }
+			bool has_connections() const noexcept { return !m_core_terms.empty(); }
 
 			void add_to_active_list(core_terminal_t &term) noexcept;
 			void remove_from_active_list(core_terminal_t &term) noexcept;
@@ -712,18 +716,15 @@ namespace netlist
 			void move_connections(net_t &dest_net);
 
 			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
-	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
+
 			void update_inputs() noexcept
 			{
+#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 				for (auto & term : m_core_terms)
 					term->m_Q = m_cur_Q;
+#endif
+				// nothing needs to be done if define not set
 			}
-	#else
-			void update_inputs() const noexcept
-			{
-				// nothing needs to be done
-			}
-	#endif
 
 		protected:
 
@@ -798,6 +799,8 @@ namespace netlist
 
 		const analog_net_t & net() const noexcept;
 		analog_net_t & net() noexcept;
+
+		solver::matrix_solver_t *solver() const noexcept;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -825,23 +828,22 @@ namespace netlist
 		void set_go_gt_I(nl_fptype GO, nl_fptype GT, nl_fptype I) const noexcept
 		{
 			// Check for rail nets ...
-			if (m_go1 != nullptr)
+			if (m_go != nullptr)
 			{
-				*m_Idr1 = I;
-				*m_go1 = GO;
-				*m_gt1 = GT;
+				*m_Idr = I;
+				*m_go = GO;
+				*m_gt = GT;
 			}
 		}
 
 		void solve_now();
-		void schedule_solve_after(netlist_time after) noexcept;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
-	private:
 
-		nl_fptype *m_Idr1; // drive current
-		nl_fptype *m_go1;  // conductance for Voltage from other term
-		nl_fptype *m_gt1;  // conductance for total conductance
+	private:
+		nl_fptype *m_Idr; // drive current
+		nl_fptype *m_go;  // conductance for Voltage from other term
+		nl_fptype *m_gt;  // conductance for total conductance
 
 	};
 
@@ -938,12 +940,17 @@ namespace netlist
 		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
 
 		nl_fptype Q_Analog() const noexcept { return m_cur_Analog; }
-		void set_Q_Analog(const nl_fptype v) noexcept { m_cur_Analog = v; }
+		void set_Q_Analog(nl_fptype v) noexcept { m_cur_Analog = v; }
 		nl_fptype *Q_Analog_state_ptr() noexcept { return m_cur_Analog.ptr(); }
 
 		//FIXME: needed by current solver code
 		solver::matrix_solver_t *solver() const noexcept { return m_solver; }
 		void set_solver(solver::matrix_solver_t *solver) noexcept { m_solver = solver; }
+
+		friend constexpr bool operator==(const analog_net_t &lhs, const analog_net_t &rhs) noexcept
+		{
+			return &lhs == &rhs;
+		}
 
 	private:
 		state_var<nl_fptype>     m_cur_Analog;
@@ -994,15 +1001,14 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	class core_device_t :
-			public detail::object_t,
-			public logic_family_t,
-			public detail::netlist_ref
+			public detail::netlist_object_t,
+			public logic_family_t
 	{
 	public:
 		core_device_t(netlist_state_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
-		COPYASSIGNMOVE(core_device_t, delete)
+		PCOPYASSIGNMOVE(core_device_t, delete)
 
 		virtual ~core_device_t() noexcept = default;
 
@@ -1080,7 +1086,7 @@ namespace netlist
 		device_t(netlist_state_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
-		COPYASSIGNMOVE(device_t, delete)
+		PCOPYASSIGNMOVE(device_t, delete)
 
 		~device_t() noexcept override = default;
 
@@ -1119,7 +1125,7 @@ namespace netlist
 
 		param_t(device_t &device, const pstring &name);
 
-		COPYASSIGNMOVE(param_t, delete)
+		PCOPYASSIGNMOVE(param_t, delete)
 
 		param_type_t param_type() const noexcept(false);
 
@@ -1134,7 +1140,7 @@ namespace netlist
 		pstring get_initial(const device_t &dev, bool *found) const;
 
 		template<typename C>
-		void set(C &p, const C v) noexcept
+		void set_and_update_param(C &p, const C v) noexcept
 		{
 			if (p != v)
 			{
@@ -1158,7 +1164,7 @@ namespace netlist
 		T operator()() const noexcept { return m_param; }
 		operator T() const noexcept { return m_param; }
 
-		void setTo(const T &param) noexcept { set(m_param, param); }
+		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
 	private:
 		T m_param;
 	};
@@ -1171,7 +1177,7 @@ namespace netlist
 
 		T operator()() const noexcept { return T(m_param); }
 		operator T() const noexcept { return T(m_param); }
-		void setTo(const T &param) noexcept { set(m_param, static_cast<int>(param)); }
+		void set(const T &param) noexcept { set_and_update_param(m_param, static_cast<int>(param)); }
 	private:
 		int m_param;
 	};
@@ -1190,7 +1196,7 @@ namespace netlist
 	public:
 		param_ptr_t(device_t &device, const pstring &name, std::uint8_t* val);
 		std::uint8_t * operator()() const noexcept { return m_param; }
-		void setTo(std::uint8_t *param) noexcept { set(m_param, param); }
+		void set(std::uint8_t *param) noexcept { set_and_update_param(m_param, param); }
 	private:
 		std::uint8_t* m_param;
 	};
@@ -1205,7 +1211,7 @@ namespace netlist
 		param_str_t(device_t &device, const pstring &name, const pstring &val);
 
 		const pstring &operator()() const noexcept { return str(); }
-		void setTo(const pstring &param)
+		void set(const pstring &param)
 		{
 			if (m_param != param)
 			{
@@ -1252,7 +1258,7 @@ namespace netlist
 		nl_fptype value(const pstring &entity);
 		pstring type();
 		// hide this
-		void setTo(const pstring &param) = delete;
+		void set(const pstring &param) = delete;
 	protected:
 		void changed() noexcept override;
 	private:
@@ -1329,7 +1335,7 @@ namespace netlist
 		class queue_t :
 				//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
 				public timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>,
-				public netlist_ref,
+				public netlist_object_t,
 				public plib::state_manager_t::callback_t
 		{
 		public:
@@ -1372,7 +1378,7 @@ namespace netlist
 		netlist_state_t(const pstring &aname,
 			plib::unique_ptr<callbacks_t> &&callbacks);
 
-		COPYASSIGNMOVE(netlist_state_t, delete)
+		PCOPYASSIGNMOVE(netlist_state_t, delete)
 
 		/// \brief Destructor
 		///
@@ -1414,9 +1420,9 @@ namespace netlist
 		inline std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
-			for (auto &d : m_devices)
+			for (const auto &d : m_devices)
 			{
-				auto dev = dynamic_cast<C *>(d.second.get());
+				auto * const dev = dynamic_cast<C *>(d.second.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
@@ -1430,7 +1436,7 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib &lib() const noexcept { return *m_lib; }
+		plib::dynlib_base &lib() const noexcept { return *m_lib; }
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -1464,7 +1470,7 @@ namespace netlist
 
 		core_device_t *find_device(const pstring &name) const
 		{
-			for (auto & d : m_devices)
+			for (const auto & d : m_devices)
 				if (d.first == name)
 					return d.second.get();
 			return nullptr;
@@ -1576,7 +1582,7 @@ namespace netlist
 
 		pstring                             m_name;
 		unique_pool_ptr<netlist_t>          m_netlist;
-		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
+		plib::unique_ptr<plib::dynlib_base> m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
 		log_type                            m_log;
@@ -1640,7 +1646,7 @@ namespace netlist
 
 		explicit netlist_t(netlist_state_t &state);
 
-		COPYASSIGNMOVE(netlist_t, delete)
+		PCOPYASSIGNMOVE(netlist_t, delete)
 
 		virtual ~netlist_t() noexcept = default;
 
@@ -1738,7 +1744,7 @@ namespace netlist
 		{
 			passert_always_msg(names.size() == N, "initializer_list size mismatch");
 			std::size_t i = 0;
-			for (auto &n : names)
+			for (const auto &n : names)
 				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
 		}
 
@@ -1762,12 +1768,12 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	inline netlist_state_t & detail::netlist_ref::state() noexcept
+	inline netlist_state_t & detail::netlist_object_t::state() noexcept
 	{
 		return m_netlist.nlstate();
 	}
 
-	inline const netlist_state_t & detail::netlist_ref::state() const noexcept
+	inline const netlist_state_t & detail::netlist_object_t::state() const noexcept
 	{
 		return m_netlist.nlstate();
 	}
@@ -1790,7 +1796,7 @@ namespace netlist
 			plib::pfunction<nl_fptype> func;
 			func.compile_infix(p, {});
 			auto valx = func.evaluate();
-			if (std::is_integral<T>::value)
+			if (plib::is_integral<T>::value)
 				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
 					throw nl_exception(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
 			m_param = static_cast<T>(valx);
@@ -1874,7 +1880,7 @@ namespace netlist
 
 	inline void detail::net_t::push_to_queue(netlist_time delay) noexcept
 	{
-		if ((num_cons() != 0))
+		if (has_connections())
 		{
 			m_next_scheduled_time = exec().time() + delay;
 
@@ -1941,6 +1947,13 @@ namespace netlist
 		return static_cast<analog_net_t &>(core_terminal_t::net());
 	}
 
+	inline solver::matrix_solver_t *analog_t::solver() const noexcept
+	{
+		if (this->has_net())
+			return net().solver();
+		return nullptr;
+	}
+
 	inline nl_fptype terminal_t::operator ()() const noexcept { return net().Q_Analog(); }
 
 	inline void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
@@ -1951,9 +1964,9 @@ namespace netlist
 			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
 		}
 
-		m_gt1 = gt;
-		m_go1 = go;
-		m_Idr1 = Idr;
+		m_gt = gt;
+		m_go = go;
+		m_Idr = Idr;
 	}
 
 	inline logic_net_t & logic_t::net() noexcept
@@ -2078,7 +2091,7 @@ namespace netlist
 	template <bool KEEP_STATS>
 	inline void detail::net_t::update_devs() noexcept
 	{
-		nl_assert(this->isRailNet());
+		nl_assert(this->is_rail_net());
 
 		m_in_queue = queue_status::DELIVERED; // mark as taken ...
 		if (m_new_Q ^ m_cur_Q)
@@ -2129,7 +2142,7 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				const auto obj(top->object());
+				auto *const obj(top->object());
 				m_queue.pop();
 				if (obj != nullptr)
 					obj->template update_devs<KEEP_STATS>();

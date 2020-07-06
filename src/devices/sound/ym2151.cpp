@@ -6,6 +6,7 @@
 
 DEFINE_DEVICE_TYPE(YM2151, ym2151_device, "ym2151", "Yamaha YM2151 OPM")
 DEFINE_DEVICE_TYPE(YM2164, ym2164_device, "ym2164", "Yamaha YM2164 OPP")
+DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "Yamaha YM2414 OPZ")
 
 
 #define FREQ_SH         16  /* 16.16 fixed point (frequency calculations) */
@@ -964,51 +965,46 @@ void ym2151_device::device_start()
 	irqlinestate = 0;
 
 	/* save all 32 operators */
-	for (int j=0; j<32; j++)
-	{
-		YM2151Operator &op = oper[(j&7)*4+(j>>3)];
+	save_item(STRUCT_MEMBER(oper, phase));
+	save_item(STRUCT_MEMBER(oper, freq));
+	save_item(STRUCT_MEMBER(oper, dt1));
+	save_item(STRUCT_MEMBER(oper, mul));
+	save_item(STRUCT_MEMBER(oper, dt1_i));
+	save_item(STRUCT_MEMBER(oper, dt2));
+	/* operators connection is saved in chip data block */
+	save_item(STRUCT_MEMBER(oper, mem_value));
 
-		save_item(NAME(op.phase), j);
-		save_item(NAME(op.freq), j);
-		save_item(NAME(op.dt1), j);
-		save_item(NAME(op.mul), j);
-		save_item(NAME(op.dt1_i), j);
-		save_item(NAME(op.dt2), j);
-		/* operators connection is saved in chip data block */
-		save_item(NAME(op.mem_value), j);
+	save_item(STRUCT_MEMBER(oper, fb_shift));
+	save_item(STRUCT_MEMBER(oper, fb_out_curr));
+	save_item(STRUCT_MEMBER(oper, fb_out_prev));
+	save_item(STRUCT_MEMBER(oper, kc));
+	save_item(STRUCT_MEMBER(oper, kc_i));
+	save_item(STRUCT_MEMBER(oper, pms));
+	save_item(STRUCT_MEMBER(oper, ams));
+	save_item(STRUCT_MEMBER(oper, AMmask));
 
-		save_item(NAME(op.fb_shift), j);
-		save_item(NAME(op.fb_out_curr), j);
-		save_item(NAME(op.fb_out_prev), j);
-		save_item(NAME(op.kc), j);
-		save_item(NAME(op.kc_i), j);
-		save_item(NAME(op.pms), j);
-		save_item(NAME(op.ams), j);
-		save_item(NAME(op.AMmask), j);
+	save_item(STRUCT_MEMBER(oper, state));
+	save_item(STRUCT_MEMBER(oper, eg_sh_ar));
+	save_item(STRUCT_MEMBER(oper, eg_sel_ar));
+	save_item(STRUCT_MEMBER(oper, tl));
+	save_item(STRUCT_MEMBER(oper, volume));
+	save_item(STRUCT_MEMBER(oper, eg_sh_d1r));
+	save_item(STRUCT_MEMBER(oper, eg_sel_d1r));
+	save_item(STRUCT_MEMBER(oper, d1l));
+	save_item(STRUCT_MEMBER(oper, eg_sh_d2r));
+	save_item(STRUCT_MEMBER(oper, eg_sel_d2r));
+	save_item(STRUCT_MEMBER(oper, eg_sh_rr));
+	save_item(STRUCT_MEMBER(oper, eg_sel_rr));
 
-		save_item(NAME(op.state), j);
-		save_item(NAME(op.eg_sh_ar), j);
-		save_item(NAME(op.eg_sel_ar), j);
-		save_item(NAME(op.tl), j);
-		save_item(NAME(op.volume), j);
-		save_item(NAME(op.eg_sh_d1r), j);
-		save_item(NAME(op.eg_sel_d1r), j);
-		save_item(NAME(op.d1l), j);
-		save_item(NAME(op.eg_sh_d2r), j);
-		save_item(NAME(op.eg_sel_d2r), j);
-		save_item(NAME(op.eg_sh_rr), j);
-		save_item(NAME(op.eg_sel_rr), j);
+	save_item(STRUCT_MEMBER(oper, key));
+	save_item(STRUCT_MEMBER(oper, ks));
+	save_item(STRUCT_MEMBER(oper, ar));
+	save_item(STRUCT_MEMBER(oper, d1r));
+	save_item(STRUCT_MEMBER(oper, d2r));
+	save_item(STRUCT_MEMBER(oper, rr));
 
-		save_item(NAME(op.key), j);
-		save_item(NAME(op.ks), j);
-		save_item(NAME(op.ar), j);
-		save_item(NAME(op.d1r), j);
-		save_item(NAME(op.d2r), j);
-		save_item(NAME(op.rr), j);
-
-		save_item(NAME(op.reserved0), j);
-		save_item(NAME(op.reserved1), j);
-	}
+	save_item(STRUCT_MEMBER(oper, reserved0));
+	save_item(STRUCT_MEMBER(oper, reserved1));
 
 	save_item(NAME(pan));
 
@@ -1711,6 +1707,16 @@ ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, dev
 
 ym2164_device::ym2164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ym2151_device(mconfig, YM2164, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  ym2414_device - constructor
+//-------------------------------------------------
+
+ym2414_device::ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ym2151_device(mconfig, YM2414, tag, owner, clock)
 {
 }
 

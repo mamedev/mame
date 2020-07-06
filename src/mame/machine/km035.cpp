@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER( km035_device::write_rxd )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( km035_device::p1_w )
+void km035_device::p1_w(uint8_t data)
 {
 	int sense = 0;
 
@@ -328,19 +328,19 @@ WRITE8_MEMBER( km035_device::p1_w )
 	m_tx_handler(!BIT(data, 3));
 }
 
-WRITE8_MEMBER( km035_device::p2_w )
+void km035_device::p2_w(uint8_t data)
 {
 	LOGDBG("p2_w %02x\n", data);
 
 	m_p2 = data;
 }
 
-READ8_MEMBER( km035_device::p1_r )
+uint8_t km035_device::p1_r()
 {
 	return m_p1;
 }
 
-READ8_MEMBER( km035_device::p2_r )
+uint8_t km035_device::p2_r()
 {
 	return m_p2;
 }
@@ -349,7 +349,7 @@ READ8_MEMBER( km035_device::p2_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( km035_device::bus_w )
+void km035_device::bus_w(uint8_t data)
 {
 	LOGDBG("bus_w %02x\n", data);
 }

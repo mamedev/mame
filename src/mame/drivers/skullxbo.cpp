@@ -36,29 +36,35 @@
  *
  *************************************/
 
-void skullxbo_state::update_interrupts()
+TIMER_CALLBACK_MEMBER(skullxbo_state::scanline_interrupt)
 {
-	m_maincpu->set_input_line(1, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+
+void skullxbo_state::scanline_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
+
+void skullxbo_state::video_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
 {
-	scanline_int_write_line(1);
-}
-
-
-void skullxbo_state::scanline_update(screen_device &screen, int scanline)
-{
 	/* check for interrupts in the alpha ram */
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
+	int scanline = param;
 	int offset = (scanline / 8) * 64 + 42;
 	if (offset < 0x7c0 && (m_alpha_tilemap->basemem_read(offset) & 0x8000))
 	{
-		int width = screen.width();
-		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
-		m_scanline_timer->adjust(period);
+		int width = m_screen->width();
+		attotime period = m_screen->time_until_pos(m_screen->vpos() + 6, width * 0.9);
+		m_scanline_int_timer->adjust(period);
 	}
 
 	/* update the playfield and motion objects */
@@ -72,10 +78,13 @@ WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 }
 
 
-void skullxbo_state::machine_reset()
+void skullxbo_state::machine_start()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	atarigen_state::machine_start();
+
+	m_scanline_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(skullxbo_state::scanline_interrupt), this));
+
+	save_item(NAME(m_scanline_int_state));
 }
 
 
@@ -229,10 +238,10 @@ GFXDECODE_END
 void skullxbo_state::skullxbo(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &skullxbo_state::main_map);
 
-	TIMER(config, m_scanline_timer).configure_generic(FUNC(skullxbo_state::scanline_timer));
+	TIMER(config, "scantimer").configure_scanline(FUNC(skullxbo_state::scanline_timer), m_screen, 0, 8);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -252,10 +261,10 @@ void skullxbo_state::skullxbo(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(skullxbo_state::screen_update_skullxbo));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(skullxbo_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

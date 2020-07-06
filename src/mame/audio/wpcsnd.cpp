@@ -65,7 +65,7 @@ uint8_t wpcsnd_device::ctrl_r()
 uint8_t wpcsnd_device::data_r()
 {
 	m_reply_available = false;
-	m_reply_cb(m_cpu->space(AS_PROGRAM),0);
+	m_reply_cb(0);
 	return m_reply;
 }
 
@@ -113,19 +113,19 @@ WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)
 	m_cpu->set_input_line(M6809_FIRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( wpcsnd_device::bg_speech_clock_w )
+void wpcsnd_device::bg_speech_clock_w(uint8_t data)
 {
 	// pulses clock input?
 	m_hc55516->clock_w(1);
 	m_hc55516->clock_w(0);
 }
 
-WRITE8_MEMBER( wpcsnd_device::bg_speech_digit_w )
+void wpcsnd_device::bg_speech_digit_w(uint8_t data)
 {
 	m_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( wpcsnd_device::rombank_w )
+void wpcsnd_device::rombank_w(uint8_t data)
 {
 	uint8_t bank = data & 0x0f;
 
@@ -146,19 +146,19 @@ WRITE8_MEMBER( wpcsnd_device::rombank_w )
 	LOG("WPCSND: Bank set to %02x\n",bank);
 }
 
-READ8_MEMBER(wpcsnd_device::latch_r)
+uint8_t wpcsnd_device::latch_r()
 {
 	m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 	return m_latch;
 }
 
-WRITE8_MEMBER(wpcsnd_device::latch_w)
+void wpcsnd_device::latch_w(uint8_t data)
 {
 	m_reply_available = true;
 	m_reply = data;
-	m_reply_cb(space,1);
+	m_reply_cb(1);
 }
 
-WRITE8_MEMBER(wpcsnd_device::volume_w)
+void wpcsnd_device::volume_w(uint8_t data)
 {
 }

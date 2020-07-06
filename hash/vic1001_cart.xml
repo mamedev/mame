@@ -307,7 +307,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="amok! (umi)(1981)(1611)(jue).a0" size="0x1000" crc="77738d0b" sha1="a354481bdc5411e07a446a8a41397e7237d9f198" offset="0x0000" />
+				<rom name="amok (umi)(1981)(1611)(jue).a0" size="0x1000" crc="77738d0b" sha1="a354481bdc5411e07a446a8a41397e7237d9f198" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2670,10 +2670,10 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
-				<rom name="satellites and meteorites! (umi)(1982)(1650)(ju).60" size="0x1000" crc="eb3361c6" sha1="7376391e363074bf99843bfb2ecf4277edb6d17d" offset="0x0000" />
+				<rom name="satellites and meteorites (umi)(1982)(1650)(ju).60" size="0x1000" crc="eb3361c6" sha1="7376391e363074bf99843bfb2ecf4277edb6d17d" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
-				<rom name="satellites and meteorites! (umi)(1982)(1650)(ju).a0" size="0x1000" crc="be390d00" sha1="53afad6a1c2fb87a82ecb28d86258ea2d78615cb" offset="0x0000" />
+				<rom name="satellites and meteorites (umi)(1982)(1650)(ju).a0" size="0x1000" crc="be390d00" sha1="53afad6a1c2fb87a82ecb28d86258ea2d78615cb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2686,7 +2686,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="satellites and meteorites! (umi)(1982)(1650)(e).a0" size="0x2000" crc="f3db203b" sha1="fe823deb548c3dac51b24aaf28758c248487f170" offset="0x0000" />
+				<rom name="satellites and meteorites (umi)(1982)(1650)(e).a0" size="0x2000" crc="f3db203b" sha1="fe823deb548c3dac51b24aaf28758c248487f170" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3873,7 +3873,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="write now! (cardco)(1983)(jue)(sys 41000).a0" size="0x2000" crc="3616451e" sha1="e4b9a71dfd5b31406a681a7e5b09888039789fd2" offset="0x0000" />
+				<rom name="write now (cardco)(1983)(jue)(sys 41000).a0" size="0x2000" crc="3616451e" sha1="e4b9a71dfd5b31406a681a7e5b09888039789fd2" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

@@ -51,7 +51,7 @@ public:
 	{
 		return datatype_t(sizeof(T),
 				plib::is_integral<T>::value || std::is_enum<T>::value,
-				std::is_floating_point<T>::value);
+				plib::is_floating_point<T>::value);
 	}
 
 	class callback_t
@@ -65,7 +65,7 @@ public:
 	protected:
 		callback_t() = default;
 		virtual ~callback_t() = default;
-		COPYASSIGNMOVE(callback_t, default)
+		PCOPYASSIGNMOVE(callback_t, default)
 	};
 
 	struct entry_t
@@ -97,7 +97,7 @@ public:
 
 	state_manager_t() = default;
 
-	template<typename C> //, typename std::enable_if<std::is_integral<C>::value || std::is_floating_point<C>::value>::type>
+	template<typename C>
 	void save_item(const void *owner, C &state, const pstring &stname)
 	{
 		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
@@ -165,7 +165,7 @@ public:
 	std::vector<const entry_t *> save_list() const
 	{
 		std::vector<const entry_t *> ret;
-		for (auto &i : m_save)
+		for (const auto &i : m_save)
 			ret.push_back(&i);
 		return ret;
 	}

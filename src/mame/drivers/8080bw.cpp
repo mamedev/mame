@@ -15,101 +15,97 @@
     Notes:
     -----
 
-    - Space Invaders Deluxe still says Space Invaders Part II,
-      because according to KLOV, Midway was only allowed to make minor
-      modifications of the Taito code.
-
+    - Midway Deluxe Space Invaders still displays 'Space Invaders Part II',
+      because of the terms of the licensing agreement.
     - DIP settings/locations verified from manual for:
       sitv, sicv, invadpt2, lrescue, invasion, invrvnge
 
-    - The Taito Space invaders hardware comes on at least five board types;
+    - The Taito Space Invaders hardware comes on at least five board types;
       The Taito manufactured ones are:
-      * The "L-shaped" PCB set, Upright, B&W only
-      * Three pcbs in a stack, often called the '3 layer pcb set' (most common)
-      * Two pcbs in a stack, with the function of two of the three pcb stack
-        pcbs combined.
-      * In general, discounting revision specific differences, the pcbs are
+      * The "L-shaped" PCB set, B&W and Upright mode only
+      * Three PCBs in a stack, often called the '3 layer PCB set' (most common)
+      * Two PCBs in a stack, with the function of the CPU/ROM boards combined.
+      * In general, discounting revision specific differences, the PCBs are
         arranged in a stack, connected end-to-end by ribbon cables and folded
-        such that the middle pcb (of 3 pcb stack) or the bottom pcb (of 2 pcb
+        such that the middle PCB (of 3 PCB stack) or the bottom PCB (of 2 PCB
         stack) is upside down.
-      * Keep in mind specific differences on the pcbs (especially the TVN pcbs
-        vs the others) sometimes prevent exchanging 'equivalent' pcbs between stacks.
-        * L-shaped pcb set details:
+      * Keep in mind specific differences on the PCBs (especially the TVN PCBs
+        vs the others) sometimes prevent exchanging 'equivalent' PCBs between stacks.
+        * L-shaped PCB set details:
           * One large, square board with ROM, RAM, CPU, Video circuitry on it.
-          * One smaller pcb with audio/io/shifter circuitry on it, plugged into
-            the main pcb at a right angle (hence the entire pcb set is 'L-shaped')
-          * Does not have the capability of any sort of electronic color overlay.
-        * 3 layer pcb set details:
-          * This pcb set came in 3 versions: TVN, CVN, PVN; see below for differences.
-          * Top pcb: Audio/IO/Shifter pcb
-            - discrete audio and sn76477, and volume knobs
+          * One smaller PCB with audio/io/shifter circuitry on it, plugged into
+            the main PCB at a right angle (hence the entire PCB set is 'L-shaped')
+          * Does not have the any hardware of any sort for electronic color screen
+            overlay or screen flipping for cocktail use.
+        * 3 layer PCB set details:
+          * This PCB set came in 3 versions: TVN, CVN, PVN; see below for differences.
+          * Top PCB: Audio/IO/Shifter PCB
+            - discrete analogue audio and sn76477, and volume pots
             - data shifter, using either ~11 74xx chips, AM25S10s, Fujitsu MB14221
               or Fujitsu MB14241 chips, which all do the same thing.
             - has the dipswitches
             - has the main "G" edge connector for the wiring harness
             - has the gating circuitry for the color overlay
-              (these are not present and/or populated on some TVN pcbs)
-            - despite there being at least six versions of this pcb, the discrete
+              (these are not present and/or populated on some TVN PCBs)
+            - despite there being at least six versions of this PCB, the discrete
               audio section is identical in all of them.
-          * Middle pcb: CPU/RAM/Color overlay pcb
+          * Middle PCB: CPU/RAM/Color overlay PCB
             - has DRAMS on it
             - has the 8080 CPU on it
             - has the two PROMS for color overlay on it (one for each player flip)
-              (these are not populated on TVN pcbs and the related circuitry is not
-              present and/or populated on some TVN pcbs)
-          * Bottom pcb: Power/Video/ROM pcb
-            - has the game roms on it
+              (these are not populated on TVN PCBs and the related circuitry is not
+              present and/or populated on the earliest TVN PCBs)
+          * Bottom PCB: Power/Video/ROM PCB
+            - has the game ROMs on it
             - has the main B&W video generation logic on it
-            - has the larger connection to the PSU, and B&W composite output "T" connector
-        * 2 layer pcb set details:
-          * This pcb set came in one version: PVN, and is entirely exchangeable
-            with the 3 layer PVN pcb set.
-          * Top pcb is same as 3 layer pcb set
-          * Bottom pcb combines the function of the Middle and Bottom pcbs
+            - has connection to the PSU, and B&W composite output "T" connector
+        * 2 layer PCB set details:
+          * This PCB set came in one version for PVN use, sharing the same top PCB
+            as 3 found in regular layer PCB sets
+          * Bottom PCB combines the function of the Middle and Bottom PCBs
             of the 3 layer set.
 
-       * The different pcb set versions are noted by a different version code on
-         a paper sticker on the pcb; The code will be of the format mVNnnnnn where
-         m is a letter and nnnnn is a number.
-         Codes:
-         * TVNxxxxx (3 layer pcbset) - B&W only, used on "T.T Space Invaders"
-           cocktail with 'blended' single-sheet gel color overlay.
-     ***TODO: this overlay is not supported yet!
-           Several revisions (at least 5 rom, 3 cpu, 3 audio) of each pcb exist
-           for this set.
-           Does support flipscreen.
-           Does not have the color overlay circuitry nor places for it on the pcbs.
-           (Later TVNxxxxx are actually rebadged CVNxxxxx, see below)
-           Came from factory with one of the SV or TV romsets.
-           Capable of running TV, SV or CV romsets.
-           This pcb set is probably the oldest one and was designed at Taito.
-         * SVNxxxxx? (L-shaped pcbset) - B&W only, used on "Space Invaders" Upright
-           with 3-separate-sheets-of-gel 'strips' color overlay.
-     ***TODO: this overlay might not be supported properly yet!
-           Does not support flipscreen, was intended for upright cabinets only.
-           Audio PCB daughterboard has part number SVN00001 or SVN00003.
-           Came from factory with one of the 6x 0x400 or 4x 0x800 romsets
-           Capable of running TV, SV or CV romsets.
-           This is probably the second-oldest pcb set and may have been made to
-           allow closer physical interchangeability with Midway's m8080bw hardware,
-           which had a similar board shape?
-         * CVNxxxxx (3 layer pcbset) - Color, used on "T.T Space Invaders Color"
-           cocktail with electronic color overlay.
-           Does support flipscreen.
-           Note that later TVNxxxxx pcbsets are actually 'rebadged' CVNxxxxx
-           pcbsets with the color overlay circuitry unpopulated, and can be
-           'upgraded' to CVNxxxxx by adding a few components and proms.
-           Came from factory with one of the CV romsets.
-           Capable of running TV, SV or CV romsets.
-         * PVNxxxxx (2&3 layer pcbsets) - Color, used on "T.T Space Invaders Part
-           II" cocktail with electronic color overlay.
-           Several revisions (at least 3 rom, 1 cpu, 2 audio) of each pcb exist
-           for this set.
-           Came from factory with UV (2708) or PV (2716) romsets.
-           Capable of running TV, SV, CV, UV or PV romsets.
+        * The different PCB set versions are noted by a different version code on
+          a paper sticker on the PCB; The code will be of the format mVNnnnnn where
+          m is a letter and nnnnn is a number.
+          Codes:
+          * TVNxxxxx (3 layer PCBset) - B&W only, used on "T.T Space Invaders"
+            cocktail with 'blended' single-sheet gel color overlay.
+      ***TODO: this overlay is not supported yet!
+            Several revisions (at least 5 ROM, 3 cpu, 3 audio) of each PCB exist
+            for this set.
+            Does support flipscreen.
+            Does not have the color overlay circuitry nor places for it on the PCBs.
+            (Later TVNxxxxx are actually rebadged CVNxxxxx, see below)
+            Came from factory with one of the SV or TV romsets.
+            Capable of running TV, SV or CV romsets.
+            This PCB set is probably the oldest one and was designed at Taito.
+          * SVNxxxxx? (L-shaped PCBset) - B&W only, used on "Space Invaders" Upright
+            with 3-separate-sheets-of-gel 'strips' color overlay.
+      ***TODO: this overlay might not be supported properly yet!
+            Does not support flipscreen, was intended for upright cabinets only.
+            Audio PCB daughterboard has part number SVN00001 or SVN00003.
+            Came from factory with one of the 6x 0x400 or 4x 0x800 romsets
+            Capable of running TV, SV or CV romsets.
+            This is the second-oldest PCB set and does not share physical compatibility
+            with Midway (interboard connector is of a differing pitch)
+          * CVNxxxxx (3 layer PCBset) - Color, used on "T.T Space Invaders Color"
+            cocktail with electronic color overlay.
+            Does support flipscreen.
+            Note that later TVNxxxxx PCBsets are actually 'rebadged' CVNxxxxx
+            PCBsets with the color overlay circuitry unpopulated, and can be
+            'upgraded' to CVNxxxxx by adding a few components and proms.
+            Came from factory with one of the CV romsets.
+            Capable of running TV, SV or CV romsets.
+          * PVNxxxxx (2&3 layer PCBsets) - Color, used on "T.T Space Invaders Part
+            II" cocktail with electronic color overlay.
+            Several revisions (at least 3 rom, 1 cpu, 2 audio) of each PCB exist
+            for this set.
+            Came from factory with UV (2708) or PV (2716) romsets.
+            Capable of running all romsets.
 
        * The following Romsets are known, ROUGHLY from oldest to newest:
-         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), If this exists at all this would be the very first japan release of space invaders (Andy W may call this 'SV0'?)
+         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), If this exists at all this would be the very first Japanese release of space invaders (Andy W may call this 'SV0'?)
          SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
          SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
          SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)
@@ -117,18 +113,18 @@
          TV0H, TV02, TV03, TV04 - sitv (rev 2 with bug fixes)
          CV03, CV04, CV05, CV06 w/proms - undumped (but may be the same as one of the sisv sets with the roms combined to 2716 size)
          CV17, CV18, CV19, CV20 w/proms - sicv
-         UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
+         UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - invadpt2a - (same as PVxx set just split differently)
          PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
-         Note: SV0H and TV0H are called in taito documentation "SV01-1" and "TV01-1" most likely due to someone along the line mistaking the '1-1' for an H or vice versa when writing the documentation or creating the labels.
+         Note: SV0H and TV0H are called in Taito documentation "SV01-1" and "TV01-1" most likely due to someone along the line mistaking the '1-1' for an H or vice versa when writing the documentation or creating the labels.
 
-    - Midway PCB sets: (cursory descripton)
+    - Midway PCB sets: (cursory description)
       * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail],
         [Deluxe Space Invaders Upright], [Deluxe Space Invaders Cocktail], and [Space Invaders II])
         use the same m8080bw mainboard, with no emulation-relevant differences between revisions.
       * [Space Invaders II] from Midway (only produced as a cocktail) uses
         an extra sound board for the simultaneous 2 player head-to-head sounds.
 
-    - Taito-USA-made 'trimline' PCBS do not match the taito japan-made pcbs either.
+    - Taito-USA-made 'trimline' PCBS do not match the Taito Japan-made PCBs either.
 
 
     To Do:
@@ -4382,6 +4378,24 @@ ROM_START( invadpt2 )
 	ROM_LOAD( "pv07.2",   0x0400, 0x0400, CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) )
 ROM_END
 
+ROM_START( invadpt2a ) // Comes from original TAITO PCBs. Same as invadpt2 but with half sized ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "uv01.36",     0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )
+	ROM_LOAD( "uv02.35",     0x0400, 0x0400, CRC(c867f5b4) SHA1(686318fda6edde297aecaf33f480bfa075fa6eca) )
+	ROM_LOAD( "uv03.34",     0x0800, 0x0400, CRC(cb23ccc1) SHA1(86be2d14d52b3404e1a25c573bd25b97729d82a1) )
+	ROM_LOAD( "uv04.33",     0x0c00, 0x0400, CRC(9a11abe2) SHA1(f5337183c7f279d75ddeeab24f4f132aa2ee103b) )
+	ROM_LOAD( "uv05.32",     0x1000, 0x0400, CRC(787821dd) SHA1(ae6e7297fccf8ae9aced8cb8b58fda1a616fa43b) )
+	ROM_LOAD( "uv06.31",     0x1400, 0x0400, CRC(f5e8114f) SHA1(dd5f5b00ee662ac2c7234f1e278441879fc7d394) )
+	ROM_LOAD( "uv07.42",     0x1800, 0x0400, CRC(07839f04) SHA1(989f77219b578b1b14a18e0fd6bf9079e3b1e155) )
+	ROM_LOAD( "uv08.41",     0x1c00, 0x0400, CRC(a7e1c6ef) SHA1(2b96617a1631d74068f51e911c74fe554a448776) )
+	ROM_LOAD( "uv09.40",     0x4000, 0x0400, CRC(261a39ae) SHA1(6554b33d9a44632a5856eb45aaafbdeed8244ce4) )
+	ROM_LOAD( "uv10.39",     0x4400, 0x0400, CRC(b2cbcc8b) SHA1(f11961445e81efeeb636bc430e372f79c10efd8c) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        // color maps player 1/player 2
+	ROM_LOAD( "pv06",        0x0000, 0x0400, CRC(a732810b) SHA1(a5fabffa73ca740909e23b9530936f9274dff356) )
+	ROM_LOAD( "pv07",        0x0400, 0x0400, CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) )
+ROM_END
+
 ROM_START( invadpt2br )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pv01",        0x0000, 0x0800, CRC(7288a511) SHA1(ff617872784c28ed03591aefa9f0519e5651701f) )
@@ -4467,7 +4481,6 @@ ROM_START( moonbasea )
 	ROM_LOAD( "cv02.h7",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 	ROM_LOAD( "cv01.g7",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
-
 
 ROM_START( invrvnge ) // Space Invaders hw + sound daughterboard
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4709,8 +4722,8 @@ Leisure Time Electronics produced three games: Astro Laser, Moon Lander, and Spa
 The games were designed to be interchangeable with a universal cocktail cabinet which they designed and named "Star Series". The cocktail cabinets share the same artwork with all three games and has a different instruction card for each game.
 There were no upright or cabaret cabinets. The game ROMs operate on Taito pc boards.
 
-Moon Lander is a clone/ripoff of Lunar Rescue/Destination Earth. I do not have a manual or schematics for this pcb although
-I was able to confirm 5 out of 8 dipswitch settings. I was surprised to hear the sounds effects are almost exactly like when Lunar Rescue used the "invaders" external samples in MAME. The pcb does not play the invader "hit" sound for some reason.
+Moon Lander is a clone/ripoff of Lunar Rescue/Destination Earth. I do not have a manual or schematics for this PCB although
+I was able to confirm 5 out of 8 dipswitch settings. I was surprised to hear the sounds effects are almost exactly like when Lunar Rescue used the "invaders" external samples in MAME. The PCB does not play the invader "hit" sound for some reason.
 I couldn't find anything obviously wrong in the sound section so it must be that it's just not hooked up as-is from the factory. There does not appear to be a sound-in-attract option.
 
 
@@ -4902,7 +4915,7 @@ ROM_START( cosmicmo ) /*  Roms stamped with "II", denoting version II  */
 	ROM_LOAD( "ii-6.h6",   0x4400, 0x0400, CRC(4ae1b9c4) SHA1(8eed87eebe68caa775fa679363b0fe3728d98c34) )
 	ROM_LOAD( "ii-7.h7",   0x4800, 0x0400, CRC(6a13b15b) SHA1(dc03a6c3e938cfd08d16bd1660899f951ba72ea2) )
 
-	/* There is no colour circuits or tracking on the game pcb, its a black and white composite video signal only */
+	/* There is no colour circuits or tracking on the game PCB, it's a black and white composite video signal only */
 		/* The PCB is etched with Universal 7814A-3 */
 ROM_END
 
@@ -4991,7 +5004,7 @@ Space Invaders (Electromar, Madrid) 1980
 Board by Roselson
 Dumped by Ricky2001 from Aumap
 
-This game runs in a clone of a Midway L-Shape Space Invaders pcb with different connectors, but identical.
+This game runs in a clone of a Midway L-Shape Space Invaders PCB with different connectors, but identical.
 The board is updated with a litthe daughter board for the reset, instead of being generated in the Power supply.
 Most of the Texts are in Spanish but keeps the original name "Space Invaders", also in the psb is writen a Patent number, I think this means it was a licensed version.
 
@@ -5658,7 +5671,8 @@ GAME( 1978, darthvdr,    invaders, darthvdr,  darthvdr,  _8080bw_state,  empty_i
 GAMEL(19??, tst_invd,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT0,   "<unknown>", "Space Invaders Test ROM", MACHINE_SUPPORTS_SAVE, layout_invaders )
 
 // other Taito
-GAME( 1979, invadpt2,    0,        invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Invaders Part II (Taito)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, invadpt2,    0,        invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Invaders Part II (Taito, bigger ROMs)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, invadpt2a,   invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Invaders Part II (Taito, smaller ROMs)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, invadpt2br,  invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito do Brasil", "Space Invaders Part II (Brazil)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1980, invaddlx,    invadpt2, invaders,  invadpt2,  mw8080bw_state, empty_init,    ROT270, "Taito (Midway license)", "Space Invaders Deluxe", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, moonbase,    invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito / Nichibutsu", "Moon Base Zeta (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - to display it, press P1 Right+P1 Fire+2P Start then P1 Left+P1 Fire+P1 Start at the attract gameplay sequence

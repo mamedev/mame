@@ -1690,6 +1690,25 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/pasopia/pac2.h,BUSES["PASOPIA"] = true
+---------------------------------------------------
+
+if (BUSES["PASOPIA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pasopia/pac2.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/pac2.h",
+		MAME_DIR .. "src/devices/bus/pasopia/pac2exp.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/pac2exp.h",
+		MAME_DIR .. "src/devices/bus/pasopia/rampac2.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/rampac2.h",
+		MAME_DIR .. "src/devices/bus/pasopia/rompac2.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/rompac2.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/pc_joy/pc_joy.h,BUSES["PC_JOY"] = true
 ---------------------------------------------------
 
@@ -3116,6 +3135,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/internal/992board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/buffram.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/buffram.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.cpp",
@@ -3170,6 +3191,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/myarcmem.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/pcode.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/pcode.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/pgram.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/pgram.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.cpp",

@@ -1,0 +1,180 @@
+TITLE     PAL22V10 Registered Test
+PATTERN   A
+REVISION  1.0
+AUTHOR    MAMEDev
+COMPANY   MAMEDev
+DATE      3/23/2020
+
+CHIP PAL22V10Test2 PAL22V10
+
+;---------------------------------- PIN Declarations ---------------
+PIN  1          I1                   COMBINATORIAL               ;
+PIN  2          I2                   COMBINATORIAL               ;
+PIN  3          I3                   COMBINATORIAL               ;
+PIN  4          I4                   COMBINATORIAL               ;
+PIN  5          I5                   COMBINATORIAL               ;
+PIN  6          I6                   COMBINATORIAL               ;
+PIN  7          I7                   COMBINATORIAL               ;
+PIN  8          I8                   COMBINATORIAL               ;
+PIN  9          I9                   COMBINATORIAL               ;
+PIN  10         I10                  COMBINATORIAL               ;
+PIN  11         I11                  COMBINATORIAL               ;
+PIN  12         GND                                              ;
+PIN  13         I13                  COMBINATORIAL               ;
+PIN  14         RF14                 REGISTERED                  ;
+PIN  15         RF15                 REGISTERED                  ;
+PIN  16         RF16                 REGISTERED                  ;
+PIN  17         RF17                 REGISTERED                  ;
+PIN  18         RF18                 REGISTERED                  ;
+PIN  19         RF19                 REGISTERED                  ;
+PIN  20         RF20                 REGISTERED                  ;
+PIN  21         RF21                 REGISTERED                  ;
+PIN  22         RF22                 REGISTERED                  ;
+PIN  23         RF23                 REGISTERED                  ;
+PIN  24         VCC                                              ;
+
+EQUATIONS
+
+/RF14 := I2 +
+         I3 +
+         I4 +
+         I5 +
+         I6 +
+         I7 +
+         I8 +
+         I9
+RF14.TRST = /I1
+
+RF15 := I10 +
+        I11 +
+        I13 +
+        /I2 * /I5 +
+        /I4 * /I6 +
+        /I8 +
+        /I11 * /I13 +
+        /I9 * /I10 +
+        /I7 * /I8 +
+        /I3
+RF15.TRST = I1
+
+RF16 := /I1 * /I2 +
+        /I3 * /I4 +
+        /I5 * /I6 +
+        /I7 * /I8 +
+        /I9 * /I10 +
+        /I11 * /I13 +
+        I5 * I11 * I13 +
+        I3 * I4 * I13 +
+        I2 * /I3 * I4 +
+        /I2 * /I3 +
+        /I2 * /I3 * /I11 * /I13 +
+        I4 * I5 * I6
+RF16.TRST = /RF14
+
+/RF17 := /I13 +
+         /I11 +
+         /I10 +
+         /I9 +
+         /I8 +
+         /I7 +
+         /I6 +
+         /I5 +
+         /I4 +
+         /I3 +
+         /I2 +
+         /I1 +
+         I1 * I2 * I3 * I4 * I5 +
+         I6 * I7 * I8 * I9 * I10
+RF17.TRST = VCC
+
+/RF18 := RF17 +
+         I1 * I2 * /RF17 +
+         I3 * I4 * /RF17 +
+         /I1 * /I2 * /I4 +
+         I3 * RF17 +
+         I3 * /I4 +
+         /I5 * /I6 * I10 +
+         I7 * I9 * I13 +
+         /I9 * /I11 +
+         /I1 * /I3 * RF17 +
+         /RF17 * RF20 +
+         I5 * I6 * /RF20 +
+         I9 * I10 * I11 +
+         /I13 * RF20 +
+         /I1 * /I2 * I5 * I6 +
+         I7 * I8
+RF18.TRST = I11 * I13
+
+RF19 := /I1 * /RF14 +
+        RF14 +
+        I2 +
+        I3 +
+        I4 +
+        I5 +
+        I6 +
+        I7 +
+        I8 +
+        I9 +
+        I10 +
+        I11 +
+        I13 +
+        /I2 +
+        /I3 +
+        /I4
+RF19.TRST = /I3 * I9 * I10 * /I11
+
+RF20 := /I1 * I2 +
+        /I5 +
+        /I6 +
+        /I7 +
+        /I8 +
+        /I9 +
+        /I10 +
+        /I11 +
+        /I13 +
+        I13 +
+        I11 +
+        I10 +
+        I9 +
+        I8
+RF20.TRST = VCC
+
+RF21 := /I1 * /I10 +
+        RF17 * RF23 +
+        I2 * I3 +
+        I3 * I4 +
+        I5 * I6 +
+        I7 * I8 +
+        I9 * I10 +
+        I11 * I13 +
+        /I2 * I3 +
+        /I3 * I4 +
+        /I4 * I5 +
+        /I5 * I6
+RF21.TRST = I13
+
+RF22 := /RF23 +
+        /I6 * I7 +
+        /I7 * I8 +
+        /I8 * I9 +
+        /I9 * I10 +
+        /I10 * I11 +
+        /I11 * I13 +
+        /I1 * /I2 * /I3 * /I4 +
+        /I5 * /I6 * /I7 * /I8 +
+        /I9 * /I10 * /I11 * /I13
+RF22.TRST = VCC
+
+/RF23 := /I3 * I4 +
+         /I1 * /I2 * /I3 * /I4 * /I5 * /I6 * /I7 * /I8 * /I9 * /I10 * /I11 * /I13 +
+         I3 * /I4 +
+         I1 * I2 * I3 * I4 * I5 * I6 * I7 * I8 * I9 * I10 * I11 * I13 +
+         I1 * I13 +
+         /I1 * I2 * /I3 * I4 * /I5 * I6 * /I7 * I8 * /I9 * I10 * /I11 * I13 +
+         I1 * /I2 * I3 * /I4 * I5 * /I6 * I7 * /I8 * I9 * /I10 * I11 * /I13 +
+         I1 * I2 * I3 * I4 * I5 * I6 * I7 * I8 * I9 * I10 * I11 * I13
+RF23.TRST = VCC
+
+SIMULATION
+
+

@@ -36,7 +36,7 @@ namespace plib
 		static constexpr const int NSQ = (N < 0 ? -N * N : N * N);
 		static constexpr const int Np1 = (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1);
 
-		COPYASSIGNMOVE(pmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pmatrix_cr_t, default)
 
 		enum constants_e
 		{
@@ -81,6 +81,13 @@ namespace plib
 		{
 			for (std::size_t i=0, e=nz_num; i<e; i++)
 				A[i] = scalar;
+		}
+
+		void set_row_scalar(C r, T val) noexcept
+		{
+			C ri = row_idx[r];
+			while (ri < row_idx[r+1])
+				A[ri++] = val;
 		}
 
 		void set(C r, C c, T val) noexcept
@@ -242,7 +249,7 @@ namespace plib
 		using base = B;
 		using index_type = typename base::index_type;
 
-		COPYASSIGNMOVE(pGEmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pGEmatrix_cr_t, default)
 
 		explicit pGEmatrix_cr_t(std::size_t n)
 		: B(n)
@@ -476,7 +483,7 @@ namespace plib
 		using base = B;
 		using index_type = typename base::index_type;
 
-		COPYASSIGNMOVE(pLUmatrix_cr_t, default)
+		PCOPYASSIGNMOVE(pLUmatrix_cr_t, default)
 
 		explicit pLUmatrix_cr_t(std::size_t n)
 		: B(n)

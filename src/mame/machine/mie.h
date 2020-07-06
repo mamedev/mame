@@ -39,37 +39,37 @@ public:
 		set_gpio_names<First + 1>(std::forward<U>(other_tags)...);
 	}
 
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(lreg_r);
-	DECLARE_WRITE8_MEMBER(lreg_w);
-	DECLARE_READ8_MEMBER(tbuf_r);
-	DECLARE_WRITE8_MEMBER(tbuf_w);
-	DECLARE_READ8_MEMBER(gpio_r);
-	DECLARE_WRITE8_MEMBER(gpio_w);
-	DECLARE_READ8_MEMBER(gpiodir_r);
-	DECLARE_WRITE8_MEMBER(gpiodir_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
+	uint8_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint8_t data);
+	uint8_t lreg_r();
+	void lreg_w(uint8_t data);
+	uint8_t tbuf_r(offs_t offset);
+	void tbuf_w(offs_t offset, uint8_t data);
+	uint8_t gpio_r(offs_t offset);
+	void gpio_w(offs_t offset, uint8_t data);
+	uint8_t gpiodir_r();
+	void gpiodir_w(uint8_t data);
+	uint8_t adc_r();
+	void adc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(irq_enable_r);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(maple_irqlevel_r);
-	DECLARE_WRITE8_MEMBER(maple_irqlevel_w);
-	DECLARE_READ8_MEMBER(irq_pending_r);
-	DECLARE_WRITE8_MEMBER(irq_pending_w);
+	uint8_t irq_enable_r();
+	void irq_enable_w(uint8_t data);
+	uint8_t maple_irqlevel_r();
+	void maple_irqlevel_w(uint8_t data);
+	uint8_t irq_pending_r();
+	void irq_pending_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(jvs_r);
-	DECLARE_WRITE8_MEMBER(jvs_w);
-	DECLARE_WRITE8_MEMBER(jvs_dest_w);
-	DECLARE_READ8_MEMBER(jvs_status_r);
-	DECLARE_WRITE8_MEMBER(jvs_control_w);
-	DECLARE_READ8_MEMBER(jvs_sense_r);
-	DECLARE_WRITE8_MEMBER(jvs_lcr_w);
+	uint8_t jvs_r();
+	void jvs_w(uint8_t data);
+	void jvs_dest_w(uint8_t data);
+	uint8_t jvs_status_r();
+	void jvs_control_w(uint8_t data);
+	uint8_t jvs_sense_r();
+	void jvs_lcr_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(read_ff);
-	DECLARE_READ8_MEMBER(read_00);
-	DECLARE_READ8_MEMBER(read_78xx);
+	uint8_t read_ff();
+	uint8_t read_00();
+	uint8_t read_78xx(offs_t offset);
 
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;

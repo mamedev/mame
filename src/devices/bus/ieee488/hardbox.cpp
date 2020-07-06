@@ -231,7 +231,7 @@ READ8_MEMBER( hardbox_device::ppi1_pc_r )
 
 	*/
 
-	uint8_t status = m_hdc->status_r(space, 0);
+	uint8_t status = m_hdc->status_r();
 	uint8_t data = 0;
 
 	data |= (status & corvus_hdc_device::CONTROLLER_BUSY) ? 0 : 0x10;

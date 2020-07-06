@@ -36,13 +36,13 @@ license:CC0
 
 		<part name="rom1" interface="pet_9000_rom">
 			<dataarea name="rom" size="0x1000">
-				<rom name="bat4_8$9.bin" size="0x1000" crc="da80481b" sha1="d9ebc8a0b0eab81fcb867b1a89f603bef0fb8509" offset="0" />
+				<rom name="bat4_8-9.bin" size="0x1000" crc="da80481b" sha1="d9ebc8a0b0eab81fcb867b1a89f603bef0fb8509" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="rom2" interface="pet_a000_rom">
 			<dataarea name="rom" size="0x1000">
-				<rom name="bat4_8$a.bin" size="0x1000" crc="a19433a9" sha1="266c323a1254cdaecbcc9b10e606f1c16ea9ef64" offset="0" />
+				<rom name="bat4_8-a.bin" size="0x1000" crc="a19433a9" sha1="266c323a1254cdaecbcc9b10e606f1c16ea9ef64" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -115,7 +115,7 @@ void v3021_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( v3021_device::read )
+uint8_t v3021_device::read()
 {
 	uint8_t calr = (m_cal_val & m_cal_mask) ? 1 : 0;
 
@@ -123,7 +123,7 @@ READ8_MEMBER( v3021_device::read )
 	return calr;
 }
 
-WRITE8_MEMBER( v3021_device::write )
+void v3021_device::write(uint8_t data)
 {
 	m_cal_com <<= 1;
 	m_cal_com |= data & 1;

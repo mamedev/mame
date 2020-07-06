@@ -159,18 +159,9 @@
 #define IRQ_SMIDINT_LEVEL       (3 ^ 7)
 #define IRQ_AIC_LEVEL           (4 ^ 7)
 
-#define IRQ_CHINT8_LEVEL        (15 ^ 7)
-#define IRQ_CHINT7_LEVEL        (14 ^ 7)
-#define IRQ_CHINT6_LEVEL        (13 ^ 7)
-#define IRQ_CHINT5_LEVEL        (12 ^ 7)
-#define IRQ_CHINT4_LEVEL        (11 ^ 7)
-#define IRQ_CHINT3_LEVEL        (10 ^ 7)
-#define IRQ_CHINT2_LEVEL        (9 ^ 7)
-#define IRQ_CHINT1_LEVEL        (8 ^ 7)
-
 static const int ch_int_levels[8] =
 {
-	12 ^ 7, 8 ^ 7, 13 ^ 7, 9 ^ 7, 14 ^ 7, 10 ^ 7, 15 ^ 7, 11 ^ 7 //IRQ_CHINT8_LEVEL, IRQ_CHINT7_LEVEL, IRQ_CHINT6_LEVEL, IRQ_CHINT5_LEVEL, IRQ_CHINT4_LEVEL, IRQ_CHINT3_LEVEL, IRQ_CHINT2_LEVEL, IRQ_CHINT1_LEVEL
+	0xc ^ 7, 0x8 ^ 7, 0xd ^ 7, 0x9 ^ 7, 0xe ^ 7, 0xa ^ 7, 0xf ^ 7, 0xb ^ 7
 };
 
 #define IRQ_PERRINT_LEVEL       (0 ^ 7)

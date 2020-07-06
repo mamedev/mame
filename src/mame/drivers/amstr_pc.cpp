@@ -298,7 +298,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 		if (m_port61&0x80)
 			data=m_port60;
 		else
-			data = m_keyboard->read(space, 0);
+			data = m_keyboard->read();
 		break;
 
 	case 1:
@@ -316,7 +316,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 {
-	uint8_t data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -328,7 +328,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 {
-	uint8_t data = m_lpt2->read(space, offset);
+	uint8_t data = m_lpt2->read(offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -341,7 +341,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 
 READ8_MEMBER( amstrad_pc_state::pc1640_port378_r )
 {
-	uint8_t data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (ioport("DSW0")->read() & 7);

@@ -60,12 +60,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// internal map handlers
-	DECLARE_READ8_MEMBER(regs_r);
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(mram_r);
-	DECLARE_WRITE8_MEMBER(mram_w);
-	DECLARE_READ8_MEMBER(xram_r);
-	DECLARE_WRITE8_MEMBER(xram_w);
+	uint8_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t mram_r(offs_t offset);
+	void mram_w(offs_t offset, uint8_t data);
+	uint8_t xram_r(offs_t offset);
+	void xram_w(offs_t offset, uint8_t data);
 
 	// configuration helpers
 	void set_cpu_clock(clock_source source, uint32_t clock) { m_clocks[unsigned(source)] = clock; }

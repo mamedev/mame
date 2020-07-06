@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(ARKANOID_68705P3,     arkanoid_68705p3_device,     "arkanoid6
 DEFINE_DEVICE_TYPE(ARKANOID_68705P5,     arkanoid_68705p5_device,     "arkanoid68705p5", "Arkanoid MC68705P5 Interface")
 
 
-READ8_MEMBER(taito68705_mcu_device_base::data_r)
+u8 taito68705_mcu_device_base::data_r()
 {
 	// clear MCU semaphore flag and return data
 	u8 const result(m_mcu_latch);
@@ -63,14 +63,14 @@ READ8_MEMBER(taito68705_mcu_device_base::data_r)
 	return result;
 }
 
-WRITE8_MEMBER(taito68705_mcu_device_base::data_w)
+void taito68705_mcu_device_base::data_w(u8 data)
 {
 	// set host semaphore flag and latch data
 	if (!m_reset_input)
 		m_host_flag = true;
 	m_host_latch = data;
 	if (m_latch_driven)
-		m_mcu->pa_w(space, 0, data);
+		m_mcu->pa_w(data);
 	m_mcu->set_input_line(M68705_IRQ_LINE, m_host_flag ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -105,7 +105,7 @@ taito68705_mcu_device_base::taito68705_mcu_device_base(
 {
 }
 
-WRITE8_MEMBER(taito68705_mcu_device_base::mcu_pa_w)
+void taito68705_mcu_device_base::mcu_pa_w(u8 data)
 {
 	m_pa_output = data;
 }
@@ -147,7 +147,7 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 	if (BIT(data, host_bit))
 	{
 		m_latch_driven = false;
-		m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, 0xff);
+		m_mcu->pa_w(0xff);
 		if (!BIT(value, host_bit))
 		{
 			m_host_flag = false;
@@ -157,7 +157,7 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 	else
 	{
 		m_latch_driven = true;
-		m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, m_host_latch);
+		m_mcu->pa_w(m_host_latch);
 	}
 
 	// PB2 sets the MCU semaphore when low
@@ -228,14 +228,14 @@ void taito68705_mcu_device::device_start()
  */
 
 
-READ8_MEMBER(taito68705_mcu_device::mcu_portc_r)
+u8 taito68705_mcu_device::mcu_portc_r()
 {
 	// PC0 is the host semaphore flag (active high)
 	// PC1 is the MCU semaphore flag (active low)
 	return (host_flag() ? 0x01 : 0x00) | (mcu_flag() ? 0x00 : 0x02) | 0xfc;
 }
 
-WRITE8_MEMBER(taito68705_mcu_device::mcu_portb_w)
+void taito68705_mcu_device::mcu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	// some games have additional peripherals strobed on falling edge
 	u8 const old_pa_value(pa_value());
@@ -261,10 +261,10 @@ taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &m
 {
 }
 
-READ8_MEMBER(taito68705_mcu_tiger_device::mcu_portc_r)
+u8 taito68705_mcu_tiger_device::mcu_portc_r()
 {
 	// Tiger Heli has these status bits inverted MCU-side
-	return taito68705_mcu_device::mcu_portc_r(space, offset, mem_mask) ^ 0x03;
+	return taito68705_mcu_device::mcu_portc_r() ^ 0x03;
 }
 
 
@@ -282,19 +282,19 @@ arkanoid_mcu_device_base::arkanoid_mcu_device_base(
 {
 }
 
-READ8_MEMBER(arkanoid_mcu_device_base::mcu_pb_r)
+u8 arkanoid_mcu_device_base::mcu_pb_r()
 {
-	return m_portb_r_cb(space, offset, mem_mask);
+	return m_portb_r_cb();
 }
 
-READ8_MEMBER(arkanoid_mcu_device_base::mcu_pc_r)
+u8 arkanoid_mcu_device_base::mcu_pc_r()
 {
 	// PC0 is the host semaphore flag (active high)
 	// PC1 is the MCU semaphore flag (active low)
 	return (host_flag() ? 0x01 : 0x00) | (mcu_flag() ? 0x00 : 0x02) | 0xfc;
 }
 
-WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)
+void arkanoid_mcu_device_base::mcu_pc_w(u8 data)
 {
 	// rising edge on PC2 clears the host semaphore flag
 	// PC3 sets the MCU semaphore when low

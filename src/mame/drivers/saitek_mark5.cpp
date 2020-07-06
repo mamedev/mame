@@ -14,7 +14,7 @@ Mark VI/Philidor was released a year later, it was a plug-in module for the Mark
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
 When using the MAME sensorboard interface with MK VI, reset the board by pressing
-CLEAR before RESET, needed on 1st power-on or when starting a new game.
+CLEAR before RESET, needed when starting a new game.
 
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
@@ -99,7 +99,7 @@ private:
 	required_device_array<hlcd0538_device, 3> m_lcd;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<u8> m_nvram;
-	required_ioport_array<7+1> m_inputs;
+	required_ioport_array<7+2> m_inputs;
 	output_finder<3, 8, 34> m_out_x;
 
 	// address maps
@@ -112,7 +112,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(reset_irq_w);
+	void reset_irq_w(u8 data);
 	DECLARE_READ8_MEMBER(reset_irq_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(cb_rom_r);
@@ -122,11 +122,12 @@ private:
 	template<int N> DECLARE_WRITE8_MEMBER(pwm_output_w);
 	template<int N> DECLARE_WRITE64_MEMBER(lcd_output_w);
 
-	u8 m_dac_data;
-	u8 m_lcd_lcd;
-	u8 m_lcd_rowsel;
-	u8 m_cb_mux;
+	u8 m_dac_data = 0;
+	u8 m_lcd_lcd = 0;
+	u8 m_lcd_rowsel = 0;
+	u8 m_cb_mux = 0;
 
+	emu_timer *m_cb_startdelay;
 	emu_timer *m_irqtimer;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
@@ -137,11 +138,8 @@ void mark5_state::machine_start()
 	m_out_x.resolve();
 	m_irqtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mark5_state::interrupt),this));
 
-	// zerofill
-	m_dac_data = 0;
-	m_lcd_lcd = 0;
-	m_lcd_rowsel = 0;
-	m_cb_mux = 0;
+	m_cb_startdelay = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_cb_startdelay->adjust(attotime::from_msec(100));
 
 	// register for savestates
 	save_item(NAME(m_dac_data));
@@ -152,7 +150,7 @@ void mark5_state::machine_start()
 
 void mark5_state::machine_reset()
 {
-	reset_irq_w(machine().dummy_space(), 0, 0);
+	reset_irq_w(0);
 }
 
 
@@ -210,7 +208,7 @@ TIMER_CALLBACK_MEMBER(mark5_state::interrupt)
 	write_lcd(m_lcd_lcd ^ 1);
 }
 
-WRITE8_MEMBER(mark5_state::reset_irq_w)
+void mark5_state::reset_irq_w(u8 data)
 {
 	// MC14020 R
 	m_irqtimer->adjust(attotime::from_hz((19.6608_MHz_XTAL / 10 / 0x1000) * 2));
@@ -220,7 +218,7 @@ WRITE8_MEMBER(mark5_state::reset_irq_w)
 READ8_MEMBER(mark5_state::reset_irq_r)
 {
 	if (!machine().side_effects_disabled())
-		reset_irq_w(space, offset, 0);
+		reset_irq_w(0);
 
 	return 0xff;
 }
@@ -279,7 +277,7 @@ WRITE8_MEMBER(mark5_state::cb_w)
 
 READ8_MEMBER(mark5_state::cb_r)
 {
-	if (~m_inputs[6]->read() & 0x20)
+	if (~m_inputs[6]->read() & 0x20 || m_cb_startdelay->enabled())
 		return 0xff;
 
 	// read chessboard sensors
@@ -364,11 +362,11 @@ static INPUT_PORTS_START( mark5 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Mode")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Start Clock")
 
-	PORT_START("IN.5") // square 'd-pad' (8-way, so define joystick)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_CODE(KEYCODE_UP) PORT_NAME("Cursor Up")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Cursor Down")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Cursor Right")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Cursor Left")
+	PORT_START("IN.5") // d-pad reads here
+	PORT_BIT(0x01, 0x01, IPT_CUSTOM) PORT_CONDITION("IN.8", 0x31, NOTEQUALS, 0x00)
+	PORT_BIT(0x02, 0x02, IPT_CUSTOM) PORT_CONDITION("IN.8", 0xc2, NOTEQUALS, 0x00)
+	PORT_BIT(0x04, 0x04, IPT_CUSTOM) PORT_CONDITION("IN.8", 0xa4, NOTEQUALS, 0x00)
+	PORT_BIT(0x08, 0x08, IPT_CUSTOM) PORT_CONDITION("IN.8", 0x58, NOTEQUALS, 0x00)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -389,6 +387,16 @@ static INPUT_PORTS_START( mark5 )
 	PORT_CONFNAME( 0x02, 0x02, "LCD Light" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("IN.8") // square 'd-pad' (8-way, so define joystick)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_CODE(KEYCODE_UP) PORT_NAME("Cursor Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Cursor Down")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Cursor Right")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Cursor Left")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) // ul
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) // ur
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) // dl
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) // dr
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mark6 )

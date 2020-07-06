@@ -471,7 +471,7 @@ void mb87030_device::scsi_ctrl_changed()
 		step(false);
 }
 
-WRITE_LINE_MEMBER(mb87030_device::reset_w)
+void mb87030_device::reset_w(int state)
 {
 	LOG("%s: %s\n", __FUNCTION__, state);
 	if (state)
@@ -502,38 +502,38 @@ void mb87030_device::update_ints()
 	m_irq_handler(m_ints && (m_sctl & 1));// || (m_ints & INTS_DISCONNECTED));
 }
 
-READ8_MEMBER(mb87030_device::bdid_r)
+uint8_t mb87030_device::bdid_r()
 {
 	LOG("%s %02X\n", __FUNCTION__, (1 << m_bdid));
 	return 1 << m_bdid;
 }
 
-WRITE8_MEMBER(mb87030_device::bdid_w)
+void mb87030_device::bdid_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_bdid = data & 0x7;
 }
 
-READ8_MEMBER(mb87030_device::sctl_r)
+uint8_t mb87030_device::sctl_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_sctl);
 	return m_sctl;
 }
 
-WRITE8_MEMBER(mb87030_device::sctl_w)
+void mb87030_device::sctl_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_sctl = data;
 	update_ints();
 }
 
-READ8_MEMBER(mb87030_device::scmd_r)
+uint8_t mb87030_device::scmd_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_scmd);
 	return m_scmd;
 }
 
-WRITE8_MEMBER(mb87030_device::scmd_w)
+void mb87030_device::scmd_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_scmd = data;
@@ -609,32 +609,32 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 	}
 }
 
-READ8_MEMBER(mb87030_device::tmod_r)
+uint8_t mb87030_device::tmod_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_tmod);
 	return m_tmod;
 }
 
-WRITE8_MEMBER(mb87030_device::tmod_w)
+void mb87030_device::tmod_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_tmod = data;
 }
 
-READ8_MEMBER(mb87030_device::ints_r)
+uint8_t mb87030_device::ints_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_ints);
 	return m_ints;
 }
 
-WRITE8_MEMBER(mb87030_device::ints_w)
+void mb87030_device::ints_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_ints &= ~(data);
 	update_ints();
 }
 
-READ8_MEMBER(mb87030_device::psns_r)
+uint8_t mb87030_device::psns_r()
 {
 	uint32_t ctrl = scsi_get_ctrl();
 	uint8_t ret  = (!!(ctrl & S_REQ) << 7) |
@@ -649,33 +649,33 @@ READ8_MEMBER(mb87030_device::psns_r)
 	return ret;
 }
 
-WRITE8_MEMBER(mb87030_device::sdgc_w)
+void mb87030_device::sdgc_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_sdgc = data;
 	scsi_ctrl_changed();
 }
 
-READ8_MEMBER(mb87030_device::ssts_r)
+uint8_t mb87030_device::ssts_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_ssts);
 	update_ssts();
 	return m_ssts;
 }
 
-READ8_MEMBER(mb87030_device::serr_r)
+uint8_t mb87030_device::serr_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_serr);
 	return m_serr;
 }
 
-READ8_MEMBER(mb87030_device::pctl_r)
+uint8_t mb87030_device::pctl_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_pctl);
 	return m_pctl;
 }
 
-WRITE8_MEMBER(mb87030_device::pctl_w)
+void mb87030_device::pctl_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_pctl = data;
@@ -684,13 +684,13 @@ WRITE8_MEMBER(mb87030_device::pctl_w)
 		step(false);
 }
 
-READ8_MEMBER(mb87030_device::mbc_r)
+uint8_t mb87030_device::mbc_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_mbc);
 	return m_mbc;
 }
 
-READ8_MEMBER(mb87030_device::dreg_r)
+uint8_t mb87030_device::dreg_r()
 {
 	step(false);
 	if (!m_fifo.empty())
@@ -699,7 +699,7 @@ READ8_MEMBER(mb87030_device::dreg_r)
 	return m_dreg;
 }
 
-WRITE8_MEMBER(mb87030_device::dreg_w)
+void mb87030_device::dreg_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_dreg = data;
@@ -708,35 +708,35 @@ WRITE8_MEMBER(mb87030_device::dreg_w)
 	step(false);
 }
 
-READ8_MEMBER(mb87030_device::temp_r)
+uint8_t mb87030_device::temp_r()
 {
 	step(false);
 	LOG("%s: %02X\n", __FUNCTION__, m_temp);
 	return m_temp;
 }
 
-WRITE8_MEMBER(mb87030_device::temp_w)
+void mb87030_device::temp_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_temp = data;
 	step(false);
 }
 
-READ8_MEMBER(mb87030_device::tch_r)
+uint8_t mb87030_device::tch_r()
 {
 	uint8_t ret = (m_tc >> 16) & 0xff;
 	LOG("%s: %02X\n", __FUNCTION__, ret);
 	return ret;
 }
 
-READ8_MEMBER(mb87030_device::tcm_r)
+uint8_t mb87030_device::tcm_r()
 {
 	uint8_t ret = (m_tc >> 8) & 0xff;
 	LOG("%s: %02X\n", __FUNCTION__, ret);
 	return ret;
 }
 
-READ8_MEMBER(mb87030_device::tcl_r)
+uint8_t mb87030_device::tcl_r()
 {
 	uint8_t ret = m_tc & 0xff;
 	LOG("%s: %02X\n", __FUNCTION__, ret);
@@ -744,7 +744,7 @@ READ8_MEMBER(mb87030_device::tcl_r)
 }
 
 
-WRITE8_MEMBER(mb87030_device::tch_w)
+void mb87030_device::tch_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_tc &= 0x00ffff;
@@ -752,7 +752,7 @@ WRITE8_MEMBER(mb87030_device::tch_w)
 	update_ssts();
 }
 
-WRITE8_MEMBER(mb87030_device::tcm_w)
+void mb87030_device::tcm_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_tc &= 0xff00ff;
@@ -760,7 +760,7 @@ WRITE8_MEMBER(mb87030_device::tcm_w)
 	update_ssts();
 }
 
-WRITE8_MEMBER(mb87030_device::tcl_w)
+void mb87030_device::tcl_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_tc &= 0xffff00;
@@ -768,13 +768,13 @@ WRITE8_MEMBER(mb87030_device::tcl_w)
 	update_ssts();
 }
 
-READ8_MEMBER(mb87030_device::exbf_r)
+uint8_t mb87030_device::exbf_r()
 {
 	LOG("%s: %02X\n", __FUNCTION__, m_exbf);
 	return m_exbf;
 }
 
-WRITE8_MEMBER(mb87030_device::exbf_w)
+void mb87030_device::exbf_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__,  data);
 	m_exbf = data;

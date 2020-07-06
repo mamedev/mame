@@ -75,9 +75,10 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	while (source < finish)
 	{
-		int sy = 240 - source[0];
+		// 224 matches reference (stage 1 boss in kuniokun is aligned with the train door)
+		int sy = 224 - source[0];
 
-		if (sy >= 16)
+		//if (sy >= 0)
 		{
 			int attributes = source[1]; /* SFCCBBBB */
 			int sx = source[3];
@@ -88,11 +89,14 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (sx > 248)
 				sx -= 256;
+			// wrap-around (stage 2 bike tires)
+			if (sy < 0)
+				sy += 256;
 
 			if (flip_screen())
 			{
 				sx = 240 - sx;
-				sy = 240 - sy;
+				sy = 224 - sy;
 				xflip = !xflip;
 			}
 

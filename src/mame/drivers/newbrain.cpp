@@ -172,7 +172,7 @@ READ8_MEMBER( newbrain_state::iorq_r )
 				break;
 
 			case 2: // COP
-				data = m_cop->microbus_rd(space, 0);
+				data = m_cop->microbus_rd();
 				break;
 			}
 			break;
@@ -215,7 +215,7 @@ WRITE8_MEMBER( newbrain_state::iorq_w )
 				break;
 
 			case 2: // COP
-				m_cop->microbus_wr(space, offset, data);
+				m_cop->microbus_wr(data);
 				break;
 
 			case 3: // ENRG1

@@ -257,10 +257,10 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		if (changeData & RESET_IOASIC) {
 			if ((data & RESET_IOASIC) == 0) {
 				m_ioasic->ioasic_reset();
-				m_dcs->reset_w(ASSERT_LINE);
+				m_dcs->reset_w(0);
 			}
 			else {
-				m_dcs->reset_w(CLEAR_LINE);
+				m_dcs->reset_w(1);
 			}
 		}
 		if (changeData & RESET_IDE) {
@@ -648,8 +648,8 @@ void atlantis_state::machine_start()
 *************************************/
 void atlantis_state::machine_reset()
 {
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 	m_user_io_state = 0;
 	m_cmos_write_enabled = false;
 	m_serial_count = 0;

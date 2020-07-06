@@ -40,7 +40,7 @@ public:
 	DECLARE_READ64_MEMBER(priv_regs1_r);
 	DECLARE_WRITE64_MEMBER(priv_regs1_w);
 
-	DECLARE_WRITE64_MEMBER(regs_w);
+	void regs_w(offs_t offset, uint64_t data);
 
 	DECLARE_READ32_MEMBER(gif_r);
 	DECLARE_WRITE32_MEMBER(gif_w);

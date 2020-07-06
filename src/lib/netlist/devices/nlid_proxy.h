@@ -119,7 +119,6 @@ namespace devices
 		analog::NETLIB_NAME(twoterm) m_RP;
 		analog::NETLIB_NAME(twoterm) m_RN;
 		state_var<int> m_last_state;
-		bool m_is_timestep;
 	};
 
 } // namespace devices

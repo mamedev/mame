@@ -47,8 +47,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
-	DECLARE_WRITE8_MEMBER(out_0);
-	DECLARE_WRITE8_MEMBER(out_1);
+	DECLARE_WRITE8_MEMBER(out);
+	DECLARE_WRITE_LINE_MEMBER(lockout);
 	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
 	DECLARE_READ8_MEMBER(namco_52xx_si_r);
 	void init_galaga();

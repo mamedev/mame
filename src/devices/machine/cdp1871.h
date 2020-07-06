@@ -54,7 +54,7 @@ public:
 	auto da_callback() { return m_write_da.bind(); }
 	auto rpt_callback() { return m_write_rpt.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
+	uint8_t read();
 
 	DECLARE_READ_LINE_MEMBER( da_r ) { return m_da; }
 	DECLARE_READ_LINE_MEMBER( rpt_r ) { return m_rpt; }

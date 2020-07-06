@@ -1458,7 +1458,7 @@ void dcs_audio_device::set_io_callbacks(write_line_delegate output_full_cb, writ
 }
 
 
-void dcs_audio_device::set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w)
+void dcs_audio_device::set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w)
 {
 	m_fifo_data_r = fifo_data_r;
 	m_fifo_status_r = fifo_status_r;
@@ -1479,8 +1479,8 @@ int dcs_audio_device::control_r()
 
 void dcs_audio_device::reset_w(int state)
 {
-	/* going high halts the CPU */
-	if (state)
+	/* going low halts the CPU */
+	if (!state)
 	{
 		//      logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
 
@@ -1489,7 +1489,7 @@ void dcs_audio_device::reset_w(int state)
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	/* going low resets and reactivates the CPU */
+	/* going high resets and reactivates the CPU */
 	else
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
@@ -1513,7 +1513,7 @@ READ16_MEMBER( dcs_audio_device::latch_status_r )
 READ16_MEMBER( dcs_audio_device::fifo_input_r )
 {
 	if (!m_fifo_data_r.isnull())
-		return m_fifo_data_r(space,0, 0xffff);
+		return m_fifo_data_r();
 	else
 		return 0xffff;
 }
@@ -1610,7 +1610,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::output_latch_w )
+void dcs_audio_device::output_latch_w(uint16_t data)
 {
 	m_pre_output_data = data;
 	if (LOG_DCS_IO)
@@ -2184,7 +2184,7 @@ void dcs_audio_device::fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(m_fifo_data_r(machine().dummy_space(), 0, 0xffff));
+			preprocess_write(m_fifo_data_r());
 	}
 }
 
@@ -2197,7 +2197,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(m_fifo_data_r(machine().dummy_space(), 0, 0xffff));
+			preprocess_write(m_fifo_data_r());
 	}
 	if (transfer.watchdog != nullptr)
 		transfer.watchdog->adjust(attotime::from_msec(1), transfer.writes_left);
@@ -2212,7 +2212,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this), param);
 		return;
 	}
-	output_latch_w(m_cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
+	output_latch_w(0x000a);
 }
 
 
@@ -2224,7 +2224,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
 		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), param);
 		return;
 	}
-	output_latch_w(m_cpu->space(AS_PROGRAM), 0, param, 0xffff);
+	output_latch_w(param);
 
 	/* chain to the next word we need to write back */
 	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this));
@@ -2364,7 +2364,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), param);
 		return;
 	}
-	output_latch_w(space, 0, param, 0xffff);
+	output_latch_w(param);
 	output_control_w(space, 0, (m_output_control & ~0xff00) | 0x0300, 0xffff);
 }
 

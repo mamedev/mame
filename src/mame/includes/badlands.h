@@ -14,8 +14,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eeprompar.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "machine/atarigen.h"
 #include "machine/timer.h"
 #include "sound/ym2151.h"
 #include "video/atarimo.h"
@@ -37,7 +37,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_soundcomm(*this, "soundcomm")
+		, m_soundlatch(*this, "soundlatch")
+		, m_mainlatch(*this, "mainlatch")
+		, m_ymsnd(*this, "ymsnd")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_playfield_tilemap(*this, "playfield")
@@ -46,18 +48,25 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<atari_sound_comm_device> m_soundcomm;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_mainlatch;
+	optional_device<ym2151_device> m_ymsnd;
 
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tilemap_device> m_playfield_tilemap;
 	optional_device<atari_motion_objects_device> m_mob;
 
-	DECLARE_READ16_MEMBER(sound_busy_r);
-	DECLARE_READ16_MEMBER(pedal_0_r);
-	DECLARE_READ16_MEMBER(pedal_1_r);
-	DECLARE_READ8_MEMBER(audio_io_r);
-	DECLARE_WRITE8_MEMBER(audio_io_w);
+	uint16_t sound_busy_r();
+	void sound_reset_w(uint16_t data);
+	uint16_t pedal_0_r();
+	uint16_t pedal_1_r();
+
+	uint8_t audio_io_r();
+	void audio_io_w(uint8_t data);
+	uint8_t audio_irqack_r();
+	void audio_irqack_w(uint8_t data);
+
 	void init_badlands();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(badlands);

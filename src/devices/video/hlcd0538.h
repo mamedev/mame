@@ -58,11 +58,14 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override { lcd_w(!m_lcd); }
 
-	int m_lcd;      // input pin state
-	int m_clk;      // "
-	int m_data;     // "
-	u64 m_shift;
+	emu_timer *m_lcd_timer;
+
+	int m_lcd = 0;
+	int m_clk = 0;
+	int m_data = 0;
+	u64 m_shift = 0;
 
 	// callbacks
 	devcb_write64 m_write_cols;

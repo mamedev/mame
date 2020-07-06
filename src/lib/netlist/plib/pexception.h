@@ -106,7 +106,7 @@ namespace plib {
 	public:
 		explicit fpsignalenabler(unsigned fpexceptions);
 
-		COPYASSIGNMOVE(fpsignalenabler, delete)
+		PCOPYASSIGNMOVE(fpsignalenabler, delete)
 
 		~fpsignalenabler();
 

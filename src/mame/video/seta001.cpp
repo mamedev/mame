@@ -110,12 +110,12 @@ void seta001_device::device_reset()
 {
 }
 
-READ16_MEMBER( seta001_device::spritectrl_r16 )
+uint16_t seta001_device::spritectrl_r16(offs_t offset)
 {
 	return m_spritectrl[offset];
 }
 
-WRITE16_MEMBER( seta001_device::spritectrl_w16 )
+void seta001_device::spritectrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -123,22 +123,22 @@ WRITE16_MEMBER( seta001_device::spritectrl_w16 )
 	}
 }
 
-READ8_MEMBER( seta001_device::spritectrl_r8 )
+uint8_t seta001_device::spritectrl_r8(offs_t offset)
 {
 	return m_spritectrl[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spritectrl_w8 )
+void seta001_device::spritectrl_w8(offs_t offset, uint8_t data)
 {
 	m_spritectrl[offset] = data;
 }
 
-READ16_MEMBER( seta001_device::spriteylow_r16 )
+uint16_t seta001_device::spriteylow_r16(offs_t offset)
 {
 	return m_spriteylow[offset];
 }
 
-WRITE16_MEMBER( seta001_device::spriteylow_w16 )
+void seta001_device::spriteylow_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -146,51 +146,51 @@ WRITE16_MEMBER( seta001_device::spriteylow_w16 )
 	}
 }
 
-READ8_MEMBER( seta001_device::spriteylow_r8 )
+uint8_t seta001_device::spriteylow_r8(offs_t offset)
 {
 	return m_spriteylow[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spriteylow_w8 )
+void seta001_device::spriteylow_w8(offs_t offset, uint8_t data)
 {
 	m_spriteylow[offset] = data;
 }
 
 
-READ8_MEMBER( seta001_device::spritecodelow_r8 )
+uint8_t seta001_device::spritecodelow_r8(offs_t offset)
 {
 	return m_spritecodelow[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spritecodelow_w8 )
+void seta001_device::spritecodelow_w8(offs_t offset, uint8_t data)
 {
 	m_spritecodelow[offset] = data;
 }
 
-READ8_MEMBER( seta001_device::spritecodehigh_r8 )
+uint8_t seta001_device::spritecodehigh_r8(offs_t offset)
 {
 	return m_spritecodehigh[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spritecodehigh_w8 )
+void seta001_device::spritecodehigh_w8(offs_t offset, uint8_t data)
 {
 	m_spritecodehigh[offset] = data;
 }
 
-READ16_MEMBER( seta001_device::spritecode_r16 )
+uint16_t seta001_device::spritecode_r16(offs_t offset)
 {
 	uint16_t ret = m_spritecodelow[offset];
 	ret |= m_spritecodehigh[offset] << 8;
 	return ret;
 }
 
-WRITE16_MEMBER( seta001_device::spritecode_w16 )
+void seta001_device::spritecode_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_spritecodelow[offset] = data & 0x00ff;
 	if (ACCESSING_BITS_8_15)  m_spritecodehigh[offset] = (data & 0xff00)>>8;
 }
 
-WRITE8_MEMBER( seta001_device::spritebgflag_w8 )
+void seta001_device::spritebgflag_w8(uint8_t data)
 {
 	m_bgflag = data;
 }

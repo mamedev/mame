@@ -90,9 +90,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 
 	// IO
-	virtual DECLARE_READ8_MEMBER( ff00_read );
-	virtual DECLARE_WRITE8_MEMBER( ff00_write );
-	virtual DECLARE_READ8_MEMBER( ff20_read );
 	virtual DECLARE_WRITE8_MEMBER( ff20_write );
 	virtual DECLARE_READ8_MEMBER( ff40_read );
 	virtual DECLARE_WRITE8_MEMBER( ff40_write );
@@ -134,7 +131,7 @@ public:
 	void coco_floating(machine_config &config);
 
 	void coco_floating_map(address_map &map);
-	void coco_mem(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

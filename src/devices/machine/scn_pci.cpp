@@ -40,6 +40,10 @@
     registers are often mapped to separate addresses when placed on an
     Intel-type bus, like the MC6850 ACIA but with reads below writes.
 
+    The clock outputs have not been tested. The documentation for these is
+    not very descriptive, and the resynchronization of the RxC output in
+    1X mode is more or less a conjecture.
+
 ***************************************************************************/
 
 #include "emu.h"

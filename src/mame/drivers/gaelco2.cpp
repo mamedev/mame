@@ -8,22 +8,23 @@
 
     Known games that run on this hardware:
     ======================================
-    Game               | Year | Chip      | Ref      |Protected
-    -------------------+------+-----------+----------+--------------------------------------------------
-    Alligator Hunt     | 1994 | GAE1 449  | 940411   | DS5002FP (unprotected version available)
-    World Rally 2      | 1995 | GAE1 449  | 950510   | DS5002FP
-    World Rally 2      | 1995 | GAE1 506  | 950510-1 | DS5002FP
-    Touch & Go         | 1995 | GAE1 501  | 950906   | DS5002FP (unprotected version available)
-    Touch & Go         | 1995 | GAE1 501  | 950510-1 | DS5002FP
-    Maniac Square      | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
-    Maniac Square      | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
-    Snow Board         | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
-    Cardioline Cycle   | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
-    Cardioline Stepper | 1997 | CG-1V 288 | 970410   | IO board MCU (not really protection)
-    Bang!              | 1998 | CG-1V 388 | 980921/1 | No
-    Super Roller       | 1998 | CG-1V-218 |          | DS5002FP (by Nova Desitec)
-    Play 2000          | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
-    -------------------+------+-----------+----------+--------------------------------------------------
+    Game                   | Year | Chip        | Ref      |Protected
+    -----------------------+------+-------------+----------+--------------------------------------------------
+    Alligator Hunt         | 1994 | GAE1 449    | 940411   | DS5002FP (unprotected version available)
+    Alligator Hunt (proto) | 1994 | GAE1 CS438  |          | DS5002FP
+    World Rally 2          | 1995 | GAE1 449    | 950510   | DS5002FP
+    World Rally 2          | 1995 | GAE1 506    | 950510-1 | DS5002FP
+    Touch & Go             | 1995 | GAE1 501    | 950906   | DS5002FP (unprotected version available)
+    Touch & Go             | 1995 | GAE1 501    | 950510-1 | DS5002FP
+    Maniac Square          | 1996 | GAE1 501    | 940411   | DS5002FP (unprotected version available)
+    Maniac Square          | 1996 | CG-1V 427   | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
+    Snow Board             | 1996 | CG-1V 366   | 960419/1 | Lattice IspLSI 1016-80LJ
+    Cardioline Cycle       | 1997 | GAE1 501    | 970410   | IO board ST62T15C6 MCU (not really protection)
+    Cardioline Stepper     | 1997 | CG-1V 288   | 970410   | IO board ST62T15B6 MCU (not really protection)
+    Bang!                  | 1998 | CG-1V 388   | 980921/1 | No
+    Super Roller           | 1998 | CG-1V-218   |          | DS5002FP (by Nova Desitec)
+    Play 2000              | 1999 | CG-1V-149   | 990315   | DS5002FP (by Nova Desitec)
+    -----------------------+------+-------------+----------+--------------------------------------------------
 
     Notes:
     touchgo:
@@ -1462,6 +1463,59 @@ ROM_START( aligator )
 	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
 ROM_END
 
+/* PCB without Gaelco logos. Gfx and sound on a subboard with 32 EPROMs connected to the main PCB mask ROMs sockets.
+   Checksum = B975CB0B */
+ROM_START( aligatorp )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "all_27-10_notext.u45",  0x000000, 0x080000, CRC(da2798df) SHA1(528ef26aca57b8cfaa6f82bbf74e6368741d01ea) )
+	ROM_LOAD16_BYTE(    "all_27-10_notext.u44",  0x000001, 0x080000, CRC(b2b6cdeb) SHA1(0ce8982711c16e85da4f7b6756c541d3445a8745) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "aligator_ds5002fp_sram_all_27-10_notext.bin", 0x00000, 0x8000, NO_DUMP ) // doesn't work with release version
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
+	// data 100% matches final version, just different arrangement
+	ROM_LOAD( "a0.bin",        0x0000000, 0x0080000, CRC(f6780a0e) SHA1(3dc850744c2129b5b0fe8ab9eb2afda224cff83a) )
+	ROM_LOAD( "a1.bin",        0x0080000, 0x0080000, CRC(a59c32a9) SHA1(c50b9252b1be10ee1e48eff4f72d381e543a62c5) )
+	ROM_LOAD( "a2.bin",        0x0100000, 0x0080000, CRC(1470030c) SHA1(927f6d45a6b9c9345de543e2416a9c7e6e401159) )
+	ROM_LOAD( "a3.bin",        0x0180000, 0x0080000, CRC(b684705a) SHA1(772a7b763fb8e9cf525af4b7f4f0a16493e9d7f9) )
+	ROM_LOAD( "a4.bin",        0x0200000, 0x0080000, CRC(73a317fa) SHA1(97804b1e1a9ea65bce2e4da18ec90ded84e31bba) )
+	ROM_LOAD( "a5.bin",        0x0280000, 0x0080000, CRC(3fb37680) SHA1(ea5d877e7626828347f1516142a6e47710e723c0) )
+	ROM_LOAD( "a6.bin",        0x0300000, 0x0080000, CRC(8034a5f4) SHA1(d51f47794e9c33d883a77ba603ff89899bb815dd) )
+	ROM_LOAD( "a7.bin",        0x0380000, 0x0080000, CRC(e49d3d6d) SHA1(1b8471f8a92f7667822af01dbd017a172f66f4fb) )
+	ROM_LOAD( "b0.bin",        0x0400000, 0x0080000, CRC(ccd038c1) SHA1(d9b0a7353627fb2d328d62829300fdde6b51e998) )
+	ROM_LOAD( "b1.bin",        0x0480000, 0x0080000, CRC(163b3973) SHA1(18c6c639cbc323d9ca776d78f3c9ed4bc7cf778a) )
+	ROM_LOAD( "b2.bin",        0x0500000, 0x0080000, CRC(da2125fb) SHA1(58822e9d7188d7aa436cefaf7fc1585c8efd8c1d) )
+	ROM_LOAD( "b3.bin",        0x0580000, 0x0080000, CRC(8b926c7e) SHA1(32e7bf25d2afabb8cff7da9288b8d1ba93d29ef3) )
+	ROM_LOAD( "b4.bin",        0x0600000, 0x0080000, CRC(82b807ce) SHA1(60d5b4df5e733b2be9dc5374e2232204ed9d75d1) )
+	ROM_LOAD( "b5.bin",        0x0680000, 0x0080000, CRC(58dc1b44) SHA1(cffa7a77c9d944ea1f4f63042a9daceb627518a9) )
+	ROM_LOAD( "b6.bin",        0x0700000, 0x0080000, CRC(778e79de) SHA1(158f751975b4bacd3553d592da53cfa504dc6749) )
+	ROM_LOAD( "b7.bin",        0x0780000, 0x0080000, CRC(9734fd7e) SHA1(154398b51c97a621d37a41a5133c1d80f5229cc1) )
+	ROM_LOAD( "c0.bin",        0x0800000, 0x0080000, CRC(a86d0718) SHA1(39d0ddf5cde5eea6367fa7b1fd895f23a112651e) )
+	ROM_LOAD( "c1.bin",        0x0880000, 0x0080000, CRC(ccba9472) SHA1(c7fc8a5340ba560ab51d72a12eccfae78c451cbd) )
+	ROM_LOAD( "c2.bin",        0x0900000, 0x0080000, CRC(3ccd59b9) SHA1(b1e72db51f5fe953a4edcace001aa1d5fe83e113) )
+	ROM_LOAD( "c3.bin",        0x0980000, 0x0080000, CRC(16ed8ffb) SHA1(18733d6fde5641e317cd9727d556cac929e17170) )
+	ROM_LOAD( "c4.bin",        0x0a00000, 0x0080000, CRC(b0106f8d) SHA1(c9a806dc9214ac28f2f88307263d364740b08a66) )
+	ROM_LOAD( "c5.bin",        0x0a80000, 0x0080000, CRC(305b798f) SHA1(aac9afe801fdcf0fce1858dadbb5d909ea8ac43b) )
+	ROM_LOAD( "c6.bin",        0x0b00000, 0x0080000, CRC(7dd38c7a) SHA1(9564041dbda306f40fee17283a634b6e05c49830) )
+	ROM_LOAD( "c7.bin",        0x0b80000, 0x0080000, CRC(5413c9f0) SHA1(633276e82be4e49043869166a67e0db10d205f86) )
+	ROM_LOAD( "d0.bin",        0x0c00000, 0x0080000, CRC(5c362787) SHA1(700811da92b1100db7edc33dfb138cc58111f08a) )
+	ROM_LOAD( "d1.bin",        0x0c80000, 0x0080000, CRC(131dc831) SHA1(31284be8cc9defe740840b85848fedb8d177eb5f) )
+	ROM_LOAD( "d2.bin",        0x0d00000, 0x0080000, CRC(d820af09) SHA1(97244cee2f36493173357e29dad660fd7f2b4e2e) )
+	ROM_LOAD( "d3.bin",        0x0d80000, 0x0080000, CRC(39d7ea9e) SHA1(3f1203e5da16360e717404dbbf48a231eaab38f6) )
+	ROM_LOAD( "d4.bin",        0x0e00000, 0x0080000, CRC(ccfdc8b4) SHA1(b9bb82e9c150e3fdd839561251bfc1742e6fdbae) )
+	ROM_LOAD( "d5.bin",        0x0e80000, 0x0080000, CRC(f4151d83) SHA1(08dafbc2b9e8e89a1bb76778afdae711bf07b431) )
+	ROM_LOAD( "d6.bin",        0x0f00000, 0x0080000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) ) // blank ROM (but correct)
+	ROM_LOAD( "d7.bin",        0x0f80000, 0x0080000, CRC(67ae054e) SHA1(96210a4ee472abf58b4af9f35db849268e0a5c87) )
+	ROM_FILL(                  0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
+ROM_END
+
 ROM_START( aligators )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE(    "u45",  0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
@@ -2635,6 +2689,7 @@ GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state, i
 GAME( 1994, aligators,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
 GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
 GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
+GAME( 1994, aligatorp,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, empty_init,     ROT0, "Gaelco", "Alligator Hunt (protected, prototype?)", MACHINE_NOT_WORKING ) // requires different protection program / data
 
 GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )

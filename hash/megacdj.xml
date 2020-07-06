@@ -686,7 +686,7 @@ license:CC0
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 激闘! 東京マージャンランド編"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gambler jiko chuushinha 2 - gekitou! tokyo mahjongland hen (japan)" sha1="12cb45fafb9f63b41551150dc313eba51fa639c9"/>
+				<disk name="gambler jiko chuushinha 2 - gekitou tokyo mahjongland hen (japan)" sha1="12cb45fafb9f63b41551150dc313eba51fa639c9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2684,7 +2684,7 @@ license:CC0
 		<info name="alt_title" value="Aランクサンダー 誕生編"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a-rank thunder tanjouhen (1993)(riot)(ntsc)(jp)[!]" sha1="e143c4044521b8ade18161f8f2767145967e4041"/>
+				<disk name="a-rank thunder tanjouhen (1993)(riot)(ntsc)(jp)" sha1="e143c4044521b8ade18161f8f2767145967e4041"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2740,7 +2740,7 @@ license:CC0
 		<info name="alt_title" value="アフターハルマゲドン外伝 魔獣闘将伝エクリプス"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="after armageddon gaiden - majuu toushouden eclipse (1994)(sega)(ntsc)(jp)[!]" sha1="1e86a6fbb394519c6248eaeff2421af8b50b61e2"/>
+				<disk name="after armageddon gaiden - majuu toushouden eclipse (1994)(sega)(ntsc)(jp)" sha1="1e86a6fbb394519c6248eaeff2421af8b50b61e2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2774,7 +2774,7 @@ license:CC0
 		<info name="alt_title" value="アイルロード"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="aisle lord (1992)(wolf team)(ntsc)(jp)[!]" sha1="f887450ea288247c4e38ff5b5dbded05f446a857"/>
+				<disk name="aisle lord (1992)(wolf team)(ntsc)(jp)" sha1="f887450ea288247c4e38ff5b5dbded05f446a857"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2827,7 +2827,7 @@ license:CC0
 		<info name="alt_title" value="アルシャーク"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alshark (1993)(polydor k.k.)(ntsc)(jp)[!]" sha1="5bc6cb84f7d664f2d3b10894bbce88bfb71a2e7c"/>
+				<disk name="alshark (1993)(polydor k.k.)(ntsc)(jp)" sha1="5bc6cb84f7d664f2d3b10894bbce88bfb71a2e7c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2875,7 +2875,7 @@ license:CC0
 		<info name="alt_title" value="アネット再び"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="anett futatabi (1993)(wolf team)(ntsc)(jp)(en)[!]" sha1="3b86f9d737a36266a72b46f148dbdb369356ff9b"/>
+				<disk name="anett futatabi (1993)(wolf team)(ntsc)(jp)(en)" sha1="3b86f9d737a36266a72b46f148dbdb369356ff9b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2982,7 +2982,7 @@ license:CC0
 		<info name="alt_title" value="蒼き狼と白き牝鹿・元朝秘史"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="aoki ookami to shiroki mejika - genchou hishi (1993)(koei)(ntsc)(jp)[!]" sha1="465f91122ad1f5d42bb7833a060af74b8dd12f09"/>
+				<disk name="aoki ookami to shiroki mejika - genchou hishi (1993)(koei)(ntsc)(jp)" sha1="465f91122ad1f5d42bb7833a060af74b8dd12f09"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3020,7 +3020,7 @@ license:CC0
 		<info name="alt_title" value="アークス I・II・III"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arcus i-ii-iii (1993)(wolf team)(ntsc)(jp)[!]" sha1="a0190fafe2618845356336998bdb849ea63624f2"/>
+				<disk name="arcus i-ii-iii (1993)(wolf team)(ntsc)(jp)" sha1="a0190fafe2618845356336998bdb849ea63624f2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3096,7 +3096,7 @@ license:CC0
 		<info name="alt_title" value="アルスラーン戦記"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arislan senki - the heroic legend of arslan (1993)(sega)(ntsc)(jp)[!]" sha1="e424b94599fd05d786c0b66e9c33809bb7df31d2"/>
+				<disk name="arislan senki - the heroic legend of arslan (1993)(sega)(ntsc)(jp)" sha1="e424b94599fd05d786c0b66e9c33809bb7df31d2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3150,7 +3150,7 @@ license:CC0
 		<info name="alt_title" value="爆伝 アンバランスゾーン"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="baku-den - the unbalanced zone (1994)(sony)(ntsc)(jp)[!]" sha1="abf00751f618aa8373757194fa2b8d9f8452f1dd"/>
+				<disk name="baku-den - the unbalanced zone (1994)(sony)(ntsc)(jp)" sha1="abf00751f618aa8373757194fa2b8d9f8452f1dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3212,7 +3212,7 @@ license:CC0
 		<info name="alt_title" value="バトルファンタジー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle fantasy (1994)(micronet)(ntsc)(jp)[!]" sha1="763d75175e1a1fac6368c42b95c6260fbf14e865"/>
+				<disk name="battle fantasy (1994)(micronet)(ntsc)(jp)" sha1="763d75175e1a1fac6368c42b95c6260fbf14e865"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3279,7 +3279,7 @@ license:CC0
 		<info name="alt_title" value="バトルコープス"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battlecorps - 3d mechanical battle simulator (1994)(victor)(ntsc)(jp)[!]" sha1="f901e3fcfa56c4c22b7384bfe471954c7eb6e661"/>
+				<disk name="battlecorps - 3d mechanical battle simulator (1994)(victor)(ntsc)(jp)" sha1="f901e3fcfa56c4c22b7384bfe471954c7eb6e661"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3319,7 +3319,7 @@ license:CC0
 		<info name="alt_title" value="ブラックホールアサルト"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="black hole assault (1992)(micronet)(ntsc)(jp)[!]" sha1="230a773feb5520186f8dbe1985b9a1e3e679fdb6"/>
+				<disk name="black hole assault (1992)(micronet)(ntsc)(jp)" sha1="230a773feb5520186f8dbe1985b9a1e3e679fdb6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3339,7 +3339,7 @@ license:CC0
 		<info name="alt_title" value="キャプテン翼"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="captain tsubasa (1994)(tecmo)(ntsc)(jp)[!]" sha1="60bf853778b6beedf2b715978b35b1aeed6181c0"/>
+				<disk name="captain tsubasa (1994)(tecmo)(ntsc)(jp)" sha1="60bf853778b6beedf2b715978b35b1aeed6181c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3362,7 +3362,7 @@ license:CC0
 		<info name="alt_title" value="大封神伝"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="daihoushinden (1995)(victor)(ntsc)(jp)[!]" sha1="a46faeab35697cf9e1aaed18e84b678d8cb3374c"/>
+				<disk name="daihoushinden (1995)(victor)(ntsc)(jp)" sha1="a46faeab35697cf9e1aaed18e84b678d8cb3374c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3391,7 +3391,7 @@ license:CC0
 		<info name="alt_title" value="ダークウィザード 蘇りし闇の魔導士"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dark wizard - yomigaeri shiyami no madoushi (1993)(sega)(ntsc)(jp)[!]" sha1="e0260d65c223d9edc22992c09833143b8d67a9a0"/>
+				<disk name="dark wizard - yomigaeri shiyami no madoushi (1993)(sega)(ntsc)(jp)" sha1="e0260d65c223d9edc22992c09833143b8d67a9a0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3422,7 +3422,7 @@ license:CC0
 		<info name="alt_title" value="デスブリンガー 秘められた紋章"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="death bringer - himerata monshou - the knight of darkness (1992)(riot)(ntsc)(jp)[!]" sha1="a308691aa84df7033b5836ed569391c454198145"/>
+				<disk name="death bringer - himerata monshou - the knight of darkness (1992)(riot)(ntsc)(jp)" sha1="a308691aa84df7033b5836ed569391c454198145"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3450,7 +3450,7 @@ license:CC0
 		<info name="alt_title" value="幻影都市 -ILLUSION CITY-"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="denei toshi - illusion city (1993)(micro cabin)(ntsc)(jp)[!][t-51014p-00066-r2m]" sha1="8035db298e1d4b5713443a07b1285377c5b59cab"/>
+				<disk name="denei toshi - illusion city (1993)(micro cabin)(ntsc)(jp)[t-51014p-00066-r2m]" sha1="8035db298e1d4b5713443a07b1285377c5b59cab"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3469,7 +3469,7 @@ license:CC0
 		<info name="alt_title" value="ダブルスイッチ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="double switch (1995)(sega)(ntsc)(jp)[!]" sha1="b09e3b24662b3d9a683fb9996cc83a2ea3a455a2"/>
+				<disk name="double switch (1995)(sega)(ntsc)(jp)" sha1="b09e3b24662b3d9a683fb9996cc83a2ea3a455a2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3493,7 +3493,7 @@ license:CC0
 		<info name="alt_title" value="ダンジョンマスターII スカルキープ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dungeon master ii - skullkeep v1.0 (1994)(victor)(ntsc)(jp)[!]" sha1="baa47cdb0ae5a1c3499e64a7131f12235a2ec6d8"/>
+				<disk name="dungeon master ii - skullkeep v1.0 (1994)(victor)(ntsc)(jp)" sha1="baa47cdb0ae5a1c3499e64a7131f12235a2ec6d8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3527,7 +3527,7 @@ license:CC0
 		<info name="alt_title" value="エコー・ザ・ドルフィンCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 1 of 2)[!][ecco the dolphin]" sha1="efc86eeefd7c25dbd9f9301850db79212e53252e"/>
+				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 1 of 2)[ecco the dolphin]" sha1="efc86eeefd7c25dbd9f9301850db79212e53252e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3561,7 +3561,7 @@ license:CC0
 		<info name="alt_title" value="エコー・ザ・ドルフィンCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 2 of 2)[!][ecco the dolphin ii]" sha1="06100e6a07e30a7d075b99ffb4455f4ee069fc83"/>
+				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 2 of 2)[ecco the dolphin ii]" sha1="06100e6a07e30a7d075b99ffb4455f4ee069fc83"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3634,7 +3634,7 @@ license:CC0
 		<info name="alt_title" value="アイ・オブ・ザ・ビホルダー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eye of the beholder (1994)(pony canyon)(ntsc)(jp)[!]" sha1="2d8919d9972d953cebe3016221b869566e6ef910"/>
+				<disk name="eye of the beholder (1994)(pony canyon)(ntsc)(jp)" sha1="2d8919d9972d953cebe3016221b869566e6ef910"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3653,7 +3653,7 @@ license:CC0
 		<info name="alt_title" value="ファーレンハイト"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fahrenheit (1995)(sega)(ntsc)(jp)[!]" sha1="daf0c50a88b4f0a270215eb8ac8605aa2879fc8b"/>
+				<disk name="fahrenheit (1995)(sega)(ntsc)(jp)" sha1="daf0c50a88b4f0a270215eb8ac8605aa2879fc8b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3716,7 +3716,7 @@ license:CC0
 		<info name="alt_title" value="ザ・サード ワールド ウォー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="iiird world war, the (1993)(micronet)(ntsc)(jp)[!]" sha1="b1d25f9d8bdddfe06f9b2aab5b7050726c0e4f37"/>
+				<disk name="iiird world war, the (1993)(micronet)(ntsc)(jp)" sha1="b1d25f9d8bdddfe06f9b2aab5b7050726c0e4f37"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3735,7 +3735,7 @@ license:CC0
 		<info name="alt_title" value="いしいひさいちの大政界"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ishii hisaichi no daisekai (1994)(sega)(ntsc)(jp)[!]" sha1="fa3f5f6529510fca2888960eb1d3fbfb160aa82c"/>
+				<disk name="ishii hisaichi no daisekai (1994)(sega)(ntsc)(jp)" sha1="fa3f5f6529510fca2888960eb1d3fbfb160aa82c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3784,7 +3784,7 @@ license:CC0
 		<info name="alt_title" value="ジュラシックパーク"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jurassic park (1992)(sega)(ntsc)(jp)[!]" sha1="087cd2ddb228c8f731d3e62cd4929b766f3169a8"/>
+				<disk name="jurassic park (1992)(sega)(ntsc)(jp)" sha1="087cd2ddb228c8f731d3e62cd4929b766f3169a8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3824,7 +3824,7 @@ license:CC0
 		<info name="alt_title" value="リーサルエンフォーサーズ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lethal enforcers (1993)(konami)(ntsc)(jp)(en)[!]" sha1="c10e5002a4d4086b1c49c57a9a15e7cf3d6fda50"/>
+				<disk name="lethal enforcers (1993)(konami)(ntsc)(jp)(en)" sha1="c10e5002a4d4086b1c49c57a9a15e7cf3d6fda50"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3864,7 +3864,7 @@ license:CC0
 		<info name="alt_title" value="リーサルエンフォーサーズII ザ・ウエスタン"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lethal enforcers ii - the western (1994)(konami)(ntsc)(jp)(en)[!]" sha1="63127c8eac149ac3e032f21d98dbe343fff44942"/>
+				<disk name="lethal enforcers ii - the western (1994)(konami)(ntsc)(jp)(en)" sha1="63127c8eac149ac3e032f21d98dbe343fff44942"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3887,7 +3887,7 @@ license:CC0
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[!][t-45074p-00271-r1m]" sha1="1aae24f5646879641f47273db530093648093699"/>
+				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[t-45074p-00271-r1m]" sha1="1aae24f5646879641f47273db530093648093699"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3909,7 +3909,7 @@ license:CC0
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[!][t-45074p-00271a-r1m]" sha1="dfe1a6c27af88d8202f5b77aaa81c6661ce8e05f"/>
+				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[t-45074p-00271a-r1m]" sha1="dfe1a6c27af88d8202f5b77aaa81c6661ce8e05f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3980,7 +3980,7 @@ license:CC0
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[!][t-45014p-00017-r1m]" sha1="5edd3e7a2f928f830abc682375309e78c6b74b1e"/>
+				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[t-45014p-00017-r1m]" sha1="5edd3e7a2f928f830abc682375309e78c6b74b1e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4050,7 +4050,7 @@ license:CC0
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[!][t-45014p-00017-r2m]" sha1="ee5947838910555eedbe419705ecbda732ff641b"/>
+				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[t-45014p-00017-r2m]" sha1="ee5947838910555eedbe419705ecbda732ff641b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4103,7 +4103,7 @@ license:CC0
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[!][t-49024p-00016-r2m]" sha1="38f2f195e4c95e27ff7ceb2f8a554ca71f61b004"/>
+				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[t-49024p-00016-r2m]" sha1="38f2f195e4c95e27ff7ceb2f8a554ca71f61b004"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4156,7 +4156,7 @@ license:CC0
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[!][t-49024p-00016-r1m]" sha1="a432d30104f55e6fc051cc40e0ce6d416bd7b3fc"/>
+				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[t-49024p-00016-r1m]" sha1="a432d30104f55e6fc051cc40e0ce6d416bd7b3fc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4190,7 +4190,7 @@ license:CC0
 		<info name="alt_title" value="メガシュヴァルツシルト"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega schwarzschild (1993)(sega)(ntsc)(jp)[!]" sha1="63e2e6732a74856bd7b432f7ffeac62197caee6f"/>
+				<disk name="mega schwarzschild (1993)(sega)(ntsc)(jp)" sha1="63e2e6732a74856bd7b432f7ffeac62197caee6f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4253,7 +4253,7 @@ license:CC0
 		<info name="alt_title" value="マイト アンド マジックIII: Isles of Terra"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="might and magic iii - isles of terra (1993)(cri)(ntsc)(jp)[!]" sha1="d3c5769e5c7ca147806db7d2e3de2b4d8b28d7e6"/>
+				<disk name="might and magic iii - isles of terra (1993)(cri)(ntsc)(jp)" sha1="d3c5769e5c7ca147806db7d2e3de2b4d8b28d7e6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4291,7 +4291,7 @@ license:CC0
 		<info name="alt_title" value="モータルコンバット 完全版"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat (1994)(acclaim)(ntsc)(jp)(en)[!]" sha1="f0f41dab302241fe7d6b78b10b133e1265e9fed0"/>
+				<disk name="mortal kombat (1994)(acclaim)(ntsc)(jp)(en)" sha1="f0f41dab302241fe7d6b78b10b133e1265e9fed0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4317,7 +4317,7 @@ license:CC0
 		<info name="alt_title" value="NBA Jam"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nba jam (1993)(acclaim)(ntsc)(jp)(en)[!]" sha1="a8d30422e8f620c98a4ac672507a6844cfcd4ece"/>
+				<disk name="nba jam (1993)(acclaim)(ntsc)(jp)(en)" sha1="a8d30422e8f620c98a4ac672507a6844cfcd4ece"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4354,7 +4354,7 @@ license:CC0
 		<info name="alt_title" value="ニンジャウォーリアーズ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ninjawarriors, the (1993)(taito)(ntsc)(jp)(en)[!]" sha1="54139589ce904ddba72f9379949f3b6d0bfef2f6"/>
+				<disk name="ninjawarriors, the (1993)(taito)(ntsc)(jp)(en)" sha1="54139589ce904ddba72f9379949f3b6d0bfef2f6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4384,7 +4384,7 @@ license:CC0
 		<info name="alt_title" value="信長の野望・覇王伝"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nobunaga no yabou - haouden (1994)(koei)(ntsc)(jp)[!]" sha1="33be72040603a63d7f4f7cffba7a5e7654c3209a"/>
+				<disk name="nobunaga no yabou - haouden (1994)(koei)(ntsc)(jp)" sha1="33be72040603a63d7f4f7cffba7a5e7654c3209a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4407,13 +4407,13 @@ license:CC0
 		<info name="alt_title" value="プライズファイター"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="prize fighter (1993)(sega)(ntsc)(jp)(disc 1 of 2)[!]" sha1="c8d895e85dc2b1e6a9f0aa606f98d7013bad0db4"/>
+				<disk name="prize fighter (1993)(sega)(ntsc)(jp)(disc 1 of 2)" sha1="c8d895e85dc2b1e6a9f0aa606f98d7013bad0db4"/>
 			</diskarea>
 		</part>
 
 		<part name="cdrom2" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="prize fighter (1993)(sega)(ntsc)(jp)(disc 2 of 2)[!]" sha1="342fd9fad3d5ae6530ea6ce756a2ba6b88858dfc"/>
+				<disk name="prize fighter (1993)(sega)(ntsc)(jp)(disc 2 of 2)" sha1="342fd9fad3d5ae6530ea6ce756a2ba6b88858dfc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4437,7 +4437,7 @@ license:CC0
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="psychic detective series vol.3 - aya (1993)(data west)(ntsc)(jp)[!]" sha1="0db9939af75a9c15079c93e0ed46790d1e67c43a"/>
+				<disk name="psychic detective series vol.3 - aya (1993)(data west)(ntsc)(jp)" sha1="0db9939af75a9c15079c93e0ed46790d1e67c43a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4461,7 +4461,7 @@ license:CC0
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.4 オルゴール"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="psychic detective series vol.4 - orgel (1993)(data west)(ntsc)(jp)[!]" sha1="6b541e9ba6843f2f2005c2c8b3a2a54aca96fc64"/>
+				<disk name="psychic detective series vol.4 - orgel (1993)(data west)(ntsc)(jp)" sha1="6b541e9ba6843f2f2005c2c8b3a2a54aca96fc64"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4521,7 +4521,7 @@ license:CC0
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[!][g-6003p-00014b-r1m]" sha1="48f5a84eca3432e0a7d145f7543f300ed326b01a"/>
+				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[g-6003p-00014b-r1m]" sha1="48f5a84eca3432e0a7d145f7543f300ed326b01a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4580,7 +4580,7 @@ license:CC0
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[!][g-6003p-00014b-r2m]" sha1="6b39a0b8ea9ee7860b228e5cdb0109421b9a89e9"/>
+				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[g-6003p-00014b-r2m]" sha1="6b39a0b8ea9ee7860b228e5cdb0109421b9a89e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4601,7 +4601,7 @@ license:CC0
 		<info name="alt_title" value="ロードブラスターFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="road blaster fx (1992)(wolf team)(ntsc)(jp)(en)[!]" sha1="851df6a824f8c20984574f8fae781b347c3644ba"/>
+				<disk name="road blaster fx (1992)(wolf team)(ntsc)(jp)(en)" sha1="851df6a824f8c20984574f8fae781b347c3644ba"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4645,7 +4645,7 @@ license:CC0
 		<info name="alt_title" value="モンキー・アイランド ユーレイ海賊大騒動!"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="secret of monkey island, the - monkey island yurei - kaizoku oosoudou! (1993)(victor)(ntsc)(jp)[!]" sha1="66a95bf6f661e60fc2b00a2fa679ae1f7559d471"/>
+				<disk name="secret of monkey island, the - monkey island yurei - kaizoku oosoudou (1993)(victor)(ntsc)(jp)" sha1="66a95bf6f661e60fc2b00a2fa679ae1f7559d471"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4676,7 +4676,7 @@ license:CC0
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[!][compilation][r1m]" sha1="95a970944ed0dd6a27d3795cbf695b0b2b0647e4"/>
+				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[compilation][r1m]" sha1="95a970944ed0dd6a27d3795cbf695b0b2b0647e4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4706,7 +4706,7 @@ license:CC0
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[!][compilation][r2m]" sha1="7f7e5172ee1263bd3eaf927cf488ec2d6657cbff"/>
+				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[compilation][r2m]" sha1="7f7e5172ee1263bd3eaf927cf488ec2d6657cbff"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4810,7 +4810,7 @@ license:CC0
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[!][t-32034p-00009-r1k]" sha1="ade3853c78d5b6a0fb12b07377f470875b253609"/>
+				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[t-32034p-00009-r1k]" sha1="ade3853c78d5b6a0fb12b07377f470875b253609"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4913,7 +4913,7 @@ license:CC0
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[!][t-32034p-00009-r2k]" sha1="5d0fe93b926309238040c94f55c010fb3673851a"/>
+				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[t-32034p-00009-r2k]" sha1="5d0fe93b926309238040c94f55c010fb3673851a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4961,7 +4961,7 @@ license:CC0
 		<info name="alt_title" value="戦国伝承"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sengoku denshou (1993)(sammy)(ntsc)(jp)[!]" sha1="a7068e9594b65c665796689bfe16c7ee0ecba041"/>
+				<disk name="sengoku denshou (1993)(sammy)(ntsc)(jp)" sha1="a7068e9594b65c665796689bfe16c7ee0ecba041"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4981,7 +4981,7 @@ license:CC0
 		<info name="alt_title" value="シャドウラン"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shadowrun (1996)(compile)(ntsc)(jp)[!]" sha1="d2a3b3c4950abe9051971aa53cb9c4921b145e14"/>
+				<disk name="shadowrun (1996)(compile)(ntsc)(jp)" sha1="d2a3b3c4950abe9051971aa53cb9c4921b145e14"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5020,7 +5020,7 @@ license:CC0
 		<info name="alt_title" value="シムアース"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simearth (1993)(sega)(ntsc)(jp)[!]" sha1="9869519d4d0b23b4ac60e0745395e3f90df399da"/>
+				<disk name="simearth (1993)(sega)(ntsc)(jp)" sha1="9869519d4d0b23b4ac60e0745395e3f90df399da"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5054,7 +5054,7 @@ license:CC0
 		<info name="alt_title" value="ソウルスター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="soulstar (1994)(victor)(ntsc)(jp)(en)[!]" sha1="32e08fa3f612f2906ab2a44c811d8f928ed68bd1"/>
+				<disk name="soulstar (1994)(victor)(ntsc)(jp)(en)" sha1="32e08fa3f612f2906ab2a44c811d8f928ed68bd1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5075,7 +5075,7 @@ license:CC0
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[!][t32064p-00022-r1m]" sha1="ffbb3832ad9873afa1e5d257e2f93fb3d07ca3e3"/>
+				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[t32064p-00022-r1m]" sha1="ffbb3832ad9873afa1e5d257e2f93fb3d07ca3e3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5095,7 +5095,7 @@ license:CC0
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[!][t32064p-00022-r2m]" sha1="992cb2f5fd2209dd959b351c5d2f7cc548981dc7"/>
+				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[t32064p-00022-r2m]" sha1="992cb2f5fd2209dd959b351c5d2f7cc548981dc7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5114,7 +5114,7 @@ license:CC0
 		<info name="alt_title" value="トムキャットアレイ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomcat alley (1994)(sega)(ntsc)(jp)[!]" sha1="419d407e3b49a646f04a9e294189b88c33cf3ead"/>
+				<disk name="tomcat alley (1994)(sega)(ntsc)(jp)" sha1="419d407e3b49a646f04a9e294189b88c33cf3ead"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5134,7 +5134,7 @@ license:CC0
 		<info name="alt_title" value="笑ゥせぇるすまん"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="warau salesman (1993)(sega)(ntsc)(jp)[!]" sha1="d84726de55de147264af5f5b00cd36a316d0c391"/>
+				<disk name="warau salesman (1993)(sega)(ntsc)(jp)" sha1="d84726de55de147264af5f5b00cd36a316d0c391"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5165,7 +5165,7 @@ license:CC0
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lodoss tou senki - eiyuu sensou - record of lodoss war (demo) (1994)(sega)(ntsc)(jp)[!]" sha1="71ce3e984a13c444999a1abf13efc431a80f5be1"/>
+				<disk name="lodoss tou senki - eiyuu sensou - record of lodoss war (demo) (1994)(sega)(ntsc)(jp)" sha1="71ce3e984a13c444999a1abf13efc431a80f5be1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5185,7 +5185,7 @@ license:CC0
 		<info name="serial" value="T-45074"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - eternal blue - premium cd (1994)(game arts)(jp)[!][lunar - eternal blue, t-45074][cd-audio]" sha1="2b22660e21e1262414424df90ec30eac8df638c6"/>
+				<disk name="lunar - eternal blue - premium cd (1994)(game arts)(jp)[lunar - eternal blue, t-45074][cd-audio]" sha1="2b22660e21e1262414424df90ec30eac8df638c6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5231,7 +5231,7 @@ license:CC0
 		<info name="serial" value="T-32084"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenbu mega cd special (1992)(wolf team)(jp)[!][tenbu mega cd special, t-32084][cd-audio]" sha1="816cfd9864245f68d1eec716d54d882b448f349f"/>
+				<disk name="tenbu mega cd special (1992)(wolf team)(jp)[tenbu mega cd special, t-32084][cd-audio]" sha1="816cfd9864245f68d1eec716d54d882b448f349f"/>
 			</diskarea>
 		</part>
 	</software>

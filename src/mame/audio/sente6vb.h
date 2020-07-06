@@ -40,11 +40,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(counter_state_r);
-	DECLARE_WRITE8_MEMBER(counter_control_w);
-	DECLARE_WRITE8_MEMBER(chip_select_w);
-	DECLARE_WRITE8_MEMBER(dac_data_w);
-	DECLARE_WRITE8_MEMBER(register_addr_w);
+	uint8_t counter_state_r();
+	void counter_control_w(uint8_t data);
+	void chip_select_w(uint8_t data);
+	void dac_data_w(offs_t offset, uint8_t data);
+	void register_addr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(counter_0_set_out);
 

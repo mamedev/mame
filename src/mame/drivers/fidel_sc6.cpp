@@ -47,7 +47,6 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.0")
 	{ }
 
@@ -63,13 +62,10 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -101,26 +97,6 @@ void sc6_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(sc6_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-
-	// 4KB ROM only?
-	if (size != 0x1000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return image_init_result::FAIL;
-	}
-
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
 
 // MCU ports/generic
 
@@ -242,10 +218,7 @@ void sc6_state::sc6(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_sc6", "bin");
-	m_cart->set_device_load(FUNC(sc6_state::cart_load));
-	m_cart->set_must_be_loaded(true);
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_sc6").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
 }
 
@@ -269,4 +242,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT  CMP MACHINE  INPUT  CLASS      INIT        COMPANY                 FULLNAME                      FLAGS
-CONS( 1982, fscc6, 0,       0, sc6,     sc6,   sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc6, 0,       0, sc6,     sc6,   sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"6\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

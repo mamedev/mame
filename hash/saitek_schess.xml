@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="saitek_schess" description="Sensor Chess Modules">
+
+	<software name="csss">
+		<description>Classical Style Super Strong</description>
+		<year>1982</year>
+		<publisher>SciSys</publisher>
+		<part name="cart" interface="schess_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="c45046_y02_mb" size="0x1000" crc="caff380d" sha1="5b227f0d9e457c56642bd217192744f8df60e685" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

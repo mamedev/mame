@@ -23,7 +23,7 @@
       &FC00-&FC0F CPU card VIA
       &FC10-&FC1F GDP card control register
       &FC20-&FC2F GDP card colour register
-      &FC30-&FC3F Real-Time-Clock registers
+      &FC30-&FC3F Real-Time-Clock registers (EM M3002)
       &FC40-&FC4F Disc controller registers
       &FC50-&FC5F Disc controller drive select register
       &FC60-&FC6F IEEE controller card
@@ -48,6 +48,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
+#include "machine/m3002.h"
 #include "bus/acorn/bus.h"
 #include "coreutil.h"
 
@@ -76,10 +77,6 @@ private:
 	DECLARE_WRITE8_MEMBER(map_select_w);
 	DECLARE_WRITE8_MEMBER(page_select_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
-	DECLARE_READ8_MEMBER(cms_rtc_r);
-	DECLARE_WRITE8_MEMBER(cms_rtc_w);
-
-	void cms_rtc_set_time();
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -92,18 +89,6 @@ private:
 
 	uint8_t m_map_select;
 	uint8_t m_page_select[4];
-
-	uint8_t m_rtc_data[0x10];
-	int m_rtc_reg;
-	int m_rtc_state;
-
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	emu_timer* m_rtc_timer;
-
-	enum
-	{
-		TIMER_RTC
-	};
 };
 
 
@@ -114,7 +99,7 @@ void cms_state::cms6502_mem(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1").w(FUNC(cms_state::page_select_w));
 	map(0xc000, 0xffff).rom().region("mos", 0);
 	map(0xfc00, 0xfc0f).m(m_via, FUNC(via6522_device::map));
-	map(0xfc30, 0xfc3f).rw(FUNC(cms_state::cms_rtc_r), FUNC(cms_state::cms_rtc_w));
+	map(0xfc30, 0xfc30).mirror(0xf).rw("rtc", FUNC(m3002_device::read), FUNC(m3002_device::write));
 	map(0xfc70, 0xfc7f).w(FUNC(cms_state::map_select_w));
 }
 
@@ -145,14 +130,6 @@ void cms_state::machine_start()
 {
 	m_bank1->configure_entries(0, 16, m_rom->base(), 0x4000);
 
-	memset(&m_rtc_data, 0, sizeof(m_rtc_data));
-	m_rtc_reg = 0;
-	m_rtc_state = 0;
-	m_rtc_data[0xf] = 1;
-
-	m_rtc_timer = timer_alloc();
-	m_rtc_timer->adjust(attotime::zero, 0, attotime(1, 0));
-
 	/* register for save states */
 	save_item(NAME(m_map_select));
 	save_item(NAME(m_page_select));
@@ -167,113 +144,6 @@ void cms_state::machine_reset()
 		m_page_select[i] = 0x00;
 	}
 	m_bank1->set_entry(0);
-}
-
-/* Real Time Clock and NVRAM  EM M3002
-
-reg 0: seconds
-reg 1: minutes
-reg 2: hours
-reg 3: day 1 based
-reg 4: month 1 based
-reg 5: year
-reg 6: week day
-reg 7: week number
-reg ..
-reg 15: status
-
-*/
-
-void cms_state::cms_rtc_set_time()
-{
-	system_time systime;
-
-	/* get the current date/time from the core */
-	machine().current_datetime(systime);
-
-	m_rtc_data[0] = dec_2_bcd(systime.utc_time.second);
-	m_rtc_data[1] = dec_2_bcd(systime.utc_time.minute);
-	m_rtc_data[2] = dec_2_bcd(systime.utc_time.hour);
-
-	m_rtc_data[3] = dec_2_bcd(systime.utc_time.mday);
-	m_rtc_data[4] = dec_2_bcd(systime.utc_time.month + 1);
-	m_rtc_data[5] = dec_2_bcd(systime.utc_time.year % 100);
-}
-
-void cms_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	int month, year;
-
-	switch (id)
-	{
-	case TIMER_RTC:
-		m_rtc_data[0] = bcd_adjust(m_rtc_data[0] + 1);
-		if (m_rtc_data[0] >= 0x60)
-		{
-			m_rtc_data[0] = 0;
-			m_rtc_data[1] = bcd_adjust(m_rtc_data[1] + 1);
-			if (m_rtc_data[1] >= 0x60)
-			{
-				m_rtc_data[1] = 0;
-				m_rtc_data[2] = bcd_adjust(m_rtc_data[2] + 1);
-				if (m_rtc_data[2] >= 0x24)
-				{
-					m_rtc_data[2] = 0;
-					m_rtc_data[3] = bcd_adjust(m_rtc_data[3] + 1);
-					month = bcd_2_dec(m_rtc_data[4]);
-					year = bcd_2_dec(m_rtc_data[5]) + 2000; // save for julian_days_in_month_calculation
-					if (m_rtc_data[3]> gregorian_days_in_month(month, year))
-					{
-						m_rtc_data[3] = 1;
-						m_rtc_data[4] = bcd_adjust(m_rtc_data[4] + 1);
-						if (m_rtc_data[4]>0x12)
-						{
-							m_rtc_data[4] = 1;
-							m_rtc_data[5] = bcd_adjust(m_rtc_data[5] + 1) & 0xff;
-						}
-					}
-				}
-			}
-		}
-		break;
-	}
-}
-
-READ8_MEMBER(cms_state::cms_rtc_r)
-{
-	int data = 0;
-
-	switch (m_rtc_state)
-	{
-	case 1:
-		data = (m_rtc_data[m_rtc_reg] & 0xf0) >> 4;
-		m_rtc_state++;
-		break;
-	case 2:
-		data = m_rtc_data[m_rtc_reg] & 0xf;
-		m_rtc_state = 0;
-		break;
-	}
-	return data;
-}
-
-WRITE8_MEMBER(cms_state::cms_rtc_w)
-{
-	switch (m_rtc_state)
-	{
-	case 0:
-		m_rtc_reg = data;
-		m_rtc_state = 1;
-		break;
-	case 1:
-		m_rtc_data[m_rtc_reg] = (m_rtc_data[m_rtc_reg] & ~0xf0) | ((data & 0xf) << 4);
-		m_rtc_state++;
-		break;
-	case 2:
-		m_rtc_data[m_rtc_reg] = (m_rtc_data[m_rtc_reg] & ~0xf) | (data & 0xf);
-		m_rtc_state = 0;
-		break;
-	}
 }
 
 
@@ -296,6 +166,8 @@ void cms_state::cms6502(machine_config &config)
 
 	VIA6522(config, m_via, 1_MHz_XTAL);
 	m_via->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
+
+	M3002(config, "rtc", 32.768_kHz_XTAL);
 
 	/* 7 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);

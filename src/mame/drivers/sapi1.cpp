@@ -611,7 +611,7 @@ WRITE8_MEMBER(sapi_state::port13_w)
 
 READ8_MEMBER( sapi_state::port40_r )
 {
-	return ~m_uart->get_received_data();
+	return ~m_uart->receive();
 }
 
 READ8_MEMBER(sapi_state::port41_r)
@@ -624,7 +624,7 @@ READ8_MEMBER(sapi_state::port41_r)
 
 WRITE8_MEMBER( sapi_state::port43_w )
 {
-	m_uart->set_transmit_data(~data);
+	m_uart->transmit(~data);
 }
 
 READ_LINE_MEMBER( sapi_state::si )

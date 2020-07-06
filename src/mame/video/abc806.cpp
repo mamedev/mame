@@ -163,7 +163,7 @@ READ8_MEMBER( abc806_state::sti_r )
 //  sto_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::sto_w )
+void abc806_state::sto_w(uint8_t data)
 {
 	int level = BIT(data, 7);
 
@@ -419,6 +419,28 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void abc806_state::video_start()
 {
+	// allocate memory
+	m_char_ram.allocate(m_char_ram_size);
+	m_attr_ram.allocate(m_char_ram_size);
+
+	uint32_t videoram_size = m_ram->size() - 0x8000;
+	m_video_ram.allocate(videoram_size);
+
+	// register for state saving
+	save_item(NAME(m_txoff));
+	save_item(NAME(m_40));
+	save_item(NAME(m_flshclk_ctr));
+	save_item(NAME(m_flshclk));
+	save_item(NAME(m_attr_data));
+	save_item(NAME(m_hrs));
+	save_item(NAME(m_hrc));
+	save_item(NAME(m_sync));
+	save_item(NAME(m_v50_addr));
+	save_item(NAME(m_hru2_a8));
+	save_item(NAME(m_vsync_shift));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_d_vsync));
+
 	// initialize variables
 	for (auto & elem : m_hrc)
 	{
@@ -429,10 +451,6 @@ void abc806_state::video_start()
 	m_d_vsync = 1;
 	m_vsync = 1;
 	m_40 = 1;
-
-	// allocate memory
-	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);
-	m_attr_ram.allocate(ABC806_ATTR_RAM_SIZE);
 }
 
 

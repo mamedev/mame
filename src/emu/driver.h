@@ -105,9 +105,6 @@ public:
 	// dummy driver_init callback
 	void empty_init();
 
-	// memory helpers
-	address_space &generic_space() const { return machine().dummy_space(); }
-
 	// output heler
 	output_manager &output() const { return machine().output(); }
 

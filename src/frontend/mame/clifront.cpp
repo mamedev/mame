@@ -1304,7 +1304,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 						nrlists++;
 						for (const software_info &swinfo : swlistdev.get_info())
 						{
-							media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
+							media_auditor::summary summary = auditor.audit_software(swlistdev, swinfo, AUDIT_VALIDATE_FAST);
 
 							print_summary(
 									auditor, summary, false,
@@ -1411,7 +1411,7 @@ void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 					// Get the actual software list contents
 					for (const software_info &swinfo : swlistdev.get_info())
 					{
-						media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
+						media_auditor::summary summary = auditor.audit_software(swlistdev, swinfo, AUDIT_VALIDATE_FAST);
 
 						print_summary(
 								auditor, summary, false,

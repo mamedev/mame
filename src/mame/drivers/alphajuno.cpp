@@ -9,8 +9,11 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/mb62h195.h"
 #include "machine/mb63h149.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "machine/upd7001.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -114,7 +117,16 @@ void alphajuno_state::ajuno1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
+	mb62h195_device &io(MB62H195(config, "io"));
+	io.lc_callback().set(m_lcdc, FUNC(hd44780_device::write));
+	io.sout_callback().set("adc", FUNC(upd7001_device::si_w));
+	io.sck_callback().set("adc", FUNC(upd7001_device::sck_w));
+	io.sin_callback().set("adc", FUNC(upd7001_device::so_r));
+	io.adc_callback().set("adc", FUNC(upd7001_device::cs_w));
+
 	//MB87123(config, "dco", 12_MHz_XTAL);
+
+	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 
 	// LCD: LM16155A or LM16155B
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -130,7 +142,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
-	m_lcdc->set_busy_factor(0.005);
+	m_lcdc->set_busy_factor(0.005f);
 }
 
 void alphajuno_state::ajuno2(machine_config &config)
@@ -150,6 +162,9 @@ void alphajuno_state::mks50(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 
+	mb62h195_device &io(MB62H195(config, "io"));
+	io.lc_callback().set(m_lcdc, FUNC(hd44780_device::write));
+
 	//MB87123(config, "dco", 12_MHz_XTAL);
 
 	// LCD Unit: DM011Z-1DL3
@@ -166,7 +181,7 @@ void alphajuno_state::mks50(machine_config &config)
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
-	m_lcdc->set_busy_factor(0.05);
+	m_lcdc->set_busy_factor(0.05f);
 }
 
 // Original EPROM labels specify major and minor revisions with punch grids; "U" (update?) tag is separate.

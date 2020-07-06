@@ -18,8 +18,8 @@ public:
 	msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// msx_switched_interface overrides
-	virtual DECLARE_READ8_MEMBER(switched_read) override;
-	virtual DECLARE_WRITE8_MEMBER(switched_write) override;
+	virtual uint8_t switched_read(offs_t offset) override;
+	virtual void switched_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

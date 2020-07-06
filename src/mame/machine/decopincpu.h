@@ -47,7 +47,7 @@ public:
 	auto lamp_write_callback() { return m_write_lamp.bind(); }
 	auto solenoid_write_callback() { return m_write_solenoid.bind(); }
 
-	DECLARE_WRITE8_MEMBER(solenoid2_w);
+	void solenoid2_w(uint8_t data);
 	INPUT_CHANGED_MEMBER(main_nmi);
 	INPUT_CHANGED_MEMBER(audio_nmi);
 
@@ -92,20 +92,20 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_READ8_MEMBER(display_strobe_r);
-	DECLARE_WRITE8_MEMBER(display_strobe_w);
-	DECLARE_WRITE8_MEMBER(display_out1_w);
-	DECLARE_WRITE8_MEMBER(display_out2_w);
-	DECLARE_WRITE8_MEMBER(display_out3_w);
-	DECLARE_WRITE8_MEMBER(display_out4_w);
-	DECLARE_READ8_MEMBER(display_in3_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_READ8_MEMBER(dmdstatus_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(solenoid1_w);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data);
+	uint8_t display_strobe_r();
+	void display_strobe_w(uint8_t data);
+	void display_out1_w(uint8_t data);
+	void display_out2_w(uint8_t data);
+	void display_out3_w(uint8_t data);
+	void display_out4_w(uint8_t data);
+	uint8_t display_in3_r();
+	void switch_w(uint8_t data);
+	uint8_t switch_r();
+	uint8_t dmdstatus_r();
+	void sound_w(uint8_t data);
+	void solenoid1_w(uint8_t data);
 };
 
 class decocpu_type2_device : public decocpu_type1_device

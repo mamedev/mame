@@ -46,29 +46,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 /***************************************************************************
 
-                        Hardware registers access
-
-***************************************************************************/
-
-
-WRITE8_MEMBER(powerins_state::flipscreen_w)
-{
-	flip_screen_set(data & 1);
-	m_spritegen->set_flip_screen(flip_screen());
-}
-
-WRITE8_MEMBER(powerins_state::tilebank_w)
-{
-	if (data != m_tile_bank)
-	{
-		m_tile_bank = data;     // Tiles Bank (VRAM 0)
-		m_tilemap[0]->mark_all_dirty();
-	}
-}
-
-
-/***************************************************************************
-
                         Callbacks for the TileMap code
 
 ***************************************************************************/
@@ -96,18 +73,13 @@ Offset:
 #define DIM_NY_0            (0x20)
 */
 
-TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
+TILE_GET_INFO_MEMBER(powerins_state::powerins_get_bg_tile_info)
 {
-	uint16_t code = m_vram[0][tile_index];
-	tileinfo.set(0,
-			(code & 0x07ff) | (m_tile_bank << 11),
+	uint16_t code = m_bgvideoram[0][tile_index];
+	tileinfo.set(1,
+			(code & 0x07ff) | (m_bgbank << 11),
 			((code & 0xf000) >> 12) | ((code & 0x0800) >> 7),
 			0);
-}
-
-TILEMAP_MAPPER_MEMBER(powerins_state::get_memory_offset_0)
-{
-	return  (row & 0xf) | ((col & 0xff) << 4) | ((row & 0x10) << 8);
 }
 
 
@@ -127,15 +99,6 @@ Offset:
 #define DIM_NY_1    (0x20)
 */
 
-TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
-{
-	uint16_t code = m_vram[1][tile_index];
-	tileinfo.set(1,
-			code & 0x0fff,
-			(code & 0xf000) >> 12,
-			0);
-}
-
 /***************************************************************************
 
 
@@ -146,17 +109,15 @@ TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 
 void powerins_state::video_start()
 {
-	m_spritebuffer[0] = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_spritebuffer[1] = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::powerins_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(powerins_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::get_tile_info_0)), tilemap_mapper_delegate(*this, FUNC(powerins_state::get_memory_offset_0)), 16, 16, 256, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::get_tile_info_1)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_tx_tilemap->set_transparent_pen(15);
 
-	m_tilemap[1]->set_transparent_pen(15);
-
-	save_item(NAME(m_tile_bank));
-	save_pointer(NAME(m_spritebuffer[0]), 0x1000/2);
-	save_pointer(NAME(m_spritebuffer[1]), 0x1000/2);
+	video_init();
+	 // fixed offset
+	m_bg_tilemap[0]->set_scrolldx(32,32);
+	m_tx_tilemap->set_scrolldx(32,32);
 }
 
 
@@ -224,17 +185,9 @@ void powerins_state::get_flip_extcode(u16 attr, int &flipx, int &flipy, int &cod
 ***************************************************************************/
 
 
-uint32_t powerins_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 powerins_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
-
-	int scrollx = (m_vctrl_0[2/2]&0xff) | ((m_vctrl_0[0/2]&0xff)<<8);
-	int scrolly = (m_vctrl_0[6/2]&0xff) | ((m_vctrl_0[4/2]&0xff)<<8);
-
-	m_tilemap[0]->set_scrollx(0, scrollx - 0x20);
-	m_tilemap[0]->set_scrolly(0, scrolly );
-
-	m_tilemap[1]->set_scrollx(0, -0x20); // fixed offset
 
 #ifdef MAME_DEBUG
 if (machine().input().code_pressed(KEYCODE_Z))
@@ -250,10 +203,10 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	screen.priority().fill(0, cliprect);
-	if (layers_ctrl&1)      m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+	if (layers_ctrl&1)      bg_update(screen, bitmap, cliprect, 0);
 	else                    bitmap.fill(0, cliprect);
-	if (layers_ctrl&2)      m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
-	if (layers_ctrl&8)      m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spritebuffer[1].get(), 0x1000/2);
+	if (layers_ctrl&2)      tx_update(screen, bitmap, cliprect);
+	if (layers_ctrl&8)      draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
@@ -261,8 +214,18 @@ WRITE_LINE_MEMBER(powerins_state::screen_vblank)
 {
 	if (state)
 	{
-		std::copy_n(&m_spritebuffer[0][0], 0x1000/2, &m_spritebuffer[1][0]);
-		std::copy_n(&m_spriteram[0x8000/2], 0x1000/2, &m_spritebuffer[0][0]);
 		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_dma_timer->adjust(attotime::from_usec(256)); // 256 USEC after VBOUT, same as nmk16.cpp?
+	}
+}
+
+WRITE_LINE_MEMBER(powerins_state::screen_vblank_powerinsa)
+{
+	if (state)
+	{
+		m_maincpu->set_input_line(4, HOLD_LINE);
+		// bootlegs aren't has DMA?
+		memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+		memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
 	}
 }

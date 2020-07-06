@@ -27,12 +27,13 @@
 constexpr int clamp16(int16_t val, int16_t min, int16_t max) { return std::min(max, std::max(min, val)); }
 
 
-DEFINE_DEVICE_TYPE(ROLANDPCM, rolandpcm_device, "rolandpcm", "Roland PCM")
+DEFINE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device, "mb87419_mb87420", "Roland MB87419/MB87420 PCM")
 
-rolandpcm_device::rolandpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ROLANDPCM, tag, owner, clock)
+mb87419_mb87420_device::mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MB87419_MB87420, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 22)
+	, m_int_callback(*this)
 	, m_clock(0)
 	, m_rate(0)
 	, m_stream(nullptr)
@@ -41,12 +42,23 @@ rolandpcm_device::rolandpcm_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void mb87419_mb87420_device::device_resolve_objects()
+{
+	m_int_callback.resolve_safe();
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void rolandpcm_device::device_start()
+void mb87419_mb87420_device::device_start()
 {
-	m_clock = clock();
+	m_clock = clock() / 2;
 	m_rate = m_clock / 512; // usually 32 KHz
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
@@ -55,17 +67,26 @@ void rolandpcm_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mb87419_mb87420_device::device_reset()
+{
+	m_int_callback(CLEAR_LINE);
+}
+
+//-------------------------------------------------
 //  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------
 
-void rolandpcm_device::rom_bank_updated()
+void mb87419_mb87420_device::rom_bank_updated()
 {
 	// unused right now
 	m_stream->update();
 }
 
 
-u8 rolandpcm_device::read(offs_t offset)
+u8 mb87419_mb87420_device::read(offs_t offset)
 {
 	// Note: only offset 0x01 is verified, the rest is probably all wrong
 	if (offset != 0x01)
@@ -137,7 +158,7 @@ u8 rolandpcm_device::read(offs_t offset)
 	return 0x00;
 }
 
-void rolandpcm_device::write(offs_t offset, u8 data)
+void mb87419_mb87420_device::write(offs_t offset, u8 data)
 {
 	logerror("Reg %02X = %02X\n", offset, data);
 	if (offset < 0x10)
@@ -248,7 +269,7 @@ void rolandpcm_device::write(offs_t offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void rolandpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mb87419_mb87420_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));
@@ -340,7 +361,7 @@ void rolandpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	return;
 }
 
-int16_t rolandpcm_device::decode_sample(int8_t data)
+int16_t mb87419_mb87420_device::decode_sample(int8_t data)
 {
 	int16_t val;
 	int16_t sign;
@@ -368,7 +389,7 @@ int16_t rolandpcm_device::decode_sample(int8_t data)
 	return result * sign;
 }
 
-int16_t rolandpcm_device::sample_interpolate(int16_t smp1, int16_t smp2, uint16_t frac)
+int16_t mb87419_mb87420_device::sample_interpolate(int16_t smp1, int16_t smp2, uint16_t frac)
 {
 	int32_t smpfrac0 = (int32_t)smp1 * (0x4000 - frac);
 	int32_t smpfrac1 = (int32_t)smp2 * frac;

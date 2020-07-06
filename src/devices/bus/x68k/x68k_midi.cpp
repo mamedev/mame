@@ -49,12 +49,12 @@ void x68k_midi_device::device_reset()
 
 READ8_MEMBER(x68k_midi_device::x68k_midi_reg_r)
 {
-	return m_midi->read(space, offset);
+	return m_midi->read(offset);
 }
 
 WRITE8_MEMBER(x68k_midi_device::x68k_midi_reg_w)
 {
-	m_midi->write(space, offset, data);
+	m_midi->write(offset, data);
 }
 
 void x68k_midi_device::irq_w(int state)

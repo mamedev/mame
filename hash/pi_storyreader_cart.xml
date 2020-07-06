@@ -367,4 +367,92 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="101dal" supported="no">
+		<description>101 Dalmatiner (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="101 Dalmatiner (GER).bin" size="0x100000" crc="85112e08" sha1="137f1842cf60767badf18357db515de526a949da" />
+			</dataarea>
+		</part>
+	</software>
+
+  <software name="arielle" supported="no">
+	<description>Arielle - Die Meerjungfrau (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Arielle - Die Meerjungfrau (GER).bin" size="0x100000" crc="a113accf" sha1="a7e3a915ce71ddea58e03fdd762c97ad0e72c33e" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="bambi" supported="no">
+	<description>Bambi (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Bambi (GER).bin" size="0x100000" crc="fec017bd" sha1="6ffd67e7d6e5bc3ce17e1f21646269711386d694" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="cinder" supported="no">
+	<description>Cinderella (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Cinderella (GER).bin" size="0x100000" crc="742d2e0f" sha1="26583dfb23eb56fce4f2518c4009db407e8b72d6" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="schone" supported="no">
+	<description>Die Schöne und das Biest (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Die Schone und das Biest (GER).bin" size="0x100000" crc="8f8d1dd8" sha1="0d125bcf2bb583d3733074afc2ca35c50368e56f" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="pino" supported="no">
+	<description>Pinocchio (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Pinocchio (GER).bin" size="0x100000" crc="ec576e74" sha1="d385ce39f359707b5cdc84d28b32444e24d7ab3a" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="scheewtn" supported="no">
+	<description>Schneewittchen und die Sieben Zwerge (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Schneewittchen und die Sieben Zwerge (GER).bin" size="0x100000" crc="893f0743" sha1="f2e9d802f4856b77ed959e1178b5db465bf3fcf4" />
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="susistro" supported="no">
+	<description>Susi und STROLCH (Germany)</description>
+	<year>200?</year>
+	<publisher>Publications International Ltd. / Disney</publisher>
+	<part name="cart" interface="pi_storyreader_cart">
+	  <dataarea name="rom" size="0x100000">
+		<rom name="Susi und STROLCH (GER).bin" size="0x100000" crc="1181ea02" sha1="2d1d660d5f1bf014f5fa445e3424634016e8aaa6" />
+	  </dataarea>
+	</part>
+  </software>
+
 </softwarelist>

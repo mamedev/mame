@@ -165,4 +165,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME           FLAGS
-COMP( 1987, ht68k, 0,      0,      ht68k,   ht68k, ht68k_state, empty_init, "Hawthorne Technology", "TinyGiant HT68k", MACHINE_NO_SOUND)
+COMP( 1987, ht68k, 0,      0,      ht68k,   ht68k, ht68k_state, empty_init, "Hawthorne Technology", "TinyGiant HT68k", MACHINE_NO_SOUND_HW )

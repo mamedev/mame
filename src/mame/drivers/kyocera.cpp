@@ -202,7 +202,7 @@ uint8_t kc85_state::uart_r()
 		m_uart->drr_w(1);
 	}
 
-	return m_uart->read(machine().dummy_space(), 0);
+	return m_uart->read();
 }
 
 void kc85_state::uart_ctrl_w(uint8_t data)

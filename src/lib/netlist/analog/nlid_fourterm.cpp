@@ -33,13 +33,13 @@ NETLIB_RESET(VCCS)
 NETLIB_UPDATE(VCCS)
 {
 	// only called if connected to a rail net ==> notify the solver to recalculate
-	if (!m_IP.net().isRailNet())
+	if (!m_IP.net().is_rail_net())
 		m_IP.solve_now();
-	else if (!m_IN.net().isRailNet())
+	else if (!m_IN.net().is_rail_net())
 		m_IN.solve_now();
-	else if (!m_OP.net().isRailNet())
+	else if (!m_OP.net().is_rail_net())
 		m_OP.solve_now();
-	else if (!m_ON.net().isRailNet())
+	else if (!m_ON.net().is_rail_net())
 		m_ON.solve_now();
 }
 

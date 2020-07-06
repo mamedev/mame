@@ -1,20 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria,Aaron Giles
+// copyright-holders:Nicola Salmoria,Aaron Giles,Vas Crabb
 /*********************************************************************
 
     romload.h
 
     ROM loading functions.
 *********************************************************************/
-
-#pragma once
-
 #ifndef MAME_EMU_ROMLOAD_H
 #define MAME_EMU_ROMLOAD_H
 
+#pragma once
+
 #include "chd.h"
 
+#include <functional>
+#include <initializer_list>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 
 /***************************************************************************
@@ -420,6 +423,13 @@ public:
 
 	void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
 
+	/* get search path for a software item */
+	static std::vector<std::string> get_software_searchpath(software_list_device &swlist, const software_info &swinfo);
+
+	/* open a disk image, searching up the parent and loading by checksum */
+	static chd_error open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd);
+	static chd_error open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd);
+
 private:
 	void determine_bios_rom(device_t &device, const char *specbios);
 	void count_roms();
@@ -430,17 +440,17 @@ private:
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
 	void region_post_process(memory_region *region, bool invert);
-	std::unique_ptr<emu_file> open_rom_file(const char *regiontag, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list);
+	std::unique_ptr<emu_file> open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list);
+	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, const std::string &name, osd_file::error &filerr);
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(const rom_entry *romp);
 	void copy_rom_data(const rom_entry *romp);
-	void process_rom_entries(const device_t &device, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, bool from_list);
+	void process_rom_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, u8 bios, const rom_entry *parent_region, const rom_entry *romp, bool from_list);
 	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
-	void process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag);
+	void process_disk_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const char *regiontag, const rom_entry *romp, std::function<const rom_entry * ()> next_parent);
 	void normalize_flags_for_device(const char *rgntag, u8 &width, endianness_t &endian);
 	void process_region_list();
-
 
 	// internal state
 	running_machine &   m_machine;            // reference to our machine
@@ -465,8 +475,6 @@ private:
 
 /* ----- Helpers ----- */
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr);
-
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);
 
@@ -490,9 +498,5 @@ const rom_entry *rom_next_parameter(const rom_entry *romp);
 
 // builds a rom_entry vector from a tiny_rom_entry array
 std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries);
-
-
-/* open a disk image, searching up the parent and loading by checksum */
-int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_entry *romp, chd_file &image_chd, const char *locationtag);
 
 #endif  // MAME_EMU_ROMLOAD_H

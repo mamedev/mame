@@ -2588,6 +2588,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &galaxold_state::drivfrcg_io);
 	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)); // ???
+	maincpu.intack_handler().set_constant(0x03);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2636,10 +2637,10 @@ void galaxold_state::hunchbkg(machine_config &config)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	S2650(config.replace(), m_maincpu, PIXEL_CLOCK / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::hunchbkg_map);
-	m_maincpu->set_addrmap(AS_DATA, &galaxold_state::hunchbkg_data);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxold_state::hunchbkg_irq_callback));
+	s2650_device &s2650(S2650(config.replace(), m_maincpu, PIXEL_CLOCK / 4));
+	s2650.set_addrmap(AS_PROGRAM, &galaxold_state::hunchbkg_map);
+	s2650.set_addrmap(AS_DATA, &galaxold_state::hunchbkg_data);
+	s2650.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	/* the nmi line seems to be inverted on the cpu plugin board */
 	m_7474_9m_1->comp_output_cb().set_inputline("maincpu", S2650_SENSE_LINE);
@@ -2677,6 +2678,7 @@ void galaxold_state::racknrol(machine_config &config)
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
 	// FIXME: kill the following line - convert to a screen vblank callback
 	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
+	maincpu.intack_handler().set_constant(0x03);
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
@@ -2705,6 +2707,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
 	// FIXME: kill the following line - convert to a screen vblank callback
 	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
+	maincpu.intack_handler().set_constant(0x03);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 32);

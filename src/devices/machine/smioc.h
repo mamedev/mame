@@ -44,17 +44,17 @@ public:
 	auto m68k_w_callback() { return m_m68k_w_cb.bind(); }
 
 
-	DECLARE_READ8_MEMBER(ram2_mmio_r);
-	DECLARE_WRITE8_MEMBER(ram2_mmio_w);
+	u8 ram2_mmio_r(offs_t offset);
+	void ram2_mmio_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(dma68k_r);
-	DECLARE_WRITE8_MEMBER(dma68k_w);
+	u8 dma68k_r(offs_t offset);
+	void dma68k_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(dma8237_2_dmaread);
-	DECLARE_WRITE8_MEMBER(dma8237_2_dmawrite);
+	u8 dma8237_2_dmaread(offs_t offset);
+	void dma8237_2_dmawrite(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(boardlogic_mmio_r);
-	DECLARE_WRITE8_MEMBER(boardlogic_mmio_w);
+	u8 boardlogic_mmio_r(offs_t offset);
+	void boardlogic_mmio_w(offs_t offset, u8 data);
 
 
 	int m_activePortIndex;

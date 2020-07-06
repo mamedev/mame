@@ -46,8 +46,6 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "vhd"; }
 
 	// specific implementation
-	DECLARE_READ8_MEMBER(read) { return read(offset); }
-	DECLARE_WRITE8_MEMBER(write) { write(offset, data); }
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 

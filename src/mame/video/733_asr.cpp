@@ -315,7 +315,7 @@ void asr733_device::receive_callback(int dummy)
     14: DSR data set ready, 1 if online
     15: INT interrupt, 1 if interrupt
 */
-READ8_MEMBER( asr733_device::cru_r )
+uint8_t asr733_device::cru_r(offs_t offset)
 {
 	int reply = 0;
 
@@ -346,7 +346,7 @@ READ8_MEMBER( asr733_device::cru_r )
     14: enable interrupts, 1 to enable interrupts
     15: diagnostic mode, 0 for normal mode
 */
-WRITE8_MEMBER( asr733_device::cru_w )
+void asr733_device::cru_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

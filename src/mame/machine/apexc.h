@@ -111,7 +111,7 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(uint8_t data);
 
 private:
 	virtual void device_start() override { }
@@ -138,7 +138,8 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read();
+
 private:
 	virtual void device_start() override { }
 };

@@ -36,24 +36,24 @@ public:
 	auto in_cs1010_callback() { return m_in_cs1010_cb.bind(); }
 	auto out_cs1010_callback() { return m_out_cs1010_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
+	void dack3_w(int state);
 	uint8_t dack_r();
 	void dack_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ireq_w );
-	DECLARE_WRITE_LINE_MEMBER( io_w );
-	DECLARE_WRITE_LINE_MEMBER( cd_w );
-	DECLARE_WRITE_LINE_MEMBER( clct_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_w );
+	void ireq_w(int state);
+	void io_w(int state);
+	void cd_w(int state);
+	void clct_w(int state);
+	void mode_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( busy_r );
-	DECLARE_READ_LINE_MEMBER( ecc_not_0_r );
+	int busy_r();
+	int ecc_not_0_r();
 
 protected:
 	// device-level overrides

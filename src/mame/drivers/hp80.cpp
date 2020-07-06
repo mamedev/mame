@@ -31,6 +31,35 @@
 // - Beeper & 1-bit bitbanged sound
 // - I/O slots
 //
+// The HP86B was also produced with support for various non-English European languages.
+// There were 3 major differences between standard (i.e. English only) and international models:
+// - The keyboard controller IC translated from the matrix position to key code in the
+//   standard model whereas it only reported the row/column position in the international models.
+//   In the latter case the decoding was done in software.
+// - The international models had an extra built-in ROM (the "Language" ROM) that handled the
+//   decoding of various keyboard layouts and also provided some extra BASIC instructions to
+//   deal with non-English text.
+// - There were 3 video controllers that displayed different character shapes in the 00..1b range.
+//
+// This table summarizes the differences between hp86b models.
+//
+// | Model   | Kb layout        | Kb controller | Has           | Video controller | Emulator  |
+// |         |                  | decodes key?  | Language ROM? | version          |           |
+// |---------+------------------+---------------+---------------+------------------+-----------|
+// | Std     | English          | Yes           | No            | 1st              | hp86b     |
+// | Opt 001 | Swedish/Finnish  | No            | Yes           | 2nd              | hp86b_001 |
+// | Opt 002 | Danish/Norwegian | No            | Yes           | 2nd              | hp86b_001 |
+// | Opt 004 | German           | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 006 | Spanish          | No            | Yes           | 2nd              | hp86b_001 |
+// | Opt 008 | French           | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 009 | Italian          | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 010 | Dutch            | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 020 | Swiss German     | No            | Yes           | 3rd              | hp86b_004 |
+// | Opt 021 | Swiss French     | No            | Yes           | 3rd              | hp86b_004 |
+//
+// Special thanks to Everett Kaser for his excellent reverse engineering of Language ROM and for
+// all his support.
+//
 // Thanks to all the people who made docs available & dumped the various ROMs.
 //
 // References for these systems:
@@ -102,7 +131,8 @@ static constexpr unsigned CPU_CLOCK = 613000;
 // Time taken by hw timer updating (semi-made up) (in µsec)
 static constexpr unsigned TIMER_BUSY_USEC   = 128;
 static constexpr unsigned IRQ_KEYBOARD_BIT  = 0;
-static constexpr unsigned IRQ_TIMER0_BIT    = 1;
+static constexpr unsigned IRQ_INTKEYB_BIT   = 1;
+static constexpr unsigned IRQ_TIMER0_BIT    = 2;
 static constexpr unsigned TIMER_COUNT       = 4;
 static constexpr unsigned IRQ_IOP0_BIT      = IRQ_TIMER0_BIT + TIMER_COUNT;
 // Maximum count of I/O processors (the same thing as count of I/O slots)
@@ -116,7 +146,7 @@ static constexpr unsigned NO_IRQ            = IRQ_BIT_COUNT;
 class hp80_base_state : public driver_device
 {
 public:
-	hp80_base_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp80_base_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb = false);
 
 protected:
 	void hp80_base(machine_config &config);
@@ -128,7 +158,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	uint8_t intack_r();
 
 	DECLARE_WRITE8_MEMBER(ginten_w);
 	DECLARE_WRITE8_MEMBER(gintdis_w);
@@ -159,6 +189,7 @@ protected:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_modkeys;
+	optional_ioport m_io_language;
 	required_device_array<hp80_optrom_device , 6> m_rom_drawers;
 	required_device<address_map_bank_device> m_rombank;
 	required_device_array<hp80_io_slot_device , IOP_COUNT> m_io_slots;
@@ -176,7 +207,11 @@ protected:
 	bool m_kb_enable;
 	bool m_kb_pressed;
 	bool m_kb_flipped;
+	bool m_kb_lang_readout;
+	bool m_kb_raw_readout;
 	uint8_t m_kb_keycode;
+	uint8_t m_raw_keycode;
+	const bool m_has_int_keyb;
 
 	// Timers
 	typedef struct {
@@ -190,7 +225,8 @@ protected:
 	uint8_t m_timer_idx;
 	bool m_clk_busy;
 
-	bool kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& keycode);
+	bool kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col);
+	unsigned get_kb_irq() const;
 
 	void irq_w(unsigned n_irq , bool state);
 	void irq_en_w(unsigned n_irq , bool state);
@@ -200,7 +236,7 @@ protected:
 	void update_irl();
 };
 
-hp80_base_state::hp80_base_state(const machine_config &mconfig, device_type type, const char *tag)
+hp80_base_state::hp80_base_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb)
 	: driver_device(mconfig , type , tag)
 	, m_cpu(*this , "cpu")
 	, m_clk_busy_timer(*this , "clk_busy_timer")
@@ -210,9 +246,11 @@ hp80_base_state::hp80_base_state(const machine_config &mconfig, device_type type
 	, m_io_key1(*this , "KEY1")
 	, m_io_key2(*this , "KEY2")
 	, m_io_modkeys(*this, "MODKEYS")
+	, m_io_language(*this , "LANGUAGE")
 	, m_rom_drawers(*this , "drawer%u" , 1)
 	, m_rombank(*this , "rombank")
 	, m_io_slots(*this , "slot%u" , 1)
+	, m_has_int_keyb(has_int_keyb)
 {
 }
 
@@ -220,7 +258,7 @@ void hp80_base_state::hp80_base(machine_config &config)
 {
 	HP_CAPRICORN(config, m_cpu, CPU_CLOCK);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp80_base_state::cpu_mem_map);
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp80_base_state::irq_callback));
+	m_cpu->intack_cb().set(FUNC(hp80_base_state::intack_r));
 	config.set_perfect_quantum(m_cpu);
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp80_base_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
@@ -292,7 +330,10 @@ void hp80_base_state::machine_start()
 	save_item(NAME(m_kb_enable));
 	save_item(NAME(m_kb_pressed));
 	save_item(NAME(m_kb_flipped));
+	save_item(NAME(m_kb_lang_readout));
+	save_item(NAME(m_kb_raw_readout));
 	save_item(NAME(m_kb_keycode));
+	save_item(NAME(m_raw_keycode));
 }
 
 void hp80_base_state::machine_reset()
@@ -310,6 +351,8 @@ void hp80_base_state::machine_reset()
 	m_kb_enable = true;
 	m_kb_pressed = false;
 	m_kb_flipped = false;
+	m_kb_lang_readout = false;
+	m_kb_raw_readout = false;
 	for (auto& timer : m_hw_timer) {
 		for (unsigned i = 0; i < 4; i++) {
 			timer.m_timer_cnt[ i ] = 0;
@@ -345,6 +388,7 @@ void hp80_base_state::machine_reset()
 // Vector table (indexed by bit no. in m_int_serv)
 static const uint8_t vector_table[] = {
 	0x04,   // Keyboard
+	0x12,   // International keyboard (or is it 0x14?)
 	0x08,   // Timer 0
 	0x0a,   // Timer 1
 	0x0c,   // Timer 2
@@ -356,9 +400,9 @@ static const uint8_t vector_table[] = {
 	0x00    // No IRQ
 };
 
-IRQ_CALLBACK_MEMBER(hp80_base_state::irq_callback)
+uint8_t hp80_base_state::intack_r()
 {
-	LOG_IRQ("IRQ ACK %u %u\n" , m_top_pending , m_top_acked);
+	LOG_IRQ("INTACK %u %u\n" , m_top_pending , m_top_acked);
 	BIT_SET(m_int_acked , m_top_pending);
 	m_top_acked = m_top_pending;
 	if (m_top_pending > IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT) {
@@ -389,11 +433,19 @@ WRITE8_MEMBER(hp80_base_state::gintdis_w)
 READ8_MEMBER(hp80_base_state::keysts_r)
 {
 	uint8_t res = 0;
-	if (BIT(m_int_en , IRQ_KEYBOARD_BIT)) {
+	if (BIT(m_int_en , get_kb_irq())) {
 		BIT_SET(res , 0);
 	}
 	if (m_kb_pressed) {
 		BIT_SET(res , 1);
+	}
+	if (m_has_int_keyb) {
+		if (m_kb_flipped) {
+			BIT_SET(res , 2);
+		}
+		if (BIT(m_io_modkeys->read() , 2)) {
+			BIT_SET(res , 6);
+		}
 	}
 	if (BIT(m_io_modkeys->read() , 0)) {
 		BIT_SET(res , 3);
@@ -407,33 +459,42 @@ READ8_MEMBER(hp80_base_state::keysts_r)
 WRITE8_MEMBER(hp80_base_state::keysts_w)
 {
 	if (BIT(data , 0)) {
-		irq_en_w(IRQ_KEYBOARD_BIT , true);
+		irq_en_w(get_kb_irq() , true);
 	} else if (BIT(data , 1)) {
-		irq_en_w(IRQ_KEYBOARD_BIT , false);
+		irq_en_w(get_kb_irq() , false);
+	}
+	if (m_has_int_keyb) {
+		m_kb_lang_readout = BIT(data , 2);
+		m_kb_raw_readout = BIT(data , 3);
 	}
 	m_dac->write(BIT(data , 5));
 	m_beep->set_state(BIT(data , 6));
 	if (BIT(data , 7)) {
 		m_kb_flipped = !m_kb_flipped;
 	}
-	if (data & 0x1c) {
-		LOG("Funny write to keysts=%02x\n" , data);
-	}
 }
 
 READ8_MEMBER(hp80_base_state::keycod_r)
 {
-	return m_kb_keycode;
+	if (m_kb_lang_readout && m_io_language) {
+		return m_io_language->read();
+	} else if (m_kb_raw_readout) {
+		return m_raw_keycode;
+	} else {
+		return m_kb_keycode;
+	}
 }
 
 WRITE8_MEMBER(hp80_base_state::keycod_w)
 {
+	if (m_has_int_keyb) {
+		m_kb_keycode = data;
+	}
 	if (data == 1) {
-		irq_w(IRQ_KEYBOARD_BIT , false);
+		unsigned irq = get_kb_irq();
+		irq_w(irq , false);
 		m_kb_enable = true;
-		release_irq(IRQ_KEYBOARD_BIT);
-	} else {
-		LOG("Funny write to keycod=%02x\n" , data);
+		release_irq(irq);
 	}
 }
 
@@ -636,31 +697,21 @@ static const uint8_t keyboard_table[ 80 ][ 2 ] = {
 	{ 0x8a , 0x8a }     // 9,7: PAPER ADVANCE   N/U
 };
 
-bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& keycode)
+bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col)
 {
-	while (pressed) {
+	if (pressed) {
 		unsigned bit_no = 31 - count_leading_zeros(pressed);
-		uint8_t unshifted = keyboard_table[ idx_base + bit_no ][ 0 ];
-		bool isalpha = unshifted >= 'A' && unshifted <= 'Z';
-		ioport_value modifiers = m_io_modkeys->read();
-		bool shift = BIT(modifiers , 0);
-		bool caps_lock = BIT(modifiers , 1);
-		bool control = BIT(modifiers , 2);
-		if (isalpha) {
-			shift = shift ^ caps_lock ^ m_kb_flipped;
-		}
-		keycode = keyboard_table[ idx_base + bit_no ][ shift ];
-		uint8_t tmp = isalpha ? unshifted : keycode;
-		if (control && (tmp & 0xe0) == 0x40) {
-			keycode &= ~0xe0;
-		}
-		if (keycode != 0xff) {
-			return true;
-		}
-		ioport_value mask = BIT_MASK<ioport_value>(bit_no);
-		pressed &= ~mask;
+		row = (idx_base + bit_no) / 8;
+		col = (idx_base + bit_no) % 8;
+		return true;
+	} else {
+		return false;
 	}
-	return false;
+}
+
+unsigned hp80_base_state::get_kb_irq() const
+{
+	return m_has_int_keyb ? IRQ_INTKEYB_BIT : IRQ_KEYBOARD_BIT;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::kb_scan)
@@ -671,15 +722,35 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::kb_scan)
 	input[ 2 ] = m_io_key2->read();
 
 	if (m_kb_enable) {
-		uint8_t keycode;
+		uint8_t row;
+		uint8_t col;
 
-		bool got_key = kb_scan_ioport(input[ 0 ] & ~m_kb_state[ 0 ] , 0 , keycode) ||
-			kb_scan_ioport(input[ 1 ] & ~m_kb_state[ 1 ] , 32 , keycode) ||
-			kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , 64 , keycode);
+		bool got_key = kb_scan_ioport(input[ 0 ] & ~m_kb_state[ 0 ] , 0 , row , col) ||
+			kb_scan_ioport(input[ 1 ] & ~m_kb_state[ 1 ] , 32 , row , col) ||
+			kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , 64 , row , col);
 
 		if (got_key) {
-			m_kb_keycode = keycode;
-			irq_w(IRQ_KEYBOARD_BIT , true);
+			if (m_has_int_keyb) {
+				m_raw_keycode = (row << 4) + col;
+			} else {
+				uint8_t keycode = (row << 3) + col;
+				uint8_t unshifted = keyboard_table[ keycode ][ 0 ];
+				bool isalpha = unshifted >= 'A' && unshifted <= 'Z';
+				ioport_value modifiers = m_io_modkeys->read();
+				bool shift = BIT(modifiers , 0);
+				bool caps_lock = BIT(modifiers , 1);
+				bool control = BIT(modifiers , 2);
+				if (isalpha) {
+					shift = shift ^ caps_lock ^ m_kb_flipped;
+				}
+				keycode = keyboard_table[ keycode ][ shift ];
+				uint8_t tmp = isalpha ? unshifted : keycode;
+				if (control && (tmp & 0xe0) == 0x40) {
+					keycode &= ~0xe0;
+				}
+				m_kb_keycode = keycode;
+			}
+			irq_w(get_kb_irq() , true);
 			m_kb_enable = false;
 		}
 	}
@@ -1539,7 +1610,7 @@ ROM_END
 class hp86_state : public hp80_base_state
 {
 public:
-	hp86_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp86_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb = false);
 
 	// **** Constants of HP86 ****
 	static constexpr unsigned MASTER_CLOCK  = 12260000;
@@ -1625,8 +1696,8 @@ private:
 	void opcode_cb(uint8_t opcode);
 };
 
-hp86_state::hp86_state(const machine_config &mconfig, device_type type, const char *tag)
-	: hp80_base_state(mconfig , type , tag)
+hp86_state::hp86_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb)
+	: hp80_base_state(mconfig , type , tag , has_int_keyb)
 	, m_screen(*this , "screen")
 	, m_palette(*this , "palette")
 	, m_vm_timer(*this , "vm_timer")
@@ -2162,5 +2233,207 @@ ROM_START(hp86b)
 	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(e90fad22) SHA1(6b2ecef96906ead99cd688e54c507611747c8687))
 ROM_END
 
-COMP( 1980, hp85, 0, 0, hp85, hp85, hp85_state, empty_init, "HP", "HP 85", 0)
-COMP( 1983, hp86b,0, 0, hp86, hp86, hp86_state, empty_init, "HP", "HP 86B",0)
+// ****************
+//  hp86_int_state
+// ****************
+class hp86_int_state : public hp86_state
+{
+public:
+	hp86_int_state(const machine_config &mconfig, device_type type, const char *tag);
+
+protected:
+	virtual void rombank_mem_map(address_map &map) override;
+	virtual void unmap_optroms(address_space &space) override;
+};
+
+hp86_int_state::hp86_int_state(const machine_config &mconfig, device_type type, const char *tag)
+	: hp86_state(mconfig , type , tag , true)
+{
+}
+
+void hp86_int_state::rombank_mem_map(address_map &map)
+{
+	hp86_state::rombank_mem_map(map);
+	// rom030 (language)
+	map(0x30000, 0x31fff).rom();
+}
+
+void hp86_int_state::unmap_optroms(address_space &space)
+{
+	LOG("hp86_int_state::unmap_optroms\n");
+	// OptROMs are in rombanks [02..17] & [19..CF] & [D2..FF]
+	space.unmap_read(HP80_OPTROM_SIZE * 2 , HP80_OPTROM_SIZE * 0x18 - 1);
+	space.unmap_read(HP80_OPTROM_SIZE * 0x19 , HP80_OPTROM_SIZE * 0xd0 - 1);
+	space.unmap_read(HP80_OPTROM_SIZE * 0xd2 , HP80_OPTROM_SIZE * 0x100 - 1);
+}
+
+static INPUT_PORTS_START(hp86_int)
+	// Keyboard is arranged in a matrix of 11 rows and 8 columns. In addition there are 2 keys with
+	// dedicated input lines: SHIFT & CONTROL.
+	// A key on row "r"=[0..10] and column "c"=[0..7] is mapped to bit "b" of KEY"n" input, where
+	// n = r / 4
+	// b = (r % 4) * 8 + c
+	PORT_START("KEY0")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')                            // 0,0: K
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')                            // 0,1: M
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')                            // 0,2: N
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')                            // 0,3: B
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')                            // 0,4: V
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')                            // 0,5: Z
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')                            // 0,6: X
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')                            // 0,7: C
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')                            // 1,0: 9
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_NAME("k5 k12")        // 1,1: k5 / k12
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_NAME("k4 k11")       // 1,2: k4 / k11
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_NAME("k3 k10")       // 1,3: k3 / k10
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_NAME("k2 k9")        // 1,4: k2 / k9
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_NAME("Caps")                                // 1,5: Caps
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LABEL KEY")                                                       // 1,6: LABEL KEY
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("k1 k8")        // 1,7: k1 / k8
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')                           // 2,0: I
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')                           // 2,1: J
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')                           // 2,2: H
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')                           // 2,3: G
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')                           // 2,4: F
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')                           // 2,5: A
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')                           // 2,6: S
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')                           // 2,7: D
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')                           // 3,0: 8
+	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')                           // 3,1: U
+	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')                           // 3,2: Y
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')                           // 3,3: T
+	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')                           // 3,4: R
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')                           // 3,5: Q
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')                           // 3,6: W
+	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')                           // 3,7: E
+
+	PORT_START("KEY1")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')                            // 4,0: 0
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')                       // 4,1: = +
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\\') PORT_CHAR('|')                       // 4,2: \ |
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                     // 4,3: BS
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("E TEST")                                                           // 4,4: KP E / TEST
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("^ RESLT")                                                          // 4,5: KP ^ / RESLT
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME(") INIT")                                                           // 4,6: KP ) / INIT
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("( RESET")                                                          // 4,7: KP ( / RESET
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')                            // 5,0: P
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')                        // 5,1: ; :
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')                      // 5,2: ' "
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("END LINE")                 // 5,3: END LINE
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_CHAR('$')      // 5,4: KP 4
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("KP *") // 5,5: KP *
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_CHAR('^')      // 5,6: KP 6
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) PORT_CHAR('%')      // 5,7: KP 5
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')                           // 6,0: L
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')                        // 6,1: .
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')                       // 6,2: / ?
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("LIST P LST")                                                      // 6,3: LIST / P LST
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_CHAR('!')      // 6,4: KP 1
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("KP -")   // 6,5: KP -
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) PORT_CHAR('#')      // 6,6: KP 3
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_CHAR('@')      // 6,7: KP 2
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')                           // 7,0: O
+	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')                           // 7,1: 7
+	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')                           // 7,2: 6
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')                           // 7,3: 5
+	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')                           // 7,4: 4
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')                           // 7,5: 1
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')                           // 7,6: 2
+	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')                           // 7,7: 3
+
+	PORT_START("KEY2")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')                        // 8,0: - _
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(') PORT_CHAR('[')                    // 8,1: ( [
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')') PORT_CHAR(']')                   // 8,2: ) ]
+	PORT_BIT(IOP_MASK(3) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("CONT TR/NORM")                                                     // 8,3: CONT / TR/NORM
+	PORT_BIT(IOP_MASK(4) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) PORT_CHAR('&')       // 8,4: KP 7
+	PORT_BIT(IOP_MASK(5) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) PORT_NAME("KP /")    // 8,5: KP /
+	PORT_BIT(IOP_MASK(6) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) PORT_CHAR('(')       // 8,6: KP 9
+	PORT_BIT(IOP_MASK(7) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_CHAR('*')       // 8,7: KP 8
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')                        // 9,0: ,
+	PORT_BIT(IOP_MASK(9) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')                                       // 9,1: Space
+	PORT_BIT(IOP_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("PAUSE STEP")                                                      // 9,2: PAUSE / STEP
+	PORT_BIT(IOP_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("RUN")                                                             // 9,3: RUN
+	PORT_BIT(IOP_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_CHAR(')')      // 9,4: KP 0
+	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) PORT_NAME("KP +") // 9,5: KP +
+	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) PORT_CHAR('<')  // 9,6: KP ,
+	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CHAR('.') PORT_CHAR('>') PORT_NAME("KP .")                              // 9,7: KP .
+	PORT_BIT(IOP_MASK(16) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_NAME("k6 k13")       // 10,0: k6 / k13
+	PORT_BIT(IOP_MASK(17) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_NAME("k7 k14")       // 10,1: k7 / k14
+	PORT_BIT(IOP_MASK(18) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("-LINE CLEAR")                                                     // 10,2: -LINE / CLEAR
+	PORT_BIT(IOP_MASK(19) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Up Home")      // 10,3: Up / Home
+	PORT_BIT(IOP_MASK(20) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Down A/G") // 10,4: Down / A/G
+	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("ROLL")                                    // 10,5: ROLL
+	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right -CHAR") // 10,6: RIGHT / -CHAR
+	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left I/R") // 10,7: LEFT / I/R
+
+	PORT_START("MODKEYS")
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)                // Shift
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)              // Control
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(hp86_001)
+	PORT_INCLUDE(hp86_int)
+
+	PORT_START("LANGUAGE")
+	PORT_DIPNAME(0x3f , 0 , "Language")
+	PORT_DIPLOCATION("S2:7,6,5,4,3,2")
+	PORT_DIPSETTING(0x00 , "English")
+	PORT_DIPSETTING(0x01 , "Swedish/Finnish")
+	PORT_DIPSETTING(0x02 , "Norwegian/Danish")
+	PORT_DIPSETTING(0x06 , "Spanish")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(hp86_004)
+	PORT_INCLUDE(hp86_int)
+
+	PORT_START("LANGUAGE")
+	PORT_DIPNAME(0x3f , 0 , "Language")
+	PORT_DIPLOCATION("S2:7,6,5,4,3,2")
+	PORT_DIPSETTING(0x00 , "English")
+	PORT_DIPSETTING(0x04 , "German")
+	PORT_DIPSETTING(0x08 , "French")
+	PORT_DIPSETTING(0x09 , "Italian")
+	PORT_DIPSETTING(0x0a , "Dutch")
+	PORT_DIPSETTING(0x14 , "Swiss German")
+	PORT_DIPSETTING(0x15 , "Swiss French")
+INPUT_PORTS_END
+
+ROM_START(hp86b_001)
+	ROM_REGION(0x6000 , "cpu" , 0)
+	ROM_LOAD("romsys1.bin" , 0x0000 , 0x2000 , CRC(bfa473b8) SHA1(cc420742a5f03c466484a5063e0abcbc084bf298))
+	ROM_LOAD("romsys2.bin" , 0x2000 , 0x2000 , CRC(2bc3ba4b) SHA1(760bef9c482f562677f80b18d6163a19ee7aea1c))
+	ROM_LOAD("romsys3.bin" , 0x4000 , 0x2000 , CRC(86bf3b8b) SHA1(209c91b9b972ab514c600752e2e4af68f984612e))
+
+	ROM_REGION(0x1a4000 , "rombank" , 0)
+	ROM_LOAD("rom000.bin" , 0x0000 , 0x2000 , CRC(c3ca5c54) SHA1(2b291607de101c7206bfae9520a18f1009929e9b))
+	ROM_LOAD("rom001.bin" , 0x2000 , 0x2000 , CRC(59a1616c) SHA1(e0fe840f9740bdb455fe1872869671f8712b7cff))
+	ROM_LOAD("rom030.bin" , 0x30000 , 0x2000 , CRC(14507bc0) SHA1(67ca5a15019bd7b2bfbf53bb8cfbe2ca20a6239c))
+	ROM_LOAD("rom320.bin" , 0x1a0000 , 0x2000 , CRC(c921e2e4) SHA1(e37ac61364830cfa214e6d1b9942cc1cde6ad01f))
+	ROM_LOAD("rom321.bin" , 0x1a2000 , 0x2000 , CRC(e6e5cc91) SHA1(67711de228cc48a78d04b13f0a1c91dc26f7e87c))
+
+	ROM_REGION(0x500 , "chargen" , 0)
+	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(a3d891c2) SHA1(df7c262b585e9394251640d0775474a76c199905))
+ROM_END
+
+ROM_START(hp86b_004)
+	ROM_REGION(0x6000 , "cpu" , 0)
+	ROM_LOAD("romsys1.bin" , 0x0000 , 0x2000 , CRC(bfa473b8) SHA1(cc420742a5f03c466484a5063e0abcbc084bf298))
+	ROM_LOAD("romsys2.bin" , 0x2000 , 0x2000 , CRC(2bc3ba4b) SHA1(760bef9c482f562677f80b18d6163a19ee7aea1c))
+	ROM_LOAD("romsys3.bin" , 0x4000 , 0x2000 , CRC(86bf3b8b) SHA1(209c91b9b972ab514c600752e2e4af68f984612e))
+
+	ROM_REGION(0x1a4000 , "rombank" , 0)
+	ROM_LOAD("rom000.bin" , 0x0000 , 0x2000 , CRC(c3ca5c54) SHA1(2b291607de101c7206bfae9520a18f1009929e9b))
+	ROM_LOAD("rom001.bin" , 0x2000 , 0x2000 , CRC(59a1616c) SHA1(e0fe840f9740bdb455fe1872869671f8712b7cff))
+	ROM_LOAD("rom030.bin" , 0x30000 , 0x2000 , CRC(14507bc0) SHA1(67ca5a15019bd7b2bfbf53bb8cfbe2ca20a6239c))
+	ROM_LOAD("rom320.bin" , 0x1a0000 , 0x2000 , CRC(c921e2e4) SHA1(e37ac61364830cfa214e6d1b9942cc1cde6ad01f))
+	ROM_LOAD("rom321.bin" , 0x1a2000 , 0x2000 , CRC(e6e5cc91) SHA1(67711de228cc48a78d04b13f0a1c91dc26f7e87c))
+
+	ROM_REGION(0x500 , "chargen" , 0)
+	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(c7d04292) SHA1(b86ed801ee9f7a57b259374b8a9810572cb03230))
+ROM_END
+
+COMP( 1980, hp85,      0,     0, hp85, hp85,     hp85_state,     empty_init, "HP", "HP 85", 0)
+COMP( 1983, hp86b,     0,     0, hp86, hp86,     hp86_state,     empty_init, "HP", "HP 86B",0)
+COMP( 1983, hp86b_001, hp86b, 0, hp86, hp86_001, hp86_int_state, empty_init, "HP", "HP 86B Opt 001",0)
+COMP( 1983, hp86b_004, hp86b, 0, hp86, hp86_004, hp86_int_state, empty_init, "HP", "HP 86B Opt 004",0)

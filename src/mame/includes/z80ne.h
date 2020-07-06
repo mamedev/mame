@@ -113,7 +113,7 @@ protected:
 	DECLARE_READ8_MEMBER(lx383_r);
 	DECLARE_WRITE8_MEMBER(lx383_w);
 	DECLARE_READ8_MEMBER(lx385_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
+	void lx385_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
 
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);

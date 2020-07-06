@@ -103,7 +103,7 @@ void wiping_sound_device::make_mixer_table(int voices, int gain)
 
 /********************************************************************************/
 
-WRITE8_MEMBER( wiping_sound_device::sound_w )
+void wiping_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	wp_sound_channel *voice;
 	int base;

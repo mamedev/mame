@@ -30,10 +30,10 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include "ibmxdf_dsk.h"
 
-#include "emu.h" // emu_fatalerror
-#include "formats/ibmxdf_dsk.h"
+#include "emucore.h" // emu_fatalerror
+
 
 ibmxdf_format::ibmxdf_format() : wd177x_format(formats)
 {
@@ -259,4 +259,3 @@ void ibmxdf_format::build_sector_description(const format &f, uint8_t *sectdata,
 }
 
 const floppy_format_type FLOPPY_IBMXDF_FORMAT = &floppy_image_format_creator<ibmxdf_format>;
-

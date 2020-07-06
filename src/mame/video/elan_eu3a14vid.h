@@ -42,32 +42,32 @@ private:
 	inline uint8_t read_vram(int offset);
 	inline uint8_t readpix(int baseaddr, int count, int drawfromram);
 
-	DECLARE_READ8_MEMBER(tilecfg_r) { return m_tilecfg[offset]; }
-	DECLARE_WRITE8_MEMBER(tilecfg_w) { m_tilecfg[offset] = data; }
-	DECLARE_READ8_MEMBER(ramtilecfg_r) { return m_ramtilecfg[offset]; }
-	DECLARE_WRITE8_MEMBER(ramtilecfg_w) { m_ramtilecfg[offset] = data; }
-	DECLARE_READ8_MEMBER(rowscrollcfg_r) { return m_rowscrollcfg[offset]; }
-	DECLARE_WRITE8_MEMBER(rowscrollcfg_w) { m_rowscrollcfg[offset] = data; }
-	DECLARE_READ8_MEMBER(scrollregs_r) { return m_scrollregs[offset]; }
-	DECLARE_WRITE8_MEMBER(scrollregs_w) { m_scrollregs[offset] = data; }
-	DECLARE_READ8_MEMBER(rowscrollregs_r) { return m_rowscrollregs[offset]; }
-	DECLARE_WRITE8_MEMBER(rowscrollregs_w) { m_rowscrollregs[offset] = data; }
-	DECLARE_READ8_MEMBER(spritebase_r) { return m_spritebase[offset]; }
-	DECLARE_WRITE8_MEMBER(spritebase_w) { m_spritebase[offset] = data; }
-	DECLARE_READ8_MEMBER(rowscrollsplit_r) { return m_rowscrollsplit[offset]; }
-	DECLARE_WRITE8_MEMBER(rowscrollsplit_w) { m_rowscrollsplit[offset] = data; }
+	uint8_t tilecfg_r(offs_t offset) { return m_tilecfg[offset]; }
+	void tilecfg_w(offs_t offset, uint8_t data) { m_tilecfg[offset] = data; }
+	uint8_t ramtilecfg_r(offs_t offset) { return m_ramtilecfg[offset]; }
+	void ramtilecfg_w(offs_t offset, uint8_t data) { m_ramtilecfg[offset] = data; }
+	uint8_t rowscrollcfg_r(offs_t offset) { return m_rowscrollcfg[offset]; }
+	void rowscrollcfg_w(offs_t offset, uint8_t data) { m_rowscrollcfg[offset] = data; }
+	uint8_t scrollregs_r(offs_t offset) { return m_scrollregs[offset]; }
+	void scrollregs_w(offs_t offset, uint8_t data) { m_scrollregs[offset] = data; }
+	uint8_t rowscrollregs_r(offs_t offset) { return m_rowscrollregs[offset]; }
+	void rowscrollregs_w(offs_t offset, uint8_t data) { m_rowscrollregs[offset] = data; }
+	uint8_t spritebase_r(offs_t offset) { return m_spritebase[offset]; }
+	void spritebase_w(offs_t offset, uint8_t data) { m_spritebase[offset] = data; }
+	uint8_t rowscrollsplit_r(offs_t offset) { return m_rowscrollsplit[offset]; }
+	void rowscrollsplit_w(offs_t offset, uint8_t data) { m_rowscrollsplit[offset] = data; }
 
-	DECLARE_READ8_MEMBER(spriteaddr_r) { return m_spriteaddr; }
-	DECLARE_WRITE8_MEMBER(spriteaddr_w) { m_spriteaddr = data; }
-	DECLARE_READ8_MEMBER(reg5107_r) { return m_5107; }
-	DECLARE_WRITE8_MEMBER(reg5107_w) { m_5107 = data; }
-	DECLARE_READ8_MEMBER(reg5108_r) { return m_5108; }
-	DECLARE_WRITE8_MEMBER(reg5108_w) { m_5108 = data; }
-	DECLARE_READ8_MEMBER(reg5109_r) { return m_5109; }
-	DECLARE_WRITE8_MEMBER(reg5109_w) { m_5109 = data; }
+	uint8_t spriteaddr_r() { return m_spriteaddr; }
+	void spriteaddr_w(uint8_t data) { m_spriteaddr = data; }
+	uint8_t reg5107_r() { return m_5107; }
+	void reg5107_w(uint8_t data) { m_5107 = data; }
+	uint8_t reg5108_r() { return m_5108; }
+	void reg5108_w(uint8_t data) { m_5108 = data; }
+	uint8_t reg5109_r() { return m_5109; }
+	void reg5109_w(uint8_t data) { m_5109 = data; }
 
-	DECLARE_READ8_MEMBER(read_unmapped);
-	DECLARE_WRITE8_MEMBER(write_unmapped);
+	uint8_t read_unmapped(offs_t offset);
+	void write_unmapped(offs_t offset, uint8_t data);
 
 	void draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	int get_xscroll_for_screenypos(int line);

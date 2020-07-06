@@ -53,7 +53,7 @@
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
 #define PARAM(name, val)                                                       \
-		setup.register_param(# name, # val);
+		setup.register_param(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
 		setup.register_param(# name ".HINT_" # val, "1");
@@ -73,7 +73,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(plib::make_unique<netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
+		setup.register_source<netlist::source_proc_t>(# name, &NETLIST_NAME(name));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -186,7 +186,7 @@ namespace netlist
 
 		source_netlist_t() = default;
 
-		COPYASSIGNMOVE(source_netlist_t, delete)
+		PCOPYASSIGNMOVE(source_netlist_t, delete)
 		~source_netlist_t() noexcept override = default;
 
 		virtual bool parse(nlparse_t &setup, const pstring &name);
@@ -200,7 +200,7 @@ namespace netlist
 
 		source_data_t() = default;
 
-		COPYASSIGNMOVE(source_data_t, delete)
+		PCOPYASSIGNMOVE(source_data_t, delete)
 		~source_data_t() noexcept override = default;
 	};
 
@@ -254,31 +254,29 @@ namespace netlist
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
+
 		void register_param(const pstring &param, const pstring &value);
 
 		// FIXME: quick hack
 		void register_param_x(const pstring &param, nl_fptype value);
 
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value || std::is_integral<T>::value>::type
+		typename std::enable_if<plib::is_floating_point<T>::value || plib::is_integral<T>::value>::type
 		register_param_val(const pstring &param, T value)
 		{
 			register_param_x(param, static_cast<nl_fptype>(value));
 		}
 
-#if PUSE_FLOAT128
-		void register_param(const pstring &param, __float128 value)
-		{
-			register_param_x(param, static_cast<nl_fptype>(value));
-		}
-#endif
-
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
 		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
 		// register a source
-		void register_source(plib::unique_ptr<plib::psource_t> &&src)
+		template <typename S, typename... Args>
+		void register_source(Args&&... args)
 		{
+			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
+
+			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
 			m_sources.add_source(std::move(src));
 		}
 
@@ -305,9 +303,13 @@ namespace netlist
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
 
-		void add_include(plib::unique_ptr<plib::psource_t> &&inc)
+		template <typename S, typename... Args>
+		void add_include(Args&&... args)
 		{
-			m_includes.add_source(std::move(inc));
+			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
+
+			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
+			m_includes.add_source(std::move(src));
 		}
 
 		void add_define(const pstring &def, const pstring &val)
@@ -371,7 +373,7 @@ namespace netlist
 		explicit setup_t(netlist_state_t &nlstate);
 		~setup_t() noexcept = default;
 
-		COPYASSIGNMOVE(setup_t, delete)
+		PCOPYASSIGNMOVE(setup_t, delete)
 
 		netlist_state_t &nlstate() { return m_nlstate; }
 		const netlist_state_t &nlstate() const { return m_nlstate; }

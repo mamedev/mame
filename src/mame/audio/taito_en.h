@@ -26,9 +26,6 @@ public:
 
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
-	DECLARE_WRITE8_MEMBER( en_volume_w );
-
 	void set_bank(int bank, int entry) { m_cpubank[bank]->set_entry(entry); }
 
 protected:
@@ -57,10 +54,13 @@ private:
 	uint32_t m_bankmask;
 
 	IRQ_CALLBACK_MEMBER(duart_iack);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	void mb87078_gain_changed(offs_t offset, uint8_t data);
 	void es5505_clock_changed(u32 data);
+
+	void en_es5505_bank_w(offs_t offset, uint16_t data);
+	void en_volume_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)

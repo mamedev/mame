@@ -121,7 +121,8 @@ tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, 
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
 	m_port_in_cb(*this),
 	m_port_out_cb(*this),
-	m_info_flags(info_flags)
+	m_info_flags(info_flags),
+	m_divider(2)
 {
 }
 
@@ -494,7 +495,7 @@ TIMER_CALLBACK_MEMBER(tms7000_device::simple_timer_cb)
 //  note: TMS7000 family is from $00 to $0b, TMS7002 family adds $10 to $17
 //-------------------------------------------------
 
-READ8_MEMBER(tms7000_device::tms7000_pf_r)
+uint8_t tms7000_device::tms7000_pf_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -535,7 +536,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 	return 0;
 }
 
-WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
+void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -901,12 +902,12 @@ void tms70c46_device::device_reset()
 	tms7000_device::device_reset();
 }
 
-READ8_MEMBER(tms70c46_device::control_r)
+uint8_t tms70c46_device::control_r()
 {
 	return m_control;
 }
 
-WRITE8_MEMBER(tms70c46_device::control_w)
+void tms70c46_device::control_w(uint8_t data)
 {
 	// d5: enable external databus
 	if (~m_control & data & 0x20)
@@ -925,7 +926,7 @@ WRITE8_MEMBER(tms70c46_device::control_w)
 // right now pretend that nothing is connected
 // external pins are HD0-HD3(data), HSK(handshake), BAV(bus available)
 
-READ8_MEMBER(tms70c46_device::dockbus_status_r)
+uint8_t tms70c46_device::dockbus_status_r()
 {
 	// d0: slave _HSK
 	// d1: slave _BAV
@@ -934,18 +935,18 @@ READ8_MEMBER(tms70c46_device::dockbus_status_r)
 	return 0;
 }
 
-WRITE8_MEMBER(tms70c46_device::dockbus_status_w)
+void tms70c46_device::dockbus_status_w(uint8_t data)
 {
 	// d0: master _HSK (setting it low(write 1) also clears IRQ)
 	// d1: master _BAV
 	// other bits: unused?
 }
 
-READ8_MEMBER(tms70c46_device::dockbus_data_r)
+uint8_t tms70c46_device::dockbus_data_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(tms70c46_device::dockbus_data_w)
+void tms70c46_device::dockbus_data_w(uint8_t data)
 {
 }

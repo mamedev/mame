@@ -163,11 +163,11 @@ private:
 	// screen
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
-	DECLARE_WRITE16_MEMBER(IPConReg_w);
+	void IPConReg_w(uint16_t data);
 	DECLARE_WRITE16_MEMBER(EPConReg_w);
-	DECLARE_WRITE16_MEMBER(FIFOReg_w);
+	void FIFOReg_w(uint16_t data);
 	DECLARE_WRITE16_MEMBER(FIFOBus_w);
-	DECLARE_WRITE16_MEMBER(DiskReg_w);
+	void DiskReg_w(uint16_t data);
 	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
 
 	// uarts
@@ -310,7 +310,7 @@ uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE16_MEMBER(notetaker_state::IPConReg_w)
+void notetaker_state::IPConReg_w(uint16_t data)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
 	m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
@@ -363,7 +363,7 @@ WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
-WRITE16_MEMBER(notetaker_state::FIFOReg_w)
+void notetaker_state::FIFOReg_w(uint16_t data)
 {
 	m_SetSH = (data&0x8000)?1:0;
 	m_SHConA = (data&0x4000)?1:0;
@@ -397,7 +397,7 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 	m_outfifo_head_ptr&=0xF;
 }
 
-WRITE16_MEMBER( notetaker_state::DiskReg_w )
+void notetaker_state::DiskReg_w(uint16_t data)
 {
 	/* See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf
 	   but note that bit 12 (called bit 3 in documentation) was changed between
@@ -793,14 +793,14 @@ void notetaker_state::iop_reset()
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg ls273 latch at #f1
-	IPConReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	IPConReg_w(0x0000);
 	// Clear the DAC FIFO
 	for (int i=0; i<16; i++) m_outfifo[i] = 0;
 	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	// reset the FIFOReg latch at #h9
-	FIFOReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	FIFOReg_w(0x0000);
 	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
-	DiskReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	DiskReg_w(0x0000);
 	// reset the framebuffer display address counter:
 	m_DispAddr = 0;
 }

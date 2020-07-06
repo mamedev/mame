@@ -2282,8 +2282,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		// loads the image if necessary
 		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
 		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			snapfile.set_restrict_to_mediapath(true);
+			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
 
 			// try to load snapshot first from saved "0000.png" file

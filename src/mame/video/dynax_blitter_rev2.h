@@ -30,8 +30,8 @@ public:
 	auto ready_cb() { return m_ready_cb.bind(); }
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(pen_w);
-	virtual DECLARE_WRITE8_MEMBER(regs_w);
+	void pen_w(uint8_t data);
+	virtual void regs_w(offs_t offset, uint8_t data);
 
 	// getter
 	u8 blit_pen() const { return m_blit_pen; }
@@ -79,8 +79,8 @@ public:
 	auto blit_dest_cb() { return m_blit_dest_cb.bind(); }
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(flags_w);
-	virtual DECLARE_WRITE8_MEMBER(regs_w) override;
+	void flags_w(uint8_t data);
+	virtual void regs_w(offs_t offset, uint8_t data) override;
 
 private:
 	// device-level overrides

@@ -328,7 +328,7 @@ void spectrum_state::spectrum_128(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296);
+	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 456, 0, 352,  311, 0, 296);
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);

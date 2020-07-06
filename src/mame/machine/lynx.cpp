@@ -1710,7 +1710,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		value = m_sound->read(space, offset);
+		value = m_sound->read(offset);
 		break;
 
 	case 0x80:
@@ -1777,7 +1777,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		m_sound->write(space, offset, data);
+		m_sound->write(offset, data);
 		return;
 
 	case 0x80:
@@ -1877,7 +1877,7 @@ READ8_MEMBER(lynx_state::lynx_memory_config_r)
 	return m_memory_config;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
+void lynx_state::lynx_memory_config_w(uint8_t data)
 {
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
 	 * when these are safe in the cpu */
@@ -1891,7 +1891,7 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 
 void lynx_state::machine_reset()
 {
-	lynx_memory_config_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	lynx_memory_config_w(0);
 
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
@@ -1926,7 +1926,7 @@ void lynx_state::machine_reset()
 
 void lynx_state::lynx_postload()
 {
-	lynx_memory_config_w(m_maincpu->space(AS_PROGRAM), 0, m_memory_config);
+	lynx_memory_config_w(m_memory_config);
 }
 
 void lynx_state::machine_start()

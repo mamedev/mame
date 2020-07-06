@@ -17,8 +17,8 @@ class scc2698b_channel : public device_t, public device_serial_interface
 public:
 	scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(mpi0_w);
-	DECLARE_WRITE_LINE_MEMBER(mpi1_w);
+	void mpi0_w(int state);
+	void mpi1_w(int state);
 
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte
@@ -80,11 +80,8 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-
-	void write_reg(int offset, uint8_t data);
-	uint8_t read_reg(int offset);
+	void write(offs_t offset, u8 data);
+	uint8_t read(offs_t offset);
 
 	auto intr_A() { return write_intr_A.bind(); }
 	auto intr_B() { return write_intr_B.bind(); }
@@ -93,14 +90,14 @@ public:
 
 	required_device_array<scc2698b_channel, 8> m_channel;
 
-	DECLARE_WRITE_LINE_MEMBER(port_a_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_b_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_c_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_d_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_e_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_f_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_g_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(port_h_rx_w);
+	void port_a_rx_w(int state);
+	void port_b_rx_w(int state);
+	void port_c_rx_w(int state);
+	void port_d_rx_w(int state);
+	void port_e_rx_w(int state);
+	void port_f_rx_w(int state);
+	void port_g_rx_w(int state);
+	void port_h_rx_w(int state);
 
 
 	void write_line_tx(int port, int value);

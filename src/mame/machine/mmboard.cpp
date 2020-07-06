@@ -99,13 +99,13 @@ void mephisto_board_device::device_reset()
 //  I/O handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER( mephisto_board_device::refresh_leds_w )
+void mephisto_board_device::refresh_leds_w(offs_t offset, uint8_t data)
 {
 	if (!m_disable_leds)
 		m_led_out[(offset >> 6 & 7) | (offset & 7) << 3] = data;
 }
 
-READ8_MEMBER( mephisto_board_device::input_r )
+uint8_t mephisto_board_device::input_r()
 {
 	uint8_t data = 0xff;
 
@@ -116,18 +116,18 @@ READ8_MEMBER( mephisto_board_device::input_r )
 	return data;
 }
 
-READ8_MEMBER( mephisto_board_device::mux_r )
+uint8_t mephisto_board_device::mux_r()
 {
 	return m_mux;
 }
 
-WRITE8_MEMBER( mephisto_board_device::mux_w )
+void mephisto_board_device::mux_w(uint8_t data)
 {
 	m_mux = data;
 	update_led_pwm();
 }
 
-WRITE8_MEMBER( mephisto_board_device::led_w )
+void mephisto_board_device::led_w(uint8_t data)
 {
 	m_led_data = data;
 	update_led_pwm();

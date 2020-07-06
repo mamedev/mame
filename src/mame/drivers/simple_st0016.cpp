@@ -704,23 +704,23 @@ ROM_END
 
 void st0016_state::init_renju()
 {
-	m_maincpu->set_st0016_game_flag(0);
+	m_maincpu->set_game_flag(0);
 }
 
 void st0016_state::init_nratechu()
 {
-	m_maincpu->set_st0016_game_flag(1);
+	m_maincpu->set_game_flag(1);
 }
 
 void st0016_state::init_mayjinsn()
 {
-	m_maincpu->set_st0016_game_flag(4 /*| 0x80*/);
+	m_maincpu->set_game_flag(4 /*| 0x80*/);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 
 void st0016_state::init_mayjisn2()
 {
-	m_maincpu->set_st0016_game_flag(4);
+	m_maincpu->set_game_flag(4);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 

@@ -622,8 +622,8 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
-	DECLARE_READ8_MEMBER(upi41_master_r);
-	DECLARE_WRITE8_MEMBER(upi41_master_w);
+	uint8_t upi41_master_r(offs_t offset);
+	void upi41_master_w(offs_t offset, uint8_t data);
 
 protected:
 	// construction/destruction

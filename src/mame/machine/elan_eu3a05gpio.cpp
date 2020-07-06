@@ -54,7 +54,7 @@ uint8_t elan_eu3a05gpio_device::read_direction(int which)
 	return m_ddr[which];
 }
 
-READ8_MEMBER(elan_eu3a05gpio_device::gpio_r)
+uint8_t elan_eu3a05gpio_device::gpio_r(offs_t offset)
 {
 
 	int port = offset/2;
@@ -81,14 +81,14 @@ void elan_eu3a05gpio_device::write_direction(int which, uint8_t data)
 	m_ddr[which] = data;
 }
 
-WRITE8_MEMBER(elan_eu3a05gpio_device::gpio_w)
+void elan_eu3a05gpio_device::gpio_w(offs_t offset, uint8_t data)
 {
 	int port = offset/2;
 	if (!(offset&1)) return write_direction(port, data);
 	else return write_port_data(port, data);
 }
 
-WRITE8_MEMBER(elan_eu3a05gpio_device::gpio_unk_w)
+void elan_eu3a05gpio_device::gpio_unk_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: gpio_unk_w (port %d) %02x (direction register %02x)\n", machine().describe_context(), offset, data, m_ddr[offset]);
 }

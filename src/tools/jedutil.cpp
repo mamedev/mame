@@ -94,10 +94,11 @@
         PAL20X8     = QP24 QF1600
         PAL20X10    = QP24 QF1600
 
-        PAL22V10    = QP24 QF5828?
-
         GAL20V8A    = QP24 QF2706
         GAL22V10    = QP24 QF5892
+
+        PALCE22V10  = QP24 QF5828
+        PAL22V10    = QP24 QF5828
 
     28-pin devices:
         PLS100      = QP28 QF1928 (Tri-State)
@@ -290,6 +291,7 @@ static void print_pal20ra10_product_terms(const pal_data* pal, const jed_data* j
 static void print_pal20x4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -353,6 +355,7 @@ static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed);
+static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed);
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed);
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -664,6 +667,18 @@ static pin_fuse_rows pal20x10pinfuserows[] = {
 	{21, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 440},   /* Registered Output */
 	{22, NO_OUTPUT_ENABLE_FUSE_ROW, 160, 280},   /* Registered Output */
 	{23, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 120}};    /* Registered Output */
+
+static pin_fuse_rows palce22v10_pal22v10pinfuserows[] = {
+	{14, 5368, 5412, 5720},
+	{15, 4884, 4928, 5324},
+	{16, 4312, 4356, 4840},
+	{17, 3652, 3696, 4268},
+	{18, 2904, 2948, 3608},
+	{19, 2156, 2200, 2860},
+	{20, 1496, 1540, 2112},
+	{21, 924,  968,  1452},
+	{22, 440,  484,  880},
+	{23, 44,   88,   396}};
 
 static pin_fuse_rows _82s153_pls153pinfuserows[] = {
 	{9,  1472, 0, 0},
@@ -1456,6 +1471,30 @@ static pin_fuse_columns pal20x10pinfusecolumns[] = {
 	{23, 3, 2}
 };
 
+static pin_fuse_columns palce22v10_pal22v10pinfusecolumns[] = {
+	{1, 1, 0},
+	{2, 5, 4},
+	{3, 9, 8},
+	{4, 13, 12},
+	{5, 17, 16},
+	{6, 21, 20},
+	{7, 25, 24},
+	{8, 29, 28},
+	{9, 33, 32},
+	{10, 37, 36},
+	{11, 41, 40},
+	{13, 43, 42},
+	{14, 39, 38},
+	{15, 35, 34},
+	{16, 31, 30},
+	{17, 27, 26},
+	{18, 23, 22},
+	{19, 19, 18},
+	{20, 15, 14},
+	{21, 11, 10},
+	{22, 7, 6},
+	{23, 3, 2}};
+
 static pin_fuse_columns _82s153_pls153pinfusecolumns[] = {
 	{1,  1,  0},
 	{2,  3,  2},
@@ -2167,9 +2206,22 @@ static pal_data paldata[] = {
 		config_pal20x10_pins,
 		nullptr,
 		nullptr},
-	/*{"PAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+	/*{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"PAL22V10", 5828,
+		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
+		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
+		print_palce22v10_pal22v10_product_terms,
+		config_palce22v10_pal22v10_pins,
+		nullptr,
+		nullptr},
+	{"PALCE22V10", 5828,
+		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
+		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
+		print_palce22v10_pal22v10_product_terms,
+		config_palce22v10_pal22v10_pins,
+		nullptr,
+		nullptr},
 	{"82S153", 1842,
 		_82s153_pls153pinfuserows, ARRAY_LENGTH(_82s153_pls153pinfuserows),
 		_82s153_pls153pinfusecolumns, ARRAY_LENGTH(_82s153_pls153pinfusecolumns),
@@ -3705,6 +3757,42 @@ static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed)
 {
 	print_pal20xxx_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_palce22v10_pal22v10_product_terms - prints the product
+    terms for a PALCE22V10 and PAL22V10
+-------------------------------------------------*/
+
+static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	char buffer[200];
+
+	print_product_terms(pal, jed);
+
+	/* Synchronous Preset */
+
+	generate_product_terms(pal, jed, 5764, buffer);
+
+	if (strlen(buffer))
+	{
+		printf("Synchronous Preset:\n\n");
+		printf("%s\n", buffer);
+		printf("\n");
+	}
+
+	/* Asynchronous Reset */
+
+	generate_product_terms(pal, jed, 0, buffer);
+
+	if (strlen(buffer))
+	{
+		printf("Asynchronous Reset:\n\n");
+		printf("%s\n", buffer);
+		printf("\n");
+	}
 }
 
 
@@ -5930,6 +6018,87 @@ static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed)
 
 
 /*-------------------------------------------------
+    config_palce22v10_pal22v10_pins - configures the pins for
+    a PALCE22V10
+-------------------------------------------------*/
+
+static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _output_logic_macrocell output_logic_macrocell;
+	struct _output_logic_macrocell
+	{
+		uint16_t pin;
+		uint16_t s0_fuse; /* output polarity (0 - low, 1 - high) */
+		uint16_t s1_fuse; /* registers allowed (0 - registered, 1 - not registered) */
+	};
+
+	static output_logic_macrocell macrocells[] = {
+		{14, 5826, 5827},
+		{15, 5824, 5825},
+		{16, 5822, 5823},
+		{17, 5820, 5821},
+		{18, 5818, 5819},
+		{19, 5816, 5817},
+		{20, 5814, 5815},
+		{21, 5812, 5813},
+		{22, 5810, 5811},
+		{23, 5808, 5809}};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
+	uint16_t index, output_pin_count;
+
+	output_pin_count = 0;
+
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
+	{
+		if (jed_get_fuse(jed, macrocells[index].s1_fuse))
+		{
+			/* Combinatorial output or dedicated input */
+
+			if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+			{
+				output_pins[output_pin_count].pin = macrocells[index].pin;
+				output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+				if (!jed_get_fuse(jed, macrocells[index].s0_fuse))
+				{
+					output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+				}
+				else
+				{
+					output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+				}
+
+				++output_pin_count;
+			}
+		}
+		else
+		{
+			/* Registered output */
+
+			output_pins[output_pin_count].pin = macrocells[index].pin;
+			output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+			if (!jed_get_fuse(jed, macrocells[index].s0_fuse))
+			{
+				output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+			}
+			else
+			{
+				output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+			}
+
+			++output_pin_count;
+		}
+	}
+
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, output_pin_count);
+}
+
+
+
+/*-------------------------------------------------
     config_82s153_pls153_pins - configures the pins for
     a 82S153/PLS153
 -------------------------------------------------*/
@@ -7323,6 +7492,8 @@ static int print_usage()
 		"  jedutil -view <source.jed> <device> -- dump JED logic equations\n"
 		"  jedutil -view <source.bin> <device> -- dump binary logic equations\n"
 		"  jedutil -viewlist -- view list of supported devices\n"
+		"  jedutil -listcompatible <source.jed> -- list compatible devices\n"
+		"  jedutil -listcompatible <source.bin> -- list compatible devices\n"
 	);
 
 	return 0;
@@ -7577,6 +7748,77 @@ static int command_viewlist(int argc, char *argv[])
 }
 
 
+
+/*-------------------------------------------------
+    command_listcompatible - views the list of
+                             compatible devices
+-------------------------------------------------*/
+
+static int command_listcompatible(int argc, char *argv[])
+{
+	int result = 0;
+	const char *srcfile;
+	int is_jed;
+	jed_data jed;
+	int err;
+	int index;
+
+	if (argc != 1)
+	{
+		return print_usage();
+	}
+
+	/* extract arguments */
+	srcfile = argv[0];
+
+	/* does the source end in '.jed'? */
+	is_jed = is_jed_file(srcfile);
+
+	/* read the source file */
+	err = read_source_file(srcfile);
+	if (err != 0)
+	{
+		result = 1;
+		goto end;
+	}
+
+	/* if the source is JED, convert to binary */
+	if (is_jed)
+	{
+		/* read the JEDEC data */
+		err = jed_parse(srcbuf, srcbuflen, &jed);
+		switch (err)
+		{
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); result = 1; goto end;
+			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); result = 1; goto end;
+			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); result = 1; goto end;
+		}
+	}
+	else
+	{
+		/* read the binary data */
+		err = jedbin_parse(srcbuf, srcbuflen, &jed);
+		switch (err)
+		{
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); result = 1; goto end;
+		}
+	}
+
+	for (index = 0; index < ARRAY_LENGTH(paldata); ++index)
+	{
+		if (paldata[index].numfuses == jed.numfuses)
+		{
+			printf("%s\n", paldata[index].name);
+		}
+	}
+
+end:
+	free(srcbuf);
+	return result;
+}
+
+
+
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
@@ -7584,9 +7826,10 @@ static int command_viewlist(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	command_entry command_entries[] = {
-		{"-convert",  &command_convert},
-		{"-view",     &command_view},
-		{"-viewlist", &command_viewlist}};
+		{"-convert",        &command_convert},
+		{"-view",           &command_view},
+		{"-viewlist",       &command_viewlist},
+		{"-listcompatible", &command_listcompatible}};
 	int index;
 
 	if (argc < 2)

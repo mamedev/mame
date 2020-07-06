@@ -109,7 +109,7 @@ private:
 	DECLARE_WRITE8_MEMBER(video_low_w);
 	DECLARE_WRITE8_MEMBER(video_high_w);
 	DECLARE_WRITE8_MEMBER(pio_port_b_w);
-	DECLARE_READ8_MEMBER(pio_port_b_r);
+	uint8_t pio_port_b_r();
 	DECLARE_WRITE_LINE_MEMBER(pio_ardy);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_READ8_MEMBER(fdc_status_r);

@@ -4071,7 +4071,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="44408">
-				<rom name="francais ce - grammaire et orthographe 4 - accord, d'accord! (1985)(vifi-nathan)(fr).k7" size="44408" crc="dc7ffcb6" sha1="affe06b34bc7e0c2d7bce8de28fe3c2c168affae"/>
+				<rom name="francais ce - grammaire et orthographe 4 - accord, d'accord (1985)(vifi-nathan)(fr).k7" size="44408" crc="dc7ffcb6" sha1="affe06b34bc7e0c2d7bce8de28fe3c2c168affae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4083,7 +4083,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="44408">
-				<rom name="francais ce - grammaire et orthographe 4 - accord, d'accord! (1985)(vifi-nathan)(fr)[a].k7" size="44408" crc="9a40841a" sha1="8d535ead9d7f2e6dc2ea218d250095f3ac431f15"/>
+				<rom name="francais ce - grammaire et orthographe 4 - accord, d'accord (1985)(vifi-nathan)(fr)[a].k7" size="44408" crc="9a40841a" sha1="8d535ead9d7f2e6dc2ea218d250095f3ac431f15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4095,7 +4095,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="16133872">
-				<rom name="francais ce - grammaire et orthographe 4 - accord, d'accord! (1985)(vifi-nathan)(fr).wav" size="16133872" crc="20478ed3" sha1="106de7af77fdc30cd1f90f5a06b2f9d727996703"/>
+				<rom name="francais ce - grammaire et orthographe 4 - accord, d'accord (1985)(vifi-nathan)(fr).wav" size="16133872" crc="20478ed3" sha1="106de7af77fdc30cd1f90f5a06b2f9d727996703"/>
 			</dataarea>
 		</part>
 	</software>

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "audio/seibu.h"
-#include "machine/seibucop/seibucop.h"
+#include "machine/seibucop.h"
 #include "video/bufsprite.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"

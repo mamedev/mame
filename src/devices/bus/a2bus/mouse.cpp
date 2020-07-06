@@ -231,7 +231,7 @@ WRITE8_MEMBER(a2bus_mouse_device::pia_out_a)
 
 WRITE8_MEMBER(a2bus_mouse_device::pia_out_b)
 {
-	m_mcu->pc_w(space, 0, 0xf0 | ((data >> 4) & 0x0f));
+	m_mcu->pc_w(0xf0 | ((data >> 4) & 0x0f));
 
 	m_rom_bank = (data & 0xe) << 7;
 }
@@ -294,7 +294,7 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
 
 WRITE8_MEMBER(a2bus_mouse_device::mcu_port_c_w)
 {
-	m_pia->write_portb(data << 4);
+	m_pia->portb_w(data << 4);
 }
 
 template <unsigned AXIS, u8 DIR, u8 CLK> void a2bus_mouse_device::update_axis()

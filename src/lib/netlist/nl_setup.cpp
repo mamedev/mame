@@ -62,7 +62,7 @@ namespace netlist
 		std::initializer_list<const char *> params_and_connections)
 	{
 		std::vector<pstring> params;
-		auto i(params_and_connections.begin());
+		const auto *i(params_and_connections.begin());
 		pstring name(*i);
 		++i;
 		for (; i != params_and_connections.end(); ++i)
@@ -138,7 +138,7 @@ namespace netlist
 
 	void nlparse_t::register_dev(const pstring &classname, const pstring &name)
 	{
-		auto f = m_factory.factory_by_name(classname);
+		auto *f = m_factory.factory_by_name(classname);
 		if (f == nullptr)
 		{
 			log().fatal(MF_CLASS_1_NOT_FOUND(classname));
@@ -305,7 +305,7 @@ namespace netlist
 
 	bool nlparse_t::device_exists(const pstring &name) const
 	{
-		for (auto &d : m_device_factory)
+		for (const auto &d : m_device_factory)
 			if (d.first == name)
 				return true;
 		return false;
@@ -436,7 +436,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 	do {
 		ret = temp;
 		temp = "";
-		for (auto &e : m_alias)
+		for (const auto &e : m_alias)
 		{
 			// FIXME: this will resolve first one found
 			if (e.second == ret)
@@ -454,7 +454,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname) const
 {
 	std::vector<pstring> terms;
-	for (auto & t : m_terminals)
+	for (const auto & t : m_terminals)
 	{
 		if (plib::startsWith(t.second->name(), devname))
 		{
@@ -464,7 +464,7 @@ std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devna
 		}
 	}
 
-	for (auto & t : m_alias)
+	for (const auto & t : m_alias)
 	{
 		if (plib::startsWith(t.first, devname))
 		{
@@ -596,7 +596,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 	out.net().add_terminal(new_proxy->in());
 
-	auto proxy(new_proxy.get());
+	auto *proxy(new_proxy.get());
 	if (!m_proxies.insert({&out, proxy}).second)
 		throw nl_exception(MF_DUPLICATE_PROXY_1(out.name()));
 
@@ -621,7 +621,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 	auto new_proxy = incast.logic_family()->create_a_d_proxy(m_nlstate, x, &incast);
 	//auto new_proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 
-	auto ret(new_proxy.get());
+	auto *ret(new_proxy.get());
 
 	if (!m_proxies.insert({&inp, ret}).second)
 		throw nl_exception(MF_DUPLICATE_PROXY_1(inp.name()));
@@ -672,13 +672,13 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 		return; // Nothing to do
 	}
 
-	if (thisnet.isRailNet() && othernet.isRailNet())
+	if (thisnet.is_rail_net() && othernet.is_rail_net())
 	{
 		log().fatal(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
 		throw nl_exception(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
 	}
 
-	if (othernet.isRailNet())
+	if (othernet.is_rail_net())
 	{
 		log().debug("othernet is railnet\n");
 		merge_nets(othernet, thisnet);
@@ -695,7 +695,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 {
 	if (out.is_analog() && in.is_logic())
 	{
-		auto proxy = get_a_d_proxy(in);
+		auto *proxy = get_a_d_proxy(in);
 
 		out.net().add_terminal(proxy->proxy_term());
 	}
@@ -726,7 +726,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	{
 		log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(),
 				inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?", term.name());
-		auto proxy = get_a_d_proxy(inp);
+		auto *proxy = get_a_d_proxy(inp);
 
 		//out.net().register_con(proxy->proxy_term());
 		connect_terminals(term, proxy->proxy_term());
@@ -786,7 +786,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
 		auto anet = nlstate().pool().make_owned<analog_net_t>(m_nlstate,"net." + t1.name());
-		auto anetp = anet.get();
+		auto *anetp = anet.get();
 		m_nlstate.register_net(std::move(anet));
 		t1.set_net(anetp);
 		anetp->add_terminal(t2);
@@ -799,7 +799,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	bool ret = false;
 	if (t1.has_net())
 	{
-		if (t1.net().isRailNet())
+		if (t1.net().is_rail_net())
 			ret = connect(t2, t1.net().railterminal());
 		if (!ret)
 		{
@@ -814,7 +814,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	}
 	if (!ret && t2.has_net())
 	{
-		if (t2.net().isRailNet())
+		if (t2.net().is_rail_net())
 			ret = connect(t1, t2.net().railterminal());
 		if (!ret)
 		{
@@ -839,7 +839,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 
 	if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
-		if (t2.has_net() && t2.net().isRailNet())
+		if (t2.has_net() && t2.net().is_rail_net())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
 			throw nl_exception(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
@@ -848,7 +848,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	}
 	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
-		if (t1.has_net() && t1.net().isRailNet())
+		if (t1.has_net() && t1.net().is_rail_net())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
 			throw nl_exception(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
@@ -893,17 +893,43 @@ void setup_t::resolve_inputs()
 	// after all other terminals were connected.
 
 	unsigned tries = m_netlist_params->m_max_link_loops();
+#if 0
+	// This code fails for some netlists when the element at position 0
+	// is deleted. It will fail somewhere deep in std::pair releasing
+	// std::string called from erase.
+	//
+	// One example is the this netlist:
+	//
+	// #include "netlist/devices/net_lib.h"
+	// NETLIST_START(charge_discharge)
+	//     SOLVER(solver, 48000) // Fixed frequency solver
+	//     CLOCK(I, 200) // 200 Hz  clock as input, TTL logic output
+	//     RES(R, RES_K(1))
+	//     CAP(C, CAP_U(1))
+	//
+	//     NET_C(I.Q, R.1)
+	//     NET_C(R.2, C.1)
+	//     NET_C(C.2, GND)
+	//
+	//     ALIAS(O, R.2) // Output O == C.1 == R.2
+	// // NETLIST_END()
+	//
+	// Just save the net list as /tmp/test1.cpp, run
+	// ./nltool --cmd=run -t 0.05 -l O -l I /tmp/test1.cpp
+	// and see it crash with this code enabled.
+	//
+	// g++-7 (Ubuntu 7.4.0-1ubuntu1~16.04~ppa1) 7.4.0
+	//
 	while (!m_links.empty() && tries >  0)
 	{
-
-		for (auto li = m_links.begin(); li != m_links.end(); )
+		auto li = m_links.begin();
+		while (li != m_links.end())
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 
-			//printf("%s %s\n", t1s.c_str(), t2s.c_str());
 			if (connect(*t1, *t2))
 				li = m_links.erase(li);
 			else
@@ -911,6 +937,23 @@ void setup_t::resolve_inputs()
 		}
 		tries--;
 	}
+#else
+	while (!m_links.empty() && tries > 0)
+	{
+		for (std::size_t i = 0; i < m_links.size(); )
+		{
+			const pstring t1s(m_links[i].first);
+			const pstring t2s(m_links[i].second);
+			detail::core_terminal_t *t1 = find_terminal(t1s);
+			detail::core_terminal_t *t2 = find_terminal(t2s);
+			if (connect(*t1, *t2))
+				m_links.erase(m_links.begin() + static_cast<std::ptrdiff_t>(i));
+			else
+				i++;
+		}
+		tries--;
+	}
+#endif
 	if (tries == 0)
 	{
 		for (auto & link : m_links)
@@ -947,7 +990,7 @@ void setup_t::resolve_inputs()
 			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
 			err = true;
 		}
-		else if (term->net().num_cons() == 0)
+		else if (!term->net().has_connections())
 		{
 			if (term->is_logic_input())
 				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(term->name()));
@@ -973,7 +1016,7 @@ void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
 	for (const pstring &ll : loglist)
 	{
 		pstring name = "log_" + ll;
-		auto nc = factory().factory_by_name("LOG")->Create(m_nlstate.pool(), m_nlstate, name);
+		auto nc = factory().factory_by_name("LOG")->make_device(m_nlstate.pool(), m_nlstate, name);
 		register_link(name + ".I", ll);
 		log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 		m_nlstate.register_device(nc->name(), std::move(nc));
@@ -1055,7 +1098,7 @@ pstring models_t::model_string(const model_map_t &map)
 {
 	// operator [] has no const implementation
 	pstring ret = map.at("COREMODEL") + "(";
-	for (auto & i : map)
+	for (const auto & i : map)
 		ret += (i.first + '=' + i.second + ' ');
 
 	return ret + ")";
@@ -1154,7 +1197,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	ret->m_R_low = m_models.value(model, "ORL");
 	ret->m_R_high = m_models.value(model, "ORH");
 
-	auto retp = ret.get();
+	auto *retp = ret.get();
 
 	m_nlstate.m_family_cache.emplace(model, std::move(ret));
 
@@ -1183,12 +1226,12 @@ void setup_t::delete_empty_nets()
 {
 	m_nlstate.nets().erase(
 		std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
-			[](owned_pool_ptr<detail::net_t> &x)
+			[](owned_pool_ptr<detail::net_t> &net)
 			{
-				if (x->num_cons() == 0)
+				if (!net->has_connections())
 				{
-					x->state().log().verbose("Deleting net {1} ...", x->name());
-					x->state().run_state_manager().remove_save_items(x.get());
+					net->state().log().verbose("Deleting net {1} ...", net->name());
+					net->state().run_state_manager().remove_save_items(net.get());
 					return true;
 				}
 				return false;
@@ -1217,13 +1260,13 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_nlstate.register_device(e.first, e.second->Create(nlstate().pool(), m_nlstate, e.first));
+			m_nlstate.register_device(e.first, e.second->make_device(nlstate().pool(), m_nlstate, e.first));
 		}
 	}
 
 	log().debug("Searching for solver and parameters ...\n");
 
-	auto solver = m_nlstate.get_single_device<devices::NETLIB_NAME(solver)>("solver");
+	auto *solver = m_nlstate.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 	m_netlist_params = m_nlstate.get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
 	// set default model parameters
@@ -1239,7 +1282,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = e.second->Create(m_nlstate.pool(), m_nlstate, e.first);
+			auto dev = e.second->make_device(m_nlstate.pool(), m_nlstate, e.first);
 			m_nlstate.register_device(dev->name(), std::move(dev));
 		}
 	}
@@ -1293,7 +1336,7 @@ void setup_t::prepare_to_run()
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
-		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		if (t->m_N.net().is_rail_net() && t->m_P.net().is_rail_net())
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
 				t->name(), t->m_N.net().name(), t->m_P.net().name()));
@@ -1341,7 +1384,7 @@ source_string_t::stream_ptr source_string_t::stream(const pstring &name)
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::istringstream>(m_str));
 	ret->imbue(std::locale::classic());
-	return std::move(ret);
+	return std::move(ret); // FIXME: for c++11 clang builds
 }
 
 source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
@@ -1349,7 +1392,7 @@ source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::istringstream>(m_str, std::ios_base::binary));
 	ret->imbue(std::locale::classic());
-	return std::move(ret);
+	return std::move(ret); // FIXME: for c++11 clang builds
 }
 
 source_file_t::stream_ptr source_file_t::stream(const pstring &name)

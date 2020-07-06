@@ -1245,7 +1245,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 1:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1255,7 +1255,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 2:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1265,7 +1265,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 3:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1372,6 +1372,15 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 			}
 			else        // 320 mode
 			{
+				// the low 5 bits of the SCB determine the initial fillmode color
+				// for the scanline (hardware testing by John Brooks)
+				static const uint32_t fillmode_init[32] =
+				{
+					2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+				};
+
+				last_pixel = fillmode_init[scb & 0x1f];
 				for (col = 0; col < 160; col++)
 				{
 					b = vram[col];

@@ -49,7 +49,7 @@ public:
 
 	template <typename... T> void set_vector_func(T &&... args) { m_vector_callback.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( read_jmi );
+	uint8_t read_jmi();
 	void wdt_timer_trigger();
 
 protected:

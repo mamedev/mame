@@ -114,9 +114,9 @@ public:
 	// conversion to other forms
 	constexpr double as_double() const noexcept { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	constexpr attoseconds_t as_attoseconds() const noexcept;
-	constexpr double as_hz() const { return m_seconds == 0 ? ATTOSECONDS_TO_HZ(m_attoseconds) : is_never() ? 0.0 : 1.0 / as_double(); }
-	constexpr double as_khz() const { return m_seconds == 0 ? double(ATTOSECONDS_PER_MILLISECOND) / double(m_attoseconds) : is_never() ? 0.0 : 1e-3 / as_double(); }
-	constexpr double as_mhz() const { return m_seconds == 0 ? double(ATTOSECONDS_PER_MICROSECOND) / double(m_attoseconds) : is_never() ? 0.0 : 1e-6 / as_double(); }
+	double as_hz() const noexcept { assert(!is_zero()); return m_seconds == 0 ? ATTOSECONDS_TO_HZ(m_attoseconds) : is_never() ? 0.0 : 1.0 / as_double(); }
+	double as_khz() const noexcept { assert(!is_zero()); return m_seconds == 0 ? double(ATTOSECONDS_PER_MILLISECOND) / double(m_attoseconds) : is_never() ? 0.0 : 1e-3 / as_double(); }
+	double as_mhz() const noexcept { assert(!is_zero()); return m_seconds == 0 ? double(ATTOSECONDS_PER_MICROSECOND) / double(m_attoseconds) : is_never() ? 0.0 : 1e-6 / as_double(); }
 	u64 as_ticks(u32 frequency) const;
 	u64 as_ticks(const XTAL &xtal) const { return as_ticks(xtal.value()); }
 	/** Convert to string using at @p precision */

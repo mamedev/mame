@@ -27,11 +27,11 @@ public:
 	auto rs232_conn_txd_handler() { return m_rs232_conn_txd_handler.bind(); }
 	auto rs232_conn_dtr_handler() { return m_rs232_conn_dtr_handler.bind(); }
 	auto rs232_conn_rts_handler() { return m_rs232_conn_rts_handler.bind(); }
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_ri_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_rxd_w);
+	void rs232_conn_dcd_w(int state);
+	void rs232_conn_dsr_w(int state);
+	void rs232_conn_ri_w(int state);
+	void rs232_conn_cts_w(int state);
+	void rs232_conn_rxd_w(int state);
 
 protected:
 	swtpc8212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -74,16 +74,16 @@ private:
 
 	MC6845_UPDATE_ROW(update_row);
 
-	DECLARE_WRITE8_MEMBER(latch_w);
+	void latch_w(uint8_t data);
 	uint8_t m_latch_data;
 
-	DECLARE_READ8_MEMBER(pia0_pa_r);
-	DECLARE_READ8_MEMBER(pia0_pb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
+	uint8_t pia0_pa_r();
+	uint8_t pia0_pb_r();
+	void pia0_ca2_w(int state);
 
-	DECLARE_WRITE8_MEMBER(pia1_pa_w);
-	DECLARE_READ_LINE_MEMBER(pia1_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_pa_w(uint8_t data);
+	int pia1_ca1_r();
+	void pia1_ca2_w(int state);
 
 	uint8_t m_keyboard_data;
 	uint8_t m_keypad_data;
@@ -92,9 +92,9 @@ private:
 
 	void keyboard_put(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
-	DECLARE_WRITE_LINE_MEMBER(write_dtr);
-	DECLARE_WRITE_LINE_MEMBER(write_rts);
+	void write_txd(int state);
+	void write_dtr(int state);
+	void write_rts(int state);
 };
 
 DECLARE_DEVICE_TYPE(SWTPC8212, swtpc8212_device)

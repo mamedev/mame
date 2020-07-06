@@ -9,6 +9,7 @@
 #include "audio/atarijsa.h"
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
 #include "tilemap.h"
@@ -50,8 +51,8 @@ public:
 	uint16_t          m_playfield_yscroll;
 
 	virtual void device_post_load() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
+	void video_int_ack_w(uint16_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	DECLARE_WRITE16_MEMBER(mo_command_w);
 	DECLARE_WRITE16_MEMBER(a2d_select_w);
 	DECLARE_READ16_MEMBER(a2d_data_r);
@@ -63,8 +64,6 @@ public:
 	void init_pitfightb();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(atarig1);
-	DECLARE_MACHINE_RESET(atarig1);
 	DECLARE_VIDEO_START(atarig1);
 	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarig1(machine_config &config);

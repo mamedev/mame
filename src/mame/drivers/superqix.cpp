@@ -355,7 +355,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 		//already after a synchronize, and doing another one would be redundant
 	}
 
-	mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
+	mcu_port2_w(m_bl_fake_port2); // finally write to port 2, which will do another synchronize
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
@@ -395,7 +395,7 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_port3_w)
 	m_bl_port3_out = data;
 }
 
-WRITE8_MEMBER(superqix_state::mcu_port2_w)
+void superqix_state::mcu_port2_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_port2_w_cb), this), data);
 }
@@ -955,7 +955,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
+		mcu_port2_w(0x00);
 		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }

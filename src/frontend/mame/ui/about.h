@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-    ui/barcode.h
+    ui/about.h
 
     "About" modal
 
@@ -27,9 +27,6 @@ public:
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
-
-	bool m_pause_checked;
-	bool m_was_paused;
 };
 
 } // namespace ui

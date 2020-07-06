@@ -43,8 +43,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -53,19 +51,6 @@ private:
 	void dfruit_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
-
-void dfruit_state::video_start()
-{
-}
-
-uint32_t dfruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	m_vdp->screen_update(screen, bitmap, cliprect);
-
-	return 0;
-}
 
 WRITE_LINE_MEMBER(dfruit_state::screen_vblank)
 {
@@ -314,7 +299,7 @@ void dfruit_state::dfruit(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(dfruit_state::screen_update));
+	screen.set_screen_update("tc0091lvc", FUNC(tc0091lvc_device::screen_update));
 	screen.screen_vblank().set(FUNC(dfruit_state::screen_vblank));
 	screen.set_palette("tc0091lvc:palette");
 

@@ -643,6 +643,7 @@ public:
 	void kof2k4se(machine_config &config);
 	void mslug5(machine_config &config);
 	void ms5plus(machine_config &config);
+	void mslug5b(machine_config &config);
 	void svc(machine_config &config);
 	void svcboot(machine_config &config);
 	void svcplus(machine_config &config);
@@ -1064,7 +1065,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 	uint16_t ret;
 
 	if (m_memcard->present())
-		ret = m_memcard->read(space, offset) | 0xff00;
+		ret = m_memcard->read(offset) | 0xff00;
 	else
 		ret = 0xffff;
 
@@ -1079,7 +1080,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (m_memcard->present())
-				m_memcard->write(space, offset, data);
+				m_memcard->write(offset, data);
 	}
 }
 
@@ -2652,6 +2653,12 @@ void mvs_led_state::ms5plus(machine_config &config)
 {
 	mv1_fixed(config);
 	cartslot_fixed(config, "boot_ms5plus");
+}
+
+void mvs_led_state::mslug5b(machine_config &config)
+{
+	mv1_fixed(config);
+	cartslot_fixed(config, "boot_mslug5b");
 }
 
 void mvs_led_state::svc(machine_config &config)
@@ -11010,7 +11017,7 @@ ROM_START( matrimbl )
 	ROM_LOAD16_BYTE( "mart-c8.bin", 0x3000001, 0x800000, CRC(906cf267) SHA1(b0f2cf8887794d715f208751ddd1ed26b2c3ffdf) ) /* Plane 2,3 */
 ROM_END
 
-/* Metal Slug 5 bootleg */
+/* Metal Slug 5 bootlegs */
 
 ROM_START( ms5plus )
 	ROM_REGION( 0x500000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
@@ -11043,6 +11050,41 @@ ROM_START( ms5plus )
 	ROM_LOAD16_BYTE( "268-c6c.c6", 0x2000001, 0x800000, CRC(010a831b) SHA1(aec140661e3ae35d264df416478ba15188544d91) ) /* Plane 2,3 */ /* mask rom TC5364205 */
 	ROM_LOAD16_BYTE( "268-c7c.c7", 0x3000000, 0x800000, CRC(6d72a969) SHA1(968dd9a4d1209b770b9b85ea6532fa24d262a262) ) /* Plane 0,1 */ /* mask rom TC5364205 */
 	ROM_LOAD16_BYTE( "268-c8c.c8", 0x3000001, 0x800000, CRC(551d720e) SHA1(ebf69e334fcaba0fda6fd432fd0970283a365d12) ) /* Plane 2,3 */ /* mask rom TC5364205 */
+ROM_END
+
+/* clear cart, orange pcbs
+   prog board: no v encryption, uses a plcc epm7096lc84-15 for pcm, 16-bit v roms decoded by 2x 74hc245
+   cha board: no c/m encryption, uses a soic palce16v8 for zmc, 5x 74hc273a for neo-273, 6x so44 m59pw064 64Mbit + 2x dip lh28f160 16MBit flash roms for gfx
+   all roms are erasable flash chips, mixture of 5v and 3.3v
+   produced sometime after early 2004 (going by youngest ic date code) */
+ROM_START( mslug5b )
+	ROM_REGION( 0x500000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "ms5b-p1.bin", 0x000000, 0x100000, CRC(1376f43c) SHA1(7ca4a8b11c7effda2603d04e793cf664e7aa39bf) ) /* MX29F1615PC-10     16Mbit  2nd half empty */
+	ROM_LOAD16_WORD_SWAP( "ms5b-p2.bin", 0x100000, 0x400000, CRC(4becfba0) SHA1(fd3708f6c8fa26133b29b4b033148dff54dc1e7d) ) /* LH28F320BJD-TTL80  32Mbit  3.3v */
+
+	/* Scrambled */
+	NEO_SFIX_128K( "ms5b-s1.bin", CRC(3a427c9f) SHA1(6c6050640adb7148d42d35e3017cc171e53ae957) ) /* W29C011A-15  1Mbit */
+
+	/* Not encrypted */
+	NEO_BIOS_AUDIO_128K( "ms5b-m1.bin", CRC(bf1601bc) SHA1(5e285c98c65acefd77e893247482af0d09f3e1e4) ) /* W29EE011-15  1Mbit */
+
+	/* Not encrypted, odd bytes scrambled */
+	ROM_REGION( 0x1000000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "ms5b-v1.bin", 0x000000, 0x400000, CRC(e3f9fd75) SHA1(8772d0936c45623763b92c55816d0e56dd8d2ef2) ) /* LH28F320BJD-TTL80  32Mbit  3.3v  2 bytes diff vs decrypted */
+	ROM_LOAD( "ms5b-v2.bin", 0x400000, 0x400000, CRC(a53618f6) SHA1(002e37f3d45aa6153593c7939902e1a022de14c7) ) /* LH28F320BJD-TTL80  32Mbit  3.3v */
+	ROM_LOAD( "ms5b-v3.bin", 0x800000, 0x400000, CRC(14f000ee) SHA1(b30df60964cc8480b78a4bc2d323cad59e44a0ae) ) /* LH28F320BJD-TTL80  32Mbit  3.3v */
+	ROM_LOAD( "ms5b-v4.bin", 0xc00000, 0x400000, CRC(0ccee813) SHA1(4bc034f7f37da956b4116a2dea8a856b96e43c18) ) /* LH28F320BJD-TTL80  32Mbit  3.3v */
+
+	/* Not encrypted, a18/a19 lines swapped */
+	ROM_REGION( 0x4000000, "cslot1:sprites", 0 )
+	ROM_LOAD16_BYTE( "ms5b-c1.bin", 0x0000000, 0x800000, CRC(4b0e5998) SHA1(458486d579db118ec4ba4f9fce9d62fedfef949b) ) /* M59PW064  64Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c2.bin", 0x0000001, 0x800000, CRC(022fc30b) SHA1(7178900acbb377c3de95338c8fae56e308327cab) ) /* M59PW064  64Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c3.bin", 0x1000000, 0x800000, CRC(ead86d28) SHA1(e1db4f839972748f49dddfe3bd4b0cf2e0ddf074) ) /* M59PW064  64Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c4.bin", 0x1000001, 0x800000, CRC(0be6be35) SHA1(34e20e55423cefd2b98c15061f86198b64727173) ) /* M59PW064  64Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c5.bin", 0x2000000, 0x200000, CRC(2a23e569) SHA1(576370a24a8ef5ca0f8e7afa4ccdb0cb3ad9bdaa) ) /* LH28F160BJD-TTL80  16Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c6.bin", 0x2000001, 0x200000, CRC(6eb6bc9e) SHA1(4e54d904b0ce34cca429b3c86ab8bf972c66336e) ) /* LH28F160BJD-TTL80  16Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c7.bin", 0x3000000, 0x800000, CRC(57f4e53f) SHA1(813d98175288045c0750d45afe03c74973d70cee) ) /* M59PW064  64Mbit  3.3v */
+	ROM_LOAD16_BYTE( "ms5b-c8.bin", 0x3000001, 0x800000, CRC(9d59ff7c) SHA1(ff90dc79598de0880df17624c76df81c92f267ce) ) /* M59PW064  64Mbit  3.3v */
 ROM_END
 
 /* Puzzle Bobble / Bust-A-Move (Neo-Geo) bootleg */
@@ -11911,6 +11953,7 @@ GAME( 2004, kof2k4se,   kof2002,  kof2k4se,  neogeo,    mvs_led_state, empty_ini
 GAME( 2003, mslug5,     neogeo,   mslug5,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK Playmore", "Metal Slug 5 (NGM-2680)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, mslug5h,    mslug5,   mslug5,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK Playmore", "Metal Slug 5 (NGH-2680)", MACHINE_SUPPORTS_SAVE ) /* Also found in later MVS carts */
 GAME( 2003, ms5plus,    mslug5,   ms5plus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 5 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, mslug5b,    mslug5,   mslug5b,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 5 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svc,        neogeo,   svc,       neogeo,    mvs_led_state, empty_init, ROT0, "Playmore / Capcom", "SNK vs. Capcom - SVC Chaos (NGM-2690 ~ NGH-2690)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svcboot,    svc,      svcboot,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svcplus,    svc,      svcplus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 1)", MACHINE_SUPPORTS_SAVE )

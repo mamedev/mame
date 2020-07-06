@@ -57,14 +57,15 @@ DIMM controller registers
 
 28          16bit  dddd---c ------ba
                     a - 0->1 NAOMI reset
-                    b - 1 seems disable DIMM RAM access, followed by write 01010101 to bank 10 offset 000110 or 000190 (some MMIO?)
+                    b - 1 activates sdram command "load mode register", followed by write 01010101 to bank 10 offset 000110 or 000190 depending on cas latency
+                        address bits 12-3 correspond to bits A9-A0 in the sdram chip address bus when sending the command
                     c - unk, set to 1 in VxWorks, 0 in 1.02
                     d - unk, checked for == 1 in 1.02
 
 2A           8bit  possible DES decryption area size 8 MSB bits (16MB units number)
                    VxWorks firmwares set this to ((DIMMsize >> 24) - 1), 1.02 set it to FF
 
-2C          32bit  SDRAM config
+2C          32bit  DIMM SDRAM config
 30          32bit  DES key low
 34          32bit  DES key high
 
@@ -588,7 +589,7 @@ void naomi_gdrom_board::pci_map(address_map &map)
 	map(0x00000020, 0x00000023).rw(t, FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
 	map(0x00000024, 0x00000027).rw(t, FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
 	map(0x00000028, 0x0000002b).rw(t, FUNC(naomi_gdrom_board::sh4_control_r), FUNC(naomi_gdrom_board::sh4_control_w));
-	map(0x0000002c, 0x0000002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
+	map(0x0000002c, 0x0000002f).rw(t, FUNC(naomi_gdrom_board::sh4_sdramconfig_r), FUNC(naomi_gdrom_board::sh4_sdramconfig_w));
 	map(0x00000030, 0x00000033).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
 	map(0x00000034, 0x00000037).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
 	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
@@ -727,9 +728,14 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
 
 	dimm_control = data;
 	if (dimm_control & 2)
+	{
 		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		logerror("Activated 'load mode register' command mode\n");
+	}
 	else
+	{
 		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
 }
@@ -737,6 +743,17 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
 READ32_MEMBER(naomi_gdrom_board::sh4_control_r)
 {
 	return dimm_control;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_sdramconfig_w)
+{
+	dimm_sdramconfig = data;
+	logerror("Detected sdram dimm module size: %d megabytes\n", 4 * (1 << ((data >> 1) & 7)));
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_sdramconfig_r)
+{
+	return dimm_sdramconfig;
 }
 
 WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyl_w)

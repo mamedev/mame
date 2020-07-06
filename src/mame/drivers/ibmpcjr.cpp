@@ -6,7 +6,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-#include "machine/pc_fdc.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
@@ -271,7 +270,7 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
 
-	if(state && (data = m_keyboard->read(machine().dummy_space(), 0)))
+	if(state && (data = m_keyboard->read()))
 	{
 		uint8_t   parity = 0;
 		int     i;

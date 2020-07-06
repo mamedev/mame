@@ -40,7 +40,7 @@ namespace solver
 			{
 			}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_omega;
@@ -51,7 +51,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		// The matrix based code looks a lot nicer but actually is 30% slower than
 		// the optimized code which works directly on the data structures.
@@ -101,7 +101,7 @@ namespace solver
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_terms[k].template getV<FT>();
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 
 		do {
 			resched = false;
@@ -149,14 +149,8 @@ namespace solver
 		if (resched)
 		{
 			this->m_iterative_fail++;
-			return matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(newton_raphson);
+			matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic();
 		}
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

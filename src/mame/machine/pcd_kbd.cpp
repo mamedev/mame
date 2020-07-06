@@ -234,19 +234,19 @@ void pcd_keyboard_device::device_start()
 	m_out_tx_handler(1);
 }
 
-READ8_MEMBER( pcd_keyboard_device::bus_r )
+uint8_t pcd_keyboard_device::bus_r()
 {
 	if(m_p1 & 0x10)
 		return m_rows[16]->read();
 	return m_rows[m_p1 & 0xf]->read();
 }
 
-READ8_MEMBER( pcd_keyboard_device::p1_r )
+uint8_t pcd_keyboard_device::p1_r()
 {
 	return m_p1;
 }
 
-WRITE8_MEMBER( pcd_keyboard_device::p1_w )
+void pcd_keyboard_device::p1_w(uint8_t data)
 {
 	m_p1 = data;
 	m_out_tx_handler(BIT(data, 5));

@@ -43,17 +43,17 @@
  *
  *************************************/
 
-void rampart_state::update_interrupts()
+TIMER_DEVICE_CALLBACK_MEMBER(rampart_state::scanline_interrupt)
 {
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	/* generate 32V signals */
+	if ((param & 32) == 0)
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
 
-void rampart_state::scanline_update(screen_device &screen, int scanline)
+void rampart_state::scanline_int_ack_w(uint16_t data)
 {
-	/* generate 32V signals */
-	if ((scanline & 32) == 0)
-		scanline_int_write_line(1);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -66,8 +66,6 @@ void rampart_state::scanline_update(screen_device &screen, int scanline)
 
 void rampart_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 32);
 }
 
 
@@ -344,6 +342,8 @@ void rampart_state::rampart(machine_config &config)
 
 	SLAPSTIC(config, m_slapstic_device, 118, true);
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
+
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
@@ -362,7 +362,7 @@ void rampart_state::rampart(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(rampart_state::screen_update_rampart));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(rampart_state::video_int_write_line));
+	//m_screen->screen_vblank().set(FUNC(rampart_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

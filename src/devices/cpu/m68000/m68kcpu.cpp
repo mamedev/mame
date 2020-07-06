@@ -735,14 +735,14 @@ void m68000_base_device::set_irq_line(int irqline, int state)
 		m_nmi_pending = true;
 }
 
-void m68000_base_device::presave()
+void m68000_base_device::device_pre_save()
 {
 	m_save_sr = m68ki_get_sr();
 	m_save_stopped = (m_stopped & STOP_LEVEL_STOP) != 0;
 	m_save_halted  = (m_stopped & STOP_LEVEL_HALT) != 0;
 }
 
-void m68000_base_device::postload()
+void m68000_base_device::device_post_load()
 {
 	m68ki_set_sr_noint_nosp(m_save_sr);
 	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
@@ -1078,13 +1078,8 @@ void m68000_base_device::init_cpu_common(void)
 	save_item(NAME(m_mmu_last_page_entry));
 	save_item(NAME(m_mmu_last_page_entry_addr));
 
-	for (int i=0; i<MMU_ATC_ENTRIES;i++) {
-		save_item(NAME(m_mmu_atc_tag[i]), i);
-		save_item(NAME(m_mmu_atc_data[i]), i);
-	}
-
-	machine().save().register_presave(save_prepost_delegate(FUNC(m68000_base_device::presave), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(m68000_base_device::postload), this));
+	save_item(NAME(m_mmu_atc_tag));
+	save_item(NAME(m_mmu_atc_data));
 
 	set_icountptr(m_icount);
 	m_icount = 0;

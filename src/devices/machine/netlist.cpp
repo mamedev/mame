@@ -52,10 +52,11 @@ DEFINE_DEVICE_TYPE(NETLIST_LOGIC_OUTPUT,  netlist_mame_logic_output_device,  "nl
 DEFINE_DEVICE_TYPE(NETLIST_ANALOG_OUTPUT, netlist_mame_analog_output_device, "nl_analog_out", "Netlist Analog Output")
 DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl_stream_out", "Netlist Stream Output")
 
-
 // ----------------------------------------------------------------------------------------
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
+
+extern plib::dynlib_static_sym nl_static_solver_syms[];
 
 class netlist_mame_device::netlist_mame_callbacks_t : public netlist::callbacks_t
 {
@@ -88,10 +89,15 @@ protected:
 			m_parent.logerror("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 			m_parent.logerror("netlist FATAL: %s\n", ls.c_str());
 			break;
 		}
+	}
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	{
+		//return plib::make_unique<plib::dynlib_static>(nullptr);
+		return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 	}
 
 private:
@@ -128,8 +134,12 @@ protected:
 		case plib::plog_level::FATAL:
 			osd_printf_error("netlist FATAL: %s\n", ls);
 			break;
-			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 		}
+	}
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	{
+		return plib::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 private:
@@ -537,7 +547,7 @@ protected:
 				if (m_channels[i].m_buffer == nullptr)
 					break; // stop, called outside of stream_update
 				const nl_fptype v = m_channels[i].m_buffer[m_pos];
-				m_channels[i].m_param->setTo(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
+				m_channels[i].m_param->set(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
 			}
 		}
 		else
@@ -629,7 +639,7 @@ netlist::setup_t &netlist_mame_device::setup()
 
 void netlist_mame_device::register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name)
 {
-	setup.register_source(plib::make_unique<netlist_source_memregion_t>(dev, pstring(name)));
+	setup.register_source<netlist_source_memregion_t>(dev, pstring(name));
 }
 
 void netlist_mame_analog_input_device::write(const double val)
@@ -642,7 +652,7 @@ void netlist_mame_analog_input_device::write(const double val)
 void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
-	m_param->setTo(*((double *) ptr));
+	m_param->set(*((double *) ptr));
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -662,13 +672,13 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
-	m_param->setTo(param);
+	m_param->set(param);
 }
 
 void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
-	m_param->setTo(param);
+	m_param->set(param);
 }
 
 void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -837,7 +847,7 @@ netlist_mame_int_input_device::netlist_mame_int_input_device(const machine_confi
 
 void netlist_mame_int_input_device::set_params(const char *param_name, const uint32_t mask, const uint32_t shift)
 {
-	if (LOG_DEV_CALLS) logerror("set_params\n");
+	LOGDEVCALLS("set_params\n");
 	m_param_name = param_name;
 	m_shift = shift;
 	m_mask = mask;
@@ -880,7 +890,7 @@ netlist_mame_logic_input_device::netlist_mame_logic_input_device(const machine_c
 
 void netlist_mame_logic_input_device::set_params(const char *param_name, const uint32_t shift)
 {
-	if (LOG_DEV_CALLS) logerror("set_params\n");
+	LOGDEVCALLS("set_params\n");
 	m_param_name = param_name;
 	m_shift = shift;
 }
@@ -932,7 +942,7 @@ netlist_mame_ram_pointer_device::netlist_mame_ram_pointer_device(const machine_c
 
 void netlist_mame_ram_pointer_device::set_params(const char *param_name)
 {
-	if (LOG_DEV_CALLS) logerror("set_params\n");
+	LOGDEVCALLS("set_params\n");
 	m_param_name = param_name;
 }
 
@@ -1095,7 +1105,7 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 
 	/* add default data provider for roms - if not in validity check*/
 	//if (has_running_machine())
-		lsetup.register_source(plib::make_unique<netlist_data_memregions_t>(*this));
+		lsetup.register_source<netlist_data_memregions_t>(*this);
 
 	m_setup_func(lsetup);
 
@@ -1324,7 +1334,7 @@ void netlist_mame_cpu_device::device_start()
 
 void netlist_mame_cpu_device::nl_register_devices(netlist::setup_t &lsetup) const
 {
-	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
+	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-", __FILE__);
 }
 
 uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
@@ -1477,8 +1487,8 @@ void netlist_mame_sound_device::device_start()
 
 void netlist_mame_sound_device::nl_register_devices(netlist::setup_t &lsetup) const
 {
-	lsetup.factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN");
-	lsetup.factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-");
+	lsetup.factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN", __FILE__);
+	lsetup.factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-", __FILE__);
 }
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

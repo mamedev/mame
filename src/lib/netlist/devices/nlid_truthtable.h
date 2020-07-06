@@ -95,7 +95,7 @@ namespace devices
 #endif
 			}
 			for (auto &q : m_Q)
-				if (q.has_net() && q.net().num_cons() > 0)
+				if (q.has_net() && q.net().has_connections())
 					active_outputs++;
 			set_active_outputs(active_outputs);
 		}

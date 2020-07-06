@@ -37,8 +37,8 @@ public:
 	u16 get_backdrop_pen() { return m_entries-1; }
 
 	// I/O operations
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 read(offs_t offset);
 
 protected:
 	// device-level overrides

@@ -69,29 +69,29 @@ private:
 	inline void load_xy_reg();
 	void mover();
 
-	DECLARE_READ8_MEMBER( video_ram_r );
-	DECLARE_WRITE8_MEMBER( video_ram_w );
+	uint8_t video_ram_r(offs_t offset);
+	void video_ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( iord0_r );
-	DECLARE_WRITE8_MEMBER( ldsx_hb_w );
-	DECLARE_WRITE8_MEMBER( ldsx_lb_w );
-	DECLARE_WRITE8_MEMBER( ldsy_hb_w );
-	DECLARE_WRITE8_MEMBER( ldsy_lb_w );
-	DECLARE_WRITE8_MEMBER( ldtx_hb_w );
-	DECLARE_WRITE8_MEMBER( ldtx_lb_w );
-	DECLARE_WRITE8_MEMBER( ldty_hb_w );
-	DECLARE_WRITE8_MEMBER( ldty_lb_w );
-	DECLARE_WRITE8_MEMBER( ldfx_hb_w );
-	DECLARE_WRITE8_MEMBER( ldfx_lb_w );
-	DECLARE_WRITE8_MEMBER( ldfy_hb_w );
-	DECLARE_WRITE8_MEMBER( ldfy_lb_w );
-	DECLARE_WRITE8_MEMBER( wrml_w );
-	DECLARE_WRITE8_MEMBER( wrdl_w );
-	DECLARE_WRITE8_MEMBER( wrmask_strobe_hb_w );
-	DECLARE_WRITE8_MEMBER( wrmask_strobe_lb_w );
-	DECLARE_WRITE8_MEMBER( enable_clocks_w );
-	DECLARE_WRITE8_MEMBER( flag_strobe_w );
-	DECLARE_WRITE8_MEMBER( endisp_w );
+	uint8_t iord0_r();
+	void ldsx_hb_w(uint8_t data);
+	void ldsx_lb_w(uint8_t data);
+	void ldsy_hb_w(uint8_t data);
+	void ldsy_lb_w(uint8_t data);
+	void ldtx_hb_w(uint8_t data);
+	void ldtx_lb_w(uint8_t data);
+	void ldty_hb_w(uint8_t data);
+	void ldty_lb_w(uint8_t data);
+	void ldfx_hb_w(uint8_t data);
+	void ldfx_lb_w(uint8_t data);
+	void ldfy_hb_w(uint8_t data);
+	void ldfy_lb_w(uint8_t data);
+	void wrml_w(offs_t offset, uint8_t data);
+	void wrdl_w(offs_t offset, uint8_t data);
+	void wrmask_strobe_hb_w(uint8_t data);
+	void wrmask_strobe_lb_w(uint8_t data);
+	void enable_clocks_w(uint8_t data);
+	void flag_strobe_w(uint8_t data);
+	void endisp_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

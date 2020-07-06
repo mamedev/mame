@@ -47,23 +47,23 @@ void elan_eu3a14sys_device::device_reset()
 }
 
 
-READ8_MEMBER(elan_eu3a14sys_device::dma_param_r)
+uint8_t elan_eu3a14sys_device::dma_param_r(offs_t offset)
 {
 	return m_dmaparams[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a14sys_device::dma_param_w)
+void elan_eu3a14sys_device::dma_param_w(offs_t offset, uint8_t data)
 {
 	m_dmaparams[offset] = data;
 }
 
-READ8_MEMBER(elan_eu3a14sys_device::dma_trigger_r)
+uint8_t elan_eu3a14sys_device::dma_trigger_r()
 {
 	logerror("%s: dma_trigger_r\n", machine().describe_context());
 	return 0;
 }
 
-WRITE8_MEMBER(elan_eu3a14sys_device::dma_trigger_w)
+void elan_eu3a14sys_device::dma_trigger_w(uint8_t data)
 {
 	uint32_t dmasrc = (m_dmaparams[2] << 16) | (m_dmaparams[1] << 8) | (m_dmaparams[0] << 0);
 	uint32_t dmadst = (m_dmaparams[5] << 16) | (m_dmaparams[4] << 8) | (m_dmaparams[3] << 0);

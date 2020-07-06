@@ -298,14 +298,6 @@ private:
 	void reinstall(address_space &space, read_or_write mode);
 	void write_tracking(address_space &space, offs_t address, u64 data);
 
-	// symbol get/set callbacks
-	static u64 get_current_pc(symbol_table &table);
-	static u64 get_cycles(symbol_table &table);
-	static u64 get_totalcycles(symbol_table &table);
-	static u64 get_lastinstructioncycles(symbol_table &table);
-	static u64 get_state(symbol_table &table, int index);
-	static void set_state(symbol_table &table, int index, u64 value);
-
 	// basic device information
 	device_t &                 m_device;                // device we are attached to
 	device_execute_interface * m_exec;                  // execute interface, if present
@@ -507,10 +499,10 @@ public:
 	/* ----- symbol table interfaces ----- */
 
 	/* return the global symbol table */
-	symbol_table *get_global_symtable() { return m_symtable.get(); }
+	symbol_table &global_symtable() { return *m_symtable; }
 
 	/* return the locally-visible symbol table */
-	symbol_table *get_visible_symtable();
+	symbol_table &visible_symtable();
 
 
 	/* ----- debugger comment helpers ----- */
@@ -589,22 +581,19 @@ private:
 	static const size_t NUM_TEMP_VARIABLES;
 
 	/* expression handlers */
-	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size, bool disable_se);
+	u64 expression_read_memory(const char *name, expression_space space, u32 address, int size, bool disable_se);
 	u64 expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
 	u64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
-	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data, bool disable_se);
+	void expression_write_memory(const char *name, expression_space space, u32 address, int size, u64 data, bool disable_se);
 	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void expression_write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
-	expression_error::error_code expression_validate(void *param, const char *name, expression_space space);
+	expression_error::error_code expression_validate(const char *name, expression_space space);
 	device_t* expression_get_device(const char *tag);
 
-	/* variable getters/setters */
-	u64 get_cpunum(symbol_table &table);
-	u64 get_beamx(symbol_table &table, screen_device *screen);
-	u64 get_beamy(symbol_table &table, screen_device *screen);
-	u64 get_frame(symbol_table &table, screen_device *screen);
+	// variable getters/setters
+	u64 get_cpunum();
 
-	/* internal helpers */
+	// internal helpers
 	void on_vblank(screen_device &device, bool vblank_state);
 
 	running_machine&    m_machine;

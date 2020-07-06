@@ -14,12 +14,12 @@
 
 DEFINE_DEVICE_TYPE(DECODMD3, decodmd_type3_device, "decodmd3", "Data East Pinball Dot Matrix Display Type 3")
 
-WRITE8_MEMBER( decodmd_type3_device::data_w )
+void decodmd_type3_device::data_w(uint8_t data)
 {
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type3_device::busy_r )
+uint8_t decodmd_type3_device::busy_r()
 {
 	uint8_t ret = 0x00;
 
@@ -31,7 +31,7 @@ READ8_MEMBER( decodmd_type3_device::busy_r )
 		return 0x00 | ret;
 }
 
-WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
+void decodmd_type3_device::ctrl_w(uint8_t data)
 {
 	if(!(m_ctrl & 0x01) && (data & 0x01))
 	{
@@ -47,17 +47,17 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ16_MEMBER( decodmd_type3_device::status_r )
+uint16_t decodmd_type3_device::status_r()
 {
 	return m_status;
 }
 
-WRITE16_MEMBER( decodmd_type3_device::status_w )
+void decodmd_type3_device::status_w(uint16_t data)
 {
 	m_status = data & 0x0f;
 }
 
-READ16_MEMBER( decodmd_type3_device::latch_r )
+uint16_t decodmd_type3_device::latch_r()
 {
 	// clear IRQ?
 	m_cpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
@@ -70,7 +70,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type3_device::dmd_irq)
 	m_cpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
-WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
+void decodmd_type3_device::crtc_address_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{
@@ -79,7 +79,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 	}
 }
 
-READ16_MEMBER( decodmd_type3_device::crtc_status_r )
+uint16_t decodmd_type3_device::crtc_status_r(offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 		return m_mc6845->register_r();
@@ -87,7 +87,7 @@ READ16_MEMBER( decodmd_type3_device::crtc_status_r )
 		return 0xff;
 }
 
-WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
+void decodmd_type3_device::crtc_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{

@@ -6,9 +6,16 @@
 SciSys Chess Partner 2000, also sold by Novag with the same name.
 It's probably the last SciSys / Novag collaboration.
 
-- 3850PK CPU at ~2MHz, 3853PK memory interface
+Hardware notes:
+- 3850PK CPU at ~2.77MHz(averaged), 3853PK memory interface
 - 4KB ROM, 256 bytes RAM(2*2111N)
 - 4-digit 7seg panel, sensory chessboard
+
+3850 is officially rated 2MHz, and even the CP2000 manual says it runs at 2MHz,
+but tests show that the chesscomputer runs at a much higher speed. Three individual
+CP2000 were measured, by timing move calculation, and one recording to verify
+beeper pitch and display blinking rate. Real CP2000 CPU frequency is in the
+2.63MHz to 2.91MHz range.
 
 Entering moves is not as friendly as newer sensory games. The player is expected
 to press ENTER after their own move, but if they (accidentally) press it after
@@ -213,12 +220,12 @@ INPUT_PORTS_END
 void cp2000_state::cp2000(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2000000);
+	F8(config, m_maincpu, 2750000); // see driver notes
 	m_maincpu->set_addrmap(AS_PROGRAM, &cp2000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cp2000_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2000000));
+	f3853_device &f3853(F3853(config, "f3853", 2750000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

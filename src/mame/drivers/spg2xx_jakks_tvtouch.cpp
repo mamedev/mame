@@ -209,7 +209,7 @@ READ16_MEMBER(jakks_tvtouch_state::portb_r)
 
 READ16_MEMBER(jakks_tvtouch_state::portc_r)
 {
-	uint16_t data = m_i2cmem->read_sda();
+	uint16_t data = (m_i2cmem->read_sda() & 1) | (m_io_p3->read() & 0xfffe);
 	return data;
 }
 

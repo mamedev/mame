@@ -13,7 +13,7 @@
 #pragma once
 
 #include "machine/tmc208k.h"
-#include "screen.h"
+//#include "screen.h"
 
 
 //**************************************************************************
@@ -56,7 +56,7 @@ protected:
 
 	void fsck_tick();
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	//uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_matte_selects();
 
@@ -102,7 +102,7 @@ protected:
 
 	emu_timer *m_fsck_timer;
 
-	required_device<screen_device> m_screen;
+	//required_device<screen_device> m_screen;
 	required_device<tmc28ku_device> m_mult_ge;
 	required_device<tmc28ku_device> m_mult_gd;
 	required_device<tmc28ku_device> m_mult_gc;

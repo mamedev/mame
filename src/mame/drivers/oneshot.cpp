@@ -114,13 +114,6 @@ For One Shot One Kill:
  chip appears to be unpopulated for One Shot One Kill.
  The ROM board for One Shot One Kill has 8 additional logic chips along the front edge of the PCB
 
-For Mad Donna:
- At least one PCB (in an eBay auction) has shown original ROM labels as:
-  MADDONNA
-  TMAD_B15  (B15 being the PCB location of ROM)
-  160595    (Date, IE: May 16th, 1995)
-
- It has NOT be verified as to which set this corresponds to or if this set had been dumped.
 
 Clock measurements:
  SCN68000C8N64: 12MHz
@@ -526,23 +519,30 @@ ROM_START( oneshot )
 	ROM_LOAD( "1shot.mb", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, unknown purpose
 ROM_END
 
+/*
+For this set of Mad Donna, original ROM labels follow this format:
+  MADDONNA
+  TMAD_B15  (B15 being the PCB location of ROM)
+  160595    (Date, IE: May 16th, 1995)
+*/
 ROM_START( maddonna )
+
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "maddonna.b16", 0x00000, 0x20000, CRC(643f9054) SHA1(77907ecdb02a525f9beed7fee203431eda16c831) )
-	ROM_LOAD16_BYTE( "maddonna.b15", 0x00001, 0x20000, CRC(e36c0e26) SHA1(f261b2c74eeca05df302aa4956f5d02121d42054) )
+	ROM_LOAD16_BYTE( "maddonna_tmad_b16_160595.ua24", 0x00000, 0x20000, CRC(643f9054) SHA1(77907ecdb02a525f9beed7fee203431eda16c831) )
+	ROM_LOAD16_BYTE( "maddonna_tmad_b15_160595.ua22", 0x00001, 0x20000, CRC(e36c0e26) SHA1(f261b2c74eeca05df302aa4956f5d02121d42054) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "x13.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) ) // b13
+	ROM_LOAD( "maddonna_tmad_b13_160595.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "maddonna.b5",  0x000000, 0x080000, CRC(838d3244) SHA1(7339143481ec043219825f282450ff53bb718f8c) )
-	ROM_LOAD( "maddonna.b7",  0x080000, 0x080000, CRC(4920d2ec) SHA1(e72a374bca81ffa4f925326455e007df7227ae08) )
-	ROM_LOAD( "maddonna.b9",  0x100000, 0x080000, CRC(3a8a3feb) SHA1(832654902963c163644134431fd1221e1895cfec) )
-	ROM_LOAD( "maddonna.b11", 0x180000, 0x080000, CRC(6f9b7fdf) SHA1(14ced1d43eae3b6db4a0a4c12fb26cbd13eb7428) )
-	ROM_LOAD( "maddonna.b6",  0x200000, 0x080000, CRC(b02e9e0e) SHA1(6e527a2bfda0f4f420c10139c75dac2704e08d08) )
-	ROM_LOAD( "maddonna.b8",  0x280000, 0x080000, CRC(03f1de40) SHA1(bb0c0525155404c0740ac5f048f71ae7651a5941) )
-	ROM_LOAD( "maddonna.b10", 0x300000, 0x080000, CRC(87936423) SHA1(dda42f3685427edad7686d9712ff07d2fd9bf57e) )
-	ROM_LOAD( "maddonna.b12", 0x380000, 0x080000, CRC(879ab23c) SHA1(5288016542a10e60ccb28a930d8dfe4db41c6fc6) )
+	ROM_LOAD( "maddonna_tmad_b5_160595.ui16a", 0x000000, 0x080000, CRC(838d3244) SHA1(7339143481ec043219825f282450ff53bb718f8c) )
+	ROM_LOAD( "maddonna_tmad_b7_160595.ui13a", 0x080000, 0x080000, CRC(4920d2ec) SHA1(e72a374bca81ffa4f925326455e007df7227ae08) )
+	ROM_LOAD( "maddonna_tmad_b9_160595.ui11a", 0x100000, 0x080000, CRC(3a8a3feb) SHA1(832654902963c163644134431fd1221e1895cfec) )
+	ROM_LOAD( "maddonna_tmad_b11_160595.ui8a", 0x180000, 0x080000, CRC(6f9b7fdf) SHA1(14ced1d43eae3b6db4a0a4c12fb26cbd13eb7428) )
+	ROM_LOAD( "maddonna_tmad_b6_160595.ui16",  0x200000, 0x080000, CRC(b02e9e0e) SHA1(6e527a2bfda0f4f420c10139c75dac2704e08d08) )
+	ROM_LOAD( "maddonna_tmad_b8_160595.ui13",  0x280000, 0x080000, CRC(03f1de40) SHA1(bb0c0525155404c0740ac5f048f71ae7651a5941) )
+	ROM_LOAD( "maddonna_tmad_b10_160595.ui11", 0x300000, 0x080000, CRC(87936423) SHA1(dda42f3685427edad7686d9712ff07d2fd9bf57e) )
+	ROM_LOAD( "maddonna_tmad_b12_160595.ui8",  0x380000, 0x080000, CRC(879ab23c) SHA1(5288016542a10e60ccb28a930d8dfe4db41c6fc6) )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* no samples for this game */

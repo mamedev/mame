@@ -140,35 +140,31 @@
  *
  *************************************/
 
-void gauntlet_state::update_interrupts()
+void gauntlet_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
-void gauntlet_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(gauntlet_state::scanline_update)
 {
-	/* sound IRQ is on 32V */
-	if (scanline & 32)
-		m_soundcomm->sound_irq_gen(*m_audiocpu);
-	else
-		m_soundcomm->sound_irq_ack_w();
+	// sound IRQ is on 32V
+	if (param & 32)
+		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, ASSERT_LINE);
 }
 
 
-void gauntlet_state::machine_start()
+uint8_t gauntlet_state::sound_irq_ack_r()
 {
-	atarigen_state::machine_start();
-	save_item(NAME(m_sound_reset_val));
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
+	return 0xff;
 }
 
 
-void gauntlet_state::machine_reset()
+void gauntlet_state::sound_irq_ack_w(uint8_t data)
 {
-	m_sound_reset_val = 1;
-
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 32);
+	m_audiocpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -179,25 +175,14 @@ void gauntlet_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(gauntlet_state::sound_reset_w)
+WRITE_LINE_MEMBER(gauntlet_state::sound_reset_w)
 {
-	if (ACCESSING_BITS_0_7)
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_soundctl->clear_w(state);
+	if (!state)
 	{
-		int oldword = m_sound_reset_val;
-		COMBINE_DATA(&m_sound_reset_val);
-
-		if ((oldword ^ m_sound_reset_val) & 1)
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			m_soundctl->clear_w(m_sound_reset_val & 1);
-			m_soundcomm->sound_cpu_reset();
-			if (m_sound_reset_val & 1)
-			{
-				m_ym2151->set_output_gain(ALL_OUTPUTS, 0.0f);
-				m_pokey->set_output_gain(ALL_OUTPUTS, 0.0f);
-				m_tms5220->set_output_gain(ALL_OUTPUTS, 0.0f);
-			}
-		}
+		m_mainlatch->acknowledge_w();
+		mixer_w(0);
 	}
 }
 
@@ -209,12 +194,12 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(gauntlet_state::switch_6502_r)
+uint8_t gauntlet_state::switch_6502_r()
 {
 	int temp = 0x30;
 
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x80;
-	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x40;
+	if (m_soundlatch->pending_r()) temp ^= 0x80;
+	if (m_mainlatch->pending_r()) temp ^= 0x40;
 	if (!m_tms5220->readyq_r()) temp ^= 0x20;
 	if (!(ioport("803008")->read() & 0x0008)) temp ^= 0x10;
 
@@ -231,7 +216,7 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
 WRITE_LINE_MEMBER(gauntlet_state::speech_squeak_w)
 {
 	uint8_t data = 5 | (state ? 2 : 0);
-	m_tms5220->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
+	m_tms5220->set_unscaled_clock(14.318181_MHz_XTAL/2 / (16 - data));
 }
 
 WRITE_LINE_MEMBER(gauntlet_state::coin_counter_left_w)
@@ -254,7 +239,7 @@ WRITE_LINE_MEMBER(gauntlet_state::coin_counter_right_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gauntlet_state::mixer_w)
+void gauntlet_state::mixer_w(uint8_t data)
 {
 	m_ym2151->set_output_gain(ALL_OUTPUTS, (data & 7) / 7.0f);
 	m_pokey->set_output_gain(ALL_OUTPUTS, ((data >> 3) & 3) / 3.0f);
@@ -269,15 +254,15 @@ WRITE8_MEMBER(gauntlet_state::mixer_w)
  *
  *************************************/
 
-/* full map verified from schematics */
+// full map verified from schematics
 void gauntlet_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x037fff).mirror(0x280000).rom();
-	map(0x038000, 0x03ffff).mirror(0x280000).rom(); /* slapstic maps here */
+	map(0x038000, 0x03ffff).mirror(0x280000).rom(); // slapstic maps here
 	map(0x040000, 0x07ffff).mirror(0x280000).rom();
 
-	/* MBUS */
+	// MBUS
 	map(0x800000, 0x801fff).mirror(0x2fc000).ram();
 	map(0x802000, 0x802fff).mirror(0x2fc000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x803000, 0x803001).mirror(0x2fcef0).portr("803000");
@@ -285,14 +270,14 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x803004, 0x803005).mirror(0x2fcef0).portr("803004");
 	map(0x803006, 0x803007).mirror(0x2fcef0).portr("803006");
 	map(0x803008, 0x803009).mirror(0x2fcef0).portr("803008");
-	map(0x80300f, 0x80300f).mirror(0x2fcef0).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
+	map(0x80300f, 0x80300f).mirror(0x2fcef0).r(m_mainlatch, FUNC(generic_latch_8_device::read));
 	map(0x803100, 0x803101).mirror(0x2fce8e).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x803120, 0x803121).mirror(0x2fce8e).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0x803120, 0x80312f).mirror(0x2fce80).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x803140, 0x803141).mirror(0x2fce8e).w(FUNC(gauntlet_state::video_int_ack_w));
 	map(0x803150, 0x803151).mirror(0x2fce8e).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x803171, 0x803171).mirror(0x2fce8e).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
+	map(0x803171, 0x803171).mirror(0x2fce8e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	/* VBUS */
+	// VBUS
 	map(0x900000, 0x901fff).mirror(0x2c8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x902000, 0x903fff).mirror(0x2c8000).ram().share("mob");
 	map(0x904000, 0x904fff).mirror(0x2c8000).ram();
@@ -311,20 +296,20 @@ void gauntlet_state::main_map(address_map &map)
  *
  *************************************/
 
-/* full map verified from schematics */
+// full map verified from schematics
 void gauntlet_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).mirror(0x2000).ram();
-	map(0x1000, 0x100f).mirror(0x27c0).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
-	map(0x1010, 0x101f).mirror(0x27c0).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
+	map(0x1000, 0x100f).mirror(0x27c0).w(m_mainlatch, FUNC(generic_latch_8_device::write));
+	map(0x1010, 0x101f).mirror(0x27c0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1020, 0x102f).mirror(0x27c0).portr("COIN").w(FUNC(gauntlet_state::mixer_w));
 	map(0x1030, 0x1030).mirror(0x27cf).r(FUNC(gauntlet_state::switch_6502_r));
 	map(0x1030, 0x1037).mirror(0x27c8).w(m_soundctl, FUNC(ls259_device::write_d7));
 	map(0x1800, 0x180f).mirror(0x27c0).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1810, 0x1811).mirror(0x27ce).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1820, 0x182f).mirror(0x27c0).w(m_tms5220, FUNC(tms5220_device::data_w));
-	map(0x1830, 0x183f).mirror(0x27c0).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));
+	map(0x1830, 0x183f).mirror(0x27c0).rw(FUNC(gauntlet_state::sound_irq_ack_r), FUNC(gauntlet_state::sound_irq_ack_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -380,12 +365,12 @@ static INPUT_PORTS_START( gauntlet )
 	PORT_START("803008")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("COIN")  /* 1020 (sound) */
+	PORT_START("COIN")  // 1020 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -428,12 +413,12 @@ static INPUT_PORTS_START( vindctr2 )
 	PORT_START("803008")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("COIN")  /* 1020 (sound) */
+	PORT_START("COIN")  // 1020 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -488,18 +473,27 @@ GFXDECODE_END
 
 void gauntlet_state::gauntlet_base(machine_config &config)
 {
-	/* basic machine hardware */
-	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	// basic machine hardware
+	M68010(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gauntlet_state::main_map);
 
-	M6502(config, m_audiocpu, ATARI_CLOCK_14MHz/8);
+	M6502(config, m_audiocpu, 14.318181_MHz_XTAL/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gauntlet_state::sound_map);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	WATCHDOG_TIMER(config, "watchdog");
+	ls259_device &outlatch(LS259(config, "outlatch")); // 14A
+	//outlatch.q_out_cb<0>().set_output("led1").invert(); // LEDs not connected?
+	//outlatch.q_out_cb<1>().set_output("led2").invert();
+	//outlatch.q_out_cb<2>().set_output("led3").invert();
+	//outlatch.q_out_cb<3>().set_output("led4").invert();
+	outlatch.q_out_cb<7>().set(FUNC(gauntlet_state::sound_reset_w));
 
-	/* video hardware */
+	TIMER(config, "scantimer").configure_scanline(FUNC(gauntlet_state::scanline_update), m_screen, 0, 32);
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
+
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gauntlet);
 
 	PALETTE(config, "palette").set_format(palette_device::IRGB_4444, 1024);
@@ -512,28 +506,32 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	/* note: these parameters are from published specs, not derived */
-	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	// note: these parameters are from published specs, not derived
+	// the board uses a SYNGEN chip to generate video signals
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(gauntlet_state::screen_update_gauntlet));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(gauntlet_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
-	/* sound hardware */
-	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu)
-		.int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, m_ym2151, ATARI_CLOCK_14MHz/4);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
+
+	GENERIC_LATCH_8(config, m_mainlatch);
+	m_mainlatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_6);
+
+	YM2151(config, m_ym2151, 14.318181_MHz_XTAL/4);
 	m_ym2151->add_route(1, "lspeaker", 0.48);
 	m_ym2151->add_route(0, "rspeaker", 0.48);
 
-	POKEY(config, m_pokey, ATARI_CLOCK_14MHz/8);
+	POKEY(config, m_pokey, 14.318181_MHz_XTAL/8);
 	m_pokey->add_route(ALL_OUTPUTS, "lspeaker", 0.32);
 	m_pokey->add_route(ALL_OUTPUTS, "rspeaker", 0.32);
 
-	TMS5220C(config, m_tms5220, ATARI_CLOCK_14MHz/2/11); /* potentially ATARI_CLOCK_14MHz/2/9 as well */
+	TMS5220C(config, m_tms5220, 14.318181_MHz_XTAL/2/11); // potentially 14.318181_MHz_XTAL/2/9 as well
 	m_tms5220->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	m_tms5220->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 
@@ -1658,14 +1656,14 @@ void gauntlet_state::common_init(int vindctr2)
 	uint8_t *rom = memregion("maincpu")->base();
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 
-	/* swap the top and bottom halves of the main CPU ROM images */
+	// swap the top and bottom halves of the main CPU ROM images
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);
 	swap_memory(rom + 0x040000, rom + 0x048000, 0x8000);
 	swap_memory(rom + 0x050000, rom + 0x058000, 0x8000);
 	swap_memory(rom + 0x060000, rom + 0x068000, 0x8000);
 	swap_memory(rom + 0x070000, rom + 0x078000, 0x8000);
 
-	/* indicate whether or not we are vindicators 2 */
+	// indicate whether or not we are vindicators 2
 	m_vindctr2_screen_refresh = vindctr2;
 }
 

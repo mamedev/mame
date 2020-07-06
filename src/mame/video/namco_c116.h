@@ -24,8 +24,8 @@ public:
 	void enable_shadows() { m_enable_shadows = true; }
 
 	//read/write handlers
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	//getters
 	uint16_t get_reg(int reg) { return m_regs[reg]; }

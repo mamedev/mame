@@ -2,10 +2,7 @@
 #
 #   makefile
 #
-#   Core makefile for building MAME and derivatives
-#
-#   Copyright (c) Nicola Salmoria and the MAME Team.
-#   Visit http://mamedev.org for licensing and usage restrictions.
+#   Core makefile for building netlist
 #
 ###########################################################################
 
@@ -26,7 +23,8 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements
+TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
+TIDY_FLAGSX += -readability-named-parameter,-readability-function-size
 
 space := 
 space += 
@@ -60,7 +58,7 @@ LD = @g++
 MD = @mkdir
 RM = @rm
 DOXYGEN = @./doxygen
-CLANG_TIDY = clang-tidy-9
+CLANG_TIDY = clang-tidy-10
 
 TARGETS = nltool nlwav
 
@@ -76,6 +74,7 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/macro \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
+			$(OBJ)/generated \
 
 
 OBJS = $(POBJS) $(NLOBJS)
@@ -166,6 +165,7 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
+	$(NLOBJ)/generated/static_solvers.o \
 	
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
@@ -239,16 +239,16 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9: 
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
-	$(MAKE) CC=clang++-10 LD=clang++-10 CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
 nvcc:
-	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc \
+	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc OBJ=obj/nvcc \
 		CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda --expt-relaxed-constexpr --default-stream per-thread --restrict"
 
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix

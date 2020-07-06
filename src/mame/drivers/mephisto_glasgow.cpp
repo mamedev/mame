@@ -170,8 +170,8 @@ WRITE8_MEMBER( amsterd_state::write_lcd_flag )
 WRITE8_MEMBER( amsterd_state::write_board )
 {
 	m_key_select = 0;
-	m_board->led_w(space, offset, 0);
-	m_board->mux_w(space, offset, data);
+	m_board->led_w(0);
+	m_board->mux_w(data);
 }
 
 WRITE8_MEMBER( amsterd_state::write_beeper )

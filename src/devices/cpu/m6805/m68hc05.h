@@ -75,7 +75,9 @@ protected:
 		M68HC05_COPCR,
 		M68HC05_PCOP,
 		M68HC05_NCOPE,
-		M68HC05_NCOP
+		M68HC05_NCOP,
+
+		M68HC705C8A_OPTION
 	};
 
 	enum { PORT_COUNT = 4 };
@@ -241,6 +243,17 @@ protected:
 	virtual void device_reset() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	required_region_ptr<u8> m_rom;
+
+	DECLARE_READ8_MEMBER(ram0_r);
+	DECLARE_WRITE8_MEMBER(ram0_w);
+	DECLARE_READ8_MEMBER(ram1_r);
+	DECLARE_WRITE8_MEMBER(ram1_w);
+
+	u8 m_ram[0x80];
+	u8 m_option;
 };
 
 

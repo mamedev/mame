@@ -392,6 +392,8 @@ void cz101_state::cz101(machine_config &config)
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));
 
 	config.set_default_layout(layout_cz101);
+
+	//UPD933(config, "music", 8.96_MHz_XTAL / 2);
 }
 
 

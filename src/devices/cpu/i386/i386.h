@@ -36,11 +36,11 @@ public:
 	auto smiact() { return m_smiact.bind(); }
 	auto ferr() { return m_ferr_handler.bind(); }
 
-	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_segofftovirt(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_virttophys(symbol_table &table, int params, const uint64_t *param);
-	uint64_t debug_cacheflush(symbol_table &table, int params, const uint64_t *param);
+	uint64_t debug_segbase(int params, const uint64_t *param);
+	uint64_t debug_seglimit(int params, const uint64_t *param);
+	uint64_t debug_segofftovirt(int params, const uint64_t *param);
+	uint64_t debug_virttophys(int params, const uint64_t *param);
+	uint64_t debug_cacheflush(int params, const uint64_t *param);
 
 protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);

@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(handshake_w);
 
 	DECLARE_WRITE_LINE_MEMBER(halt_w) { m_z8000->set_input_line(INPUT_LINE_HALT, state); }
-	DECLARE_WRITE_LINE_MEMBER(int_w) { m_z8000->set_input_line(INPUT_LINE_IRQ1, state); }
+	DECLARE_WRITE_LINE_MEMBER(int_w) { m_z8000->set_input_line(z8001_device::VI_LINE, state); }
 
 	bool halted() const { return m_z8000_halt; }
 
@@ -55,7 +55,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(mo_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
-	IRQ_CALLBACK_MEMBER(int_cb);
+	uint16_t nviack_r();
+	uint16_t viack_r();
 };
 
 DECLARE_DEVICE_TYPE(M24_Z8000, m24_z8000_device)

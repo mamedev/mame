@@ -721,7 +721,7 @@ void pit68230_device::wr_pitreg_tsr(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER (pit68230_device::write)
+void pit68230_device::write(offs_t offset, uint8_t data)
 {
 	LOG("\"%s\" %s: Register write '%02x' -> [%02x]\n", tag(), FUNCNAME, data, offset );
 	LOGSETUP(" * %s Reg %02x <- %02x  \n", tag(), offset, data);
@@ -970,7 +970,7 @@ uint8_t pit68230_device::rr_pitreg_tsr()
 	return m_tsr;
 }
 
-READ8_MEMBER (pit68230_device::read){
+uint8_t pit68230_device::read(offs_t offset){
 	uint8_t data;
 
 	switch (offset) {

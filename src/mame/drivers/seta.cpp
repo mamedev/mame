@@ -2491,28 +2491,28 @@ CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
 
 WRITE16_MEMBER(setaroul_state::spritecode_w)
 {
-	if ((offset & 1) == 1) m_seta001->spritecodelow_w8(space, offset >> 1, (data & 0xff00) >> 8);
-	if ((offset & 1) == 0) m_seta001->spritecodehigh_w8(space, offset >> 1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 1) m_seta001->spritecodelow_w8(offset >> 1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 0) m_seta001->spritecodehigh_w8(offset >> 1, (data & 0xff00) >> 8);
 }
 
 READ16_MEMBER(setaroul_state::spritecode_r)
 {
 	u16 ret;
 	if ((offset & 1) == 1)
-		ret = m_seta001->spritecodelow_r8(space, offset >> 1);
+		ret = m_seta001->spritecodelow_r8(offset >> 1);
 	else
-		ret = m_seta001->spritecodehigh_r8(space, offset >> 1);
+		ret = m_seta001->spritecodehigh_r8(offset >> 1);
 	return ret << 8;
 }
 
 WRITE16_MEMBER(setaroul_state::spriteylow_w)
 {
-	if ((offset & 1) == 0) m_seta001->spriteylow_w8(space, offset >> 1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 0) m_seta001->spriteylow_w8(offset >> 1, (data & 0xff00) >> 8);
 }
 
 WRITE16_MEMBER(setaroul_state::spritectrl_w)
 {
-	if ((offset & 1) == 0) m_seta001->spritectrl_w8(space, offset >> 1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 0) m_seta001->spritectrl_w8(offset >> 1, (data & 0xff00) >> 8);
 }
 
 // RTC (To do: write a D4911C device)

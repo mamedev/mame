@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#include "emu.h" // BIT
 #include "formats/ccvf_dsk.h"
+
+#include "coretmpl.h" // BIT
+
 
 ccvf_format::ccvf_format()
 {
@@ -124,7 +126,7 @@ bool ccvf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image
 
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
 			for (int bit=0; bit<8; bit++) {
-				bit_w(buffer, BIT(bytes[pos], bit), f.cell_size);
+				bit_w(buffer, util::BIT(bytes[pos], bit), f.cell_size);
 			}
 		}
 

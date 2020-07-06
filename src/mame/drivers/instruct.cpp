@@ -208,17 +208,14 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	{
 		uint8_t switches = ioport("SW")->read();
 
-		// Set vector from INDIRECT sw
-		uint8_t vector = BIT(switches, 0) ? 0x87 : 0x07;
-
 		// Check INT sw & key
 		if (BIT(switches, 1))
-			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
+			device.execute().set_input_line(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE);
 		else
 		// process ac input
 		{
 			m_irqstate ^= 1;
-			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
+			device.execute().set_input_line(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -430,6 +427,8 @@ void instruct_state::instruct(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(instruct_state::t2l_int), attotime::from_hz(120));
 	m_maincpu->sense_handler().set(FUNC(instruct_state::sense_r));
 	m_maincpu->flag_handler().set(FUNC(instruct_state::flag_w));
+	// Set vector from INDIRECT sw
+	m_maincpu->intack_handler().set([this]() { return BIT(ioport("SW")->read(), 0) ? 0x87 : 0x07; });
 
 	/* video hardware */
 	config.set_default_layout(layout_instruct);

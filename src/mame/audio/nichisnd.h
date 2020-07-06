@@ -32,12 +32,11 @@ public:
 	nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( soundlatch_clear_w );
-	DECLARE_WRITE8_MEMBER( soundbank_w );
-	DECLARE_WRITE8_MEMBER( sound_host_command_w );
+	void sound_host_command_w(uint8_t data);
 
 	void nichisnd_io_map(address_map &map);
 	void nichisnd_map(address_map &map);
+
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -48,6 +47,9 @@ protected:
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_region_ptr<uint8_t> m_sound_rom;
+
+	void soundlatch_clear_w(uint8_t data);
+	void soundbank_w(uint8_t data);
 };
 
 

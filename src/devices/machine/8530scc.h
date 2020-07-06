@@ -37,8 +37,8 @@ public:
 
 	void set_status(int status);
 
-	DECLARE_READ8_MEMBER(reg_r);
-	DECLARE_WRITE8_MEMBER(reg_w);
+	uint8_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint8_t data);
 
 	void write_reg(int offset, uint8_t data);
 	uint8_t read_reg(int offset);

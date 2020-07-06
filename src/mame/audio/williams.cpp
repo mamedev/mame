@@ -249,7 +249,7 @@ void williams_cvsd_sound_device::device_reset()
 void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// process incoming data write
-	m_pia->write_portb(param & 0xff);
+	m_pia->portb_w(param & 0xff);
 	m_pia->cb1_w((param >> 8) & 1);
 	m_pia->cb2_w((param >> 9) & 1);
 }

@@ -155,7 +155,7 @@ void i8291a_device::device_start()
 	save_item(NAME(m_dt_state));
 }
 
-READ8_MEMBER(i8291a_device::din_r)
+uint8_t i8291a_device::din_r()
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, m_din);
 	if (!machine().side_effects_disabled()) {
@@ -201,7 +201,7 @@ void i8291a_device::update_int()
 	}
 }
 
-READ8_MEMBER(i8291a_device::ints1_r)
+uint8_t i8291a_device::ints1_r()
 {
 	uint8_t ret = m_ints1;
 
@@ -213,7 +213,7 @@ READ8_MEMBER(i8291a_device::ints1_r)
 	return ret;
 }
 
-READ8_MEMBER(i8291a_device::ints2_r)
+uint8_t i8291a_device::ints2_r()
 {
 	uint8_t ret = m_ints2;
 
@@ -225,13 +225,13 @@ READ8_MEMBER(i8291a_device::ints2_r)
 	return ret;
 }
 
-READ8_MEMBER(i8291a_device::spoll_stat_r)
+uint8_t i8291a_device::spoll_stat_r()
 {
 	LOGMASKED(LOG_REG, "%s\n", __FUNCTION__);
 	return 0;
 }
 
-READ8_MEMBER(i8291a_device::addr_stat_r)
+uint8_t i8291a_device::addr_stat_r()
 {
 	if (!(m_address_status & 0xfe))
 			m_address_status = 0;
@@ -240,25 +240,25 @@ READ8_MEMBER(i8291a_device::addr_stat_r)
 	return m_address_status;
 }
 
-READ8_MEMBER(i8291a_device::cpt_r)
+uint8_t i8291a_device::cpt_r()
 {
 	LOGMASKED(LOG_REG, "%s\n", __FUNCTION__);
 	return m_cpt;
 }
 
-READ8_MEMBER(i8291a_device::addr0_r)
+uint8_t i8291a_device::addr0_r()
 {
 	//LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address0);
 	return m_address0;
 }
 
-READ8_MEMBER(i8291a_device::addr1_r)
+uint8_t i8291a_device::addr1_r()
 {
 	LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address1);
 	return m_address1;
 }
 
-WRITE8_MEMBER(i8291a_device::dout_w)
+void i8291a_device::dout_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (m_nba)
@@ -268,35 +268,35 @@ WRITE8_MEMBER(i8291a_device::dout_w)
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::ie1_w)
+void i8291a_device::ie1_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_ie1 = data;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::ie2_w)
+void i8291a_device::ie2_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_ie2 = data;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::spoll_mode_w)
+void i8291a_device::spoll_mode_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_spoll_mode = data;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::addr_mode_w)
+void i8291a_device::addr_mode_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_address_mode = data & 3;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::aux_mode_w)
+void i8291a_device::aux_mode_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	switch (data >> 5) {
@@ -401,7 +401,7 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::addr01_w)
+void i8291a_device::addr01_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (data & REG_ADDRESS01_ARS)
@@ -411,56 +411,56 @@ WRITE8_MEMBER(i8291a_device::addr01_w)
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::eos_w)
+void i8291a_device::eos_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_eos = data;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::nrfd_w)
+void i8291a_device::nrfd_w(int state)
 {
 	m_nrfd = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::ndac_w)
+void i8291a_device::ndac_w(int state)
 {
 	m_ndac = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::dav_w)
+void i8291a_device::dav_w(int state)
 {
 	m_dav = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::eoi_w)
+void i8291a_device::eoi_w(int state)
 {
 	m_eoi = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::srq_w)
+void i8291a_device::srq_w(int state)
 {
 	m_srq = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::ifc_w)
+void i8291a_device::ifc_w(int state)
 {
 	m_ifc = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::atn_w)
+void i8291a_device::atn_w(int state)
 {
 	m_atn = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::ren_w)
+void i8291a_device::ren_w(int state)
 {
 	m_ren = !state;
 	run_fsm();

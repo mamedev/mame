@@ -21,7 +21,7 @@
     - display
     - jumpers
     - ROM capsule
-    - uPD7001
+    - uPD7001 (controlled by uPD7508)
     - RAM disk (64K/128K RAM, Z80, 4K ROM)
     - modem (82C55)
     - Multi-Unit (60K RAM, ROM capsule, modem, 82C55)
@@ -32,6 +32,8 @@
 #include "emu.h"
 #include "includes/px8.h"
 
+#include "machine/rescap.h"
+#include "machine/upd7001.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -744,8 +746,8 @@ void px8_state::px8(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &px8_state::px8_mem);
 	m_maincpu->set_addrmap(AS_IO, &px8_state::px8_io);
 
-	/* slave cpu (HD6303) */
-	m6803_cpu_device &slave(M6803(config, HD6303_TAG, XTAL_CR1 / 4)); /* 614 kHz */
+	/* slave cpu (HD6303CA) */
+	hd6301_cpu_device &slave(HD6301V1(config, HD6303_TAG, XTAL_CR1 / 4)); /* 614 kHz */
 	slave.set_addrmap(AS_PROGRAM, &px8_state::px8_slave_mem);
 	slave.set_disable();
 
@@ -776,7 +778,9 @@ void px8_state::px8(machine_config &config)
 	GENERIC_CARTSLOT(config, "capsule2", generic_plain_slot, "px8_cart", "bin,rom");
 
 	/* devices */
-	I8251(config, I8251_TAG, 0);
+	I8251(config, I8251_TAG, XTAL_CR1 / 4);
+
+	UPD7001(config, UPD7001_TAG, RES_K(27), CAP_P(47));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);

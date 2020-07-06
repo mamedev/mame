@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -104,9 +104,10 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "imageutl.h"
 #include "jvc_dsk.h"
+
+#include "emucore.h" // emu_fatalerror
+
 
 jvc_format::jvc_format()
 {

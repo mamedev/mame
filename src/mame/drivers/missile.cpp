@@ -1507,7 +1507,7 @@ GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state,  init_suprmatk,
 GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,     empty_init, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 /* the following bootleg has extremely similar program ROMs to missile1, but has different unknown sound hardware and 2 more ROMs */
-GAME( 1981, missilea, missile, missilea, missile, missile_state,     empty_init, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, missilea, missile, missilea, missile, missile_state,     empty_init, ROT0, "bootleg (U.Games)", "Missile Attack (U.Games bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* the following bootlegs are on different hardware and don't work */
 GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )

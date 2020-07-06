@@ -174,6 +174,18 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 }
 
 
+void abc802_state::video_start()
+{
+	// allocate memory
+	m_char_ram.allocate(m_char_ram_size);
+
+	// register for state saving
+	save_item(NAME(m_flshclk_ctr));
+	save_item(NAME(m_flshclk));
+	save_item(NAME(m_80_40_mux));
+}
+
+
 //-------------------------------------------------
 //  machine_config( abc802_video )
 //-------------------------------------------------

@@ -185,7 +185,7 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &devname,
 
 void nl_convert_base_t::add_device_extra_s(const pstring &devname, const pstring &extra)
 {
-	auto dev = get_device(devname);
+	auto *dev = get_device(devname);
 	if (dev == nullptr)
 		out("// ERROR: Device {} not found\n", devname);
 	else
@@ -260,7 +260,7 @@ void nl_convert_base_t::dump_nl()
 		else
 			out("{}({})\n", m_devs[j]->type(),
 					m_devs[j]->name());
-		for (auto &e : m_devs[j]->extra())
+		for (const auto &e : m_devs[j]->extra())
 			out("{}\n", e);
 
 	}
@@ -287,7 +287,7 @@ void nl_convert_base_t::dump_nl()
 
 pstring nl_convert_base_t::get_nl_val(double val) const
 {
-	for (auto &e : m_units)
+	for (const auto &e : m_units)
 	{
 		if (e.m_mult <= plib::abs(val))
 		{
@@ -305,7 +305,7 @@ pstring nl_convert_base_t::get_nl_val(double val) const
 
 double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 {
-	for (auto &e : m_units)
+	for (const auto &e : m_units)
 	{
 		if (e.m_unit == unit)
 			return e.m_mult;
@@ -549,8 +549,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					pstring lastnet = tt[1];
 					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
-						pstring devname = tt[0] + plib::pfmt("{}")(i);
-						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
+						pstring devname = plib::pfmt("{}{}")(tt[0], i);
+						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? plib::pfmt("{}a{}")(tt[1], i) : tt[2];
 						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
 						add_device("VCVS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(lastnet, devname, 0);
@@ -584,7 +584,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					}
 					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
-						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						pstring devname = plib::pfmt("{}{}")(tt[0], i);
 						add_device("CCCS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(tt[1], devname, 0);
 						add_term(tt[2], devname, 1);

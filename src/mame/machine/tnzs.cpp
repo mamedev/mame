@@ -20,7 +20,7 @@
 
 READ8_MEMBER(tnzs_mcu_state::mcu_r)
 {
-	uint8_t data = m_mcu->upi41_master_r(space, offset & 1);
+	uint8_t data = m_mcu->upi41_master_r(offset & 1);
 	m_subcpu->yield();
 
 //  logerror("%s: read %02x from mcu $c00%01x\n", m_maincpu->pcbase(), data, offset);
@@ -32,7 +32,7 @@ WRITE8_MEMBER(tnzs_mcu_state::mcu_w)
 {
 //  logerror("%s: write %02x to mcu $c00%01x\n", m_maincpu->pcbase(), data, offset);
 
-	m_mcu->upi41_master_w(space, offset & 1, data);
+	m_mcu->upi41_master_w(offset & 1, data);
 }
 
 READ8_MEMBER(tnzs_mcu_state::mcu_port1_r)
@@ -67,10 +67,10 @@ WRITE8_MEMBER(tnzs_mcu_state::mcu_port2_w)
 	m_input_select = data & 0xf;
 }
 
-READ8_MEMBER(tnzs_mcu_state::analog_r)
+uint8_t tnzs_mcu_state::analog_r(offs_t offset)
 {
 	if (m_upd4701.found())
-		return m_upd4701->read_xy(space, offset);
+		return m_upd4701->read_xy(offset);
 
 	return 0;
 }

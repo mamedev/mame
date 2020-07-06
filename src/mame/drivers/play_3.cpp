@@ -350,7 +350,7 @@ WRITE8_MEMBER( play_3_state::port03_w )
 WRITE8_MEMBER( play_3_state::sklflite_port03_w )
 {
 	if (BIT(data, 6) && !BIT(m_port03_old, 6))
-		m_zsu->sound_command_w(space, 0, m_soundlatch);
+		m_zsu->sound_command_w(m_soundlatch);
 	if (BIT(data, 5))
 	{
 		if (m_soundlatch == 11)

@@ -6,7 +6,7 @@
 /*
  * 0 = Basic hack (Norton with just amplification, no voltage cutting)
  * 1 = Model from LTSPICE mailing list - slow!
- * 2 = Simplified model using diode inputs and netlist TYPE=3
+ * 2 = Simplified model using diode inputs and netlist
  * 3 = Model according to datasheet
  *
  * For Money Money 1 and 3 delivery comparable results.
@@ -237,8 +237,7 @@ static NETLIST_START(LM3900)
 	NET_C(R1.1, G1.IP)
 	NET_C(R2.1, G1.IN)
 	NET_C(R1.2, R2.2, G1.ON)
-	VCVS(G1)
-	PARAM(G1.G, 10000000)
+	VCVS(G1, 10000000)
 	//PARAM(G1.RI, 1)
 	PARAM(G1.RO, RES_K(8))
 
@@ -267,7 +266,7 @@ static NETLIST_START(LM3900)
 	//CS(B1/*I=LIMIT(0, V(VCC,VSS)/10K, 0.2m)*/)
 	CS(B1, 2e-4)
 	CAP(C1, CAP_P(6.000000))
-	VCVS(E1)
+	VCVS(E1, 1)
 	QBJT_EB(Q1, "LM3900_NPN1")
 	QBJT_EB(Q10, "LM3900_NPN1")
 	QBJT_EB(Q11, "LM3900_NPN1")
@@ -302,7 +301,7 @@ static NETLIST_START(LM3900)
 	OPAMP(A, "LM3900")
 
 	DIODE(D1, "D(IS=1e-15 N=1)")
-	CCCS(CS1) // Current Mirror
+	CCCS(CS1, 1) // Current Mirror
 
 	ALIAS(VCC, A.VCC)
 	ALIAS(GND, A.GND)

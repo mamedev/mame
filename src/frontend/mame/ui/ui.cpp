@@ -1207,11 +1207,11 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// toggle MNG recording
 	if (machine().ui_input().pressed(IPT_UI_RECORD_MNG))
-		machine().video().toggle_record_mng();
+		machine().video().toggle_record_movie(movie_recording::format::MNG);
 
 	// toggle MNG recording
 	if (machine().ui_input().pressed(IPT_UI_RECORD_AVI))
-		machine().video().toggle_record_avi();
+		machine().video().toggle_record_movie(movie_recording::format::AVI);
 
 	// toggle profiler display
 	if (machine().ui_input().pressed(IPT_UI_SHOW_PROFILER))

@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Dan Boris
 /***************************************************************************
-
-  advision.c
 
   Machine file to handle emulation of the AdventureVision.
 
@@ -33,7 +31,7 @@ void advision_state::machine_start()
 
 	/* configure EA banking */
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
-	if (m_cart_rom != nullptr)
+	if (m_cart_rom)
 		m_bank1->configure_entry(1, m_cart_rom->base());
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	m_bank1->set_entry(0);
@@ -56,7 +54,7 @@ void advision_state::machine_start()
 
 void advision_state::machine_reset()
 {
-	m_ea_bank = 0;
+	m_ea_bank = 1;
 	m_rambank = 0x300;
 	m_frame_start = 0;
 	m_video_enable = 0;
@@ -64,7 +62,8 @@ void advision_state::machine_reset()
 
 	/* enable internal ROM */
 	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
-	m_bank1->set_entry(m_ea_bank);
+	if (m_cart_rom)
+		m_bank1->set_entry(m_ea_bank);
 
 	/* reset sound CPU */
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -78,7 +77,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 	m_rambank = (data & 0x03) << 8;
 
 	m_maincpu->set_input_line(MCS48_INPUT_EA, m_ea_bank ? ASSERT_LINE : CLEAR_LINE);
-	if (m_cart_rom != nullptr)
+	if (m_cart_rom)
 		m_bank1->set_entry(m_ea_bank);
 }
 
@@ -88,11 +87,8 @@ READ8_MEMBER( advision_state::ext_ram_r )
 {
 	uint8_t data = m_ext_ram[m_rambank + offset];
 
-	if (!m_video_enable)
-	{
-		/* the video hardware interprets reads as writes */
-		vh_write(data);
-	}
+	/* the video hardware interprets reads as writes */
+	vh_write(data);
 
 	if (m_video_bank == 0x06)
 	{
@@ -190,5 +186,8 @@ READ8_MEMBER( advision_state::controller_r )
 	if (in & 0x04) data = data & 0xaf; /* Button 2 */
 	if (in & 0x01) data = data & 0x6f; /* Button 4 */
 
-	return data & 0xf8;
+	data &= 0xf8;
+	data |= (m_ea_bank << 2);
+	data |= (m_rambank >> 8);
+	return data;
 }

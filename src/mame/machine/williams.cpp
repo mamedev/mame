@@ -155,7 +155,7 @@ void williams2_state::bank_select_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(williams_state::deferred_snd_cmd_w)
 {
-	m_pia[2]->write_portb(param);
+	m_pia[2]->portb_w(param);
 	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
 }
 
@@ -172,7 +172,7 @@ void playball_state::snd_cmd_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(williams2_state::deferred_snd_cmd_w)
 {
-	m_pia[2]->write_porta(param);
+	m_pia[2]->porta_w(param);
 }
 
 void williams2_state::snd_cmd_w(u8 data)
@@ -414,8 +414,8 @@ TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 	uint8_t l_data = param | 0x80;
 	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
-	m_pia[2]->write_portb(l_data); m_pia[2]->cb1_w((l_data == 0xff) ? 0 : 1);
-	m_pia[3]->write_portb(r_data); m_pia[3]->cb1_w((r_data == 0xff) ? 0 : 1);
+	m_pia[2]->portb_w(l_data); m_pia[2]->cb1_w((l_data == 0xff) ? 0 : 1);
+	m_pia[3]->portb_w(r_data); m_pia[3]->cb1_w((r_data == 0xff) ? 0 : 1);
 }
 
 
@@ -504,7 +504,7 @@ void joust2_state::machine_start()
 
 TIMER_CALLBACK_MEMBER(joust2_state::deferred_snd_cmd_w)
 {
-	m_pia[2]->write_porta(param & 0xff);
+	m_pia[2]->porta_w(param & 0xff);
 }
 
 

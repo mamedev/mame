@@ -336,7 +336,7 @@ INPUT_PORTS_END
 void beathead_state::beathead(machine_config &config)
 {
 	/* basic machine hardware */
-	ASAP(config, m_maincpu, ATARI_CLOCK_14MHz);
+	ASAP(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &beathead_state::main_map);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);

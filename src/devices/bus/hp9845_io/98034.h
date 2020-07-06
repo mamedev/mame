@@ -37,8 +37,9 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(dc_w);
-	DECLARE_READ8_MEMBER(dc_r);
+	void dc_w(uint8_t data);
+	uint8_t dc_r();
+	uint8_t int_ack_r();
 
 	DECLARE_WRITE8_MEMBER(hpib_data_w);
 	DECLARE_WRITE8_MEMBER(hpib_ctrl_w);
@@ -52,8 +53,6 @@ private:
 
 	void np_io_map(address_map &map);
 	void np_program_map(address_map &map);
-
-	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
 

@@ -627,7 +627,7 @@ int z80scc_device::z80daisy_irq_ack()
 			elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
 			check_interrupts();
 			LOGINT(" - Found an INT request, ");
-			if (m_wr9 & WR9_BIT_VIS)
+			if (m_wr9 & WR9_BIT_NV)
 			{
 				LOGINT("but WR9 D1 set to use autovector, returning the default vector\n");
 				break;
@@ -852,7 +852,7 @@ int z80scc_device::m1_r()
 //-------------------------------------------------
 //  zbus_r - Z-Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::zbus_r )
+uint8_t z80scc_device::zbus_r(offs_t offset)
 {
 	offset &= 31;
 	bool ba = BIT(offset, 4);
@@ -883,7 +883,7 @@ READ8_MEMBER( z80scc_device::zbus_r )
 //-------------------------------------------------
 //  zbus_w - Z-Bus write
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::zbus_w )
+void z80scc_device::zbus_w(offs_t offset, uint8_t data)
 {
 	offset &= 31;
 	bool ba = BIT(offset, 4);
@@ -2664,7 +2664,7 @@ void z80scc_channel::receive_data(uint8_t data)
 //-------------------------------------------------
 //  cts_w - clear to send handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::cts_w )
+void z80scc_channel::cts_w(int state)
 {
 	LOG("\"%s\"%s: %c : CTS %u\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 
@@ -2701,7 +2701,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 //-------------------------------------------------
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
+void z80scc_channel::dcd_w(int state)
 {
 	LOGDCD("\"%s\": %c : DCD %u\n", owner()->tag(), 'A' + m_index, state);
 
@@ -2740,7 +2740,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 //-------------------------------------------------
 //  sync_w - sync handler for external sync mode
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::sync_w )
+void z80scc_channel::sync_w(int state)
 {
 	LOGSYNC("\"%s\": %c : SYNC %u\n", owner()->tag(), 'A' + m_index, state);
 
@@ -2778,7 +2778,7 @@ WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 //-------------------------------------------------
 //  rxc_w - receive clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
+void z80scc_channel::rxc_w(int state)
 {
 /* Support for external clock as source for BRG yet to be finished */
 #if 0
@@ -2830,7 +2830,7 @@ WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
 //-------------------------------------------------
 //  txc_w - transmit clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::txc_w )
+void z80scc_channel::txc_w(int state)
 {
 	//LOG("\"%s\": %c : Transmitter Clock Pulse\n", owner()->tag(), m_index + 'A');
 	if (m_wr5 & WR5_TX_ENABLE)
@@ -2981,7 +2981,7 @@ void z80scc_channel::set_dtr(int state)
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-WRITE_LINE_MEMBER(z80scc_channel::write_rx)
+void z80scc_channel::write_rx(int state)
 {
 #if START_BIT_HUNT
 	// Check for start bit if not receiving

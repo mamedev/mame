@@ -264,7 +264,7 @@ void ks0164_cpu_device::execute_run()
 			case 0xc: cond = (m_r[R_PSW] & F_Z) || ((m_r[R_PSW] & F_N) && !(m_r[R_PSW] & F_V)) || ((m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
 			case 0xd: cond = ((m_r[R_PSW] & F_N) && (m_r[R_PSW] & F_V)) || (!(m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
 			case 0xe: cond = ((m_r[R_PSW] & F_N) && !(m_r[R_PSW] & F_V)) || ((m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
-			case 0xf: cond = true; break;
+			case 0xf: default: cond = true; break;
 			}
 			if(cond) {
 				if(opcode & 0x200)
@@ -355,7 +355,7 @@ void ks0164_cpu_device::execute_run()
 				case 0: res = v1 > v2 ? v1 : v2; break;
 				case 1: res = s16(v1) > s16(v2) ? v1 : v2; break;
 				case 2: res = v1 < v2 ? v1 : v2; break;
-				case 3: res = s16(v1) < s16(v2) ? v1 : v2; break;
+				case 3: default: res = s16(v1) < s16(v2) ? v1 : v2; break;
 				}
 				m_r[(opcode >> 8) & 7] = res;
 				break;
@@ -577,7 +577,7 @@ void ks0164_cpu_device::execute_run()
 				m_r[R_PC] += 2;
 
 				m_r[r] --;
-				if(m_r[r] != 0xffff)
+				if(m_r[r] != 0)
 					m_r[R_PC] = a;
 				break;
 			}

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/atarimo.h"
@@ -32,15 +33,16 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
+	void scanline_int_ack_w(uint16_t data);
 	DECLARE_WRITE16_MEMBER(latch_w);
 	uint32_t screen_update_rampart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
 
-private:
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<okim6295_device> m_oki;
 	required_device<ym2413_device> m_ym2413;

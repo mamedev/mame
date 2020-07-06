@@ -43,12 +43,14 @@ namespace netlist { namespace devices {
 
 	NETLIB_UPDATE(CD4316_GATE)
 	{
-		m_R.update();
-		if (m_S() && !m_E())
-			m_R.set_R(m_base_r());
-		else
-			m_R.set_R(plib::reciprocal(exec().gmin()));
-		m_R.solve_later(NLTIME_FROM_NS(1));
+		m_R.change_state([this]()
+			{
+			if (m_S() && !m_E())
+				m_R.set_R(m_base_r());
+			else
+				m_R.set_R(plib::reciprocal(exec().gmin()));
+			}
+			, NLTIME_FROM_NS(1));
 	}
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")

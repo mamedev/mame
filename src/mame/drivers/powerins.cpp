@@ -10,10 +10,10 @@
 Set 1
     CPU:    MC68000, Z80 (for sound)
     Sound:  2x OKI6295 + 1x YM2203
-Set 2
+Bootleg Set 1
     CPU:    MC68000
     Sound:  OKIM6295
-Set 3
+Bootleg Set 2
     CPU:    MC68000, Z80 (for sound)
     Sound:  2x OKI6295 (Sound code supports an additional YM2203, but it's not fitted)
 
@@ -26,7 +26,7 @@ Note:
 
 TODO:
 - sprites flip y (not used by the game)
-- graphic system and PCB design is similar as nmk16.cpp games;
+- graphic system and PCB design is similar as macross2 era hardwares in nmk16.cpp;
   it's mergeable?
 
 ***************************************************************************/
@@ -50,21 +50,14 @@ TODO:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(powerins_state::powerinsa_okibank_w)
+void powerins_state::powerinsa_okibank_w(u8 data)
 {
-	m_okibank->set_entry(data & 7);
+	m_okibank[0]->set_entry(data & 7);
 }
 
-READ8_MEMBER(powerins_state::powerinsb_fake_ym2203_r)
+u8 powerins_state::powerinsb_fake_ym2203_r()
 {
 	return 0x01;
-}
-
-template<int Layer>
-WRITE16_MEMBER(powerins_state::vram_w)
-{
-	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 void powerins_state::powerins_map(address_map &map)
@@ -75,14 +68,14 @@ void powerins_state::powerins_map(address_map &map)
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
 	map(0x100015, 0x100015).w(FUNC(powerins_state::flipscreen_w));
-	map(0x100016, 0x100017).nopw();          // ? always 1
+	map(0x100016, 0x100017).nopw();    /* IRQ enable or z80 sound reset like in Macross 2? */
 	map(0x100019, 0x100019).w(FUNC(powerins_state::tilebank_w));
-	map(0x10001f, 0x10001f).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x120000, 0x120fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x130007).ram().share("vctrl_0");
-	map(0x140000, 0x143fff).ram().w(FUNC(powerins_state::vram_w<0>)).share("vram_0");
-	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(powerins_state::vram_w<1>)).share("vram_1");
-	map(0x180000, 0x18ffff).ram().share("spriteram");
+	map(0x130000, 0x130007).ram().w(FUNC(powerins_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x140000, 0x143fff).ram().w(FUNC(powerins_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(powerins_state::txvideoram_w)).share("txvideoram");
+	map(0x180000, 0x18ffff).ram().share("mainram");
 }
 
 /* powerinsa: same as the original one but without the sound cpu (and inferior sound HW) */
@@ -90,25 +83,16 @@ void powerins_state::powerinsa_map(address_map &map)
 {
 	powerins_map(map);
 	map(0x100031, 0x100031).w(FUNC(powerins_state::powerinsa_okibank_w));
-	map(0x10003f, 0x10003f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x10003f, 0x10003f).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 void powerins_state::powerins_sound_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 //  map(0xe000, 0xe000).nopw(); // ? written only once ?
 //  map(0xe001, 0xe001).nopw(); // ?
-}
-
-void powerins_state::powerins_sound_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x80, 0x80).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x88, 0x88).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
 }
 
 void powerins_state::powerinsb_sound_io_map(address_map &map)
@@ -116,15 +100,15 @@ void powerins_state::powerinsb_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(powerins_state::powerinsb_fake_ym2203_r)).nopw();
 	map(0x01, 0x01).noprw();
-	map(0x80, 0x80).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x88, 0x88).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x80, 0x80).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x88, 0x88).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
 }
 
 void powerins_state::powerinsa_oki_map(address_map &map)
 {
-	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x00000, 0x2ffff).rom().region("oki1", 0);
+	map(0x30000, 0x3ffff).bankr("okibank1");
 }
 
 
@@ -244,15 +228,15 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_powerins )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_powerinsc )
-	GFXDECODE_ENTRY( "gfx1", 0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
-	GFXDECODE_ENTRY( "gfx1", 0x280000, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
-	GFXDECODE_ENTRY( "gfx3", 0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
+	GFXDECODE_ENTRY( "bgtile",  0x280000, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
+	GFXDECODE_ENTRY( "bgtile",  0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "sprites", 0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
 GFXDECODE_END
 
 /***************************************************************************
@@ -263,17 +247,17 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(powerins_state, powerinsa)
 {
-	m_okibank->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
+	m_okibank[0]->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
 
 void powerins_state::init_powerinsc()
 {
-	uint8_t *gfx1 = memregion("gfx1")->base();
+	u8 *bgtile = memregion("bgtile")->base();
 
 	for (int i = 0; i < 0x300000; i++)
 	{
-		uint8_t x = gfx1[i];
-		gfx1[i] = bitswap(x, 3, 2, 1, 0, 7, 6, 5, 4);
+		u8 x = bgtile[i];
+		bgtile[i] = bitswap(x, 3, 2, 1, 0, 7, 6, 5, 4);
 	}
 }
 
@@ -283,9 +267,9 @@ void powerins_state::powerins(machine_config &config)
 	M68000(config, m_maincpu, XTAL(12'000'000));   /* 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_map);
 
-	Z80(config, m_soundcpu, XTAL(12'000'000) / 2); /* 6 MHz */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &powerins_state::powerins_sound_io_map);
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2); /* 6 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &powerins_state::macross2_sound_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -308,17 +292,15 @@ void powerins_state::powerins(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203(YM2203(config, "ym2203", XTAL(12'000'000) / 8));
-	ym2203.irq_handler().set_inputline(m_soundcpu, 0);
-	ym2203.add_route(ALL_OUTPUTS, "mono", 2.0);
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW));
-	oki1.add_route(ALL_OUTPUTS, "mono", 0.15);
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW));
-	oki2.add_route(ALL_OUTPUTS, "mono", 0.15);
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
@@ -333,18 +315,18 @@ void powerins_state::powerinsa(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &powerins_state::powerinsa_map);
 
-	m_screen->set_refresh_hz(60);
+	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 0, 320, 262, 16, 240); // ~60hz, XTAL verified, correct params?
+	m_screen->screen_vblank().set(FUNC(powerins_state::screen_vblank_powerinsa));
 
-	config.device_remove("soundcpu");
+	config.device_remove("audiocpu");
 
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
-	okim6295_device &oki1(OKIM6295(config.replace(), "oki1", 990000, okim6295_device::PIN7_LOW)); // pin7 not verified
-	oki1.set_addrmap(0, &powerins_state::powerinsa_oki_map);
-	oki1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->set_clock(990000); // pin7 not verified
+	m_oki[0]->set_addrmap(0, &powerins_state::powerinsa_oki_map);
 
 	config.device_remove("oki2");
-	config.device_remove("ym2203");
+	config.device_remove("ymsnd");
 	config.device_remove("nmk112");
 }
 
@@ -354,12 +336,13 @@ void powerins_state::powerinsb(machine_config &config)
 
 	/* basic machine hardware */
 
-	m_screen->set_refresh_hz(60);
+	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 0, 320, 262, 16, 240); // ~60hz, XTAL verified, correct params?
+	m_screen->screen_vblank().set(FUNC(powerins_state::screen_vblank_powerinsa));
 
-	m_soundcpu->set_addrmap(AS_IO, &powerins_state::powerinsb_sound_io_map);
-	m_soundcpu->set_periodic_int(FUNC(powerins_state::irq0_line_hold), attotime::from_hz(120));  // YM2203 rate is at 150??
+	m_audiocpu->set_addrmap(AS_IO, &powerins_state::powerinsb_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(powerins_state::irq0_line_hold), attotime::from_hz(120));  // YM2203 rate is at 150??
 
-	config.device_remove("ym2203");    // Sound code talks to one, but it's not fitted on the board
+	config.device_remove("ymsnd");    // Sound code talks to one, but it's not fitted on the board
 }
 
 void powerins_state::powerinsc(machine_config &config)
@@ -436,18 +419,18 @@ ROM_START( powerins )
 	ROM_LOAD16_WORD_SWAP( "93095-3a.u108", 0x00000, 0x80000, CRC(9825ea3d) SHA1(567fd8e3d866a58a68608ea20c5d3fc16cf9f444) )
 	ROM_LOAD16_WORD_SWAP( "93095-4.u109",  0x80000, 0x80000, CRC(d3d7a782) SHA1(7846de0ebb09bd9b2534cd451ff9aa5175e60647) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "93095-2.u90",  0x00000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x280000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD( "93095-5.u16",  0x000000, 0x100000, CRC(b1371808) SHA1(15fca313314ff2e0caff35841a2fdda97f6235a8) )
 	ROM_LOAD( "93095-6.u17",  0x100000, 0x100000, CRC(29c85d80) SHA1(abd54f9c8bade21ea918a426627199da04193165) )
 	ROM_LOAD( "93095-7.u18",  0x200000, 0x080000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "fgtile", 0 )   /* Layer 1 */
 	ROM_LOAD( "93095-1.u15",  0x000000, 0x020000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "93095-12.u116", 0x000000, 0x100000, CRC(35f3c2a3) SHA1(70efebfe248401ba3d766dc0e4bcc2846cd0d9a0) )
 	ROM_LOAD16_WORD_SWAP( "93095-13.u117", 0x100000, 0x100000, CRC(1ebd45da) SHA1(99b0ac734890673064b2a4b4b57ff2694e338dea) )
 	ROM_LOAD16_WORD_SWAP( "93095-14.u118", 0x200000, 0x100000, CRC(760d871b) SHA1(4887122ad0518c90f08c11a7a6b694f3fd218498) )
@@ -476,18 +459,18 @@ ROM_START( powerinsj )
 	ROM_LOAD16_WORD_SWAP( "93095-3j.u108", 0x00000, 0x80000, CRC(3050a3fb) SHA1(e7e729bf62266e2e78ccd84cf937abb99de18ad5) )
 	ROM_LOAD16_WORD_SWAP( "93095-4.u109",  0x80000, 0x80000, CRC(d3d7a782) SHA1(7846de0ebb09bd9b2534cd451ff9aa5175e60647) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "93095-2.u90",  0x00000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x280000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD( "93095-5.u16",  0x000000, 0x100000, CRC(b1371808) SHA1(15fca313314ff2e0caff35841a2fdda97f6235a8) )
 	ROM_LOAD( "93095-6.u17",  0x100000, 0x100000, CRC(29c85d80) SHA1(abd54f9c8bade21ea918a426627199da04193165) )
 	ROM_LOAD( "93095-7.u18",  0x200000, 0x080000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "fgtile", 0 )   /* Layer 1 */
 	ROM_LOAD( "93095-1.u15",  0x000000, 0x020000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "93095-12.u116", 0x000000, 0x100000, CRC(35f3c2a3) SHA1(70efebfe248401ba3d766dc0e4bcc2846cd0d9a0) )
 	ROM_LOAD16_WORD_SWAP( "93095-13.u117", 0x100000, 0x100000, CRC(1ebd45da) SHA1(99b0ac734890673064b2a4b4b57ff2694e338dea) )
 	ROM_LOAD16_WORD_SWAP( "93095-14.u118", 0x200000, 0x100000, CRC(760d871b) SHA1(4887122ad0518c90f08c11a7a6b694f3fd218498) )
@@ -516,20 +499,20 @@ ROM_START( powerinspu )
 	ROM_LOAD16_WORD_SWAP( "3.p000.v4.0a.u116.27c240", 0x000000, 0x80000, CRC(d1dd5a3f) SHA1(b2a52a2bbdf63eddc04bae2b4322d6d320f35e89) )
 	ROM_LOAD16_WORD_SWAP( "4.p000.v3.8.u117.27c4096", 0x080000, 0x80000, CRC(9c0f23cf) SHA1(9ac78939a743c340aa51ff1b05817866124acd34) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "2.sound 9.20.u74.27c1001",  0x000000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x280000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD( "ba0.s0.27c040", 0x000000, 0x80000, CRC(1975b4b8) SHA1(cb400967744fa602df1bd2d88950dfdbdc77073f) ) /* located on OS93089 SUB daughterboard */
 	ROM_LOAD( "ba1.s1.27c040", 0x080000, 0x80000, CRC(376e4919) SHA1(12baa17382c176838df1b5ef86f1fa6dbcb978dd) )
 	ROM_LOAD( "ba2.s2.27c040", 0x100000, 0x80000, CRC(0d5ff532) SHA1(4febdb9cdacd85903a4a28e8df945dee0ce85558) )
 	ROM_LOAD( "ba3.s3.27c040", 0x180000, 0x80000, CRC(99b25791) SHA1(82f4bb5780826773d2e5f7143afb3ba209f57652) )
 	ROM_LOAD( "ba4.s4.27c040", 0x200000, 0x80000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "fgtile", 0 )   /* Layer 1 */
 	ROM_LOAD( "1.text 1080.u16.27c010", 0x000000, 0x20000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "fo0.mo0.27c040", 0x000001, 0x80000, CRC(8b9b89c9) SHA1(f1d39d1a62e40a14642d8f22fc38b764465a8daa) ) /* located on OS93089 SUB daughterboard */
 	ROM_LOAD16_BYTE( "fe0.me0.27c040", 0x000000, 0x80000, CRC(4d127bdf) SHA1(26a7c277e7660a7c7c0c11cacadf815d2487ba8a) )
 	ROM_LOAD16_BYTE( "fo1.mo1.27c040", 0x100001, 0x80000, CRC(298eb50e) SHA1(2b922c1473bb559a1e8bd6221619141658179bb9) )
@@ -570,20 +553,20 @@ ROM_START( powerinspj )
 	ROM_LOAD16_WORD_SWAP( "3.p000.pc_j_12-1_155e.u116", 0x000000, 0x80000, CRC(4ea18490) SHA1(6b933b7ee11c65adf15430c8b185feaddb1c0bb0) ) /* labeled:  PC J 12/1 155E */
 	ROM_LOAD16_WORD_SWAP( "4.p000.f_p4.u117",           0x080000, 0x80000, CRC(9c0f23cf) SHA1(9ac78939a743c340aa51ff1b05817866124acd34) ) /* labeled:  F P4 */
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "2.sound 9.20.u74.27c1001",  0x000000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x280000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD( "ba0.s0.27c040", 0x000000, 0x80000, CRC(1975b4b8) SHA1(cb400967744fa602df1bd2d88950dfdbdc77073f) ) /* located on OS93089 SUB daughterboard */
 	ROM_LOAD( "ba1.s1.27c040", 0x080000, 0x80000, CRC(376e4919) SHA1(12baa17382c176838df1b5ef86f1fa6dbcb978dd) )
 	ROM_LOAD( "ba2.s2.27c040", 0x100000, 0x80000, CRC(0d5ff532) SHA1(4febdb9cdacd85903a4a28e8df945dee0ce85558) )
 	ROM_LOAD( "ba3.s3.27c040", 0x180000, 0x80000, CRC(99b25791) SHA1(82f4bb5780826773d2e5f7143afb3ba209f57652) )
 	ROM_LOAD( "ba4.s4.27c040", 0x200000, 0x80000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "fgtile", 0 )   /* Layer 1 */
 	ROM_LOAD( "1.text 1080.u16.27c010", 0x000000, 0x20000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "fo0.mo0.27c040", 0x000001, 0x80000, CRC(8b9b89c9) SHA1(f1d39d1a62e40a14642d8f22fc38b764465a8daa) ) /* located on OS93089 SUB daughterboard */
 	ROM_LOAD16_BYTE( "fe0.me0.27c040", 0x000000, 0x80000, CRC(4d127bdf) SHA1(26a7c277e7660a7c7c0c11cacadf815d2487ba8a) )
 	ROM_LOAD16_BYTE( "fo1.mo1.27c040", 0x100001, 0x80000, CRC(298eb50e) SHA1(2b922c1473bb559a1e8bd6221619141658179bb9) )
@@ -654,14 +637,14 @@ ROM_START( powerinsa )
 	ROM_LOAD16_WORD_SWAP( "rom1", 0x000000, 0x080000, CRC(b86c84d6) SHA1(2ec0933130925dfae859ea6abe62a8c92385aee8) )
 	ROM_LOAD16_WORD_SWAP( "rom2", 0x080000, 0x080000, CRC(d3d7a782) SHA1(7846de0ebb09bd9b2534cd451ff9aa5175e60647) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x280000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD( "rom6",  0x000000, 0x200000, CRC(b6c10f80) SHA1(feece0aeaa01a455d0c4885a3699f8bda14fe00f) )
 	ROM_LOAD( "rom4",  0x200000, 0x080000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "fgtile", 0 )   /* Layer 1 */
 	ROM_LOAD( "rom3",  0x000000, 0x020000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "rom10", 0x000000, 0x200000, CRC(efad50e8) SHA1(89e8c307b927e987a32d22ab4ab7f3be037cca03) )
 	ROM_LOAD16_WORD_SWAP( "rom9",  0x200000, 0x200000, CRC(08229592) SHA1(759679e89832b475adfdc783630d9ee2c105b0f3) )
 	ROM_LOAD16_WORD_SWAP( "rom8",  0x400000, 0x200000, CRC(b02fdd6d) SHA1(1e2c52b4e9999f0b564fcf13ff41b097ad7d0c39) )
@@ -727,20 +710,20 @@ ROM_START( powerinsb )
 	ROM_LOAD16_BYTE( "2q.bin", 0x000000, 0x80000, CRC(11bf3f2a) SHA1(c840add78da9b19839c667f9bbd77e0a7c560ed7) )
 	ROM_LOAD16_BYTE( "2r.bin", 0x000001, 0x80000, CRC(d8d621be) SHA1(91d501ac661c1ff52c85eee96c455c008a7dad1c) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "1f.bin",  0x000000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x280000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD( "13k.bin", 0x000000, 0x80000, CRC(1975b4b8) SHA1(cb400967744fa602df1bd2d88950dfdbdc77073f) )
 	ROM_LOAD( "13l.bin", 0x080000, 0x80000, CRC(376e4919) SHA1(12baa17382c176838df1b5ef86f1fa6dbcb978dd) )
 	ROM_LOAD( "13o.bin", 0x100000, 0x80000, CRC(0d5ff532) SHA1(4febdb9cdacd85903a4a28e8df945dee0ce85558) )
 	ROM_LOAD( "13q.bin", 0x180000, 0x80000, CRC(99b25791) SHA1(82f4bb5780826773d2e5f7143afb3ba209f57652) )
 	ROM_LOAD( "13r.bin", 0x200000, 0x80000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "fgtile", 0 )   /* Layer 1 */
 	ROM_LOAD( "6n.bin", 0x000000, 0x20000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "14g.bin", 0x000001, 0x80000, CRC(8b9b89c9) SHA1(f1d39d1a62e40a14642d8f22fc38b764465a8daa) )
 	ROM_LOAD16_BYTE( "11g.bin", 0x000000, 0x80000, CRC(4d127bdf) SHA1(26a7c277e7660a7c7c0c11cacadf815d2487ba8a) )
 	ROM_LOAD16_BYTE( "13g.bin", 0x100001, 0x80000, CRC(298eb50e) SHA1(2b922c1473bb559a1e8bd6221619141658179bb9) )
@@ -780,10 +763,10 @@ ROM_START( powerinsc )
 	ROM_LOAD16_BYTE( "10.040.u41", 0x000000, 0x80000, CRC(88e1244b) SHA1(595a560b807eab9576ed057a7e532c83860e9c40) )
 	ROM_LOAD16_BYTE( "11.040.u39", 0x000001, 0x80000, CRC(46cd506f) SHA1(4585824f65e2b7da9f815fee92bb5f6d250a286d) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "1.010.u2",  0x000000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
 
-	ROM_REGION( 0x300000, "gfx1", 0 )   /* Layer 0 */
+	ROM_REGION( 0x300000, "bgtile", 0 )   /* Layer 0 */
 	ROM_LOAD16_BYTE( "33.040.u99",  0x000000, 0x80000, CRC(9b56a394) SHA1(f9451d8d5a911f4daa0f57af496dae08d320b3b2) )
 	ROM_LOAD16_BYTE( "22.040.u97",  0x000001, 0x80000, CRC(1e693f05) SHA1(049eeabd9b4f55f2f314f4f6871b1a0e1ec39517) )
 	ROM_LOAD16_BYTE( "32.040.u100", 0x100000, 0x80000, CRC(7749bc80) SHA1(ceee996e694865dfbc48b5365731f4903ca674f1) )
@@ -792,7 +775,7 @@ ROM_START( powerinsc )
 	ROM_LOAD16_BYTE( "20.040.u101", 0x200001, 0x80000, CRC(e4b2823c) SHA1(1ef41ff625ad82dcc85994f87e1d82fc11e26dd8) )
 
 	// TODO: check sprites' ROM loading
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "sprites", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "30.040.u82", 0x000000, 0x80000,  CRC(6668d29d) SHA1(41b7ab49b72a1ffc7618c3fc45a1c1bbe1d84d21) )
 	ROM_LOAD16_BYTE( "19.040.u91", 0x000001, 0x80000,  CRC(17659d0c) SHA1(394b5dbb4461d0c05599d1ecd9fe92de999970fa) )
 	ROM_LOAD16_BYTE( "29.040.u85", 0x100000, 0x80000,  CRC(c349e556) SHA1(a89d4292a6f3b3cfd5b85f8db6de207831e779e6) )

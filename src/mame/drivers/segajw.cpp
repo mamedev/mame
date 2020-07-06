@@ -177,8 +177,7 @@ void segajw_state::segajw_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x080000, 0x080001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x080002, 0x080003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x080000, 0x080003).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 
 	map(0x180000, 0x180001).portr("DSW0");
 	map(0x180005, 0x180005).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);

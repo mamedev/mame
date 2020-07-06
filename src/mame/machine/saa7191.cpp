@@ -75,7 +75,7 @@ void saa7191_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 }
 
-WRITE8_MEMBER(saa7191_device::i2c_data_w)
+void saa7191_device::i2c_data_w(uint8_t data)
 {
 	switch (m_i2c_state)
 	{
@@ -96,7 +96,7 @@ WRITE8_MEMBER(saa7191_device::i2c_data_w)
 		m_i2c_state = I2C_STATE_DATA_READ;
 		break;
 	case I2C_STATE_DATA_WRITE:
-		reg_w(space, m_i2c_subaddr, data);
+		reg_w(data);
 		m_i2c_subaddr = (m_i2c_subaddr + 1) % REG_COUNT;
 		break;
 	case I2C_STATE_DATA_READ:
@@ -110,7 +110,7 @@ WRITE8_MEMBER(saa7191_device::i2c_data_w)
 	}
 }
 
-READ8_MEMBER(saa7191_device::i2c_data_r)
+uint8_t saa7191_device::i2c_data_r()
 {
 	if (m_i2c_state != I2C_STATE_DATA_READ)
 	{
@@ -141,7 +141,7 @@ WRITE_LINE_MEMBER(saa7191_device::iicsa_w)
 	m_i2c_read_addr = m_i2c_write_addr | 1;
 }
 
-WRITE8_MEMBER(saa7191_device::reg_w)
+void saa7191_device::reg_w(uint8_t data)
 {
 	if (m_i2c_subaddr < REG_COUNT)
 	{

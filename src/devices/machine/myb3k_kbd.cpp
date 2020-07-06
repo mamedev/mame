@@ -338,6 +338,8 @@ myb3k_keyboard_device::myb3k_keyboard_device(
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_keyboard_cb(*this)
 	, m_io_kbd_t(*this, "MYB3K_T%X", 0U)
+	, m_x(0)
+	, m_y(0)
 {
 }
 

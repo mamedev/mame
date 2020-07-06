@@ -14,6 +14,8 @@
 
 #include "formats/imageutl.h"
 
+#include "corefile.h"
+
 
 //**************************************************************************
 //  MACROS/CONSTANTS

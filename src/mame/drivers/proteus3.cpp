@@ -173,7 +173,7 @@ void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
-	m_pia->write_portb(data);
+	m_pia->portb_w(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
 }

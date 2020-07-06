@@ -164,7 +164,7 @@ public:
 	void fifo_full_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
-	DECLARE_READ16_MEMBER(fifo_r);
+	uint16_t fifo_r();
 	DECLARE_READ16_MEMBER(fifo_status_r);
 
 	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);

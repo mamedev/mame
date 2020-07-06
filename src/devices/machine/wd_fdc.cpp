@@ -145,6 +145,8 @@ void wd_fdc_device_base::device_start()
 	if (!disable_mfm)
 		save_item(NAME(dden));
 	save_item(NAME(mr));
+	save_item(NAME(intrq));
+	save_item(NAME(drq));
 }
 
 void wd_fdc_device_base::device_reset()
