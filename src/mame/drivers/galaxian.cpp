@@ -8351,7 +8351,7 @@ ROM_START( zerotimed )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-/* Marti Colls (Falgas) bootleg */
+// Marti Colls (Falgas) bootleg
 ROM_START( zerotimemc )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "4_7k.bin", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
@@ -8366,9 +8366,25 @@ ROM_START( zerotimemc )
 
 	/* Not dumped on the Marti Colls PCB, taken from the parent set */
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+	ROM_LOAD( "6l.bpr",    0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+// Cirsa bootleg
+ROM_START( galaxcirsa )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "cirsagal.1", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
+	ROM_LOAD( "cirsagal.2", 0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "cirsagal.3", 0x1000, 0x0800, CRC(7c86fc8a) SHA1(ea7e16cfd765fb992bd476796e2e3a5f87e8360c) )
+	ROM_LOAD( "cirsagal.4", 0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
+	ROM_LOAD( "cirsagal.5", 0x2000, 0x0800, CRC(863a688f) SHA1(fa1f92476e10af9a63290ed30359bc88e7721528) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "cirsagal.h", 0x0000, 0x0800, CRC(6babd14e) SHA1(c8601803bc74c1089f767c4672376d4788dc4f49) )
+	ROM_LOAD( "cirsagal.i", 0x0800, 0x0800, CRC(0997e81b) SHA1(a5c6b2b59f7a807b44e5d49c54c42d1abf2fc71a) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6113_1.bin", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
 
 ROM_START( starfght )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -13116,6 +13132,7 @@ GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_
 GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Petaco S.A.)",                      "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                          "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",                      "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxcirsa,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Cirsa)",                            "Galaxian (Cirsa Spanish bootleg)",                                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg (Jeutel)",                           "Star Fighter",                                                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 1)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,  galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 2)",                                                                    MACHINE_SUPPORTS_SAVE )
