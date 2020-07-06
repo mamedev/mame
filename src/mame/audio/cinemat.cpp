@@ -39,26 +39,59 @@
  *
  *************************************/
 
-cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask)
+cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_samples(*this, "samples")
 	, m_out_input(*this, "sound_nl:out_%u", 0)
-	, m_shiftreg_input(*this, "sound_nl:shiftreg_%u", 0)
-	, m_shiftreg16_input(*this, "sound_nl:shiftreg16_%u", 0)
 	, m_inputs_mask(inputs_mask)
+	, m_netlist(netlist)
+	, m_output_scale(output_scale)
 {
 }
 
 void cinemat_audio_device::configure_latch_inputs(ls259_device &latch, u8 mask)
 {
-	if (BIT(mask, 0)) latch.q_out_cb<0>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<0>)));
-	if (BIT(mask, 1)) latch.q_out_cb<1>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<1>)));
-	if (BIT(mask, 2)) latch.q_out_cb<2>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<2>)));
-	if (BIT(mask, 3)) latch.q_out_cb<3>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<3>)));
-	if (BIT(mask, 4)) latch.q_out_cb<4>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<4>)));
-	if (BIT(mask, 5)) latch.q_out_cb<5>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<5>)));
-	if (BIT(mask, 6)) latch.q_out_cb<6>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<6>)));
-	if (BIT(mask, 7)) latch.q_out_cb<7>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<7>)));
+	if (mask == 0)
+		mask = m_inputs_mask;
+	if (BIT(mask, 0))
+		latch.q_out_cb<0>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<0>)));
+	if (BIT(mask, 1))
+		latch.q_out_cb<1>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<1>)));
+	if (BIT(mask, 2))
+		latch.q_out_cb<2>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<2>)));
+	if (BIT(mask, 3))
+		latch.q_out_cb<3>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<3>)));
+	if (BIT(mask, 4))
+		latch.q_out_cb<4>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<4>)));
+	if (BIT(mask, 7))
+		latch.q_out_cb<7>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<7>)));
+}
+
+void cinemat_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	if (m_netlist != nullptr)
+	{
+		NETLIST_SOUND(config, "sound_nl", 48000)
+			.set_source(m_netlist)
+			.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+		if ((m_inputs_mask & 0x01) != 0)
+			NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+		if ((m_inputs_mask & 0x02) != 0)
+			NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+		if ((m_inputs_mask & 0x04) != 0)
+			NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
+		if ((m_inputs_mask & 0x08) != 0)
+			NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
+		if ((m_inputs_mask & 0x10) != 0)
+			NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
+		if ((m_inputs_mask & 0x80) != 0)
+			NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
+
+		NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(m_output_scale, 0.0);
+	}
 }
 
 void cinemat_audio_device::device_start()
@@ -98,15 +131,9 @@ void cinemat_audio_device::input_set(int bit, int state)
 void cinemat_audio_device::shiftreg_latch()
 {
 	u8 oldvals = m_shiftreg;
-	m_shiftreg = shiftreg_swizzle(m_shiftreg_accum);
+	m_shiftreg = m_shiftreg_accum;
 	if (oldvals != m_shiftreg)
-	{
-		log_changes(m_shiftreg, oldvals, "I_SHIFTREG");
-		for (int index = 0; index < 8; index++)
-			if (m_shiftreg_input[index] != nullptr)
-				m_shiftreg_input[index]->write_line(BIT(m_shiftreg, index));
 		shiftreg_changed(m_shiftreg, oldvals);
-	}
 }
 
 void cinemat_audio_device::shiftreg16_latch()
@@ -114,13 +141,7 @@ void cinemat_audio_device::shiftreg16_latch()
 	u16 oldvals = m_shiftreg16;
 	m_shiftreg16 = m_shiftreg16_accum;
 	if (oldvals != m_shiftreg16)
-	{
-		log_changes(m_shiftreg16, oldvals, "I_SHIFTREG16");
-		for (int index = 0; index < 16; index++)
-			if (m_shiftreg16_input[index] != nullptr)
-				m_shiftreg16_input[index]->write_line(BIT(m_shiftreg16, index));
 		shiftreg16_changed(m_shiftreg16, oldvals);
-	}
 }
 
 void cinemat_audio_device::shiftreg_set(int bit, int val)
@@ -128,11 +149,7 @@ void cinemat_audio_device::shiftreg_set(int bit, int val)
 	u8 oldvals = m_shiftreg;
 	u8 mask = 1 << bit;
 	m_shiftreg = (m_shiftreg & ~mask) | ((val & 1) << bit);
-	if (oldvals != m_shiftreg)
-	{
-		log_changes(m_shiftreg, oldvals, "I_SHIFTREG");
 		shiftreg_changed(m_shiftreg, oldvals);
-	}
 }
 
 void cinemat_audio_device::inputs_changed(u8 newvals, u8 oldvals)
@@ -150,12 +167,6 @@ void cinemat_audio_device::shiftreg16_changed(u16 newvals, u16 oldvals)
 	// overridden by base class if needed
 }
 
-u8 cinemat_audio_device::shiftreg_swizzle(u8 rawvals)
-{
-	// overridden if needed by base class
-	return rawvals;
-}
-
 
 
 /*************************************
@@ -167,25 +178,8 @@ u8 cinemat_audio_device::shiftreg_swizzle(u8 rawvals)
 DEFINE_DEVICE_TYPE(SPACE_WARS_AUDIO, spacewar_audio_device, "spacewar_audio", "Space Wars Sound Board")
 
 spacewar_audio_device::spacewar_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SPACE_WARS_AUDIO, tag, owner, clock, 0x1f)
+	: cinemat_audio_device(mconfig, SPACE_WARS_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(spacewar), 150000.0)
 {
-}
-
-void spacewar_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(spacewar))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(150000.0, 0.0);
 }
 
 
@@ -199,23 +193,8 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(BARRIER_AUDIO, barrier_audio_device, "barrier_audio", "Barrier Sound Board")
 
 barrier_audio_device::barrier_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, BARRIER_AUDIO, tag, owner, clock, 0x07)
+	: cinemat_audio_device(mconfig, BARRIER_AUDIO, tag, owner, clock, 0x07, NETLIST_NAME(barrier), 200000.0)
 {
-}
-
-void barrier_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(barrier))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(200000.0, 0.0);
 }
 
 
@@ -229,26 +208,8 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SPEED_FREAK_AUDIO, speedfrk_audio_device, "speedfrk_audio", "Speed Freak Sound Board")
 
 speedfrk_audio_device::speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x9f)
+	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(speedfrk), 12000.0)
 {
-}
-
-void speedfrk_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(speedfrk))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(12000.0, 0.0);
 }
 
 
@@ -262,26 +223,8 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(STAR_HAWK_AUDIO, starhawk_audio_device, "starhawk_audio", "Star Hawk Sound Board")
 
 starhawk_audio_device::starhawk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, STAR_HAWK_AUDIO, tag, owner, clock, 0x9f)
+	: cinemat_audio_device(mconfig, STAR_HAWK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(starhawk), 50000.0)
 {
-}
-
-void starhawk_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(starhawk))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(50000.0, 0.0);
 }
 
 
@@ -295,26 +238,8 @@ void starhawk_audio_device::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SUNDANCE_AUDIO, sundance_audio_device, "sundance_audio", "Sundance Sound Board")
 
 sundance_audio_device::sundance_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SUNDANCE_AUDIO, tag, owner, clock, 0x9f)
+	: cinemat_audio_device(mconfig, SUNDANCE_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(sundance), 45000.0)
 {
-}
-
-void sundance_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(sundance))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
 }
 
 
@@ -328,25 +253,8 @@ void sundance_audio_device::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(TAIL_GUNNER_AUDIO, tailg_audio_device, "tailg_audio", "Tail Gunner Sound Board")
 
 tailg_audio_device::tailg_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, TAIL_GUNNER_AUDIO, tag, owner, clock, 0x1f)
+	: cinemat_audio_device(mconfig, TAIL_GUNNER_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(tailg), 75000.0)
 {
-}
-
-void tailg_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(tailg))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(75000.0, 0.0);
 }
 
 
@@ -597,26 +505,8 @@ void ripoff_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(STAR_CASTLE_AUDIO, starcas_audio_device, "starcas_audio", "Star Castle Sound Board")
 
 starcas_audio_device::starcas_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock, 0x9f)
+	: cinemat_audio_device(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(starcas), 5000.0)
 {
-}
-
-void starcas_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(starcas))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
 }
 
 
@@ -894,26 +784,8 @@ void boxingb_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
 DEFINE_DEVICE_TYPE(WAR_OF_THE_WORLDS_AUDIO, wotw_audio_device, "wotw_audio", "War of the Worlds Sound Board")
 
 wotw_audio_device::wotw_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, WAR_OF_THE_WORLDS_AUDIO, tag, owner, clock, 0x0e)
+	: cinemat_audio_device(mconfig, WAR_OF_THE_WORLDS_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(wotw), 5000.0)
 {
-}
-
-void wotw_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(wotw))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
-
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
 }
 
 

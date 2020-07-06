@@ -41,6 +41,13 @@
 
 
 //
+// Optimizations
+//
+
+#define HLE_NOISE_GEN (1)
+
+
+//
 // Initial compilation includes this section.
 //
 
@@ -239,7 +246,18 @@ NETLIST_START(barrier)
 	// Top-left until output from U1
 	//
 
-#if 0
+#if (HLE_NOISE_GEN)
+	CLOCK(NOISE_CLOCK, 2000)
+	NET_C(NOISE_CLOCK.GND, GND)
+	NET_C(NOISE_CLOCK.VCC, I_V5)
+
+	SYS_NOISE_MT_U(NOISE, 3)
+	NET_C(NOISE.I, NOISE_CLOCK.Q)
+	NET_C(NOISE.1, GND)
+	NET_C(NOISE.2, C1.1)
+
+	NET_C(GND, R1.1, R1.2, R2.1, R2.2, CR1.A, CR1.K, CR2.A, CR2.K)
+#else
 	NET_C(I_V15, CR1.A)
 	NET_C(CR1.K, CR2.A)
 	NET_C(CR2.K, R1.2, Q1.B)
@@ -249,17 +267,6 @@ NETLIST_START(barrier)
 	NET_C(R2.1, Q1.E)
 	NET_C(Q1.C, Q2.E, C1.1)
 	NET_C(Q2.C, GND)
-#else
-	CLOCK(NOISE_CLOCK, 2000)
-	NET_C(NOISE_CLOCK.GND, GND)
-	NET_C(NOISE_CLOCK.VCC, I_V5)
-
-	SYS_NOISE_MT_N(NOISE, 0.5)
-	NET_C(NOISE.I, NOISE_CLOCK.Q)
-	NET_C(NOISE.1, I_V15)
-	NET_C(NOISE.2, C1.1)
-
-	NET_C(GND, R1.1, R1.2, R2.1, R2.2, CR1.A, CR1.K, CR2.A, CR2.K)
 #endif
 
 	NET_C(C1.2, R3.2, U1.3)

@@ -17,11 +17,12 @@
 class cinemat_audio_device : public device_t
 {
 public:
-	cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask);
+	cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &) = nullptr, double output_scale = 0);
 
-	void configure_latch_inputs(ls259_device &latch, u8 mask);
+	void configure_latch_inputs(ls259_device &latch, u8 mask = 0);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
 
@@ -45,14 +46,8 @@ protected:
 	virtual void shiftreg_changed(u8 newvals, u8 oldvals);
 	virtual void shiftreg16_changed(u16 newvals, u16 oldvals);
 
-	virtual u8 shiftreg_swizzle(u8 rawvals);
-
-	u16 shiftreg16_accum() const { return m_shiftreg16_accum; }
-
 	optional_device<samples_device> m_samples;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_out_input;
-	optional_device_array<netlist_mame_logic_input_device, 8> m_shiftreg_input;
-	optional_device_array<netlist_mame_logic_input_device, 16> m_shiftreg16_input;
 
 private:
 	template<typename _Type>
@@ -76,6 +71,8 @@ private:
 	u8 m_shiftreg_accum = 0xff;
 	u16 m_shiftreg16 = 0xffff;
 	u16 m_shiftreg16_accum = 0xffff;
+	void (*m_netlist)(netlist::nlparse_t &) = nullptr;
+	double m_output_scale = 0;
 
 #if ENABLE_NETLIST_LOGGING
 	FILE *m_logfile = nullptr;
@@ -88,9 +85,6 @@ class spacewar_audio_device : public cinemat_audio_device
 {
 public:
 	spacewar_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -98,9 +92,6 @@ class barrier_audio_device : public cinemat_audio_device
 {
 public:
 	barrier_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -108,9 +99,6 @@ class speedfrk_audio_device : public cinemat_audio_device
 {
 public:
 	speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -118,9 +106,6 @@ class starhawk_audio_device : public cinemat_audio_device
 {
 public:
 	starhawk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -128,9 +113,6 @@ class sundance_audio_device : public cinemat_audio_device
 {
 public:
 	sundance_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -138,9 +120,6 @@ class tailg_audio_device : public cinemat_audio_device
 {
 public:
 	tailg_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -186,9 +165,6 @@ class starcas_audio_device : public cinemat_audio_device
 {
 public:
 	starcas_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -230,9 +206,6 @@ class wotw_audio_device : public cinemat_audio_device
 {
 public:
 	wotw_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
