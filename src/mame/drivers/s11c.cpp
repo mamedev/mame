@@ -26,25 +26,6 @@ void s11c_state::s11c_main_map(address_map &map)
 	map(0x4000, 0xffff).rom();
 }
 
-void s11c_state::s11c_audio_map(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x1000, 0x1000).mirror(0x0fff).w(FUNC(s11c_state::bank_w));
-	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x8000, 0xbfff).bankr("bank0");
-	map(0xc000, 0xffff).bankr("bank1");
-}
-
-void s11c_state::s11c_bg_map(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6000).mirror(0x07ff).w(FUNC(s11c_state::bg_cvsd_digit_clock_clear_w));
-	map(0x6800, 0x6800).mirror(0x07ff).w(FUNC(s11c_state::bg_cvsd_clock_set_w));
-	map(0x7800, 0x7800).mirror(0x07ff).w(FUNC(s11c_state::bgbank_w));
-	map(0x8000, 0xffff).bankr("bgbank");
-}
 
 static INPUT_PORTS_START( s11c )
 	PORT_START("SW.0")
@@ -219,6 +200,8 @@ void s11c_state::s11c(machine_config &config)
 	/* Add the background music card */
 	SPEAKER(config, "speaker").front_center();
 	S11C_BG(config, m_bg);
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 	m_bg->set_romregion(m_bgcpu);
 	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
