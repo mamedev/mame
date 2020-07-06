@@ -845,6 +845,31 @@ static INPUT_PORTS_START( guitarss )
 
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( senwfit )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )  PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )  PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Weight Left")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Weight Right")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Up-Left")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Down-Left")
+	PORT_BIT( 0x1c00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Up-Right")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Down-Right")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jjstrip )
 	PORT_START("P1") // active LOW or HIGH?
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -1426,7 +1451,7 @@ void spg2xx_game_gssytts_state::portc_w(offs_t offset, uint16_t data, uint16_t m
 
 void spg2xx_game_gssytts_state::machine_start()
 {
-	m_upperbank->configure_entries(0, 4, memregion("maincpu")->base(), 0x400000);
+	m_upperbank->configure_entries(0, memregion("maincpu")->bytes()/0x400000, memregion("maincpu")->base(), 0x400000);
 	m_upperbank->set_entry(1);
 
 	spg2xx_game_state::machine_start();
@@ -1456,6 +1481,61 @@ void spg2xx_game_gssytts_state::gssytts(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
+
+void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int bank = 0;
+
+	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	if (mem_mask & 1)
+		if (data & 1)
+			bank |= 1;
+
+	if (mem_mask & 2)
+		if (data & 2)
+			bank |= 2;
+
+	if (mem_mask & 4)
+		if (data & 4)
+			bank |= 4;
+
+	m_upperbank->set_entry(bank);
+	m_maincpu->invalidate_cache();
+}
+
+
+void spg2xx_game_senwfit_state::init_senwfit()
+{
+	uint8_t *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	std::vector<u8> buffer(len);
+
+	for (int i = 0; i < len; i++)
+	{
+		int newaddr = bitswap<25>(i, 24,23,22,20,9,19,18,21,17,16,15,14,13,12,11,10,8,7,6,5,4,3,2,1,0);
+		buffer[i] = src[newaddr];
+	}
+	std::copy(buffer.begin(), buffer.end(), &src[0]);
+
+}
 
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
@@ -1584,7 +1664,10 @@ ROM_START( gssytts )
 	ROM_CONTINUE(0x800000, 0x800000) // 2nd 8mb
 ROM_END
 
-
+ROM_START( senwfit )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "wirelessfit.bin", 0x000000, 0x2000000, CRC(bfdc9c56) SHA1(dd0d4262720fcc3fab5b66d39df9be3419b07178) )
+ROM_END
 
 
 ROM_START( jjstrip )
@@ -1719,6 +1802,8 @@ CONS( 200?, guitarssa,  guitarss, 0, spg2xx,    guitarss,  spg2xx_game_state,   
 
 // The sequel has 'You Take The Stage' on both the box and title screen
 CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_state,  empty_init,    "Senario",                                                "Guitar Super Star: You Take The Stage",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
