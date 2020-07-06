@@ -15,11 +15,11 @@
       transfers to 0000 (where no valid code exists).
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
     - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567) which has to be emulated
-	- Taxi and Police Force both have issues with the display showing garbage overlaid by the alphanumerics.
+    - Taxi and Police Force both have issues with the display showing garbage overlaid by the alphanumerics.
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
     (Hold these keys and press "1" after inserting 1 or more credits.)
-	Almost universally, these will be listed in the switch matrix as "Ball Trough Right" "Ball Trough Center" and "Ball Shooter"
+    Almost universally, these will be listed in the switch matrix as "Ball Trough Right" "Ball Trough Center" and "Ball Shooter"
     - Bad Cats: "H" "Enter"
     - Banzai Run: "S" "D" "F" (won't start due to calibration? needs more investigation, try hitting E and / and lots of keys until calibration finishes); - starts music
     - Big Guns: "D" "F" "U"

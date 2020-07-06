@@ -2,8 +2,9 @@
 // copyright-holders:Barry Rodewald
 /*
  * s11c_bg.cpp - Williams D-11581 "Audio Board" (M68B09E + YM2151 + HC55516 + DAC)
- * Used by Williams System 11A (F-14), all System 11V (except Jokerz) and all System 11C pinballs
+ * Used by Williams System 11A (F-14), all System 11B (except Jokerz) and all System 11C pinballs
  * Used by Midway Y-Unit Arcade Hardware (for Smash TV and High Impact Football)
+ * Used by the prototype version of Funhouse pinball for the WPC Alphanumeric system
  *
  * The mixing resistors before the MC1458 differ between the D-11581, D-11581-20xx (System 11C), and D-1129x board schematics:
  *                 D-1129x    D-11581        D-11581-20xx
@@ -83,7 +84,8 @@
  * [1] Logically there should be a capacitor to ground at c1 of value 1800uf,
  *     but this was omitted on the D-11297 board, possibly in error, and this
  *     omission carried over to future sound boards including all versions of the D-11581.
- *     The WPC-AN sound board, A-12738-50xxx, fixed this by completely redesigning the filters for both the ym2151 and cvsd.
+ *     The WPC-AN sound board, A-12738-50xxx, fixed this by completely redesigning the filters
+ *     for both the ym2151 and cvsd.
  *
  * This circuit would be a 4th order (cascaded 2nd order) op-amp multifeedback lowpass filter,
  *  but because of the capacitor omitted, it is actually a first order-with-gain lowpass,
@@ -113,11 +115,11 @@
  * W4                      : if present, the VCC/+5v rail is shorted to the +12v rail. (This is used in the case where the board is only run on +5v and -12v instead of +5v, +12v, and -12v)
  * W5 - exclusive w/W6, W7 : YM2151 reset comes from Board Reset
  * W6 -'exclusive'w/W5, W7 : YM2151 reset comes from PIA CB2/J4 P12 (internal or external)
- 
+
 
 
  * Williams "BG Sound Board" C-11029/C-11030 5766-10929-00
- *  * used on Williams System 11 'High Speed' and 'Grand Lizard' only
+ *  * used on Williams System 11 'High Speed' and 'Grand Lizard' only (as well as the "Wreck'n Ball" prototype, see https://www.ipdb.org/machine.cgi?id=6167 )
  *  * has DAC only
  *  * no EPROM banking hardware, 1 28-pin ROM socket (2764/27128/27256 only)
  *  * PIA CA1 and CA2 are labeled 'HAND1' and 'HAND2' on schematics and are tied high/unused.
