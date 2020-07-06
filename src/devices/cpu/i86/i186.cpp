@@ -3,6 +3,10 @@
 // Peripheral code from rmnimbus driver by Phill Harvey-Smith which is
 // based on the Leland sound driver by Aaron Giles and Paul Leaman
 
+// Note: the X1 input (typically an XTAL) is divided by 2 internally.
+// The device clock should therefore be twice the desired operating
+// frequency (and twice the speed rating suffixed to the part number).
+
 #include "emu.h"
 #include "i186.h"
 #include "debugger.h"
@@ -586,7 +590,7 @@ void i80186_cpu_device::device_start()
 	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
 	state_add( I8086_PC, "PC", m_pc ).callimport().formatstr("%05X");
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
+	state_add<uint32_t>( STATE_GENPCBASE, "CURPC", [this] { return (m_sregs[CS] << 4) + m_prev_ip; }).mask(0xfffff).noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
 	// Most of these mnemonics are borrowed from the Intel 80C186EA/80C188EA User's Manual.
@@ -677,6 +681,7 @@ void i80186_cpu_device::device_start()
 	memset(&m_intr, 0, sizeof(intr_state));
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
+	m_last_dma = 0;
 
 	m_timer[0].int_timer = timer_alloc(TIMER_INT0);
 	m_timer[1].int_timer = timer_alloc(TIMER_INT1);
@@ -737,9 +742,9 @@ uint8_t i80186_cpu_device::read_port_byte(uint16_t port)
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
 		if(port & 1)
-			return internal_port_r(*m_io, (port >> 1) & 0x7f, 0xff00) >> 8;
+			return internal_port_r((port >> 1) & 0x7f, 0xff00) >> 8;
 		else
-			return internal_port_r(*m_io, (port >> 1) & 0x7f, 0x00ff) & 0xff;
+			return internal_port_r((port >> 1) & 0x7f, 0x00ff) & 0xff;
 	}
 	return m_io->read_byte(port);
 }
@@ -750,9 +755,9 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 	{
 		// Unaligned reads from the internal bus are swapped rather than split
 		if(port & 1)
-			return swapendian_int16(internal_port_r(*m_io, (port >> 1) & 0x7f));
+			return swapendian_int16(internal_port_r((port >> 1) & 0x7f));
 		else
-			return internal_port_r(*m_io, (port >> 1) & 0x7f);
+			return internal_port_r((port >> 1) & 0x7f);
 	}
 	return m_io->read_word_unaligned(port);
 }
@@ -762,9 +767,9 @@ void i80186_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
 		if(port & 1)
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data << 8, 0xff00);
+			internal_port_w((port >> 1) & 0x7f, data << 8);
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data, 0x00ff);
+			internal_port_w((port >> 1) & 0x7f, data);
 	}
 	else
 		m_io->write_byte(port, data);
@@ -776,9 +781,9 @@ void i80186_cpu_device::write_port_byte_al(uint16_t port)
 	{
 		// Both AH and AL are written onto the internal bus
 		if(port & 1)
-			internal_port_w(*m_io, (port >> 1) & 0x7f, swapendian_int16(m_regs.w[AX]), 0xff00);
+			internal_port_w((port >> 1) & 0x7f, swapendian_int16(m_regs.w[AX]));
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, m_regs.w[AX], 0x00ff);
+			internal_port_w((port >> 1) & 0x7f, m_regs.w[AX]);
 	}
 	else
 		m_io->write_byte(port, m_regs.w[AL]);
@@ -790,9 +795,9 @@ void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 	{
 		// Unaligned writes to the internal bus are swapped rather than split
 		if(port & 1)
-			internal_port_w(*m_io, (port >> 1) & 0x7f, swapendian_int16(data));
+			internal_port_w((port >> 1) & 0x7f, swapendian_int16(data));
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data);
+			internal_port_w((port >> 1) & 0x7f, data);
 	}
 	else
 		m_io->write_word_unaligned(port, data);
@@ -802,7 +807,7 @@ uint8_t i80186_cpu_device::read_byte(uint32_t addr)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
-		uint16_t ret = internal_port_r(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
+		uint16_t ret = internal_port_r((addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
 		return (addr & 1) ? (ret >> 8) : (ret & 0xff);
 	}
 	return m_program->read_byte(addr);
@@ -814,9 +819,9 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 	{
 		// Unaligned reads from the internal bus are swapped rather than split
 		if(addr & 1)
-			return swapendian_int16(internal_port_r(*m_program, (addr >> 1) & 0x7f));
+			return swapendian_int16(internal_port_r((addr >> 1) & 0x7f));
 		else
-			return internal_port_r(*m_program, (addr >> 1) & 0x7f);
+			return internal_port_r((addr >> 1) & 0x7f);
 	}
 	return m_program->read_word_unaligned(addr);
 }
@@ -824,7 +829,7 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 void i80186_cpu_device::write_byte(uint32_t addr, uint8_t data)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
-		internal_port_w(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data, (addr & 1) ? 0xff00 : 0x00ff);
+		internal_port_w((addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data);
 	else
 		m_program->write_byte(addr, data);
 }
@@ -835,9 +840,9 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
 	{
 		// Unaligned writes from the internal bus are swapped rather than split
 		if(addr & 1)
-			internal_port_w(*m_program, (addr >> 1) & 0x7f, swapendian_int16(data));
+			internal_port_w((addr >> 1) & 0x7f, swapendian_int16(data));
 		else
-			internal_port_w(*m_program, (addr >> 1) & 0x7f, data);
+			internal_port_w((addr >> 1) & 0x7f, data);
 	}
 	else
 		m_program->write_word_unaligned(addr, data);
@@ -1550,7 +1555,7 @@ void i80186_cpu_device::drq_callback(int which)
 	}
 }
 
-READ16_MEMBER(i80186_cpu_device::internal_port_r)
+uint16_t i80186_cpu_device::internal_port_r(offs_t offset, uint16_t mem_mask)
 {
 	int temp, which;
 
@@ -1754,7 +1759,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
  *
  *************************************/
 
-WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
+void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 {
 	int which;
 

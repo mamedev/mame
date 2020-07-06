@@ -44,10 +44,10 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE8_MEMBER(sm1800_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
-	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
-	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
+	void sm1800_8255_portb_w(uint8_t data);
+	void sm1800_8255_portc_w(uint8_t data);
+	uint8_t sm1800_8255_porta_r();
+	uint8_t sm1800_8255_portc_r();
 	uint8_t m_irq_state;
 	virtual void machine_reset() override;
 	void sm1800_palette(palette_device &palette) const;
@@ -115,20 +115,20 @@ I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
-WRITE8_MEMBER( sm1800_state::sm1800_8255_portb_w )
+void sm1800_state::sm1800_8255_portb_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( sm1800_state::sm1800_8255_portc_w )
+void sm1800_state::sm1800_8255_portc_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( sm1800_state::sm1800_8255_porta_r )
+uint8_t sm1800_state::sm1800_8255_porta_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
+uint8_t sm1800_state::sm1800_8255_portc_r()
 {
 	return 0;
 }

@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/raiden2.h"
 
-WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
+void raiden2_state::m_videoram_private_w(offs_t offset, uint16_t data)
 {
 	//  map(0x0d000, 0x0d7ff).ram().w(FUNC(raiden2_state::background_w)).share("back_data");
 	//  map(0x0d800, 0x0dfff).ram().w(FUNC(raiden2_state::foreground_w).share("fore_data");

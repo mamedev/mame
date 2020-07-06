@@ -114,7 +114,7 @@ void hp98034_io_card_device::device_reset()
 	update_dc();
 }
 
-READ16_MEMBER(hp98034_io_card_device::reg_r)
+uint16_t hp98034_io_card_device::reg_r(address_space &space, offs_t offset)
 {
 	uint16_t res = m_odr;
 
@@ -154,7 +154,7 @@ READ16_MEMBER(hp98034_io_card_device::reg_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp98034_io_card_device::reg_w)
+void hp98034_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t data)
 {
 	m_idr = (uint8_t)data;
 
@@ -199,19 +199,19 @@ uint8_t hp98034_io_card_device::dc_r()
 	return res;
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::hpib_data_w)
+void hp98034_io_card_device::hpib_data_w(uint8_t data)
 {
 	m_data_out = data;
 	update_data_out();
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::hpib_ctrl_w)
+void hp98034_io_card_device::hpib_ctrl_w(uint8_t data)
 {
 	m_ctrl_out = data;
 	update_ctrl_out();
 }
 
-READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
+uint8_t hp98034_io_card_device::hpib_ctrl_r()
 {
 	uint8_t res = 0;
 
@@ -243,28 +243,28 @@ READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
 	return res;
 }
 
-READ8_MEMBER(hp98034_io_card_device::hpib_data_r)
+uint8_t hp98034_io_card_device::hpib_data_r()
 {
-	return ~m_ieee488->read_dio();
+	return ~m_ieee488->dio_r();
 }
 
-READ8_MEMBER(hp98034_io_card_device::idr_r)
+uint8_t hp98034_io_card_device::idr_r()
 {
 	return m_idr;
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::odr_w)
+void hp98034_io_card_device::odr_w(uint8_t data)
 {
 	m_odr = data;
 }
 
-READ8_MEMBER(hp98034_io_card_device::mode_reg_r)
+uint8_t hp98034_io_card_device::mode_reg_r()
 {
 	LOG("%.06f MR=%02x\n" , machine().time().as_double() , m_mode_reg);
 	return m_mode_reg;
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::mode_reg_clear_w)
+void hp98034_io_card_device::mode_reg_clear_w(uint8_t data)
 {
 	LOG("%.06f clear_w\n" , machine().time().as_double());
 	m_mode_reg = 0xff;
@@ -276,7 +276,7 @@ WRITE8_MEMBER(hp98034_io_card_device::mode_reg_clear_w)
 	}
 }
 
-READ8_MEMBER(hp98034_io_card_device::switch_r)
+uint8_t hp98034_io_card_device::switch_r()
 {
 	return m_sw1->read() | 0xc0;
 }
@@ -331,7 +331,7 @@ void hp98034_io_card_device::update_data_out()
 	if (m_clr_hpib) {
 		m_data_out = 0;
 	}
-	m_ieee488->write_dio(~m_data_out);
+	m_ieee488->host_dio_w(~m_data_out);
 }
 
 void hp98034_io_card_device::update_ctrl_out()

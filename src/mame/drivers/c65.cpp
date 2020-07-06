@@ -74,23 +74,23 @@ public:
 	uint8_t m_keyb_c0_c7;
 	uint8_t m_keyb_c8_c9;
 
-	DECLARE_READ8_MEMBER(vic4567_dummy_r);
-	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
-	DECLARE_WRITE8_MEMBER(PalRed_w);
-	DECLARE_WRITE8_MEMBER(PalGreen_w);
-	DECLARE_WRITE8_MEMBER(PalBlue_w);
-	DECLARE_READ8_MEMBER(uart_r);
-	DECLARE_WRITE8_MEMBER(uart_w);
-	DECLARE_WRITE8_MEMBER(DMAgic_w);
-	DECLARE_READ8_MEMBER(CIASelect_r);
-	DECLARE_WRITE8_MEMBER(CIASelect_w);
-	DECLARE_READ8_MEMBER(cia0_porta_r);
-	DECLARE_WRITE8_MEMBER(cia0_porta_w);
-	DECLARE_READ8_MEMBER(cia0_portb_r);
-	DECLARE_WRITE8_MEMBER(cia0_portb_w);
+	uint8_t vic4567_dummy_r(offs_t offset);
+	void vic4567_dummy_w(offs_t offset, uint8_t data);
+	void PalRed_w(offs_t offset, uint8_t data);
+	void PalGreen_w(offs_t offset, uint8_t data);
+	void PalBlue_w(offs_t offset, uint8_t data);
+	uint8_t uart_r(offs_t offset);
+	void uart_w(offs_t offset, uint8_t data);
+	void DMAgic_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t CIASelect_r(offs_t offset);
+	void CIASelect_w(offs_t offset, uint8_t data);
+	uint8_t cia0_porta_r();
+	void cia0_porta_w(uint8_t data);
+	uint8_t cia0_portb_r();
+	void cia0_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
 
-	DECLARE_READ8_MEMBER(dummy_r);
+	uint8_t dummy_r();
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -188,7 +188,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(c65_state::vic4567_dummy_r)
+uint8_t c65_state::vic4567_dummy_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -230,7 +230,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::vic4567_dummy_w)
+void c65_state::vic4567_dummy_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -278,25 +278,25 @@ void c65_state::PalEntryFlush(uint8_t offset)
 	m_palette->set_pen_color(offset, pal4bit(m_palred[offset]), pal4bit(m_palgreen[offset]), pal4bit(m_palblue[offset]));
 }
 
-WRITE8_MEMBER(c65_state::PalRed_w)
+void c65_state::PalRed_w(offs_t offset, uint8_t data)
 {
 	m_palred[offset] = data;
 	PalEntryFlush(offset);
 }
 
-WRITE8_MEMBER(c65_state::PalGreen_w)
+void c65_state::PalGreen_w(offs_t offset, uint8_t data)
 {
 	m_palgreen[offset] = data;
 	PalEntryFlush(offset);
 }
 
-WRITE8_MEMBER(c65_state::PalBlue_w)
+void c65_state::PalBlue_w(offs_t offset, uint8_t data)
 {
 	m_palblue[offset] = data;
 	PalEntryFlush(offset);
 }
 
-READ8_MEMBER(c65_state::uart_r)
+uint8_t c65_state::uart_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -306,7 +306,7 @@ READ8_MEMBER(c65_state::uart_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(c65_state::uart_w)
+void c65_state::uart_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -385,14 +385,14 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 }
 
 
-WRITE8_MEMBER(c65_state::DMAgic_w)
+void c65_state::DMAgic_w(address_space &space, offs_t offset, uint8_t data)
 {
 	m_dmalist[offset] = data;
 	if(offset == 0)
 		DMAgicExecute(space,(m_dmalist[0])|(m_dmalist[1]<<8)|(m_dmalist[2]<<16));
 }
 
-READ8_MEMBER(c65_state::CIASelect_r)
+uint8_t c65_state::CIASelect_r(offs_t offset)
 {
 	if(m_VIC3_ControlA & 1)
 		return m_cram[offset];
@@ -415,7 +415,7 @@ READ8_MEMBER(c65_state::CIASelect_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(c65_state::CIASelect_w)
+void c65_state::CIASelect_w(offs_t offset, uint8_t data)
 {
 	if(m_VIC3_ControlA & 1)
 		m_cram[offset] = data;
@@ -439,12 +439,12 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 
 }
 
-READ8_MEMBER(c65_state::cia0_porta_r)
+uint8_t c65_state::cia0_porta_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(c65_state::cia0_portb_r)
+uint8_t c65_state::cia0_portb_r()
 {
 	static const char *const c64ports[] = { "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7" };
 	static const char *const c65ports[] = { "C8", "C9" };
@@ -470,17 +470,17 @@ READ8_MEMBER(c65_state::cia0_portb_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::cia0_porta_w)
+void c65_state::cia0_porta_w(uint8_t data)
 {
 	m_keyb_c0_c7 = ~data;
 //  printf("%02x\n",m_keyb_c0_c7);
 }
 
-WRITE8_MEMBER(c65_state::cia0_portb_w)
+void c65_state::cia0_portb_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(c65_state::dummy_r)
+uint8_t c65_state::dummy_r()
 {
 	return 0;
 }

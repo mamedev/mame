@@ -81,18 +81,18 @@ private:
 
 	void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
+	uint8_t port_a_r();
+	void port_a_w(uint8_t data);
+	void port_b_w(uint8_t data);
+	uint8_t port_c_r();
+	void port_c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(upd934g_c_data_r);
-	DECLARE_WRITE8_MEMBER(upd934g_c_w);
-	DECLARE_READ8_MEMBER(upd934g_b_data_r);
-	DECLARE_WRITE8_MEMBER(upd934g_b_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	uint8_t upd934g_c_data_r(offs_t offset);
+	void upd934g_c_w(offs_t offset, uint8_t data);
+	uint8_t upd934g_b_data_r(offs_t offset);
+	void upd934g_b_w(offs_t offset, uint8_t data);
+	uint8_t key_r();
+	void leds_w(uint8_t data);
 
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -209,7 +209,7 @@ HD44780_PIXEL_UPDATE( rz1_state::lcd_pixel_update )
 		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
 }
 
-READ8_MEMBER( rz1_state::upd934g_c_data_r )
+uint8_t rz1_state::upd934g_c_data_r(offs_t offset)
 {
 	if (offset < 0x8000)
 		return m_samples[1]->base()[offset];
@@ -222,7 +222,7 @@ READ8_MEMBER( rz1_state::upd934g_c_data_r )
 	}
 }
 
-READ8_MEMBER( rz1_state::upd934g_b_data_r )
+uint8_t rz1_state::upd934g_b_data_r(offs_t offset)
 {
 	if (offset < 0x8000)
 		return m_samples[0]->base()[offset];
@@ -230,17 +230,17 @@ READ8_MEMBER( rz1_state::upd934g_b_data_r )
 		return 0;
 }
 
-WRITE8_MEMBER( rz1_state::upd934g_c_w )
+void rz1_state::upd934g_c_w(offs_t offset, uint8_t data)
 {
 	m_pg[0]->write(offset >> 8, data);
 }
 
-WRITE8_MEMBER( rz1_state::upd934g_b_w )
+void rz1_state::upd934g_b_w(offs_t offset, uint8_t data)
 {
 	m_pg[1]->write(offset >> 8, data);
 }
 
-READ8_MEMBER( rz1_state::port_a_r )
+uint8_t rz1_state::port_a_r()
 {
 	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 1))
 	{
@@ -252,7 +252,7 @@ READ8_MEMBER( rz1_state::port_a_r )
 	return 0;
 }
 
-WRITE8_MEMBER( rz1_state::port_a_w )
+void rz1_state::port_a_w(uint8_t data)
 {
 	m_port_a = data;
 
@@ -269,7 +269,7 @@ WRITE8_MEMBER( rz1_state::port_a_w )
 // ------1-  change-over signal tom3/bd
 // -------0  change-over signal tom1/tom2
 
-WRITE8_MEMBER( rz1_state::port_b_w )
+void rz1_state::port_b_w(uint8_t data)
 {
 	if (0)
 		logerror("port_b_w: %02x\n", data);
@@ -286,17 +286,17 @@ WRITE8_MEMBER( rz1_state::port_b_w )
 // ------1-  midi in
 // -------0  midi out
 
-READ8_MEMBER( rz1_state::port_c_r )
+uint8_t rz1_state::port_c_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( rz1_state::port_c_w )
+void rz1_state::port_c_w(uint8_t data)
 {
 	logerror("port_c_w: %02x\n", data);
 }
 
-READ8_MEMBER( rz1_state::key_r )
+uint8_t rz1_state::key_r()
 {
 	uint8_t data = 0;
 
@@ -312,7 +312,7 @@ READ8_MEMBER( rz1_state::key_r )
 	return data;
 }
 
-WRITE8_MEMBER( rz1_state::leds_w )
+void rz1_state::leds_w(uint8_t data)
 {
 	m_led_song =      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0;
 	m_led_pattern =   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0;

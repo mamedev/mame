@@ -923,7 +923,7 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
+uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -934,7 +934,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
-				res = vga_device::port_03c0_r(space,offset,mem_mask);
+				res = vga_device::port_03c0_r(offset);
 			else
 			{
 				if (vga.dac.read)
@@ -964,14 +964,14 @@ READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 			res = cirrus_gc_reg_read(vga.gc.index);
 			break;
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
+void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -980,7 +980,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
-				vga_device::port_03c0_w(space,offset,data,mem_mask);
+				vga_device::port_03c0_w(offset,data);
 			else
 			{
 				if (!vga.dac.read)
@@ -1009,13 +1009,13 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 			cirrus_gc_reg_write(vga.gc.index,data);
 			break;
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 	}
 	cirrus_define_video_mode();
 }
 
-READ8_MEMBER(cirrus_gd5428_device::port_03b0_r)
+uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -1027,7 +1027,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03b0_r)
 				res = cirrus_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -1035,7 +1035,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03b0_r)
 	return res;
 }
 
-READ8_MEMBER(cirrus_gd5428_device::port_03d0_r)
+uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -1047,7 +1047,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03d0_r)
 				res = cirrus_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -1055,7 +1055,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::port_03b0_w)
+void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -1066,14 +1066,14 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03b0_w)
 				cirrus_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
 	cirrus_define_video_mode();
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::port_03d0_w)
+void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -1084,7 +1084,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03d0_w)
 				cirrus_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
@@ -1194,14 +1194,14 @@ inline uint8_t cirrus_gd5428_device::cirrus_vga_latch_write(int offs, uint8_t da
 	return res;
 }
 
-READ8_MEMBER(cirrus_gd5428_device::mem_r)
+uint8_t cirrus_gd5428_device::mem_r(offs_t offset)
 {
 	uint32_t addr;
 	uint8_t bank;
 	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
-		return vga_device::mem_r(space,offset,mem_mask);
+		return vga_device::mem_r(offset);
 
 	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
 		bank = gc_bank_1;
@@ -1325,7 +1325,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	}
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
+void cirrus_gd5428_device::mem_w(offs_t offset, uint8_t data)
 {
 	uint32_t addr;
 	uint8_t bank;
@@ -1356,7 +1356,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 	{
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 		return;
 	}
 

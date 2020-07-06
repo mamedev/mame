@@ -129,7 +129,7 @@ void rf5c400_device::envelope_tables::init(uint32_t clock)
 rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RF5C400, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 25, ENDIANNESS_LITTLE, 16)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_env_tables()
 {
@@ -318,7 +318,7 @@ void rf5c400_device::rom_bank_updated()
 
 /*****************************************************************************/
 
-READ16_MEMBER( rf5c400_device::rf5c400_r )
+uint16_t rf5c400_device::rf5c400_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x400)
 	{
@@ -364,7 +364,7 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 	}
 }
 
-WRITE16_MEMBER( rf5c400_device::rf5c400_w )
+void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x400)
 	{

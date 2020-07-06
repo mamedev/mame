@@ -123,6 +123,7 @@
 #include "sound/pokey.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -143,21 +144,21 @@ WRITE_LINE_MEMBER(cloak_state::coin_counter_r_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_custom_w)
+void cloak_state::cloak_custom_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(cloak_state::cloak_irq_reset_0_w)
+void cloak_state::cloak_irq_reset_0_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_irq_reset_1_w)
+void cloak_state::cloak_irq_reset_1_w(uint8_t data)
 {
 	m_slave->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_nvram_enable_w)
+void cloak_state::cloak_nvram_enable_w(uint8_t data)
 {
 	m_nvram_enabled = data & 0x01;
 }

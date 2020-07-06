@@ -629,12 +629,11 @@ protected:
 	uint32_t          m_exec_pc;
 	uint32_t          m_next_pc;
 
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_datacache;
-	address_space *m_io;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_datacache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_io;
 
 	typedef void ( am29000_cpu_device::*opcode_func ) ();
 	struct op_info {

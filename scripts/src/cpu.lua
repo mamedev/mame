@@ -1282,6 +1282,16 @@ if (CPUS["PIC16C5X"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- PIC1670 - Disassembler only temporarily
+--@src/devices/cpu/pic1670/pic1670.h,CPUS["PIC1670"] = true
+--------------------------------------------------
+
+if (CPUS["PIC1670"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic1670/pic1670d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic1670/pic1670d.h")
+end
+
+--------------------------------------------------
 -- Microchip PIC16C62x
 --@src/devices/cpu/pic16c62x/pic16c62x.h,CPUS["PIC16C62X"] = true
 --------------------------------------------------
@@ -1306,6 +1316,25 @@ end
 if (CPUS["PIC16"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16/pic16d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16/pic16d.h")
+end
+
+--------------------------------------------------
+-- Microchip PIC17
+--@src/devices/cpu/pic17/pic17.h,CPUS["PIC17"] = true
+--------------------------------------------------
+
+if (CPUS["PIC17"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/pic17/pic17.cpp",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17.h",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.cpp",
+		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.h",
+	}
+end
+
+if (CPUS["PIC17"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic17/pic17d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic17/pic17d.h")
 end
 
 --------------------------------------------------
@@ -2044,6 +2073,23 @@ if (CPUS["RSP"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Panasonic MN1880
+--@src/devices/cpu/mn1800/mn1880.h,CPUS["MN1880"] = true
+--------------------------------------------------
+
+if (CPUS["MN1880"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.h",
+	}
+end
+
+if (CPUS["MN1880"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1880/mn1880d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1880/mn1880d.h")
+end
+
+--------------------------------------------------
 -- Panasonic MN10200
 --@src/devices/cpu/mn10200/mn10200.h,CPUS["MN10200"] = true
 --------------------------------------------------
@@ -2524,6 +2570,11 @@ if (CPUS["TLCS900"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.h",
 	}
 end
 

@@ -97,14 +97,14 @@ Notes:
 #include "emu.h"
 #include "includes/tmc600.h"
 
-READ8_MEMBER( tmc600_state::rtc_r )
+uint8_t tmc600_state::rtc_r()
 {
 	m_rtc_int = m_vismac_reg_latch >> 3;
 
 	return 0;
 }
 
-WRITE8_MEMBER( tmc600_state::printer_w )
+void tmc600_state::printer_w(uint8_t data)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_data1(BIT(data, 1));
@@ -242,14 +242,14 @@ WRITE_LINE_MEMBER( tmc600_state::q_w )
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
-WRITE8_MEMBER( tmc600_state::sc_w )
+void tmc600_state::sc_w(uint8_t data)
 {
 	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
 		m_maincpu->int_w(CLEAR_LINE);
 	}
 }
 
-WRITE8_MEMBER( tmc600_state::out3_w )
+void tmc600_state::out3_w(uint8_t data)
 {
 	m_out3 = data;
 }

@@ -11,10 +11,16 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 TODO:
 - unemulated waitstates with DTACK
 - EAG USART is not emulated
+- V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
+  reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
-  at twice the frequency due to lack of superscalar.
-- V11 beeper is too high pitched, related to wrong CPU type too? But even at 72MHz
-  it's still wrong, so maybe waitstates or clock divider on I/O access.
+- V11 beeper is too high pitched, related to wrong CPU type too?
+  maybe waitstates or clock divider on I/O access.
+
+Currently(May 2020) when compared to the real chesscomputers, to get closer to the
+actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
+with the -cheat option and going to the Slider Controls menu, hold Ctrl and press
+Right to overclock maincpu.
 
 *******************************************************************************
 
@@ -229,11 +235,11 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	virtual DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
+	virtual void mux_w(offs_t offset, u8 data);
+	u8 input1_r(offs_t offset);
+	u8 input2_r();
+	void leds_w(offs_t offset, u8 data);
+	void digit_w(offs_t offset, u8 data);
 
 	bool m_rotate;
 	u8 m_select = 0;
@@ -275,9 +281,9 @@ private:
 	void sub_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(reset_subcpu_w);
-	DECLARE_READ8_MEMBER(main_ack_r);
-	DECLARE_READ8_MEMBER(sub_ack_r);
+	void reset_subcpu_w(u8 data);
+	u8 main_ack_r();
+	u8 sub_ack_r();
 };
 
 // Excel 68000
@@ -321,7 +327,7 @@ void eag_state::update_display()
 	m_display->matrix(1 << m_select, m_led_data << 8 | seg_data);
 }
 
-WRITE8_MEMBER(eag_state::mux_w)
+void eag_state::mux_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0: 74259
 	u8 mask = 1 << offset;
@@ -336,7 +342,7 @@ WRITE8_MEMBER(eag_state::mux_w)
 	update_display();
 }
 
-READ8_MEMBER(eag_state::input1_r)
+u8 eag_state::input1_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -358,20 +364,20 @@ READ8_MEMBER(eag_state::input1_r)
 	return (data >> offset & 1) ? 0 : 0x80;
 }
 
-READ8_MEMBER(eag_state::input2_r)
+u8 eag_state::input2_r()
 {
 	// d7: 3 more buttons on EAG
 	return (BIT(m_inputs[1]->read(), m_select)) ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(eag_state::leds_w)
+void eag_state::leds_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0: led data
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-WRITE8_MEMBER(eag_state::digit_w)
+void eag_state::digit_w(offs_t offset, u8 data)
 {
 	// a1-a3,d0(d8): digit segment data
 	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
@@ -381,19 +387,19 @@ WRITE8_MEMBER(eag_state::digit_w)
 
 // EAG V5
 
-WRITE8_MEMBER(eagv5_state::reset_subcpu_w)
+void eagv5_state::reset_subcpu_w(u8 data)
 {
 	// reset subcpu, from trigger to monostable 555 (R1=47K, C1=1uF)
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::from_msec(52));
 }
 
-READ8_MEMBER(eagv5_state::main_ack_r)
+u8 eagv5_state::main_ack_r()
 {
 	// d8,d9: latches ack state
 	return (m_mainlatch->pending_r() << 1 ^ 2) | m_sublatch->pending_r();
 }
 
-READ8_MEMBER(eagv5_state::sub_ack_r)
+u8 eagv5_state::sub_ack_r()
 {
 	// d8,d9: latches ack state
 	return (m_sublatch->pending_r() << 1 ^ 2) | m_mainlatch->pending_r();
@@ -705,7 +711,7 @@ void eag_state::eagv11(machine_config &config)
 	eagv7(config);
 
 	/* basic machine hardware */
-	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2*2); // wrong! should be M68EC060 @ 72MHz
+	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2); // wrong! should be M68EC060
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
 	m_maincpu->set_periodic_int(FUNC(eag_state::irq2_line_hold), attotime::from_hz(600));
 
@@ -840,5 +846,5 @@ CONS( 1989, feagv5,    feagv2,  0, eagv5,    eag,      eagv5_state,    init_eag,
 CONS( 1990, feagv7,    feagv2,  0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv7a,   feagv2,  0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv9,    feagv2,  0, eagv9,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv10,   feagv2,  0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 2002, feagv11,   feagv2,  0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+CONS( 1990, feagv10,   feagv2,  0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 2002, feagv11,   feagv2,  0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

@@ -90,7 +90,7 @@ void cyberbal2p_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(cyberbal2p_state::sound_state_r)
+uint16_t cyberbal2p_state::sound_state_r()
 {
 	int temp = 0xffff;
 	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
@@ -105,7 +105,7 @@ READ16_MEMBER(cyberbal2p_state::sound_state_r)
  *
  *************************************/
 
-WRITE16_MEMBER(cyberbal_state::p2_reset_w)
+void cyberbal_state::p2_reset_w(uint16_t data)
 {
 	m_extracpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
@@ -415,7 +415,7 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	cyberbal_base(config);
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	SLAPSTIC(config, "slapstic", 116, true);
+	SLAPSTIC(config, m_slapstic, 116, true);
 }
 
 void cyberbal2p_state::cyberbal2p(machine_config &config)
@@ -994,7 +994,7 @@ ROM_END
 
 void cyberbal_state::init_cyberbalt()
 {
-	slapstic_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }
 
 

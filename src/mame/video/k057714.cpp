@@ -70,7 +70,7 @@ void k057714_device::device_stop()
 }
 
 
-READ32_MEMBER(k057714_device::read)
+uint32_t k057714_device::read(offs_t offset)
 {
 	int reg = offset * 4;
 
@@ -93,7 +93,7 @@ READ32_MEMBER(k057714_device::read)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(k057714_device::write)
+void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int reg = offset * 4;
 
@@ -317,7 +317,7 @@ WRITE32_MEMBER(k057714_device::write)
 	}
 }
 
-WRITE32_MEMBER(k057714_device::fifo_w)
+void k057714_device::fifo_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{

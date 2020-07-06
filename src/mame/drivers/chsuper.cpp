@@ -44,9 +44,9 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
-	DECLARE_WRITE8_MEMBER(chsuper_outporta_w);
-	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
+	void chsuper_vram_w(offs_t offset, uint8_t data);
+	void chsuper_outporta_w(uint8_t data);
+	void chsuper_outportb_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -108,7 +108,7 @@ uint32_t chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
+void chsuper_state::chsuper_vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 }
@@ -155,7 +155,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 */
 
-WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
+void chsuper_state::chsuper_outporta_w(uint8_t data)  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
 	m_lamps[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
@@ -181,7 +181,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 	}
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
+void chsuper_state::chsuper_outportb_w(uint8_t data)  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...

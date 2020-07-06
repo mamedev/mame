@@ -112,18 +112,18 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sc0_vram_w);
-	DECLARE_WRITE8_MEMBER(sc0_attr_w);
-	DECLARE_WRITE8_MEMBER(led_array_w);
-	DECLARE_WRITE8_MEMBER(kingdrbb_lamps_w);
-	DECLARE_READ8_MEMBER(hopper_io_r);
-	DECLARE_WRITE8_MEMBER(hopper_io_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(outport2_w);
-	DECLARE_READ8_MEMBER(input_mux_r);
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_READ8_MEMBER(sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(outportb_w);
+	void sc0_vram_w(offs_t offset, uint8_t data);
+	void sc0_attr_w(offs_t offset, uint8_t data);
+	void led_array_w(offs_t offset, uint8_t data);
+	void kingdrbb_lamps_w(uint8_t data);
+	uint8_t hopper_io_r();
+	void hopper_io_w(uint8_t data);
+	void sound_cmd_w(uint8_t data);
+	void outport2_w(uint8_t data);
+	uint8_t input_mux_r();
+	uint8_t key_matrix_r();
+	uint8_t sound_cmd_r();
+	void outportb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	void kingdrby_palette(palette_device &palette) const;
@@ -294,7 +294,7 @@ uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
+void kingdrby_state::sc0_vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
@@ -302,7 +302,7 @@ WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
+void kingdrby_state::sc0_attr_w(offs_t offset, uint8_t data)
 {
 	m_attr[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
@@ -318,19 +318,19 @@ WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 
 /* hopper I/O */
 
-READ8_MEMBER(kingdrby_state::hopper_io_r)
+uint8_t kingdrby_state::hopper_io_r()
 {
 	return (ioport("HPIO")->read() & 0x3f) | m_p1_hopper | m_p2_hopper;
 }
 
-WRITE8_MEMBER(kingdrby_state::hopper_io_w)
+void kingdrby_state::hopper_io_w(uint8_t data)
 {
 	m_p1_hopper = (data & 0x8)<<3;
 	m_p2_hopper = (data & 0x4)<<5;
 //  printf("%02x\n",data);
 }
 
-WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
+void kingdrby_state::sound_cmd_w(uint8_t data)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 	m_sound_cmd = data;
@@ -340,13 +340,13 @@ WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 
 
 /* No idea about what's this (if it's really a mux etc.)*/
-WRITE8_MEMBER(kingdrby_state::outport2_w)
+void kingdrby_state::outport2_w(uint8_t data)
 {
 //  popmessage("PPI1 port C(upper) out: %02X", data);
 	m_mux_data = data & 0x80;
 }
 
-READ8_MEMBER(kingdrby_state::input_mux_r)
+uint8_t kingdrby_state::input_mux_r()
 {
 	if(m_mux_data & 0x80)
 		return ioport("MUX0")->read();
@@ -354,7 +354,7 @@ READ8_MEMBER(kingdrby_state::input_mux_r)
 		return ioport("MUX1")->read();
 }
 
-READ8_MEMBER(kingdrby_state::key_matrix_r)
+uint8_t kingdrby_state::key_matrix_r()
 {
 	uint16_t p1_val,p2_val;
 	uint8_t p1_res,p2_res;
@@ -406,7 +406,7 @@ READ8_MEMBER(kingdrby_state::key_matrix_r)
 	return p1_res | (p2_res<<4);
 }
 
-READ8_MEMBER(kingdrby_state::sound_cmd_r)
+uint8_t kingdrby_state::sound_cmd_r()
 {
 	return m_sound_cmd;
 }
@@ -414,7 +414,7 @@ READ8_MEMBER(kingdrby_state::sound_cmd_r)
 static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-WRITE8_MEMBER(kingdrby_state::led_array_w)
+void kingdrby_state::led_array_w(offs_t offset, uint8_t data)
 {
 	/*
 	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
@@ -464,7 +464,7 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x7c00, 0x7c00).portr("DSW");
 }
 
-WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
+void kingdrby_state::kingdrbb_lamps_w(uint8_t data)
 {
 	// (same as the inputs but active high)
 }
@@ -521,7 +521,7 @@ void kingdrby_state::cowrace_sound_io(address_map &map)
 }
 
 
-WRITE8_MEMBER(kingdrby_state::outportb_w)
+void kingdrby_state::outportb_w(uint8_t data)
 {
 	//  printf("%02x B\n",data);
 }

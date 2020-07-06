@@ -135,49 +135,49 @@ VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaiden_state::gaiden_flip_w)
+void gaiden_state::gaiden_flip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		flip_screen_set(data & 1);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_txscrollx_w)
+void gaiden_state::gaiden_txscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_scroll_x);
 	m_text_layer->set_scrollx(0, m_tx_scroll_x);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_txscrolly_w)
+void gaiden_state::gaiden_txscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_scroll_y);
 	m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_fgscrollx_w)
+void gaiden_state::gaiden_fgscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_scroll_x);
 	m_foreground->set_scrollx(0, m_fg_scroll_x);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_fgscrolly_w)
+void gaiden_state::gaiden_fgscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_scroll_y);
 	m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_bgscrollx_w)
+void gaiden_state::gaiden_bgscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_scroll_x);
 	m_background->set_scrollx(0, m_bg_scroll_x);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_bgscrolly_w)
+void gaiden_state::gaiden_bgscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_scroll_y);
 	m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
+void gaiden_state::gaiden_txoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_tx_offset_y = data;
@@ -185,7 +185,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
 	}
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
+void gaiden_state::gaiden_fgoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_fg_offset_y = data;
@@ -193,7 +193,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
 	}
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
+void gaiden_state::gaiden_bgoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_bg_offset_y = data;
@@ -201,7 +201,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
 	}
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
+void gaiden_state::gaiden_sproffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_spr_offset_y = data;
@@ -210,19 +210,19 @@ WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 }
 
 
-WRITE16_MEMBER(gaiden_state::bg_videoram_w)
+void gaiden_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[2][offset]);
 	m_background->mark_tile_dirty(offset & 0x07ff);
 }
 
-WRITE16_MEMBER(gaiden_state::fg_videoram_w)
+void gaiden_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[1][offset]);
 	m_foreground->mark_tile_dirty(offset & 0x07ff);
 }
 
-WRITE16_MEMBER(gaiden_state::tx_videoram_w)
+void gaiden_state::tx_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[0][offset]);
 	m_text_layer->mark_tile_dirty(offset & 0x03ff);
@@ -326,9 +326,6 @@ uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &
 
 	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, &m_tile_bitmap_tx, &m_sprite_bitmap);
 
-	// raiga sprite has 2 frame lags
-	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(3), cliprect, m_spriteram->buffer(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
 	return 0;
 }
 
@@ -341,4 +338,17 @@ uint32_t gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind1
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 	drgnbowl_draw_sprites(screen, bitmap, cliprect);
 	return 0;
+}
+
+WRITE_LINE_MEMBER(gaiden_state::screen_vblank_raiga)
+{
+	if (state)
+	{
+		const rectangle visarea = m_screen->visible_area();
+		// raiga sprite has 2 frame lags
+		m_sprite_bitmap.fill(0, visarea);
+		m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(3), visarea, m_spriteram->buffer(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
+
+		m_spriteram->copy();
+	}
 }

@@ -105,7 +105,7 @@ void _8080bw_state::invaders_samples_audio(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
+void _8080bw_state::invadpt2_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -123,7 +123,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
+void _8080bw_state::invadpt2_sh_port_2_w(uint8_t data)
 {
 	/* FLEET (movement)
 
@@ -154,7 +154,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
+void _8080bw_state::spacerng_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -175,7 +175,7 @@ WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
+void _8080bw_state::spcewars_sh_port_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -213,7 +213,7 @@ const char *const lrescue_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
+void _8080bw_state::lrescue_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
+void _8080bw_state::lrescue_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -256,10 +256,10 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::cosmo_sh_port_2_w)
+void _8080bw_state::cosmo_sh_port_2_w(uint8_t data)
 {
 	/* inverted flip screen bit */
-	invadpt2_sh_port_2_w(space, offset, data ^ 0x20);
+	invadpt2_sh_port_2_w(data ^ 0x20);
 }
 
 
@@ -315,12 +315,12 @@ DISCRETE_SOUND_START(ballbomb_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
+void _8080bw_state::ballbomb_01_w(uint8_t data)
 {
 	m_discrete->write(BALLBOMB_MUSIC_DATA, data|0x80);
 }
 
-WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
+void _8080bw_state::ballbomb_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -337,7 +337,7 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
+void _8080bw_state::ballbomb_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -395,7 +395,7 @@ DISCRETE_SOUND_START(indianbt_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
+void _8080bw_state::indianbt_sh_port_1_w(uint8_t data)
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
@@ -410,7 +410,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
+void _8080bw_state::indianbt_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -424,12 +424,12 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 	m_port_2_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
+void _8080bw_state::indianbt_sh_port_3_w(uint8_t data)
 {
 	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
+void _8080bw_state::indianbtbr_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -442,7 +442,7 @@ WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_2_w)
+void _8080bw_state::indianbtbr_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -768,12 +768,12 @@ DISCRETE_SOUND_START(polaris_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(_8080bw_state::polaris_sh_port_1_w)
+void _8080bw_state::polaris_sh_port_1_w(uint8_t data)
 {
 	m_discrete->write(POLARIS_MUSIC_DATA, data);
 }
 
-WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
+void _8080bw_state::polaris_sh_port_2_w(uint8_t data)
 {
 	/* 0x01 - SX0 - Shot */
 	m_discrete->write(POLARIS_SX0_EN, data & 0x01);
@@ -793,7 +793,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 	m_discrete->write(POLARIS_SX5_EN, data & 0x20);
 }
 
-WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
+void _8080bw_state::polaris_sh_port_3_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 0x04);  /* SX8 */
 
@@ -920,7 +920,7 @@ static const double schaser_effect_rc[8] =
 	(1.0/ (1.0/RES_K(15) + 1.0/RES_K(39) + 1.0/RES_K(82)) + RES_K(20)) * CAP_U(1)
 };
 
-WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
+void _8080bw_state::schaser_sh_port_1_w(uint8_t data)
 {
 	int effect;
 
@@ -987,7 +987,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 	m_sn->mixer_b_w(m_schaser_explosion);
 }
 
-WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
+void _8080bw_state::schaser_sh_port_2_w(uint8_t data)
 {
 	/* bit 0 - Music (DAC) (SX6)
 	   bit 1 - Sound Enable (SX7)
@@ -1039,9 +1039,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
 
 void _8080bw_state::schaser_reinit_555_time_remain()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_schaser_effect_555_time_remain = attotime::from_double(m_schaser_effect_555_time_remain_savable);
-	schaser_sh_port_2_w(space, 0, m_port_2_last_extra);
+	schaser_sh_port_2_w(m_port_2_last_extra);
 }
 
 
@@ -1057,12 +1056,10 @@ MACHINE_START_MEMBER(_8080bw_state,schaser_sh)
 
 MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	m_schaser_effect_555_is_low = 0;
 	m_schaser_effect_555_timer->adjust(attotime::never);
-	schaser_sh_port_1_w(space, 0, 0);
-	schaser_sh_port_2_w(space, 0, 0);
+	schaser_sh_port_1_w(0);
+	schaser_sh_port_2_w(0);
 	m_schaser_effect_555_time_remain = attotime::zero;
 	m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 }
@@ -1075,12 +1072,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_port03_w)
+void _8080bw_state::invrvnge_port03_w(uint8_t data)
 {
 	m_sound_data = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
+void _8080bw_state::invrvnge_port05_w(uint8_t data)
 {
 	/*
 	    00 - normal play
@@ -1109,7 +1106,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
 /* - Press Left or Right to choose game to play     */
 /****************************************************/
 
-WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
+void _8080bw_state::rollingc_sh_port_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_3_last_extra;
 
@@ -1140,12 +1137,12 @@ const char *const lupin3_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER( _8080bw_state::lupin3_00_w )
+void  _8080bw_state::lupin3_00_w (uint8_t data)
 {
 	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
-WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
+void _8080bw_state::lupin3_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 	static uint8_t lupin3_step = 2;
@@ -1169,7 +1166,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
+void _8080bw_state::lupin3_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -1193,7 +1190,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 /* Much more work needs to be done       */
 /*****************************************/
 
-WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
+void _8080bw_state::schasercv_sh_port_1_w(uint8_t data)
 {
 	/* bit 2 = 2nd speedup
 	   bit 3 = 1st speedup
@@ -1207,7 +1204,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
+void _8080bw_state::schasercv_sh_port_2_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));      /* End-of-Level */
 
@@ -1223,7 +1220,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 /* Much more work needs to be done       */
 /*****************************************/
 
-WRITE8_MEMBER(_8080bw_state::crashrd_port03_w)
+void _8080bw_state::crashrd_port03_w(uint8_t data)
 {
 	int effect;
 
@@ -1287,7 +1284,7 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port03_w)
 	m_sn->mixer_b_w(m_schaser_explosion);
 }
 
-WRITE8_MEMBER(_8080bw_state::crashrd_port05_w)
+void _8080bw_state::crashrd_port05_w(uint8_t data)
 {
 	// bit 0 = bitstream audio
 	// bit 4 = not sure
@@ -1301,7 +1298,7 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port05_w)
 /* No information available as what the correct sounds are         */
 /*******************************************************************/
 
-WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
+void _8080bw_state::yosakdon_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -1316,7 +1313,7 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
+void _8080bw_state::yosakdon_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -1339,7 +1336,7 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 /* Proper samples are unavailable        */
 /*****************************************/
 
-WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
+void _8080bw_state::shuttlei_sh_port_1_w(uint8_t data)
 {
 	/* bit 3 is high while you are alive and playing */
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
@@ -1352,7 +1349,7 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
+void _8080bw_state::shuttlei_sh_port_2_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -1380,12 +1377,12 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 /* Proper samples are unavailable        */
 /*****************************************/
 
-WRITE8_MEMBER( _8080bw_state::darthvdr_00_w )
+void _8080bw_state::darthvdr_00_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 0) & ioport(CABINET_PORT_TAG)->read();
 }
 
-WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
+void _8080bw_state::darthvdr_08_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
@@ -1470,7 +1467,7 @@ cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *
 
 void cane_audio_device::device_add_mconfig(machine_config &config)
 {
-	TIMER(config, m_vco_timer).configure_periodic(FUNC(cane_audio_device::vco_voltage_timer), attotime::from_hz(1000));
+	TIMER(config, m_vco_timer).configure_generic(FUNC(cane_audio_device::vco_voltage_timer));
 
 	SPEAKER(config, "mono").front_center();
 

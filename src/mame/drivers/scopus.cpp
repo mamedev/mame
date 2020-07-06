@@ -48,7 +48,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
 	void maincpu_io_map(address_map &map);
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(sagitta180_state::memory_read_byte)
+uint8_t sagitta180_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);

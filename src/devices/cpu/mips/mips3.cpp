@@ -401,30 +401,30 @@ void mips3_device::device_start()
 	{
 		if (m_data_bits == 32)
 		{
-			auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache32le);
+			m_pr32 = [this](offs_t address) -> u32 { return m_cache32le.read_dword(address); };
+			m_prptr = [this](offs_t address) -> const void * { return m_cache32le.read_ptr(address); };
 		}
 		else
 		{
-			auto cache = m_program->cache<3, 0, ENDIANNESS_LITTLE>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache64le);
+			m_pr32 = [this](offs_t address) -> u32 { return m_cache64le.read_dword(address); };
+			m_prptr = [this](offs_t address) -> const void * { return m_cache64le.read_ptr(address); };
 		}
 	}
 	else
 	{
 		if (m_data_bits == 32)
 		{
-			auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache32be);
+			m_pr32 = [this](offs_t address) -> u32 { return m_cache32be.read_dword(address); };
+			m_prptr = [this](offs_t address) -> const void * { return m_cache32be.read_ptr(address); };
 		}
 		else
 		{
-			auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache64be);
+			m_pr32 = [this](offs_t address) -> u32 { return m_cache64be.read_dword(address); };
+			m_prptr = [this](offs_t address) -> const void * { return m_cache64be.read_ptr(address); };
 		}
 	}
 

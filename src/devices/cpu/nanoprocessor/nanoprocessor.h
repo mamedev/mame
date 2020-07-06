@@ -113,9 +113,9 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 4, 0, 0, ENDIANNESS_BIG>::specific m_io;
 
 	// device_t overrides
 	virtual void device_start() override;

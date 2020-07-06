@@ -125,14 +125,14 @@ void pce_tennokoe_device::nvram_write(emu_file &file)
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(pce_rom_device::read_cart)
+uint8_t pce_rom_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
 
-READ8_MEMBER(pce_cdsys3_device::read_cart)
+uint8_t pce_cdsys3_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	if (!m_ram.empty() && offset >= 0xd0000)
@@ -141,14 +141,14 @@ READ8_MEMBER(pce_cdsys3_device::read_cart)
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
-WRITE8_MEMBER(pce_cdsys3_device::write_cart)
+void pce_cdsys3_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (!m_ram.empty() && offset >= 0xd0000)
 		m_ram[offset - 0xd0000] = data;
 }
 
 
-READ8_MEMBER(pce_populous_device::read_cart)
+uint8_t pce_populous_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
@@ -157,14 +157,14 @@ READ8_MEMBER(pce_populous_device::read_cart)
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
-WRITE8_MEMBER(pce_populous_device::write_cart)
+void pce_populous_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
 		m_ram[offset & 0x7fff] = data;
 }
 
 
-READ8_MEMBER(pce_sf2_device::read_cart)
+uint8_t pce_sf2_device::read_cart(offs_t offset)
 {
 	if (offset < 0x80000)
 		return m_rom[offset];
@@ -172,13 +172,13 @@ READ8_MEMBER(pce_sf2_device::read_cart)
 		return m_rom[0x80000 + m_bank_base * 0x80000 + (offset & 0x7ffff)];
 }
 
-WRITE8_MEMBER(pce_sf2_device::write_cart)
+void pce_sf2_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x1ff0 && offset < 0x1ff4)
 		m_bank_base = offset & 3;
 }
 
-READ8_MEMBER(pce_tennokoe_device::read_cart)
+uint8_t pce_tennokoe_device::read_cart(offs_t offset)
 {
 	switch((offset & 0xf0000) >> 16)
 	{
@@ -202,7 +202,7 @@ READ8_MEMBER(pce_tennokoe_device::read_cart)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pce_tennokoe_device::write_cart)
+void pce_tennokoe_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch((offset & 0xf0000) >> 16)
 	{

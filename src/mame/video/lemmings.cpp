@@ -66,7 +66,7 @@ WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
 /******************************************************************************/
 
 // RAM based
-WRITE16_MEMBER(lemmings_state::lemmings_pixel_0_w)
+void lemmings_state::lemmings_pixel_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sx, sy, src, old;
 
@@ -87,7 +87,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_pixel_0_w)
 }
 
 // RAM based tiles for the FG tilemap
-WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
+void lemmings_state::lemmings_pixel_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sx, sy, src, tile;
 
@@ -106,7 +106,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
 	m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 0) & 0xf;
 }
 
-WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
+void lemmings_state::lemmings_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_data[offset]);
 	m_vram_tilemap->mark_tile_dirty(offset);

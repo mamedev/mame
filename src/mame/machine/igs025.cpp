@@ -84,7 +84,7 @@ void igs025_device::device_reset()
 /* WRITE */
 /****************************************/
 
-WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
+void igs025_device::killbld_igs025_prot_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -143,7 +143,7 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 	}
 }
 
-WRITE16_MEMBER(igs025_device::olds_w )
+void igs025_device::olds_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -196,7 +196,7 @@ WRITE16_MEMBER(igs025_device::olds_w )
 
 
 
-WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
+void igs025_device::drgw2_d80000_protection_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -239,7 +239,7 @@ WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 /* READ */
 /****************************************/
 
-READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
+uint16_t igs025_device::killbld_igs025_prot_r(offs_t offset)
 {
 	if (offset)
 	{

@@ -37,12 +37,12 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_rombank_w)
+void ojankohs_state::ojankohs_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x3f);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
+void ojankohs_state::ojankoy_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 
@@ -53,7 +53,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 	m_msm->reset_w(!m_adpcm_reset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
+void ojankohs_state::ojankohs_adpcm_reset_w(uint8_t data)
 {
 	m_adpcm_reset = BIT(data, 0);
 	m_vclk_left = 0;
@@ -61,7 +61,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
 	m_msm->reset_w(!m_adpcm_reset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
+void ojankohs_state::ojankohs_msm5205_w(uint8_t data)
 {
 	m_adpcm_data = data;
 	m_vclk_left = 2;
@@ -86,13 +86,13 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
+void ojankohs_state::ojankoc_ctrl_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 
 	m_adpcm_reset = BIT(data, 4);
 	m_msm->reset_w(!BIT(data, 4));
-	ojankoc_flipscreen(space, data);
+	ojankoc_flipscreen(data);
 }
 
 
@@ -544,12 +544,12 @@ INPUT_PORTS_END
 //  INPUT PORT HANDLING
 //**************************************************************************
 
-WRITE8_MEMBER( ojankohs_state::port_select_w )
+void ojankohs_state::port_select_w(uint8_t data)
 {
 	m_port_select = data;
 }
 
-READ8_MEMBER( ojankohs_state::keymatrix_p1_r )
+uint8_t ojankohs_state::keymatrix_p1_r()
 {
 	uint8_t data = 0xff;
 
@@ -564,7 +564,7 @@ READ8_MEMBER( ojankohs_state::keymatrix_p1_r )
 	return data;
 }
 
-READ8_MEMBER( ojankohs_state::keymatrix_p2_r )
+uint8_t ojankohs_state::keymatrix_p2_r()
 {
 	uint8_t data = 0xff;
 
@@ -579,7 +579,7 @@ READ8_MEMBER( ojankohs_state::keymatrix_p2_r )
 	return data;
 }
 
-READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p1_r )
+uint8_t ojankohs_state::ojankoc_keymatrix_p1_r()
 {
 	uint8_t data = 0x00;
 
@@ -593,7 +593,7 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p1_r )
 	return data;
 }
 
-READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p2_r )
+uint8_t ojankohs_state::ojankoc_keymatrix_p2_r()
 {
 	uint8_t data = 0x00;
 
@@ -607,34 +607,34 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p2_r )
 	return data;
 }
 
-READ8_MEMBER( ojankohs_state::ojankohs_dipsw1_r )
+uint8_t ojankohs_state::ojankohs_dipsw1_r()
 {
 	uint8_t data = m_dsw1->read();
 	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-READ8_MEMBER( ojankohs_state::ojankohs_dipsw2_r )
+uint8_t ojankohs_state::ojankohs_dipsw2_r()
 {
 	uint8_t data = m_dsw2->read();
 	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-READ8_MEMBER( ojankohs_state::ccasino_dipsw3_r )
+uint8_t ojankohs_state::ccasino_dipsw3_r()
 {
 	return m_dsw3->read() ^ 0xff;
 }
 
-READ8_MEMBER( ojankohs_state::ccasino_dipsw4_r )
+uint8_t ojankohs_state::ccasino_dipsw4_r()
 {
 	return m_dsw4->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( ojankohs_state::ojankoy_coinctr_w )
+void ojankohs_state::ojankoy_coinctr_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( ojankohs_state::ccasino_coinctr_w )
+void ojankohs_state::ccasino_coinctr_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 }

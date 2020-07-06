@@ -40,7 +40,7 @@ public:
 
 	void init_twin16();
 
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -74,19 +74,19 @@ protected:
 	tilemap_t *m_fixed_tmap;
 	tilemap_t *m_scroll_tmap[2];
 
-	DECLARE_WRITE16_MEMBER(CPUA_register_w);
-	DECLARE_WRITE16_MEMBER(CPUB_register_w);
+	void CPUA_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void CPUB_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sprite_status_r);
-	DECLARE_WRITE16_MEMBER(video_register_w);
-	DECLARE_WRITE16_MEMBER(fixram_w);
-	DECLARE_WRITE16_MEMBER(videoram0_w);
-	DECLARE_WRITE16_MEMBER(videoram1_w);
-	DECLARE_WRITE16_MEMBER(zipram_w);
+	uint16_t sprite_status_r();
+	void video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(upd_busy_r);
-	DECLARE_WRITE8_MEMBER(upd_reset_w);
-	DECLARE_WRITE8_MEMBER(upd_start_w);
+	uint8_t upd_busy_r();
+	void upd_reset_w(uint8_t data);
+	void upd_start_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(fix_tile_info);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
@@ -123,8 +123,8 @@ public:
 	void init_fround();
 
 private:
-	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
+	void fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void fround_map(address_map &map);
 
@@ -146,7 +146,7 @@ public:
 	void init_cuebrickj();
 
 private:
-	DECLARE_WRITE8_MEMBER(nvram_bank_w);
+	void nvram_bank_w(uint8_t data);
 
 	uint16_t m_nvram[0x400 * 0x20 / 2];
 };

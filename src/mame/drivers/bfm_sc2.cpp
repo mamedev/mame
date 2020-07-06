@@ -160,6 +160,7 @@ Adder hardware:
 
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
+#include "machine/rescap.h"
 
 #include "speaker.h"
 
@@ -214,43 +215,42 @@ public:
 protected:
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_WRITE8_MEMBER(mux_output_w);
-	DECLARE_READ8_MEMBER(mux_input_r);
-	DECLARE_WRITE8_MEMBER(unlock_w);
-	DECLARE_WRITE8_MEMBER(dimas_w);
-	DECLARE_WRITE8_MEMBER(dimcnt_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_WRITE8_MEMBER(volume_override_w);
-	DECLARE_WRITE8_MEMBER(expansion_latch_w);
-	DECLARE_READ8_MEMBER(expansion_latch_r);
-	DECLARE_WRITE8_MEMBER(muxena_w);
-	DECLARE_WRITE8_MEMBER(timerirq_w);
-	DECLARE_READ8_MEMBER(timerirqclr_r);
-	DECLARE_READ8_MEMBER(irqstatus_r);
-	DECLARE_WRITE8_MEMBER(coininhib_w);
-	DECLARE_READ8_MEMBER(coin_input_r);
-	DECLARE_WRITE8_MEMBER(payout_latch_w);
-	DECLARE_WRITE8_MEMBER(payout_triac_w);
-	DECLARE_WRITE8_MEMBER(payout_select_w);
-	DECLARE_WRITE8_MEMBER(vfd_reset_w);
-	DECLARE_READ8_MEMBER(uart1stat_r);
-	DECLARE_READ8_MEMBER(uart1data_r);
-	DECLARE_WRITE8_MEMBER(uart1ctrl_w);
-	DECLARE_WRITE8_MEMBER(uart1data_w);
-	DECLARE_READ8_MEMBER(uart2stat_r);
-	DECLARE_READ8_MEMBER(uart2data_r);
-	DECLARE_WRITE8_MEMBER(uart2ctrl_w);
-	DECLARE_WRITE8_MEMBER(uart2data_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(vfd1_bd1_w);
-	DECLARE_WRITE8_MEMBER(vfd2_data_w);
-	DECLARE_WRITE8_MEMBER(e2ram_w);
-	DECLARE_READ8_MEMBER(direct_input_r);
+	void bankswitch_w(uint8_t data);
+	void mmtr_w(uint8_t data);
+	void mux_output_w(offs_t offset, uint8_t data);
+	uint8_t mux_input_r(offs_t offset);
+	void unlock_w(uint8_t data);
+	void dimas_w(uint8_t data);
+	void dimcnt_w(uint8_t data);
+	void unknown_w(uint8_t data);
+	void volume_override_w(uint8_t data);
+	void expansion_latch_w(uint8_t data);
+	uint8_t expansion_latch_r();
+	void muxena_w(uint8_t data);
+	void timerirq_w(uint8_t data);
+	uint8_t timerirqclr_r();
+	uint8_t irqstatus_r();
+	void coininhib_w(uint8_t data);
+	void payout_latch_w(uint8_t data);
+	void payout_triac_w(uint8_t data);
+	void payout_select_w(uint8_t data);
+	void vfd_reset_w(uint8_t data);
+	uint8_t uart1stat_r();
+	uint8_t uart1data_r();
+	void uart1ctrl_w(uint8_t data);
+	void uart1data_w(uint8_t data);
+	uint8_t uart2stat_r();
+	uint8_t uart2data_r();
+	void uart2ctrl_w(uint8_t data);
+	void uart2data_w(uint8_t data);
+	uint8_t key_r(offs_t offset);
+	void vfd1_bd1_w(uint8_t data);
+	void vfd2_data_w(uint8_t data);
+	void e2ram_w(uint8_t data);
+	uint8_t direct_input_r();
 	int recdata(int changed, int data);
-	DECLARE_WRITE8_MEMBER(nec_reset_w);
-	DECLARE_WRITE8_MEMBER(nec_latch_w);
+	void nec_reset_w(uint8_t data);
+	void nec_latch_w(uint8_t data);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void on_scorpion2_reset();
@@ -342,8 +342,8 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(reel12_vid_w);
-	DECLARE_READ8_MEMBER(vfd_status_hop_r);
+	void reel12_vid_w(uint8_t data);
+	uint8_t vfd_status_hop_r();
 
 	void memmap_vid(address_map &map);
 };
@@ -362,10 +362,10 @@ public:
 
 protected:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(reel56_w);
-	DECLARE_READ8_MEMBER(vfd_status_r);
+	void reel12_w(uint8_t data);
+	void reel34_w(uint8_t data);
+	void reel56_w(uint8_t data);
+	uint8_t vfd_status_r();
 
 	void init_drwho_common();
 	virtual void save_state() override;
@@ -417,8 +417,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(vfd1_dmd_w);
-	DECLARE_WRITE8_MEMBER(dmd_reset_w);
+	void vfd1_dmd_w(uint8_t data);
+	void dmd_reset_w(uint8_t data);
 };
 
 
@@ -574,7 +574,7 @@ void bfm_sc2_state::e2ram_init(nvram_device &nvram, void *data, size_t size)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::bankswitch_w)
+void bfm_sc2_state::bankswitch_w(uint8_t data)
 {
 	m_rombank1->set_entry(data & 0x03);
 }
@@ -596,7 +596,7 @@ INTERRUPT_GEN_MEMBER(bfm_sc2_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_vid_state::reel12_vid_w)// in a video cabinet this is used to drive a hopper
+void bfm_sc2_vid_state::reel12_vid_w(uint8_t data) // in a video cabinet this is used to drive a hopper
 {
 	m_reel12_latch = data;
 
@@ -631,7 +631,7 @@ WRITE8_MEMBER(bfm_sc2_vid_state::reel12_vid_w)// in a video cabinet this is used
 
 
 /* Reels 1 and 2 */
-WRITE8_MEMBER(bfm_sc2_novid_state::reel12_w)
+void bfm_sc2_novid_state::reel12_w(uint8_t data)
 {
 	m_reel12_latch = data;
 
@@ -642,7 +642,7 @@ WRITE8_MEMBER(bfm_sc2_novid_state::reel12_w)
 	awp_draw_reel(machine(),"reel2", *m_reel[1]);
 }
 
-WRITE8_MEMBER(bfm_sc2_novid_state::reel34_w)
+void bfm_sc2_novid_state::reel34_w(uint8_t data)
 {
 	m_reel34_latch = data;
 
@@ -655,7 +655,7 @@ WRITE8_MEMBER(bfm_sc2_novid_state::reel34_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_novid_state::reel56_w)
+void bfm_sc2_novid_state::reel56_w(uint8_t data)
 {
 	m_reel56_latch = data;
 
@@ -672,16 +672,15 @@ WRITE8_MEMBER(bfm_sc2_novid_state::reel56_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
+void bfm_sc2_state::mmtr_w(uint8_t data)
 {
-	int i;
 	int  changed = m_mmtr_latch ^ data;
 
 	m_mmtr_latch = data;
 
 	if (m_meters != nullptr)
 	{
-		for (i = 0; i<8; i++)
+		for (int i = 0; i<8; i++)
 		{
 			if ( changed & (1 << i) )
 			{
@@ -695,7 +694,7 @@ WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
+void bfm_sc2_state::mux_output_w(offs_t offset, uint8_t data)
 {
 	// this is a useful profiler point to make sure the artwork writes / lookups are performing properly.
 	g_profiler.start(PROFILER_USER6);
@@ -719,7 +718,7 @@ WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::mux_input_r)
+uint8_t bfm_sc2_state::mux_input_r(offs_t offset)
 {
 	int result = 0xFF,t1,t2;
 
@@ -745,31 +744,31 @@ READ8_MEMBER(bfm_sc2_state::mux_input_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::unlock_w)
+void bfm_sc2_state::unlock_w(uint8_t data)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::dimas_w)
+void bfm_sc2_state::dimas_w(uint8_t data)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::dimcnt_w)
+void bfm_sc2_state::dimcnt_w(uint8_t data)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::unknown_w)
+void bfm_sc2_state::unknown_w(uint8_t data)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
+void bfm_sc2_state::volume_override_w(uint8_t data)
 {
 	int old = m_volume_override;
 
@@ -792,7 +791,7 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::nec_reset_w)
+void bfm_sc2_state::nec_reset_w(uint8_t data)
 {
 	m_upd7759->start_w(0);
 	m_upd7759->reset_w(data != 0);
@@ -800,7 +799,7 @@ WRITE8_MEMBER(bfm_sc2_state::nec_reset_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
+void bfm_sc2_state::nec_latch_w(uint8_t data)
 {
 	int bank = 0;
 
@@ -816,7 +815,7 @@ WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_vid_state::vfd_status_hop_r)// on video games, hopper inputs are connected to this
+uint8_t bfm_sc2_vid_state::vfd_status_hop_r()// on video games, hopper inputs are connected to this
 {
 	// b7 = NEC busy
 	// b6 = alpha busy (also matrix board)
@@ -848,7 +847,7 @@ READ8_MEMBER(bfm_sc2_vid_state::vfd_status_hop_r)// on video games, hopper input
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::expansion_latch_w)
+void bfm_sc2_state::expansion_latch_w(uint8_t data)
 {
 	int changed = m_expansion_latch^data;
 
@@ -894,27 +893,27 @@ WRITE8_MEMBER(bfm_sc2_state::expansion_latch_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::expansion_latch_r)
+uint8_t bfm_sc2_state::expansion_latch_r()
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::muxena_w)
+void bfm_sc2_state::muxena_w(uint8_t data)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::timerirq_w)
+void bfm_sc2_state::timerirq_w(uint8_t data)
 {
 	m_is_timer_enabled = data & 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::timerirqclr_r)
+uint8_t bfm_sc2_state::timerirqclr_r()
 {
 	m_irq_timer_stat = 0;
 	m_irq_status     = 0;
@@ -924,7 +923,7 @@ READ8_MEMBER(bfm_sc2_state::timerirqclr_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::irqstatus_r)
+uint8_t bfm_sc2_state::irqstatus_r()
 {
 	int result = m_irq_status | m_irq_timer_stat | 0x80;    // 0x80 = ~MUXERROR
 
@@ -935,7 +934,7 @@ READ8_MEMBER(bfm_sc2_state::irqstatus_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::coininhib_w)
+void bfm_sc2_state::coininhib_w(uint8_t data)
 {
 	int changed = m_coin_inhibits^data,i,p;
 
@@ -957,23 +956,17 @@ WRITE8_MEMBER(bfm_sc2_state::coininhib_w)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-
-READ8_MEMBER(bfm_sc2_state::coin_input_r)
-{
-	return ioport("COINS")->read();
-}
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::payout_latch_w)
+void bfm_sc2_state::payout_latch_w(uint8_t data)
 {
 	m_pay_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::payout_triac_w)
+void bfm_sc2_state::payout_triac_w(uint8_t data)
 {
 	if ( m_triac_select == 0x57 )
 	{
@@ -1034,7 +1027,7 @@ WRITE8_MEMBER(bfm_sc2_state::payout_triac_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::payout_select_w)
+void bfm_sc2_state::payout_select_w(uint8_t data)
 {
 	m_triac_select = data;
 }
@@ -1043,7 +1036,7 @@ WRITE8_MEMBER(bfm_sc2_state::payout_select_w)
 
 ///////////////////////////////////////////////////////////////////////////
 //TODO: Change this!
-WRITE8_MEMBER(bfm_sc2_state::vfd2_data_w)
+void bfm_sc2_state::vfd2_data_w(uint8_t data)
 {
 	m_vfd1->write_char(data);
 }
@@ -1052,7 +1045,7 @@ WRITE8_MEMBER(bfm_sc2_state::vfd2_data_w)
 // serial port ////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::uart1stat_r)
+uint8_t bfm_sc2_state::uart1stat_r()
 {
 	int status = 0x06;
 
@@ -1063,20 +1056,20 @@ READ8_MEMBER(bfm_sc2_state::uart1stat_r)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::uart1data_r)
+uint8_t bfm_sc2_state::uart1data_r()
 {
 	return m_uart1_data;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::uart1ctrl_w)
+void bfm_sc2_state::uart1ctrl_w(uint8_t data)
 {
 	UART_LOG(("uart1ctrl:%x\n", data));
 }
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::uart1data_w)
+void bfm_sc2_state::uart1data_w(uint8_t data)
 {
 	m_data_to_uart2 = 1;
 	m_uart1_data    = data;
@@ -1084,7 +1077,7 @@ WRITE8_MEMBER(bfm_sc2_state::uart1data_w)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::uart2stat_r)
+uint8_t bfm_sc2_state::uart2stat_r()
 {
 	int status = 0x06;
 
@@ -1095,21 +1088,21 @@ READ8_MEMBER(bfm_sc2_state::uart2stat_r)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::uart2data_r)
+uint8_t bfm_sc2_state::uart2data_r()
 {
 	return m_uart2_data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::uart2ctrl_w)
+void bfm_sc2_state::uart2ctrl_w(uint8_t data)
 {
 	UART_LOG(("uart2ctrl:%x\n", data));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc2_state::uart2data_w)
+void bfm_sc2_state::uart2data_w(uint8_t data)
 {
 	m_data_to_uart1 = 1;
 	m_uart2_data    = data;
@@ -1120,7 +1113,7 @@ WRITE8_MEMBER(bfm_sc2_state::uart2data_w)
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc2_state::key_r)
+uint8_t bfm_sc2_state::key_r(offs_t offset)
 {
 	int result = m_key[ offset ];
 
@@ -1215,7 +1208,7 @@ int bfm_sc2_state::recAck(int changed, int data)
 
 
 /* VFD Status */
-READ8_MEMBER(bfm_sc2_novid_state::vfd_status_r)
+uint8_t bfm_sc2_novid_state::vfd_status_r()
 {
 	/* b7 = NEC busy */
 	/* b6 = alpha busy (also matrix board) */
@@ -1231,24 +1224,24 @@ READ8_MEMBER(bfm_sc2_novid_state::vfd_status_r)
 	return result;
 }
 
-WRITE8_MEMBER(bfm_sc2_state::vfd1_bd1_w)
+void bfm_sc2_state::vfd1_bd1_w(uint8_t data)
 {
 	m_vfd0->write_char(data);
 }
 
-WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
+void bfm_sc2_state::vfd_reset_w(uint8_t data)
 {
 	m_vfd0->reset();
 	m_vfd1->reset();
 }
 
-WRITE8_MEMBER(bfm_sc2_dmd_state::vfd1_dmd_w)
+void bfm_sc2_dmd_state::vfd1_dmd_w(uint8_t data)
 {
 	m_dm01->writedata(data);
 }
 
 //
-WRITE8_MEMBER(bfm_sc2_state::e2ram_w)
+void bfm_sc2_state::e2ram_w(uint8_t data)
 {
 	int changed, ack;
 
@@ -1476,7 +1469,7 @@ void bfm_sc2_vid_state::machine_reset()
 }
 
 
-READ8_MEMBER(bfm_sc2_state::direct_input_r)
+uint8_t bfm_sc2_state::direct_input_r()
 {
 	return 0;
 }
@@ -1569,7 +1562,7 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 	//map(0x2F00, 0x2F00).w(FUNC(bfm_sc2_state::vfd2_data_w));                /* vfd2 data (not usually connected!)*/
 
 	map(0x3FFE, 0x3FFE).r(FUNC(bfm_sc2_state::direct_input_r));
-	map(0x3FFF, 0x3FFF).r(FUNC(bfm_sc2_state::coin_input_r));
+	map(0x3FFF, 0x3FFF).portr("COINS");
 	map(0x4000, 0x5FFF).rom();
 	map(0x4000, 0xFFFF).w(FUNC(bfm_sc2_state::unknown_w));            // contains unknown I/O registers
 	map(0x6000, 0x7FFF).bankr("bank1");
@@ -2764,7 +2757,7 @@ ROM_END
 
 #ifdef UNUSED_FUNCTION
 /* Scorpion 3 expansion */
-READ8_MEMBER(bfm_sc2_state::sc3_expansion_r)
+uint8_t bfm_sc2_state::sc3_expansion_r(offs_t offset)
 {
 	int result = 0;
 
@@ -2779,7 +2772,7 @@ READ8_MEMBER(bfm_sc2_state::sc3_expansion_r)
 }
 
 
-WRITE8_MEMBER(bfm_sc2_state::sc3_expansion_w)
+void bfm_sc2_state::sc3_expansion_w(offs_t offset, uint8_t data)
 {
 	switch ( offset )
 	{
@@ -3732,7 +3725,7 @@ static INPUT_PORTS_START( scorpion3 )
 
 INPUT_PORTS_END
 
-WRITE8_MEMBER(bfm_sc2_dmd_state::dmd_reset_w)
+void bfm_sc2_dmd_state::dmd_reset_w(uint8_t data)
 {
 	//TODO: Reset callback for DMD
 }
@@ -3741,8 +3734,8 @@ void bfm_sc2_dmd_state::machine_start()
 {
 	bfm_sc2_state::machine_start();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x2800, 0x2800, write8_delegate(*this, FUNC(bfm_sc2_dmd_state::vfd1_dmd_w)));
-	space.install_write_handler(0x2900, 0x2900, write8_delegate(*this, FUNC(bfm_sc2_dmd_state::dmd_reset_w)));
+	space.install_write_handler(0x2800, 0x2800, write8smo_delegate(*this, FUNC(bfm_sc2_dmd_state::vfd1_dmd_w)));
+	space.install_write_handler(0x2900, 0x2900, write8smo_delegate(*this, FUNC(bfm_sc2_dmd_state::dmd_reset_w)));
 }
 
 /* machine driver for scorpion2 board */

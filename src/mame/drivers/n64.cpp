@@ -34,7 +34,7 @@ public:
 	void n64dd(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(dd_null_r);
+	uint32_t dd_null_r();
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -48,7 +48,7 @@ private:
 	void rsp_map(address_map &map);
 };
 
-READ32_MEMBER(n64_mess_state::dd_null_r)
+uint32_t n64_mess_state::dd_null_r()
 {
 	return 0xffffffff;
 }

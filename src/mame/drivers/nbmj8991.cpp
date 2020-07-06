@@ -42,7 +42,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(nbmj8991_state::soundbank_w)
+void nbmj8991_state::soundbank_w(uint8_t data)
 {
 	if (!(data & 0x80)) m_soundlatch->clear_w();
 	membank("bank1")->set_entry(data & 0x03);

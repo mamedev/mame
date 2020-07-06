@@ -26,7 +26,7 @@
 
 /* Memory Maps */
 
-READ8_MEMBER( advision_state::rom_r )
+uint8_t advision_state::rom_r(offs_t offset)
 {
 	offset += 0x400;
 	return m_cart->read_rom(offset & 0xfff);

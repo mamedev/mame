@@ -40,7 +40,7 @@
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cloak_state::cloak_paletteram_w)
+void cloak_state::cloak_paletteram_w(offs_t offset, uint8_t data)
 {
 	m_palette_ram[offset & 0x3f] = ((offset & 0x40) << 2) | data;
 	set_pen(offset & 0x3f);
@@ -90,7 +90,7 @@ void cloak_state::set_current_bitmap_videoram_pointer()
 	m_current_bitmap_videoram_displayed = m_bitmap_videoram_selected ? m_bitmap_videoram2.get() : m_bitmap_videoram1.get();
 }
 
-WRITE8_MEMBER(cloak_state::cloak_clearbmp_w)
+void cloak_state::cloak_clearbmp_w(uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -115,7 +115,7 @@ void cloak_state::adjust_xy(int offset)
 	}
 }
 
-READ8_MEMBER(cloak_state::graph_processor_r)
+uint8_t cloak_state::graph_processor_r(offs_t offset)
 {
 	uint8_t ret = m_current_bitmap_videoram_displayed[(m_bitmap_videoram_address_y << 8) | m_bitmap_videoram_address_x];
 
@@ -124,7 +124,7 @@ READ8_MEMBER(cloak_state::graph_processor_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cloak_state::graph_processor_w)
+void cloak_state::graph_processor_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -138,11 +138,9 @@ WRITE8_MEMBER(cloak_state::graph_processor_w)
 	}
 }
 
-WRITE8_MEMBER(cloak_state::cloak_videoram_w)
+void cloak_state::cloak_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 

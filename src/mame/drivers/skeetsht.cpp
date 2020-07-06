@@ -49,12 +49,12 @@ private:
 	uint8_t m_ay_sel;
 	uint8_t m_lastdataw;
 	uint16_t m_lastdatar;
-	DECLARE_READ16_MEMBER(ramdac_r);
-	DECLARE_WRITE16_MEMBER(ramdac_w);
-	DECLARE_WRITE8_MEMBER(tms_w);
-	DECLARE_READ8_MEMBER(tms_r);
-	DECLARE_WRITE8_MEMBER(hc11_porta_w);
-	DECLARE_WRITE8_MEMBER(ay8910_w);
+	uint16_t ramdac_r(offs_t offset);
+	void ramdac_w(offs_t offset, uint16_t data);
+	void tms_w(offs_t offset, uint8_t data);
+	uint8_t tms_r(offs_t offset);
+	void hc11_porta_w(uint8_t data);
+	void ay8910_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	virtual void machine_reset() override;
@@ -104,7 +104,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 	}
 }
 
-READ16_MEMBER(skeetsht_state::ramdac_r)
+uint16_t skeetsht_state::ramdac_r(offs_t offset)
 {
 	offset = (offset >> 12) & ~4;
 
@@ -114,7 +114,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	return m_tlc34076->read(offset);
 }
 
-WRITE16_MEMBER(skeetsht_state::ramdac_w)
+void skeetsht_state::ramdac_w(offs_t offset, uint16_t data)
 {
 	offset = (offset >> 12) & ~4;
 
@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER(skeetsht_state::tms_irq)
 }
 
 
-WRITE8_MEMBER(skeetsht_state::tms_w)
+void skeetsht_state::tms_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
@@ -145,7 +145,7 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 		m_tms->host_w(offset >> 1, (m_lastdataw << 8) | data);
 }
 
-READ8_MEMBER(skeetsht_state::tms_r)
+uint8_t skeetsht_state::tms_r(offs_t offset)
 {
 	if ((offset & 1) == 0)
 		m_lastdatar = m_tms->host_r(offset >> 1);
@@ -160,7 +160,7 @@ READ8_MEMBER(skeetsht_state::tms_r)
  *
  *************************************/
 
-WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
+void skeetsht_state::hc11_porta_w(uint8_t data)
 {
 	if (!(data & 0x8) && (m_porta_latch & 8))
 		m_ay_sel = m_porta_latch & 0x10;
@@ -168,7 +168,7 @@ WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 	m_porta_latch = data;
 }
 
-WRITE8_MEMBER(skeetsht_state::ay8910_w)
+void skeetsht_state::ay8910_w(uint8_t data)
 {
 	if (m_ay_sel)
 		m_ay->data_w(data);

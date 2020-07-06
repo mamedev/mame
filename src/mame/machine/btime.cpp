@@ -6,7 +6,7 @@
 
 #define BASE  0xb000
 
-READ8_MEMBER(btime_state::mmonkey_protection_r)
+uint8_t btime_state::mmonkey_protection_r(offs_t offset)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	int ret = 0;
@@ -23,7 +23,7 @@ READ8_MEMBER(btime_state::mmonkey_protection_r)
 	return ret;
 }
 
-WRITE8_MEMBER(btime_state::mmonkey_protection_w)
+void btime_state::mmonkey_protection_w(offs_t offset, uint8_t data)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    inpttype.h
+    inpttype.ipp
 
     Array of core-defined input types and default mappings.
 

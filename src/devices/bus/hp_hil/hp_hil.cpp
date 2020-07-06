@@ -99,7 +99,7 @@ void hp_hil_mlc_device::device_reset()
 }
 
 
-WRITE8_MEMBER(hp_hil_mlc_device::write)
+void hp_hil_mlc_device::write(offs_t offset, uint8_t data)
 {
 	device_hp_hil_interface *entry = m_device_list.first();
 	uint16_t tmp = data | (m_w1 << 8);
@@ -154,7 +154,7 @@ WRITE8_MEMBER(hp_hil_mlc_device::write)
 	}
 }
 
-READ8_MEMBER(hp_hil_mlc_device::read)
+uint8_t hp_hil_mlc_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 

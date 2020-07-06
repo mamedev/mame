@@ -311,18 +311,18 @@ private:
 	uint8_t m_flash_packet;
 	uint8_t m_flash_packet_start;
 
-	DECLARE_WRITE8_MEMBER(tiles_offset_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
-	DECLARE_WRITE8_MEMBER(out_a_w);
-	DECLARE_WRITE8_MEMBER(out_b_w);
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
-	DECLARE_READ8_MEMBER(hwcheck_r);
-	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
-	DECLARE_READ8_MEMBER(reel_scrollattr_r);
+	void tiles_offset_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
+	void out_a_w(uint8_t data);
+	void out_b_w(uint8_t data);
+	uint8_t flash_r();
+	void flash_w(uint8_t data);
+	uint8_t hwcheck_r();
+	void out_c_w(uint8_t data);
+	void reel_scrollattr_w(offs_t offset, uint8_t data);
+	uint8_t reel_scrollattr_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
@@ -362,20 +362,20 @@ void subsino_state::machine_start()
 ***************************************************************************/
 
 
-WRITE8_MEMBER(subsino_state::tiles_offset_w)
+void subsino_state::tiles_offset_w(offs_t offset, uint8_t data)
 {
 	m_tiles_offset = (data & 1) ? 0x1000: 0;
 	m_tmap->mark_tile_dirty(offset);
 //  popmessage("gfx %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::videoram_w)
+void subsino_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(subsino_state::colorram_w)
+void subsino_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
@@ -407,7 +407,7 @@ VIDEO_START_MEMBER(subsino_state,subsino)
 
 
 template<uint8_t Reel>
-WRITE8_MEMBER(subsino_state::reel_ram_w)
+void subsino_state::reel_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel_ram[Reel][offset] = data;
 	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
@@ -599,7 +599,7 @@ void subsino_state::_3proms_palette(palette_device &palette) const
 *                          Lamps & other outputs.                          *
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino_state::out_a_w)
+void subsino_state::out_a_w(uint8_t data)
 {
 /***** COIN PULSE: *****
 
@@ -643,7 +643,7 @@ WRITE8_MEMBER(subsino_state::out_a_w)
 //  popmessage("Out A %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::out_b_w)
+void subsino_state::out_b_w(uint8_t data)
 {
 /***** LAMPS: *****
 
@@ -856,7 +856,7 @@ what it is exactly and what it can possibly do.
 */
 
 
-READ8_MEMBER(subsino_state::flash_r)
+uint8_t subsino_state::flash_r()
 {
 //  printf("R %02x\n",m_flash_val);
 
@@ -870,7 +870,7 @@ READ8_MEMBER(subsino_state::flash_r)
 		return 0xd9;
 }
 
-WRITE8_MEMBER(subsino_state::flash_w)
+void subsino_state::flash_w(uint8_t data)
 {
 	switch(m_flash_packet_start)
 	{
@@ -898,7 +898,7 @@ void subsino_state::victor5_map(address_map &map)
 }
 
 
-READ8_MEMBER(subsino_state::hwcheck_r)
+uint8_t subsino_state::hwcheck_r()
 {
 	/* Wants this at POST otherwise an "Hardware Error" occurs. */
 	return 0x55;
@@ -938,7 +938,7 @@ void subsino_state::crsbingo_map(address_map &map)
 
 }
 
-WRITE8_MEMBER(subsino_state::out_c_w)
+void subsino_state::out_c_w(uint8_t data)
 {
 	// not 100% sure on this
 
@@ -996,7 +996,7 @@ void subsino_state::ramdac_map(address_map &map)
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
-WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
+void subsino_state::reel_scrollattr_w(offs_t offset, uint8_t data)
 {
 	if (*m_stbsub_out_c & 0x20)
 	{
@@ -1040,7 +1040,7 @@ WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 	}
 }
 
-READ8_MEMBER(subsino_state::reel_scrollattr_r)
+uint8_t subsino_state::reel_scrollattr_r(offs_t offset)
 {
 	return m_reel_attr[0][offset];
 }

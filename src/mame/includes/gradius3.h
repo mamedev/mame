@@ -51,15 +51,15 @@ private:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 
-	DECLARE_READ16_MEMBER(k052109_halfword_r);
-	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
-	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
-	DECLARE_WRITE16_MEMBER(cpuB_irqenable_w);
-	DECLARE_WRITE16_MEMBER(cpuB_irqtrigger_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(gradius3_gfxrom_r);
-	DECLARE_WRITE16_MEMBER(gradius3_gfxram_w);
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	uint16_t k052109_halfword_r(offs_t offset);
+	void k052109_halfword_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuB_irqenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuB_irqtrigger_w(uint16_t data);
+	void sound_irq_w(uint16_t data);
+	uint16_t gradius3_gfxrom_r(offs_t offset);
+	void gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_bank_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -67,7 +67,7 @@ private:
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
 	void gradius3_postload();
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void gradius3_map(address_map &map);

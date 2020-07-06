@@ -9,6 +9,7 @@ license:CC0
 		<description>GMX Flex-09 3.3</description>
 		<year>1981</year>
 		<publisher>Technical System Consultants / Gimix Inc.</publisher>
+		<info name="usage" value="Enter U to boot" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gfx33dma.dsk" size="102400" crc="5548dd85" sha1="0e0a94908478cbcf1d9ab7430189bdf43e12355b"/>
@@ -18,10 +19,11 @@ license:CC0
 
 	<!-- 8 inch disk - to boot, you'll need to set DIP switch S2-9 on the DMA FDC board (5.25/8 inch drive select) to 8 inch.
 	     You'll also need to set the first drive to be 8 inch also, (-fdc:0 8dd) -->
-	<software name="flex36">
+	<software name="flex36" supported="no"><!-- mame reports invalid image and ejects the disk -->
 		<description>GMX Flex-09 3.6</description>
 		<year>1981</year>
 		<publisher>Technical System Consultants / Gimix Inc.</publisher>
+		<info name="usage" value="Enter U to boot" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1265664">
 				<rom name="gflx_36.dsk" size="161280" crc="6cdd4198" sha1="307b635a3abb487c1295d8ef75afeecec9e61c39"/>
@@ -33,6 +35,7 @@ license:CC0
 		<description>GMX Flex-09 4.3</description>
 		<year>1981</year>
 		<publisher>Technical System Consultants / Gimix Inc.</publisher>
+		<info name="usage" value="Enter U to boot" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="flex_v4.3.imd" size="103190" crc="2685ca76" sha1="b297f8e774cf4253a2d2259cb1959c74911ceda3"/>
@@ -40,10 +43,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="os9l1_12">
+	<software name="os9l1_12" supported="no"><!-- does not boot -->
 		<description>OS-9 GMX I</description>
 		<year>1981</year>
 		<publisher>Microware Systems Corp. / Gimix Inc.</publisher>
+		<info name="usage" value="Enter U to boot" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="os9_v1.2.imd" size="116070" crc="aa3791b9" sha1="29036b5a6d1e63801b7b9fe9b99f5a4b536f9f3d"/>

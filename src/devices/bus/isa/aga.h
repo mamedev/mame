@@ -41,14 +41,14 @@ public:
 protected:
 	isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( pc_aga_mda_r );
-	DECLARE_WRITE8_MEMBER( pc_aga_mda_w );
-	DECLARE_READ8_MEMBER( pc_aga_cga_r );
-	DECLARE_WRITE8_MEMBER( pc_aga_cga_w );
+	uint8_t pc_aga_mda_r(offs_t offset);
+	void pc_aga_mda_w(offs_t offset, uint8_t data);
+	uint8_t pc_aga_cga_r(offs_t offset);
+	void pc_aga_cga_w(offs_t offset, uint8_t data);
 	void set_palette_luts();
 	void pc_aga_set_mode(mode_t mode);
-	DECLARE_WRITE8_MEMBER( pc_aga_videoram_w );
-	DECLARE_READ8_MEMBER( pc_aga_videoram_r );
+	void pc_aga_videoram_w(offs_t offset, uint8_t data);
+	uint8_t pc_aga_videoram_r(offs_t offset);
 
 	MC6845_UPDATE_ROW( aga_update_row );
 	MC6845_UPDATE_ROW( mda_text_inten_update_row );
@@ -108,10 +108,10 @@ public:
 	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	DECLARE_READ8_MEMBER( pc200_videoram_r );
-	DECLARE_WRITE8_MEMBER( pc200_videoram_w );
-	DECLARE_WRITE8_MEMBER( pc200_cga_w );
-	DECLARE_READ8_MEMBER( pc200_cga_r );
+	uint8_t pc200_videoram_r(offs_t offset);
+	void pc200_videoram_w(offs_t offset, uint8_t data);
+	void pc200_cga_w(offs_t offset, uint8_t data);
+	uint8_t pc200_cga_r(offs_t offset);
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

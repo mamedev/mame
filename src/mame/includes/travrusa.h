@@ -37,11 +37,11 @@ private:
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
 	int                  m_scrollx[2];
-	DECLARE_WRITE8_MEMBER(travrusa_videoram_w);
-	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_low_w);
-	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_high_w);
-	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
-	DECLARE_READ8_MEMBER(shtridrb_port11_r);
+	void travrusa_videoram_w(offs_t offset, uint8_t data);
+	void travrusa_scroll_x_low_w(uint8_t data);
+	void travrusa_scroll_x_high_w(uint8_t data);
+	void travrusa_flipscreen_w(uint8_t data);
+	uint8_t shtridrb_port11_r();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

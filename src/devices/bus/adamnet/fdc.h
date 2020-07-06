@@ -54,11 +54,11 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t data_r(offs_t offset);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 
 	void adam_fdc_mem(address_map &map);
 };

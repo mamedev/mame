@@ -109,7 +109,7 @@
 #include "segabill.lh"
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
-READ32_MEMBER(model2_state::timers_r)
+u32 model2_state::timers_r(offs_t offset)
 {
 	m_maincpu->i960_noburst();
 
@@ -117,7 +117,7 @@ READ32_MEMBER(model2_state::timers_r)
 	if (m_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		uint32_t cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
+		u32 cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
 		m_timervals[offset] = m_timerorig[offset] - cur;
@@ -126,7 +126,7 @@ READ32_MEMBER(model2_state::timers_r)
 	return m_timervals[offset];
 }
 
-WRITE32_MEMBER(model2_state::timers_w)
+void model2_state::timers_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	attotime period;
 
@@ -328,37 +328,37 @@ void model2c_state::machine_reset()
 	m_copro_tgpx4->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(model2_state::palette_w)
+void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	u16 color = m_palram[offset];
 	m_palette->set_pen_color(offset, pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
 }
 
-READ16_MEMBER(model2_state::palette_r)
+u16 model2_state::palette_r(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-WRITE16_MEMBER(model2_state::colorxlat_w)
+void model2_state::colorxlat_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_colorxlat[offset]);
 }
 
-READ16_MEMBER(model2_state::colorxlat_r)
+u16 model2_state::colorxlat_r(offs_t offset)
 {
 	return m_colorxlat[offset];
 }
 
 // Apparently original Model 2 doesn't have fifo control?
-READ32_MEMBER(model2o_state::fifo_control_2o_r)
+u32 model2o_state::fifo_control_2o_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(model2_state::fifo_control_2a_r)
+u32 model2_state::fifo_control_2a_r()
 {
-	uint32_t r = 0;
+	u32 r = 0;
 
 	if (m_copro_fifo_out->is_empty())
 	{
@@ -371,9 +371,9 @@ READ32_MEMBER(model2_state::fifo_control_2a_r)
 //  return r | 0x04;
 }
 
-READ32_MEMBER(model2_state::videoctl_r)
+u32 model2_state::videoctl_r()
 {
-	uint8_t framenum;
+	u8 framenum;
 
 	if(m_render_mode == false)
 		framenum = (m_screen->frame_number() & 2) << 1;
@@ -383,23 +383,23 @@ READ32_MEMBER(model2_state::videoctl_r)
 	return (framenum) | (m_videocontrol & 3);
 }
 
-WRITE32_MEMBER(model2_state::videoctl_w)
+void model2_state::videoctl_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_videocontrol);
 }
 
 // Coprocessor - Common
-READ32_MEMBER(model2_state::copro_prg_r)
+u32 model2_state::copro_prg_r()
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(model2_state::copro_ctl1_r)
+u32 model2_state::copro_ctl1_r()
 {
 	return m_coproctl;
 }
 
-WRITE32_MEMBER(model2_state::copro_ctl1_w)
+void model2_state::copro_ctl1_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// did hi bit change?
 	if ((data ^ m_coproctl) == 0x80000000)
@@ -457,7 +457,7 @@ void model2_tgp_state::copro_tgp_rf_map(address_map &map)
 	map(0x3, 0x3).w(FUNC(model2_tgp_state::copro_tgp_bank_w));
 }
 
-READ32_MEMBER(model2_tgp_state::copro_tgp_memory_r)
+u32 model2_tgp_state::copro_tgp_memory_r(offs_t offset)
 {
 	offs_t adr = (m_copro_tgp_bank_reg & 0xff0000) | offset;
 
@@ -474,7 +474,7 @@ READ32_MEMBER(model2_tgp_state::copro_tgp_memory_r)
 	return 0;
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_tgp_memory_w)
+void model2_tgp_state::copro_tgp_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	offs_t adr = (m_copro_tgp_bank_reg & 0xff0000) | offset;
 	if(adr & 0x400000) {
@@ -483,18 +483,18 @@ WRITE32_MEMBER(model2_tgp_state::copro_tgp_memory_w)
 	}
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_tgp_bank_w)
+void model2_tgp_state::copro_tgp_bank_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_tgp_bank_reg);
 	m_copro_tgp_bank->set_bank(m_copro_tgp_bank_reg & 0xc00000 ? 1 : 0);
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_sincos_w)
+void model2_tgp_state::copro_sincos_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_sincos_base);
 }
 
-READ32_MEMBER(model2_tgp_state::copro_sincos_r)
+u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 {
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
@@ -506,12 +506,12 @@ READ32_MEMBER(model2_tgp_state::copro_sincos_r)
 	return result;
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_inv_w)
+void model2_tgp_state::copro_inv_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_inv_base);
 }
 
-READ32_MEMBER(model2_tgp_state::copro_inv_r)
+u32 model2_tgp_state::copro_inv_r(offs_t offset)
 {
 	offs_t index = ((m_copro_inv_base >> 9) & 0x3ffe) | (offset & 1);
 	u32 result = m_copro_tgp_tables[index | 0x8000];
@@ -523,12 +523,12 @@ READ32_MEMBER(model2_tgp_state::copro_inv_r)
 	return result;
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_isqrt_w)
+void model2_tgp_state::copro_isqrt_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_isqrt_base);
 }
 
-READ32_MEMBER(model2_tgp_state::copro_isqrt_r)
+u32 model2_tgp_state::copro_isqrt_r(offs_t offset)
 {
 	offs_t index = 0x2000 ^ (((m_copro_isqrt_base>> 10) & 0x3ffe) | (offset & 1));
 	u32 result = m_copro_tgp_tables[index | 0xc000];
@@ -540,13 +540,13 @@ READ32_MEMBER(model2_tgp_state::copro_isqrt_r)
 	return result;
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_atan_w)
+void model2_tgp_state::copro_atan_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_atan_base[offset]);
 	m_copro_tgp->gpio0_w((m_copro_atan_base[0] & 0x7fffffff) <= (m_copro_atan_base[1] & 0x7fffffff));
 }
 
-READ32_MEMBER(model2_tgp_state::copro_atan_r)
+u32 model2_tgp_state::copro_atan_r()
 {
 	u8 ie = 0x88 - (m_copro_atan_base[3] >> 23);
 
@@ -571,10 +571,10 @@ READ32_MEMBER(model2_tgp_state::copro_atan_r)
 	return result & 0xffff;
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_function_port_w)
+void model2_tgp_state::copro_function_port_w(offs_t offset, u32 data)
 {
-	uint32_t d = data & 0x800fffff;
-	uint32_t a = (offset >> 2) & 0xff;
+	u32 d = data & 0x800fffff;
+	u32 a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
 	m_copro_fifo_in->push(u32(d));
@@ -591,13 +591,13 @@ void model2_tgp_state::copro_boot()
 	m_copro_tgp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-READ32_MEMBER(model2_tgp_state::copro_fifo_r)
+u32 model2_tgp_state::copro_fifo_r()
 {
 	m_maincpu->i960_noburst();
 	return m_copro_fifo_out->pop();
 }
 
-WRITE32_MEMBER(model2_tgp_state::copro_fifo_w)
+void model2_tgp_state::copro_fifo_w(u32 data)
 {
 	m_maincpu->i960_noburst();
 	if (m_coproctl & 0x80000000)
@@ -613,12 +613,12 @@ WRITE32_MEMBER(model2_tgp_state::copro_fifo_w)
 
 // Coprocessor - SHARC
 
-READ32_MEMBER(model2b_state::copro_sharc_buffer_r)
+u32 model2b_state::copro_sharc_buffer_r(offs_t offset)
 {
 	return m_bufferram[offset & 0x7fff];
 }
 
-WRITE32_MEMBER(model2b_state::copro_sharc_buffer_w)
+void model2b_state::copro_sharc_buffer_w(offs_t offset, u32 data)
 {
 	m_bufferram[offset & 0x7fff] = data;
 }
@@ -640,13 +640,13 @@ void model2b_state::copro_boot()
 	m_copro_adsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ32_MEMBER(model2b_state::copro_fifo_r)
+u32 model2b_state::copro_fifo_r()
 {
 	m_maincpu->i960_noburst();
 	return m_copro_fifo_out->pop();
 }
 
-WRITE32_MEMBER(model2b_state::copro_fifo_w)
+void model2b_state::copro_fifo_w(u32 data)
 {
 	m_maincpu->i960_noburst();
 	if (m_coproctl & 0x80000000)
@@ -660,7 +660,7 @@ WRITE32_MEMBER(model2b_state::copro_fifo_w)
 	}
 }
 
-WRITE32_MEMBER(model2b_state::copro_sharc_iop_w)
+void model2b_state::copro_sharc_iop_w(offs_t offset, u32 data)
 {
 	/* FIXME: clean this mess */
 	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
@@ -698,10 +698,10 @@ WRITE32_MEMBER(model2b_state::copro_sharc_iop_w)
 	}
 }
 
-WRITE32_MEMBER(model2b_state::copro_function_port_w)
+void model2b_state::copro_function_port_w(offs_t offset, u32 data)
 {
-	uint32_t d = data & 0x800fffff;
-	uint32_t a = (offset >> 2) & 0xff;
+	u32 d = data & 0x800fffff;
+	u32 a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
 	m_copro_fifo_in->push(u32(d));
@@ -719,13 +719,13 @@ void model2c_state::copro_boot()
 	m_copro_tgpx4->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ32_MEMBER(model2c_state::copro_fifo_r)
+u32 model2c_state::copro_fifo_r()
 {
 	m_maincpu->i960_noburst();
 	return m_copro_fifo_out->pop();
 }
 
-WRITE32_MEMBER(model2c_state::copro_fifo_w)
+void model2c_state::copro_fifo_w(u32 data)
 {
 	m_maincpu->i960_noburst();
 	if (m_coproctl & 0x80000000)
@@ -749,10 +749,10 @@ WRITE32_MEMBER(model2c_state::copro_fifo_w)
 	}
 }
 
-WRITE32_MEMBER(model2c_state::copro_function_port_w)
+void model2c_state::copro_function_port_w(offs_t offset, u32 data)
 {
-	uint32_t d = data & 0x800fffff;
-	uint32_t a = (offset >> 2) & 0xff;
+	u32 d = data & 0x800fffff;
+	u32 a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
 	m_copro_fifo_in->push(u32(d));
@@ -775,7 +775,7 @@ void model2c_state::copro_tgpx4_data_map(address_map &map)
 /* GEO */
 
 
-WRITE32_MEMBER(model2_state::geo_ctl1_w)
+void model2_state::geo_ctl1_w(u32 data)
 {
 	// did hi bit change?
 	if ((data ^ m_geoctl) == 0x80000000)
@@ -794,20 +794,20 @@ WRITE32_MEMBER(model2_state::geo_ctl1_w)
 	m_geoctl = data;
 }
 
-void model2_state::push_geo_data(uint32_t data)
+void model2_state::push_geo_data(u32 data)
 {
 	//osd_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
 	m_bufferram[m_geo_write_start_address/4] = data;
 	m_geo_write_start_address += 4;
 }
 
-READ32_MEMBER(model2_state::geo_prg_r)
+u32 model2_state::geo_prg_r(offs_t offset)
 {
 	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(model2_state::geo_prg_w)
+void model2_state::geo_prg_w(u32 data)
 {
 	if (m_geoctl & 0x80000000)
 	{
@@ -821,7 +821,7 @@ WRITE32_MEMBER(model2_state::geo_prg_w)
 	}
 }
 
-READ32_MEMBER(model2_state::geo_r)
+u32 model2_state::geo_r(offs_t offset)
 {
 	int address = offset * 4;
 	if (address == 0x2008)
@@ -839,7 +839,7 @@ READ32_MEMBER(model2_state::geo_r)
 	return 0;
 }
 
-WRITE32_MEMBER(model2_state::geo_w)
+void model2_state::geo_w(offs_t offset, u32 data)
 {
 	int address = offset * 4;
 
@@ -848,7 +848,7 @@ WRITE32_MEMBER(model2_state::geo_w)
 		/*if (data & 0x80000000)
 		{
 		    int i;
-		    uint32_t a;
+		    u32 a;
 		    osd_printf_debug("GEO: jump to %08X\n", (data & 0xfffff));
 		    a = (data & 0xfffff) / 4;
 		    for (i=0; i < 4; i++)
@@ -875,7 +875,7 @@ WRITE32_MEMBER(model2_state::geo_w)
 
 		if (data & 0x80000000)
 		{
-			uint32_t r = 0;
+			u32 r = 0;
 			r |= data & 0x800fffff;
 			r |= ((address >> 4) & 0x3f) << 23;
 			push_geo_data(r);
@@ -884,12 +884,12 @@ WRITE32_MEMBER(model2_state::geo_w)
 		{
 			if ((address & 0xf) == 0)
 			{
-				uint32_t r = 0;
+				u32 r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
 				if((address >> 4) & 0xc0)
 				{
-					uint8_t function = (address >> 4) & 0x3f;
+					u8 function = (address >> 4) & 0x3f;
 					if(function == 1)
 					{
 						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
@@ -918,21 +918,21 @@ WRITE32_MEMBER(model2_state::geo_w)
 
 /*****************************************************************************/
 
-READ32_MEMBER(model2_state::irq_request_r)
+u32 model2_state::irq_request_r()
 {
 	m_maincpu->i960_noburst();
 
 	return m_intreq;
 }
 
-READ32_MEMBER(model2_state::irq_enable_r)
+u32 model2_state::irq_enable_r()
 {
 	m_maincpu->i960_noburst();
 
 	return m_intena;
 }
 
-WRITE32_MEMBER(model2_state::irq_ack_w)
+void model2_state::irq_ack_w(u32 data)
 {
 	m_maincpu->i960_noburst();
 
@@ -941,7 +941,7 @@ WRITE32_MEMBER(model2_state::irq_ack_w)
 	model2_check_irqack_state(data ^ 0xffffffff);
 }
 
-WRITE32_MEMBER(model2_state::irq_enable_w)
+void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_maincpu->i960_noburst();
 
@@ -966,7 +966,7 @@ void model2_state::model2_check_irq_state()
 	}
 }
 
-void model2_state::model2_check_irqack_state(uint32_t data)
+void model2_state::model2_check_irqack_state(u32 data)
 {
 	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
 
@@ -978,7 +978,7 @@ void model2_state::model2_check_irqack_state(uint32_t data)
 }
 
 /* TODO: rewrite this part. It's a 8251-compatible chip */
-READ32_MEMBER(model2_state::model2_serial_r)
+u32 model2_state::model2_serial_r(offs_t offset, u32 mem_mask)
 {
 	if (offset == 0)
 	{
@@ -994,7 +994,7 @@ READ32_MEMBER(model2_state::model2_serial_r)
 }
 
 
-WRITE32_MEMBER(model2_state::model2_serial_w)
+void model2_state::model2_serial_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
@@ -1017,7 +1017,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(model2_state::copro_w)
+void model2_state::copro_w(offs_t offset, u32 data)
 {
 	int address = offset * 4;
 
@@ -1036,12 +1036,12 @@ WRITE32_MEMBER(model2_state::copro_w)
 }
 #endif
 
-READ32_MEMBER(model2_state::render_mode_r)
+u32 model2_state::render_mode_r()
 {
 	return (m_render_unk << 14) | (m_render_mode << 2) | (m_render_test_mode << 0);
 }
 
-WRITE32_MEMBER(model2_state::render_mode_w)
+void model2_state::render_mode_w(u32 data)
 {
 	// ---- -x-- (1) 60 Hz mode
 	//           (0) 30 Hz mode - skytargt, desert, vstriker, vcop
@@ -1056,7 +1056,7 @@ WRITE32_MEMBER(model2_state::render_mode_w)
 //  osd_printf_debug("Mode = %08X\n", data);
 }
 
-WRITE32_MEMBER(model2_tgp_state::tex0_w)
+void model2_tgp_state::tex0_w(offs_t offset, u32 data)
 {
 	if ( (offset & 1) == 0 )
 	{
@@ -1070,7 +1070,7 @@ WRITE32_MEMBER(model2_tgp_state::tex0_w)
 	}
 }
 
-WRITE32_MEMBER(model2_tgp_state::tex1_w)
+void model2_tgp_state::tex1_w(offs_t offset, u32 data)
 {
 	if ( (offset & 1) == 0 )
 	{
@@ -1084,28 +1084,28 @@ WRITE32_MEMBER(model2_tgp_state::tex1_w)
 	}
 }
 
-READ16_MEMBER(model2_state::lumaram_r)
+u16 model2_state::lumaram_r(offs_t offset)
 {
 	return m_lumaram[offset];
 }
 
-WRITE16_MEMBER(model2_state::lumaram_w)
+void model2_state::lumaram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_lumaram[offset]);
 }
 
 /* Top Skater reads here and discards the result */
-READ8_MEMBER(model2_state::tgpid_r)
+u8 model2_state::tgpid_r(offs_t offset)
 {
 	unsigned char ID[]={0,'T','A','H',0,'A','K','O',0,'Z','A','K',0,'M','T','K'};
 
 	return ID[offset];
 }
 
-READ16_MEMBER(model2_state::fbvram_bankA_r) { return m_fbvramA[offset]; }
-READ16_MEMBER(model2_state::fbvram_bankB_r) { return m_fbvramB[offset]; }
-WRITE16_MEMBER(model2_state::fbvram_bankA_w) { COMBINE_DATA(&m_fbvramA[offset]); }
-WRITE16_MEMBER(model2_state::fbvram_bankB_w) { COMBINE_DATA(&m_fbvramB[offset]); }
+u16 model2_state::fbvram_bankA_r(offs_t offset) { return m_fbvramA[offset]; }
+u16 model2_state::fbvram_bankB_r(offs_t offset) { return m_fbvramB[offset]; }
+void model2_state::fbvram_bankA_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_fbvramA[offset]); }
+void model2_state::fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_fbvramB[offset]); }
 
 /* common map for all Model 2 versions */
 void model2_state::model2_base_mem(address_map &map)
@@ -1182,27 +1182,27 @@ void model2_state::model2_5881_mem(address_map &map)
 // Interface board ID: 837-12079
 // ALTERA FLEX + Sega 315-5338A
 
-READ8_MEMBER( model2_state::lightgun_data_r )
+u8 model2_state::lightgun_data_r(offs_t offset)
 {
-	uint16_t data = m_lightgun_ports[offset >> 1].read_safe(0);
+	u16 data = m_lightgun_ports[offset >> 1].read_safe(0);
 	return BIT(offset, 0) ? (data >> 8) : data;
 }
 
-READ8_MEMBER( model2_state::lightgun_mux_r )
+u8 model2_state::lightgun_mux_r()
 {
 	if (m_lightgun_mux < 8)
-		return lightgun_data_r(space, m_lightgun_mux);
+		return lightgun_data_r(m_lightgun_mux);
 	else
-		return lightgun_offscreen_r(space, 0);
+		return lightgun_offscreen_r(0);
 }
 
-WRITE8_MEMBER( model2_state::lightgun_mux_w )
+void model2_state::lightgun_mux_w(u8 data)
 {
 	m_lightgun_mux = data;
 }
 
 // handles offscreen gun trigger detection here
-READ8_MEMBER( model2_state::lightgun_offscreen_r )
+u8 model2_state::lightgun_offscreen_r(offs_t offset)
 {
 	// 5 percent border size
 	const float BORDER_SIZE = 0.05f;
@@ -1213,12 +1213,12 @@ READ8_MEMBER( model2_state::lightgun_offscreen_r )
 	const int BORDER_P2X = (m_lightgun_ports[3]->field(0x3ff)->maxval() - m_lightgun_ports[3]->field(0x3ff)->minval()) * BORDER_SIZE;
 	const int BORDER_P2Y = (m_lightgun_ports[2]->field(0x3ff)->maxval() - m_lightgun_ports[2]->field(0x3ff)->minval()) * BORDER_SIZE;
 
-	uint16_t data = 0xfffc;
+	u16 data = 0xfffc;
 
-	const uint16_t P1X = m_lightgun_ports[1].read_safe(0);
-	const uint16_t P1Y = m_lightgun_ports[0].read_safe(0);
-	const uint16_t P2X = m_lightgun_ports[3].read_safe(0);
-	const uint16_t P2Y = m_lightgun_ports[2].read_safe(0);
+	const u16 P1X = m_lightgun_ports[1].read_safe(0);
+	const u16 P1Y = m_lightgun_ports[0].read_safe(0);
+	const u16 P2X = m_lightgun_ports[3].read_safe(0);
+	const u16 P2Y = m_lightgun_ports[2].read_safe(0);
 
 	// border hit test for player 1 and 2
 	if (P1X <= (m_lightgun_ports[1]->field(0x3ff)->minval() + BORDER_P1X)) data |= 1;
@@ -1238,7 +1238,7 @@ READ8_MEMBER( model2_state::lightgun_offscreen_r )
 //  OUTPUTS
 //**************************************************************************
 
-WRITE8_MEMBER( model2o_state::daytona_output_w )
+void model2o_state::daytona_output_w(u8 data)
 {
 	// 7-------  leader led
 	// -6------  vr4 led
@@ -1253,7 +1253,7 @@ WRITE8_MEMBER( model2o_state::daytona_output_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model2o_state::desert_output_w )
+void model2o_state::desert_output_w(u8 data)
 {
 	// 7-------  cannon motor
 	// -6------  machine gun motor
@@ -1268,7 +1268,7 @@ WRITE8_MEMBER( model2o_state::desert_output_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model2o_state::vcop_output_w )
+void model2o_state::vcop_output_w(u8 data)
 {
 	// 7654----  unknown (not used?)
 	// ----32--  start leds (always set together)
@@ -1318,9 +1318,9 @@ void model2o_state::model2o_mem(address_map &map)
 }
 
 /* Daytona "To The MAXX" PIC protection simulation */
-READ32_MEMBER(model2o_maxx_state::maxx_r)
+u32 model2o_maxx_state::maxx_r(offs_t offset, u32 mem_mask)
 {
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1365,9 +1365,9 @@ void model2o_maxx_state::model2o_maxx_mem(address_map &map)
 	map(0x00240000, 0x0024ffff).r(FUNC(model2o_maxx_state::maxx_r));
 }
 
-READ8_MEMBER(model2o_gtx_state::gtx_r)
+u8 model2o_gtx_state::gtx_r(offs_t offset)
 {
-	uint8_t *ROM = memregion("prot_data")->base();
+	u8 *ROM = memregion("prot_data")->base();
 
 	if(offset == 0xffffc) // disable protection ROM overlay (fallbacks to data rom?)
 		m_gtx_state = 2;
@@ -1386,7 +1386,7 @@ void model2o_gtx_state::model2o_gtx_mem(address_map &map)
 }
 
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
-READ32_MEMBER(model2_state::copro_status_r)
+u32 model2_state::copro_status_r()
 {
 	if(m_coprocnt == 0)
 		return -1;
@@ -1569,9 +1569,9 @@ void model2c_state::model2c_5881_mem(address_map &map)
 */
 
 // simulate this so that it passes the initial checks
-READ8_MEMBER( model2_state::rchase2_drive_board_r )
+u8 model2_state::rchase2_drive_board_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	if(m_cmd_data == 0xe0 || m_cmd_data == 0x0e)
 		data &= ~1;
@@ -1585,12 +1585,12 @@ READ8_MEMBER( model2_state::rchase2_drive_board_r )
 	return data;
 }
 
-WRITE8_MEMBER( model2_state::rchase2_drive_board_w )
+void model2_state::rchase2_drive_board_w(u8 data)
 {
 	m_cmd_data = data;
 }
 
-WRITE8_MEMBER( model2_state::drive_board_w )
+void model2_state::drive_board_w(u8 data)
 {
 	m_driveio_comm_data = data;
 	m_drivecpu->set_input_line(0, HOLD_LINE);
@@ -1601,7 +1601,7 @@ WRITE8_MEMBER( model2_state::drive_board_w )
 //  INPUT HANDLING
 //**************************************************************************
 
-WRITE8_MEMBER( model2_state::eeprom_w )
+void model2_state::eeprom_w(u8 data)
 {
 	m_ctrlmode = BIT(data, 0);
 
@@ -1610,9 +1610,9 @@ WRITE8_MEMBER( model2_state::eeprom_w )
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( model2_state::in0_r )
+u8 model2_state::in0_r()
 {
-	uint8_t data = m_in0->read();
+	u8 data = m_in0->read();
 
 	if (m_ctrlmode)
 		return (0xc0) | (m_eeprom->do_read() << 5) | (0x10) | (data & 0x0f);
@@ -1633,9 +1633,9 @@ READ8_MEMBER( model2_state::in0_r )
 // Used by Sega Rally and Daytona USA, others might be different
 CUSTOM_INPUT_MEMBER(model2_state::daytona_gearbox_r)
 {
-	uint8_t res = m_gears.read_safe(0);
+	u8 res = m_gears.read_safe(0);
 	int i;
-	const uint8_t gearvalue[5] = { 0, 2, 1, 6, 5 };
+	const u8 gearvalue[5] = { 0, 2, 1, 6, 5 };
 
 	for(i=0;i<5;i++)
 	{
@@ -2419,12 +2419,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2c_state::model2c_interrupt)
 
 /* Model 2 sound board emulation */
 
-WRITE16_MEMBER(model2_state::model2snd_ctrl)
+void model2_state::model2snd_ctrl(u16 data)
 {
 	// handle sample banking
 	if (memregion("samples")->bytes() > 0x800000)
 	{
-		uint8_t *snd = memregion("samples")->base();
+		u8 *snd = memregion("samples")->base();
 		if (data & 0x20)
 		{
 			membank("bank4")->set_base(snd + 0x200000);
@@ -2454,7 +2454,7 @@ void model2_state::scsp_map(address_map &map)
 	map(0x000000, 0x07ffff).ram().share("soundram");
 }
 
-WRITE8_MEMBER(model2_state::scsp_irq)
+void model2_state::scsp_irq(offs_t offset, u8 data)
 {
 	m_audiocpu->set_input_line(offset, data);
 }
@@ -2571,17 +2571,17 @@ void model2o_state::model2o(machine_config &config)
 	M2COMM(config, "m2comm", 0);
 }
 
-READ8_MEMBER(model2_state::driveio_portg_r)
+u8 model2_state::driveio_portg_r()
 {
 	return m_driveio_comm_data;
 }
 
-READ8_MEMBER(model2_state::driveio_porth_r)
+u8 model2_state::driveio_porth_r()
 {
 	return m_driveio_comm_data;
 }
 
-WRITE8_MEMBER(model2_state::driveio_port_w)
+void model2_state::driveio_port_w(u8 data)
 {
 //  TODO: hook up to the main CPU
 //  popmessage("%02x",data);
@@ -2710,7 +2710,7 @@ void model2a_state::model2a(machine_config &config)
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
-	io.out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
+	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2774,9 +2774,9 @@ void model2a_state::skytargt(machine_config &config)
 	io.an_port_callback<2>().set_ioport("STICKX");
 }
 
-uint16_t model2_state::crypt_read_callback(uint32_t addr)
+u16 model2_state::crypt_read_callback(u32 addr)
 {
-	uint16_t dat= m_maincpu->space().read_word((0x1d80000+2*addr));
+	u16 dat= m_maincpu->space().read_word((0x1d80000+2*addr));
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
@@ -2835,7 +2835,7 @@ void model2b_state::model2b(machine_config &config)
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
-	io.out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
+	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
 
 	model2_timers(config);
 	model2_screen(config);
@@ -6967,20 +6967,20 @@ ROM_END
 void model2_state::init_pltkids()
 {
 	// fix bug in program: it destroys the interrupt table and never fixes it
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
 void model2_state::init_zerogun()
 {
 	// fix bug in program: it destroys the interrupt table and never fixes it
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
 void model2_state::init_sgt24h()
 {
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
@@ -6993,20 +6993,20 @@ void model2_state::init_powsledm ()
 	ROM[0x1585D] = 0xFD; // inverted node ID
 }
 
-READ32_MEMBER(model2_state::doa_prot_r)
+u32 model2_state::doa_prot_r(offs_t offset, u32 mem_mask)
 {
 	// doa only reads 16-bits at a time, while STV reads 32-bits
 	uint32 ret = 0;
 
-	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r(space,0,0xffff)<<16);
-	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r(space,0,0xffff);
+	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r()<<16);
+	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r();
 
 	return ret;
 }
 
-READ32_MEMBER(model2_state::doa_unk_r)
+u32 model2_state::doa_unk_r()
 {
-	uint32_t retval = 0;
+	u32 retval = 0;
 
 	// this actually looks a busy status flag
 	m_prot_a = !m_prot_a;
@@ -7039,7 +7039,7 @@ void model2_state::model2_0229_mem(address_map &map)
 
 void model2_state::init_doa()
 {
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x630 / 4] = 0x08000004;
 	ROM[0x808 / 4] = 0x08000004;
 

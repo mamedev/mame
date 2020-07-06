@@ -37,7 +37,7 @@ public:
 	acorn_vidc10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O operations
-	DECLARE_WRITE32_MEMBER( write );
+	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_READ_LINE_MEMBER( flyback_r );
 	auto vblank() { return m_vblank_cb.bind(); }
 	auto sound_drq() { return m_sound_drq_cb.bind(); }
@@ -99,12 +99,12 @@ private:
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
-	DECLARE_WRITE32_MEMBER( pal_data_display_w );
-	DECLARE_WRITE32_MEMBER( pal_data_cursor_w );
-	DECLARE_WRITE32_MEMBER( stereo_image_w );
-	DECLARE_WRITE32_MEMBER( crtc_w );
-	DECLARE_WRITE32_MEMBER( sound_frequency_w );
-	DECLARE_WRITE32_MEMBER( control_w );
+	void pal_data_display_w(offs_t offset, u32 data);
+	void pal_data_cursor_w(offs_t offset, u32 data);
+	void stereo_image_w(offs_t offset, u32 data);
+	void crtc_w(offs_t offset, u32 data);
+	void sound_frequency_w(u32 data);
+	void control_w(u32 data);
 
 	u8 m_pixel_clock;
 	bool m_cursor_enable;
@@ -168,14 +168,14 @@ protected:
 	const double m_sound_internal_divider = 1.0;
 
 private:
-	DECLARE_WRITE32_MEMBER( vidc20_pal_data_display_w );
-	DECLARE_WRITE32_MEMBER( vidc20_pal_data_index_w );
-	DECLARE_WRITE32_MEMBER( vidc20_pal_data_cursor_w );
-	DECLARE_WRITE32_MEMBER( vidc20_crtc_w );
-	DECLARE_WRITE32_MEMBER( vidc20_control_w );
-	DECLARE_WRITE32_MEMBER( vidc20_sound_frequency_w );
-	DECLARE_WRITE32_MEMBER( vidc20_sound_control_w );
-	DECLARE_WRITE32_MEMBER( fsynreg_w );
+	void vidc20_pal_data_display_w(offs_t offset, u32 data);
+	void vidc20_pal_data_index_w(u32 data);
+	void vidc20_pal_data_cursor_w(offs_t offset, u32 data);
+	void vidc20_crtc_w(offs_t offset, u32 data);
+	void vidc20_control_w(u32 data);
+	void vidc20_sound_frequency_w(u32 data);
+	void vidc20_sound_control_w(u32 data);
+	void fsynreg_w(u32 data);
 
 	u8 m_pal_data_index;
 	inline void update_8bpp_palette(u16 index, u32 paldata);

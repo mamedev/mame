@@ -19,12 +19,12 @@ public:
 	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04) override { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom0c) override { if (m_subslot->exists()) return m_subslot->read_rom0c(space, offset); else return 0xff; }
+	virtual uint8_t read_rom04(offs_t offset) override { if (m_subslot->exists()) return m_subslot->read_rom04(offset); else return 0xff; }
+	virtual uint8_t read_rom0c(offs_t offset) override { if (m_subslot->exists()) return m_subslot->read_rom0c(offset); else return 0xff; }
 
 	virtual void write_bank(int bank) override   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
 
-	virtual DECLARE_WRITE8_MEMBER(io_write) override;
+	virtual void io_write(offs_t offset, uint8_t data) override;
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) override { return m_speech->lrq_r() ? 0 : 1; }
 
 protected:

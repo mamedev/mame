@@ -27,8 +27,6 @@ public:
 
 	virtual void map(address_map &map) = 0;
 
-	uint8_t sra_r();
-	uint8_t srb_r();
 	uint8_t dor_r();
 	void dor_w(uint8_t data);
 	uint8_t tdr_r();
@@ -54,7 +52,6 @@ public:
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
-	void set_mode(mode_t mode);
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
 	void set_floppy(floppy_image_device *image);
@@ -238,6 +235,8 @@ protected:
 
 	bool external_ready;
 
+	int recalibrate_steps;
+
 	mode_t mode;
 	int main_phase;
 
@@ -251,8 +250,8 @@ protected:
 	bool fifo_write;
 	uint8_t dor, dsr, msr, fifo[16], command[16], result[16];
 	uint8_t st1, st2, st3;
-	uint8_t fifocfg, motorcfg, dor_reset;
-	uint8_t precomp, perpmode;
+	uint8_t fifocfg, dor_reset;
+	uint8_t precomp;
 	uint16_t spec;
 	int sector_size;
 	int cur_rate;
@@ -283,6 +282,7 @@ protected:
 		C_SCAN_LOW,
 		C_SCAN_HIGH,
 		C_MOTOR_ONOFF,
+		C_VERSION,
 
 		C_INVALID,
 		C_INCOMPLETE
@@ -307,6 +307,7 @@ protected:
 	virtual void start_command(int cmd);
 	virtual void execute_command(int cmd);
 	virtual void command_end(floppy_info &fi, bool data_completion);
+	virtual uint8_t get_st3(floppy_info &fi);
 
 	void recalibrate_start(floppy_info &fi);
 	void seek_start(floppy_info &fi);
@@ -422,13 +423,33 @@ protected:
 	void motor_control(int fid, bool start_motor);
 
 private:
+	u8 motorcfg;
 	u8 motor_off_counter;
 	u8 motor_on_counter;
 	u8 drive_busy;
 	int delayed_command;
 };
 
-class smc37c78_device : public upd765_family_device {
+class ps2_fdc_device : public upd765_family_device {
+public:
+	void set_mode(mode_t mode);
+
+	uint8_t sra_r();
+	uint8_t srb_r();
+
+protected:
+	ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void soft_reset() override;
+	virtual int check_command() override;
+	virtual void execute_command(int cmd) override;
+
+	uint8_t perpmode;
+};
+
+class smc37c78_device : public ps2_fdc_device {
 public:
 	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -465,10 +486,10 @@ public:
 	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class n82077aa_device : public upd765_family_device {
+class n82077aa_device : public ps2_fdc_device {
 public:
-	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, mode_t mode)
-		: n82077aa_device(mconfig, tag, owner, 0U)
+	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, mode_t mode)
+		: n82077aa_device(mconfig, tag, owner, clock)
 	{
 		set_mode(mode);
 	}
@@ -491,8 +512,13 @@ public:
 	virtual void map(address_map &map) override;
 };
 
-class pc8477a_device : public upd765_family_device {
+class pc8477a_device : public ps2_fdc_device {
 public:
+	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, mode_t mode)
+		: pc8477a_device(mconfig, tag, owner, clock)
+	{
+		set_mode(mode);
+	}
 	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
@@ -513,6 +539,7 @@ public:
 	void set_clock2(const XTAL &xtal) { set_clock2(xtal.value()); }
 
 	virtual void map(address_map &map) override;
+	virtual uint8_t get_st3(floppy_info &fi) override;
 
 private:
 	uint32_t m_clock2;

@@ -239,16 +239,16 @@ public:
 	void sms(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(link_r);
-	DECLARE_WRITE8_MEMBER(link_w);
-	DECLARE_READ8_MEMBER(z80_8088_r);
-	DECLARE_READ8_MEMBER(p03_r);
-	DECLARE_WRITE8_MEMBER(p03_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(ppi0_c_r);
-	DECLARE_WRITE8_MEMBER(ppi0_a_w);
-	DECLARE_WRITE8_MEMBER(ppi0_b_w);
+	void bankswitch_w(uint8_t data);
+	uint8_t link_r(offs_t offset);
+	void link_w(offs_t offset, uint8_t data);
+	uint8_t z80_8088_r();
+	uint8_t p03_r(offs_t offset);
+	void p03_w(offs_t offset, uint8_t data);
+	void video_w(offs_t offset, uint8_t data);
+	uint8_t ppi0_c_r();
+	void ppi0_a_w(uint8_t data);
+	void ppi0_b_w(uint8_t data);
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sms_map(address_map &map);
@@ -275,7 +275,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(smsmfg_state::bankswitch_w)
+void smsmfg_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -286,7 +286,7 @@ WRITE8_MEMBER(smsmfg_state::bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::link_r)
+uint8_t smsmfg_state::link_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -302,7 +302,7 @@ READ8_MEMBER(smsmfg_state::link_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::link_w)
+void smsmfg_state::link_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -317,12 +317,12 @@ WRITE8_MEMBER(smsmfg_state::link_w)
 	}
 }
 
-READ8_MEMBER(smsmfg_state::z80_8088_r)
+uint8_t smsmfg_state::z80_8088_r()
 {
 	return m_communication_port_status;
 }
 
-READ8_MEMBER(smsmfg_state::p03_r)
+uint8_t smsmfg_state::p03_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -336,7 +336,7 @@ READ8_MEMBER(smsmfg_state::p03_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::p03_w)
+void smsmfg_state::p03_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -396,7 +396,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::ppi0_c_r)
+uint8_t smsmfg_state::ppi0_c_r()
 {
 /*
   PC7 - unused
@@ -414,7 +414,7 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
+void smsmfg_state::ppi0_a_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
 	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
@@ -427,7 +427,7 @@ WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 	m_lamps[7] = BIT(~data, 0); /* Draw Light */
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
+void smsmfg_state::ppi0_b_w(uint8_t data)
 {
 	m_lamps[8] = BIT(~data, 7); /* Stand Light */
 	m_lamps[9] = BIT(~data, 6); /* Cancel Light */
@@ -443,7 +443,7 @@ WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(smsmfg_state::video_w)
+void smsmfg_state::video_w(offs_t offset, uint8_t data)
 {
 	m_vid_regs[offset] = data;
 	if ( offset == 5 )

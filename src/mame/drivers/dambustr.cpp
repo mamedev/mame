@@ -75,14 +75,14 @@ private:
 	required_device<galaxian_sound_device> m_custom;
 
 	int m_noise_data;
-	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
+	void dambustr_noise_enable_w(uint8_t data);
 	void dambustr_map(address_map &map);
 };
 
 
 
 /* FIXME: Really needed? - Should be handled by either interface */
-WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
+void dambustr_state::dambustr_noise_enable_w(uint8_t data)
 {
 	if (data != m_noise_data) {
 		m_noise_data = data;

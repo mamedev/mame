@@ -1197,7 +1197,7 @@ Addresses found at @0x510, cpu2
 
 */
 
-WRITE8_MEMBER(dkong_state::m58817_command_w)
+void dkong_state::m58817_command_w(uint8_t data)
 {
 	m_m58817->ctl_w(data & 0x0f);
 	m_m58817->pdc_w((data>>4) & 0x01);
@@ -1211,7 +1211,7 @@ WRITE8_MEMBER(dkong_state::m58817_command_w)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_voice_w)
+void dkong_state::dkong_voice_w(uint8_t data)
 {
 	/* only provided for documentation purposes
 	 * not actually used
@@ -1219,7 +1219,7 @@ WRITE8_MEMBER(dkong_state::dkong_voice_w)
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
-READ8_MEMBER(dkong_state::dkong_voice_status_r)
+uint8_t dkong_state::dkong_voice_status_r()
 {
 	/* only provided for documentation purposes
 	 * not actually used
@@ -1227,13 +1227,13 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 	return 0;
 }
 
-READ8_MEMBER(dkong_state::dkong_tune_r)
+uint8_t dkong_state::dkong_tune_r(offs_t offset)
 {
 	uint8_t page = m_dev_vp2->read(0) & 0x47;
 
 	if ( page & 0x40 )
 	{
-		return (m_ls175_3d->read(0) & 0x0F) | (dkong_voice_status_r(space, 0) << 4);
+		return (m_ls175_3d->read(0) & 0x0F) | (dkong_voice_status_r() << 4);
 	}
 	else
 	{
@@ -1242,7 +1242,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_p1_w)
+void dkong_state::dkong_p1_w(uint8_t data)
 {
 	m_discrete->write(DS_DAC,data);
 }
@@ -1254,7 +1254,7 @@ WRITE8_MEMBER(dkong_state::dkong_p1_w)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
+void dkong_state::dkong_audio_irq_w(uint8_t data)
 {
 	if (data)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);

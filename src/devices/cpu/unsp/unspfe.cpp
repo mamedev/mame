@@ -24,7 +24,7 @@ unsp_frontend::unsp_frontend(unsp_device *unsp, uint32_t window_start, uint32_t 
 
 inline uint16_t unsp_frontend::read_op_word(opcode_desc &desc, int offset)
 {
-	return m_cpu->m_pr16(desc.physpc + offset);
+	return m_cpu->m_cache.read_word(desc.physpc + offset);
 }
 
 /*-------------------------------------------------

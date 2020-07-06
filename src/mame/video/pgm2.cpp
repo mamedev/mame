@@ -339,7 +339,7 @@ WRITE_LINE_MEMBER(pgm2_state::screen_vblank)
 	}
 }
 
-WRITE32_MEMBER(pgm2_state::fg_videoram_w)
+void pgm2_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -354,7 +354,7 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
 	tileinfo.set(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
-WRITE32_MEMBER(pgm2_state::bg_videoram_w)
+void pgm2_state::bg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);

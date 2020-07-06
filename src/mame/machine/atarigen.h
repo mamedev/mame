@@ -11,7 +11,6 @@
 #ifndef MAME_MACHINE_ATARIGEN_H
 #define MAME_MACHINE_ATARIGEN_H
 
-#include "includes/slapstic.h"
 #include "screen.h"
 
 
@@ -29,14 +28,7 @@ protected:
 	// users must call through to these
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// slapstic helpers
-	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);
-	void slapstic_update_bank(int bank);
-	DECLARE_WRITE16_MEMBER(slapstic_w);
-	DECLARE_READ16_MEMBER(slapstic_r);
 
 	// video helpers
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
@@ -51,22 +43,10 @@ protected:
 		TID_ATARIGEN_LAST
 	};
 
-	/* internal state */
-	u8               m_slapstic_num;
-	u16 *            m_slapstic;
-	u8               m_slapstic_bank;
-	std::vector<u8>  m_slapstic_bank0;
-	offs_t           m_slapstic_last_pc;
-	offs_t           m_slapstic_last_address;
-	offs_t           m_slapstic_base;
-	offs_t           m_slapstic_mirror;
-
-
 	required_device<cpu_device> m_maincpu;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
-	optional_device<atari_slapstic_device> m_slapstic_device;
 };
 
 

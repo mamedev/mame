@@ -12,6 +12,7 @@
 #include "debugwininfo.h"
 #include "uimetrics.h"
 #include "debugger.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
 #include "strconv.h"
@@ -207,7 +208,7 @@ bool debugview_info::source_is_visible_cpu() const
 	if (m_view != nullptr)
 	{
 		const debug_view_source *const source = m_view->source();
-		return (source != nullptr) && (machine().debugger().cpu().get_visible_cpu() == source->device());
+		return (source != nullptr) && (machine().debugger().console().get_visible_cpu() == source->device());
 	}
 	return false;
 }
@@ -245,7 +246,7 @@ bool debugview_info::set_source_for_device(device_t &device)
 
 bool debugview_info::set_source_for_visible_cpu()
 {
-	device_t *const curcpu = machine().debugger().cpu().get_visible_cpu();
+	device_t *const curcpu = machine().debugger().console().get_visible_cpu();
 	if (curcpu != nullptr)
 		return set_source_for_device(*curcpu);
 	else

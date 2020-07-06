@@ -71,7 +71,7 @@ void cms_fdc_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfc50, 0xfc5f, read8_delegate(*this, FUNC(cms_fdc_device::wd1770_state_r)), write8_delegate(*this, FUNC(cms_fdc_device::wd1770_control_w)));
+	space.install_readwrite_handler(0xfc50, 0xfc5f, read8smo_delegate(*this, FUNC(cms_fdc_device::wd1770_state_r)), write8smo_delegate(*this, FUNC(cms_fdc_device::wd1770_control_w)));
 	space.install_readwrite_handler(0xfc40, 0xfc4f, read8sm_delegate(*m_fdc, FUNC(wd1770_device::read)), write8sm_delegate(*m_fdc, FUNC(wd1770_device::write)));
 }
 
@@ -80,7 +80,7 @@ void cms_fdc_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(cms_fdc_device::wd1770_state_r)
+uint8_t cms_fdc_device::wd1770_state_r()
 {
 	uint8_t data = 0x3f;
 
@@ -90,7 +90,7 @@ READ8_MEMBER(cms_fdc_device::wd1770_state_r)
 	return data;
 }
 
-WRITE8_MEMBER(cms_fdc_device::wd1770_control_w)
+void cms_fdc_device::wd1770_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

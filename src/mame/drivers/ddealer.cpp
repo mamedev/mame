@@ -145,10 +145,10 @@ public:
 	void init_ddealer();
 
 private:
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(back_vram_w);
-	DECLARE_WRITE16_MEMBER(mcu_shared_w);
-	DECLARE_READ16_MEMBER(mcu_r);
+	void flipscreen_w(uint16_t data);
+	void back_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mcu_r();
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
@@ -188,7 +188,7 @@ private:
 
 
 
-WRITE16_MEMBER(ddealer_state::flipscreen_w)
+void ddealer_state::flipscreen_w(uint16_t data)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -401,7 +401,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 
 
 
-WRITE16_MEMBER(ddealer_state::back_vram_w)
+void ddealer_state::back_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_vram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -429,7 +429,7 @@ Protection handling, identical to Hacha Mecha Fighter / Thunder Dragon with diff
 		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-WRITE16_MEMBER(ddealer_state::mcu_shared_w)
+void ddealer_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
 
@@ -634,7 +634,7 @@ void ddealer_state::ddealer(machine_config &config)
 
 
 
-READ16_MEMBER(ddealer_state::mcu_r)
+uint16_t ddealer_state::mcu_r()
 {
 	static const int resp[] =
 	{
@@ -657,7 +657,7 @@ READ16_MEMBER(ddealer_state::mcu_r)
 
 void ddealer_state::init_ddealer()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(*this, FUNC(ddealer_state::mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16smo_delegate(*this, FUNC(ddealer_state::mcu_r)));
 }
 
 ROM_START( ddealer )

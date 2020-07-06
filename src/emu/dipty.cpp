@@ -2,7 +2,7 @@
 // copyright-holders:F.Ulivi
 /***************************************************************************
 
-    dipty.h
+    dipty.cpp
 
     Device PTY interface
 

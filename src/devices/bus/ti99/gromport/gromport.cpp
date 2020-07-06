@@ -139,7 +139,7 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
     Reading via the GROM port. Only 13 address lines are passed through
     on the TI-99/4A, and 14 lines on the TI-99/8.
 */
-READ8Z_MEMBER(gromport_device::readz)
+void gromport_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_connector != nullptr)
 	{
@@ -161,7 +161,7 @@ void gromport_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(gromport_device::crureadz)
+void gromport_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if (m_connector != nullptr)
 		m_connector->crureadz(offset, value);

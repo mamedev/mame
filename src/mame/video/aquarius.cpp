@@ -41,14 +41,13 @@ void aquarius_state::aquarius_palette(palette_device &palette) const
 		palette.set_pen_indirect(i, aquarius_pens[i]);
 }
 
-WRITE8_MEMBER(aquarius_state::aquarius_videoram_w)
+void aquarius_state::aquarius_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(aquarius_state::aquarius_colorram_w)
+void aquarius_state::aquarius_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -56,9 +55,8 @@ WRITE8_MEMBER(aquarius_state::aquarius_colorram_w)
 
 TILE_GET_INFO_MEMBER(aquarius_state::aquarius_gettileinfo)
 {
-	uint8_t *videoram = m_videoram;
 	int bank = 0;
-	int code = videoram[tile_index];
+	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 	int flags = 0;
 

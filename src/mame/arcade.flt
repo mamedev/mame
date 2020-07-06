@@ -264,6 +264,7 @@ cps1bl_pic.cpp
 cps2.cpp
 cps3.cpp
 cpzodiac.cpp
+crazybal.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
@@ -342,6 +343,7 @@ dooyong.cpp
 dorachan.cpp
 dotrikun.cpp
 dragrace.cpp
+drdmania.cpp
 dreambal.cpp
 dreamwld.cpp
 drgnmst.cpp
@@ -581,6 +583,7 @@ jack.cpp
 jackal.cpp
 jackie.cpp
 jackpool.cpp
+jackpot.cpp
 jaguar.cpp
 jailbrek.cpp
 jalmah.cpp
@@ -1014,6 +1017,7 @@ re900.cpp
 realbrk.cpp
 redalert.cpp
 redclash.cpp
+regama.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
@@ -1062,6 +1066,7 @@ sbasketb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schick.cpp
 scm_500.cpp
 scobra.cpp
 scotrsht.cpp
@@ -1144,6 +1149,7 @@ slapshot.cpp
 sleic.cpp
 sliver.cpp
 slotcarn.cpp
+smotor.cpp
 smsmcorp.cpp
 sms_bootleg.cpp
 snesb.cpp

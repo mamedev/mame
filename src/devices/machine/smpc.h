@@ -1,10 +1,10 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
 // TODO: make separate device when code is decoupled better
-//DECLARE_WRITE8_MEMBER( stv_SMPC_w );
-//DECLARE_READ8_MEMBER( stv_SMPC_r );
-//DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
-//DECLARE_READ8_MEMBER( saturn_SMPC_r );
+//void stv_SMPC_w(offs_t offset, uint8_t data);
+//uint8_t stv_SMPC_r(offs_t offset);
+//void saturn_SMPC_w(offs_t offset, uint8_t data);
+//uint8_t saturn_SMPC_r(offs_t offset);
 
 #ifndef MAME_MACHINE_SMPC_HLE_H
 #define MAME_MACHINE_SMPC_HLE_H

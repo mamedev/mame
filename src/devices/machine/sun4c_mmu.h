@@ -15,6 +15,8 @@
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 
+#define SUN4CMMU_LOG_MEM_ACCESSES   (0)
+
 class sun4_mmu_base_device : public device_t, public sparc_mmu_interface
 {
 public:
@@ -30,12 +32,14 @@ public:
 		set_seg_entry_mask(seg_entry_mask);
 		set_page_entry_mask(page_entry_mask);
 		set_cache_mask(cache_mask);
+		set_cache_line_size(16);
 	}
 
 	template <typename T> void set_cpu(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
 	template <typename T> void set_ram(T &&ram_tag) { m_ram.set_tag(std::forward<T>(ram_tag)); }
 	template <typename T> void set_rom(T &&rom_tag) { m_rom.set_tag(std::forward<T>(rom_tag)); }
 	template <typename T> void set_scc(T &&scc_tag) { m_scc.set_tag(std::forward<T>(scc_tag)); }
+	void set_cache_line_size(uint32_t line_size) { m_cache_line_size = line_size; }
 
 	auto type1_r() { return m_type1_r.bind(); }
 	auto type1_w() { return m_type1_w.bind(); }
@@ -48,16 +52,22 @@ public:
 	void set_page_entry_mask(uint32_t page_entry_mask) { m_page_entry_mask = page_entry_mask; }
 	void set_cache_mask(uint32_t cache_mask) { m_cache_mask = cache_mask; }
 
+	enum perm_mode
+	{
+		USER_MODE,
+		SUPER_MODE
+	};
+
 	enum insn_data_mode
 	{
 		USER_INSN,
-		SUPER_INSN,
 		USER_DATA,
+		SUPER_INSN,
 		SUPER_DATA
 	};
 
-	template <insn_data_mode MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
-	template <insn_data_mode MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
+	template <insn_data_mode MODE> uint32_t insn_data_r(uint32_t offset, uint32_t mem_mask);
+	template <insn_data_mode MODE> void insn_data_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
 
 	uint32_t type1_timeout_r(uint32_t offset);
 	void type1_timeout_w(uint32_t offset, uint32_t data);
@@ -65,16 +75,42 @@ public:
 	void parity_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
 
 	// sparc_mmu_device overrides
-	uint32_t fetch_insn(const bool supervisor, const uint32_t offset) override;
-	uint32_t read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask) override;
-	void write_asi(uint8_t asi, uint32_t offset, uint32_t data, uint32_t mem_mask) override;
+	uint32_t fetch_insn(const bool supervisor, uint32_t offset) override;
 	void set_host(sparc_mmu_host_interface *host) override { m_host = host; }
+
+	uint32_t context_reg_r(uint32_t offset, uint32_t mem_mask);
+	void context_reg_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t system_enable_r(uint32_t offset, uint32_t mem_mask);
+	void system_enable_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t bus_error_r(uint32_t offset, uint32_t mem_mask);
+	void bus_error_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cache_tag_r(uint32_t offset, uint32_t mem_mask);
+	void cache_tag_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cache_data_r(uint32_t offset, uint32_t mem_mask);
+	void cache_data_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t uart_r(uint32_t offset, uint32_t mem_mask);
+	void uart_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t segment_map_r(uint32_t offset, uint32_t mem_mask);
+	void segment_map_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t page_map_r(uint32_t offset, uint32_t mem_mask);
+	void page_map_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+
+	void segment_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	void page_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	void context_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+
+	void hw_segment_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	void hw_page_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	void hw_context_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+	void hw_flush_all_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
 
 protected:
 	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	struct page_entry
 	{
+		uint32_t index;
+		uint32_t raw;
 		uint32_t valid;
 		uint32_t writable;
 		uint32_t supervisor;
@@ -90,24 +126,20 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t page_entry_to_uint(uint32_t index);
 	void merge_page_entry(uint32_t index, uint32_t data, uint32_t mem_mask);
 
-	bool cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data);
-	void segment_flush_w(const uint32_t vaddr);
-	void context_flush_w(const uint32_t vaddr);
-	void page_flush_w(const uint32_t vaddr);
-	uint32_t system_r(const uint32_t offset, const uint32_t mem_mask);
-	void system_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
-	uint32_t segment_map_r(const uint32_t offset, const uint32_t mem_mask);
-	void segment_map_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
-	uint32_t page_map_r(const uint32_t offset, const uint32_t mem_mask);
-	void page_map_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
+	template <insn_data_mode MODE> bool cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
+	void cache_fill(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t entry_index);
+
 	void type0_timeout_r(const uint32_t offset);
 	void type0_timeout_w(const uint32_t offset);
+	bool translate(uint32_t &addr);
 	void l2p_command(int ref, const std::vector<std::string> &params);
+	uint32_t vaddr_to_cache_line(uint32_t vaddr);
 
 	enum
 	{
@@ -175,9 +207,18 @@ protected:
 	uint32_t m_page_entry_mask;
 	uint32_t m_cache_mask;
 	uint32_t m_cache_tag_mask;
+	uint32_t m_cache_line_size;
+	uint32_t m_cache_word_size;
+	uint32_t m_cache_tag_shift;
+	uint32_t m_cache_tag_id_mask;
+	uint32_t m_cache_tag_id_shift;
+	uint32_t m_cache_vaddr_shift;
 	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
 	uint32_t m_ram_set_base[4];
 	uint32_t m_populated_ram_words;
+#if SUN4CMMU_LOG_MEM_ACCESSES
+	uint64_t m_fpos;
+#endif
 	emu_timer *m_reset_timer;
 	bool m_log_mem;
 };

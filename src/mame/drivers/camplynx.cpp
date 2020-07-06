@@ -191,41 +191,42 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(port58_w); // drive select etc
-	DECLARE_WRITE8_MEMBER(port7f_w); // banking 48k
-	DECLARE_READ8_MEMBER(port80_r); // cassin for 48k
-	DECLARE_WRITE8_MEMBER(port80_w); // control port 48k
-	DECLARE_READ8_MEMBER(port82_r); // cassin for 128k
-	DECLARE_WRITE8_MEMBER(port82_w); // banking 128k
-	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
-	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
-	DECLARE_MACHINE_RESET(lynx48k);
-	DECLARE_MACHINE_RESET(lynx128k);
-	void init_lynx48k();
-	void init_lynx128k();
-	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
-	MC6845_UPDATE_ROW(lynx48k_update_row);
-	MC6845_UPDATE_ROW(lynx128k_update_row);
-	required_device<palette_device> m_palette;
 	void lynx_common(machine_config &config);
 	void lynx_disk(machine_config &config);
 	void lynx128k(machine_config &config);
 	void lynx48k(machine_config &config);
 	void lynx96k(machine_config &config);
+	void init_lynx48k();
+	void init_lynx128k();
+	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
+
+private:
+	void bank1_w(offs_t offset, u8 data);
+	void bank6_w(offs_t offset, u8 data);
+	void port58_w(u8 data); // drive select etc
+	void port7f_w(u8 data); // banking 48k
+	u8 port80_r(); // cassin for 48k
+	void port80_w(u8 data); // control port 48k
+	u8 port82_r(); // cassin for 128k
+	void port82_w(u8 data); // banking 128k
+	void port84_w(u8 data); // dac port 48k
+	DECLARE_MACHINE_RESET(lynx48k);
+	DECLARE_MACHINE_RESET(lynx128k);
+	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
+	MC6845_UPDATE_ROW(lynx48k_update_row);
+	MC6845_UPDATE_ROW(lynx128k_update_row);
 	void lynx128k_io(address_map &map);
 	void lynx128k_mem(address_map &map);
 	void lynx48k_io(address_map &map);
 	void lynx48k_mem(address_map &map);
 	void lynx96k_io(address_map &map);
-private:
-	uint8_t m_port58;
-	uint8_t m_port80;
-	uint8_t m_bankdata;
-	uint8_t m_wbyte;
-	uint8_t *m_p_ram;
+	u8 m_port58;
+	u8 m_port80;
+	u8 m_bankdata;
+	u8 m_wbyte;
+	u8 *m_p_ram;
 	bool m_is_128k;
+	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	//required_device<> m_printer;
@@ -236,7 +237,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 };
 
-WRITE8_MEMBER( camplynx_state::port7f_w )
+void camplynx_state::port7f_w(u8 data)
 {
 /*
 d0 = write to bank 1
@@ -254,7 +255,7 @@ d7 = read from bank 4 */
 	// do writes
 	m_wbyte = (data & 0x0f) | ((m_port80 & 0x0c) << 3);
 	// do reads
-	uint8_t rbyte = (data & 0x70) | (m_port80 & 0x0c);
+	u8 rbyte = (data & 0x70) | (m_port80 & 0x0c);
 	switch (rbyte)
 	{
 		case 0x00:
@@ -357,7 +358,7 @@ d7 = read from bank 4 */
 	}
 }
 
-WRITE8_MEMBER( camplynx_state::port82_w )
+void camplynx_state::port82_w(u8 data)
 {
 /* Almost the same as the 48k, except the bit order is reversed.
 d7 = write to bank 1
@@ -373,7 +374,7 @@ d0 = read from bank 4 */
 	// do writes
 	m_wbyte = bitswap<8>(data, 0, 0, 0, 0, 4, 5, 6, 7) & 0x0f; // rearrange to 1,2,3,4
 	// do reads
-	uint8_t rbyte = bitswap<8>(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
+	u8 rbyte = bitswap<8>(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
 	if (BIT(rbyte, 1))
 		rbyte &= 0x07; // remove 4 if 1 selected (AND gate in IC82)
 //printf("%s:%X:%X:%X\n", machine().describe_context().c_str(), data, rbyte, m_wbyte);
@@ -631,7 +632,7 @@ INPUT_CHANGED_MEMBER( camplynx_state::brk_key )
 	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER( camplynx_state::bank1_w )
+void camplynx_state::bank1_w(offs_t offset, u8 data)
 {
 	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
@@ -643,7 +644,7 @@ WRITE8_MEMBER( camplynx_state::bank1_w )
 		m_p_ram[offset+0x40000] = data;
 }
 
-WRITE8_MEMBER( camplynx_state::bank6_w )
+void camplynx_state::bank6_w(offs_t offset, u8 data)
 {
 	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
@@ -667,9 +668,9 @@ WRITE8_MEMBER( camplynx_state::bank6_w )
 	}
 }
 
-READ8_MEMBER( camplynx_state::port80_r )
+u8 camplynx_state::port80_r()
 {
-	uint8_t data = ioport("LINE0")->read();
+	u8 data = ioport("LINE0")->read();
 	// when reading tape, bit 0 becomes cass-in signal
 	if (BIT(m_port80, 1))
 	{
@@ -688,12 +689,12 @@ d3 = cass motor on
 d2 = cass enable
 d1 = serial h/s out
 d0 = speaker */
-WRITE8_MEMBER( camplynx_state::port80_w )
+void camplynx_state::port80_w(u8 data)
 {
 	m_port80 = data;
 	m_cass->change_state( BIT(data, (m_is_128k) ? 3 : 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	if (!m_is_128k)
-		port7f_w(space, 0, m_bankdata);
+		port7f_w(m_bankdata);
 }
 
 /* DAC port (6-bit). If writing cassette, output goes to tape as a sine wave, otherwise it goes to speaker.
@@ -702,7 +703,7 @@ WRITE8_MEMBER( camplynx_state::port80_w )
    MESS can load PALE's wav files though.
    Currently square wave output is selected. */
 
-WRITE8_MEMBER( camplynx_state::port84_w )
+void camplynx_state::port84_w(u8 data)
 {
 	if (BIT(m_port80, (m_is_128k) ? 3 : 1)) // for 128k, bit 2 might be ok too
 	{
@@ -722,34 +723,32 @@ d7 = clock
 d2 = cass-in
 d1 = serial data in
 d0 = serial h/s in */
-READ8_MEMBER( camplynx_state::port82_r )
+u8 camplynx_state::port82_r()
 {
-	uint8_t data = 0xfb; // guess
+	u8 data = 0xfb; // guess
 	data |= (m_cass->input() > +0.02) ? 4 : 0;
 	return data;
 }
 
 MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
 	m_port80 = 0;
-	port7f_w( mem, 0, 0 );
+	port7f_w( 0 );
 	m_maincpu->reset();
 }
 
 MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
 	m_port80 = 0;
-	port82_w( mem, 0, 0 );
+	port82_w( 0 );
 	m_maincpu->reset();
 }
 
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
-	uint8_t r,g,b,x;
+	u8 r,g,b,x;
 	uint32_t green_bank, *p = &bitmap.pix32(y);
 	uint16_t mem = ((ma << 2) + (ra << 5)) & 0x1fff;
 
@@ -778,7 +777,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 
 MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 {
-	uint8_t r,g,b,x;
+	u8 r,g,b,x;
 	uint32_t green_bank, *p = &bitmap.pix32(y);
 	uint16_t mem = ((ma << 2) + (ra << 6)) & 0x3fff;
 	// determine green bank
@@ -804,7 +803,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 	}
 }
 
-WRITE8_MEMBER( camplynx_state::port58_w )
+void camplynx_state::port58_w(u8 data)
 {
 /*
 d0,d1 = drive select
@@ -819,9 +818,9 @@ d7 = 125ns or 250ns */
 	{
 		m_port58 = data;
 		if (m_is_128k)
-			port82_w(space, 0, m_bankdata);
+			port82_w(m_bankdata);
 		else
-			port7f_w(space, 0, m_bankdata);
+			port7f_w(m_bankdata);
 	}
 
 	floppy_image_device *floppy = nullptr;

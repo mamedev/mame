@@ -91,50 +91,50 @@ private:
 	int m_speed_meter;
 	int m_brake_meter;
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mcu_comm_r);
-	DECLARE_WRITE8_MEMBER(mcu_comm_w);
-	DECLARE_READ8_MEMBER(jc_pcbid_r);
-	DECLARE_READ8_MEMBER(jc_lan_r);
-	DECLARE_WRITE8_MEMBER(jc_lan_w);
-	DECLARE_WRITE8_MEMBER(jc_irq_unk_w);
-	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
-	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
+	uint8_t mcu_comm_r(offs_t offset);
+	void mcu_comm_w(offs_t offset, uint8_t data);
+	uint8_t jc_pcbid_r(offs_t offset);
+	uint8_t jc_lan_r();
+	void jc_lan_w(uint8_t data);
+	void jc_irq_unk_w(uint8_t data);
+	void dendego_speedmeter_w(uint8_t data);
+	void dendego_brakemeter_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(hc11_comm_r);
-	DECLARE_WRITE8_MEMBER(hc11_comm_w);
-	DECLARE_WRITE8_MEMBER(hc11_output_w);
-	DECLARE_READ8_MEMBER(hc11_data_r);
-	DECLARE_WRITE8_MEMBER(hc11_data_w);
+	uint8_t hc11_comm_r();
+	void hc11_comm_w(uint8_t data);
+	void hc11_output_w(uint8_t data);
+	uint8_t hc11_data_r();
+	void hc11_data_w(uint8_t data);
 	template <int Ch> uint8_t hc11_analog_r();
 
-	DECLARE_READ16_MEMBER(dsp_shared_r);
-	DECLARE_WRITE16_MEMBER(dsp_shared_w);
-	DECLARE_READ16_MEMBER(dsp_to_main_7fe_r);
-	DECLARE_WRITE16_MEMBER(dsp_to_main_7fe_w);
-	DECLARE_WRITE16_MEMBER(main_to_dsp_7ff_w);
+	uint16_t dsp_shared_r(offs_t offset);
+	void dsp_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_to_main_7fe_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dsp_to_main_7fe_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void main_to_dsp_7ff_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dsp_rom_r);
-	DECLARE_WRITE16_MEMBER(dsp_rom_w);
+	uint16_t dsp_rom_r();
+	void dsp_rom_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(dsp_math_viewport_w);
-	DECLARE_WRITE16_MEMBER(dsp_math_projection_w);
-	DECLARE_READ16_MEMBER(dsp_math_projection_y_r);
-	DECLARE_READ16_MEMBER(dsp_math_projection_x_r);
-	DECLARE_WRITE16_MEMBER(dsp_math_intersection_w);
-	DECLARE_READ16_MEMBER(dsp_math_intersection_r);
-	DECLARE_READ16_MEMBER(dsp_math_unk_r);
+	void dsp_math_viewport_w(offs_t offset, uint16_t data);
+	void dsp_math_projection_w(offs_t offset, uint16_t data);
+	uint16_t dsp_math_projection_y_r();
+	uint16_t dsp_math_projection_x_r();
+	void dsp_math_intersection_w(offs_t offset, uint16_t data);
+	uint16_t dsp_math_intersection_r();
+	uint16_t dsp_math_unk_r();
 
-	DECLARE_READ16_MEMBER(taitojc_dsp_idle_skip_r);
-	DECLARE_READ16_MEMBER(dendego2_dsp_idle_skip_r);
+	uint16_t taitojc_dsp_idle_skip_r();
+	uint16_t dendego2_dsp_idle_skip_r();
 
-	DECLARE_READ32_MEMBER(taitojc_palette_r);
-	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
-	DECLARE_READ32_MEMBER(taitojc_tile_r);
-	DECLARE_READ32_MEMBER(taitojc_char_r);
-	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
-	DECLARE_WRITE32_MEMBER(taitojc_char_w);
+	uint32_t taitojc_palette_r(offs_t offset);
+	void taitojc_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t taitojc_tile_r(offs_t offset);
+	uint32_t taitojc_char_r(offs_t offset);
+	void taitojc_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void taitojc_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 	virtual void machine_reset() override;

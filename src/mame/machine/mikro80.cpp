@@ -30,7 +30,7 @@ void mikro80_state::init_radio99()
 	m_key_mask = 0xff;
 }
 
-READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
+uint8_t mikro80_state::mikro80_8255_portb_r()
 {
 	uint8_t key = 0xff;
 	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
@@ -44,17 +44,17 @@ READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
 	return key & m_key_mask;
 }
 
-READ8_MEMBER(mikro80_state::mikro80_8255_portc_r)
+uint8_t mikro80_state::mikro80_8255_portc_r()
 {
 	return m_io_line8->read();
 }
 
-WRITE8_MEMBER(mikro80_state::mikro80_8255_porta_w)
+void mikro80_state::mikro80_8255_porta_w(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_MEMBER(mikro80_state::mikro80_8255_portc_w)
+void mikro80_state::mikro80_8255_portc_w(uint8_t data)
 {
 }
 
@@ -78,24 +78,24 @@ void mikro80_state::machine_reset()
 }
 
 
-READ8_MEMBER(mikro80_state::mikro80_keyboard_r)
+uint8_t mikro80_state::mikro80_keyboard_r(offs_t offset)
 {
 	return m_ppi8255->read(offset^0x03);
 }
 
-WRITE8_MEMBER(mikro80_state::mikro80_keyboard_w)
+void mikro80_state::mikro80_keyboard_w(offs_t offset, uint8_t data)
 {
 	m_ppi8255->write(offset^0x03, data);
 }
 
 
-WRITE8_MEMBER(mikro80_state::mikro80_tape_w)
+void mikro80_state::mikro80_tape_w(uint8_t data)
 {
 	m_cassette->output(data & 0x01 ? 1 : -1);
 }
 
 
-READ8_MEMBER(mikro80_state::mikro80_tape_r)
+uint8_t mikro80_state::mikro80_tape_r()
 {
 	double level = m_cassette->input();
 	if (level <  0) {
@@ -104,7 +104,7 @@ READ8_MEMBER(mikro80_state::mikro80_tape_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mikro80_state::radio99_sound_w)
+void mikro80_state::radio99_sound_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 1));
 }

@@ -273,7 +273,7 @@ IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 
 // memory handlers
 
-READ8_MEMBER(isa8_pgc_device::vram_r)
+uint8_t isa8_pgc_device::vram_r(offs_t offset)
 {
 	uint8_t ret;
 
@@ -293,7 +293,7 @@ READ8_MEMBER(isa8_pgc_device::vram_r)
  * 9 - write up to 5 pixel groups, ending at offset.  offset may be in the middle of pixel group.
  * 13 - write up to 5 pixel groups, starting at offset.
  */
-WRITE8_MEMBER(isa8_pgc_device::vram_w)
+void isa8_pgc_device::vram_w(offs_t offset, uint8_t data)
 {
 	bool handled = true;
 
@@ -336,13 +336,13 @@ WRITE8_MEMBER(isa8_pgc_device::vram_w)
 		 handled ? "" : " (unsupported)");
 }
 
-WRITE8_MEMBER(isa8_pgc_device::accel_w)
+void isa8_pgc_device::accel_w(offs_t offset, uint8_t data)
 {
 	m_accel = offset >> 1;
 	LOGV("accel  @ %05x <- %02x (%d)\n", 0x32020 + offset, data, m_accel);
 }
 
-READ8_MEMBER(isa8_pgc_device::stateparam_r)
+uint8_t isa8_pgc_device::stateparam_r(offs_t offset)
 {
 	uint8_t ret;
 
@@ -354,7 +354,7 @@ READ8_MEMBER(isa8_pgc_device::stateparam_r)
 	return ret;
 }
 
-WRITE8_MEMBER(isa8_pgc_device::stateparam_w)
+void isa8_pgc_device::stateparam_w(offs_t offset, uint8_t data)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
@@ -363,7 +363,7 @@ WRITE8_MEMBER(isa8_pgc_device::stateparam_w)
 	m_stateparam[offset >> 1] = data;
 }
 
-WRITE8_MEMBER(isa8_pgc_device::lut_w)
+void isa8_pgc_device::lut_w(offs_t offset, uint8_t data)
 {
 	uint8_t o = (offset >> 1) * 3;
 
@@ -379,17 +379,22 @@ WRITE8_MEMBER(isa8_pgc_device::lut_w)
 	}
 }
 
-READ8_MEMBER(isa8_pgc_device::init_r)
+uint8_t isa8_pgc_device::init_r()
 {
-	LOG("INIT: unmapping ROM\n");
-	space.unmap_read(0xf8000, 0xfffff);
+	if (!machine().side_effects_disabled())
+	{
+		address_space &space = m_cpu->space(AS_PROGRAM);
 
-	LOG("INIT: mapping emulator RAM\n");
-	space.install_readwrite_bank(0xf8000, 0xfffff, "eram");
-	membank("eram")->set_base(m_eram.get());
+		LOG("INIT: unmapping ROM\n");
+		space.unmap_read(0xf8000, 0xfffff);
 
-	LOG("INIT: mapping LUT\n");
-	space.install_write_handler(0xf8400, 0xf85ff, write8_delegate(*this, FUNC(isa8_pgc_device::lut_w)));
+		LOG("INIT: mapping emulator RAM\n");
+		space.install_readwrite_bank(0xf8000, 0xfffff, "eram");
+		membank("eram")->set_base(m_eram.get());
+
+		LOG("INIT: mapping LUT\n");
+		space.install_write_handler(0xf8400, 0xf85ff, write8sm_delegate(*this, FUNC(isa8_pgc_device::lut_w)));
+	}
 
 	return 0; // XXX ignored
 }

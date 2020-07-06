@@ -97,10 +97,29 @@ public:
 
 	state_manager_t() = default;
 
+	struct saver_t
+	{
+		saver_t(state_manager_t &sm, const void *owner, const pstring &membername)
+		: m_sm(sm)
+		, m_owner(owner)
+		, m_membername(membername)
+		{ }
+
+		template <typename XS>
+		void save_item(XS &xstate, const pstring &itemname)
+		{
+			m_sm.save_item(m_owner, xstate, m_membername + "." + itemname);
+		}
+
+		state_manager_t &m_sm;
+		const void * m_owner;
+		const pstring m_membername;
+	};
+
 	template<typename C>
 	void save_item(const void *owner, C &state, const pstring &stname)
 	{
-		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
+		save_item_dispatch(owner, state, stname);
 	}
 
 	template<typename C, std::size_t N>
@@ -173,12 +192,32 @@ public:
 protected:
 
 private:
+
+	template<typename C>
+	std::enable_if_t<plib::is_integral<C>::value || std::is_enum<C>::value
+			|| plib::is_floating_point<C>::value>
+	save_item_dispatch(const void *owner, C &state, const pstring &stname)
+	{
+		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
+	}
+
+
+	template<typename C>
+	std::enable_if_t<!(plib::is_integral<C>::value || std::is_enum<C>::value
+			|| plib::is_floating_point<C>::value)>
+	save_item_dispatch(const void *owner, C &state, const pstring &stname)
+	{
+		saver_t sav(*this, owner, stname);
+		state.save_state(sav);
+	}
+
 	entry_t::list_t m_save;
 	entry_t::list_t m_custom;
 
 };
 
-template<> inline void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)
+template<>
+inline void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)
 {
 	m_custom.emplace_back(stname, owner, &state);
 	state.register_state(*this, stname);

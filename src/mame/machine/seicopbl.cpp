@@ -19,27 +19,27 @@
 
 DEFINE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device, "seibu_cop_boot", "Seibu COP (bootleg)")
 
-READ16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_r)
+uint16_t seibu_cop_bootleg_device::reg_lo_addr_r(offs_t offset)
 {
 	return m_reg[offset] & 0xffff;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::reg_hi_addr_r)
+uint16_t seibu_cop_bootleg_device::reg_hi_addr_r(offs_t offset)
 {
 	return m_reg[offset] >> 16;
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_w)
+void seibu_cop_bootleg_device::reg_lo_addr_w(offs_t offset, uint16_t data)
 {
 	m_reg[offset] = (m_reg[offset] & 0xffff0000) | (data & 0xffff);
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::reg_hi_addr_w)
+void seibu_cop_bootleg_device::reg_hi_addr_w(offs_t offset, uint16_t data)
 {
 	m_reg[offset] = (m_reg[offset] & 0xffff) | (data << 16);
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
+void seibu_cop_bootleg_device::cmd_trigger_w(offs_t offset, uint16_t data)
 {
 	//printf("%04x %08x %08x\n",data,m_reg[0],m_reg[1]);
 	uint8_t offs;
@@ -324,27 +324,27 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::status_r)
+uint16_t seibu_cop_bootleg_device::status_r()
 {
 	return m_status;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::dist_r)
+uint16_t seibu_cop_bootleg_device::dist_r()
 {
 	return m_dist;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::angle_r)
+uint16_t seibu_cop_bootleg_device::angle_r()
 {
 	return m_angle;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::d104_move_r)
+uint16_t seibu_cop_bootleg_device::d104_move_r(offs_t offset)
 {
 	return m_d104_move_offset >> offset*16;
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
+void seibu_cop_bootleg_device::d104_move_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		m_d104_move_offset = (m_d104_move_offset & 0xffff0000) | (data & 0xffff);
@@ -352,27 +352,27 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
 		m_d104_move_offset = (m_d104_move_offset & 0xffff) | (data << 16);
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::prng_max_r)
+uint16_t seibu_cop_bootleg_device::prng_max_r()
 {
 	return m_prng_max;
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::prng_max_w)
+void seibu_cop_bootleg_device::prng_max_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prng_max);
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::prng_r)
+uint16_t seibu_cop_bootleg_device::prng_r()
 {
 	return m_host_cpu->total_cycles() % (m_prng_max + 1);
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::scale_r)
+uint16_t seibu_cop_bootleg_device::scale_r()
 {
 	return m_scale;
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::scale_w)
+void seibu_cop_bootleg_device::scale_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scale);
 	m_scale &= 3;
@@ -457,12 +457,12 @@ inline void seibu_cop_bootleg_device::write_word(offs_t address, uint16_t data)
 	space().write_word(address << 1, data);
 }
 
-READ16_MEMBER( seibu_cop_bootleg_device::read )
+uint16_t seibu_cop_bootleg_device::read(offs_t offset)
 {
 	return read_word(offset);
 }
 
-WRITE16_MEMBER( seibu_cop_bootleg_device::write )
+void seibu_cop_bootleg_device::write(offs_t offset, uint16_t data)
 {
 	write_word(offset,data);
 }

@@ -89,7 +89,7 @@ TODO:
 
 ******************************************************************************/
 
-WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
+void inufuku_state::inufuku_soundrombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }

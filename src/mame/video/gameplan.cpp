@@ -138,25 +138,25 @@ uint32_t gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(gameplan_state::video_data_w)
+void gameplan_state::video_data_w(uint8_t data)
 {
 	m_video_data = data;
 }
 
 
-WRITE8_MEMBER(gameplan_state::gameplan_video_command_w)
+void gameplan_state::gameplan_video_command_w(uint8_t data)
 {
 	m_video_command = data & 0x07;
 }
 
 
-WRITE8_MEMBER(gameplan_state::leprechn_video_command_w)
+void gameplan_state::leprechn_video_command_w(uint8_t data)
 {
 	m_video_command = (data >> 3) & 0x07;
 }
 
 
-READ8_MEMBER(gameplan_state::leprechn_videoram_r)
+uint8_t gameplan_state::leprechn_videoram_r()
 {
 	return m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
 }

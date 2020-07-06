@@ -55,15 +55,15 @@ protected:
 
 private:
 
-	DECLARE_READ32_MEMBER(eolith_custom_r);
-	DECLARE_WRITE32_MEMBER(systemcontrol_w);
-	template<int Player> DECLARE_READ32_MEMBER(hidctch3_pen_r);
-	DECLARE_WRITE16_MEMBER(eolith_vram_w);
-	DECLARE_READ16_MEMBER(eolith_vram_r);
-	DECLARE_WRITE8_MEMBER(sound_p1_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
+	uint32_t eolith_custom_r();
+	void systemcontrol_w(uint32_t data);
+	template<int Player> uint32_t hidctch3_pen_r();
+	void eolith_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t eolith_vram_r(offs_t offset);
+	void sound_p1_w(uint8_t data);
+	uint8_t qs1000_p1_r();
+	void qs1000_p1_w(uint8_t data);
+	void soundcpu_to_qs1000(uint8_t data);
 
 	DECLARE_MACHINE_RESET(eolith);
 	DECLARE_VIDEO_START(eolith);

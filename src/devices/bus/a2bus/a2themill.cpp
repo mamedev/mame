@@ -226,7 +226,7 @@ void a2bus_themill_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( a2bus_themill_device::dma_r )
+uint8_t a2bus_themill_device::dma_r(offs_t offset)
 {
 	// MAME startup ordering has the 6809 free-running at boot, which is undesirable
 	if (!m_bEnabled)
@@ -277,7 +277,7 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( a2bus_themill_device::dma_w )
+void a2bus_themill_device::dma_w(offs_t offset, uint8_t data)
 {
 	if (m_6809Mode)
 	{

@@ -80,29 +80,29 @@ private:
 	int m_cart_present;
 	int m_pr7820_enter;
 	struct ssi263_t m_ssi263;
-	DECLARE_WRITE8_MEMBER(intrq_w);
-	DECLARE_READ8_MEMBER(irqstate_r);
-	DECLARE_WRITE8_MEMBER(timer_int_ack_w);
-	DECLARE_WRITE8_MEMBER(data_rdy_int_ack_w);
-	DECLARE_WRITE8_MEMBER(cop_d_w);
-	DECLARE_READ8_MEMBER(cop_data_r);
-	DECLARE_WRITE8_MEMBER(cop_data_w);
-	DECLARE_READ8_MEMBER(cop_l_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(cop_g_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(cop_g_w);
+	void intrq_w(uint8_t data);
+	uint8_t irqstate_r();
+	void timer_int_ack_w(uint8_t data);
+	void data_rdy_int_ack_w(uint8_t data);
+	void cop_d_w(uint8_t data);
+	uint8_t cop_data_r();
+	void cop_data_w(uint8_t data);
+	uint8_t cop_l_r();
+	void cop_l_w(uint8_t data);
+	uint8_t cop_g_r();
+	void control_w(uint8_t data);
+	void cop_g_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kbdata_r);
 	DECLARE_WRITE_LINE_MEMBER(kbclk_w);
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(dsw_b_r);
-	DECLARE_READ8_MEMBER(laserdsc_data_r);
-	DECLARE_WRITE8_MEMBER(laserdsc_data_w);
-	DECLARE_WRITE8_MEMBER(laserdsc_control_w);
-	DECLARE_WRITE8_MEMBER(den1_w);
-	DECLARE_WRITE8_MEMBER(den2_w);
-	DECLARE_WRITE8_MEMBER(ssi263_register_w);
-	DECLARE_READ8_MEMBER(ssi263_register_r);
+	void control2_w(uint8_t data);
+	uint8_t dsw_b_r();
+	uint8_t laserdsc_data_r();
+	void laserdsc_data_w(uint8_t data);
+	void laserdsc_control_w(uint8_t data);
+	void den1_w(uint8_t data);
+	void den2_w(uint8_t data);
+	void ssi263_register_w(offs_t offset, uint8_t data);
+	uint8_t ssi263_register_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -149,7 +149,7 @@ void thayers_state::check_interrupt()
 	}
 }
 
-WRITE8_MEMBER(thayers_state::intrq_w)
+void thayers_state::intrq_w(uint8_t data)
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
@@ -158,7 +158,7 @@ WRITE8_MEMBER(thayers_state::intrq_w)
 	timer_set(attotime::from_usec(8250), TIMER_INTRQ_TICK);
 }
 
-READ8_MEMBER(thayers_state::irqstate_r)
+uint8_t thayers_state::irqstate_r()
 {
 	/*
 
@@ -178,7 +178,7 @@ READ8_MEMBER(thayers_state::irqstate_r)
 	return m_cart_present << 6 | (m_data_rdy_int << 5) | (m_timer_int << 4) | 0x08 | (m_ssi_data_request << 2);
 }
 
-WRITE8_MEMBER(thayers_state::timer_int_ack_w)
+void thayers_state::timer_int_ack_w(uint8_t data)
 {
 	if (LOG) logerror("%s %s TIMER INT ACK\n", machine().time().as_string(), machine().describe_context());
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER(thayers_state::timer_int_ack_w)
 	check_interrupt();
 }
 
-WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
+void thayers_state::data_rdy_int_ack_w(uint8_t data)
 {
 	if (LOG) logerror("%s %s DATA RDY INT ACK\n", machine().time().as_string(), machine().describe_context());
 
@@ -196,7 +196,7 @@ WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
 	check_interrupt();
 }
 
-WRITE8_MEMBER(thayers_state::cop_d_w)
+void thayers_state::cop_d_w(uint8_t data)
 {
 	/*
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER(thayers_state::cop_d_w)
 
 /* COP Communication */
 
-READ8_MEMBER(thayers_state::cop_data_r)
+uint8_t thayers_state::cop_data_r()
 {
 	if (!m_cop_data_latch_enable)
 	{
@@ -238,13 +238,13 @@ READ8_MEMBER(thayers_state::cop_data_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_data_w)
+void thayers_state::cop_data_w(uint8_t data)
 {
 	m_cop_data_latch = data;
 	if (LOG) logerror("COP DATA %02x\n", m_cop_data_latch);
 }
 
-READ8_MEMBER(thayers_state::cop_l_r)
+uint8_t thayers_state::cop_l_r()
 {
 	if (!m_cop_data_latch_enable)
 	{
@@ -256,13 +256,13 @@ READ8_MEMBER(thayers_state::cop_l_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_l_w)
+void thayers_state::cop_l_w(uint8_t data)
 {
 	m_cop_l = data;
 	if (LOG) logerror("COP L %02x\n", m_cop_l);
 }
 
-READ8_MEMBER(thayers_state::cop_g_r)
+uint8_t thayers_state::cop_g_r()
 {
 	/*
 
@@ -278,7 +278,7 @@ READ8_MEMBER(thayers_state::cop_g_r)
 	return m_cop_cmd_latch;
 }
 
-WRITE8_MEMBER(thayers_state::control_w)
+void thayers_state::control_w(uint8_t data)
 {
 	/*
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER(thayers_state::control_w)
 	if (LOG) logerror("COP G0..2 %u\n", m_cop_cmd_latch);
 }
 
-WRITE8_MEMBER(thayers_state::cop_g_w)
+void thayers_state::cop_g_w(uint8_t data)
 {
 	/*
 
@@ -377,7 +377,7 @@ WRITE_LINE_MEMBER(thayers_state::kbclk_w)
 
 /* I/O Board */
 
-WRITE8_MEMBER(thayers_state::control2_w)
+void thayers_state::control2_w(uint8_t data)
 {
 	/*
 
@@ -400,24 +400,24 @@ WRITE8_MEMBER(thayers_state::control2_w)
 	}
 }
 
-READ8_MEMBER(thayers_state::dsw_b_r)
+uint8_t thayers_state::dsw_b_r()
 {
 	return (ioport("COIN")->read() & 0xf0) | (ioport("DSWB")->read() & 0x0f);
 }
 
-READ8_MEMBER(thayers_state::laserdsc_data_r)
+uint8_t thayers_state::laserdsc_data_r()
 {
 	if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
 	if (m_pr7820 != nullptr) return m_pr7820->data_r();
 	return 0;
 }
 
-WRITE8_MEMBER(thayers_state::laserdsc_data_w)
+void thayers_state::laserdsc_data_w(uint8_t data)
 {
 	m_laserdisc_data = data;
 }
 
-WRITE8_MEMBER(thayers_state::laserdsc_control_w)
+void thayers_state::laserdsc_control_w(uint8_t data)
 {
 	/*
 
@@ -453,7 +453,7 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::den1_w)
+void thayers_state::den1_w(uint8_t data)
 {
 	/*
 
@@ -473,7 +473,7 @@ WRITE8_MEMBER(thayers_state::den1_w)
 	m_digits[data >> 4] = led_map[data & 0x0f];
 }
 
-WRITE8_MEMBER(thayers_state::den2_w)
+void thayers_state::den2_w(uint8_t data)
 {
 	/*
 
@@ -511,7 +511,7 @@ static const char SSI263_PHONEMES[0x40][5] =
 	"L", "L1", "LF", "W", "B", "D", "KV", "P", "T", "K", "HV", "HVC", "HF", "HFC", "HN", "Z", "S", "J", "SCH", "V", "F", "THV", "TH", "M", "N", "NG", ":A", ":OH", ":U", ":UH", "E2", "LB"
 };
 
-WRITE8_MEMBER(thayers_state::ssi263_register_w)
+void thayers_state::ssi263_register_w(offs_t offset, uint8_t data)
 {
 	struct ssi263_t &ssi263 = m_ssi263;
 	switch (offset)
@@ -614,7 +614,7 @@ WRITE8_MEMBER(thayers_state::ssi263_register_w)
 	}
 }
 
-READ8_MEMBER(thayers_state::ssi263_register_r)
+uint8_t thayers_state::ssi263_register_r()
 {
 	// D7 becomes an output, as the inverted state of A/_R. The register address bits are ignored.
 

@@ -44,13 +44,13 @@ namespace plib
 	template<typename T, typename V1, typename V2>
 	T vec_mult(const std::size_t n, const V1 & v1, const V2 & v2 ) noexcept
 	{
-		using b8 = std::array<T, 8>;
+		using b8 = std::array<T, 8>; // NOLINT
 		PALIGNAS_VECTOROPT() b8 value = {0};
 		for (std::size_t i = 0; i < n ; i++ )
 		{
-			value[i & 7] += v1[i] * v2[i];
+			value[i & 7] += v1[i] * v2[i]; // NOLINT
 		}
-		return value[0] + value[1] + value[2] + value[3] + value[4] + value[5] + value[6] + value[7];
+		return value[0] + value[1] + value[2] + value[3] + value[4] + value[5] + value[6] + value[7]; // NOLINT
 	}
 
 	template<typename T, typename VT>

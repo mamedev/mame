@@ -2,7 +2,7 @@
 // copyright-holders:Paul Leaman, Curt Coder
 /***************************************************************************
 
-  sidearms.c
+  sidearms.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/sidearms.h"
 
-WRITE8_MEMBER(sidearms_state::videoram_w)
+void sidearms_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::colorram_w)
+void sidearms_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::c804_w)
+void sidearms_state::c804_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -67,13 +67,13 @@ WRITE8_MEMBER(sidearms_state::c804_w)
 	}
 }
 
-WRITE8_MEMBER(sidearms_state::gfxctrl_w)
+void sidearms_state::gfxctrl_w(uint8_t data)
 {
 	m_objon = data & 0x01;
 	m_bgon = data & 0x02;
 }
 
-WRITE8_MEMBER(sidearms_state::star_scrollx_w)
+void sidearms_state::star_scrollx_w(uint8_t data)
 {
 	uint32_t last_state = m_hcount_191;
 
@@ -85,7 +85,7 @@ WRITE8_MEMBER(sidearms_state::star_scrollx_w)
 		m_hflop_74a_n ^= 1;
 }
 
-WRITE8_MEMBER(sidearms_state::star_scrolly_w)
+void sidearms_state::star_scrolly_w(uint8_t data)
 {
 	m_vcount_191++;
 	m_vcount_191 &= 0xff;

@@ -17,49 +17,49 @@ robbiex@rocketmail.com
 #include "includes/tehkanwc.h"
 
 
-WRITE8_MEMBER(tehkanwc_state::videoram_w)
+void tehkanwc_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tehkanwc_state::colorram_w)
+void tehkanwc_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tehkanwc_state::videoram2_w)
+void tehkanwc_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(tehkanwc_state::scroll_x_w)
+void tehkanwc_state::scroll_x_w(offs_t offset, uint8_t data)
 {
 	m_scroll_x[offset] = data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::scroll_y_w)
+void tehkanwc_state::scroll_y_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(tehkanwc_state::flipscreen_x_w)
+void tehkanwc_state::flipscreen_x_w(uint8_t data)
 {
 	flip_screen_x_set(data & 0x40);
 }
 
-WRITE8_MEMBER(tehkanwc_state::flipscreen_y_w)
+void tehkanwc_state::flipscreen_y_w(uint8_t data)
 {
 	flip_screen_y_set(data & 0x40);
 }
 
-WRITE8_MEMBER(tehkanwc_state::gridiron_led0_w)
+void tehkanwc_state::gridiron_led0_w(uint8_t data)
 {
 	m_led0 = data;
 }
-WRITE8_MEMBER(tehkanwc_state::gridiron_led1_w)
+void tehkanwc_state::gridiron_led1_w(uint8_t data)
 {
 	m_led1 = data;
 }

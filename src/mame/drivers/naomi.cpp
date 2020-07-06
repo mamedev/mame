@@ -347,6 +347,7 @@ Virtua NBA (prototype)                          no cart  *       21 (64Mb)   pre
 Virtua NBA (prototype, 15.11)                   no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
 Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM  PCB s/n is 840-0064B-01
+Wave Runner GP                                840-0064C  ?       12 (64Mb)   ?        315-6206  ?             not dumped, IC22 sums 4F04 / BA28
 
 
 PFSB 64M Mask ROM board
@@ -1642,7 +1643,7 @@ Premier Eleven
 
 #define CPU_CLOCK (200000000)
 
-READ16_MEMBER(naomi_state::naomi_g2bus_r )
+uint16_t naomi_state::naomi_g2bus_r(offs_t offset)
 {
 	// G2 bus is 16bit wide, "floating bus" value is 16 most significant address bits
 	u32 address = 0x01000000 + offset * 2;
@@ -1654,7 +1655,7 @@ READ16_MEMBER(naomi_state::naomi_g2bus_r )
 */
 
 
-READ64_MEMBER(naomi_state::eeprom_93c46a_r )
+uint64_t naomi_state::eeprom_93c46a_r()
 {
 	int res;
 	// bit 0 - EEPROM type: 0 - 93C46, 1 - X76F100 TODO
@@ -1664,7 +1665,7 @@ READ64_MEMBER(naomi_state::eeprom_93c46a_r )
 	return res;
 }
 
-WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
+void naomi_state::eeprom_93c46a_w(uint64_t data)
 {
 	/* bit 4 is data */
 	/* bit 2 is clock */
@@ -1783,7 +1784,7 @@ void naomi_state::naomi_map(address_map &map)
  */
 
 // example hookup for accessing both PVRs, to be extended to everything else.
-WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
+void naomi2_state::both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	space.write_dword(0x005f8000|offset*4,data,mem_mask);
 	space.write_dword(0x025f8000|offset*4,data,mem_mask);
@@ -1859,13 +1860,13 @@ void naomi_state::naomi_port(address_map &map)
  * Atomiswave address map, almost identical to Dreamcast
  */
 
-READ64_MEMBER(atomiswave_state::aw_flash_r)
+uint64_t atomiswave_state::aw_flash_r(offs_t offset)
 {
 	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
 			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
 }
 
-WRITE64_MEMBER(atomiswave_state::aw_flash_w)
+void atomiswave_state::aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int i;
 	uint32_t addr = offset * 8;
@@ -1907,7 +1908,7 @@ inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask,
 	return reg;
 }
 
-READ64_MEMBER(atomiswave_state::aw_modem_r )
+uint64_t atomiswave_state::aw_modem_r(offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -1933,7 +1934,7 @@ READ64_MEMBER(atomiswave_state::aw_modem_r )
 	return 0;
 }
 
-WRITE64_MEMBER(atomiswave_state::aw_modem_w )
+void atomiswave_state::aw_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -3510,14 +3511,16 @@ USA, Korea and Australia is missing.
 EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
 EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
-Korea and Australia is missing.
+EPR-23609B - NAOMI BOOT ROM 2001 09/10  1.70 (Korea)
+Australia is missing.
 
 EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
+EPR-23607C - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
 EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
-USA, Korea and Australia is missing.
+Korea and Australia is missing.
+Actual build date Dec 19 2005.
 
 EPR-21604  - No known dumps (Development BOOT ROM)
-EPR-?????  - No known dumps (Korea)
 EPR-?????  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
@@ -3554,12 +3557,16 @@ Region byte encoding is as follows:
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23608a.ic27",   0x000000, 0x200000, CRC(e8f884d1) SHA1(28f4de747bb3cf860b9ebf897322fbc5d7c1e156) ) \
 	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23608 (Export)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23608.ic27",    0x000000, 0x200000, CRC(929cc3a6) SHA1(47d00c818de23f733a4a33b1bbc72eb8aa729246) ) \
-	ROM_SYSTEM_BIOS( 8, "bios8", "epr-23607b (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23607b.ic27",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
-	ROM_SYSTEM_BIOS( 9, "bios9", "epr-23607 (USA)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.ic27",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
-	ROM_SYSTEM_BIOS( 10, "bios10", "epr-23605c (multi-region hack)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-23605c_multi.ic27",   0x000000, 0x200000, CRC(353fdbcd) SHA1(a8b7dce572b74e02e65cb949b2c366c87625157f) )
+	ROM_SYSTEM_BIOS( 8, "bios8", "epr-23607c (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23607c.ic27",   0x000000, 0x200000, CRC(750e254b) SHA1(81d0b1a076c274c6bd7c53b65e7b80e14fe039e1) ) \
+	ROM_SYSTEM_BIOS( 9, "bios9", "epr-23607b (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607b.ic27",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "epr-23607 (USA)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-23607.ic27",   0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
+	ROM_SYSTEM_BIOS( 11, "bios11", "epr-23609b (Korea)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-23609b.ic27",  0x000000, 0x200000, CRC(99e3751f) SHA1(8a244f75595c49d2a37a42ab96b6bab35163ca0e) ) \
+	ROM_SYSTEM_BIOS( 12, "bios12", "epr-23605c (multi-region hack)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-23605c_multi.ic27",   0x000000, 0x200000, CRC(353fdbcd) SHA1(a8b7dce572b74e02e65cb949b2c366c87625157f) )
 /*
    First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
    area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
@@ -7471,6 +7478,7 @@ ROM_START( ninjaslt )
 	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
 	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
+	ROM_LOAD( "jyu2_dr0b.ic3",  0x000000, 0x020000, CRC(f3258f69) SHA1(5c8f8b61b36624c75093a501863943e01d8dd08f) ) // JYU(SWP) PCB, same PCB as below, no coin input features, belong to (undumped) Namco System10 "AFC2" game.
 	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
 
 	// 25469801    2000     317-5068-COM   Naomi
@@ -10733,7 +10741,7 @@ void atomiswave_state::init_atomiswave()
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
 }
 
-READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
+uint64_t atomiswave_state::xtrmhnt2_hack_r()
 {
 	// disable ALL.Net board check
 	if (m_maincpu->pc() == 0xc03cb30)
@@ -10751,7 +10759,7 @@ READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
 void atomiswave_state::init_xtrmhnt2()
 {
 	init_atomiswave();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64_delegate(*this, FUNC(atomiswave_state::xtrmhnt2_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64smo_delegate(*this, FUNC(atomiswave_state::xtrmhnt2_hack_r)));
 }
 
 ROM_START( fotns )

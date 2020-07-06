@@ -33,7 +33,7 @@ public:
 		, m_subregion(*this, "slave_rom")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(hd6445_crt_w);
+	void hd6445_crt_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER(v30_interrupt);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
@@ -60,13 +60,13 @@ protected:
 	tilemap_t *m_tx_layer;
 	bitmap_rgb32 m_temp_bitmap;
 	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
-	DECLARE_WRITE16_MEMBER(text_w);
-	DECLARE_READ16_MEMBER(tatsumi_v30_68000_r);
-	DECLARE_WRITE16_MEMBER(tatsumi_v30_68000_w);
-	DECLARE_READ16_MEMBER(tatsumi_sprite_control_r);
-	DECLARE_WRITE16_MEMBER(tatsumi_sprite_control_w);
+	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t tatsumi_v30_68000_r(offs_t offset);
+	void tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t tatsumi_sprite_control_r(offs_t offset);
+	void tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
+	uint8_t tatsumi_hack_ym2151_r();
 
 	void tatsumi_reset();
 	template<class _BitmapClass> void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
@@ -99,17 +99,17 @@ public:
 	void init_apache3();
 
 private:
-	DECLARE_READ16_MEMBER(apache3_bank_r);
-	DECLARE_WRITE16_MEMBER(apache3_bank_w);
-	DECLARE_WRITE16_MEMBER(apache3_z80_ctrl_w);
-	DECLARE_READ16_MEMBER(apache3_v30_v20_r);
-	DECLARE_WRITE16_MEMBER(apache3_v30_v20_w);
-	DECLARE_READ16_MEMBER(apache3_z80_r);
-	DECLARE_WRITE16_MEMBER(apache3_z80_w);
-	DECLARE_READ8_MEMBER(apache3_vr1_r);
-	DECLARE_WRITE16_MEMBER(apache3_rotate_w);
-	DECLARE_WRITE16_MEMBER(apache3_road_z_w);
-	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
+	uint16_t apache3_bank_r();
+	void apache3_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void apache3_z80_ctrl_w(uint16_t data);
+	uint16_t apache3_v30_v20_r(offs_t offset);
+	void apache3_v30_v20_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t apache3_z80_r(offs_t offset);
+	void apache3_z80_w(offs_t offset, uint16_t data);
+	uint8_t apache3_vr1_r();
+	void apache3_rotate_w(uint16_t data);
+	void apache3_road_z_w(uint16_t data);
+	void apache3_road_x_w(offs_t offset, uint8_t data);
 
 	DECLARE_MACHINE_RESET(apache3);
 	DECLARE_VIDEO_START(apache3);
@@ -159,13 +159,13 @@ public:
 	void init_roundup5();
 
 private:
-	DECLARE_READ16_MEMBER(roundup_v30_z80_r);
-	DECLARE_WRITE16_MEMBER(roundup_v30_z80_w);
-	DECLARE_WRITE16_MEMBER(roundup5_control_w);
-	DECLARE_WRITE16_MEMBER(road_vregs_w);
-	DECLARE_READ8_MEMBER(gfxdata_r);
-	DECLARE_WRITE8_MEMBER(gfxdata_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint16_t roundup_v30_z80_r(offs_t offset);
+	void roundup_v30_z80_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void roundup5_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void road_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t gfxdata_r(offs_t offset);
+	void gfxdata_w(offs_t offset, uint8_t data);
+	void output_w(uint8_t data);
 
 	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -214,18 +214,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
-	DECLARE_WRITE16_MEMBER(cyclwarr_sprite_w);
-	DECLARE_WRITE16_MEMBER(video_config_w);
-	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
-	DECLARE_WRITE16_MEMBER(mixing_control_w);
-	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
-	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
-	DECLARE_WRITE16_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(oki_status_xor_r);
+	uint16_t cyclwarr_sprite_r(offs_t offset);
+	void cyclwarr_sprite_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void video_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bigfight_a40000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mixing_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cyclwarr_control_w(uint8_t data);
+	void cyclwarr_sound_w(uint8_t data);
+	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t oki_status_xor_r();
 
-	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
-	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
+	template<int Bank> uint16_t cyclwarr_videoram_r(offs_t offset);
+	template<int Bank> void cyclwarr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_bigfight);
 	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_cyclwarr_road);

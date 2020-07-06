@@ -1055,7 +1055,7 @@ DEFINE_DEVICE_TYPE(YMF278B, ymf278b_device, "ymf278b", "Yamaha YMF278B OPL4")
 ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF278B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 22)
+	, device_rom_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_last_fm_data(0)
 {

@@ -75,24 +75,25 @@ public:
 	void cd2650(machine_config &config);
 
 private:
-	void cd2650_data(address_map &map);
-	void cd2650_io(address_map &map);
-	void cd2650_mem(address_map &map);
-	DECLARE_READ8_MEMBER(keyin_r);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	u8 keyin_r();
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t m_term_data;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 m_term_data;
 	bool m_cassbit;
 	bool m_cassold;
-	uint8_t m_cass_data[4];
-	virtual void machine_reset() override;
+	u8 m_cass_data[4];
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<s2650_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 };
@@ -118,7 +119,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -138,27 +139,27 @@ READ_LINE_MEMBER(cd2650_state::cass_r)
 	return m_cass_data[2];
 }
 
-READ8_MEMBER(cd2650_state::keyin_r)
+u8 cd2650_state::keyin_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = ret | 0x80;
 	return ret;
 }
 
-void cd2650_state::cd2650_mem(address_map &map)
+void cd2650_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("roms", 0);
 	map(0x1000, 0x7fff).ram().share("videoram");
 }
 
-void cd2650_state::cd2650_io(address_map &map)
+void cd2650_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	//map(0x80, 0x84) disk i/o
 }
 
-void cd2650_state::cd2650_data(address_map &map)
+void cd2650_state::data_map(address_map &map)
 {
 	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
 }
@@ -173,22 +174,29 @@ void cd2650_state::machine_reset()
 	m_term_data = 0x80;
 }
 
-uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cd2650_state::machine_start()
+{
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cass_data));
+}
+
+u32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.
     Further, the letters have bit 6 set low, thus the range is 01 to 1A.
     When the bottom of the screen is reached, it does not scroll, it just wraps around. */
 
-	uint16_t offset = 0;
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,x,mem;
+	u8 y,ra,chr,gfx;
+	u16 offset=0,sy=0,x,mem;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < CHARACTER_LINES; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 80; x++)
 			{
@@ -263,7 +271,7 @@ QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 	}
 	else
 	{
-		std::vector<uint8_t> quick_data(quick_length);
+		std::vector<u8> quick_data(quick_length);
 		int read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
@@ -317,9 +325,9 @@ void cd2650_state::cd2650(machine_config &config)
 {
 	/* basic machine hardware */
 	S2650(config, m_maincpu, XTAL(14'192'640) / 12); // 1.182720MHz according to RE schematic
-	m_maincpu->set_addrmap(AS_PROGRAM, &cd2650_state::cd2650_mem);
-	m_maincpu->set_addrmap(AS_IO, &cd2650_state::cd2650_io);
-	m_maincpu->set_addrmap(AS_DATA, &cd2650_state::cd2650_data);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cd2650_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cd2650_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &cd2650_state::data_map);
 	m_maincpu->sense_handler().set(FUNC(cd2650_state::cass_r));
 	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
 
@@ -381,4 +389,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME                FLAGS
-COMP( 1977, cd2650, 0,      0,      cd2650,  cd2650, cd2650_state, empty_init, "Central Data", "2650 Computer System", 0 )
+COMP( 1977, cd2650, 0,      0,      cd2650,  cd2650, cd2650_state, empty_init, "Central Data", "2650 Computer System", MACHINE_SUPPORTS_SAVE )

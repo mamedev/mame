@@ -293,9 +293,9 @@ WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::data_write )
 //  bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_r )
+uint8_t ibm_pc_xt_83_keyboard_device::bus_r()
 {
-	// HACK this should be handled in mcs48.c
+	// HACK this should be handled in mcs48.cpp
 	return m_bus;
 }
 
@@ -304,7 +304,7 @@ READ8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
+void ibm_pc_xt_83_keyboard_device::bus_w(uint8_t data)
 {
 	/*
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
+void ibm_pc_xt_83_keyboard_device::p1_w(uint8_t data)
 {
 	/*
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
+void ibm_pc_xt_83_keyboard_device::p2_w(uint8_t data)
 {
 	/*
 

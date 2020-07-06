@@ -107,27 +107,26 @@ private:
 	void mark6_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(sound_r);
+	void nvram_w(offs_t offset, u8 data);
+	u8 nvram_r(offs_t offset);
+	void lcd_data_w(u8 data);
+	void sound_w(u8 data);
+	u8 sound_r();
 	void reset_irq_w(u8 data);
-	DECLARE_READ8_MEMBER(reset_irq_r);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(cb_rom_r);
-	DECLARE_WRITE8_MEMBER(cb_w);
-	DECLARE_READ8_MEMBER(cb_r);
+	u8 reset_irq_r();
+	u8 input_r(offs_t offset);
+	u8 cb_rom_r(offs_t offset);
+	void cb_w(u8 data);
+	u8 cb_r();
 
-	template<int N> DECLARE_WRITE8_MEMBER(pwm_output_w);
-	template<int N> DECLARE_WRITE64_MEMBER(lcd_output_w);
+	template<int N> void pwm_output_w(offs_t offset, u8 data);
+	template<int N> void lcd_output_w(u64 data);
 
 	u8 m_dac_data = 0;
 	u8 m_lcd_lcd = 0;
 	u8 m_lcd_rowsel = 0;
 	u8 m_cb_mux = 0;
 
-	emu_timer *m_cb_startdelay;
 	emu_timer *m_irqtimer;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
@@ -137,9 +136,6 @@ void mark5_state::machine_start()
 {
 	m_out_x.resolve();
 	m_irqtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mark5_state::interrupt),this));
-
-	m_cb_startdelay = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_cb_startdelay->adjust(attotime::from_msec(100));
 
 	// register for savestates
 	save_item(NAME(m_dac_data));
@@ -159,25 +155,25 @@ void mark5_state::machine_reset()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(mark5_state::nvram_w)
+void mark5_state::nvram_w(offs_t offset, u8 data)
 {
 	// nvram is only d0-d3
 	m_nvram[offset] = data & 0xf;
 }
 
-READ8_MEMBER(mark5_state::nvram_r)
+u8 mark5_state::nvram_r(offs_t offset)
 {
 	return m_nvram[offset] & 0xf;
 }
 
 template<int N>
-WRITE8_MEMBER(mark5_state::pwm_output_w)
+void mark5_state::pwm_output_w(offs_t offset, u8 data)
 {
 	m_out_x[N][offset & 0x3f][offset >> 6] = data;
 }
 
 template<int N>
-WRITE64_MEMBER(mark5_state::lcd_output_w)
+void mark5_state::lcd_output_w(u64 data)
 {
 	if (N == 0)
 	{
@@ -215,7 +211,7 @@ void mark5_state::reset_irq_w(u8 data)
 	write_lcd(0);
 }
 
-READ8_MEMBER(mark5_state::reset_irq_r)
+u8 mark5_state::reset_irq_r()
 {
 	if (!machine().side_effects_disabled())
 		reset_irq_w(0);
@@ -223,22 +219,22 @@ READ8_MEMBER(mark5_state::reset_irq_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mark5_state::sound_w)
+void mark5_state::sound_w(u8 data)
 {
 	// 7474 to speaker out
 	m_dac_data ^= 1;
 	m_dac->write(m_dac_data & m_inputs[7]->read());
 }
 
-READ8_MEMBER(mark5_state::sound_r)
+u8 mark5_state::sound_r()
 {
 	if (!machine().side_effects_disabled())
-		sound_w(space, offset, 0);
+		sound_w(0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(mark5_state::lcd_data_w)
+void mark5_state::lcd_data_w(u8 data)
 {
 	// d0,d2,d4: LCD data
 	for (int i = 0; i < 3; i++)
@@ -250,7 +246,7 @@ WRITE8_MEMBER(mark5_state::lcd_data_w)
 	}
 }
 
-READ8_MEMBER(mark5_state::input_r)
+u8 mark5_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -263,7 +259,7 @@ READ8_MEMBER(mark5_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(mark5_state::cb_w)
+void mark5_state::cb_w(u8 data)
 {
 	if (~m_inputs[6]->read() & 0x20)
 		return;
@@ -275,16 +271,16 @@ WRITE8_MEMBER(mark5_state::cb_w)
 	m_cb_mux = data;
 }
 
-READ8_MEMBER(mark5_state::cb_r)
+u8 mark5_state::cb_r()
 {
-	if (~m_inputs[6]->read() & 0x20 || m_cb_startdelay->enabled())
+	if (~m_inputs[6]->read() & 0x20)
 		return 0xff;
 
 	// read chessboard sensors
 	return ~m_board->read_file(m_cb_mux & 7);
 }
 
-READ8_MEMBER(mark5_state::cb_rom_r)
+u8 mark5_state::cb_rom_r(offs_t offset)
 {
 	return (m_inputs[6]->read() & 0x20) ? m_cb_rom[offset] : 0xff;
 }
@@ -461,6 +457,7 @@ void mark5_state::mark6(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	PWM_DISPLAY(config, m_display[3]).set_size(8, 8);
 	m_display[3]->set_bri_levels(0.001);
@@ -481,7 +478,7 @@ ROM_START( ccmk5 )
 	ROM_LOAD("c47027_syp_2364-3-y5d", 0xe000, 0x2000, CRC(7c0f7bd8) SHA1(68b4566f0501005f6b1739bb24a4bec990421a6f) ) // "
 
 	ROM_REGION( 1887415, "screen", 0)
-	ROM_LOAD( "ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
+	ROM_LOAD("ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
 ROM_END
 
 ROM_START( ccmk6 )
@@ -495,7 +492,7 @@ ROM_START( ccmk6 )
 	ROM_LOAD("d2732c-e.u1", 0x0000, 0x1000, CRC(93221b4c) SHA1(8561b52c80cab7c04d30eaa14f9520a362d7f822) ) // no label, identical halves
 
 	ROM_REGION( 1887415, "screen", 0)
-	ROM_LOAD( "ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
+	ROM_LOAD("ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
 ROM_END
 
 } // anonymous namespace

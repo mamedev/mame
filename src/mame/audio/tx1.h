@@ -19,30 +19,30 @@ class tx1_sound_device : public device_t, public device_sound_interface
 public:
 	tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER( z80_busreq_w );
-	DECLARE_READ16_MEMBER( dipswitches_r );
-	DECLARE_READ16_MEMBER( z80_shared_r );
-	DECLARE_WRITE16_MEMBER( z80_shared_w );
+	void z80_busreq_w(uint16_t data);
+	uint16_t dipswitches_r();
+	uint16_t z80_shared_r(offs_t offset);
+	void z80_shared_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE8_MEMBER( z80_intreq_w );
+	void z80_intreq_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ts_w );
-	DECLARE_READ8_MEMBER( ts_r );
+	void ts_w(offs_t offset, uint8_t data);
+	uint8_t ts_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER( pit8253_r );
-	DECLARE_WRITE8_MEMBER( pit8253_w );
+	uint8_t pit8253_r(offs_t offset);
+	void pit8253_w(offs_t offset, uint8_t data);
 
 	INTERRUPT_GEN_MEMBER( z80_irq );
 
 protected:
 
-	DECLARE_WRITE8_MEMBER( tx1_ppi_latch_w );
-	DECLARE_WRITE8_MEMBER( tx1_coin_cnt_w );
-	DECLARE_READ8_MEMBER( tx1_ppi_porta_r );
-	DECLARE_READ8_MEMBER( tx1_ppi_portb_r );
+	void tx1_ppi_latch_w(uint8_t data);
+	void tx1_coin_cnt_w(uint8_t data);
+	uint8_t tx1_ppi_porta_r();
+	uint8_t tx1_ppi_portb_r();
 
-	DECLARE_WRITE8_MEMBER( ay8910_a_w );
-	DECLARE_WRITE8_MEMBER( ay8910_b_w );
+	void ay8910_a_w(uint8_t data);
+	void ay8910_b_w(uint8_t data);
 
 	/*************************************
 	 *
@@ -142,8 +142,8 @@ class buggyboy_sound_device : public tx1_sound_device
 public:
 	buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( ym2_a_w );
-	DECLARE_WRITE8_MEMBER( ym2_b_w );
+	void ym2_a_w(uint8_t data);
+	void ym2_b_w(uint8_t data);
 
 protected:
 	buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -157,10 +157,10 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	DECLARE_WRITE8_MEMBER( ym1_a_w );
+	void ym1_a_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( bb_analog_r );
-	DECLARE_WRITE8_MEMBER( bb_coin_cnt_w );
+	uint8_t bb_analog_r(offs_t offset);
+	void bb_coin_cnt_w(uint8_t data);
 
 	virtual bool has_coin_counters() { return false; }
 
@@ -180,7 +180,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ8_MEMBER( bbjr_analog_r );
+	uint8_t bbjr_analog_r(offs_t offset);
 
 	virtual bool has_coin_counters() override { return true; }
 

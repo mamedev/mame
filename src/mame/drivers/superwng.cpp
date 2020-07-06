@@ -82,21 +82,21 @@ private:
 	tilemap_t * m_bg_tilemap;
 	tilemap_t * m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(superwng_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(superwng_sound_interrupt_w);
-	DECLARE_WRITE8_MEMBER(superwng_sound_nmi_clear_w);
-	DECLARE_WRITE8_MEMBER(superwng_bg_vram_w);
-	DECLARE_WRITE8_MEMBER(superwng_bg_cram_w);
-	DECLARE_WRITE8_MEMBER(superwng_fg_vram_w);
-	DECLARE_WRITE8_MEMBER(superwng_fg_cram_w);
-	DECLARE_WRITE8_MEMBER(superwng_tilebank_w);
-	DECLARE_WRITE8_MEMBER(superwng_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
-	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
-	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
-	DECLARE_READ8_MEMBER(superwng_sound_byte_r);
-	DECLARE_WRITE8_MEMBER(superwng_unk_a187_w);
-	DECLARE_WRITE8_MEMBER(superwng_unk_a185_w);
+	void superwng_nmi_enable_w(uint8_t data);
+	void superwng_sound_interrupt_w(uint8_t data);
+	void superwng_sound_nmi_clear_w(uint8_t data);
+	void superwng_bg_vram_w(offs_t offset, uint8_t data);
+	void superwng_bg_cram_w(offs_t offset, uint8_t data);
+	void superwng_fg_vram_w(offs_t offset, uint8_t data);
+	void superwng_fg_cram_w(offs_t offset, uint8_t data);
+	void superwng_tilebank_w(uint8_t data);
+	void superwng_flip_screen_w(uint8_t data);
+	void superwng_cointcnt1_w(uint8_t data);
+	void superwng_cointcnt2_w(uint8_t data);
+	void superwng_hopper_w(uint8_t data);
+	uint8_t superwng_sound_byte_r();
+	void superwng_unk_a187_w(uint8_t data);
+	void superwng_unk_a185_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -109,12 +109,12 @@ private:
 	void superwng_sound_map(address_map &map);
 };
 
-WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
+void superwng_state::superwng_unk_a187_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data&1);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_unk_a185_w)
+void superwng_state::superwng_unk_a185_w(uint8_t data)
 {
 //  printf("superwng_unk_a185_w %02x\n", data);
 }
@@ -237,7 +237,7 @@ void superwng_state::superwng_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
+void superwng_state::superwng_nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 }
@@ -248,19 +248,19 @@ WRITE_LINE_MEMBER(superwng_state::main_nmi_interrupt)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
+void superwng_state::superwng_sound_interrupt_w(uint8_t data)
 {
 	m_sound_byte = data;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(superwng_state::superwng_sound_byte_r)
+uint8_t superwng_state::superwng_sound_byte_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;
 }
 
-WRITE8_MEMBER(superwng_state::superwng_sound_nmi_clear_w)
+void superwng_state::superwng_sound_nmi_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -271,55 +271,55 @@ INTERRUPT_GEN_MEMBER(superwng_state::superwng_sound_nmi_assert)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)
+void superwng_state::superwng_bg_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_bg_cram_w)
+void superwng_state::superwng_bg_cram_w(offs_t offset, uint8_t data)
 {
 	m_colorram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_fg_vram_w)
+void superwng_state::superwng_fg_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_fg_cram_w)
+void superwng_state::superwng_fg_cram_w(offs_t offset, uint8_t data)
 {
 	m_colorram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
+void superwng_state::superwng_tilebank_w(uint8_t data)
 {
 	m_tile_bank = data;
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
+void superwng_state::superwng_flip_screen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x01);
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(superwng_state::superwng_cointcnt1_w)
+void superwng_state::superwng_cointcnt1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
+void superwng_state::superwng_cointcnt2_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_hopper_w)
+void superwng_state::superwng_hopper_w(uint8_t data)
 {
 }
 

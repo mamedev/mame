@@ -146,8 +146,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	required_device<bert_device> m_bert;
 };
@@ -172,8 +172,8 @@ private:
 	u8 mcu_status_r();
 	void irq_w(u8 data);
 
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	required_device<bt478_device> m_ramdac;
 };
@@ -194,8 +194,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u16 lance_dma_r(offs_t offset);
+	void lance_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 };
 
 void ncd68k_state::machine_reset()
@@ -383,7 +383,7 @@ void ncd17c_state::irq_w(u8 data)
 	m_maincpu->set_input_line(M68K_IRQ_1, BIT(data, 7));
 }
 
-READ16_MEMBER(ncd16_state::lance_dma_r)
+u16 ncd16_state::lance_dma_r(offs_t offset)
 {
 	if (offset < 0x380000)
 		fatalerror("lance_dma_r DMA target %08x not handled", offset);
@@ -396,7 +396,7 @@ READ16_MEMBER(ncd16_state::lance_dma_r)
 	return data;
 }
 
-WRITE16_MEMBER(ncd16_state::lance_dma_w)
+void ncd16_state::lance_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset < 0x380000)
 		fatalerror("lance_dma_w DMA target %08x not handled", offset);
@@ -409,7 +409,7 @@ WRITE16_MEMBER(ncd16_state::lance_dma_w)
 		m_ram->write(BYTE_XOR_BE(offset + 1), u8(data >> 0));
 }
 
-READ16_MEMBER(ncd17c_state::lance_dma_r)
+u16 ncd17c_state::lance_dma_r(offs_t offset)
 {
 	u16 const data =
 		(u16(m_ram->read(BYTE4_XOR_BE(offset + 0))) << 8) | m_ram->read(BYTE4_XOR_BE(offset + 1));
@@ -417,7 +417,7 @@ READ16_MEMBER(ncd17c_state::lance_dma_r)
 	return data;
 }
 
-WRITE16_MEMBER(ncd17c_state::lance_dma_w)
+void ncd17c_state::lance_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_ram->write(BYTE4_XOR_BE(offset + 0), u8(data >> 8));
@@ -425,7 +425,7 @@ WRITE16_MEMBER(ncd17c_state::lance_dma_w)
 		m_ram->write(BYTE4_XOR_BE(offset + 1), u8(data >> 0));
 }
 
-READ16_MEMBER(ncd19_state::lance_dma_r)
+u16 ncd19_state::lance_dma_r(offs_t offset)
 {
 	if (offset < 0x800000)
 		fatalerror("lance_dma_r DMA target %08x not handled!", offset);
@@ -436,7 +436,7 @@ READ16_MEMBER(ncd19_state::lance_dma_r)
 	return data;
 }
 
-WRITE16_MEMBER(ncd19_state::lance_dma_w)
+void ncd19_state::lance_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset < 0x800000)
 		fatalerror("lance_dma_w DMA target %08x not handled!", offset);

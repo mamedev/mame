@@ -422,13 +422,13 @@ private:
 
 	uint8_t m_adpcm_data;
 
-	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
-	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
-	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
-	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
+	void kurukuru_out_latch_w(uint8_t data);
+	void kurukuru_bankswitch_w(uint8_t data);
+	void kurukuru_adpcm_reset_w(uint8_t data);
+	uint8_t kurukuru_adpcm_timer_irqack_r();
+	void kurukuru_adpcm_data_w(uint8_t data);
+	void ym2149_aout_w(uint8_t data);
+	void ym2149_bout_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -470,7 +470,7 @@ WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 
 // Main CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
+void kurukuru_state::kurukuru_out_latch_w(uint8_t data)
 {
 /*
    00-0f is output latch (controls jamma output pins)
@@ -496,7 +496,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
+void kurukuru_state::kurukuru_bankswitch_w(uint8_t data)
 {
 	m_bank1->set_entry(7); // remove banked rom
 /*
@@ -580,7 +580,7 @@ void kurukuru_state::ppj_io(address_map &map)
 
 // Audio CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
+void kurukuru_state::kurukuru_adpcm_data_w(uint8_t data)
 {
 /*
      6-bit latch. only 4 connected...
@@ -589,7 +589,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
 	m_adpcm_data = data & 0xf;
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
+void kurukuru_state::kurukuru_adpcm_reset_w(uint8_t data)
 {
 /*
      6-bit latch. only 4 connected...
@@ -602,7 +602,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 	m_adpcm->reset_w(data & 1);
 }
 
-READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
+uint8_t kurukuru_state::kurukuru_adpcm_timer_irqack_r()
 {
 	if (!machine().side_effects_disabled())
 		m_soundirq->rst30_w(0);
@@ -646,12 +646,12 @@ void kurukuru_state::ppj_audio_io(address_map &map)
 */
 
 /* YM2149 ports */
-WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
+void kurukuru_state::ym2149_aout_w(uint8_t data)
 {
 	logerror("YM2149: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
+void kurukuru_state::ym2149_bout_w(uint8_t data)
 {
 	logerror("YM2149: Port B out: %02X\n", data);
 }

@@ -46,7 +46,7 @@ Notes:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(yunsung8_state::bankswitch_w)
+void yunsung8_state::bankswitch_w(uint8_t data)
 {
 	m_layers_ctrl = data & 0x30;    // Layers enable
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 		logerror("CPU #0 - PC %04X: Bank %02X\n", m_maincpu->pc(), data);
 }
 
-WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
+void yunsung8_state::main_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -102,7 +102,7 @@ void yunsung8_state::port_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
+void yunsung8_state::sound_bankswitch_w(uint8_t data)
 {
 	m_msm->reset_w(data & 0x20);
 

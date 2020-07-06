@@ -82,19 +82,19 @@ public:
 	void scanline_int_ack_w(uint32_t data = 0);
 	void video_int_ack_w(uint32_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
-	DECLARE_READ32_MEMBER(special_port2_r);
-	DECLARE_READ32_MEMBER(special_port3_r);
-	DECLARE_READ8_MEMBER(analog_port_r);
-	DECLARE_WRITE32_MEMBER(latch_w);
-	DECLARE_WRITE32_MEMBER(mo_command_w);
-	DECLARE_WRITE32_MEMBER(led_w);
-	DECLARE_READ32_MEMBER(sound_data_r);
-	DECLARE_WRITE32_MEMBER(sound_data_w);
-	DECLARE_READ32_MEMBER(colorram_protection_r);
-	DECLARE_WRITE32_MEMBER(colorram_protection_w);
-	DECLARE_WRITE32_MEMBER(tmek_pf_w);
+	uint32_t special_port2_r();
+	uint32_t special_port3_r();
+	uint8_t analog_port_r(offs_t offset);
+	void latch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void led_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sound_data_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void tmek_pf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_callback);
+	void cage_irq_callback(uint8_t data);
 
 	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
 	uint16_t atarigt_colorram_r(offs_t address);

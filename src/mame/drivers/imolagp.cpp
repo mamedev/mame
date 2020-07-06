@@ -127,15 +127,15 @@ private:
 	uint8_t m_steerlatch;
 	uint8_t m_draw_mode;
 
-	DECLARE_WRITE8_MEMBER(transmit_data_w);
-	DECLARE_READ8_MEMBER(trigger_slave_nmi_r);
-	DECLARE_READ8_MEMBER(receive_data_r);
-	DECLARE_WRITE8_MEMBER(imola_led_board_w);
-	DECLARE_READ8_MEMBER(vreg_data_r);
-	DECLARE_WRITE8_MEMBER(screenram_w);
-	DECLARE_READ8_MEMBER(imola_draw_mode_r);
-	DECLARE_WRITE8_MEMBER(vreg_control_w);
-	DECLARE_WRITE8_MEMBER(vreg_data_w);
+	void transmit_data_w(offs_t offset, uint8_t data);
+	uint8_t trigger_slave_nmi_r();
+	uint8_t receive_data_r(offs_t offset);
+	void imola_led_board_w(offs_t offset, uint8_t data);
+	uint8_t vreg_data_r();
+	void screenram_w(offs_t offset, uint8_t data);
+	uint8_t imola_draw_mode_r(offs_t offset);
+	void vreg_control_w(uint8_t data);
+	void vreg_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
@@ -259,17 +259,17 @@ WRITE_LINE_MEMBER(imolagp_state::vblank_irq)
  * Handling the NMI takes more time than triggering the NMI, implying that the slave CPU either runs at
  * a higher clock, or has a way to force the main CPU to wait.
  */
-WRITE8_MEMBER(imolagp_state::transmit_data_w)
+void imolagp_state::transmit_data_w(offs_t offset, uint8_t data)
 {
 	m_comms_latch[offset] = data;
 }
 
-READ8_MEMBER(imolagp_state::receive_data_r)
+uint8_t imolagp_state::receive_data_r(offs_t offset)
 {
 	return m_comms_latch[offset];
 }
 
-READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
+uint8_t imolagp_state::trigger_slave_nmi_r()
 {
 	if (!machine().side_effects_disabled())
 		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -277,7 +277,7 @@ READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 }
 
 
-WRITE8_MEMBER(imolagp_state::imola_led_board_w)
+void imolagp_state::imola_led_board_w(offs_t offset, uint8_t data)
 {
 	// not sure what chip is used here, this is copied from turbo.c
 	static const uint8_t ls48_map[16] =
@@ -301,12 +301,12 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 }
 
 
-WRITE8_MEMBER(imolagp_state::vreg_control_w)
+void imolagp_state::vreg_control_w(uint8_t data)
 {
 	m_vcontrol = data & 0xf;
 }
 
-READ8_MEMBER(imolagp_state::vreg_data_r)
+uint8_t imolagp_state::vreg_data_r()
 {
 	// auto-steer related
 	return 0;
@@ -314,7 +314,7 @@ READ8_MEMBER(imolagp_state::vreg_data_r)
 	//return 0x17; // it checks for this too
 }
 
-WRITE8_MEMBER(imolagp_state::vreg_data_w)
+void imolagp_state::vreg_data_w(uint8_t data)
 {
 	// $07: always $ff?
 	// $0e: x scroll
@@ -323,7 +323,7 @@ WRITE8_MEMBER(imolagp_state::vreg_data_w)
 }
 
 
-WRITE8_MEMBER(imolagp_state::screenram_w)
+void imolagp_state::screenram_w(offs_t offset, uint8_t data)
 {
 	// when in tunnel: $81/$82 -> sprite ram?
 	if (m_draw_mode & 0x80)
@@ -338,7 +338,7 @@ WRITE8_MEMBER(imolagp_state::screenram_w)
 		m_videoram[0][offset] = data;
 }
 
-READ8_MEMBER(imolagp_state::imola_draw_mode_r)
+uint8_t imolagp_state::imola_draw_mode_r(offs_t offset)
 {
 	// the game reads a port before and after writing to screen ram
 	m_draw_mode = offset;

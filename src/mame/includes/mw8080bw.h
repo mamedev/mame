@@ -65,7 +65,6 @@ public:
 	void phantom2(machine_config &config);
 	void shuffle(machine_config &config);
 	void tornbase(machine_config &config);
-	void zzzap(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(direct_coin_count);
 
@@ -118,20 +117,18 @@ private:
 
 	attotime m_interrupt_time;
 
-	DECLARE_WRITE8_MEMBER(tornbase_io_w);
-	DECLARE_WRITE8_MEMBER(maze_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(maze_io_w);
-	DECLARE_WRITE8_MEMBER(checkmat_io_w);
-	DECLARE_READ8_MEMBER(bowler_shift_result_r);
-	DECLARE_WRITE8_MEMBER(bowler_lights_1_w);
-	DECLARE_WRITE8_MEMBER(bowler_lights_2_w);
-	DECLARE_WRITE8_MEMBER(zzzap_audio_1_w);
-	DECLARE_WRITE8_MEMBER(zzzap_audio_2_w);
-	DECLARE_WRITE8_MEMBER(bowler_audio_2_w);
-	DECLARE_WRITE8_MEMBER(bowler_audio_3_w);
-	DECLARE_WRITE8_MEMBER(bowler_audio_4_w);
-	DECLARE_WRITE8_MEMBER(bowler_audio_5_w);
-	DECLARE_WRITE8_MEMBER(bowler_audio_6_w);
+	void tornbase_io_w(offs_t offset, uint8_t data);
+	void maze_coin_counter_w(uint8_t data);
+	void maze_io_w(offs_t offset, uint8_t data);
+	void checkmat_io_w(offs_t offset, uint8_t data);
+	uint8_t bowler_shift_result_r();
+	void bowler_lights_1_w(uint8_t data);
+	void bowler_lights_2_w(uint8_t data);
+	void bowler_audio_2_w(uint8_t data);
+	void bowler_audio_3_w(uint8_t data);
+	void bowler_audio_4_w(uint8_t data);
+	void bowler_audio_5_w(uint8_t data);
+	void bowler_audio_6_w(uint8_t data);
 	DECLARE_MACHINE_START(maze);
 	DECLARE_MACHINE_START(phantom2);
 	DECLARE_MACHINE_START(invaders);
@@ -139,12 +136,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_trigger);
-	DECLARE_WRITE8_MEMBER(tornbase_audio_w);
-	DECLARE_WRITE8_MEMBER(checkmat_audio_w);
-	DECLARE_WRITE8_MEMBER(shuffle_audio_1_w);
-	DECLARE_WRITE8_MEMBER(shuffle_audio_2_w);
-	DECLARE_WRITE8_MEMBER(bowler_audio_1_w);
-	DECLARE_WRITE8_MEMBER(blueshrk_audio_w);
+	void tornbase_audio_w(uint8_t data);
+	void checkmat_audio_w(uint8_t data);
+	void shuffle_audio_1_w(uint8_t data);
+	void shuffle_audio_2_w(uint8_t data);
+	void bowler_audio_1_w(uint8_t data);
+	void blueshrk_audio_w(uint8_t data);
 	void maze_update_discrete();
 	void maze_write_discrete(uint8_t maze_tone_timing_state);
 	uint8_t vpos_to_vysnc_chain_counter(int vpos);
@@ -159,7 +156,6 @@ private:
 	void maze_audio(machine_config &config);
 	void shuffle_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
-	void zzzap_audio(machine_config &config);
 
 	void blueshrk_io_map(address_map &map);
 	void bowler_io_map(address_map &map);
@@ -172,7 +168,6 @@ private:
 	void phantom2_io_map(address_map &map);
 	void shuffle_io_map(address_map &map);
 	void tornbase_io_map(address_map &map);
-	void zzzap_io_map(address_map &map);
 };
 
 
@@ -377,6 +372,21 @@ private:
 	u8 m_trench_slope[16];  // 16x4 bit RAM
 	u8 m_bright_control;
 	u8 m_brightness;
+};
+
+
+class zzzap_state : public mw8080bw_state
+{
+public:
+	zzzap_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag)
+	{
+	}
+
+	void zzzap(machine_config &config);
+
+private:
+	void io_map(address_map &map);
 };
 
 

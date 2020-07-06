@@ -1108,7 +1108,7 @@ uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
     Machine
 ***************************************************************************/
 
-READ8_MEMBER( x07_state::x07_io_r )
+uint8_t x07_state::x07_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1158,7 +1158,7 @@ READ8_MEMBER( x07_state::x07_io_r )
 }
 
 
-WRITE8_MEMBER( x07_state::x07_io_w )
+void x07_state::x07_io_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

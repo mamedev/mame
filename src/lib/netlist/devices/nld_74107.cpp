@@ -7,7 +7,6 @@
 
 #include "nld_74107.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -20,7 +19,7 @@ namespace netlist
 	NETLIB_OBJECT(74107A)
 	{
 		NETLIB_CONSTRUCTOR(74107A)
-		, m_clk(*this, "CLK", NETLIB_DELEGATE(74107A, clk))
+		, m_clk(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_J(*this, "J")
@@ -34,7 +33,6 @@ namespace netlist
 
 		friend class NETLIB_NAME(74107_dip);
 		friend class NETLIB_NAME(74107);
-		//friend class NETLIB_NAME(74107A_dip);
 
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
@@ -63,7 +61,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(74107, 74107A)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A)
+		NETLIB_CONSTRUCTOR(74107)
 		{
 			m_delay[0] = delay_107[0];
 			m_delay[1] = delay_107[1];

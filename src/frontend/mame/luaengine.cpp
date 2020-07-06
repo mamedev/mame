@@ -14,6 +14,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 #include "debug/textbuf.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -207,35 +208,72 @@ namespace sol
 }
 
 
-//-------------------------------------------------
-// parse_seq_type - parses a string into an input_seq_type
-//-------------------------------------------------
-
-static input_seq_type parse_seq_type(const std::string &s)
+namespace
 {
-	input_seq_type result = SEQ_TYPE_STANDARD;
-	if (s == "increment")
-		result = SEQ_TYPE_INCREMENT;
-	else if (s == "decrement")
-		result = SEQ_TYPE_DECREMENT;
-	return result;
-}
+	// ======================> enum_parser
+	template<typename T, size_t SIZE>
+	class enum_parser
+	{
+	public:
+		constexpr enum_parser(std::initializer_list<std::pair<const char *, T>> values)
+		{
+			if (values.size() != SIZE)
+				throw false && "size template argument incorrectly specified";
+			std::copy(values.begin(), values.end(), m_map.begin());
+		}
+
+		T operator()(const char *text) const
+		{
+			auto iter = std::find_if(
+				m_map.begin() + 1,
+				m_map.end(),
+				[text](const auto &x) { return !strcmp(text, x.first); });
+			if (iter == m_map.end())
+				iter = m_map.begin();
+			return iter->second;
+		}
+
+		T operator()(const std::string &text) const
+		{
+			return (*this)(text.c_str());
+		}
+
+	private:
+		std::array<std::pair<const char *, T>, SIZE>    m_map;
+	};
+};
 
 
-//-------------------------------------------------
-//  parse_movie_format - processes a movie format
-//  string
-//-------------------------------------------------
-
-static movie_recording::format parse_movie_format(const std::string &s)
+static const enum_parser<input_seq_type, 3> s_seq_type_parser =
 {
-	movie_recording::format result = movie_recording::format::AVI;
-	if (s == "avi")
-		result = movie_recording::format::AVI;
-	else if (s == "mng")
-		result = movie_recording::format::MNG;
-	return result;
-}
+	{ "standard", SEQ_TYPE_STANDARD },
+	{ "increment", SEQ_TYPE_INCREMENT },
+	{ "decrement", SEQ_TYPE_DECREMENT },
+};
+
+
+static const enum_parser<movie_recording::format, 2> s_movie_recording_format_parser =
+{
+	{ "avi", movie_recording::format::AVI },
+	{ "mng", movie_recording::format::MNG }
+};
+
+
+static const enum_parser<read_or_write, 4> s_read_or_write_parser =
+{
+	{ "r", read_or_write::READ },
+	{ "w", read_or_write::WRITE },
+	{ "rw", read_or_write::READWRITE },
+	{ "wr", read_or_write::READWRITE }
+};
+
+
+static const enum_parser<ui::text_layout::text_justify, 3> s_text_justify_parser =
+{
+	{ "left", ui::text_layout::LEFT },
+	{ "right", ui::text_layout::RIGHT },
+	{ "center", ui::text_layout::CENTER },
+};
 
 
 //-------------------------------------------------
@@ -1540,8 +1578,8 @@ void lua_engine::initialize()
 	debugger_type.set("consolelog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); }));
 	debugger_type.set("errorlog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); }));
 	debugger_type.set("visible_cpu", sol::property(
-		[](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
-		[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }));
+		[](debugger_manager &debug) { debug.console().get_visible_cpu(); },
+		[](debugger_manager &debug, device_t &dev) { debug.console().set_visible_cpu(&dev); }));
 	debugger_type.set("execution_state", sol::property(
 		[](debugger_manager &debug) {
 			return debug.cpu().is_stopped() ? "stop" : "run";
@@ -1579,7 +1617,7 @@ void lua_engine::initialize()
  * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
  *                                            expressions. returns breakpoint index
  * debug:bpclr(idx) - clear break
- * debug:bplist()[] - table of breakpoints (k=index, v=device_debug::breakpoint)
+ * debug:bplist()[] - table of breakpoints (k=index, v=debug_breakpoint)
  * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
  *                                                              are debugger expressions.
  *                                                              returns watchpoint index
@@ -1599,8 +1637,9 @@ void lua_engine::initialize()
 	device_debug_type.set("bpclr", &device_debug::breakpoint_clear);
 	device_debug_type.set("bplist", [this](device_debug &dev) {
 			sol::table table = sol().create_table();
-			for(const device_debug::breakpoint &bpt : dev.breakpoint_list())
+			for(const auto &bpp : dev.breakpoint_list())
 			{
+				const debug_breakpoint &bpt = *bpp.second;
 				sol::table bp = sol().create_table();
 				bp["enabled"] = bpt.enabled();
 				bp["address"] = bpt.address();
@@ -1611,11 +1650,7 @@ void lua_engine::initialize()
 			return table;
 		});
 	device_debug_type.set("wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-			read_or_write wptype = read_or_write::READ;
-			if(type == "w")
-				wptype = read_or_write::WRITE;
-			else if((type == "rw") || (type == "wr"))
-				wptype = read_or_write::READWRITE;
+			read_or_write wptype = s_read_or_write_parser(type);
 			return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
 		});
 	device_debug_type.set("wpclr", &device_debug::watchpoint_clear);
@@ -1664,6 +1699,7 @@ void lua_engine::initialize()
  * device.spaces[] - device address spaces table (k=name, v=addr_space)
  * device.state[] - device state entries table (k=name, v=device_state_entry)
  * device.items[] - device save state items table (k=name, v=index)
+ * device.roms[] - device rom entry table (k=name, v=rom_entry)
  */
 
 	auto device_type = sol().registry().create_simple_usertype<device_t>("new", sol::no_constructor);
@@ -1717,6 +1753,13 @@ void lua_engine::initialize()
 					table[name] = i;
 				}
 			}
+			return table;
+		}));
+	device_type.set("roms", sol::property([this](device_t &dev) {
+			sol::table table = sol().create_table();
+			for(auto rom : dev.rom_region_vector())
+				if(!rom.name().empty())
+					table[rom.name()] = rom;
 			return table;
 		}));
 	sol().registry().set_usertype("device", device_type);
@@ -2028,27 +2071,29 @@ void lua_engine::initialize()
  * field.crosshair_scale
  * field.crosshair_offset
  * field.user_value
+ *
+ * field.settings[] - ioport_setting table (k=value, v=name)
  */
 
 	auto ioport_field_type = sol().registry().create_simple_usertype<ioport_field>("new", sol::no_constructor);
 	ioport_field_type.set("set_value", &ioport_field::set_value);
 	ioport_field_type.set("set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
 			settings.seq[seq_type] = seq;
 			f.set_user_settings(settings);
 		});
 	ioport_field_type.set("input_seq", [](ioport_field &f, const std::string &seq_type_string) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			return sol::make_user(f.seq(seq_type));
 		});
 	ioport_field_type.set("set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			f.set_defseq(seq_type, seq);
 		});
 	ioport_field_type.set("default_input_seq", [](ioport_field &f, const std::string &seq_type_string) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			return sol::make_user(f.defseq(seq_type));
 		});
 	ioport_field_type.set("keyboard_codes", [this](ioport_field &f, int which) {
@@ -2109,6 +2154,13 @@ void lua_engine::initialize()
 			settings.value = val;
 			f.set_user_settings(settings);
 		}));
+	ioport_field_type.set("settings", sol::property([this](ioport_field &f) {
+			sol::table result = sol().create_table();
+			for (ioport_setting &setting : f.settings())
+				if (setting.enabled())
+					result[setting.value()] = setting.name();
+			return result;
+		}));
 	sol().registry().set_usertype("ioport_field", ioport_field_type);
 
 
@@ -2160,7 +2212,7 @@ void lua_engine::initialize()
 	video_type.set("begin_recording", sol::overload(
 		[this](video_manager &vm, const char *filename, const char *format_string) {
 			std::string fn = process_snapshot_filename(machine(), filename);
-			movie_recording::format format = parse_movie_format(format_string);
+			movie_recording::format format = s_movie_recording_format_parser(format_string);
 			vm.begin_recording(fn.c_str(), format);
 		},
 		[this](video_manager &vm, const char *filename) {
@@ -2565,11 +2617,7 @@ void lua_engine::initialize()
 			}
 			else if(xobj.is<const char *>())
 			{
-				std::string just_str = xobj.as<const char *>();
-				if(just_str == "right")
-					justify = ui::text_layout::RIGHT;
-				else if(just_str == "center")
-					justify = ui::text_layout::CENTER;
+				justify = s_text_justify_parser(xobj.as<const char *>());
 			}
 			else
 			{
@@ -2731,6 +2779,26 @@ void lua_engine::initialize()
 	dev_space_type.set("is_visible", &device_state_entry::visible);
 	dev_space_type.set("is_divider", &device_state_entry::divider);
 	sol().registry().set_usertype("dev_space", dev_space_type);
+
+
+/*  rom_entry library
+ *
+ * manager:machine().devices[device_tag].roms[rom]
+ *
+ * rom:name()
+ * rom:hashdata() - see hash.h
+ * rom:offset()
+ * rom:length()
+ * rom:flags() - see romentry.h
+ */
+
+	auto rom_entry_type = sol().registry().create_simple_usertype<rom_entry>("new", sol::no_constructor);
+	rom_entry_type.set("name", &rom_entry::name);
+	rom_entry_type.set("hashdata", &rom_entry::hashdata);
+	rom_entry_type.set("offset", &rom_entry::get_offset);
+	rom_entry_type.set("length", &rom_entry::get_length);
+	rom_entry_type.set("flags", &rom_entry::get_flags);
+	sol().registry().set_usertype("rom_entry", rom_entry_type);
 
 
 /*  memory_manager library

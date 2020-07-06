@@ -46,13 +46,13 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(foreground_videoram_w);
-	DECLARE_WRITE8_MEMBER(background_videoram_w);
-	DECLARE_WRITE8_MEMBER(maincpu_50_w);
-	DECLARE_WRITE8_MEMBER(leds_output_block);
-	DECLARE_WRITE8_MEMBER(leds_start_block);
-	DECLARE_WRITE8_MEMBER(leds_shift_bit);
+	void coincounter_w(uint8_t data);
+	void foreground_videoram_w(offs_t offset, uint8_t data);
+	void background_videoram_w(offs_t offset, uint8_t data);
+	void maincpu_50_w(uint8_t data);
+	void leds_output_block(uint8_t data);
+	void leds_start_block(uint8_t data);
+	void leds_shift_bit(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);

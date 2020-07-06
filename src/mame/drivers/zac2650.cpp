@@ -255,7 +255,7 @@ void zac2650_state::tinvader(machine_config &config)
 	S2636(config, m_s2636, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
+void zac2650_state::tinvader_sound_w(uint8_t data)
 {
 	/* sounds are NOT the same as space invaders */
 

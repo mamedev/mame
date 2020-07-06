@@ -53,16 +53,16 @@ private:
 		TIMER_QUARTER
 	};
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
-	DECLARE_READ8_MEMBER(potsense_r);
-	DECLARE_WRITE8_MEMBER(potmask_w);
-	DECLARE_WRITE8_MEMBER(pitcher_pic_w);
-	DECLARE_WRITE8_MEMBER(ball_vert_w);
-	DECLARE_WRITE8_MEMBER(ball_horz_w);
-	DECLARE_WRITE8_MEMBER(pitcher_vert_w);
-	DECLARE_WRITE8_MEMBER(pitcher_horz_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	uint8_t input_r();
+	uint8_t scanline_r();
+	uint8_t potsense_r();
+	void potmask_w(uint8_t data);
+	void pitcher_pic_w(uint8_t data);
+	void ball_vert_w(uint8_t data);
+	void ball_horz_w(uint8_t data);
+	void pitcher_vert_w(uint8_t data);
+	void pitcher_horz_w(uint8_t data);
+	void misc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lamp_w);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
@@ -239,52 +239,52 @@ TIMER_CALLBACK_MEMBER(flyball_state::quarter_callback)
  *************************************/
 
 /* two physical buttons (start game and stop runner) share the same port bit */
-READ8_MEMBER(flyball_state::input_r)
+uint8_t flyball_state::input_r()
 {
 	return ioport("IN0")->read() & ioport("IN1")->read();
 }
 
-READ8_MEMBER(flyball_state::scanline_r)
+uint8_t flyball_state::scanline_r()
 {
 	return m_screen->vpos() & 0x3f;
 }
 
-READ8_MEMBER(flyball_state::potsense_r)
+uint8_t flyball_state::potsense_r()
 {
 	return m_potsense & ~m_potmask;
 }
 
-WRITE8_MEMBER(flyball_state::potmask_w)
+void flyball_state::potmask_w(uint8_t data)
 {
 	m_potmask |= data & 0xf;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_pic_w)
+void flyball_state::pitcher_pic_w(uint8_t data)
 {
 	m_pitcher_pic = data & 0xf;
 }
 
-WRITE8_MEMBER(flyball_state::ball_vert_w)
+void flyball_state::ball_vert_w(uint8_t data)
 {
 	m_ball_vert = data;
 }
 
-WRITE8_MEMBER(flyball_state::ball_horz_w)
+void flyball_state::ball_horz_w(uint8_t data)
 {
 	m_ball_horz = data;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_vert_w)
+void flyball_state::pitcher_vert_w(uint8_t data)
 {
 	m_pitcher_vert = data;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_horz_w)
+void flyball_state::pitcher_horz_w(uint8_t data)
 {
 	m_pitcher_horz = data;
 }
 
-WRITE8_MEMBER(flyball_state::misc_w)
+void flyball_state::misc_w(offs_t offset, uint8_t data)
 {
 	// address and data lines passed through inverting buffers
 	m_outlatch->write_d0(~offset, ~data);

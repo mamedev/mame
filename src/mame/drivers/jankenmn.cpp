@@ -174,9 +174,9 @@ public:
 	void jankenmn(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(lamps3_w);
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void lamps3_w(uint8_t data);
 
 	virtual void machine_start() override;
 
@@ -196,7 +196,7 @@ private:
 static constexpr uint8_t led_map[16] = // 7748 IC?
 	{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
-WRITE8_MEMBER(jankenmn_state::lamps1_w)
+void jankenmn_state::lamps1_w(uint8_t data)
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
 	m_lamps[8] = (data & 7) != 0;
@@ -212,7 +212,7 @@ WRITE8_MEMBER(jankenmn_state::lamps1_w)
 	// d3: ? (only set if game is over)
 }
 
-WRITE8_MEMBER(jankenmn_state::lamps2_w)
+void jankenmn_state::lamps2_w(uint8_t data)
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
 	m_lamps[2] = BIT(data, 3);
@@ -231,7 +231,7 @@ WRITE8_MEMBER(jankenmn_state::lamps2_w)
 	m_digits[0] = led_map[data & 1];
 }
 
-WRITE8_MEMBER(jankenmn_state::lamps3_w)
+void jankenmn_state::lamps3_w(uint8_t data)
 {
 	// d1: blue rotating lamp on top of cab
 	m_lamps[15] = BIT(data, 1);

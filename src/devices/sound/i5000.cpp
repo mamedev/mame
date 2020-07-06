@@ -266,7 +266,7 @@ void i5000snd_device::write_reg16(uint8_t reg, uint16_t data)
 }
 
 
-READ16_MEMBER( i5000snd_device::read )
+uint16_t i5000snd_device::read(offs_t offset)
 {
 	uint16_t ret = 0;
 	m_stream->update();
@@ -291,7 +291,7 @@ READ16_MEMBER( i5000snd_device::read )
 }
 
 
-WRITE16_MEMBER( i5000snd_device::write )
+void i5000snd_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask != 0xffff)
 	{

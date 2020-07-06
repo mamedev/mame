@@ -301,7 +301,7 @@ void md_boot_state::md_bootleg(machine_config &config)
  *
  *************************************/
 
-WRITE16_MEMBER(md_boot_state::aladmdb_w )
+void md_boot_state::aladmdb_w(uint16_t data)
 {
 	/*
 	Values returned from the log file :
@@ -313,7 +313,7 @@ WRITE16_MEMBER(md_boot_state::aladmdb_w )
 	logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
 }
 
-READ16_MEMBER(md_boot_state::aladmdb_r )
+uint16_t md_boot_state::aladmdb_r()
 {
 	if (m_maincpu->pc()==0x1b2a56)
 	{
@@ -332,7 +332,7 @@ READ16_MEMBER(md_boot_state::aladmdb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::twinktmb_r )
+uint16_t md_boot_state::twinktmb_r()
 {
 	if (m_maincpu->pc()==0x02f81e)
 		return ioport("COIN")->read(); // TODO: coins don't respond well
@@ -344,7 +344,7 @@ READ16_MEMBER(md_boot_state::twinktmb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::jparkmb_r )
+uint16_t md_boot_state::jparkmb_r()
 {
 	if (m_maincpu->pc()==0x1e327a)
 		return ioport("COIN")->read(); // TODO: coins don't respond well
@@ -356,31 +356,31 @@ READ16_MEMBER(md_boot_state::jparkmb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::mk3mdb_dsw_r )
+uint16_t md_boot_state::mk3mdb_dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::ssf2mdb_dsw_r )
+uint16_t md_boot_state::ssf2mdb_dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::srmdb_dsw_r )
+uint16_t md_boot_state::srmdb_dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::topshoot_200051_r )
+uint16_t md_boot_state::topshoot_200051_r()
 {
 	return -0x5b;
 }
 
 // jzth protection
-WRITE16_MEMBER(md_boot_state::bl_710000_w)
+void md_boot_state::bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 
@@ -435,7 +435,7 @@ WRITE16_MEMBER(md_boot_state::bl_710000_w)
 }
 
 
-READ16_MEMBER(md_boot_state::bl_710000_r)
+uint16_t md_boot_state::bl_710000_r()
 {
 	uint16_t ret;
 	int pc = m_maincpu->pc();
@@ -956,8 +956,8 @@ void md_boot_state::init_aladmdb()
 	#endif
 
 	// 220000 = writes to mcu? 330000 = reads?
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16_delegate(*this, FUNC(md_boot_state::aladmdb_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16smo_delegate(*this, FUNC(md_boot_state::aladmdb_r)));
 
 	init_megadrij();
 }
@@ -1005,12 +1005,12 @@ void md_boot_state::init_mk3mdb()
 	rom[0x07] = 0x02;
 	rom[0x06] = 0x10;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(*this, FUNC(md_boot_state::mk3mdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::mk3mdb_dsw_r)));
 
 	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void md_boot_state::init_ssf2mdb()
@@ -1021,12 +1021,12 @@ void md_boot_state::init_ssf2mdb()
 
 	membank("bank5")->set_base(memregion( "maincpu" )->base() + 0x400000 );
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(*this, FUNC(md_boot_state::ssf2mdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::ssf2mdb_dsw_r)));
 
 	init_megadrij();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void md_boot_state::init_srmdb()
@@ -1052,14 +1052,14 @@ void md_boot_state::init_srmdb()
 	rom[0x06] = 0xd2;
 	rom[0x07] = 0x00;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(*this, FUNC(md_boot_state::srmdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::srmdb_dsw_r)));
 
 	init_megadriv();
 }
 
 void md_boot_state::init_topshoot()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16_delegate(*this, FUNC(md_boot_state::topshoot_200051_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16smo_delegate(*this, FUNC(md_boot_state::topshoot_200051_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
@@ -1086,7 +1086,7 @@ void md_boot_state::init_barek3()
 void md_boot_state::init_sonic2mb()
 {
 	// 100000 = writes to unpopulated MCU?
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x300000, 0x300001, "DSW");
 
 	init_megadrij();
@@ -1103,15 +1103,15 @@ void md_boot_state::init_twinktmb()
 	rom[0x06] = 0xcc;
 
 	init_megadrij();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(md_boot_state::twinktmb_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::twinktmb_r)));
 }
 
 void md_boot_state::init_jparkmb()
 {
 	init_megadrij();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(md_boot_state::jparkmb_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::jparkmb_r)));
 }
 
 /*************************************

@@ -53,15 +53,15 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(attr_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(hsync_r);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void vram_w(offs_t offset, uint8_t data);
+	void attr_w(offs_t offset, uint8_t data);
+	void video_w(uint8_t data);
+	uint8_t hsync_r();
+	void lamps_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(asic_r);
-	DECLARE_WRITE8_MEMBER(asic_w);
-	DECLARE_WRITE8_MEMBER(a3003_w);
+	uint8_t asic_r(offs_t offset);
+	void asic_w(offs_t offset, uint8_t data);
+	void a3003_w(uint8_t data);
 
 	void cardline_palette(palette_device &palette) const;
 
@@ -160,18 +160,18 @@ WRITE_LINE_MEMBER(cardline_state::vsync_changed)
 	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cardline_state::a3003_w)
+void cardline_state::a3003_w(uint8_t data)
 {
 	/* seems to generate a signal when address is written to */
 }
 
-WRITE8_MEMBER(cardline_state::vram_w)
+void cardline_state::vram_w(offs_t offset, uint8_t data)
 {
 	offset+=0x1000*((m_video&2)>>1);
 	m_videoram[offset]=data;
 }
 
-READ8_MEMBER(cardline_state::asic_r)
+uint8_t cardline_state::asic_r(offs_t offset)
 {
 	static int t=0;
 	//printf("asic read %02x\n", offset);
@@ -182,30 +182,30 @@ READ8_MEMBER(cardline_state::asic_r)
 		return 0xaa;
 }
 
-WRITE8_MEMBER(cardline_state::asic_w)
+void cardline_state::asic_w(offs_t offset, uint8_t data)
 {
 	//printf("asic write %02x %02x\n", offset, data);
 }
 
 
-WRITE8_MEMBER(cardline_state::attr_w)
+void cardline_state::attr_w(offs_t offset, uint8_t data)
 {
 	offset+=0x1000*((m_video&2)>>1);
 	m_colorram[offset]=data;
 }
 
-WRITE8_MEMBER(cardline_state::video_w)
+void cardline_state::video_w(uint8_t data)
 {
 	m_video=data;
 	//printf("m_video %x\n", m_video);
 }
 
-READ8_MEMBER(cardline_state::hsync_r)
+uint8_t cardline_state::hsync_r()
 {
 	return m_hsync_q;
 }
 
-WRITE8_MEMBER(cardline_state::lamps_w)
+void cardline_state::lamps_w(uint8_t data)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
 	m_lamps[5] = BIT(data, 0);

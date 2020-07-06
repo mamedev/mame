@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 /*******************************************************************
 
-TLCS-900/H instruction set
+TLCS-900 instruction set
 
 *******************************************************************/
 
@@ -34,7 +34,7 @@ enum e_operand
 };
 
 
-int tlcs900h_device::condition_true( uint8_t cond )
+int tlcs900_device::condition_true( uint8_t cond )
 {
 	switch ( cond & 0x0f )
 	{
@@ -112,7 +112,7 @@ int tlcs900h_device::condition_true( uint8_t cond )
 }
 
 
-uint8_t* tlcs900h_device::get_reg8_current( uint8_t reg )
+uint8_t* tlcs900_device::get_reg8_current( uint8_t reg )
 {
 	switch( reg & 7 )
 	{
@@ -153,7 +153,7 @@ uint8_t* tlcs900h_device::get_reg8_current( uint8_t reg )
 }
 
 
-uint16_t* tlcs900h_device::get_reg16_current( uint8_t reg )
+uint16_t* tlcs900_device::get_reg16_current( uint8_t reg )
 {
 	switch( reg & 7 )
 	{
@@ -195,7 +195,7 @@ uint16_t* tlcs900h_device::get_reg16_current( uint8_t reg )
 }
 
 
-uint32_t* tlcs900h_device::get_reg32_current( uint8_t reg )
+uint32_t* tlcs900_device::get_reg32_current( uint8_t reg )
 {
 	switch( reg & 7 )
 	{
@@ -237,7 +237,7 @@ uint32_t* tlcs900h_device::get_reg32_current( uint8_t reg )
 }
 
 
-PAIR* tlcs900h_device::get_reg( uint8_t reg )
+PAIR* tlcs900_device::get_reg( uint8_t reg )
 {
 	uint8_t   regbank;
 
@@ -279,7 +279,7 @@ PAIR* tlcs900h_device::get_reg( uint8_t reg )
 }
 
 
-uint8_t* tlcs900h_device::get_reg8( uint8_t reg )
+uint8_t* tlcs900_device::get_reg8( uint8_t reg )
 {
 	PAIR    *r = get_reg( reg );
 
@@ -295,7 +295,7 @@ uint8_t* tlcs900h_device::get_reg8( uint8_t reg )
 }
 
 
-uint16_t* tlcs900h_device::get_reg16( uint8_t reg )
+uint16_t* tlcs900_device::get_reg16( uint8_t reg )
 {
 	PAIR    *r = get_reg( reg );
 
@@ -303,7 +303,7 @@ uint16_t* tlcs900h_device::get_reg16( uint8_t reg )
 }
 
 
-uint32_t* tlcs900h_device::get_reg32( uint8_t reg )
+uint32_t* tlcs900_device::get_reg32( uint8_t reg )
 {
 	PAIR    *r = get_reg( reg );
 
@@ -312,7 +312,7 @@ uint32_t* tlcs900h_device::get_reg32( uint8_t reg )
 
 
 
-void tlcs900h_device::parity8( uint8_t a )
+void tlcs900_device::parity8( uint8_t a )
 {
 	int i, j;
 
@@ -326,7 +326,7 @@ void tlcs900h_device::parity8( uint8_t a )
 }
 
 
-void tlcs900h_device::parity16( uint16_t a )
+void tlcs900_device::parity16( uint16_t a )
 {
 	int i, j;
 
@@ -340,7 +340,7 @@ void tlcs900h_device::parity16( uint16_t a )
 }
 
 
-void tlcs900h_device::parity32( uint32_t a )
+void tlcs900_device::parity32( uint32_t a )
 {
 	int i, j;
 
@@ -354,7 +354,7 @@ void tlcs900h_device::parity32( uint32_t a )
 }
 
 
-uint8_t tlcs900h_device::adc8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::adc8( uint8_t a, uint8_t b)
 {
 	uint8_t cy = m_sr.b.l & FLAG_CF;
 	uint8_t result = a + b + cy;
@@ -369,7 +369,7 @@ uint8_t tlcs900h_device::adc8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::adc16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::adc16( uint16_t a, uint16_t b)
 {
 	uint8_t cy = m_sr.b.l & FLAG_CF;
 	uint16_t result = a + b + cy;
@@ -384,7 +384,7 @@ uint16_t tlcs900h_device::adc16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::adc32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::adc32( uint32_t a, uint32_t b)
 {
 	uint8_t cy = m_sr.b.l & FLAG_CF;
 	uint32_t result = a + b + cy;
@@ -398,7 +398,7 @@ uint32_t tlcs900h_device::adc32( uint32_t a, uint32_t b)
 }
 
 
-uint8_t tlcs900h_device::add8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::add8( uint8_t a, uint8_t b)
 {
 	uint8_t result = a + b;
 
@@ -412,7 +412,7 @@ uint8_t tlcs900h_device::add8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::add16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::add16( uint16_t a, uint16_t b)
 {
 	uint16_t result = a + b;
 
@@ -426,7 +426,7 @@ uint16_t tlcs900h_device::add16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::add32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::add32( uint32_t a, uint32_t b)
 {
 	uint32_t result = a + b;
 
@@ -439,7 +439,7 @@ uint32_t tlcs900h_device::add32( uint32_t a, uint32_t b)
 }
 
 
-uint8_t tlcs900h_device::sbc8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::sbc8( uint8_t a, uint8_t b)
 {
 	uint8_t cy = m_sr.b.l & FLAG_CF;
 	uint8_t result = a - b - cy;
@@ -454,7 +454,7 @@ uint8_t tlcs900h_device::sbc8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::sbc16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::sbc16( uint16_t a, uint16_t b)
 {
 	uint8_t cy = m_sr.b.l & FLAG_CF;
 	uint16_t result = a - b - cy;
@@ -469,7 +469,7 @@ uint16_t tlcs900h_device::sbc16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::sbc32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::sbc32( uint32_t a, uint32_t b)
 {
 	uint8_t cy = m_sr.b.l & FLAG_CF;
 	uint32_t result = a - b - cy;
@@ -483,7 +483,7 @@ uint32_t tlcs900h_device::sbc32( uint32_t a, uint32_t b)
 }
 
 
-uint8_t tlcs900h_device::sub8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::sub8( uint8_t a, uint8_t b)
 {
 	uint8_t result = a - b;
 
@@ -497,7 +497,7 @@ uint8_t tlcs900h_device::sub8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::sub16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::sub16( uint16_t a, uint16_t b)
 {
 	uint16_t result = a - b;
 
@@ -511,7 +511,7 @@ uint16_t tlcs900h_device::sub16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::sub32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::sub32( uint32_t a, uint32_t b)
 {
 	uint32_t result = a - b;
 
@@ -524,7 +524,7 @@ uint32_t tlcs900h_device::sub32( uint32_t a, uint32_t b)
 }
 
 
-uint8_t tlcs900h_device::and8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::and8( uint8_t a, uint8_t b)
 {
 	uint8_t result = a & b;
 
@@ -537,7 +537,7 @@ uint8_t tlcs900h_device::and8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::and16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::and16( uint16_t a, uint16_t b)
 {
 	uint16_t result = a & b;
 
@@ -550,7 +550,7 @@ uint16_t tlcs900h_device::and16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::and32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::and32( uint32_t a, uint32_t b)
 {
 	uint32_t result = a & b;
 
@@ -561,7 +561,7 @@ uint32_t tlcs900h_device::and32( uint32_t a, uint32_t b)
 }
 
 
-uint8_t tlcs900h_device::or8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::or8( uint8_t a, uint8_t b)
 {
 	uint8_t result = a | b;
 
@@ -574,7 +574,7 @@ uint8_t tlcs900h_device::or8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::or16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::or16( uint16_t a, uint16_t b)
 {
 	uint16_t result = a | b;
 
@@ -587,7 +587,7 @@ uint16_t tlcs900h_device::or16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::or32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::or32( uint32_t a, uint32_t b)
 {
 	uint32_t result = a | b;
 
@@ -598,7 +598,7 @@ uint32_t tlcs900h_device::or32( uint32_t a, uint32_t b)
 }
 
 
-uint8_t tlcs900h_device::xor8( uint8_t a, uint8_t b)
+uint8_t tlcs900_device::xor8( uint8_t a, uint8_t b)
 {
 	uint8_t result = a ^ b;
 
@@ -611,7 +611,7 @@ uint8_t tlcs900h_device::xor8( uint8_t a, uint8_t b)
 }
 
 
-uint16_t tlcs900h_device::xor16( uint16_t a, uint16_t b)
+uint16_t tlcs900_device::xor16( uint16_t a, uint16_t b)
 {
 	uint16_t result = a ^ b;
 
@@ -624,7 +624,7 @@ uint16_t tlcs900h_device::xor16( uint16_t a, uint16_t b)
 }
 
 
-uint32_t tlcs900h_device::xor32( uint32_t a, uint32_t b)
+uint32_t tlcs900_device::xor32( uint32_t a, uint32_t b)
 {
 	uint32_t result = a ^ b;
 
@@ -635,7 +635,7 @@ uint32_t tlcs900h_device::xor32( uint32_t a, uint32_t b)
 }
 
 
-void tlcs900h_device::ldcf8( uint8_t a, uint8_t b )
+void tlcs900_device::ldcf8( uint8_t a, uint8_t b )
 {
 	if ( b & ( 1 << ( a & 0x07 ) ) )
 		m_sr.b.l |= FLAG_CF;
@@ -644,7 +644,7 @@ void tlcs900h_device::ldcf8( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900h_device::ldcf16( uint8_t a, uint8_t b )
+void tlcs900_device::ldcf16( uint8_t a, uint8_t b )
 {
 	if ( b & ( 1 << ( a & 0x0f ) ) )
 		m_sr.b.l |= FLAG_CF;
@@ -653,7 +653,7 @@ void tlcs900h_device::ldcf16( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900h_device::andcf8( uint8_t a, uint8_t b )
+void tlcs900_device::andcf8( uint8_t a, uint8_t b )
 {
 	if ( ( b & ( 1 << ( a & 0x07 ) ) ) && ( m_sr.b.l & FLAG_CF ) )
 		m_sr.b.l |= FLAG_CF;
@@ -662,7 +662,7 @@ void tlcs900h_device::andcf8( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900h_device::andcf16( uint8_t a, uint8_t b )
+void tlcs900_device::andcf16( uint8_t a, uint8_t b )
 {
 	if ( ( b & ( 1 << ( a & 0x0f ) ) ) && ( m_sr.b.l & FLAG_CF ) )
 		m_sr.b.l |= FLAG_CF;
@@ -671,39 +671,39 @@ void tlcs900h_device::andcf16( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900h_device::orcf8( uint8_t a, uint8_t b )
+void tlcs900_device::orcf8( uint8_t a, uint8_t b )
 {
 	if ( b & ( 1 << ( a & 0x07 ) ) )
 		m_sr.b.l |= FLAG_CF;
 }
 
 
-void tlcs900h_device::orcf16( uint8_t a, uint8_t b )
+void tlcs900_device::orcf16( uint8_t a, uint8_t b )
 {
 	if ( b & ( 1 << ( a & 0x0f ) ) )
 		m_sr.b.l |= FLAG_CF;
 }
 
 
-void tlcs900h_device::xorcf8( uint8_t a, uint8_t b )
+void tlcs900_device::xorcf8( uint8_t a, uint8_t b )
 {
 	if ( b & ( 1 << ( a & 0x07 ) ) )
 		m_sr.b.l ^= FLAG_CF;
 }
 
 
-void tlcs900h_device::xorcf16( uint8_t a, uint8_t b )
+void tlcs900_device::xorcf16( uint8_t a, uint8_t b )
 {
 	if ( b & ( 1 << ( a & 0x0f ) ) )
 		m_sr.b.l ^= FLAG_CF;
 }
 
 
-uint8_t tlcs900h_device::rl8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::rl8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		if ( a & 0x80 )
 		{
@@ -716,6 +716,7 @@ uint8_t tlcs900h_device::rl8( uint8_t a, uint8_t s )
 			m_sr.b.l &= ~ FLAG_CF;
 		}
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( a & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -725,11 +726,11 @@ uint8_t tlcs900h_device::rl8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::rl16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::rl16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		if ( a & 0x8000 )
 		{
@@ -742,6 +743,7 @@ uint16_t tlcs900h_device::rl16( uint16_t a, uint8_t s )
 			m_sr.b.l &= ~ FLAG_CF;
 		}
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 8 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -751,11 +753,11 @@ uint16_t tlcs900h_device::rl16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::rl32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::rl32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		if ( a & 0x80000000 )
 		{
@@ -767,8 +769,8 @@ uint32_t tlcs900h_device::rl32( uint32_t a, uint8_t s )
 			a = ( a << 1 ) | ( m_sr.b.l & FLAG_CF );
 			m_sr.b.l &= ~ FLAG_CF;
 		}
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 24 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -777,14 +779,15 @@ uint32_t tlcs900h_device::rl32( uint32_t a, uint8_t s )
 	return a;
 }
 
-uint8_t tlcs900h_device::rlc8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::rlc8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		a = ( a << 1 ) | ( ( a & 0x80 ) ? 1 : 0 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( a & FLAG_SF ) | ( a ? 0 : FLAG_ZF ) | ( a & FLAG_CF );
@@ -794,14 +797,15 @@ uint8_t tlcs900h_device::rlc8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::rlc16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::rlc16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		a = ( a << 1 ) | ( ( a & 0x8000 ) ? 1 : 0 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( ( a >> 8 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF ) | ( a & FLAG_CF );
@@ -811,15 +815,15 @@ uint16_t tlcs900h_device::rlc16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::rlc32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::rlc32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		a = ( a << 1 ) | ( ( a & 0x80000000 ) ? 1 : 0 );
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( ( a >> 24 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF ) | ( a & FLAG_CF );
@@ -829,11 +833,11 @@ uint32_t tlcs900h_device::rlc32( uint32_t a, uint8_t s )
 }
 
 
-uint8_t tlcs900h_device::rr8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::rr8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		if ( m_sr.b.l & FLAG_CF )
 		{
@@ -846,6 +850,7 @@ uint8_t tlcs900h_device::rr8( uint8_t a, uint8_t s )
 			a = ( a >> 1 );
 		}
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( a & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -855,11 +860,11 @@ uint8_t tlcs900h_device::rr8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::rr16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::rr16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		if ( m_sr.b.l & FLAG_CF )
 		{
@@ -872,6 +877,7 @@ uint16_t tlcs900h_device::rr16( uint16_t a, uint8_t s )
 			a = ( a >> 1 );
 		}
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 8 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -881,11 +887,11 @@ uint16_t tlcs900h_device::rr16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::rr32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::rr32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		if ( m_sr.b.l & FLAG_CF )
 		{
@@ -897,8 +903,8 @@ uint32_t tlcs900h_device::rr32( uint32_t a, uint8_t s )
 			m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 			a = ( a >> 1 );
 		}
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 24 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -908,14 +914,15 @@ uint32_t tlcs900h_device::rr32( uint32_t a, uint8_t s )
 }
 
 
-uint8_t tlcs900h_device::rrc8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::rrc8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		a = ( a >> 1 ) | ( ( a & 0x01 ) ? 0x80 : 0 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( ( a & FLAG_SF ) ? FLAG_CF | FLAG_SF : 0 ) | ( a ? 0 : FLAG_ZF );
@@ -925,14 +932,15 @@ uint8_t tlcs900h_device::rrc8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::rrc16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::rrc16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		a = ( a >> 1 ) | ( ( a & 0x0001 ) ? 0x8000 : 0 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( ( ( a >> 8 ) & FLAG_SF ) ? FLAG_CF | FLAG_SF : 0 ) | ( a ? 0 : FLAG_ZF );
@@ -942,15 +950,15 @@ uint16_t tlcs900h_device::rrc16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::rrc32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::rrc32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		a = ( a >> 1 ) | ( ( a & 0x00000001 ) ? 0x80000000 : 0 );
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( ( ( a >> 24 ) & FLAG_SF ) ? FLAG_CF | FLAG_SF : 0 ) | ( a ? 0 : FLAG_ZF );
@@ -960,15 +968,16 @@ uint32_t tlcs900h_device::rrc32( uint32_t a, uint8_t s )
 }
 
 
-uint8_t tlcs900h_device::sla8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::sla8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( ( a & 0x80 ) ? FLAG_CF : 0 );
 		a = ( a << 1 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( a & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -978,15 +987,16 @@ uint8_t tlcs900h_device::sla8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::sla16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::sla16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( ( a & 0x8000 ) ? FLAG_CF : 0 );
 		a = ( a << 1 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 8 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -996,16 +1006,16 @@ uint16_t tlcs900h_device::sla16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::sla32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::sla32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( ( a & 0x80000000 ) ? FLAG_CF : 0 );
 		a = ( a << 1 );
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 24 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1015,15 +1025,16 @@ uint32_t tlcs900h_device::sla32( uint32_t a, uint8_t s )
 }
 
 
-uint8_t tlcs900h_device::sra8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::sra8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 		a = ( a & 0x80 ) | ( a >> 1 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( a & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1033,15 +1044,16 @@ uint8_t tlcs900h_device::sra8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::sra16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::sra16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 		a = ( a & 0x8000 ) | ( a >> 1 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 8 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1051,16 +1063,16 @@ uint16_t tlcs900h_device::sra16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::sra32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::sra32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 		a = ( a & 0x80000000 ) | ( a >> 1 );
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 24 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1070,15 +1082,16 @@ uint32_t tlcs900h_device::sra32( uint32_t a, uint8_t s )
 }
 
 
-uint8_t tlcs900h_device::srl8( uint8_t a, uint8_t s )
+uint8_t tlcs900_device::srl8( uint8_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 		a = ( a >> 1 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( a & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1088,15 +1101,16 @@ uint8_t tlcs900h_device::srl8( uint8_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::srl16( uint16_t a, uint8_t s )
+uint16_t tlcs900_device::srl16( uint16_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 		a = ( a >> 1 );
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 8 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1106,16 +1120,16 @@ uint16_t tlcs900h_device::srl16( uint16_t a, uint8_t s )
 }
 
 
-uint32_t tlcs900h_device::srl32( uint32_t a, uint8_t s )
+uint32_t tlcs900_device::srl32( uint32_t a, uint8_t s )
 {
 	uint8_t count = ( s & 0x0f ) ? ( s & 0x0f ) : 16;
 
-	for ( ; count > 0; count-- )
+	for (uint8_t n = count; n > 0; n--)
 	{
 		m_sr.b.l = ( m_sr.b.l & ~ FLAG_CF ) | ( a & FLAG_CF );
 		a = ( a >> 1 );
-		m_cycles += 2;
 	}
+	m_cycles += tlcs900_shift_cycles(count);
 
 	m_sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF | FLAG_NF );
 	m_sr.b.l |= ( ( a >> 24 ) & FLAG_SF ) | ( a ? 0 : FLAG_ZF );
@@ -1125,7 +1139,7 @@ uint32_t tlcs900h_device::srl32( uint32_t a, uint8_t s )
 }
 
 
-uint16_t tlcs900h_device::div8( uint16_t a, uint8_t b )
+uint16_t tlcs900_device::div8( uint16_t a, uint8_t b )
 {
 	ldiv_t  result;
 
@@ -1157,7 +1171,7 @@ uint16_t tlcs900h_device::div8( uint16_t a, uint8_t b )
 }
 
 
-uint32_t tlcs900h_device::div16( uint32_t a, uint16_t b )
+uint32_t tlcs900_device::div16( uint32_t a, uint16_t b )
 {
 	ldiv_t  result;
 
@@ -1189,7 +1203,7 @@ uint32_t tlcs900h_device::div16( uint32_t a, uint16_t b )
 }
 
 
-uint16_t tlcs900h_device::divs8( int16_t a, int8_t b )
+uint16_t tlcs900_device::divs8( int16_t a, int8_t b )
 {
 	ldiv_t  result;
 
@@ -1210,7 +1224,7 @@ uint16_t tlcs900h_device::divs8( int16_t a, int8_t b )
 }
 
 
-uint32_t tlcs900h_device::divs16( int32_t a, int16_t b )
+uint32_t tlcs900_device::divs16( int32_t a, int16_t b )
 {
 	ldiv_t  result;
 
@@ -1231,295 +1245,295 @@ uint32_t tlcs900h_device::divs16( int32_t a, int16_t b )
 }
 
 
-void tlcs900h_device::op_ADCBMI()
+void tlcs900_device::op_ADCBMI()
 {
 	WRMEM( m_ea1.d, adc8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_ADCBMR()
+void tlcs900_device::op_ADCBMR()
 {
 	WRMEM( m_ea1.d, adc8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_ADCBRI()
+void tlcs900_device::op_ADCBRI()
 {
 	*m_p1_reg8 = adc8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_ADCBRM()
+void tlcs900_device::op_ADCBRM()
 {
 	*m_p1_reg8 = adc8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ADCBRR()
+void tlcs900_device::op_ADCBRR()
 {
 	*m_p1_reg8 = adc8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ADCWMI()
+void tlcs900_device::op_ADCWMI()
 {
 	WRMEMW( m_ea1.d, adc16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_ADCWMR()
+void tlcs900_device::op_ADCWMR()
 {
 	WRMEMW( m_ea1.d, adc16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_ADCWRI()
+void tlcs900_device::op_ADCWRI()
 {
 	*m_p1_reg16 = adc16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_ADCWRM()
+void tlcs900_device::op_ADCWRM()
 {
 	*m_p1_reg16 = adc16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ADCWRR()
+void tlcs900_device::op_ADCWRR()
 {
 	*m_p1_reg16 = adc16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ADCLMR()
+void tlcs900_device::op_ADCLMR()
 {
 	WRMEML( m_ea1.d, adc32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_ADCLRI()
+void tlcs900_device::op_ADCLRI()
 {
 	*m_p1_reg32 = adc32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_ADCLRM()
+void tlcs900_device::op_ADCLRM()
 {
 	*m_p1_reg32 = adc32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ADCLRR()
+void tlcs900_device::op_ADCLRR()
 {
 	*m_p1_reg32 = adc32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_ADDBMI()
+void tlcs900_device::op_ADDBMI()
 {
 	WRMEM( m_ea1.d, add8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_ADDBMR()
+void tlcs900_device::op_ADDBMR()
 {
 	WRMEM( m_ea1.d, add8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_ADDBRI()
+void tlcs900_device::op_ADDBRI()
 {
 	*m_p1_reg8 = add8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_ADDBRM()
+void tlcs900_device::op_ADDBRM()
 {
 	*m_p1_reg8 = add8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ADDBRR()
+void tlcs900_device::op_ADDBRR()
 {
 	*m_p1_reg8 = add8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ADDWMI()
+void tlcs900_device::op_ADDWMI()
 {
 	WRMEMW( m_ea1.d, add16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_ADDWMR()
+void tlcs900_device::op_ADDWMR()
 {
 	WRMEMW( m_ea1.d, add16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_ADDWRI()
+void tlcs900_device::op_ADDWRI()
 {
 	*m_p1_reg16 = add16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_ADDWRM()
+void tlcs900_device::op_ADDWRM()
 {
 	*m_p1_reg16 = add16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ADDWRR()
+void tlcs900_device::op_ADDWRR()
 {
 	*m_p1_reg16 = add16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ADDLMR()
+void tlcs900_device::op_ADDLMR()
 {
 	WRMEML( m_ea1.d, add32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_ADDLRI()
+void tlcs900_device::op_ADDLRI()
 {
 	*m_p1_reg32 = add32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_ADDLRM()
+void tlcs900_device::op_ADDLRM()
 {
 	*m_p1_reg32 = add32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ADDLRR()
+void tlcs900_device::op_ADDLRR()
 {
 	*m_p1_reg32 = add32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_ANDBMI()
+void tlcs900_device::op_ANDBMI()
 {
 	WRMEM( m_ea1.d, and8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_ANDBMR()
+void tlcs900_device::op_ANDBMR()
 {
 	WRMEM( m_ea1.d, and8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_ANDBRI()
+void tlcs900_device::op_ANDBRI()
 {
 	*m_p1_reg8 = and8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_ANDBRM()
+void tlcs900_device::op_ANDBRM()
 {
 	*m_p1_reg8 = and8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ANDBRR()
+void tlcs900_device::op_ANDBRR()
 {
 	*m_p1_reg8 = and8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ANDWMI()
+void tlcs900_device::op_ANDWMI()
 {
 	WRMEMW( m_ea1.d, and16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_ANDWMR()
+void tlcs900_device::op_ANDWMR()
 {
 	WRMEMW( m_ea1.d, and16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_ANDWRI()
+void tlcs900_device::op_ANDWRI()
 {
 	*m_p1_reg16 = and16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_ANDWRM()
+void tlcs900_device::op_ANDWRM()
 {
 	*m_p1_reg16 = and16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ANDWRR()
+void tlcs900_device::op_ANDWRR()
 {
 	*m_p1_reg16 = and16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ANDLMR()
+void tlcs900_device::op_ANDLMR()
 {
 	WRMEML( m_ea1.d, and32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_ANDLRI()
+void tlcs900_device::op_ANDLRI()
 {
 	*m_p1_reg32 = and32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_ANDLRM()
+void tlcs900_device::op_ANDLRM()
 {
 	*m_p1_reg32 = and32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ANDLRR()
+void tlcs900_device::op_ANDLRR()
 {
 	*m_p1_reg32 = and32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_ANDCFBIM()
+void tlcs900_device::op_ANDCFBIM()
 {
 	andcf8( m_imm1.b.l, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ANDCFBIR()
+void tlcs900_device::op_ANDCFBIR()
 {
 	andcf8( m_imm1.b.l, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ANDCFBRM()
+void tlcs900_device::op_ANDCFBRM()
 {
 	andcf8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ANDCFBRR()
+void tlcs900_device::op_ANDCFBRR()
 {
 	andcf8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ANDCFWIR()
+void tlcs900_device::op_ANDCFWIR()
 {
 	andcf16( m_imm1.b.l, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ANDCFWRR()
+void tlcs900_device::op_ANDCFWRR()
 {
 	andcf16( *m_p1_reg8, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_BITBIM()
+void tlcs900_device::op_BITBIM()
 {
 	m_sr.b.l &= ~ ( FLAG_ZF | FLAG_NF );
 	if ( RDMEM( m_ea2.d ) & ( 1 << ( m_imm1.b.l & 0x07 ) ) )
@@ -1529,7 +1543,7 @@ void tlcs900h_device::op_BITBIM()
 }
 
 
-void tlcs900h_device::op_BITBIR()
+void tlcs900_device::op_BITBIR()
 {
 	m_sr.b.l &= ~ ( FLAG_ZF | FLAG_NF );
 	if ( *m_p2_reg8 & ( 1 << ( m_imm1.b.l & 0x0f ) ) )
@@ -1539,7 +1553,7 @@ void tlcs900h_device::op_BITBIR()
 }
 
 
-void tlcs900h_device::op_BITWIR()
+void tlcs900_device::op_BITWIR()
 {
 	m_sr.b.l &= ~ ( FLAG_ZF | FLAG_NF );
 	if ( *m_p2_reg16 & ( 1 << ( m_imm1.b.l & 0x0f ) ) )
@@ -1549,7 +1563,7 @@ void tlcs900h_device::op_BITWIR()
 }
 
 
-void tlcs900h_device::op_BS1BRR()
+void tlcs900_device::op_BS1BRR()
 {
 	uint16_t  r = *m_p2_reg16;
 
@@ -1568,7 +1582,7 @@ void tlcs900h_device::op_BS1BRR()
 }
 
 
-void tlcs900h_device::op_BS1FRR()
+void tlcs900_device::op_BS1FRR()
 {
 	uint16_t  r = *m_p2_reg16;
 
@@ -1587,7 +1601,7 @@ void tlcs900h_device::op_BS1FRR()
 }
 
 
-void tlcs900h_device::op_CALLI()
+void tlcs900_device::op_CALLI()
 {
 	m_xssp.d -= 4;
 	WRMEML( m_xssp.d, m_pc.d );
@@ -1596,20 +1610,20 @@ void tlcs900h_device::op_CALLI()
 }
 
 
-void tlcs900h_device::op_CALLM()
+void tlcs900_device::op_CALLM()
 {
 	if ( condition_true( m_op ) )
 	{
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );
 		m_pc.d = m_ea2.d;
-		m_cycles += 6;
+		m_cycles += tlcs900_call_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_CALR()
+void tlcs900_device::op_CALR()
 {
 	m_xssp.d -= 4;
 	WRMEML( m_xssp.d, m_pc.d );
@@ -1618,116 +1632,116 @@ void tlcs900h_device::op_CALR()
 }
 
 
-void tlcs900h_device::op_CCF()
+void tlcs900_device::op_CCF()
 {
 	m_sr.b.l &= ~ FLAG_NF;
 	m_sr.b.l ^= FLAG_CF;
 }
 
 
-void tlcs900h_device::op_CHGBIM()
+void tlcs900_device::op_CHGBIM()
 {
 	WRMEM( m_ea2.d, RDMEM( m_ea2.d ) ^ ( 1 << ( m_imm1.b.l & 0x07 ) ) );
 }
 
 
-void tlcs900h_device::op_CHGBIR()
+void tlcs900_device::op_CHGBIR()
 {
 	*m_p2_reg8 ^= ( 1 << ( m_imm1.b.l & 0x07 ) );
 }
 
 
-void tlcs900h_device::op_CHGWIR()
+void tlcs900_device::op_CHGWIR()
 {
 	*m_p2_reg16 ^= ( 1 << ( m_imm1.b.l & 0x0f ) );
 }
 
 
-void tlcs900h_device::op_CPBMI()
+void tlcs900_device::op_CPBMI()
 {
 	sub8( RDMEM( m_ea1.d ), m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_CPBMR()
+void tlcs900_device::op_CPBMR()
 {
 	sub8( RDMEM( m_ea1.d ), *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_CPBRI()
+void tlcs900_device::op_CPBRI()
 {
 	sub8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_CPBRM()
+void tlcs900_device::op_CPBRM()
 {
 	sub8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_CPBRR()
+void tlcs900_device::op_CPBRR()
 {
 	sub8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_CPWMI()
+void tlcs900_device::op_CPWMI()
 {
 	sub16( RDMEMW( m_ea1.d ), m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_CPWMR()
+void tlcs900_device::op_CPWMR()
 {
 	sub16( RDMEMW( m_ea1.d ), *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_CPWRI()
+void tlcs900_device::op_CPWRI()
 {
 	sub16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_CPWRM()
+void tlcs900_device::op_CPWRM()
 {
 	sub16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_CPWRR()
+void tlcs900_device::op_CPWRR()
 {
 	sub16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_CPLMR()
+void tlcs900_device::op_CPLMR()
 {
 	sub32( RDMEML( m_ea1.d ), *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_CPLRI()
+void tlcs900_device::op_CPLRI()
 {
 	sub32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_CPLRM()
+void tlcs900_device::op_CPLRM()
 {
 	sub32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_CPLRR()
+void tlcs900_device::op_CPLRR()
 {
 	sub32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_CPD()
+void tlcs900_device::op_CPD()
 {
 	uint8_t   result = *get_reg8_current( 1 ) - RDMEM( *m_p2_reg32 );
 	uint16_t  *bc = get_reg16_current( 1 );
@@ -1740,20 +1754,20 @@ void tlcs900h_device::op_CPD()
 }
 
 
-void tlcs900h_device::op_CPDR()
+void tlcs900_device::op_CPDR()
 {
 	op_CPD();
 
 	if ( ( m_sr.b.l & ( FLAG_ZF | FLAG_VF ) ) == FLAG_VF )
 	{
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_CPDW()
+void tlcs900_device::op_CPDW()
 {
 	uint16_t  result = *get_reg16_current( 0 ) - RDMEMW( *m_p2_reg32 );
 	uint16_t  *bc = get_reg16_current( 1 );
@@ -1766,20 +1780,20 @@ void tlcs900h_device::op_CPDW()
 }
 
 
-void tlcs900h_device::op_CPDRW()
+void tlcs900_device::op_CPDRW()
 {
 	op_CPDW();
 
 	if ( ( m_sr.b.l & ( FLAG_ZF | FLAG_VF ) ) == FLAG_VF )
 	{
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_CPI()
+void tlcs900_device::op_CPI()
 {
 	uint8_t   result = *get_reg8_current( 1 ) - RDMEM( *m_p2_reg32 );
 	uint16_t  *bc = get_reg16_current( 1 );
@@ -1792,20 +1806,20 @@ void tlcs900h_device::op_CPI()
 }
 
 
-void tlcs900h_device::op_CPIR()
+void tlcs900_device::op_CPIR()
 {
 	op_CPI();
 
 	if ( ( m_sr.b.l & ( FLAG_ZF | FLAG_VF ) ) == FLAG_VF )
 	{
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_CPIW()
+void tlcs900_device::op_CPIW()
 {
 	uint16_t  result = *get_reg16_current( 0 ) - RDMEMW( *m_p2_reg32 );
 	uint16_t  *bc = get_reg16_current( 1 );
@@ -1818,34 +1832,34 @@ void tlcs900h_device::op_CPIW()
 }
 
 
-void tlcs900h_device::op_CPIRW()
+void tlcs900_device::op_CPIRW()
 {
 	op_CPIW();
 
 	if ( ( m_sr.b.l & ( FLAG_ZF | FLAG_VF ) ) == FLAG_VF )
 	{
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_CPLBR()
+void tlcs900_device::op_CPLBR()
 {
 	*m_p1_reg8 = ~ *m_p1_reg8;
 	m_sr.b.l |= FLAG_HF | FLAG_NF;
 }
 
 
-void tlcs900h_device::op_CPLWR()
+void tlcs900_device::op_CPLWR()
 {
 	*m_p1_reg16 = ~ *m_p1_reg16;
 	m_sr.b.l |= FLAG_HF | FLAG_NF;
 }
 
 
-void tlcs900h_device::op_DAABR()
+void tlcs900_device::op_DAABR()
 {
 	uint8_t   oldval = *m_p1_reg8;
 	uint8_t   fixval = 0;
@@ -1907,13 +1921,13 @@ void tlcs900h_device::op_DAABR()
 }
 
 
-void tlcs900h_device::op_DB()
+void tlcs900_device::op_DB()
 {
 	logerror("%08x: invalid or illegal instruction\n", m_pc.d );
 }
 
 
-void tlcs900h_device::op_DECBIM()
+void tlcs900_device::op_DECBIM()
 {
 	uint8_t   cy = m_sr.b.l & FLAG_CF;
 
@@ -1922,7 +1936,7 @@ void tlcs900h_device::op_DECBIM()
 }
 
 
-void tlcs900h_device::op_DECBIR()
+void tlcs900_device::op_DECBIR()
 {
 	uint8_t   cy = m_sr.b.l & FLAG_CF;
 
@@ -1931,7 +1945,7 @@ void tlcs900h_device::op_DECBIR()
 }
 
 
-void tlcs900h_device::op_DECWIM()
+void tlcs900_device::op_DECWIM()
 {
 	uint8_t   cy = m_sr.b.l & FLAG_CF;
 
@@ -1940,19 +1954,19 @@ void tlcs900h_device::op_DECWIM()
 }
 
 
-void tlcs900h_device::op_DECWIR()
+void tlcs900_device::op_DECWIR()
 {
 	*m_p2_reg16 -= m_imm1.b.l ? m_imm1.b.l : 8;
 }
 
 
-void tlcs900h_device::op_DECLIR()
+void tlcs900_device::op_DECLIR()
 {
 	*m_p2_reg32 -= m_imm1.b.l ? m_imm1.b.l : 8;
 }
 
 
-void tlcs900h_device::op_DECF()
+void tlcs900_device::op_DECF()
 {
 	/* 0x03 for MAX mode, 0x07 for MIN mode */
 	m_sr.b.h = ( m_sr.b.h & 0xf8 ) | ( ( m_sr.b.h - 1 ) & 0x07 );
@@ -1960,110 +1974,110 @@ void tlcs900h_device::op_DECF()
 }
 
 
-void tlcs900h_device::op_DIVBRI()
+void tlcs900_device::op_DIVBRI()
 {
 	*m_p1_reg16 = div8( *m_p1_reg16, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_DIVBRM()
+void tlcs900_device::op_DIVBRM()
 {
 	*m_p1_reg16 = div8( *m_p1_reg16, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_DIVBRR()
+void tlcs900_device::op_DIVBRR()
 {
 	*m_p1_reg16 = div8( *m_p1_reg16, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_DIVWRI()
+void tlcs900_device::op_DIVWRI()
 {
 	*m_p1_reg32 = div16( *m_p1_reg32, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_DIVWRM()
+void tlcs900_device::op_DIVWRM()
 {
 	*m_p1_reg32 = div16( *m_p1_reg32, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_DIVWRR()
+void tlcs900_device::op_DIVWRR()
 {
 	*m_p1_reg32 = div16( *m_p1_reg32, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_DIVSBRI()
+void tlcs900_device::op_DIVSBRI()
 {
 	*m_p1_reg16 = divs8( *m_p1_reg16, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_DIVSBRM()
+void tlcs900_device::op_DIVSBRM()
 {
 	*m_p1_reg16 = divs8( *m_p1_reg16, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_DIVSBRR()
+void tlcs900_device::op_DIVSBRR()
 {
 	*m_p1_reg16 = divs8( *m_p1_reg16, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_DIVSWRI()
+void tlcs900_device::op_DIVSWRI()
 {
 	*m_p1_reg32 = divs16( *m_p1_reg32, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_DIVSWRM()
+void tlcs900_device::op_DIVSWRM()
 {
 	*m_p1_reg32 = divs16( *m_p1_reg32, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_DIVSWRR()
+void tlcs900_device::op_DIVSWRR()
 {
 	*m_p1_reg32 = divs16( *m_p1_reg32, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_DJNZB()
+void tlcs900_device::op_DJNZB()
 {
 	*m_p1_reg8 -= 1;
 	if ( *m_p1_reg8 )
 	{
 		m_pc.d = m_ea2.d;
-		m_cycles += 4;
+		m_cycles += tlcs900_djnz_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_DJNZW()
+void tlcs900_device::op_DJNZW()
 {
 	*m_p1_reg16 -= 1;
 	if ( *m_p1_reg16 )
 	{
 		m_pc.d = m_ea2.d;
-		m_cycles += 4;
+		m_cycles += tlcs900_djnz_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_EI()
+void tlcs900_device::op_EI()
 {
 	m_sr.b.h = ( m_sr.b.h & 0x8f ) | ( ( m_imm1.b.l & 0x07 ) << 4 );
 	m_check_irqs = 1;
 }
 
 
-void tlcs900h_device::op_EXBMR()
+void tlcs900_device::op_EXBMR()
 {
 	uint8_t   i = RDMEM( m_ea1.d );
 
@@ -2072,7 +2086,7 @@ void tlcs900h_device::op_EXBMR()
 }
 
 
-void tlcs900h_device::op_EXBRR()
+void tlcs900_device::op_EXBRR()
 {
 	uint8_t   i = *m_p2_reg8;
 
@@ -2081,7 +2095,7 @@ void tlcs900h_device::op_EXBRR()
 }
 
 
-void tlcs900h_device::op_EXWMR()
+void tlcs900_device::op_EXWMR()
 {
 	uint16_t  i = RDMEMW( m_ea1.d );
 
@@ -2090,7 +2104,7 @@ void tlcs900h_device::op_EXWMR()
 }
 
 
-void tlcs900h_device::op_EXWRR()
+void tlcs900_device::op_EXWRR()
 {
 	uint16_t  i = *m_p2_reg16;
 
@@ -2099,7 +2113,7 @@ void tlcs900h_device::op_EXWRR()
 }
 
 
-void tlcs900h_device::op_EXTSWR()
+void tlcs900_device::op_EXTSWR()
 {
 	if ( *m_p1_reg16 & 0x0080 )
 		*m_p1_reg16 |= 0xff00;
@@ -2108,7 +2122,7 @@ void tlcs900h_device::op_EXTSWR()
 }
 
 
-void tlcs900h_device::op_EXTSLR()
+void tlcs900_device::op_EXTSLR()
 {
 	if ( *m_p1_reg32 & 0x00008000 )
 		*m_p1_reg32 |= 0xffff0000;
@@ -2117,25 +2131,25 @@ void tlcs900h_device::op_EXTSLR()
 }
 
 
-void tlcs900h_device::op_EXTZWR()
+void tlcs900_device::op_EXTZWR()
 {
 	*m_p1_reg16 &= 0x00ff;
 }
 
 
-void tlcs900h_device::op_EXTZLR()
+void tlcs900_device::op_EXTZLR()
 {
 	*m_p1_reg32 &= 0x0000ffff;
 }
 
 
-void tlcs900h_device::op_HALT()
+void tlcs900_device::op_HALT()
 {
 	m_halted = 1;
 }
 
 
-void tlcs900h_device::op_INCBIM()
+void tlcs900_device::op_INCBIM()
 {
 	uint8_t   cy = m_sr.b.l & FLAG_CF;
 
@@ -2144,7 +2158,7 @@ void tlcs900h_device::op_INCBIM()
 }
 
 
-void tlcs900h_device::op_INCBIR()
+void tlcs900_device::op_INCBIR()
 {
 	uint8_t   cy = m_sr.b.l & FLAG_CF;
 
@@ -2153,7 +2167,7 @@ void tlcs900h_device::op_INCBIR()
 }
 
 
-void tlcs900h_device::op_INCWIM()
+void tlcs900_device::op_INCWIM()
 {
 	uint8_t   cy = m_sr.b.l & FLAG_CF;
 
@@ -2162,19 +2176,19 @@ void tlcs900h_device::op_INCWIM()
 }
 
 
-void tlcs900h_device::op_INCWIR()
+void tlcs900_device::op_INCWIR()
 {
 	*m_p2_reg16 += m_imm1.b.l ? m_imm1.b.l : 8;
 }
 
 
-void tlcs900h_device::op_INCLIR()
+void tlcs900_device::op_INCLIR()
 {
 	*m_p2_reg32 += m_imm1.b.l ? m_imm1.b.l : 8;
 }
 
 
-void tlcs900h_device::op_INCF()
+void tlcs900_device::op_INCF()
 {
 	/* 0x03 for MAX mode, 0x07 for MIN mode */
 	m_sr.b.h = ( m_sr.b.h & 0xf8 ) | ( ( m_sr.b.h + 1 ) & 0x07 );
@@ -2182,209 +2196,209 @@ void tlcs900h_device::op_INCF()
 }
 
 
-void tlcs900h_device::op_JPI()
+void tlcs900_device::op_JPI()
 {
 	m_pc.d = m_imm1.d;
 	m_prefetch_clear = true;
 }
 
 
-void tlcs900h_device::op_JPM()
+void tlcs900_device::op_JPM()
 {
 	if ( condition_true( m_op ) )
 	{
 		m_pc.d = m_ea2.d;
-		m_cycles += 4;
+		m_cycles += tlcs900_jp_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_JR()
+void tlcs900_device::op_JR()
 {
 	if ( condition_true( m_op ) )
 	{
 		m_pc.d = m_ea2.d;
-		m_cycles += 4;
+		m_cycles += tlcs900_jp_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_JRL()
+void tlcs900_device::op_JRL()
 {
 	if ( condition_true( m_op ) )
 	{
 		m_pc.d = m_ea2.d;
-		m_cycles += 4;
+		m_cycles += tlcs900_jp_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_LDBMI()
+void tlcs900_device::op_LDBMI()
 {
 	WRMEM( m_ea1.d, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_LDBMM()
+void tlcs900_device::op_LDBMM()
 {
 	WRMEM( m_ea1.d, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_LDBMR()
+void tlcs900_device::op_LDBMR()
 {
 	WRMEM( m_ea1.d, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_LDBRI()
+void tlcs900_device::op_LDBRI()
 {
 	*m_p1_reg8 = m_imm2.b.l;
 }
 
 
-void tlcs900h_device::op_LDBRM()
+void tlcs900_device::op_LDBRM()
 {
 	*m_p1_reg8 = RDMEM( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_LDBRR()
+void tlcs900_device::op_LDBRR()
 {
 	*m_p1_reg8 = *m_p2_reg8;
 }
 
 
-void tlcs900h_device::op_LDWMI()
+void tlcs900_device::op_LDWMI()
 {
 	WRMEMW( m_ea1.d, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_LDWMM()
+void tlcs900_device::op_LDWMM()
 {
 	WRMEMW( m_ea1.d, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_LDWMR()
+void tlcs900_device::op_LDWMR()
 {
 	WRMEMW( m_ea1.d, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_LDWRI()
+void tlcs900_device::op_LDWRI()
 {
 	*m_p1_reg16 = m_imm2.w.l;
 }
 
 
-void tlcs900h_device::op_LDWRM()
+void tlcs900_device::op_LDWRM()
 {
 	*m_p1_reg16 = RDMEMW( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_LDWRR()
+void tlcs900_device::op_LDWRR()
 {
 	*m_p1_reg16 = *m_p2_reg16;
 }
 
 
-void tlcs900h_device::op_LDLRI()
+void tlcs900_device::op_LDLRI()
 {
 	*m_p1_reg32 = m_imm2.d;
 }
 
 
-void tlcs900h_device::op_LDLRM()
+void tlcs900_device::op_LDLRM()
 {
 	*m_p1_reg32 = RDMEML( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_LDLRR()
+void tlcs900_device::op_LDLRR()
 {
 	*m_p1_reg32 = *m_p2_reg32;
 }
 
 
-void tlcs900h_device::op_LDLMR()
+void tlcs900_device::op_LDLMR()
 {
 	WRMEML( m_ea1.d, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_LDAW()
+void tlcs900_device::op_LDAW()
 {
 	*m_p1_reg16 = m_ea2.w.l;
 }
 
 
-void tlcs900h_device::op_LDAL()
+void tlcs900_device::op_LDAL()
 {
 	*m_p1_reg32 = m_ea2.d;
 }
 
 
-void tlcs900h_device::op_LDCBRR()
+void tlcs900_device::op_LDCBRR()
 {
 	*m_p1_reg8 = *m_p2_reg8;
 }
 
 
-void tlcs900h_device::op_LDCWRR()
+void tlcs900_device::op_LDCWRR()
 {
 	*m_p1_reg16 = *m_p2_reg16;
 }
 
 
-void tlcs900h_device::op_LDCLRR()
+void tlcs900_device::op_LDCLRR()
 {
 	*m_p1_reg32 = *m_p2_reg32;
 }
 
 
-void tlcs900h_device::op_LDCFBIM()
+void tlcs900_device::op_LDCFBIM()
 {
 	ldcf8( m_imm1.b.l, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_LDCFBIR()
+void tlcs900_device::op_LDCFBIR()
 {
 	ldcf8( m_imm1.b.l, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_LDCFBRM()
+void tlcs900_device::op_LDCFBRM()
 {
 	ldcf8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_LDCFBRR()
+void tlcs900_device::op_LDCFBRR()
 {
 	ldcf8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_LDCFWIR()
+void tlcs900_device::op_LDCFWIR()
 {
 	ldcf16( m_imm1.b.l, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_LDCFWRR()
+void tlcs900_device::op_LDCFWRR()
 {
 	ldcf16( *m_p1_reg8, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_LDD()
+void tlcs900_device::op_LDD()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2400,7 +2414,7 @@ void tlcs900h_device::op_LDD()
 }
 
 
-void tlcs900h_device::op_LDDR()
+void tlcs900_device::op_LDDR()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2413,13 +2427,13 @@ void tlcs900h_device::op_LDDR()
 	{
 		m_sr.b.l |= FLAG_VF;
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_LDDRW()
+void tlcs900_device::op_LDDRW()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2432,13 +2446,13 @@ void tlcs900h_device::op_LDDRW()
 	{
 		m_sr.b.l |= FLAG_VF;
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_LDDW()
+void tlcs900_device::op_LDDW()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2454,14 +2468,14 @@ void tlcs900h_device::op_LDDW()
 }
 
 
-void tlcs900h_device::op_LDF()
+void tlcs900_device::op_LDF()
 {
 	m_sr.b.h = ( m_sr.b.h & 0xf8 ) | ( m_imm1.b.l & 0x07 );
 	m_regbank = m_imm1.b.l & 0x03;
 }
 
 
-void tlcs900h_device::op_LDI()
+void tlcs900_device::op_LDI()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2477,7 +2491,7 @@ void tlcs900h_device::op_LDI()
 }
 
 
-void tlcs900h_device::op_LDIR()
+void tlcs900_device::op_LDIR()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2490,13 +2504,13 @@ void tlcs900h_device::op_LDIR()
 	{
 		m_sr.b.l |= FLAG_VF;
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_LDIRW()
+void tlcs900_device::op_LDIRW()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2509,13 +2523,13 @@ void tlcs900h_device::op_LDIRW()
 	{
 		m_sr.b.l |= FLAG_VF;
 		m_pc.d -= 2;
-		m_cycles += 4;
+		m_cycles += tlcs900_ldxx_repeat_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_LDIW()
+void tlcs900_device::op_LDIW()
 {
 	uint16_t  *bc = get_reg16_current( 1 );
 
@@ -2531,7 +2545,7 @@ void tlcs900h_device::op_LDIW()
 }
 
 
-void tlcs900h_device::op_LDX()
+void tlcs900_device::op_LDX()
 {
 	uint8_t   a, b;
 
@@ -2544,7 +2558,7 @@ void tlcs900h_device::op_LDX()
 }
 
 
-void tlcs900h_device::op_LINK()
+void tlcs900_device::op_LINK()
 {
 	m_xssp.d -= 4;
 	WRMEML( m_xssp.d, *m_p1_reg32 );
@@ -2553,13 +2567,13 @@ void tlcs900h_device::op_LINK()
 }
 
 
-void tlcs900h_device::op_MAX()
+void tlcs900_device::op_MAX()
 {
 	m_sr.b.h |= 0x04;
 }
 
 
-void tlcs900h_device::op_MDEC1()
+void tlcs900_device::op_MDEC1()
 {
 	if ( ( *m_p2_reg16 & m_imm1.w.l ) == m_imm1.w.l )
 		*m_p2_reg16 += m_imm1.w.l;
@@ -2568,7 +2582,7 @@ void tlcs900h_device::op_MDEC1()
 }
 
 
-void tlcs900h_device::op_MDEC2()
+void tlcs900_device::op_MDEC2()
 {
 	if ( ( *m_p2_reg16 & m_imm1.w.l ) == m_imm1.w.l )
 		*m_p2_reg16 += m_imm1.w.l;
@@ -2577,7 +2591,7 @@ void tlcs900h_device::op_MDEC2()
 }
 
 
-void tlcs900h_device::op_MDEC4()
+void tlcs900_device::op_MDEC4()
 {
 	if ( ( *m_p2_reg16 & m_imm1.w.l ) == m_imm1.w.l )
 		*m_p2_reg16 += m_imm1.w.l;
@@ -2586,7 +2600,7 @@ void tlcs900h_device::op_MDEC4()
 }
 
 
-void tlcs900h_device::op_MINC1()
+void tlcs900_device::op_MINC1()
 {
 	if ( ( *m_p2_reg16 & m_imm1.w.l ) == m_imm1.w.l )
 		*m_p2_reg16 -= m_imm1.w.l;
@@ -2595,7 +2609,7 @@ void tlcs900h_device::op_MINC1()
 }
 
 
-void tlcs900h_device::op_MINC2()
+void tlcs900_device::op_MINC2()
 {
 	if ( ( *m_p2_reg16 & m_imm1.w.l ) == m_imm1.w.l )
 		*m_p2_reg16 -= m_imm1.w.l;
@@ -2604,7 +2618,7 @@ void tlcs900h_device::op_MINC2()
 }
 
 
-void tlcs900h_device::op_MINC4()
+void tlcs900_device::op_MINC4()
 {
 	if ( ( *m_p2_reg16 & m_imm1.w.l ) == m_imm1.w.l )
 		*m_p2_reg16 -= m_imm1.w.l;
@@ -2613,7 +2627,7 @@ void tlcs900h_device::op_MINC4()
 }
 
 
-void tlcs900h_device::op_MIRRW()
+void tlcs900_device::op_MIRRW()
 {
 	uint16_t  r = *m_p1_reg16;
 	uint16_t  s = ( r & 0x01 );
@@ -2631,43 +2645,43 @@ void tlcs900h_device::op_MIRRW()
 }
 
 
-void tlcs900h_device::op_MULBRI()
+void tlcs900_device::op_MULBRI()
 {
 	*m_p1_reg16 = ( *m_p1_reg16 & 0xff ) * m_imm2.b.l;
 }
 
 
-void tlcs900h_device::op_MULBRM()
+void tlcs900_device::op_MULBRM()
 {
 	*m_p1_reg16 = ( *m_p1_reg16 & 0xff ) * RDMEM( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_MULBRR()
+void tlcs900_device::op_MULBRR()
 {
 	*m_p1_reg16 = ( *m_p1_reg16 & 0xff ) * *m_p2_reg8;
 }
 
 
-void tlcs900h_device::op_MULWRI()
+void tlcs900_device::op_MULWRI()
 {
 	*m_p1_reg32 = ( *m_p1_reg32 & 0xffff ) * m_imm2.w.l;
 }
 
 
-void tlcs900h_device::op_MULWRM()
+void tlcs900_device::op_MULWRM()
 {
 	*m_p1_reg32 = ( *m_p1_reg32 & 0xffff ) * RDMEMW( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_MULWRR()
+void tlcs900_device::op_MULWRR()
 {
 	*m_p1_reg32 = ( *m_p1_reg32 & 0xffff ) * *m_p2_reg16;
 }
 
 
-void tlcs900h_device::op_MULAR()
+void tlcs900_device::op_MULAR()
 {
 	uint32_t  *xde = get_reg32_current( 2 );
 	uint32_t  *xhl = get_reg32_current( 3 );
@@ -2680,229 +2694,229 @@ void tlcs900h_device::op_MULAR()
 }
 
 
-void tlcs900h_device::op_MULSBRI()
+void tlcs900_device::op_MULSBRI()
 {
 	*m_p1_reg16 = (int8_t)( *m_p1_reg16 & 0xff ) * m_imm2.sb.l;
 }
 
 
-void tlcs900h_device::op_MULSBRM()
+void tlcs900_device::op_MULSBRM()
 {
 	*m_p1_reg16 = (int8_t)( *m_p1_reg16 & 0xff ) * (int8_t)RDMEM( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_MULSBRR()
+void tlcs900_device::op_MULSBRR()
 {
 	*m_p1_reg16 = (int8_t)( *m_p1_reg16 & 0xff ) * (int8_t)*m_p2_reg8;
 }
 
 
-void tlcs900h_device::op_MULSWRI()
+void tlcs900_device::op_MULSWRI()
 {
 	*m_p1_reg32 = (int16_t)( *m_p1_reg32 & 0xffff ) * m_imm2.sw.l;
 }
 
 
-void tlcs900h_device::op_MULSWRM()
+void tlcs900_device::op_MULSWRM()
 {
 	*m_p1_reg32 = (int16_t)( *m_p1_reg32 & 0xffff ) * (int16_t)RDMEMW( m_ea2.d );
 }
 
 
-void tlcs900h_device::op_MULSWRR()
+void tlcs900_device::op_MULSWRR()
 {
 	*m_p1_reg32 = (int16_t)( *m_p1_reg32 & 0xffff ) * (int16_t)*m_p2_reg16;
 }
 
 
-void tlcs900h_device::op_NEGBR()
+void tlcs900_device::op_NEGBR()
 {
 	*m_p1_reg8 = sub8( 0, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_NEGWR()
+void tlcs900_device::op_NEGWR()
 {
 	*m_p1_reg16 = sub16( 0, *m_p1_reg16 );
 }
 
 
-void tlcs900h_device::op_NOP()
+void tlcs900_device::op_NOP()
 {
 	/* Do nothing */
 }
 
 
-void tlcs900h_device::op_NORMAL()
+void tlcs900_device::op_NORMAL()
 {
 	m_sr.b.h &= 0x7F;
 }
 
 
-void tlcs900h_device::op_ORBMI()
+void tlcs900_device::op_ORBMI()
 {
 	WRMEM( m_ea1.d, or8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_ORBMR()
+void tlcs900_device::op_ORBMR()
 {
 	WRMEM( m_ea1.d, or8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_ORBRI()
+void tlcs900_device::op_ORBRI()
 {
 	*m_p1_reg8 = or8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_ORBRM()
+void tlcs900_device::op_ORBRM()
 {
 	*m_p1_reg8 = or8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ORBRR()
+void tlcs900_device::op_ORBRR()
 {
 	*m_p1_reg8 = or8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ORWMI()
+void tlcs900_device::op_ORWMI()
 {
 	WRMEMW( m_ea1.d, or16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_ORWMR()
+void tlcs900_device::op_ORWMR()
 {
 	WRMEMW( m_ea1.d, or16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_ORWRI()
+void tlcs900_device::op_ORWRI()
 {
 	*m_p1_reg16 = or16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_ORWRM()
+void tlcs900_device::op_ORWRM()
 {
 	*m_p1_reg16 = or16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ORWRR()
+void tlcs900_device::op_ORWRR()
 {
 	*m_p1_reg16 = or16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ORLMR()
+void tlcs900_device::op_ORLMR()
 {
 	WRMEML( m_ea1.d, or32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_ORLRI()
+void tlcs900_device::op_ORLRI()
 {
 	*m_p1_reg32 = or32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_ORLRM()
+void tlcs900_device::op_ORLRM()
 {
 	*m_p1_reg32 = or32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ORLRR()
+void tlcs900_device::op_ORLRR()
 {
 	*m_p1_reg32 = or32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_ORCFBIM()
+void tlcs900_device::op_ORCFBIM()
 {
 	orcf8( m_imm1.b.l, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ORCFBIR()
+void tlcs900_device::op_ORCFBIR()
 {
 	orcf8( m_imm1.b.l, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ORCFBRM()
+void tlcs900_device::op_ORCFBRM()
 {
 	orcf8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_ORCFBRR()
+void tlcs900_device::op_ORCFBRR()
 {
 	orcf8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_ORCFWIR()
+void tlcs900_device::op_ORCFWIR()
 {
 	orcf16( m_imm1.b.l, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ORCFWRR()
+void tlcs900_device::op_ORCFWRR()
 {
 	orcf16( *m_p1_reg8, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_PAAWR()
+void tlcs900_device::op_PAAWR()
 {
 	if ( *m_p1_reg16 & 1 )
 		*m_p1_reg16 += 1;
 }
 
 
-void tlcs900h_device::op_PAALR()
+void tlcs900_device::op_PAALR()
 {
 	if ( *m_p1_reg32 & 1 )
 		*m_p1_reg32 += 1;
 }
 
 
-void tlcs900h_device::op_POPBM()
+void tlcs900_device::op_POPBM()
 {
 	WRMEM( m_ea1.d, RDMEM( m_xssp.d ) );
 	m_xssp.d += 1;
 }
 
 
-void tlcs900h_device::op_POPBR()
+void tlcs900_device::op_POPBR()
 {
 	*m_p1_reg8 = RDMEM( m_xssp.d );
 	m_xssp.d += 1;
 }
 
 
-void tlcs900h_device::op_POPWM()
+void tlcs900_device::op_POPWM()
 {
 	WRMEMW( m_ea1.d, RDMEMW( m_xssp.d ) );
 	m_xssp.d += 2;
 }
 
 
-void tlcs900h_device::op_POPWR()
+void tlcs900_device::op_POPWR()
 {
 	*m_p1_reg16 = RDMEMW( m_xssp.d );
 	m_xssp.d += 2;
 }
 
 
-void tlcs900h_device::op_POPWSR()
+void tlcs900_device::op_POPWSR()
 {
 	op_POPWR();
 	m_regbank = m_sr.b.h & 0x03;
@@ -2910,87 +2924,87 @@ void tlcs900h_device::op_POPWSR()
 }
 
 
-void tlcs900h_device::op_POPLR()
+void tlcs900_device::op_POPLR()
 {
 	*m_p1_reg32 = RDMEML( m_xssp.d );
 	m_xssp.d += 4;
 }
 
 
-void tlcs900h_device::op_PUSHBI()
+void tlcs900_device::op_PUSHBI()
 {
 	m_xssp.d -= 1;
 	WRMEM( m_xssp.d, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_PUSHBM()
+void tlcs900_device::op_PUSHBM()
 {
 	m_xssp.d -= 1;
 	WRMEM( m_xssp.d, RDMEM( m_ea1.d ) );
 }
 
 
-void tlcs900h_device::op_PUSHBR()
+void tlcs900_device::op_PUSHBR()
 {
 	m_xssp.d -= 1;
 	WRMEM( m_xssp.d, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_PUSHWI()
+void tlcs900_device::op_PUSHWI()
 {
 	m_xssp.d -= 2;
 	WRMEMW( m_xssp.d, m_imm1.w.l );
 }
 
 
-void tlcs900h_device::op_PUSHWM()
+void tlcs900_device::op_PUSHWM()
 {
 	m_xssp.d -= 2;
 	WRMEMW( m_xssp.d, RDMEMW( m_ea1.d ) );
 }
 
 
-void tlcs900h_device::op_PUSHWR()
+void tlcs900_device::op_PUSHWR()
 {
 	m_xssp.d -= 2;
 	WRMEMW( m_xssp.d, *m_p1_reg16 );
 }
 
 
-void tlcs900h_device::op_PUSHLR()
+void tlcs900_device::op_PUSHLR()
 {
 	m_xssp.d -= 4;
 	WRMEML( m_xssp.d, *m_p1_reg32 );
 }
 
 
-void tlcs900h_device::op_RCF()
+void tlcs900_device::op_RCF()
 {
 	m_sr.b.l &= ~ ( FLAG_HF | FLAG_NF | FLAG_CF );
 }
 
 
-void tlcs900h_device::op_RESBIM()
+void tlcs900_device::op_RESBIM()
 {
 	WRMEM( m_ea2.d, RDMEM( m_ea2.d ) & ~( 1 << ( m_imm1.d & 0x07 ) ) );
 }
 
 
-void tlcs900h_device::op_RESBIR()
+void tlcs900_device::op_RESBIR()
 {
 	*m_p2_reg8 = *m_p2_reg8 & ~( 1 << ( m_imm1.d & 0x07 ) );
 }
 
 
-void tlcs900h_device::op_RESWIR()
+void tlcs900_device::op_RESWIR()
 {
 	*m_p2_reg16 = *m_p2_reg16 & ~( 1 << ( m_imm1.d & 0x0f ) );
 }
 
 
-void tlcs900h_device::op_RET()
+void tlcs900_device::op_RET()
 {
 	m_pc.d = RDMEML( m_xssp.d );
 	m_xssp.d += 4;
@@ -2998,19 +3012,19 @@ void tlcs900h_device::op_RET()
 }
 
 
-void tlcs900h_device::op_RETCC()
+void tlcs900_device::op_RETCC()
 {
 	if ( condition_true( m_op ) )
 	{
 		m_pc.d = RDMEML( m_xssp.d );
 		m_xssp.d += 4;
-		m_cycles += 6;
+		m_cycles += tlcs900_call_true_cycles();
 		m_prefetch_clear = true;
 	}
 }
 
 
-void tlcs900h_device::op_RETD()
+void tlcs900_device::op_RETD()
 {
 	m_pc.d = RDMEML( m_xssp.d );
 	m_xssp.d += 4 + m_imm1.sw.l;
@@ -3018,7 +3032,7 @@ void tlcs900h_device::op_RETD()
 }
 
 
-void tlcs900h_device::op_RETI()
+void tlcs900_device::op_RETI()
 {
 	m_sr.w.l = RDMEMW( m_xssp.d );
 	m_xssp.d += 2;
@@ -3030,103 +3044,103 @@ void tlcs900h_device::op_RETI()
 }
 
 
-void tlcs900h_device::op_RLBM()
+void tlcs900_device::op_RLBM()
 {
 	WRMEM( m_ea2.d, rl8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RLWM()
+void tlcs900_device::op_RLWM()
 {
 	WRMEMW( m_ea2.d, rl16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RLBIR()
+void tlcs900_device::op_RLBIR()
 {
 	*m_p2_reg8 = rl8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RLBRR()
+void tlcs900_device::op_RLBRR()
 {
 	*m_p2_reg8 = rl8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RLWIR()
+void tlcs900_device::op_RLWIR()
 {
 	*m_p2_reg16 = rl16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RLWRR()
+void tlcs900_device::op_RLWRR()
 {
 	*m_p2_reg16 = rl16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RLLIR()
+void tlcs900_device::op_RLLIR()
 {
 	*m_p2_reg32 = rl32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RLLRR()
+void tlcs900_device::op_RLLRR()
 {
 	*m_p2_reg32 = rl32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RLCBM()
+void tlcs900_device::op_RLCBM()
 {
 	WRMEM( m_ea2.d, rlc8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RLCWM()
+void tlcs900_device::op_RLCWM()
 {
 	WRMEMW( m_ea2.d, rlc16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RLCBIR()
+void tlcs900_device::op_RLCBIR()
 {
 	*m_p2_reg8 = rlc8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RLCBRR()
+void tlcs900_device::op_RLCBRR()
 {
 	*m_p2_reg8 = rlc8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RLCWIR()
+void tlcs900_device::op_RLCWIR()
 {
 	*m_p2_reg16 = rlc16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RLCWRR()
+void tlcs900_device::op_RLCWRR()
 {
 	*m_p2_reg16 = rlc16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RLCLIR()
+void tlcs900_device::op_RLCLIR()
 {
 	*m_p2_reg32 = rlc32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RLCLRR()
+void tlcs900_device::op_RLCLRR()
 {
 	*m_p2_reg32 = rlc32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RLDRM()
+void tlcs900_device::op_RLDRM()
 {
 	uint8_t   a = *m_p1_reg8 & 0x0f;
 	uint8_t   b = RDMEM( m_ea2.d );
@@ -3139,103 +3153,103 @@ void tlcs900h_device::op_RLDRM()
 }
 
 
-void tlcs900h_device::op_RRBM()
+void tlcs900_device::op_RRBM()
 {
 	WRMEM( m_ea2.d, rr8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RRWM()
+void tlcs900_device::op_RRWM()
 {
 	WRMEMW( m_ea2.d, rr16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RRBIR()
+void tlcs900_device::op_RRBIR()
 {
 	*m_p2_reg8 = rr8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RRBRR()
+void tlcs900_device::op_RRBRR()
 {
 	*m_p2_reg8 = rr8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RRWIR()
+void tlcs900_device::op_RRWIR()
 {
 	*m_p2_reg16 = rr16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RRWRR()
+void tlcs900_device::op_RRWRR()
 {
 	*m_p2_reg16 = rr16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RRLIR()
+void tlcs900_device::op_RRLIR()
 {
 	*m_p2_reg32 = rr32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RRLRR()
+void tlcs900_device::op_RRLRR()
 {
 	*m_p2_reg32 = rr32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RRCBM()
+void tlcs900_device::op_RRCBM()
 {
 	WRMEM( m_ea2.d, rrc8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RRCWM()
+void tlcs900_device::op_RRCWM()
 {
 	WRMEMW( m_ea2.d, rrc16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_RRCBIR()
+void tlcs900_device::op_RRCBIR()
 {
 	*m_p2_reg8 = rrc8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RRCBRR()
+void tlcs900_device::op_RRCBRR()
 {
 	*m_p2_reg8 = rrc8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RRCWIR()
+void tlcs900_device::op_RRCWIR()
 {
 	*m_p2_reg16 = rrc16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RRCWRR()
+void tlcs900_device::op_RRCWRR()
 {
 	*m_p2_reg16 = rrc16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RRCLIR()
+void tlcs900_device::op_RRCLIR()
 {
 	*m_p2_reg32 = rrc32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_RRCLRR()
+void tlcs900_device::op_RRCLRR()
 {
 	*m_p2_reg32 = rrc32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_RRDRM()
+void tlcs900_device::op_RRDRM()
 {
 	uint8_t   a = *m_p1_reg8 & 0x0f;
 	uint8_t   b = RDMEM( m_ea2.d );
@@ -3248,320 +3262,320 @@ void tlcs900h_device::op_RRDRM()
 }
 
 
-void tlcs900h_device::op_SBCBMI()
+void tlcs900_device::op_SBCBMI()
 {
 	WRMEM( m_ea1.d, sbc8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_SBCBMR()
+void tlcs900_device::op_SBCBMR()
 {
 	WRMEM( m_ea1.d, sbc8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_SBCBRI()
+void tlcs900_device::op_SBCBRI()
 {
 	*m_p1_reg8 = sbc8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_SBCBRM()
+void tlcs900_device::op_SBCBRM()
 {
 	*m_p1_reg8 = sbc8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_SBCBRR()
+void tlcs900_device::op_SBCBRR()
 {
 	*m_p1_reg8 = sbc8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_SBCWMI()
+void tlcs900_device::op_SBCWMI()
 {
 	WRMEMW( m_ea1.d, sbc16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_SBCWMR()
+void tlcs900_device::op_SBCWMR()
 {
 	WRMEMW( m_ea1.d, sbc16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_SBCWRI()
+void tlcs900_device::op_SBCWRI()
 {
 	*m_p1_reg16 = sbc16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_SBCWRM()
+void tlcs900_device::op_SBCWRM()
 {
 	*m_p1_reg16 = sbc16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_SBCWRR()
+void tlcs900_device::op_SBCWRR()
 {
 	*m_p1_reg16 = sbc16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_SBCLMR()
+void tlcs900_device::op_SBCLMR()
 {
 	WRMEML( m_ea1.d, sbc32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_SBCLRI()
+void tlcs900_device::op_SBCLRI()
 {
 	*m_p1_reg32 = sbc32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_SBCLRM()
+void tlcs900_device::op_SBCLRM()
 {
 	*m_p1_reg32 = sbc32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_SBCLRR()
+void tlcs900_device::op_SBCLRR()
 {
 	*m_p1_reg32 = sbc32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_SCCBR()
+void tlcs900_device::op_SCCBR()
 {
 	*m_p2_reg8 = condition_true( m_op ) ? 1 : 0;
 }
 
 
-void tlcs900h_device::op_SCCWR()
+void tlcs900_device::op_SCCWR()
 {
 	*m_p2_reg16 = condition_true( m_op ) ? 1 : 0;
 }
 
 
-void tlcs900h_device::op_SCF()
+void tlcs900_device::op_SCF()
 {
 	m_sr.b.l &= ~ ( FLAG_HF | FLAG_NF );
 	m_sr.b.l |= FLAG_CF;
 }
 
 
-void tlcs900h_device::op_SETBIM()
+void tlcs900_device::op_SETBIM()
 {
 	WRMEM( m_ea2.d, RDMEM( m_ea2.d ) | ( 1 << ( m_imm1.d & 0x07 ) ) );
 }
 
 
-void tlcs900h_device::op_SETBIR()
+void tlcs900_device::op_SETBIR()
 {
 	*m_p2_reg8 = *m_p2_reg8 | ( 1 << ( m_imm1.d & 0x07 ) );
 }
 
 
-void tlcs900h_device::op_SETWIR()
+void tlcs900_device::op_SETWIR()
 {
 	*m_p2_reg16 = *m_p2_reg16 | ( 1 << ( m_imm1.d & 0x0f ) );
 }
 
 
-void tlcs900h_device::op_SLABM()
+void tlcs900_device::op_SLABM()
 {
 	WRMEM( m_ea2.d, sla8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SLAWM()
+void tlcs900_device::op_SLAWM()
 {
 	WRMEMW( m_ea2.d, sla16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SLABIR()
+void tlcs900_device::op_SLABIR()
 {
 	*m_p2_reg8 = sla8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SLABRR()
+void tlcs900_device::op_SLABRR()
 {
 	*m_p2_reg8 = sla8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SLAWIR()
+void tlcs900_device::op_SLAWIR()
 {
 	*m_p2_reg16 = sla16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SLAWRR()
+void tlcs900_device::op_SLAWRR()
 {
 	*m_p2_reg16 = sla16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SLALIR()
+void tlcs900_device::op_SLALIR()
 {
 	*m_p2_reg32 = sla32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SLALRR()
+void tlcs900_device::op_SLALRR()
 {
 	*m_p2_reg32 = sla32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SLLBM()
+void tlcs900_device::op_SLLBM()
 {
 	WRMEM( m_ea2.d, sla8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SLLWM()
+void tlcs900_device::op_SLLWM()
 {
 	WRMEMW( m_ea2.d, sla16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SLLBIR()
+void tlcs900_device::op_SLLBIR()
 {
 	*m_p2_reg8 = sla8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SLLBRR()
+void tlcs900_device::op_SLLBRR()
 {
 	*m_p2_reg8 = sla8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SLLWIR()
+void tlcs900_device::op_SLLWIR()
 {
 	*m_p2_reg16 = sla16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SLLWRR()
+void tlcs900_device::op_SLLWRR()
 {
 	*m_p2_reg16 = sla16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SLLLIR()
+void tlcs900_device::op_SLLLIR()
 {
 	*m_p2_reg32 = sla32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SLLLRR()
+void tlcs900_device::op_SLLLRR()
 {
 	*m_p2_reg32 = sla32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SRABM()
+void tlcs900_device::op_SRABM()
 {
 	WRMEM( m_ea2.d, sra8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SRAWM()
+void tlcs900_device::op_SRAWM()
 {
 	WRMEMW( m_ea2.d, sra16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SRABIR()
+void tlcs900_device::op_SRABIR()
 {
 	*m_p2_reg8 = sra8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SRABRR()
+void tlcs900_device::op_SRABRR()
 {
 	*m_p2_reg8 = sra8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SRAWIR()
+void tlcs900_device::op_SRAWIR()
 {
 	*m_p2_reg16 = sra16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SRAWRR()
+void tlcs900_device::op_SRAWRR()
 {
 	*m_p2_reg16 = sra16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SRALIR()
+void tlcs900_device::op_SRALIR()
 {
 	*m_p2_reg32 = sra32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SRALRR()
+void tlcs900_device::op_SRALRR()
 {
 	*m_p2_reg32 = sra32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SRLBM()
+void tlcs900_device::op_SRLBM()
 {
 	WRMEM( m_ea2.d, srl8( RDMEM( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SRLWM()
+void tlcs900_device::op_SRLWM()
 {
 	WRMEMW( m_ea2.d, srl16( RDMEMW( m_ea2.d ), 1 ) );
 }
 
 
-void tlcs900h_device::op_SRLBIR()
+void tlcs900_device::op_SRLBIR()
 {
 	*m_p2_reg8 = srl8( *m_p2_reg8, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SRLBRR()
+void tlcs900_device::op_SRLBRR()
 {
 	*m_p2_reg8 = srl8( *m_p2_reg8, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SRLWIR()
+void tlcs900_device::op_SRLWIR()
 {
 	*m_p2_reg16 = srl16( *m_p2_reg16, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SRLWRR()
+void tlcs900_device::op_SRLWRR()
 {
 	*m_p2_reg16 = srl16( *m_p2_reg16, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_SRLLIR()
+void tlcs900_device::op_SRLLIR()
 {
 	*m_p2_reg32 = srl32( *m_p2_reg32, m_imm1.b.l );
 }
 
 
-void tlcs900h_device::op_SRLLRR()
+void tlcs900_device::op_SRLLRR()
 {
 	*m_p2_reg32 = srl32( *m_p2_reg32, *m_p1_reg8 );
 }
 
 
-void tlcs900h_device::op_STCFBIM()
+void tlcs900_device::op_STCFBIM()
 {
 	if ( m_sr.b.l & FLAG_CF )
 		WRMEM( m_ea2.d, RDMEM( m_ea2.d ) | ( 1 << ( m_imm1.b.l & 0x07 ) ) );
@@ -3570,7 +3584,7 @@ void tlcs900h_device::op_STCFBIM()
 }
 
 
-void tlcs900h_device::op_STCFBIR()
+void tlcs900_device::op_STCFBIR()
 {
 	if ( m_sr.b.l & FLAG_CF )
 		*m_p2_reg8 |= ( 1 << ( m_imm1.b.l & 0x07 ) );
@@ -3579,7 +3593,7 @@ void tlcs900h_device::op_STCFBIR()
 }
 
 
-void tlcs900h_device::op_STCFBRM()
+void tlcs900_device::op_STCFBRM()
 {
 	if ( m_sr.b.l & FLAG_CF )
 		WRMEM( m_ea2.d, RDMEM( m_ea2.d ) | ( 1 << ( *m_p1_reg8 & 0x07 ) ) );
@@ -3588,7 +3602,7 @@ void tlcs900h_device::op_STCFBRM()
 }
 
 
-void tlcs900h_device::op_STCFBRR()
+void tlcs900_device::op_STCFBRR()
 {
 	if ( m_sr.b.l & FLAG_CF )
 		*m_p2_reg8 |= ( 1 << ( *m_p1_reg8 & 0x07 ) );
@@ -3597,7 +3611,7 @@ void tlcs900h_device::op_STCFBRR()
 }
 
 
-void tlcs900h_device::op_STCFWIR()
+void tlcs900_device::op_STCFWIR()
 {
 	if ( m_sr.b.l & FLAG_CF )
 		*m_p2_reg16 |= ( 1 << ( m_imm1.b.l & 0x0f ) );
@@ -3606,7 +3620,7 @@ void tlcs900h_device::op_STCFWIR()
 }
 
 
-void tlcs900h_device::op_STCFWRR()
+void tlcs900_device::op_STCFWRR()
 {
 	if ( m_sr.b.l & FLAG_CF )
 		*m_p2_reg16 |= ( 1 << ( *m_p1_reg8 & 0x0f ) );
@@ -3615,91 +3629,91 @@ void tlcs900h_device::op_STCFWRR()
 }
 
 
-void tlcs900h_device::op_SUBBMI()
+void tlcs900_device::op_SUBBMI()
 {
 	WRMEM( m_ea1.d, sub8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_SUBBMR()
+void tlcs900_device::op_SUBBMR()
 {
 	WRMEM( m_ea1.d, sub8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_SUBBRI()
+void tlcs900_device::op_SUBBRI()
 {
 	*m_p1_reg8 = sub8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_SUBBRM()
+void tlcs900_device::op_SUBBRM()
 {
 	*m_p1_reg8 = sub8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_SUBBRR()
+void tlcs900_device::op_SUBBRR()
 {
 	*m_p1_reg8 = sub8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_SUBWMI()
+void tlcs900_device::op_SUBWMI()
 {
 	WRMEMW( m_ea1.d, sub16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_SUBWMR()
+void tlcs900_device::op_SUBWMR()
 {
 	WRMEMW( m_ea1.d, sub16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_SUBWRI()
+void tlcs900_device::op_SUBWRI()
 {
 	*m_p1_reg16 = sub16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_SUBWRM()
+void tlcs900_device::op_SUBWRM()
 {
 	*m_p1_reg16 = sub16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_SUBWRR()
+void tlcs900_device::op_SUBWRR()
 {
 	*m_p1_reg16 = sub16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_SUBLMR()
+void tlcs900_device::op_SUBLMR()
 {
 	WRMEML( m_ea1.d, sub32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_SUBLRI()
+void tlcs900_device::op_SUBLRI()
 {
 	*m_p1_reg32 = sub32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_SUBLRM()
+void tlcs900_device::op_SUBLRM()
 {
 	*m_p1_reg32 = sub32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_SUBLRR()
+void tlcs900_device::op_SUBLRR()
 {
 	*m_p1_reg32 = sub32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_SWI()
+void tlcs900_device::op_SWI()
 {
 	m_xssp.d -= 4;
 	WRMEML( m_xssp.d, m_pc.d );
@@ -3710,7 +3724,18 @@ void tlcs900h_device::op_SWI()
 }
 
 
-void tlcs900h_device::op_TSETBIM()
+void tlcs900_device::op_SWI900()
+{
+	m_xssp.d -= 4;
+	WRMEML( m_xssp.d, m_pc.d );
+	m_xssp.d -= 2;
+	WRMEMW( m_xssp.d, m_sr.w.l );
+	m_pc.d = 0x00008000 + 0x10 * m_imm1.b.l;
+	m_prefetch_clear = true;
+}
+
+
+void tlcs900_device::op_TSETBIM()
 {
 	uint8_t   b = 1 << ( m_imm1.b.l & 0x07 );
 	uint8_t   a = RDMEM( m_ea2.d );
@@ -3721,7 +3746,7 @@ void tlcs900h_device::op_TSETBIM()
 }
 
 
-void tlcs900h_device::op_TSETBIR()
+void tlcs900_device::op_TSETBIR()
 {
 	uint8_t   b = 1 << ( m_imm1.b.l & 0x07 );
 
@@ -3731,7 +3756,7 @@ void tlcs900h_device::op_TSETBIR()
 }
 
 
-void tlcs900h_device::op_TSETWIR()
+void tlcs900_device::op_TSETWIR()
 {
 	uint16_t  b = 1 << ( m_imm1.b.l & 0x0f );
 
@@ -3741,7 +3766,7 @@ void tlcs900h_device::op_TSETWIR()
 }
 
 
-void tlcs900h_device::op_UNLK()
+void tlcs900_device::op_UNLK()
 {
 	m_xssp.d = *m_p1_reg32;
 	*m_p1_reg32 = RDMEML( m_xssp.d );
@@ -3749,134 +3774,134 @@ void tlcs900h_device::op_UNLK()
 }
 
 
-void tlcs900h_device::op_XORBMI()
+void tlcs900_device::op_XORBMI()
 {
 	WRMEM( m_ea1.d, xor8( RDMEM( m_ea1.d ), m_imm2.b.l ) );
 }
 
 
-void tlcs900h_device::op_XORBMR()
+void tlcs900_device::op_XORBMR()
 {
 	WRMEM( m_ea1.d, xor8( RDMEM( m_ea1.d ), *m_p2_reg8 ) );
 }
 
 
-void tlcs900h_device::op_XORBRI()
+void tlcs900_device::op_XORBRI()
 {
 	*m_p1_reg8 = xor8( *m_p1_reg8, m_imm2.b.l );
 }
 
 
-void tlcs900h_device::op_XORBRM()
+void tlcs900_device::op_XORBRM()
 {
 	*m_p1_reg8 = xor8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_XORBRR()
+void tlcs900_device::op_XORBRR()
 {
 	*m_p1_reg8 = xor8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_XORWMI()
+void tlcs900_device::op_XORWMI()
 {
 	WRMEMW( m_ea1.d, xor16( RDMEMW( m_ea1.d ), m_imm2.w.l ) );
 }
 
 
-void tlcs900h_device::op_XORWMR()
+void tlcs900_device::op_XORWMR()
 {
 	WRMEMW( m_ea1.d, xor16( RDMEMW( m_ea1.d ), *m_p2_reg16 ) );
 }
 
 
-void tlcs900h_device::op_XORWRI()
+void tlcs900_device::op_XORWRI()
 {
 	*m_p1_reg16 = xor16( *m_p1_reg16, m_imm2.w.l );
 }
 
 
-void tlcs900h_device::op_XORWRM()
+void tlcs900_device::op_XORWRM()
 {
 	*m_p1_reg16 = xor16( *m_p1_reg16, RDMEMW( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_XORWRR()
+void tlcs900_device::op_XORWRR()
 {
 	*m_p1_reg16 = xor16( *m_p1_reg16, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_XORLMR()
+void tlcs900_device::op_XORLMR()
 {
 	WRMEML( m_ea1.d, xor32( RDMEML( m_ea1.d ), *m_p2_reg32 ) );
 }
 
 
-void tlcs900h_device::op_XORLRI()
+void tlcs900_device::op_XORLRI()
 {
 	*m_p1_reg32 = xor32( *m_p1_reg32, m_imm2.d );
 }
 
 
-void tlcs900h_device::op_XORLRM()
+void tlcs900_device::op_XORLRM()
 {
 	*m_p1_reg32 = xor32( *m_p1_reg32, RDMEML( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_XORLRR()
+void tlcs900_device::op_XORLRR()
 {
 	*m_p1_reg32 = xor32( *m_p1_reg32, *m_p2_reg32 );
 }
 
 
-void tlcs900h_device::op_XORCFBIM()
+void tlcs900_device::op_XORCFBIM()
 {
 	xorcf8( m_imm1.b.l, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_XORCFBIR()
+void tlcs900_device::op_XORCFBIR()
 {
 	xorcf8( m_imm1.b.l, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_XORCFBRM()
+void tlcs900_device::op_XORCFBRM()
 {
 	xorcf8( *m_p1_reg8, RDMEM( m_ea2.d ) );
 }
 
 
-void tlcs900h_device::op_XORCFBRR()
+void tlcs900_device::op_XORCFBRR()
 {
 	xorcf8( *m_p1_reg8, *m_p2_reg8 );
 }
 
 
-void tlcs900h_device::op_XORCFWIR()
+void tlcs900_device::op_XORCFWIR()
 {
 	xorcf16( m_imm1.b.l, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_XORCFWRR()
+void tlcs900_device::op_XORCFWRR()
 {
 	xorcf16( *m_p1_reg8, *m_p2_reg16 );
 }
 
 
-void tlcs900h_device::op_ZCF()
+void tlcs900_device::op_ZCF()
 {
 	m_sr.b.l &= ~ ( FLAG_NF | FLAG_CF );
 	m_sr.b.l |= ( ( m_sr.b.l & FLAG_ZF ) ? 0 : FLAG_CF );
 }
 
 
-void tlcs900h_device::prepare_operands(const tlcs900inst *inst)
+void tlcs900_device::prepare_operands(const tlcs900inst *inst)
 {
 	switch ( inst->operand1 )
 	{
@@ -4154,1184 +4179,1184 @@ void tlcs900h_device::prepare_operands(const tlcs900inst *inst)
 }
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_80[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_80[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_PUSHBM, p_M, 0, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_RLDRM, p_A, p_M, 12 }, { &tlcs900h_device::op_RRDRM, p_A, p_M, 12 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDI, 0, 0, 10 }, { &tlcs900h_device::op_LDIR, 0, 0, 10 }, { &tlcs900h_device::op_LDD, 0, 0, 10 }, { &tlcs900h_device::op_LDDR, 0, 0, 10 },
-	{ &tlcs900h_device::op_CPI, 0, 0, 8 }, { &tlcs900h_device::op_CPIR, 0, 0, 10 }, { &tlcs900h_device::op_CPD, 0, 0, 8 }, { &tlcs900h_device::op_CPDR, 0, 0, 10 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDBMM, p_M16, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_PUSHBM, p_M, 0, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_RLDRM, p_A, p_M, 12 }, { &tlcs900_device::op_RRDRM, p_A, p_M, 12 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDI, 0, 0, 10 }, { &tlcs900_device::op_LDIR, 0, 0, 10 }, { &tlcs900_device::op_LDD, 0, 0, 10 }, { &tlcs900_device::op_LDDR, 0, 0, 10 },
+	{ &tlcs900_device::op_CPI, 0, 0, 8 }, { &tlcs900_device::op_CPIR, 0, 0, 10 }, { &tlcs900_device::op_CPD, 0, 0, 8 }, { &tlcs900_device::op_CPDR, 0, 0, 10 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDBMM, p_M16, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADDBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_ADCBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_SUBBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_SBCBMI, p_M, p_I8, 7 },
-	{ &tlcs900h_device::op_ANDBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_XORBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_ORBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_CPBMI, p_M, p_I8, 6 },
+	{ &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_ADCBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_SUBBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_SBCBMI, p_M, p_I8, 7 },
+	{ &tlcs900_device::op_ANDBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_XORBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_ORBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_CPBMI, p_M, p_I8, 6 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18}, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18}, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 },
-	{ &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 },
-	{ &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 },
-	{ &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 },
+	{ &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 },
+	{ &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 },
+	{ &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 },
+	{ &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_RLCBM, p_M, 0, 8 }, { &tlcs900h_device::op_RRCBM, p_M, 0, 8 }, { &tlcs900h_device::op_RLBM, p_M, 0, 8 }, { &tlcs900h_device::op_RRBM, p_M, 0, 8 },
-	{ &tlcs900h_device::op_SLABM, p_M, 0, 8 }, { &tlcs900h_device::op_SRABM, p_M, 0, 8 }, { &tlcs900h_device::op_SLLBM, p_M, 0, 8 }, { &tlcs900h_device::op_SRLBM, p_M, 0, 8 },
+	{ &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_RLCBM, p_M, 0, 6 }, { &tlcs900_device::op_RRCBM, p_M, 0, 6 }, { &tlcs900_device::op_RLBM, p_M, 0, 6 }, { &tlcs900_device::op_RRBM, p_M, 0, 6 },
+	{ &tlcs900_device::op_SLABM, p_M, 0, 6 }, { &tlcs900_device::op_SRABM, p_M, 0, 6 }, { &tlcs900_device::op_SLLBM, p_M, 0, 6 }, { &tlcs900_device::op_SRLBM, p_M, 0, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_88[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_88[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_PUSHBM, p_M, 0, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_RLDRM, p_A, p_M, 12 }, { &tlcs900h_device::op_RRDRM, p_A, p_M, 12 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDBMM, p_M16, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_PUSHBM, p_M, 0, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_RLDRM, p_A, p_M, 12 }, { &tlcs900_device::op_RRDRM, p_A, p_M, 12 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDBMM, p_M16, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADDBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_ADCBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_SUBBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_SBCBMI, p_M, p_I8, 7 },
-	{ &tlcs900h_device::op_ANDBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_XORBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_ORBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_CPBMI, p_M, p_I8, 6 },
+	{ &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_ADCBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_SUBBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_SBCBMI, p_M, p_I8, 7 },
+	{ &tlcs900_device::op_ANDBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_XORBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_ORBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_CPBMI, p_M, p_I8, 6 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 },
-	{ &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 },
-	{ &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 },
-	{ &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 },
+	{ &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 },
+	{ &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 },
+	{ &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 },
+	{ &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_RLCBM, p_M, 0, 8 }, { &tlcs900h_device::op_RRCBM, p_M, 0, 8 }, { &tlcs900h_device::op_RLBM, p_M, 0, 8 }, { &tlcs900h_device::op_RRBM, p_M, 0, 8 },
-	{ &tlcs900h_device::op_SLABM, p_M, 0, 8 }, { &tlcs900h_device::op_SRABM, p_M, 0, 8 }, { &tlcs900h_device::op_SLLBM, p_M, 0, 8 }, { &tlcs900h_device::op_SRLBM, p_M, 0, 8 },
+	{ &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_RLCBM, p_M, 0, 6 }, { &tlcs900_device::op_RRCBM, p_M, 0, 6 }, { &tlcs900_device::op_RLBM, p_M, 0, 6 }, { &tlcs900_device::op_RRBM, p_M, 0, 6 },
+	{ &tlcs900_device::op_SLABM, p_M, 0, 6 }, { &tlcs900_device::op_SRABM, p_M, 0, 6 }, { &tlcs900_device::op_SLLBM, p_M, 0, 6 }, { &tlcs900_device::op_SRLBM, p_M, 0, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_90[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_90[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_PUSHWM, p_M, 0, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDIW, 0, 0, 10 }, { &tlcs900h_device::op_LDIRW, 0, 0, 10 }, { &tlcs900h_device::op_LDDW, 0, 0, 10 }, { &tlcs900h_device::op_LDDRW, 0, 0, 10 },
-	{ &tlcs900h_device::op_CPIW, 0, 0, 8 }, { &tlcs900h_device::op_CPIRW, 0, 0, 10 }, { &tlcs900h_device::op_CPDW, 0, 0, 8 }, { &tlcs900h_device::op_CPDRW, 0, 0, 10 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMM, p_M16, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_PUSHWM, p_M, 0, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDIW, 0, 0, 10 }, { &tlcs900_device::op_LDIRW, 0, 0, 10 }, { &tlcs900_device::op_LDDW, 0, 0, 10 }, { &tlcs900_device::op_LDDRW, 0, 0, 10 },
+	{ &tlcs900_device::op_CPIW, 0, 0, 8 }, { &tlcs900_device::op_CPIRW, 0, 0, 10 }, { &tlcs900_device::op_CPDW, 0, 0, 8 }, { &tlcs900_device::op_CPDRW, 0, 0, 10 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMM, p_M16, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADDWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_ADCWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_SUBWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_SBCWMI, p_M, p_I16, 8 },
-	{ &tlcs900h_device::op_ANDWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_XORWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_ORWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_CPWMI, p_M, p_I16, 6 },
+	{ &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_ADCWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_SUBWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_SBCWMI, p_M, p_I16, 8 },
+	{ &tlcs900_device::op_ANDWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_XORWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_ORWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_CPWMI, p_M, p_I16, 6 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 },
-	{ &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 },
-	{ &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 },
-	{ &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 },
+	{ &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 },
+	{ &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 },
+	{ &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 },
+	{ &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_RLCWM, p_M, 0, 8 }, { &tlcs900h_device::op_RRCWM, p_M, 0, 8 }, { &tlcs900h_device::op_RLWM, p_M, 0, 8 }, { &tlcs900h_device::op_RRWM, p_M, 0, 8 },
-	{ &tlcs900h_device::op_SLAWM, p_M, 0, 8 }, { &tlcs900h_device::op_SRAWM, p_M, 0, 8 }, { &tlcs900h_device::op_SLLWM, p_M, 0, 8 }, { &tlcs900h_device::op_SRLWM, p_M, 0, 8 },
+	{ &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_RLCWM, p_M, 0, 6 }, { &tlcs900_device::op_RRCWM, p_M, 0, 6 }, { &tlcs900_device::op_RLWM, p_M, 0, 6 }, { &tlcs900_device::op_RRWM, p_M, 0, 6 },
+	{ &tlcs900_device::op_SLAWM, p_M, 0, 6 }, { &tlcs900_device::op_SRAWM, p_M, 0, 6 }, { &tlcs900_device::op_SLLWM, p_M, 0, 6 }, { &tlcs900_device::op_SRLWM, p_M, 0, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_98[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_98[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_PUSHWM, p_M, 0, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMM, p_M16, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_PUSHWM, p_M, 0, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMM, p_M16, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADDWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_ADCWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_SUBWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_SBCWMI, p_M, p_I16, 8 },
-	{ &tlcs900h_device::op_ANDWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_XORWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_ORWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_CPWMI, p_M, p_I16, 6 },
+	{ &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_ADCWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_SUBWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_SBCWMI, p_M, p_I16, 8 },
+	{ &tlcs900_device::op_ANDWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_XORWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_ORWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_CPWMI, p_M, p_I16, 6 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 },
-	{ &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 },
-	{ &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 },
-	{ &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 },
+	{ &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 },
+	{ &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 },
+	{ &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 },
+	{ &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_RLCWM, p_M, 0, 8 }, { &tlcs900h_device::op_RRCWM, p_M, 0, 8 }, { &tlcs900h_device::op_RLWM, p_M, 0, 8 }, { &tlcs900h_device::op_RRWM, p_M, 0, 8 },
-	{ &tlcs900h_device::op_SLAWM, p_M, 0, 8 }, { &tlcs900h_device::op_SRAWM, p_M, 0, 8 }, { &tlcs900h_device::op_SLLWM, p_M, 0, 8 }, { &tlcs900h_device::op_SRLWM, p_M, 0, 8 },
+	{ &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_RLCWM, p_M, 0, 6 }, { &tlcs900_device::op_RRCWM, p_M, 0, 6 }, { &tlcs900_device::op_RLWM, p_M, 0, 6 }, { &tlcs900_device::op_RRWM, p_M, 0, 6 },
+	{ &tlcs900_device::op_SLAWM, p_M, 0, 6 }, { &tlcs900_device::op_SRAWM, p_M, 0, 6 }, { &tlcs900_device::op_SLLWM, p_M, 0, 6 }, { &tlcs900_device::op_SRLWM, p_M, 0, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_a0[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_a0[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_b0[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_b0[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_LDBMI, p_M, p_I8, 5 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMI, p_M, p_I16, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_POPBM, p_M, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_POPWM, p_M, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDBMM, p_M, p_M16, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMM, p_M, p_M16, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMI, p_M, p_I8, 5 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMI, p_M, p_I16, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_POPBM, p_M, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_POPWM, p_M, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMM, p_M, p_M16, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMM, p_M, p_M16, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_ORCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_XORCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_LDCFBRM, p_A, p_M, 8 },
-	{ &tlcs900h_device::op_STCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 },
-	{ &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_ORCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_XORCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_LDCFBRM, p_A, p_M, 8 },
+	{ &tlcs900_device::op_STCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 },
+	{ &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 },
-	{ &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 },
-	{ &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 },
+	{ &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 },
+	{ &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 },
-	{ &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 },
-	{ &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 },
+	{ &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 },
+	{ &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 },
-	{ &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 },
-	{ &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 },
-	{ &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900h_device::op_RETCC, p_CC, 0, 6 }
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 },
+	{ &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 },
+	{ &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 },
+	{ &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }, { &tlcs900_device::op_RETCC, p_CC, 0, 6 }
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_b8[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_b8[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_LDBMI, p_M, p_I8, 5 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMI, p_M, p_I16, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_POPBM, p_M, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_POPWM, p_M, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDBMM, p_M, p_M16, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMM, p_M, p_M16, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMI, p_M, p_I8, 5 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMI, p_M, p_I16, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_POPBM, p_M, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_POPWM, p_M, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMM, p_M, p_M16, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMM, p_M, p_M16, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_ORCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_XORCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_LDCFBRM, p_A, p_M, 8 },
-	{ &tlcs900h_device::op_STCFBRM, p_A, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 },
-	{ &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_ORCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_XORCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_LDCFBRM, p_A, p_M, 8 },
+	{ &tlcs900_device::op_STCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 },
+	{ &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 },
-	{ &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 },
-	{ &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 },
+	{ &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 },
+	{ &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 },
-	{ &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 },
-	{ &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 },
+	{ &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 },
+	{ &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_c0[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_c0[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_PUSHBM, p_M, 0, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_RLDRM, p_A, p_M, 12 }, { &tlcs900h_device::op_RRDRM, p_A, p_M, 12 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDBMM, p_M16, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_PUSHBM, p_M, 0, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_RLDRM, p_A, p_M, 12 }, { &tlcs900_device::op_RRDRM, p_A, p_M, 12 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDBMM, p_M16, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_LDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_EXBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADDBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_ADCBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_SUBBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_SBCBMI, p_M, p_I8, 7 },
-	{ &tlcs900h_device::op_ANDBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_XORBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_ORBMI, p_M, p_I8, 7 }, { &tlcs900h_device::op_CPBMI, p_M, p_I8, 6 },
+	{ &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_LDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_EXBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_ADCBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_SUBBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_SBCBMI, p_M, p_I8, 7 },
+	{ &tlcs900_device::op_ANDBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_XORBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_ORBMI, p_M, p_I8, 7 }, { &tlcs900_device::op_CPBMI, p_M, p_I8, 6 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900h_device::op_MULSBRM, p_MC16, p_M, 18 },
-	{ &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 },
-	{ &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900h_device::op_DIVBRM, p_MC16, p_M, 22 },
-	{ &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 },
-	{ &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900h_device::op_DIVSBRM, p_MC16, p_M, 24 },
+	{ &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 }, { &tlcs900_device::op_MULSBRM, p_MC16, p_M, 18 },
+	{ &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 },
+	{ &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 }, { &tlcs900_device::op_DIVBRM, p_MC16, p_M, 22 },
+	{ &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 },
+	{ &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 }, { &tlcs900_device::op_DIVSBRM, p_MC16, p_M, 24 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECBIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_RLCBM, p_M, 0, 8 }, { &tlcs900h_device::op_RRCBM, p_M, 0, 8 }, { &tlcs900h_device::op_RLBM, p_M, 0, 8 }, { &tlcs900h_device::op_RRBM, p_M, 0, 8 },
-	{ &tlcs900h_device::op_SLABM, p_M, 0, 8 }, { &tlcs900h_device::op_SRABM, p_M, 0, 8 }, { &tlcs900h_device::op_SLLBM, p_M, 0, 8 }, { &tlcs900h_device::op_SRLBM, p_M, 0, 8 },
+	{ &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECBIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_RLCBM, p_M, 0, 6 }, { &tlcs900_device::op_RRCBM, p_M, 0, 6 }, { &tlcs900_device::op_RLBM, p_M, 0, 6 }, { &tlcs900_device::op_RRBM, p_M, 0, 6 },
+	{ &tlcs900_device::op_SLABM, p_M, 0, 6 }, { &tlcs900_device::op_SRABM, p_M, 0, 6 }, { &tlcs900_device::op_SLLBM, p_M, 0, 6 }, { &tlcs900_device::op_SRLBM, p_M, 0, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ADCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ADCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ADCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ADCBMR, p_M, p_C8, 6 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SUBBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SUBBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_SBCBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_SBCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SUBBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SUBBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_SBCBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_SBCBMR, p_M, p_C8, 6 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ANDBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ANDBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_XORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_XORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ANDBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ANDBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_XORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_XORBMR, p_M, p_C8, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_ORBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_ORBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900h_device::op_CPBRM, p_C8, p_M, 4 },
-	{ &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 },
-	{ &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900h_device::op_CPBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_ORBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_ORBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 }, { &tlcs900_device::op_CPBRM, p_C8, p_M, 4 },
+	{ &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 },
+	{ &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 }, { &tlcs900_device::op_CPBMR, p_M, p_C8, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_c8[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_c8[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDBRI, p_R, p_I8, 4 },
-	{ &tlcs900h_device::op_PUSHBR, p_R, 0, 6 }, { &tlcs900h_device::op_POPBR, p_R, 0, 6 }, { &tlcs900h_device::op_CPLBR, p_R, 0, 4 }, { &tlcs900h_device::op_NEGBR, p_R, 0, 5 },
-	{ &tlcs900h_device::op_MULBRI, p_R, p_I8, 18}, { &tlcs900h_device::op_MULSBRI, p_R, p_I8, 18 }, { &tlcs900h_device::op_DIVBRI, p_R, p_I8, 22 }, { &tlcs900h_device::op_DIVSBRI, p_R, p_I8, 24 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DAABR, p_R, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DJNZB, p_R, p_D8, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDBRI, p_R, p_I8, 4 },
+	{ &tlcs900_device::op_PUSHBR, p_R, 0, 6 }, { &tlcs900_device::op_POPBR, p_R, 0, 6 }, { &tlcs900_device::op_CPLBR, p_R, 0, 4 }, { &tlcs900_device::op_NEGBR, p_R, 0, 5 },
+	{ &tlcs900_device::op_MULBRI, p_R, p_I8, 18 }, { &tlcs900_device::op_MULSBRI, p_R, p_I8, 18 }, { &tlcs900_device::op_DIVBRI, p_R, p_I8, 22 }, { &tlcs900_device::op_DIVSBRI, p_R, p_I8, 24 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DAABR, p_R, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DJNZB, p_R, p_D8, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_ANDCFBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_ORCFBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_XORCFBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_LDCFBIR, p_I8, p_R, 4 },
-	{ &tlcs900h_device::op_STCFBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_ANDCFBRR, p_A, p_R, 4 }, { &tlcs900h_device::op_ORCFBRR, p_A, p_R, 4 }, { &tlcs900h_device::op_XORCFBRR, p_A, p_R, 4 }, { &tlcs900h_device::op_LDCFBRR, p_A, p_R, 4 },
-	{ &tlcs900h_device::op_STCFBRR, p_A, p_R, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDCBRR, p_CR8, p_R, 1 }, { &tlcs900h_device::op_LDCBRR, p_R, p_CR8, 1 },
-	{ &tlcs900h_device::op_RESBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_SETBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_CHGBIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_BITBIR, p_I8, p_R, 4 },
-	{ &tlcs900h_device::op_TSETBIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_ANDCFBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_ORCFBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_XORCFBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_LDCFBIR, p_I8, p_R, 4 },
+	{ &tlcs900_device::op_STCFBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_ANDCFBRR, p_A, p_R, 4 }, { &tlcs900_device::op_ORCFBRR, p_A, p_R, 4 }, { &tlcs900_device::op_XORCFBRR, p_A, p_R, 4 }, { &tlcs900_device::op_LDCFBRR, p_A, p_R, 4 },
+	{ &tlcs900_device::op_STCFBRR, p_A, p_R, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDCBRR, p_CR8, p_R, 8 }, { &tlcs900_device::op_LDCBRR, p_R, p_CR8, 8 },
+	{ &tlcs900_device::op_RESBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_SETBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_CHGBIR, p_I8, p_R, 4 }, { &tlcs900_device::op_BITBIR, p_I8, p_R, 4 },
+	{ &tlcs900_device::op_TSETBIR, p_I8, p_R, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 },
-	{ &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULBRR, p_MC16, p_R, 18 },
-	{ &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 },
-	{ &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900h_device::op_MULSBRR, p_MC16, p_R, 18 },
-	{ &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 },
-	{ &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900h_device::op_DIVBRR, p_MC16, p_R, 22 },
-	{ &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 },
-	{ &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900h_device::op_DIVSBRR, p_MC16, p_R, 24 },
+	{ &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 },
+	{ &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULBRR, p_MC16, p_R, 18 },
+	{ &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 },
+	{ &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 }, { &tlcs900_device::op_MULSBRR, p_MC16, p_R, 18 },
+	{ &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 },
+	{ &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 }, { &tlcs900_device::op_DIVBRR, p_MC16, p_R, 22 },
+	{ &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 },
+	{ &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 }, { &tlcs900_device::op_DIVSBRR, p_MC16, p_R, 24 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCBIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECBIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 },
-	{ &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 },
-	{ &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 },
-	{ &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCBR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCBIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCBIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECBIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECBIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECBIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCBR, p_CC, p_R, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADDBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_LDBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ADCBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 },
-	{ &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900h_device::op_LDBRR, p_R, p_C8, 4 },
+	{ &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADDBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_LDBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_LDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_LDBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ADCBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900_device::op_LDBRR, p_R, p_C8, 4 },
+	{ &tlcs900_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900_device::op_LDBRR, p_R, p_C8, 4 }, { &tlcs900_device::op_LDBRR, p_R, p_C8, 4 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SUBBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDBRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_SBCBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 },
-	{ &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900h_device::op_EXBRR, p_C8, p_R, 5 },
+	{ &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SUBBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDBRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDBRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_SBCBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900_device::op_EXBRR, p_C8, p_R, 5 },
+	{ &tlcs900_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900_device::op_EXBRR, p_C8, p_R, 5 }, { &tlcs900_device::op_EXBRR, p_C8, p_R, 5 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ANDBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_ADDBRI, p_R, p_I8, 4 }, { &tlcs900h_device::op_ADCBRI, p_R, p_I8, 4 }, { &tlcs900h_device::op_SUBBRI, p_R, p_I8, 4 }, { &tlcs900h_device::op_SBCBRI, p_R, p_I8, 4 },
-	{ &tlcs900h_device::op_ANDBRI, p_R, p_I8, 4 }, { &tlcs900h_device::op_XORBRI, p_R, p_I8, 4 }, { &tlcs900h_device::op_ORBRI, p_R, p_I8, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I8, 4 },
-	{ &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_XORBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPBRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ANDBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_ADDBRI, p_R, p_I8, 4 }, { &tlcs900_device::op_ADCBRI, p_R, p_I8, 4 }, { &tlcs900_device::op_SUBBRI, p_R, p_I8, 4 }, { &tlcs900_device::op_SBCBRI, p_R, p_I8, 4 },
+	{ &tlcs900_device::op_ANDBRI, p_R, p_I8, 4 }, { &tlcs900_device::op_XORBRI, p_R, p_I8, 4 }, { &tlcs900_device::op_ORBRI, p_R, p_I8, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I8, 4 },
+	{ &tlcs900_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_XORBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_XORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_XORBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPBRI, p_R, p_I3, 4 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_ORBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_RLCBIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_RRCBIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_RLBIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_RRBIR, p_I8, p_R, 6 },
-	{ &tlcs900h_device::op_SLABIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_SRABIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_SLLBIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_SRLBIR, p_I8, p_R, 6 },
-	{ &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900h_device::op_CPBRR, p_C8, p_R, 4 },
-	{ &tlcs900h_device::op_RLCBRR, p_A, p_R, 6 }, { &tlcs900h_device::op_RRCBRR, p_A, p_R, 6 }, { &tlcs900h_device::op_RLBRR, p_A, p_R, 6 }, { &tlcs900h_device::op_RRBRR, p_A, p_R, 6 },
-	{ &tlcs900h_device::op_SLABRR, p_A, p_R, 6 }, { &tlcs900h_device::op_SRABRR, p_A, p_R, 6 }, { &tlcs900h_device::op_SLLBRR, p_A, p_R, 6 }, { &tlcs900h_device::op_SRLBRR, p_A, p_R, 6 }
+	{ &tlcs900_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ORBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ORBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_ORBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_RLCBIR, p_I8, p_R, 6 }, { &tlcs900_device::op_RRCBIR, p_I8, p_R, 6 }, { &tlcs900_device::op_RLBIR, p_I8, p_R, 6 }, { &tlcs900_device::op_RRBIR, p_I8, p_R, 6 },
+	{ &tlcs900_device::op_SLABIR, p_I8, p_R, 6 }, { &tlcs900_device::op_SRABIR, p_I8, p_R, 6 }, { &tlcs900_device::op_SLLBIR, p_I8, p_R, 6 }, { &tlcs900_device::op_SRLBIR, p_I8, p_R, 6 },
+	{ &tlcs900_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_CPBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_CPBRR, p_C8, p_R, 4 }, { &tlcs900_device::op_CPBRR, p_C8, p_R, 4 },
+	{ &tlcs900_device::op_RLCBRR, p_A, p_R, 6 }, { &tlcs900_device::op_RRCBRR, p_A, p_R, 6 }, { &tlcs900_device::op_RLBRR, p_A, p_R, 6 }, { &tlcs900_device::op_RRBRR, p_A, p_R, 6 },
+	{ &tlcs900_device::op_SLABRR, p_A, p_R, 6 }, { &tlcs900_device::op_SRABRR, p_A, p_R, 6 }, { &tlcs900_device::op_SLLBRR, p_A, p_R, 6 }, { &tlcs900_device::op_SRLBRR, p_A, p_R, 6 }
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_d0[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_d0[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_PUSHWM, p_M, 0, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMM, p_M16, p_M, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_PUSHWM, p_M, 0, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMM, p_M16, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_EXWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADDWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_ADCWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_SUBWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_SBCWMI, p_M, p_I16, 8 },
-	{ &tlcs900h_device::op_ANDWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_XORWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_ORWMI, p_M, p_I16, 8 }, { &tlcs900h_device::op_CPWMI, p_M, p_I16, 6 },
+	{ &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_LDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_EXWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_ADCWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_SUBWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_SBCWMI, p_M, p_I16, 8 },
+	{ &tlcs900_device::op_ANDWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_XORWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_ORWMI, p_M, p_I16, 8 }, { &tlcs900_device::op_CPWMI, p_M, p_I16, 6 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900h_device::op_MULSWRM, p_C32, p_M, 26 },
-	{ &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 },
-	{ &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900h_device::op_DIVWRM, p_C32, p_M, 30 },
-	{ &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 },
-	{ &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900h_device::op_DIVSWRM, p_C32, p_M, 32 },
+	{ &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 }, { &tlcs900_device::op_MULSWRM, p_C32, p_M, 26 },
+	{ &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 },
+	{ &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 }, { &tlcs900_device::op_DIVWRM, p_C32, p_M, 30 },
+	{ &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 },
+	{ &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 }, { &tlcs900_device::op_DIVSWRM, p_C32, p_M, 32 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_INCWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900h_device::op_DECWIM, p_I3, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_RLCWM, p_M, 0, 8 }, { &tlcs900h_device::op_RRCWM, p_M, 0, 8 }, { &tlcs900h_device::op_RLWM, p_M, 0, 8 }, { &tlcs900h_device::op_RRWM, p_M, 0, 8 },
-	{ &tlcs900h_device::op_SLAWM, p_M, 0, 8 }, { &tlcs900h_device::op_SRAWM, p_M, 0, 8 }, { &tlcs900h_device::op_SLLWM, p_M, 0, 8 }, { &tlcs900h_device::op_SRLWM, p_M, 0, 8 },
+	{ &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_INCWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 }, { &tlcs900_device::op_DECWIM, p_I3, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_RLCWM, p_M, 0, 6 }, { &tlcs900_device::op_RRCWM, p_M, 0, 6 }, { &tlcs900_device::op_RLWM, p_M, 0, 6 }, { &tlcs900_device::op_RRWM, p_M, 0, 6 },
+	{ &tlcs900_device::op_SLAWM, p_M, 0, 6 }, { &tlcs900_device::op_SRAWM, p_M, 0, 6 }, { &tlcs900_device::op_SLLWM, p_M, 0, 6 }, { &tlcs900_device::op_SRLWM, p_M, 0, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ADCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ADCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ADCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ADCWMR, p_M, p_C16, 6 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SUBWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SUBWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_SBCWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_SBCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SUBWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SUBWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_SBCWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_SBCWMR, p_M, p_C16, 6 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ANDWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ANDWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_XORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_XORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ANDWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ANDWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_XORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_XORWMR, p_M, p_C16, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_ORWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_ORWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900h_device::op_CPWRM, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 },
-	{ &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900h_device::op_CPWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_ORWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_ORWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 }, { &tlcs900_device::op_CPWRM, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 },
+	{ &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 }, { &tlcs900_device::op_CPWMR, p_M, p_C16, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_d8[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_d8[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWRI, p_R, p_I16, 4 },
-	{ &tlcs900h_device::op_PUSHWR, p_R, 0, 5 }, { &tlcs900h_device::op_POPWR, p_R, 0, 6 }, { &tlcs900h_device::op_CPLWR, p_R, 0, 4 }, { &tlcs900h_device::op_NEGWR, p_R, 0, 5 },
-	{ &tlcs900h_device::op_MULWRI, p_R, p_I16, 26 }, { &tlcs900h_device::op_MULSWRI, p_R, p_I16, 26 }, { &tlcs900h_device::op_DIVWRI, p_R, p_I16, 30 }, { &tlcs900h_device::op_DIVSWRI, p_R, p_I16, 32 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_BS1FRR, p_A, p_R, 4 }, { &tlcs900h_device::op_BS1BRR, p_A, p_R, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_EXTZWR, p_R, 0, 4 }, { &tlcs900h_device::op_EXTSWR, p_R, 0, 5 },
-	{ &tlcs900h_device::op_PAAWR, p_R, 0, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_MIRRW, p_R, 0, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_MULAR, p_R, 0, 31 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DJNZW, p_R, p_D8, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWRI, p_R, p_I16, 4 },
+	{ &tlcs900_device::op_PUSHWR, p_R, 0, 5 }, { &tlcs900_device::op_POPWR, p_R, 0, 6 }, { &tlcs900_device::op_CPLWR, p_R, 0, 4 }, { &tlcs900_device::op_NEGWR, p_R, 0, 5 },
+	{ &tlcs900_device::op_MULWRI, p_R, p_I16, 26 }, { &tlcs900_device::op_MULSWRI, p_R, p_I16, 26 }, { &tlcs900_device::op_DIVWRI, p_R, p_I16, 30 }, { &tlcs900_device::op_DIVSWRI, p_R, p_I16, 32 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_BS1FRR, p_A, p_R, 4 }, { &tlcs900_device::op_BS1BRR, p_A, p_R, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_EXTZWR, p_R, 0, 4 }, { &tlcs900_device::op_EXTSWR, p_R, 0, 5 },
+	{ &tlcs900_device::op_PAAWR, p_R, 0, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_MIRRW, p_R, 0, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_MULAR, p_R, 0, 31 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DJNZW, p_R, p_D8, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_ANDCFWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_ORCFWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_XORCFWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_LDCFWIR, p_I8, p_R, 4 },
-	{ &tlcs900h_device::op_STCFWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_ANDCFWRR, p_A, p_R, 4 }, { &tlcs900h_device::op_ORCFWRR, p_A, p_R, 4 }, { &tlcs900h_device::op_XORCFWRR, p_A, p_R, 4 }, { &tlcs900h_device::op_LDCFWRR, p_A, p_R, 4 },
-	{ &tlcs900h_device::op_STCFWRR, p_A, p_R, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDCWRR, p_CR16, p_R, 1 }, { &tlcs900h_device::op_LDCWRR, p_R, p_CR16, 1 },
-	{ &tlcs900h_device::op_RESWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_SETWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_CHGWIR, p_I8, p_R, 4 }, { &tlcs900h_device::op_BITWIR, p_I8, p_R, 4 },
-	{ &tlcs900h_device::op_TSETWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_MINC1, p_I16, p_R, 8 }, { &tlcs900h_device::op_MINC2, p_I16, p_R, 8 }, { &tlcs900h_device::op_MINC4, p_I16, p_R, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_MDEC1, p_I16, p_R, 7 }, { &tlcs900h_device::op_MDEC2, p_I16, p_R, 7 }, { &tlcs900h_device::op_MDEC4, p_I16, p_R, 7 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_ANDCFWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_ORCFWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_XORCFWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_LDCFWIR, p_I8, p_R, 4 },
+	{ &tlcs900_device::op_STCFWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_ANDCFWRR, p_A, p_R, 4 }, { &tlcs900_device::op_ORCFWRR, p_A, p_R, 4 }, { &tlcs900_device::op_XORCFWRR, p_A, p_R, 4 }, { &tlcs900_device::op_LDCFWRR, p_A, p_R, 4 },
+	{ &tlcs900_device::op_STCFWRR, p_A, p_R, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDCWRR, p_CR16, p_R, 8 }, { &tlcs900_device::op_LDCWRR, p_R, p_CR16, 8 },
+	{ &tlcs900_device::op_RESWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_SETWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_CHGWIR, p_I8, p_R, 4 }, { &tlcs900_device::op_BITWIR, p_I8, p_R, 4 },
+	{ &tlcs900_device::op_TSETWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_MINC1, p_I16, p_R, 8 }, { &tlcs900_device::op_MINC2, p_I16, p_R, 8 }, { &tlcs900_device::op_MINC4, p_I16, p_R, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_MDEC1, p_I16, p_R, 7 }, { &tlcs900_device::op_MDEC2, p_I16, p_R, 7 }, { &tlcs900_device::op_MDEC4, p_I16, p_R, 7 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 },
-	{ &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULWRR, p_C32, p_R, 26 },
-	{ &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 },
-	{ &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900h_device::op_MULSWRR, p_C32, p_R, 26 },
-	{ &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 },
-	{ &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900h_device::op_DIVWRR, p_C32, p_R, 30 },
-	{ &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 },
-	{ &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900h_device::op_DIVSWRR, p_C32, p_R, 32 },
+	{ &tlcs900_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULWRR, p_C32, p_R, 26 },
+	{ &tlcs900_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULWRR, p_C32, p_R, 26 },
+	{ &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 },
+	{ &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 }, { &tlcs900_device::op_MULSWRR, p_C32, p_R, 26 },
+	{ &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 },
+	{ &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 }, { &tlcs900_device::op_DIVWRR, p_C32, p_R, 30 },
+	{ &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 },
+	{ &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 }, { &tlcs900_device::op_DIVSWRR, p_C32, p_R, 32 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCWIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECWIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 },
-	{ &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 },
-	{ &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 },
-	{ &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900h_device::op_SCCWR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCWIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCWIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECWIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECWIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECWIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 },
+	{ &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 }, { &tlcs900_device::op_SCCWR, p_CC, p_R, 6 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADDWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_LDWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ADCWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 },
-	{ &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900h_device::op_LDWRR, p_R, p_C16, 4 },
+	{ &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADDWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_LDWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_LDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_LDWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ADCWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900_device::op_LDWRR, p_R, p_C16, 4 },
+	{ &tlcs900_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900_device::op_LDWRR, p_R, p_C16, 4 }, { &tlcs900_device::op_LDWRR, p_R, p_C16, 4 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SUBWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDWRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_SBCWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 },
-	{ &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900h_device::op_EXWRR, p_C16, p_R, 5 },
+	{ &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SUBWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDWRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDWRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_SBCWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900_device::op_EXWRR, p_C16, p_R, 5 },
+	{ &tlcs900_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900_device::op_EXWRR, p_C16, p_R, 5 }, { &tlcs900_device::op_EXWRR, p_C16, p_R, 5 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ANDWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_ADDWRI, p_R, p_I16, 4 }, { &tlcs900h_device::op_ADCWRI, p_R, p_I16, 4 }, { &tlcs900h_device::op_SUBWRI, p_R, p_I16, 4 }, { &tlcs900h_device::op_SBCWRI, p_R, p_I16, 4 },
-	{ &tlcs900h_device::op_ANDWRI, p_R, p_I16, 4 }, { &tlcs900h_device::op_XORWRI, p_R, p_I16, 4 }, { &tlcs900h_device::op_ORWRI, p_R, p_I16, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I16, 4 },
-	{ &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_XORWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_CPWRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ANDWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_ADDWRI, p_R, p_I16, 4 }, { &tlcs900_device::op_ADCWRI, p_R, p_I16, 4 }, { &tlcs900_device::op_SUBWRI, p_R, p_I16, 4 }, { &tlcs900_device::op_SBCWRI, p_R, p_I16, 4 },
+	{ &tlcs900_device::op_ANDWRI, p_R, p_I16, 4 }, { &tlcs900_device::op_XORWRI, p_R, p_I16, 4 }, { &tlcs900_device::op_ORWRI, p_R, p_I16, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I16, 4 },
+	{ &tlcs900_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_XORWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_XORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_XORWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I3, 4 }, { &tlcs900_device::op_CPWRI, p_R, p_I3, 4 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_ORWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_RLCWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_RRCWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_RLWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_RRWIR, p_I8, p_R, 6 },
-	{ &tlcs900h_device::op_SLAWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_SRAWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_SLLWIR, p_I8, p_R, 6 }, { &tlcs900h_device::op_SRLWIR, p_I8, p_R, 6 },
-	{ &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900h_device::op_CPWRR, p_C16, p_R, 4 },
-	{ &tlcs900h_device::op_RLCWRR, p_A, p_R, 6 }, { &tlcs900h_device::op_RRCWRR, p_A, p_R, 6 }, { &tlcs900h_device::op_RLWRR, p_A, p_R, 6 }, { &tlcs900h_device::op_RRWRR, p_A, p_R, 6 },
-	{ &tlcs900h_device::op_SLAWRR, p_A, p_R, 6 }, { &tlcs900h_device::op_SRAWRR, p_A, p_R, 6 }, { &tlcs900h_device::op_SLLWRR, p_A, p_R, 6 }, { &tlcs900h_device::op_SRLWRR, p_A, p_R, 6 }
+	{ &tlcs900_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ORWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ORWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_ORWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_RLCWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_RRCWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_RLWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_RRWIR, p_I8, p_R, 6 },
+	{ &tlcs900_device::op_SLAWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_SRAWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_SLLWIR, p_I8, p_R, 6 }, { &tlcs900_device::op_SRLWIR, p_I8, p_R, 6 },
+	{ &tlcs900_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_CPWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_CPWRR, p_C16, p_R, 4 }, { &tlcs900_device::op_CPWRR, p_C16, p_R, 4 },
+	{ &tlcs900_device::op_RLCWRR, p_A, p_R, 6 }, { &tlcs900_device::op_RRCWRR, p_A, p_R, 6 }, { &tlcs900_device::op_RLWRR, p_A, p_R, 6 }, { &tlcs900_device::op_RRWRR, p_A, p_R, 6 },
+	{ &tlcs900_device::op_SLAWRR, p_A, p_R, 6 }, { &tlcs900_device::op_SRAWRR, p_A, p_R, 6 }, { &tlcs900_device::op_SLLWRR, p_A, p_R, 6 }, { &tlcs900_device::op_SRLWRR, p_A, p_R, 6 }
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_e0[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_e0[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_LDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_LDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ADCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ADCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ADCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ADCLMR, p_M, p_C32, 10 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SUBLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SUBLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_SBCLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_SBCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SUBLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SUBLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_SBCLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_SBCLMR, p_M, p_C32, 10 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ANDLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ANDLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_XORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_XORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ANDLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ANDLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_XORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_XORLMR, p_M, p_C32, 10 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_ORLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900h_device::op_ORLMR, p_M, p_C32, 10 },
-	{ &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900h_device::op_CPLRM, p_C32, p_M, 6 },
-	{ &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_CPLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_ORLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 }, { &tlcs900_device::op_ORLMR, p_M, p_C32, 10 },
+	{ &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 }, { &tlcs900_device::op_CPLRM, p_C32, p_M, 6 },
+	{ &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_CPLMR, p_M, p_C32, 6 },
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_e8[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_e8[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDLRI, p_R, p_I32, 6 },
-	{ &tlcs900h_device::op_PUSHLR, p_R, 0, 7 }, { &tlcs900h_device::op_POPLR, p_R, 0, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LINK, p_R, p_I16, 10 }, { &tlcs900h_device::op_UNLK, p_R, 0, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_EXTZLR, p_R, 0, 4 }, { &tlcs900h_device::op_EXTSLR, p_R, 0, 5 },
-	{ &tlcs900h_device::op_PAALR, p_R, 0, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDLRI, p_R, p_I32, 6 },
+	{ &tlcs900_device::op_PUSHLR, p_R, 0, 7 }, { &tlcs900_device::op_POPLR, p_R, 0, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LINK, p_R, p_I16, 10 }, { &tlcs900_device::op_UNLK, p_R, 0, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_EXTZLR, p_R, 0, 4 }, { &tlcs900_device::op_EXTSLR, p_R, 0, 5 },
+	{ &tlcs900_device::op_PAALR, p_R, 0, 4 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDCLRR, p_CR32, p_R, 1 }, { &tlcs900h_device::op_LDCLRR, p_R, p_CR32, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDCLRR, p_CR32, p_R, 8 }, { &tlcs900_device::op_LDCLRR, p_R, p_CR32, 8 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_INCLIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900h_device::op_DECLIR, p_I3, p_R, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCLIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_INCLIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECLIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECLIR, p_I3, p_R, 4 }, { &tlcs900_device::op_DECLIR, p_I3, p_R, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADDLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 },
-	{ &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900h_device::op_LDLRR, p_C32, p_R, 4 },
-	{ &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ADCLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 },
-	{ &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900h_device::op_LDLRR, p_R, p_C32, 4 },
+	{ &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADDLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900_device::op_LDLRR, p_C32, p_R, 4 },
+	{ &tlcs900_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900_device::op_LDLRR, p_C32, p_R, 4 }, { &tlcs900_device::op_LDLRR, p_C32, p_R, 4 },
+	{ &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ADCLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900_device::op_LDLRR, p_R, p_C32, 4 },
+	{ &tlcs900_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900_device::op_LDLRR, p_R, p_C32, 4 }, { &tlcs900_device::op_LDLRR, p_R, p_C32, 4 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SUBLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900h_device::op_LDLRI, p_R, p_I3, 4 },
-	{ &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_SBCLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SUBLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDLRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDLRI, p_R, p_I3, 4 }, { &tlcs900_device::op_LDLRI, p_R, p_I3, 4 },
+	{ &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_SBCLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ANDLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_ADDLRI, p_R, p_I32, 7 }, { &tlcs900h_device::op_ADCLRI, p_R, p_I32, 7 }, { &tlcs900h_device::op_SUBLRI, p_R, p_I32, 7 }, { &tlcs900h_device::op_SBCLRI, p_R, p_I32, 7 },
-	{ &tlcs900h_device::op_ANDLRI, p_R, p_I32, 7 }, { &tlcs900h_device::op_XORLRI, p_R, p_I32, 7 }, { &tlcs900h_device::op_ORLRI, p_R, p_I32, 7 }, { &tlcs900h_device::op_CPLRI, p_R, p_I32, 7 },
-	{ &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_XORLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 },
-	{ &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900h_device::op_CPLRI, p_R, p_I3, 6 },
+	{ &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ANDLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_ADDLRI, p_R, p_I32, 7 }, { &tlcs900_device::op_ADCLRI, p_R, p_I32, 7 }, { &tlcs900_device::op_SUBLRI, p_R, p_I32, 7 }, { &tlcs900_device::op_SBCLRI, p_R, p_I32, 7 },
+	{ &tlcs900_device::op_ANDLRI, p_R, p_I32, 7 }, { &tlcs900_device::op_XORLRI, p_R, p_I32, 7 }, { &tlcs900_device::op_ORLRI, p_R, p_I32, 7 }, { &tlcs900_device::op_CPLRI, p_R, p_I32, 7 },
+	{ &tlcs900_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_XORLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_XORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_XORLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900_device::op_CPLRI, p_R, p_I3, 6 },
+	{ &tlcs900_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900_device::op_CPLRI, p_R, p_I3, 6 }, { &tlcs900_device::op_CPLRI, p_R, p_I3, 6 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_ORLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_RLCLIR, p_I8, p_R, 8 }, { &tlcs900h_device::op_RRCLIR, p_I8, p_R, 8 }, { &tlcs900h_device::op_RLLIR, p_I8, p_R, 8 }, { &tlcs900h_device::op_RRLIR, p_I8, p_R, 8 },
-	{ &tlcs900h_device::op_SLALIR, p_I8, p_R, 8 }, { &tlcs900h_device::op_SRALIR, p_I8, p_R, 8 }, { &tlcs900h_device::op_SLLLIR, p_I8, p_R, 8 }, { &tlcs900h_device::op_SRLLIR, p_I8, p_R, 8 },
-	{ &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900h_device::op_CPLRR, p_C32, p_R, 7 },
-	{ &tlcs900h_device::op_RLCLRR, p_A, p_R, 8 }, { &tlcs900h_device::op_RRCLRR, p_A, p_R, 8 }, { &tlcs900h_device::op_RLLRR, p_A, p_R, 8 }, { &tlcs900h_device::op_RRLRR, p_A, p_R, 8 },
-	{ &tlcs900h_device::op_SLALRR, p_A, p_R, 8 }, { &tlcs900h_device::op_SRALRR, p_A, p_R, 8 }, { &tlcs900h_device::op_SLLLRR, p_A, p_R, 8 }, { &tlcs900h_device::op_SRLLRR, p_A, p_R, 8 }
+	{ &tlcs900_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ORLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ORLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_ORLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_RLCLIR, p_I8, p_R, 8 }, { &tlcs900_device::op_RRCLIR, p_I8, p_R, 8 }, { &tlcs900_device::op_RLLIR, p_I8, p_R, 8 }, { &tlcs900_device::op_RRLIR, p_I8, p_R, 8 },
+	{ &tlcs900_device::op_SLALIR, p_I8, p_R, 8 }, { &tlcs900_device::op_SRALIR, p_I8, p_R, 8 }, { &tlcs900_device::op_SLLLIR, p_I8, p_R, 8 }, { &tlcs900_device::op_SRLLIR, p_I8, p_R, 8 },
+	{ &tlcs900_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_CPLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_CPLRR, p_C32, p_R, 7 }, { &tlcs900_device::op_CPLRR, p_C32, p_R, 7 },
+	{ &tlcs900_device::op_RLCLRR, p_A, p_R, 8 }, { &tlcs900_device::op_RRCLRR, p_A, p_R, 8 }, { &tlcs900_device::op_RLLRR, p_A, p_R, 8 }, { &tlcs900_device::op_RRLRR, p_A, p_R, 8 },
+	{ &tlcs900_device::op_SLALRR, p_A, p_R, 8 }, { &tlcs900_device::op_SRALRR, p_A, p_R, 8 }, { &tlcs900_device::op_SLLLRR, p_A, p_R, 8 }, { &tlcs900_device::op_SRLLRR, p_A, p_R, 8 }
 };
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic_f0[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic_f0[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_LDBMI, p_M, p_I8, 5 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMI, p_M, p_I16, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_POPBM, p_M, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_POPWM, p_M, 0, 6 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDBMM, p_M, p_M16, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_LDWMM, p_M, p_M16, 8 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMI, p_M, p_I8, 5 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMI, p_M, p_I16, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_POPBM, p_M, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_POPWM, p_M, 0, 6 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMM, p_M, p_M16, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_LDWMM, p_M, p_M16, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900h_device::op_LDAW, p_C16, p_M, 4 },
-	{ &tlcs900h_device::op_ANDCFBRM, p_A, p_M, 4 }, { &tlcs900h_device::op_ORCFBRM, p_A, p_M, 4 }, { &tlcs900h_device::op_XORCFBRM, p_A, p_M, 4 }, { &tlcs900h_device::op_LDCFBRM, p_A, p_M, 4 },
-	{ &tlcs900h_device::op_STCFBRM, p_A, p_M, 4 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 },
-	{ &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900h_device::op_LDAL, p_C32, p_M, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 }, { &tlcs900_device::op_LDAW, p_C16, p_M, 4 },
+	{ &tlcs900_device::op_ANDCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_ORCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_XORCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_LDCFBRM, p_A, p_M, 8 },
+	{ &tlcs900_device::op_STCFBRM, p_A, p_M, 8 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 },
+	{ &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 }, { &tlcs900_device::op_LDAL, p_C32, p_M, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 },
-	{ &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900h_device::op_LDBMR, p_M, p_C8, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 },
-	{ &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900h_device::op_LDWMR, p_M, p_C16, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 },
+	{ &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 }, { &tlcs900_device::op_LDBMR, p_M, p_C8, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 },
+	{ &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 }, { &tlcs900_device::op_LDWMR, p_M, p_C16, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900h_device::op_LDLMR, p_M, p_C32, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 }, { &tlcs900_device::op_LDLMR, p_M, p_C32, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ANDCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_ORCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_XORCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_LDCFBIM, p_I3, p_M, 4 },
+	{ &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ANDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_ORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_XORCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_LDCFBIM, p_I3, p_M, 8 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_STCFBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 },
-	{ &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900h_device::op_TSETBIM, p_I3, p_M, 10 },
-	{ &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_RESBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_SETBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_STCFBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 },
+	{ &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 }, { &tlcs900_device::op_TSETBIM, p_I3, p_M, 10 },
+	{ &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_RESBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_SETBIM, p_I3, p_M, 8 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900h_device::op_CHGBIM, p_I3, p_M, 8 },
-	{ &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 }, { &tlcs900h_device::op_BITBIM, p_I3, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
-	{ &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900h_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_CHGBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 }, { &tlcs900_device::op_BITBIM, p_I3, p_M, 8 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
+	{ &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 }, { &tlcs900_device::op_JPM, p_CC, p_M, 4 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900h_device::op_CALLM, p_CC, p_M, 6 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 }, { &tlcs900_device::op_CALLM, p_CC, p_M, 6 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }
 };
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP) used as source in byte operations */
-void tlcs900h_device::op_80()
+void tlcs900_device::op_80()
 {
 	const tlcs900inst *inst;
 
@@ -5341,7 +5366,7 @@ void tlcs900h_device::op_80()
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
-	inst = &s_mnemonic_80[m_op];
+	inst = &m_mnemonic_80[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5349,7 +5374,7 @@ void tlcs900h_device::op_80()
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP + d8) used as source in byte operations */
-void tlcs900h_device::op_88()
+void tlcs900_device::op_88()
 {
 	const tlcs900inst *inst;
 
@@ -5360,9 +5385,9 @@ void tlcs900h_device::op_88()
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
 	m_ea2.d += (int8_t)m_op;
-	m_cycles += 2;
+	m_cycles += tlcs900_mem_index_cycles();
 	m_op = RDOP();
-	inst = &s_mnemonic_80[m_op];
+	inst = &m_mnemonic_80[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5370,7 +5395,7 @@ void tlcs900h_device::op_88()
 
 
 /* (XWA/XBC/XDE/XHL/XIXI/XIY/XIZ/XSP) used as source in word operations */
-void tlcs900h_device::op_90()
+void tlcs900_device::op_90()
 {
 	const tlcs900inst *inst;
 
@@ -5380,7 +5405,7 @@ void tlcs900h_device::op_90()
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
-	inst = &s_mnemonic_90[m_op];
+	inst = &m_mnemonic_90[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5388,16 +5413,16 @@ void tlcs900h_device::op_90()
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP + d8) used as source in word operations */
-void tlcs900h_device::op_98()
+void tlcs900_device::op_98()
 {
 	const tlcs900inst *inst;
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
 	m_ea2.d += (int8_t)m_op;
-	m_cycles += 2;
+	m_cycles += tlcs900_mem_index_cycles();
 	m_op = RDOP();
-	inst = &s_mnemonic_98[m_op];
+	inst = &m_mnemonic_98[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5405,13 +5430,13 @@ void tlcs900h_device::op_98()
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP) used as source in long word operations */
-void tlcs900h_device::op_A0()
+void tlcs900_device::op_A0()
 {
 	const tlcs900inst *inst;
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
-	inst = &s_mnemonic_a0[m_op];
+	inst = &m_mnemonic_a0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5419,16 +5444,16 @@ void tlcs900h_device::op_A0()
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP + d8) used as source in long word operations */
-void tlcs900h_device::op_A8()
+void tlcs900_device::op_A8()
 {
 	const tlcs900inst *inst;
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
 	m_ea2.d += (int8_t)m_op;
-	m_cycles += 2;
+	m_cycles += tlcs900_mem_index_cycles();
 	m_op = RDOP();
-	inst = &s_mnemonic_a0[m_op];
+	inst = &m_mnemonic_a0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5436,13 +5461,13 @@ void tlcs900h_device::op_A8()
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP) used as destination in operations */
-void tlcs900h_device::op_B0()
+void tlcs900_device::op_B0()
 {
 	const tlcs900inst *inst;
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
-	inst = &s_mnemonic_b0[m_op];
+	inst = &m_mnemonic_b0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5450,16 +5475,16 @@ void tlcs900h_device::op_B0()
 
 
 /* (XWA/XBC/XDE/XHL/XIX/XIY/XIZ/XSP + d8) used as destination in operations */
-void tlcs900h_device::op_B8()
+void tlcs900_device::op_B8()
 {
 	const tlcs900inst *inst;
 
 	m_ea2.d = *get_reg32_current( m_op );
 	m_op = RDOP();
 	m_ea2.d += (int8_t)m_op;
-	m_cycles += 2;
+	m_cycles += tlcs900_mem_index_cycles();
 	m_op = RDOP();
-	inst = &s_mnemonic_b8[m_op];
+	inst = &m_mnemonic_b8[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5467,7 +5492,7 @@ void tlcs900h_device::op_B8()
 
 
 /* memory used as source in byte operations */
-void tlcs900h_device::op_C0()
+void tlcs900_device::op_C0()
 {
 	const tlcs900inst *inst;
 	uint32_t *reg = nullptr;
@@ -5476,20 +5501,20 @@ void tlcs900h_device::op_C0()
 	{
 	case 0x00:  /* (n) */
 		m_ea2.d = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_8_cycles();
 		break;
 
 	case 0x01:  /* (nn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_16_cycles();
 		break;
 
 	case 0x02:  /* (nnn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
 		m_ea2.b.h2 = RDOP();
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_absolute_24_cycles();
 		break;
 
 	case 0x03:
@@ -5499,7 +5524,7 @@ void tlcs900h_device::op_C0()
 		/* (xrr) */
 		case 0x00:
 			m_ea2.d = *get_reg32( m_op );
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_indirect_cycles();
 			break;
 
 		/* (xrr+d16) */
@@ -5507,7 +5532,7 @@ void tlcs900h_device::op_C0()
 			m_ea2.b.l = RDOP();
 			m_ea2.b.h = RDOP();
 			m_ea2.d = *get_reg32( m_op ) + m_ea2.sw.l;
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_index_cycles();
 			break;
 
 		/* unknown/illegal */
@@ -5523,7 +5548,7 @@ void tlcs900h_device::op_C0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int8_t) *get_reg8( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (xrr+r16) */
@@ -5532,7 +5557,7 @@ void tlcs900h_device::op_C0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int16_t) *get_reg16( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (pc+d16) */
@@ -5540,7 +5565,7 @@ void tlcs900h_device::op_C0()
 				m_ea2.b.l = RDOP();
 				m_ea2.b.h = RDOP();
 				m_ea2.d = m_pc.d + m_ea2.sw.l;
-				m_cycles += 5;
+				m_cycles += tlcs900_mem_gpr_index_cycles();
 				break;
 			}
 		}
@@ -5551,7 +5576,7 @@ void tlcs900h_device::op_C0()
 		reg = get_reg32( m_op );
 		*reg -= ( 1 << ( m_op & 0x03 ) );
 		m_ea2.d = *reg;
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 
 	case 0x05:  /* (xrr+) */
@@ -5559,18 +5584,18 @@ void tlcs900h_device::op_C0()
 		reg = get_reg32( m_op );
 		m_ea2.d = *reg;
 		*reg += ( 1 << ( m_op & 0x03 ) );
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 	}
 	m_op = RDOP();
-	inst = &s_mnemonic_c0[m_op];
+	inst = &m_mnemonic_c0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
 }
 
 
-void tlcs900h_device::oC8()
+void tlcs900_device::oC8()
 {
 	const tlcs900inst *inst;
 
@@ -5588,7 +5613,7 @@ void tlcs900h_device::oC8()
 		m_p2_reg16 = get_reg16( m_op );
 	}
 	m_op = RDOP();
-	inst = &s_mnemonic_c8[m_op];
+	inst = &m_mnemonic_c8[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5596,7 +5621,7 @@ void tlcs900h_device::oC8()
 
 
 /* memory used as source in word operations */
-void tlcs900h_device::op_D0()
+void tlcs900_device::op_D0()
 {
 	const tlcs900inst *inst;
 	uint32_t *reg = nullptr;
@@ -5605,20 +5630,20 @@ void tlcs900h_device::op_D0()
 	{
 	case 0x00:  /* (n) */
 		m_ea2.d = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_8_cycles();
 		break;
 
 	case 0x01:  /* (nn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_16_cycles();
 		break;
 
 	case 0x02:  /* (nnn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
 		m_ea2.b.h2 = RDOP();
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_absolute_24_cycles();
 		break;
 
 	case 0x03:
@@ -5628,7 +5653,7 @@ void tlcs900h_device::op_D0()
 		/* (xrr) */
 		case 0x00:
 			m_ea2.d = *get_reg32( m_op );
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_indirect_cycles();
 			break;
 
 		/* (xrr+d16) */
@@ -5636,7 +5661,7 @@ void tlcs900h_device::op_D0()
 			m_ea2.b.l = RDOP();
 			m_ea2.b.h = RDOP();
 			m_ea2.d = *get_reg32( m_op ) + m_ea2.sw.l;
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_index_cycles();
 			break;
 
 		/* unknown/illegal */
@@ -5652,7 +5677,7 @@ void tlcs900h_device::op_D0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int8_t) *get_reg8( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (xrr+r16) */
@@ -5661,7 +5686,7 @@ void tlcs900h_device::op_D0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int16_t) *get_reg16( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (pc+d16) */
@@ -5669,7 +5694,7 @@ void tlcs900h_device::op_D0()
 				m_ea2.b.l = RDOP();
 				m_ea2.b.h = RDOP();
 				m_ea2.d = m_pc.d + m_ea2.sw.l;
-				m_cycles += 5;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 			}
 		}
@@ -5680,7 +5705,7 @@ void tlcs900h_device::op_D0()
 		reg = get_reg32( m_op );
 		*reg -= ( 1 << ( m_op & 0x03 ) );
 		m_ea2.d = *reg;
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 
 	case 0x05:  /* (xrr+) */
@@ -5688,18 +5713,18 @@ void tlcs900h_device::op_D0()
 		reg = get_reg32( m_op );
 		m_ea2.d = *reg;
 		*reg += ( 1 << ( m_op & 0x03 ) );
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 	}
 	m_op = RDOP();
-	inst = &s_mnemonic_d0[m_op];
+	inst = &m_mnemonic_d0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
 }
 
 
-void tlcs900h_device::oD8()
+void tlcs900_device::oD8()
 {
 	const tlcs900inst *inst;
 
@@ -5715,7 +5740,7 @@ void tlcs900h_device::oD8()
 		m_p2_reg32 = get_reg32( m_op );
 	}
 	m_op = RDOP();
-	inst = &s_mnemonic_d8[m_op];
+	inst = &m_mnemonic_d8[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5723,7 +5748,7 @@ void tlcs900h_device::oD8()
 
 
 /* memory used as source in long word operations */
-void tlcs900h_device::op_E0()
+void tlcs900_device::op_E0()
 {
 	const tlcs900inst *inst;
 	uint32_t *reg = nullptr;
@@ -5732,20 +5757,20 @@ void tlcs900h_device::op_E0()
 	{
 	case 0x00:  /* (n) */
 		m_ea2.d = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_8_cycles();
 		break;
 
 	case 0x01:  /* (nn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_16_cycles();
 		break;
 
 	case 0x02:  /* (nnn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
 		m_ea2.b.h2 = RDOP();
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_absolute_24_cycles();
 		break;
 
 	case 0x03:
@@ -5755,7 +5780,7 @@ void tlcs900h_device::op_E0()
 		/* (xrr) */
 		case 0x00:
 			m_ea2.d = *get_reg32( m_op );
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_indirect_cycles();
 			break;
 
 		/* (xrr+d16) */
@@ -5763,7 +5788,7 @@ void tlcs900h_device::op_E0()
 			m_ea2.b.l = RDOP();
 			m_ea2.b.h = RDOP();
 			m_ea2.d = *get_reg32( m_op ) + m_ea2.sw.l;
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_index_cycles();
 			break;
 
 		/* unknown/illegal */
@@ -5779,7 +5804,7 @@ void tlcs900h_device::op_E0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int8_t) *get_reg8( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (xrr+r16) */
@@ -5788,7 +5813,7 @@ void tlcs900h_device::op_E0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int16_t) *get_reg16( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (pc+d16) */
@@ -5796,7 +5821,7 @@ void tlcs900h_device::op_E0()
 				m_ea2.b.l = RDOP();
 				m_ea2.b.h = RDOP();
 				m_ea2.d = m_pc.d + m_ea2.sw.l;
-				m_cycles += 5;
+				m_cycles += tlcs900_mem_gpr_index_cycles();
 				break;
 			}
 		}
@@ -5807,7 +5832,7 @@ void tlcs900h_device::op_E0()
 		reg = get_reg32( m_op );
 		*reg -= ( 1 << ( m_op & 0x03 ) );
 		m_ea2.d = *reg;
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 
 	case 0x05:  /* (xrr+) */
@@ -5815,18 +5840,18 @@ void tlcs900h_device::op_E0()
 		reg = get_reg32( m_op );
 		m_ea2.d = *reg;
 		*reg += ( 1 << ( m_op & 0x03 ) );
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 	}
 	m_op = RDOP();
-	inst = &s_mnemonic_e0[m_op];
+	inst = &m_mnemonic_e0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
 }
 
 
-void tlcs900h_device::op_E8()
+void tlcs900_device::op_E8()
 {
 	const tlcs900inst *inst;
 
@@ -5840,7 +5865,7 @@ void tlcs900h_device::op_E8()
 		m_p2_reg32 = get_reg32( m_op );
 	}
 	m_op = RDOP();
-	inst = &s_mnemonic_e8[m_op];
+	inst = &m_mnemonic_e8[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
@@ -5848,7 +5873,7 @@ void tlcs900h_device::op_E8()
 
 
 /* memory used as destination operations */
-void tlcs900h_device::op_F0()
+void tlcs900_device::op_F0()
 {
 	const tlcs900inst *inst;
 	uint32_t *reg = nullptr;
@@ -5857,20 +5882,20 @@ void tlcs900h_device::op_F0()
 	{
 	case 0x00:  /* (n) */
 		m_ea2.d = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_8_cycles();
 		break;
 
 	case 0x01:  /* (nn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
-		m_cycles += 2;
+		m_cycles += tlcs900_mem_absolute_16_cycles();
 		break;
 
 	case 0x02:  /* (nnn) */
 		m_ea2.d = RDOP();
 		m_ea2.b.h = RDOP();
 		m_ea2.b.h2 = RDOP();
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_absolute_24_cycles();
 		break;
 
 	case 0x03:
@@ -5880,7 +5905,7 @@ void tlcs900h_device::op_F0()
 		/* (xrr) */
 		case 0x00:
 			m_ea2.d = *get_reg32( m_op );
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_indirect_cycles();
 			break;
 
 		/* (xrr+d16) */
@@ -5888,7 +5913,7 @@ void tlcs900h_device::op_F0()
 			m_ea2.b.l = RDOP();
 			m_ea2.b.h = RDOP();
 			m_ea2.d = *get_reg32( m_op ) + m_ea2.sw.l;
-			m_cycles += 5;
+			m_cycles += tlcs900_mem_gpr_index_cycles();
 			break;
 
 		/* unknown/illegal */
@@ -5904,7 +5929,7 @@ void tlcs900h_device::op_F0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int8_t) *get_reg8( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (xrr+r16) */
@@ -5913,7 +5938,7 @@ void tlcs900h_device::op_F0()
 				m_ea2.d = *get_reg32( m_op );
 				m_op = RDOP();
 				m_ea2.d += (int16_t) *get_reg16( m_op );
-				m_cycles += 8;
+				m_cycles += tlcs900_mem_gpr_reg_index_cycles();
 				break;
 
 			/* (pc+d16) */
@@ -5921,7 +5946,7 @@ void tlcs900h_device::op_F0()
 				m_ea2.b.l = RDOP();
 				m_ea2.b.h = RDOP();
 				m_ea2.d = m_pc.d + m_ea2.sw.l;
-				m_cycles += 5;
+				m_cycles += tlcs900_mem_gpr_index_cycles();
 				break;
 			}
 		}
@@ -5932,7 +5957,7 @@ void tlcs900h_device::op_F0()
 		reg = get_reg32( m_op );
 		*reg -= ( 1 << ( m_op & 0x03 ) );
 		m_ea2.d = *reg;
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 
 	case 0x05:  /* (xrr+) */
@@ -5940,97 +5965,97 @@ void tlcs900h_device::op_F0()
 		reg = get_reg32( m_op );
 		m_ea2.d = *reg;
 		*reg += ( 1 << ( m_op & 0x03 ) );
-		m_cycles += 3;
+		m_cycles += tlcs900_mem_indirect_prepost_cycles();
 		break;
 	}
 
 	m_op = RDOP();
-	inst = &s_mnemonic_f0[m_op];
+	inst = &m_mnemonic_f0[m_op];
 	prepare_operands( inst );
 	(this->*inst->opfunc)();
 	m_cycles += inst->cycles;
 }
 
 
-const tlcs900h_device::tlcs900inst tlcs900h_device::s_mnemonic[256] =
+const tlcs900_device::tlcs900inst tlcs900_device::s_mnemonic[256] =
 {
 	/* 00 - 1F */
-	{ &tlcs900h_device::op_NOP, 0, 0, 1 }, { &tlcs900h_device::op_NORMAL, 0, 0, 4 }, { &tlcs900h_device::op_PUSHWR, p_SR, 0, 4 }, { &tlcs900h_device::op_POPWSR, p_SR, 0, 6 },
-	{ &tlcs900h_device::op_MAX, 0, 0, 4 }, { &tlcs900h_device::op_HALT, 0, 0, 8 }, { &tlcs900h_device::op_EI, p_I8, 0, 5 }, { &tlcs900h_device::op_RETI, 0, 0, 12 },
-	{ &tlcs900h_device::op_LDBMI, p_M8, p_I8, 5 }, { &tlcs900h_device::op_PUSHBI, p_I8, 0, 4 }, { &tlcs900h_device::op_LDWMI, p_M8, p_I16, 6 }, { &tlcs900h_device::op_PUSHWI, p_I16, 0, 5 },
-	{ &tlcs900h_device::op_INCF, 0, 0, 2 }, { &tlcs900h_device::op_DECF, 0, 0, 2 }, { &tlcs900h_device::op_RET, 0, 0, 9 }, { &tlcs900h_device::op_RETD, p_I16, 0, 9 },
-	{ &tlcs900h_device::op_RCF, 0, 0, 2 }, { &tlcs900h_device::op_SCF, 0, 0, 2 }, { &tlcs900h_device::op_CCF, 0, 0, 2 }, { &tlcs900h_device::op_ZCF, 0, 0, 2 },
-	{ &tlcs900h_device::op_PUSHBR, p_A, 0, 3 }, { &tlcs900h_device::op_POPBR, p_A, 0, 4 }, { &tlcs900h_device::op_EXBRR, p_F, p_F, 2 }, { &tlcs900h_device::op_LDF, p_I8, 0, 2 },
-	{ &tlcs900h_device::op_PUSHBR, p_F, 0, 3 }, { &tlcs900h_device::op_POPBR, p_F, 0, 4 }, { &tlcs900h_device::op_JPI, p_I16, 0, 7 }, { &tlcs900h_device::op_JPI, p_I24, 0, 7 },
-	{ &tlcs900h_device::op_CALLI, p_I16, 0, 12 }, { &tlcs900h_device::op_CALLI, p_I24, 0, 12 }, { &tlcs900h_device::op_CALR, p_D16, 0, 12 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_NOP, 0, 0, 1 }, { &tlcs900_device::op_NORMAL, 0, 0, 4 }, { &tlcs900_device::op_PUSHWR, p_SR, 0, 4 }, { &tlcs900_device::op_POPWSR, p_SR, 0, 6 },
+	{ &tlcs900_device::op_MAX, 0, 0, 4 }, { &tlcs900_device::op_HALT, 0, 0, 8 }, { &tlcs900_device::op_EI, p_I8, 0, 5 }, { &tlcs900_device::op_RETI, 0, 0, 12 },
+	{ &tlcs900_device::op_LDBMI, p_M8, p_I8, 5 }, { &tlcs900_device::op_PUSHBI, p_I8, 0, 4 }, { &tlcs900_device::op_LDWMI, p_M8, p_I16, 6 }, { &tlcs900_device::op_PUSHWI, p_I16, 0, 5 },
+	{ &tlcs900_device::op_INCF, 0, 0, 2 }, { &tlcs900_device::op_DECF, 0, 0, 2 }, { &tlcs900_device::op_RET, 0, 0, 9 }, { &tlcs900_device::op_RETD, p_I16, 0, 9 },
+	{ &tlcs900_device::op_RCF, 0, 0, 2 }, { &tlcs900_device::op_SCF, 0, 0, 2 }, { &tlcs900_device::op_CCF, 0, 0, 2 }, { &tlcs900_device::op_ZCF, 0, 0, 2 },
+	{ &tlcs900_device::op_PUSHBR, p_A, 0, 3 }, { &tlcs900_device::op_POPBR, p_A, 0, 4 }, { &tlcs900_device::op_EXBRR, p_F, p_F, 2 }, { &tlcs900_device::op_LDF, p_I8, 0, 2 },
+	{ &tlcs900_device::op_PUSHBR, p_F, 0, 3 }, { &tlcs900_device::op_POPBR, p_F, 0, 4 }, { &tlcs900_device::op_JPI, p_I16, 0, 7 }, { &tlcs900_device::op_JPI, p_I24, 0, 7 },
+	{ &tlcs900_device::op_CALLI, p_I16, 0, 12 }, { &tlcs900_device::op_CALLI, p_I24, 0, 12 }, { &tlcs900_device::op_CALR, p_D16, 0, 12 }, { &tlcs900_device::op_DB, 0, 0, 1 },
 
 	/* 20 - 3F */
-	{ &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 },
-	{ &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900h_device::op_LDBRI, p_C8, p_I8, 2 },
-	{ &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 },
-	{ &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900h_device::op_PUSHWR, p_C16, 0, 3 },
-	{ &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 },
-	{ &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900h_device::op_LDWRI, p_C16, p_I16, 3 },
-	{ &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 },
-	{ &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900h_device::op_PUSHLR, p_C32, 0, 5 },
+	{ &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 },
+	{ &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 }, { &tlcs900_device::op_LDBRI, p_C8, p_I8, 2 },
+	{ &tlcs900_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900_device::op_PUSHWR, p_C16, 0, 3 },
+	{ &tlcs900_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900_device::op_PUSHWR, p_C16, 0, 3 }, { &tlcs900_device::op_PUSHWR, p_C16, 0, 3 },
+	{ &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 },
+	{ &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 }, { &tlcs900_device::op_LDWRI, p_C16, p_I16, 3 },
+	{ &tlcs900_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900_device::op_PUSHLR, p_C32, 0, 5 },
+	{ &tlcs900_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900_device::op_PUSHLR, p_C32, 0, 5 }, { &tlcs900_device::op_PUSHLR, p_C32, 0, 5 },
 
 	/* 40 - 5F */
-	{ &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 },
-	{ &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900h_device::op_LDLRI, p_C32, p_I32, 5 },
-	{ &tlcs900h_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900h_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900h_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900h_device::op_POPWR, p_C16, 0, 4 },
-	{ &tlcs900h_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900h_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900h_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900h_device::op_POPWR, p_C16, 0, 4 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 }, { &tlcs900h_device::op_DB, 0, 0, 1 },
-	{ &tlcs900h_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900h_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900h_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900h_device::op_POPLR, p_C32, 0, 6 },
-	{ &tlcs900h_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900h_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900h_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900h_device::op_POPLR, p_C32, 0, 6 },
+	{ &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 },
+	{ &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 }, { &tlcs900_device::op_LDLRI, p_C32, p_I32, 5 },
+	{ &tlcs900_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900_device::op_POPWR, p_C16, 0, 4 },
+	{ &tlcs900_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900_device::op_POPWR, p_C16, 0, 4 }, { &tlcs900_device::op_POPWR, p_C16, 0, 4 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 }, { &tlcs900_device::op_DB, 0, 0, 1 },
+	{ &tlcs900_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900_device::op_POPLR, p_C32, 0, 6 },
+	{ &tlcs900_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900_device::op_POPLR, p_C32, 0, 6 }, { &tlcs900_device::op_POPLR, p_C32, 0, 6 },
 
 	/* 60 - 7F */
-	{ &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 },
-	{ &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 },
-	{ &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 },
-	{ &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900h_device::op_JR, p_CC, p_D8, 4 },
-	{ &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 },
-	{ &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 },
-	{ &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 },
-	{ &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900h_device::op_JRL, p_CC, p_D16, 4 },
+	{ &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 },
+	{ &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 },
+	{ &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 },
+	{ &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 }, { &tlcs900_device::op_JR, p_CC, p_D8, 4 },
+	{ &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 },
+	{ &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 },
+	{ &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 },
+	{ &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 }, { &tlcs900_device::op_JRL, p_CC, p_D16, 4 },
 
 	/* 80 - 9F */
-	{ &tlcs900h_device::op_80, 0, 0, 0 }, { &tlcs900h_device::op_80, 0, 0, 0 }, { &tlcs900h_device::op_80, 0, 0, 0 }, { &tlcs900h_device::op_80, 0, 0, 0 },
-	{ &tlcs900h_device::op_80, 0, 0, 0 }, { &tlcs900h_device::op_80, 0, 0, 0 }, { &tlcs900h_device::op_80, 0, 0, 0 }, { &tlcs900h_device::op_80, 0, 0, 0 },
-	{ &tlcs900h_device::op_88, 0, 0, 0 }, { &tlcs900h_device::op_88, 0, 0, 0 }, { &tlcs900h_device::op_88, 0, 0, 0 }, { &tlcs900h_device::op_88, 0, 0, 0 },
-	{ &tlcs900h_device::op_88, 0, 0, 0 }, { &tlcs900h_device::op_88, 0, 0, 0 }, { &tlcs900h_device::op_88, 0, 0, 0 }, { &tlcs900h_device::op_88, 0, 0, 0 },
-	{ &tlcs900h_device::op_90, 0, 0, 0 }, { &tlcs900h_device::op_90, 0, 0, 0 }, { &tlcs900h_device::op_90, 0, 0, 0 }, { &tlcs900h_device::op_90, 0, 0, 0 },
-	{ &tlcs900h_device::op_90, 0, 0, 0 }, { &tlcs900h_device::op_90, 0, 0, 0 }, { &tlcs900h_device::op_90, 0, 0, 0 }, { &tlcs900h_device::op_90, 0, 0, 0 },
-	{ &tlcs900h_device::op_98, 0, 0, 0 }, { &tlcs900h_device::op_98, 0, 0, 0 }, { &tlcs900h_device::op_98, 0, 0, 0 }, { &tlcs900h_device::op_98, 0, 0, 0 },
-	{ &tlcs900h_device::op_98, 0, 0, 0 }, { &tlcs900h_device::op_98, 0, 0, 0 }, { &tlcs900h_device::op_98, 0, 0, 0 }, { &tlcs900h_device::op_98, 0, 0, 0 },
+	{ &tlcs900_device::op_80, 0, 0, 0 }, { &tlcs900_device::op_80, 0, 0, 0 }, { &tlcs900_device::op_80, 0, 0, 0 }, { &tlcs900_device::op_80, 0, 0, 0 },
+	{ &tlcs900_device::op_80, 0, 0, 0 }, { &tlcs900_device::op_80, 0, 0, 0 }, { &tlcs900_device::op_80, 0, 0, 0 }, { &tlcs900_device::op_80, 0, 0, 0 },
+	{ &tlcs900_device::op_88, 0, 0, 0 }, { &tlcs900_device::op_88, 0, 0, 0 }, { &tlcs900_device::op_88, 0, 0, 0 }, { &tlcs900_device::op_88, 0, 0, 0 },
+	{ &tlcs900_device::op_88, 0, 0, 0 }, { &tlcs900_device::op_88, 0, 0, 0 }, { &tlcs900_device::op_88, 0, 0, 0 }, { &tlcs900_device::op_88, 0, 0, 0 },
+	{ &tlcs900_device::op_90, 0, 0, 0 }, { &tlcs900_device::op_90, 0, 0, 0 }, { &tlcs900_device::op_90, 0, 0, 0 }, { &tlcs900_device::op_90, 0, 0, 0 },
+	{ &tlcs900_device::op_90, 0, 0, 0 }, { &tlcs900_device::op_90, 0, 0, 0 }, { &tlcs900_device::op_90, 0, 0, 0 }, { &tlcs900_device::op_90, 0, 0, 0 },
+	{ &tlcs900_device::op_98, 0, 0, 0 }, { &tlcs900_device::op_98, 0, 0, 0 }, { &tlcs900_device::op_98, 0, 0, 0 }, { &tlcs900_device::op_98, 0, 0, 0 },
+	{ &tlcs900_device::op_98, 0, 0, 0 }, { &tlcs900_device::op_98, 0, 0, 0 }, { &tlcs900_device::op_98, 0, 0, 0 }, { &tlcs900_device::op_98, 0, 0, 0 },
 
 	/* A0 - BF */
-	{ &tlcs900h_device::op_A0, 0, 0, 0 }, { &tlcs900h_device::op_A0, 0, 0, 0 }, { &tlcs900h_device::op_A0, 0, 0, 0 }, { &tlcs900h_device::op_A0, 0, 0, 0 },
-	{ &tlcs900h_device::op_A0, 0, 0, 0 }, { &tlcs900h_device::op_A0, 0, 0, 0 }, { &tlcs900h_device::op_A0, 0, 0, 0 }, { &tlcs900h_device::op_A0, 0, 0, 0 },
-	{ &tlcs900h_device::op_A8, 0, 0, 0 }, { &tlcs900h_device::op_A8, 0, 0, 0 }, { &tlcs900h_device::op_A8, 0, 0, 0 }, { &tlcs900h_device::op_A8, 0, 0, 0 },
-	{ &tlcs900h_device::op_A8, 0, 0, 0 }, { &tlcs900h_device::op_A8, 0, 0, 0 }, { &tlcs900h_device::op_A8, 0, 0, 0 }, { &tlcs900h_device::op_A8, 0, 0, 0 },
-	{ &tlcs900h_device::op_B0, 0, 0, 0 }, { &tlcs900h_device::op_B0, 0, 0, 0 }, { &tlcs900h_device::op_B0, 0, 0, 0 }, { &tlcs900h_device::op_B0, 0, 0, 0 },
-	{ &tlcs900h_device::op_B0, 0, 0, 0 }, { &tlcs900h_device::op_B0, 0, 0, 0 }, { &tlcs900h_device::op_B0, 0, 0, 0 }, { &tlcs900h_device::op_B0, 0, 0, 0 },
-	{ &tlcs900h_device::op_B8, 0, 0, 0 }, { &tlcs900h_device::op_B8, 0, 0, 0 }, { &tlcs900h_device::op_B8, 0, 0, 0 }, { &tlcs900h_device::op_B8, 0, 0, 0 },
-	{ &tlcs900h_device::op_B8, 0, 0, 0 }, { &tlcs900h_device::op_B8, 0, 0, 0 }, { &tlcs900h_device::op_B8, 0, 0, 0 }, { &tlcs900h_device::op_B8, 0, 0, 0 },
+	{ &tlcs900_device::op_A0, 0, 0, 0 }, { &tlcs900_device::op_A0, 0, 0, 0 }, { &tlcs900_device::op_A0, 0, 0, 0 }, { &tlcs900_device::op_A0, 0, 0, 0 },
+	{ &tlcs900_device::op_A0, 0, 0, 0 }, { &tlcs900_device::op_A0, 0, 0, 0 }, { &tlcs900_device::op_A0, 0, 0, 0 }, { &tlcs900_device::op_A0, 0, 0, 0 },
+	{ &tlcs900_device::op_A8, 0, 0, 0 }, { &tlcs900_device::op_A8, 0, 0, 0 }, { &tlcs900_device::op_A8, 0, 0, 0 }, { &tlcs900_device::op_A8, 0, 0, 0 },
+	{ &tlcs900_device::op_A8, 0, 0, 0 }, { &tlcs900_device::op_A8, 0, 0, 0 }, { &tlcs900_device::op_A8, 0, 0, 0 }, { &tlcs900_device::op_A8, 0, 0, 0 },
+	{ &tlcs900_device::op_B0, 0, 0, 0 }, { &tlcs900_device::op_B0, 0, 0, 0 }, { &tlcs900_device::op_B0, 0, 0, 0 }, { &tlcs900_device::op_B0, 0, 0, 0 },
+	{ &tlcs900_device::op_B0, 0, 0, 0 }, { &tlcs900_device::op_B0, 0, 0, 0 }, { &tlcs900_device::op_B0, 0, 0, 0 }, { &tlcs900_device::op_B0, 0, 0, 0 },
+	{ &tlcs900_device::op_B8, 0, 0, 0 }, { &tlcs900_device::op_B8, 0, 0, 0 }, { &tlcs900_device::op_B8, 0, 0, 0 }, { &tlcs900_device::op_B8, 0, 0, 0 },
+	{ &tlcs900_device::op_B8, 0, 0, 0 }, { &tlcs900_device::op_B8, 0, 0, 0 }, { &tlcs900_device::op_B8, 0, 0, 0 }, { &tlcs900_device::op_B8, 0, 0, 0 },
 
 	/* C0 - DF */
-	{ &tlcs900h_device::op_C0, 0, 0, 0 }, { &tlcs900h_device::op_C0, 0, 0, 0 }, { &tlcs900h_device::op_C0, 0, 0, 0 }, { &tlcs900h_device::op_C0, 0, 0, 0 },
-	{ &tlcs900h_device::op_C0, 0, 0, 0 }, { &tlcs900h_device::op_C0, 0, 0, 0 }, { &tlcs900h_device::op_DB, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 },
-	{ &tlcs900h_device::oC8, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 },
-	{ &tlcs900h_device::oC8, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 }, { &tlcs900h_device::oC8, 0, 0, 0 },
-	{ &tlcs900h_device::op_D0, 0, 0, 0 }, { &tlcs900h_device::op_D0, 0, 0, 0 }, { &tlcs900h_device::op_D0, 0, 0, 0 }, { &tlcs900h_device::op_D0, 0, 0, 0 },
-	{ &tlcs900h_device::op_D0, 0, 0, 0 }, { &tlcs900h_device::op_D0, 0, 0, 0 }, { &tlcs900h_device::op_DB, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 },
-	{ &tlcs900h_device::oD8, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 },
-	{ &tlcs900h_device::oD8, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 }, { &tlcs900h_device::oD8, 0, 0, 0 },
+	{ &tlcs900_device::op_C0, 0, 0, 0 }, { &tlcs900_device::op_C0, 0, 0, 0 }, { &tlcs900_device::op_C0, 0, 0, 0 }, { &tlcs900_device::op_C0, 0, 0, 0 },
+	{ &tlcs900_device::op_C0, 0, 0, 0 }, { &tlcs900_device::op_C0, 0, 0, 0 }, { &tlcs900_device::op_DB, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 },
+	{ &tlcs900_device::oC8, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 },
+	{ &tlcs900_device::oC8, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 }, { &tlcs900_device::oC8, 0, 0, 0 },
+	{ &tlcs900_device::op_D0, 0, 0, 0 }, { &tlcs900_device::op_D0, 0, 0, 0 }, { &tlcs900_device::op_D0, 0, 0, 0 }, { &tlcs900_device::op_D0, 0, 0, 0 },
+	{ &tlcs900_device::op_D0, 0, 0, 0 }, { &tlcs900_device::op_D0, 0, 0, 0 }, { &tlcs900_device::op_DB, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 },
+	{ &tlcs900_device::oD8, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 },
+	{ &tlcs900_device::oD8, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 }, { &tlcs900_device::oD8, 0, 0, 0 },
 
 	/* E0 - FF */
-	{ &tlcs900h_device::op_E0, 0, 0, 0 }, { &tlcs900h_device::op_E0, 0, 0, 0 }, { &tlcs900h_device::op_E0, 0, 0, 0 }, { &tlcs900h_device::op_E0, 0, 0, 0 },
-	{ &tlcs900h_device::op_E0, 0, 0, 0 }, { &tlcs900h_device::op_E0, 0, 0, 0 }, { &tlcs900h_device::op_DB, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 },
-	{ &tlcs900h_device::op_E8, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 },
-	{ &tlcs900h_device::op_E8, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 }, { &tlcs900h_device::op_E8, 0, 0, 0 },
-	{ &tlcs900h_device::op_F0, 0, 0, 0 }, { &tlcs900h_device::op_F0, 0, 0, 0 }, { &tlcs900h_device::op_F0, 0, 0, 0 }, { &tlcs900h_device::op_F0, 0, 0, 0 },
-	{ &tlcs900h_device::op_F0, 0, 0, 0 }, { &tlcs900h_device::op_F0, 0, 0, 0 }, { &tlcs900h_device::op_DB, 0, 0, 0 }, { &tlcs900h_device::op_LDX, 0, 0, 9 },
-	{ &tlcs900h_device::op_SWI, p_I3, 0, 16 }, { &tlcs900h_device::op_SWI, p_I3, 0, 16 }, { &tlcs900h_device::op_SWI, p_I3, 0, 16 }, { &tlcs900h_device::op_SWI, p_I3, 0, 16 },
-	{ &tlcs900h_device::op_SWI, p_I3, 0, 16 }, { &tlcs900h_device::op_SWI, p_I3, 0, 16 }, { &tlcs900h_device::op_SWI, p_I3, 0, 16 }, { &tlcs900h_device::op_SWI, p_I3, 0, 16 }
+	{ &tlcs900_device::op_E0, 0, 0, 0 }, { &tlcs900_device::op_E0, 0, 0, 0 }, { &tlcs900_device::op_E0, 0, 0, 0 }, { &tlcs900_device::op_E0, 0, 0, 0 },
+	{ &tlcs900_device::op_E0, 0, 0, 0 }, { &tlcs900_device::op_E0, 0, 0, 0 }, { &tlcs900_device::op_DB, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 },
+	{ &tlcs900_device::op_E8, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 },
+	{ &tlcs900_device::op_E8, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 }, { &tlcs900_device::op_E8, 0, 0, 0 },
+	{ &tlcs900_device::op_F0, 0, 0, 0 }, { &tlcs900_device::op_F0, 0, 0, 0 }, { &tlcs900_device::op_F0, 0, 0, 0 }, { &tlcs900_device::op_F0, 0, 0, 0 },
+	{ &tlcs900_device::op_F0, 0, 0, 0 }, { &tlcs900_device::op_F0, 0, 0, 0 }, { &tlcs900_device::op_DB, 0, 0, 0 }, { &tlcs900_device::op_LDX, 0, 0, 9 },
+	{ &tlcs900_device::op_SWI900, p_I3, 0, 16 }, { &tlcs900_device::op_SWI900, p_I3, 0, 16 }, { &tlcs900_device::op_SWI900, p_I3, 0, 16 }, { &tlcs900_device::op_SWI900, p_I3, 0, 16 },
+	{ &tlcs900_device::op_SWI900, p_I3, 0, 16 }, { &tlcs900_device::op_SWI900, p_I3, 0, 16 }, { &tlcs900_device::op_SWI900, p_I3, 0, 16 }, { &tlcs900_device::op_SWI900, p_I3, 0, 16 }
 };

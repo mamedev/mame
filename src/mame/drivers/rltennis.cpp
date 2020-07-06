@@ -76,17 +76,17 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
 #define RLT_XTAL           XTAL(12'000'000)
 
-READ16_MEMBER(rltennis_state::io_r)
+uint16_t rltennis_state::io_r()
 {
 	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
-WRITE16_MEMBER(rltennis_state::snd1_w)
+void rltennis_state::snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_data760000);
 }
 
-WRITE16_MEMBER(rltennis_state::snd2_w)
+void rltennis_state::snd2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_data740000);
 }

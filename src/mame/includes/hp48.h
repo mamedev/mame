@@ -66,9 +66,9 @@ public:
 
 		/* static part */
 		uint32_t off_mask;          // offset bit-mask, indicates the real size
-		read8_delegate read;
+		read8sm_delegate read;
 		const char *read_name;
-		write8_delegate write;
+		write8sm_delegate write;
 		void* data;                 // non-NULL for banks
 		int isnop;
 
@@ -94,10 +94,10 @@ private:
 	DECLARE_MACHINE_START(hp48sx);
 	DECLARE_MACHINE_START(hp48s);
 	uint32_t screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(hp49_bank_w);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	uint8_t bank_r(offs_t offset);
+	void hp49_bank_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(rs232_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(rs232_byte_sent_cb);
 	TIMER_CALLBACK_MEMBER(kbd_cb);
@@ -113,16 +113,16 @@ private:
 
 	/* memory controller */
 	DECLARE_WRITE_LINE_MEMBER(mem_reset);
-	DECLARE_WRITE32_MEMBER(mem_config);
-	DECLARE_WRITE32_MEMBER(mem_unconfig);
-	DECLARE_READ32_MEMBER(mem_id);
+	void mem_config(uint32_t data);
+	void mem_unconfig(uint32_t data);
+	uint32_t mem_id();
 
 	/* CRC computation */
-	DECLARE_WRITE32_MEMBER(mem_crc);
+	void mem_crc(offs_t offset, uint32_t data);
 
 	/* IN/OUT registers */
-	DECLARE_READ32_MEMBER(reg_in);
-	DECLARE_WRITE32_MEMBER(reg_out);
+	uint32_t reg_in();
+	void reg_out(uint32_t data);
 
 	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER(rsi);

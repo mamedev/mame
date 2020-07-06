@@ -18,8 +18,8 @@ public:
 	pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
+	uint8_t opn_porta_r();
+	void opn_portb_w(uint8_t data);
 
 private:
 	uint8_t m_joy_sel;

@@ -94,6 +94,18 @@ if (MACHINES["AKIKO"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/am2901b.h,MACHINES["AM2901B"] = true
+---------------------------------------------------
+
+if (MACHINES["AM2901B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am2901b.cpp",
+		MAME_DIR .. "src/devices/machine/am2901b.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/machine/arm_iomd.h,MACHINES["ARM_IOMD"] = true
@@ -2769,7 +2781,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/scnxx562.h,MACHINES["SCN_PCI"] = true
+--@src/devices/machine/scn_pci.h,MACHINES["SCN_PCI"] = true
 ---------------------------------------------------
 
 if (MACHINES["SCN_PCI"]~=null) then
@@ -2867,7 +2879,7 @@ end
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
---@src/devices/machine/sunplus_gcm394.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/generalplus_gpl16250soc.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if (MACHINES["SPG2XX"]~=null) then
@@ -2886,13 +2898,35 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110.h",
 		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.cpp",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.h",
+		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
+		MAME_DIR .. "src/devices/machine/spg_renderer.h",
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/spg290_cdservo.h,MACHINES["SPG290"] = true
+--@src/devices/machine/spg290_timer.h,MACHINES["SPG290"] = true
+--@src/devices/machine/spg290_i2c.h,MACHINES["SPG290"] = true
+--@src/devices/machine/spg290_ppu.h,MACHINES["SPG290"] = true
+---------------------------------------------------
+
+if (MACHINES["SPG290"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spg290_cdservo.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_cdservo.h",
+		MAME_DIR .. "src/devices/machine/spg290_timer.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_timer.h",
+		MAME_DIR .. "src/devices/machine/spg290_i2c.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_i2c.h",
+		MAME_DIR .. "src/devices/machine/spg290_ppu.cpp",
+		MAME_DIR .. "src/devices/machine/spg290_ppu.h",
+	}
+end
 ---------------------------------------------------
 --
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
@@ -3550,6 +3584,18 @@ if (MACHINES["MM58167"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mm58167.cpp",
 		MAME_DIR .. "src/devices/machine/mm58167.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mm58174.h,MACHINES["MM58174"] = true
+---------------------------------------------------
+
+if (MACHINES["MM58174"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mm58174.cpp",
+		MAME_DIR .. "src/devices/machine/mm58174.h",
 	}
 end
 
@@ -4338,5 +4384,60 @@ if (MACHINES["CXD1185"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/cxd1185.cpp",
 		MAME_DIR .. "src/devices/machine/cxd1185.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/applefdc.h,MACHINES["APPLE_FDINTF"] = true
+---------------------------------------------------
+if (MACHINES["APPLE_FDINTF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/applefdintf.cpp",
+		MAME_DIR .. "src/devices/machine/applefdintf.h",
+	}
+end
+
+---------------------------------------------------
+ --
+ --@src/devices/machine/iwm.h,MACHINES["IWM"] = true
+ ---------------------------------------------------
+ if (MACHINES["IWM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/iwm.cpp",
+		MAME_DIR .. "src/devices/machine/iwm.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swim1.h,MACHINES["SWIM1"] = true
+---------------------------------------------------
+if (MACHINES["SWIM1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swim1.cpp",
+		MAME_DIR .. "src/devices/machine/swim1.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swim2.h,MACHINES["SWIM2"] = true
+---------------------------------------------------
+if (MACHINES["SWIM2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swim2.cpp",
+		MAME_DIR .. "src/devices/machine/swim2.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swim3.h,MACHINES["SWIM3"] = true
+---------------------------------------------------
+if (MACHINES["SWIM3"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swim3.cpp",
+		MAME_DIR .. "src/devices/machine/swim3.h",
 	}
 end

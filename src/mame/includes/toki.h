@@ -66,17 +66,17 @@ private:
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_text_layer;
 
-	DECLARE_WRITE16_MEMBER(tokib_soundcommand_w);
-	DECLARE_READ16_MEMBER(pip_r);
-	DECLARE_WRITE16_MEMBER(toki_control_w);
-	DECLARE_WRITE16_MEMBER(foreground_videoram_w);
-	DECLARE_WRITE16_MEMBER(background1_videoram_w);
-	DECLARE_WRITE16_MEMBER(background2_videoram_w);
-	DECLARE_WRITE8_MEMBER(tokib_adpcm_control_w);
-	DECLARE_WRITE8_MEMBER(tokib_adpcm_data_w);
+	void tokib_soundcommand_w(uint16_t data);
+	uint16_t pip_r();
+	void toki_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void foreground_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void background1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void background2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tokib_adpcm_control_w(uint8_t data);
+	void tokib_adpcm_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
 
-	DECLARE_READ8_MEMBER(jujuba_z80_data_decrypt);
+	uint8_t jujuba_z80_data_decrypt(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

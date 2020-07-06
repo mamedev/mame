@@ -41,7 +41,7 @@ constexpr XTAL VIDEO_CLOCK = 19.6_MHz_XTAL;
 
 /* PAL16R6CN used for protection. The game doesn't clear the screen */
 /* if a read from this address doesn't return the value it expects. */
-READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
+uint8_t mrdo_state::mrdo_SECRE_r()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 

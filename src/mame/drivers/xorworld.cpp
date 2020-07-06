@@ -51,12 +51,12 @@ EEPROM chip: 93C46
                 EEPROM read/write/control
 ****************************************************************/
 
-WRITE16_MEMBER(xorworld_state::irq2_ack_w)
+void xorworld_state::irq2_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(xorworld_state::irq6_ack_w)
+void xorworld_state::irq6_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }

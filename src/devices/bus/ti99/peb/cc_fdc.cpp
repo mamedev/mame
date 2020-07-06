@@ -90,7 +90,7 @@ corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_typ
 {
 }
 
-SETADDRESS_DBIN_MEMBER( corcomp_fdc_device::setaddress_dbin )
+void corcomp_fdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for debugger
 	if (machine().side_effects_disabled()) return;
@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_hld_w )
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", state);
 }
 
-READ8Z_MEMBER(corcomp_fdc_device::readz)
+void corcomp_fdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -253,7 +253,7 @@ void corcomp_fdc_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER( corcomp_fdc_device::crureadz )
+void corcomp_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_decpal->address9901())
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::clock_in )
 	m_tms9901->phi_line(state);
 }
 
-READ8_MEMBER( corcomp_fdc_device::tms9901_input )
+uint8_t corcomp_fdc_device::tms9901_input(offs_t offset)
 {
 	// Inputs
 	// INT1: Switch 8

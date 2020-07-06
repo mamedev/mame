@@ -69,21 +69,21 @@ public:
 
 	output_finder<1> m_led;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
-	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_READ8_MEMBER(sound_status_main_r);
-	DECLARE_READ8_MEMBER(sound_status_sound_r);
-	DECLARE_WRITE8_MEMBER(buggychl_chargen_w);
-	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_bank_w);
-	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);
-	DECLARE_WRITE8_MEMBER(buggychl_ctrl_w);
-	DECLARE_WRITE8_MEMBER(buggychl_bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(ta7630_volbal_ay1_w);
-	DECLARE_WRITE8_MEMBER(port_b_0_w);
-	DECLARE_WRITE8_MEMBER(ta7630_volbal_ay2_w);
-	DECLARE_WRITE8_MEMBER(port_b_1_w);
-	DECLARE_WRITE8_MEMBER(ta7630_volbal_msm_w);
+	void bankswitch_w(uint8_t data);
+	void sound_enable_w(uint8_t data);
+	uint8_t mcu_status_r();
+	uint8_t sound_status_main_r();
+	uint8_t sound_status_sound_r();
+	void buggychl_chargen_w(offs_t offset, uint8_t data);
+	void buggychl_sprite_lookup_bank_w(uint8_t data);
+	void buggychl_sprite_lookup_w(offs_t offset, uint8_t data);
+	void buggychl_ctrl_w(uint8_t data);
+	void buggychl_bg_scrollx_w(uint8_t data);
+	void ta7630_volbal_ay1_w(uint8_t data);
+	void port_b_0_w(uint8_t data);
+	void ta7630_volbal_ay2_w(uint8_t data);
+	void port_b_1_w(uint8_t data);
+	void ta7630_volbal_msm_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

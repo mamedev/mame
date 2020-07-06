@@ -40,9 +40,9 @@ public:
 
 private:
 
-	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_WRITE8_MEMBER(cru_w);
-	DECLARE_WRITE8_MEMBER(oe_w);
+	uint8_t ff_r();
+	void cru_w(offs_t offset, uint8_t data);
+	void oe_w(uint8_t data);
 	void nsm_io_map(address_map &map);
 	void nsm_map(address_map &map);
 
@@ -82,14 +82,14 @@ void nsm_state::nsm_io_map(address_map &map)
 static INPUT_PORTS_START( nsm )
 INPUT_PORTS_END
 
-READ8_MEMBER( nsm_state::ff_r ) { return 1; }
+uint8_t nsm_state::ff_r() { return 1; }
 
-WRITE8_MEMBER( nsm_state::oe_w )
+void nsm_state::oe_w(uint8_t data)
 {
 	m_cru_count = 9;
 }
 
-WRITE8_MEMBER( nsm_state::cru_w )
+void nsm_state::cru_w(offs_t offset, uint8_t data)
 {
 	offset &= 7;
 	if (!offset)

@@ -66,14 +66,14 @@ public:
 	bool m_bios_disable;
 
 	void gb_io_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER(gb_io2_w);
-	DECLARE_WRITE8_MEMBER(sgb_io_w);
-	DECLARE_READ8_MEMBER(gb_ie_r);
-	DECLARE_WRITE8_MEMBER(gb_ie_w);
-	DECLARE_READ8_MEMBER(gb_io_r);
-	DECLARE_WRITE8_MEMBER(gbc_io_w);
-	DECLARE_WRITE8_MEMBER(gbc_io2_w);
-	DECLARE_READ8_MEMBER(gbc_io2_r);
+	void gb_io2_w(offs_t offset, uint8_t data);
+	void sgb_io_w(offs_t offset, uint8_t data);
+	uint8_t gb_ie_r();
+	void gb_ie_w(uint8_t data);
+	uint8_t gb_io_r(offs_t offset);
+	void gbc_io_w(offs_t offset, uint8_t data);
+	void gbc_io2_w(offs_t offset, uint8_t data);
+	uint8_t gbc_io2_r(offs_t offset);
 	void gb_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
@@ -82,15 +82,15 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	void gbc_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	void gb_timer_callback(uint8_t data);
 
-	DECLARE_READ8_MEMBER(gb_cart_r);
-	DECLARE_READ8_MEMBER(gbc_cart_r);
-	DECLARE_WRITE8_MEMBER(gb_bank_w);
-	DECLARE_READ8_MEMBER(gb_ram_r);
-	DECLARE_WRITE8_MEMBER(gb_ram_w);
-	DECLARE_READ8_MEMBER(gb_echo_r);
-	DECLARE_WRITE8_MEMBER(gb_echo_w);
+	uint8_t gb_cart_r(offs_t offset);
+	uint8_t gbc_cart_r(offs_t offset);
+	void gb_bank_w(offs_t offset, uint8_t data);
+	uint8_t gb_ram_r(offs_t offset);
+	void gb_ram_w(offs_t offset, uint8_t data);
+	uint8_t gb_echo_r(address_space &space, offs_t offset);
+	void gb_echo_w(address_space &space, offs_t offset, uint8_t data);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 	void supergb(machine_config &config);
@@ -149,18 +149,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(megaduck_video_r);
-	DECLARE_WRITE8_MEMBER(megaduck_video_w);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
-	DECLARE_READ8_MEMBER(megaduck_sound_r1);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
-	DECLARE_READ8_MEMBER(megaduck_sound_r2);
+	uint8_t megaduck_video_r(offs_t offset);
+	void megaduck_video_w(offs_t offset, uint8_t data);
+	void megaduck_sound_w1(offs_t offset, uint8_t data);
+	uint8_t megaduck_sound_r1(offs_t offset);
+	void megaduck_sound_w2(offs_t offset, uint8_t data);
+	uint8_t megaduck_sound_r2(offs_t offset);
 	void megaduck_palette(palette_device &palette) const;;
 	void megaduck_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(cart_r);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
+	uint8_t cart_r(offs_t offset);
+	void bank1_w(offs_t offset, uint8_t data);
+	void bank2_w(offs_t offset, uint8_t data);
 	required_device<megaduck_cart_slot_device> m_cartslot;
 };
 

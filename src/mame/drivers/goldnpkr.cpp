@@ -1353,10 +1353,10 @@ public:
 	void init_bchancep();
 	void init_bonuspkr();
 
-	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	uint8_t pottnpkr_mux_port_r();
+	void lamps_a_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void mux_w(uint8_t data);
 
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1365,8 +1365,8 @@ protected:
 
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
+	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
 
 	void witchcrd_palette(palette_device &palette) const;
 	void super21p_palette(palette_device &palette) const;
@@ -1380,19 +1380,19 @@ protected:
 	optional_device<discrete_device> m_discrete;
 
 private:
-	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
+	uint8_t goldnpkr_mux_port_r();
+	void mux_port_w(uint8_t data);
 	uint8_t ay8910_data_r();
 	void ay8910_data_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
+	void pia0_a_w(uint8_t data);
+	void pia0_b_w(uint8_t data);
+	void pia1_a_w(uint8_t data);
+	void pia1_b_w(uint8_t data);
+	uint8_t pia0_a_r();
+	uint8_t pia0_b_r();
+	uint8_t pia1_a_r();
+	uint8_t pia1_b_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
@@ -1446,10 +1446,10 @@ public:
 	void megadpkr(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
-	DECLARE_WRITE8_MEMBER(mcu_command_w);
-	DECLARE_WRITE8_MEMBER(mcu_portb_w);
-	DECLARE_WRITE8_MEMBER(mcu_portc_w);
+	uint8_t cpubank_decrypt_r(offs_t offset);
+	void mcu_command_w(uint8_t data);
+	void mcu_portb_w(uint8_t data);
+	void mcu_portc_w(uint8_t data);
 	void megadpkr_banked_map(address_map &map);
 	void megadpkr_map(address_map &map);
 
@@ -1468,13 +1468,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_videoram_w)
+void goldnpkr_state::goldnpkr_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_colorram_w)
+void goldnpkr_state::goldnpkr_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -1740,7 +1740,7 @@ void goldnpkr_state::super21p_palette(palette_device &palette) const
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
+uint8_t goldnpkr_state::goldnpkr_mux_port_r()
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -1760,7 +1760,7 @@ READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
+uint8_t goldnpkr_state::pottnpkr_mux_port_r()
 {
 	uint8_t pa_0_4 = 0xff, pa_7;  /* Temporary place holder for bits 0 to 4 & 7 */
 
@@ -1777,13 +1777,13 @@ READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
 
-WRITE8_MEMBER(goldnpkr_state::mux_w)
+void goldnpkr_state::mux_w(uint8_t data)
 {
 	//logerror("mux_w: %2x\n",data);
 	m_mux_data = data ^ 0xff;   /* inverted */
 }
 
-WRITE8_MEMBER(goldnpkr_state::mux_port_w)
+void goldnpkr_state::mux_port_w(uint8_t data)
 {
 	m_pia0_PA_data = data;
 }
@@ -1859,7 +1859,7 @@ void goldnpkr_state::ay8910_control_w(uint8_t data)
   ---- x---  Take Lamp.
 
 */
-WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
+void goldnpkr_state::lamps_a_w(uint8_t data)
 {
 /***** General Lamps and Counters wiring *****
 
@@ -1887,7 +1887,7 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* counter3 */
 }
 
-WRITE8_MEMBER(goldnpkr_state::sound_w)
+void goldnpkr_state::sound_w(uint8_t data)
 {
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
@@ -1897,43 +1897,43 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	m_discrete->write(NODE_10, data & 0x07);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
+void goldnpkr_state::pia0_a_w(uint8_t data)
 {
 	logerror("pia0_a_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia0_b_w)
+void goldnpkr_state::pia0_b_w(uint8_t data)
 {
 	logerror("pia0_b_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia1_a_w)
+void goldnpkr_state::pia1_a_w(uint8_t data)
 {
 	logerror("pia1_a_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia1_b_w)
+void goldnpkr_state::pia1_b_w(uint8_t data)
 {
 	logerror("pia1_b_w: %2x\n", data);
 }
 
 
-READ8_MEMBER(goldnpkr_state::pia0_a_r)
+uint8_t goldnpkr_state::pia0_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia0_b_r)
+uint8_t goldnpkr_state::pia0_b_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia1_a_r)
+uint8_t goldnpkr_state::pia1_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia1_b_r)
+uint8_t goldnpkr_state::pia1_b_r()
 {
 	return 0xff;
 }
@@ -4894,12 +4894,12 @@ void goldnpkr_state::caspoker(machine_config &config)
 *                Blitz System                *
 *********************************************/
 
-READ8_MEMBER(blitz_state::cpubank_decrypt_r)
+uint8_t blitz_state::cpubank_decrypt_r(offs_t offset)
 {
 	return m_cpubank[offset] ^ m_cpubank_xor;
 }
 
-WRITE8_MEMBER(blitz_state::mcu_command_w)
+void blitz_state::mcu_command_w(uint8_t data)
 {
 	m_mcu->pa_w(data);
 	if (BIT(m_portc_data, 0))
@@ -4909,12 +4909,12 @@ WRITE8_MEMBER(blitz_state::mcu_command_w)
 	}
 }
 
-WRITE8_MEMBER(blitz_state::mcu_portb_w)
+void blitz_state::mcu_portb_w(uint8_t data)
 {
 	m_cpubank_xor = data;
 }
 
-WRITE8_MEMBER(blitz_state::mcu_portc_w)
+void blitz_state::mcu_portc_w(uint8_t data)
 {
 	if (!BIT(data, 0))
 	{
@@ -11227,6 +11227,9 @@ ROM_START( witchcdj )
 	ROM_LOAD( "3.7a",   0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
 	ROM_IGNORE(                 0x0800) /* identical halves */
 
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise the game is not working
+	ROM_LOAD( "witchcdj_nvram.bin", 0x0000, 0x0800, CRC(39766c6a) SHA1(9de4c5886d1ee12898f7d3b0224ab99d49e5e43d) )
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
@@ -12109,7 +12112,7 @@ GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init
 GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
 GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
-GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1)",                         0 )
+GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
 
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )

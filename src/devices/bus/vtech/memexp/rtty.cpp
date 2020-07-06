@@ -63,9 +63,9 @@ void vtech_rtty_interface_device::device_reset()
 	program_space().install_rom(0x4000, 0x4fff, 0x1000, memregion("software")->base());
 
 	// data
-	program_space().install_read_handler(0x5000, 0x57ff, read8_delegate(*this, FUNC(vtech_rtty_interface_device::receive_data_r)));
-	program_space().install_write_handler(0x5800, 0x5fff, write8_delegate(*this, FUNC(vtech_rtty_interface_device::transmit_data_w)));
-	program_space().install_write_handler(0x6000, 0x67ff, write8_delegate(*this, FUNC(vtech_rtty_interface_device::relay_w)));
+	program_space().install_read_handler(0x5000, 0x57ff, read8smo_delegate(*this, FUNC(vtech_rtty_interface_device::receive_data_r)));
+	program_space().install_write_handler(0x5800, 0x5fff, write8smo_delegate(*this, FUNC(vtech_rtty_interface_device::transmit_data_w)));
+	program_space().install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(vtech_rtty_interface_device::relay_w)));
 }
 
 
@@ -73,17 +73,17 @@ void vtech_rtty_interface_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( vtech_rtty_interface_device::receive_data_r )
+uint8_t vtech_rtty_interface_device::receive_data_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( vtech_rtty_interface_device::transmit_data_w )
+void vtech_rtty_interface_device::transmit_data_w(uint8_t data)
 {
 	logerror("transmit_w: %d\n", BIT(data, 7));
 }
 
-WRITE8_MEMBER( vtech_rtty_interface_device::relay_w )
+void vtech_rtty_interface_device::relay_w(uint8_t data)
 {
 	logerror("relay_w: %d\n", BIT(data, 7));
 }

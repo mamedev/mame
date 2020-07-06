@@ -1180,30 +1180,30 @@ private:
 	uint8_t m_jvssense;
 	uint8_t m_tssio_port_4;
 
-	DECLARE_READ16_MEMBER(s12_mcu_p6_r);
-	DECLARE_READ16_MEMBER(iob_p4_r);
-	DECLARE_READ16_MEMBER(iob_p6_r);
-	DECLARE_WRITE16_MEMBER(iob_p4_w);
+	uint16_t s12_mcu_p6_r();
+	uint16_t iob_p4_r();
+	uint16_t iob_p6_r();
+	void iob_p4_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(sharedram_w);
-	DECLARE_READ16_MEMBER(sharedram_r);
-	DECLARE_WRITE16_MEMBER(bankoffset_w);
-	DECLARE_WRITE16_MEMBER(dmaoffset_w);
-	DECLARE_WRITE16_MEMBER(system11gun_w);
-	DECLARE_READ16_MEMBER(system11gun_r);
-	DECLARE_WRITE16_MEMBER(tektagt_protection_1_w);
-	DECLARE_READ16_MEMBER(tektagt_protection_1_r);
-	DECLARE_WRITE16_MEMBER(tektagt_protection_2_w);
-	DECLARE_READ16_MEMBER(tektagt_protection_2_r);
-	DECLARE_READ16_MEMBER(tektagt_protection_3_r);
-	DECLARE_READ16_MEMBER(s12_mcu_p8_r);
-	DECLARE_READ16_MEMBER(s12_mcu_jvs_p8_r);
-	DECLARE_READ16_MEMBER(s12_mcu_pa_r);
-	DECLARE_WRITE16_MEMBER(s12_mcu_pa_w);
-	DECLARE_READ16_MEMBER(s12_mcu_portB_r);
-	DECLARE_WRITE16_MEMBER(s12_mcu_portB_w);
-	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
-	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
+	void sharedram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sharedram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void bankoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dmaoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void system11gun_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t system11gun_r(offs_t offset, uint16_t mem_mask = ~0);
+	void tektagt_protection_1_w(offs_t offset, uint16_t data);
+	uint16_t tektagt_protection_1_r(offs_t offset);
+	void tektagt_protection_2_w(offs_t offset, uint16_t data);
+	uint16_t tektagt_protection_2_r(offs_t offset);
+	uint16_t tektagt_protection_3_r();
+	uint16_t s12_mcu_p8_r();
+	uint16_t s12_mcu_jvs_p8_r();
+	uint16_t s12_mcu_pa_r();
+	void s12_mcu_pa_w(uint16_t data);
+	uint16_t s12_mcu_portB_r();
+	void s12_mcu_portB_w(uint16_t data);
+	uint16_t s12_mcu_gun_h_r();
+	uint16_t s12_mcu_gun_v_r();
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -1240,19 +1240,19 @@ inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char
 	}
 }
 
-WRITE16_MEMBER(namcos12_state::sharedram_w)
+void namcos12_state::sharedram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &m_sharedram[ offset ] );
 }
 
-READ16_MEMBER(namcos12_state::sharedram_r)
+uint16_t namcos12_state::sharedram_r(offs_t offset, uint16_t mem_mask)
 {
 	verboselog(1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, m_sharedram[ offset ] );
 	return m_sharedram[ offset ];
 }
 
-WRITE16_MEMBER(namcos12_state::bankoffset_w)
+void namcos12_state::bankoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Golgo 13 has different banking (maybe the keycus controls it?)
 	if(m_alt_bank)
@@ -1276,7 +1276,7 @@ WRITE16_MEMBER(namcos12_state::bankoffset_w)
 	verboselog(1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
 
-WRITE16_MEMBER(namcos12_state::dmaoffset_w)
+void namcos12_state::dmaoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_n_dmaoffset = ( offset * 2 ) | ( data << 16 );
 
@@ -1387,7 +1387,7 @@ void namcos12_state::tektagt_map(address_map &map)
 	map(0x1f700000, 0x1f700003).r(FUNC(namcos12_state::tektagt_protection_3_r));
 }
 
-WRITE16_MEMBER(namcos12_state::system11gun_w)
+void namcos12_state::system11gun_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1412,7 +1412,7 @@ WRITE16_MEMBER(namcos12_state::system11gun_w)
 	}
 }
 
-READ16_MEMBER(namcos12_state::system11gun_r)
+uint16_t namcos12_state::system11gun_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1446,7 +1446,7 @@ READ16_MEMBER(namcos12_state::system11gun_r)
 	return data;
 }
 
-WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
+void namcos12_state::tektagt_protection_1_w(offs_t offset, uint16_t data)
 {
 	// Second dma offset or protection ref values write
 
@@ -1467,7 +1467,7 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
 	}
 }
 
-READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
+uint16_t namcos12_state::tektagt_protection_1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1481,7 +1481,7 @@ READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
+void namcos12_state::tektagt_protection_2_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -1494,7 +1494,7 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
 	}
 }
 
-READ16_MEMBER(namcos12_state::tektagt_protection_2_r)
+uint16_t namcos12_state::tektagt_protection_2_r(offs_t offset)
 {
 	if( m_ttt_cnt == 2 )
 	{
@@ -1528,7 +1528,7 @@ READ16_MEMBER(namcos12_state::tektagt_protection_2_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos12_state::tektagt_protection_3_r)
+uint16_t namcos12_state::tektagt_protection_3_r()
 {
 	m_has_tektagt_dma = 1;
 	// Always ignored
@@ -1537,8 +1537,7 @@ READ16_MEMBER(namcos12_state::tektagt_protection_3_r)
 
 void namcos12_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	bankoffset_w(space,0,0,0xffff);
+	bankoffset_w(0,0,0xffff);
 
 	m_jvssense = 1;
 	m_tssio_port_4 = 0;
@@ -1581,7 +1580,7 @@ void namcos12_state::s12h8rwjvsmap(address_map &map)
 	map(0x300030, 0x300031).noprw(); // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
+uint16_t namcos12_state::s12_mcu_p8_r()
 {
 	return 0x02;
 }
@@ -1590,37 +1589,37 @@ READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
 // in System 12, bit 0 of H8/3002 port A is connected to its chip enable
 // the actual I/O takes place through the H8/3002's serial port B.
 
-READ16_MEMBER(namcos12_state::s12_mcu_pa_r)
+uint16_t namcos12_state::s12_mcu_pa_r()
 {
 	return m_sub_porta;
 }
 
-WRITE16_MEMBER(namcos12_state::s12_mcu_pa_w)
+void namcos12_state::s12_mcu_pa_w(uint16_t data)
 {
 	m_sub_porta = data;
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
 	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_portB_r)
+uint16_t namcos12_state::s12_mcu_portB_r()
 {
 	return m_sub_portb;
 }
 
-WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
+void namcos12_state::s12_mcu_portB_w(uint16_t data)
 {
 	m_sub_portb = (m_sub_portb & 0x80) | (data & 0x7f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
 	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_p6_r)
+uint16_t namcos12_state::s12_mcu_p6_r()
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
+uint16_t namcos12_state::s12_mcu_jvs_p8_r()
 {
 	return 0x12;    // bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
 }
@@ -1666,12 +1665,12 @@ void namcos12_state::s12h8railiomap(address_map &map)
 
 // Golgo 13 lightgun inputs
 
-READ16_MEMBER(namcos12_state::s12_mcu_gun_h_r)
+uint16_t namcos12_state::s12_mcu_gun_h_r()
 {
 	return m_lightgun_io[0]->read();
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
+uint16_t namcos12_state::s12_mcu_gun_v_r()
 {
 	return m_lightgun_io[1]->read();
 }
@@ -1839,12 +1838,12 @@ void namcos12_boothack_state::truckk(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
 
-READ16_MEMBER(namcos12_state::iob_p4_r)
+uint16_t namcos12_state::iob_p4_r()
 {
 	return m_tssio_port_4;
 }
 
-WRITE16_MEMBER(namcos12_state::iob_p4_w)
+void namcos12_state::iob_p4_w(uint16_t data)
 {
 	m_tssio_port_4 = data;
 
@@ -1852,7 +1851,7 @@ WRITE16_MEMBER(namcos12_state::iob_p4_w)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
 
-READ16_MEMBER(namcos12_state::iob_p6_r)
+uint16_t namcos12_state::iob_p6_r()
 {
 	// d4 is service button
 	uint8_t sb = (m_service_io->read() & 1) << 4;

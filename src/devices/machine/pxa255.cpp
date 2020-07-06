@@ -52,7 +52,7 @@ pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, cons
 
 */
 
-READ32_MEMBER(pxa255_periphs_device::i2s_r)
+uint32_t pxa255_periphs_device::i2s_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
@@ -84,7 +84,7 @@ READ32_MEMBER(pxa255_periphs_device::i2s_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pxa255_periphs_device::i2s_w)
+void pxa255_periphs_device::i2s_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
@@ -307,7 +307,7 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_dma_end)
 	dma_irq_check();
 }
 
-READ32_MEMBER(pxa255_periphs_device::dma_r)
+uint32_t pxa255_periphs_device::dma_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
@@ -363,7 +363,7 @@ READ32_MEMBER(pxa255_periphs_device::dma_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pxa255_periphs_device::dma_w)
+void pxa255_periphs_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
@@ -467,7 +467,7 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::ostimer_match)
 	ostimer_irq_check();
 }
 
-READ32_MEMBER(pxa255_periphs_device::ostimer_r)
+uint32_t pxa255_periphs_device::ostimer_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
@@ -504,7 +504,7 @@ READ32_MEMBER(pxa255_periphs_device::ostimer_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pxa255_periphs_device::ostimer_w)
+void pxa255_periphs_device::ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
@@ -595,7 +595,7 @@ void pxa255_periphs_device::set_irq_line(uint32_t line, int irq_state)
 	update_interrupts();
 }
 
-READ32_MEMBER(pxa255_periphs_device::intc_r)
+uint32_t pxa255_periphs_device::intc_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (PXA255_INTC_BASE_ADDR | (offset << 2))
 	{
@@ -624,7 +624,7 @@ READ32_MEMBER(pxa255_periphs_device::intc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pxa255_periphs_device::intc_w)
+void pxa255_periphs_device::intc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (PXA255_INTC_BASE_ADDR | (offset << 2))
 	{
@@ -663,25 +663,25 @@ WRITE32_MEMBER(pxa255_periphs_device::intc_w)
 
 */
 
-READ32_MEMBER(pxa255_periphs_device::gpio_r)
+uint32_t pxa255_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
 		{
-			const uint32_t value = (m_gpio_regs.gplr0 & m_gpio_regs.gpdr0) | m_gpio0_r(space, 0, ~m_gpio_regs.gpdr0);
+			const uint32_t value = (m_gpio_regs.gplr0 & m_gpio_regs.gpdr0) | m_gpio0_r(0, ~m_gpio_regs.gpdr0);
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", m_gpio_regs.gplr0, mem_mask);
 			return value;
 		}
 		case PXA255_GPLR1:
 		{
-			const uint32_t value = (m_gpio_regs.gplr1 & m_gpio_regs.gpdr1) | m_gpio1_r(space, 0, ~m_gpio_regs.gpdr1);
+			const uint32_t value = (m_gpio_regs.gplr1 & m_gpio_regs.gpdr1) | m_gpio1_r(0, ~m_gpio_regs.gpdr1);
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_r: GPIO Pin-Level Register 1: %08x & %08x\n", m_gpio_regs.gplr1, mem_mask);
 			return value;
 		}
 		case PXA255_GPLR2:
 		{
-			const uint32_t value = (m_gpio_regs.gplr2 & m_gpio_regs.gpdr2) | m_gpio2_r(space, 0, ~m_gpio_regs.gpdr2);
+			const uint32_t value = (m_gpio_regs.gplr2 & m_gpio_regs.gpdr2) | m_gpio2_r(0, ~m_gpio_regs.gpdr2);
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_r: GPIO Pin-Level Register 2: %08x & %08x\n", m_gpio_regs.gplr2, mem_mask);
 			return value;
 		}
@@ -764,7 +764,7 @@ READ32_MEMBER(pxa255_periphs_device::gpio_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pxa255_periphs_device::gpio_w)
+void pxa255_periphs_device::gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
@@ -792,32 +792,32 @@ WRITE32_MEMBER(pxa255_periphs_device::gpio_w)
 		case PXA255_GPSR0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr0 |= data & m_gpio_regs.gpdr0;
-			m_gpio0_w(space, 0, data, m_gpio_regs.gpdr0);
+			m_gpio0_w(0, data, m_gpio_regs.gpdr0);
 			break;
 		case PXA255_GPSR1:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Set Register 1: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr1 |= data & m_gpio_regs.gpdr1;
-			m_gpio1_w(space, 0, data, m_gpio_regs.gpdr1);
+			m_gpio1_w(0, data, m_gpio_regs.gpdr1);
 			break;
 		case PXA255_GPSR2:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Set Register 2: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr2 |= data & m_gpio_regs.gpdr2;
-			m_gpio2_w(space, 0, data, m_gpio_regs.gpdr2);
+			m_gpio2_w(0, data, m_gpio_regs.gpdr2);
 			break;
 		case PXA255_GPCR0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr0 &= ~(data & m_gpio_regs.gpdr0);
-			m_gpio0_w(space, 0, data, m_gpio_regs.gpdr0);
+			m_gpio0_w(0, data, m_gpio_regs.gpdr0);
 			break;
 		case PXA255_GPCR1:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Clear Register 1: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr1 &= ~(data & m_gpio_regs.gpdr1);
-			m_gpio1_w(space, 0, data, m_gpio_regs.gpdr1);
+			m_gpio1_w(0, data, m_gpio_regs.gpdr1);
 			break;
 		case PXA255_GPCR2:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Clear Register 2: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr2 &= ~(data & m_gpio_regs.gpdr2);
-			m_gpio2_w(space, 0, data, m_gpio_regs.gpdr2);
+			m_gpio2_w(0, data, m_gpio_regs.gpdr2);
 			break;
 		case PXA255_GRER0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", data, mem_mask);
@@ -999,7 +999,7 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::lcd_dma_eof)
 	lcd_irq_check();
 }
 
-READ32_MEMBER(pxa255_periphs_device::lcd_r)
+uint32_t pxa255_periphs_device::lcd_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
@@ -1064,7 +1064,7 @@ READ32_MEMBER(pxa255_periphs_device::lcd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pxa255_periphs_device::lcd_w)
+void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
 	{

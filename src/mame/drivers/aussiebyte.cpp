@@ -43,15 +43,15 @@
 
 ************************************************************/
 
-void aussiebyte_state::aussiebyte_map(address_map &map)
+void aussiebyte_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
 	map(0x4000, 0x7fff).bankrw("bank1");
 	map(0x8000, 0xbfff).bankrw("bank2");
-	map(0xc000, 0xffff).ram().region("mram", 0x0000);
+	map(0xc000, 0xffff).bankrw("bank3");
 }
 
-void aussiebyte_state::aussiebyte_io(address_map &map)
+void aussiebyte_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -97,7 +97,7 @@ INPUT_PORTS_END
     I/O Ports
 
 ************************************************************/
-WRITE8_MEMBER( aussiebyte_state::port15_w )
+void aussiebyte_state::port15_w(u8 data)
 {
 	membank("bankr0")->set_entry(m_port15); // point at ram
 	m_port15 = true;
@@ -115,7 +115,7 @@ WRITE8_MEMBER( aussiebyte_state::port15_w )
 5 Disable 5.25 inch floppy spindle motors.
 6 Unused.
 7 Enable write precompensation on WD2797 controller. */
-WRITE8_MEMBER( aussiebyte_state::port16_w )
+void aussiebyte_state::port16_w(u8 data)
 {
 	floppy_image_device *m_floppy = nullptr;
 	if ((data & 15) == 0)
@@ -142,7 +142,7 @@ WRITE8_MEMBER( aussiebyte_state::port16_w )
 5 - SIO Ch D
 6 - Ext ready 1
 7 - Ext ready 2 */
-WRITE8_MEMBER( aussiebyte_state::port17_w )
+void aussiebyte_state::port17_w(u8 data)
 {
 	m_port17 = data & 7;
 	m_dma->rdy_w(BIT(m_port17_rdy, data));
@@ -151,19 +151,19 @@ WRITE8_MEMBER( aussiebyte_state::port17_w )
 /* FDC params
 2 EXC: WD2797 clock frequency. H = 5.25"; L = 8"
 3 WIEN: WD2797 Double density select. */
-WRITE8_MEMBER( aussiebyte_state::port18_w )
+void aussiebyte_state::port18_w(u8 data)
 {
 	m_fdc->set_unscaled_clock(BIT(data, 2) ? 1e6 : 2e6);
 	m_fdc->dden_w(BIT(data, 3));
 }
 
-READ8_MEMBER( aussiebyte_state::port19_r )
+u8 aussiebyte_state::port19_r()
 {
 	return m_port19;
 }
 
 // Memory banking
-WRITE8_MEMBER( aussiebyte_state::port1a_w )
+void aussiebyte_state::port1a_w(u8 data)
 {
 	data &= 7;
 	switch (data)
@@ -208,23 +208,23 @@ WRITE8_MEMBER( aussiebyte_state::port1a_w )
 }
 
 // Winchester control
-WRITE8_MEMBER( aussiebyte_state::port1b_w )
+void aussiebyte_state::port1b_w(u8 data)
 {
 }
 
 // GPEHB control
-WRITE8_MEMBER( aussiebyte_state::port1c_w )
+void aussiebyte_state::port1c_w(u8 data)
 {
 }
 
-WRITE8_MEMBER( aussiebyte_state::port20_w )
+void aussiebyte_state::port20_w(u8 data)
 {
 	m_speaker->level_w(BIT(data, 7));
 	m_rtc->cs_w(BIT(data, 0));
 	m_rtc->hold_w(BIT(data, 0));
 }
 
-READ8_MEMBER( aussiebyte_state::port28_r )
+u8 aussiebyte_state::port28_r()
 {
 	return m_port28;
 }
@@ -234,16 +234,16 @@ READ8_MEMBER( aussiebyte_state::port28_r )
     RTC
 
 ************************************************************/
-READ8_MEMBER( aussiebyte_state::rtc_r )
+u8 aussiebyte_state::rtc_r(offs_t offset)
 {
 	m_rtc->read_w(1);
 	m_rtc->address_w(offset);
-	uint8_t data = m_rtc->data_r();
+	u8 data = m_rtc->data_r();
 	m_rtc->read_w(0);
 	return data;
 }
 
-WRITE8_MEMBER( aussiebyte_state::rtc_w )
+void aussiebyte_state::rtc_w(offs_t offset, u8 data)
 {
 	m_rtc->address_w(offset);
 	m_rtc->data_w(data);
@@ -256,25 +256,25 @@ WRITE8_MEMBER( aussiebyte_state::rtc_w )
     DMA
 
 ************************************************************/
-READ8_MEMBER( aussiebyte_state::memory_read_byte )
+u8 aussiebyte_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::memory_write_byte )
+void aussiebyte_state::memory_write_byte(offs_t offset, u8 data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER( aussiebyte_state::io_read_byte )
+u8 aussiebyte_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::io_write_byte )
+void aussiebyte_state::io_write_byte(offs_t offset, u8 data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -294,28 +294,28 @@ WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
 ************************************************************/
 WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdya_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xfd) | (uint8_t)(state << 1);
+	m_port17_rdy = (m_port17_rdy & 0xfd) | (u8)(state << 1);
 	if (m_port17 == 1)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdyb_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xfb) | (uint8_t)(state << 2);
+	m_port17_rdy = (m_port17_rdy & 0xfb) | (u8)(state << 2);
 	if (m_port17 == 2)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdya_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xef) | (uint8_t)(state << 4);
+	m_port17_rdy = (m_port17_rdy & 0xef) | (u8)(state << 4);
 	if (m_port17 == 4)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdyb_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xdf) | (uint8_t)(state << 5);
+	m_port17_rdy = (m_port17_rdy & 0xdf) | (u8)(state << 5);
 	if (m_port17 == 5)
 		m_dma->rdy_w(state);
 }
@@ -365,56 +365,22 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 /***********************************************************
 
-    CTC
-
-************************************************************/
-
-// baud rate generator. All inputs are 1.2288MHz.
-WRITE_LINE_MEMBER( aussiebyte_state::ctc_z2_w )
-{
-	m_ctc->trg3(1);
-	m_ctc->trg3(0);
-}
-
-/***********************************************************
-
-    Centronics ack
-
-************************************************************/
-WRITE_LINE_MEMBER( aussiebyte_state::write_centronics_busy )
-{
-	m_centronics_busy = state;
-}
-
-/***********************************************************
-
-    Speech ack
-
-************************************************************/
-WRITE_LINE_MEMBER( aussiebyte_state::votrax_w )
-{
-	m_port28 = state;
-}
-
-
-/***********************************************************
-
     Floppy Disk
 
 ************************************************************/
 
 WRITE_LINE_MEMBER( aussiebyte_state::fdc_intrq_w )
 {
-	uint8_t data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
+	u8 data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
 	m_port19 = data;
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
 {
-	uint8_t data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
+	u8 data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
 	m_port19 = data;
 	state ^= 1; // inverter on pin38 of fdc
-	m_port17_rdy = (m_port17_rdy & 0xfe) | (uint8_t)state;
+	m_port17_rdy = (m_port17_rdy & 0xfe) | (u8)state;
 	if (m_port17 == 0)
 		m_dma->rdy_w(state);
 }
@@ -457,9 +423,9 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
-	for (uint16_t i = 0; i < quickload_size; i++)
+	for (u16 i = 0; i < quickload_size; i++)
 	{
-		uint8_t data;
+		u8 data;
 		if (image.fread( &data, 1) != 1)
 			return image_init_result::FAIL;
 		prog_space.write_byte(i+0x100, data);
@@ -492,15 +458,52 @@ void aussiebyte_state::machine_reset()
 	membank("bankw0")->set_entry(1); // always write to ram
 	membank("bank1")->set_entry(2);
 	membank("bank2")->set_entry(3);
+	membank("bank3")->set_entry(0);
 	m_maincpu->reset();
 }
+
+void aussiebyte_state::machine_start()
+{
+	m_vram = std::make_unique<u8[]>(0x10000);
+	m_aram = std::make_unique<u8[]>(0x800);
+	m_ram = make_unique_clear<u8[]>(0x40000);
+	save_pointer(NAME(m_vram), 0x10000);
+	save_pointer(NAME(m_aram), 0x800);
+	save_pointer(NAME(m_ram),  0x40000);
+	save_item(NAME(m_port15));
+	save_item(NAME(m_port17));
+	save_item(NAME(m_port17_rdy));
+	save_item(NAME(m_port19));
+	save_item(NAME(m_port1a));
+	save_item(NAME(m_port28));
+	save_item(NAME(m_port34));
+	save_item(NAME(m_port35));
+	save_item(NAME(m_video_index));
+	save_item(NAME(m_cnt));
+	save_item(NAME(m_alpha_address));
+	save_item(NAME(m_graph_address));
+	save_item(NAME(m_centronics_busy));
+
+	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
+	// For convenience, bank 0 is permanently assigned to C000-FFFF
+	u8 *main = memregion("roms")->base();
+	u8 *ram = m_ram.get();
+
+	membank("bankr0")->configure_entries(0, 16, ram, 0x4000);
+	membank("bankw0")->configure_entries(0, 16, ram, 0x4000);
+	membank("bank1")->configure_entries(0, 16, ram, 0x4000);
+	membank("bank2")->configure_entries(0, 16, ram, 0x4000);
+	membank("bank3")->configure_entries(0, 1, ram, 0x4000);
+	membank("bankr0")->configure_entry(16, &main[0x0000]);
+}
+
 
 void aussiebyte_state::aussiebyte(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &aussiebyte_state::aussiebyte_map);
-	m_maincpu->set_addrmap(AS_IO, &aussiebyte_state::aussiebyte_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aussiebyte_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &aussiebyte_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
@@ -515,13 +518,13 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
-	m_votrax->ar_callback().set(FUNC(aussiebyte_state::votrax_w));
+	m_votrax->ar_callback().set([this] (bool state) { m_port28 = state ? 0 : 1; });
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer("cent_data_in");
-	m_centronics->busy_handler().set(FUNC(aussiebyte_state::write_centronics_busy));
+	m_centronics->busy_handler().set([this] (bool state) { m_centronics_busy = state; });
 	INPUT_BUFFER(config, "cent_data_in");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
@@ -536,7 +539,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	m_ctc->zc_callback<1>().set("sio1", FUNC(z80sio_device::rxtxcb_w));
 	m_ctc->zc_callback<1>().append("sio2", FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<1>().append("sio2", FUNC(z80sio_device::txca_w));
-	m_ctc->zc_callback<2>().set(FUNC(aussiebyte_state::ctc_z2_w));    // SIO2 Ch B, CTC Ch 3
+	m_ctc->zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg3));
 	m_ctc->zc_callback<2>().append("sio2", FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
@@ -597,21 +600,6 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 }
 
 
-void aussiebyte_state::machine_start()
-{
-	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
-	// For convenience, bank 0 is permanently assigned to C000-FFFF
-	uint8_t *main = memregion("roms")->base();
-	uint8_t *ram = memregion("mram")->base();
-
-	membank("bankr0")->configure_entries(0, 16, &ram[0x0000], 0x4000);
-	membank("bankw0")->configure_entries(0, 16, &ram[0x0000], 0x4000);
-	membank("bank1")->configure_entries(0, 16, &ram[0x0000], 0x4000);
-	membank("bank2")->configure_entries(0, 16, &ram[0x0000], 0x4000);
-	membank("bankr0")->configure_entry(16, &main[0x0000]);
-}
-
-
 /***********************************************************
 
     Game driver
@@ -625,11 +613,7 @@ ROM_START(aussieby)
 
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD( "8002.bin", 0x0000, 0x0800, CRC(fdd6eb13) SHA1(a094d416e66bdab916e72238112a6265a75ca690) )
-
-	ROM_REGION(0x40000, "mram", ROMREGION_ERASE00) // main ram, 256k dynamic
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) // video ram, 64k dynamic
-	ROM_REGION(0x00800, "aram", ROMREGION_ERASEFF) // attribute ram, 2k static
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY        FULLNAME          FLAGS
-COMP( 1984, aussieby, 0,      0,      aussiebyte, aussiebyte, aussiebyte_state, empty_init, "SME Systems", "Aussie Byte II", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, aussieby, 0,      0,      aussiebyte, aussiebyte, aussiebyte_state, empty_init, "SME Systems", "Aussie Byte II", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

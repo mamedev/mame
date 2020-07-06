@@ -13,10 +13,16 @@
 #include "m6502.h"
 #include "m6502d.h"
 
-DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "MOS Technology M6502")
+DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "MOS Technology 6502")
+DEFINE_DEVICE_TYPE(M6512, m6512_device, "m6512", "MOS Technology 6512")
 
 m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6502, tag, owner, clock)
+{
+}
+
+m6512_device::m6512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m6502_device(mconfig, M6512, tag, owner, clock)
 {
 }
 
@@ -31,18 +37,19 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 
 void m6502_device::device_start()
 {
-	mintf = std::make_unique<mi_default>();
+	mintf = space(AS_PROGRAM).addr_width() > 14 ? std::make_unique<mi_default>() : std::make_unique<mi_default14>();
 
 	init();
 }
 
 void m6502_device::init()
 {
-	mintf->program  = &space(AS_PROGRAM);
-	mintf->sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : mintf->program;
-
-	mintf->cache  = mintf->program->cache<0, 0, ENDIANNESS_LITTLE>();
-	mintf->scache = mintf->sprogram->cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(mintf->cprogram);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
+	if(space(AS_PROGRAM).addr_width() > 14)
+		space(AS_PROGRAM).specific(mintf->program);
+	else
+		space(AS_PROGRAM).specific(mintf->program14);
 
 	sync_w.resolve_safe();
 
@@ -522,24 +529,33 @@ void m6502_device::memory_interface::write_9(uint16_t adr, uint8_t val)
 
 uint8_t m6502_device::mi_default::read(uint16_t adr)
 {
-	return program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 uint8_t m6502_device::mi_default::read_sync(uint16_t adr)
 {
-	return scache->read_byte(adr);
+	return csprogram.read_byte(adr);
 }
 
 uint8_t m6502_device::mi_default::read_arg(uint16_t adr)
 {
-	return cache->read_byte(adr);
+	return cprogram.read_byte(adr);
 }
 
 void m6502_device::mi_default::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 }
 
+uint8_t m6502_device::mi_default14::read(uint16_t adr)
+{
+	return program14.read_byte(adr);
+}
+
+void m6502_device::mi_default14::write(uint16_t adr, uint8_t val)
+{
+	program14.write_byte(adr, val);
+}
 
 m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock)

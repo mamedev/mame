@@ -288,7 +288,7 @@ void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, c
 	draw_roz_helper(screen, bitmap, m_tilemap_roz, cliprect, &rozParam);
 }
 
-WRITE16_MEMBER(namcos2_roz_device::rozram_word_w)
+void namcos2_roz_device::rozram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_tilemap_roz->mark_tile_dirty(offset);

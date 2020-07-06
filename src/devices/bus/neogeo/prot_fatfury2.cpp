@@ -31,7 +31,7 @@ void fatfury2_prot_device::device_reset()
 
 /* the protection involves reading and writing addresses in the */
 /* 0x2xxxxx range. There are several checks all around the code. */
-READ16_MEMBER( fatfury2_prot_device::protection_r )
+uint16_t fatfury2_prot_device::protection_r(offs_t offset)
 {
 	uint16_t res = m_prot_data >> 24;
 
@@ -56,7 +56,7 @@ READ16_MEMBER( fatfury2_prot_device::protection_r )
 }
 
 
-WRITE16_MEMBER( fatfury2_prot_device::protection_w )
+void fatfury2_prot_device::protection_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{

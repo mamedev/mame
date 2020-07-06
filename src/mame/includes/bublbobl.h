@@ -94,30 +94,30 @@ public:
 	void bublbobl_bankswitch_w(uint8_t data);
 	void tokio_bankswitch_w(uint8_t data);
 	void tokio_videoctrl_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
-	DECLARE_READ8_MEMBER(tokiob_mcu_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_soundcpu_reset_w);
-	DECLARE_READ8_MEMBER(common_sound_semaphores_r);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr1_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr1_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr2_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr2_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr3_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr3_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr4_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr4_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port1_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_port2_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port2_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_port3_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port3_w);
-	DECLARE_READ8_MEMBER(bublbobl_mcu_port4_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port4_w);
-	DECLARE_READ8_MEMBER(boblbobl_ic43_a_r);
-	DECLARE_WRITE8_MEMBER(boblbobl_ic43_a_w);
-	DECLARE_WRITE8_MEMBER(boblbobl_ic43_b_w);
-	DECLARE_READ8_MEMBER(boblbobl_ic43_b_r);
+	void bublbobl_nmitrigger_w(uint8_t data);
+	uint8_t tokiob_mcu_r();
+	void bublbobl_soundcpu_reset_w(uint8_t data);
+	uint8_t common_sound_semaphores_r();
+	uint8_t bublbobl_mcu_ddr1_r();
+	void bublbobl_mcu_ddr1_w(uint8_t data);
+	uint8_t bublbobl_mcu_ddr2_r();
+	void bublbobl_mcu_ddr2_w(uint8_t data);
+	uint8_t bublbobl_mcu_ddr3_r();
+	void bublbobl_mcu_ddr3_w(uint8_t data);
+	uint8_t bublbobl_mcu_ddr4_r();
+	void bublbobl_mcu_ddr4_w(uint8_t data);
+	uint8_t bublbobl_mcu_port1_r();
+	void bublbobl_mcu_port1_w(uint8_t data);
+	uint8_t bublbobl_mcu_port2_r();
+	void bublbobl_mcu_port2_w(uint8_t data);
+	uint8_t bublbobl_mcu_port3_r();
+	void bublbobl_mcu_port3_w(uint8_t data);
+	uint8_t bublbobl_mcu_port4_r();
+	void bublbobl_mcu_port4_w(uint8_t data);
+	uint8_t boblbobl_ic43_a_r(offs_t offset);
+	void boblbobl_ic43_a_w(offs_t offset, uint8_t data);
+	void boblbobl_ic43_b_w(offs_t offset, uint8_t data);
+	uint8_t boblbobl_ic43_b_r(offs_t offset);
 
 	void init_dland();
 	void init_common();
@@ -168,8 +168,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	void port_a_w(uint8_t data);
+	void port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
 

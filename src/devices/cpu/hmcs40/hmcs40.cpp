@@ -251,6 +251,7 @@ void hmcs40_cpu_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_stack));
+	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));

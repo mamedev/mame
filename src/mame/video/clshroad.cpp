@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::vram_0_w)
+void clshroad_state::vram_0_w(offs_t offset, uint8_t data)
 {
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
@@ -192,7 +192,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::vram_1_w)
+void clshroad_state::vram_1_w(offs_t offset, uint8_t data)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset % 0x400);

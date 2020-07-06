@@ -230,13 +230,13 @@ public:
 	void init_kas89();
 
 private:
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(sound_comm_w);
-	DECLARE_WRITE8_MEMBER(int_ack_w);
-	DECLARE_WRITE8_MEMBER(led_mux_data_w);
-	DECLARE_WRITE8_MEMBER(led_mux_select_w);
+	void mux_w(uint8_t data);
+	uint8_t mux_r();
+	void control_w(uint8_t data);
+	void sound_comm_w(uint8_t data);
+	void int_ack_w(uint8_t data);
+	void led_mux_data_w(uint8_t data);
+	void led_mux_select_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
 	void audio_io(address_map &map);
@@ -290,7 +290,7 @@ void kas89_state::machine_reset()
 *  Input Ports Demux & Common Routines  *
 ****************************************/
 
-WRITE8_MEMBER(kas89_state::mux_w)
+void kas89_state::mux_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -302,7 +302,7 @@ WRITE8_MEMBER(kas89_state::mux_w)
 	m_mux_data = data;
 }
 
-READ8_MEMBER(kas89_state::mux_r)
+uint8_t kas89_state::mux_r()
 {
 	switch(m_mux_data)
 	{
@@ -337,7 +337,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_sound_nmi_cb)
 }
 
 
-WRITE8_MEMBER(kas89_state::control_w)
+void kas89_state::control_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -354,7 +354,7 @@ WRITE8_MEMBER(kas89_state::control_w)
 	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); /* Credits Out counter */
 }
 
-WRITE8_MEMBER(kas89_state::sound_comm_w)
+void kas89_state::sound_comm_w(uint8_t data)
 {
 /*  This port is used mainly for sound latch, but bit6 activates a
     sort of output port (maybe for a sign?)
@@ -363,7 +363,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
     bit6 = 1 ; outport data.
 
     Once the ball is landed, the outport writes the winner number
-    14 times (as an intermitent way).
+    14 times (as an intermittent way).
 
     When the attract starts, just before the game title appear, $3f
     is written to the outport... (maybe to clear the possible sign).
@@ -394,7 +394,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 	}
 }
 
-WRITE8_MEMBER(kas89_state::int_ack_w)
+void kas89_state::int_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
@@ -404,7 +404,7 @@ WRITE8_MEMBER(kas89_state::int_ack_w)
 *   Output Ports Demux & LEDs Support   *
 ****************************************/
 
-WRITE8_MEMBER(kas89_state::led_mux_data_w)
+void kas89_state::led_mux_data_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -414,7 +414,7 @@ WRITE8_MEMBER(kas89_state::led_mux_data_w)
 	m_leds_mux_data = data;
 }
 
-WRITE8_MEMBER(kas89_state::led_mux_select_w)
+void kas89_state::led_mux_select_w(uint8_t data)
 {
 /*  - bits -
     7654 3210

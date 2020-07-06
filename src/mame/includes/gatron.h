@@ -25,9 +25,9 @@ private:
 	output_finder<9> m_lamps;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(output_port_0_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(output_port_1_w);
+	void output_port_0_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void output_port_1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

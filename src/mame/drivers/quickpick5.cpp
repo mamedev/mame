@@ -57,21 +57,21 @@ private:
 
 	K05324X_CB_MEMBER(sprite_callback);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
+	void ccu_int_time_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	READ8_MEMBER(control_r) { return m_control; }
+	uint8_t control_r() { return m_control; }
 
 	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
-	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(offset^1);  }
-	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(offset^1, data); }
-	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(offset^1);  }
-	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(offset^1, data); }
+	uint8_t k244_r(offs_t offset) { return m_k053245->k053244_r(offset^1);  }
+	void k244_w(offs_t offset, uint8_t data) { m_k053245->k053244_w(offset^1, data); }
+	uint8_t k245_r(offs_t offset) { return m_k053245->k053245_r(offset^1);  }
+	void k245_w(offs_t offset, uint8_t data) { m_k053245->k053245_w(offset^1, data); }
 
-	WRITE8_MEMBER(control_w)
+	void control_w(uint8_t data)
 	{
 		membank("bank1")->set_entry(data&0x1);
 		if (((m_control & 0x60) != 0x60) && ((data & 0x60) == 0x60))
@@ -81,8 +81,8 @@ private:
 		m_control = data;
 	}
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 
 	void quickpick5_main(address_map &map);
 
@@ -107,13 +107,13 @@ private:
 	int         m_ccu_int_time, m_ccu_int_time_count;
 };
 
-WRITE8_MEMBER(quickpick5_state::ccu_int_time_w)
+void quickpick5_state::ccu_int_time_w(uint8_t data)
 {
 	logerror("ccu_int_time rewritten with value of %02x\n", data);
 	m_ccu_int_time = data;
 }
 
-READ8_MEMBER(quickpick5_state::vram_r)
+uint8_t quickpick5_state::vram_r(offs_t offset)
 {
 	if ((m_control & 0x10) == 0x10)
 	{
@@ -137,7 +137,7 @@ READ8_MEMBER(quickpick5_state::vram_r)
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(quickpick5_state::vram_w)
+void quickpick5_state::vram_w(offs_t offset, uint8_t data)
 {
 	if ((m_control & 0x10) == 0x10)
 	{

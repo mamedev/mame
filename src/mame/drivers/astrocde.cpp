@@ -141,20 +141,20 @@
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
+void astrocde_state::protected_ram_enable_w(uint8_t data)
 {
 	m_ram_write_enable = true;
 }
 
 
-READ8_MEMBER(astrocde_state::protected_ram_r)
+uint8_t astrocde_state::protected_ram_r(offs_t offset)
 {
 	m_ram_write_enable = false;
 	return m_protected_ram ? m_protected_ram[offset] : m_nvram[offset];
 }
 
 
-WRITE8_MEMBER(astrocde_state::protected_ram_w)
+void astrocde_state::protected_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_ram_write_enable)
 		(m_protected_ram ? m_protected_ram : m_nvram)[offset] = data;
@@ -169,7 +169,7 @@ WRITE8_MEMBER(astrocde_state::protected_ram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(seawolf2_state::sound_1_w)// Port 40
+void seawolf2_state::sound_1_w(uint8_t data) // Port 40
 {
 	uint8_t rising_bits = data & ~m_port_1_last;
 	m_port_1_last = data;
@@ -183,7 +183,7 @@ WRITE8_MEMBER(seawolf2_state::sound_1_w)// Port 40
 }
 
 
-WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
+void seawolf2_state::sound_2_w(uint8_t data) // Port 41
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 	m_port_2_last = data;
@@ -220,7 +220,7 @@ WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::input_mux_r)
+uint8_t astrocde_state::input_mux_r(offs_t offset)
 {
 	return m_handle[offset & 3].read_safe(0xff);
 }
@@ -253,13 +253,13 @@ CUSTOM_INPUT_MEMBER(ebases_state::trackball_r)
 }
 
 
-WRITE8_MEMBER(ebases_state::trackball_select_w)
+void ebases_state::trackball_select_w(uint8_t data)
 {
 	m_input_select = data & 3;
 }
 
 
-WRITE8_MEMBER(ebases_state::coin_w)
+void ebases_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER(astrocde_state::gorf_sound_switch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::demndrgn_banksw_w)
+void astrocde_state::demndrgn_banksw_w(uint8_t data)
 {
 	int bank = (data >> 5) & 3;
 	m_bank4000->set_bank(bank);
@@ -304,7 +304,7 @@ CUSTOM_INPUT_MEMBER(demndrgn_state::joystick_r)
 }
 
 
-WRITE8_MEMBER(demndrgn_state::sound_w)
+void demndrgn_state::sound_w(uint8_t data)
 {
 	logerror("Trigger sound sample 0x%02x\n",data);
 }
@@ -318,9 +318,9 @@ WRITE8_MEMBER(demndrgn_state::sound_w)
  *************************************/
 
 
-WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
+void astrocde_state::profpac_banksw_w(uint8_t data)
 {
-	demndrgn_banksw_w(space, 0, data);
+	demndrgn_banksw_w(data);
 
 	if (data & 0x80)
 	{
@@ -343,7 +343,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tenpindx_state::lamp_w)
+void tenpindx_state::lamp_w(offs_t offset, uint8_t data)
 {
 	/* lamps */
 	if (offset == 0)
@@ -365,14 +365,14 @@ WRITE8_MEMBER(tenpindx_state::lamp_w)
 }
 
 
-WRITE8_MEMBER(tenpindx_state::counter_w)
+void tenpindx_state::counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	if (data & 0xfc) osd_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
 
-WRITE8_MEMBER(tenpindx_state::lights_w)
+void tenpindx_state::lights_w(uint8_t data)
 {
 	/* "flashlights" */
 	int which = data >> 4;
@@ -395,7 +395,7 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::votrax_speech_w)
+void astrocde_state::votrax_speech_w(uint8_t data)
 {
 	m_votrax->inflection_w(data >> 6);
 	m_votrax->write(data & 0x3f);

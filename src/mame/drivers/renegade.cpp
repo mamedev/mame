@@ -133,13 +133,13 @@ $8000 - $ffff   ROM
 **  playback to work, but seems to be what the code expects
 */
 
-WRITE8_MEMBER(renegade_state::adpcm_start_w)
+void renegade_state::adpcm_start_w(uint8_t data)
 {
 	m_msm->reset_w(0);
 	m_adpcm_playing = true;
 }
 
-WRITE8_MEMBER(renegade_state::adpcm_addr_w)
+void renegade_state::adpcm_addr_w(uint8_t data)
 {
 	// table at $CB52 in audiocpu program:
 	// 38 38 39 3A 3B 34 35 36 37 2C 2D 2E 2F
@@ -159,7 +159,7 @@ WRITE8_MEMBER(renegade_state::adpcm_addr_w)
 	m_adpcm_end = m_adpcm_pos + 0x2000 * 2;
 }
 
-WRITE8_MEMBER(renegade_state::adpcm_stop_w)
+void renegade_state::adpcm_stop_w(uint8_t data)
 {
 	m_msm->reset_w(1);
 	m_adpcm_playing = false;
@@ -199,7 +199,7 @@ void renegade_state::machine_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(renegade_state::mcu_reset_r)
+uint8_t renegade_state::mcu_reset_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -225,7 +225,7 @@ CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 
 /********************************************************************************************/
 
-WRITE8_MEMBER(renegade_state::bankswitch_w)
+void renegade_state::bankswitch_w(uint8_t data)
 {
 	m_rombank->set_entry(data & 1);
 }
@@ -239,12 +239,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::nmi_ack_w)
+void renegade_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::irq_ack_w)
+void renegade_state::irq_ack_w(uint8_t data)
 {
 	if (data != 0xff)
 	{

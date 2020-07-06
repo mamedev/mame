@@ -193,6 +193,8 @@ files{
   MAME_DIR .. "src/mame/video/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
+	MAME_DIR .. "src/mame/audio/nl_280zzzap.cpp",
+	MAME_DIR .. "src/mame/audio/nl_280zzzap.h",
 
 	MAME_DIR .. "src/mame/audio/cheekyms.cpp",
 	MAME_DIR .. "src/mame/audio/cheekyms.h",
@@ -262,6 +264,7 @@ files{
 	MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
 	MAME_DIR .. "src/mame/drivers/bailey.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
+	MAME_DIR .. "src/mame/drivers/crazybal.cpp",
 	MAME_DIR .. "src/mame/drivers/electra.cpp",
 	MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
 	MAME_DIR .. "src/mame/drivers/fungames.cpp",

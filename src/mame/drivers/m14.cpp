@@ -86,14 +86,14 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_device<samples_device> m_samples;
 
-	DECLARE_WRITE8_MEMBER(m14_vram_w);
-	DECLARE_WRITE8_MEMBER(m14_cram_w);
-	DECLARE_READ8_MEMBER(m14_rng_r);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(ball_x_w);
-	DECLARE_WRITE8_MEMBER(ball_y_w);
-	DECLARE_WRITE8_MEMBER(paddle_x_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void m14_vram_w(offs_t offset, uint8_t data);
+	void m14_cram_w(offs_t offset, uint8_t data);
+	uint8_t m14_rng_r();
+	void output_w(uint8_t data);
+	void ball_x_w(uint8_t data);
+	void ball_y_w(uint8_t data);
+	void paddle_x_w(uint8_t data);
+	void sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -203,13 +203,13 @@ uint32_t m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE8_MEMBER(m14_state::m14_vram_w)
+void m14_state::m14_vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m14_state::m14_cram_w)
+void m14_state::m14_cram_w(offs_t offset, uint8_t data)
 {
 	m_color_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
@@ -221,14 +221,14 @@ WRITE8_MEMBER(m14_state::m14_cram_w)
  *
  *************************************/
 
-READ8_MEMBER(m14_state::m14_rng_r)
+uint8_t m14_state::m14_rng_r()
 {
 	/* graphic artifacts happens if this doesn't return random values. */
 	/* guess directly tied to screen frame number */
 	return (m_screen->frame_number() & 0x7f) | (ioport("IN1")->read() & 0x80);
 }
 
-WRITE8_MEMBER(m14_state::output_w)
+void m14_state::output_w(uint8_t data)
 {
 	/* ---- x--- active after calling a winning hand */
 	/* ---- --x- lamp? */
@@ -238,17 +238,17 @@ WRITE8_MEMBER(m14_state::output_w)
 	//popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(m14_state::ball_x_w)
+void m14_state::ball_x_w(uint8_t data)
 {
 	m_ballx = data;
 }
 
-WRITE8_MEMBER(m14_state::ball_y_w)
+void m14_state::ball_y_w(uint8_t data)
 {
 	m_bally = data;
 }
 
-WRITE8_MEMBER(m14_state::paddle_x_w)
+void m14_state::paddle_x_w(uint8_t data)
 {
 	m_paddlex = data;
 }
@@ -270,7 +270,7 @@ static const char *const m14_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER(m14_state::sound_w)
+void m14_state::sound_w(uint8_t data)
 {
 	switch(data)
 	{

@@ -35,11 +35,11 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_READ8_MEMBER(sysctl_r);
-	DECLARE_WRITE8_MEMBER(sysctl_w);
-	DECLARE_READ16_MEMBER(irqstat_r);
-	DECLARE_WRITE16_MEMBER(port50_w);
+	void beep_w(u8 data);
+	u8 sysctl_r(offs_t offset);
+	void sysctl_w(offs_t offset, u8 data);
+	u16 irqstat_r();
+	void port50_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(rtcirq_w);
 
 	void check_irq();
@@ -176,7 +176,7 @@ void magnum_state::machine_reset()
 	m_keybirq = false;
 }
 
-WRITE8_MEMBER(magnum_state::beep_w)
+void magnum_state::beep_w(u8 data)
 {
 	if (data & ~1) logerror("beep_w unmapped bits %02x\n", data);
 	m_beep->set_state(BIT(data, 0));
@@ -188,7 +188,7 @@ void magnum_state::magnum_map(address_map &map)
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
 }
 
-READ8_MEMBER(magnum_state::sysctl_r)
+u8 magnum_state::sysctl_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -205,7 +205,7 @@ READ8_MEMBER(magnum_state::sysctl_r)
 	return 0;
 }
 
-WRITE8_MEMBER(magnum_state::sysctl_w)
+void magnum_state::sysctl_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -239,7 +239,7 @@ WRITE8_MEMBER(magnum_state::sysctl_w)
  *      15- CRTC?
  */
 
-READ16_MEMBER(magnum_state::irqstat_r)
+u16 magnum_state::irqstat_r()
 {
 	u16 ret = m_wake ? 0 : 0x400;
 	ret |= m_rtcirq ? 0x40 : 0;
@@ -248,7 +248,7 @@ READ16_MEMBER(magnum_state::irqstat_r)
 	return ret;
 }
 
-WRITE16_MEMBER(magnum_state::port50_w)
+void magnum_state::port50_w(u16 data)
 {
 }
 

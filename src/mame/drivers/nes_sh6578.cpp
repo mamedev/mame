@@ -53,7 +53,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	WRITE8_MEMBER(sprite_dma_w);
+	void sprite_dma_w(address_space &space, uint8_t data);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -64,52 +64,52 @@ private:
 	required_device<nesapu_device> m_apu;
 	required_device<timer_device> m_timer;
 
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	uint8_t bankswitch_r(offs_t offset);
+	void bankswitch_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(dma_r);
-	DECLARE_WRITE8_MEMBER(dma_w);
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
 
 	uint8_t bank_r(int bank, uint16_t offset);
 	void bank_w(int bank, uint16_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(bank0_r) { return bank_r(0, offset); }
-	DECLARE_WRITE8_MEMBER(bank0_w) { bank_w(0, offset, data); }
-	DECLARE_READ8_MEMBER(bank1_r) { return bank_r(1, offset); }
-	DECLARE_WRITE8_MEMBER(bank1_w) { bank_w(1, offset, data); }
-	DECLARE_READ8_MEMBER(bank2_r) { return bank_r(2, offset); }
-	DECLARE_WRITE8_MEMBER(bank2_w) { bank_w(2, offset, data); }
-	DECLARE_READ8_MEMBER(bank3_r) { return bank_r(3, offset); }
-	DECLARE_WRITE8_MEMBER(bank3_w) { bank_w(3, offset, data); }
-	DECLARE_READ8_MEMBER(bank4_r) { return bank_r(4, offset); }
-	DECLARE_WRITE8_MEMBER(bank4_w) { bank_w(4, offset, data); }
-	DECLARE_READ8_MEMBER(bank5_r) { return bank_r(5, offset); }
-	DECLARE_WRITE8_MEMBER(bank5_w) { bank_w(5, offset, data); }
-	DECLARE_READ8_MEMBER(bank6_r) { return bank_r(6, offset); }
-	DECLARE_WRITE8_MEMBER(bank6_w) { bank_w(6, offset, data); }
-	DECLARE_READ8_MEMBER(bank7_r) { return bank_r(7, offset); }
-	DECLARE_WRITE8_MEMBER(bank7_w) { bank_w(7, offset, data); }
+	uint8_t bank0_r(offs_t offset) { return bank_r(0, offset); }
+	void bank0_w(offs_t offset, uint8_t data) { bank_w(0, offset, data); }
+	uint8_t bank1_r(offs_t offset) { return bank_r(1, offset); }
+	void bank1_w(offs_t offset, uint8_t data) { bank_w(1, offset, data); }
+	uint8_t bank2_r(offs_t offset) { return bank_r(2, offset); }
+	void bank2_w(offs_t offset, uint8_t data) { bank_w(2, offset, data); }
+	uint8_t bank3_r(offs_t offset) { return bank_r(3, offset); }
+	void bank3_w(offs_t offset, uint8_t data) { bank_w(3, offset, data); }
+	uint8_t bank4_r(offs_t offset) { return bank_r(4, offset); }
+	void bank4_w(offs_t offset, uint8_t data) { bank_w(4, offset, data); }
+	uint8_t bank5_r(offs_t offset) { return bank_r(5, offset); }
+	void bank5_w(offs_t offset, uint8_t data) { bank_w(5, offset, data); }
+	uint8_t bank6_r(offs_t offset) { return bank_r(6, offset); }
+	void bank6_w(offs_t offset, uint8_t data) { bank_w(6, offset, data); }
+	uint8_t bank7_r(offs_t offset) { return bank_r(7, offset); }
+	void bank7_w(offs_t offset, uint8_t data) { bank_w(7, offset, data); }
 
-	DECLARE_WRITE8_MEMBER(timing_setting_control_w);
-	DECLARE_WRITE8_MEMBER(initial_startup_w);
-	DECLARE_READ8_MEMBER(irq_status_r);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(timer_config_w);
-	DECLARE_WRITE8_MEMBER(timer_value_w);
+	void timing_setting_control_w(uint8_t data);
+	void initial_startup_w(uint8_t data);
+	uint8_t irq_status_r();
+	void irq_mask_w(uint8_t data);
+	void timer_config_w(uint8_t data);
+	void timer_value_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(io0_r);
-	DECLARE_READ8_MEMBER(io1_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io0_r();
+	uint8_t io1_r();
+	void io_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(psg1_4014_r);
-	DECLARE_READ8_MEMBER(psg1_4015_r);
-	DECLARE_WRITE8_MEMBER(psg1_4015_w);
-	DECLARE_WRITE8_MEMBER(psg1_4017_w);
-	DECLARE_READ8_MEMBER(apu_read_mem);
+	uint8_t psg1_4014_r();
+	uint8_t psg1_4015_r();
+	void psg1_4015_w(uint8_t data);
+	void psg1_4017_w(uint8_t data);
+	uint8_t apu_read_mem(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 
-	int m_iniital_startup_state;
+	int m_initial_startup_state;
 
 	uint8_t m_bankswitch[8];
 
@@ -158,22 +158,22 @@ void nes_sh6578_state::bank_w(int bank, uint16_t offset, uint8_t data)
 	m_fullrom->write8(address, data);
 }
 
-WRITE8_MEMBER(nes_sh6578_state::sprite_dma_w)
+void nes_sh6578_state::sprite_dma_w(address_space &space, uint8_t data)
 {
 	m_ppu->spriteram_dma(space, data);
 }
 
-READ8_MEMBER(nes_sh6578_state::bankswitch_r)
+uint8_t nes_sh6578_state::bankswitch_r(offs_t offset)
 {
 	return m_bankswitch[offset];
 }
 
-WRITE8_MEMBER(nes_sh6578_state::bankswitch_w)
+void nes_sh6578_state::bankswitch_w(offs_t offset, uint8_t data)
 {
 	m_bankswitch[offset] = data;
 }
 
-READ8_MEMBER(nes_sh6578_state::dma_r)
+uint8_t nes_sh6578_state::dma_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -240,7 +240,7 @@ void nes_sh6578_state::do_dma()
 	//m_dma_length[1] = 0;
 }
 
-WRITE8_MEMBER(nes_sh6578_state::dma_w)
+void nes_sh6578_state::dma_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -288,53 +288,53 @@ WRITE8_MEMBER(nes_sh6578_state::dma_w)
 }
 
 
-WRITE8_MEMBER(nes_sh6578_state::initial_startup_w)
+void nes_sh6578_state::initial_startup_w(uint8_t data)
 {
 	// there is also a timeframe in which this must happen
 	// if the writes are not correct the system does not operate
-	if (m_iniital_startup_state == 0)
+	if (m_initial_startup_state == 0)
 	{
 		if (data == 0x65)
 		{
 			logerror("initial_startup_w VALID first write (0x65)\n");
-			m_iniital_startup_state = 1;
+			m_initial_startup_state = 1;
 		}
 		else
 		{
 			logerror("initial_startup_w invalid first write (not 0x65)\n");
-			m_iniital_startup_state = -1;
+			m_initial_startup_state = -1;
 		}
 	}
-	else if (m_iniital_startup_state == 1)
+	else if (m_initial_startup_state == 1)
 	{
 		if (data == 0x76)
 		{
 			logerror("initial_startup_w VALID second write (0x76)\n");
-			m_iniital_startup_state = 2;
+			m_initial_startup_state = 2;
 		}
 		else
 		{
 			logerror("initial_startup_w invalid second write (not 0x76)\n");
-			m_iniital_startup_state = -1;
+			m_initial_startup_state = -1;
 		}
 	}
-	else if (m_iniital_startup_state == 2)
+	else if (m_initial_startup_state == 2)
 	{
 		logerror("initial_startup_w invalid write (already passed) (%02x)\n", data);
 	}
-	else if (m_iniital_startup_state == -1)
+	else if (m_initial_startup_state == -1)
 	{
 		logerror("initial_startup_w invalid write (already failed) (%02x)\n", data);
 	}
 }
 
-READ8_MEMBER(nes_sh6578_state::irq_status_r)
+uint8_t nes_sh6578_state::irq_status_r()
 {
 	logerror("%s: nes_sh6578_state::irq_status_r\n", machine().describe_context());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(nes_sh6578_state::irq_mask_w)
+void nes_sh6578_state::irq_mask_w(uint8_t data)
 {
 	m_irqmask = data;
 
@@ -342,7 +342,7 @@ WRITE8_MEMBER(nes_sh6578_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(nes_sh6578_state::timer_config_w)
+void nes_sh6578_state::timer_config_w(uint8_t data)
 {
 	logerror("%s: nes_sh6578_state::timer_config_w : %02x (at pos y: %d x: %d )\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos() );
 
@@ -356,34 +356,34 @@ WRITE8_MEMBER(nes_sh6578_state::timer_config_w)
 	}
 }
 
-WRITE8_MEMBER(nes_sh6578_state::timer_value_w)
+void nes_sh6578_state::timer_value_w(uint8_t data)
 {
 	logerror("%s: nes_sh6578_state::timer_value_w : %02x\n", machine().describe_context(), data);
 	m_timerval = data;
 }
 
 
-WRITE8_MEMBER(nes_sh6578_state::timing_setting_control_w)
+void nes_sh6578_state::timing_setting_control_w(uint8_t data)
 {
 	logerror("%s: nes_sh6578_state::timing_setting_control_w : %02x\n", machine().describe_context(), data);
 }
 
 
-READ8_MEMBER(nes_sh6578_state::io0_r)
+uint8_t nes_sh6578_state::io0_r()
 {
 	uint8_t ret = m_iolatch[0] & 0x01;
 	m_iolatch[0] >>= 1;
 	return ret;
 }
 
-READ8_MEMBER(nes_sh6578_state::io1_r)
+uint8_t nes_sh6578_state::io1_r()
 {
 	uint8_t ret = m_iolatch[1] & 0x01;
 	m_iolatch[1] >>= 1;
 	return ret;
 }
 
-WRITE8_MEMBER(nes_sh6578_state::io_w)
+void nes_sh6578_state::io_w(uint8_t data)
 {
 	if ((data != 0x00) && (data != 0x01) && (data != 0x02) && (data != 0x03))
 		logerror("%s: io_w : unexpected value : %02x\n", machine().describe_context(), data);
@@ -407,22 +407,22 @@ WRITE8_MEMBER(nes_sh6578_state::io_w)
 }
 
 
-READ8_MEMBER(nes_sh6578_state::psg1_4014_r)
+uint8_t nes_sh6578_state::psg1_4014_r()
 {
 	return m_apu->read(0x14);
 }
 
-READ8_MEMBER(nes_sh6578_state::psg1_4015_r)
+uint8_t nes_sh6578_state::psg1_4015_r()
 {
 	return m_apu->read(0x15);
 }
 
-WRITE8_MEMBER(nes_sh6578_state::psg1_4015_w)
+void nes_sh6578_state::psg1_4015_w(uint8_t data)
 {
 	m_apu->write(0x15, data);
 }
 
-WRITE8_MEMBER(nes_sh6578_state::psg1_4017_w)
+void nes_sh6578_state::psg1_4017_w(uint8_t data)
 {
 	m_apu->write(0x17, data);
 }
@@ -432,7 +432,7 @@ WRITE_LINE_MEMBER(nes_sh6578_state::apu_irq)
 	// unimplemented
 }
 
-READ8_MEMBER(nes_sh6578_state::apu_read_mem)
+uint8_t nes_sh6578_state::apu_read_mem(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
@@ -503,7 +503,7 @@ void nes_sh6578_state::machine_reset()
 	for (int i = 0; i < 8; i++)
 		m_bankswitch[i] = i;
 
-	m_iniital_startup_state = 0;
+	m_initial_startup_state = 0;
 	m_bank->set_entry(0);
 
 	m_irqmask = 0xff;
@@ -577,7 +577,7 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
 
-	TIMER(config, m_timer).configure_periodic(FUNC(nes_sh6578_state::timer_expired), attotime::never);
+	TIMER(config, m_timer).configure_generic(FUNC(nes_sh6578_state::timer_expired));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

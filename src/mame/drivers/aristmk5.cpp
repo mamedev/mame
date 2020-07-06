@@ -705,28 +705,28 @@ public:
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
-	DECLARE_WRITE32_MEMBER(Ns5w48);
-	DECLARE_READ32_MEMBER(Ns5x58);
-	DECLARE_READ32_MEMBER(Ns5r50);
-	DECLARE_WRITE8_MEMBER(sram_banksel_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(eeprom_usa_w);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_WRITE8_MEMBER(rtc_usa_w);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_READ8_MEMBER(ldor_r);
-	DECLARE_WRITE8_MEMBER(ldor_clk_w);
-	DECLARE_WRITE8_MEMBER(buttons_lamps_w);
-	DECLARE_WRITE8_MEMBER(other_lamps_w);
-	DECLARE_WRITE8_MEMBER(bill_acceptor_lamps_w);
-	DECLARE_READ8_MEMBER(sram_r);
-	DECLARE_WRITE8_MEMBER(sram_w);
-	DECLARE_WRITE8_MEMBER(spi_mux_w);
-	DECLARE_WRITE8_MEMBER(spi_data_w);
-	DECLARE_READ8_MEMBER(spi_int_ack_r);
-	DECLARE_WRITE8_MEMBER(spi_int_ack_w);
-	DECLARE_READ8_MEMBER(spi_data_r);
+	void Ns5w48(uint32_t data);
+	uint32_t Ns5x58();
+	uint32_t Ns5r50();
+	void sram_banksel_w(uint8_t data);
+	void eeprom_w(uint8_t data);
+	void eeprom_usa_w(uint8_t data);
+	void rtc_w(uint8_t data);
+	void rtc_usa_w(uint8_t data);
+	void hopper_w(uint8_t data);
+	uint8_t eeprom_r();
+	uint8_t ldor_r();
+	void ldor_clk_w(uint8_t data);
+	void buttons_lamps_w(offs_t offset, uint8_t data);
+	void other_lamps_w(uint8_t data);
+	void bill_acceptor_lamps_w(uint8_t data);
+	uint8_t sram_r(offs_t offset);
+	void sram_w(offs_t offset, uint8_t data);
+	void spi_mux_w(uint8_t data);
+	void spi_data_w(uint8_t data);
+	uint8_t spi_int_ack_r();
+	void spi_int_ack_w(uint8_t data);
+	uint8_t spi_data_r();
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
 
 	virtual void machine_start() override;
@@ -767,7 +767,7 @@ private:
 };
 
 
-WRITE8_MEMBER(aristmk5_state::spi_mux_w)
+void aristmk5_state::spi_mux_w(uint8_t data)
 {
 	uint8_t spi_mux = (data >> 4) & 7;
 
@@ -812,7 +812,7 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 	}
 }
 
-WRITE8_MEMBER(aristmk5_state::spi_data_w)
+void aristmk5_state::spi_data_w(uint8_t data)
 {
 	m_spi_latch = data;
 	m_spi_bits = 0;
@@ -821,18 +821,18 @@ WRITE8_MEMBER(aristmk5_state::spi_data_w)
 	m_spi_timer->adjust(attotime::from_hz(MASTER_CLOCK / 9 / 512 / 2), 0, attotime::from_hz(MASTER_CLOCK / 9 / 512 / 2));
 }
 
-READ8_MEMBER(aristmk5_state::spi_data_r)
+uint8_t aristmk5_state::spi_data_r()
 {
 	return m_spi_latch;
 }
 
-READ8_MEMBER(aristmk5_state::spi_int_ack_r)
+uint8_t aristmk5_state::spi_int_ack_r()
 {
 	archimedes_clear_irq_b(0x08);
 	return 0;
 }
 
-WRITE8_MEMBER(aristmk5_state::spi_int_ack_w)
+void aristmk5_state::spi_int_ack_w(uint8_t data)
 {
 	archimedes_clear_irq_b(0x08);
 }
@@ -877,17 +877,17 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 	m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
-READ8_MEMBER(aristmk5_state::sram_r)
+uint8_t aristmk5_state::sram_r(offs_t offset)
 {
 	return m_sram->base()[(m_sram_bank << 14) | (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(aristmk5_state::sram_w)
+void aristmk5_state::sram_w(offs_t offset, uint8_t data)
 {
 	m_sram->base()[(m_sram_bank << 14) | (offset & 0x3fff)] = data;
 }
 
-WRITE32_MEMBER(aristmk5_state::Ns5w48)
+void aristmk5_state::Ns5w48(uint32_t data)
 {
 	/*
 	There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
@@ -952,7 +952,7 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
 
 }
 
-READ32_MEMBER(aristmk5_state::Ns5x58)
+uint32_t aristmk5_state::Ns5x58()
 {
 	/*
 	    1953.125 Hz for the operating system timer interrupt
@@ -979,12 +979,12 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 	return 0xffffffff;
 }
 
-READ32_MEMBER(aristmk5_state::Ns5r50)
+uint32_t aristmk5_state::Ns5r50()
 {
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
-READ8_MEMBER(aristmk5_state::eeprom_r)
+uint8_t aristmk5_state::eeprom_r()
 {
 	uint8_t data = 0x00;
 	if (m_eeprom[0]->do_read() && m_eeprom[1]->do_read())
@@ -996,13 +996,13 @@ READ8_MEMBER(aristmk5_state::eeprom_r)
 	return data;
 }
 
-WRITE8_MEMBER(aristmk5_state::hopper_w)
+void aristmk5_state::hopper_w(uint8_t data)
 {
 	m_hopper->motor_w(BIT(data, 1));
 	m_hopper_test = BIT(data, 2);
 }
 
-WRITE8_MEMBER(aristmk5_state::rtc_w)
+void aristmk5_state::rtc_w(uint8_t data)
 {
 	m_rtc->ce_w(BIT(data, 5));
 
@@ -1012,13 +1012,13 @@ WRITE8_MEMBER(aristmk5_state::rtc_w)
 	m_rtc->sclk_w(BIT(data, 4));
 }
 
-WRITE8_MEMBER(aristmk5_state::rtc_usa_w)
+void aristmk5_state::rtc_usa_w(uint8_t data)
 {
-	rtc_w(space, offset, data, mem_mask);
+	rtc_w(data);
 	m_hopper_test = BIT(data, 2);
 }
 
-WRITE8_MEMBER(aristmk5_state::eeprom_w)
+void aristmk5_state::eeprom_w(uint8_t data)
 {
 	m_coin_div = data & 1;
 
@@ -1030,13 +1030,13 @@ WRITE8_MEMBER(aristmk5_state::eeprom_w)
 	m_eeprom[1]->clk_write(BIT(data, 4));
 }
 
-WRITE8_MEMBER(aristmk5_state::eeprom_usa_w)
+void aristmk5_state::eeprom_usa_w(uint8_t data)
 {
-	eeprom_w(space, offset, data, mem_mask);
+	eeprom_w(data);
 	m_hopper->motor_w(BIT(data, 2));
 }
 
-READ8_MEMBER(aristmk5_state::ldor_r)
+uint8_t aristmk5_state::ldor_r()
 {
 	if (m_extra_ports->read() & 0x01)
 		m_ldor_shift_reg = 0;   // open the Logic door clears the shift register
@@ -1044,12 +1044,12 @@ READ8_MEMBER(aristmk5_state::ldor_r)
 	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && m_hopper->line_r()) ? 0x10 : 0x00);
 }
 
-WRITE8_MEMBER(aristmk5_state::ldor_clk_w)
+void aristmk5_state::ldor_clk_w(uint8_t data)
 {
 	m_ldor_shift_reg = (m_ldor_shift_reg << 1) | BIT(data, 0);
 }
 
-WRITE8_MEMBER(aristmk5_state::sram_banksel_w)
+void aristmk5_state::sram_banksel_w(uint8_t data)
 {
 	/*
 
@@ -1108,19 +1108,19 @@ WRITE8_MEMBER(aristmk5_state::sram_banksel_w)
 	m_sram_bank = ((data & 0xc0) >> 3) | (data & 0x07);
 }
 
-WRITE8_MEMBER(aristmk5_state::buttons_lamps_w)
+void aristmk5_state::buttons_lamps_w(offs_t offset, uint8_t data)
 {
 	for(int i = 0; i < 8; i++)
 		m_lamps[(offset >> 2) * 8 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(aristmk5_state::other_lamps_w)
+void aristmk5_state::other_lamps_w(uint8_t data)
 {
 	for(int i = 0; i < 8; i++)
 		m_lamps[16 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
+void aristmk5_state::bill_acceptor_lamps_w(uint8_t data)
 {
 	for(int i = 0; i < 8; i++)
 		m_lamps[24 + i] = BIT(data, i);

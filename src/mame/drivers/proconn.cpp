@@ -59,72 +59,72 @@ public:
 	void init_proconn();
 
 private:
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(N, data); }
+	template <unsigned N> void ay_w(uint8_t data) { m_ay->address_data_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(N, data); }
+	template <unsigned N> void ctc_w(uint8_t data) { m_z80ctc->write(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(N, data); }
+	template <unsigned N> void sio_w(uint8_t data) { m_z80sio->cd_ba_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio1_w ) { m_z80pio[0]->write(N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio2_w ) { m_z80pio[1]->write(N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio3_w ) { m_z80pio[2]->write(N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(N, data); }
+	template <unsigned N> void pio1_w(uint8_t data) { m_z80pio[0]->write(N, data); }
+	template <unsigned N> void pio2_w(uint8_t data) { m_z80pio[1]->write(N, data); }
+	template <unsigned N> void pio3_w(uint8_t data) { m_z80pio[2]->write(N, data); }
+	template <unsigned N> void pio4_w(uint8_t data) { m_z80pio[3]->write(N, data); }
+	template <unsigned N> void pio5_w(uint8_t data) { m_z80pio[4]->write(N, data); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(N); }
+	template <unsigned N> uint8_t ctc_r() { return m_z80ctc->read(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(N); }
+	template <unsigned N> uint8_t sio_r() { return m_z80sio->cd_ba_r(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( pio1_r ) { return m_z80pio[0]->read(N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio2_r ) { return m_z80pio[1]->read(N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio3_r ) { return m_z80pio[2]->read(N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio4_r ) { return m_z80pio[3]->read(N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio5_r ) { return m_z80pio[4]->read(N); }
+	template <unsigned N> uint8_t pio1_r() { return m_z80pio[0]->read(N); }
+	template <unsigned N> uint8_t pio2_r() { return m_z80pio[1]->read(N); }
+	template <unsigned N> uint8_t pio3_r() { return m_z80pio[2]->read(N); }
+	template <unsigned N> uint8_t pio4_r() { return m_z80pio[3]->read(N); }
+	template <unsigned N> uint8_t pio5_r() { return m_z80pio[4]->read(N); }
 
 	/* PIO 1 */
 
 	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_int_w)    { /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_1_m_in_pa_r)           { logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return machine().rand(); }
-	DECLARE_WRITE8_MEMBER(pio_1_m_out_pa_w)         { logerror("pio_1_m_out_pa_w %02x\n", data); }
+	uint8_t pio_1_m_in_pa_r()           { logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return machine().rand(); }
+	void pio_1_m_out_pa_w(uint8_t data) { logerror("pio_1_m_out_pa_w %02x\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_ardy_w)   { logerror("pio_1_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_1_m_in_pb_r)           { logerror("pio_1_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_1_m_out_pb_w)         { logerror("pio_1_m_out_pb_w %02x (REELS)\n", data); }
+	uint8_t pio_1_m_in_pb_r()           { logerror("pio_1_m_in_pb_r\n"); return 0x00; }
+	void pio_1_m_out_pb_w(uint8_t data) { logerror("pio_1_m_out_pb_w %02x (REELS)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_brdy_w)   { logerror("pio_1_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 2 */
 	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_int_w)    { /* logerror("pio_2_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_2_m_in_pa_r)           { logerror("pio_2_m_in_pa_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_2_m_out_pa_w)         { logerror("pio_2_m_out_pa_w %02x\n", data); }
+	uint8_t pio_2_m_in_pa_r()           { logerror("pio_2_m_in_pa_r\n"); return 0x00; }
+	void pio_2_m_out_pa_w(uint8_t data) { logerror("pio_2_m_out_pa_w %02x\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_ardy_w)   { logerror("pio_2_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_2_m_in_pb_r)           { logerror("pio_2_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_2_m_out_pb_w)         { logerror("pio_2_m_out_pb_w %02x (ALPHA)\n", data); }
+	uint8_t pio_2_m_in_pb_r()           { logerror("pio_2_m_in_pb_r\n"); return 0x00; }
+	void pio_2_m_out_pb_w(uint8_t data) { logerror("pio_2_m_out_pb_w %02x (ALPHA)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_brdy_w)   { logerror("pio_2_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 3 */
 	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_int_w)    { /* logerror("pio_3_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_3_m_in_pa_r)           { logerror("pio_3_m_in_pa_r (REEL OPTICS)\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_3_m_out_pa_w)         { logerror("pio_3_m_out_pa_w %02x (STROBE)\n", data); }
+	uint8_t pio_3_m_in_pa_r()           { logerror("pio_3_m_in_pa_r (REEL OPTICS)\n"); return 0x00; }
+	void pio_3_m_out_pa_w(uint8_t data) { logerror("pio_3_m_out_pa_w %02x (STROBE)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_ardy_w)   { logerror("pio_3_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_3_m_in_pb_r)           { logerror("pio_3_m_in_pb_r (COIN INPUT)\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_3_m_out_pb_w)         { logerror("pio_3_m_out_pb_w %02x\n", data); }
+	uint8_t pio_3_m_in_pb_r()           { logerror("pio_3_m_in_pb_r (COIN INPUT)\n"); return 0x00; }
+	void pio_3_m_out_pb_w(uint8_t data) { logerror("pio_3_m_out_pb_w %02x\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_brdy_w)   { logerror("pio_3_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 4 */
 	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_int_w)    { /* logerror("pio_4_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_4_m_in_pa_r)           { logerror("pio_4_m_in_pa_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_4_m_out_pa_w)         { logerror("pio_4_m_out_pa_w %02x (TRIAC)\n", data); }
+	uint8_t pio_4_m_in_pa_r()           { logerror("pio_4_m_in_pa_r\n"); return 0x00; }
+	void pio_4_m_out_pa_w(uint8_t data) { logerror("pio_4_m_out_pa_w %02x (TRIAC)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_ardy_w)   { logerror("pio_4_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_4_m_in_pb_r)           { logerror("pio_4_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_4_m_out_pb_w)         { logerror("pio_4_m_out_pb_w %02x (7SEG)\n", data); }
+	uint8_t pio_4_m_in_pb_r()           { logerror("pio_4_m_in_pb_r\n"); return 0x00; }
+	void pio_4_m_out_pb_w(uint8_t data) { logerror("pio_4_m_out_pb_w %02x (7SEG)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_brdy_w)   { logerror("pio_4_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 5 */
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_int_w)    { /* logerror("pio_5_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_5_m_in_pa_r)           { logerror("pio_5_m_in_pa_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_5_m_out_pa_w)         { logerror("pio_5_m_out_pa_w %02x (LAMPS0)\n", data); }
+	uint8_t pio_5_m_in_pa_r()           { logerror("pio_5_m_in_pa_r\n"); return 0x00; }
+	void pio_5_m_out_pa_w(uint8_t data) { logerror("pio_5_m_out_pa_w %02x (LAMPS0)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_ardy_w)   { logerror("pio_5_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_5_m_in_pb_r)           { logerror("pio_5_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)         { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
+	uint8_t pio_5_m_in_pb_r()           { logerror("pio_5_m_in_pb_r\n"); return 0x00; }
+	void pio_5_m_out_pb_w(uint8_t data) { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
 	void proconn_map(address_map &map);
@@ -141,9 +141,9 @@ private:
 
 	int m_meter;
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_WRITE16_MEMBER(serial_transmit);
-	DECLARE_READ16_MEMBER(serial_receive);
+	void meter_w(uint8_t data);
+	void serial_transmit(offs_t offset, uint16_t data);
+	uint16_t serial_receive(offs_t offset);
 };
 
 void proconn_state::proconn_map(address_map &map)
@@ -216,7 +216,7 @@ void proconn_state::proconn_portmap(address_map &map)
 static INPUT_PORTS_START( proconn )
 INPUT_PORTS_END
 
-WRITE16_MEMBER(proconn_state::serial_transmit)
+void proconn_state::serial_transmit(offs_t offset, uint16_t data)
 {
 //Don't like the look of this, should be a clock somewhere
 
@@ -233,13 +233,13 @@ WRITE16_MEMBER(proconn_state::serial_transmit)
 	}
 }
 
-READ16_MEMBER(proconn_state::serial_receive)
+uint16_t proconn_state::serial_receive(offs_t offset)
 {
 	logerror("proconn serial receive read %x",offset);
 	return -1;
 }
 
-WRITE8_MEMBER(proconn_state::meter_w)
+void proconn_state::meter_w(uint8_t data)
 {
 	for (int i=0; i<8; i++)
 	{

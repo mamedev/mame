@@ -259,7 +259,7 @@ INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
+uint8_t homedata_state::mrokumei_keyboard_r(offs_t offset)
 {
 	int res = 0x3f,i;
 
@@ -293,13 +293,13 @@ READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_keyboard_select_w)
+void homedata_state::mrokumei_keyboard_select_w(uint8_t data)
 {
 	m_keyb = data;
 }
 
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
+void homedata_state::mrokumei_sound_bank_w(uint8_t data)
 {
 	/* bit 0 = ROM bank
 	   bit 2 = ROM or soundlatch
@@ -307,7 +307,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 	m_mrokumei_soundbank->set_bank(data & 7);
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
+void homedata_state::mrokumei_sound_cmd_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -322,17 +322,17 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::reikaids_upd7807_porta_r)
+uint8_t homedata_state::reikaids_upd7807_porta_r()
 {
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_porta_w)
+void homedata_state::reikaids_upd7807_porta_w(uint8_t data)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
+void homedata_state::reikaids_upd7807_portc_w(uint8_t data)
 {
 	/* port C layout:
 	   7 coin counter
@@ -359,7 +359,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	m_upd7807_portc = data;
 }
 
-READ8_MEMBER(homedata_state::reikaids_io_r)
+uint8_t homedata_state::reikaids_io_r()
 {
 	int res = ioport("IN2")->read();    // bit 4 = coin, bit 5 = service
 
@@ -385,7 +385,7 @@ READ8_MEMBER(homedata_state::reikaids_io_r)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::pteacher_io_r)
+uint8_t homedata_state::pteacher_io_r()
 {
 	/* bit 6: !vblank
 	 * bit 7: visible page
@@ -402,7 +402,7 @@ READ8_MEMBER(homedata_state::pteacher_io_r)
 	return res;
 }
 
-READ8_MEMBER(homedata_state::pteacher_keyboard_r)
+uint8_t homedata_state::pteacher_keyboard_r()
 {
 	int dips = ioport("DSW")->read();
 
@@ -424,7 +424,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	return 0xff;
 }
 
-READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
+uint8_t homedata_state::pteacher_upd7807_porta_r()
 {
 	if (!BIT(m_upd7807_portc, 6))
 		m_upd7807_porta = m_soundlatch->read();
@@ -434,12 +434,12 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
+void homedata_state::pteacher_upd7807_porta_w(uint8_t data)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
+void homedata_state::pteacher_upd7807_portc_w(uint8_t data)
 {
 	/* port C layout:
 	   7 coin counter
@@ -467,7 +467,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 /********************************************************************************/
 
 
-WRITE8_MEMBER(homedata_state::bankswitch_w)
+void homedata_state::bankswitch_w(uint8_t data)
 {
 	int last_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
@@ -1235,10 +1235,8 @@ MACHINE_RESET_MEMBER(homedata_state,mrokumei)
 
 MACHINE_RESET_MEMBER(homedata_state,pteacher)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(space, 0, 0xff);
+	pteacher_upd7807_portc_w(0xff);
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 
@@ -1249,10 +1247,8 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 
 MACHINE_RESET_MEMBER(homedata_state,reikaids)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	reikaids_upd7807_portc_w(space, 0, 0xff);
+	reikaids_upd7807_portc_w(0xff);
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 
@@ -1478,13 +1474,13 @@ void homedata_state::cpu1_map(address_map &map)
 }
 
 
-READ8_MEMBER(homedata_state::mirderby_prot_r)
+uint8_t homedata_state::mirderby_prot_r()
 {
 	m_prot_data&=0x7f;
 	return m_prot_data++;
 }
 
-WRITE8_MEMBER(homedata_state::mirderby_prot_w)
+void homedata_state::mirderby_prot_w(uint8_t data)
 {
 	m_prot_data = data;
 }

@@ -473,8 +473,8 @@ void hp9845_base_state::device_reset()
 
 	// Then, set r/w handlers of all installed I/O cards
 	int sc;
-	read16_delegate rhandler(*this);
-	write16_delegate whandler(*this);
+	read16m_delegate rhandler(*this);
+	write16m_delegate whandler(*this);
 	for (unsigned i = 0; 4 > i; ++i) {
 		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
 			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
@@ -622,17 +622,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 		memcpy(&m_kb_state[ 0 ] , &input[ 0 ] , sizeof(m_kb_state));
 }
 
-READ16_MEMBER(hp9845_base_state::kb_scancode_r)
+uint16_t hp9845_base_state::kb_scancode_r()
 {
 		return ~m_kb_scancode & 0x7f;
 }
 
-READ16_MEMBER(hp9845_base_state::kb_status_r)
+uint16_t hp9845_base_state::kb_status_r()
 {
 		return m_kb_status;
 }
 
-WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
+void hp9845_base_state::kb_irq_clear_w(uint16_t data)
 {
 		BIT_CLR(m_kb_status, 0);
 		update_kb_prt_irq();
@@ -755,8 +755,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -820,7 +820,7 @@ void hp9845b_state::machine_reset()
 	update_graphic_bits();
 }
 
-READ16_MEMBER(hp9845b_state::graphic_r)
+uint16_t hp9845b_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -859,7 +859,7 @@ READ16_MEMBER(hp9845b_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845b_state::graphic_w)
+void hp9845b_state::graphic_w(offs_t offset, uint16_t data)
 {
 		//logerror("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -1983,8 +1983,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -1993,7 +1993,6 @@ private:
 	void graphic_video_render(unsigned video_scanline);
 	virtual void plot(uint16_t x, uint16_t y, bool draw_erase) override;
 
-	void check_io_counter_restore();
 	void advance_io_counter();
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits() override;
@@ -2012,7 +2011,6 @@ private:
 	uint16_t m_gv_music_memory;
 	uint8_t m_gv_cursor_color;
 	uint8_t m_gv_plane;
-	bool m_gv_plane_wrap;
 	bool m_gv_lp_int_latched;
 	bool m_gv_sk_int_latched;
 };
@@ -2076,12 +2074,11 @@ void hp9845c_state::machine_reset()
 	// TODO: correct?
 	m_gv_cursor_color = 7;
 	m_gv_plane = 0;
-	m_gv_plane_wrap = false;
 	m_gv_lp_int_latched = false;
 	m_gv_sk_int_latched = false;
 }
 
-READ16_MEMBER(hp9845c_state::graphic_r)
+uint16_t hp9845c_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -2133,7 +2130,7 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845c_state::graphic_w)
+void hp9845c_state::graphic_w(offs_t offset, uint16_t data)
 {
 	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -2402,21 +2399,6 @@ void hp9845c_state::plot(uint16_t x, uint16_t y, bool draw_erase)
 	}
 }
 
-void hp9845c_state::check_io_counter_restore()
-{
-	if (m_gv_last_cmd != m_gv_cmd) {
-		// restore memory counter
-		m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
-		// no auto-increment when switching commands
-		if (m_gv_plane_wrap) {
-			m_gv_plane = 2;
-		} else if (m_gv_plane > 0) {
-			m_gv_plane--;
-		}
-		m_gv_last_cmd = m_gv_cmd;
-	}
-}
-
 void hp9845c_state::advance_io_counter()
 {
 	m_gv_plane++;
@@ -2427,7 +2409,6 @@ void hp9845c_state::advance_io_counter()
 		} else {
 			m_gv_plane = 2;
 		}
-		m_gv_plane_wrap = true;
 	}
 }
 
@@ -2450,22 +2431,18 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			// inital state (same as GV_STAT_RESET), command received
 			if (m_gv_cmd == 0x1) {
 				// read words command
-				check_io_counter_restore();
-				LOG("read words, last = %x\n", m_gv_last_cmd);
-				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;    // -> read stream
-				m_gv_last_cmd = m_gv_cmd;
+				LOG("read words\n");
+				m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;
 			} else if (ds) {
 				if ((m_gv_cmd == 0x0) || (m_gv_cmd == 0x2)) {
 					// write words & clear/set words commands
-					check_io_counter_restore();
-					if (m_gv_cmd == 0x2) LOG("clear/set words, last = %x\n", m_gv_last_cmd);
-					else LOG("write words, last = %x\n", m_gv_last_cmd);
+					if (m_gv_cmd == 0x2) LOG("clear/set words\n");
+					else LOG("write words\n");
 					m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;   // -> write stream
 				} else {
 					// any other command
 					m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;   // -> wait for trigger
 				}
-				m_gv_last_cmd = m_gv_cmd;
 			} else {
 				get_out = true;
 			}
@@ -2475,19 +2452,18 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			// process data on R4 or R6
 			if (act_trig) {
 				switch (m_gv_cmd) {
+				case 1: // read words command
+					break;
 				case 0x8:   // load X I/O address
 					m_gv_word_x_position = ~m_gv_data_w & 0x3f;     // 0..34
 					LOG("load X I/O adress = %04x\n", m_gv_word_x_position);
 					m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 					m_gv_plane = 0;
-					m_gv_plane_wrap = false;
 					break;
 				case 0x9:   // load Y I/O address
 					m_gv_word_y_position = ~m_gv_data_w & 0x1ff;    // 0..454
 					LOG("load Y I/O adress = %04x\n", m_gv_word_y_position);
 					m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
-					m_gv_plane = 0;
-					m_gv_plane_wrap = false;
 					break;
 				case 0xa:   // load memory control
 					m_gv_memory_control = m_gv_data_w & 0x7f;
@@ -2518,7 +2494,9 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 				default:
 					logerror("unknown 98770A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w);
 				}
-				if (m_gv_cmd == 0xd) {
+				if (m_gv_cmd == 1) {    // Read words
+					m_gv_fsm_state = GV_STAT_WAIT_MEM_0;
+				} else if (m_gv_cmd == 0xd) {
 					m_gv_fsm_state = GV_STAT_WAIT_DS_2;     // -> get second data word
 				} else {
 					get_out = true;
@@ -2548,7 +2526,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			// wait for data word to be read
 			if (ds) {
 				// -- next word
-				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;    // -> process data word
+				m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;    // -> process data word
 			} else {
 				// -- done
 				get_out = true;
@@ -2721,8 +2699,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -2792,7 +2770,7 @@ void hp9845t_state::machine_reset()
 	set_video_mar(0);
 }
 
-READ16_MEMBER(hp9845t_state::graphic_r)
+uint16_t hp9845t_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -2848,7 +2826,7 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845t_state::graphic_w)
+void hp9845t_state::graphic_w(offs_t offset, uint16_t data)
 {
 	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 

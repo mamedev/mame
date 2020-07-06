@@ -59,14 +59,14 @@ WRITE_LINE_MEMBER(gaelco_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(gaelco_state::oki_bankswitch_w)
+void gaelco_state::oki_bankswitch_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
 
 /*********** Squash Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::vram_encrypted_w)
+void gaelco_state::vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -74,7 +74,7 @@ WRITE16_MEMBER(gaelco_state::vram_encrypted_w)
 }
 
 
-WRITE16_MEMBER(gaelco_state::encrypted_w)
+void gaelco_state::encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -83,14 +83,14 @@ WRITE16_MEMBER(gaelco_state::encrypted_w)
 
 /*********** Thunder Hoop Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
+void gaelco_state::thoop_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	vram_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
+void gaelco_state::thoop_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
@@ -327,11 +327,11 @@ static INPUT_PORTS_START( biomtoy )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Lives in Reserve" ) PORT_DIPLOCATION("SW2:4,3") // Test mode doesn't show the value of the lives given, but of the ones after you die the first time
-	PORT_DIPSETTING(    0x20, "0" )
-	PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPSETTING(    0x30, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4,3") // Test mode doesn't show the value of the lives given, but of the ones after you die the first time
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )

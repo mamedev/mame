@@ -39,7 +39,7 @@ void m90_state::machine_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(m90_state::coincounter_w)
+void m90_state::coincounter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -50,14 +50,14 @@ WRITE16_MEMBER(m90_state::coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
+void m90_state::quizf1_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_mainbank->set_entry(data & 0xf);
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(m90_state::unknown_w)
+void m90_state::unknown_w(uint16_t data)
 {
 	printf("%04x    ",data);
 }

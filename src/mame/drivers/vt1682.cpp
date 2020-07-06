@@ -239,120 +239,120 @@ private:
 	uint8_t m_2030;
 
 
-	DECLARE_READ8_MEMBER(vt1682_2000_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2000_w);
+	uint8_t vt1682_2000_r();
+	void vt1682_2000_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2001_vblank_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2001_w);
+	uint8_t vt1682_2001_vblank_r();
+	void vt1682_2001_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2002_sprramaddr_2_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2002_sprramaddr_2_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2003_sprramaddr_10_3_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2003_sprramaddr_10_3_w);
-	DECLARE_READ8_MEMBER(vt1682_2004_sprram_data_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2004_sprram_data_w);
+	uint8_t vt1682_2002_sprramaddr_2_0_r();
+	void vt1682_2002_sprramaddr_2_0_w(uint8_t data);
+	uint8_t vt1682_2003_sprramaddr_10_3_r();
+	void vt1682_2003_sprramaddr_10_3_w(uint8_t data);
+	uint8_t vt1682_2004_sprram_data_r();
+	void vt1682_2004_sprram_data_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2005_vramaddr_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2005_vramaddr_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2006_vramaddr_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2006_vramaddr_15_8_w);
-	DECLARE_READ8_MEMBER(vt1682_2007_vram_data_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2007_vram_data_w);
+	uint8_t vt1682_2005_vramaddr_7_0_r();
+	void vt1682_2005_vramaddr_7_0_w(uint8_t data);
+	uint8_t vt1682_2006_vramaddr_15_8_r();
+	void vt1682_2006_vramaddr_15_8_w(uint8_t data);
+	uint8_t vt1682_2007_vram_data_r();
+	void vt1682_2007_vram_data_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_201a_sp_segment_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_201a_sp_segment_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_201b_sp_segment_11_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_201b_sp_segment_11_8_w);
+	uint8_t vt1682_201a_sp_segment_7_0_r();
+	void vt1682_201a_sp_segment_7_0_w(uint8_t data);
+	uint8_t vt1682_201b_sp_segment_11_8_r();
+	void vt1682_201b_sp_segment_11_8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_201c_bk1_segment_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_201c_bk1_segment_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_201d_bk1_segment_11_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_201d_bk1_segment_11_8_w);
-	DECLARE_READ8_MEMBER(vt1682_201e_bk2_segment_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_201e_bk2_segment_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_201f_bk2_segment_11_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_201f_bk2_segment_11_8_w);
+	uint8_t vt1682_201c_bk1_segment_7_0_r();
+	void vt1682_201c_bk1_segment_7_0_w(uint8_t data);
+	uint8_t vt1682_201d_bk1_segment_11_8_r();
+	void vt1682_201d_bk1_segment_11_8_w(uint8_t data);
+	uint8_t vt1682_201e_bk2_segment_7_0_r();
+	void vt1682_201e_bk2_segment_7_0_w(uint8_t data);
+	uint8_t vt1682_201f_bk2_segment_11_8_r();
+	void vt1682_201f_bk2_segment_11_8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2013_bk1_main_control_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2013_bk1_main_control_w);
-	DECLARE_READ8_MEMBER(vt1682_2017_bk2_main_control_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2017_bk2_main_control_w);
+	uint8_t vt1682_2013_bk1_main_control_r();
+	void vt1682_2013_bk1_main_control_w(uint8_t data);
+	uint8_t vt1682_2017_bk2_main_control_r();
+	void vt1682_2017_bk2_main_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2012_bk1_scroll_control_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2012_bk1_scroll_control_w);
-	DECLARE_READ8_MEMBER(vt1682_2016_bk2_scroll_control_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2016_bk2_scroll_control_w);
+	uint8_t vt1682_2012_bk1_scroll_control_r();
+	void vt1682_2012_bk1_scroll_control_w(uint8_t data);
+	uint8_t vt1682_2016_bk2_scroll_control_r();
+	void vt1682_2016_bk2_scroll_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2010_bk1_xscroll_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2010_bk1_xscroll_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2011_bk1_yscoll_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2011_bk1_yscoll_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2014_bk2_xscroll_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2014_bk2_xscroll_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2015_bk2_yscoll_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2015_bk2_yscoll_7_0_w);
+	uint8_t vt1682_2010_bk1_xscroll_7_0_r();
+	void vt1682_2010_bk1_xscroll_7_0_w(uint8_t data);
+	uint8_t vt1682_2011_bk1_yscoll_7_0_r();
+	void vt1682_2011_bk1_yscoll_7_0_w(uint8_t data);
+	uint8_t vt1682_2014_bk2_xscroll_7_0_r();
+	void vt1682_2014_bk2_xscroll_7_0_w(uint8_t data);
+	uint8_t vt1682_2015_bk2_yscoll_7_0_r();
+	void vt1682_2015_bk2_yscoll_7_0_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_200e_blend_pal_sel_r);
-	DECLARE_WRITE8_MEMBER(vt1682_200e_blend_pal_sel_w);
-	DECLARE_READ8_MEMBER(vt1682_200f_bk_pal_sel_r);
-	DECLARE_WRITE8_MEMBER(vt1682_200f_bk_pal_sel_w);
+	uint8_t vt1682_200e_blend_pal_sel_r();
+	void vt1682_200e_blend_pal_sel_w(uint8_t data);
+	uint8_t vt1682_200f_bk_pal_sel_r();
+	void vt1682_200f_bk_pal_sel_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2008_lcd_vs_delay_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2008_lcd_vs_delay_w);
-	DECLARE_READ8_MEMBER(vt1682_2009_lcd_hs_delay_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2009_lcd_hs_delay_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_200a_lcd_fr_delay_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_200a_lcd_fr_delay_7_0_w);
+	uint8_t vt1682_2008_lcd_vs_delay_r();
+	void vt1682_2008_lcd_vs_delay_w(uint8_t data);
+	uint8_t vt1682_2009_lcd_hs_delay_7_0_r();
+	void vt1682_2009_lcd_hs_delay_7_0_w(uint8_t data);
+	uint8_t vt1682_200a_lcd_fr_delay_7_0_r();
+	void vt1682_200a_lcd_fr_delay_7_0_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_200d_misc_vregs2_r);
-	DECLARE_WRITE8_MEMBER(vt1682_200d_misc_vregs2_w);
-	DECLARE_READ8_MEMBER(vt1682_200c_misc_vregs1_r);
-	DECLARE_WRITE8_MEMBER(vt1682_200c_misc_vregs1_w);
-	DECLARE_READ8_MEMBER(vt1682_200b_misc_vregs0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_200b_misc_vregs0_w);
+	uint8_t vt1682_200d_misc_vregs2_r();
+	void vt1682_200d_misc_vregs2_w(uint8_t data);
+	uint8_t vt1682_200c_misc_vregs1_r();
+	void vt1682_200c_misc_vregs1_w(uint8_t data);
+	uint8_t vt1682_200b_misc_vregs0_r();
+	void vt1682_200b_misc_vregs0_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2018_spregs_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2018_spregs_w);
-	DECLARE_READ8_MEMBER(vt1682_2019_bkgain_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2019_bkgain_w);
+	uint8_t vt1682_2018_spregs_r();
+	void vt1682_2018_spregs_w(uint8_t data);
+	uint8_t vt1682_2019_bkgain_r();
+	void vt1682_2019_bkgain_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2020_bk_linescroll_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2020_bk_linescroll_w);
-	DECLARE_READ8_MEMBER(vt1682_2021_lum_offset_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2021_lum_offset_w);
-	DECLARE_READ8_MEMBER(vt1682_2022_saturation_misc_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2022_saturation_misc_w);
+	uint8_t vt1682_2020_bk_linescroll_r();
+	void vt1682_2020_bk_linescroll_w(uint8_t data);
+	uint8_t vt1682_2021_lum_offset_r();
+	void vt1682_2021_lum_offset_w(uint8_t data);
+	uint8_t vt1682_2022_saturation_misc_r();
+	void vt1682_2022_saturation_misc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2023_lightgun_reset_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2023_lightgun_reset_w);
-	DECLARE_READ8_MEMBER(vt1682_2024_lightgun1_y_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2024_lightgun1_y_w);
-	DECLARE_READ8_MEMBER(vt1682_2025_lightgun1_x_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2025_lightgun1_x_w);
-	DECLARE_READ8_MEMBER(vt1682_2026_lightgun2_y_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2026_lightgun2_y_w);
-	DECLARE_READ8_MEMBER(vt1682_2027_lightgun2_x_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2027_lightgun2_x_w);
+	uint8_t vt1682_2023_lightgun_reset_r();
+	void vt1682_2023_lightgun_reset_w(uint8_t data);
+	uint8_t vt1682_2024_lightgun1_y_r();
+	void vt1682_2024_lightgun1_y_w(uint8_t data);
+	uint8_t vt1682_2025_lightgun1_x_r();
+	void vt1682_2025_lightgun1_x_w(uint8_t data);
+	uint8_t vt1682_2026_lightgun2_y_r();
+	void vt1682_2026_lightgun2_y_w(uint8_t data);
+	uint8_t vt1682_2027_lightgun2_x_r();
+	void vt1682_2027_lightgun2_x_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2031_red_dac_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2031_red_dac_w);
-	DECLARE_READ8_MEMBER(vt1682_2032_green_dac_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2032_green_dac_w);
-	DECLARE_READ8_MEMBER(vt1682_2033_blue_dac_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2033_blue_dac_w);
+	uint8_t vt1682_2031_red_dac_r();
+	void vt1682_2031_red_dac_w(uint8_t data);
+	uint8_t vt1682_2032_green_dac_r();
+	void vt1682_2032_green_dac_w(uint8_t data);
+	uint8_t vt1682_2033_blue_dac_r();
+	void vt1682_2033_blue_dac_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2028_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2028_w);
-	DECLARE_READ8_MEMBER(vt1682_2029_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2029_w);
-	DECLARE_READ8_MEMBER(vt1682_202a_r);
-	DECLARE_WRITE8_MEMBER(vt1682_202a_w);
-	DECLARE_READ8_MEMBER(vt1682_202b_r);
-	DECLARE_WRITE8_MEMBER(vt1682_202b_w);
-	DECLARE_READ8_MEMBER(vt1682_202e_r);
-	DECLARE_WRITE8_MEMBER(vt1682_202e_w);
-	DECLARE_READ8_MEMBER(vt1682_2030_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2030_w);
+	uint8_t vt1682_2028_r();
+	void vt1682_2028_w(uint8_t data);
+	uint8_t vt1682_2029_r();
+	void vt1682_2029_w(uint8_t data);
+	uint8_t vt1682_202a_r();
+	void vt1682_202a_w(uint8_t data);
+	uint8_t vt1682_202b_r();
+	void vt1682_202b_w(uint8_t data);
+	uint8_t vt1682_202e_r();
+	void vt1682_202e_w(uint8_t data);
+	uint8_t vt1682_2030_r();
+	void vt1682_2030_w(uint8_t data);
 
 	/* Video Helpers */
 
@@ -426,73 +426,73 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
-	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
-	DECLARE_READ8_MEMBER(vt1682_210c_prgbank1_r2_r);
-	DECLARE_WRITE8_MEMBER(vt1682_210c_prgbank1_r2_w);
+	uint8_t vt1682_2100_prgbank1_r3_r();
+	void vt1682_2100_prgbank1_r3_w(uint8_t data);
+	uint8_t vt1682_210c_prgbank1_r2_r();
+	void vt1682_210c_prgbank1_r2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2107_prgbank0_r0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2107_prgbank0_r0_w);
-	DECLARE_READ8_MEMBER(vt1682_2108_prgbank0_r1_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2108_prgbank0_r1_w);
-	DECLARE_READ8_MEMBER(vt1682_2109_prgbank0_r2_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2109_prgbank0_r2_w);
-	DECLARE_READ8_MEMBER(vt1682_210a_prgbank0_r3_r);
-	DECLARE_WRITE8_MEMBER(vt1682_210a_prgbank0_r3_w);
+	uint8_t vt1682_2107_prgbank0_r0_r();
+	void vt1682_2107_prgbank0_r0_w(uint8_t data);
+	uint8_t vt1682_2108_prgbank0_r1_r();
+	void vt1682_2108_prgbank0_r1_w(uint8_t data);
+	uint8_t vt1682_2109_prgbank0_r2_r();
+	void vt1682_2109_prgbank0_r2_w(uint8_t data);
+	uint8_t vt1682_210a_prgbank0_r3_r();
+	void vt1682_210a_prgbank0_r3_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_prgbank0_r4_r);
-	DECLARE_READ8_MEMBER(vt1682_prgbank0_r5_r);
-	DECLARE_READ8_MEMBER(vt1682_prgbank1_r0_r);
-	DECLARE_READ8_MEMBER(vt1682_prgbank1_r1_r);
+	uint8_t vt1682_prgbank0_r4_r();
+	uint8_t vt1682_prgbank0_r5_r();
+	uint8_t vt1682_prgbank1_r0_r();
+	uint8_t vt1682_prgbank1_r1_r();
 
-	DECLARE_WRITE8_MEMBER(vt1682_prgbank1_r0_w);
-	DECLARE_WRITE8_MEMBER(vt1682_prgbank1_r1_w);
-	DECLARE_WRITE8_MEMBER(vt1682_prgbank0_r4_w);
-	DECLARE_WRITE8_MEMBER(vt1682_prgbank0_r5_w);
+	void vt1682_prgbank1_r0_w(uint8_t data);
+	void vt1682_prgbank1_r1_w(uint8_t data);
+	void vt1682_prgbank0_r4_w(uint8_t data);
+	void vt1682_prgbank0_r5_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2118_prgbank1_r4_r5_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2118_prgbank1_r4_r5_w);
+	uint8_t vt1682_2118_prgbank1_r4_r5_r();
+	void vt1682_2118_prgbank1_r4_r5_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_210b_misc_cs_prg0_bank_sel_r);
-	DECLARE_WRITE8_MEMBER(vt1682_210b_misc_cs_prg0_bank_sel_w);
+	uint8_t vt1682_210b_misc_cs_prg0_bank_sel_r();
+	void vt1682_210b_misc_cs_prg0_bank_sel_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(vt1682_2105_comr6_tvmodes_w);
+	void vt1682_2105_comr6_tvmodes_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(vt1682_211c_regs_ext2421_w);
+	void vt1682_211c_regs_ext2421_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2122_dma_dt_addr_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2122_dma_dt_addr_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2123_dma_dt_addr_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2123_dma_dt_addr_15_8_w);
+	uint8_t vt1682_2122_dma_dt_addr_7_0_r();
+	void vt1682_2122_dma_dt_addr_7_0_w(uint8_t data);
+	uint8_t vt1682_2123_dma_dt_addr_15_8_r();
+	void vt1682_2123_dma_dt_addr_15_8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2124_dma_sr_addr_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2124_dma_sr_addr_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_2125_dma_sr_addr_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2125_dma_sr_addr_15_8_w);
+	uint8_t vt1682_2124_dma_sr_addr_7_0_r();
+	void vt1682_2124_dma_sr_addr_7_0_w(uint8_t data);
+	uint8_t vt1682_2125_dma_sr_addr_15_8_r();
+	void vt1682_2125_dma_sr_addr_15_8_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2126_dma_sr_bank_addr_22_15_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2126_dma_sr_bank_addr_22_15_w);
-	DECLARE_READ8_MEMBER(vt1682_2128_dma_sr_bank_addr_24_23_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2128_dma_sr_bank_addr_24_23_w);
+	uint8_t vt1682_2126_dma_sr_bank_addr_22_15_r();
+	void vt1682_2126_dma_sr_bank_addr_22_15_w(uint8_t data);
+	uint8_t vt1682_2128_dma_sr_bank_addr_24_23_r();
+	void vt1682_2128_dma_sr_bank_addr_24_23_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2127_dma_status_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2127_dma_size_trigger_w);
+	uint8_t vt1682_2127_dma_status_r();
+	void vt1682_2127_dma_size_trigger_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
-	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
+	uint8_t vt1682_2106_enable_regs_r();
+	void vt1682_2106_enable_regs_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_212c_prng_r);
-	DECLARE_WRITE8_MEMBER(vt1682_212c_prng_seed_w);
+	uint8_t vt1682_212c_prng_r();
+	void vt1682_212c_prng_seed_w(uint8_t data);
 
 	virtual void clock_joy2();
 
-	READ8_MEMBER(inteact_212a_send_joy_clock2_r);
+	uint8_t inteact_212a_send_joy_clock2_r();
 
 	/* Hacky */
 
-	DECLARE_READ8_MEMBER(soundcpu_irq_vector_hack_r);
-	DECLARE_READ8_MEMBER(maincpu_irq_vector_hack_r);
-	DECLARE_WRITE8_MEMBER(vt1682_sound_reset_hack_w);
+	uint8_t soundcpu_irq_vector_hack_r(offs_t offset);
+	uint8_t maincpu_irq_vector_hack_r(offs_t offset);
+	void vt1682_sound_reset_hack_w(offs_t offset, uint8_t data);
 	bool m_scpu_is_in_reset;
 
 	/* System Helpers */
@@ -560,30 +560,30 @@ private:
 	uint8_t m_soundcpu_211a_dacright_7_0;
 	uint8_t m_soundcpu_211b_dacright_15_8;
 
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_211c_reg_irqctrl_w);
+	void vt1682_soundcpu_211c_reg_irqctrl_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_2118_dacleft_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2118_dacleft_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_2119_dacleft_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2119_dacleft_15_8_w);
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_211a_dacright_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_211a_dacright_7_0_w);
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_211b_dacright_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_211b_dacright_15_8_w);
+	uint8_t vt1682_soundcpu_2118_dacleft_7_0_r();
+	void vt1682_soundcpu_2118_dacleft_7_0_w(uint8_t data);
+	uint8_t vt1682_soundcpu_2119_dacleft_15_8_r();
+	void vt1682_soundcpu_2119_dacleft_15_8_w(uint8_t data);
+	uint8_t vt1682_soundcpu_211a_dacright_7_0_r();
+	void vt1682_soundcpu_211a_dacright_7_0_w(uint8_t data);
+	uint8_t vt1682_soundcpu_211b_dacright_15_8_r();
+	void vt1682_soundcpu_211b_dacright_15_8_w(uint8_t data);
 
 	/* Support */
 
-	DECLARE_WRITE8_MEMBER(vt1682_timer_enable_trampoline_w)
+	void vt1682_timer_enable_trampoline_w(uint8_t data)
 	{
 		// this is used for raster interrpt effects, despite not being a scanline timer, so knowing when it triggers is useful, so trampoline it to avoid passing m_screen to the device
 		LOGMASKED(LOG_OTHER, "%s: vt1682_timer_enable_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
-		m_system_timer_dev->vt1682_timer_enable_w(space, offset, data);
+		m_system_timer_dev->vt1682_timer_enable_w(data);
 	};
 
-	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_15_8_trampoline_w)
+	void vt1682_timer_preload_15_8_trampoline_w(uint8_t data)
 	{
 		LOGMASKED(LOG_OTHER, "%s: vt1682_timer_preload_15_8_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
-		m_system_timer_dev->vt1682_timer_preload_15_8_w(space, offset, data);
+		m_system_timer_dev->vt1682_timer_preload_15_8_w(data);
 	};
 
 
@@ -592,8 +592,8 @@ private:
 	uint32_t translate_address_4000_to_7fff(uint16_t address);
 	uint32_t translate_address_8000_to_ffff(uint16_t address);
 
-	DECLARE_READ8_MEMBER(rom_4000_to_7fff_r);
-	DECLARE_READ8_MEMBER(rom_8000_to_ffff_r);
+	uint8_t rom_4000_to_7fff_r(offs_t offset);
+	uint8_t rom_8000_to_ffff_r(offs_t offset);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(line_render_start);
@@ -629,17 +629,17 @@ public:
 	void intech_interact(machine_config& config);
 	void intech_interact_bank(machine_config& config);
 
-	virtual DECLARE_READ8_MEMBER(porta_r);
-	virtual DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
-	virtual DECLARE_READ8_MEMBER(portc_r);
-	virtual DECLARE_READ8_MEMBER(portd_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	virtual uint8_t porta_r();
+	virtual uint8_t portb_r() { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	virtual uint8_t portc_r();
+	virtual uint8_t portd_r() { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
 
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w) { LOGMASKED(LOG_OTHER, "%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
-	DECLARE_WRITE8_MEMBER(portd_w) { LOGMASKED(LOG_OTHER, "%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data) { LOGMASKED(LOG_OTHER, "%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	void portd_w(uint8_t data) { LOGMASKED(LOG_OTHER, "%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
 
-	DECLARE_WRITE8_MEMBER(ext_rombank_w);
+	void ext_rombank_w(uint8_t data);
 
 protected:
 	virtual void machine_start() override;
@@ -669,8 +669,8 @@ public:
 	void vt1682_dance(machine_config& config);
 
 protected:
-	DECLARE_READ8_MEMBER(uio_porta_r);
-	DECLARE_WRITE8_MEMBER(uio_porta_w);
+	uint8_t uio_porta_r();
+	void uio_porta_w(uint8_t data);
 
 private:
 	required_ioport m_io_p1;
@@ -688,8 +688,8 @@ public:
 	void vt1682_exsport(machine_config& config);
 	void vt1682_exsportp(machine_config& config);
 
-	virtual DECLARE_READ8_MEMBER(uiob_r);
-	DECLARE_WRITE8_MEMBER(uiob_w);
+	virtual uint8_t uiob_r();
+	void uiob_w(uint8_t data);
 
 protected:
 	virtual void machine_start() override;
@@ -944,7 +944,7 @@ void vt_vt1682_state::machine_reset()
 
 /*
 
-Address tranlsation
+Address translation
 
 ----------------------------------------------------------------
 
@@ -1174,13 +1174,13 @@ uint32_t vt_vt1682_state::translate_address_8000_to_ffff(uint16_t address)
 	return realaddress;
 }
 
-READ8_MEMBER(vt_vt1682_state::rom_4000_to_7fff_r)
+uint8_t vt_vt1682_state::rom_4000_to_7fff_r(offs_t offset)
 {
 	const uint32_t address = translate_address_4000_to_7fff(offset + 0x4000);
 	return m_fullrom->read8(address);
 }
 
-READ8_MEMBER(vt_vt1682_state::rom_8000_to_ffff_r)
+uint8_t vt_vt1682_state::rom_8000_to_ffff_r(offs_t offset)
 {
 	const uint32_t address = translate_address_8000_to_ffff(offset + 0x8000);
 	return m_fullrom->read8(address);
@@ -1203,14 +1203,14 @@ READ8_MEMBER(vt_vt1682_state::rom_8000_to_ffff_r)
     0x01 - NMI_EN
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2000_r)
+uint8_t vt_vt1682_state::vt1682_2000_r()
 {
 	uint8_t ret = m_2000;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2000_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
+void vt_vt1682_state::vt1682_2000_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2000_w writing: %02x (Capture:%1x Slave:%1x NMI_Enable:%1x)\n", machine().describe_context(), data, (data & 0x10)>>4, (data & 0x08)>>3, (data & 0x01)>>0 );
 	m_2000 = data;
@@ -1240,7 +1240,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - BK INI (blank bg on left 8 pixels)
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
+uint8_t vt_vt1682_state::vt1682_2001_vblank_r()
 {
 	uint8_t ret = 0x00;
 
@@ -1254,7 +1254,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2001_w)
+void vt_vt1682_state::vt1682_2001_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2001_w writing: %02x (ext_clk_div:%1x sp_ini:%1x bk_ini:%1x)\n", machine().describe_context(), data,
 		(data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
@@ -1276,14 +1276,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2001_w)
     0x01 - SPRAM ADDR:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_r)
+uint8_t vt_vt1682_state::vt1682_2002_sprramaddr_2_0_r()
 {
 	uint8_t ret = m_2002_sprramaddr_2_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2002_sprramaddr_2_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_w)
+void vt_vt1682_state::vt1682_2002_sprramaddr_2_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2002_sprramaddr_2_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2002_sprramaddr_2_0 = data & 0x07;
@@ -1302,14 +1302,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_w)
     0x01 - SPRAM ADDR:3
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_r)
+uint8_t vt_vt1682_state::vt1682_2003_sprramaddr_10_3_r()
 {
 	uint8_t ret = m_2003_sprramaddr_10_3;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2003_sprramaddr_10_3_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_w)
+void vt_vt1682_state::vt1682_2003_sprramaddr_10_3_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2003_sprramaddr_10_3_w writing: %02x\n", machine().describe_context(), data);
 	m_2003_sprramaddr_10_3 = data;
@@ -1328,7 +1328,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_w)
     0x01 - SPRAM DATA:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_r)
+uint8_t vt_vt1682_state::vt1682_2004_sprram_data_r()
 {
 	uint16_t spriteram_address = get_spriteram_addr();
 	uint8_t ret = m_spriteram->read8(spriteram_address);
@@ -1338,7 +1338,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_w)
+void vt_vt1682_state::vt1682_2004_sprram_data_w(uint8_t data)
 {
 	uint16_t spriteram_address = get_spriteram_addr();
 	m_spriteram->write8(spriteram_address, data);
@@ -1361,14 +1361,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_w)
     0x01 - VRAM ADDR:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2005_vramaddr_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2005_vramaddr_7_0_r()
 {
 	uint8_t ret = m_2005_vramaddr_7_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2005_vramaddr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2005_vramaddr_7_0_w)
+void vt_vt1682_state::vt1682_2005_vramaddr_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2005_vramaddr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2005_vramaddr_7_0 = data;
@@ -1387,14 +1387,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2005_vramaddr_7_0_w)
     0x01 - VRAM ADDR:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2006_vramaddr_15_8_r)
+uint8_t vt_vt1682_state::vt1682_2006_vramaddr_15_8_r()
 {
 	uint8_t ret = m_2006_vramaddr_15_8;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2006_vramaddr_15_8 returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2006_vramaddr_15_8_w)
+void vt_vt1682_state::vt1682_2006_vramaddr_15_8_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2006_vramaddr_15_8 writing: %02x\n", machine().describe_context(), data);
 	m_2006_vramaddr_15_8 = data;
@@ -1414,7 +1414,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2006_vramaddr_15_8_w)
     0x01 - VRAM DATA:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_r)
+uint8_t vt_vt1682_state::vt1682_2007_vram_data_r()
 {
 	uint16_t vram_address = get_vram_addr();
 	uint8_t ret = m_vram->read8(vram_address);
@@ -1424,7 +1424,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_w)
+void vt_vt1682_state::vt1682_2007_vram_data_w(uint8_t data)
 {
 	uint16_t vram_address = get_vram_addr();
 	m_vram->write8(vram_address, data);
@@ -1447,14 +1447,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_w)
     0x01 - LCD VS DELAY
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2008_lcd_vs_delay_r)
+uint8_t vt_vt1682_state::vt1682_2008_lcd_vs_delay_r()
 {
 	uint8_t ret = m_2008_lcd_vs_delay;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2008_lcd_vs_delay_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2008_lcd_vs_delay_w)
+void vt_vt1682_state::vt1682_2008_lcd_vs_delay_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2008_lcd_vs_delay_w writing: %02x\n", machine().describe_context(), data);
 	m_2008_lcd_vs_delay = data;
@@ -1473,14 +1473,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2008_lcd_vs_delay_w)
     0x01 - LCD HS DELAY:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2009_lcd_hs_delay_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2009_lcd_hs_delay_7_0_r()
 {
 	uint8_t ret = m_2009_lcd_hs_delay_7_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2009_lcd_hs_delay_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2009_lcd_hs_delay_7_0_w)
+void vt_vt1682_state::vt1682_2009_lcd_hs_delay_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2009_lcd_hs_delay_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2009_lcd_hs_delay_7_0 = data;
@@ -1499,14 +1499,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2009_lcd_hs_delay_7_0_w)
     0x01 - LCD FR DELAY:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_200a_lcd_fr_delay_7_0_r)
+uint8_t vt_vt1682_state::vt1682_200a_lcd_fr_delay_7_0_r()
 {
 	uint8_t ret = m_200a_lcd_fr_delay_7_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200a_lcd_fr_delay_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_200a_lcd_fr_delay_7_0_w)
+void vt_vt1682_state::vt1682_200a_lcd_fr_delay_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200a_lcd_fr_delay_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_200a_lcd_fr_delay_7_0 = data;
@@ -1526,14 +1526,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200a_lcd_fr_delay_7_0_w)
     0x01 - LCD HS:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_200b_misc_vregs0_r)
+uint8_t vt_vt1682_state::vt1682_200b_misc_vregs0_r()
 {
 	uint8_t ret = m_200b_misc_vregs0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200b_misc_vregs0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_200b_misc_vregs0_w)
+void vt_vt1682_state::vt1682_200b_misc_vregs0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200b_misc_vregs0_w writing: %02x\n", machine().describe_context(), data);
 	m_200b_misc_vregs0 = data;
@@ -1552,14 +1552,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200b_misc_vregs0_w)
     0x01 - LCD MODE
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_200c_misc_vregs1_r)
+uint8_t vt_vt1682_state::vt1682_200c_misc_vregs1_r()
 {
 	uint8_t ret = m_200c_misc_vregs1;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200c_misc_vregs1_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_200c_misc_vregs1_w)
+void vt_vt1682_state::vt1682_200c_misc_vregs1_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200c_misc_vregs1_w writing: %02x\n", machine().describe_context(), data);
 	m_200c_misc_vregs1 = data;
@@ -1578,14 +1578,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200c_misc_vregs1_w)
     0x01 - Even Line Color
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_200d_misc_vregs2_r)
+uint8_t vt_vt1682_state::vt1682_200d_misc_vregs2_r()
 {
 	uint8_t ret = m_200d_misc_vregs2;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200d_misc_vregs2_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_200d_misc_vregs2_w)
+void vt_vt1682_state::vt1682_200d_misc_vregs2_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200d_misc_vregs2_w writing: %02x\n", machine().describe_context(), data);
 	m_200d_misc_vregs2 = data;
@@ -1605,14 +1605,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200d_misc_vregs2_w)
     0x01 - Palette 1 Out Sel 'SB5' /- 0 = output Palette 1 Disable, 1 = output Palette 1 to LCD only, 2 = Output Palette 1 to TV only, 3 = Output Palette 1 to both
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_200e_blend_pal_sel_r)
+uint8_t vt_vt1682_state::vt1682_200e_blend_pal_sel_r()
 {
 	uint8_t ret = m_200e_blend_pal_sel;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200e_blend_pal_sel_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_200e_blend_pal_sel_w)
+void vt_vt1682_state::vt1682_200e_blend_pal_sel_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200e_blend_pal_sel_w writing: %02x\n", machine().describe_context(), data);
 	m_200e_blend_pal_sel = data;
@@ -1631,14 +1631,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200e_blend_pal_sel_w)
     0x01 - Bk1 Palette Select 'BK1 SB1'
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_200f_bk_pal_sel_r)
+uint8_t vt_vt1682_state::vt1682_200f_bk_pal_sel_r()
 {
 	uint8_t ret = m_200f_bk_pal_sel;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200f_bk_pal_sel_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_200f_bk_pal_sel_w)
+void vt_vt1682_state::vt1682_200f_bk_pal_sel_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_200f_bk_pal_sel_w writing: %02x\n", machine().describe_context(), data);
 	m_200f_bk_pal_sel = data;
@@ -1657,14 +1657,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200f_bk_pal_sel_w)
     0x01 - BK1X:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r()
 {
 	uint8_t ret = m_xscroll_7_0_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2010_bk1_xscroll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
+void vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2010_bk1_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[0] = data;
@@ -1683,14 +1683,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
     0x01 - BK1Y:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_r()
 {
 	uint8_t ret = m_yscroll_7_0_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2011_bk1_yscoll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w)
+void vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2011_bk1_yscoll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_yscroll_7_0_bk[0] = data;
@@ -1710,7 +1710,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w)
     0x01 - BK1X:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
+uint8_t vt_vt1682_state::vt1682_2012_bk1_scroll_control_r()
 {
 	uint8_t ret = m_scroll_control_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2012_bk1_scroll_control_r returning: %02x\n", machine().describe_context(), ret);
@@ -1718,7 +1718,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
 }
 
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
+void vt_vt1682_state::vt1682_2012_bk1_scroll_control_w(uint8_t data)
 {
 
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
@@ -1741,14 +1741,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
     0x01 - BK1 Size
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_r)
+uint8_t vt_vt1682_state::vt1682_2013_bk1_main_control_r()
 {
 	uint8_t ret = m_main_control_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2013_bk1_main_control_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
+void vt_vt1682_state::vt1682_2013_bk1_main_control_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
@@ -1770,14 +1770,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 */
 
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r()
 {
 	uint8_t ret = m_xscroll_7_0_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2014_bk2_xscroll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
+void vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2014_bk2_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[1] = data;
@@ -1796,14 +1796,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
     0x01 - BK2Y:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_r()
 {
 	uint8_t ret = m_yscroll_7_0_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2015_bk2_yscoll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w)
+void vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2015_bk2_yscoll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_yscroll_7_0_bk[1] = data;
@@ -1823,7 +1823,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w)
     0x01 - BK2X:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
+uint8_t vt_vt1682_state::vt1682_2016_bk2_scroll_control_r()
 {
 	uint8_t ret = m_scroll_control_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2016_bk2_scroll_control_r returning: %02x\n", machine().describe_context(), ret);
@@ -1831,7 +1831,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
 }
 
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
+void vt_vt1682_state::vt1682_2016_bk2_scroll_control_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
@@ -1853,14 +1853,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
     0x01 - BK2 Size
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_r)
+uint8_t vt_vt1682_state::vt1682_2017_bk2_main_control_r()
 {
 	uint8_t ret = m_main_control_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2017_bk2_main_control_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
+void vt_vt1682_state::vt1682_2017_bk2_main_control_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x (invalid):%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
@@ -1882,14 +1882,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
     0x01 - SP SIZE
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2018_spregs_r)
+uint8_t vt_vt1682_state::vt1682_2018_spregs_r()
 {
 	uint8_t ret = m_2018_spregs;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2018_spregs_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2018_spregs_w)
+void vt_vt1682_state::vt1682_2018_spregs_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2018_spregs_w writing: %02x\n", machine().describe_context(), data);
 	m_2018_spregs = data;
@@ -1908,14 +1908,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2018_spregs_w)
     0x01 - BK1 Gain
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2019_bkgain_r)
+uint8_t vt_vt1682_state::vt1682_2019_bkgain_r()
 {
 	uint8_t ret = m_2019_bkgain;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2019_bkgain_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2019_bkgain_w)
+void vt_vt1682_state::vt1682_2019_bkgain_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2019_bkgain_w writing: %02x\n", machine().describe_context(), data);
 	m_2019_bkgain = data;
@@ -1935,14 +1935,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2019_bkgain_w)
     0x01 - SP SEGMENT:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_201a_sp_segment_7_0_r)
+uint8_t vt_vt1682_state::vt1682_201a_sp_segment_7_0_r()
 {
 	uint8_t ret = m_201a_sp_segment_7_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201a_sp_segment_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_201a_sp_segment_7_0_w)
+void vt_vt1682_state::vt1682_201a_sp_segment_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201a_sp_segment_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_201a_sp_segment_7_0 = data;
@@ -1961,14 +1961,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201a_sp_segment_7_0_w)
     0x01 - SP SEGMENT:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_201b_sp_segment_11_8_r)
+uint8_t vt_vt1682_state::vt1682_201b_sp_segment_11_8_r()
 {
 	uint8_t ret = m_201b_sp_segment_11_8;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201b_sp_segment_11_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_201b_sp_segment_11_8_w)
+void vt_vt1682_state::vt1682_201b_sp_segment_11_8_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201b_sp_segment_11_8_w writing: %02x\n", machine().describe_context(), data);
 	m_201b_sp_segment_11_8 = data & 0x0f;
@@ -1988,14 +1988,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201b_sp_segment_11_8_w)
     0x01 - BK1 SEGMENT:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_r)
+uint8_t vt_vt1682_state::vt1682_201c_bk1_segment_7_0_r()
 {
 	uint8_t ret = m_segment_7_0_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201c_bk1_segment_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_w)
+void vt_vt1682_state::vt1682_201c_bk1_segment_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201c_bk1_segment_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_segment_7_0_bk[0] = data;
@@ -2014,14 +2014,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_w)
     0x01 - BK1 SEGMENT:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_r)
+uint8_t vt_vt1682_state::vt1682_201d_bk1_segment_11_8_r()
 {
 	uint8_t ret = m_segment_11_8_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201d_bk1_segment_11_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_w)
+void vt_vt1682_state::vt1682_201d_bk1_segment_11_8_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201d_bk1_segment_11_8_w writing: %02x\n", machine().describe_context(), data);
 	m_segment_11_8_bk[0] = data & 0x0f;
@@ -2041,14 +2041,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_w)
     0x01 - BK2 SEGMENT:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_r)
+uint8_t vt_vt1682_state::vt1682_201e_bk2_segment_7_0_r()
 {
 	uint8_t ret = m_segment_7_0_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201e_bk2_segment_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_w)
+void vt_vt1682_state::vt1682_201e_bk2_segment_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201e_bk2_segment_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_segment_7_0_bk[1] = data;
@@ -2067,14 +2067,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_w)
     0x01 - BK2 SEGMENT:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_201f_bk2_segment_11_8_r)
+uint8_t vt_vt1682_state::vt1682_201f_bk2_segment_11_8_r()
 {
 	uint8_t ret = m_segment_11_8_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201f_bk2_segment_11_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_201f_bk2_segment_11_8_w)
+void vt_vt1682_state::vt1682_201f_bk2_segment_11_8_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_201f_bk2_segment_11_8_w writing: %02x\n", machine().describe_context(), data);
 	m_segment_11_8_bk[1] = data & 0x0f;
@@ -2093,14 +2093,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201f_bk2_segment_11_8_w)
     0x01 - Scroll Bank
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_r)
+uint8_t vt_vt1682_state::vt1682_2020_bk_linescroll_r()
 {
 	uint8_t ret = m_2020_bk_linescroll;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2020_bk_linescroll_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_w)
+void vt_vt1682_state::vt1682_2020_bk_linescroll_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2020_bk_linescroll_w writing: %02x\n", machine().describe_context(), data);
 	m_2020_bk_linescroll = data;
@@ -2122,14 +2122,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_w)
     0x01 - Luminance_offset
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2021_lum_offset_r)
+uint8_t vt_vt1682_state::vt1682_2021_lum_offset_r()
 {
 	uint8_t ret = m_2021_lum_offset;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2021_lum_offset_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2021_lum_offset_w)
+void vt_vt1682_state::vt1682_2021_lum_offset_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2021_lum_offset_w writing: %02x\n", machine().describe_context(), data);
 	m_2021_lum_offset = data;
@@ -2149,14 +2149,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2021_lum_offset_w)
     0x01 - Saturation
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_r)
+uint8_t vt_vt1682_state::vt1682_2022_saturation_misc_r()
 {
 	uint8_t ret = m_2022_saturation_misc;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2022_saturation_misc_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
+void vt_vt1682_state::vt1682_2022_saturation_misc_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2022_saturation_misc_w writing: %02x\n", machine().describe_context(), data);
 	m_2022_saturation_misc = data;
@@ -2175,14 +2175,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x01 - Light Gun Reset
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2023_lightgun_reset_r)
+uint8_t vt_vt1682_state::vt1682_2023_lightgun_reset_r()
 {
 	uint8_t ret = m_2023_lightgun_reset;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2023_lightgun_reset_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2023_lightgun_reset_w)
+void vt_vt1682_state::vt1682_2023_lightgun_reset_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2023_lightgun_reset_w writing: %02x\n", machine().describe_context(), data);
 	m_2023_lightgun_reset = data;
@@ -2201,14 +2201,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2023_lightgun_reset_w)
     0x01 - Light Gun 1 Y
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2024_lightgun1_y_r)
+uint8_t vt_vt1682_state::vt1682_2024_lightgun1_y_r()
 {
 	uint8_t ret = m_2024_lightgun1_y;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2024_lightgun1_y_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2024_lightgun1_y_w)
+void vt_vt1682_state::vt1682_2024_lightgun1_y_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2024_lightgun1_y_w writing: %02x\n", machine().describe_context(), data);
 	m_2024_lightgun1_y = data;
@@ -2227,14 +2227,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2024_lightgun1_y_w)
     0x01 - Light Gun 1 X
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2025_lightgun1_x_r)
+uint8_t vt_vt1682_state::vt1682_2025_lightgun1_x_r()
 {
 	uint8_t ret = m_2025_lightgun1_x;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2025_lightgun1_x_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2025_lightgun1_x_w)
+void vt_vt1682_state::vt1682_2025_lightgun1_x_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2025_lightgun1_x_w writing: %02x\n", machine().describe_context(), data);
 	m_2025_lightgun1_x = data;
@@ -2253,14 +2253,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2025_lightgun1_x_w)
     0x01 - Light Gun 2 Y
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2026_lightgun2_y_r)
+uint8_t vt_vt1682_state::vt1682_2026_lightgun2_y_r()
 {
 	uint8_t ret = m_2026_lightgun2_y;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2026_lightgun2_y_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2026_lightgun2_y_w)
+void vt_vt1682_state::vt1682_2026_lightgun2_y_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2026_lightgun2_y_w writing: %02x\n", machine().describe_context(), data);
 	m_2026_lightgun2_y = data;
@@ -2280,14 +2280,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2026_lightgun2_y_w)
     0x01 - Light Gun 2 X
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_r)
+uint8_t vt_vt1682_state::vt1682_2027_lightgun2_x_r()
 {
 	uint8_t ret = m_2027_lightgun2_x;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2027_lightgun2_x_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
+void vt_vt1682_state::vt1682_2027_lightgun2_x_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2027_lightgun2_x_w writing: %02x\n", machine().describe_context(), data);
 	m_2027_lightgun2_x = data;
@@ -2307,14 +2307,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x01 - CCIR Y
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2028_r)
+uint8_t vt_vt1682_state::vt1682_2028_r()
 {
 	uint8_t ret = m_2028;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2028_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2028_w)
+void vt_vt1682_state::vt1682_2028_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2028_w writing: %02x\n", machine().describe_context(), data);
 	m_2028 = data;
@@ -2333,14 +2333,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2028_w)
     0x01 - CCIR X
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2029_r)
+uint8_t vt_vt1682_state::vt1682_2029_r()
 {
 	uint8_t ret = m_2029;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2029_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2029_w)
+void vt_vt1682_state::vt1682_2029_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2029_w writing: %02x\n", machine().describe_context(), data);
 	m_2029 = data;
@@ -2361,14 +2361,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2029_w)
 */
 
 
-READ8_MEMBER(vt_vt1682_state::vt1682_202a_r)
+uint8_t vt_vt1682_state::vt1682_202a_r()
 {
 	uint8_t ret = m_202a;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_202a_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_202a_w)
+void vt_vt1682_state::vt1682_202a_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_202a_w writing: %02x\n", machine().describe_context(), data);
 	m_202a = data;
@@ -2389,14 +2389,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_202a_w)
 */
 
 
-READ8_MEMBER(vt_vt1682_state::vt1682_202b_r)
+uint8_t vt_vt1682_state::vt1682_202b_r()
 {
 	uint8_t ret = m_202b;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_202b_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_202b_w)
+void vt_vt1682_state::vt1682_202b_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_202b_w writing: %02x\n", machine().describe_context(), data);
 	m_202b = data;
@@ -2420,14 +2420,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_202b_w)
 */
 
 
-READ8_MEMBER(vt_vt1682_state::vt1682_202e_r)
+uint8_t vt_vt1682_state::vt1682_202e_r()
 {
 	uint8_t ret = m_202e;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_202e_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_202e_w)
+void vt_vt1682_state::vt1682_202e_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_202e_w writing: %02x\n", machine().describe_context(), data);
 	m_202e = data;
@@ -2450,14 +2450,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_202e_w)
 */
 
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2030_r)
+uint8_t vt_vt1682_state::vt1682_2030_r()
 {
 	uint8_t ret = m_2030;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2030_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2030_w)
+void vt_vt1682_state::vt1682_2030_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2030_w writing: %02x\n", machine().describe_context(), data);
 	m_2030 = data;
@@ -2477,14 +2477,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2030_w)
     0x01 - R DAC OUT:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2031_red_dac_r)
+uint8_t vt_vt1682_state::vt1682_2031_red_dac_r()
 {
 	uint8_t ret = m_2031_red_dac;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2031_red_dac_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2031_red_dac_w)
+void vt_vt1682_state::vt1682_2031_red_dac_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2031_red_dac_w writing: %02x\n", machine().describe_context(), data);
 	m_2031_red_dac = data;
@@ -2503,14 +2503,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2031_red_dac_w)
     0x01 - G DAC OUT:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2032_green_dac_r)
+uint8_t vt_vt1682_state::vt1682_2032_green_dac_r()
 {
 	uint8_t ret = m_2032_green_dac;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2032_green_dac_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2032_green_dac_w)
+void vt_vt1682_state::vt1682_2032_green_dac_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2032_green_dac_w writing: %02x\n", machine().describe_context(), data);
 	m_2032_green_dac = data;
@@ -2529,14 +2529,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2032_green_dac_w)
     0x01 - B DAC OUT:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2033_blue_dac_r)
+uint8_t vt_vt1682_state::vt1682_2033_blue_dac_r()
 {
 	uint8_t ret = m_2033_blue_dac;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2033_blue_dac_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2033_blue_dac_w)
+void vt_vt1682_state::vt1682_2033_blue_dac_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2033_blue_dac_w writing: %02x\n", machine().describe_context(), data);
 	m_2033_blue_dac = data;
@@ -2560,14 +2560,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2033_blue_dac_w)
     0x01 - Program Bank 1 Register 3
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_r)
+uint8_t vt_vt1682_state::vt1682_2100_prgbank1_r3_r()
 {
 	uint8_t ret = m_2100_prgbank1_r3;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2100_prgbank1_r3_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
+void vt_vt1682_state::vt1682_2100_prgbank1_r3_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2100_prgbank1_r3_w writing: %02x (4-bits)\n", machine().describe_context(), data);
 	m_2100_prgbank1_r3 = data;
@@ -2595,7 +2595,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
 
 */
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w)
+void vt_vt1682_state::vt1682_2105_comr6_tvmodes_w(uint8_t data)
 {
 	// COMR6 is used for banking
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2105_comr6_tvmodes_w writing: %02x\n", machine().describe_context(), data);
@@ -2617,14 +2617,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w)
     0x01 - LCD ON (LCD display controller enable)
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_r)
+uint8_t vt_vt1682_state::vt1682_2106_enable_regs_r()
 {
 	uint8_t ret = m_2106_enable_reg;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
+void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 {
 	// COMR6 is used for banking
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context().c_str(), data,
@@ -2657,14 +2657,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
     0x01 - Program Bank 0 Register 0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2107_prgbank0_r0_r)
+uint8_t vt_vt1682_state::vt1682_2107_prgbank0_r0_r()
 {
 	uint8_t ret = m_2107_prgbank0_r0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2107_prgbank0_r0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2107_prgbank0_r0_w)
+void vt_vt1682_state::vt1682_2107_prgbank0_r0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2107_prgbank0_r0_w writing: %02x\n", machine().describe_context(), data);
 	m_2107_prgbank0_r0 = data;
@@ -2684,14 +2684,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2107_prgbank0_r0_w)
     0x01 - Program Bank 0 Register 1
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2108_prgbank0_r1_r)
+uint8_t vt_vt1682_state::vt1682_2108_prgbank0_r1_r()
 {
 	uint8_t ret = m_2108_prgbank0_r1;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2108_prgbank0_r1_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2108_prgbank0_r1_w)
+void vt_vt1682_state::vt1682_2108_prgbank0_r1_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2108_prgbank0_r1_w writing: %02x\n", machine().describe_context(), data);
 	m_2108_prgbank0_r1 = data;
@@ -2713,14 +2713,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2108_prgbank0_r1_w)
 */
 
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2109_prgbank0_r2_r)
+uint8_t vt_vt1682_state::vt1682_2109_prgbank0_r2_r()
 {
 	uint8_t ret = m_2109_prgbank0_r2;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2109_prgbank0_r2_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2109_prgbank0_r2_w)
+void vt_vt1682_state::vt1682_2109_prgbank0_r2_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2109_prgbank0_r2_w writing: %02x\n", machine().describe_context(), data);
 	m_2109_prgbank0_r2 = data;
@@ -2740,14 +2740,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2109_prgbank0_r2_w)
     0x01 - Program Bank 0 Register 3
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_210a_prgbank0_r3_r)
+uint8_t vt_vt1682_state::vt1682_210a_prgbank0_r3_r()
 {
 	uint8_t ret = m_210a_prgbank0_r3;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_210a_prgbank0_r3_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210a_prgbank0_r3_w)
+void vt_vt1682_state::vt1682_210a_prgbank0_r3_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_210a_prgbank0_r3_w writing: %02x\n", machine().describe_context(), data);
 	m_210a_prgbank0_r3 = data;
@@ -2767,14 +2767,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210a_prgbank0_r3_w)
     0x01 - Program Bank 0 Select
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r)
+uint8_t vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r()
 {
 	uint8_t ret = m_210b_misc_cs_prg0_bank_sel;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_210b_misc_cs_prg0_bank_sel_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
+void vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w(uint8_t data)
 {
 	// PQ2 Enable is also used for ROM banking along with Program Bank 0 select
 	uint32_t clock = m_maincpu->clock();
@@ -2818,14 +2818,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
     0x01 - Program Bank 1 Register 2
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_r)
+uint8_t vt_vt1682_state::vt1682_210c_prgbank1_r2_r()
 {
 	uint8_t ret = m_210c_prgbank1_r2;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_210c_prgbank1_r2_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
+void vt_vt1682_state::vt1682_210c_prgbank1_r2_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_210c_prgbank1_r2_w writing: %02x (4-bits)\n", machine().describe_context(), data);
 	m_210c_prgbank1_r2 = data;
@@ -2862,14 +2862,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
     0x01 - Program Bank 1 Register 0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r4_r)
+uint8_t vt_vt1682_state::vt1682_prgbank0_r4_r()
 {
 	uint8_t ret = m_prgbank0_r4;
 	LOGMASKED(LOG_OTHER, "%s: (2110) vt1682_prgbank0_r4_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r0_w)
+void vt_vt1682_state::vt1682_prgbank1_r0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: (2110) vt1682_prgbank1_r0_w writing: %02x (4-bits)\n", machine().describe_context(), data);
 	m_prgbank1_r0 = data;
@@ -2900,7 +2900,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r0_w)
     0x01 - Program Bank 1 Register 1
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r5_r)
+uint8_t vt_vt1682_state::vt1682_prgbank0_r5_r()
 {
 	uint8_t ret = m_prgbank0_r5;
 	LOGMASKED(LOG_OTHER, "%s: (2111) vt1682_prgbank0_r5_r returning: %02x\n", machine().describe_context(), ret);
@@ -2908,7 +2908,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r5_r)
 }
 
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r1_w)
+void vt_vt1682_state::vt1682_prgbank1_r1_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: (2111) vt1682_prgbank1_r1_w writing: %02x (4-bits)\n", machine().describe_context(), data);
 	m_prgbank1_r1 = data;
@@ -2940,7 +2940,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r1_w)
     0x01 - Program Bank 0 Register 4
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r0_r)
+uint8_t vt_vt1682_state::vt1682_prgbank1_r0_r()
 {
 	uint8_t ret = m_prgbank1_r0;
 	LOGMASKED(LOG_OTHER, "%s: (2112) vt1682_prgbank1_r0_r returning: %02x\n", machine().describe_context(), ret);
@@ -2948,7 +2948,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r0_r)
 }
 
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r4_w)
+void vt_vt1682_state::vt1682_prgbank0_r4_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: (2112) vt1682_prgbank0_r4_w writing: %02x (8-bits)\n", machine().describe_context(), data);
 	m_prgbank0_r4 = data;
@@ -2980,14 +2980,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r4_w)
     0x01 - Program Bank 0 Register 5
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r1_r)
+uint8_t vt_vt1682_state::vt1682_prgbank1_r1_r()
 {
 	uint8_t ret = m_prgbank1_r1;
 	LOGMASKED(LOG_OTHER, "%s: (2113) vt1682_prgbank1_r1_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r5_w)
+void vt_vt1682_state::vt1682_prgbank0_r5_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: (2113) vt1682_prgbank0_r5_w writing: %02x (8-bits)\n", machine().describe_context(), data);
 	m_prgbank0_r5 = data;
@@ -3070,14 +3070,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r5_w)
     0x01 - Program Bank 1 Register 4
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r)
+uint8_t vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r()
 {
 	uint8_t ret = m_2118_prgbank1_r4_r5;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2118_prgbank1_r4_r5_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w)
+void vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2118_prgbank1_r4_r5_w writing: %02x (2x 4-bits)\n", machine().describe_context(), data);
 	m_2118_prgbank1_r4_r5 = data;
@@ -3170,7 +3170,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w)
     0x01 - Clear_SCPU_IRQ
 */
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
+void vt_vt1682_state::vt1682_211c_regs_ext2421_w(uint8_t data)
 {
 	// EXT2421EN is used for ROM banking
 	LOGMASKED(LOG_OTHER, "%s: vt1682_211c_regs_ext2421_w writing: %02x\n", machine().describe_context(), data);
@@ -3296,14 +3296,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x01 - DMA DT ADDR:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r()
 {
 	uint8_t ret = m_2122_dma_dt_addr_7_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2122_dma_dt_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w)
+void vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2122_dma_dt_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2122_dma_dt_addr_7_0 = data;
@@ -3323,14 +3323,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w)
     0x01 - DMA DT ADDR:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r)
+uint8_t vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r()
 {
 	uint8_t ret = m_2123_dma_dt_addr_15_8;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2123_dma_dt_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w)
+void vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2123_dma_dt_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_2123_dma_dt_addr_15_8 = data;
@@ -3350,14 +3350,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w)
     0x01 - DMA SR ADDR:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r)
+uint8_t vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r()
 {
 	uint8_t ret = m_2124_dma_sr_addr_7_0;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2124_dma_sr_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w)
+void vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2124_dma_sr_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2124_dma_sr_addr_7_0 = data;
@@ -3377,14 +3377,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w)
     0x01 - DMA SR ADDR:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r)
+uint8_t vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r()
 {
 	uint8_t ret = m_2125_dma_sr_addr_15_8;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2125_dma_sr_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w)
+void vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2125_dma_sr_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_2125_dma_sr_addr_15_8 = data;
@@ -3405,14 +3405,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w)
     0x01 - DMA SR BANK:15
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r)
+uint8_t vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r()
 {
 	uint8_t ret = m_2126_dma_sr_bank_addr_22_15;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2126_dma_sr_bank_addr_22_15_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w)
+void vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2126_dma_sr_bank_addr_22_15_w writing: %02x\n", machine().describe_context(), data);
 	m_2126_dma_sr_bank_addr_22_15 = data;
@@ -3442,7 +3442,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w)
     0x01 - DMA Status
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2127_dma_status_r)
+uint8_t vt_vt1682_state::vt1682_2127_dma_status_r()
 {
 	uint8_t ret = 0x00;
 
@@ -3523,7 +3523,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 
 
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
+void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
 
@@ -3612,14 +3612,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
     0x01 - DMA SR BANK:23
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r)
+uint8_t vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r()
 {
 	uint8_t ret = m_2128_dma_sr_bank_addr_24_23;
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2128_dma_sr_bank_addr_24_23_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
+void vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2128_dma_sr_bank_addr_24_23_w writing: %02x\n", machine().describe_context(), data);
 	m_2128_dma_sr_bank_addr_24_23 = data & 0x03;
@@ -3679,9 +3679,9 @@ void vt_vt1682_state::clock_joy2()
 {
 }
 
-READ8_MEMBER(vt_vt1682_state::inteact_212a_send_joy_clock2_r)
+uint8_t vt_vt1682_state::inteact_212a_send_joy_clock2_r()
 {
-	uint8_t ret = m_uio->inteact_212a_uio_a_direction_r(space,offset);
+	uint8_t ret = m_uio->inteact_212a_uio_a_direction_r();
 	clock_joy2();
 	return ret;
 }
@@ -3723,14 +3723,14 @@ READ8_MEMBER(vt_vt1682_state::inteact_212a_send_joy_clock2_r)
     0x01 - Pseudo Random Number Seed
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_212c_prng_r)
+uint8_t vt_vt1682_state::vt1682_212c_prng_r()
 {
 	uint8_t ret = machine().rand();
 	LOGMASKED(LOG_OTHER, "%s: vt1682_212c_prng_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_212c_prng_seed_w)
+void vt_vt1682_state::vt1682_212c_prng_seed_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_212c_prng_seed_w writing: %02x\n", machine().describe_context(), data);
 	// don't know the algorithm
@@ -3952,14 +3952,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_212c_prng_seed_w)
     actually 12 bits precision so only 15 to 4 are used
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2118_dacleft_7_0_r)
+uint8_t vt_vt1682_state::vt1682_soundcpu_2118_dacleft_7_0_r()
 {
 	uint8_t ret = m_soundcpu_2118_dacleft_7_0;
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_2118_dacleft_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2118_dacleft_7_0_w)
+void vt_vt1682_state::vt1682_soundcpu_2118_dacleft_7_0_w(uint8_t data)
 {
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_2118_dacleft_7_0_r writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_2118_dacleft_7_0 = data;
@@ -3978,14 +3978,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2118_dacleft_7_0_w)
     0x01 - Audio DAC Left:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2119_dacleft_15_8_r)
+uint8_t vt_vt1682_state::vt1682_soundcpu_2119_dacleft_15_8_r()
 {
 	uint8_t ret = m_soundcpu_2119_dacleft_15_8;
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_2119_dacleft_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2119_dacleft_15_8_w)
+void vt_vt1682_state::vt1682_soundcpu_2119_dacleft_15_8_w(uint8_t data)
 {
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_2119_dacleft_15_8_r writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_2119_dacleft_15_8 = data;
@@ -4007,14 +4007,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2119_dacleft_15_8_w)
     0x01 - Audio DAC Right:0
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211a_dacright_7_0_r)
+uint8_t vt_vt1682_state::vt1682_soundcpu_211a_dacright_7_0_r()
 {
 	uint8_t ret = m_soundcpu_211a_dacright_7_0;
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_211a_dacright_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211a_dacright_7_0_w)
+void vt_vt1682_state::vt1682_soundcpu_211a_dacright_7_0_w(uint8_t data)
 {
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_211a_dacright_7_0_r writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_211a_dacright_7_0 = data;
@@ -4033,14 +4033,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211a_dacright_7_0_w)
     0x01 - Audio DAC Right:8
 */
 
-READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211b_dacright_15_8_r)
+uint8_t vt_vt1682_state::vt1682_soundcpu_211b_dacright_15_8_r()
 {
 	uint8_t ret = m_soundcpu_211b_dacright_15_8;
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_211b_dacright_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211b_dacright_15_8_w)
+void vt_vt1682_state::vt1682_soundcpu_211b_dacright_15_8_w(uint8_t data)
 {
 	//LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_211b_dacright_15_8_r writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_211b_dacright_15_8 = data;
@@ -4074,7 +4074,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211b_dacright_15_8_w)
     0x01 - Clear_CPU_IRQ
 */
 
-WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
+void vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w(uint8_t data)
 {
 	// EXT2421EN is used for ROM banking
 	LOGMASKED(LOG_OTHER, "%s: vt1682_soundcpu_211c_reg_irqctrl_w writing: %02x\n", machine().describe_context(), data);
@@ -5282,21 +5282,21 @@ Ext IRQ         0x0ffe - 0x0fff
 */
 
 
-READ8_MEMBER(vt_vt1682_state::soundcpu_irq_vector_hack_r)
+uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 {
 	// redirect to Timer IRQ!
 	return m_sound_share[0x0ff8 + offset];
 }
 
-READ8_MEMBER(vt_vt1682_state::maincpu_irq_vector_hack_r)
+uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
 	// redirect to Timer IRQ!
-	return rom_8000_to_ffff_r(space, (0xfff8 - 0x8000)+offset);
+	return rom_8000_to_ffff_r((0xfff8 - 0x8000)+offset);
 }
 
 // intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
 // it does appear to rewrite the vectors first, so maybe there is some hardware side-effect of this putting the CPU in reset state??
-WRITE8_MEMBER(vt_vt1682_state::vt1682_sound_reset_hack_w)
+void vt_vt1682_state::vt1682_sound_reset_hack_w(offs_t offset, uint8_t data)
 {
 	m_sound_share[0x0ff4 + offset] = data;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -5487,7 +5487,7 @@ void vt_vt1682_state::vt_vt1682_palbase(machine_config& config)
 void vt_vt1682_state::vt_vt1682_common(machine_config& config)
 {
 	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
-	TIMER(config, m_render_timer).configure_periodic(FUNC(vt_vt1682_state::line_render_start), attotime::never);
+	TIMER(config, m_render_timer).configure_generic(FUNC(vt_vt1682_state::line_render_start));
 
 	VT_VT1682_ALU(config, m_maincpu_alu, 0);
 	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
@@ -5570,7 +5570,7 @@ void vt1682_exsport_state::machine_reset()
 	m_p2_latch = 0;
 }
 
-WRITE8_MEMBER(intec_interact_state::ext_rombank_w)
+void intec_interact_state::ext_rombank_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: ext_rombank_w writing: %1x\n", machine().describe_context(), data);
 
@@ -5588,7 +5588,7 @@ WRITE8_MEMBER(intec_interact_state::ext_rombank_w)
 };
 
 
-WRITE8_MEMBER(intec_interact_state::porta_w)
+void intec_interact_state::porta_w(uint8_t data)
 {
 	if (data != 0xf)
 	{
@@ -5692,7 +5692,7 @@ INPUT_PORTS_END
 // to move between games, why not?  ram address 0x6c contains current selection if you want to manually change it to start
 // other games.  maybe it's waiting on some status from the sound cpu?
 
-READ8_MEMBER(intec_interact_state::porta_r)
+uint8_t intec_interact_state::porta_r()
 {
 	uint8_t ret = 0x0;// = machine().rand() & 0xf;
 
@@ -5708,7 +5708,7 @@ READ8_MEMBER(intec_interact_state::porta_r)
 	return ret;
 }
 
-READ8_MEMBER(intec_interact_state::portc_r)
+uint8_t intec_interact_state::portc_r()
 {
 	uint8_t ret = 0x0;
 	ret |= m_input_sense ^1;
@@ -5716,7 +5716,7 @@ READ8_MEMBER(intec_interact_state::portc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(intec_interact_state::portb_w)
+void intec_interact_state::portb_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf);
 
@@ -5779,7 +5779,7 @@ void vt1682_exsport_state::clock_joy2()
 	m_portb_shiftpos++;
 }
 
-READ8_MEMBER(vt1682_exsport_state::uiob_r)
+uint8_t vt1682_exsport_state::uiob_r()
 {
 	int p1bit = (m_p1_latch >> m_portb_shiftpos) & 1;
 	int p2bit = (m_p2_latch >> m_portb_shiftpos) & 1;
@@ -5787,7 +5787,7 @@ READ8_MEMBER(vt1682_exsport_state::uiob_r)
 	return (p1bit << 1) | (p2bit << 3);
 };
 
-WRITE8_MEMBER(vt1682_exsport_state::uiob_w)
+void vt1682_exsport_state::uiob_w(uint8_t data)
 {
 	if ((m_old_portb & 0x01) != (data & 0x01))
 	{
@@ -5835,14 +5835,14 @@ void intec_interact_state::intech_interact(machine_config& config)
 
 
 
-READ8_MEMBER(vt1682_dance_state::uio_porta_r)
+uint8_t vt1682_dance_state::uio_porta_r()
 {
 	uint8_t ret = m_io_p1->read();
 	logerror("%s: porta_r returning: %02x (INPUTS)\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt1682_dance_state::uio_porta_w)
+void vt1682_dance_state::uio_porta_w(uint8_t data)
 {
 	logerror("%s: porta_w writing: %02x (INPUTS)\n", machine().describe_context(), data);
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    fileio.c
+    fileio.cpp
 
     File access functions.
 

@@ -15,10 +15,10 @@ public:
 	void set_planemask(int _mask) { m_plane_mask = _mask; }
 	void get_cursor_pos(int &startx, int &starty, int &endx, int &endy);
 
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	uint16_t vram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	WRITE_LINE_MEMBER(vblank_w);
 	void topcat_mem(address_map &map);

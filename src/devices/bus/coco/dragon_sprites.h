@@ -21,7 +21,7 @@ class dragon_sprites_device :
 {
 public:
 	// construction/destruction
-	dragon_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dragon_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -31,8 +31,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
-	virtual DECLARE_WRITE8_MEMBER(cts_write) override;
+	virtual u8 cts_read(offs_t offset) override;
+	virtual void cts_write(offs_t offset, u8 data) override;
 
 private:
 	required_memory_region m_eprom;

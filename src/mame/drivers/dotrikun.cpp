@@ -32,8 +32,6 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 
-#include "dotrikun.lh"
-
 #define MASTER_CLOCK XTAL(4'000'000)
 
 
@@ -62,8 +60,8 @@ protected:
 	uint8_t m_vram_latch;
 	uint8_t m_color;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(color_w);
+	void vram_w(offs_t offset, uint8_t data);
+	void color_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_off);
@@ -106,13 +104,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
  *
  *************************************/
 
-WRITE8_MEMBER(dotrikun_state::vram_w)
+void dotrikun_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_screen->update_now();
 	m_vram[offset] = data;
 }
 
-WRITE8_MEMBER(dotrikun_state::color_w)
+void dotrikun_state::color_w(uint8_t data)
 {
 	// d0-d2: fg palette
 	// d3-d5: bg palette
@@ -211,6 +209,7 @@ void dotrikun_state::dotrikun(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192);
+	m_screen->set_physical_aspect(1, 1); // large border area
 	m_screen->set_screen_update(FUNC(dotrikun_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");
@@ -242,6 +241,6 @@ ROM_START( dotriman )
 ROM_END
 
 
-GAMEL( 1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
-GAMEL( 1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
-GAMEL( 2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAME( 1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+GAME( 1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+GAME( 2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

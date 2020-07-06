@@ -108,15 +108,15 @@ public:
 	void pt68k4(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(hiram_r);
-	DECLARE_WRITE8_MEMBER(hiram_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	uint8_t hiram_r(offs_t offset);
+	void hiram_w(offs_t offset, uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+	void keyboard_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(pia_stub_r);
-	DECLARE_WRITE8_MEMBER(duart1_out);
+	uint8_t pia_stub_r();
+	void duart1_out(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(fdc_select_w);
+	void fdc_select_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(duart1_irq);
 	DECLARE_WRITE_LINE_MEMBER(duart2_irq);
@@ -201,17 +201,17 @@ WRITE_LINE_MEMBER(pt68k4_state::keyboard_data_w)
 	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER(pt68k4_state::duart1_out)
+void pt68k4_state::duart1_out(uint8_t data)
 {
 	m_speaker->level_w((data >> 3) & 1);
 }
 
-READ8_MEMBER(pt68k4_state::pia_stub_r)
+uint8_t pt68k4_state::pia_stub_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pt68k4_state::fdc_select_w)
+void pt68k4_state::fdc_select_w(uint8_t data)
 {
 	floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
 	floppy_image_device *floppy2 = m_floppy_connector[1] ? m_floppy_connector[1]->get_device() : nullptr;
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( pt68k4 )
 INPUT_PORTS_END
 
 /* built in keyboard: offset 0 reads 0x80 if key ready, 0 if not.  If key ready, offset 1 reads scancode.  Read or write to offs 0 clears key ready */
-READ8_MEMBER(pt68k4_state::keyboard_r)
+uint8_t pt68k4_state::keyboard_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -303,18 +303,18 @@ READ8_MEMBER(pt68k4_state::keyboard_r)
 	return m_scancode;
 }
 
-WRITE8_MEMBER(pt68k4_state::keyboard_w)
+void pt68k4_state::keyboard_w(uint8_t data)
 {
 	m_kbdflag = 0;
 	m_duart1->ip2_w(ASSERT_LINE);
 }
 
-READ8_MEMBER(pt68k4_state::hiram_r)
+uint8_t pt68k4_state::hiram_r(offs_t offset)
 {
 	return m_hiram[offset];
 }
 
-WRITE8_MEMBER(pt68k4_state::hiram_w)
+void pt68k4_state::hiram_w(offs_t offset, uint8_t data)
 {
 	m_hiram[offset] = data;
 }

@@ -117,6 +117,7 @@ private:
 	uint8_t m_reg_int1_mask;
 	uint8_t m_reg_address;
 	uint8_t m_reg_serial_p;
+	uint8_t m_reg_2nd_serial_p;
 	uint8_t m_reg_parallel_p;
 	uint8_t m_reg_2nd_parallel_p;
 	uint8_t m_reg_di;
@@ -137,6 +138,7 @@ private:
 	bool m_stdl;
 	bool m_shdw;
 	bool m_vstdl;
+	bool m_rsvd2;
 
 	// AH (Acceptor Handshake) states
 	enum {

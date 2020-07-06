@@ -45,10 +45,10 @@ public:
 
 private:
 	required_device<v9938_device> m_v9938;
-	DECLARE_WRITE8_MEMBER(tonton_outport_w);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_WRITE8_MEMBER(ay_aout_w);
-	DECLARE_WRITE8_MEMBER(ay_bout_w);
+	void tonton_outport_w(offs_t offset, uint8_t data);
+	void hopper_w(uint8_t data);
+	void ay_aout_w(uint8_t data);
+	void ay_bout_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +69,7 @@ private:
 *          Multi-Purpose Output Port             *
 *************************************************/
 
-WRITE8_MEMBER(tonton_state::tonton_outport_w)
+void tonton_state::tonton_outport_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 	machine().bookkeeping().coin_lockout_global_w(data & 0x02);  /* Coin Lock */
@@ -80,7 +80,7 @@ WRITE8_MEMBER(tonton_state::tonton_outport_w)
 		logerror("tonton_outport_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(tonton_state::hopper_w)
+void tonton_state::hopper_w(uint8_t data)
 {
 	m_hopper->motor_w(BIT(data, 1));
 }
@@ -208,12 +208,12 @@ void tonton_state::machine_reset()
 *      R/W Handlers and Interrupt Routines       *
 *************************************************/
 
-WRITE8_MEMBER(tonton_state::ay_aout_w)
+void tonton_state::ay_aout_w(uint8_t data)
 {
 	logerror("AY8910: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(tonton_state::ay_bout_w)
+void tonton_state::ay_bout_w(uint8_t data)
 {
 	logerror("AY8910: Port B out: %02X\n", data);
 }

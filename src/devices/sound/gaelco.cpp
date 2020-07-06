@@ -64,7 +64,7 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 27) // Unknown address bits
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 {
 }
@@ -189,7 +189,7 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
                         CG-1V/GAE1 Read Handler
   ============================================================================*/
 
-READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
+uint16_t gaelco_gae1_device::gaelcosnd_r(offs_t offset)
 {
 	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", machine().describe_context(), offset));
 
@@ -203,7 +203,7 @@ READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
                         CG-1V/GAE1 Write Handler
   ============================================================================*/
 
-WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
+void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sound_channel *channel = &m_channel[offset >> 3];
 

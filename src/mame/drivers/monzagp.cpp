@@ -68,11 +68,11 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(port2_r);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
+	void port1_w(uint8_t data);
+	void port2_w(uint8_t data);
+	uint8_t port2_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	void monzagp_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -283,7 +283,7 @@ void monzagp_state::monzagp_map(address_map &map)
 }
 
 
-READ8_MEMBER(monzagp_state::port_r)
+uint8_t monzagp_state::port_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (!(m_p1 & 0x01))             // 8350 videoram
@@ -330,7 +330,7 @@ READ8_MEMBER(monzagp_state::port_r)
 	return data;
 }
 
-WRITE8_MEMBER(monzagp_state::port_w)
+void monzagp_state::port_w(offs_t offset, uint8_t data)
 {
 	if (!(m_p1 & 0x01))     // 8350 videoram
 	{
@@ -403,18 +403,18 @@ WRITE8_MEMBER(monzagp_state::port_w)
 	}
 }
 
-WRITE8_MEMBER(monzagp_state::port1_w)
+void monzagp_state::port1_w(uint8_t data)
 {
 //  printf("P1 %x = %x\n",m_maincpu->pc(),data);
 	m_p1 = data;
 }
 
-READ8_MEMBER(monzagp_state::port2_r)
+uint8_t monzagp_state::port2_r()
 {
 	return m_p2;
 }
 
-WRITE8_MEMBER(monzagp_state::port2_w)
+void monzagp_state::port2_w(uint8_t data)
 {
 //  printf("P2 %x = %x\n",m_maincpu->pc(),data);
 	m_p2 = data;

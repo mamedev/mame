@@ -13,7 +13,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dcon_state::gfxbank_w)
+void dcon_state::gfxbank_w(uint16_t data)
 {
 	if (data&1)
 		m_gfx_bank_select=0x1000;
@@ -21,25 +21,25 @@ WRITE16_MEMBER(dcon_state::gfxbank_w)
 		m_gfx_bank_select=0;
 }
 
-WRITE16_MEMBER(dcon_state::background_w)
+void dcon_state::background_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dcon_state::foreground_w)
+void dcon_state::foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dcon_state::midground_w)
+void dcon_state::midground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dcon_state::text_w)
+void dcon_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);

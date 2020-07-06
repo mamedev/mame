@@ -24,11 +24,11 @@ public:
 
 private:
 	void mem_map_2m_mkram(address_map& map);
-	DECLARE_WRITE16_MEMBER(portc_w) override;
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 
-WRITE16_MEMBER(jakks_state::portc_w)
+void jakks_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));
@@ -124,7 +124,7 @@ void jakks_state::base_config(machine_config& config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
 
-	I2CMEM(config, m_i2cmem, 0).set_data_size(0x200);
+	I2C_24C04(config, m_i2cmem, 0); // ?
 }
 
 void jakks_state::batman(machine_config &config)

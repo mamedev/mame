@@ -78,7 +78,7 @@ void cvs_state::set_pens(  )
 
 
 
-WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
+void cvs_state::cvs_video_fx_w(uint8_t data)
 {
 	if (data & 0xce)
 		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",m_maincpu->pc(), data & 0xce);
@@ -98,19 +98,19 @@ WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 
 
 
-READ8_MEMBER(cvs_state::cvs_collision_r)
+uint8_t cvs_state::cvs_collision_r()
 {
 	return m_collision_register;
 }
 
-READ8_MEMBER(cvs_state::cvs_collision_clear)
+uint8_t cvs_state::cvs_collision_clear()
 {
 	m_collision_register = 0;
 	return 0;
 }
 
 
-WRITE8_MEMBER(cvs_state::cvs_scroll_w)
+void cvs_state::cvs_scroll_w(uint8_t data)
 {
 	m_scroll_reg = 255 - data;
 }

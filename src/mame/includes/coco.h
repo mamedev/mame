@@ -34,6 +34,7 @@ INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_joystick );
 INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
+INPUT_PORTS_EXTERN( coco_beckerport_dw );
 
 void coco_cart(device_slot_interface &device);
 
@@ -90,32 +91,32 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 
 	// IO
-	virtual DECLARE_WRITE8_MEMBER( ff20_write );
-	virtual DECLARE_READ8_MEMBER( ff40_read );
-	virtual DECLARE_WRITE8_MEMBER( ff40_write );
-	DECLARE_READ8_MEMBER( ff60_read );
-	DECLARE_WRITE8_MEMBER( ff60_write );
+	virtual void ff20_write(offs_t offset, uint8_t data);
+	virtual uint8_t ff40_read(offs_t offset);
+	virtual void ff40_write(offs_t offset, uint8_t data);
+	uint8_t ff60_read(offs_t offset);
+	void ff60_write(offs_t offset, uint8_t data);
 
 	// PIA0
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
 
 	// PIA1
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE8_MEMBER( pia1_pb_w );
+	uint8_t pia1_pa_r();
+	uint8_t pia1_pb_r();
+	void pia1_pa_w(uint8_t data);
+	void pia1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus & "space"
-	DECLARE_READ8_MEMBER( floating_bus_r )   { return floating_bus_read(); }
+	uint8_t floating_bus_r()   { return floating_bus_read(); }
 	uint8_t floating_space_read(offs_t offset);
 	void floating_space_write(offs_t offset, uint8_t data);
 

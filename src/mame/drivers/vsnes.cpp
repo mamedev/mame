@@ -151,19 +151,19 @@ Changes:
 /******************************************************************************/
 
 
-WRITE8_MEMBER(vsnes_state::sprite_dma_0_w)
+void vsnes_state::sprite_dma_0_w(address_space &space, uint8_t data)
 {
 	int source = ( data & 7 );
 	m_ppu1->spriteram_dma( space, source );
 }
 
-WRITE8_MEMBER(vsnes_state::sprite_dma_1_w)
+void vsnes_state::sprite_dma_1_w(address_space &space, uint8_t data)
 {
 	int source = ( data & 7 );
 	m_ppu2->spriteram_dma( space, source );
 }
 
-WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
+void vsnes_state::vsnes_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01 );
 	m_coin = data;
@@ -175,13 +175,13 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
 	}
 }
 
-READ8_MEMBER(vsnes_state::vsnes_coin_counter_r)
+uint8_t vsnes_state::vsnes_coin_counter_r()
 {
 	//only for platoon
 	return m_coin;
 }
 
-WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
+void vsnes_state::vsnes_coin_counter_1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01 );
 	if( data & 0xfe ) //vsbball service mode
@@ -221,7 +221,7 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 
 
 
-READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_address_r)
+uint8_t vsnes_state::vsnes_bootleg_z80_address_r()
 {
 	// NMI routine uses the value read here as the low part of an offset from 0x2000 to store a value read at 0x4000
 	// before reading 0x6000 and returning
@@ -233,14 +233,14 @@ READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_address_r)
 	return m_bootleg_sound_offset;
 }
 
-WRITE8_MEMBER(vsnes_state::bootleg_sound_write)
+void vsnes_state::bootleg_sound_write(offs_t offset, uint8_t data)
 {
 	m_bootleg_sound_offset = offset & 0xf;
 	m_bootleg_sound_data = data;
 	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
+uint8_t vsnes_state::vsnes_bootleg_z80_data_r()
 {
 	//printf("Z80 read data %02x\n", m_bootleg_sound_data);
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -248,7 +248,7 @@ READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
 }
 
 // A0 = SN #1 enable, A1 = SN #2 enable, A2 = SN write enables (both) on edge
-WRITE8_MEMBER(vsnes_state::vssmbbl_sn_w)
+void vsnes_state::vssmbbl_sn_w(offs_t offset, uint8_t data)
 {
 //  printf("sn_w: ofs %x\n", offset & 7);
 	if (!(offset & 4))
@@ -280,7 +280,7 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
+uint8_t vsnes_state::vsnes_bootleg_z80_latch_r()
 {
 	return 0x00;
 }

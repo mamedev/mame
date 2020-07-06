@@ -117,7 +117,7 @@ void t6963c_device::device_reset()
 
 u8 t6963c_device::read(offs_t offset)
 {
-	return BIT(offset, 0) ? 0x0b : 0x00;
+	return BIT(offset, 0) ? 0x2b : 0x00;
 }
 
 

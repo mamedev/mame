@@ -15,6 +15,7 @@
 
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okiadpcm.h"
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,7 +25,7 @@
 
 class qs1000_device :   public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<24>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }

@@ -24,42 +24,43 @@ public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
 	void k8915(machine_config &config);
 
-	void init_k8915();
-
 private:
-	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	void k8915_a8_w(u8 data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_framecnt;
-	virtual void machine_reset() override;
+	u8 m_framecnt;
+	bool m_rom_in_map;
+	void machine_start() override;
+	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
 
-WRITE8_MEMBER( k8915_state::k8915_a8_w )
+void k8915_state::k8915_a8_w(u8 data)
 {
 // seems to switch ram and rom around.
-	if (data == 0x87)
-		membank("boot")->set_entry(0); // ram at 0000
-	else
-		membank("boot")->set_entry(1); // rom at 0000
+	m_rom_in_map = (data == 0x87) ? 0 : 1;
 }
 
 void k8915_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankrw("boot");
+	map(0x0000, 0x0fff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
 	map(0x1000, 0x17ff).ram().share("videoram");
 	map(0x1800, 0xffff).ram();
 }
@@ -78,19 +79,19 @@ INPUT_PORTS_END
 
 void k8915_state::machine_reset()
 {
-	membank("boot")->set_entry(1);
+	m_rom_in_map = 1;
 }
 
-void k8915_state::init_k8915()
+void k8915_state::machine_start()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
+	save_item(NAME(m_framecnt));
+	save_item(NAME(m_rom_in_map));
 }
 
-uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
 
 	m_framecnt++;
 
@@ -98,7 +99,7 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -170,8 +171,8 @@ void k8915_state::k8915(machine_config &config)
 
 /* ROM definition */
 ROM_START( k8915 )
-	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "k8915.bin", 0x10000, 0x1000, CRC(ca70385f) SHA1(a34c14adae9be821678aed7f9e33932ee1f3e61c))
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "k8915.bin", 0x0000, 0x1000, CRC(ca70385f) SHA1(a34c14adae9be821678aed7f9e33932ee1f3e61c))
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
@@ -181,4 +182,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
-COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, init_k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, empty_init, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

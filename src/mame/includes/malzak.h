@@ -50,15 +50,15 @@ private:
 	required_device<palette_device> m_palette;
 	required_memory_bank m_mainbank;
 
-	DECLARE_READ8_MEMBER(fake_VRLE_r);
-	DECLARE_READ8_MEMBER(s2636_portA_r);
-	DECLARE_READ8_MEMBER(s2650_data_r);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(portc0_w);
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(playfield_w);
-	DECLARE_READ8_MEMBER(videoram_r);
+	uint8_t fake_VRLE_r();
+	uint8_t s2636_portA_r();
+	uint8_t s2650_data_r();
+	void port40_w(uint8_t data);
+	void port60_w(uint8_t data);
+	void portc0_w(uint8_t data);
+	uint8_t collision_r();
+	void playfield_w(offs_t offset, uint8_t data);
+	uint8_t videoram_r(offs_t offset);
 
 	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

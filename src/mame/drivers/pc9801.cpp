@@ -395,7 +395,7 @@ Keyboard TX commands:
 
 
 
-WRITE8_MEMBER(pc9801_state::rtc_w)
+void pc9801_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 0x01) >> 0);
 	m_rtc->c1_w((data & 0x02) >> 1);
@@ -407,13 +407,13 @@ WRITE8_MEMBER(pc9801_state::rtc_w)
 		logerror("RTC write to undefined bits %02x\n",data & 0xc0);
 }
 
-WRITE8_MEMBER(pc9801_state::dmapg4_w)
+void pc9801_state::dmapg4_w(offs_t offset, uint8_t data)
 {
 	if(offset < 4)
 		m_dma_offset[(offset+1) & 3] = data & 0x0f;
 }
 
-WRITE8_MEMBER(pc9801_state::dmapg8_w)
+void pc9801_state::dmapg8_w(offs_t offset, uint8_t data)
 {
 	if(offset == 4)
 		m_dma_autoinc[data & 3] = (data >> 2) & 3;
@@ -421,22 +421,22 @@ WRITE8_MEMBER(pc9801_state::dmapg8_w)
 		m_dma_offset[(offset+1) & 3] = data;
 }
 
-WRITE8_MEMBER(pc9801_state::nmi_ctrl_w)
+void pc9801_state::nmi_ctrl_w(offs_t offset, uint8_t data)
 {
 	m_nmi_ff = offset;
 }
 
-WRITE8_MEMBER(pc9801_state::vrtc_clear_w)
+void pc9801_state::vrtc_clear_w(uint8_t data)
 {
 	m_pic1->ir2_w(0);
 }
 
-READ8_MEMBER(pc9801_state::fdc_2hd_ctrl_r)
+uint8_t pc9801_state::fdc_2hd_ctrl_r()
 {
 	return 0x44; //unknown port meaning 2hd flag?
 }
 
-WRITE8_MEMBER(pc9801_state::fdc_2hd_ctrl_w)
+void pc9801_state::fdc_2hd_ctrl_w(uint8_t data)
 {
 	//logerror("%02x ctrl\n",data);
 	if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
@@ -465,14 +465,14 @@ WRITE8_MEMBER(pc9801_state::fdc_2hd_ctrl_w)
 }
 
 
-READ8_MEMBER(pc9801_state::fdc_2dd_ctrl_r)
+uint8_t pc9801_state::fdc_2dd_ctrl_r()
 {
 		int ret = (!m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
 		ret |= (m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
 		return ret | 0x40; //unknown port meaning, might be 0x70
 }
 
-WRITE8_MEMBER(pc9801_state::fdc_2dd_ctrl_w)
+void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
 {
 	logerror("%02x ctrl\n",data);
 	if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
@@ -483,7 +483,7 @@ WRITE8_MEMBER(pc9801_state::fdc_2dd_ctrl_w)
 	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(pc9801_state::ide_ctrl_r)
+uint8_t pc9801_state::ide_ctrl_r()
 {
 	address_space &ram = m_maincpu->space(AS_PROGRAM);
 	// this makes the ide driver not do 512 to 256 byte sector translation, the 9821 looks for bit 6 of offset 0xac403 of the kanji ram to set this, the rs unknown
@@ -491,33 +491,33 @@ READ8_MEMBER(pc9801_state::ide_ctrl_r)
 	return m_ide_sel;
 }
 
-WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
+void pc9801_state::ide_ctrl_w(uint8_t data)
 {
 	if(!(data & 0x80))
 		m_ide_sel = data & 1;
 }
 
-READ16_MEMBER(pc9801_state::ide_cs0_r)
+uint16_t pc9801_state::ide_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ide[m_ide_sel]->read_cs0(offset, mem_mask);
+	return m_ide[m_ide_sel]->cs0_r(offset, mem_mask);
 }
 
-WRITE16_MEMBER(pc9801_state::ide_cs0_w)
+void pc9801_state::ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ide[m_ide_sel]->write_cs0(offset, data, mem_mask);
+	m_ide[m_ide_sel]->cs0_w(offset, data, mem_mask);
 }
 
-READ16_MEMBER(pc9801_state::ide_cs1_r)
+uint16_t pc9801_state::ide_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_ide[m_ide_sel]->read_cs1(offset, mem_mask);
+	return m_ide[m_ide_sel]->cs1_r(offset, mem_mask);
 }
 
-WRITE16_MEMBER(pc9801_state::ide_cs1_w)
+void pc9801_state::ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ide[m_ide_sel]->write_cs1(offset, data, mem_mask);
+	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
 }
 
-READ8_MEMBER( pc9801_state::sasi_data_r )
+uint8_t pc9801_state::sasi_data_r()
 {
 	uint8_t data = m_sasi_data_in->read();
 
@@ -526,7 +526,7 @@ READ8_MEMBER( pc9801_state::sasi_data_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc9801_state::sasi_data_w )
+void pc9801_state::sasi_data_w(uint8_t data)
 {
 	m_sasi_data = data;
 
@@ -574,7 +574,7 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
 }
 
 
-READ8_MEMBER( pc9801_state::sasi_status_r )
+uint8_t pc9801_state::sasi_status_r()
 {
 	uint8_t res = 0;
 
@@ -604,7 +604,7 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 	return res;
 }
 
-WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
+void pc9801_state::sasi_ctrl_w(uint8_t data)
 {
 	/*
 	    x--- ---- channel enable
@@ -630,7 +630,7 @@ WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 //  m_sasibus->write_sel(BIT(data, 0));
 }
 
-READ8_MEMBER(pc9801_state::f0_r)
+uint8_t pc9801_state::f0_r(offs_t offset)
 {
 	if(offset == 0)
 	{
@@ -703,7 +703,7 @@ void pc9801_state::pc9801_io(address_map &map)
 
 /* TODO: it's possible that the offset calculation is actually linear. */
 /* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
-READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
+uint8_t pc9801_state::pc9801rs_knjram_r(offs_t offset)
 {
 	uint32_t pcg_offset;
 
@@ -728,7 +728,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 	return m_kanji_rom[pcg_offset];
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
+void pc9801_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 {
 	uint32_t pcg_offset;
 
@@ -744,7 +744,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 }
 
 /* FF-based */
-WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
+void pc9801_state::pc9801rs_bank_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 	{
@@ -770,17 +770,17 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 	}
 }
 
-READ8_MEMBER(pc9801_state::a20_ctrl_r)
+uint8_t pc9801_state::a20_ctrl_r(offs_t offset)
 {
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x03)
 		return (m_gate_a20 ^ 1) | (m_nmi_ff << 1);
 
-	return f0_r(space,offset);
+	return f0_r(offset);
 }
 
-WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
+void pc9801_state::a20_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0x00)
 	{
@@ -807,7 +807,7 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 }
 
-READ8_MEMBER(pc9801_state::grcg_r)
+uint8_t pc9801_state::grcg_r(offs_t offset)
 {
 	if(offset == 6)
 	{
@@ -819,10 +819,10 @@ READ8_MEMBER(pc9801_state::grcg_r)
 		logerror("GRCG tile R\n");
 		return 0xff;
 	}
-	return txt_scrl_r(space,offset);
+	return txt_scrl_r(offset);
 }
 
-WRITE8_MEMBER(pc9801_state::grcg_w)
+void pc9801_state::grcg_w(offs_t offset, uint8_t data)
 {
 	if(offset == 6)
 	{
@@ -840,10 +840,10 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 		return;
 	}
 
-	txt_scrl_w(space,offset,data);
+	txt_scrl_w(offset,data);
 }
 
-WRITE16_MEMBER(pc9801_state::egc_w)
+void pc9801_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!m_ex_video_ff[2])
 		return;
@@ -885,12 +885,12 @@ WRITE16_MEMBER(pc9801_state::egc_w)
 	}
 }
 
-READ8_MEMBER(pc9801_state::fdc_mode_ctrl_r)
+uint8_t pc9801_state::fdc_mode_ctrl_r()
 {
 	return (m_fdc_ctrl & 3) | 0xf0 | 8 | 4;
 }
 
-WRITE8_MEMBER(pc9801_state::fdc_mode_ctrl_w)
+void pc9801_state::fdc_mode_ctrl_w(uint8_t data)
 {
 	/*
 	---- x--- ready line?
@@ -909,7 +909,7 @@ WRITE8_MEMBER(pc9801_state::fdc_mode_ctrl_w)
 }
 
 #if 0
-READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
+uint8_t pc9801_state::pc9801rs_2dd_r()
 {
 //  if(m_fdc_ctrl & 1)
 //      return 0xff;
@@ -918,8 +918,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0: return m_fdc_2hd->msr_r(space, 0, 0xff);
-			case 2: return m_fdc_2hd->fifo_r(space, 0, 0xff);
+			case 0: return m_fdc_2hd->msr_r();
+			case 2: return m_fdc_2hd->fifo_r();
 			case 4: return 0x44; //2dd flag
 		}
 	}
@@ -929,7 +929,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
+void pc9801_state::pc9801rs_2dd_w(uint8_t data)
 {
 //  if(m_fdc_ctrl & 1)
 //      return;
@@ -938,7 +938,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: m_fdc_2hd->fifo_w(space, 0, data, 0xff); return;
+			case 2: m_fdc_2hd->fifo_w(data); return;
 			case 4: logerror("%02x 2DD FDC ctrl\n",data); return;
 		}
 	}
@@ -947,7 +947,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 }
 #endif
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
+void pc9801_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 	{
@@ -972,10 +972,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 		return;
 	}
 
-	pc9801_video_ff_w(space,offset,data);
+	pc9801_video_ff_w(data);
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
+void pc9801_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 {
 	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16_MODE])
 	{
@@ -994,10 +994,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 		return;
 	}
 
-	pc9801_a0_w(space,offset,data);
+	pc9801_a0_w(offset,data);
 }
 
-READ8_MEMBER( pc9801_state::access_ctrl_r )
+uint8_t pc9801_state::access_ctrl_r(offs_t offset)
 {
 	if(offset == 1)
 		return m_access_ctrl;
@@ -1005,13 +1005,13 @@ READ8_MEMBER( pc9801_state::access_ctrl_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc9801_state::access_ctrl_w )
+void pc9801_state::access_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 		m_access_ctrl = data;
 }
 
-WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
+void  pc9801_state::pc9801rs_mouse_freq_w(offs_t offset, uint8_t data)
 {
 	/* TODO: bit 3 used */
 	if(offset == 3)
@@ -1021,44 +1021,44 @@ WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
 	}
 }
 
-READ8_MEMBER( pc9801_state::midi_r )
+uint8_t pc9801_state::midi_r()
 {
 	/* unconnect, needed by Amaranth KH to boot */
 	return 0xff;
 }
 
-READ8_MEMBER(pc9801_state::pic_r)
+uint8_t pc9801_state::pic_r(offs_t offset)
 {
 	return ((offset >= 4) ? m_pic2 : m_pic1)->read(offset & 3);
 }
 
-WRITE8_MEMBER(pc9801_state::pic_w)
+void pc9801_state::pic_w(offs_t offset, uint8_t data)
 {
 	((offset >= 4) ? m_pic2 : m_pic1)->write(offset & 3, data);
 }
 
-READ16_MEMBER(pc9801_state::grcg_gvram_r)
+uint16_t pc9801_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = upd7220_grcg_r(space, (offset + 0x4000) | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r((offset + 0x4000) | (m_vram_bank << 16), mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
-WRITE16_MEMBER(pc9801_state::grcg_gvram_w)
+void pc9801_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w(space, (offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
+	upd7220_grcg_w((offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
 }
 
-READ16_MEMBER(pc9801_state::grcg_gvram0_r)
+uint16_t pc9801_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = upd7220_grcg_r(space, offset | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(offset | (m_vram_bank << 16), mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
-WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
+void pc9801_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
+	upd7220_grcg_w(offset | (m_vram_bank << 16), data, mem_mask);
 }
 
 void pc9801_state::ipl_bank(address_map &map)
@@ -1122,7 +1122,7 @@ void pc9801_state::pc9801rs_io(address_map &map)
  *
  ************************************/
 
-WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
+void pc9801_state::pc9821_video_ff_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 	{
@@ -1135,10 +1135,10 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 	}
 
 	/* Intentional fall-through */
-	pc9801rs_video_ff_w(space,offset,data);
+	pc9801rs_video_ff_w(offset,data);
 }
 
-READ8_MEMBER(pc9801_state::pc9821_a0_r)
+uint8_t pc9801_state::pc9821_a0_r(offs_t offset)
 {
 	if((offset & 1) == 0 && offset & 8)
 	{
@@ -1163,10 +1163,10 @@ READ8_MEMBER(pc9801_state::pc9821_a0_r)
 		}
 	}
 
-	return pc9801_a0_r(space,offset);
+	return pc9801_a0_r(offset);
 }
 
-WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
+void pc9801_state::pc9821_a0_w(offs_t offset, uint8_t data)
 {
 	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_256_MODE])
 	{
@@ -1185,10 +1185,10 @@ WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 		return;
 	}
 
-	pc9801rs_a0_w(space,offset,data);
+	pc9801rs_a0_w(offset,data);
 }
 
-READ8_MEMBER(pc9801_state::window_bank_r)
+uint8_t pc9801_state::window_bank_r(offs_t offset)
 {
 	if(offset == 1)
 		return m_pc9821_window_bank & 0xfe;
@@ -1196,7 +1196,7 @@ READ8_MEMBER(pc9801_state::window_bank_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_state::window_bank_w)
+void pc9801_state::window_bank_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
 		m_pc9821_window_bank = data & 0xfe;
@@ -1224,31 +1224,31 @@ void pc9801_state::m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data)
 	logerror("Warning: write from unknown SDIP area %02x %04x %02x\n",port,0x841c + port + (sdip_offset % 12)*0x100,data);
 }
 
-READ8_MEMBER(pc9801_state::sdip_0_r) { return m_sdip_read(offset, 0+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_1_r) { return m_sdip_read(offset, 1+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_2_r) { return m_sdip_read(offset, 2+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_3_r) { return m_sdip_read(offset, 3+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_4_r) { return m_sdip_read(offset, 4+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_5_r) { return m_sdip_read(offset, 5+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_6_r) { return m_sdip_read(offset, 6+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_7_r) { return m_sdip_read(offset, 7+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_8_r) { return m_sdip_read(offset, 8+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_9_r) { return m_sdip_read(offset, 9+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_a_r) { return m_sdip_read(offset, 10+m_sdip_bank*12); }
-READ8_MEMBER(pc9801_state::sdip_b_r) { return m_sdip_read(offset, 11+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_0_r(offs_t offset) { return m_sdip_read(offset, 0+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_1_r(offs_t offset) { return m_sdip_read(offset, 1+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_2_r(offs_t offset) { return m_sdip_read(offset, 2+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_3_r(offs_t offset) { return m_sdip_read(offset, 3+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_4_r(offs_t offset) { return m_sdip_read(offset, 4+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_5_r(offs_t offset) { return m_sdip_read(offset, 5+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_6_r(offs_t offset) { return m_sdip_read(offset, 6+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_7_r(offs_t offset) { return m_sdip_read(offset, 7+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_8_r(offs_t offset) { return m_sdip_read(offset, 8+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_9_r(offs_t offset) { return m_sdip_read(offset, 9+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_a_r(offs_t offset) { return m_sdip_read(offset, 10+m_sdip_bank*12); }
+uint8_t pc9801_state::sdip_b_r(offs_t offset) { return m_sdip_read(offset, 11+m_sdip_bank*12); }
 
-WRITE8_MEMBER(pc9801_state::sdip_0_w) { m_sdip_write(offset,0+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_1_w) { m_sdip_write(offset,1+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_2_w) { m_sdip_write(offset,2+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_3_w) { m_sdip_write(offset,3+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_4_w) { m_sdip_write(offset,4+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_5_w) { m_sdip_write(offset,5+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_6_w) { m_sdip_write(offset,6+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_7_w) { m_sdip_write(offset,7+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_8_w) { m_sdip_write(offset,8+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_9_w) { m_sdip_write(offset,9+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_a_w) { m_sdip_write(offset,10+m_sdip_bank*12,data); }
-WRITE8_MEMBER(pc9801_state::sdip_b_w)
+void pc9801_state::sdip_0_w(offs_t offset, uint8_t data) { m_sdip_write(offset,0+m_sdip_bank*12,data); }
+void pc9801_state::sdip_1_w(offs_t offset, uint8_t data) { m_sdip_write(offset,1+m_sdip_bank*12,data); }
+void pc9801_state::sdip_2_w(offs_t offset, uint8_t data) { m_sdip_write(offset,2+m_sdip_bank*12,data); }
+void pc9801_state::sdip_3_w(offs_t offset, uint8_t data) { m_sdip_write(offset,3+m_sdip_bank*12,data); }
+void pc9801_state::sdip_4_w(offs_t offset, uint8_t data) { m_sdip_write(offset,4+m_sdip_bank*12,data); }
+void pc9801_state::sdip_5_w(offs_t offset, uint8_t data) { m_sdip_write(offset,5+m_sdip_bank*12,data); }
+void pc9801_state::sdip_6_w(offs_t offset, uint8_t data) { m_sdip_write(offset,6+m_sdip_bank*12,data); }
+void pc9801_state::sdip_7_w(offs_t offset, uint8_t data) { m_sdip_write(offset,7+m_sdip_bank*12,data); }
+void pc9801_state::sdip_8_w(offs_t offset, uint8_t data) { m_sdip_write(offset,8+m_sdip_bank*12,data); }
+void pc9801_state::sdip_9_w(offs_t offset, uint8_t data) { m_sdip_write(offset,9+m_sdip_bank*12,data); }
+void pc9801_state::sdip_a_w(offs_t offset, uint8_t data) { m_sdip_write(offset,10+m_sdip_bank*12,data); }
+void pc9801_state::sdip_b_w(offs_t offset, uint8_t data)
 {
 	if(offset == 3)
 		m_sdip_bank = (data & 0x40) >> 6;
@@ -1260,7 +1260,7 @@ WRITE8_MEMBER(pc9801_state::sdip_b_w)
 		logerror("SDIP area B write %02x %02x\n",offset,data);
 }
 
-READ16_MEMBER(pc9801_state::timestamp_r)
+uint16_t pc9801_state::timestamp_r(offs_t offset)
 {
 	return (m_maincpu->total_cycles() >> (16 * offset));
 }
@@ -1268,7 +1268,7 @@ READ16_MEMBER(pc9801_state::timestamp_r)
 /* basically a read-back of various registers */
 // bit 1: GDC clock select (port 0x6a, selects with 0x84 & bit 0)
 // bit 0: current setting
-READ8_MEMBER(pc9801_state::ext2_video_ff_r)
+uint8_t pc9801_state::ext2_video_ff_r()
 {
 	uint8_t res;
 
@@ -1319,25 +1319,25 @@ READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 	return res;
 }
 
-WRITE8_MEMBER(pc9801_state::ext2_video_ff_w)
+void pc9801_state::ext2_video_ff_w(uint8_t data)
 {
 	m_ext2_ff = data;
 }
 
-/*READ8_MEMBER(pc9801_state::winram_r)
+/*uint8_t pc9801_state::winram_r(offs_t offset)
 {
     offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
     return
 }
 
 
-WRITE8_MEMBER(pc9801_state::winram_w)
+void pc9801_state::winram_w(offs_t offset, uint8_t data)
 {
     offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
 }*/
 
 // TODO: analog 256 mode needs HW tests
-READ16_MEMBER(pc9801_state::pc9821_grcg_gvram_r)
+uint16_t pc9801_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
@@ -1348,10 +1348,10 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram_r)
 		return 0xffff;
 	}
 
-	return grcg_gvram_r(space,offset,mem_mask);
+	return grcg_gvram_r(offset, mem_mask);
 }
 
-WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram_w)
+void pc9801_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
@@ -1362,10 +1362,10 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram_w)
 		return;
 	}
 
-	grcg_gvram_w(space,offset,data,mem_mask);
+	grcg_gvram_w(offset,data,mem_mask);
 }
 
-READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
+uint16_t pc9801_state::pc9821_grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
@@ -1378,10 +1378,10 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
 		//return 0;
 	}
 
-	return grcg_gvram0_r(space,offset,mem_mask);
+	return grcg_gvram0_r(offset, mem_mask);
 }
 
-WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
+void pc9801_state::pc9821_grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
@@ -1397,7 +1397,7 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 		return;
 	}
 
-	grcg_gvram0_w(space,offset,data,mem_mask);
+	grcg_gvram0_w(offset,data,mem_mask);
 }
 
 
@@ -1422,7 +1422,7 @@ void pc9801_state::pc9821_io(address_map &map)
 {
 //  map.unmap_value_high(); // TODO: a read to somewhere makes this to fail at POST
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
-	map(0x0000, 0x001f).lr8(NAME([this] (address_space &s, offs_t o, u8 mm) { return BIT(o, 1) ? 0xff : pic_r(s, o, mm); })).umask32(0x00ff00ff);
+	map(0x0000, 0x001f).lr8(NAME([this] (offs_t o) { return BIT(o, 1) ? 0xff : pic_r(o); })).umask32(0x00ff00ff);
 	map(0x0000, 0x001f).w(FUNC(pc9801_state::pic_w)).umask32(0x00ff00ff);  // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask32(0x000000ff);
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg8_w)).umask32(0xff00ff00);
@@ -1507,7 +1507,7 @@ void pc9801_state::pc9821_io(address_map &map)
 }
 
 // TODO: identify this, might be an alt way to access SDIP?
-READ8_MEMBER(pc9801_state::as_unkdev_data_r)
+uint8_t pc9801_state::as_unkdev_data_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_unkdev0468[m_unkdev0468_addr];
@@ -1515,7 +1515,7 @@ READ8_MEMBER(pc9801_state::as_unkdev_data_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_state::as_unkdev_data_w)
+void pc9801_state::as_unkdev_data_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 		m_unkdev0468[m_unkdev0468_addr] = data;
@@ -1523,7 +1523,7 @@ WRITE8_MEMBER(pc9801_state::as_unkdev_data_w)
 	// offset == 0: access bit?
 }
 
-WRITE8_MEMBER(pc9801_state::as_unkdev_addr_w)
+void pc9801_state::as_unkdev_addr_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 		m_unkdev0468_addr = data;
@@ -1816,7 +1816,7 @@ ir7
 */
 
 
-READ8_MEMBER(pc9801_state::get_slave_ack)
+uint8_t pc9801_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic2->acknowledge();
@@ -1864,7 +1864,7 @@ WRITE_LINE_MEMBER(pc9801_state::tc_w )
 //  logerror("TC %02x\n",state);
 }
 
-READ8_MEMBER(pc9801_state::dma_read_byte)
+uint8_t pc9801_state::dma_read_byte(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -1890,7 +1890,7 @@ READ8_MEMBER(pc9801_state::dma_read_byte)
 }
 
 
-WRITE8_MEMBER(pc9801_state::dma_write_byte)
+void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -1936,12 +1936,12 @@ ch3 SCSI
 *
 ****************************************/
 
-WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
+void pc9801_state::ppi_sys_portc_w(uint8_t data)
 {
 	m_beeper->set_state(!(data & 0x08));
 }
 
-READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
+uint8_t pc9801_state::ppi_mouse_porta_r()
 {
 	uint8_t res;
 	uint8_t isporthi;
@@ -1964,17 +1964,17 @@ READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 	return res;
 }
 
-WRITE8_MEMBER(pc9801_state::ppi_mouse_porta_w)
+void pc9801_state::ppi_mouse_porta_w(uint8_t data)
 {
 //  logerror("A %02x\n",data);
 }
 
-WRITE8_MEMBER(pc9801_state::ppi_mouse_portb_w)
+void pc9801_state::ppi_mouse_portb_w(uint8_t data)
 {
 //  logerror("B %02x\n",data);
 }
 
-WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
+void pc9801_state::ppi_mouse_portc_w(uint8_t data)
 {
 	if((m_mouse.control & 0x80) == 0 && data & 0x80)
 	{
@@ -1985,7 +1985,7 @@ WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
 	m_mouse.control = data;
 }
 
-READ8_MEMBER(pc9801_state::unk_r)
+uint8_t pc9801_state::unk_r()
 {
 	return 0xff;
 }

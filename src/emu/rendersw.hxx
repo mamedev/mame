@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    rendersw.inc
+    rendersw.hxx
 
     Software-only rasterization system.
 

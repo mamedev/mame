@@ -108,7 +108,7 @@ void oric_microdisc_device::remap()
 	}
 }
 
-WRITE8_MEMBER(oric_microdisc_device::port_314_w)
+void oric_microdisc_device::port_314_w(uint8_t data)
 {
 	port_314 = data;
 	remap();
@@ -122,12 +122,12 @@ WRITE8_MEMBER(oric_microdisc_device::port_314_w)
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-READ8_MEMBER(oric_microdisc_device::port_314_r)
+uint8_t oric_microdisc_device::port_314_r()
 {
 	return (intrq_state && (port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(oric_microdisc_device::port_318_r)
+uint8_t oric_microdisc_device::port_318_r()
 {
 	return drq_state ? 0x7f : 0xff;
 }

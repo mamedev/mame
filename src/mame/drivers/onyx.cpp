@@ -58,12 +58,13 @@ public:
 	void c8002(machine_config &config);
 	void c5000(machine_config &config);
 	void c5000_io(address_map &map);
+
+private:
 	void c5000_mem(address_map &map);
 	void c8002_io(address_map &map);
 	void c8002_mem(address_map &map);
 	void subio(address_map &map);
 	void submem(address_map &map);
-private:
 	void z8002_m1_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu; // z8002 or z80 depending on driver

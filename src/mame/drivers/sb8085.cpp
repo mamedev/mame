@@ -22,6 +22,14 @@
     Space Byte also advertised a 16K static RAM board and a 2708/2716
     EPROM programmer for use in this system.
 
+    Getting it to work:
+    1. Slot CRT: choose Terminal
+    2. Reboot
+    3. Press E. It will autodetect the baud rate and start up
+    4. Now you can enter commands (such as D000,FFF)
+    5. If it says KEYBOARD ERROR it doesn't mean a problem with the
+       keyboard, it means you made a mistake.
+
 ***************************************************************************/
 
 #include "emu.h"

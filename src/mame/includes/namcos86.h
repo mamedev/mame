@@ -41,27 +41,27 @@ public:
 	void init_namco86();
 
 private:
-	DECLARE_WRITE8_MEMBER(bankswitch1_w);
-	DECLARE_WRITE8_MEMBER(bankswitch1_ext_w);
-	DECLARE_WRITE8_MEMBER(bankswitch2_w);
-	DECLARE_READ8_MEMBER(dsw0_r);
-	DECLARE_READ8_MEMBER(dsw1_r);
-	DECLARE_WRITE8_MEMBER(int_ack1_w);
-	DECLARE_WRITE8_MEMBER(int_ack2_w);
-	DECLARE_WRITE8_MEMBER(watchdog1_w);
-	DECLARE_WRITE8_MEMBER(watchdog2_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(cus115_w);
-	DECLARE_WRITE8_MEMBER(videoram1_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(tilebank_select_w);
-	DECLARE_WRITE8_MEMBER(scroll0_w);
-	DECLARE_WRITE8_MEMBER(scroll1_w);
-	DECLARE_WRITE8_MEMBER(scroll2_w);
-	DECLARE_WRITE8_MEMBER(scroll3_w);
-	DECLARE_WRITE8_MEMBER(backcolor_w);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
+	void bankswitch1_w(uint8_t data);
+	void bankswitch1_ext_w(uint8_t data);
+	void bankswitch2_w(uint8_t data);
+	uint8_t dsw0_r();
+	uint8_t dsw1_r();
+	void int_ack1_w(uint8_t data);
+	void int_ack2_w(uint8_t data);
+	void watchdog1_w(uint8_t data);
+	void watchdog2_w(uint8_t data);
+	void coin_w(uint8_t data);
+	void led_w(uint8_t data);
+	void cus115_w(offs_t offset, uint8_t data);
+	void videoram1_w(offs_t offset, uint8_t data);;
+	void videoram2_w(offs_t offset, uint8_t data);;
+	void tilebank_select_w(offs_t offset, uint8_t data);;
+	void scroll0_w(offs_t offset, uint8_t data);;
+	void scroll1_w(offs_t offset, uint8_t data);;
+	void scroll2_w(offs_t offset, uint8_t data);;
+	void scroll3_w(offs_t offset, uint8_t data);;
+	void backcolor_w(uint8_t data);;
+	void spriteram_w(offs_t offset, uint8_t data);;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
@@ -73,7 +73,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void scroll_w(address_space &space, int offset, int data, int layer);
+	void scroll_w(offs_t offset, int data, int layer);
 
 	void common_mcu_map(address_map &map);
 	void cpu1_map(address_map &map);

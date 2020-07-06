@@ -51,9 +51,9 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_memory_config;
 	address_space_config m_idr_config;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_program_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_memory_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_idr_cache;
+	memory_access<10, 1, -1, ENDIANNESS_LITTLE>::cache m_program_cache;
+	memory_access<16, 0,  0, ENDIANNESS_LITTLE>::cache m_memory_cache;
+	memory_access< 6, 0,  0, ENDIANNESS_LITTLE>::cache m_idr_cache;
 
 	// processor state
 	u16 m_pc;

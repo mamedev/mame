@@ -3,7 +3,6 @@
 
 #include "pstring.h"
 #include "palloc.h"
-#include "plists.h"
 
 #include <algorithm>
 #include <atomic>
@@ -28,7 +27,7 @@ int pstring_t<F>::compare(const pstring_t &right) const noexcept
 	}
 
 	if (si != this->end() && ri != right.end())
-		return static_cast<int>(*si) - static_cast<int>(*ri);
+		return plib::narrow_cast<int>(*si) - plib::narrow_cast<int>(*ri);
 	if (this->mem_t_size() > right.mem_t_size())
 		return 1;
 	if (this->mem_t_size() < right.mem_t_size())
@@ -46,8 +45,8 @@ pstring_t<F> pstring_t<F>::substr(size_type start, size_type nlen) const
 	{
 		if (nlen == npos || start + nlen > l)
 			nlen = l - start;
-		auto ps = std::next(begin(), static_cast<difference_type>(start));
-		auto pe = std::next(ps, static_cast<difference_type>(nlen));
+		auto ps = std::next(begin(), plib::narrow_cast<difference_type>(start));
+		auto pe = std::next(ps, plib::narrow_cast<difference_type>(nlen));
 		ret.m_str.assign(ps.p, pe.p);
 	}
 	return ret;
@@ -88,4 +87,5 @@ typename pstring_t<F>::size_type pstring_t<F>::find(code_t search, size_type sta
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;
 template struct pstring_t<putf16_traits>;
+template struct pstring_t<putf32_traits>;
 template struct pstring_t<pwchar_traits>;

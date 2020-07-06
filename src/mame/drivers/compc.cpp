@@ -55,10 +55,10 @@ public:
 
 	void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(pioiii_w);
-	DECLARE_READ8_MEMBER(pioiii_r);
-	DECLARE_WRITE8_MEMBER(pio_w);
-	DECLARE_READ8_MEMBER(pio_r);
+	void pioiii_w(offs_t offset, u8 data);
+	u8 pioiii_r(offs_t offset);
+	void pio_w(offs_t offset, u8 data);
+	u8 pio_r(offs_t offset);
 
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
@@ -76,7 +76,7 @@ void compc_state::machine_reset()
 	m_dips = 0;
 }
 
-WRITE8_MEMBER(compc_state::pio_w)
+void compc_state::pio_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -92,7 +92,7 @@ WRITE8_MEMBER(compc_state::pio_w)
 }
 
 
-READ8_MEMBER(compc_state::pio_r)
+u8 compc_state::pio_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -121,7 +121,7 @@ READ8_MEMBER(compc_state::pio_r)
 	return data;
 }
 
-WRITE8_MEMBER(compc_state::pioiii_w)
+void compc_state::pioiii_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -140,7 +140,7 @@ WRITE8_MEMBER(compc_state::pioiii_w)
 }
 
 
-READ8_MEMBER(compc_state::pioiii_r)
+u8 compc_state::pioiii_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)

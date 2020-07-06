@@ -240,7 +240,7 @@ void mtx_sdxbas_device::device_reset()
 
 	/* SDX FDC */
 	io_space().install_readwrite_handler(0x10, 0x13, read8sm_delegate(*m_fdc, FUNC(mb8877_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8877_device::write)));
-	io_space().install_readwrite_handler(0x14, 0x14, read8_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
+	io_space().install_readwrite_handler(0x14, 0x14, read8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
 }
 
 void mtx_sdxcpm_device::device_reset()
@@ -249,10 +249,10 @@ void mtx_sdxcpm_device::device_reset()
 
 	/* SDX FDC */
 	io_space().install_readwrite_handler(0x10, 0x13, read8sm_delegate(*m_fdc, FUNC(mb8877_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8877_device::write)));
-	io_space().install_readwrite_handler(0x14, 0x14, read8_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
+	io_space().install_readwrite_handler(0x14, 0x14, read8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
 
 	/* 80 column */
-	io_space().install_readwrite_handler(0x30, 0x33, read8_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_r)), write8_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_w)));
+	io_space().install_readwrite_handler(0x30, 0x33, read8sm_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_r)), write8sm_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_w)));
 	io_space().install_readwrite_handler(0x38, 0x38, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
 	io_space().install_readwrite_handler(0x39, 0x39, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 
@@ -265,7 +265,7 @@ void mtx_sdxcpm_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(mtx_sdx_device::sdx_status_r)
+uint8_t mtx_sdx_device::sdx_status_r()
 {
 	/*
 	bit     description
@@ -294,7 +294,7 @@ READ8_MEMBER(mtx_sdx_device::sdx_status_r)
 	return data;
 }
 
-WRITE8_MEMBER(mtx_sdx_device::sdx_control_w)
+void mtx_sdx_device::sdx_control_w(uint8_t data)
 {
 	/*
 	bit     description
@@ -341,7 +341,7 @@ WRITE_LINE_MEMBER(mtx_sdx_device::motor_w)
 //  80 column video board
 //-------------------------------------------------
 
-READ8_MEMBER(mtx_sdxcpm_device::mtx_80col_r)
+uint8_t mtx_sdxcpm_device::mtx_80col_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -362,7 +362,7 @@ READ8_MEMBER(mtx_sdxcpm_device::mtx_80col_r)
 	return data;
 }
 
-WRITE8_MEMBER(mtx_sdxcpm_device::mtx_80col_w)
+void mtx_sdxcpm_device::mtx_80col_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -8,8 +8,7 @@ Hewlett-Packard, 1985
 Driver to-do list
 =================
 
-- softlist: merge dumps from coho.org and classiccmp.org
-- keyboard: NMI generation, autorepeat
+- keyboard: NMI generation
 - RTC chip: proper month, day (possibly a different chip, 82167)
 - HP-IL printer
 - sound (needs dump of COP452)
@@ -353,7 +352,7 @@ Software to look for
 00095-60006 (original System III-based HP-UX 1.0 ROM)
 82995A (same bits as 82991A; the latter is an upgrade kit, former was pre-installed)
 82989J Technical Basic ROM (Jan'1986)
-82987A Software Engineering ROM (Nov'1986) (possibly can be rebuilt from floppy images on coho?)
+82987A Software Engineering ROM (Nov'1986)
 
 ******************************************************************************/
 

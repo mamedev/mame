@@ -74,20 +74,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(m107_state::coincounter_w)
+void m107_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(m107_state::bankswitch_w)
+void m107_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-WRITE16_MEMBER(m107_state::sound_reset_w)
+void m107_state::sound_reset_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -143,7 +143,7 @@ void m107_state::dsoccr94_io_map(address_map &map)
 }
 
 /* same as M107 but with an extra i/o board */
-WRITE16_MEMBER(m107_state::wpksoc_output_w)
+void m107_state::wpksoc_output_w(uint16_t data)
 {
 	/*
 	x--- ---- ?

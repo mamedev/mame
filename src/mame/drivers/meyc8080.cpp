@@ -84,13 +84,13 @@ public:
 	void meyc8080(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(lights_1_w);
-	DECLARE_WRITE8_MEMBER(lights_2_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_1_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
+	void lights_1_w(uint8_t data);
+	void lights_2_w(uint8_t data);
+	void counters_w(uint8_t data);
+	void meyc8080_dac_1_w(uint8_t data);
+	void meyc8080_dac_2_w(uint8_t data);
+	void meyc8080_dac_3_w(uint8_t data);
+	void meyc8080_dac_4_w(uint8_t data);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void meyc8080_map(address_map &map);
 
@@ -155,7 +155,7 @@ uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(meyc8080_state::lights_1_w)
+void meyc8080_state::lights_1_w(uint8_t data)
 {
 /* Wild Arrow lamps
 
@@ -201,7 +201,7 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
 }
 
 
-WRITE8_MEMBER(meyc8080_state::lights_2_w)
+void meyc8080_state::lights_2_w(uint8_t data)
 {
 /* Wild Arrow unknown pulse...
 
@@ -250,7 +250,7 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
 }
 
 
-WRITE8_MEMBER(meyc8080_state::counters_w)
+void meyc8080_state::counters_w(uint8_t data)
 {
 /* Wild Arrow & Draw Poker counters
 
@@ -286,25 +286,25 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_1_w)
+void meyc8080_state::meyc8080_dac_1_w(uint8_t data)
 {
 	m_dac->write(0);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_2_w)
+void meyc8080_state::meyc8080_dac_2_w(uint8_t data)
 {
 	m_dac->write(1);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_3_w)
+void meyc8080_state::meyc8080_dac_3_w(uint8_t data)
 {
 	m_dac->write(2);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
+void meyc8080_state::meyc8080_dac_4_w(uint8_t data)
 {
 	m_dac->write(3);
 }

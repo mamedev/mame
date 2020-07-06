@@ -111,60 +111,60 @@ protected:
 	void assert_coin_status();
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(characterram_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void characterram_w(offs_t offset, uint8_t data);
+	void palette_bank_w(uint8_t data);
 
 	// game specific
-	DECLARE_READ8_MEMBER(depthch_io_r);
-	DECLARE_WRITE8_MEMBER(depthch_io_w);
-	DECLARE_READ8_MEMBER(safari_io_r);
-	DECLARE_WRITE8_MEMBER(safari_io_w);
-	DECLARE_READ8_MEMBER(frogs_io_r);
-	DECLARE_WRITE8_MEMBER(frogs_io_w);
-	DECLARE_READ8_MEMBER(headon_io_r);
-	DECLARE_READ8_MEMBER(sspaceat_io_r);
-	DECLARE_WRITE8_MEMBER(headon_io_w);
+	uint8_t depthch_io_r(offs_t offset);
+	void depthch_io_w(offs_t offset, uint8_t data);
+	uint8_t safari_io_r(offs_t offset);
+	void safari_io_w(offs_t offset, uint8_t data);
+	uint8_t frogs_io_r(offs_t offset);
+	void frogs_io_w(offs_t offset, uint8_t data);
+	uint8_t headon_io_r(offs_t offset);
+	uint8_t sspaceat_io_r(offs_t offset);
+	void headon_io_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(headon2);
-	DECLARE_READ8_MEMBER(headon2_io_r);
-	DECLARE_WRITE8_MEMBER(headon2_io_w);
-	DECLARE_WRITE8_MEMBER(digger_io_w);
-	DECLARE_WRITE8_MEMBER(invho2_io_w);
-	DECLARE_WRITE8_MEMBER(invds_io_w);
-	DECLARE_WRITE8_MEMBER(carhntds_io_w);
-	DECLARE_WRITE8_MEMBER(sspacaho_io_w);
-	DECLARE_WRITE8_MEMBER(headonn_io_w);
-	DECLARE_WRITE8_MEMBER(tranqgun_io_w);
-	DECLARE_WRITE8_MEMBER(spacetrk_io_w);
-	DECLARE_WRITE8_MEMBER(brdrline_io_w);
-	DECLARE_WRITE8_MEMBER(pulsar_io_w);
-	DECLARE_WRITE8_MEMBER(heiankyo_io_w);
-	DECLARE_WRITE8_MEMBER(alphaho_io_w);
-	DECLARE_WRITE8_MEMBER(samurai_protection_w);
-	DECLARE_WRITE8_MEMBER(samurai_io_w);
-	DECLARE_READ8_MEMBER(invinco_io_r);
-	DECLARE_WRITE8_MEMBER(invinco_io_w);
+	uint8_t headon2_io_r(offs_t offset);
+	void headon2_io_w(offs_t offset, uint8_t data);
+	void digger_io_w(offs_t offset, uint8_t data);
+	void invho2_io_w(offs_t offset, uint8_t data);
+	void invds_io_w(offs_t offset, uint8_t data);
+	void carhntds_io_w(offs_t offset, uint8_t data);
+	void sspacaho_io_w(offs_t offset, uint8_t data);
+	void headonn_io_w(offs_t offset, uint8_t data);
+	void tranqgun_io_w(offs_t offset, uint8_t data);
+	void spacetrk_io_w(offs_t offset, uint8_t data);
+	void brdrline_io_w(offs_t offset, uint8_t data);
+	void pulsar_io_w(offs_t offset, uint8_t data);
+	void heiankyo_io_w(offs_t offset, uint8_t data);
+	void alphaho_io_w(offs_t offset, uint8_t data);
+	void samurai_protection_w(uint8_t data);
+	void samurai_io_w(offs_t offset, uint8_t data);
+	uint8_t invinco_io_r(offs_t offset);
+	void invinco_io_w(offs_t offset, uint8_t data);
 
 	/*----------- defined in audio/vicdual.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( frogs_audio_w );
-	DECLARE_WRITE8_MEMBER( headon_audio_w );
-	DECLARE_WRITE8_MEMBER( invho2_audio_w );
-	DECLARE_WRITE8_MEMBER( brdrline_audio_w );
-	DECLARE_WRITE8_MEMBER( brdrline_audio_aux_w );
+	void frogs_audio_w(uint8_t data);
+	void headon_audio_w(uint8_t data);
+	void invho2_audio_w(uint8_t data);
+	void brdrline_audio_w(uint8_t data);
+	void brdrline_audio_aux_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
 	/*----------- defined in audio/depthch.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( depthch_audio_w );
+	void depthch_audio_w(uint8_t data);
 
 	/*----------- defined in audio/invinco.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( invinco_audio_w );
+	void invinco_audio_w(uint8_t data);
 
 	/*----------- defined in audio/pulsar.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
-	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
+	void pulsar_audio_1_w(uint8_t data);
+	void pulsar_audio_2_w(uint8_t data);
 
 	/*----------- defined in audio/tranqgun.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( tranqgun_audio_w );
+	void tranqgun_audio_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
@@ -231,8 +231,8 @@ private:
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
 
-	DECLARE_READ8_MEMBER(nsub_io_r);
-	DECLARE_WRITE8_MEMBER(nsub_io_w);
+	uint8_t nsub_io_r(offs_t offset);
+	void nsub_io_w(offs_t offset, uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
 
@@ -278,17 +278,17 @@ protected:
 	int m_musicData;
 	int m_musicBus;
 
-	DECLARE_WRITE8_MEMBER(carnival_io_w);
+	void carnival_io_w(offs_t offset, uint8_t data);
 
 	/*----------- defined in audio/carnival.cpp -----------*/
-	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
-	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
+	void carnival_audio_1_w(uint8_t data);
+	void carnival_audio_2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
-	DECLARE_WRITE8_MEMBER( carnivala_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnivala_music_port_2_w );
+	void carnivala_music_port_1_w(uint8_t data);
+	void carnivala_music_port_2_w(uint8_t data);
 	void carnival_psg_latch();
-	DECLARE_WRITE8_MEMBER( carnivalb_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnivalb_music_port_2_w );
+	void carnivalb_music_port_1_w(uint8_t data);
+	void carnivalb_music_port_2_w(uint8_t data);
 };
 
 class headonsa_state : public vicdual_state

@@ -33,11 +33,11 @@ public:
 	ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ps2_vif1_device() override;
 
-	DECLARE_READ64_MEMBER(mmio_r);
-	DECLARE_WRITE64_MEMBER(mmio_w);
+	uint64_t mmio_r(offs_t offset);
+	void mmio_w(offs_t offset, uint64_t data);
 
-	DECLARE_READ32_MEMBER(regs_r);
-	DECLARE_WRITE32_MEMBER(regs_w);
+	uint32_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint32_t data);
 
 	void dma_write(const uint64_t hi, const uint64_t lo);
 	void tag_write(uint32_t *data);

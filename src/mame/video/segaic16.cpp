@@ -450,7 +450,7 @@ void sega_16bit_common_base::palette_init()
 //  paletteram_w - handle writes to palette RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
+void sega_16bit_common_base::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -476,7 +476,7 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
 }
 
-WRITE16_MEMBER( sega_16bit_common_base::hangon_paletteram_w )
+void sega_16bit_common_base::hangon_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -500,7 +500,7 @@ WRITE16_MEMBER( sega_16bit_common_base::hangon_paletteram_w )
 	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
-WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
+void sega_16bit_common_base::philko_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -1442,26 +1442,26 @@ void segaic16_video_device::tilemap_set_colscroll(int which, int enable)
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::tileram_r )
+uint16_t segaic16_video_device::tileram_r(offs_t offset)
 {
 	return m_tileram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::tileram_w )
+void segaic16_video_device::tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tileram[offset]);
 	m_bg_tilemap[0].tilemaps[offset / (64*32)]->mark_tile_dirty(offset % (64*32));
 }
 
 
-READ16_MEMBER( segaic16_video_device::textram_r )
+uint16_t segaic16_video_device::textram_r(offs_t offset)
 {
 	return m_textram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::textram_w )
+void segaic16_video_device::textram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
@@ -1593,7 +1593,7 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::rotate_control_r )
+uint16_t segaic16_video_device::rotate_control_r()
 {
 	struct rotate_info *info = &m_rotate[0];
 

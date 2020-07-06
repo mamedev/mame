@@ -11,11 +11,13 @@
 
 #pragma once
 
+#include "dirom.h"
+
 #define K054539_CB_MEMBER(_name)   void _name(double left, double right)
 
 class k054539_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+					   public device_sound_interface,
+					   public device_rom_interface<24>
 {
 public:
 	// control flags, may be set at DRIVER_INIT().

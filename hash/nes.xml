@@ -15269,7 +15269,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgnu" cloneof="guardlgn">
+	<software name="guardlgnu" cloneof="guardlgn" supported="no">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
 		<publisher>Brøderbund</publisher>
@@ -15288,7 +15288,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgn">
+	<software name="guardlgn" supported="no">
 		<description>The Guardian Legend (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -15307,7 +15307,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardic" cloneof="guardlgn">
+	<software name="guardic" cloneof="guardlgn" supported="no">
 		<description>Guardic Gaiden (Jpn)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -25010,7 +25010,7 @@ license:CC0
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-28"/>
 		<info name="release" value="19900629"/>
-		<info name="alt_title" value="燃えろ!! 柔道うぉり・ーず"/>
+		<info name="alt_title" value="燃えろ!! 柔道うおりあ〜ず"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jf17" />
 			<feature name="pcb" value="JALECO-JF-17" />
@@ -39045,7 +39045,7 @@ license:CC0
 
 	<software name="ttoonadv">
 		<description>Tiny Toon Adventures (Euro)</description>
-		<year>1993</year>
+		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-NI (NOE/SCN)"/>
 		<info name="release" value="19921022"/>
@@ -45049,6 +45049,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="cosmo police galivan (japan).prg" size="131072" crc="720fff06" sha1="03d6d18ea4e7d3ac087dc51e7aba4ca4730714cf" offset="00000" status="baddump" />
 			</dataarea>
+			<dataarea name="bwram" size="8192"> <!-- TODO: verify on cart, but without it game doesn't start or continue after title screen -->
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -46946,7 +46949,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NAT-JL"/>
 		<info name="release" value="19900810"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="闇の仕事人KAGE"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -47336,14 +47339,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A1" />
 			<feature name="vrc2-pin4" value="PRG A0" />
-			<feature name="vrc2-pin21" value ="CHR A10" />
-			<feature name="vrc2-pin22" value ="CHR A16" />
-			<feature name="vrc2-pin23" value ="CHR A11" />
-			<feature name="vrc2-pin24" value ="CHR A13" />
-			<feature name="vrc2-pin25" value ="CHR A14" />
-			<feature name="vrc2-pin26" value ="CHR A12" />
-			<feature name="vrc2-pin27" value ="CHR A15" />
-			<feature name="vrc2-pin28" value ="NC" />
+			<feature name="vrc2-pin21" value="CHR A10" />
+			<feature name="vrc2-pin22" value="CHR A16" />
+			<feature name="vrc2-pin23" value="CHR A11" />
+			<feature name="vrc2-pin24" value="CHR A13" />
+			<feature name="vrc2-pin25" value="CHR A14" />
+			<feature name="vrc2-pin26" value="CHR A12" />
+			<feature name="vrc2-pin27" value="CHR A15" />
+			<feature name="vrc2-pin28" value="NC" />
 			<dataarea name="chr" size="131072">
 				<rom name="mad city (japan) (beta).chr" size="131072" crc="028dc0ef" sha1="1212b249bfc2c13e76a337d4ceedc5f78d1d5be6" offset="00000" status="baddump" />
 			</dataarea>
@@ -47607,7 +47610,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FMT-7800"/>
 		<info name="release" value="19900406"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="女神転生Ⅱ デジタルデビル物語"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
@@ -49873,7 +49876,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Capcom</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value="19861224"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="闘いの挽歌"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
@@ -50289,14 +50292,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A1" />
 			<feature name="vrc2-pin4" value="PRG A0" />
-			<feature name="vrc2-pin21" value ="CHR A10" />
-			<feature name="vrc2-pin22" value ="CHR A16" />
-			<feature name="vrc2-pin23" value ="CHR A11" />
-			<feature name="vrc2-pin24" value ="CHR A13" />
-			<feature name="vrc2-pin25" value ="CHR A14" />
-			<feature name="vrc2-pin26" value ="CHR A12" />
-			<feature name="vrc2-pin27" value ="CHR A15" />
-			<feature name="vrc2-pin28" value ="NC" />
+			<feature name="vrc2-pin21" value="CHR A10" />
+			<feature name="vrc2-pin22" value="CHR A16" />
+			<feature name="vrc2-pin23" value="CHR A11" />
+			<feature name="vrc2-pin24" value="CHR A13" />
+			<feature name="vrc2-pin25" value="CHR A14" />
+			<feature name="vrc2-pin26" value="CHR A12" />
+			<feature name="vrc2-pin27" value="CHR A15" />
+			<feature name="vrc2-pin28" value="NC" />
 			<dataarea name="chr" size="131072">
 				<rom name="twinbee 3 - poko poko dai maou (japan) (beta).chr" size="131072" crc="22a2268f" sha1="a930b56984f1bf8cc08050a52a8e2ed2484619cf" offset="00000" status="baddump" />
 			</dataarea>
@@ -75764,7 +75767,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sf3_9">
+	<software name="sf3_9" cloneof="sf3">
 		<description>Street Fighter III (Asia, 9 characters)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

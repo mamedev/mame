@@ -86,7 +86,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(laserbat_state_base::ct_io_w)
+void laserbat_state_base::ct_io_w(uint8_t data)
 {
 	/*
 	    Uses a hex buffer, so bits 6 and 7 are not physically present.
@@ -134,7 +134,7 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 //  popmessage("ct io: %02X", data);
 }
 
-READ8_MEMBER(laserbat_state_base::rrowx_r)
+uint8_t laserbat_state_base::rrowx_r()
 {
 	return (m_mpx_p_1_2 ? m_row2 : m_mux_ports[m_input_mux])->read();
 }

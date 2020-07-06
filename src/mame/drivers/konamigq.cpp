@@ -116,11 +116,11 @@ private:
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(pcmram_w);
-	DECLARE_READ8_MEMBER(pcmram_r);
-	DECLARE_READ16_MEMBER(tms57002_status_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
+	void eeprom_w(uint16_t data);
+	void pcmram_w(offs_t offset, uint8_t data);
+	uint8_t pcmram_r(offs_t offset);
+	uint16_t tms57002_status_word_r();
+	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_MACHINE_START(konamigq);
 	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
@@ -148,7 +148,7 @@ static const uint16_t konamigq_def_eeprom[64] =
 	0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa,
 };
 
-WRITE16_MEMBER(konamigq_state::eeprom_w)
+void konamigq_state::eeprom_w(uint16_t data)
 {
 	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
@@ -157,12 +157,12 @@ WRITE16_MEMBER(konamigq_state::eeprom_w)
 
 /* PCM RAM */
 
-WRITE8_MEMBER(konamigq_state::pcmram_w)
+void konamigq_state::pcmram_w(offs_t offset, uint8_t data)
 {
 	m_pcmram[ offset ] = data;
 }
 
-READ8_MEMBER(konamigq_state::pcmram_r)
+uint8_t konamigq_state::pcmram_r(offs_t offset)
 {
 	return m_pcmram[ offset ];
 }
@@ -199,14 +199,14 @@ INTERRUPT_GEN_MEMBER(konamigq_state::tms_sync)
 		m_dasp->sync_w(1);
 }
 
-READ16_MEMBER(konamigq_state::tms57002_status_word_r)
+uint16_t konamigq_state::tms57002_status_word_r()
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
 		(m_dasp->pc0_r() ? 2 : 0) |
 		(m_dasp->empty_r() ? 1 : 0);
 }
 
-WRITE16_MEMBER(konamigq_state::tms57002_control_word_w)
+void konamigq_state::tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

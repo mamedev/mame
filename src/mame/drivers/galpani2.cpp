@@ -94,12 +94,12 @@ Notes:
 
 ***************************************************************************/
 
-READ16_MEMBER(galpani2_state::galpani2_eeprom_r)
+uint16_t galpani2_state::galpani2_eeprom_r()
 {
 	return (m_eeprom_word & ~1) | (m_eeprom->do_read() & 1);
 }
 
-WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
+void galpani2_state::galpani2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_eeprom_word );
 	if ( ACCESSING_BITS_0_7 )
@@ -172,7 +172,7 @@ static void galpani2_write_kaneko(cpu_device *cpu)
 	}
 }
 
-WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
+void galpani2_state::galpani2_mcu_init_w(uint8_t data)
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
@@ -295,7 +295,7 @@ void galpani2_state::galpani2_mcu_nmi2()
 		//logerror("%s : MCU executes CHECKs synchro\n", machine().describe_context());
 }
 
-WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
+void galpani2_state::galpani2_mcu_nmi1_w(uint8_t data) //driven by CPU1's int5 ISR
 {
 //for galpan2t:
 //Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
@@ -307,7 +307,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
 	m_old_mcu_nmi1 = data;
 }
 
-WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi2_w)//driven by CPU2's int5 ISR
+void galpani2_state::galpani2_mcu_nmi2_w(uint8_t data) //driven by CPU2's int5 ISR
 {
 	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )  galpani2_mcu_nmi2();
 	m_old_mcu_nmi2 = data;
@@ -322,7 +322,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi2_w)//driven by CPU2's int5 ISR
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
+void galpani2_state::galpani2_coin_lockout_w(uint8_t data)
 {
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -333,14 +333,14 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 		// & 0x40     CARD out
 }
 
-WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
+void galpani2_state::galpani2_oki1_bank_w(uint8_t data)
 {
 	uint8_t *ROM = memregion("oki1")->base();
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
-WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
+void galpani2_state::galpani2_oki2_bank_w(uint8_t data)
 {
 	m_oki2->set_rom_bank(data & 0xf);
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
@@ -408,7 +408,7 @@ void galpani2_state::galpani2_mem1(address_map &map)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(galpani2_state::subdatabank_select_w)
+void galpani2_state::subdatabank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 

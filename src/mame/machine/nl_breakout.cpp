@@ -73,15 +73,13 @@
 NETLIST_START(breakout)
 
 #if (SLOW_BUT_ACCURATE)
-	//SOLVER(Solver, 48000)
 	SOLVER(Solver, 16000)
-	PARAM(Solver.ACCURACY, 1e-7) // less accuracy and diode will not work
+	PARAM(Solver.RELTOL, 5e-4) // less accuracy and diode will not work
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_LTE, 1e-2)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-8)
+	PARAM(Solver.DYNAMIC_LTE, 1e0)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
 	PARAM(Solver.METHOD, "MAT_CR")
 #else
-	//SOLVER(Solver, 48000)
 	SOLVER(Solver, 16000)
 	PARAM(Solver.ACCURACY, 1e-4)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -1679,7 +1677,7 @@ NETLIST_START(breakout)
 
 	NET_C(CR6.A, R41.1, R42.1, R43.1, R51.1, R52.1)
 #else
-	RES_SWITCH(CR6, E2.11, R41.1, GND)
+	SYS_DSW(CR6, E2.11, R41.1, GND)
 	PARAM(CR6.RON, 1e20)
 	PARAM(CR6.ROFF, 1)
 	NET_C(R41.1, R42.1, R43.1, R51.1, R52.1)

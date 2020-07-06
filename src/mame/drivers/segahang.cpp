@@ -45,7 +45,7 @@ const uint32_t MASTER_CLOCK_8MHz = 8000000;
 //  display enable, lamps, and coin counters
 //-------------------------------------------------
 
-WRITE8_MEMBER( segahang_state::video_lamps_w )
+void segahang_state::video_lamps_w(uint8_t data)
 {
 	//
 	//  Main PPI port B
@@ -88,7 +88,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 //  tilemap control and global sound mute
 //-------------------------------------------------
 
-WRITE8_MEMBER( segahang_state::tilemap_sound_w )
+void segahang_state::tilemap_sound_w(uint8_t data)
 {
 	//
 	//  Main PPI port C
@@ -120,7 +120,7 @@ WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 //  selects
 //-------------------------------------------------
 
-WRITE8_MEMBER( segahang_state::sub_control_adc_w )
+void segahang_state::sub_control_adc_w(uint8_t data)
 {
 	//
 	//  Sub PPI port A
@@ -145,7 +145,7 @@ WRITE8_MEMBER( segahang_state::sub_control_adc_w )
 //  adc_status_r - get ADC status
 //-------------------------------------------------
 
-READ8_MEMBER( segahang_state::adc_status_r )
+uint8_t segahang_state::adc_status_r()
 {
 	//
 	// D7 = 0 (left open)
@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
 //  sound_data_r - read data from the sound latch
 //-------------------------------------------------
 
-READ8_MEMBER( segahang_state::sound_data_r )
+uint8_t segahang_state::sound_data_r()
 {
 	// assert ACK
 	m_i8255_1->pc6_w(CLEAR_LINE);

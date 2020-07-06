@@ -24,7 +24,7 @@
  *   bit 6: Sub-CPU cancel IRQ
  */
 
-READ8_MEMBER(fm7_state::fm7_subintf_r)
+uint8_t fm7_state::fm7_subintf_r()
 {
 	uint8_t ret = 0x00;
 
@@ -37,7 +37,7 @@ READ8_MEMBER(fm7_state::fm7_subintf_r)
 	return ret;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_subintf_w)
+void fm7_state::fm7_subintf_w(uint8_t data)
 {
 	m_video.sub_halt = data & 0x80;
 	if(data & 0x80)
@@ -49,14 +49,14 @@ WRITE8_MEMBER(fm7_state::fm7_subintf_w)
 	//popmessage("Sub CPU Interface write: %02x\n",data);
 }
 
-READ8_MEMBER(fm7_state::fm7_sub_busyflag_r)
+uint8_t fm7_state::fm7_sub_busyflag_r()
 {
 	if(m_video.sub_halt == 0)
 		m_video.sub_busy = 0x00;
 	return 0x00;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_sub_busyflag_w)
+void fm7_state::fm7_sub_busyflag_w(uint8_t data)
 {
 	m_video.sub_busy = 0x80;
 }
@@ -65,7 +65,7 @@ WRITE8_MEMBER(fm7_state::fm7_sub_busyflag_w)
  * Sub-CPU port 0xd402
  *   Read-only: Acknowledge Cancel IRQ
  */
-READ8_MEMBER(fm7_state::fm7_cancel_ack)
+uint8_t fm7_state::fm7_cancel_ack()
 {
 	m_sub->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 	return 0x00;
@@ -74,7 +74,7 @@ READ8_MEMBER(fm7_state::fm7_cancel_ack)
 /*
  * Reading from 0xd404 (sub-CPU) causes an "Attention" FIRQ on the main CPU
  */
-READ8_MEMBER(fm7_state::fm7_attn_irq_r)
+uint8_t fm7_state::fm7_attn_irq_r()
 {
 	m_video.attn_irq = 1;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
@@ -87,13 +87,13 @@ READ8_MEMBER(fm7_state::fm7_attn_irq_r)
  *  On read, enables VRAM access
  *  On write, disables VRAM access
  */
-READ8_MEMBER(fm7_state::fm7_vram_access_r)
+uint8_t fm7_state::fm7_vram_access_r()
 {
 	m_video.vram_access = 1;
 	return 0xff;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram_access_w)
+void fm7_state::fm7_vram_access_w(uint8_t data)
 {
 	m_video.vram_access = 0;
 }
@@ -565,7 +565,7 @@ void fm7_state::fm77av_line_draw()
 	timer_set(attotime::from_usec(byte_count/16), TIMER_FM77AV_ALU_TASK_END);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram_r)
+uint8_t fm7_state::fm7_vram_r(offs_t offset)
 {
 	int offs;
 	uint16_t page = 0x0000;
@@ -602,7 +602,7 @@ READ8_MEMBER(fm7_state::fm7_vram_r)
 	return m_video_ram[offs + page];
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram_w)
+void fm7_state::fm7_vram_w(offs_t offset, uint8_t data)
 {
 	int offs;
 	uint16_t page = 0x0000;
@@ -642,7 +642,7 @@ WRITE8_MEMBER(fm7_state::fm7_vram_w)
 }
 
 // not pretty, but it should work.
-WRITE8_MEMBER(fm7_state::fm7_vram_banked_w)
+void fm7_state::fm7_vram_banked_w(offs_t offset, uint8_t data)
 {
 	int offs;
 	uint16_t page = 0x0000;
@@ -683,148 +683,148 @@ WRITE8_MEMBER(fm7_state::fm7_vram_banked_w)
 	m_video_ram[offs+page] = data;
 }
 
-READ8_MEMBER(fm7_state::fm7_vram0_r)
+uint8_t fm7_state::fm7_vram0_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset);
+	return fm7_vram_r(offset);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram1_r)
+uint8_t fm7_state::fm7_vram1_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x1000);
+	return fm7_vram_r(offset+0x1000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram2_r)
+uint8_t fm7_state::fm7_vram2_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x2000);
+	return fm7_vram_r(offset+0x2000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram3_r)
+uint8_t fm7_state::fm7_vram3_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x3000);
+	return fm7_vram_r(offset+0x3000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram4_r)
+uint8_t fm7_state::fm7_vram4_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x4000);
+	return fm7_vram_r(offset+0x4000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram5_r)
+uint8_t fm7_state::fm7_vram5_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x5000);
+	return fm7_vram_r(offset+0x5000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram6_r)
+uint8_t fm7_state::fm7_vram6_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x6000);
+	return fm7_vram_r(offset+0x6000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram7_r)
+uint8_t fm7_state::fm7_vram7_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x7000);
+	return fm7_vram_r(offset+0x7000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram8_r)
+uint8_t fm7_state::fm7_vram8_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x8000);
+	return fm7_vram_r(offset+0x8000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vram9_r)
+uint8_t fm7_state::fm7_vram9_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0x9000);
+	return fm7_vram_r(offset+0x9000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vramA_r)
+uint8_t fm7_state::fm7_vramA_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0xa000);
+	return fm7_vram_r(offset+0xa000);
 }
 
-READ8_MEMBER(fm7_state::fm7_vramB_r)
+uint8_t fm7_state::fm7_vramB_r(offs_t offset)
 {
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return 0xff;
-	return fm7_vram_r(space,offset+0xb000);
+	return fm7_vram_r(offset+0xb000);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram0_w)
+void fm7_state::fm7_vram0_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset,data);
+	fm7_vram_banked_w(offset,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram1_w)
+void fm7_state::fm7_vram1_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x1000,data);
+	fm7_vram_banked_w(offset+0x1000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram2_w)
+void fm7_state::fm7_vram2_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x2000,data);
+	fm7_vram_banked_w(offset+0x2000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram3_w)
+void fm7_state::fm7_vram3_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x3000,data);
+	fm7_vram_banked_w(offset+0x3000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram4_w)
+void fm7_state::fm7_vram4_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x4000,data);
+	fm7_vram_banked_w(offset+0x4000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram5_w)
+void fm7_state::fm7_vram5_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x5000,data);
+	fm7_vram_banked_w(offset+0x5000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram6_w)
+void fm7_state::fm7_vram6_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x6000,data);
+	fm7_vram_banked_w(offset+0x6000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram7_w)
+void fm7_state::fm7_vram7_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x7000,data);
+	fm7_vram_banked_w(offset+0x7000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram8_w)
+void fm7_state::fm7_vram8_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x8000,data);
+	fm7_vram_banked_w(offset+0x8000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vram9_w)
+void fm7_state::fm7_vram9_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0x9000,data);
+	fm7_vram_banked_w(offset+0x9000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vramA_w)
+void fm7_state::fm7_vramA_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0xa000,data);
+	fm7_vram_banked_w(offset+0xa000,data);
 }
 
-WRITE8_MEMBER(fm7_state::fm7_vramB_w)
+void fm7_state::fm7_vramB_w(offs_t offset, uint8_t data)
 {
-	fm7_vram_banked_w(space,offset+0xb000,data);
+	fm7_vram_banked_w(offset+0xb000,data);
 }
 
 /*
@@ -833,13 +833,13 @@ WRITE8_MEMBER(fm7_state::fm7_vramB_w)
  *  On read, enables the CRT display
  *  On write, disables the CRT display
  */
-READ8_MEMBER(fm7_state::fm7_crt_r)
+uint8_t fm7_state::fm7_crt_r()
 {
 	m_video.crt_enable = 1;
 	return 0xff;
 }
 
-WRITE8_MEMBER(fm7_state::fm7_crt_w)
+void fm7_state::fm7_crt_w(uint8_t data)
 {
 	m_video.crt_enable = 0;
 }
@@ -850,7 +850,7 @@ WRITE8_MEMBER(fm7_state::fm7_crt_w)
  *  0xd40e: bits 0-6 - offset in bytes (high byte) (bit 6 is used for 400 line video only)
  *  0xd40f: bits 0-7 - offset in bytes (low byte)
  */
-WRITE8_MEMBER(fm7_state::fm7_vram_offset_w)
+void fm7_state::fm7_vram_offset_w(offs_t offset, uint8_t data)
 {
 	uint16_t new_offset = 0;
 
@@ -898,7 +898,7 @@ WRITE8_MEMBER(fm7_state::fm7_vram_offset_w)
  *  bits 6-4: VRAM planes to display (G,R,B) (1=disable)
  *  bits 2-0: VRAM CPU access (G,R,B) (1=disable)
  */
-WRITE8_MEMBER(fm7_state::fm7_multipage_w)
+void fm7_state::fm7_multipage_w(uint8_t data)
 {
 	m_video.multi_page = data & 0x77;
 }
@@ -911,12 +911,12 @@ WRITE8_MEMBER(fm7_state::fm7_multipage_w)
  *  bit 1 = Red
  *  bit 0 = Blue
  */
-READ8_MEMBER(fm7_state::fm7_palette_r)
+uint8_t fm7_state::fm7_palette_r(offs_t offset)
 {
 	return m_video.fm7_pal[offset];
 }
 
-WRITE8_MEMBER(fm7_state::fm7_palette_w)
+void fm7_state::fm7_palette_w(offs_t offset, uint8_t data)
 {
 	m_palette->set_pen_color(offset, rgb_t(pal1bit(data >> 1), pal1bit(data >> 2), pal1bit(data >> 0)));
 	m_video.fm7_pal[offset] = data & 0x07;
@@ -933,7 +933,7 @@ WRITE8_MEMBER(fm7_state::fm7_palette_w)
  *  fd33: red level (4 bits)
  *  fd34: green level (4 bits)
  */
-WRITE8_MEMBER(fm7_state::fm77av_analog_palette_w)
+void fm7_state::fm77av_analog_palette_w(offs_t offset, uint8_t data)
 {
 	int val;
 
@@ -974,7 +974,7 @@ WRITE8_MEMBER(fm7_state::fm77av_analog_palette_w)
  *             bit 6 - display VRAM page
  *             bit 7 - NMI mask register (1=mask)
  */
-READ8_MEMBER(fm7_state::fm77av_video_flags_r)
+uint8_t fm7_state::fm77av_video_flags_r()
 {
 	uint8_t ret = 0xff;
 
@@ -993,7 +993,7 @@ READ8_MEMBER(fm7_state::fm77av_video_flags_r)
 	return ret;
 }
 
-WRITE8_MEMBER(fm7_state::fm77av_video_flags_w)
+void fm7_state::fm77av_video_flags_w(uint8_t data)
 {
 	uint8_t* RAM = memregion("subsyscg")->base();
 
@@ -1012,7 +1012,7 @@ WRITE8_MEMBER(fm7_state::fm77av_video_flags_w)
  *  bit 1 (R/O) - DISPTMG status (0=blank)
  *  bit 0 (R/O) - VSync status (1=sync?)
  */
-READ8_MEMBER(fm7_state::fm77av_sub_modestatus_r)
+uint8_t fm7_state::fm77av_sub_modestatus_r()
 {
 	uint8_t ret = 0x00;
 
@@ -1028,7 +1028,7 @@ READ8_MEMBER(fm7_state::fm77av_sub_modestatus_r)
 	return ret;
 }
 
-WRITE8_MEMBER(fm7_state::fm77av_sub_modestatus_w)
+void fm7_state::fm77av_sub_modestatus_w(uint8_t data)
 {
 	m_video.modestatus = data & 0x40;
 	if(data & 0x40)
@@ -1050,7 +1050,7 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_modestatus_w)
  *  bits 1 and 0 select which subsys ROM to be banked into sub CPU space
  *  on the FM-77AV40 and later, bit 2 can also selected to bank in sub monitor RAM.
  */
-WRITE8_MEMBER(fm7_state::fm77av_sub_bank_w)
+void fm7_state::fm77av_sub_bank_w(uint8_t data)
 {
 //  uint8_t* RAM = memregion("sub")->base();
 	uint8_t* ROM;
@@ -1122,7 +1122,7 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_bank_w)
  *  0xd428-29(W): Line X1 (High-Low, X9-X0)
  *  0xd42a-2b(W): Line Y1 (High-Low, Y8-Y0)
  */
-READ8_MEMBER(fm7_state::fm77av_alu_r)
+uint8_t fm7_state::fm77av_alu_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -1147,7 +1147,7 @@ READ8_MEMBER(fm7_state::fm77av_alu_r)
 	}
 }
 
-WRITE8_MEMBER(fm7_state::fm77av_alu_w)
+void fm7_state::fm77av_alu_w(offs_t offset, uint8_t data)
 {
 	uint16_t dat;
 
@@ -1274,7 +1274,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
 }
 
 // called when banked into main CPU space by the MMR, available only if sub CPU is halted
-READ8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_r)
+uint8_t fm7_state::fm7_sub_ram_ports_banked_r(offs_t offset)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 	uint8_t* ROM;
@@ -1295,37 +1295,37 @@ READ8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_r)
 	}
 
 	if(offset >= 0x410 && offset <= 0x42b)
-		return fm77av_alu_r(space,offset-0x410);
+		return fm77av_alu_r(offset-0x410);
 
 	switch(offset)
 	{
 		case 0x400:
 		case 0x401:
-			return fm7_sub_keyboard_r(space,offset-0x400);
+			return fm7_sub_keyboard_r(offset-0x400);
 		case 0x402:
-			return fm7_cancel_ack(space,0);
+			return fm7_cancel_ack();
 		case 0x403:
-			return fm7_sub_beeper_r(space,0);
+			return fm7_sub_beeper_r();
 		case 0x404:
-			return fm7_attn_irq_r(space,0);
+			return fm7_attn_irq_r();
 		case 0x408:
-			return fm7_crt_r(space,0);
+			return fm7_crt_r();
 		case 0x409:
-			return fm7_vram_access_r(space,0);
+			return fm7_vram_access_r();
 		case 0x40a:
-			return fm7_sub_busyflag_r(space,0);
+			return fm7_sub_busyflag_r();
 		case 0x430:
-			return fm77av_video_flags_r(space,0);
+			return fm77av_video_flags_r();
 		case 0x431:
 		case 0x432:
-			return fm77av_key_encoder_r(space,offset-0x431);
+			return fm77av_key_encoder_r(offset-0x431);
 		default:
 			logerror("Unmapped read from sub CPU port 0xd%03x via MMR banking\n",offset);
 			return 0xff;
 	}
 }
 
-WRITE8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_w)
+void fm7_state::fm7_sub_ram_ports_banked_w(offs_t offset, uint8_t data)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 
@@ -1350,38 +1350,38 @@ WRITE8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_w)
 
 	if(offset >= 0x410 && offset <= 0x42b)
 	{
-		fm77av_alu_w(space,offset-0x410,data);
+		fm77av_alu_w(offset-0x410,data);
 		return;
 	}
 
 	switch(offset)
 	{
 		case 0x408:
-			fm7_crt_w(space,0,data);
+			fm7_crt_w(data);
 			break;
 		case 0x409:
-			fm7_vram_access_w(space,0,data);
+			fm7_vram_access_w(data);
 			break;
 		case 0x40a:
-			fm7_sub_busyflag_w(space,0,data);
+			fm7_sub_busyflag_w(data);
 			break;
 		case 0x40e:
 		case 0x40f:
-			fm7_vram_offset_w(space,offset-0x40e,data);
+			fm7_vram_offset_w(offset-0x40e,data);
 			break;
 		case 0x430:
-			fm77av_video_flags_w(space,0,data);
+			fm77av_video_flags_w(data);
 			break;
 		case 0x431:
 		case 0x432:
-			fm77av_key_encoder_w(space,offset-0x431,data);
+			fm77av_key_encoder_w(offset-0x431,data);
 			break;
 		default:
 			logerror("Unmapped write of 0x%02x to sub CPU port 0xd%03x via MMR banking\n",data,offset);
 	}
 }
 
-READ8_MEMBER(fm7_state::fm7_console_ram_banked_r)
+uint8_t fm7_state::fm7_console_ram_banked_r(offs_t offset)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 
@@ -1391,7 +1391,7 @@ READ8_MEMBER(fm7_state::fm7_console_ram_banked_r)
 	return RAM[0x1c000+offset];
 }
 
-WRITE8_MEMBER(fm7_state::fm7_console_ram_banked_w)
+void fm7_state::fm7_console_ram_banked_w(offs_t offset, uint8_t data)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 

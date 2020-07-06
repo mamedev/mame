@@ -69,24 +69,24 @@ public:
 	void init_inder1();
 
 private:
-	DECLARE_READ8_MEMBER(ppic_r);
-	DECLARE_WRITE8_MEMBER(ppia_w);
-	DECLARE_WRITE8_MEMBER(ppib_w);
-	DECLARE_WRITE8_MEMBER(ppic_w);
-	DECLARE_WRITE8_MEMBER(ppi60a_w);
-	DECLARE_WRITE8_MEMBER(ppi60b_w);
-	DECLARE_WRITE8_MEMBER(ppi64c_w);
-	DECLARE_READ8_MEMBER(sw_r);
-	DECLARE_WRITE8_MEMBER(sw_w);
-	DECLARE_WRITE8_MEMBER(sol_brvteam_w);
-	DECLARE_WRITE8_MEMBER(sol_canasta_w);
-	DECLARE_WRITE8_MEMBER(sn_w);
-	DECLARE_READ8_MEMBER(sndcmd_r);
-	DECLARE_WRITE8_MEMBER(sndbank_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_lapbylap_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(disp_w);
+	uint8_t ppic_r();
+	void ppia_w(uint8_t data);
+	void ppib_w(uint8_t data);
+	void ppic_w(uint8_t data);
+	void ppi60a_w(uint8_t data);
+	void ppi60b_w(uint8_t data);
+	void ppi64c_w(uint8_t data);
+	uint8_t sw_r();
+	void sw_w(offs_t offset, uint8_t data);
+	void sol_brvteam_w(uint8_t data);
+	void sol_canasta_w(uint8_t data);
+	void sn_w(uint8_t data);
+	uint8_t sndcmd_r();
+	void sndbank_w(uint8_t data);
+	void sndcmd_w(uint8_t data);
+	void sndcmd_lapbylap_w(uint8_t data);
+	void lamp_w(uint8_t data) { };
+	void disp_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
@@ -1131,39 +1131,39 @@ static INPUT_PORTS_START( metalman )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( inder_state::sw_r )
+uint8_t inder_state::sw_r()
 {
 	return m_switches[m_row]->read();
 }
 
-WRITE8_MEMBER( inder_state::sw_w )
+void inder_state::sw_w(offs_t offset, uint8_t data)
 {
 	m_row = offset;
 }
 
-WRITE8_MEMBER( inder_state::sn_w )
+void inder_state::sn_w(uint8_t data)
 {
 	m_sn->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
-WRITE8_MEMBER( inder_state::sndcmd_lapbylap_w )
+void inder_state::sndcmd_lapbylap_w(uint8_t data)
 {
 	m_sndcmd = data;
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER( inder_state::sndcmd_w )
+void inder_state::sndcmd_w(uint8_t data)
 {
 	m_sndcmd = data;
 }
 
-READ8_MEMBER( inder_state::sndcmd_r )
+uint8_t inder_state::sndcmd_r()
 {
 	return m_sndcmd;
 }
 
 // "bobinas"
-WRITE8_MEMBER( inder_state::sol_brvteam_w )
+void inder_state::sol_brvteam_w(uint8_t data)
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
@@ -1188,7 +1188,7 @@ WRITE8_MEMBER( inder_state::sol_brvteam_w )
 }
 
 // no slings in this game
-WRITE8_MEMBER( inder_state::sol_canasta_w )
+void inder_state::sol_canasta_w(uint8_t data)
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
@@ -1206,7 +1206,7 @@ WRITE8_MEMBER( inder_state::sol_canasta_w )
 	}
 }
 
-WRITE8_MEMBER( inder_state::disp_w )
+void inder_state::disp_w(offs_t offset, uint8_t data)
 {
 	uint8_t i;
 	if (offset < 8)
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER( inder_state::disp_w )
 	}
 }
 
-WRITE8_MEMBER( inder_state::ppi60a_w )
+void inder_state::ppi60a_w(uint8_t data)
 {
 	if (data)
 		for (uint8_t i = 0; i < 8; i++)
@@ -1230,7 +1230,7 @@ WRITE8_MEMBER( inder_state::ppi60a_w )
 }
 
 // always 0 but we'll support it anyway
-WRITE8_MEMBER( inder_state::ppi60b_w )
+void inder_state::ppi60b_w(uint8_t data)
 {
 	if (data & 7)
 		for (uint8_t i = 0; i < 3; i++)
@@ -1238,7 +1238,7 @@ WRITE8_MEMBER( inder_state::ppi60b_w )
 				m_row = i+8;
 }
 
-WRITE8_MEMBER( inder_state::ppi64c_w )
+void inder_state::ppi64c_w(uint8_t data)
 {
 	uint8_t i;
 	data &= 15;
@@ -1254,7 +1254,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 	}
 }
 
-WRITE8_MEMBER( inder_state::sndbank_w )
+void inder_state::sndbank_w(uint8_t data)
 {
 	m_sndbank = data;
 	uint8_t i;
@@ -1292,24 +1292,24 @@ WRITE_LINE_MEMBER( inder_state::qc9b_w )
 	m_13->select_w(state);
 }
 
-READ8_MEMBER( inder_state::ppic_r )
+uint8_t inder_state::ppic_r()
 {
 	return (m_pc0 ? 1 : 0) | m_portc;
 }
 
-WRITE8_MEMBER( inder_state::ppia_w )
+void inder_state::ppia_w(uint8_t data)
 {
 	m_sound_addr = (m_sound_addr & 0x3ff00) | data;
 	update_mus();
 }
 
-WRITE8_MEMBER( inder_state::ppib_w )
+void inder_state::ppib_w(uint8_t data)
 {
 	m_sound_addr = (m_sound_addr & 0x300ff) | (data << 8);
 	update_mus();
 }
 
-WRITE8_MEMBER( inder_state::ppic_w )
+void inder_state::ppic_w(uint8_t data)
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))

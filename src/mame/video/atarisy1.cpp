@@ -235,7 +235,7 @@ void atarisy1_state::bankselect_w(uint8_t data)
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_priority_w )
+void atarisy1_state::atarisy1_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldpens = m_playfield_priority_pens;
 	uint16_t newpens = oldpens;
@@ -255,7 +255,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_priority_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_xscroll_w )
+void atarisy1_state::atarisy1_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -286,7 +286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::reset_yscroll_callback)
 }
 
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
+void atarisy1_state::atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -320,7 +320,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
+void atarisy1_state::atarisy1_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int active_bank = m_mob->bank();
 	uint16_t *spriteram = m_mob->spriteram();
@@ -392,7 +392,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::int3_callback)
  *
  *************************************/
 
-READ16_MEMBER( atarisy1_state::atarisy1_int3state_r )
+uint16_t atarisy1_state::atarisy1_int3state_r()
 {
 	return m_scanline_int_state ? 0x0080 : 0x0000;
 }

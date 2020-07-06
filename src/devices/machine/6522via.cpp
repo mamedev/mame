@@ -19,7 +19,7 @@
 
   2017-Feb-15 Edstrom
    Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching
-   on correct flanks and leading and trailing flanks added + logging.
+   on correct edges and leading and trailing edges added + logging.
  */
 
 #include "emu.h"
@@ -386,7 +386,7 @@ void via6522_device::clear_int(int data)
 
 void via6522_device::shift_out()
 {
-	// Only shift out msb on falling flank
+	// Only shift out msb on falling edge
 	if (m_shift_counter & 1)
 	{
 		LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
@@ -399,26 +399,26 @@ void via6522_device::shift_out()
 		if (m_shift_counter == 1 && SO_EXT_CONTROL(m_acr))
 		{
 			LOGINT("SHIFT EXT out INT request ");
-			set_int(INT_SR); // IRQ on last falling flank for external clock (mode 7)
+			set_int(INT_SR); // IRQ on last falling edge for external clock (mode 7)
 		}
 	}
-	else // Check for INT condition, eg the last and raising flank of the 15-0 falling/raising flanks
+	else // Check for INT condition, eg the last and raising edge of the 15-0 falling/raising edges
 	{
 		if (!SO_T2_RATE(m_acr)) // The T2 continous shifter doesn't do interrupts (mode 4)
 		{
 			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
 			{
 				LOGINT("SHIFT O2/T2 out INT request ");
-				set_int(INT_SR); // IRQ on last raising flank for internal clock (mode 5-6)
+				set_int(INT_SR); // IRQ on last raising edge for internal clock (mode 5-6)
 			}
 		}
 	}
-	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
+	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
 void via6522_device::shift_in()
 {
-	// Only shift in data on raising flank
+	// Only shift in data on raising edge
 	if ( !(m_shift_counter & 1) )
 	{
 		LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
@@ -429,10 +429,10 @@ void via6522_device::shift_in()
 		{
 			LOGINT("SHIFT in INT request ");
 //            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
-			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 flanks for all shift INs (mode 1-3)
+			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 edges for all shift INs (mode 1-3)
 		}
 	}
-	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
+	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
 void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -440,7 +440,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 		case TIMER_SHIFT_IRQ: // This timer event is a delayed IRQ for improved cycle accuracy
-			set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising flank
+			set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising edge
 			m_shift_irq_timer->adjust(attotime::never); // Not needed really...
 			break;
 		case TIMER_SHIFT:
@@ -448,7 +448,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_out_cb1 ^= 1;
 			m_cb1_handler(m_out_cb1);
 
-			// we call shift methods for all flanks
+			// we call shift methods for all edges
 			if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 			{
 				shift_out();
@@ -459,7 +459,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 
 			// If in continous mode or the shifter is still shifting we re-arm the timer
-			if (SO_T2_RATE(m_acr) || (m_shift_counter != 0x0f))
+			if (SO_T2_RATE(m_acr) || (m_shift_counter < 0x0f))
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
@@ -703,15 +703,20 @@ u8 via6522_device::read(offs_t offset)
 		val = m_sr;
 		if (!machine().side_effects_disabled())
 		{
-			m_out_cb1 = 1;
-			m_cb1_handler(m_out_cb1);
-			m_shift_counter = 0x0f;
+			if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))) {
+				m_out_cb1 = 1;
+				m_cb1_handler(m_out_cb1);
+				m_shift_counter = 0x0f;
+			}
+			else
+				m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
+
 			LOGINT("SR INT ");
 			clear_int(INT_SR);
 			LOGSHIFT(" - ACR: %02x ", m_acr);
 			if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 			{
-				m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a read
+				m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a read
 				LOGSHIFT(" - read SR starts O2 timer ");
 			}
 			else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
@@ -889,21 +894,20 @@ void via6522_device::write(offs_t offset, u8 data)
 		m_sr = data;
 		LOGSHIFT("Write SR: %02x\n", m_sr);
 
-		// make sure CB1 is high - this should not be needed though
-		if (m_out_cb1 != 1)
-		{
-			logerror("VIA: CB1 is low starting shifter\n");
+		if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))) {
 			m_out_cb1 = 1;
 			m_cb1_handler(m_out_cb1);
+			m_shift_counter = 0x0f;
 		}
+		else
+			m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
 
-		m_shift_counter = 0x0f;
 		LOGINT("SR INT ");
 		clear_int(INT_SR);
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a write
+			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a write
 			LOGSHIFT(" - write SR starts O2 timer");
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
@@ -966,6 +970,13 @@ void via6522_device::write(offs_t offset, u8 data)
 				m_t1->adjust(clocks_to_attotime(counter1 + IFR_DELAY));
 				m_t1_active = 1;
 			}
+
+			if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr) || SI_EXT_CONTROL(m_acr))
+			{
+				m_out_cb2 = 1;
+				m_cb2_handler(m_out_cb2);
+			}
+
 			LOGSHIFT("\n");
 		}
 		break;

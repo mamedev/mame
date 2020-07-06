@@ -85,8 +85,8 @@ private:
 	u8 m_term_data;
 	u8 m_port3;
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(port3_w);
-	DECLARE_READ8_MEMBER(port3_r);
+	void port3_w(u8 data);
+	u8 port3_r();
 	void kbd_put(u8 data);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
@@ -107,7 +107,7 @@ void pes_state::kbd_put(u8 data)
 
 
 /* Port Handlers */
-WRITE8_MEMBER( pes_state::port3_w )
+void pes_state::port3_w(u8 data)
 {
 	m_port3 = data;
 #if 0
@@ -124,7 +124,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 	// todo: poke serial handler here somehow?
 }
 
-READ8_MEMBER( pes_state::port3_r )
+u8 pes_state::port3_r()
 {
 	uint8_t data = m_port3 & 0xE3; // return last written state with rts, /rdy and /int masked out
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared

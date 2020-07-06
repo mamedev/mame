@@ -251,7 +251,7 @@ Todo:
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos2_ic25_r)
+uint16_t polepos_state::polepos2_ic25_r(offs_t offset)
 {
 	int result;
 	/* protection states */
@@ -280,7 +280,7 @@ uint8_t polepos_state::analog_r()
 	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
 
-READ8_MEMBER(polepos_state::ready_r)
+uint8_t polepos_state::ready_r()
 {
 	int ret = 0xff;
 
@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER(polepos_state::sb0_w)
 	m_auto_start_mask = !state;
 }
 
-template<bool sub1> WRITE16_MEMBER(polepos_state::z8002_nvi_enable_w)
+template<bool sub1> void polepos_state::z8002_nvi_enable_w(uint16_t data)
 {
 	data &= 1;
 
@@ -317,7 +317,7 @@ READ_LINE_MEMBER(polepos_state::auto_start_r)
 	return m_auto_start_mask;
 }
 
-WRITE8_MEMBER(polepos_state::out)
+void polepos_state::out(uint8_t data)
 {
 // no start lamps in pole position
 //  output().set_led_value(1,data & 1);
@@ -331,26 +331,26 @@ WRITE_LINE_MEMBER(polepos_state::lockout)
 	machine().bookkeeping().coin_lockout_global_w(state);
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_rom_r)
+uint8_t polepos_state::namco_52xx_rom_r(offs_t offset)
 {
 	uint32_t length = memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_si_r)
+uint8_t polepos_state::namco_52xx_si_r()
 {
 	/* pulled to +5V */
 	return 1;
 }
 
-READ8_MEMBER(polepos_state::namco_53xx_k_r)
+uint8_t polepos_state::namco_53xx_k_r()
 {
 	/* hardwired to 0 */
 	return 0;
 }
 
-READ8_MEMBER(polepos_state::steering_changed_r)
+uint8_t polepos_state::steering_changed_r()
 {
 	/* read the current steering value and update our delta */
 	uint8_t steer_new = ioport("STEER")->read();
@@ -372,7 +372,7 @@ READ8_MEMBER(polepos_state::steering_changed_r)
 	return m_steer_accum & 1;
 }
 
-READ8_MEMBER(polepos_state::steering_delta_r)
+uint8_t polepos_state::steering_delta_r()
 {
 	return m_steer_delta;
 }
@@ -860,7 +860,6 @@ void polepos_state::polepos(machine_config &config)
 	m_subcpu2->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_2);
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
-	//n51xx.set_screen_tag(m_screen);
 	n51xx.input_callback<0>().set_ioport("DSWB").mask(0x0f);
 	n51xx.input_callback<1>().set_ioport("DSWB").rshift(4);
 	n51xx.input_callback<2>().set_ioport("IN0").mask(0x0f);
@@ -894,7 +893,9 @@ void polepos_state::polepos(machine_config &config)
 	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
 	n06xx.chip_select_callback<1>().set("53xx", FUNC(namco_53xx_device::chip_select));
 	n06xx.write_callback<2>().set("52xx", FUNC(namco_52xx_device::write));
+	n06xx.chip_select_callback<2>().set("52xx", FUNC(namco_52xx_device::chip_select));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
+	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
@@ -952,7 +953,7 @@ void polepos_state::polepos(machine_config &config)
 	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77);
 }
 
-WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
+void polepos_state::bootleg_soundlatch_w(uint8_t data)
 {
 	if (m_soundlatch.found()) // topracern also uses this; no idea what it should do there
 		m_soundlatch->write(data | 0xfc);
@@ -2450,7 +2451,7 @@ ROM_END
 void polepos_state::init_polepos2()
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(*this, FUNC(polepos_state::polepos2_ic25_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16sm_delegate(*this, FUNC(polepos_state::polepos2_ic25_r)));
 }
 
 

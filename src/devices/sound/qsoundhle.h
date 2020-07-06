@@ -11,9 +11,10 @@
 #pragma once
 
 #include "cpu/dsp16/dsp16.h"
+#include "dirom.h"
 
 
-class qsound_hle_device : public device_t, public device_sound_interface, public device_rom_interface
+class qsound_hle_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)

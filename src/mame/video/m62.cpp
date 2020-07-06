@@ -227,7 +227,7 @@ void m62_state::register_savestate()
 }
 
 
-WRITE8_MEMBER(m62_state::m62_flipscreen_w)
+void m62_state::m62_flipscreen_w(uint8_t data)
 {
 	/* screen flip is handled both by software and hardware */
 	data ^= ((~ioport("DSW2")->read()) & 1);
@@ -246,33 +246,33 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 		m_audio->m_audio_SINH->write((data >> 3) & 1);
 }
 
-WRITE8_MEMBER(m62_state::m62_hscroll_low_w)
+void m62_state::m62_hscroll_low_w(uint8_t data)
 {
 	m_m62_background_hscroll = (m_m62_background_hscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(m62_state::m62_hscroll_high_w)
+void m62_state::m62_hscroll_high_w(uint8_t data)
 {
 	m_m62_background_hscroll = (m_m62_background_hscroll & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER(m62_state::m62_vscroll_low_w)
+void m62_state::m62_vscroll_low_w(uint8_t data)
 {
 	m_m62_background_vscroll = (m_m62_background_vscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(m62_state::m62_vscroll_high_w)
+void m62_state::m62_vscroll_high_w(uint8_t data)
 {
 	m_m62_background_vscroll = (m_m62_background_vscroll & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER(m62_state::m62_tileram_w)
+void m62_state::m62_tileram_w(offs_t offset, uint8_t data)
 {
 	m_m62_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(m62_state::m62_textram_w)
+void m62_state::m62_textram_w(offs_t offset, uint8_t data)
 {
 	m_m62_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -361,7 +361,7 @@ void m62_state::m62_textlayer(tilemap_get_info_delegate tile_get_info, int rows,
 		m_fg_tilemap->set_scroll_cols(cols);
 }
 
-WRITE8_MEMBER(m62_state::kungfum_tileram_w)
+void m62_state::kungfum_tileram_w(offs_t offset, uint8_t data)
 {
 	m_m62_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -476,7 +476,7 @@ VIDEO_START_MEMBER(m62_state,ldrun2)
 }
 
 
-WRITE8_MEMBER(m62_state::ldrun3_topbottom_mask_w)
+void m62_state::ldrun3_topbottom_mask_w(uint8_t data)
 {
 	m_ldrun3_topbottom_mask = data & 1;
 }
@@ -626,17 +626,17 @@ uint32_t m62_state::screen_update_lotlot(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-WRITE8_MEMBER(m62_state::kidniki_text_vscroll_low_w)
+void m62_state::kidniki_text_vscroll_low_w(uint8_t data)
 {
 	m_kidniki_text_vscroll = (m_kidniki_text_vscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(m62_state::kidniki_text_vscroll_high_w)
+void m62_state::kidniki_text_vscroll_high_w(uint8_t data)
 {
 	m_kidniki_text_vscroll = (m_kidniki_text_vscroll & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER(m62_state::kidniki_background_bank_w)
+void m62_state::kidniki_background_bank_w(uint8_t data)
 {
 	if (m_kidniki_background_bank != (data & 1))
 	{
@@ -690,7 +690,7 @@ uint32_t m62_state::screen_update_kidniki(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-WRITE8_MEMBER(m62_state::spelunkr_palbank_w)
+void m62_state::spelunkr_palbank_w(uint8_t data)
 {
 	if (m_spelunkr_palbank != (data & 0x01))
 	{
@@ -740,10 +740,10 @@ uint32_t m62_state::screen_update_spelunkr(screen_device &screen, bitmap_rgb32 &
 }
 
 
-WRITE8_MEMBER(m62_state::spelunk2_gfxport_w)
+void m62_state::spelunk2_gfxport_w(uint8_t data)
 {
-	m62_hscroll_high_w(space, 0, (data & 2) >> 1);
-	m62_vscroll_high_w(space, 0, (data & 1));
+	m62_hscroll_high_w((data & 2) >> 1);
+	m62_vscroll_high_w((data & 1));
 	if (m_spelunkr_palbank != ((data & 0x0c) >> 2))
 	{
 		m_spelunkr_palbank = (data & 0x0c) >> 2;
@@ -827,7 +827,7 @@ uint32_t m62_state::screen_update_youjyudn(screen_device &screen, bitmap_rgb32 &
 }
 
 
-WRITE8_MEMBER(m62_state::horizon_scrollram_w)
+void m62_state::horizon_scrollram_w(offs_t offset, uint8_t data)
 {
 	m_scrollram[offset] = data;
 }

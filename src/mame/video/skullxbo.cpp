@@ -86,7 +86,7 @@ const atari_motion_objects_config skullxbo_state::s_mob_config =
  *
  *************************************/
 
-WRITE16_MEMBER( skullxbo_state::skullxbo_xscroll_w )
+void skullxbo_state::skullxbo_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* combine data */
 	uint16_t oldscroll = *m_xscroll;
@@ -106,7 +106,7 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_xscroll_w )
 }
 
 
-WRITE16_MEMBER( skullxbo_state::skullxbo_yscroll_w )
+void skullxbo_state::skullxbo_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* combine data */
 	int scanline = m_screen->vpos();
@@ -140,7 +140,7 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( skullxbo_state::skullxbo_mobmsb_w )
+void skullxbo_state::skullxbo_mobmsb_w(offs_t offset, uint16_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_mob->set_bank((offset >> 9) & 1);
@@ -154,12 +154,12 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_mobmsb_w )
  *
  *************************************/
 
-WRITE16_MEMBER( skullxbo_state::playfield_latch_w )
+void skullxbo_state::playfield_latch_w(uint16_t data)
 {
 	m_playfield_latch = data;
 }
 
-WRITE16_MEMBER(skullxbo_state::playfield_latched_w)
+void skullxbo_state::playfield_latched_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield_tilemap->write16(offset, data, mem_mask);
 	if (m_playfield_latch != -1)

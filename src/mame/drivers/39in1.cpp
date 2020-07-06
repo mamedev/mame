@@ -62,12 +62,12 @@ private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
+	uint32_t eeprom_r();
+	void eeprom_w(uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(cpld_r);
-	DECLARE_WRITE32_MEMBER(cpld_w);
-	DECLARE_READ32_MEMBER(prot_cheater_r);
+	uint32_t cpld_r(offs_t offset);
+	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t prot_cheater_r();
 	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -92,12 +92,12 @@ inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s
 	}
 }
 
-READ32_MEMBER(_39in1_state::eeprom_r)
+uint32_t _39in1_state::eeprom_r()
 {
 	return (m_eeprom->do_read() << 5) | (1 << 1); // Must be on.  Probably a DIP switch.
 }
 
-WRITE32_MEMBER(_39in1_state::eeprom_w)
+void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
 {
 	if (BIT(mem_mask, 2))
 		m_eeprom->cs_write(ASSERT_LINE);
@@ -107,7 +107,7 @@ WRITE32_MEMBER(_39in1_state::eeprom_w)
 		m_eeprom->di_write(BIT(data, 4));
 }
 
-READ32_MEMBER(_39in1_state::cpld_r)
+uint32_t _39in1_state::cpld_r(offs_t offset)
 {
 	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
 
@@ -162,7 +162,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::cpld_w)
+void _39in1_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -176,7 +176,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 	if (m_maincpu->pc() == 0x2874)
 	{
 		m_state = 2;
-		m_magic = space.read_byte(0xa02d4ff0);
+		m_magic = m_maincpu->space(AS_PROGRAM).read_byte(0xa02d4ff0);
 	}
 	else if (offset == 0xa)
 	{
@@ -189,7 +189,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #endif
 }
 
-READ32_MEMBER(_39in1_state::prot_cheater_r)
+uint32_t _39in1_state::prot_cheater_r()
 {
 	return 0x37;
 }
@@ -197,7 +197,7 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 void _39in1_state::driver_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
+	space.install_read_handler (0xa0151648, 0xa015164b, read32smo_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
 }
 
 void _39in1_state::_39in1_map(address_map &map)

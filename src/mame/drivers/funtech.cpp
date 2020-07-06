@@ -72,17 +72,17 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE8_MEMBER(vreg_w);
+	void lamps_w(uint8_t data);
+	void coins_w(uint8_t data);
+	void vreg_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(fgram_w);
+	void fgram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	tilemap_t *m_reel_tilemap[3];
 
-	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
+	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
 
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel_tile_info)
 }
 
 template<uint8_t Reel>
-WRITE8_MEMBER(fun_tech_corp_state::reel_ram_w)
+void fun_tech_corp_state::reel_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel_ram[Reel][offset] = data;
 	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
@@ -143,7 +143,7 @@ void fun_tech_corp_state::video_start()
 
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::fgram_w)
+void fun_tech_corp_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset&0x7ff);
@@ -223,13 +223,13 @@ void fun_tech_corp_state::funtech_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(fun_tech_corp_state::lamps_w)
+void fun_tech_corp_state::lamps_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::coins_w)
+void fun_tech_corp_state::coins_w(uint8_t data)
 {
 	if (data & 0x01) printf("coins_w %02x\n", data);
 
@@ -253,7 +253,7 @@ WRITE8_MEMBER(fun_tech_corp_state::coins_w)
 	// 02 = used when hopper is used (coin out counter?)
 }
 
-WRITE8_MEMBER(fun_tech_corp_state::vreg_w)
+void fun_tech_corp_state::vreg_w(uint8_t data)
 {
 	if (data & 0xb2) printf("vreg_w %02x\n", data);
 

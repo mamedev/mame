@@ -52,8 +52,8 @@ public:
 
 private:
 	DECLARE_MACHINE_RESET(ec1841);
-	DECLARE_READ8_MEMBER(memboard_r);
-	DECLARE_WRITE8_MEMBER(memboard_w);
+	uint8_t memboard_r(offs_t offset);
+	void memboard_w(offs_t offset, uint8_t data);
 
 	void ec1840_io(address_map &map);
 	void ec1840_map(address_map &map);
@@ -80,7 +80,7 @@ private:
  * Only one board should be enabled for read, and one for write.
  * Normally, this is the same board.
  *
- * Each board is divided into 4 banks, internally numbererd 0..3.
+ * Each board is divided into 4 banks, internally numbered 0..3.
  * POST tests each board on startup, and an error (indicated by
  * I/O CH CK bus signal) causes it to disable failing bank(s) by writing
  * 'reconfiguration code' (inverted number of failing memory bank) to
@@ -91,7 +91,7 @@ private:
  * bit 3    enable write access
  */
 
-READ8_MEMBER(ec184x_state::memboard_r)
+uint8_t ec184x_state::memboard_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -105,7 +105,7 @@ READ8_MEMBER(ec184x_state::memboard_r)
 	return data;
 }
 
-WRITE8_MEMBER(ec184x_state::memboard_w)
+void ec184x_state::memboard_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint8_t current = m_memory.enable[offset];

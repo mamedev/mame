@@ -74,9 +74,9 @@ public:
 	DECLARE_VIDEO_START(badlands);
 	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
-	DECLARE_WRITE16_MEMBER(video_int_ack_w);
+	void video_int_ack_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_scanline);
-	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
+	void badlands_pf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static const atari_motion_objects_config s_mob_config;
 	void badlands(machine_config &config);
@@ -97,11 +97,11 @@ public:
 		  m_spriteram(*this, "spriteram")
 	{}
 
-	DECLARE_READ8_MEMBER(bootleg_shared_r);
-	DECLARE_WRITE8_MEMBER(bootleg_shared_w);
-	DECLARE_WRITE8_MEMBER(bootleg_main_irq_w);
-	DECLARE_READ16_MEMBER(badlandsb_unk_r);
-	DECLARE_READ8_MEMBER(sound_response_r);
+	uint8_t bootleg_shared_r(offs_t offset);
+	void bootleg_shared_w(offs_t offset, uint8_t data);
+	void bootleg_main_irq_w(uint8_t data);
+	uint16_t badlandsb_unk_r();
+	uint8_t sound_response_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(bootleg_sound_scanline);
 
 	void badlandsb(machine_config &config);

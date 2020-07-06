@@ -43,18 +43,18 @@ enum {
 };
 
 
-WRITE8_MEMBER(decocass_state::decocass_coin_counter_w)
+void decocass_state::decocass_coin_counter_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( decocass_state::decocass_sound_command_main_r)
+uint8_t decocass_state::decocass_sound_command_main_r()
 {
 	// cgraplop2 needs to read something here or it will reset when you coin-up
 	//  could do with further investigation
 	return 0xc0;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
+void decocass_state::decocass_sound_command_w(uint8_t data)
 {
 	LOG(2,("CPU %s sound command -> $%02x\n", m_maincpu->tag(), data));
 	m_soundlatch->write(data);
@@ -64,28 +64,28 @@ WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(decocass_state::decocass_sound_data_r)
+uint8_t decocass_state::decocass_sound_data_r()
 {
 	uint8_t data = m_soundlatch2->read();
 	LOG(2,("CPU %s sound data    <- $%02x\n", m_maincpu->tag(), data));
 	return data;
 }
 
-READ8_MEMBER(decocass_state::decocass_sound_ack_r)
+uint8_t decocass_state::decocass_sound_ack_r()
 {
 	uint8_t data = m_sound_ack;   /* D6+D7 */
 	LOG(4,("CPU %s sound ack     <- $%02x\n", m_maincpu->tag(), data));
 	return data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
+void decocass_state::decocass_sound_data_w(uint8_t data)
 {
 	LOG(2,("CPU %s sound data    -> $%02x\n", m_audiocpu->tag(), data));
 	m_soundlatch2->write(data);
 	m_sound_ack |= 0x40;
 }
 
-READ8_MEMBER(decocass_state::decocass_sound_command_r)
+uint8_t decocass_state::decocass_sound_command_r()
 {
 	uint8_t data = m_soundlatch->read();
 	LOG(4,("CPU %s sound command <- $%02x\n", m_audiocpu->tag(), data));
@@ -101,20 +101,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(decocass_state::decocass_audio_nmi_gen)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(decocass_state::decocass_sound_nmi_enable_w)
+void decocass_state::decocass_sound_nmi_enable_w(uint8_t data)
 {
 	m_audio_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(decocass_state::decocass_sound_nmi_enable_r)
+uint8_t decocass_state::decocass_sound_nmi_enable_r()
 {
 	m_audio_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	return 0xff;
 }
 
-READ8_MEMBER(decocass_state::decocass_sound_data_ack_reset_r)
+uint8_t decocass_state::decocass_sound_data_ack_reset_r()
 {
 	uint8_t data = 0xff;
 	LOG(2,("CPU %s sound ack rst <- $%02x\n", m_audiocpu->tag(), data));
@@ -122,18 +122,18 @@ READ8_MEMBER(decocass_state::decocass_sound_data_ack_reset_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_sound_data_ack_reset_w)
+void decocass_state::decocass_sound_data_ack_reset_w(uint8_t data)
 {
 	LOG(2,("CPU %s sound ack rst -> $%02x\n", m_audiocpu->tag(), data));
 	m_sound_ack &= ~0x40;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_nmi_reset_w)
+void decocass_state::decocass_nmi_reset_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
-WRITE8_MEMBER(decocass_state::decocass_quadrature_decoder_reset_w)
+void decocass_state::decocass_quadrature_decoder_reset_w(uint8_t data)
 {
 	/* just latch the analog controls here */
 	m_quadrature_decoder[0] = ioport("AN0")->read();
@@ -142,7 +142,7 @@ WRITE8_MEMBER(decocass_state::decocass_quadrature_decoder_reset_w)
 	m_quadrature_decoder[3] = ioport("AN3")->read();
 }
 
-WRITE8_MEMBER(decocass_state::decocass_adc_w)
+void decocass_state::decocass_adc_w(uint8_t data)
 {
 }
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER(decocass_state::decocass_adc_w)
  * E6x6    ""
  * E6x7    a/d converter read
  */
-READ8_MEMBER(decocass_state::decocass_input_r)
+uint8_t decocass_state::decocass_input_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
@@ -190,7 +190,7 @@ READ8_MEMBER(decocass_state::decocass_input_r)
 #define E5XX_MASK   0x02    /* use 0x0e for old style board */
 
 
-WRITE8_MEMBER(decocass_state::decocass_reset_w)
+void decocass_state::decocass_reset_w(offs_t offset, uint8_t data)
 {
 	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data));
 	m_decocass_reset = data;
@@ -241,7 +241,7 @@ void decocass_state::decocass_fno( offs_t offset, uint8_t data )
 #endif
 
 
-READ8_MEMBER(decocass_type1_state::decocass_type1_r)
+uint8_t decocass_type1_state::decocass_type1_r(offs_t offset)
 {
 	if (!m_type1_map)
 		return 0x00;
@@ -508,7 +508,7 @@ MACHINE_RESET_MEMBER(decocass_type1_state,clocknchj) /* 11 */
  *  - Pro Tennis
  *
  ***************************************************************************/
-READ8_MEMBER(decocass_type2_state::decocass_type2_r)
+uint8_t decocass_type2_state::decocass_type2_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -537,7 +537,7 @@ READ8_MEMBER(decocass_type2_state::decocass_type2_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_type2_state::decocass_type2_w)
+void decocass_type2_state::decocass_type2_w(offs_t offset, uint8_t data)
 {
 	if (1 == m_type2_xx_latch)
 	{
@@ -590,7 +590,7 @@ WRITE8_MEMBER(decocass_type2_state::decocass_type2_w)
  *  - Fighting Ice Hockey
  *
  ***************************************************************************/
-READ8_MEMBER(decocass_type3_state::decocass_type3_r)
+uint8_t decocass_type3_state::decocass_type3_r(offs_t offset)
 {
 	uint8_t data, save;
 
@@ -788,7 +788,7 @@ READ8_MEMBER(decocass_type3_state::decocass_type3_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_type3_state::decocass_type3_w)
+void decocass_type3_state::decocass_type3_w(offs_t offset, uint8_t data)
 {
 	if (1 == (offset & 1))
 	{
@@ -828,7 +828,7 @@ WRITE8_MEMBER(decocass_type3_state::decocass_type3_w)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_type4_state::decocass_type4_r)
+uint8_t decocass_type4_state::decocass_type4_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -873,7 +873,7 @@ READ8_MEMBER(decocass_type4_state::decocass_type4_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_type4_state::decocass_type4_w)
+void decocass_type4_state::decocass_type4_w(offs_t offset, uint8_t data)
 {
 	if (1 == (offset & 1))
 	{
@@ -911,7 +911,7 @@ WRITE8_MEMBER(decocass_type4_state::decocass_type4_w)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_type5_state::decocass_type5_r)
+uint8_t decocass_type5_state::decocass_type5_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -953,7 +953,7 @@ READ8_MEMBER(decocass_type5_state::decocass_type5_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_type5_state::decocass_type5_w)
+void decocass_type5_state::decocass_type5_w(offs_t offset, uint8_t data)
 {
 	if (1 == (offset & 1))
 	{
@@ -987,7 +987,7 @@ WRITE8_MEMBER(decocass_type5_state::decocass_type5_w)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_nodong_state::decocass_nodong_r)
+uint8_t decocass_nodong_state::decocass_nodong_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -1029,7 +1029,7 @@ READ8_MEMBER(decocass_nodong_state::decocass_nodong_r)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_widel_state::decocass_widel_r)
+uint8_t decocass_widel_state::decocass_widel_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -1078,7 +1078,7 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_widel_state::decocass_widel_w)
+void decocass_widel_state::decocass_widel_w(offs_t offset, uint8_t data)
 {
 	if (1 == (offset & 1))
 	{
@@ -1117,7 +1117,7 @@ WRITE8_MEMBER(decocass_widel_state::decocass_widel_w)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_e5xx_r)
+uint8_t decocass_state::decocass_e5xx_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -1152,18 +1152,18 @@ READ8_MEMBER(decocass_state::decocass_e5xx_r)
 	else
 	{
 		if (!m_dongle_r.isnull())
-			data = m_dongle_r(space, offset, mem_mask);
+			data = m_dongle_r(offset);
 		else
 			data = 0xff;
 	}
 	return data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
+void decocass_state::decocass_e5xx_w(offs_t offset, uint8_t data)
 {
 	if (!m_dongle_w.isnull())
 	{
-		m_dongle_w(space, offset, data, mem_mask);
+		m_dongle_w(offset, data);
 		return;
 	}
 
@@ -1193,7 +1193,7 @@ WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::decocass_e900_w)
+void decocass_state::decocass_e900_w(uint8_t data)
 {
 	m_de0091_enable = data & 3;
 
@@ -1203,11 +1203,11 @@ WRITE8_MEMBER(decocass_state::decocass_e900_w)
 	membank("bank1")->set_entry(data & 3);
 }
 
-WRITE8_MEMBER(decocass_state::decocass_de0091_w)
+void decocass_state::decocass_de0091_w(offs_t offset, uint8_t data)
 {
 	/* don't allow writes to the ROMs - actually cexplore requires us to allow them */
 	//if (!m_de0091_enable)
-		decocass_charram_w(space, offset, data);
+		decocass_charram_w(offset, data);
 }
 
 /***************************************************************************
@@ -1251,8 +1251,8 @@ void decocass_state::machine_reset()
 	m_firsttime = 1;
 	m_latch1 = 0;
 
-	m_dongle_r = read8_delegate(*this);
-	m_dongle_w = write8_delegate(*this);
+	m_dongle_r = read8sm_delegate(*this);
+	m_dongle_w = write8sm_delegate(*this);
 
 	m_decocass_reset = 0;
 	m_i8041_p1 = 0xff;
@@ -1292,7 +1292,7 @@ void decocass_type1_state::machine_reset()
 {
 	decocass_state::machine_reset();
 
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_type1_state::decocass_type1_r));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_type1_state::decocass_type1_r));
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 }
@@ -1309,8 +1309,8 @@ void decocass_type2_state::machine_reset()
 	decocass_state::machine_reset();
 
 	LOG(0,("dongle type #2 (CS82-007)\n"));
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_type2_state::decocass_type2_r));
-	m_dongle_w = write8_delegate(*this, FUNC(decocass_type2_state::decocass_type2_w));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_type2_state::decocass_type2_r));
+	m_dongle_w = write8sm_delegate(*this, FUNC(decocass_type2_state::decocass_type2_w));
 
 	m_type2_d2_latch = 0;
 	m_type2_xx_latch = 0;
@@ -1329,8 +1329,8 @@ void decocass_type3_state::machine_reset()
 {
 	decocass_state::machine_reset();
 
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_type3_state::decocass_type3_r));
-	m_dongle_w = write8_delegate(*this, FUNC(decocass_type3_state::decocass_type3_w));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_type3_state::decocass_type3_r));
+	m_dongle_w = write8sm_delegate(*this, FUNC(decocass_type3_state::decocass_type3_w));
 
 	m_type3_ctrs = 0;
 	m_type3_d0_latch = 0;
@@ -1349,8 +1349,8 @@ void decocass_type4_state::machine_reset()
 	decocass_state::machine_reset();
 
 	LOG(0,("dongle type #4 (32K ROM)\n"));
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_type4_state::decocass_type4_r));
-	m_dongle_w = write8_delegate(*this, FUNC(decocass_type4_state::decocass_type4_w));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_type4_state::decocass_type4_r));
+	m_dongle_w = write8sm_delegate(*this, FUNC(decocass_type4_state::decocass_type4_w));
 
 	m_type4_ctrs = 0;
 	m_type4_latch = 0;
@@ -1366,8 +1366,8 @@ void decocass_type5_state::machine_reset()
 	decocass_state::machine_reset();
 
 	LOG(0,("dongle type #5 (NOP)\n"));
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_type5_state::decocass_type5_r));
-	m_dongle_w = write8_delegate(*this, FUNC(decocass_type5_state::decocass_type5_w));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_type5_state::decocass_type5_r));
+	m_dongle_w = write8sm_delegate(*this, FUNC(decocass_type5_state::decocass_type5_w));
 
 	m_type5_latch = 0;
 }
@@ -1376,7 +1376,7 @@ void decocass_nodong_state::machine_reset()
 {
 	decocass_state::machine_reset();
 	LOG(0, ("no dongle\n"));
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_nodong_state::decocass_nodong_r));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_nodong_state::decocass_nodong_r));
 }
 
 MACHINE_RESET_MEMBER(decocass_type1_state,ctsttape)
@@ -1622,8 +1622,8 @@ void decocass_widel_state::machine_reset()
 {
 	decocass_state::machine_reset();
 	LOG(0,("Deco Multigame Dongle\n"));
-	m_dongle_r = read8_delegate(*this, FUNC(decocass_widel_state::decocass_widel_r));
-	m_dongle_w = write8_delegate(*this, FUNC(decocass_widel_state::decocass_widel_w));
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_widel_state::decocass_widel_r));
+	m_dongle_w = write8sm_delegate(*this, FUNC(decocass_widel_state::decocass_widel_w));
 
 	m_widel_ctrs = 0;
 	m_widel_latch = 0;
@@ -1636,7 +1636,7 @@ void decocass_widel_state::machine_reset()
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::i8041_p1_w)
+void decocass_state::i8041_p1_w(uint8_t data)
 {
 	if (data != m_i8041_p1_write_latch)
 	{
@@ -1670,7 +1670,7 @@ WRITE8_MEMBER(decocass_state::i8041_p1_w)
 	m_i8041_p1 = data;
 }
 
-READ8_MEMBER(decocass_state::i8041_p1_r)
+uint8_t decocass_state::i8041_p1_r()
 {
 	uint8_t data = m_i8041_p1;
 
@@ -1693,7 +1693,7 @@ READ8_MEMBER(decocass_state::i8041_p1_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_state::i8041_p2_w)
+void decocass_state::i8041_p2_w(uint8_t data)
 {
 	if (data != m_i8041_p2_write_latch)
 	{
@@ -1714,7 +1714,7 @@ WRITE8_MEMBER(decocass_state::i8041_p2_w)
 	m_i8041_p2 = (m_i8041_p2 & 0xe0) | (data & ~0xe0);
 }
 
-READ8_MEMBER(decocass_state::i8041_p2_r)
+uint8_t decocass_state::i8041_p2_r()
 {
 	uint8_t data;
 

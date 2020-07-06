@@ -86,17 +86,17 @@ public:
 	void pcm(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( pcm_85_r );
-	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
-	DECLARE_WRITE8_MEMBER( pcm_85_w );
+	uint8_t port85_r();
+	DECLARE_WRITE_LINE_MEMBER( port82_w );
+	void port85_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pcm_io(address_map &map);
-	void pcm_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	bool m_cone;
 	uint8_t m_85;
-	virtual void machine_reset() override;
+	void machine_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio_s;
 	required_device<z80pio_device> m_pio_u;
@@ -109,7 +109,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( pcm_state::pcm_82_w )
+WRITE_LINE_MEMBER( pcm_state::port82_w )
 {
 	if (state)
 	{
@@ -139,7 +139,7 @@ There is also a HALT LED, connected directly to the processor.
 */
 
 
-READ8_MEMBER( pcm_state::pcm_85_r )
+uint8_t pcm_state::port85_r()
 {
 	uint8_t data = m_85 & 0x7f;
 
@@ -149,7 +149,7 @@ READ8_MEMBER( pcm_state::pcm_85_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcm_state::pcm_85_w )
+void pcm_state::port85_w(uint8_t data)
 {
 	if (BIT(data, 5))
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
@@ -162,15 +162,14 @@ WRITE8_MEMBER( pcm_state::pcm_85_w )
 
 
 
-void pcm_state::pcm_mem(address_map &map)
+void pcm_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();  // ROM
-	map(0x2000, 0xf7ff).ram();  // RAM
-	map(0xf800, 0xffff).ram().share("videoram"); // Video RAM
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
 }
 
-void pcm_state::pcm_io(address_map &map)
+void pcm_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -189,8 +188,10 @@ void pcm_state::pcm_io(address_map &map)
 static INPUT_PORTS_START( pcm )
 INPUT_PORTS_END
 
-void pcm_state::machine_reset()
+void pcm_state::machine_start()
 {
+	save_item(NAME(m_cone));
+	save_item(NAME(m_85));
 }
 
 uint32_t pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -226,7 +227,7 @@ uint32_t pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-static const z80_daisy_config pcm_daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc_s" },     /* System ctc */
 	{ "pio_s" },     /* System pio */
@@ -238,7 +239,7 @@ static const z80_daisy_config pcm_daisy_chain[] =
 
 
 /* F4 Character Displayer */
-static const gfx_layout pcm_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -252,16 +253,16 @@ static const gfx_layout pcm_charlayout =
 };
 
 static GFXDECODE_START( gfx_pcm )
-	GFXDECODE_ENTRY( "chargen", 0x0000, pcm_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 void pcm_state::pcm(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'000'000) /4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pcm_state::pcm_mem);
-	m_maincpu->set_addrmap(AS_IO, &pcm_state::pcm_io);
-	m_maincpu->set_daisy_config(pcm_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcm_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pcm_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -290,8 +291,8 @@ void pcm_state::pcm(machine_config &config)
 	Z80PIO(config, m_pio_s, XTAL(10'000'000)/4);
 	m_pio_s->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio_s->in_pa_callback().set(K7659_KEYBOARD_TAG, FUNC(k7659_keyboard_device::read));
-	m_pio_s->in_pb_callback().set(FUNC(pcm_state::pcm_85_r));
-	m_pio_s->out_pb_callback().set(FUNC(pcm_state::pcm_85_w));
+	m_pio_s->in_pb_callback().set(FUNC(pcm_state::port85_r));
+	m_pio_s->out_pb_callback().set(FUNC(pcm_state::port85_w));
 
 	Z80SIO(config, "sio", XTAL(10'000'000) /4);
 
@@ -303,12 +304,12 @@ void pcm_state::pcm(machine_config &config)
 	m_ctc_s->zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
 	m_ctc_s->zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 	m_ctc_s->zc_callback<1>().set("sio", FUNC(z80sio_device::rxtxcb_w));
-	m_ctc_s->zc_callback<2>().set(FUNC(pcm_state::pcm_82_w));  // speaker
+	m_ctc_s->zc_callback<2>().set(FUNC(pcm_state::port82_w));  // speaker
 }
 
 /* ROM definition */
 ROM_START( pcm )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v202", "Version 2.02" )
 	ROMX_LOAD( "bios_v202.d14", 0x0000, 0x0800, CRC(27c24892) SHA1(a97bf9ef075de91330dc0c7cfd3bb6c7a88bb585), ROM_BIOS(0))
 	ROMX_LOAD( "bios_v202.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(0))
@@ -332,4 +333,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
-COMP( 1988, pcm,  0,      0,      pcm,     pcm,   pcm_state, empty_init, "Mugler/Mathes", "PC/M",   0)
+COMP( 1988, pcm,  0,      0,      pcm,     pcm,   pcm_state, empty_init, "Mugler/Mathes", "PC/M",   MACHINE_SUPPORTS_SAVE )

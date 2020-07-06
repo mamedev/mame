@@ -89,17 +89,17 @@ private:
 	uint32_t m_vaddr;
 	emu_timer *m_sample;
 
-	DECLARE_READ8_MEMBER(disk_iobank_r);
-	DECLARE_WRITE8_MEMBER(disk_iobank_w);
-	DECLARE_READ8_MEMBER(fdc765_status_r);
-	DECLARE_READ8_MEMBER(fdc765_data_r);
-	DECLARE_WRITE8_MEMBER(fdc765_data_w);
-	DECLARE_WRITE8_MEMBER(fdc_dor_w);
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_WRITE8_MEMBER(voice_start_w);
+	uint8_t disk_iobank_r(offs_t offset);
+	void disk_iobank_w(offs_t offset, uint8_t data);
+	uint8_t fdc765_status_r();
+	uint8_t fdc765_data_r();
+	void fdc765_data_w(uint8_t data);
+	void fdc_dor_w(uint8_t data);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	uint8_t port_c_r();
+	void port_b_w(uint8_t data);
+	void voice_start_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -159,8 +159,8 @@ public:
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(bg_bank_r);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	uint8_t bg_bank_r();
+	void bg_bank_w(uint8_t data);
 private:
 	uint8_t m_bg_bank;
 };
@@ -183,15 +183,15 @@ void isa8_cga_tetriskr_device::device_start()
 {
 	m_bg_bank = 0;
 	isa8_cga_superimpose_device::device_start();
-	m_isa->install_device(0x3c0, 0x3c0, read8_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_r)), write8_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_w)));
+	m_isa->install_device(0x3c0, 0x3c0, read8smo_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_r)), write8smo_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_w)));
 }
 
-WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)
+void isa8_cga_tetriskr_device::bg_bank_w(uint8_t data)
 {
 	m_bg_bank = (data & 0x0f) ^ 8;
 }
 
-READ8_MEMBER(isa8_cga_tetriskr_device::bg_bank_r)
+uint8_t isa8_cga_tetriskr_device::bg_bank_r()
 {
 	return 0xff;
 }
@@ -255,7 +255,7 @@ const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 	return ROM_NAME( tetriskr_cga );
 }
 
-READ8_MEMBER(pcxt_state::disk_iobank_r)
+uint8_t pcxt_state::disk_iobank_r(offs_t offset)
 {
 	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,m_maincpu->pc());
 	//if(offset == 0) return ioport("DSW")->read();
@@ -264,7 +264,7 @@ READ8_MEMBER(pcxt_state::disk_iobank_r)
 	return m_disk_data[offset];
 }
 
-WRITE8_MEMBER(pcxt_state::disk_iobank_w)
+void pcxt_state::disk_iobank_w(offs_t offset, uint8_t data)
 {
 /*
     BIOS does a single out $0310,$F0 on reset
@@ -320,17 +320,17 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 	m_disk_data[offset] = data;
 }
 
-READ8_MEMBER(pcxt_state::port_a_r)
+uint8_t pcxt_state::port_a_r()
 {
 	return 0xaa;//harmless keyboard error occurs without this
 }
 
-READ8_MEMBER(pcxt_state::port_b_r)
+uint8_t pcxt_state::port_b_r()
 {
 	return m_port_b_data;
 }
 
-READ8_MEMBER(pcxt_state::port_c_r)
+uint8_t pcxt_state::port_c_r()
 {
 	return 0x00;// DIPS?
 }
@@ -338,7 +338,7 @@ READ8_MEMBER(pcxt_state::port_c_r)
 /*'buzzer' sound routes here*/
 /* Filetto uses this for either beep and um5100 sound routing,probably there's a mux somewhere.*/
 /* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
-WRITE8_MEMBER(pcxt_state::port_b_w)
+void pcxt_state::port_b_w(uint8_t data)
 {
 	m_mb->m_pit8253->write_gate2(BIT(data, 0));
 	m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
@@ -353,7 +353,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 #define FDC_WRITE 0x40
 #define FDC_READ 0x00 /*~0x40*/
 
-READ8_MEMBER(pcxt_state::fdc765_status_r)
+uint8_t pcxt_state::fdc765_status_r()
 {
 	uint8_t tmp;
 	tmp = m_status | 0x80;
@@ -366,26 +366,26 @@ READ8_MEMBER(pcxt_state::fdc765_status_r)
 	return tmp;
 }
 
-READ8_MEMBER(pcxt_state::fdc765_data_r)
+uint8_t pcxt_state::fdc765_data_r()
 {
 	m_status = (FDC_READ);
 	m_mb->m_pic8259->ir6_w(0);
 	return 0xc0;
 }
 
-WRITE8_MEMBER(pcxt_state::fdc765_data_w)
+void pcxt_state::fdc765_data_w(uint8_t data)
 {
 	m_status = (FDC_WRITE);
 }
 
 
-WRITE8_MEMBER(pcxt_state::fdc_dor_w)
+void pcxt_state::fdc_dor_w(uint8_t data)
 {
 	m_mb->m_pic8259->ir6_w(1);
 }
 
 // TODO: um5100 device; the actual codec may be sightly different
-WRITE8_MEMBER(pcxt_state::voice_start_w)
+void pcxt_state::voice_start_w(uint8_t data)
 {
 	m_sample->adjust(attotime::zero, 0, attotime::from_hz(28000));
 	m_bit = 7;

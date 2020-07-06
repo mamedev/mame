@@ -102,17 +102,17 @@ TODO:
 #define MCU_CLOCK           (XTAL(12'000'000)/4)
 
 
-WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)
+void lkage_state::lkage_sh_nmi_disable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(0);
 }
 
-WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
+void lkage_state::lkage_sh_nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(1);
 }
 
-READ8_MEMBER(lkage_state::sound_status_r)
+uint8_t lkage_state::sound_status_r()
 {
 	return 0xff;
 }
@@ -155,7 +155,7 @@ void lkage_state::lkage_map_boot(address_map &map)
 }
 
 
-READ8_MEMBER(lkage_state::port_fetch_r)
+uint8_t lkage_state::port_fetch_r(offs_t offset)
 {
 	return memregion("user1")->base()[offset];
 }
@@ -846,7 +846,7 @@ ROM_START( bygone )
 ROM_END
 
 
-READ8_MEMBER(lkage_state::mcu_status_r)
+uint8_t lkage_state::mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -857,7 +857,7 @@ READ8_MEMBER(lkage_state::mcu_status_r)
 
 // Note: This probably uses another MCU program, which is undumped.
 
-READ8_MEMBER(lkage_state::fake_mcu_r)
+uint8_t lkage_state::fake_mcu_r()
 {
 	int result = 0;
 
@@ -892,12 +892,12 @@ READ8_MEMBER(lkage_state::fake_mcu_r)
 	return result;
 }
 
-WRITE8_MEMBER(lkage_state::fake_mcu_w)
+void lkage_state::fake_mcu_w(uint8_t data)
 {
 	m_mcu_val = data;
 }
 
-READ8_MEMBER(lkage_state::fake_status_r)
+uint8_t lkage_state::fake_status_r()
 {
 	return m_mcu_ready;
 }

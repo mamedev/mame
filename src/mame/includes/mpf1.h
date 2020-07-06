@@ -61,10 +61,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( step_r );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t step_r(offs_t offset);
+	uint8_t ppi_pa_r();
+	void ppi_pb_w(uint8_t data);
+	void ppi_pc_w(uint8_t data);
 
 	int m_break;
 	int m_m1;

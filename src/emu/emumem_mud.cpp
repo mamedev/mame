@@ -35,7 +35,7 @@ template<> u8 mask_to_ukey<u64>(u64 mask)
 		(mask & 0x00000000000000ff ? 0x01 : 0x00);
 }
 
-template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, AddrShift, Endian>::memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
+template<int Width, int AddrShift, endianness_t Endian> memory_units_descriptor<Width, AddrShift, Endian>::memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
 {
 	u32 bits_per_access = 8 << access_width;
 	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
@@ -86,7 +86,7 @@ template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, Ad
 			generate(m_keymap[i], unitmask, umasks[i], cswidth, bits_per_access, base_shift, shift, active_count);
 }
 
-template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Width, AddrShift, Endian>::generate(u8 ukey, typename emu::detail::handler_entry_size<Width>::uX gumask, typename emu::detail::handler_entry_size<Width>::uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
+template<int Width, int AddrShift, endianness_t Endian> void memory_units_descriptor<Width, AddrShift, Endian>::generate(u8 ukey, typename emu::detail::handler_entry_size<Width>::uX gumask, typename emu::detail::handler_entry_size<Width>::uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
 {
 	auto &entries = m_entries_for_key[ukey];
 

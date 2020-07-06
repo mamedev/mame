@@ -245,16 +245,16 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(lower_r);
-	DECLARE_WRITE16_MEMBER(lower_w);
+	uint16_t lower_r(offs_t offset);
+	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_WRITE16_MEMBER(analog_w);
+	uint16_t analog_r();
+	void analog_w(offs_t offset, uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(uint8_t data);
 
 	void es5505_clock_changed(u32 data);
 
@@ -372,7 +372,7 @@ void esq5505_state::update_irq_to_maincpu()
 	}
 }
 
-READ16_MEMBER(esq5505_state::lower_r)
+uint16_t esq5505_state::lower_r(offs_t offset)
 {
 	offset &= 0x7fff;
 
@@ -393,7 +393,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 	}
 }
 
-WRITE16_MEMBER(esq5505_state::lower_w)
+void esq5505_state::lower_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7fff;
 
@@ -470,13 +470,13 @@ void esq5505_state::es5505_clock_changed(u32 data)
 	m_pump->set_unscaled_clock(data);
 }
 
-WRITE16_MEMBER(esq5505_state::analog_w)
+void esq5505_state::analog_w(offs_t offset, uint16_t data)
 {
 	offset &= 0x7;
 	m_analog_values[offset] = data;
 }
 
-READ16_MEMBER(esq5505_state::analog_r)
+uint16_t esq5505_state::analog_r()
 {
 	return m_analog_values[m_duart_io & 7];
 }
@@ -495,7 +495,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(esq5505_state::duart_output)
+void esq5505_state::duart_output(uint8_t data)
 {
 	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 

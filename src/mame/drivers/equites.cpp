@@ -412,14 +412,14 @@ READ_LINE_MEMBER(gekisou_state::gekisou_unknown_bit_r)
 	return m_gekisou_unknown_bit;
 }
 
-WRITE16_MEMBER(gekisou_state::gekisou_unknown_bit_w)
+void gekisou_state::gekisou_unknown_bit_w(offs_t offset, uint16_t data)
 {
 	// data bit is A17 (offset)
 	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
 }
 
 
-READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
+uint16_t equites_state::equites_spriteram_kludge_r()
 {
 	if (m_spriteram[0] == 0x5555)
 		return 0;
@@ -468,7 +468,7 @@ void equites_state::bngotime_map(address_map &map)
 {
 	equites_common_map(map);
 	map(0x040000, 0x040fff).ram();
-	// map(0x180001, 0x180001).w("sound_board", FUNC(ad_60mc01_device::sound_command_w)); // where's this?
+	map(0x180001, 0x180001).w("sound_board", FUNC(ad_60mc01_device::sound_command_w));
 }
 
 void splndrbt_state::splndrbt_map(address_map &map)
@@ -722,7 +722,7 @@ static INPUT_PORTS_START( hvoltage )
 	PORT_ADJUSTER(27, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bngotime )
+static INPUT_PORTS_START( bngotime ) // TODO: possibly still missing something? Couldn't find any use for the unknown inputs
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) // tilt up, only has effect when ball's in play
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -730,14 +730,14 @@ static INPUT_PORTS_START( bngotime )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // tilt left, only has effect when ball's in play
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // spring launcher and tilt up (doubled?)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 ) // starts game after betting, also changes background before launching first ball
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // buys extra ball after game over
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN1 )
 
@@ -1742,7 +1742,7 @@ GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equite
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bngotime,  0,        bngotime, bngotime, equites_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs verification of the inputs, emulation of the sound board (flag is in the audio device)
+GAME( 1986, bngotime,  0,        bngotime, bngotime, equites_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_SUPPORTS_SAVE ) // emulation of the sound board is imperfect (flag is in the audio device)
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -36,15 +36,16 @@ public:
 	void mc8020(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	u8 port_b_r();
+	void port_a_w(u8 data);
+	void port_b_w(u8 data);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	u8 m_row;
+	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
@@ -142,7 +143,7 @@ static INPUT_PORTS_START( mc8020 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( mc8020_state::port_b_r )
+u8 mc8020_state::port_b_r()
 {
 	if (m_row == 0x40)
 		return m_keyboard[0]->read();
@@ -168,13 +169,18 @@ READ8_MEMBER( mc8020_state::port_b_r )
 		return 0;
 }
 
-WRITE8_MEMBER( mc8020_state::port_a_w )
+void mc8020_state::port_a_w(u8 data)
 {
 	m_row = data;
 }
 
-WRITE8_MEMBER( mc8020_state::port_b_w )
+void mc8020_state::port_b_w(u8 data)
 {
+}
+
+void mc8020_state::machine_start()
+{
+	save_item(NAME(m_row));
 }
 
 
@@ -331,7 +337,7 @@ void mc8020_state::mc8020(machine_config &config)
 
 /* ROM definition */
 ROM_START( mc8020 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver1", "Version 1")
 	ROMX_LOAD( "s01.rom",     0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(0))
 	ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(0))
@@ -371,4 +377,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )
+COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

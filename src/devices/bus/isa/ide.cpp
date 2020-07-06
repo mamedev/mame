@@ -15,12 +15,12 @@
 #include "speaker.h"
 
 
-READ8_MEMBER(isa16_ide_device::ide16_alt_r )
+uint8_t isa16_ide_device::ide16_alt_r()
 {
 	return m_ide->read_cs1(6/2, 0xff);
 }
 
-WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
+void isa16_ide_device::ide16_alt_w(uint8_t data)
 {
 	m_ide->write_cs1(6/2, data, 0xff);
 }

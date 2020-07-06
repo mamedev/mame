@@ -499,6 +499,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_21_QS5 0x1e,0x0c02,  -1,  -1,  -1,  -1,  0x0c, -1,  -1,   0x2a,{0x2c,0x2e,0x30,0x32},0x1c, {0x04,0x08,0x10,0x00,0x00}
 #define HACK_B_1      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x0e,0x0e,0x0e,0x30,0x30}
 #define HACK_B_2      -1,   -1,   0x0e,0x0c,0x0a,0x08, 0x06,0x04,0x02,  0x28,{0x26,0x24,0x22,0x20},0x22, {0x20,0x04,0x08,0x12,0x12}
+#define HACK_B_3     0x20,0x0004,          __not_applicable__,          0x30,{0x26, -1, 0x28,0x32},0x2a, {0x02,0x04,0x08,0x00,0x00} // varthb2, writes to priority mask 2 have been patched out
 
 /*
 CPS_B_21_DEF is CPS-B-21 at default settings (no battery)
@@ -1854,7 +1855,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2b2",       CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2ceupl",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 2 },
+	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2ceds6",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6a",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
@@ -1862,6 +1863,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"varth",       CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
+	{"varthb2",     HACK_B_3,     mapper_sfzch, 0, 0, 0, 0x80 },  // unknown gal, other varth mappers don't work (game looks for sprites in >0x8000 unmapped region)
 	{"varthr1",     CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
@@ -2047,7 +2049,7 @@ inline uint16_t *cps_state::cps1_base( int offset, int boundary )
 
 
 
-WRITE16_MEMBER(cps_state::cps1_cps_a_w)
+void cps_state::cps1_cps_a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_a_regs[offset]);
 
@@ -2073,7 +2075,7 @@ WRITE16_MEMBER(cps_state::cps1_cps_a_w)
 }
 
 
-READ16_MEMBER(cps_state::cps1_cps_b_r)
+uint16_t cps_state::cps1_cps_b_r(offs_t offset)
 {
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
@@ -2117,7 +2119,7 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 }
 
 
-WRITE16_MEMBER(cps_state::cps1_cps_b_w)
+void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
@@ -2288,7 +2290,7 @@ void cps_state::cps1_get_video_base()
 	if (m_game_config->bootleg_kludge == 2)
 	{
 		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
-		scroll1xoff = -0x0c;
+		scroll1xoff = -0x10;
 		scroll2xoff = -0x10;
 		scroll3xoff = -0x10;
 	}
@@ -2298,6 +2300,13 @@ void cps_state::cps1_get_video_base()
 		scroll1xoff = -0x08;
 		scroll2xoff = -0x0b;
 		scroll3xoff = -0x0c;
+	}
+	else
+	if (m_game_config->bootleg_kludge == 0x80)
+	{
+		scroll1xoff = -0x0c;
+		scroll2xoff = -0x0e;
+		scroll3xoff = -0x10;
 	}
 	else
 	if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
@@ -2367,7 +2376,7 @@ void cps_state::cps1_get_video_base()
 }
 
 
-WRITE16_MEMBER(cps_state::cps1_gfxram_w)
+void cps_state::cps1_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int page = (offset >> 7) & 0x3c0;
 	COMBINE_DATA(&m_gfxram[offset]);
@@ -2774,7 +2783,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 	uint16_t *base = m_buffered_obj.get();
 
 	/* some sf2 hacks draw the sprites in reverse order */
-	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2) || (m_game_config->bootleg_kludge == 3))
+	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2) || (m_game_config->bootleg_kludge == 3) || (m_game_config->bootleg_kludge == 0x80))
 	{
 		base += m_last_sprite_offset;
 		baseadd = -4;
@@ -2906,13 +2915,13 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-WRITE16_MEMBER(cps2_state::cps2_objram_bank_w)
+void cps2_state::cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_objram_bank = data & 1;
 }
 
-READ16_MEMBER(cps2_state::cps2_objram1_r)
+uint16_t cps2_state::cps2_objram1_r(offs_t offset)
 {
 	if (m_objram_bank & 1)
 		return m_objram2[offset];
@@ -2920,7 +2929,7 @@ READ16_MEMBER(cps2_state::cps2_objram1_r)
 		return m_objram1[offset];
 }
 
-READ16_MEMBER(cps2_state::cps2_objram2_r)
+uint16_t cps2_state::cps2_objram2_r(offs_t offset)
 {
 	if (m_objram_bank & 1)
 		return m_objram1[offset];
@@ -2928,7 +2937,7 @@ READ16_MEMBER(cps2_state::cps2_objram2_r)
 		return m_objram2[offset];
 }
 
-WRITE16_MEMBER(cps2_state::cps2_objram1_w)
+void cps2_state::cps2_objram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram2[offset]);
@@ -2936,7 +2945,7 @@ WRITE16_MEMBER(cps2_state::cps2_objram1_w)
 		COMBINE_DATA(&m_objram1[offset]);
 }
 
-WRITE16_MEMBER(cps2_state::cps2_objram2_w)
+void cps2_state::cps2_objram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram1[offset]);

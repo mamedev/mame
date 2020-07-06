@@ -70,6 +70,7 @@ public:
 	void juko16(machine_config &config);
 	void alphatp50(machine_config &config);
 	void mbc16lt(machine_config &config);
+	void modernxt(machine_config &config);
 
 	void init_bondwell();
 
@@ -78,7 +79,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(unk_r);
+	u8 unk_r();
 
 	double m_turbo_off_speed;
 
@@ -91,6 +92,7 @@ private:
 	void pc16_map(address_map &map);
 	void pc8_io(address_map &map);
 	void pc8_map(address_map &map);
+	void pc8_flash_map(address_map &map);
 	void zenith_map(address_map &map);
 };
 
@@ -119,7 +121,7 @@ void pc_state::pc16_io(address_map &map)
 	map(0x0070, 0x007f).ram(); // needed for Poisk-2
 }
 
-READ8_MEMBER(pc_state::unk_r)
+u8 pc_state::unk_r()
 {
 	return 0;
 }
@@ -1436,6 +1438,28 @@ ROM_START( cadd810 )
 	ROM_LOAD("wd_ide_bios_rev_2.0.bin",0x0000,0x2000, NO_DUMP) //missing: dump of hd controller
 ROM_END
 
+/************************************************* Juko Nest 8 bit variants ***
+
+CPU: 8088 or NEC V20
+
+******************************************************************************/
+
+ROM_START( juko8 )
+	ROM_REGION(0x10000, "bios", 0)
+	// 0: BIOS ver 2.00 VEGAS COMPUTER COMMUNICATIONS.
+	ROM_SYSTEM_BIOS(0, "nestv200", "JUKO NEST v2.00")
+	ROMX_LOAD( "jukoa.bin", 0xe000, 0x2000, CRC(7d78707e) SHA1(8b09a32658a850e7f03254d1328fe6e336e91871),ROM_BIOS(0))
+	// 1: Flytek (Protek) ST-12 (a 15MHz ST-15 was also available)
+	ROM_SYSTEM_BIOS(1, "st-12", "ST-12")
+	ROMX_LOAD( "flytek_st-12_bios_ver_2.20_c_nel_electronics_ltd.bin", 0xe000, 0x2000, CRC(448c3089) SHA1(779d4138d841783d0e2e5ad29c83d9a8cb4497b6), ROM_BIOS(1))
+	// 2: Juko ST BIOS ver 2.30 / Copyright 1988 Juko Electronics Industrial Co., Ltd.
+	ROM_SYSTEM_BIOS(2, "nest230", "JUKO NEST v2.30")
+	ROMX_LOAD( "juko_st_v2.30.bin", 0xe000, 0x2000, CRC(7a1c6dfa) SHA1(0b343f3028ca06c9e6dc69427d1b15a47c74b9fc),ROM_BIOS(2))
+	// 3: BIOS Ver 2.32
+	ROM_SYSTEM_BIOS(3, "nest232", "JUKO NEST v2.32")
+	ROMX_LOAD( "xt-juko-st-2.32.bin", 0xe000, 0x2000, CRC(0768524e) SHA1(259520bb7a6796e5b987c2b9bef1acd501df1670),ROM_BIOS(3))
+ROM_END
+
 /**************************************** JUKO NEST N3 true 16 bit variants ***
 
 https://www.vogons.org/viewtopic.php?f=46&t=60077
@@ -1873,6 +1897,186 @@ ROM_START( mbc16lt ) // screen remains blank
 	ROM_LOAD("fc2x.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
+/************************************************** DTK-Group PC-XT-Clones ***
+
+DTK-Group is the manufacturer of those popular motherboards, utilising a BIOS developed by the Taiwanese
+Industrial Technology Research Institute's Electronics Research and Service Organization (ERSO)
+
+*****************************************************************************/
+
+ROM_START( dtkerso )
+	ROM_REGION(0x10000, "bios", 0)
+	// 0: DTK Corp. COMPUTER XT / DTK/ERSO/BIOS 2.26 (C) 1986
+	ROM_SYSTEM_BIOS(0, "dtk226", "XT DTK Erso bios 2.26")
+	ROMX_LOAD( "dtk-ers0.rom", 0xe000, 0x2000, CRC(85fd5e10) SHA1(2ae152f042e7e43e27621f071af763e3f9dc68d2),ROM_BIOS(0))
+	// 1: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.37 (C) 1986
+	ROM_SYSTEM_BIOS(1, "dtk237", "XT DTK Erso bios 2.37")
+	ROMX_LOAD( "dtk2.37.bin", 0xe000, 0x2000, CRC(d29884a5) SHA1(217c949b4188f638a7ae82a408c5a18d77707009), ROM_BIOS(1))
+	// 2: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.38 (C) 1986
+	ROM_SYSTEM_BIOS(2, "tava238", "Tava DTK Erso V2.38")
+	ROMX_LOAD( "tava_dtk_erso_bios_2.38_u87.bin", 0xe000, 0x2000, CRC(34f5c0e5) SHA1(5a1590f948670a5ef85a1ee7cbb40387fced8a1f), ROM_BIOS(2))
+	// 3: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.40 (C) 1986
+	ROM_SYSTEM_BIOS(3, "dtk240", "XT DTK Erso bios 2.40") // 8 MHz Turbo
+	ROMX_LOAD( "dtk2.40.bin", 0xe000, 0x2000, CRC(a4ed27c3) SHA1(66b67540d94c0d049ebc14ee14eadd2ab7304818),ROM_BIOS(3))
+	// 4: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.42 (C) 1986
+	ROM_SYSTEM_BIOS(4, "dtk242", "XT DTK Erso bios 2.42") // 10 MHz Turbo
+	ROMX_LOAD( "dtk2.42.bin", 0xe000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(4))
+ROM_END
+
+/*********************************************************** Corona PPC-21 ***
+
+identical to the Olivetti M18P (one online source shows a ROM version 3.06 with the Olivetti)
+a BIOS version 1.53 exists
+
+*****************************************************************************/
+
+ROM_START( coppc21 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_SYSTEM_BIOS( 0, "v3.10", "V3.10" )
+	ROMX_LOAD( "corona_ppc_21_3.10_8k_rom.bin", 0xe000, 0x2000, CRC(4c243424) SHA1(55910035b49679beddb43a0728a10dc32c73e3e8), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "v4.23cg", "V4.23CG" )
+	ROMX_LOAD( "corona_ppc21_16k_4.23cg.bin", 0xc000, 0x4000, CRC(4fd3b8fa) SHA1(faeec1d91b7f83ebea05dc80a1961d7d6ddd1a67), ROM_BIOS(1))
+ROM_END
+
+/********************************* Sergey's XT, Micro 88, NuXT and NuXT 2.0 ***
+
+Open source projects originating from http://www.malinov.com/Home/sergeys-projects
+Various projects have been combined to offer a "modern" ATX XT
+https://monotech.fwscart.com/
+https://github.com/monotech/NuXTv2
+https://github.com/monotech/NuXT
+
+Sergey's XT: http://www.malinov.com/Home/sergeys-projects/sergey-s-xt
+The mainboard is a 16bit (long) ISA card that has to be used in conjunction with a backplane - 8-bit ISA bus but some 16-bit ISA signal are
+implemented: IRQ10 - IRQ15 lines, and non-latched address lines LA17-LA19. The latter are to enable compatibility with Cirrus Logic CL-GD54xx VGA cards.
+Supported CPUs: 12 MHz: NEC uPD70108HCZ-16 (NEC V20HL), 10 MHz: NEC uPD70108HCZ-10 (NEC V20HL), NEC uPD70108C-10 (NEC V20), 8088-1 (AMD and Siemens)
+8 MHz: NEC uPD70108C-8 (NEC V20), 80C88-2 (Intel and Harris), 8088-2 (Intel, Fujitsu, Siemens), 4.77 MHz: 80C88 (Harris), 8088 (Intel, NEC, Soviet clones)
+AT keyboard controller, can use AT keyboards (VIA VT82C42N, Holtek HT6542B, Intel P8042AHP with AMI KB-BIOS-VER-F firmware)
+1MB of SRAM (00000h-9FFFFh, 640K +  6 x 32 KB blocks that can be configured to reside between 0C0000h-0EFFFFh as UMB memory
+128KB Flash memory that contains the BIOS ROM and can be used to hold BIOS extensions like the XT-IDE BIOS.
+Two 8259 Programmable Interrupt Controllers (PICs in cascade configuration, like in IBM AT. This gives 15 hardware interrupts in total, 5 of them are routed
+to the system board itself: IRQ0 - timer, IRQ1 - keyboard, IRQ8 - RTC, IRQ12 - PS/2 mouse, IRQ13 - 8087 co-processor.
+The Rest are available on ISA bus., 8237 Direct Memory Access Controller (DMAC), 8254 Programmable Interval Timer (PIT), 8042 keyboard controller (AT-compatible)
+1.193182 MHz clock for feeding the 8254 PIT is produced by a 74LS92 divide-by-12 counter, instead of using PCLK output of 8284. This makes PIT input frequency
+independent from CPU speed which is an important consideration for turbo mode.
+Turbo mode is implemented using F/C input and an oscillator connected to EFI input of 8284 clock generator. Turbo mode could be toggled either using a switch
+or by software using 2nd bit of 61h port - DS12887A RTC (DS12885 is recommended)
+on board connectors: PS/2 keyboard, PS/2 mouse, connectors for speaker, Reset and Turbo buttons and LED
+
+Xi 8088 processor board: http://www.malinov.com/Home/sergeys-projects/xi-8088
+An improved version of Sergey's XT
+
+Micro 8088 processor board: https://github.com/skiselev/micro_8088 , uses https://github.com/skiselev/8088_bios
+Micro 8088 is an easy to build IBM PC/XT compatible processor board. It uses a fairly common Faraday FE2010/FE2010A chipset, that implements most of IBM PC/XT LSIs
+(Intel 8xxx ICs) and glue logic. Micro 8088 uses SRAM ICs to implement the system RAM, and a Flash ROM IC to store the BIOS, further reducing the number of components,
+and simplifying the build process.
+
+The codebase for the BIOS of the different projects has been unified, the code from https://github.com/skiselev/8088_bios now builds for Sergey's XT, Xi and Micro 8088
+
+Monotech NuXT: https://github.com/monotech/NuXT , https://www.vogonswiki.com/index.php/NuXT
+MicroATX "Turbo XT" Motherboard - BM PC/XT Compatible Motherboard - MicroATX form factor, 244 x 185 mm - Switchable 4.77MHz, 7.16MHz, and 9.55MHz CPU clock
+640K Conventional Memory - Up to 192K Upper Memory Blocks - • Dual 64K System ROM – switchable with DIP switch - System BIOS is Sergey Kiselev’s Micro 8088 BIOS
+Up to 32K usable as Option ROM space. XT-IDE BIOS uses half -  Option ROM socket with write support - PS/2 Keyboard Port - Implemented with AT to XT converter in a microcontroller.
+ATX power input - -5V rail not needed. Is generated onboard for ISA slots - 20-pin connector. 24-pin connectors will fit too - Four 8-bit ISA Slots - Three of the four slots can fit 16-bit cards
+Onboard peripherals: Advanced floppy controller - Supports most floppy drives, including HD and ED - Supports single-density (FM) disks - Serial port - 16550 UART with FIFO buffer
+Selectable I/O address and IRQ - CompactFlash interface - Located at I/O port 300h - Super VGA graphics (TVGA9000i SVGA): Up to 1024 x 768 resolution / Up to 256 colours
+
+// Monotech NuXTv2
+New: real-time clock - PS/2 mouse port - parallel port - IDE interface - improved CF card compatibility - PC/104 platform - onboard VGA is now an optional PC/104 card.
+the VGA port still remains in the I/O area - removed extra Option ROM socket
+
+*****************************************************************************/
+
+void pc_state::pc8_flash_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xe0000, 0xfffff).rom().region("bios", 0); // should be Flash memory 29F010/29C010 but can be partially swapped out as UMB for the underlying RAM
+}
+
+void pc_state::modernxt(machine_config &config) // this is just to load the ROMs properly, the XT/AT hardware combination resp. the FE2010A (see notes) needs to be set up
+{
+	/* basic machine hardware */
+	v20_device &maincpu(V20(config, "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_flash_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "vga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_at", false); // bios supports HD floppies
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "xtide", false);
+
+	/* keyboard */
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K");
+}
+
+ROM_START( sergeysxt )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v0.7c", "v0.7c")
+	ROMX_LOAD( "bios-0.7c.bin", 0x00000, 0x20000, CRC(bbc87eea) SHA1(2d7445cbbae87e6be860c063aceed34085718caf), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v0.7e", "v0.7e")
+	ROMX_LOAD( "bios-0.7e-128k-1.0.bin", 0x00000, 0x20000, CRC(26a065c6) SHA1(3578ff4eb1c3f0cb9540798a2f609eb26c3cdf6f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "v0.8", "v0.8")
+	ROMX_LOAD( "bios-0.8-128k-1.0.bin", 0x00000, 0x20000, CRC(4e841aa6) SHA1(a8554f7ef0ee233cd8748ace59523baf6cc44bec), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v0.8.1", "v0.81")
+	ROMX_LOAD( "bios-0.8.1-128k-1.0.bin", 0x00000, 0x20000, CRC(6ebda8be) SHA1(b3291da7c0d43f06b2e9f46cb9a4fe0cb9ee8d56), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "v0.9", "v0.9")
+	ROMX_LOAD( "bios-0.9-128k-1.0.bin", 0x00000, 0x20000, CRC(2010ff32) SHA1(b89a7a0ddb4686bfe17f122cd14e29ae0c121c7e), ROM_BIOS(4))
+ROM_END
+
+
+ROM_START( xiprocessor )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v0.7e", "v0.7e")
+	ROMX_LOAD( "bios-0.7e-128k-2.0.bin", 0x00000, 0x20000, CRC(ad041c73) SHA1(d9186cbcd98aa98e24efacdfa6c39b8666ba01eb), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v0.8", "v0.8")
+	ROMX_LOAD( "bios-0.8-128k-2.0.bin", 0x00000, 0x20000, CRC(b75ebdf5) SHA1(f03bd56378535074a29612e0eadaa0257d77bb9f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "v0.8.1", "v0.8.1")
+	ROMX_LOAD( "bios-0.8.1-128k-2.0.bin", 0x00000, 0x20000, CRC(5cb8ecd2) SHA1(1f9a9d35861480b19459f8ab48c459c77c7b97de), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v0.9", "v0.9")
+	ROMX_LOAD( "bios-0.9-128k-2.0.bin", 0x00000, 0x20000, CRC(e7334d76) SHA1(fb4025accb47f191bc9b526fe5f050c929868ca8), ROM_BIOS(3))
+ROM_END
+
+ROM_START( micro88 ) // constant beep but boots, keyboard not working
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v0.9.2", "v0.9.2")
+	ROMX_LOAD( "bios-0.9.2.bin", 0x10000, 0x10000, CRC(ce2da51b) SHA1(c6f7935464369502e42b42768c09e5a115c79d44), ROM_BIOS(0))
+	ROM_IGNORE(0x10000)
+	ROM_SYSTEM_BIOS(1, "0.9.3", "v0.9.3")
+	ROMX_LOAD( "bios-0.9.3.bin", 0x10000, 0x10000, CRC(0f376e95) SHA1(6284922f85f7094c37a1ced5bd8e8b3ebdd0d153), ROM_BIOS(1))
+	ROM_IGNORE(0x10000)
+	ROM_SYSTEM_BIOS(2, "0.9.4", "v0.9.4")
+	ROMX_LOAD( "bios-0.9.4.bin", 0x10000, 0x10000, CRC(15f8eb3f) SHA1(10d334c25eb6e44900acb5a2b76ac90dcec102a3), ROM_BIOS(2))
+	ROM_IGNORE(0x10000)
+	ROM_SYSTEM_BIOS(3, "0.9.5", "v0.9.5")
+	ROMX_LOAD( "bios-0.9.5.bin", 0x10000, 0x10000, CRC(99c250fb) SHA1(4a740cebe091d42ccb1e8af2defb6d2325bd98c4), ROM_BIOS(3))
+	ROM_IGNORE(0x10000)
+	ROM_SYSTEM_BIOS(4, "0.9.6", "v0.9.6")
+	ROMX_LOAD( "bios-0.9.6.bin", 0x10000, 0x10000, CRC(8ba6dfc5) SHA1(0652a131268853ac44284c334f340018d4e8659c), ROM_BIOS(4))
+	ROM_IGNORE(0x10000)
+ROM_END
+
+
+ROM_START( mononuxt ) // constant beep but boots, keyboard not working
+	ROM_REGION(0x20000, "bios", 0) // These systems have a CF card slot onboard and include the XT-IDE BIOS in the system BIOS
+	ROM_LOAD( "micro8088_bios_0.9.6_plus_xt-ide-cf.bin", 0x00000, 0x20000, CRC(d58f2a1a) SHA1(01b0d75b0ee991c544b9cf40019a358287cafab0))
+ROM_END
+
+ROM_START( mononuxt2 ) // constant beep but boots, keyboard not working
+	ROM_REGION(0x20000, "bios", 0) // first half is V20 compatible, second half 8088/V20 compatible. Other versions can be built
+	ROM_LOAD( "nuxt_128k image_0.9.8_hybrid.bin", 0x00000, 0x20000, CRC(ca22cc53) SHA1(57e04285ca7920afe38366c90d6f0359b398367b))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1889,10 +2093,12 @@ COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state,
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
+COMP( 198?, coppc21,        ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Corona PPC-21",         MACHINE_NOT_WORKING )
 COMP( 198?, coppc400,       ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Cordata PPC-400",       MACHINE_NOT_WORKING )
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )
+COMP( 198?, dtkerso,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "DTK Group", "PC-XT-Clones with DTK/ERSO-BIOS", 0 )
 COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "Eagle 1600" ,           MACHINE_NOT_WORKING )
 COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",       MACHINE_NOT_WORKING )
 COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
@@ -1900,6 +2106,7 @@ COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
+COMP( 198?, juko8,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8088 and V20",     MACHINE_NOT_WORKING )
 COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
 COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",             0 )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
@@ -1928,3 +2135,8 @@ COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
 COMP( 198?, zdz150,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-150 series",          0 )
 COMP( 198?, zdz160,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-160 series",          0 )
+COMP( 2010, sergeysxt,      ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Sergey Kiselev",                  "Sergey's XT",           MACHINE_NOT_WORKING )
+COMP( 2012, xiprocessor,    ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Sergey Kiselev",                  "Xi processor board",    MACHINE_NOT_WORKING )
+COMP( 2017, micro88,        ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Sergey Kiselev",                  "Micro 8088",            MACHINE_NOT_WORKING )
+COMP( 2019, mononuxt,       ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Monotech",                        "NuXT",                  MACHINE_NOT_WORKING )
+COMP( 2020, mononuxt2,      ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Monotech",                        "NuXT v2",               MACHINE_NOT_WORKING )

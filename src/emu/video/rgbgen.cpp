@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb, Ryan Holtz
 /***************************************************************************
 
-    rgbgen.c
+    rgbgen.cpp
 
     General RGB utilities.
 

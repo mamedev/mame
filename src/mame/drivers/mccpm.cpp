@@ -40,33 +40,32 @@ public:
 	mccpm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_ram(*this, "ram")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void mccpm(machine_config &config);
 
 private:
-	void mccpm_io(address_map &map);
-	void mccpm_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<u8> m_ram;
 };
 
 
-void mccpm_state::mccpm_mem(address_map &map)
+void mccpm_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0xffff).ram().share("ram");
+	map(0x0000, 0xffff).ram().share("mainram");
 }
 
-void mccpm_state::mccpm_io(address_map &map)
+void mccpm_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0xf4, 0xf7).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));  // init bytes look like those for a Z80PIO
+	map(0xf4, 0xf7).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
 /* Input ports */
@@ -77,15 +76,15 @@ INPUT_PORTS_END
 void mccpm_state::machine_reset()
 {
 	uint8_t* bios = memregion("maincpu")->base();
-	memcpy(m_p_ram, bios, 0x1000);
+	memcpy(m_ram, bios, 0x1000);
 }
 
 void mccpm_state::mccpm(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &mccpm_state::mccpm_mem);
-	m_maincpu->set_addrmap(AS_IO, &mccpm_state::mccpm_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mccpm_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mccpm_state::io_map);
 
 	/* Devices */
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
@@ -107,7 +106,7 @@ void mccpm_state::mccpm(machine_config &config)
 
 /* ROM definition */
 ROM_START( mccpm )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "v36", "V3.6")
 	ROMX_LOAD("mon36.j15",   0x0000, 0x1000, CRC(9c441537) SHA1(f95bad52d9392b8fc9d9b8779b7b861672a0022b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v34", "V3.4")
@@ -119,4 +118,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                         FULLNAME            FLAGS
-COMP( 1981, mccpm, 0,      0,      mccpm,   mccpm, mccpm_state, empty_init, "GRAF Elektronik Systeme GmbH", "mc-CP/M-Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, mccpm, 0,      0,      mccpm,   mccpm, mccpm_state, empty_init, "GRAF Elektronik Systeme GmbH", "mc-CP/M-Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -2,9 +2,10 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /*********************************************************************
 
-    drawgfx.c
+    drawgfx.cpp
 
     Generic graphic functions.
+
 *********************************************************************/
 
 #include "emu.h"

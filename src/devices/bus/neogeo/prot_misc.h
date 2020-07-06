@@ -34,8 +34,8 @@ public:
 	void samsho5b_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size);
 	void samsho5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndrom_size);
 
-	DECLARE_READ16_MEMBER(mslug5p_prot_r);
-	//DECLARE_WRITE16_MEMBER(ms5plus_bankswitch_w);
+	uint16_t mslug5p_prot_r();
+	//void ms5plus_bankswitch_w(offs_t offset, uint16_t data);
 	uint32_t mslug5p_bank_base(uint16_t sel);
 
 	void mslug5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndrom_size);

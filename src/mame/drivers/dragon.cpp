@@ -19,6 +19,7 @@
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "imagedev/floppy.h"
+#include "bus/rs232/rs232.h"
 
 #include "bus/coco/dragon_amtor.h"
 #include "bus/coco/dragon_fdc.h"
@@ -27,6 +28,7 @@
 #include "bus/coco/dragon_sprites.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
+#include "bus/coco/coco_ram.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_psg.h"
@@ -207,6 +209,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
@@ -343,10 +346,23 @@ void dragon64_state::dragon64(machine_config &config)
 	// acia
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set(FUNC(dragon64_state::acia_irq));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(acia, FUNC(mos6551_device::write_cts));
 
 	// software lists
 	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
 	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
+}
+
+WRITE_LINE_MEMBER( dragon64_state::acia_irq )
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dragon64_state::dragon64h(machine_config &config)

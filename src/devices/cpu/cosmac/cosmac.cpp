@@ -381,10 +381,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_clear(true),
 		m_irq(CLEAR_LINE),
 		m_dmain(CLEAR_LINE),
-		m_dmaout(CLEAR_LINE),
-		m_program(nullptr),
-		m_io(nullptr),
-		m_cache(nullptr)
+		m_dmaout(CLEAR_LINE)
 {
 	for (auto & elem : m_ef)
 		elem = CLEAR_LINE;
@@ -467,9 +464,9 @@ void cosmac_device::device_start()
 	m_write_tpb.resolve_safe();
 
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",        m_pc).callimport().callexport().noshow();
@@ -644,7 +641,7 @@ std::unique_ptr<util::disasm_interface> cdp1805_device::create_disassembler()
 
 inline uint8_t cosmac_device::read_opcode(offs_t pc)
 {
-	return m_cache->read_byte(pc);
+	return m_cache.read_byte(pc);
 }
 
 
@@ -654,7 +651,7 @@ inline uint8_t cosmac_device::read_opcode(offs_t pc)
 
 inline uint8_t cosmac_device::read_byte(offs_t address)
 {
-	return m_program->read_byte(address);
+	return m_program.read_byte(address);
 }
 
 
@@ -665,7 +662,7 @@ inline uint8_t cosmac_device::read_byte(offs_t address)
 
 inline uint8_t cosmac_device::read_io_byte(offs_t address)
 {
-	return m_io->read_byte(address);
+	return m_io.read_byte(address);
 }
 
 
@@ -675,7 +672,7 @@ inline uint8_t cosmac_device::read_io_byte(offs_t address)
 
 inline void cosmac_device::write_byte(offs_t address, uint8_t data)
 {
-	m_program->write_byte(address, data);
+	m_program.write_byte(address, data);
 }
 
 
@@ -686,7 +683,7 @@ inline void cosmac_device::write_byte(offs_t address, uint8_t data)
 
 inline void cosmac_device::write_io_byte(offs_t address, uint8_t data)
 {
-	m_io->write_byte(address, data);
+	m_io.write_byte(address, data);
 }
 
 

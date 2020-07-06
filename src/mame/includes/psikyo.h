@@ -112,18 +112,18 @@ private:
 	u8          m_s1945_mcu_bctrl;
 	const u8    *m_s1945_mcu_table;
 
-	DECLARE_READ32_MEMBER(sngkace_input_r);
-	DECLARE_READ32_MEMBER(gunbird_input_r);
+	u32 sngkace_input_r(offs_t offset);
+	u32 gunbird_input_r(offs_t offset);
 	void s1945_mcu_data_w(uint8_t data);
 	void s1945_mcu_control_w(uint8_t data);
 	void s1945_mcu_direction_w(uint8_t data);
 	void s1945_mcu_bctrl_w(uint8_t data);
 	void s1945_mcu_command_w(uint8_t data);
-	uint32_t s1945_mcu_data_r();
+	u32 s1945_mcu_data_r();
 	uint8_t s1945_mcu_control_r();
-	DECLARE_READ32_MEMBER(s1945_input_r);
-	DECLARE_WRITE8_MEMBER(s1945bl_okibank_w);
-	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	u32 s1945_input_r(offs_t offset);
+	void s1945bl_okibank_w(u8 data);
+	template<int Shift> void sound_bankswitch_w(u8 data);
 	template<int Layer> u16 vram_r(offs_t offset);
 	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask);
 

@@ -51,8 +51,12 @@ namespace solver
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{
-		connect_post_start(m_fb_sync, m_Q_sync);
-		setup_base(nets);
+		if (!anetlist.setup().connect(m_fb_sync, m_Q_sync))
+		{
+			log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+		}
+		setup_base(anetlist.setup(), nets);
 
 		// now setup the matrix
 		setup_matrix();
@@ -63,7 +67,7 @@ namespace solver
 		return &state().setup().get_connected_terminal(*term)->net();
 	}
 
-	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
+	void matrix_solver_t::setup_base(setup_t &setup, const analog_net_t::list_t &nets)
 	{
 		log().debug("New solver setup\n");
 		std::vector<core_device_t *> step_devices;
@@ -117,11 +121,11 @@ namespace solver
 							{
 								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
 								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = state().make_object<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
+								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, nname, &dynamic_cast<analog_net_t &>(p->net()));
 								net_proxy_output = net_proxy_output_u.get();
 								m_inps.emplace_back(std::move(net_proxy_output_u));
 							}
-							net_proxy_output->net().add_terminal(*p);
+							setup.add_terminal(net_proxy_output->net(), *p);
 							// FIXME: repeated calling - kind of brute force
 							net_proxy_output->net().rebuild_list();
 							log().debug("Added input {1}", net_proxy_output->name());
@@ -371,6 +375,17 @@ namespace solver
 		m_Idrn.resize(iN, max_count);
 		m_connected_net_Vn.resize(iN, max_count);
 
+		// Initialize arrays to 0 (in case the vrl one is used
+		for (std::size_t k = 0; k < iN; k++)
+			for (std::size_t j = 0; j < m_terms[k].count(); j++)
+			{
+				m_gtn.set(k,j, nlconst::zero());
+				m_gonn.set(k,j, nlconst::zero());
+				m_Idrn.set(k,j, nlconst::zero());
+				m_connected_net_Vn.set(k, j, nullptr);
+			}
+
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			auto count = m_terms[k].count();
@@ -415,20 +430,9 @@ namespace solver
 		m_last_step = netlist_time_ext::zero();
 	}
 
-	void matrix_solver_t::update() noexcept
-	{
-		const netlist_time new_timestep = solve(exec().time());
-		update_inputs();
-
-		if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
-		{
-			m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
-		}
-	}
-
 	void matrix_solver_t::step(netlist_time delta) noexcept
 	{
-		const auto dd(delta.as_fp<nl_fptype>());
+		const auto dd(delta.as_fp<fptype>());
 		for (auto &d : m_step_funcs)
 			d(dd);
 	}
@@ -485,7 +489,7 @@ namespace solver
 
 
 		if (m_params.m_dynamic_ts)
-			return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_max_timestep);
+			return compute_next_timestep(delta.as_fp<fptype>(), m_params.m_max_timestep);
 
 		return netlist_time::from_fp(m_params.m_max_timestep);
 	}
@@ -530,7 +534,7 @@ namespace solver
 		return {colmax, colmin};
 	}
 
-	nl_fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
+	matrix_solver_t::fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
 	{
 		{
 			//
@@ -539,7 +543,7 @@ namespace solver
 
 			std::vector<bool> touched(1024, false); // FIXME!
 
-			nl_fptype weight = nlconst::zero();
+			fptype weight = nlconst::zero();
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term.count(); i++)
 			{
@@ -552,7 +556,7 @@ namespace solver
 						if (colu==row) colu = static_cast<unsigned>(diag);
 						else if (colu==diag) colu = static_cast<unsigned>(row);
 
-						weight = weight + plib::abs(static_cast<nl_fptype>(colu) - static_cast<nl_fptype>(diag));
+						weight = weight + plib::abs(static_cast<fptype>(colu) - static_cast<fptype>(diag));
 						touched[colu] = true;
 					}
 				}
@@ -588,18 +592,18 @@ namespace solver
 		{
 			log().verbose("==============================================");
 			log().verbose("Solver {1}", this->name());
-			log().verbose("       ==> {1} nets", this->m_terms.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
+			log().verbose("       ==> {1} nets", this->m_terms.size());
 			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
 			log().verbose("       has {1} timestep elements", this->timestep_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",
-						static_cast<nl_fptype>(this->m_stat_newton_raphson) / static_cast<nl_fptype>(this->m_stat_vsolver_calls));
+						static_cast<fptype>(this->m_stat_newton_raphson) / static_cast<fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 					this->m_stat_calculations,
-					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_fp<nl_fptype>(),
+					static_cast<fptype>(this->m_stat_calculations) / this->exec().time().as_fp<fptype>(),
 					this->m_iterative_fail,
-					nlconst::magic(100.0) * static_cast<nl_fptype>(this->m_iterative_fail)
-						/ static_cast<nl_fptype>(this->m_stat_calculations),
-					static_cast<nl_fptype>(this->m_iterative_total) / static_cast<nl_fptype>(this->m_stat_calculations));
+					nlconst::hundred() * static_cast<fptype>(this->m_iterative_fail)
+						/ static_cast<fptype>(this->m_stat_calculations),
+					static_cast<fptype>(this->m_iterative_total) / static_cast<fptype>(this->m_stat_calculations));
 		}
 	}
 

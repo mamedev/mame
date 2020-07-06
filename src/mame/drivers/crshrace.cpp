@@ -140,7 +140,7 @@ Dip locations verified with Service Mode.
 #define CRSHRACE_3P_HACK    0
 
 
-WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
+void crshrace_state::crshrace_sh_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x03);
 }

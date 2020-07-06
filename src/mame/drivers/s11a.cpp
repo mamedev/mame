@@ -148,7 +148,7 @@ MACHINE_RESET_MEMBER( s11a_state, s11a )
 	membank("bgbank")->set_entry(0);
 }
 
-WRITE8_MEMBER( s11a_state::dig0_w )
+void s11a_state::dig0_w(uint8_t data)
 {
 	data &= 0x7f;
 	set_strobe(data & 15);
@@ -160,7 +160,7 @@ WRITE8_MEMBER( s11a_state::dig0_w )
 	set_segment2(0);
 }
 
-WRITE8_MEMBER( s11a_state::bgbank_w )
+void s11a_state::bgbank_w(uint8_t data)
 {
 	membank("bgbank")->set_entry(data & 0x03);
 }

@@ -6,7 +6,8 @@
  */
 
 #include "nld_4020.h"
-#include "nlid_system.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 namespace netlist
 {
@@ -14,8 +15,7 @@ namespace netlist
 	{
 	NETLIB_OBJECT(CD4020_sub)
 	{
-		NETLIB_CONSTRUCTOR(CD4020_sub)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
 		, m_IP(*this, "IP")
 		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"})
@@ -58,8 +58,7 @@ namespace netlist
 
 	NETLIB_OBJECT(CD4020)
 	{
-		NETLIB_CONSTRUCTOR(CD4020)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4020, "CD4XXX")
 		, m_sub(*this, "sub")
 		, m_RESET(*this, "RESET")
 		{

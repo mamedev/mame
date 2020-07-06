@@ -69,24 +69,24 @@ public:
 
 private:
 
-	DECLARE_READ16_MEMBER(extra_ram_r);
-	DECLARE_WRITE16_MEMBER(extra_ram_w);
-	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
-	DECLARE_WRITE16_MEMBER(mp_io_write);
-	DECLARE_READ16_MEMBER(mp_io_read);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bios_6402_r);
-	DECLARE_WRITE8_MEMBER(bios_6402_w);
-	DECLARE_READ8_MEMBER(bios_6204_r);
-	DECLARE_WRITE8_MEMBER(bios_width_w);
-	DECLARE_READ8_MEMBER(bios_6404_r);
-	DECLARE_WRITE8_MEMBER(bios_6404_w);
-	DECLARE_READ8_MEMBER(bios_6600_r);
-	DECLARE_WRITE8_MEMBER(bios_6600_w);
-	DECLARE_WRITE8_MEMBER(game_w);
-	DECLARE_READ8_MEMBER(vdp1_count_r);
+	uint16_t extra_ram_r(offs_t offset);
+	void extra_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bios_banksel_w(uint8_t data);
+	void bios_gamesel_w(uint8_t data);
+	void mp_io_write(offs_t offset, uint16_t data);
+	uint16_t mp_io_read(offs_t offset);
+	uint8_t bank_r(offs_t offset);
+	void bank_w(offs_t offset, uint8_t data);
+	uint8_t bios_6402_r();
+	void bios_6402_w(uint8_t data);
+	uint8_t bios_6204_r();
+	void bios_width_w(uint8_t data);
+	uint8_t bios_6404_r();
+	void bios_6404_w(uint8_t data);
+	uint8_t bios_6600_r();
+	void bios_6600_w(uint8_t data);
+	void game_w(uint8_t data);
+	uint8_t vdp1_count_r(offs_t offset);
 
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
@@ -410,7 +410,7 @@ READ_LINE_MEMBER(mplay_state::start2_r)
 	return BIT(m_bios_bank, 5);
 }
 
-WRITE8_MEMBER(mplay_state::bios_banksel_w)
+void mplay_state::bios_banksel_w(uint8_t data)
 {
 /*  Multi-slot note:
     Bits 0 and 1 appear to determine the selected game slot.
@@ -426,7 +426,7 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n", m_bios_bank >> 6, data);
 }
 
-WRITE8_MEMBER(mplay_state::bios_gamesel_w)
+void mplay_state::bios_gamesel_w(uint8_t data)
 {
 	m_bios_6403 = data;
 
@@ -434,23 +434,23 @@ WRITE8_MEMBER(mplay_state::bios_gamesel_w)
 	m_bios_mode = BIT(data, 4);
 }
 
-WRITE16_MEMBER(mplay_state::mp_io_write)
+void mplay_state::mp_io_write(offs_t offset, uint16_t data)
 {
 	if (offset == 0x03)
 		m_megadrive_io_data_regs[2] = (data & m_megadrive_io_ctrl_regs[2]) | (m_megadrive_io_data_regs[2] & ~m_megadrive_io_ctrl_regs[2]);
 	else
-		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
+		megadriv_68k_io_write(offset & 0x1f, data);
 }
 
-READ16_MEMBER(mplay_state::mp_io_read)
+uint16_t mplay_state::mp_io_read(offs_t offset)
 {
 	if (offset == 0x03)
 		return m_megadrive_io_data_regs[2];
 	else
-		return megadriv_68k_io_read(space, offset & 0x1f, 0xffff);
+		return megadriv_68k_io_read(offset & 0x1f);
 }
 
-READ8_MEMBER(mplay_state::bank_r)
+uint8_t mplay_state::bank_r(offs_t offset)
 {
 	uint8_t* bank = memregion("mtbios")->base();
 	uint32_t fulladdress = m_bios_bank_addr + offset;
@@ -476,7 +476,7 @@ READ8_MEMBER(mplay_state::bank_r)
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO access
 	{
-		return mp_io_read(space, (offset & 0x1f) / 2, 0xffff);
+		return mp_io_read((offset & 0x1f) / 2);
 	}
 	else
 	{
@@ -486,7 +486,7 @@ READ8_MEMBER(mplay_state::bank_r)
 
 }
 
-WRITE8_MEMBER(mplay_state::bank_w)
+void mplay_state::bank_w(offs_t offset, uint8_t data)
 {
 	uint32_t fulladdress = m_bios_bank_addr + offset;
 
@@ -499,7 +499,7 @@ WRITE8_MEMBER(mplay_state::bank_w)
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <=0xa1001f) // IO Access
 	{
-		mp_io_write(space, (offset & 0x1f) / 2, data, 0xffff);
+		mp_io_write((offset & 0x1f) / 2, data);
 	}
 	else
 	{
@@ -511,38 +511,38 @@ WRITE8_MEMBER(mplay_state::bank_w)
 /* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
 /* other io data/ctrl regs are dealt with exactly like in the console              */
 
-READ8_MEMBER(mplay_state::bios_6402_r)
+uint8_t mplay_state::bios_6402_r()
 {
 	return m_megadrive_io_data_regs[2];// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6402_w)
+void mplay_state::bios_6402_w(uint8_t data)
 {
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6204_r)
+uint8_t mplay_state::bios_6204_r()
 {
 	return m_megadrive_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
-WRITE8_MEMBER(mplay_state::bios_width_w)
+void mplay_state::bios_width_w(uint8_t data)
 {
 	m_bios_width = data;
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6404_r)
+uint8_t mplay_state::bios_6404_r()
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6404_w)
+void mplay_state::bios_6404_w(uint8_t data)
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -551,7 +551,7 @@ WRITE8_MEMBER(mplay_state::bios_6404_w)
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6600_r)
+uint8_t mplay_state::bios_6600_r()
 {
 /*  Multi-slot note:
     0x6600 appears to be used to check for extra slots being used.
@@ -562,13 +562,13 @@ READ8_MEMBER(mplay_state::bios_6600_r)
 	return m_bios_6600;// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6600_w)
+void mplay_state::bios_6600_w(uint8_t data)
 {
 	m_bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
 }
 
-WRITE8_MEMBER(mplay_state::game_w)
+void mplay_state::game_w(uint8_t data)
 {
 	if (m_readpos == 1)
 		m_game_banksel = 0;
@@ -603,7 +603,7 @@ void mplay_state::megaplay_bios_map(address_map &map)
 
 
 
-READ8_MEMBER(mplay_state::vdp1_count_r)
+uint8_t mplay_state::vdp1_count_r(offs_t offset)
 {
 	if (offset & 0x01)
 		return m_vdp1->hcount_read();
@@ -893,12 +893,12 @@ ROM_START( mp_gunhe ) /* Gunstar Heroes */
 	MEGAPLAY_BIOS
 ROM_END
 
-READ16_MEMBER(mplay_state::extra_ram_r )
+uint16_t mplay_state::extra_ram_r(offs_t offset)
 {
 	return m_ic36_ram[(offset << 1) ^ 1] | (m_ic36_ram[(offset << 1)] << 8);
 }
 
-WRITE16_MEMBER(mplay_state::extra_ram_w )
+void mplay_state::extra_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!ACCESSING_BITS_0_7) // byte (MSB) access
 	{
@@ -935,17 +935,18 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(*this, FUNC(mplay_state::mp_io_read)), write16_delegate(*this, FUNC(mplay_state::mp_io_write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16sm_delegate(*this, FUNC(mplay_state::mp_io_read)), write16sm_delegate(*this, FUNC(mplay_state::mp_io_write)));
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	// instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(*this, FUNC(mplay_state::extra_ram_r)), write16_delegate(*this, FUNC(mplay_state::extra_ram_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa02000, 0xa03fff, read16sm_delegate(*this, FUNC(mplay_state::extra_ram_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02000, 0xa03fff, write16s_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
 
 /*

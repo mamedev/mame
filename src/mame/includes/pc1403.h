@@ -36,13 +36,13 @@ protected:
 	void pc1421_writemem(address_map &map);
 
 	DECLARE_READ_LINE_MEMBER(reset_r);
-	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_READ8_MEMBER(in_a_r);
+	void out_c_w(uint8_t data);
+	uint8_t in_a_r();
 
-	DECLARE_READ8_MEMBER(asic_read);
-	DECLARE_WRITE8_MEMBER(asic_write);
-	DECLARE_READ8_MEMBER(lcd_read);
-	DECLARE_WRITE8_MEMBER(lcd_write);
+	uint8_t asic_read(offs_t offset);
+	void asic_write(offs_t offset, uint8_t data);
+	uint8_t lcd_read(offs_t offset);
+	void lcd_write(offs_t offset, uint8_t data);
 
 	int m_down;
 	int m_right;

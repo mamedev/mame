@@ -46,7 +46,6 @@ ToDo:
 - Dump Telcon and Gemini BIOSes
 - Emulate the Co-Power-88 expansion (allows PC-DOS, CP/M-86, etc. to be used)
 - Probably lots of other things
-- Press F3 and screen turns into garbage. This breakage started in the 0.198 to 0.199 cycle.
 
 
 *************************************************************************************************************/
@@ -73,7 +72,7 @@ ToDo:
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr(m_read_bank).bankw("bankw0");
+	map(0x0000, 0x3fff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
 	map(0x4000, 0xffff).ram();
 }
 
@@ -267,12 +266,6 @@ void zorba_state::zorba(machine_config &config)
 
 void zorba_state::machine_start()
 {
-	uint8_t *main = memregion("maincpu")->base();
-
-	m_read_bank->configure_entry(0, &main[0x0000]);
-	m_read_bank->configure_entry(1, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
-
 	save_item(NAME(m_intmask));
 	save_item(NAME(m_tx_rx_rdy));
 	save_item(NAME(m_irq));
@@ -282,6 +275,7 @@ void zorba_state::machine_start()
 	save_item(NAME(m_printer_select));
 
 	save_item(NAME(m_term_data));
+	save_item(NAME(m_rom_in_map));
 
 	m_printer_prowriter = false;
 	m_printer_fault = 0;
@@ -299,8 +293,7 @@ void zorba_state::machine_reset()
 	m_printer_prowriter = BIT(m_config_port->read(), 0);
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
-	m_read_bank->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to RAM
+	m_rom_in_map = true;
 
 	m_maincpu->reset();
 }
@@ -310,28 +303,28 @@ void zorba_state::machine_reset()
 // Memory banking control
 //-------------------------------------------------
 
-READ8_MEMBER( zorba_state::ram_r )
+uint8_t zorba_state::ram_r()
 {
 	if (!machine().side_effects_disabled())
-		m_read_bank->set_entry(0);
+		m_rom_in_map = false;
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::ram_w )
+void zorba_state::ram_w(uint8_t data)
 {
-	m_read_bank->set_entry(0);
+	m_rom_in_map = false;
 }
 
-READ8_MEMBER( zorba_state::rom_r )
+uint8_t zorba_state::rom_r()
 {
 	if (!machine().side_effects_disabled())
-		m_read_bank->set_entry(1);
+		m_rom_in_map = true;
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::rom_w )
+void zorba_state::rom_w(uint8_t data)
 {
-	m_read_bank->set_entry(1);
+	m_rom_in_map = true;
 }
 
 
@@ -339,7 +332,7 @@ WRITE8_MEMBER( zorba_state::rom_w )
 //  Interrupt vectoring glue
 //-------------------------------------------------
 
-WRITE8_MEMBER( zorba_state::intmask_w )
+void zorba_state::intmask_w(uint8_t data)
 {
 	m_intmask = data & 0x3f; // only six lines physically present
 	irq_w<3>(BIT(m_intmask & m_tx_rx_rdy, 0) | BIT(m_intmask & m_tx_rx_rdy, 1));
@@ -388,23 +381,23 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(zorba_state::memory_read_byte)
+uint8_t zorba_state::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::memory_write_byte)
+void zorba_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER(zorba_state::io_read_byte)
+uint8_t zorba_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::io_write_byte)
+void zorba_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
@@ -432,7 +425,7 @@ WRITE_LINE_MEMBER( zorba_state::br1_w )
 //  PIA handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER( zorba_state::pia0_porta_w )
+void zorba_state::pia0_porta_w(uint8_t data)
 {
 	m_beep->set_state(BIT(data, 7));
 	m_fdc->dden_w(BIT(data, 6));
@@ -450,7 +443,7 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
 }
 
-READ8_MEMBER( zorba_state::pia1_portb_r )
+uint8_t zorba_state::pia1_portb_r()
 {
 	// 0  (output only)
 	// 1  (output only)
@@ -471,7 +464,7 @@ READ8_MEMBER( zorba_state::pia1_portb_r )
 			(BIT(outputs, 2) ? 0x00 : 0x28);
 }
 
-WRITE8_MEMBER( zorba_state::pia1_portb_w )
+void zorba_state::pia1_portb_w(uint8_t data)
 {
 	// 0  DIO direction
 	// 1  NDAC/NRFD data direction, SRQ gate
@@ -544,8 +537,8 @@ INPUT_CHANGED_MEMBER( zorba_state::printer_type )
 
 
 ROM_START( zorba )
-	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "780000.u47", 0x10000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "780000.u47", 0x0000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "773000.u5", 0x0000, 0x1000, CRC(d0a2f8fc) SHA1(29aee7ee657778c46e9800abd4955e6d4b33ef68) )

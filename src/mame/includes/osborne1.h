@@ -57,8 +57,7 @@ public:
 		m_p_chargen(*this, "chargen"),
 		m_video_timer(nullptr),
 		m_tilemap(nullptr),
-		m_acia_rxc_txc_timer(nullptr),
-		m_mem_cache(nullptr)
+		m_acia_rxc_txc_timer(nullptr)
 	{
 	}
 
@@ -77,13 +76,13 @@ protected:
 	void osborne1_op(address_map &map);
 	void osborne1_io(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
-	DECLARE_WRITE8_MEMBER(bank_1xxx_w);
-	DECLARE_READ8_MEMBER(bank_2xxx_3xxx_r);
-	DECLARE_WRITE8_MEMBER(bank_2xxx_3xxx_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(opcode_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bank_0xxx_w(offs_t offset, u8 data);
+	void bank_1xxx_w(offs_t offset, u8 data);
+	u8 bank_2xxx_3xxx_r(offs_t offset);
+	void bank_2xxx_3xxx_w(offs_t offset, u8 data);
+	void videoram_w(offs_t offset, u8 data);
+	u8 opcode_r(offs_t offset);
+	void bankswitch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(irqack_w);
 
 	bool rom_mode() const { return 0 != m_rom_mode; }
@@ -98,12 +97,12 @@ protected:
 	required_device<pia6821_device>         m_pia1;
 
 private:
-	DECLARE_READ8_MEMBER(ieee_pia_pb_r);
-	DECLARE_WRITE8_MEMBER(ieee_pia_pb_w);
+	u8 ieee_pia_pb_r();
+	void ieee_pia_pb_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
 
-	DECLARE_WRITE8_MEMBER(video_pia_port_a_w);
-	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
+	void video_pia_port_a_w(u8 data);
+	void video_pia_port_b_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
 
@@ -166,7 +165,7 @@ private:
 	u8              m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
 
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_mem_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_mem_cache;
 };
 
 
@@ -186,8 +185,8 @@ protected:
 
 	void osborne1sp_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(bank_2xxx_3xxx_r);
-	DECLARE_WRITE8_MEMBER(bank_2xxx_3xxx_w);
+	u8 bank_2xxx_3xxx_r(offs_t offset);
+	void bank_2xxx_3xxx_w(offs_t offset, u8 data);
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

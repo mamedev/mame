@@ -15,8 +15,8 @@ public:
 	// construction/destruction
 	isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(sad8852_r);
-	DECLARE_WRITE8_MEMBER(sad8852_w);
+	uint8_t sad8852_r(offs_t offset);
+	void sad8852_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

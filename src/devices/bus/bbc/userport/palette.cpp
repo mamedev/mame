@@ -95,13 +95,13 @@ void bbc_chameleon_device::pb_w(uint8_t data)
 	switch (data >> 6)
 	{
 	case 0x00:
-		m_palette_ram[m_colour].set_r((data << 4) | (data & 0x0f));
+		m_palette_ram[m_colour].set_r(pal4bit(data));
 		break;
 	case 0x01:
-		m_palette_ram[m_colour].set_g((data << 4) | (data & 0x0f));
+		m_palette_ram[m_colour].set_g(pal4bit(data));
 		break;
 	case 0x02:
-		m_palette_ram[m_colour].set_b((data << 4) | (data & 0x0f));
+		m_palette_ram[m_colour].set_b(pal4bit(data));
 		break;
 	case 0x03:
 		m_colour = data & 0x0f;
@@ -120,13 +120,13 @@ void bbc_cpalette_device::pb_w(uint8_t data)
 			m_colour = ~(data >> 4) & 0x07;
 			break;
 		case 0x01:
-			m_palette_ram[m_colour].set_r((data & 0xf0) | (data >> 4));
+			m_palette_ram[m_colour].set_r(pal4bit(data));
 			break;
 		case 0x02:
-			m_palette_ram[m_colour].set_g((data & 0xf0) | (data >> 4));
+			m_palette_ram[m_colour].set_g(pal4bit(data));
 			break;
 		case 0x03:
-			m_palette_ram[m_colour].set_b((data & 0xf0) | (data >> 4));
+			m_palette_ram[m_colour].set_b(pal4bit(data));
 			break;
 		}
 	}

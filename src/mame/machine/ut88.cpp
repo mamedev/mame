@@ -53,7 +53,7 @@ void ut88mini_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-READ8_MEMBER( ut88_state::ppi_portb_r )
+uint8_t ut88_state::ppi_portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -77,12 +77,12 @@ READ8_MEMBER( ut88_state::ppi_portb_r )
 	return data;
 }
 
-READ8_MEMBER( ut88_state::ppi_portc_r )
+uint8_t ut88_state::ppi_portc_r()
 {
 	return m_io_line8->read();
 }
 
-WRITE8_MEMBER( ut88_state::ppi_porta_w )
+void ut88_state::ppi_porta_w(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
@@ -95,31 +95,31 @@ void ut88_state::machine_reset()
 }
 
 
-READ8_MEMBER( ut88_state::keyboard_r )
+uint8_t ut88_state::keyboard_r(offs_t offset)
 {
 	return m_ppi->read(offset ^ 0x03);
 }
 
 
-WRITE8_MEMBER( ut88_state::keyboard_w )
+void ut88_state::keyboard_w(offs_t offset, uint8_t data)
 {
 	m_ppi->write(offset ^ 0x03, data);
 }
 
-WRITE8_MEMBER( ut88_state::sound_w )
+void ut88_state::sound_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 0));
 	m_cassette->output(BIT(data, 0) ? 1 : -1);
 }
 
 
-READ8_MEMBER( ut88_base_state::tape_r )
+uint8_t ut88_base_state::tape_r()
 {
 	double level = m_cassette->input();
 	return (level <  0) ? 0 : 0xff;
 }
 
-READ8_MEMBER( ut88mini_state::keyboard_r )
+uint8_t ut88mini_state::keyboard_r()
 {
 	// This is real keyboard implementation
 	uint8_t *keyrom1 = m_region_proms->base();
@@ -145,7 +145,7 @@ READ8_MEMBER( ut88mini_state::keyboard_r )
 }
 
 
-WRITE8_MEMBER( ut88mini_state::led_w )
+void ut88mini_state::led_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

@@ -755,7 +755,7 @@ void williams2_state::sound_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( monitor_controls )
+static INPUT_PORTS_START( monitor_controls_mysticm )
 	PORT_START("REDG")
 	PORT_ADJUSTER( 80, "Monitor Gain Red" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 0)
 	PORT_START("GREENG")
@@ -770,6 +770,20 @@ static INPUT_PORTS_START( monitor_controls )
 	PORT_ADJUSTER( 78, "Monitor Offset Blue" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 5)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( monitor_controls )
+	PORT_START("REDG")
+	PORT_ADJUSTER( 25, "Monitor Gain Red" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 0)
+	PORT_START("GREENG")
+	PORT_ADJUSTER( 25, "Monitor Gain Green" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 1)
+	PORT_START("BLUEG")
+	PORT_ADJUSTER( 25, "Monitor Gain Blue" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 2)
+	PORT_START("REDO")
+	PORT_ADJUSTER(100, "Monitor Offset Red" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 3)
+	PORT_START("GREENO")
+	PORT_ADJUSTER(100, "Monitor Offset Green" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 4)
+	PORT_START("BLUEO")
+	PORT_ADJUSTER(100, "Monitor Offset Blue" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 5)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( defender )
 	PORT_START("IN0")
@@ -1357,7 +1371,7 @@ static INPUT_PORTS_START( mysticm )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_INCLUDE(monitor_controls)
+	PORT_INCLUDE(monitor_controls_mysticm)
 INPUT_PORTS_END
 
 

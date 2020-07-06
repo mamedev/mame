@@ -25,7 +25,6 @@
 ///  PMF_TYPE_INTERNAL:       215%    215%
 ///  PMF_TYPE_GNUC_PMF:       163%    196%
 ///  PMF_TYPE_GNUC_PMF_CONV:  215%    215%
-///  PMF_TYPE_VIRTUAL:        213%    209%
 ///
 ///  The whole exercise was done to avoid virtual calls. In prior versions of
 ///  netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
@@ -34,31 +33,35 @@
 ///
 
 #include "pconfig.h"
+#include "ptypes.h"
+#include "putil.h"
 
+#include <algorithm>
 #include <cstdint> // uintptr_t
 #include <utility>
-
-
 
 //============================================================
 //  Macro magic
 //============================================================
 
-//#define PPMF_TYPE 0
+//#define PPMF_TYPE 2
 
 #define PPMF_TYPE_PMF             0
 #define PPMF_TYPE_GNUC_PMF_CONV   1
 #define PPMF_TYPE_INTERNAL        2
 
-#if defined(__GNUC__)
+// FIXME: Remove this macro madmess latest after September, 2020
+// FIXME: Do we still need to support MINGW <= 4.6?
+
+#if defined(__clang__) && defined(__i386__) && defined(_WIN32)
+	#define PHAS_PMF_INTERNAL 0
+#elif defined(__GNUC__) || defined(__clang__)
 	// does not work in versions over 4.7.x of 32bit MINGW
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
 		#define PHAS_PMF_INTERNAL 0
 	#elif defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
 		#define PHAS_PMF_INTERNAL 1
 		#define MEMBER_ABI _thiscall
-	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
-		#define PHAS_PMF_INTERNAL 0
 	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(__EMSCRIPTEN__)
 		#define PHAS_PMF_INTERNAL 2
 	#else
@@ -81,106 +84,131 @@
 		#define PPMF_TYPE PPMF_TYPE_PMF
 	#endif
 #else
-	#undef PHAS_PMF_INTERNAL
-	#define PHAS_PMF_INTERNAL 0
-	#undef MEMBER_ABI
-	#define MEMBER_ABI
+	#if (PPMF_TYPE == PPMF_TYPE_INTERNAL)
+		#if (PHAS_PMF_INTERNAL == 0)
+			#error "Internal type not supported"
+		#endif
+	#else
+		#undef PHAS_PMF_INTERNAL
+		#define PHAS_PMF_INTERNAL 0
+		#undef MEMBER_ABI
+		#define MEMBER_ABI
+	#endif
 #endif
 
-
-#if (PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV)
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
-#endif
-
-#if defined(__GNUC__) && (__GNUC__ > 6)
-#pragma GCC diagnostic ignored "-Wnoexcept-type"
 #endif
 
 namespace plib {
 
-#if (PHAS_PMF_INTERNAL > 0)
+	struct ppmf_internal
+	{
+		using ci = compile_info;
+		enum { value =
+			(ci::type() == ci_compiler::CLANG && !ci::m64()
+				&& ci::os() == ci_os::WINDOWS)                                   ? 0 :
+			(ci::mingw() && !ci::m64() && ci::version() >= 407)                  ? 0 :
+			(ci::mingw() && !ci::m64())                                          ? 1 :
+			((ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC)
+				&& (ci::arch() == ci_arch::MIPS
+					|| ci::arch() == ci_arch::ARM
+					|| ci::os() == ci_os::EMSCRIPTEN))                           ? 2 :
+			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? 1 :
+			(ci::type() == ci_compiler::MSC && ci::m64()) ?                        3 :
+																				   0
+		};
+	};
+
+	// FIXME: on supported platforms we should consider using GNU PMF extensions
+	//        if no internal solution exists
+
+	using ppmf_type = std::integral_constant<int, (ppmf_internal::value > 0 ? PPMF_TYPE_INTERNAL : PPMF_TYPE_PMF)>;
+
+	// check against previous implementation
+	static_assert(ppmf_internal::value == PHAS_PMF_INTERNAL, "internal mismatch");
+	static_assert(ppmf_type::value == PPMF_TYPE, "type mismatch");
+
 	///
 	/// \brief Used to derive a pointer to a member function.
 	///
 	/// The following class was derived from the MAME delegate.h code.
 	///
-	class mfp
+	template <int PMFINTERNAL>
+	class mfp_raw
 	{
 	public:
 		// construct from any member function pointer
-#ifdef _MSC_VER
-		class __single_inheritance si_generic_class;
-		class generic_class { };
-#else
 		class generic_class;
-#endif
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
-		mfp(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0), m_dummy1(0), m_dummy2(0), m_size(sizeof(mfp))
+		mfp_raw(MemberFunctionType mftp)
+		: m_function(0), m_this_delta(0), m_dummy1(0), m_dummy2(0), m_size(sizeof(mfp_raw))
 		{
+			static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
 			// NOLINTNEXTLINE(clang-analyzer-optin.cplusplus.UninitializedObject)
 		}
 
-		template<typename MemberFunctionType, typename FunctionType, typename ObjectType>
-		static void get_mfp(MemberFunctionType mftp, FunctionType &func, ObjectType *&object)
-		{
-			mfp mfpo(mftp);
-			//return mfpo.update_after_bind<FunctionType>(object);
-			generic_function rfunc(nullptr);
-			auto *robject = reinterpret_cast<generic_class *>(object);
-			mfpo.convert_to_generic(rfunc, robject);
-			func = reinterpret_cast<FunctionType>(rfunc);
-			object = reinterpret_cast<ObjectType *>(robject);
-		}
-
-	private:
+	//private:
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, generic_class *&object) const
 		{
-			if (PHAS_PMF_INTERNAL == 1)
+			if (PMFINTERNAL == 1)
 			{
 				// apply the "this" delta to the object first
-				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-				auto *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult,cppcoreguidelines-pro-type-reinterpret-cast)
+				generic_class *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
-				if (!(m_function & 1))
+				if ((m_function & 1) == 0)
+				{
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = reinterpret_cast<generic_function>(m_function);
+				}
 				else
 				{
 					// otherwise, it is the byte index into the vtable where the actual function lives
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
 				}
 				object = o_p_delta;
 			}
-			else if (PHAS_PMF_INTERNAL == 2)
+			else if (PMFINTERNAL == 2)
 			{
-				if ((m_this_delta & 1) == 0) {
+				if ((m_this_delta & 1) == 0)
+				{
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = reinterpret_cast<generic_function>(m_function);
 				}
 				else
 				{
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object));
 
 					// otherwise, it is the byte index into the vtable where the actual function lives
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					func = *reinterpret_cast<generic_function *>(vtable_base + m_function + m_this_delta - 1);
 				}
 			}
-			else if (PHAS_PMF_INTERNAL == 3)
+			else if (PMFINTERNAL == 3)
 			{
 				const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (generic_class::*)());
 
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				func = reinterpret_cast<generic_function>(m_function);
 				if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 			}
-
 		}
 
 		// actual state
@@ -193,136 +221,260 @@ namespace plib {
 		int                     m_dummy2;
 		int                     m_size;
 	};
-#endif
 
-#if (PPMF_TYPE == PPMF_TYPE_PMF)
-	template<typename R, typename... Targs>
-	class pmfp_base
+	template<int PMFTYPE, int PMFINTERNAL, typename R, typename... Targs>
+	struct mfp_helper
 	{
-	public:
-		class generic_class;
-#if defined (__INTEL_COMPILER) && defined (_M_X64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
-		using generic_function = int [((sizeof(void *) + 4 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
-#elif defined(_MSC_VER) // all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
-		using generic_function = int[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
-#else
-		using generic_function = R (generic_class::*)(Targs...);
-#endif
-		pmfp_base()
-		{
-			int *p = reinterpret_cast<int *>(&m_func);
-			int *e = p + sizeof(generic_function) / sizeof(int);
-			for (; p < e; p++)
-				*p = 0;
-		}
+		static_assert(PMFTYPE == 2 && PMFINTERNAL >= 1 && PMFINTERNAL <=3, "Invalid PMF type");
 
-		template<typename MemberFunctionType, typename O>
-		void set_base(MemberFunctionType mftp, O *object)
-		{
-			using function_ptr = R (O::*)(Targs...);
-			function_ptr t = mftp;
-			*reinterpret_cast<function_ptr *>(&m_func) = t;
-		}
-		template<typename O>
-		inline R call(O *obj, Targs... args) const noexcept(true)
-		{
-			using function_ptr = R (O::*)(Targs...);
-			function_ptr t = *reinterpret_cast<const function_ptr *>(&m_func);
-			return (obj->*t)(std::forward<Targs>(args)...);
-		}
-		bool is_set() const {
-#if defined(_MSC_VER) || (defined (__INTEL_COMPILER) && defined (_M_X64))
-			const int *p = reinterpret_cast<const int *>(&m_func);
-			const int *e = p + sizeof(generic_function) / sizeof(int);
-			for (; p < e; p++)
-				if (*p != 0)
-					return true;
-
-			return false;
-#else
-			return m_func != nullptr;
-#endif
-		}
-	private:
-		generic_function m_func;
-#if 0 && defined(_MSC_VER)
-		int dummy[4];
-#endif
-	};
-
-#elif ((PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV) || (PPMF_TYPE == PPMF_TYPE_INTERNAL))
-	template<typename R, typename... Targs>
-	class pmfp_base
-	{
-	public:
-		using generic_function = void (*)();
-
-		pmfp_base() : m_func(nullptr) {}
-
-		template<typename MemberFunctionType, typename O>
-		void set_base(MemberFunctionType mftp, O *object)
-		{
-	#if (PPMF_TYPE == PPMF_TYPE_INTERNAL)
-			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
-			function_ptr func(nullptr);
-			plib::mfp::get_mfp(mftp, func, object);
-			m_func = reinterpret_cast<generic_function>(func);
-	#elif (PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV)
-			R (O::* pFunc)(Targs...) = mftp;
-			m_func = reinterpret_cast<generic_function>((object->*pFunc));
-	#endif
-		}
-		template<typename O>
-		R call(O *obj, Targs&&... args) const noexcept(true)
-		{
-			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
-			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
-		}
-		bool is_set() const noexcept { return m_func != nullptr; }
-		generic_function get_function() const noexcept { return m_func; }
-	private:
-		generic_function m_func;
-	};
-#endif
-
-	template<typename R, typename... Targs>
-	class pmfp : public pmfp_base<R, Targs...>
-	{
-	public:
-		class generic_class;
+		using raw_type = mfp_raw<PMFINTERNAL>;
+		using generic_function_storage = typename raw_type::generic_function;
+		using generic_class = typename raw_type::generic_class;
 
 		template <class C>
-		using MemberFunctionType =  R (C::*)(Targs...); // noexcept(true) --> c++-17
+		using specific_member_function = R (C::*)(Targs...);
 
-		pmfp() : pmfp_base<R, Targs...>(), m_obj(nullptr) {}
+		using generic_member_function = specific_member_function<generic_class>;
 
-		template<typename O>
-		pmfp(MemberFunctionType<O> mftp, O *object)
-		: pmfp_base<R, Targs...>()
+		template <class C>
+		using member_abi_function      = MEMBER_ABI R (*)(C *obj, Targs... args);
+
+		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
+		static std::pair<FunctionType, ObjectType *> get(MemberFunctionType mftp, ObjectType *object)
 		{
-			this->set_base(mftp, object);
-			m_obj = reinterpret_cast<generic_class *>(object);
+			raw_type mfpo(mftp);
+			generic_function_storage rfunc(nullptr);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			auto *robject = reinterpret_cast<generic_class *>(object);
+			mfpo.convert_to_generic(rfunc, robject);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return std::make_pair(reinterpret_cast<FunctionType>(rfunc), reinterpret_cast<ObjectType *>(robject));
+		}
+		template<typename O>
+		static R call(const member_abi_function<O> *func, O *obj, Targs&&... args) noexcept(true)
+		{
+			return (*func)(obj, std::forward<Targs>(args)...);
+		}
+	};
+
+	template<typename R, typename... Targs>
+	struct mfp_helper<PPMF_TYPE_PMF, 0, R, Targs...>
+	{
+		template <class C>
+		using specific_member_function = R (C::*)(Targs...);
+
+		class generic_class;
+		using generic_member_function = specific_member_function<generic_class>;
+
+		template <class C>
+		using member_abi_function      = specific_member_function<C>;
+
+		using generic_function_storage = generic_member_function;
+
+		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
+		static std::pair<FunctionType, ObjectType *> get(MemberFunctionType mftp, ObjectType *object)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return std::make_pair(reinterpret_cast<FunctionType>(mftp), reinterpret_cast<ObjectType *>(object));
 		}
 
 		template<typename O>
-		void set(MemberFunctionType<O> mftp, O *object)
+		static R call(const member_abi_function<O> *func, O *obj, Targs&&... args) noexcept(true)
 		{
-			this->set_base(mftp, object);
-			m_obj = reinterpret_cast<generic_class *>(object);
+			return (obj->*(*func))(std::forward<Targs>(args)...);
+		}
+	};
+
+	template<typename R, typename... Targs>
+	struct mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, 0, R, Targs...>
+	{
+		template <class C>
+		using specific_member_function = R (C::*)(Targs...);
+
+		class generic_class;
+		using generic_member_function = specific_member_function<generic_class>;
+
+		template <class C>
+		using member_abi_function      = MEMBER_ABI R (*)(C *obj, Targs... args);
+
+		using generic_function_storage = void (*)();
+
+		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
+		static std::pair<FunctionType, ObjectType *> get(MemberFunctionType mftp, ObjectType *object)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return std::make_pair(reinterpret_cast<FunctionType>(object->*mftp), reinterpret_cast<ObjectType *>(object));
+		}
+		template<typename O>
+		static R call(const member_abi_function<O> *func, O *obj, Targs&&... args) noexcept(true)
+		{
+			return (*func)(obj, std::forward<Targs>(args)...);
+		}
+	};
+
+	template<int PMFTYPE, int PMFINTERNAL, typename R, typename... Targs>
+	class pmfp_base
+	{
+	public:
+		using helper = mfp_helper<PMFTYPE, PMFINTERNAL, R, Targs...>;
+
+		template <class C>
+		using specific_member_function = typename helper::template specific_member_function<C>;
+
+		using generic_class = typename helper::generic_class;
+		using generic_member_function = typename helper::generic_member_function;
+
+		template <class C>
+		using member_abi_function = typename helper::template  member_abi_function<C>;
+
+		using generic_function_storage = typename helper::generic_function_storage;
+
+		pmfp_base()
+		: m_obj(nullptr)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+			std::fill(s, s + sizeof(m_resolved), 0);
+		}
+
+		template<typename O>
+		pmfp_base(specific_member_function<O> mftp, O *object)
+		: m_obj(nullptr)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+			std::fill(s, s + sizeof(m_resolved), 0);
+			bind(object, &mftp);
+		}
+
+		bool is_set() const noexcept { return m_resolved != nullptr; }
+
+		generic_class *object() const noexcept { return m_obj; }
+		bool has_object() const noexcept { return m_obj != nullptr; }
+
+		template<typename O>
+		void set(specific_member_function<O> mftp, O *object)
+		{
+			bind(object, &mftp);
 		}
 
 		inline R operator()(Targs... args) const noexcept(true)
 		{
-			return this->call(m_obj, std::forward<Targs>(args)...);
+			return this->call(std::forward<Targs>(args)...);
 		}
 
-		generic_class *object() const noexcept { return m_obj; }
-		bool has_object() const noexcept { return m_obj != nullptr; }
 	private:
-		generic_class *m_obj;
+		template<typename O, typename MF>
+		void bind(O * object, MF *fraw)
+		{
+			//auto pFunc = *reinterpret_cast<specific_member_function<O> *>(fraw); // mftp;
+			specific_member_function<O> pFunc;
+			static_assert(sizeof(pFunc) >= sizeof(MF), "size error");
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			*reinterpret_cast<MF *>(&pFunc) = *fraw;
+
+			auto r = helper::template get<member_abi_function<O>>(pFunc, object);
+
+			static_assert(sizeof(m_resolved) >= sizeof(r.first), "size mismatch 1");
+			static_assert(sizeof(m_resolved) >= sizeof(member_abi_function<O>), "size mismatch 2");
+
+			//*reinterpret_cast<member_abi_function<O> *>(&m_resolved) = r.first;
+			reinterpret_copy(r.first, m_resolved);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			m_obj = reinterpret_cast<generic_class *>(r.second);
+		}
+
+		template<typename O>
+		R call(O *obj, Targs&&... args) const noexcept(true)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return helper::call(reinterpret_cast<member_abi_function<O> *>(&m_resolved),
+				obj, std::forward<Targs>(args)...);
+		}
+
+		R call(Targs&&... args) const noexcept(true)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return helper::call(reinterpret_cast<const member_abi_function<generic_class> *>(&m_resolved),
+				m_obj, std::forward<Targs>(args)...);
+		}
+
+		generic_function_storage  m_resolved;
+		generic_class    *m_obj;
 	};
 
+	template<typename R, typename... Targs>
+	using pmfp = pmfp_base<ppmf_type::value, ppmf_internal::value, R, Targs...>;
+
+	///
+	/// \brief Class to support delegate late binding
+	///
+	/// When constructing delegates in constructors AND the referenced function
+	/// is virtual, the vtable may not yet be fully constructed. In these cases
+	/// the following class allows to construct the delegate later.
+	///
+	///     plib::late_pmfp<plib::pmfp<void, pstring>> a(&nld_7493::printer);
+	///     // Store the a object somewhere
+	///
+	///     // After full construction ...
+	///
+	///     auto dele = a(this);
+	///     dele(pstring("Hello World!"));
+	///
+	template<typename T>
+	class late_pmfp
+	{
+	public:
+
+		using return_type = T;
+
+		template <class C>
+		using specific_member_function = typename return_type::template specific_member_function<C>; // noexcept(true) --> c++-17
+
+		using generic_member_function   = typename return_type::generic_member_function;
+
+		class generic_class;
+
+		using static_creator = return_type (*)(const generic_member_function *, generic_class *);
+
+		late_pmfp() = default;
+
+		template<typename O>
+		late_pmfp(specific_member_function<O> mftp)
+		{
+			static_assert(sizeof(m_raw) >= sizeof(specific_member_function<O>), "size issue");
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			*reinterpret_cast<specific_member_function<O> *>(&m_raw) = mftp;
+			m_creator = creator<O>;
+		}
+
+		template<typename O>
+		return_type operator()(O *object) const
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return m_creator(&m_raw, reinterpret_cast<generic_class *>(object));
+		}
+
+	private:
+
+		template <typename O>
+		static return_type creator(const generic_member_function *raw, generic_class *obj)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			auto p = reinterpret_cast<const specific_member_function<O> *>(raw);
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			auto o = reinterpret_cast<O *>(obj);
+			return return_type(*p, o);
+		}
+
+		generic_member_function m_raw;
+		static_creator m_creator;
+	};
 
 } // namespace plib
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 #endif // PPMF_H_

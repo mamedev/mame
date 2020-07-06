@@ -50,9 +50,13 @@ Known Games on this Platform
 
 (add more)
 
-ToDo:
+TODO:
 
- IRQ4 generation - Puzzli 2 doesn't like this, many other games require it for coins / inputs to work.
+- IRQ4 generation - Puzzli 2 doesn't like this, many other games require it for coins / inputs to work.
+- Verify/Implement unemulated vreg usage (b04000, b0e000)
+  b04000 is 210h or 610h, bit 10 unknown
+  b0e000 bit 2/0 related to VRAM access / DMA / or others?
+- Zooming function is not fully verified; sprite zoom table is bit different in drgw2
 
 
 Protection Devices / Co-processors
@@ -4991,10 +4995,10 @@ GAME( 2002, ketbl,        ket,       pgm_arm_type2,          pgm,       pgm_arm_
 
 // these are modern hacks, some of them have been seen on original PCBs, also reportedly on a bootleg PCB with mostly original components but the ARM replaced with a custom chip.
 // this is a significantly reworked version of the game
-GAME( 2014, ketarr,       ket,       pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr151,    ket,       pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
-GAME( 2012, ketarr15,     ket,       pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr10,     ket,       pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2014, ketarr,       ket,       pgm_arm_type1_cave,     espgal,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr151,    ket,       pgm_arm_type1_cave,     espgal,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
+GAME( 2012, ketarr15,     ket,       pgm_arm_type1_cave,     espgal,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr10,     ket,       pgm_arm_type1_cave,     espgal,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // these simplify the scoring system
 GAME( 2012, ketarrs151,   ket,       pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )

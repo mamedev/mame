@@ -7,12 +7,11 @@
 #include "screen.h"
 
 
-WRITE8_MEMBER(playch10_state::playch10_videoram_w)
+void playch10_state::playch10_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
 	if (m_pc10_sdcs)
 	{
-		videoram[offset] = data;
+		m_videoram[offset] = data;
 		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 }

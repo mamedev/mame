@@ -661,17 +661,17 @@ void scn2674_device::write_delayed_command(uint8_t data)
 	{
 	case 0xa4:
 		// read at pointer address
-		m_char_buffer = m_char_space->read_byte(m_screen2_address);
+		m_char_buffer = m_char_space->read_byte(m_display_pointer_address);
 		if (m_attr_space != nullptr)
-			m_attr_buffer = m_attr_space->read_byte(m_screen2_address);
+			m_attr_buffer = m_attr_space->read_byte(m_display_pointer_address);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at pointer address %02x\n", machine().describe_context(), data);
 		break;
 
 	case 0xa2:
 		// write at pointer address
-		m_char_space->write_byte(m_screen2_address, m_char_buffer);
+		m_char_space->write_byte(m_display_pointer_address, m_char_buffer);
 		if (m_attr_space != nullptr)
-			m_attr_space->write_byte(m_screen2_address, m_attr_buffer);
+			m_attr_space->write_byte(m_display_pointer_address, m_attr_buffer);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at pointer address %02x\n", machine().describe_context(), data);
 		break;
 
@@ -730,7 +730,7 @@ void scn2674_device::write_delayed_command(uint8_t data)
 		m_display_enabled = false;
 		m_display_enabled_field = true;
 		m_display_enabled_scanline = false;
-		for (i = m_cursor_address; i != m_screen2_address; i = ((i + 1) & 0xffff))
+		for (i = m_cursor_address; i != m_display_pointer_address; i = ((i + 1) & 0xffff))
 		{
 			m_char_space->write_byte(i, m_char_buffer);
 			if (m_attr_space != nullptr)
@@ -739,7 +739,7 @@ void scn2674_device::write_delayed_command(uint8_t data)
 		m_char_space->write_byte(i, m_char_buffer); // get the last
 		if (m_attr_space != nullptr)
 			m_attr_space->write_byte(i, m_attr_buffer);
-		m_cursor_address = m_screen2_address;
+		m_cursor_address = m_display_pointer_address;
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write from cursor address to pointer address %02x\n", machine().describe_context(), data);
 		break;
 
@@ -963,15 +963,30 @@ void scn2674_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 6:
-		m_screen2_address = (m_screen2_address & 0x3f00) | data;
-		break;
-
 	case 7:
+		write_screen2_address(BIT(offset, 0), data);
+		break;
+	}
+}
+
+void scn2674_device::write_screen2_address(bool msb, uint8_t data)
+{
+	if (msb)
+	{
 		m_screen2_address = (m_screen2_address & 0x00ff) | (data & 0x3f) << 8;
 		m_spl[0] = BIT(data, 6);
 		m_spl[1] = BIT(data, 7);
-		break;
 	}
+	else
+		m_screen2_address = (m_screen2_address & 0x3f00) | data;
+}
+
+void scn2672_device::write_screen2_address(bool msb, uint8_t data)
+{
+	if (msb)
+		m_display_pointer_address = (m_display_pointer_address & 0x00ff) | (data & 0x3f) << 8;
+	else
+		m_display_pointer_address = (m_display_pointer_address & 0x3f00) | data;
 }
 
 void scn2674_device::recompute_parameters()

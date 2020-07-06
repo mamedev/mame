@@ -98,13 +98,13 @@ private:
 	uint8_t m_scrollx_lo;
 	uint8_t m_gfx_switch;
 
-	DECLARE_WRITE8_MEMBER(charram_w);
-	DECLARE_WRITE8_MEMBER(char_vregs_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void charram_w(offs_t offset, uint8_t data);
+	void char_vregs_w(uint8_t data);
+	void scrollx_lo_w(uint8_t data);
+	void scrollx_hi_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	uint8_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -187,7 +187,7 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(progolf_state::charram_w)
+void progolf_state::charram_w(offs_t offset, uint8_t data)
 {
 	int i;
 	m_fbram[offset] = data;
@@ -209,31 +209,31 @@ WRITE8_MEMBER(progolf_state::charram_w)
 	}
 }
 
-WRITE8_MEMBER(progolf_state::char_vregs_w)
+void progolf_state::char_vregs_w(uint8_t data)
 {
 	m_char_pen = data & 0x07;
 	m_gfx_switch = data & 0xf0;
 	m_char_pen_vreg = data & 0x30;
 }
 
-WRITE8_MEMBER(progolf_state::scrollx_lo_w)
+void progolf_state::scrollx_lo_w(uint8_t data)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(progolf_state::scrollx_hi_w)
+void progolf_state::scrollx_hi_w(uint8_t data)
 {
 	m_scrollx_hi = data;
 }
 
-WRITE8_MEMBER(progolf_state::flip_screen_w)
+void progolf_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 	if(data & 0xfe)
 		printf("$9600 with data = %02x used\n",data);
 }
 
-READ8_MEMBER(progolf_state::videoram_r)
+uint8_t progolf_state::videoram_r(offs_t offset)
 {
 	uint8_t *gfx_rom = memregion("gfx1")->base();
 
@@ -259,7 +259,7 @@ READ8_MEMBER(progolf_state::videoram_r)
 	}
 }
 
-WRITE8_MEMBER(progolf_state::videoram_w)
+void progolf_state::videoram_w(offs_t offset, uint8_t data)
 {
 	//if(m_gfx_switch & 0x40)
 	m_videoram[offset] = data;

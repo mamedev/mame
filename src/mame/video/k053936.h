@@ -34,10 +34,10 @@ public:
 		m_yoff = y_offset;
 	}
 
-	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_READ16_MEMBER( ctrl_r );
-	DECLARE_WRITE16_MEMBER( linectrl_w );
-	DECLARE_READ16_MEMBER( linectrl_r );
+	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ctrl_r(offs_t offset);
+	void linectrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t linectrl_r(offs_t offset);
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack);
 	void zoom_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack);
 	// void wraparound_enable(int status);   unused? // shall we merge this into the configuration intf?

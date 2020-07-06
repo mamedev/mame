@@ -24,7 +24,8 @@ TODO:
 - glfgreat: imperfect protection emulation:
   1. putting to MAX power on green causes the game to return an incorrect
      value a.k.a. it detects a bunker/rough/water hazard;
-  2. top/back spins doesn't seem to have any effect in-game;
+  2. top/back spins doesn't have any effect in-game;
+- glfgreat: serious sound cut off -> "it's in the" ... "water"
 - prmrsocr: when the field rotates before the penalty kicks, parts of the
   053936 tilemap that shouldn't be seen are visible. Maybe the tilemap ROM is
   banked, or there are controls to clip the visible region (registers 0x06 and
@@ -75,7 +76,7 @@ Updates:
 #include "speaker.h"
 
 
-READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
+uint16_t tmnt_state::k052109_word_noA12_r(offs_t offset)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -83,7 +84,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	return m_k052109->word_r(offset);
 }
 
-WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
+void tmnt_state::k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -91,7 +92,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	m_k052109->word_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
+void tmnt_state::punkshot_k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
@@ -101,19 +102,19 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 		m_k052109->write(offset + 0x2000, data & 0xff);
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
+void tmnt_state::punkshot_k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	punkshot_k052109_word_w(space, offset, data, mem_mask);
+	punkshot_k052109_word_w(offset, data, mem_mask);
 }
 
 
 /* the interface with the 053245 is weird. The chip can address only 0x800 bytes */
 /* of RAM, but they put 0x4000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053245. */
-READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
+uint16_t tmnt_state::k053245_scattered_word_r(offs_t offset)
 {
 	if (offset & 0x0031)
 		return m_spriteram[offset];
@@ -124,7 +125,7 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
+void tmnt_state::k053245_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_spriteram + offset);
 
@@ -135,14 +136,14 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
+uint16_t tmnt_state::k053244_word_noA1_r(offs_t offset)
 {
 	offset &= ~1;   /* handle mirror address */
 
 	return m_k053245->k053244_r(offset + 1) | (m_k053245->k053244_r(offset) << 8);
 }
 
-WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
+void tmnt_state::k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= ~1;   /* handle mirror address */
 
@@ -173,7 +174,7 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-WRITE8_MEMBER(glfgreat_state::glfgreat_sound_w)
+void glfgreat_state::glfgreat_sound_w(offs_t offset, uint8_t data)
 {
 	m_k053260->main_write(offset, data);
 
@@ -182,23 +183,23 @@ WRITE8_MEMBER(glfgreat_state::glfgreat_sound_w)
 }
 
 
-WRITE16_MEMBER(prmrsocr_state::prmrsocr_sound_irq_w)
+void prmrsocr_state::prmrsocr_sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(prmrsocr_state::prmrsocr_audio_bankswitch_w)
+void prmrsocr_state::prmrsocr_audio_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
 
-READ8_MEMBER(tmnt_state::tmnt_sres_r)
+uint8_t tmnt_state::tmnt_sres_r()
 {
 	return m_tmnt_soundlatch;
 }
 
-WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
+void tmnt_state::tmnt_sres_w(uint8_t data)
 {
 	/* bit 1 resets the UPD7795C sound chip */
 	m_upd7759->reset_w(data & 2);
@@ -214,12 +215,12 @@ WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 	m_tmnt_soundlatch = data;
 }
 
-WRITE8_MEMBER(tmnt_state::tmnt_upd_start_w)
+void tmnt_state::tmnt_upd_start_w(uint8_t data)
 {
 	m_upd7759->start_w(data & 1);
 }
 
-READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
+uint8_t tmnt_state::tmnt_upd_busy_r()
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
@@ -276,7 +277,7 @@ void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
+void tmnt_state::sound_arm_nmi_w(uint8_t data)
 {
 //  sound_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -284,7 +285,7 @@ WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
 }
 
 
-READ16_MEMBER(tmnt_state::punkshot_kludge_r)
+uint16_t tmnt_state::punkshot_kludge_r()
 {
 	/* I don't know what's going on here; at one point, the code reads location */
 	/* 0xffffff, and returning 0 causes the game to mess up - locking up in a */
@@ -295,7 +296,7 @@ READ16_MEMBER(tmnt_state::punkshot_kludge_r)
 
 
 /* protection simulation derived from a bootleg */
-READ16_MEMBER(tmnt_state::ssriders_protection_r)
+uint16_t tmnt_state::ssriders_protection_r(address_space &space)
 {
 	int data = space.read_word(0x105a0a);
 	int cmd = space.read_word(0x1058fc);
@@ -338,7 +339,7 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
+void tmnt_state::ssriders_protection_w(address_space &space, offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 	{
@@ -370,7 +371,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(tmnt_state::blswhstl_coin_r)
+uint16_t tmnt_state::blswhstl_coin_r()
 {
 	int res;
 
@@ -382,7 +383,7 @@ READ16_MEMBER(tmnt_state::blswhstl_coin_r)
 	return res ^ m_toggle;
 }
 
-READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
+uint16_t tmnt_state::ssriders_eeprom_r()
 {
 	int res;
 
@@ -396,7 +397,7 @@ READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
 	return res ^ m_toggle;
 }
 
-READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
+uint16_t tmnt_state::sunsetbl_eeprom_r()
 {
 	int res;
 
@@ -410,7 +411,7 @@ READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
 	return res ^ m_toggle;
 }
 
-WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
+void tmnt_state::blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -421,7 +422,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
+uint16_t tmnt_state::thndrx2_eeprom_r()
 {
 	int res;
 
@@ -434,7 +435,7 @@ READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
 	return (res ^ m_toggle);
 }
 
-WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
+void tmnt_state::thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -453,11 +454,11 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(prmrsocr_state::prmrsocr_eeprom_w)
+void prmrsocr_state::prmrsocr_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		prmrsocr_122000_w(space, offset, data, mem_mask);
+		prmrsocr_122000_w(offset, data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -469,7 +470,7 @@ WRITE16_MEMBER(prmrsocr_state::prmrsocr_eeprom_w)
 	}
 }
 
-WRITE8_MEMBER(tmnt_state::cuebrick_nvbank_w)
+void tmnt_state::cuebrick_nvbank_w(uint8_t data)
 {
 	membank("nvrambank")->set_entry(data);
 }
@@ -579,7 +580,7 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
+void tmnt_state::ssriders_soundkludge_w(uint16_t dat)
 {
 	/* I think this is more than just a trigger */
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
@@ -606,17 +607,15 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 }
 
-WRITE16_MEMBER(glfgreat_state::k053251_glfgreat_w)
+void glfgreat_state::k053251_glfgreat_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int i;
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_k053251->write(offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
 		and got marked as dirty in the write above... how was the original hardware working?!? */
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			if (m_k053251->get_tmap_dirty(2 + i))
 			{
@@ -690,7 +689,7 @@ inline uint32_t tmnt_state::tmnt2_get_word( uint32_t addr )
 	return 0;
 }
 
-void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data )
+void tmnt_state::tmnt2_put_word( uint32_t addr, uint16_t data )
 {
 	uint32_t offs;
 	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
@@ -707,7 +706,7 @@ void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t d
 		m_sunset_104000[addr - 0x104000 / 2] = data;
 }
 
-WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
+void tmnt_state::tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
@@ -820,14 +819,14 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	xoffs += xmod;
 	yoffs += ymod;
 
-	tmnt2_put_word(space, dst_addr +  0, attr1);
-	tmnt2_put_word(space, dst_addr +  2, code);
-	tmnt2_put_word(space, dst_addr +  4, (uint32_t)yoffs);
-	tmnt2_put_word(space, dst_addr +  6, (uint32_t)xoffs);
-	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
+	tmnt2_put_word(dst_addr +  0, attr1);
+	tmnt2_put_word(dst_addr +  2, code);
+	tmnt2_put_word(dst_addr +  4, (uint32_t)yoffs);
+	tmnt2_put_word(dst_addr +  6, (uint32_t)xoffs);
+	tmnt2_put_word(dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
-WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
+void tmnt_state::tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_tmnt2_1c0800 + offset);
 	if (offset == 0x0008 && (m_tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
@@ -1899,7 +1898,7 @@ static INPUT_PORTS_START( prmrsocr )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(tmnt_state::volume_callback)
+void tmnt_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -4346,9 +4345,9 @@ GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, empty_init, 
 GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )

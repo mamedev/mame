@@ -34,12 +34,12 @@ public:
 	// construction/destruction
 	a2bus_agat_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(d14_i_b);
-	DECLARE_READ8_MEMBER(d15_i_a);
-	DECLARE_READ8_MEMBER(d15_i_c);
-	DECLARE_WRITE8_MEMBER(d14_o_c);
-	DECLARE_WRITE8_MEMBER(d15_o_b);
-	DECLARE_WRITE8_MEMBER(d15_o_c);
+	uint8_t d14_i_b();
+	uint8_t d15_i_a();
+	uint8_t d15_i_c();
+	void d14_o_c(uint8_t data);
+	void d15_o_b(uint8_t data);
+	void d15_o_c(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

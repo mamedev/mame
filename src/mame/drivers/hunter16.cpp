@@ -56,7 +56,7 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	void keyboard_w(uint8_t data);
 
 	uint8_t m_keydata;
 	uint8_t pt_r();
@@ -191,7 +191,7 @@ MC6845_UPDATE_ROW(hunter16_state::crtc_update_row)
 	}
 }
 
-WRITE8_MEMBER(hunter16_state::keyboard_w)
+void hunter16_state::keyboard_w(uint8_t data)
 {
 	m_keydata = data;
 }

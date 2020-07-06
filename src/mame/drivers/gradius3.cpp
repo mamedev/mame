@@ -36,12 +36,12 @@
 #include "speaker.h"
 
 
-READ16_MEMBER(gradius3_state::k052109_halfword_r)
+uint16_t gradius3_state::k052109_halfword_r(offs_t offset)
 {
 	return m_k052109->read(offset);
 }
 
-WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
+void gradius3_state::k052109_halfword_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_k052109->write(offset, data & 0xff);
@@ -52,7 +52,7 @@ WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 //      logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
 }
 
-WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
+void gradius3_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -76,7 +76,7 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(gradius3_state::cpuB_irqenable_w)
+void gradius3_state::cpuB_irqenable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_irqBmask = (data >> 8) & 0x07;
@@ -100,7 +100,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 		m_subcpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
+void gradius3_state::cpuB_irqtrigger_w(uint16_t data)
 {
 	if (m_irqBmask & 4)
 	{
@@ -111,12 +111,12 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 		logerror("%04x MISSED cpu B irq 4 %02x\n",m_maincpu->pc(),data);
 }
 
-WRITE16_MEMBER(gradius3_state::sound_irq_w)
+void gradius3_state::sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(gradius3_state::sound_bank_w)
+void gradius3_state::sound_bank_w(uint8_t data)
 {
 	int bank_A, bank_B;
 
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( gradius3 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(gradius3_state::volume_callback)
+void gradius3_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

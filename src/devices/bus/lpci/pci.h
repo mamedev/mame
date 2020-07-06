@@ -72,11 +72,11 @@ public:
 	// construction/destruction
 	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ64_MEMBER( read_64be );
-	DECLARE_WRITE64_MEMBER( write_64be );
+	uint64_t read_64be(offs_t offset, uint64_t mem_mask = ~0);
+	void write_64be(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
 	template <typename T>

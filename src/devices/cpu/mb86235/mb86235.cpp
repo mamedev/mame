@@ -68,7 +68,7 @@ void mb86235_device::execute_run()
 		curpc = check_previous_op_stall() ? m_core->cur_fifo_state.pc : m_core->pc;
 
 		debugger_instruction_hook(curpc);
-		opcode = m_pcache->read_qword(curpc);
+		opcode = m_pcache.read_qword(curpc);
 
 		m_core->ppc = curpc;
 
@@ -91,10 +91,10 @@ void mb86235_device::execute_run()
 
 void mb86235_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_pcache = m_program->cache<3, -3, ENDIANNESS_LITTLE>();
-	m_dataa = &space(AS_DATA);
-	m_datab = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_pcache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_dataa);
+	space(AS_IO).specific(m_datab);
 
 	m_core = (mb86235_internal_state *)m_cache.alloc_near(sizeof(mb86235_internal_state));
 	memset(m_core, 0, sizeof(mb86235_internal_state));

@@ -12,7 +12,7 @@
 #define NLID_PROXY_H_
 
 #include "netlist/analog/nlid_twoterm.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -23,11 +23,11 @@ namespace devices
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(base_proxy)
+	class nld_base_proxy : public device_t
 	{
 	public:
 		nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_t *inout_proxied);
+				const logic_t *inout_proxied);
 
 		// only used during setup
 		virtual detail::core_terminal_t &proxy_term() noexcept = 0;
@@ -44,22 +44,22 @@ namespace devices
 	// nld_a_to_d_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(base_a_to_d_proxy, base_proxy)
+	class nld_base_a_to_d_proxy : public nld_base_proxy
 	{
 	public:
 		virtual logic_output_t &out() noexcept = 0;
 
 	protected:
 		nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_input_t *in_proxied);
+				const logic_input_t *in_proxied);
 
 	};
 
-	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_a_to_d_proxy)
+	class nld_a_to_d_proxy : public nld_base_a_to_d_proxy
 	{
 	public:
 		nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_input_t *in_proxied);
+			const logic_input_t *in_proxied);
 
 		logic_output_t &out() noexcept override { return m_Q; }
 
@@ -81,7 +81,7 @@ namespace devices
 	// nld_base_d_to_a_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
+	class nld_base_d_to_a_proxy : public nld_base_proxy
 	{
 	public:
 		// only used in setup
@@ -89,21 +89,21 @@ namespace devices
 
 	protected:
 		nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_output_t *out_proxied);
+				const logic_output_t *out_proxied);
 
 	};
 
-	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)
+	class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 	{
 	public:
 		nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_output_t *out_proxied);
+			const logic_output_t *out_proxied);
 
 		logic_input_t &in() noexcept override { return m_I; }
 
 		detail::core_terminal_t &proxy_term() noexcept override
 		{
-			return m_RN.m_P;
+			return m_RN.setup_P();
 		}
 
 	protected:
@@ -113,12 +113,12 @@ namespace devices
 
 	private:
 
-		static constexpr const nl_fptype G_OFF = nlconst::magic(1e-9);
+		static constexpr const nl_fptype G_OFF = nlconst::cgmin();
 
 		logic_input_t m_I;
 		analog::NETLIB_NAME(twoterm) m_RP;
 		analog::NETLIB_NAME(twoterm) m_RN;
-		state_var<int> m_last_state;
+		state_var<netlist_sig_t> m_last_state;
 	};
 
 } // namespace devices

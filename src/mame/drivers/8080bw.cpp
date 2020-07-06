@@ -852,7 +852,7 @@ void _8080bw_state::init_spacecom()
 /*                                                     */
 /*******************************************************/
 
-READ8_MEMBER(_8080bw_state::invrvnge_02_r)
+uint8_t _8080bw_state::invrvnge_02_r()
 {
 	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
@@ -1332,22 +1332,22 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram_r)
+uint8_t _8080bw_state::rollingc_scattered_colorram_r(offs_t offset)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
 }
 
-WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram_w)
+void _8080bw_state::rollingc_scattered_colorram_w(offs_t offset, uint8_t data)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
 }
 
-READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_r)
+uint8_t _8080bw_state::rollingc_scattered_colorram2_r(offs_t offset)
 {
 	return m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
 }
 
-WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_w)
+void _8080bw_state::rollingc_scattered_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
 }
@@ -1429,12 +1429,12 @@ void _8080bw_state::rollingc(machine_config &config)
 /*******************************************************/
 
 
-READ8_MEMBER(_8080bw_state::schaser_scattered_colorram_r)
+uint8_t _8080bw_state::schaser_scattered_colorram_r(offs_t offset)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
 }
 
-WRITE8_MEMBER(_8080bw_state::schaser_scattered_colorram_w)
+void _8080bw_state::schaser_scattered_colorram_w(offs_t offset, uint8_t data)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
 }
@@ -1596,7 +1596,7 @@ void _8080bw_state::schaser(machine_config &config)
 /*******************************************************/
 
 
-READ8_MEMBER(_8080bw_state::schasercv_02_r)
+uint8_t _8080bw_state::schasercv_02_r()
 {
 	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
@@ -1978,7 +1978,7 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	save_item(NAME(m_polaris_cloud_pos));
 }
 
-READ8_MEMBER(_8080bw_state::polaris_port00_r)
+uint8_t _8080bw_state::polaris_port00_r()
 {
 	uint8_t data = ioport("IN0")->read();
 	if (m_flip_screen) return data;
@@ -2394,7 +2394,7 @@ INPUT_PORTS_END
 
 */
 
-READ8_MEMBER(_8080bw_state::indianbt_r)
+uint8_t _8080bw_state::indianbt_r()
 {
 	switch(m_maincpu->pc())
 	{
@@ -2405,7 +2405,7 @@ READ8_MEMBER(_8080bw_state::indianbt_r)
 	return machine().rand();
 }
 
-READ8_MEMBER(_8080bw_state::indianbtbr_01_r)
+uint8_t _8080bw_state::indianbtbr_01_r()
 {
 	uint8_t data = ioport("IN1")->read();
 	if (!m_flip_screen) return data;
@@ -2493,7 +2493,7 @@ void _8080bw_state::indianbtbr(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
+void _8080bw_state::steelwkr_sh_port_3_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(!(~data & 0x03));      /* possibly */
 }
@@ -2724,14 +2724,14 @@ static INPUT_PORTS_START( skylove )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
+uint8_t _8080bw_state::shuttlei_ff_r()
 {
 	uint8_t data = ioport("INPUTS")->read();
 	if (!m_flip_screen) return data;
 	return (data & 0x3b) | ioport("P2")->read();
 }
 
-WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
+void _8080bw_state::shuttlei_ff_w(uint8_t data)
 {
 	/* bit 0 goes high when first coin inserted
 	   bit 1 also goes high when subsequent coins are inserted
@@ -2828,7 +2828,7 @@ IRQ_CALLBACK_MEMBER(_8080bw_state::darthvdr_interrupt_vector)
 	return 0xff;
 }
 
-READ8_MEMBER(_8080bw_state::darthvdr_01_r)
+uint8_t _8080bw_state::darthvdr_01_r()
 {
 	uint8_t data = ioport("P2")->read();
 	if (m_flip_screen) return data;
@@ -3204,12 +3204,12 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 	}
 }
 
-READ8_MEMBER(_8080bw_state::claybust_gun_lo_r)
+uint8_t _8080bw_state::claybust_gun_lo_r()
 {
 	return m_claybust_gun_pos & 0xff;
 }
 
-READ8_MEMBER(_8080bw_state::claybust_gun_hi_r)
+uint8_t _8080bw_state::claybust_gun_hi_r()
 {
 	return m_claybust_gun_pos >> 8;
 }
@@ -3503,12 +3503,12 @@ void _8080bw_state::invmulti_map(address_map &map)
 	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(_8080bw_state::invmulti_bank_w));
 }
 
-READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
+uint8_t _8080bw_state::invmulti_eeprom_r()
 {
 	return m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
+void _8080bw_state::invmulti_eeprom_w(uint8_t data)
 {
 	// d0: latch bit
 	m_eeprom->di_write(data & 1);
@@ -3520,7 +3520,7 @@ WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 	m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
+void _8080bw_state::invmulti_bank_w(uint8_t data)
 {
 	// d0, d4, d6: bank
 	int bank = (data & 1) | (data >> 3 & 2) | (data >> 4 & 4);
@@ -5678,10 +5678,10 @@ GAME( 1980, invaddlx,    invadpt2, invaders,  invadpt2,  mw8080bw_state, empty_i
 GAME( 1979, moonbase,    invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito / Nichibutsu", "Moon Base Zeta (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - to display it, press P1 Right+P1 Fire+2P Start then P1 Left+P1 Fire+P1 Start at the attract gameplay sequence
 GAME( 1979, moonbasea,   invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito / Nichibutsu", "Moon Base Zeta (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // this has the same string replaced with Nichibutsu, no other differences
 
-GAME( 1980, spclaser,    0,        invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Laser", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, intruder,    spclaser, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Taito (Game Plan license)", "Intruder", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1980, laser,       spclaser, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Astro Laser (bootleg of Space Laser)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spcewarl,    spclaser, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Leijac Corporation", "Space War (Leijac Corporation)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Taito's version is actually a spin-off of this?
+GAME( 1979, spcewarl,    0,        invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Leijac Corporation", "Space War (Leijac Corporation)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Taito's version is actually a spin-off of this?
+GAME( 1980, spclaser,    spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Laser", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, intruder,    spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Taito (Game Plan license)", "Intruder", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, laser,       spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Astro Laser (bootleg of Space Laser)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, lrescue,     0,        lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito", "Lunar Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito (Universal license?)", "Galaxy Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

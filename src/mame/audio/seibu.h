@@ -31,6 +31,7 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/okiadpcm.h"
+#include "dirom.h"
 
 class seibu_sound_common {
 public:
@@ -110,7 +111,7 @@ DECLARE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device)
 
 // SEI80BU (Z80 program decryption)
 
-class sei80bu_device : public device_t, public device_rom_interface
+class sei80bu_device : public device_t, public device_rom_interface<16>
 {
 public:
 	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

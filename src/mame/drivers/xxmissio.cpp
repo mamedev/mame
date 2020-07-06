@@ -19,7 +19,7 @@ XX Mission (c) 1986 UPL
 #include "speaker.h"
 
 
-WRITE8_MEMBER(xxmissio_state::bank_sel_w)
+void xxmissio_state::bank_sel_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 7);
 }
@@ -30,7 +30,7 @@ READ_LINE_MEMBER(xxmissio_state::status_r)
 	return (m_status & Mask) ? 1 : 0;
 }
 
-WRITE8_MEMBER(xxmissio_state::status_m_w)
+void xxmissio_state::status_m_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -49,7 +49,7 @@ WRITE8_MEMBER(xxmissio_state::status_m_w)
 	}
 }
 
-WRITE8_MEMBER(xxmissio_state::status_s_w)
+void xxmissio_state::status_s_w(uint8_t data)
 {
 	switch (data)
 	{

@@ -57,7 +57,7 @@ void spcforce_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-WRITE8_MEMBER(spcforce_state::sn76496_latch_w)
+void spcforce_state::sn76496_latch_w(uint8_t data)
 {
 	m_sn76496_latch = data;
 }
@@ -77,7 +77,7 @@ WRITE_LINE_MEMBER(spcforce_state::write_sn3_ready)
 	m_sn3_ready = state;
 }
 
-READ8_MEMBER(spcforce_state::sn76496_select_r)
+uint8_t spcforce_state::sn76496_select_r()
 {
 	if (!BIT(m_sn76496_select, 6)) return m_sn1_ready;
 	if (!BIT(m_sn76496_select, 5)) return m_sn2_ready;
@@ -86,7 +86,7 @@ READ8_MEMBER(spcforce_state::sn76496_select_r)
 	return 0;
 }
 
-WRITE8_MEMBER(spcforce_state::sn76496_select_w)
+void spcforce_state::sn76496_select_w(uint8_t data)
 {
 	m_sn76496_select = data;
 
@@ -102,12 +102,12 @@ READ_LINE_MEMBER(spcforce_state::t0_r)
 }
 
 
-WRITE8_MEMBER(spcforce_state::soundtrigger_w)
+void spcforce_state::soundtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(spcforce_state::misc_outputs_w)
+void spcforce_state::misc_outputs_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0); // 1P start lamp
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));

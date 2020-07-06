@@ -351,6 +351,7 @@ Super Missile Attack Board Layout
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"
@@ -390,10 +391,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(missile_w);
-	DECLARE_READ8_MEMBER(missile_r);
-	DECLARE_WRITE8_MEMBER(bootleg_w);
-	DECLARE_READ8_MEMBER(bootleg_r);
+	void missile_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t missile_r(address_space &space, offs_t offset);
+	void bootleg_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t bootleg_r(address_space &space, offs_t offset);
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -722,7 +723,7 @@ uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(missile_state::missile_w)
+void missile_state::missile_w(address_space &space, offs_t offset, uint8_t data)
 {
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
@@ -781,7 +782,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 }
 
 
-READ8_MEMBER(missile_state::missile_r)
+uint8_t missile_state::missile_r(address_space &space, offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -842,7 +843,7 @@ READ8_MEMBER(missile_state::missile_r)
 }
 
 
-WRITE8_MEMBER(missile_state::bootleg_w)
+void missile_state::bootleg_w(address_space &space, offs_t offset, uint8_t data)
 {
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
@@ -894,7 +895,7 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 }
 
 
-READ8_MEMBER(missile_state::bootleg_r)
+uint8_t missile_state::bootleg_r(address_space &space, offs_t offset)
 {
 	uint8_t result = 0xff;
 

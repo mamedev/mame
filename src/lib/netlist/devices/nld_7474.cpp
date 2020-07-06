@@ -8,7 +8,6 @@
 
 #include "nld_7474.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 #include <array>
 
@@ -23,7 +22,7 @@ namespace netlist
 		, m_D(*this, "D")
 		, m_CLRQ(*this, "CLRQ")
 		, m_PREQ(*this, "PREQ")
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(7474, clk))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)

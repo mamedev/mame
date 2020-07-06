@@ -38,7 +38,7 @@ void iop_intc_device::device_reset()
 	m_enabled = false;
 }
 
-READ32_MEMBER(iop_intc_device::read)
+uint32_t iop_intc_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -64,7 +64,7 @@ READ32_MEMBER(iop_intc_device::read)
 	return ret;
 }
 
-WRITE32_MEMBER(iop_intc_device::write)
+void iop_intc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

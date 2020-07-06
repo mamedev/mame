@@ -17,12 +17,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(porta_w) override;
-	DECLARE_WRITE16_MEMBER(portb_w) override;
-	DECLARE_WRITE16_MEMBER(portc_w) override;
+	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t portc_r();
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	DECLARE_WRITE_LINE_MEMBER(spi_w);
 
 	uint8_t m_spi_bit;
@@ -195,35 +195,35 @@ void jakks_tvtouch_state::machine_reset()
 	m_spi_val = 0x00;
 }
 
-READ16_MEMBER(jakks_tvtouch_state::porta_r)
+uint16_t jakks_tvtouch_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), 0, mem_mask);
 	return 0;
 }
 
-READ16_MEMBER(jakks_tvtouch_state::portb_r)
+uint16_t jakks_tvtouch_state::portb_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: portb_r: %04x & %04x\n", machine().describe_context(), 0, mem_mask);
 	return 0;
 }
 
-READ16_MEMBER(jakks_tvtouch_state::portc_r)
+uint16_t jakks_tvtouch_state::portc_r()
 {
 	uint16_t data = (m_i2cmem->read_sda() & 1) | (m_io_p3->read() & 0xfffe);
 	return data;
 }
 
-WRITE16_MEMBER(jakks_tvtouch_state::porta_w)
+void jakks_tvtouch_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: porta_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE16_MEMBER(jakks_tvtouch_state::portb_w)
+void jakks_tvtouch_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-WRITE16_MEMBER(jakks_tvtouch_state::portc_w)
+void jakks_tvtouch_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));

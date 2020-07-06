@@ -160,26 +160,26 @@ protected:
 
 	uint8_t intack_r();
 
-	DECLARE_WRITE8_MEMBER(ginten_w);
-	DECLARE_WRITE8_MEMBER(gintdis_w);
-	DECLARE_READ8_MEMBER(keysts_r);
-	DECLARE_WRITE8_MEMBER(keysts_w);
-	DECLARE_READ8_MEMBER(keycod_r);
-	DECLARE_WRITE8_MEMBER(keycod_w);
-	DECLARE_READ8_MEMBER(clksts_r);
-	DECLARE_WRITE8_MEMBER(clksts_w);
-	DECLARE_READ8_MEMBER(clkdat_r);
-	DECLARE_WRITE8_MEMBER(clkdat_w);
-	DECLARE_WRITE8_MEMBER(rselec_w);
-	DECLARE_READ8_MEMBER(intrsc_r);
-	DECLARE_WRITE8_MEMBER(intrsc_w);
+	void ginten_w(uint8_t data);
+	void gintdis_w(uint8_t data);
+	uint8_t keysts_r();
+	void keysts_w(uint8_t data);
+	uint8_t keycod_r();
+	void keycod_w(uint8_t data);
+	uint8_t clksts_r();
+	void clksts_w(uint8_t data);
+	uint8_t clkdat_r();
+	void clkdat_w(uint8_t data);
+	void rselec_w(uint8_t data);
+	uint8_t intrsc_r();
+	void intrsc_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(clk_busy_timer);
 
-	DECLARE_WRITE8_MEMBER(irl_w);
-	DECLARE_WRITE8_MEMBER(halt_w);
+	void irl_w(offs_t offset, uint8_t data);
+	void halt_w(offs_t offset, uint8_t data);
 
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<timer_device> m_clk_busy_timer;
@@ -416,21 +416,21 @@ uint8_t hp80_base_state::intack_r()
 	return vector_table[ m_top_pending ];
 }
 
-WRITE8_MEMBER(hp80_base_state::ginten_w)
+void hp80_base_state::ginten_w(uint8_t data)
 {
 	LOG_IRQ("GINTEN\n");
 	m_global_int_en = true;
 	update_irl();
 }
 
-WRITE8_MEMBER(hp80_base_state::gintdis_w)
+void hp80_base_state::gintdis_w(uint8_t data)
 {
 	LOG_IRQ("GINTDIS\n");
 	m_global_int_en = false;
 	update_irl();
 }
 
-READ8_MEMBER(hp80_base_state::keysts_r)
+uint8_t hp80_base_state::keysts_r()
 {
 	uint8_t res = 0;
 	if (BIT(m_int_en , get_kb_irq())) {
@@ -456,7 +456,7 @@ READ8_MEMBER(hp80_base_state::keysts_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp80_base_state::keysts_w)
+void hp80_base_state::keysts_w(uint8_t data)
 {
 	if (BIT(data , 0)) {
 		irq_en_w(get_kb_irq() , true);
@@ -474,7 +474,7 @@ WRITE8_MEMBER(hp80_base_state::keysts_w)
 	}
 }
 
-READ8_MEMBER(hp80_base_state::keycod_r)
+uint8_t hp80_base_state::keycod_r()
 {
 	if (m_kb_lang_readout && m_io_language) {
 		return m_io_language->read();
@@ -485,12 +485,11 @@ READ8_MEMBER(hp80_base_state::keycod_r)
 	}
 }
 
-WRITE8_MEMBER(hp80_base_state::keycod_w)
+void hp80_base_state::keycod_w(uint8_t data)
 {
-	if (m_has_int_keyb) {
+	if (m_kb_raw_readout) {
 		m_kb_keycode = data;
-	}
-	if (data == 1) {
+	} else if (data == 1) {
 		unsigned irq = get_kb_irq();
 		irq_w(irq , false);
 		m_kb_enable = true;
@@ -498,7 +497,7 @@ WRITE8_MEMBER(hp80_base_state::keycod_w)
 	}
 }
 
-READ8_MEMBER(hp80_base_state::clksts_r)
+uint8_t hp80_base_state::clksts_r()
 {
 	uint8_t res = 0;
 	for (unsigned i = 0; i < TIMER_COUNT; i++) {
@@ -512,7 +511,7 @@ READ8_MEMBER(hp80_base_state::clksts_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp80_base_state::clksts_w)
+void hp80_base_state::clksts_w(uint8_t data)
 {
 	if (data == 0x0c) {
 		// Set test mode (see timer_update)
@@ -555,7 +554,7 @@ WRITE8_MEMBER(hp80_base_state::clksts_w)
 	}
 }
 
-READ8_MEMBER(hp80_base_state::clkdat_r)
+uint8_t hp80_base_state::clkdat_r()
 {
 	uint8_t res;
 	unsigned burst_idx = m_cpu->flatten_burst();
@@ -569,7 +568,7 @@ READ8_MEMBER(hp80_base_state::clkdat_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp80_base_state::clkdat_w)
+void hp80_base_state::clkdat_w(uint8_t data)
 {
 	unsigned burst_idx = m_cpu->flatten_burst();
 	if (burst_idx < 4) {
@@ -580,12 +579,12 @@ WRITE8_MEMBER(hp80_base_state::clkdat_w)
 	}
 }
 
-WRITE8_MEMBER(hp80_base_state::rselec_w)
+void hp80_base_state::rselec_w(uint8_t data)
 {
 	m_rombank->set_bank(data);
 }
 
-READ8_MEMBER(hp80_base_state::intrsc_r)
+uint8_t hp80_base_state::intrsc_r()
 {
 	if (m_top_acked >= IRQ_IOP0_BIT && m_top_acked < IRQ_BIT_COUNT) {
 		LOG_IRQ("INTRSC %u\n" , m_top_acked);
@@ -598,7 +597,7 @@ READ8_MEMBER(hp80_base_state::intrsc_r)
 	}
 }
 
-WRITE8_MEMBER(hp80_base_state::intrsc_w)
+void hp80_base_state::intrsc_w(uint8_t data)
 {
 	LOG_IRQ("INTRSC W %u %03x %03x %03x\n" , m_top_acked , m_int_serv , m_int_en , m_int_acked);
 	for (auto& iop: m_io_slots) {
@@ -862,12 +861,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::clk_busy_timer)
 	m_clk_busy = false;
 }
 
-WRITE8_MEMBER(hp80_base_state::irl_w)
+void hp80_base_state::irl_w(offs_t offset, uint8_t data)
 {
 	irq_w(offset + IRQ_IOP0_BIT , data != 0);
 }
 
-WRITE8_MEMBER(hp80_base_state::halt_w)
+void hp80_base_state::halt_w(offs_t offset, uint8_t data)
 {
 	bool prev_halt = m_halt_lines != 0;
 	COPY_BIT(data != 0 , m_halt_lines , offset);
@@ -991,14 +990,14 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_WRITE8_MEMBER(prtlen_w);
-	DECLARE_READ8_MEMBER(prchar_r);
-	DECLARE_WRITE8_MEMBER(prchar_w);
-	DECLARE_READ8_MEMBER(prtsts_r);
-	DECLARE_WRITE8_MEMBER(prtctl_w);
-	DECLARE_WRITE8_MEMBER(prtdat_w);
+	uint8_t crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, uint8_t data);
+	void prtlen_w(uint8_t data);
+	uint8_t prchar_r();
+	void prchar_w(uint8_t data);
+	uint8_t prtsts_r();
+	void prtctl_w(uint8_t data);
+	void prtdat_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(prt_busy_timer);
@@ -1141,7 +1140,7 @@ WRITE_LINE_MEMBER(hp85_state::vblank_w)
 	}
 }
 
-READ8_MEMBER(hp85_state::crtc_r)
+uint8_t hp85_state::crtc_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -1168,7 +1167,7 @@ READ8_MEMBER(hp85_state::crtc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp85_state::crtc_w)
+void hp85_state::crtc_w(offs_t offset, uint8_t data)
 {
 	// Write to CRT controller (1MA5)
 	uint8_t burst_idx = m_cpu->flatten_burst();
@@ -1215,7 +1214,7 @@ WRITE8_MEMBER(hp85_state::crtc_w)
 	}
 }
 
-WRITE8_MEMBER(hp85_state::prtlen_w)
+void hp85_state::prtlen_w(uint8_t data)
 {
 	if (data == 0) {
 		// Advance paper
@@ -1230,22 +1229,22 @@ WRITE8_MEMBER(hp85_state::prtlen_w)
 	}
 }
 
-READ8_MEMBER(hp85_state::prchar_r)
+uint8_t hp85_state::prchar_r()
 {
 	return m_prchar_r;
 }
 
-WRITE8_MEMBER(hp85_state::prchar_w)
+void hp85_state::prchar_w(uint8_t data)
 {
 	m_prchar_w = data;
 }
 
-READ8_MEMBER(hp85_state::prtsts_r)
+uint8_t hp85_state::prtsts_r()
 {
 	return m_prtsts;
 }
 
-WRITE8_MEMBER(hp85_state::prtctl_w)
+void hp85_state::prtctl_w(uint8_t data)
 {
 	m_prtctl = data;
 	BIT_SET(m_prtsts , PRTSTS_PRTRDY_BIT);
@@ -1261,7 +1260,7 @@ WRITE8_MEMBER(hp85_state::prtctl_w)
 	}
 }
 
-WRITE8_MEMBER(hp85_state::prtdat_w)
+void hp85_state::prtdat_w(uint8_t data)
 {
 	m_cpu->flatten_burst();
 	if (m_prt_idx < PRT_BUFFER_SIZE) {
@@ -1676,20 +1675,20 @@ private:
 	// Run light
 	bool m_rulite;
 
-	DECLARE_WRITE8_MEMBER(crtsad_w);
-	DECLARE_WRITE8_MEMBER(crtbad_w);
-	DECLARE_READ8_MEMBER(crtsts_r);
-	DECLARE_WRITE8_MEMBER(crtsts_w);
-	DECLARE_READ8_MEMBER(crtdat_r);
-	DECLARE_WRITE8_MEMBER(crtdat_w);
+	void crtsad_w(uint8_t data);
+	void crtbad_w(uint8_t data);
+	uint8_t crtsts_r();
+	void crtsts_w(uint8_t data);
+	uint8_t crtdat_r();
+	void crtdat_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	uint16_t get_video_limit() const;
-	DECLARE_WRITE8_MEMBER(rulite_w);
+	void rulite_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(rulite_timer);
-	DECLARE_READ8_MEMBER(direct_ram_r);
-	DECLARE_WRITE8_MEMBER(direct_ram_w);
-	DECLARE_READ8_MEMBER(emc_r);
-	DECLARE_WRITE8_MEMBER(emc_w);
+	uint8_t direct_ram_r(offs_t offset);
+	void direct_ram_w(offs_t offset, uint8_t data);
+	uint8_t emc_r(offs_t offset);
+	void emc_w(offs_t offset, uint8_t data);
 	uint32_t& get_ptr();
 	void ptr12_decrement();
 	DECLARE_WRITE_LINE_MEMBER(lma_cycle);
@@ -1908,7 +1907,7 @@ attotime hp86_state::time_to_video_mem_availability() const
 	}
 }
 
-WRITE8_MEMBER(hp86_state::crtsad_w)
+void hp86_state::crtsad_w(uint8_t data)
 {
 	auto burst_idx = m_cpu->flatten_burst();
 	if (burst_idx == 0) {
@@ -1919,7 +1918,7 @@ WRITE8_MEMBER(hp86_state::crtsad_w)
 	}
 }
 
-WRITE8_MEMBER(hp86_state::crtbad_w)
+void hp86_state::crtbad_w(uint8_t data)
 {
 	auto burst_idx = m_cpu->flatten_burst();
 	if (burst_idx == 0) {
@@ -1930,12 +1929,12 @@ WRITE8_MEMBER(hp86_state::crtbad_w)
 	}
 }
 
-READ8_MEMBER(hp86_state::crtsts_r)
+uint8_t hp86_state::crtsts_r()
 {
 	return m_crt_sts;
 }
 
-WRITE8_MEMBER(hp86_state::crtsts_w)
+void hp86_state::crtsts_w(uint8_t data)
 {
 	m_crt_sts = (m_crt_sts & 0x11) | (data & ~0x11);
 	if (BIT(data , 0)) {
@@ -1947,12 +1946,12 @@ WRITE8_MEMBER(hp86_state::crtsts_w)
 	}
 }
 
-READ8_MEMBER(hp86_state::crtdat_r)
+uint8_t hp86_state::crtdat_r()
 {
 	return m_crt_byte;
 }
 
-WRITE8_MEMBER(hp86_state::crtdat_w)
+void hp86_state::crtdat_w(uint8_t data)
 {
 	m_crt_byte = data;
 	BIT_SET(m_crt_sts , 0);
@@ -1989,7 +1988,7 @@ uint16_t hp86_state::get_video_limit() const
 	}
 }
 
-WRITE8_MEMBER(hp86_state::rulite_w)
+void hp86_state::rulite_w(uint8_t data)
 {
 	bool new_rulite = !BIT(data , 0);
 
@@ -2009,17 +2008,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp86_state::rulite_timer)
 	m_rulite_timer->adjust(attotime::from_msec(m_run_light ? RULITE_ON_MS : RULITE_OFF_MS));
 }
 
-READ8_MEMBER(hp86_state::direct_ram_r)
+uint8_t hp86_state::direct_ram_r(offs_t offset)
 {
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER(hp86_state::direct_ram_w)
+void hp86_state::direct_ram_w(offs_t offset, uint8_t data)
 {
 	m_ram->write(offset , data);
 }
 
-READ8_MEMBER(hp86_state::emc_r)
+uint8_t hp86_state::emc_r(offs_t offset)
 {
 	auto idx = m_cpu->flatten_burst();
 	uint8_t res = 0xff;
@@ -2054,7 +2053,7 @@ READ8_MEMBER(hp86_state::emc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp86_state::emc_w)
+void hp86_state::emc_w(offs_t offset, uint8_t data)
 {
 	auto idx = m_cpu->flatten_burst();
 

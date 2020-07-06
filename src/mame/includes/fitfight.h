@@ -38,21 +38,21 @@ public:
 	void init_bbprot();
 
 private:
-	DECLARE_READ16_MEMBER(fitfight_700000_r);
-	DECLARE_READ16_MEMBER(histryma_700000_r);
-	DECLARE_READ16_MEMBER(bbprot_700000_r);
-	DECLARE_WRITE16_MEMBER(fitfight_700000_w);
-	DECLARE_READ8_MEMBER(snd_porta_r);
-	DECLARE_READ8_MEMBER(snd_portb_r);
-	DECLARE_READ8_MEMBER(snd_portc_r);
-	DECLARE_WRITE8_MEMBER(snd_porta_w);
-	DECLARE_WRITE8_MEMBER(snd_portb_w);
-	DECLARE_WRITE8_MEMBER(snd_portc_w);
-	DECLARE_WRITE16_MEMBER(fof_bak_tileram_w);
-	DECLARE_WRITE16_MEMBER(fof_mid_tileram_w);
-	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);
+	uint16_t fitfight_700000_r();
+	uint16_t histryma_700000_r();
+	uint16_t bbprot_700000_r();
+	void fitfight_700000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t snd_porta_r();
+	uint8_t snd_portb_r();
+	uint8_t snd_portc_r();
+	void snd_porta_w(uint8_t data);
+	void snd_portb_w(uint8_t data);
+	void snd_portc_w(uint8_t data);
+	void fof_bak_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fof_mid_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fof_txt_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( hotmindff_unk_r );
+	uint16_t hotmindff_unk_r();
 	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);

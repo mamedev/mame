@@ -142,7 +142,7 @@ inline void m37710_cpu_device::m37710i_jump_16(uint32_t address)
 
 inline void m37710_cpu_device::m37710i_jump_24(uint32_t address)
 {
-	REG_PB = address&0xff0000;
+	REG_PG = address&0xff0000;
 	REG_PC = MAKE_UINT_16(address);
 }
 
@@ -161,7 +161,7 @@ inline void m37710_cpu_device::m37710i_branch_16(uint32_t offset)
 /* ============================ STATUS REGISTER =========================== */
 /* ======================================================================== */
 
-inline uint32_t m37710_cpu_device::m37710i_get_reg_p()
+inline uint32_t m37710_cpu_device::m37710i_get_reg_ps()
 {
 	return  (FLAG_N&0x80)       |
 			((FLAG_V>>1)&0x40)  |
@@ -183,26 +183,26 @@ inline void m37710_cpu_device::m37710i_set_reg_ipl(uint32_t value)
 /* ============================= ADDRESS MODES ============================ */
 /* ======================================================================== */
 
-inline uint32_t m37710_cpu_device::EA_IMM8()  {REG_PC += 1; return REG_PB | MAKE_UINT_16(REG_PC-1);}
-inline uint32_t m37710_cpu_device::EA_IMM16() {REG_PC += 2; return REG_PB | MAKE_UINT_16(REG_PC-2);}
-inline uint32_t m37710_cpu_device::EA_IMM24() {REG_PC += 3; return REG_PB | MAKE_UINT_16(REG_PC-3);}
-inline uint32_t m37710_cpu_device::EA_D()     {if(MAKE_UINT_8(REG_D)) CLK(1); return MAKE_UINT_16(REG_D + OPER_8_IMM());}
-inline uint32_t m37710_cpu_device::EA_A()     {return REG_DB | OPER_16_IMM();}
+inline uint32_t m37710_cpu_device::EA_IMM8()  {REG_PC += 1; return REG_PG | MAKE_UINT_16(REG_PC-1);}
+inline uint32_t m37710_cpu_device::EA_IMM16() {REG_PC += 2; return REG_PG | MAKE_UINT_16(REG_PC-2);}
+inline uint32_t m37710_cpu_device::EA_IMM24() {REG_PC += 3; return REG_PG | MAKE_UINT_16(REG_PC-3);}
+inline uint32_t m37710_cpu_device::EA_D()     {if(MAKE_UINT_8(REG_DPR)) CLK(1); return MAKE_UINT_16(REG_DPR + OPER_8_IMM());}
+inline uint32_t m37710_cpu_device::EA_A()     {return REG_DT | OPER_16_IMM();}
 inline uint32_t m37710_cpu_device::EA_AL()    {return OPER_24_IMM();}
-inline uint32_t m37710_cpu_device::EA_DX()    {return MAKE_UINT_16(REG_D + OPER_8_IMM() + REG_X);}
-inline uint32_t m37710_cpu_device::EA_DY()    {return MAKE_UINT_16(REG_D + OPER_8_IMM() + REG_Y);}
+inline uint32_t m37710_cpu_device::EA_DX()    {return MAKE_UINT_16(REG_DPR + OPER_8_IMM() + REG_X);}
+inline uint32_t m37710_cpu_device::EA_DY()    {return MAKE_UINT_16(REG_DPR + OPER_8_IMM() + REG_Y);}
 inline uint32_t m37710_cpu_device::EA_AX()    {uint32_t tmp = EA_A(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_X;}
 inline uint32_t m37710_cpu_device::EA_ALX()   {return EA_AL() + REG_X;}
 inline uint32_t m37710_cpu_device::EA_AY()    {uint32_t tmp = EA_A(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_Y;}
-inline uint32_t m37710_cpu_device::EA_DI()    {return REG_DB | OPER_16_D();}
+inline uint32_t m37710_cpu_device::EA_DI()    {return REG_DT | OPER_16_D();}
 inline uint32_t m37710_cpu_device::EA_DLI()   {return OPER_24_D();}
 inline uint32_t m37710_cpu_device::EA_AI()    {return read_16_A(OPER_16_IMM());}
 inline uint32_t m37710_cpu_device::EA_ALI()   {return OPER_24_A();}
-inline uint32_t m37710_cpu_device::EA_DXI()   {return REG_DB | OPER_16_DX();}
-inline uint32_t m37710_cpu_device::EA_DIY()   {uint32_t tmp = REG_DB | OPER_16_D(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_Y;}
+inline uint32_t m37710_cpu_device::EA_DXI()   {return REG_DT | OPER_16_DX();}
+inline uint32_t m37710_cpu_device::EA_DIY()   {uint32_t tmp = REG_DT | OPER_16_D(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_Y;}
 inline uint32_t m37710_cpu_device::EA_DLIY()  {return OPER_24_D() + REG_Y;}
 inline uint32_t m37710_cpu_device::EA_AXI()   {return read_16_AXI(MAKE_UINT_16(OPER_16_IMM() + REG_X));}
 inline uint32_t m37710_cpu_device::EA_S()     {return MAKE_UINT_16(REG_S + OPER_8_IMM());}
-inline uint32_t m37710_cpu_device::EA_SIY()   {return MAKE_UINT_16(read_16_SIY(REG_S + OPER_8_IMM()) + REG_Y) | REG_DB;}
+inline uint32_t m37710_cpu_device::EA_SIY()   {return MAKE_UINT_16(read_16_SIY(REG_S + OPER_8_IMM()) + REG_Y) | REG_DT;}
 
 #endif /* __M37710IL_H__ */

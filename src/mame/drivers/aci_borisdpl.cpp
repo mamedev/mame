@@ -10,7 +10,7 @@ Hardware notes:
 - 256 bytes RAM(2*2112-1)
 - 8-digit 7seg led panel
 
-Two versions exists, a blue one(seen with SC80265P) and a brown one(seen with
+Two versions exist, a blue one(seen with SC80265P) and a brown one(seen with
 either MCU). The one emulated here is from a brown version with the SC80265P.
 Motorola SC80265P is a 3870 clone, it's assumed that the program is the same
 as SL90259.
@@ -20,7 +20,6 @@ as SL90259.
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/sensorboard.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -68,18 +67,14 @@ private:
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
 
 	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address;
-	u8 m_matrix;
-	u8 m_digit_data;
+	u8 m_ram_address = 0;
+	u8 m_matrix = 0;
+	u8 m_digit_data = 0;
 };
 
 void borisdpl_state::machine_start()
 {
-	// zerofill
 	m_ram = make_unique_clear<u8[]>(0x100);
-	m_ram_address = 0;
-	m_matrix = 0;
-	m_digit_data = 0;
 
 	// register for savestates
 	save_pointer(NAME(m_ram), 0x100);
@@ -200,10 +195,6 @@ void borisdpl_state::borisdpl(machine_config &config)
 	psu.write_a().set(FUNC(borisdpl_state::ram_data_w));
 	psu.read_b().set(FUNC(borisdpl_state::ram_address_r));
 	psu.write_b().set(FUNC(borisdpl_state::ram_address_w));
-
-	// built-in chessboard is not electronic
-	sensorboard_device &board(SENSORBOARD(config, "board").set_type(sensorboard_device::NOSENSORS));
-	board.init_cb().set("board", FUNC(sensorboard_device::preset_chess));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 7);

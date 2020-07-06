@@ -5,6 +5,7 @@
     emucore.h
 
     General core utilities and macros used throughout the emulator.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_EMUCORE_H

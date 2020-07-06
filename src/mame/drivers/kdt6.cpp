@@ -72,32 +72,32 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_r);
-	DECLARE_WRITE8_MEMBER(memory_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(page0_r);
-	DECLARE_READ8_MEMBER(page1_r);
-	DECLARE_READ8_MEMBER(mapper_r);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_READ8_MEMBER(sasi_ctrl_r);
-	DECLARE_WRITE8_MEMBER(sasi_ctrl_w);
-	DECLARE_WRITE8_MEMBER(dma_map_w);
-	DECLARE_WRITE8_MEMBER(status0_w);
-	DECLARE_READ8_MEMBER(status1_r);
-	DECLARE_WRITE8_MEMBER(status1_w);
-	DECLARE_WRITE8_MEMBER(status2_w);
+	uint8_t memory_r(offs_t offset);
+	void memory_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t page0_r(offs_t offset);
+	uint8_t page1_r(offs_t offset);
+	uint8_t mapper_r(offs_t offset);
+	void mapper_w(offs_t offset, uint8_t data);
+	uint8_t sasi_ctrl_r();
+	void sasi_ctrl_w(uint8_t data);
+	void dma_map_w(uint8_t data);
+	void status0_w(uint8_t data);
+	uint8_t status1_r();
+	void status1_w(uint8_t data);
+	void status2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(video_data_r);
-	DECLARE_WRITE8_MEMBER(video_data_w);
-	DECLARE_WRITE8_MEMBER(video_data_inc_w);
-	DECLARE_WRITE8_MEMBER(video_data_dec_w);
-	DECLARE_WRITE8_MEMBER(video_address_latch_high_w);
-	DECLARE_WRITE8_MEMBER(video_address_latch_low_w);
+	uint8_t video_data_r();
+	void video_data_w(uint8_t data);
+	void video_data_inc_w(uint8_t data);
+	void video_data_dec_w(uint8_t data);
+	void video_address_latch_high_w(uint8_t data);
+	void video_address_latch_low_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
-	DECLARE_WRITE8_MEMBER(fdc_tc_w);
+	void fdc_tc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	void drive0_led_cb(floppy_image_device *floppy, int state);
 	void drive1_led_cb(floppy_image_device *floppy, int state);
@@ -105,7 +105,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(pio_porta_w);
+	void pio_porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
@@ -230,7 +230,7 @@ static void kdt6_floppies(device_slot_interface &device)
 	device.option_add("fd55f", TEAC_FD_55F);
 }
 
-WRITE8_MEMBER( kdt6_state::fdc_tc_w )
+void kdt6_state::fdc_tc_w(uint8_t data)
 {
 	m_fdc->tc_w(1);
 	m_fdc->tc_w(0);
@@ -257,34 +257,34 @@ void kdt6_state::drive1_led_cb(floppy_image_device *floppy, int state)
 //  VIDEO
 //**************************************************************************
 
-WRITE8_MEMBER( kdt6_state::video_address_latch_high_w )
+void kdt6_state::video_address_latch_high_w(uint8_t data)
 {
 	m_video_address &= 0x00ff;
 	m_video_address |= (data << 8);
 }
 
-WRITE8_MEMBER( kdt6_state::video_address_latch_low_w )
+void kdt6_state::video_address_latch_low_w(uint8_t data)
 {
 	m_video_address &= 0xff00;
 	m_video_address |= (data << 0);
 }
 
-READ8_MEMBER( kdt6_state::video_data_r )
+uint8_t kdt6_state::video_data_r()
 {
 	return m_vram[m_video_address];
 }
 
-WRITE8_MEMBER( kdt6_state::video_data_w )
+void kdt6_state::video_data_w(uint8_t data)
 {
 	m_vram[m_video_address] = ((m_status1 & 0x0c) << 6) | data;
 }
 
-WRITE8_MEMBER( kdt6_state::video_data_inc_w )
+void kdt6_state::video_data_inc_w(uint8_t data)
 {
 	m_vram[m_video_address++] = ((m_status1 & 0x0c) << 6) | data;
 }
 
-WRITE8_MEMBER( kdt6_state::video_data_dec_w )
+void kdt6_state::video_data_dec_w(uint8_t data)
 {
 	m_vram[m_video_address--] = ((m_status1 & 0x0c) << 6) | data;
 }
@@ -344,7 +344,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( kdt6_state::beeper_off )
 //  EXTERNAL I/O
 //**************************************************************************
 
-WRITE8_MEMBER( kdt6_state::pio_porta_w )
+void kdt6_state::pio_porta_w(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 	m_centronics->write_init(BIT(data, 1));
@@ -390,27 +390,27 @@ WRITE_LINE_MEMBER( kdt6_state::busreq_w )
 	m_dma->bai_w(state);
 }
 
-READ8_MEMBER( kdt6_state::memory_r )
+uint8_t kdt6_state::memory_r(offs_t offset)
 {
 	return m_ram[m_dma_map << 16 | offset];
 }
 
-WRITE8_MEMBER( kdt6_state::memory_w )
+void kdt6_state::memory_w(offs_t offset, uint8_t data)
 {
 	m_ram[m_dma_map << 16 | offset] = data;
 }
 
-READ8_MEMBER( kdt6_state::io_r )
+uint8_t kdt6_state::io_r(offs_t offset)
 {
 	return m_cpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( kdt6_state::io_w )
+void kdt6_state::io_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_IO).write_byte(offset, data);
 }
 
-READ8_MEMBER( kdt6_state::page0_r )
+uint8_t kdt6_state::page0_r(offs_t offset)
 {
 	if (BIT(m_status0, 5) == 0)
 		return m_boot->as_u8(offset);
@@ -418,7 +418,7 @@ READ8_MEMBER( kdt6_state::page0_r )
 	return reinterpret_cast<uint8_t *>(m_page_r[0]->base())[offset];
 }
 
-READ8_MEMBER( kdt6_state::page1_r )
+uint8_t kdt6_state::page1_r(offs_t offset)
 {
 	if (BIT(m_status0, 5) == 0)
 		return m_boot->as_u8(0x1000 + offset);
@@ -426,7 +426,7 @@ READ8_MEMBER( kdt6_state::page1_r )
 	return reinterpret_cast<uint8_t *>(m_page_r[1]->base())[offset];
 }
 
-READ8_MEMBER( kdt6_state::sasi_ctrl_r )
+uint8_t kdt6_state::sasi_ctrl_r()
 {
 	uint8_t data = 0;
 
@@ -445,23 +445,23 @@ READ8_MEMBER( kdt6_state::sasi_ctrl_r )
 	return data;
 }
 
-WRITE8_MEMBER( kdt6_state::sasi_ctrl_w )
+void kdt6_state::sasi_ctrl_w(uint8_t data)
 {
 	logerror("sasi_ctrl_w: %02x\n", data);
 	m_sasi_dma = bool(BIT(data, 2) == 0);
 }
 
-WRITE8_MEMBER( kdt6_state::dma_map_w )
+void kdt6_state::dma_map_w(uint8_t data)
 {
 	m_dma_map = data;
 }
 
-READ8_MEMBER( kdt6_state::mapper_r )
+uint8_t kdt6_state::mapper_r(offs_t offset)
 {
 	return m_mapper[offset];
 }
 
-WRITE8_MEMBER( kdt6_state::mapper_w )
+void kdt6_state::mapper_w(offs_t offset, uint8_t data)
 {
 	m_mapper[offset] = ((m_status2 & 0x0f) << 8) | data;
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER( kdt6_state::mapper_w )
 	}
 }
 
-WRITE8_MEMBER( kdt6_state::status0_w )
+void kdt6_state::status0_w(uint8_t data)
 {
 	logerror("status0_w: %02x\n", data);
 
@@ -506,7 +506,7 @@ WRITE8_MEMBER( kdt6_state::status0_w )
 	m_status0 = data;
 }
 
-READ8_MEMBER( kdt6_state::status1_r )
+uint8_t kdt6_state::status1_r()
 {
 	// 7-------  disable memory mapper (1 = disable)
 	// -6------  display mode (1 = text, 0 = gfx)
@@ -520,7 +520,7 @@ READ8_MEMBER( kdt6_state::status1_r )
 	return m_status1;
 }
 
-WRITE8_MEMBER( kdt6_state::status1_w )
+void kdt6_state::status1_w(uint8_t data)
 {
 	logerror("status1_w: %02x\n", data);
 
@@ -540,7 +540,7 @@ WRITE8_MEMBER( kdt6_state::status1_w )
 	m_status1 = data;
 }
 
-WRITE8_MEMBER( kdt6_state::status2_w )
+void kdt6_state::status2_w(uint8_t data)
 {
 	if (0)
 		logerror("status2_w: %02x\n", data);
@@ -574,8 +574,8 @@ void kdt6_state::machine_start()
 	m_dummy_w = std::make_unique<uint8_t[]>(0x1000);
 
 	// override the region 0x0000 to 0x1fff here to enable prom reading
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(*this, FUNC(kdt6_state::page0_r)));
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(*this, FUNC(kdt6_state::page1_r)));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*this, FUNC(kdt6_state::page0_r)));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(kdt6_state::page1_r)));
 
 	m_fdc->set_rate(250000);
 
@@ -599,7 +599,7 @@ void kdt6_state::machine_start()
 void kdt6_state::machine_reset()
 {
 	// status0 is forced to 0 on reset
-	status0_w(m_cpu->space(AS_IO), 0, 0);
+	status0_w(0);
 }
 
 

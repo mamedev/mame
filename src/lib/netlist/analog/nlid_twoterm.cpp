@@ -18,7 +18,7 @@ namespace analog
 	solver::matrix_solver_t * NETLIB_NAME(twoterm)::solver() const noexcept
 	{
 		auto *solv(m_P.solver());
-		if (solv)
+		if (solv != nullptr)
 			return solv;
 		return m_N.solver();
 	}
@@ -27,7 +27,7 @@ namespace analog
 	void NETLIB_NAME(twoterm)::solve_now() const
 	{
 		auto *solv(solver());
-		if (solv)
+		if (solv != nullptr)
 			solv->solve_now();
 	}
 
@@ -124,7 +124,6 @@ namespace analog
 		m_G = m_gmin;
 		set_mat( m_G, -m_G, -m_I,
 				-m_G,  m_G,  m_I);
-		//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 	}
 
 	NETLIB_UPDATE_PARAM(L)
@@ -146,8 +145,8 @@ namespace analog
 
 	NETLIB_RESET(D)
 	{
-		nl_fptype Is = m_model.m_IS;
-		nl_fptype n = m_model.m_N;
+		nl_fptype Is = m_modacc.m_IS;
+		nl_fptype n = m_modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
@@ -155,8 +154,8 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(D)
 	{
-		nl_fptype Is = m_model.m_IS;
-		nl_fptype n = m_model.m_N;
+		nl_fptype Is = m_modacc.m_IS;
+		nl_fptype n = m_modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 	}
@@ -171,6 +170,39 @@ namespace analog
 		//set(m_D.G(), 0.0, m_D.Ieq());
 	}
 
+	// ----------------------------------------------------------------------------------------
+	// nld_Z
+	// ----------------------------------------------------------------------------------------
+
+	NETLIB_RESET(Z)
+	{
+		nl_fptype IsBV = m_modacc.m_IBV / (plib::exp(m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV)) - nlconst::one());
+
+		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
+		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
+	}
+
+	NETLIB_UPDATE_PARAM(Z)
+	{
+		nl_fptype IsBV = m_modacc.m_IBV / (plib::exp(m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV)) - nlconst::one());
+
+		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
+		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
+	}
+
+	NETLIB_UPDATE_TERMINALS(Z)
+	{
+		m_D.update_diode(deltaV());
+		m_R.update_diode(-deltaV());
+		const nl_fptype G(m_D.G() + m_R.G());
+		const nl_fptype I(m_D.Ieq() - m_R.Ieq());
+		set_mat( G, -G, -I,
+				-G,  G,  I);
+	}
+
+
 
 } //namespace analog
 
@@ -181,6 +213,7 @@ namespace devices {
 	NETLIB_DEVICE_IMPL_NS(analog, C,    "CAP",   "C")
 	NETLIB_DEVICE_IMPL_NS(analog, L,    "IND",   "L")
 	NETLIB_DEVICE_IMPL_NS(analog, D,    "DIODE", "MODEL")
+	NETLIB_DEVICE_IMPL_NS(analog, Z,    "ZDIODE", "MODEL")
 	NETLIB_DEVICE_IMPL_NS(analog, VS,   "VS",    "V")
 	NETLIB_DEVICE_IMPL_NS(analog, CS,   "CS",    "I")
 } // namespace devices

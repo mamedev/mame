@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/pacman.h"
 
-READ8_MEMBER(epospm_state::epos_decryption_w)
+uint8_t epospm_state::epos_decryption_w(offs_t offset)
 {
 	if (offset & 0x01)
 	{

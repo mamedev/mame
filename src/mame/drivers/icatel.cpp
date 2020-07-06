@@ -46,27 +46,23 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(magic_string);
+	uint8_t magic_string(offs_t offset);
 
-	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	DECLARE_READ8_MEMBER(i80c31_p3_r);
-	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
-	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
+	uint8_t i80c31_p1_r();
+	uint8_t i80c31_p3_r();
+	void i80c31_p1_w(uint8_t data);
+	void i80c31_p3_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(cn8_extension_r);
-	DECLARE_WRITE8_MEMBER(cn8_extension_w);
+	uint8_t cn8_extension_r();
+	void cn8_extension_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(modem_r);
-	DECLARE_WRITE8_MEMBER(modem_w);
+	uint8_t modem_r(offs_t offset);
+	void modem_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(ci8_r);
-	DECLARE_WRITE8_MEMBER(ci8_w);
-
-	DECLARE_READ8_MEMBER(ci15_r);
-	DECLARE_WRITE8_MEMBER(ci15_w);
-
-	DECLARE_READ8_MEMBER(ci16_r);
-	DECLARE_WRITE8_MEMBER(ci16_w);
+	void ci8_w(uint8_t data);
+	void ci12_w(uint8_t data);
+	uint8_t ci15_r();
+	void ci16_w(uint8_t data);
 
 	void icatel_palette(palette_device &palette) const;
 
@@ -88,13 +84,14 @@ void icatel_state::i80c31_prg(address_map &map)
 void icatel_state::i80c31_io(address_map &map)
 {
 	map(0x0000, 0x3FFF).ram();
-	map(0x8000, 0x8002).ram(); /* HACK! */
-	map(0x8040, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::write)); // not sure yet. CI12 (73LS273)
-	map(0x8060, 0x8060).mirror(0x3F1F).rw(FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
-	map(0x8080, 0x8080).mirror(0x3F1F).rw(FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
-	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
+	map(0x8000, 0x8001).mirror(0x3F3C).w(m_lcdc, FUNC(hd44780_device::write));
+	map(0x8002, 0x8003).mirror(0x3F3C).r(m_lcdc, FUNC(hd44780_device::read));
+	map(0x8040, 0x8040).mirror(0x3F1F).w(FUNC(icatel_state::ci12_w)); // 74LS273
+	map(0x8060, 0x8060).mirror(0x3F1F).w(FUNC(icatel_state::ci8_w));
+	map(0x8080, 0x8080).mirror(0x3F1F).w(FUNC(icatel_state::ci16_w)); // card reader (?)
+	map(0x80C0, 0x80C0).mirror(0x3F1F).r(FUNC(icatel_state::ci15_r)); // 74LS244 (tristate buffer)
 	map(0xC000, 0xCFFF).rw(FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
-	map(0xE000, 0xEFFF).rw(FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
+	map(0xE000, 0xE0FF).mirror(0xF00).rw(FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
 }
 
 void icatel_state::i80c31_data(address_map &map)
@@ -114,41 +111,41 @@ void icatel_state::machine_reset()
 {
 }
 
-READ8_MEMBER(icatel_state::magic_string)
+uint8_t icatel_state::magic_string(offs_t offset)
 {
 //  logerror("read: magic_string, offset=%04X\n", offset);
 	char mstr[] = "TP-OK";
 	return mstr[offset%5];
 }
 
-READ8_MEMBER(icatel_state::i80c31_p1_r)
+uint8_t icatel_state::i80c31_p1_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER(icatel_state::i80c31_p3_r)
+uint8_t icatel_state::i80c31_p3_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(icatel_state::i80c31_p1_w)
+void icatel_state::i80c31_p1_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(icatel_state::i80c31_p3_w)
+void icatel_state::i80c31_p3_w(uint8_t data)
 {
 }
 
 //----------------------------------------
 
-READ8_MEMBER(icatel_state::cn8_extension_r)
+uint8_t icatel_state::cn8_extension_r()
 {
 	/* TODO: Implement-me! */
 	logerror("read: cn8_extension\n");
 	return 0;
 }
 
-WRITE8_MEMBER(icatel_state::cn8_extension_w)
+void icatel_state::cn8_extension_w(uint8_t data)
 {
 	/* TODO: Implement-me! */
 	logerror("write: cn8_extension [%02x]\n", data);
@@ -156,29 +153,22 @@ WRITE8_MEMBER(icatel_state::cn8_extension_w)
 
 //----------------------------------------
 
-READ8_MEMBER(icatel_state::modem_r)
+uint8_t icatel_state::modem_r(offs_t offset)
 {
 	/* TODO: Implement-me! */
 	logerror("read: modem\n");
 	return 0;
 }
 
-WRITE8_MEMBER(icatel_state::modem_w)
+void icatel_state::modem_w(offs_t offset, uint8_t data)
 {
 	/* TODO: Implement-me! */
-	logerror("write: modem [%02x]\n", data);
+	logerror("write: modem %02x:[%02x]\n", offset, data);
 }
 
 //----------------------------------------
 
-READ8_MEMBER(icatel_state::ci8_r)
-{
-	/* TODO: Implement-me! */
-	logerror("read: ci8\n");
-	return 0;
-}
-
-WRITE8_MEMBER(icatel_state::ci8_w)
+void icatel_state::ci8_w(uint8_t data)
 {
 	/* TODO: Implement-me! */
 	logerror("write: ci8 [%02x]\n", data);
@@ -186,7 +176,15 @@ WRITE8_MEMBER(icatel_state::ci8_w)
 
 //----------------------------------------
 
-READ8_MEMBER(icatel_state::ci15_r)
+void icatel_state::ci12_w(uint8_t data)
+{
+	/* TODO: Implement-me! */
+	logerror("write: ci12 [%02x]\n", data);
+}
+
+//----------------------------------------
+
+uint8_t icatel_state::ci15_r()
 {
 	/* TODO: Implement-me! */
 	//machine().debug_break();
@@ -194,23 +192,9 @@ READ8_MEMBER(icatel_state::ci15_r)
 	return (1 << 3) | (1 << 0);
 }
 
-WRITE8_MEMBER(icatel_state::ci15_w)
-{
-	/* TODO: Implement-me! */
-	logerror("write: ci15 [%02x]\n", data);
-}
-
 //----------------------------------------
 
-READ8_MEMBER(icatel_state::ci16_r)
-{
-	/* TODO: Implement-me! */
-	// seems to be the card reader.
-	logerror("read: ci16\n");
-	return 0;
-}
-
-WRITE8_MEMBER(icatel_state::ci16_w)
+void icatel_state::ci16_w(uint8_t data)
 {
 	/* TODO: Implement-me! */
 	// seems to be the card reader.

@@ -42,12 +42,12 @@ TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
 }
 
 
-READ16_MEMBER(tx1_state::tx1_crtc_r)
+uint16_t tx1_state::tx1_crtc_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_crtc_w)
+void tx1_state::tx1_crtc_w(offs_t offset, uint16_t data)
 {
 if (PRINT_CRTC_DATA)
 {
@@ -143,7 +143,7 @@ void tx1_state::tx1_palette(palette_device &palette) const
  *
  *************************************/
 
-WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
+void tx1_state::tx1_bankcs_w(offs_t offset, uint16_t data)
 {
 	vregs_t &tx1_vregs = m_vregs;
 
@@ -196,7 +196,7 @@ WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
 	}
 }
 
-WRITE16_MEMBER(tx1_state::tx1_slincs_w)
+void tx1_state::tx1_slincs_w(offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 		m_vregs.slin_inc = data;
@@ -204,17 +204,17 @@ WRITE16_MEMBER(tx1_state::tx1_slincs_w)
 		m_vregs.slin_inc = m_vregs.slin_val = 0;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_slock_w)
+void tx1_state::tx1_slock_w(uint16_t data)
 {
 	m_vregs.slock = data & 1;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_scolst_w)
+void tx1_state::tx1_scolst_w(uint16_t data)
 {
 	m_vregs.scol = data & 0x0707;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_flgcs_w)
+void tx1_state::tx1_flgcs_w(uint16_t data)
 {
 	m_vregs.flags = data & 0xff;
 }
@@ -2826,7 +2826,7 @@ void tx1_state::buggyboy_draw_objs(uint8_t *bitmap, bool wide)
     /WASET  = 24A0-F, 24B0-F
     /FLAGS  = 24E0-F, 24F0-F
 */
-WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
+void tx1_state::buggyboy_gas_w(offs_t offset, uint16_t data)
 {
 	vregs_t &vregs = m_vregs;
 	offset <<= 1;
@@ -2899,12 +2899,12 @@ WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
 	vregs.gas = data;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_sky_w)
+void tx1_state::buggyboy_sky_w(uint16_t data)
 {
 	m_vregs.sky = data;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_scolst_w)
+void tx1_state::buggyboy_scolst_w(uint16_t data)
 {
 	m_vregs.scol = data;
 }

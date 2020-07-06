@@ -66,16 +66,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 private:
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_WRITE8_MEMBER(sol0_w);
-	DECLARE_WRITE8_MEMBER(sol1_w);
-	DECLARE_READ8_MEMBER(dips_r);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data);
+	void sol0_w(uint8_t data);
+	void sol1_w(uint8_t data);
+	uint8_t dips_r();
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
@@ -296,13 +296,13 @@ INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER( s4_state::sol0_w )
+void s4_state::sol0_w(uint8_t data)
 {
 	if (BIT(data, 4))
 		m_samples->start(2, 5); // outhole
 }
 
-WRITE8_MEMBER( s4_state::sol1_w )
+void s4_state::sol1_w(uint8_t data)
 {
 	if (m_chimes)
 	{
@@ -348,12 +348,12 @@ WRITE8_MEMBER( s4_state::sol1_w )
 		m_samples->start(0, 6); // knocker
 }
 
-WRITE8_MEMBER( s4_state::lamp0_w )
+void s4_state::lamp0_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( s4_state::lamp1_w )
+void s4_state::lamp1_w(uint8_t data)
 {
 }
 
@@ -367,7 +367,7 @@ READ_LINE_MEMBER( s4_state::pia28_cb1_r )
 	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
 }
 
-READ8_MEMBER( s4_state::dips_r )
+uint8_t s4_state::dips_r()
 {
 	if (BIT(ioport("DIAGS")->read(), 4) )
 	{
@@ -386,7 +386,7 @@ READ8_MEMBER( s4_state::dips_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( s4_state::dig0_w )
+void s4_state::dig0_w(uint8_t data)
 {
 	m_strobe = data & 15;
 	m_data_ok = true;
@@ -394,7 +394,7 @@ WRITE8_MEMBER( s4_state::dig0_w )
 	output().set_value("led1", !BIT(data, 5));
 }
 
-WRITE8_MEMBER( s4_state::dig1_w )
+void s4_state::dig1_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
@@ -405,19 +405,19 @@ WRITE8_MEMBER( s4_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s4_state::switch_r )
+uint8_t s4_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ioport(kbdrow)->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( s4_state::switch_w )
+void s4_state::switch_w(uint8_t data)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s4_state::sound_r )
+uint8_t s4_state::sound_r()
 {
 	return m_sound_data;
 }
@@ -710,14 +710,14 @@ ROM_START(tstrk_l1)
 ROM_END
 
 
-GAME( 1979, flash_l2, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (L-2)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, flash_l1, flash_l2, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (L-1)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, flash_t1, flash_l2, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (T-1) Ted Estes",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l2, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-2)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l1, flash_l2, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_t1, flash_l2, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, T-1) Ted Estes", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1978, trizn_l1, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Tri Zone (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1978, trizn_t1, trizn_l1, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Tri Zone (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_l3, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (L-3)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (T-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_l3, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-3)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-2)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1979, stlwr_l2, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 GAME( 1978, pomp_l1,  0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Pompeii (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

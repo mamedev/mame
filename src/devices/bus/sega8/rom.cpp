@@ -383,7 +383,7 @@ void sega8_korean_device::late_bank_setup()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_rom_device::read_cart)
+uint8_t sega8_rom_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x4000;
 
@@ -396,7 +396,7 @@ READ8_MEMBER(sega8_rom_device::read_cart)
 	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_rom_device::write_cart)
+void sega8_rom_device::write_cart(offs_t offset, uint8_t data)
 {
 	int bank = offset / 0x4000;
 
@@ -404,7 +404,7 @@ WRITE8_MEMBER(sega8_rom_device::write_cart)
 		m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram.size()] = data;
 }
 
-WRITE8_MEMBER(sega8_rom_device::write_mapper)
+void sega8_rom_device::write_mapper(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -439,7 +439,7 @@ WRITE8_MEMBER(sega8_rom_device::write_mapper)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_othello_device::read_cart)
+uint8_t sega8_othello_device::read_cart(offs_t offset)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
@@ -448,7 +448,7 @@ READ8_MEMBER(sega8_othello_device::read_cart)
 	return m_rom[offset % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_othello_device::write_cart)
+void sega8_othello_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 2K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
@@ -463,7 +463,7 @@ WRITE8_MEMBER(sega8_othello_device::write_cart)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_castle_device::read_cart)
+uint8_t sega8_castle_device::read_cart(offs_t offset)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
@@ -472,7 +472,7 @@ READ8_MEMBER(sega8_castle_device::read_cart)
 	return m_rom[offset % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_castle_device::write_cart)
+void sega8_castle_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
@@ -487,7 +487,7 @@ WRITE8_MEMBER(sega8_castle_device::write_cart)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_basic_l3_device::read_cart)
+uint8_t sega8_basic_l3_device::read_cart(offs_t offset)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000)
@@ -496,19 +496,19 @@ READ8_MEMBER(sega8_basic_l3_device::read_cart)
 	return m_rom[offset % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_basic_l3_device::write_cart)
+void sega8_basic_l3_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000)
 		m_ram[offset & 0x3fff] = data;
 }
 
-READ8_MEMBER(sega8_basic_l3_device::read_ram)
+uint8_t sega8_basic_l3_device::read_ram(offs_t offset)
 {
 	return m_ram[0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_basic_l3_device::write_ram)
+void sega8_basic_l3_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_ram[0x4000 + (offset & 0x3fff)] = data;
 }
@@ -521,7 +521,7 @@ WRITE8_MEMBER(sega8_basic_l3_device::write_ram)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_music_editor_device::read_cart)
+uint8_t sega8_music_editor_device::read_cart(offs_t offset)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
@@ -530,21 +530,21 @@ READ8_MEMBER(sega8_music_editor_device::read_cart)
 	return m_rom[offset % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_music_editor_device::write_cart)
+void sega8_music_editor_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
 		m_ram[offset & 0x1fff] = data;
 }
 
-READ8_MEMBER(sega8_music_editor_device::read_ram)
+uint8_t sega8_music_editor_device::read_ram(offs_t offset)
 {
 	// 2K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff)
 	// or should it simply go to the 2K of SC3000 RAM???
 	return m_ram[0x2000 + (offset & 0x7ff)];
 }
 
-WRITE8_MEMBER(sega8_music_editor_device::write_ram)
+void sega8_music_editor_device::write_ram(offs_t offset, uint8_t data)
 {
 	// 2K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff)
 	// or should it simply go to the 2K of SC3000 RAM???
@@ -576,7 +576,7 @@ WRITE8_MEMBER(sega8_music_editor_device::write_ram)
  */
 
 
-READ8_MEMBER(sega8_terebi_device::read_cart)
+uint8_t sega8_terebi_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x4000;
 
@@ -588,7 +588,7 @@ READ8_MEMBER(sega8_terebi_device::read_cart)
 	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_terebi_device::write_cart)
+void sega8_terebi_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -640,7 +640,7 @@ ioport_constructor sega8_terebi_device::device_input_ports() const
  -------------------------------------------------*/
 
 // TYPE A
-READ8_MEMBER(sega8_dahjee_typea_device::read_cart)
+uint8_t sega8_dahjee_typea_device::read_cart(offs_t offset)
 {
 	// 8K of RAM sits in 0x2000-0x3fff
 	if (offset >= 0x2000 && offset < 0x4000)
@@ -649,21 +649,21 @@ READ8_MEMBER(sega8_dahjee_typea_device::read_cart)
 	return m_rom[offset % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_dahjee_typea_device::write_cart)
+void sega8_dahjee_typea_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 8K of RAM sits in 0x2000-0x3fff
 	if (offset >= 0x2000 && offset < 0x4000)
 		m_ram[offset & 0x1fff] = data;
 }
 
-READ8_MEMBER(sega8_dahjee_typea_device::read_ram)
+uint8_t sega8_dahjee_typea_device::read_ram(offs_t offset)
 {
 	// 1K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff
 	// or should it simply go to the 1K of SG1000 RAM???
 	return m_ram[0x2000 + (offset & 0x3ff)];
 }
 
-WRITE8_MEMBER(sega8_dahjee_typea_device::write_ram)
+void sega8_dahjee_typea_device::write_ram(offs_t offset, uint8_t data)
 {
 	// 1K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff
 	// or should it simply go to the 1K of SG1000 RAM???
@@ -672,18 +672,18 @@ WRITE8_MEMBER(sega8_dahjee_typea_device::write_ram)
 
 
 // TYPE B
-READ8_MEMBER(sega8_dahjee_typeb_device::read_cart)
+uint8_t sega8_dahjee_typeb_device::read_cart(offs_t offset)
 {
 	return m_rom[offset % m_rom_size];
 }
 
-READ8_MEMBER(sega8_dahjee_typeb_device::read_ram)
+uint8_t sega8_dahjee_typeb_device::read_ram(offs_t offset)
 {
 	// 8K more of RAM sits in 0xc000-0xffff
 	return m_ram[offset & 0x1fff];
 }
 
-WRITE8_MEMBER(sega8_dahjee_typeb_device::write_ram)
+void sega8_dahjee_typeb_device::write_ram(offs_t offset, uint8_t data)
 {
 	// 8K more of RAM sits in 0xc000-0xffff
 	m_ram[offset & 0x1fff] = data;
@@ -700,7 +700,7 @@ WRITE8_MEMBER(sega8_dahjee_typeb_device::write_ram)
  -------------------------------------------------*/
 
 
-READ8_MEMBER(sega8_eeprom_device::read_cart)
+uint8_t sega8_eeprom_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x4000;
 
@@ -717,7 +717,7 @@ READ8_MEMBER(sega8_eeprom_device::read_cart)
 	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_eeprom_device::write_cart)
+void sega8_eeprom_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset == 0x8000 && m_93c46_enabled)
 	{
@@ -728,7 +728,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_cart)
 	}
 }
 
-WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
+void sega8_eeprom_device::write_mapper(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -764,7 +764,7 @@ void sega8_eeprom_device::device_add_mconfig(machine_config &config)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_codemasters_device::read_cart)
+uint8_t sega8_codemasters_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x2000;
 
@@ -774,7 +774,7 @@ READ8_MEMBER(sega8_codemasters_device::read_cart)
 	return m_rom[m_rom_bank_base[bank/2] * 0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_codemasters_device::write_cart)
+void sega8_codemasters_device::write_cart(offs_t offset, uint8_t data)
 {
 	int bank = offset / 0x2000;
 
@@ -811,7 +811,7 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
  -------------------------------------------------*/
 
 
-READ8_MEMBER(sega8_4pak_device::read_cart)
+uint8_t sega8_4pak_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x4000;
 
@@ -819,7 +819,7 @@ READ8_MEMBER(sega8_4pak_device::read_cart)
 }
 
 
-WRITE8_MEMBER(sega8_4pak_device::write_cart)
+void sega8_4pak_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -846,7 +846,7 @@ WRITE8_MEMBER(sega8_4pak_device::write_cart)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_zemina_device::read_cart)
+uint8_t sega8_zemina_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x2000;
 
@@ -856,7 +856,7 @@ READ8_MEMBER(sega8_zemina_device::read_cart)
 	return m_rom[m_rom_bank_base[bank] * 0x2000 + (offset & 0x1fff)];
 }
 
-WRITE8_MEMBER(sega8_zemina_device::write_cart)
+void sega8_zemina_device::write_cart(offs_t offset, uint8_t data)
 {
 	int bank = offset / 0x2000;
 
@@ -902,7 +902,7 @@ WRITE8_MEMBER(sega8_zemina_device::write_cart)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_janggun_device::read_cart)
+uint8_t sega8_janggun_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x2000;
 
@@ -913,7 +913,7 @@ READ8_MEMBER(sega8_janggun_device::read_cart)
 }
 
 
-WRITE8_MEMBER(sega8_janggun_device::write_cart)
+void sega8_janggun_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -932,7 +932,7 @@ WRITE8_MEMBER(sega8_janggun_device::write_cart)
 	}
 }
 
-WRITE8_MEMBER(sega8_janggun_device::write_mapper)
+void sega8_janggun_device::write_mapper(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -956,7 +956,7 @@ WRITE8_MEMBER(sega8_janggun_device::write_mapper)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_hicom_device::read_cart)
+uint8_t sega8_hicom_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x8000)
 		return m_rom[offset & 0x3fff];
@@ -964,7 +964,7 @@ READ8_MEMBER(sega8_hicom_device::read_cart)
 	return m_rom[(m_rom_bank_base * 0x8000) + offset];
 }
 
-WRITE8_MEMBER(sega8_hicom_device::write_mapper)
+void sega8_hicom_device::write_mapper(offs_t offset, uint8_t data)
 {
 	if (offset == 0x03)
 		m_rom_bank_base = data % (m_rom_page_count << 1);
@@ -977,7 +977,7 @@ WRITE8_MEMBER(sega8_hicom_device::write_mapper)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(sega8_korean_device::write_cart)
+void sega8_korean_device::write_cart(offs_t offset, uint8_t data)
 {
 	int bank = offset / 0x4000;
 
@@ -1012,7 +1012,7 @@ void sega8_seojin_device::device_reset()
 }
 
 
-READ8_MEMBER(sega8_seojin_device::read_cart)
+uint8_t sega8_seojin_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x4000;
 
@@ -1024,11 +1024,11 @@ READ8_MEMBER(sega8_seojin_device::read_cart)
 	return m_rom[bank_to_use * 0x4000 + (offset & 0x3fff)]^m_readxor;
 }
 
-WRITE8_MEMBER(sega8_seojin_device::write_cart)
+void sega8_seojin_device::write_cart(offs_t offset, uint8_t data)
 {
 }
 
-WRITE8_MEMBER(sega8_seojin_device::write_mapper)
+void sega8_seojin_device::write_mapper(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1045,7 +1045,7 @@ WRITE8_MEMBER(sega8_seojin_device::write_mapper)
 
 // it might not have RAM inside, but the only way to get 0xfff0 to fall through to the cart with the current hook-up
 // is by saying there is.
-WRITE8_MEMBER(sega8_seojin_device::write_ram)
+void sega8_seojin_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_ram[offset & 0x3fff] = data;
 
@@ -1055,7 +1055,7 @@ WRITE8_MEMBER(sega8_seojin_device::write_ram)
 	}
 }
 
-READ8_MEMBER(sega8_seojin_device::read_ram)
+uint8_t sega8_seojin_device::read_ram(offs_t offset)
 {
 	return m_ram[offset & 0x3fff];
 }
@@ -1066,7 +1066,7 @@ READ8_MEMBER(sega8_seojin_device::read_ram)
 
 -------------------------------------------------*/
 
-READ8_MEMBER(sega8_multicart_device::read_cart)
+uint8_t sega8_multicart_device::read_cart(offs_t offset)
 {
 	// 16K of RAM sits in 0x8000-0xbfff
 	if (offset >= 0x8000)
@@ -1075,24 +1075,24 @@ READ8_MEMBER(sega8_multicart_device::read_cart)
 	return m_rom[(offset & 0x7fff) | (m_block << 15) % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_multicart_device::write_cart)
+void sega8_multicart_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 16K of RAM sits in 0x8000-0xbfff
 	if (offset >= 0x8000)
 		m_ram[offset & 0x3fff] = data;
 }
 
-READ8_MEMBER(sega8_multicart_device::read_ram)
+uint8_t sega8_multicart_device::read_ram(offs_t offset)
 {
 	return m_ram[0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_multicart_device::write_ram)
+void sega8_multicart_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_ram[0x4000 + (offset & 0x3fff)] = data;
 }
 
-WRITE8_MEMBER(sega8_multicart_device::write_io)
+void sega8_multicart_device::write_io(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xe0) == 0xe0)
 		m_block = (data & 0x80) ? ((data & 0x1f) | ((data & 0x40) ? 0x20 : 0x00)) : 0x3f;
@@ -1104,7 +1104,7 @@ WRITE8_MEMBER(sega8_multicart_device::write_io)
 
 -------------------------------------------------*/
 
-READ8_MEMBER(sega8_megacart_device::read_cart)
+uint8_t sega8_megacart_device::read_cart(offs_t offset)
 {
 	// 16K of RAM sits in 0x8000-0xbfff
 	if (offset >= 0x8000)
@@ -1113,24 +1113,24 @@ READ8_MEMBER(sega8_megacart_device::read_cart)
 	return m_rom[(offset & 0x7fff) | (m_block << 15) % m_rom_size];
 }
 
-WRITE8_MEMBER(sega8_megacart_device::write_cart)
+void sega8_megacart_device::write_cart(offs_t offset, uint8_t data)
 {
 	// 16K of RAM sits in 0x8000-0xbfff
 	if (offset >= 0x8000)
 		m_ram[offset & 0x3fff] = data;
 }
 
-READ8_MEMBER(sega8_megacart_device::read_ram)
+uint8_t sega8_megacart_device::read_ram(offs_t offset)
 {
 	return m_ram[0x4000 + (offset & 0x3fff)];
 }
 
-WRITE8_MEMBER(sega8_megacart_device::write_ram)
+void sega8_megacart_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_ram[0x4000 + (offset & 0x3fff)] = data;
 }
 
-WRITE8_MEMBER(sega8_megacart_device::write_io)
+void sega8_megacart_device::write_io(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xe0) == 0xe0)
 		m_block = (data & 0x1f) | (data & 0xc0) >> 1;

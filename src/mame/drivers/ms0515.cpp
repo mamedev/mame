@@ -90,12 +90,12 @@ private:
 
 	void ms0515_bank_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(ms0515_halt_r);
-	DECLARE_WRITE16_MEMBER(ms0515_halt_w);
+	uint16_t ms0515_halt_r();
+	void ms0515_halt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(ms0515_porta_w);
-	DECLARE_READ8_MEMBER(ms0515_portb_r);
-	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
+	void ms0515_porta_w(uint8_t data);
+	uint8_t ms0515_portb_r();
+	void ms0515_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
@@ -228,12 +228,12 @@ void ms0515_state::ms0515_bank_w(uint16_t data)
 	}
 }
 
-READ16_MEMBER(ms0515_state::ms0515_halt_r)
+uint16_t ms0515_state::ms0515_halt_r()
 {
 	return m_haltreg;
 }
 
-WRITE16_MEMBER(ms0515_state::ms0515_halt_w)
+void ms0515_state::ms0515_halt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_haltreg);
 }
@@ -254,7 +254,7 @@ WRITE16_MEMBER(ms0515_state::ms0515_halt_w)
  *
  * MZ1 = drive 1 side 0-1
  */
-WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
+void ms0515_state::ms0515_porta_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg A <- %02x\n", data);
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
  * b1 -- floppy drq (1 -- ready)
  * b0 -- floppy intrq (0 -- ready)
  */
-READ8_MEMBER(ms0515_state::ms0515_portb_r)
+uint8_t ms0515_state::ms0515_portb_r()
 {
 	uint8_t data;
 
@@ -325,7 +325,7 @@ READ8_MEMBER(ms0515_state::ms0515_portb_r)
  * b3 -- video resolution, 0: 320x200, 1: 640x200
  * b2-0 -- overscan color
  */
-WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
+void ms0515_state::ms0515_portc_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg C <- %02x\n", data);
 
@@ -478,10 +478,10 @@ void ms0515_state::irq_encoder(int irq, int state)
 	{
 		if (m_irqs & (1 << i)) break;
 	}
-	m_maincpu->set_input_line(3, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(1, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(0, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP3_LINE, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP2_LINE, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP1_LINE, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP0_LINE, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*

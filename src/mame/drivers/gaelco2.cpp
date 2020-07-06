@@ -694,7 +694,7 @@ void gaelco2_state::play2000_map(address_map &map)
 	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM */
 }
 
-READ16_MEMBER(gaelco2_state::srollnd_share_sim_r)
+u16 gaelco2_state::srollnd_share_sim_r(offs_t offset, u16 mem_mask)
 {
 	uint16_t ret = m_shareram[offset];
 
@@ -745,7 +745,7 @@ READ16_MEMBER(gaelco2_state::srollnd_share_sim_r)
 	return ret;
 }
 
-WRITE16_MEMBER(gaelco2_state::srollnd_share_sim_w)
+void gaelco2_state::srollnd_share_sim_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() != 0x552)
 		logerror("%s: srollnd_share_sim_w %04x: %04x (%04x)\n", machine().describe_context(), offset, data, mem_mask);
@@ -2394,8 +2394,8 @@ void wrally2_state::wrally2(machine_config &config)
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 0, 0);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "rspeaker", 1.0);
+	gaelco.add_route(1, "lspeaker", 1.0);
 }
 
 /*

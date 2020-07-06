@@ -111,10 +111,10 @@ private:
 	std::unique_ptr<uint32_t[]> m_spriteram32;
 	std::unique_ptr<uint32_t[]> m_spc_regs;
 
-	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
-	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
-	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
-	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
+	void galpani3_suprnova_sprite32_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void galpani3_suprnova_sprite32regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void galpani3_priority_buffer_scrollx_w(uint16_t data);
+	void galpani3_priority_buffer_scrolly_w(uint16_t data);
 
 	virtual void video_start() override;
 
@@ -386,26 +386,26 @@ static INPUT_PORTS_START( galpani3 )
 INPUT_PORTS_END
 
 
-WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32_w)
+void galpani3_state::galpani3_suprnova_sprite32_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 	offset>>=1;
 	m_spriteram32[offset]=(m_spriteram[offset*2+1]<<16) | (m_spriteram[offset*2]);
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
+void galpani3_state::galpani3_suprnova_sprite32regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprregs[offset]);
 	offset>>=1;
 	m_spc_regs[offset]=(m_sprregs[offset*2+1]<<16) | (m_sprregs[offset*2]);
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrollx_w)
+void galpani3_state::galpani3_priority_buffer_scrollx_w(uint16_t data)
 {
 	m_priority_buffer_scrollx = data;
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
+void galpani3_state::galpani3_priority_buffer_scrolly_w(uint16_t data)
 {
 	m_priority_buffer_scrolly = data;
 }

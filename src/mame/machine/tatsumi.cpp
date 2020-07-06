@@ -18,12 +18,12 @@ void tatsumi_state::tatsumi_reset()
 
 /******************************************************************************/
 
-READ16_MEMBER(apache3_state::apache3_bank_r)
+uint16_t apache3_state::apache3_bank_r()
 {
 	return m_control_word;
 }
 
-WRITE16_MEMBER(apache3_state::apache3_bank_w)
+void apache3_state::apache3_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    0x8000  - Set when accessing palette ram (not implemented, perhaps blank screen?)
@@ -56,12 +56,12 @@ WRITE16_MEMBER(apache3_state::apache3_bank_w)
 
 // D1 = /ZBREQ  - Z80 bus request
 // D0 = /GRDACC - Allow 68000 access to road pattern RAM
-WRITE16_MEMBER(apache3_state::apache3_z80_ctrl_w)
+void apache3_state::apache3_z80_ctrl_w(uint16_t data)
 {
 	m_subcpu2->set_input_line(INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ16_MEMBER(apache3_state::apache3_v30_v20_r)
+uint16_t apache3_state::apache3_v30_v20_r(offs_t offset)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -77,7 +77,7 @@ READ16_MEMBER(apache3_state::apache3_v30_v20_r)
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
-WRITE16_MEMBER(apache3_state::apache3_v30_v20_w)
+void apache3_state::apache3_v30_v20_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -91,17 +91,17 @@ WRITE16_MEMBER(apache3_state::apache3_v30_v20_w)
 	}
 }
 
-READ16_MEMBER(apache3_state::apache3_z80_r)
+uint16_t apache3_state::apache3_z80_r(offs_t offset)
 {
 	return m_apache3_z80_ram[offset];
 }
 
-WRITE16_MEMBER(apache3_state::apache3_z80_w)
+void apache3_state::apache3_z80_w(offs_t offset, uint16_t data)
 {
 	m_apache3_z80_ram[offset] = data & 0xff;
 }
 
-READ8_MEMBER(apache3_state::apache3_vr1_r)
+uint8_t apache3_state::apache3_vr1_r()
 {
 	return (uint8_t)((255./100) * (100 - m_vr1->read()));
 }
@@ -112,7 +112,7 @@ READ8_MEMBER(apache3_state::apache3_vr1_r)
  * presumably loaded into the 8 TZ2213 custom
  * accumulators and counters.
  */
-WRITE16_MEMBER(apache3_state::apache3_rotate_w)
+void apache3_state::apache3_rotate_w(uint16_t data)
 {
 	m_apache3_rotate_ctrl[m_apache3_rot_idx] = data;
 	m_apache3_rot_idx = (m_apache3_rot_idx + 1) % 12;
@@ -120,7 +120,7 @@ WRITE16_MEMBER(apache3_state::apache3_rotate_w)
 
 /******************************************************************************/
 
-READ16_MEMBER(roundup5_state::roundup_v30_z80_r)
+uint16_t roundup5_state::roundup_v30_z80_r(offs_t offset)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -131,7 +131,7 @@ READ16_MEMBER(roundup5_state::roundup_v30_z80_r)
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
-WRITE16_MEMBER(roundup5_state::roundup_v30_z80_w)
+void roundup5_state::roundup_v30_z80_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -146,7 +146,7 @@ WRITE16_MEMBER(roundup5_state::roundup_v30_z80_w)
 }
 
 
-WRITE16_MEMBER(roundup5_state::roundup5_control_w)
+void roundup5_state::roundup5_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 
@@ -207,7 +207,7 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 	m_last_control = m_control_word;
 }
 
-WRITE16_MEMBER(roundup5_state::road_vregs_w)
+void roundup5_state::road_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    ---- ---x ---- ---- enabled when there's a road slope of any kind, unknown purpose
@@ -225,7 +225,7 @@ WRITE16_MEMBER(roundup5_state::road_vregs_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
+void cyclwarr_state::cyclwarr_control_w(uint8_t data)
 {
 	m_control_word = data;
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
 
 /******************************************************************************/
 
-READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
+uint16_t tatsumi_state::tatsumi_v30_68000_r(offs_t offset)
 {
 	const uint16_t* rom=(uint16_t*)m_subregion->base();
 
@@ -293,7 +293,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 	return rom[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
+void tatsumi_state::tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((m_control_word&0x1f)!=0x18)
 		logerror("68k write in bank %05x\n",m_control_word);
@@ -305,7 +305,7 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 
 // Todo:  Current YM2151 doesn't seem to raise the busy flag quickly enough for the
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
-READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
+uint8_t tatsumi_state::tatsumi_hack_ym2151_r()
 {
 	int r=m_ym2151->status_r();
 
@@ -316,7 +316,7 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 	return r;
 }
 
-READ8_MEMBER(cyclwarr_state::oki_status_xor_r)
+uint8_t cyclwarr_state::oki_status_xor_r()
 {
 	int r = m_oki->read();
 

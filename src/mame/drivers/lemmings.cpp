@@ -28,7 +28,7 @@
 #include "speaker.h"
 
 
-WRITE16_MEMBER(lemmings_state::lemmings_control_w)
+void lemmings_state::lemmings_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Offset==0 Pixel layer X scroll */
 	if (offset == 4)
@@ -36,14 +36,14 @@ WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 	COMBINE_DATA(&m_control_data[offset]);
 }
 
-READ16_MEMBER(lemmings_state::lemmings_trackball_r)
+uint16_t lemmings_state::lemmings_trackball_r(offs_t offset)
 {
 	if ((offset & 2) == 0)
 		return m_trackball_io[(offset & 1) | ((offset & 4) >> 1)]->read();
 	return 0;
 }
 
-READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
+uint16_t lemmings_state::lem_protection_region_0_146_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -52,7 +52,7 @@ READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
+void lemmings_state::lem_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;

@@ -47,8 +47,8 @@ private:
 	void craft_data_map(address_map &map);
 	void craft_io_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
 
 	void init_palette(palette_device &palette) const;
 	void video_update();
@@ -74,7 +74,7 @@ private:
 //  GPIO
 //**************************************************************************
 
-READ8_MEMBER(craft_state::port_r)
+uint8_t craft_state::port_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -91,7 +91,7 @@ READ8_MEMBER(craft_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(craft_state::port_w)
+void craft_state::port_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

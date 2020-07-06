@@ -103,8 +103,8 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	u8 input_r(offs_t offset);
 
 	u8 m_inp_mux;
 };
@@ -124,7 +124,7 @@ void sc12_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(sc12_state::control_w)
+void sc12_state::control_w(u8 data)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
@@ -141,7 +141,7 @@ WRITE8_MEMBER(sc12_state::control_w)
 	//..
 }
 
-READ8_MEMBER(sc12_state::input_r)
+u8 sc12_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 

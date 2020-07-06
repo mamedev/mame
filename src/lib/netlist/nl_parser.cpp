@@ -20,7 +20,7 @@ void parser_t::verror(const pstring &msg)
 
 bool parser_t::parse(const pstring &nlname)
 {
-	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
+	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-$@")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13))
 		.comment("/*", "*/", "//");
@@ -33,6 +33,7 @@ bool parser_t::parse(const pstring &nlname)
 	m_tok_NET_C = register_token("NET_C");
 	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
+	m_tok_DEFPARAM = register_token("DEFPARAM");
 	m_tok_HINT = register_token("HINT");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
@@ -82,7 +83,7 @@ bool parser_t::parse(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			token_t name = get_token();
 			require_token(m_tok_paren_right);
-			if (name.str() == nlname || nlname == "")
+			if (name.str() == nlname || nlname.empty())
 			{
 				parse_netlist(name.str());
 				return true;
@@ -114,6 +115,8 @@ void parser_t::parse_netlist(const pstring &nlname)
 			frontier();
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
+		else if (token.is(m_tok_DEFPARAM))
+			netdev_defparam();
 		else if (token.is(m_tok_HINT))
 			netdev_hint();
 		else if (token.is(m_tok_NET_MODEL))
@@ -129,7 +132,8 @@ void parser_t::parse_netlist(const pstring &nlname)
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
 		{
 			require_token(m_tok_paren_left);
-			m_setup.register_lib_entry(get_identifier(), "parser: " + nlname);
+			// FIXME: Need to pass in parameter definition FIXME: get line number right
+			m_setup.register_lib_entry(get_identifier(), factory::properties("", plib::source_location("parser: " + nlname, 1)));
 			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_NETLIST_END))
@@ -159,11 +163,9 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 	require_token(m_tok_paren_right);
 
 	netlist::tt_desc desc;
-	desc.classname = name;
 	desc.name = name;
-	desc.ni = static_cast<unsigned long>(ni);
-	desc.no = static_cast<unsigned long>(no);
-	desc.def_param = "+" + def_param;
+	desc.ni = gsl::narrow<unsigned long>(ni);
+	desc.no = gsl::narrow<unsigned long>(no);
 	desc.family = "";
 
 	while (true)
@@ -196,7 +198,8 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
-			m_setup.truthtable_create(desc, nlname);
+			// FIXME: proper location
+			m_setup.truthtable_create(desc, factory::properties("+" + def_param, plib::source_location(nlname, 1)));
 			return;
 		}
 	}
@@ -348,6 +351,27 @@ void parser_t::netdev_param()
 	}
 }
 
+void parser_t::netdev_defparam()
+{
+	require_token(m_tok_paren_left);
+	pstring param(get_identifier());
+	require_token(m_tok_comma);
+	token_t tok = get_token();
+	if (tok.is_type(token_type::STRING))
+	{
+		m_setup.log().debug("Parser: DefParam: {1} {2}\n", param, tok.str());
+		m_setup.defparam(param, tok.str());
+		require_token(m_tok_paren_right);
+	}
+	else
+	{
+		auto val = stringify_expression(tok);
+		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
+		m_setup.defparam(param, val);
+		require_token(tok, m_tok_paren_right);
+	}
+}
+
 void parser_t::netdev_hint()
 {
 	require_token(m_tok_paren_left);
@@ -372,7 +396,7 @@ void parser_t::device(const pstring &dev_type)
 	while (tok.is(m_tok_comma))
 	{
 		tok = get_token();
-		if (tok.is_type(token_type::IDENTIFIER) || tok.is_type(token_type::STRING))
+		if (/*tok.is_type(token_type::IDENTIFIER) ||*/ tok.is_type(token_type::STRING))
 		{
 			params.push_back(tok.str());
 			tok = get_token();

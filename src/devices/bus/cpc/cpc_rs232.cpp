@@ -106,8 +106,8 @@ void cpc_rs232_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_readwrite_handler(0xfadc,0xfadf, read8_delegate(*this, FUNC(cpc_rs232_device::dart_r)), write8_delegate(*this, FUNC(cpc_rs232_device::dart_w)));
-	space.install_readwrite_handler(0xfbdc,0xfbdf, read8_delegate(*this, FUNC(cpc_rs232_device::pit_r)), write8_delegate(*this, FUNC(cpc_rs232_device::pit_w)));
+	space.install_readwrite_handler(0xfadc,0xfadf, read8sm_delegate(*this, FUNC(cpc_rs232_device::dart_r)), write8sm_delegate(*this, FUNC(cpc_rs232_device::dart_w)));
+	space.install_readwrite_handler(0xfbdc,0xfbdf, read8sm_delegate(*this, FUNC(cpc_rs232_device::pit_r)), write8sm_delegate(*this, FUNC(cpc_rs232_device::pit_w)));
 }
 
 //-------------------------------------------------
@@ -135,22 +135,22 @@ WRITE_LINE_MEMBER(cpc_rs232_device::pit_out2_w)
 	m_dart->rxcb_w(state);
 }
 
-READ8_MEMBER(cpc_rs232_device::dart_r)
+uint8_t cpc_rs232_device::dart_r(offs_t offset)
 {
 	return m_dart->ba_cd_r(offset);
 }
 
-WRITE8_MEMBER(cpc_rs232_device::dart_w)
+void cpc_rs232_device::dart_w(offs_t offset, uint8_t data)
 {
 	m_dart->ba_cd_w(offset,data);
 }
 
-READ8_MEMBER(cpc_rs232_device::pit_r)
+uint8_t cpc_rs232_device::pit_r(offs_t offset)
 {
 	return m_pit->read(offset);
 }
 
-WRITE8_MEMBER(cpc_rs232_device::pit_w)
+void cpc_rs232_device::pit_w(offs_t offset, uint8_t data)
 {
 	m_pit->write(offset,data);
 }

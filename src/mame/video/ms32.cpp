@@ -151,7 +151,7 @@ void ms32_state::update_color(int color)
 	m_palette->set_pen_color(color,rgb_t(r,g,b));
 }
 
-WRITE32_MEMBER(ms32_state::ms32_brightness_w)
+void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	int oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
@@ -180,7 +180,7 @@ WRITE32_MEMBER(ms32_state::ms32_brightness_w)
 
 
 
-WRITE32_MEMBER(ms32_state::ms32_gfxctrl_w)
+void ms32_state::ms32_gfxctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

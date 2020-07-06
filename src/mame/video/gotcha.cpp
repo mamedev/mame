@@ -53,25 +53,25 @@ void gotcha_state::video_start()
 }
 
 
-WRITE16_MEMBER(gotcha_state::gotcha_fgvideoram_w)
+void gotcha_state::gotcha_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_bgvideoram_w)
+void gotcha_state::gotcha_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_select_w)
+void gotcha_state::gotcha_gfxbank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_banksel = (data & 0x0300) >> 8;
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_w)
+void gotcha_state::gotcha_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -83,7 +83,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_w)
 	}
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
+void gotcha_state::gotcha_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll[offset]);
 

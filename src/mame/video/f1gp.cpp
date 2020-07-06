@@ -78,25 +78,25 @@ void f1gp2_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(f1gp_state::rozgfxram_w)
+void f1gp_state::rozgfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozgfxram[offset]);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 64);
 }
 
-WRITE16_MEMBER(f1gp_state::rozvideoram_w)
+void f1gp_state::rozvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozvideoram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::fgvideoram_w)
+void f1gp_state::fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::fgscroll_w)
+void f1gp_state::fgscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll[offset]);
 
@@ -104,13 +104,13 @@ WRITE16_MEMBER(f1gp_state::fgscroll_w)
 	m_fg_tilemap->set_scrolly(0, m_scroll[1]);
 }
 
-WRITE8_MEMBER(f1gp_state::gfxctrl_w)
+void f1gp_state::gfxctrl_w(uint8_t data)
 {
 	m_flipscreen = data & 0x20;
 	m_gfxctrl = data & 0xdf;
 }
 
-WRITE8_MEMBER(f1gp2_state::rozbank_w)
+void f1gp2_state::rozbank_w(uint8_t data)
 {
 	if (m_roz_bank != data)
 	{

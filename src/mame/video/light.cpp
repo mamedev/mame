@@ -143,7 +143,7 @@ uint32_t light_video_device::screen_update(screen_device &device, bitmap_rgb32 &
 	return 0;
 }
 
-READ32_MEMBER(light_video_device::entry_r)
+uint32_t light_video_device::entry_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -163,7 +163,7 @@ READ32_MEMBER(light_video_device::entry_r)
 	return ret;
 }
 
-WRITE32_MEMBER(light_video_device::entry_w)
+void light_video_device::entry_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	bool go = (offset >= REX15_PAGE1_GO/4) || (offset >= REX15_PAGE0_GO/4 && offset < REX15_PAGE1_SET/4);
 

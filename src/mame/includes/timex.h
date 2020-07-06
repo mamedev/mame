@@ -49,11 +49,11 @@ public:
 	void tc2048(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ts2068_port_f4_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_f4_w);
-	DECLARE_READ8_MEMBER(ts2068_port_ff_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
-	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
+	uint8_t ts2068_port_f4_r();
+	void ts2068_port_f4_w(uint8_t data);
+	uint8_t ts2068_port_ff_r();
+	void ts2068_port_ff_w(offs_t offset, uint8_t data);
+	void tc2048_port_ff_w(offs_t offset, uint8_t data);
 
 	DECLARE_MACHINE_RESET(tc2048);
 	DECLARE_MACHINE_RESET(ts2068);

@@ -51,7 +51,7 @@ void ks0164_device::device_start()
 	}
 
 	m_stream = stream_alloc(0, 2, clock()/3/2/2/32);
-	m_mem_cache = space().cache<1, 0, ENDIANNESS_BIG>();
+	space().cache(m_mem_cache);
 	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_bank1_base));
@@ -176,32 +176,32 @@ void ks0164_device::mpu401_w(u8 data)
 
 u16 ks0164_device::vec_r(offs_t offset, u16 mem_mask)
 {
-	return m_mem_cache->read_word(offset << 1, mem_mask);
+	return m_mem_cache.read_word(offset << 1, mem_mask);
 }
 
 u16 ks0164_device::rom_r(offs_t offset, u16 mem_mask)
 {
-	return m_mem_cache->read_word((offset << 1) + 0x80, mem_mask);
+	return m_mem_cache.read_word((offset << 1) + 0x80, mem_mask);
 }
 
 u16 ks0164_device::bank1_r(offs_t offset, u16 mem_mask)
 {
-	return m_mem_cache->read_word(((offset << 1) & 0x3fff) | m_bank1_base, mem_mask);
+	return m_mem_cache.read_word(((offset << 1) & 0x3fff) | m_bank1_base, mem_mask);
 }
 
 void ks0164_device::bank1_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_mem_cache->write_word(((offset << 1) & 0x3fff) | m_bank1_base, data, mem_mask);
+	m_mem_cache.write_word(((offset << 1) & 0x3fff) | m_bank1_base, data, mem_mask);
 }
 
 u16 ks0164_device::bank2_r(offs_t offset, u16 mem_mask)
 {
-	return m_mem_cache->read_word(((offset << 1) & 0x3fff) | m_bank2_base, mem_mask);
+	return m_mem_cache.read_word(((offset << 1) & 0x3fff) | m_bank2_base, mem_mask);
 }
 
 void ks0164_device::bank2_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_mem_cache->write_word(((offset << 1) & 0x3fff) | m_bank2_base, data, mem_mask);
+	m_mem_cache.write_word(((offset << 1) & 0x3fff) | m_bank2_base, data, mem_mask);
 }
 
 u16 ks0164_device::bank1_select_r()
@@ -393,13 +393,13 @@ void ks0164_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				s16 samp0, samp1;
 				switch(regs[0] & 0x8400) {
 				case 0x0000: // 16 bits linear
-					samp0 = m_mem_cache->read_word(2*adr);
-					samp1 = m_mem_cache->read_word(2*adr+2);
+					samp0 = m_mem_cache.read_word(2*adr);
+					samp1 = m_mem_cache.read_word(2*adr+2);
 					break;
 
 				case 0x8400: // 8 bits compressed
-					samp0 = uncomp_8_16(m_mem_cache->read_byte(adr));
-					samp1 = uncomp_8_16(m_mem_cache->read_byte(adr+1));
+					samp0 = uncomp_8_16(m_mem_cache.read_byte(adr));
+					samp1 = uncomp_8_16(m_mem_cache.read_byte(adr+1));
 					break;
 
 				default:

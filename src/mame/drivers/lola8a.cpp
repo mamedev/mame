@@ -70,49 +70,55 @@ public:
 	lola8a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "videoram")
-		, m_io_keyboard(*this, "KEY.%u", 0)
+		, m_io_keyboard(*this, "KEY.%u", 0U)
 	{ }
 
 	void lola8a(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(lola8a_port_a_r);
-	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
+	void machine_reset() override;
+	void machine_start() override;
+	u8 lola8a_port_a_r();
+	void lola8a_port_b_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	u8 keyboard_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void lola8a_io(address_map &map);
-	void lola8a_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_portb;
-	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
+	u8 m_portb;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<i8085a_cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_ioport_array<10> m_io_keyboard;
 };
 
-void lola8a_state::lola8a_mem(address_map &map)
+void lola8a_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).ram(); // 6264 at G45
+	map(0x0000, 0x1fff).ram().share("mainram"); // 6264 at G45
 	map(0x2000, 0x3fff).ram(); // 6264 at F45
 										// empty place for 6264 at E45
 										// empty place for 6264 at D45
-	map(0x8000, 0x9fff).rom(); // 2764A at B45
-	map(0xa000, 0xbfff).rom(); // 2764A at C45
-	map(0xc000, 0xdfff).rom(); // 2764A at H67
+	map(0x8000, 0x9fff).rom().region("maincpu", 0); // 2764A at B45
+	map(0xa000, 0xbfff).rom().region("maincpu", 0x2000); // 2764A at C45
+	map(0xc000, 0xdfff).rom().region("maincpu", 0x4000); // 2764A at H67
 	map(0xe000, 0xffff).ram().share("videoram"); // 6264 at G67
 }
 
-void lola8a_state::lola8a_io(address_map &map)
+void lola8a_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x80, 0x80).w(AY8910_TAG, FUNC(ay8910_device::address_w));
@@ -251,13 +257,13 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 }
 
 
-READ8_MEMBER(lola8a_state::lola8a_port_a_r)
+u8 lola8a_state::lola8a_port_a_r()
 {
 	logerror("lola8a_port_a_r\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(lola8a_state::lola8a_port_b_w)
+void lola8a_state::lola8a_port_b_w(u8 data)
 {
 	m_portb = data;
 }
@@ -272,7 +278,7 @@ WRITE_LINE_MEMBER( lola8a_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER(lola8a_state::keyboard_r)
+u8 lola8a_state::keyboard_r()
 {
 	u8 data = 0xff, kbrow = m_portb & 15;
 
@@ -280,6 +286,31 @@ READ8_MEMBER(lola8a_state::keyboard_r)
 		data = m_io_keyboard[kbrow]->read();
 
 	return data;
+}
+
+void lola8a_state::machine_reset()
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x1fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0x8000, 0x9fff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+}
+
+void lola8a_state::machine_start()
+{
+	save_item(NAME(m_portb));
 }
 
 WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
@@ -291,8 +322,8 @@ void lola8a_state::lola8a(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(4'915'200));
-	m_maincpu->set_addrmap(AS_PROGRAM, &lola8a_state::lola8a_mem);
-	m_maincpu->set_addrmap(AS_IO, &lola8a_state::lola8a_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lola8a_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &lola8a_state::io_map);
 	m_maincpu->in_sid_func().set(FUNC(lola8a_state::cass_r));
 	m_maincpu->out_sod_func().set(FUNC(lola8a_state::cass_w));
 
@@ -326,13 +357,13 @@ void lola8a_state::lola8a(machine_config &config)
 
 /* ROM definition */
 ROM_START( lola8a )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "lola 8a r0 w06 22.11.86.b45", 0x8000, 0x2000, CRC(aca1fc08) SHA1(f7076d937bb53b0addcba2a5b7c05ab75d6d0d93))
-	ROM_LOAD( "lola 8a r1 w06 22.11.86.c45", 0xa000, 0x2000, CRC(99f8ec9b) SHA1(88eafd09c479f177525fa0039cf04d74bae39dab))
-	ROM_LOAD( "lola 8a r2 w06 22.11.86.h67", 0xc000, 0x2000, CRC(1e7cd46b) SHA1(048b2583ee7baeb9621e629b79ed64583ac5d554))
+	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "lola 8a r0 w06 22.11.86.b45", 0x0000, 0x2000, CRC(aca1fc08) SHA1(f7076d937bb53b0addcba2a5b7c05ab75d6d0d93))
+	ROM_LOAD( "lola 8a r1 w06 22.11.86.c45", 0x2000, 0x2000, CRC(99f8ec9b) SHA1(88eafd09c479f177525fa0039cf04d74bae39dab))
+	ROM_LOAD( "lola 8a r2 w06 22.11.86.h67", 0x4000, 0x2000, CRC(1e7cd46b) SHA1(048b2583ee7baeb9621e629b79ed64583ac5d554))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                    FULLNAME   FLAGS
-COMP( 1986, lola8a, 0,      0,      lola8a,  lola8a, lola8a_state, empty_init, "Institut Ivo Lola Ribar", "Lola 8A", 0 )
+COMP( 1986, lola8a, 0,      0,      lola8a,  lola8a, lola8a_state, empty_init, "Institut Ivo Lola Ribar", "Lola 8A", MACHINE_SUPPORTS_SAVE )

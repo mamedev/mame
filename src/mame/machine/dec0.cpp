@@ -25,7 +25,7 @@ void dec0_state::machine_start()
 	save_item(NAME(m_i8751_ports));
 }
 
-READ16_MEMBER(dec0_state::dec0_controls_r)
+uint16_t dec0_state::dec0_controls_r(offs_t offset)
 {
 	switch (offset<<1)
 	{
@@ -50,7 +50,7 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 
 /******************************************************************************/
 
-READ16_MEMBER(dec0_state::midres_controls_r)
+uint16_t dec0_state::midres_controls_r(offs_t offset)
 {
 	switch (offset<<1)
 	{
@@ -85,7 +85,7 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 /******************************************************************************/
 
 
-READ8_MEMBER(dec0_state::hippodrm_prot_r)
+uint8_t dec0_state::hippodrm_prot_r(offs_t offset)
 {
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
 	if (m_hippodrm_lsb == 0x45) return 0x4e;
@@ -93,7 +93,7 @@ READ8_MEMBER(dec0_state::hippodrm_prot_r)
 	return 0;
 }
 
-WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
+void dec0_state::hippodrm_prot_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -103,13 +103,13 @@ WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
-READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
+uint16_t dec0_state::hippodrm_68000_share_r(offs_t offset)
 {
 	if (offset == 0) m_maincpu->yield(); /* A wee helper */
 	return m_hippodrm_shared_ram[offset] & 0xff;
 }
 
-WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
+void dec0_state::hippodrm_68000_share_w(offs_t offset, uint16_t data)
 {
 	m_hippodrm_shared_ram[offset] = data & 0xff;
 }
@@ -151,7 +151,7 @@ WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 */
 
 
-READ8_MEMBER(dec0_state::dec0_mcu_port0_r)
+uint8_t dec0_state::dec0_mcu_port0_r()
 {
 	uint8_t result = 0xff;
 
@@ -164,18 +164,18 @@ READ8_MEMBER(dec0_state::dec0_mcu_port0_r)
 	return result;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port0_w)
+void dec0_state::dec0_mcu_port0_w(uint8_t data)
 {
 	m_i8751_ports[0] = data;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port1_w)
+void dec0_state::dec0_mcu_port1_w(uint8_t data)
 {
 	logerror("dec0_mcu_port1_w: %02x\n", data);
 	m_i8751_ports[1] = data;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port2_w)
+void dec0_state::dec0_mcu_port2_w(uint8_t data)
 {
 	if (!BIT(data, 2) && BIT(m_i8751_ports[2], 2))
 		m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
@@ -189,7 +189,7 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port2_w)
 	m_i8751_ports[2] = data;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port3_w)
+void dec0_state::dec0_mcu_port3_w(uint8_t data)
 {
 	logerror("dec0_mcu_port3_w: %02x\n", data);
 	m_i8751_ports[3] = data;
@@ -249,21 +249,21 @@ void dec0_state::dec0_i8751_reset()
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::sprite_mirror_w)
+void dec0_state::sprite_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram->live()[offset]);
 }
 
 /******************************************************************************/
 
-READ16_MEMBER(dec0_state::robocop_68000_share_r)
+uint16_t dec0_state::robocop_68000_share_r(offs_t offset)
 {
 //logerror("%08x: Share read %04x\n",m_maincpu->pc(),offset);
 
 	return m_robocop_shared_ram[offset];
 }
 
-WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
+void dec0_state::robocop_68000_share_w(offs_t offset, uint16_t data)
 {
 //  logerror("%08x: Share write %04x %04x\n",m_maincpu->pc(),offset,data);
 

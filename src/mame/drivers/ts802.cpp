@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:
 /***************************************************************************
 
     Skeleton driver for Televideo TS802
@@ -44,22 +44,20 @@ public:
 
 	void init_ts802();
 
-protected:
-	virtual void machine_reset() override;
-
 private:
-	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
-	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
-	DECLARE_READ8_MEMBER(port0e_r) { return 0; };
-	DECLARE_READ8_MEMBER(port0f_r) { return (m_term_data) ? 5 : 4; };
-	DECLARE_READ8_MEMBER(port0d_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	virtual void machine_reset() override;
+	uint8_t port00_r() { return 0x80; };
+	uint8_t port0c_r() { return 1; };
+	uint8_t port0e_r() { return 0; };
+	uint8_t port0f_r() { return (m_term_data) ? 5 : 4; };
+	uint8_t port0d_r();
+	void port04_w(uint8_t data);
+	void port18_w(uint8_t data);
+	void port80_w(uint8_t data);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 	void ts802_io(address_map &map);
 	void ts802_mem(address_map &map);
@@ -111,35 +109,35 @@ void ts802_state::ts802_io(address_map &map)
 static INPUT_PORTS_START( ts802 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ts802_state::port04_w )
+void ts802_state::port04_w(uint8_t data)
 {
 	membank("bankr0")->set_entry(1);
 }
 
-WRITE8_MEMBER( ts802_state::port18_w )
+void ts802_state::port18_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( ts802_state::port80_w )
+void ts802_state::port80_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( ts802_state::memory_read_byte )
+uint8_t ts802_state::memory_read_byte(offs_t offset)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::memory_write_byte )
+void ts802_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( ts802_state::io_read_byte )
+uint8_t ts802_state::io_read_byte(offs_t offset)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::io_write_byte )
+void ts802_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	m_io->write_byte(offset, data);
 }
@@ -155,7 +153,7 @@ void ts802_state::machine_reset()
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-READ8_MEMBER( ts802_state::port0d_r )
+uint8_t ts802_state::port0d_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;

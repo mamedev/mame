@@ -15,14 +15,14 @@ namespace netlist
 	{
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
+		NETLIB_CONSTRUCTOR(r2r_dac)
 		, m_VIN(*this, "VIN", nlconst::one())
 		, m_R(*this, "R", nlconst::one())
 		, m_num(*this, "N", 1)
 		, m_val(*this, "VAL", 1)
 		{
-			register_subalias("VOUT", m_P);
-			register_subalias("VGND", m_N);
+			register_subalias("VOUT", P());
+			register_subalias("VGND", N());
 		}
 
 		NETLIB_UPDATE_PARAMI();

@@ -50,7 +50,7 @@
 
 /****************************************************************************************/
 
-WRITE8_MEMBER(tunhunt_state::videoram_w)
+void tunhunt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

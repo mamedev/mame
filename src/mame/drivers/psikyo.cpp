@@ -201,7 +201,7 @@ void psikyo_state::s1945_mcu_command_w(uint8_t data)
 }
 
 // TODO: make this handler 8-bit
-uint32_t psikyo_state::s1945_mcu_data_r()
+u32 psikyo_state::s1945_mcu_data_r()
 {
 	u32 res;
 	if (m_s1945_mcu_control & 16)
@@ -265,12 +265,12 @@ void psikyo_state::psikyo_map(address_map &map)
 }
 
 template<int Shift>
-WRITE8_MEMBER(psikyo_state::sound_bankswitch_w)
+void psikyo_state::sound_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry((data >> Shift) & 0x03);
 }
 
-WRITE8_MEMBER(psikyo_state::s1945bl_okibank_w)
+void psikyo_state::s1945bl_okibank_w(u8 data)
 {
 	// not at all sure about this, it seems to write 0 too often
 	if (data < 5)
@@ -306,7 +306,7 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
                         Sengoku Ace / Samurai Aces
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::sngkace_input_r)
+u32 psikyo_state::sngkace_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -346,7 +346,7 @@ void psikyo_state::sngkace_sound_io_map(address_map &map)
                                 Gun Bird
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::gunbird_input_r)
+u32 psikyo_state::gunbird_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -391,7 +391,7 @@ void psikyo_state::gunbird_sound_io_map(address_map &map)
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::s1945_input_r)
+u32 psikyo_state::s1945_input_r(offs_t offset)
 {
 	switch (offset)
 	{

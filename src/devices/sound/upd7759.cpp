@@ -145,7 +145,7 @@
 upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 17)
+	, device_rom_interface(mconfig, *this)
 	, m_channel(nullptr)
 	, m_sample_offset_shift(0)
 	, m_pos(0)

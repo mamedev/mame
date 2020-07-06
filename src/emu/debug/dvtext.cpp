@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvtext.c
+    dvtext.cpp
 
     Debugger simple text-based views.
 

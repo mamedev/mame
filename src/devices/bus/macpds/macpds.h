@@ -73,8 +73,7 @@ public:
 	void set_cputag(const char *tag) { m_cputag = tag; }
 
 	void add_macpds_card(device_macpds_card_interface *card);
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask=0xffffffff);
-	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask=0xffffffff);
+	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask=0xffffffff);
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void set_irq_line(int line, int state);
 

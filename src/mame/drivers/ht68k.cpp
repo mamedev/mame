@@ -44,11 +44,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart68681"),
 		m_fdc(*this, "wd1770"),
-		m_floppy0(*this, "wd1770:0"),
-		m_floppy1(*this, "wd1770:1"),
-		m_floppy2(*this, "wd1770:2"),
-		m_floppy3(*this, "wd1770:3"),
-		m_floppy(nullptr),
+		m_floppy(*this, "wd1770:%u", 0U),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -59,14 +55,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<wd1770_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	floppy_image_device *m_floppy;
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	required_device_array<floppy_connector, 4> m_floppy;
+
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(uint8_t data);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
 	void ht68k_mem(address_map &map);
@@ -96,11 +88,7 @@ void ht68k_state::machine_reset()
 
 	m_fdc->reset();
 	m_fdc->set_floppy(nullptr);
-}
-
-WRITE_LINE_MEMBER(ht68k_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M68K_IRQ_3, state);
+	m_fdc->dden_w(0);
 }
 
 WRITE_LINE_MEMBER(ht68k_state::duart_txb)
@@ -108,18 +96,24 @@ WRITE_LINE_MEMBER(ht68k_state::duart_txb)
 	//This is the second serial channel named AUX, for modem or other serial devices.
 }
 
-WRITE8_MEMBER(ht68k_state::duart_output)
+void ht68k_state::duart_output(uint8_t data)
 {
-	m_floppy = nullptr;
+	logerror("%s: DUART output = %02X\n", machine().describe_context(), data);
 
-	if ((BIT(data, 7)) == 0) { m_floppy = m_floppy0->get_device(); }
-	if ((BIT(data, 6)) == 0) { m_floppy = m_floppy1->get_device(); }
-	if ((BIT(data, 5)) == 0) { m_floppy = m_floppy2->get_device(); }
-	if ((BIT(data, 4)) == 0) { m_floppy = m_floppy3->get_device(); }
+	floppy_image_device *floppy = nullptr;
 
-	m_fdc->set_floppy(m_floppy);
+	for (int i = 0; i < 4; i++)
+	{
+		if (!BIT(data, 7 - i) && m_floppy[i]->get_device() != nullptr)
+		{
+			floppy = m_floppy[i]->get_device();
+			break;
+		}
+	}
 
-	if (m_floppy) {m_floppy->ss_w(BIT(data,3) ? 0 : 1);}
+	m_fdc->set_floppy(floppy);
+
+	if (floppy) {floppy->ss_w(BIT(data,3) ? 0 : 1);}
 }
 
 static void ht68k_floppies(device_slot_interface &device)
@@ -137,7 +131,7 @@ void ht68k_state::ht68k(machine_config &config)
 	/* video hardware */
 	MC68681(config, m_duart, 8_MHz_XTAL / 2);
 	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
-	m_duart->irq_cb().set(FUNC(ht68k_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(FUNC(ht68k_state::duart_txb));
 	m_duart->outport_cb().set(FUNC(ht68k_state::duart_output));
@@ -146,11 +140,12 @@ void ht68k_state::ht68k(machine_config &config)
 	rs232.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	WD1770(config, m_fdc, 8_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	FLOPPY_CONNECTOR(config, "wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1770:2", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1770:3", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:1", ht68k_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:2", ht68k_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:3", ht68k_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop525_list").set_original("ht68k");
 }

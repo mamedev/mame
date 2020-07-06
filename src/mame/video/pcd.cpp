@@ -164,7 +164,7 @@ void pcx_video_device::device_add_mconfig(machine_config &config)
 
 	SCN2672(config, m_crtc, 24_MHz_XTAL / 12); // used with SCB2673B
 	m_crtc->intr_callback().set_inputline("graphics", MCS51_INT0_LINE);
-	m_crtc->set_character_width(12);
+	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(pcx_video_device::display_pixels));
 	m_crtc->set_screen("screen");
 	m_crtc->set_addrmap(0, &pcx_video_device::pcx_char_ram);
@@ -221,22 +221,16 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	uint16_t data = m_charrom[charcode * 16 + linecount + (attrcode & 0x20 ? 4096 : 0)];
 
 	if (cursor)
-		data = 0x7ff;
-	else
-	{
-		data <<= 1;
-		data |= data << 1;
-	}
+		data = 0xff;
 
 	if (BIT(m_p1, 5))
-		data ^= 0x7ff;
+		data ^= 0xff;
 
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		rgb_t pix = palette().pen(BIT(data, 10) ? 1 : 0);
+		rgb_t pix = palette().pen(BIT(data, 7) ? 1 : 0);
 		bitmap.pix32(y, x++) = pix;
-		if (i != 1)
-			data <<= 1;
+		data <<= 1;
 	}
 }
 
@@ -429,7 +423,7 @@ void pcx_video_device::device_start()
 	m_txd_handler.resolve_safe();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(600*2);  // FIXME: fix the keyboard when the mc2661 baud rate calc is fixed
+	set_rate(600);
 
 	decode_gfx(gfx_pcx);
 }

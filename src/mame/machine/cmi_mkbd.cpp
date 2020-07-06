@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( cmi_music_keyboard_device::cmi10_u20_cb2_w )
 	m_dp3->wr_w(state);
 }
 
-template <unsigned N> WRITE16_MEMBER( cmi_music_keyboard_device::update_dp )
+template <unsigned N> void cmi_music_keyboard_device::update_dp(offs_t offset, u16 data)
 {
 	m_digit[(N << 2) | ((offset ^ 3) & 3)] = data;
 }

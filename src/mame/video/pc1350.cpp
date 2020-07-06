@@ -61,20 +61,20 @@ const char* const pc1350_state::s_sml[5] =
 	"11  1 1 111"
 };
 
-READ8_MEMBER(pc1350_state::lcd_read)
+uint8_t pc1350_state::lcd_read(offs_t offset)
 {
 	uint8_t data = m_reg[offset & 0xfff];
 	LOGMASKED(LOG_LCD, "pc1350 read %.3x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_MEMBER(pc1350_state::lcd_write)
+void pc1350_state::lcd_write(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_LCD, "pc1350 write %.3x %.2x\n",offset,data);
 	m_reg[offset & 0xfff] = data;
 }
 
-READ8_MEMBER(pc1350_state::keyboard_line_r)
+uint8_t pc1350_state::keyboard_line_r()
 {
 	return m_reg[0xe00];
 }

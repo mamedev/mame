@@ -104,7 +104,7 @@ ioport_value segaybd_state::analog_mux()
 //  output1_w - handle writes to I/O port D
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output1_w)
+void segaybd_state::output1_w(uint8_t data)
 {
 	if (!m_output_cb1.isnull())
 		m_output_cb1(data);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(segaybd_state::output1_w)
 //  misc_output_w - handle writes to I/O port E
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::misc_output_w)
+void segaybd_state::misc_output_w(uint8_t data)
 {
 	//
 	//  D7 = /KILL
@@ -140,7 +140,7 @@ WRITE8_MEMBER(segaybd_state::misc_output_w)
 //  output2_w - handle writes to I/O port H
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output2_w)
+void segaybd_state::output2_w(uint8_t data)
 {
 	if (!m_output_cb2.isnull())
 		m_output_cb2(data);
@@ -671,17 +671,17 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 }
 
 
-READ16_MEMBER(segaybd_state::link_r)
+uint16_t segaybd_state::link_r()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(segaybd_state::link2_r)
+uint16_t segaybd_state::link2_r()
 {
 	return 0x0000;
 }
 
-WRITE16_MEMBER(segaybd_state::link2_w)
+void segaybd_state::link2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 	logerror("link2_w %04x\n", data);
@@ -705,7 +705,7 @@ void segaybd_state::link_map(address_map &map)
 }
 
 #if 0
-READ8_MEMBER(segaybd_state::link_portc0_r)
+uint8_t segaybd_state::link_portc0_r()
 {
 	return 0xf8;
 }

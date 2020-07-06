@@ -80,10 +80,10 @@ public:
 	void init_taito();
 
 private:
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
@@ -287,12 +287,12 @@ static INPUT_PORTS_START( taito )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
 INPUT_PORTS_END
 
-READ8_MEMBER( taito_state::io_r )
+uint8_t taito_state::io_r(offs_t offset)
 {
 	return m_io[offset];
 }
 
-WRITE8_MEMBER( taito_state::io_w )
+void taito_state::io_w(offs_t offset, uint8_t data)
 {
 	m_io[offset] = data;
 
@@ -312,12 +312,12 @@ WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 	m_votrax->write(m_votrax_cmd);
 }
 
-READ8_MEMBER( taito_state::pia_pb_r )
+uint8_t taito_state::pia_pb_r()
 {
 	return ~m_sndcmd;
 }
 
-WRITE8_MEMBER( taito_state::pia_pb_w )
+void taito_state::pia_pb_w(uint8_t data)
 {
 	m_votrax_cmd = data;
 }

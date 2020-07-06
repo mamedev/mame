@@ -67,16 +67,16 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(devram_r);
-	DECLARE_WRITE8_MEMBER(master_nmi_trigger_w);
-	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_READ8_MEMBER(soundcommand_status_r);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	template<int Layer> DECLARE_WRITE8_MEMBER(videoram_w);
-	template<int Layer> DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(scrollregs_w);
+	uint8_t devram_r(address_space &space, offs_t offset);
+	void master_nmi_trigger_w(uint8_t data);
+	void master_bankswitch_w(uint8_t data);
+	void slave_bankswitch_w(uint8_t data);
+	void sound_bankswitch_w(uint8_t data);
+	uint8_t soundcommand_status_r();
+	void coin_counter_w(uint8_t data);
+	template<int Layer> void videoram_w(offs_t offset, uint8_t data);
+	template<int Layer> void colorram_w(offs_t offset, uint8_t data);
+	void scrollregs_w(offs_t offset, uint8_t data);
 	void init_airbustr();
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;

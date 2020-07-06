@@ -64,9 +64,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<k054321_device> m_k054321;
 
-	DECLARE_READ16_MEMBER(control2_r);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

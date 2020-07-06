@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device, "mb87419_mb87420", "
 mb87419_mb87420_device::mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MB87419_MB87420, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 22)
+	, device_rom_interface(mconfig, *this)
 	, m_int_callback(*this)
 	, m_clock(0)
 	, m_rate(0)

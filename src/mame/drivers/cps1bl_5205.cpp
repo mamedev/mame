@@ -68,16 +68,16 @@ private:
 	DECLARE_MACHINE_RESET(captcommb2);
 	DECLARE_MACHINE_START(sf2mdt);
 
-	DECLARE_WRITE16_MEMBER(captcommb2_layer_w);
-	DECLARE_WRITE16_MEMBER(captcommb2_soundlatch_w);
-	DECLARE_READ8_MEMBER(captcommb2_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(captcommb2_snd_bankswitch_w);
+	void captcommb2_layer_w(offs_t offset, uint16_t data);
+	void captcommb2_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t captcommb2_soundlatch_r();
+	void captcommb2_snd_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(captcommb2_mux_select_w);
-	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2mdt_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	void knightsb_layer_w(offs_t offset, uint16_t data);
+	void sf2b_layer_w(offs_t offset, uint16_t data);
+	void sf2mdt_layer_w(offs_t offset, uint16_t data);
+	void sf2mdt_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sf2mdta_layer_w(offs_t offset, uint16_t data);
 
 	void captcommb2_map(address_map &map);
 	void sf2b_map(address_map &map);
@@ -101,7 +101,7 @@ private:
 };
 
 
-WRITE16_MEMBER(cps1bl_5205_state::captcommb2_layer_w)
+void cps1bl_5205_state::captcommb2_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -138,7 +138,7 @@ WRITE16_MEMBER(cps1bl_5205_state::captcommb2_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_5205_state::captcommb2_soundlatch_w)
+void cps1bl_5205_state::captcommb2_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -147,14 +147,14 @@ WRITE16_MEMBER(cps1bl_5205_state::captcommb2_soundlatch_w)
 	}
 }
 
-READ8_MEMBER(cps1bl_5205_state::captcommb2_soundlatch_r)
+uint8_t cps1bl_5205_state::captcommb2_soundlatch_r()
 {
 	uint8_t latch = m_soundlatch->read();
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return latch;
 }
 
-WRITE8_MEMBER(cps1bl_5205_state::captcommb2_snd_bankswitch_w)
+void cps1bl_5205_state::captcommb2_snd_bankswitch_w(uint8_t data)
 {
 	m_msm_1->reset_w(BIT(data, 5));
 	m_msm_2->reset_w(BIT(data, 4));
@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER(cps1bl_5205_state::captcommb2_mux_select_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_captcommb2_mux_toggle);
 }
 
-WRITE16_MEMBER(cps1bl_5205_state::knightsb_layer_w)
+void cps1bl_5205_state::knightsb_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -242,7 +242,7 @@ WRITE16_MEMBER(cps1bl_5205_state::knightsb_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_5205_state::sf2b_layer_w)
+void cps1bl_5205_state::sf2b_layer_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ WRITE16_MEMBER(cps1bl_5205_state::sf2b_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_5205_state::sf2mdt_layer_w)
+void cps1bl_5205_state::sf2mdt_layer_w(offs_t offset, uint16_t data)
 {
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
 	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
@@ -305,7 +305,7 @@ WRITE16_MEMBER(cps1bl_5205_state::sf2mdt_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_5205_state::sf2mdt_soundlatch_w)
+void cps1bl_5205_state::sf2mdt_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -314,7 +314,7 @@ WRITE16_MEMBER(cps1bl_5205_state::sf2mdt_soundlatch_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_5205_state::sf2mdta_layer_w)
+void cps1bl_5205_state::sf2mdta_layer_w(offs_t offset, uint16_t data)
 {
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
 	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
@@ -601,7 +601,7 @@ void cps1bl_5205_state::init_captcommb2()
 void cps1bl_5205_state::init_knightsb()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x980000, 0x980023);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x980025, write16_delegate(*this, FUNC(cps1bl_5205_state::knightsb_layer_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x980025, write16sm_delegate(*this, FUNC(cps1bl_5205_state::knightsb_layer_w)));
 
 	init_mtwinsb();
 }
@@ -619,7 +619,7 @@ void cps1bl_5205_state::init_sf2b()
 
 void cps1bl_5205_state::init_sf2mdt()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x708100, 0x7081ff, write16_delegate(*this, FUNC(cps1bl_5205_state::sf2mdt_layer_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x708100, 0x7081ff, write16sm_delegate(*this, FUNC(cps1bl_5205_state::sf2mdt_layer_w)));
 
 	/* extra work ram */
 	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x8000);

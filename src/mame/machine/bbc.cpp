@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::reset_timer_cb)
   BBC Model B memory handling functions
 ****************************************/
 
-READ8_MEMBER(bbc_state::bbc_ram_r)
+uint8_t bbc_state::bbc_ram_r(offs_t offset)
 {
 	if (m_internal && m_internal->overrides_ram())
 		return m_internal->ram_r(offset);
@@ -39,7 +39,7 @@ READ8_MEMBER(bbc_state::bbc_ram_r)
 		return m_ram->pointer()[offset & m_ram->mask()];
 }
 
-WRITE8_MEMBER(bbc_state::bbc_ram_w)
+void bbc_state::bbc_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_internal && m_internal->overrides_ram())
 		m_internal->ram_w(offset, data);
@@ -47,7 +47,7 @@ WRITE8_MEMBER(bbc_state::bbc_ram_w)
 		m_ram->pointer()[offset & m_ram->mask()] = data;
 }
 
-READ8_MEMBER(bbc_state::bbc_romsel_r)
+uint8_t bbc_state::bbc_romsel_r(offs_t offset)
 {
 	if (m_internal && m_internal->overrides_rom())
 		return m_internal->romsel_r(offset);
@@ -55,7 +55,7 @@ READ8_MEMBER(bbc_state::bbc_romsel_r)
 		return 0xfe;
 }
 
-WRITE8_MEMBER(bbc_state::bbc_romsel_w)
+void bbc_state::bbc_romsel_w(offs_t offset, uint8_t data)
 {
 	/* no sideways expansion board fitted so address only the 4 on board ROM sockets */
 	m_romsel = data & 0x03;
@@ -65,7 +65,7 @@ WRITE8_MEMBER(bbc_state::bbc_romsel_w)
 		m_internal->romsel_w(offset, data);
 }
 
-READ8_MEMBER(bbc_state::bbc_paged_r)
+uint8_t bbc_state::bbc_paged_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -88,7 +88,7 @@ READ8_MEMBER(bbc_state::bbc_paged_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbc_paged_w)
+void bbc_state::bbc_paged_w(offs_t offset, uint8_t data)
 {
 	if (m_internal && m_internal->overrides_rom())
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER(bbc_state::bbc_paged_w)
 	}
 }
 
-READ8_MEMBER(bbc_state::bbc_mos_r)
+uint8_t bbc_state::bbc_mos_r(offs_t offset)
 {
 	if (m_internal && m_internal->overrides_mos())
 		return m_internal->mos_r(offset);
@@ -111,13 +111,13 @@ READ8_MEMBER(bbc_state::bbc_mos_r)
 		return m_region_mos->base()[offset];
 }
 
-WRITE8_MEMBER(bbc_state::bbc_mos_w)
+void bbc_state::bbc_mos_w(offs_t offset, uint8_t data)
 {
 	if (m_internal && m_internal->overrides_mos())
 		m_internal->mos_w(offset, data);
 }
 
-READ8_MEMBER(bbc_state::bbc_fred_r)
+uint8_t bbc_state::bbc_fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -131,7 +131,7 @@ READ8_MEMBER(bbc_state::bbc_fred_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbc_fred_w)
+void bbc_state::bbc_fred_w(offs_t offset, uint8_t data)
 {
 	m_1mhzbus->fred_w(offset, data);
 
@@ -141,7 +141,7 @@ WRITE8_MEMBER(bbc_state::bbc_fred_w)
 		m_cart[1]->write(offset, data, 1, 0, m_romsel & 0x01, 0, 0);
 }
 
-READ8_MEMBER(bbc_state::bbc_jim_r)
+uint8_t bbc_state::bbc_jim_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -155,7 +155,7 @@ READ8_MEMBER(bbc_state::bbc_jim_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbc_jim_w)
+void bbc_state::bbc_jim_w(offs_t offset, uint8_t data)
 {
 	m_1mhzbus->jim_w(offset, data);
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER(bbc_state::bbc_jim_w)
   BBC Model B+ memory handling functions
 ****************************************/
 
-READ8_MEMBER(bbc_state::bbcbp_fetch_r)
+uint8_t bbc_state::bbcbp_fetch_r(offs_t offset)
 {
 	switch (offset & 0xf000)
 	{
@@ -206,7 +206,7 @@ READ8_MEMBER(bbc_state::bbcbp_fetch_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
+void bbc_state::bbcbp_romsel_w(offs_t offset, uint8_t data)
 {
 	/* the BBC Model B+ addresses all 16 ROM sockets and extra 12K of RAM at 0x8000 and 20K of shadow RAM at 0x3000 */
 	switch (offset & 0x07)
@@ -229,7 +229,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
 		m_internal->romsel_w(offset, data);
 }
 
-READ8_MEMBER(bbc_state::bbcbp_paged_r)
+uint8_t bbc_state::bbcbp_paged_r(offs_t offset)
 {
 	uint8_t data;
 	std::string region_tag;
@@ -261,7 +261,7 @@ READ8_MEMBER(bbc_state::bbcbp_paged_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcbp_paged_w)
+void bbc_state::bbcbp_paged_w(offs_t offset, uint8_t data)
 {
 	if (m_paged_ram && offset < 0x3000)
 	{
@@ -319,7 +319,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_paged_w)
   ANDY is the name of the 4K of RAM used by the MOS at &8000-&8FFF
 */
 
-READ8_MEMBER(bbc_state::bbcm_fetch_r)
+uint8_t bbc_state::bbcm_fetch_r(offs_t offset)
 {
 	if (m_acccon_x || (m_acccon_e && offset >= 0xc000 && offset <= 0xdfff))
 	{
@@ -332,12 +332,12 @@ READ8_MEMBER(bbc_state::bbcm_fetch_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-READ8_MEMBER(bbc_state::bbcm_acccon_r)
+uint8_t bbc_state::bbcm_acccon_r()
 {
 	return m_acccon;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
+void bbc_state::bbcm_acccon_w(uint8_t data)
 {
 	m_acccon = data;
 
@@ -372,7 +372,7 @@ WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
 	m_bankdev->set_bank(m_acccon_tst);
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_romsel_w)
+void bbc_state::bbcm_romsel_w(offs_t offset, uint8_t data)
 {
 	m_paged_ram = BIT(data, 7);
 	m_romsel = data & 0x0f;
@@ -382,7 +382,7 @@ WRITE8_MEMBER(bbc_state::bbcm_romsel_w)
 		m_internal->romsel_w(offset, data);
 }
 
-READ8_MEMBER(bbc_state::bbcm_paged_r)
+uint8_t bbc_state::bbcm_paged_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -454,7 +454,7 @@ READ8_MEMBER(bbc_state::bbcm_paged_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_paged_w)
+void bbc_state::bbcm_paged_w(offs_t offset, uint8_t data)
 {
 	if (m_paged_ram && offset < 0x1000)
 	{
@@ -506,7 +506,7 @@ WRITE8_MEMBER(bbc_state::bbcm_paged_w)
 	}
 }
 
-READ8_MEMBER(bbc_state::bbcmc_paged_r)
+uint8_t bbc_state::bbcmc_paged_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -553,7 +553,7 @@ READ8_MEMBER(bbc_state::bbcmc_paged_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcmc_paged_w)
+void bbc_state::bbcmc_paged_w(offs_t offset, uint8_t data)
 {
 	if (m_paged_ram && offset < 0x1000)
 	{
@@ -588,7 +588,7 @@ WRITE8_MEMBER(bbc_state::bbcmc_paged_w)
 	}
 }
 
-READ8_MEMBER(bbc_state::bbcm_hazel_r)
+uint8_t bbc_state::bbcm_hazel_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -607,7 +607,7 @@ READ8_MEMBER(bbc_state::bbcm_hazel_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_hazel_w)
+void bbc_state::bbcm_hazel_w(offs_t offset, uint8_t data)
 {
 	if (m_acccon_y)
 	{
@@ -615,7 +615,7 @@ WRITE8_MEMBER(bbc_state::bbcm_hazel_w)
 	}
 }
 
-READ8_MEMBER(bbc_state::bbcm_tube_r)
+uint8_t bbc_state::bbcm_tube_r(offs_t offset)
 {
 	uint8_t data = 0xfe;
 
@@ -633,7 +633,7 @@ READ8_MEMBER(bbc_state::bbcm_tube_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_tube_w)
+void bbc_state::bbcm_tube_w(offs_t offset, uint8_t data)
 {
 	if (m_acccon_itu)
 	{
@@ -888,12 +888,12 @@ void bbc_state::mc146818_set()
 }
 
 
-READ8_MEMBER(bbc_state::via_system_porta_r)
+uint8_t bbc_state::via_system_porta_r()
 {
 	return m_via_system_porta;
 }
 
-WRITE8_MEMBER(bbc_state::via_system_porta_w)
+void bbc_state::via_system_porta_w(uint8_t data)
 {
 	m_via_system_porta = data;
 
@@ -915,7 +915,7 @@ WRITE8_MEMBER(bbc_state::via_system_porta_w)
 }
 
 
-READ8_MEMBER(bbc_state::via_system_portb_r)
+uint8_t bbc_state::via_system_portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -945,7 +945,7 @@ READ8_MEMBER(bbc_state::via_system_portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_state::via_system_portb_w)
+void bbc_state::via_system_portb_w(uint8_t data)
 {
 	m_latch->write_nibble_d3(data);
 
@@ -1233,7 +1233,7 @@ void bbc_state::cassette_motor(bool motor_state)
                110 - 16MHz / 13 / 256 -    75 baud
 */
 
-WRITE8_MEMBER(bbc_state::serial_ula_w)
+void bbc_state::serial_ula_w(uint8_t data)
 {
 	static const int serial_clocks[8] =
 	{
@@ -1275,32 +1275,6 @@ WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
 {
 	m_bus_nmi = state;
 	update_nmi();
-}
-
-
-/**************************************
-   i8271 disc control function
-***************************************/
-
-
-WRITE_LINE_MEMBER(bbc_state::motor_w)
-{
-	floppy_image_device *floppy0 = m_i8271->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_i8271->subdevice<floppy_connector>("1")->get_device();
-
-	if (floppy0) floppy0->mon_w(!state);
-	if (floppy1) floppy1->mon_w(!state);
-
-	m_i8271->ready_w(!state);
-}
-
-WRITE_LINE_MEMBER(bbc_state::side_w)
-{
-	floppy_image_device *floppy0 = m_i8271->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_i8271->subdevice<floppy_connector>("1")->get_device();
-
-	if (floppy0) floppy0->ss_w(state);
-	if (floppy1) floppy1->ss_w(state);
 }
 
 
@@ -1347,26 +1321,26 @@ WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
          0        Drive select 0.
 */
 
-WRITE8_MEMBER(bbc_state::bbcbp_drive_control_w)
+void bbc_state::bbcbp_drive_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wd1770->subdevice<floppy_connector>("1")->get_device();
-	m_wd1770->set_floppy(floppy);
+	if (BIT(data, 0)) floppy = m_wd_fdc->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd_fdc->subdevice<floppy_connector>("1")->get_device();
+	m_wd_fdc->set_floppy(floppy);
 
 	// bit 2: side select
 	if (floppy)
 		floppy->ss_w(BIT(data, 2));
 
 	// bit 3: density
-	m_wd1770->dden_w(BIT(data, 3));
+	m_wd_fdc->dden_w(BIT(data, 3));
 
 	// bit 4: interrupt enable (S5 wire link not fitted)
 
 	// bit 5: reset
-	m_wd1770->mr_w(BIT(data, 5));
+	m_wd_fdc->mr_w(BIT(data, 5));
 }
 
 /*
@@ -1383,44 +1357,24 @@ WRITE8_MEMBER(bbc_state::bbcbp_drive_control_w)
          0        Drive select 0.
 */
 
-WRITE8_MEMBER(bbc_state::bbcm_drive_control_w)
+void bbc_state::bbcm_drive_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1, 3: drive select
-	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wd1770->subdevice<floppy_connector>("1")->get_device();
-	m_wd1770->set_floppy(floppy);
+	if (BIT(data, 0)) floppy = m_wd_fdc->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd_fdc->subdevice<floppy_connector>("1")->get_device();
+	m_wd_fdc->set_floppy(floppy);
 
 	// bit 4: side select
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
 
 	// bit 5: density
-	m_wd1770->dden_w(BIT(data, 5));
+	m_wd_fdc->dden_w(BIT(data, 5));
 
 	// bit 2: reset
-	m_wd1770->mr_w(BIT(data, 2));
-}
-
-WRITE8_MEMBER(bbc_state::bbcmc_drive_control_w)
-{
-	floppy_image_device *floppy = nullptr;
-
-	// bit 0, 1, 3: drive select
-	if (BIT(data, 0)) floppy = m_wd1772->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wd1772->subdevice<floppy_connector>("1")->get_device();
-	m_wd1772->set_floppy(floppy);
-
-	// bit 4: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 4));
-
-	// bit 5: density
-	m_wd1772->dden_w(BIT(data, 5));
-
-	// bit 2: reset
-	m_wd1772->mr_w(BIT(data, 2));
+	m_wd_fdc->mr_w(BIT(data, 2));
 }
 
 
@@ -1443,7 +1397,7 @@ void bbc_state::init_bbc()
 	/* light pen strobe detect (not emulated) */
 	m_via6522_0->write_cb2(1);
 
-	m_monitortype = monitor_type_t::COLOUR;
+	update_palette(monitor_type::COLOUR);
 }
 
 void bbc_state::init_ltmp()
@@ -1451,14 +1405,14 @@ void bbc_state::init_ltmp()
 	init_bbc();
 
 	/* LTM machines used a 9" Hantarex MT3000 green monitor */
-	m_monitortype = monitor_type_t::GREEN;
+	update_palette(monitor_type::GREEN);
 }
 
 void bbc_state::init_cfa()
 {
 	init_bbc();
 
-	m_monitortype = monitor_type_t::GREEN;
+	update_palette(monitor_type::GREEN);
 }
 
 
@@ -1548,7 +1502,7 @@ void bbc_state::setup_device_roms()
 	}
 
 	/* insert ROM for FDC devices (BBC Model B only), always place into romslot 0 */
-	if (m_fdc && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
+	if (m_fdc && m_fdc->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
 	{
 		if (exp_device->memregion("dfs_rom"))
 		{
@@ -1632,15 +1586,15 @@ void bbc_state::setup_device_roms()
 	}
 
 	/* insert ROM(s) for Tube devices */
-	if (m_tube && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
+	if (m_tube && m_tube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
-	if (m_intube && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
+	if (m_intube && m_intube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
-	if (m_extube && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
+	if (m_extube && m_extube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
@@ -1660,7 +1614,7 @@ void bbc_state::setup_device_roms()
 	/* list all inserted ROMs */
 	for (int i = 15; i >= 0; i--)
 	{
-		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)));
+		osd_printf_verbose("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)));
 	}
 }
 
@@ -1672,6 +1626,18 @@ void bbc_state::setup_device_roms()
 void bbc_state::machine_start()
 {
 	setup_device_roms();
+
+	/* register save states */
+	save_item(NAME(m_vula_ctrl));
+	save_item(NAME(m_vula_palette));
+	save_item(NAME(m_vula_palette_lookup));
+	save_item(STRUCT_MEMBER(m_vnula, palette_mode));
+	save_item(STRUCT_MEMBER(m_vnula, horiz_offset));
+	save_item(STRUCT_MEMBER(m_vnula, left_blank));
+	save_item(STRUCT_MEMBER(m_vnula, disable));
+	save_item(STRUCT_MEMBER(m_vnula, flash));
+	save_item(STRUCT_MEMBER(m_vnula, palette_byte));
+	save_item(STRUCT_MEMBER(m_vnula, palette_write));
 }
 
 void bbc_state::machine_reset()
@@ -1680,7 +1646,7 @@ void bbc_state::machine_reset()
 	if (m_bbcconfig.read_safe(0) & 0x04)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8sm_delegate(*m_adlc, FUNC(mc6854_device::read)), write8sm_delegate(*m_adlc, FUNC(mc6854_device::write)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8_delegate(*this, FUNC(bbc_state::bbc_fe_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8smo_delegate(*this, FUNC(bbc_state::bbc_fe_r)));
 
 	/* power-on reset timer, should produce "boo...beep" startup sound before sn76496 is initialised */
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

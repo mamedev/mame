@@ -96,7 +96,7 @@ Stephh's Notes:
  *
  *************************************/
 
-READ8_MEMBER(jack_state::timer_r)
+uint8_t jack_state::timer_r()
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
@@ -112,7 +112,7 @@ IRQ_CALLBACK_MEMBER(jack_state::jack_sh_irq_ack)
 
 /***************************************************************/
 
-READ8_MEMBER(jack_state::striv_question_r)
+uint8_t jack_state::striv_question_r(offs_t offset)
 {
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)

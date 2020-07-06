@@ -44,7 +44,7 @@ ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, cons
 {
 }
 
-READ8Z_MEMBER(ti_32k_expcard_device::readz)
+void ti_32k_expcard_device::readz(offs_t offset, uint8_t *value)
 {
 	uint8_t val = 0;
 	/*

@@ -24,12 +24,12 @@ public:
 	void init_m79amb();
 
 private:
-	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
-	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
-	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
-	DECLARE_WRITE8_MEMBER(m79amb_8000_w);
-	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
-	DECLARE_WRITE8_MEMBER(m79amb_8003_w);
+	void ramtek_videoram_w(offs_t offset, uint8_t data);
+	uint8_t gray5bit_controller0_r();
+	uint8_t gray5bit_controller1_r();
+	void m79amb_8000_w(uint8_t data);
+	void m79amb_8002_w(uint8_t data);
+	void m79amb_8003_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
 

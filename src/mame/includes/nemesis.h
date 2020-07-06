@@ -61,6 +61,7 @@ public:
 	void blkpnthr(machine_config &config);
 
 	void bubsys_init();
+	void bubsys_twinbeeb_init();
 
 private:
 	/* memory pointers */
@@ -121,27 +122,27 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_nmi_w);
-	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
-	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
-	DECLARE_READ16_MEMBER(konamigt_input_word_r);
+	uint16_t gx400_sharedram_word_r(offs_t offset);
+	void gx400_sharedram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t konamigt_input_word_r();
 	void selected_ip_w(uint8_t data);
 	uint8_t selected_ip_r();
-	DECLARE_WRITE16_MEMBER(bubsys_mcu_w);
-	DECLARE_READ8_MEMBER(wd_r);
+	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t wd_r();
 	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
 	DECLARE_WRITE_LINE_MEMBER(gfx_flipy_w);
-	DECLARE_WRITE16_MEMBER(salamand_control_port_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_palette_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_videoram1_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_videoram2_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_colorram1_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_colorram2_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_charram_word_w);
-	DECLARE_WRITE8_MEMBER(nemesis_filter_w);
-	DECLARE_WRITE8_MEMBER(gx400_speech_start_w);
-	DECLARE_WRITE8_MEMBER(salamand_speech_start_w);
-	DECLARE_READ8_MEMBER(nemesis_portA_r);
-	DECLARE_WRITE8_MEMBER(city_sound_bank_w);
+	void salamand_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_videoram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_videoram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_colorram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_colorram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_charram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nemesis_filter_w(offs_t offset, uint8_t data);
+	void gx400_speech_start_w(uint8_t data);
+	void salamand_speech_start_w(uint8_t data);
+	uint8_t nemesis_portA_r();
+	void city_sound_bank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -159,7 +160,7 @@ private:
 	void create_palette_lookups();
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	void set_screen_raw_params(machine_config &config);
 
 	void blkpnthr_map(address_map &map);

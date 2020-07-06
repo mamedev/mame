@@ -113,9 +113,9 @@ public:
 	void init_bcs3d();
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_READ8_MEMBER(zx_r);
+	u8 keyboard_r(offs_t offset);
+	u8 video_r(offs_t offset);
+	u8 zx_r();
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	u32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -124,6 +124,7 @@ private:
 	void bcs3_io(address_map &map);
 	void bcs3_mem(address_map &map);
 	void bcs3a_mem(address_map &map);
+	void machine_start() override;
 	bool m_cassbit;
 	u8 s_curs;
 	u8 s_init;
@@ -139,16 +140,16 @@ private:
 	required_ioport_array<10> m_io_keyboard;
 };
 
-READ8_MEMBER( bcs3_state::keyboard_r )
+u8 bcs3_state::keyboard_r(offs_t offset)
 {
-	u8 i, data = 0;
+	u8 data = 0;
 
 	if (offset == 0 && m_cass)
 		data = (m_cass->input() > +0.01) ? 0x80 : 0;
 
 	offset ^= 0x3ff;
 
-	for (i = 0; i < 10; i++)
+	for (u8 i = 0; i < 10; i++)
 		if (BIT(offset, i))
 			data |= m_io_keyboard[i]->read();
 
@@ -156,7 +157,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 }
 
 // 00-7F = NUL, 0xE0 = end of line.
-READ8_MEMBER( bcs3_state::video_r )
+u8 bcs3_state::video_r(offs_t offset)
 {
 	u8 data = m_p_videoram[offset];
 	return BIT(data, 7) ? data : 0;
@@ -164,7 +165,7 @@ READ8_MEMBER( bcs3_state::video_r )
 
 // Unsure of how this works.
 // 00-7F = NUL, 0xFF = end of line, 0xF7 = finish.
-READ8_MEMBER( bcs3_state::zx_r )
+u8 bcs3_state::zx_r()
 {
 	return 0xf7;
 }
@@ -383,6 +384,15 @@ WRITE_LINE_MEMBER( bcs3_state::ctc_z1_w )
 	m_ctc->trg2(state);
 }
 
+void bcs3_state::machine_start()
+{
+	save_item(NAME(m_cassbit));
+	save_item(NAME(s_curs));
+	save_item(NAME(s_init));
+	save_item(NAME(s_rows));
+	save_item(NAME(s_cols));
+}
+
 static const z80_daisy_config daisy_chain_intf[] =
 {
 	{ "ctc" },
@@ -549,7 +559,7 @@ ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                   FLAGS */
 COMP( 1984, bcs3,  0,      0,      bcs3,    bcs3,  bcs3_state, empty_init, "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3a, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3a, "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3b, bcs3,   0,      bcs3b,   bcs3,  bcs3_state, init_bcs3b, "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3c, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3c, "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3d, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3d, "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3a, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3a, "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, bcs3b, bcs3,   0,      bcs3b,   bcs3,  bcs3_state, init_bcs3b, "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, bcs3c, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3c, "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, bcs3d, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3d, "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

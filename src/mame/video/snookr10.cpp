@@ -33,13 +33,13 @@
 #include "includes/snookr10.h"
 
 
-WRITE8_MEMBER(snookr10_state::snookr10_videoram_w)
+void snookr10_state::snookr10_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snookr10_state::snookr10_colorram_w)
+void snookr10_state::snookr10_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

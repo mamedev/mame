@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    empty.c
+    empty.cpp
 
     Empty driver.
 

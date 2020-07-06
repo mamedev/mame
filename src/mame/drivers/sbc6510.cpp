@@ -68,26 +68,26 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_videocpu(*this, "videocpu")
 		, m_terminal(*this, "terminal")
-		, m_keyboard(*this, "X%u", 0)
+		, m_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void sbc6510(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(a2_r);
-	DECLARE_WRITE8_MEMBER(a2_w);
-	DECLARE_READ8_MEMBER(psg_a_r);
-	DECLARE_READ8_MEMBER(psg_b_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(key_r);
+	u8 a2_r();
+	void a2_w(u8 data);
+	u8 psg_a_r();
+	u8 psg_b_r();
+	void key_w(u8 data);
+	u8 key_r();
 
-	void sbc6510_mem(address_map &map);
-	void sbc6510_video_data(address_map &map);
-	void sbc6510_video_io(address_map &map);
-	void sbc6510_video_mem(address_map &map);
+	void main_mem_map(address_map &map);
+	void video_data_map(address_map &map);
+	void video_io_map(address_map &map);
+	void video_mem_map(address_map &map);
 
-	uint8_t m_key_row;
-	uint8_t m_2;
+	u8 m_key_row;
+	u8 m_2;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -97,7 +97,7 @@ private:
 };
 
 
-void sbc6510_state::sbc6510_mem(address_map &map)
+void sbc6510_state::main_mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0001).ram();
@@ -106,20 +106,20 @@ void sbc6510_state::sbc6510_mem(address_map &map)
 	map(0xe000, 0xe00f).mirror(0x1f0).rw("cia6526", FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0xe800, 0xe800).mirror(0x1ff).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xea00, 0xea00).mirror(0x1ff).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu",0);
 }
 
-void sbc6510_state::sbc6510_video_mem(address_map &map)
+void sbc6510_state::video_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 }
 
-void sbc6510_state::sbc6510_video_data(address_map &map)
+void sbc6510_state::video_data_map(address_map &map)
 {
 	map(0x0100, 0x04ff).ram();
 }
 
-void sbc6510_state::sbc6510_video_io(address_map &map)
+void sbc6510_state::video_io_map(address_map &map)
 {
 }
 
@@ -213,12 +213,12 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 INPUT_PORTS_END
 
 
-READ8_MEMBER( sbc6510_state::a2_r )
+u8 sbc6510_state::a2_r()
 {
 	return m_2;
 }
 
-WRITE8_MEMBER( sbc6510_state::a2_w )
+void sbc6510_state::a2_w(u8 data)
 {
 	m_2 = data;
 	m_terminal->write(data);
@@ -226,6 +226,8 @@ WRITE8_MEMBER( sbc6510_state::a2_w )
 
 void sbc6510_state::machine_start()
 {
+	save_item(NAME(m_key_row));
+	save_item(NAME(m_2));
 }
 
 
@@ -233,17 +235,17 @@ void sbc6510_state::machine_reset()
 {
 }
 
-READ8_MEMBER( sbc6510_state::psg_a_r )
+u8 sbc6510_state::psg_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( sbc6510_state::psg_b_r )
+u8 sbc6510_state::psg_b_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER( sbc6510_state::key_r )
+u8 sbc6510_state::key_r()
 {
 	u8 i, data=0;
 
@@ -254,7 +256,7 @@ READ8_MEMBER( sbc6510_state::key_r )
 	return ~data;
 }
 
-WRITE8_MEMBER( sbc6510_state::key_w )
+void sbc6510_state::key_w(u8 data)
 {
 	m_key_row = data;
 }
@@ -280,12 +282,12 @@ void sbc6510_state::sbc6510(machine_config &config)
 {
 	/* basic machine hardware */
 	M6510(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::main_mem_map);
 
 	ATMEGA88(config, m_videocpu, XTAL(16'000'000)); // Video CPU trips SLEEP opcode, needs to be emulated
-	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_video_mem);
-	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::sbc6510_video_data);
-	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::sbc6510_video_io);
+	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::video_mem_map);
+	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::video_data_map);
+	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::video_io_map);
 	m_videocpu->set_eeprom_tag("eeprom");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME); // for F4 displayer only
@@ -311,16 +313,19 @@ void sbc6510_state::sbc6510(machine_config &config)
 
 /* ROM definition */
 ROM_START( sbc6510 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sbc6510.rom", 0xf000, 0x1000, CRC(e13a5e62) SHA1(1e7482e9b98b39d0cc456254fbe8fd0981e9377e))
-	ROM_REGION( 0x10000, "videocpu", ROMREGION_ERASEFF ) // ATMEGA8 at 16MHz
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sbc6510.rom", 0x0000, 0x1000, CRC(e13a5e62) SHA1(1e7482e9b98b39d0cc456254fbe8fd0981e9377e))
+
+	ROM_REGION( 0x2000, "videocpu", 0 ) // ATMEGA8 at 16MHz
 	ROM_LOAD( "video.bin",   0x0000, 0x2000, CRC(809f31ce) SHA1(4639de5f7b8f6c036d74f217ba85e7e897039094))
-	ROM_REGION( 0x200, "gal", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x0200, "gal", ROMREGION_ERASEFF )
 	ROM_LOAD( "sbc6510.gal", 0x0000, 0x0117, CRC(f78f9927) SHA1(b951163958f5722032826d0d17a07c81dbd5f68e))
+
 	ROM_REGION( 0x2000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME   FLAGS */
-COMP( 2009, sbc6510, 0,      0,      sbc6510, sbc6510, sbc6510_state, empty_init, "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )
+COMP( 2009, sbc6510, 0,      0,      sbc6510, sbc6510, sbc6510_state, empty_init, "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

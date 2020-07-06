@@ -113,13 +113,13 @@ void concept_state::concept_set_interrupt(int level, int state)
     6: DCD1 (I)
     7: IOX (O)
 */
-READ8_MEMBER(concept_state::via_in_a)
+uint8_t concept_state::via_in_a()
 {
 	LOG(("via_in_a: VIA port A (Omninet and COMM port status) read\n"));
 	return 1;       /* omninet ready always 1 */
 }
 
-WRITE8_MEMBER(concept_state::via_out_a)
+void concept_state::via_out_a(uint8_t data)
 {
 	LOG(("via_out_a: VIA port A status written: data=0x%2.2x\n", data));
 	/*iox = (data & 0x80) != 0;*/
@@ -137,7 +137,7 @@ WRITE8_MEMBER(concept_state::via_out_a)
     6: boot switch 0 (I)
     7: boot switch 1 (I)
 */
-READ8_MEMBER(concept_state::via_in_b)
+uint8_t concept_state::via_in_b()
 {
 	uint8_t status;
 
@@ -146,7 +146,7 @@ READ8_MEMBER(concept_state::via_in_b)
 	return status;
 }
 
-WRITE8_MEMBER(concept_state::via_out_b)
+void concept_state::via_out_b(uint8_t data)
 {
 	VLOG(("via_out_b: VIA port B (Video Control and COMM rate select) written: data=0x%2.2x\n", data));
 }
@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER(concept_state::via_irq_func)
 	concept_set_interrupt(TIMINT_level, state);
 }
 
-READ8_MEMBER(concept_state::io_r)
+uint8_t concept_state::io_r(offs_t offset)
 {
 	switch ((offset >> 8) & 7)
 	{
@@ -224,7 +224,7 @@ READ8_MEMBER(concept_state::io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!m_clock_enable)
-			return m_mm58274->read(m_clock_address);
+			return m_mm58174->read(m_clock_address);
 		break;
 
 	case 7:
@@ -277,7 +277,7 @@ READ8_MEMBER(concept_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(concept_state::io_w)
+void concept_state::io_w(offs_t offset, uint8_t data)
 {
 	switch ((offset >> 8) & 7)
 	{
@@ -330,7 +330,7 @@ WRITE8_MEMBER(concept_state::io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!m_clock_enable)
-			m_mm58274->write(m_clock_address, data & 0xf);
+			m_mm58174->write(m_clock_address, data & 0xf);
 		break;
 
 	case 7:

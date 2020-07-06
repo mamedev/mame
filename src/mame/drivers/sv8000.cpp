@@ -56,24 +56,24 @@ public:
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
-	DECLARE_READ8_MEMBER( ay_port_a_r );
-	DECLARE_READ8_MEMBER( ay_port_b_r );
-	DECLARE_WRITE8_MEMBER( ay_port_a_w );
-	DECLARE_WRITE8_MEMBER( ay_port_b_w );
+	uint8_t ay_port_a_r();
+	uint8_t ay_port_b_r();
+	void ay_port_a_w(uint8_t data);
+	void ay_port_b_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( i8255_porta_r );
-	DECLARE_WRITE8_MEMBER( i8255_porta_w );
-	DECLARE_READ8_MEMBER( i8255_portb_r );
-	DECLARE_WRITE8_MEMBER( i8255_portb_w );
-	DECLARE_READ8_MEMBER( i8255_portc_r );
-	DECLARE_WRITE8_MEMBER( i8255_portc_w );
+	uint8_t i8255_porta_r();
+	void i8255_porta_w(uint8_t data);
+	uint8_t i8255_portb_r();
+	void i8255_portb_w(uint8_t data);
+	uint8_t i8255_portc_r();
+	void i8255_portc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( mc6847_videoram_r );
+	uint8_t mc6847_videoram_r(offs_t offset);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void sv8000_io(address_map &map);
-	void sv8000_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
@@ -98,7 +98,7 @@ private:
 };
 
 
-void sv8000_state::sv8000_mem(address_map &map)
+void sv8000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	//map(0x0000, 0x0fff)      // mapped by the cartslot
@@ -107,7 +107,7 @@ void sv8000_state::sv8000_mem(address_map &map)
 }
 
 
-void sv8000_state::sv8000_io(address_map &map)
+void sv8000_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -172,15 +172,6 @@ INPUT_PORTS_END
 
 void sv8000_state::machine_start()
 {
-	m_ag = 0;
-	m_gm2 = 0;
-	m_gm1 = 0;
-	m_gm0 = 0;
-	m_as = 0;
-	m_css = 0;
-	m_intext = 0;
-	m_inv = 0;
-
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
@@ -199,6 +190,14 @@ void sv8000_state::machine_start()
 void sv8000_state::machine_reset()
 {
 	m_column = 0xff;
+	m_ag = 0;
+	m_gm2 = 0;
+	m_gm1 = 0;
+	m_gm0 = 0;
+	m_as = 0;
+	m_css = 0;
+	m_intext = 0;
+	m_inv = 0;
 }
 
 
@@ -219,34 +218,34 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state::cart_load )
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_porta_r )
+uint8_t sv8000_state::i8255_porta_r()
 {
 	//logerror("i8255_porta_r\n");
 	return m_io_joy->read();
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_porta_w )
+void sv8000_state::i8255_porta_w(uint8_t data)
 {
 	//logerror("i8255_porta_w: %02X\n", data);
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_portb_r )
+uint8_t sv8000_state::i8255_portb_r()
 {
 	uint8_t data = 0xff;
 
 	//logerror("i8255_portb_r\n");
 
-	if (!(m_column & 0x01))
+	if (!BIT(m_column, 0))
 	{
 		data &= m_io_row0->read();
 	}
-	if (!(m_column & 0x02))
+	if (!BIT(m_column, 1))
 	{
 		data &= m_io_row1->read();
 	}
-	if (!(m_column & 0x04))
+	if (!BIT(m_column, 2))
 	{
 		data &= m_io_row2->read();
 	}
@@ -254,27 +253,27 @@ READ8_MEMBER( sv8000_state::i8255_portb_r )
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_portb_w )
+void sv8000_state::i8255_portb_w(uint8_t data)
 {
 	//logerror("i8255_portb_w: %02X\n", data);
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_portc_r )
+uint8_t sv8000_state::i8255_portc_r()
 {
 	//logerror("i8255_portc_r\n");
 	return 0xff;
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_portc_w )
+void sv8000_state::i8255_portc_w(uint8_t data)
 {
 	//logerror("i8255_portc_w: %02X\n", data);
 	m_column = data;
 }
 
 
-READ8_MEMBER( sv8000_state::ay_port_a_r )
+uint8_t sv8000_state::ay_port_a_r()
 {
 	uint8_t data = 0xff;
 
@@ -283,7 +282,7 @@ READ8_MEMBER( sv8000_state::ay_port_a_r )
 }
 
 
-READ8_MEMBER( sv8000_state::ay_port_b_r )
+uint8_t sv8000_state::ay_port_b_r()
 {
 	uint8_t data = 0xff;
 
@@ -320,7 +319,7 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 // beamgala:
 // 0x5A 01011010 graphics 3KB in 6KB mode?
 //
-WRITE8_MEMBER( sv8000_state::ay_port_a_w )
+void sv8000_state::ay_port_a_w(uint8_t data)
 {
 	//logerror("ay_port_a_w: %02X\n", data);
 
@@ -341,12 +340,12 @@ WRITE8_MEMBER( sv8000_state::ay_port_a_w )
 }
 
 
-WRITE8_MEMBER( sv8000_state::ay_port_b_w )
+void sv8000_state::ay_port_b_w(uint8_t data)
 {
 	//logerror("ay_port_b_w: %02X\n", data);
 }
 
-READ8_MEMBER( sv8000_state::mc6847_videoram_r )
+uint8_t sv8000_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
@@ -378,8 +377,8 @@ void sv8000_state::sv8000(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::sv8000_mem);
-	m_maincpu->set_addrmap(AS_IO, &sv8000_state::sv8000_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sv8000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sv8000_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255(config, "i8255"));
@@ -424,4 +423,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE         INIT        COMPANY   FULLNAME                            FLAGS */
-CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, sv8000_state, empty_init, "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
+CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, sv8000_state, empty_init, "Bandai", "Super Vision 8000 (TV Jack 8000)", MACHINE_SUPPORTS_SAVE )

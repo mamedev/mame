@@ -185,13 +185,13 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
-	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_READ8_MEMBER(c001_r);
-	DECLARE_WRITE8_MEMBER(c001_w);
-	DECLARE_READ8_MEMBER(atamanot_prot_r);
-	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
+	void ssingles_videoram_w(offs_t offset, uint8_t data);
+	void ssingles_colorram_w(offs_t offset, uint8_t data);
+	uint8_t c000_r();
+	uint8_t c001_r();
+	void c001_w(uint8_t data);
+	uint8_t atamanot_prot_r(offs_t offset);
+	void atamanot_prot_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
@@ -289,14 +289,14 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 }
 
 
-WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
+void ssingles_state::ssingles_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *vram = memregion("vram")->base();
 	vram[offset] = data;
 	m_videoram[offset]=data;
 }
 
-WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
+void ssingles_state::ssingles_colorram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *cram = memregion("cram")->base();
 	cram[offset] = data;
@@ -311,18 +311,18 @@ void ssingles_state::video_start()
 }
 
 
-READ8_MEMBER(ssingles_state::c000_r)
+uint8_t ssingles_state::c000_r()
 {
 	return m_prot_data;
 }
 
-READ8_MEMBER(ssingles_state::c001_r)
+uint8_t ssingles_state::c001_r()
 {
 	m_prot_data=0xc4;
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::c001_w)
+void ssingles_state::c001_w(uint8_t data)
 {
 	m_prot_data^=data^0x11;
 }
@@ -356,7 +356,7 @@ void ssingles_state::ssingles_map(address_map &map)
 }
 
 
-READ8_MEMBER(ssingles_state::atamanot_prot_r)
+uint8_t ssingles_state::atamanot_prot_r(offs_t offset)
 {
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
@@ -377,7 +377,7 @@ READ8_MEMBER(ssingles_state::atamanot_prot_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
+void ssingles_state::atamanot_prot_w(uint8_t data)
 {
 	m_atamanot_prot_state = data;
 }

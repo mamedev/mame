@@ -33,6 +33,7 @@
 #include "emu.h"
 #include "williams.h"
 #include "machine/6821pia.h"
+#include "machine/rescap.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
@@ -141,8 +142,8 @@ void williams_cvsd_sound_device::talkback_w(u8 data)
 
 void williams_cvsd_sound_device::cvsd_digit_clock_clear_w(u8 data)
 {
-	m_hc55516->digit_w(data);
 	m_hc55516->clock_w(0);
+	m_hc55516->digit_w(data&1);
 }
 
 
@@ -435,20 +436,20 @@ void williams_narc_sound_device::slave_sync_w(u8 data)
 
 
 //-------------------------------------------------
-//  cvsd_digit_clock_clear_w - clear the clock on
-//  the HC55516 and clock the data
+//  cvsd_digit_clock_clear_w - clear the clk pin on
+//  the HC555xx and clock the data latch
 //-------------------------------------------------
 
 void williams_narc_sound_device::cvsd_digit_clock_clear_w(u8 data)
 {
-	m_hc55516->digit_w(data);
 	m_hc55516->clock_w(0);
+	m_hc55516->digit_w(data&1);
 }
 
 
-//-------------------------------------------------
-//  cvsd_clock_set_w - set the clock on the HC55516
-//-------------------------------------------------
+//---------------------------------------------------
+//  cvsd_clock_set_w - set the clk pin on the HC555xx
+//---------------------------------------------------
 
 void williams_narc_sound_device::cvsd_clock_set_w(u8 data)
 {

@@ -227,6 +227,7 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
+#include "machine/mb14241.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
@@ -234,14 +235,14 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 
 
 #if 0
-WRITE8_MEMBER(fortyl_state::fortyl_coin_counter_w)
+void fortyl_state::fortyl_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 
 
-WRITE8_MEMBER(fortyl_state::bank_select_w)
+void fortyl_state::bank_select_w(uint8_t data)
 {
 	if ((data != 0x02) && (data != 0xfd))
 	{
@@ -252,55 +253,13 @@ WRITE8_MEMBER(fortyl_state::bank_select_w)
 	membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(fortyl_state::pix1_w)
-{
-//  if (data > 7)
-//      logerror("pix1 = %2x\n", data);
-
-	m_pix1 = data;
-}
-
-READ8_MEMBER(fortyl_state::fortyl_mcu_status_r)
+uint8_t fortyl_state::fortyl_mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
 	return
 		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
 		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
-}
-
-WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
-{
-//  if (data > 7)
-//      logerror("pix1 = %2x\n", data);
-
-	m_pix1 = data;
-}
-
-WRITE8_MEMBER(fortyl_state::pix2_w)
-{
-//  if ((data!=0x00) && (data != 0xff))
-//      logerror("pix2 = %2x\n", data);
-
-	m_pix2[0] = m_pix2[1];
-	m_pix2[1] = data;
-}
-
-#if 0
-READ8_MEMBER(fortyl_state::pix1_r)
-{
-	return m_pix1;
-}
-#endif
-
-READ8_MEMBER(fortyl_state::pix2_r)
-{
-	int res;
-	int d1 = m_pix1 & 7;
-
-	res = (((m_pix2[1] << (d1 + 8)) | (m_pix2[0] << d1)) & 0xff00) >> 8;
-
-	return res;
 }
 
 
@@ -319,7 +278,7 @@ void fortyl_state::driver_init()
 
 /***************************************************************************/
 
-READ8_MEMBER(fortyl_state::snd_flag_r)
+uint8_t fortyl_state::snd_flag_r()
 {
 	return (m_soundlatch2->pending_r() ? 2 : 0) | 0xfd;
 }
@@ -331,9 +290,9 @@ void fortyl_state::_40love_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram(); /* M5517P on main board */
 	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x8801, 0x8801).rw(FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_mcu_w));      //pixel layer related
+	map(0x8801, 0x8801).r(FUNC(fortyl_state::fortyl_mcu_status_r)).w("mb14241", FUNC(mb14241_device::shift_count_w)); //pixel layer related
 	map(0x8802, 0x8802).w(FUNC(fortyl_state::bank_select_w));
-	map(0x8803, 0x8803).rw(FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
+	map(0x8803, 0x8803).rw("mb14241", FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w)); //pixel layer related
 	map(0x8804, 0x8804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x8804, 0x8804).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x8805, 0x8805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/ //????
@@ -360,9 +319,9 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xa7ff).ram().share("mcu_ram"); /* M5517P on main board */
 	map(0xa800, 0xa800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xa801, 0xa801).rw(FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_w));        //pixel layer related
+	map(0xa801, 0xa801).r(FUNC(fortyl_state::fortyl_mcu_status_r)).w("mb14241", FUNC(mb14241_device::shift_count_w)); //pixel layer related
 	map(0xa802, 0xa802).w(FUNC(fortyl_state::bank_select_w));
-	map(0xa803, 0xa803).rw(FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
+	map(0xa803, 0xa803).rw("mb14241", FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w)); //pixel layer related
 	map(0xa804, 0xa804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xa804, 0xa804).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xa805, 0xa805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
@@ -381,7 +340,7 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w));
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_0_w)
+void fortyl_state::sound_control_0_w(uint8_t data)
 {
 	m_snd_ctrl0 = data & 0xff;
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -396,7 +355,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_0_w)
 	//m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
-WRITE8_MEMBER(fortyl_state::sound_control_1_w)
+void fortyl_state::sound_control_1_w(uint8_t data)
 {
 	m_snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -409,7 +368,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_1_w)
 	//m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_2_w)
+void fortyl_state::sound_control_2_w(uint8_t data)
 {
 	m_snd_ctrl2 = data & 0xff;
 //  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -417,7 +376,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_2_w)
 	m_ta7630->set_device_volume(m_ay,m_snd_ctrl2 >> 4);
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
+void fortyl_state::sound_control_3_w(uint8_t data) /* unknown */
 {
 	m_snd_ctrl3 = data & 0xff;
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -644,10 +603,9 @@ GFXDECODE_END
 void fortyl_state::machine_start()
 {
 	/* video */
-	save_item(NAME(m_pix1));
-	save_item(NAME(m_pix2));
 	save_item(NAME(m_color_bank));
 	save_item(NAME(m_screen_disable));
+
 	/* sound */
 	save_item(NAME(m_vol_ctrl));
 	save_item(NAME(m_snd_ctrl0));
@@ -660,9 +618,6 @@ void fortyl_state::machine_start()
 void fortyl_state::machine_reset()
 {
 	/* video */
-	m_pix1 = 0;
-	m_pix2[0] = 0;
-	m_pix2[1] = 0;
 	m_color_bank = false;
 
 	/* sound */
@@ -683,7 +638,6 @@ void fortyl_state::common(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(fortyl_state::irq0_line_hold), attotime::from_hz(2*60)); /* source/number of IRQs is unknown */
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
-
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
@@ -691,6 +645,8 @@ void fortyl_state::common(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, 18432000/6); /* OK */
 
 	config.set_maximum_quantum(attotime::from_hz(6000));  /* high interleave to ensure proper synchronization of CPUs */
+
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

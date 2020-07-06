@@ -31,7 +31,7 @@ public:
 private:
 	enum
 	{
-		TIMER_NMI,
+		TIMER_DMASTART,
 		TIMER_DMAEND
 	};
 
@@ -45,7 +45,7 @@ private:
 
 	/* misc */
 	int        m_firq_enabled;
-	//int        m_nmi_enabled;
+	u64        m_nmi_enabled;
 
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;
@@ -55,23 +55,24 @@ private:
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
-	DECLARE_WRITE8_MEMBER(z80_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
-	DECLARE_WRITE8_MEMBER(simpsons_eeprom_w);
-	DECLARE_WRITE8_MEMBER(simpsons_coin_counter_w);
-	DECLARE_READ8_MEMBER(simpsons_sound_interrupt_r);
-	DECLARE_READ8_MEMBER(simpsons_k052109_r);
-	DECLARE_WRITE8_MEMBER(simpsons_k052109_w);
-	DECLARE_READ8_MEMBER(simpsons_k053247_r);
-	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
+	void z80_bankswitch_w(uint8_t data);
+	void z80_arm_nmi_w(uint8_t data);
+	void simpsons_eeprom_w(uint8_t data);
+	void simpsons_coin_counter_w(uint8_t data);
+	uint8_t simpsons_sound_interrupt_r();
+	uint8_t simpsons_k052109_r(offs_t offset);
+	void simpsons_k052109_w(offs_t offset, uint8_t data);
+	uint8_t simpsons_k053247_r(offs_t offset);
+	void simpsons_k053247_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpsons_irq);
 	void simpsons_video_banking(int bank);
 	void simpsons_objdma();
+	void z80_nmi_w(int state);
 	K052109_CB_MEMBER(tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(u8 data);
 	K053246_CB_MEMBER(sprite_callback);
 
 	void bank0000_map(address_map &map);

@@ -87,14 +87,14 @@ offs_t unsp_12_disassembler::disassemble_exxx_group(std::ostream& stream, offs_t
 		util::stream_format(stream, "%s ds:[%s],%s", bitops[bitop], regs[rd], regs[rs]);
 		return UNSP_DASM_OK;
 	}
-	else if (((op & 0xf0f8) == 0xe008))
+	else if (((op & 0xf1f8) == 0xe008))
 	{
 		// MUL operations
 		// MUL      1 1 1 0*  r r r S*  0 0 0 0   1 r r r     (* = sign bit, fixed here)
 		print_mul(stream, op); // MUL uu or MUL su (invalid?)
 		return UNSP_DASM_OK;
 	}
-	else if (((op & 0xf080) == 0xe080))
+	else if (((op & 0xf180) == 0xe080))
 	{
 		// MULS     1 1 1 0*  r r r S*  1 s s s   s r r r    (* = sign bit, fixed here)
 

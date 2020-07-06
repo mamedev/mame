@@ -68,23 +68,23 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(line_printer_r);
+	uint16_t line_printer_r();
 	void disk_control_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER(gcr_w);
+	void gcr_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(romlmap_w);
 	DECLARE_WRITE_LINE_MEMBER(error_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(parity_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(bpplus_w);
-	DECLARE_READ16_MEMBER(ram_mmu_r);
-	DECLARE_WRITE16_MEMBER(ram_mmu_w);
-	DECLARE_READ16_MEMBER(gsr_r);
-	DECLARE_WRITE16_MEMBER(tcr_w);
-	DECLARE_READ16_MEMBER(tsr_r);
-	DECLARE_READ16_MEMBER(rtc_r);
-	DECLARE_WRITE16_MEMBER(rtc_w);
-	DECLARE_READ16_MEMBER(diskdma_size_r);
-	DECLARE_WRITE16_MEMBER(diskdma_size_w);
-	DECLARE_WRITE16_MEMBER(diskdma_ptr_w);
+	uint16_t ram_mmu_r(offs_t offset);
+	void ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gsr_r();
+	void tcr_w(offs_t offset, uint16_t data);
+	uint16_t tsr_r();
+	uint16_t rtc_r();
+	void rtc_w(uint16_t data);
+	uint16_t diskdma_size_r();
+	void diskdma_size_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void diskdma_ptr_w(offs_t offset, uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(wd2797_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(wd2797_drq_w);
@@ -122,7 +122,7 @@ private:
     MEMORY
 ***************************************************************************/
 
-WRITE16_MEMBER(unixpc_state::gcr_w)
+void unixpc_state::gcr_w(offs_t offset, uint16_t data)
 {
 	m_gcr->write_bit(offset >> 11, BIT(data, 15));
 }
@@ -132,7 +132,7 @@ WRITE_LINE_MEMBER(unixpc_state::romlmap_w)
 	m_ramrombank->set_bank(state ? 1 : 0);
 }
 
-READ16_MEMBER(unixpc_state::ram_mmu_r)
+uint16_t unixpc_state::ram_mmu_r(offs_t offset)
 {
 	// TODO: MMU translation
 	if (offset > m_ramsize)
@@ -142,7 +142,7 @@ READ16_MEMBER(unixpc_state::ram_mmu_r)
 	return m_ramptr[offset];
 }
 
-WRITE16_MEMBER(unixpc_state::ram_mmu_w)
+void unixpc_state::ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// TODO: MMU translation
 	if (offset < m_ramsize)
@@ -181,32 +181,32 @@ WRITE_LINE_MEMBER(unixpc_state::bpplus_w)
     MISC
 ***************************************************************************/
 
-READ16_MEMBER(unixpc_state::gsr_r)
+uint16_t unixpc_state::gsr_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(unixpc_state::tcr_w)
+void unixpc_state::tcr_w(offs_t offset, uint16_t data)
 {
 	m_tcr->write_bit(offset >> 11, BIT(data, 14));
 }
 
-READ16_MEMBER(unixpc_state::tsr_r)
+uint16_t unixpc_state::tsr_r()
 {
 	return 0;
 }
 
-READ16_MEMBER(unixpc_state::rtc_r)
+uint16_t unixpc_state::rtc_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(unixpc_state::rtc_w)
+void unixpc_state::rtc_w(uint16_t data)
 {
 	logerror("rtc_w: %04x\n", data);
 }
 
-READ16_MEMBER(unixpc_state::line_printer_r)
+uint16_t unixpc_state::line_printer_r()
 {
 	uint16_t data = 0;
 
@@ -224,18 +224,18 @@ READ16_MEMBER(unixpc_state::line_printer_r)
     DMA
 ***************************************************************************/
 
-READ16_MEMBER(unixpc_state::diskdma_size_r)
+uint16_t unixpc_state::diskdma_size_r()
 {
 	return m_diskdmasize;
 }
 
-WRITE16_MEMBER(unixpc_state::diskdma_size_w)
+void unixpc_state::diskdma_size_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_diskdmasize );
 	logerror("%x to disk DMA size\n", data);
 }
 
-WRITE16_MEMBER(unixpc_state::diskdma_ptr_w)
+void unixpc_state::diskdma_ptr_w(offs_t offset, uint16_t data)
 {
 	if (offset >= 0x2000)
 	{

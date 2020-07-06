@@ -96,9 +96,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { m_bootrom_enabled = false; }
 
 	// I/O handlers
-	DECLARE_READ32_MEMBER(bootrom_r);
-	DECLARE_READ32_MEMBER(p1000_r);
-	DECLARE_WRITE32_MEMBER(p1000_w);
+	uint32_t bootrom_r(offs_t offset);
+	uint32_t p1000_r();
+	void p1000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
 void tasc_state::machine_start()
@@ -120,12 +120,12 @@ void tasc_state::machine_reset()
     I/O
 ******************************************************************************/
 
-READ32_MEMBER(tasc_state::bootrom_r)
+uint32_t tasc_state::bootrom_r(offs_t offset)
 {
 	return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset];
 }
 
-READ32_MEMBER(tasc_state::p1000_r)
+uint32_t tasc_state::p1000_r()
 {
 	// disconnect bootrom from the bus after next opcode
 	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
@@ -142,7 +142,7 @@ READ32_MEMBER(tasc_state::p1000_r)
 	return data;
 }
 
-WRITE32_MEMBER(tasc_state::p1000_w)
+void tasc_state::p1000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -233,6 +233,7 @@ void tasc_state::tasc(machine_config &config)
 	m_lcd->set_fs(1); // font size 6x8
 
 	TASC_SB30(config, m_smartboard);
+	subdevice<sensorboard_device>("smartboard:board")->set_nvram_enable(true);
 
 	config.set_default_layout(layout_tascr30);
 

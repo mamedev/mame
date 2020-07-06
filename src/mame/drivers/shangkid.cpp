@@ -110,13 +110,13 @@ WRITE_LINE_MEMBER(shangkid_state::irq_2_w)
 		m_bbx->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(shangkid_state::nmiq_1_w)
+void shangkid_state::nmiq_1_w(uint8_t data)
 {
 	if (m_nmi_enable[0])
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(shangkid_state::nmiq_2_w)
+void shangkid_state::nmiq_2_w(uint8_t data)
 {
 	if (m_nmi_enable[1])
 		m_bbx->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -132,14 +132,14 @@ WRITE_LINE_MEMBER(shangkid_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
+void shangkid_state::chinhero_ay8910_porta_w(uint8_t data)
 {
 	if (BIT(data, 0))
 		/* 0->1 transition triggers interrupt on Sound CPU */
 		m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
+void shangkid_state::shangkid_ay8910_porta_w(uint8_t data)
 {
 	if (BIT(data, 0))
 		/* 0->1 transition triggers interrupt on Sound CPU */
@@ -148,14 +148,14 @@ WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
 	membank("bank2")->set_entry((data & 0xfe) ? 0 : 1);
 }
 
-WRITE8_MEMBER(shangkid_state::ay8910_portb_w)
+void shangkid_state::ay8910_portb_w(uint8_t data)
 {
 	m_sound_latch = data;
 }
 
 /***************************************************************************************/
 
-READ8_MEMBER(shangkid_state::soundlatch_r)
+uint8_t shangkid_state::soundlatch_r()
 {
 	return m_sound_latch;
 }

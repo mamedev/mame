@@ -22,7 +22,7 @@ void freekick_state::video_start()
 }
 
 
-WRITE8_MEMBER(freekick_state::freek_videoram_w)
+void freekick_state::freek_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_freek_tilemap->mark_tile_dirty(offset & 0x3ff);

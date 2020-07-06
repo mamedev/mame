@@ -62,9 +62,9 @@ private:
 	// devices
 	required_device<tms1000_cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(read_k);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
+	u8 read_k();
+	void write_o(u16 data);
+	void write_r(u16 data);
 };
 
 class eva24_state : public base_state
@@ -85,9 +85,9 @@ private:
 	// devices
 	required_device<cop420_cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(read_g);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_d);
+	u8 read_g();
+	void write_g(u8 data);
+	void write_d(u8 data);
 
 	u8 m_g = 0;
 };
@@ -105,19 +105,19 @@ void eva24_state::machine_start()
 
 // EVA-24
 
-WRITE8_MEMBER(eva24_state::write_g)
+void eva24_state::write_g(u8 data)
 {
 	// G3: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 3 & 1);
 	m_g = data;
 }
 
-READ8_MEMBER(eva24_state::read_g)
+u8 eva24_state::read_g()
 {
 	return m_g;
 }
 
-WRITE8_MEMBER(eva24_state::write_d)
+void eva24_state::write_d(u8 data)
 {
 	// D3210: TMS5100 CTL8421
 	m_tms5100->ctl_w(data & 0xf);
@@ -126,19 +126,19 @@ WRITE8_MEMBER(eva24_state::write_d)
 
 // EVA-11
 
-WRITE16_MEMBER(eva11_state::write_r)
+void eva11_state::write_r(u16 data)
 {
 	// R7: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 7 & 1);
 }
 
-WRITE16_MEMBER(eva11_state::write_o)
+void eva11_state::write_o(u16 data)
 {
 	// O3210: TMS5100 CTL8421
 	m_tms5100->ctl_w(data & 0xf);
 }
 
-READ8_MEMBER(eva11_state::read_k)
+u8 eva11_state::read_k()
 {
 	// K84: TMS5100 CTL81(O30)
 	u8 ctl = m_tms5100->ctl_r();

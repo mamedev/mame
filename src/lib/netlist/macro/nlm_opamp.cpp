@@ -8,11 +8,14 @@
  * 1 = Model from LTSPICE mailing list - slow!
  * 2 = Simplified model using diode inputs and netlist
  * 3 = Model according to datasheet
+ * 4 = Faster model by Colin Howell
  *
  * For Money Money 1 and 3 delivery comparable results.
  * 3 is simpler (less BJTs) and converges a lot faster.
+ *
+ * Model 4 uses a lot less resources and pn-junctions. The preferred new normal.
  */
-#define USE_LM3900_MODEL (3)
+#define USE_LM3900_MODEL (4)
 
 /*
  *   Generic layout with 4 opamps, VCC on pin 4 and GND on pin 11
@@ -131,6 +134,13 @@ static NETLIST_START(MB3614_DIP)
 	OPAMP(D, "MB3614")
 
 	INCLUDE(opamp_layout_4_4_11)
+
+NETLIST_END()
+
+static NETLIST_START(TL081_DIP)
+	OPAMP(A, "TL084")
+
+	INCLUDE(opamp_layout_1_7_4)
 
 NETLIST_END()
 
@@ -311,8 +321,8 @@ static NETLIST_START(LM3900)
 
 	NET_C(A.PLUS, CS1.IP)
 	NET_C(D1.A, CS1.IN)
-	NET_C(CS1.OP, A.MINUS)
-	NET_C(CS1.ON, A.GND, D1.K)
+	NET_C(CS1.ON, A.MINUS)
+	NET_C(CS1.OP, A.GND, D1.K)
 
 NETLIST_END()
 #endif
@@ -345,6 +355,37 @@ static NETLIST_START(LM3900)
 NETLIST_END()
 #endif
 
+#if USE_LM3900_MODEL == 4
+static NETLIST_START(LM3900)
+	OPAMP(A, "OPAMP(TYPE=3 VLH=0.5 VLL=0.03 FPF=2k UGF=2.5M SLEW=1M RI=10M RO=100 DAB=0.0015)")
+
+	DIODE(D1, "D(IS=6e-15 N=1)")
+	DIODE(D2, "D(IS=6e-15 N=1)")
+	CCCS(CS1, 1) // Current Mirror
+
+	ALIAS(VCC, A.VCC)
+	ALIAS(GND, A.GND)
+	ALIAS(OUT, A.OUT)
+
+	ALIAS(PLUS, CS1.IP)
+	NET_C(D1.A, CS1.IN)
+	NET_C(A.GND, D1.K)
+
+	CS(CS_BIAS, 10e-6)
+	NET_C(A.VCC, CS_BIAS.P)
+
+	ALIAS(MINUS, CS1.OP)
+	NET_C(CS1.ON, A.GND)
+
+	CCVS(VS1, 200000) // current-to-voltage gain
+	NET_C(CS1.OP, VS1.IP)
+	NET_C(VS1.IN, CS_BIAS.N, D2.A)
+	NET_C(D2.K, A.GND)
+	NET_C(VS1.OP, A.MINUS)
+	NET_C(VS1.ON, A.PLUS, A.GND)
+NETLIST_END()
+#endif
+
 NETLIST_START(OPAMP_lib)
 	LOCAL_LIB_ENTRY(opamp_layout_4_4_11)
 	LOCAL_LIB_ENTRY(opamp_layout_2_8_4)
@@ -372,6 +413,7 @@ NETLIST_START(OPAMP_lib)
 	NET_MODEL("LM3900_PNP1 PNP(IS=1E-14 BF=40 TF=1E-7 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5)")
 #endif
 	LOCAL_LIB_ENTRY(MB3614_DIP)
+	LOCAL_LIB_ENTRY(TL081_DIP)
 	LOCAL_LIB_ENTRY(TL084_DIP)
 	LOCAL_LIB_ENTRY(LM324_DIP)
 	LOCAL_LIB_ENTRY(LM358_DIP)

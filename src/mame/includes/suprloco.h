@@ -39,9 +39,9 @@ private:
 	tilemap_t *m_bg_tilemap;
 	int m_control;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scrollram_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void scrollram_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

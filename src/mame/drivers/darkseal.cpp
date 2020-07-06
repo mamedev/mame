@@ -31,7 +31,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(darkseal_state::irq_ack_w)
+void darkseal_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }

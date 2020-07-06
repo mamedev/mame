@@ -147,7 +147,7 @@ void hp48_state::rs232_send_byte()
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-WRITE32_MEMBER( hp48_state::reg_out )
+void hp48_state::reg_out(uint32_t data)
 {
 	LOG(("%s %f hp48_state::reg_out: %03x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -182,7 +182,7 @@ int hp48_state::get_in()
 }
 
 /* CPU reads IN register (keyboard) */
-READ32_MEMBER( hp48_state::reg_in )
+uint32_t hp48_state::reg_in()
 {
 	int in = get_in();
 	LOG(("%s %f hp48_state::reg_in: %04x\n", machine().describe_context(), machine().time().as_double(), in));
@@ -263,7 +263,7 @@ void hp48_state::update_annunciators()
    - perform some action on read / write
  */
 
-WRITE8_MEMBER(hp48_state::io_w)
+void hp48_state::io_w(offs_t offset, uint8_t data)
 {
 	LOG(("%s %f hp48_state::io_w: off=%02x data=%x\n", machine().describe_context(), machine().time().as_double(), offset, data));
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER(hp48_state::io_w)
 }
 
 
-READ8_MEMBER(hp48_state::io_r)
+uint8_t hp48_state::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -494,7 +494,7 @@ READ8_MEMBER(hp48_state::io_r)
 
 /* ---------- bank switcher --------- */
 
-READ8_MEMBER(hp48_state::bank_r)
+uint8_t hp48_state::bank_r(offs_t offset)
 {
 	/* HP48 GX
 	   bit 0: ignored
@@ -518,7 +518,7 @@ READ8_MEMBER(hp48_state::bank_r)
 }
 
 
-WRITE8_MEMBER(hp48_state::hp49_bank_w)
+void hp48_state::hp49_bank_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
@@ -784,7 +784,7 @@ WRITE_LINE_MEMBER( hp48_state::mem_reset )
 
 
 /* CONFIG opcode */
-WRITE32_MEMBER( hp48_state::mem_config )
+void hp48_state::mem_config(uint32_t data)
 {
 	LOG(("%s %f hp48_state::mem_config: %05x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -813,7 +813,7 @@ WRITE32_MEMBER( hp48_state::mem_config )
 
 
 /* UNCFG opcode */
-WRITE32_MEMBER( hp48_state::mem_unconfig )
+void hp48_state::mem_unconfig(uint32_t data)
 {
 	LOG(("%s %f hp48_state::mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -833,7 +833,7 @@ WRITE32_MEMBER( hp48_state::mem_unconfig )
 
 
 /* C=ID opcode */
-READ32_MEMBER( hp48_state::mem_id )
+uint32_t hp48_state::mem_id()
 {
 	int data = 0; /* 0 = everything is configured */
 
@@ -865,7 +865,7 @@ READ32_MEMBER( hp48_state::mem_id )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-WRITE32_MEMBER( hp48_state::mem_crc )
+void hp48_state::mem_crc(offs_t offset, uint32_t data)
 {
 	/* no CRC for I/O RAM */
 	if (offset >= m_io_addr && offset < m_io_addr + 0x40) return;
@@ -907,8 +907,8 @@ void hp48_state::init_hp48()
 	for (int i = 0; i < 6; i++)
 	{
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[i].read     = read8_delegate(*this);
-		m_modules[i].write    = write8_delegate(*this);
+		m_modules[i].read     = read8sm_delegate(*this);
+		m_modules[i].write    = write8sm_delegate(*this);
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 	}
@@ -957,8 +957,8 @@ void hp48_state::base_machine_start(hp48_models model)
 
 	/* I/O RAM */
 	m_modules[HP48_HDW].off_mask = 0x0003f;  /* 32 B */
-	m_modules[HP48_HDW].read     = read8_delegate(*this, FUNC(hp48_state::io_r));
-	m_modules[HP48_HDW].write    = write8_delegate(*this, FUNC(hp48_state::io_w));
+	m_modules[HP48_HDW].read     = read8sm_delegate(*this, FUNC(hp48_state::io_r));
+	m_modules[HP48_HDW].write    = write8sm_delegate(*this, FUNC(hp48_state::io_w));
 
 	/* internal RAM */
 	if (HP49_G_MODEL)
@@ -980,8 +980,8 @@ void hp48_state::base_machine_start(hp48_models model)
 	if (HP48_G_SERIES)
 	{
 		m_modules[HP48_CE1].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[HP48_CE1].read     = read8_delegate(*this, FUNC(hp48_state::bank_r));
-		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8_delegate(*this, FUNC(hp48_state::hp49_bank_w)) : write8_delegate(*this);
+		m_modules[HP48_CE1].read     = read8sm_delegate(*this, FUNC(hp48_state::bank_r));
+		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8sm_delegate(*this, FUNC(hp48_state::hp49_bank_w)) : write8sm_delegate(*this);
 	}
 
 	/* timers */

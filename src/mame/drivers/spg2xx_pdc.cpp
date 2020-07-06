@@ -19,7 +19,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	int m_numbanks;
@@ -63,7 +63,7 @@ void spg2xx_pdc100_game_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
+void spg2xx_pdc100_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
 	if (data & 0xff00)

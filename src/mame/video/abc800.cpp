@@ -26,7 +26,7 @@
 //  hrs_w - high resolution scanline write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_state::hrs_w )
+void abc800_state::hrs_w(uint8_t data)
 {
 	m_hrs = data;
 }
@@ -36,7 +36,7 @@ WRITE8_MEMBER( abc800_state::hrs_w )
 //  hrc_w - high resolution color write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_state::hrc_w )
+void abc800_state::hrc_w(uint8_t data)
 {
 	m_fgctl = data;
 }
@@ -120,7 +120,7 @@ uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SAA5050_INTERFACE( trom_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc800c_state::char_ram_r )
+uint8_t abc800c_state::char_ram_r(offs_t offset)
 {
 	int row = offset / 40;
 	int col = offset % 40;

@@ -74,7 +74,7 @@ DEFINE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device, "cococart_slot", "CoCo C
 //-------------------------------------------------
 //  cococart_slot_device - constructor
 //-------------------------------------------------
-cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, COCOCART_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cococart_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
@@ -155,11 +155,11 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(cococart_slot_device::cts_read)
+u8 cococart_slot_device::cts_read(offs_t offset)
 {
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 	if (m_cart)
-		result = m_cart->cts_read(space, offset);
+		result = m_cart->cts_read(offset);
 	return result;
 }
 
@@ -168,10 +168,10 @@ READ8_MEMBER(cococart_slot_device::cts_read)
 //  cts_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(cococart_slot_device::cts_write)
+void cococart_slot_device::cts_write(offs_t offset, u8 data)
 {
 	if (m_cart)
-		m_cart->cts_write(space, offset, data);
+		m_cart->cts_write(offset, data);
 }
 
 
@@ -179,11 +179,11 @@ WRITE8_MEMBER(cococart_slot_device::cts_write)
 //  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(cococart_slot_device::scs_read)
+u8 cococart_slot_device::scs_read(offs_t offset)
 {
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 	if (m_cart)
-		result = m_cart->scs_read(space, offset);
+		result = m_cart->scs_read(offset);
 	return result;
 }
 
@@ -192,10 +192,10 @@ READ8_MEMBER(cococart_slot_device::scs_read)
 //  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(cococart_slot_device::scs_write)
+void cococart_slot_device::scs_write(offs_t offset, u8 data)
 {
 	if (m_cart)
-		m_cart->scs_write(space, offset, data);
+		m_cart->scs_write(offset, data);
 }
 
 
@@ -395,7 +395,7 @@ cococart_slot_device::line_value cococart_slot_device::get_line_value(cococart_s
 //  get_cart_base
 //-------------------------------------------------
 
-uint8_t* cococart_slot_device::get_cart_base()
+u8 *cococart_slot_device::get_cart_base()
 {
 	if (m_cart != nullptr)
 		return m_cart->get_cart_base();
@@ -407,7 +407,7 @@ uint8_t* cococart_slot_device::get_cart_base()
 //  get_cart_size
 //-------------------------------------------------
 
-uint32_t cococart_slot_device::get_cart_size()
+u32 cococart_slot_device::get_cart_size()
 {
 	if (m_cart != nullptr)
 		return m_cart->get_cart_size();
@@ -435,7 +435,7 @@ image_init_result cococart_slot_device::call_load()
 	if (m_cart)
 	{
 		memory_region *cart_mem = m_cart->get_cart_memregion();
-		uint8_t *base = cart_mem->base();
+		u8 *base = cart_mem->base();
 		offs_t read_length, cart_length = cart_mem->bytes();
 
 		if (!loaded_through_softlist())
@@ -450,7 +450,7 @@ image_init_result cococart_slot_device::call_load()
 
 		while (read_length < cart_length)
 		{
-			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
+			offs_t len = std::min(read_length, cart_length - read_length);
 			memcpy(base + read_length, base, len);
 			read_length += len;
 		}
@@ -530,7 +530,7 @@ void device_cococart_interface::interface_pre_start()
 //  on the cartridge slot was asserted ($C000-FFEF)
 //-------------------------------------------------
 
-READ8_MEMBER(device_cococart_interface::cts_read)
+u8 device_cococart_interface::cts_read(offs_t offset)
 {
 	return 0x00;
 }
@@ -541,7 +541,7 @@ READ8_MEMBER(device_cococart_interface::cts_read)
 //  on the cartridge slot was asserted ($C000-FFEF)
 //-------------------------------------------------
 
-WRITE8_MEMBER(device_cococart_interface::cts_write)
+void device_cococart_interface::cts_write(offs_t offset, u8 data)
 {
 }
 
@@ -551,7 +551,7 @@ WRITE8_MEMBER(device_cococart_interface::cts_write)
 //  on the cartridge slot was asserted ($FF40-5F)
 //-------------------------------------------------
 
-READ8_MEMBER(device_cococart_interface::scs_read)
+u8 device_cococart_interface::scs_read(offs_t offset)
 {
 	return 0x00;
 }
@@ -562,7 +562,7 @@ READ8_MEMBER(device_cococart_interface::scs_read)
 //  on the cartridge slot was asserted ($FF40-5F)
 //-------------------------------------------------
 
-WRITE8_MEMBER(device_cococart_interface::scs_write)
+void device_cococart_interface::scs_write(offs_t offset, u8 data)
 {
 }
 
@@ -580,7 +580,7 @@ void device_cococart_interface::set_sound_enable(bool sound_enable)
 //  get_cart_base
 //-------------------------------------------------
 
-uint8_t* device_cococart_interface::get_cart_base()
+u8 *device_cococart_interface::get_cart_base()
 {
 	return nullptr;
 }
@@ -590,7 +590,7 @@ uint8_t* device_cococart_interface::get_cart_base()
 //  get_cart_size
 //-------------------------------------------------
 
-uint32_t device_cococart_interface::get_cart_size()
+u32 device_cococart_interface::get_cart_size()
 {
 	return 0x8000;
 }
@@ -626,7 +626,7 @@ void device_cococart_interface::cart_base_changed(void)
     get_cart_memregion
 -------------------------------------------------*/
 
-memory_region* device_cococart_interface::get_cart_memregion()
+memory_region *device_cococart_interface::get_cart_memregion()
 {
 	return 0;
 }

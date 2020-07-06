@@ -84,6 +84,7 @@ private:
 	u64 execute_min(int params, const u64 *param);
 	u64 execute_max(int params, const u64 *param);
 	u64 execute_if(int params, const u64 *param);
+	u64 get_cpunum();
 
 	u64 global_get(global_entry *global);
 	void global_set(global_entry *global, u64 value);

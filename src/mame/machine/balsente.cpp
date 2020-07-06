@@ -132,18 +132,16 @@ void balsente_state::poly17_init()
 	}
 }
 
-WRITE8_MEMBER(balsente_state::random_reset_w)
+void balsente_state::random_reset_w(uint8_t data)
 {
 	/* reset random number generator */
 }
 
 
-READ8_MEMBER(balsente_state::random_num_r)
+uint8_t balsente_state::random_num_r()
 {
-	uint32_t cc;
-
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
-	cc = m_maincpu->total_cycles();
+	uint32_t cc = m_maincpu->total_cycles();
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);
@@ -158,7 +156,7 @@ READ8_MEMBER(balsente_state::random_num_r)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::rombank_select_w)
+void balsente_state::rombank_select_w(uint8_t data)
 {
 	/* the bank number comes from bits 4-6 */
 	m_bankab->set_entry((data >> 4) & 7);
@@ -167,7 +165,7 @@ WRITE8_MEMBER(balsente_state::rombank_select_w)
 }
 
 
-WRITE8_MEMBER(balsente_state::rombank2_select_w)
+void balsente_state::rombank2_select_w(uint8_t data)
 {
 	/* Night Stocker and Name that Tune only so far.... */
 	int bank = data & 7;
@@ -241,12 +239,12 @@ WRITE_LINE_MEMBER(balsente_state::nvrecall_w)
 	m_novram[1]->recall(!state);
 }
 
-READ8_MEMBER(balsente_state::novram_8bit_r)
+uint8_t balsente_state::novram_8bit_r(address_space &space, offs_t offset)
 {
 	return (m_novram[0]->read(space, offset) & 0x0f) | (m_novram[1]->read(space, offset) << 4);
 }
 
-WRITE8_MEMBER(balsente_state::novram_8bit_w)
+void balsente_state::novram_8bit_w(offs_t offset, uint8_t data)
 {
 	m_novram[0]->write(offset, data & 0x0f);
 	m_novram[1]->write(offset, data >> 4);
@@ -260,7 +258,7 @@ WRITE8_MEMBER(balsente_state::novram_8bit_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::acia_w)
+void balsente_state::acia_w(offs_t offset, uint8_t data)
 {
 	// Ugly workaround: suppress soft reset command in order to avert race condition
 	m_acia->write(offset, (BIT(offset, 0) && data == 0xe0) ? 0 : data);
@@ -322,14 +320,14 @@ TIMER_CALLBACK_MEMBER(balsente_state::adc_finished)
 }
 
 
-READ8_MEMBER(balsente_state::adc_data_r)
+uint8_t balsente_state::adc_data_r()
 {
 	/* just return the last value read */
 	return m_adc_value;
 }
 
 
-WRITE8_MEMBER(balsente_state::adc_select_w)
+void balsente_state::adc_select_w(offs_t offset, uint8_t data)
 {
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
@@ -337,13 +335,13 @@ WRITE8_MEMBER(balsente_state::adc_select_w)
 	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(balsente_state::adc_finished),this), offset & 7);
 }
 
-READ8_MEMBER(balsente_state::teamht_extra_r)
+uint8_t balsente_state::teamht_extra_r()
 {
 	return m_teamht_input;
 }
 
 
-WRITE8_MEMBER(balsente_state::teamht_multiplex_select_w)
+void balsente_state::teamht_multiplex_select_w(offs_t offset, uint8_t data)
 {
 	logerror("multiplex_select %d\n", offset & 7);
 	switch (offset & 7)
@@ -376,7 +374,7 @@ CUSTOM_INPUT_MEMBER(balsente_state::nstocker_bits_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::spiker_expand_w)
+void balsente_state::spiker_expand_w(offs_t offset, uint8_t data)
 {
 	/* offset 0 is the bit pattern */
 	if (offset == 0)
@@ -391,7 +389,7 @@ WRITE8_MEMBER(balsente_state::spiker_expand_w)
 		m_spiker_expand_color = data;
 }
 
-READ8_MEMBER(balsente_state::spiker_expand_r)
+uint8_t balsente_state::spiker_expand_r()
 {
 	uint8_t left, right;
 
@@ -451,7 +449,7 @@ void balsente_state::update_grudge_steering()
 }
 
 
-READ8_MEMBER(balsente_state::grudge_steering_r)
+uint8_t balsente_state::grudge_steering_r()
 {
 	logerror("%s:grudge_steering_r(@%d)\n", machine().describe_context(), m_screen->vpos());
 	m_grudge_steering_result |= 0x80;
@@ -466,7 +464,7 @@ READ8_MEMBER(balsente_state::grudge_steering_r)
  *
  *************************************/
 
-READ8_MEMBER(balsente_state::shrike_shared_6809_r)
+uint8_t balsente_state::shrike_shared_6809_r(offs_t offset)
 {
 	uint16_t mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
 
@@ -480,7 +478,7 @@ READ8_MEMBER(balsente_state::shrike_shared_6809_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::shrike_shared_6809_w)
+void balsente_state::shrike_shared_6809_w(offs_t offset, uint8_t data)
 {
 	uint16_t mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
 	m_shrike_shared[offset >> 1] = ( m_shrike_shared[offset >> 1] & mem_mask_int ) | ( data << ( mem_mask_int & 0x8 ) );
@@ -488,12 +486,12 @@ WRITE8_MEMBER(balsente_state::shrike_shared_6809_w)
 
 // uses movep, so writes even 8 bit addresses to odd 16 bit addresses, reads as 16 bit from odd addresses
 // i.e. write 0xdeadbeef to 10000, read 0xde from 10001, 0xad from 10003, 0xbe from 10005...
-WRITE16_MEMBER(balsente_state::shrike_io_68k_w)
+void balsente_state::shrike_io_68k_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_shrike_io[offset] );
 }
 
-READ16_MEMBER(balsente_state::shrike_io_68k_r)
+uint16_t balsente_state::shrike_io_68k_r(offs_t offset, uint16_t mem_mask)
 {
 	return ( m_shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
 }

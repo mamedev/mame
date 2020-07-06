@@ -5,142 +5,142 @@
 #include "emumem_hea.h"
 #include "emumem_hedp.h"
 
-template<int Width, int AddrShift, int Endian, typename READ> template<typename R>
+template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
 	std::enable_if_t<std::is_same<R, read8_delegate>::value ||
 					 std::is_same<R, read16_delegate>::value ||
 					 std::is_same<R, read32_delegate>::value ||
 					 std::is_same<R, read64_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask)
+					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> template<typename R>
+template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
 	std::enable_if_t<std::is_same<R, read8m_delegate>::value ||
 					 std::is_same<R, read16m_delegate>::value ||
 					 std::is_same<R, read32m_delegate>::value ||
 					 std::is_same<R, read64m_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask)
+					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> template<typename R>
+template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
 	std::enable_if_t<std::is_same<R, read8s_delegate>::value ||
 					 std::is_same<R, read16s_delegate>::value ||
 					 std::is_same<R, read32s_delegate>::value ||
 					 std::is_same<R, read64s_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask)
+					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> template<typename R>
+template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
 	std::enable_if_t<std::is_same<R, read8sm_delegate>::value ||
 					 std::is_same<R, read16sm_delegate>::value ||
 					 std::is_same<R, read32sm_delegate>::value ||
 					 std::is_same<R, read64sm_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask)
+					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> template<typename R>
+template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
 	std::enable_if_t<std::is_same<R, read8mo_delegate>::value ||
 					 std::is_same<R, read16mo_delegate>::value ||
 					 std::is_same<R, read32mo_delegate>::value ||
 					 std::is_same<R, read64mo_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask)
+					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(*inh::m_space);
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> template<typename R>
+template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
 	std::enable_if_t<std::is_same<R, read8smo_delegate>::value ||
 					 std::is_same<R, read16smo_delegate>::value ||
 					 std::is_same<R, read32smo_delegate>::value ||
 					 std::is_same<R, read64smo_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask)
+					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate();
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, endianness_t Endian, typename READ> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read(offs_t offset, uX mem_mask) const
 {
 	return read_impl<READ>(offset, mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian, typename READ> std::string handler_entry_read_delegate<Width, AddrShift, Endian, READ>::name() const
+template<int Width, int AddrShift, endianness_t Endian, typename READ> std::string handler_entry_read_delegate<Width, AddrShift, Endian, READ>::name() const
 {
 	return m_delegate.name();
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> template<typename W>
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
 	std::enable_if_t<std::is_same<W, write8_delegate>::value ||
 					 std::is_same<W, write16_delegate>::value ||
 					 std::is_same<W, write32_delegate>::value ||
 					 std::is_same<W, write64_delegate>::value,
-					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask)
+					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
 	m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data, mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> template<typename W>
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
 	std::enable_if_t<std::is_same<W, write8m_delegate>::value ||
 					 std::is_same<W, write16m_delegate>::value ||
 					 std::is_same<W, write32m_delegate>::value ||
 					 std::is_same<W, write64m_delegate>::value,
-					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask)
+					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
 	m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> template<typename W>
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
 	std::enable_if_t<std::is_same<W, write8s_delegate>::value ||
 					 std::is_same<W, write16s_delegate>::value ||
 					 std::is_same<W, write32s_delegate>::value ||
 					 std::is_same<W, write64s_delegate>::value,
-					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask)
+					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
 	m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data, mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> template<typename W>
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
 	std::enable_if_t<std::is_same<W, write8sm_delegate>::value ||
 					 std::is_same<W, write16sm_delegate>::value ||
 					 std::is_same<W, write32sm_delegate>::value ||
 					 std::is_same<W, write64sm_delegate>::value,
-					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask)
+					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
 	m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> template<typename W>
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
 	std::enable_if_t<std::is_same<W, write8mo_delegate>::value ||
 					 std::is_same<W, write16mo_delegate>::value ||
 					 std::is_same<W, write32mo_delegate>::value ||
 					 std::is_same<W, write64mo_delegate>::value,
-					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask)
+					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
   m_delegate(*inh::m_space, data);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> template<typename W>
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
 	std::enable_if_t<std::is_same<W, write8smo_delegate>::value ||
 					 std::is_same<W, write16smo_delegate>::value ||
 					 std::is_same<W, write32smo_delegate>::value ||
 					 std::is_same<W, write64smo_delegate>::value,
-					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask)
+					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
 	m_delegate(data);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> void handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write(offs_t offset, uX data, uX mem_mask)
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> void handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write(offs_t offset, uX data, uX mem_mask) const
 {
 	write_impl<WRITE>(offset, data, mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian, typename WRITE> std::string handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::name() const
+template<int Width, int AddrShift, endianness_t Endian, typename WRITE> std::string handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::name() const
 {
 	return m_delegate.name();
 }
@@ -148,22 +148,22 @@ template<int Width, int AddrShift, int Endian, typename WRITE> std::string handl
 
 
 
-template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_ioport<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_ioport<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask) const
 {
 	return m_port->read();
 }
 
-template<int Width, int AddrShift, int Endian> std::string handler_entry_read_ioport<Width, AddrShift, Endian>::name() const
+template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_read_ioport<Width, AddrShift, Endian>::name() const
 {
 	return m_port->tag();
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write_ioport<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_ioport<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask) const
 {
 	m_port->write(data, mem_mask);
 }
 
-template<int Width, int AddrShift, int Endian> std::string handler_entry_write_ioport<Width, AddrShift, Endian>::name() const
+template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_write_ioport<Width, AddrShift, Endian>::name() const
 {
 	return m_port->tag();
 }

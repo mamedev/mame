@@ -54,6 +54,11 @@ protected:
 	required_ioport m_switch;
 
 	int m_romcs;
+	u8 m_control;
+	bool m_motor_active;
+	bool m_128rom_bit;
+	void fdc_hld_w(int state);
+	void motors_control();
 };
 
 

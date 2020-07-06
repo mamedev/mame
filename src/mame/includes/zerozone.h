@@ -29,13 +29,13 @@ public:
 	void zerozone(machine_config &config);
 
 private:
-	// in drivers/zerozone.c
-	DECLARE_WRITE16_MEMBER(sound_w);
+	// in drivers/zerozone.cpp
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	// in video/zerozone.c
-	DECLARE_WRITE16_MEMBER(tilemap_w);
-	DECLARE_WRITE16_MEMBER(tilebank_w);
+	// in video/zerozone.cpp
+	void tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tilebank_w(uint16_t data);
 
 	// devices
 	required_device<cpu_device> m_maincpu;

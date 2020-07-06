@@ -173,14 +173,14 @@ private:
 	uint32_t m_led_mst;
 	uint32_t m_led_slv;
 
-	DECLARE_READ32_MEMBER(led_mst_r);
-	DECLARE_WRITE32_MEMBER(led_mst_w);
-	DECLARE_READ32_MEMBER(led_slv_r);
-	DECLARE_WRITE32_MEMBER(led_slv_w);
-	template<int Screen> DECLARE_READ16_MEMBER(video_enable_r);
-	template<int Screen> DECLARE_WRITE16_MEMBER(video_enable_w);
-	DECLARE_READ16_MEMBER(rso_r);
-	DECLARE_WRITE16_MEMBER(rso_w);
+	uint32_t led_mst_r();
+	void led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t led_slv_r();
+	void led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Screen> uint16_t video_enable_r();
+	template<int Screen> void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rso_r(offs_t offset);
+	void rso_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -288,39 +288,39 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 
 /***************************************************************************************/
 
-READ32_MEMBER(gal3_state::led_mst_r)
+uint32_t gal3_state::led_mst_r()
 {
 	return m_led_mst;
 }
 
-WRITE32_MEMBER(gal3_state::led_mst_w)
+void gal3_state::led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_led_mst);
 }
 
-READ32_MEMBER(gal3_state::led_slv_r)
+uint32_t gal3_state::led_slv_r()
 {
 	return m_led_slv;
 }
 
-WRITE32_MEMBER(gal3_state::led_slv_w)
+void gal3_state::led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_led_slv);
 }
 
 template<int Screen>
-READ16_MEMBER(gal3_state::video_enable_r)
+uint16_t gal3_state::video_enable_r()
 {
 	return m_video_enable[Screen];
 }
 
 template<int Screen>
-WRITE16_MEMBER(gal3_state::video_enable_w)
+void gal3_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_enable[Screen]); // 0xff53, instead of 0x40 in namcos21
 }
 
-READ16_MEMBER(gal3_state::rso_r)
+uint16_t gal3_state::rso_r(offs_t offset)
 {
 	/*store $5555 @$0046, and readback @$0000
 	read @$0144 and store at A6_21e & A4_5c
@@ -329,7 +329,7 @@ READ16_MEMBER(gal3_state::rso_r)
 	return m_rso_shared_ram[offset];
 }
 
-WRITE16_MEMBER(gal3_state::rso_w)
+void gal3_state::rso_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rso_shared_ram[offset]);
 }
@@ -599,7 +599,7 @@ void gal3_state::gal3(machine_config &config)
 	rs_cpu.set_addrmap(AS_PROGRAM, &gal3_state::rs_cpu_map);
 	rs_cpu.set_vblank_int("lscreen", FUNC(gal3_state::irq5_line_hold));  /// programmable via 148 IC
 
-	m68000_device &sound_cpu(M68000(config, "sound_cpu", 12000000)); // ??
+	m68000_device &sound_cpu(M68000(config, "sound_cpu", 49152000/4)); // ??
 	sound_cpu.set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
 
 	m68000_device &psn_b1_cpu(M68000(config, "psn_b1_cpu", 12000000)); // ??
@@ -679,13 +679,14 @@ void gal3_state::gal3(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140_16g, 8000000/374);
-	m_c140_16g->set_bank_type(c140_device::C140_TYPE::SYSTEM21);    //to be verified
+	// TODO: Total 5 of C140s in sound board, verified from gal3zlgr PCB - gal3 uses same board?
+	C140(config, m_c140_16g, 49152000/2304);
+	//m_c140_16g->set_addrmap(0, &gal3_state::c140_16g_map);    //to be verified
 	m_c140_16g->add_route(0, "lspeaker", 0.50);
 	m_c140_16g->add_route(1, "rspeaker", 0.50);
 
-	C140(config, m_c140_16a, 8000000/374);
-	m_c140_16a->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	C140(config, m_c140_16a, 49152000/2304);
+	//m_c140_16a->set_addrmap(0, &gal3_state::c140_16a_map);    //to be verified
 	m_c140_16a->add_route(0, "lspeaker", 0.50);
 	m_c140_16a->add_route(1, "rspeaker", 0.50);
 }
@@ -888,7 +889,7 @@ ROM_START( gal3 )
 	ROM_LOAD( "glc1-snd-voi8.10g", 0x000000, 0x80000, CRC(bba0c15b) SHA1(b0abc22fd1ae8a9970ad45d9ebdb38e6b06033a7) )
 	ROM_LOAD( "glc1-snd-voi9.11g", 0x080000, 0x80000, CRC(dd1b1ee4) SHA1(b69af15acaa9c3d79d7758adc8722ff5c1129b76) )
 	ROM_LOAD( "glc1-snd-voi10.13g",0x100000, 0x80000, CRC(1c1dedf4) SHA1(b6b9dac68103ff2206d731d409a557a71afd98f7) )
-	ROM_LOAD( "glc1-snd-voi11.14g",0x180000, 0x80000, CRC(559e2a8a) SHA1(9a2f28305c6073a0b9b80a5d9617cc25a921e9d0))
+	ROM_LOAD( "glc1-snd-voi11.14g",0x180000, 0x80000, CRC(559e2a8a) SHA1(9a2f28305c6073a0b9b80a5d9617cc25a921e9d0) )
 
 	/********* Laserdiscs *********/
 	/* used 2 apparently, no idea what they connect to */

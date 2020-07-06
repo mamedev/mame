@@ -4,13 +4,13 @@
 #include "includes/ksayakyu.h"
 
 
-WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoram_w)
+void ksayakyu_state::ksayakyu_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset]=data;
 	m_textmap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
+void ksayakyu_state::ksayakyu_videoctrl_w(uint8_t data)
 {
 	/*
 	    bits:

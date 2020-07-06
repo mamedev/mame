@@ -121,8 +121,8 @@ public:
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_blit_ram[8];
-	DECLARE_READ8_MEMBER(blitter_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
+	uint8_t blitter_r(offs_t offset);
+	void blitter_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void video_start() override;
 	uint32_t screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -161,7 +161,7 @@ uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-READ8_MEMBER(vpoker_state::blitter_r)
+uint8_t vpoker_state::blitter_r(offs_t offset)
 {
 	if(offset == 6)
 		return ioport("IN0")->read();
@@ -169,7 +169,7 @@ READ8_MEMBER(vpoker_state::blitter_r)
 	return 0;
 }
 
-WRITE8_MEMBER(vpoker_state::blitter_w)
+void vpoker_state::blitter_w(offs_t offset, uint8_t data)
 {
 	uint8_t *videoram = m_videoram.get();
 

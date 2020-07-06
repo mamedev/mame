@@ -164,11 +164,11 @@ private:
 
 	void cpu_io_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(kb_scancode_r);
-	DECLARE_WRITE16_MEMBER(disp_w);
-	DECLARE_READ16_MEMBER(kdp_status_r);
-	DECLARE_WRITE16_MEMBER(kdp_control_w);
-	DECLARE_WRITE16_MEMBER(printer_w);
+	uint16_t kb_scancode_r();
+	void disp_w(uint16_t data);
+	uint16_t kdp_status_r();
+	void kdp_control_w(uint16_t data);
+	void printer_w(uint16_t data);
 
 	void update_display();
 	TIMER_DEVICE_CALLBACK_MEMBER(cursor_blink);
@@ -206,8 +206,8 @@ void hp9825_state::device_reset()
 
 	// Then, set r/w handlers of all installed I/O cards
 	int sc;
-	read16_delegate rhandler(*this);
-	write16_delegate whandler(*this);
+	read16m_delegate rhandler(*this);
+	write16m_delegate whandler(*this);
 	for (unsigned i = 0; i < 3; i++) {
 		if ((sc = m_io_slot[ i ]->get_rw_handlers(rhandler , whandler)) >= 0) {
 			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
@@ -246,7 +246,7 @@ void hp9825_state::cpu_io_map(address_map &map)
 	// TODO:
 }
 
-READ16_MEMBER(hp9825_state::kb_scancode_r)
+uint16_t hp9825_state::kb_scancode_r()
 {
 	uint8_t res = m_scancode;
 	if (m_shift_key->read()) {
@@ -256,7 +256,7 @@ READ16_MEMBER(hp9825_state::kb_scancode_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9825_state::disp_w)
+void hp9825_state::disp_w(uint16_t data)
 {
 	if (m_display_on) {
 		m_display_on = false;
@@ -268,7 +268,7 @@ WRITE16_MEMBER(hp9825_state::disp_w)
 	m_display_mem[ m_display_idx++ ] = uint8_t(data);
 }
 
-READ16_MEMBER(hp9825_state::kdp_status_r)
+uint16_t hp9825_state::kdp_status_r()
 {
 	uint16_t res = 8;
 	if (m_io_sys->is_irq_pending(KDP_PA)) {
@@ -281,7 +281,7 @@ READ16_MEMBER(hp9825_state::kdp_status_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9825_state::kdp_control_w)
+void hp9825_state::kdp_control_w(uint16_t data)
 {
 	bool regen_display = false;
 	if (BIT(data , 1) && !m_display_on) {
@@ -329,7 +329,7 @@ WRITE16_MEMBER(hp9825_state::kdp_control_w)
 	}
 }
 
-WRITE16_MEMBER(hp9825_state::printer_w)
+void hp9825_state::printer_w(uint16_t data)
 {
 	m_printer_mem[ m_printer_idx ] = uint8_t(data);
 	m_printer_idx = (m_printer_idx + 1) & 0xf;
@@ -936,8 +936,8 @@ private:
 	void cpu_mem_map(address_map &map);
 	void ram_mem_map(address_map &map);
 	void rom_mem_map(address_map &map);
-	DECLARE_READ16_MEMBER(cpu_mem_r);
-	DECLARE_WRITE16_MEMBER(cpu_mem_w);
+	uint16_t cpu_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cpu_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void stm(uint8_t cycle_type);
 	void on_cycle_end();
 	void opcode_fetch(uint16_t opcode);
@@ -1010,7 +1010,7 @@ void hp9825t_state::rom_mem_map(address_map &map)
 	map(0x4000 , 0x53ff).rom().region(":rom" , 0x8000);
 }
 
-READ16_MEMBER(hp9825t_state::cpu_mem_r)
+uint16_t hp9825t_state::cpu_mem_r(offs_t offset, uint16_t mem_mask)
 {
 	bool from_rom;
 
@@ -1033,7 +1033,7 @@ READ16_MEMBER(hp9825t_state::cpu_mem_r)
 	return from_rom ? m_rom_space->read_word(offset , mem_mask) : m_ram_space->read_word(offset , mem_mask);
 }
 
-WRITE16_MEMBER(hp9825t_state::cpu_mem_w)
+void hp9825t_state::cpu_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cycle_type & hp_hybrid_cpu_device::CYCLE_WR_MASK) {
 		if (!(m_cycle_type & hp_hybrid_cpu_device::CYCLE_DMA_MASK)) {

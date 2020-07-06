@@ -94,29 +94,29 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(ymzram_r);
-	DECLARE_WRITE8_MEMBER(ymzram_w);
-	DECLARE_READ16_MEMBER(cf_regs_r);
-	DECLARE_WRITE16_MEMBER(cf_regs_w);
-	DECLARE_READ16_MEMBER(cf_data_r);
-	DECLARE_WRITE16_MEMBER(cf_data_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ64_MEMBER(portc_r);
-	DECLARE_WRITE64_MEMBER(portc_w);
-	DECLARE_WRITE64_MEMBER(portc_medal_w);
-	DECLARE_READ64_MEMBER(porte_r);
-	DECLARE_WRITE64_MEMBER(porte_w);
-	DECLARE_WRITE64_MEMBER(porte_medal_w);
-	DECLARE_READ16_MEMBER(dipsw_r);
+	u8 ymzram_r(offs_t offset);
+	void ymzram_w(offs_t offset, u8 data);
+	u16 cf_regs_r(offs_t offset, u16 mem_mask = ~0);
+	void cf_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 cf_data_r();
+	void cf_data_w(u16 data);
+	u8 rtc_r();
+	void rtc_w(u8 data);
+	u64 portc_r();
+	void portc_w(u64 data);
+	void portc_medal_w(u64 data);
+	u64 porte_r();
+	void porte_w(u64 data);
+	void porte_medal_w(u64 data);
+	u16 dipsw_r();
 	u8 m_portc_data = 0xff;
 	u8 m_porte_data = 0xff;
 
 	// Q2SD GPU
-	DECLARE_READ16_MEMBER(gpu_r);
+	u16 gpu_r(offs_t offset);
 	void gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	u16 vram_r(offs_t offset);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 	void do_render(bool vbkem);
 	void draw_quad_tex(u16 cmd, u16 *data);
@@ -198,66 +198,66 @@ protected:
 
 
 // CF interface, looks like standard memory-mapped ATA layout, probably should be devicified
-READ16_MEMBER(gsan_state::cf_regs_r)
+u16 gsan_state::cf_regs_r(offs_t offset, u16 mem_mask)
 {
 	offset *= 2;
 	u16 data = 0;
 	if (ACCESSING_BITS_0_7)
-		data |= m_ata->read_cs0(offset, 0xff) & 0xff;
+		data |= m_ata->cs0_r(offset, 0xff) & 0xff;
 	if (ACCESSING_BITS_8_15)
-		data |= (m_ata->read_cs0(offset + 1, 0xff) << 8);
+		data |= (m_ata->cs0_r(offset + 1, 0xff) << 8);
 	return data;
 }
 
-WRITE16_MEMBER(gsan_state::cf_regs_w)
+void gsan_state::cf_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
-		m_ata->write_cs0(offset, data & 0xff, 0xff);
+		m_ata->cs0_w(offset, data & 0xff, 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_ata->write_cs0(offset + 1, data >> 8, 0xff);
+		m_ata->cs0_w(offset + 1, data >> 8, 0xff);
 }
 
-READ16_MEMBER(gsan_state::cf_data_r)
+u16 gsan_state::cf_data_r()
 {
-	u16 data = m_ata->read_cs0(0, 0xffff);
+	u16 data = m_ata->cs0_r(0, 0xffff);
 	return data;
 }
 
-WRITE16_MEMBER(gsan_state::cf_data_w)
+void gsan_state::cf_data_w(u16 data)
 {
-	m_ata->write_cs0(0, data, 0xffff);
+	m_ata->cs0_w(0, data, 0xffff);
 }
 
 // misc I/O
-READ16_MEMBER(gsan_state::dipsw_r)
+u16 gsan_state::dipsw_r()
 {
 	return m_dipsw_r->read();
 }
-READ8_MEMBER(gsan_state::rtc_r)
+u8 gsan_state::rtc_r()
 {
 	return m_rtc_r->read();
 }
-WRITE8_MEMBER(gsan_state::rtc_w)
+void gsan_state::rtc_w(u8 data)
 {
 	m_rtc_w->write(data);
 }
 
-READ8_MEMBER(gsan_state::ymzram_r)
+u8 gsan_state::ymzram_r(offs_t offset)
 {
 	return m_ymzram[offset];
 }
-WRITE8_MEMBER(gsan_state::ymzram_w)
+void gsan_state::ymzram_w(offs_t offset, u8 data)
 {
 	m_ymzram[offset] = data;
 }
 
 // SH-3 GPIO output ports
-READ64_MEMBER(gsan_state::portc_r)
+u64 gsan_state::portc_r()
 {
 	return m_portc_data;
 }
-WRITE64_MEMBER(gsan_state::portc_w)
+void gsan_state::portc_w(u64 data)
 {
 /* DDR
     ---- x--- /Coin counter
@@ -269,7 +269,7 @@ WRITE64_MEMBER(gsan_state::portc_w)
 
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
-WRITE64_MEMBER(gsan_state::portc_medal_w)
+void gsan_state::portc_medal_w(u64 data)
 {
 /* Medal
     ---- ---x Medal in counter
@@ -284,11 +284,11 @@ WRITE64_MEMBER(gsan_state::portc_medal_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 	machine().bookkeeping().coin_counter_w(2, data & 1);
 }
-READ64_MEMBER(gsan_state::porte_r)
+u64 gsan_state::porte_r()
 {
 	return m_porte_data;
 }
-WRITE64_MEMBER(gsan_state::porte_w)
+void gsan_state::porte_w(u64 data)
 {
 /* DDR
     ---- -x-- Lamp R3
@@ -300,7 +300,7 @@ WRITE64_MEMBER(gsan_state::porte_w)
 */
 	m_porte_data = data;
 }
-WRITE64_MEMBER(gsan_state::porte_medal_w)
+void gsan_state::porte_medal_w(u64 data)
 {
 /* Medal
     ---- ---x Medal in lock
@@ -317,17 +317,17 @@ WRITE64_MEMBER(gsan_state::porte_medal_w)
 
 
 // Q2SD GPU
-READ16_MEMBER(gsan_state::vram_r)
+u16 gsan_state::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE16_MEMBER(gsan_state::vram_w)
+void gsan_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-READ16_MEMBER(gsan_state::gpu_r)
+u16 gsan_state::gpu_r(offs_t offset)
 {
 	return m_gpuregs[offset];
 }

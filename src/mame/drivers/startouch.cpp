@@ -2,19 +2,21 @@
 // copyright-holders:
 /*******************************************************************************
 
-    Skeleton driver for Sleic / Petaco's Star Touch / EuroPlay 2001
+    Skeleton driver for "EuroByte Electronics & Multimedia IASA" EuroPlay
+    (http://www.eurobyte.com.gr/gb_europlay.htm), sold in Spain by Sleic / Petaco
+    as Star Touch / EuroPlay 2001.
 
     Hardware overview:
-    MB Soyo M5EH V1.2 (1MB cache)
+    MB Soyo M5EH V1.2 (1MB cache) or similar (e.g. Biostar M5ATD)
     16384 KB RAM
     Intel Pentium MMX 233 MHz
 
     MicroTouch ISA (BIOS 5.6)
-    ExpertColor Med3931 v1.0 ISA sound card (82C931)
+    ExpertColor Med3931 v1.0 ISA sound card (or other 82C931-based similar card, e.g. BTC 1817DS OPTi ISA)
     S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
     Parallel port dongle HASP4
     Creative Video Blaster camera (parallel port)
-    HDD Samsung SV0322A
+    HDD Samsung SV0322A or other IDE HDD with similar capacity.
 
 *******************************************************************************/
 

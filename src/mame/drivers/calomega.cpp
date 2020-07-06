@@ -669,7 +669,7 @@ WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
 	m_aciabaud->set_clock_scale((double)dsw2 / 128);
 }
 
-READ8_MEMBER(calomega_state::s903_mux_port_r)
+uint8_t calomega_state::s903_mux_port_r()
 {
 	switch( m_s903_mux_data & 0xf0 )    /* bits 4-7 */
 	{
@@ -682,14 +682,14 @@ READ8_MEMBER(calomega_state::s903_mux_port_r)
 	return m_frq->read();   /* bit7 used for 50/60 Hz selector */
 }
 
-WRITE8_MEMBER(calomega_state::s903_mux_w)
+void calomega_state::s903_mux_w(uint8_t data)
 {
 	m_s903_mux_data = data ^ 0xff;  /* inverted */
 }
 
 
 
-READ8_MEMBER(calomega_state::s905_mux_port_r)
+uint8_t calomega_state::s905_mux_port_r()
 {
 	switch( m_s905_mux_data & 0x0f )    /* bits 0-3 */
 	{
@@ -702,7 +702,7 @@ READ8_MEMBER(calomega_state::s905_mux_port_r)
 	return m_frq->read();   /* bit6 used for 50/60 Hz selector */
 }
 
-WRITE8_MEMBER(calomega_state::s905_mux_w)
+void calomega_state::s905_mux_w(uint8_t data)
 {
 	m_s905_mux_data = data ^ 0xff;  /* inverted */
 }
@@ -710,25 +710,25 @@ WRITE8_MEMBER(calomega_state::s905_mux_w)
 
 /********* 906III PIAs debug *********/
 
-READ8_MEMBER(calomega_state::pia0_ain_r)
+uint8_t calomega_state::pia0_ain_r()
 {
 	/* Valid input port. Each polled value is stored at $0538 */
 	logerror("PIA0: Port A in\n");
 	return m_in0->read();
 }
 
-READ8_MEMBER(calomega_state::pia0_bin_r)
+uint8_t calomega_state::pia0_bin_r()
 {
 	logerror("PIA0: Port B in\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(calomega_state::pia0_aout_w)
+void calomega_state::pia0_aout_w(uint8_t data)
 {
 	logerror("PIA0: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(calomega_state::pia0_bout_w)
+void calomega_state::pia0_bout_w(uint8_t data)
 {
 	logerror("PIA0: Port B out: %02X\n", data);
 }
@@ -741,24 +741,24 @@ WRITE_LINE_MEMBER(calomega_state::pia0_ca2_w)
 
 
 
-READ8_MEMBER(calomega_state::pia1_ain_r)
+uint8_t calomega_state::pia1_ain_r()
 {
 	logerror("PIA1: Port A in\n");
 	return 0xff;
 }
 
-READ8_MEMBER(calomega_state::pia1_bin_r)
+uint8_t calomega_state::pia1_bin_r()
 {
 	logerror("PIA1: Port B in\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(calomega_state::pia1_aout_w)
+void calomega_state::pia1_aout_w(uint8_t data)
 {
 	logerror("PIA1: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(calomega_state::pia1_bout_w)
+void calomega_state::pia1_bout_w(uint8_t data)
 {
 	logerror("PIA1: Port B out: %02X\n", data);
 }
@@ -784,7 +784,7 @@ WRITE8_MEMBER(calomega_state::pia1_bout_w)
     0xff    0x7b    = Take
 
 */
-WRITE8_MEMBER(calomega_state::lamps_903a_w)
+void calomega_state::lamps_903a_w(uint8_t data)
 {
 	/* First 5 bits of PIA0 port B */
 	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
@@ -794,7 +794,7 @@ WRITE8_MEMBER(calomega_state::lamps_903a_w)
 	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
 }
 
-WRITE8_MEMBER(calomega_state::lamps_903b_w)
+void calomega_state::lamps_903b_w(uint8_t data)
 {
 	/* First 4 bits of PIA1 port A */
 	m_lamps[5] = BIT(~data, 0);  /* L6 (Cancel) */
@@ -803,7 +803,7 @@ WRITE8_MEMBER(calomega_state::lamps_903b_w)
 	m_lamps[8] = BIT(~data, 3);  /* L9 (Door?) */
 }
 
-WRITE8_MEMBER(calomega_state::lamps_905_w)
+void calomega_state::lamps_905_w(uint8_t data)
 {
 	/* Whole 8 bits of PIA0 port B */
 	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */

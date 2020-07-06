@@ -40,6 +40,7 @@ public:
 
 	void kchamp(machine_config &config);
 	void kchampvs(machine_config &config);
+	void kchamp_arfyc(machine_config &config);
 
 	void init_kchampvs();
 	void init_kchampvs2();
@@ -72,11 +73,10 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_msm_w);
-	DECLARE_READ8_MEMBER(sound_reset_r);
-	DECLARE_WRITE8_MEMBER(kc_sound_control_w);
-	DECLARE_WRITE8_MEMBER(kchamp_videoram_w);
-	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
+	uint8_t sound_reset_r();
+	void kc_sound_control_w(offs_t offset, uint8_t data);
+	void kchamp_videoram_w(offs_t offset, uint8_t data);
+	void kchamp_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void sound_control_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

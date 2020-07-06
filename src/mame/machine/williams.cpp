@@ -242,7 +242,7 @@ void bubbles_state::cmos_w(offs_t offset, u8 data)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::watchdog_reset_w)
+void williams_state::watchdog_reset_w(u8 data)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
@@ -250,7 +250,7 @@ WRITE8_MEMBER(williams_state::watchdog_reset_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::watchdog_reset_w)
+void williams2_state::watchdog_reset_w(u8 data)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)

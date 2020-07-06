@@ -191,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::irq_enable_w)
+void taitol_state::irq_enable_w(u8 data)
 {
 	//logerror("irq_enable = %02x\n",data);
 	m_vdp->irq_enable_w(data);
@@ -202,7 +202,7 @@ WRITE8_MEMBER(taitol_state::irq_enable_w)
 }
 
 
-WRITE8_MEMBER(taitol_state::rombankswitch_w)
+void taitol_state::rombankswitch_w(u8 data)
 {
 	if (m_vdp->rom_bank_r() != data)
 	{
@@ -217,7 +217,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 	}
 }
 
-WRITE8_MEMBER(fhawk_state::slave_rombank_w)
+void fhawk_state::slave_rombank_w(u8 data)
 {
 	data &= 0xf;
 
@@ -236,12 +236,12 @@ WRITE8_MEMBER(fhawk_state::slave_rombank_w)
 	}
 }
 
-READ8_MEMBER(fhawk_state::slave_rombank_r)
+u8 fhawk_state::slave_rombank_r()
 {
 	return m_slave_rombank;
 }
 
-WRITE8_MEMBER(taitol_state::coin_control_w)
+void taitol_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -249,19 +249,19 @@ WRITE8_MEMBER(taitol_state::coin_control_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
+u8 taitol_1cpu_state::extport_select_and_ym2203_r(offs_t offset)
 {
 	for (auto &mux : m_mux)
 		mux->select_w((offset >> 1) & 1);
 	return m_ymsnd->read(offset & 1);
 }
 
-WRITE8_MEMBER(taitol_state::mcu_control_w)
+void taitol_state::mcu_control_w(u8 data)
 {
 //  logerror("mcu control %02x (%04x)\n", data, m_main_cpu->pc());
 }
 
-READ8_MEMBER(taitol_state::mcu_control_r)
+u8 taitol_state::mcu_control_r()
 {
 //  logerror("mcu control read (%04x)\n", m_main_cpu->pc());
 	return 0x1;
@@ -282,28 +282,28 @@ WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
 	}
 }
 
-WRITE8_MEMBER(champwr_state::msm5205_lo_w)
+void champwr_state::msm5205_lo_w(u8 data)
 {
 	m_adpcm_pos = (m_adpcm_pos & 0xff00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(champwr_state::msm5205_hi_w)
+void champwr_state::msm5205_hi_w(u8 data)
 {
 	m_adpcm_pos = ((m_adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
 }
 
-WRITE8_MEMBER(champwr_state::msm5205_start_w)
+void champwr_state::msm5205_start_w(u8 data)
 {
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(champwr_state::msm5205_stop_w)
+void champwr_state::msm5205_stop_w(u8 data)
 {
 	m_msm->reset_w(1);
 	m_adpcm_pos &= 0x1ff00;
 }
 
-WRITE8_MEMBER(champwr_state::msm5205_volume_w)
+void champwr_state::msm5205_volume_w(u8 data)
 {
 	m_msm->set_output_gain(0, data / 255.0);
 }
@@ -366,7 +366,7 @@ void taitol_2cpu_state::raimais_2_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(taitol_2cpu_state::sound_bankswitch_w)
+void taitol_2cpu_state::sound_bankswitch_w(u8 data)
 {
 	m_audio_bnk->set_entry(data & 0x03);
 }
@@ -1310,7 +1310,7 @@ static INPUT_PORTS_START( evilston )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(fhawk_state::portA_w)
+void fhawk_state::portA_w(u8 data)
 {
 	m_audio_bnk->set_entry(data & 0x03);
 	//logerror ("YM2203 bank change val=%02x  %s\n", data & 0x03, machine().describe_context() );

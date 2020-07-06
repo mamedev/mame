@@ -154,17 +154,17 @@ WRITE_LINE_MEMBER(freekick_state::spinner_select_w)
 	m_spinner = state;
 }
 
-WRITE8_MEMBER(freekick_state::gigas_spinner_select_w)
+void freekick_state::gigas_spinner_select_w(uint8_t data)
 {
 	m_spinner = data & 1;
 }
 
-READ8_MEMBER(freekick_state::spinner_r)
+uint8_t freekick_state::spinner_r()
 {
 	return ioport(m_spinner ? "IN3" : "IN2")->read();
 }
 
-WRITE8_MEMBER(freekick_state::pbillrd_bankswitch_w)
+void freekick_state::pbillrd_bankswitch_w(uint8_t data)
 {
 	m_bank1->set_entry(data & 1);
 	if(m_bank1d)
@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(freekick_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(freekick_state::oigas_5_w)
+void freekick_state::oigas_5_w(uint8_t data)
 {
 	if (data > 0xc0 && data < 0xe0)
 		m_cnt = 1;
@@ -196,7 +196,7 @@ WRITE8_MEMBER(freekick_state::oigas_5_w)
 	}
 }
 
-READ8_MEMBER(freekick_state::oigas_3_r)
+uint8_t freekick_state::oigas_3_r()
 {
 	switch (++m_cnt)
 	{
@@ -233,17 +233,17 @@ READ8_MEMBER(freekick_state::oigas_3_r)
 	return 0;
 }
 
-READ8_MEMBER(freekick_state::oigas_2_r)
+uint8_t freekick_state::oigas_2_r()
 {
 	return 1;
 }
 
-READ8_MEMBER(freekick_state::freekick_ff_r)
+uint8_t freekick_state::freekick_ff_r()
 {
 	return m_ff_data;
 }
 
-WRITE8_MEMBER(freekick_state::freekick_ff_w)
+void freekick_state::freekick_ff_w(uint8_t data)
 {
 	m_ff_data = data;
 }
@@ -710,17 +710,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER(freekick_state::snd_rom_addr_l_w)
+void freekick_state::snd_rom_addr_l_w(uint8_t data)
 {
 	m_romaddr = (m_romaddr & 0xff00) | data;
 }
 
-WRITE8_MEMBER(freekick_state::snd_rom_addr_h_w)
+void freekick_state::snd_rom_addr_h_w(uint8_t data)
 {
 	m_romaddr = (m_romaddr & 0x00ff) | (data << 8);
 }
 
-READ8_MEMBER(freekick_state::snd_rom_r)
+uint8_t freekick_state::snd_rom_r()
 {
 	return memregion("user1")->base()[m_romaddr & 0x7fff];
 }

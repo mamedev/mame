@@ -73,16 +73,16 @@ public:
 	template <int Mask> DECLARE_READ_LINE_MEMBER(stratgyx_coinage_r);
 
 private:
-	DECLARE_READ8_MEMBER(scobra_soundram_r);
-	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
+	uint8_t scobra_soundram_r(offs_t offset);
+	void scobra_soundram_w(offs_t offset, uint8_t data);
+	uint8_t scobra_type2_ppi8255_0_r(offs_t offset);
+	uint8_t scobra_type2_ppi8255_1_r(offs_t offset);
+	uint8_t hustler_ppi8255_0_r(offs_t offset);
+	uint8_t hustler_ppi8255_1_r(offs_t offset);
+	void scobra_type2_ppi8255_0_w(offs_t offset, uint8_t data);
+	void scobra_type2_ppi8255_1_w(offs_t offset, uint8_t data);
+	void hustler_ppi8255_0_w(offs_t offset, uint8_t data);
+	void hustler_ppi8255_1_w(offs_t offset, uint8_t data);
 
 	void hustler_map(address_map &map);
 	void hustler_sound_io_map(address_map &map);
@@ -136,15 +136,15 @@ static GFXDECODE_START( gfx_scobra )
 GFXDECODE_END
 
 
-READ8_MEMBER(scobra_state::scobra_type2_ppi8255_0_r){ return m_ppi8255_0->read(offset >> 2); }
-READ8_MEMBER(scobra_state::scobra_type2_ppi8255_1_r){ return m_ppi8255_1->read(offset >> 2); }
-WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_0_w){ m_ppi8255_0->write(offset >> 2, data); }
-WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_1_w){ m_ppi8255_1->write(offset >> 2, data); }
+uint8_t scobra_state::scobra_type2_ppi8255_0_r(offs_t offset) { return m_ppi8255_0->read(offset >> 2); }
+uint8_t scobra_state::scobra_type2_ppi8255_1_r(offs_t offset) { return m_ppi8255_1->read(offset >> 2); }
+void scobra_state::scobra_type2_ppi8255_0_w(offs_t offset, uint8_t data) { m_ppi8255_0->write(offset >> 2, data); }
+void scobra_state::scobra_type2_ppi8255_1_w(offs_t offset, uint8_t data) { m_ppi8255_1->write(offset >> 2, data); }
 
-READ8_MEMBER(scobra_state::hustler_ppi8255_0_r){ return m_ppi8255_0->read(offset >> 3); }
-READ8_MEMBER(scobra_state::hustler_ppi8255_1_r){ return m_ppi8255_1->read(offset >> 3); }
-WRITE8_MEMBER(scobra_state::hustler_ppi8255_0_w){ m_ppi8255_0->write(offset >> 3, data); }
-WRITE8_MEMBER(scobra_state::hustler_ppi8255_1_w){ m_ppi8255_1->write(offset >> 3, data); }
+uint8_t scobra_state::hustler_ppi8255_0_r(offs_t offset) { return m_ppi8255_0->read(offset >> 3); }
+uint8_t scobra_state::hustler_ppi8255_1_r(offs_t offset) { return m_ppi8255_1->read(offset >> 3); }
+void scobra_state::hustler_ppi8255_0_w(offs_t offset, uint8_t data) { m_ppi8255_0->write(offset >> 3, data); }
+void scobra_state::hustler_ppi8255_1_w(offs_t offset, uint8_t data) { m_ppi8255_1->write(offset >> 3, data); }
 
 void scobra_state::type1_map(address_map &map)
 {
@@ -370,12 +370,12 @@ void scobra_state::minefldfe_map(address_map &map)
 }
 
 
-READ8_MEMBER(scobra_state::scobra_soundram_r)
+uint8_t scobra_state::scobra_soundram_r(offs_t offset)
 {
 	return m_soundram[offset & 0x03ff];
 }
 
-WRITE8_MEMBER(scobra_state::scobra_soundram_w)
+void scobra_state::scobra_soundram_w(offs_t offset, uint8_t data)
 {
 	m_soundram[offset & 0x03ff] = data;
 }

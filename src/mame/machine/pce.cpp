@@ -120,18 +120,18 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 	if (m_cartslot->get_type() == PCE_CDSYS3J)
 	{
 		m_sys3_card = 1;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
 	}
 
 	if (m_cartslot->get_type() == PCE_CDSYS3U)
 	{
 		m_sys3_card = 3;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8sm_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
 	}
 }
 
 /* todo: how many input ports does the PCE have? */
-WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
+void pce_state::mess_pce_joystick_w(uint8_t data)
 {
 	int joy_i;
 	uint8_t joy_type = m_joy_type->read();
@@ -158,7 +158,7 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 	}
 }
 
-READ8_MEMBER(pce_state::mess_pce_joystick_r)
+uint8_t pce_state::mess_pce_joystick_r()
 {
 	uint8_t joy_type = m_joy_type->read();
 	uint8_t ret, data;
@@ -201,7 +201,7 @@ READ8_MEMBER(pce_state::mess_pce_joystick_r)
 }
 
 
-WRITE8_MEMBER(pce_state::pce_cd_intf_w)
+void pce_state::pce_cd_intf_w(offs_t offset, uint8_t data)
 {
 	m_cd->update();
 
@@ -213,7 +213,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 	m_cd->update();
 }
 
-READ8_MEMBER(pce_state::pce_cd_intf_r)
+uint8_t pce_state::pce_cd_intf_r(offs_t offset)
 {
 	m_cd->update();
 
@@ -237,12 +237,12 @@ READ8_MEMBER(pce_state::pce_cd_intf_r)
 }
 
 
-READ8_MEMBER(pce_state::pce_cd_acard_wram_r)
+uint8_t pce_state::pce_cd_acard_wram_r(offs_t offset)
 {
-	return pce_cd_intf_r(space, 0x200 | (offset & 0x6000) >> 9);
+	return pce_cd_intf_r(0x200 | (offset & 0x6000) >> 9);
 }
 
-WRITE8_MEMBER(pce_state::pce_cd_acard_wram_w)
+void pce_state::pce_cd_acard_wram_w(offs_t offset, uint8_t data)
 {
-	pce_cd_intf_w(space, 0x200 | (offset & 0x6000) >> 9, data);
+	pce_cd_intf_w(0x200 | (offset & 0x6000) >> 9, data);
 }

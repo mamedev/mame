@@ -22,9 +22,9 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_kof2k3bl_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(addon_r) override { return m_kof2k3bl_prot->overlay_r(space, offset, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset) override { return m_kof2k3bl_prot->protection_r(offset); }
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { m_kof2k3bl_prot->kof2003_w(offset, data, mem_mask); }
+	virtual uint16_t addon_r(offs_t offset) override { return m_kof2k3bl_prot->overlay_r(); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -50,8 +50,8 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_kof2k3bl_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003p_w(space, offset, data, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset) override { return m_kof2k3bl_prot->protection_r(offset); }
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { m_kof2k3bl_prot->kof2003p_w(offset, data, mem_mask); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -77,9 +77,9 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_kof2k3bl_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(addon_r) override { return m_kof2k3bl_prot->overlay_r(space, offset, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset) override { return m_kof2k3bl_prot->protection_r(offset); }
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { m_kof2k3bl_prot->kof2003_w(offset, data, mem_mask); }
+	virtual uint16_t addon_r(offs_t offset) override { return m_kof2k3bl_prot->overlay_r(); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

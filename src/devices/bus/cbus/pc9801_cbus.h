@@ -111,7 +111,7 @@ public:
 	address_space &program_space() const { return *m_memspace; }
 	address_space &io_space() const { return *m_iospace; }
 	template<int I> void int_w(bool state) { m_int_callback[I](state); }
-	void install_io(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	template<typename R, typename W> void install_io(offs_t start, offs_t end, R rhandler, W whandler);
 
 protected:
 	// device-level overrides

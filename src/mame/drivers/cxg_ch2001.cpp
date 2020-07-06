@@ -70,9 +70,9 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void speaker_w(u8 data);
+	void leds_w(u8 data);
+	u8 input_r();
 
 	u16 m_inp_mux;
 	int m_dac_data;
@@ -97,14 +97,14 @@ void ch2001_state::machine_start()
 
 // TTL
 
-WRITE8_MEMBER(ch2001_state::speaker_w)
+void ch2001_state::speaker_w(u8 data)
 {
 	// 74ls109 toggle to speaker
 	m_dac_data ^= 1;
 	m_dac->write(m_dac_data);
 }
 
-WRITE8_MEMBER(ch2001_state::leds_w)
+void ch2001_state::leds_w(u8 data)
 {
 	// d0-d7: 74ls273 (WR to CLK)
 	// 74ls273 Q1-Q4: 74ls145 A-D
@@ -118,7 +118,7 @@ WRITE8_MEMBER(ch2001_state::leds_w)
 	m_display->matrix(sel, led_data);
 }
 
-READ8_MEMBER(ch2001_state::input_r)
+u8 ch2001_state::input_r()
 {
 	u8 data = 0;
 

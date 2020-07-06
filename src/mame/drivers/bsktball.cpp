@@ -10,7 +10,8 @@
         * Basketball
 
     Known issues:
-        * none at this time
+        * Arcade screen hblank (left/right) border is grey, MAME screen emulation
+          is limited to active display area.
 
 ****************************************************************************
 
@@ -31,7 +32,6 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -209,7 +209,6 @@ GFXDECODE_END
 void bsktball_state::machine_start()
 {
 	save_item(NAME(m_nmi_on));
-//  save_item(NAME(m_i256v));
 	save_item(NAME(m_ld1));
 	save_item(NAME(m_ld2));
 	save_item(NAME(m_dir0));
@@ -224,7 +223,6 @@ void bsktball_state::machine_start()
 
 void bsktball_state::machine_reset()
 {
-//  m_i256v = 0;
 	m_ld1 = 0;
 	m_ld2 = 0;
 	m_dir0 = 0;
@@ -241,12 +239,13 @@ void bsktball_state::machine_reset()
 void bsktball_state::bsktball(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 750000);
+	M6502(config, m_maincpu, 12.096_MHz_XTAL/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bsktball_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bsktball_state::bsktball_scanline), "screen", 0, 1);
+	m_maincpu->set_vblank_int("screen", FUNC(bsktball_state::irq0_line_hold));
+	TIMER(config, "nmi_timer").configure_scanline(FUNC(bsktball_state::bsktball_scanline), "screen", 32, 64);
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // M6
-	outlatch.q_out_cb<1>().set_nop(); // Coin Counter
+	outlatch.q_out_cb<1>().set([this](int state) { machine().bookkeeping().coin_counter_w(0, state); }); // Coin Counter
 	outlatch.q_out_cb<2>().set_output("led0"); // LED 1
 	outlatch.q_out_cb<3>().set_output("led1"); // LED 2
 	outlatch.q_out_cb<4>().set(FUNC(bsktball_state::ld1_w)); // LD 1
@@ -255,20 +254,16 @@ void bsktball_state::bsktball(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(bsktball_state::nmion_w)); // NMI On
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 28*8);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bsktball_state::screen_update_bsktball));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12.096_MHz_XTAL/2, 384, 0, 256, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(bsktball_state::screen_update_bsktball));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bsktball);
 	PALETTE(config, m_palette, FUNC(bsktball_state::bsktball_palette), 2*4 + 4*4*4*4, 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
 	DISCRETE(config, m_discrete, bsktball_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -300,4 +295,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, empty_init, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, empty_init, ROT0, "Atari", "Atari Basketball", MACHINE_SUPPORTS_SAVE )

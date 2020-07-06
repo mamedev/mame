@@ -33,6 +33,7 @@
 ///
 
 #include "nld_matrix_solver.h"
+#include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
 #include "plib/vector_ops.h"
 
@@ -46,8 +47,6 @@ namespace solver
 	template <typename FT, int SIZE>
 	class matrix_solver_sm_t: public matrix_solver_ext_t<FT, SIZE>
 	{
-		friend class matrix_solver_t;
-
 	public:
 
 		using float_ext_type = FT;

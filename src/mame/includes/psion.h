@@ -63,7 +63,6 @@ protected:
 	uint16_t m_kb_counter;
 	uint8_t m_enable_nmi;
 	optional_shared_ptr<uint8_t> m_sys_register;
-	uint8_t m_tcsr_value;
 	uint8_t m_stby_pwr;
 	uint8_t m_pulse;
 
@@ -85,15 +84,12 @@ protected:
 	void update_banks();
 	void port2_w(offs_t offset, uint8_t data, uint8_t ddr);
 	uint8_t port2_r();
-	void tcsr_w(uint8_t data);
-	uint8_t tcsr_r();
-	uint8_t rcp5c_r();
 	uint8_t port5_r();
 	void port6_w(uint8_t data);
 	uint8_t port6_r();
 	void io_rw(uint16_t offset);
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_READ8_MEMBER( io_r );
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
 	void psion_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
@@ -119,9 +115,9 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( reset_kb_counter_r );
-	DECLARE_READ8_MEMBER( inc_kb_counter_r );
-	DECLARE_READ8_MEMBER( switchoff_r );
+	uint8_t reset_kb_counter_r();
+	uint8_t inc_kb_counter_r();
+	uint8_t switchoff_r();
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
 	void psion1_mem(address_map &map);

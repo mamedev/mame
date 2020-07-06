@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(atn_w);
 	DECLARE_WRITE_LINE_MEMBER(ren_w);
 
-	DECLARE_WRITE8_MEMBER(bus_dio_w);
+	void bus_dio_w(uint8_t data);
 
 	void set_ext_signal(phi_488_signal_t signal , int state);
 
@@ -84,10 +84,10 @@ public:
 	// 2        13
 	// 1        14
 	// 0        15
-	DECLARE_WRITE16_MEMBER(reg16_w);
-	DECLARE_READ16_MEMBER(reg16_r);
-	DECLARE_WRITE8_MEMBER(reg8_w);
-	DECLARE_READ8_MEMBER(reg8_r);
+	void reg16_w(offs_t offset, uint16_t data);
+	uint16_t reg16_r(offs_t offset);
+	void reg8_w(offs_t offset, uint8_t data);
+	uint8_t reg8_r(offs_t offset);
 
 protected:
 	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

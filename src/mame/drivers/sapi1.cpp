@@ -81,22 +81,22 @@ public:
 private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
-	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
-	DECLARE_READ8_MEMBER(sapi2_keyboard_status_r);
-	DECLARE_READ8_MEMBER(sapi2_keyboard_data_r);
-	DECLARE_READ8_MEMBER(sapi3_0c_r);
-	DECLARE_WRITE8_MEMBER(sapi3_00_w);
-	DECLARE_READ8_MEMBER(sapi3_25_r);
-	DECLARE_WRITE8_MEMBER(sapi3_25_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port11_w);
-	DECLARE_WRITE8_MEMBER(port13_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_READ8_MEMBER(port11_r);
-	DECLARE_READ8_MEMBER(port40_r);
-	DECLARE_READ8_MEMBER(port41_r);
+	uint8_t sapi1_keyboard_r();
+	void sapi1_keyboard_w(uint8_t data);
+	uint8_t sapi2_keyboard_status_r();
+	uint8_t sapi2_keyboard_data_r();
+	uint8_t sapi3_0c_r();
+	void sapi3_00_w(uint8_t data);
+	uint8_t sapi3_25_r();
+	void sapi3_25_w(uint8_t data);
+	void port10_w(uint8_t data);
+	void port11_w(uint8_t data);
+	void port13_w(uint8_t data);
+	void port43_w(uint8_t data);
+	uint8_t port10_r();
+	uint8_t port11_r();
+	uint8_t port40_r();
+	uint8_t port41_r();
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -521,7 +521,7 @@ MC6845_UPDATE_ROW( sapi_state::crtc_update_row )
 
 **************************************/
 
-READ8_MEMBER( sapi_state::sapi1_keyboard_r )
+uint8_t sapi_state::sapi1_keyboard_r()
 {
 	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) key &= m_io_keyboard[0]->read();
@@ -532,24 +532,24 @@ READ8_MEMBER( sapi_state::sapi1_keyboard_r )
 	return key;
 }
 
-WRITE8_MEMBER( sapi_state::sapi1_keyboard_w )
+void sapi_state::sapi1_keyboard_w(uint8_t data)
 {
 	m_keyboard_mask = (data ^ 0xff ) & 0x1f;
 }
 
-READ8_MEMBER( sapi_state::sapi2_keyboard_status_r)
+uint8_t sapi_state::sapi2_keyboard_status_r()
 {
 	return (m_term_data) ? 0 : 1;
 }
 
-READ8_MEMBER( sapi_state::sapi2_keyboard_data_r)
+uint8_t sapi_state::sapi2_keyboard_data_r()
 {
 	uint8_t ret = ~m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER(sapi_state::port10_r)
+uint8_t sapi_state::port10_r()
 {
 	uint8_t result = 0;
 	result |= m_uart->tbmt_r() || m_uart->dav_r();
@@ -566,7 +566,7 @@ READ8_MEMBER(sapi_state::port10_r)
 	return result;
 }
 
-WRITE8_MEMBER(sapi_state::port10_w)
+void sapi_state::port10_w(uint8_t data)
 {
 	if (m_v24)
 	{
@@ -583,7 +583,7 @@ WRITE8_MEMBER(sapi_state::port10_w)
 	m_ier = BIT(data, 7);
 }
 
-READ8_MEMBER(sapi_state::port11_r)
+uint8_t sapi_state::port11_r()
 {
 	u8 data = 0x3f;
 	data |= m_uart->dav_r() ? 0x80 : 0;
@@ -591,7 +591,7 @@ READ8_MEMBER(sapi_state::port11_r)
 	return data;
 }
 
-WRITE8_MEMBER(sapi_state::port11_w)
+void sapi_state::port11_w(uint8_t data)
 {
 	m_uart->write_np(BIT(data, 0));
 	m_uart->write_tsb(BIT(data, 1));
@@ -602,19 +602,19 @@ WRITE8_MEMBER(sapi_state::port11_w)
 	m_uart->write_cs(0);
 }
 
-WRITE8_MEMBER(sapi_state::port13_w)
+void sapi_state::port13_w(uint8_t data)
 {
 	// really pulsed by K155AG3 (=74123N): R29=22k, C16=220 (output combined with master reset)
 	m_uart->write_xr(0);
 	m_uart->write_xr(1);
 }
 
-READ8_MEMBER( sapi_state::port40_r )
+uint8_t sapi_state::port40_r()
 {
 	return ~m_uart->receive();
 }
 
-READ8_MEMBER(sapi_state::port41_r)
+uint8_t sapi_state::port41_r()
 {
 	u8 data = 0x7e;
 	data |= m_uart->dav_r() ? 0 : 1;
@@ -622,7 +622,7 @@ READ8_MEMBER(sapi_state::port41_r)
 	return data;
 }
 
-WRITE8_MEMBER( sapi_state::port43_w )
+void sapi_state::port43_w(uint8_t data)
 {
 	m_uart->transmit(~data);
 }
@@ -702,24 +702,24 @@ void sapi_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-READ8_MEMBER( sapi_state::sapi3_0c_r )
+uint8_t sapi_state::sapi3_0c_r()
 {
 	return 0xc0;
 }
 
 /* switch out the rom shadow */
-WRITE8_MEMBER( sapi_state::sapi3_00_w )
+void sapi_state::sapi3_00_w(uint8_t data)
 {
 	m_bank1->set_entry(0);
 }
 
 /* to stop execution in random ram */
-READ8_MEMBER( sapi_state::sapi3_25_r )
+uint8_t sapi_state::sapi3_25_r()
 {
 	return m_zps3_25;
 }
 
-WRITE8_MEMBER( sapi_state::sapi3_25_w )
+void sapi_state::sapi3_25_w(uint8_t data)
 {
 	m_zps3_25 = data & 0xfc; //??
 }

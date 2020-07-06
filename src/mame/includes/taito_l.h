@@ -32,18 +32,18 @@ public:
 	DECLARE_MACHINE_RESET(taito_l);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(u8 data);
 
 protected:
 	/* misc */
 	int m_last_irq_level;
 	int m_main_high;
 
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(rombankswitch_w);
+	void irq_enable_w(u8 data);
+	void rombankswitch_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(mcu_control_w);
-	DECLARE_READ8_MEMBER(mcu_control_r);
+	void mcu_control_w(u8 data);
+	u8 mcu_control_r();
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 
@@ -72,7 +72,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(u8 data);
 
 	void kurikint(machine_config &config);
 	void evilston(machine_config &config);
@@ -108,9 +108,9 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(slave_rombank_w);
-	DECLARE_READ8_MEMBER(slave_rombank_r);
-	DECLARE_WRITE8_MEMBER(portA_w);
+	void slave_rombank_w(u8 data);
+	u8 slave_rombank_r();
+	void portA_w(u8 data);
 
 	void fhawk(machine_config &config);
 
@@ -144,11 +144,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
 
-	DECLARE_WRITE8_MEMBER(msm5205_lo_w);
-	DECLARE_WRITE8_MEMBER(msm5205_hi_w);
-	DECLARE_WRITE8_MEMBER(msm5205_start_w);
-	DECLARE_WRITE8_MEMBER(msm5205_stop_w);
-	DECLARE_WRITE8_MEMBER(msm5205_volume_w);
+	void msm5205_lo_w(u8 data);
+	void msm5205_hi_w(u8 data);
+	void msm5205_start_w(u8 data);
+	void msm5205_stop_w(u8 data);
+	void msm5205_volume_w(u8 data);
 
 	void champwr(machine_config &config);
 
@@ -178,7 +178,7 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(extport_select_and_ym2203_r);
+	u8 extport_select_and_ym2203_r(offs_t offset);
 
 	void init_plottinga();
 
@@ -227,7 +227,7 @@ protected:
 private:
 	void horshoes_tile_cb(u32 &code);
 
-	DECLARE_WRITE8_MEMBER(bankg_w);
+	void bankg_w(u8 data);
 	int m_horshoes_gfxbank;
 
 	void horshoes_map(address_map &map);

@@ -15,6 +15,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 
 //#include "winutf8.h"
 
@@ -115,7 +116,7 @@ void disasmbasewin_info::update_menu()
 		device_debug *const debug = dasmview->source_device()->debug();
 
 		// first find an existing breakpoint at this address
-		const device_debug::breakpoint *bp = debug->breakpoint_find(address);
+		const debug_breakpoint *bp = debug->breakpoint_find(address);
 
 		if (bp == nullptr)
 		{
@@ -166,7 +167,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				device_debug *const debug = dasmview->source_device()->debug();
 
 				// first find an existing breakpoint at this address
-				const device_debug::breakpoint *bp = debug->breakpoint_find(address);
+				const debug_breakpoint *bp = debug->breakpoint_find(address);
 
 				// if it doesn't exist, add a new one
 				if (!is_main_console())
@@ -204,7 +205,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				device_debug *const debug = dasmview->source_device()->debug();
 
 				// first find an existing breakpoint at this address
-				const device_debug::breakpoint *bp = debug->breakpoint_find(address);
+				const debug_breakpoint *bp = debug->breakpoint_find(address);
 
 				// if it doesn't exist, add a new one
 				if (bp != nullptr)

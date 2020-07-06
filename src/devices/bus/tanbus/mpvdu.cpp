@@ -142,7 +142,7 @@ void tanbus_mpvdu_device::set_inhibit_lines(offs_t offset, int &inhram, int &inh
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(tanbus_mpvdu_device::videoram_r)
+uint8_t tanbus_mpvdu_device::videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }

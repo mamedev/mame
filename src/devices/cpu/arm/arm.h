@@ -64,6 +64,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
+	memory_access<26, 2, 0, ENDIANNESS_LITTLE>::cache m_cachele;
+	memory_access<26, 2, 0, ENDIANNESS_BIG>::cache m_cachebe;
 
 	int m_icount;
 	uint32_t m_sArmRegister[27];

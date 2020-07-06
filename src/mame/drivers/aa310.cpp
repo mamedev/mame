@@ -91,7 +91,6 @@
 #include "formats/apd_dsk.h"
 #include "formats/jfd_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/i2cmem.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
@@ -131,8 +130,8 @@ public:
 private:
 	required_shared_ptr<uint32_t> m_physram;
 
-	DECLARE_READ32_MEMBER(aa310_psy_wram_r);
-	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
+	uint32_t aa310_psy_wram_r(offs_t offset);
+	void aa310_psy_wram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
 
@@ -163,12 +162,12 @@ WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_drq_w)
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
-READ32_MEMBER(aa310_state::aa310_psy_wram_r)
+uint32_t aa310_state::aa310_psy_wram_r(offs_t offset)
 {
 	return m_physram[offset];
 }
 
-WRITE32_MEMBER(aa310_state::aa310_psy_wram_w)
+void aa310_state::aa310_psy_wram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_physram[offset]);
 }
@@ -179,7 +178,8 @@ void aa310_state::init_aa310()
 	uint32_t ram_size = m_ram->size();
 
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x02000000, 0x02ffffff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(*this, FUNC(aa310_state::aa310_psy_wram_r)), write32_delegate(*this, FUNC(aa310_state::aa310_psy_wram_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x02000000, 0x02000000+(ram_size-1), read32sm_delegate(*this, FUNC(aa310_state::aa310_psy_wram_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x02000000, 0x02000000+(ram_size-1), write32s_delegate(*this, FUNC(aa310_state::aa310_psy_wram_w)));
 
 	archimedes_driver_init();
 }
@@ -427,7 +427,7 @@ void aa310_state::aa310(machine_config &config)
 	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
 	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
+	I2C_24C02(config, "i2cmem", 0); // TODO: PCF8583
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 

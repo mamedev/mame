@@ -61,16 +61,16 @@ public:
 	void peyper(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(sw_r);
-	DECLARE_WRITE8_MEMBER(col_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(lamp7_w);
-	DECLARE_WRITE8_MEMBER(sol_w);
-	DECLARE_WRITE8_MEMBER(p1a_w) { } // more lamps
-	DECLARE_WRITE8_MEMBER(p1b_w) { } // more lamps
-	DECLARE_WRITE8_MEMBER(p2a_w) { } // more lamps
-	DECLARE_WRITE8_MEMBER(p2b_w) { } // more lamps
+	uint8_t sw_r();
+	void col_w(uint8_t data);
+	void disp_w(uint8_t data);
+	void lamp_w(offs_t offset, uint8_t data);
+	void lamp7_w(uint8_t data);
+	void sol_w(uint8_t data);
+	void p1a_w(uint8_t data) { } // more lamps
+	void p1b_w(uint8_t data) { } // more lamps
+	void p2a_w(uint8_t data) { } // more lamps
+	void p2b_w(uint8_t data) { } // more lamps
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -86,20 +86,20 @@ private:
 	output_finder<34> m_dpl; // 0 used as black hole
 };
 
-WRITE8_MEMBER( peyper_state::col_w )
+void peyper_state::col_w(uint8_t data)
 {
 	m_digit = data;
 }
 
-READ8_MEMBER( peyper_state::sw_r )
+uint8_t peyper_state::sw_r()
 {
-	if (m_digit < 4)
-		return m_switch[m_digit]->read();
+	if ((m_digit & 7) < 4)
+		return m_switch[m_digit & 7]->read();
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( peyper_state::disp_w )
+void peyper_state::disp_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 /*
@@ -169,18 +169,18 @@ WRITE8_MEMBER( peyper_state::disp_w )
 	}
 }
 
-WRITE8_MEMBER(peyper_state::lamp_w)
+void peyper_state::lamp_w(offs_t offset, uint8_t data)
 {
 	//logerror("lamp_w %02x\n",data);
 	//logerror("[%d]= %02x\n",4+offset/4,data);
 }
 
-WRITE8_MEMBER(peyper_state::lamp7_w)
+void peyper_state::lamp7_w(uint8_t data)
 {
 	//logerror("[7]= %02x\n",data);
 }
 
-WRITE8_MEMBER(peyper_state::sol_w)
+void peyper_state::sol_w(uint8_t data)
 {
 	//logerror("sol_w %02x\n",data);
 }

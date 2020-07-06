@@ -58,7 +58,7 @@ forti_device::forti_device(const machine_config &mconfig, const char *tag, devic
 /*
     No read access. The FORTi card does not support any reading.
 */
-READ8Z_MEMBER(forti_device::readz)
+void forti_device::readz(offs_t offset, uint8_t *value)
 {
 	return;
 }

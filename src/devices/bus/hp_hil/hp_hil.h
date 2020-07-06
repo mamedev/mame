@@ -125,8 +125,8 @@ public:
 	void add_hp_hil_device(device_hp_hil_interface *device);
 	bool get_int(void) { return m_r3 & 1; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ap_w);
 
 	void hil_write(uint16_t data);

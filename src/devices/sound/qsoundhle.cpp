@@ -42,7 +42,7 @@ ROM_END
 qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)

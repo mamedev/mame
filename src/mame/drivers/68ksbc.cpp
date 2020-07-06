@@ -44,12 +44,12 @@ public:
 	void c68ksbc(machine_config &config);
 
 private:
-	void c68ksbc_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
 
-void c68ksbc_state::c68ksbc_mem(address_map &map)
+void c68ksbc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x002fff).rom();
@@ -66,7 +66,7 @@ INPUT_PORTS_END
 void c68ksbc_state::c68ksbc(machine_config &config)
 {
 	M68000(config, m_maincpu, 8000000); // text says 8MHz, schematic says 10MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &c68ksbc_state::c68ksbc_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c68ksbc_state::mem_map);
 
 	acia6850_device &acia(ACIA6850(config, "acia", 0));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -83,11 +83,11 @@ void c68ksbc_state::c68ksbc(machine_config &config)
 
 /* ROM definition */
 ROM_START( 68ksbc )
-	ROM_REGION(0x1000000, "maincpu", 0)
+	ROM_REGION(0x3000, "maincpu", 0)
 	ROM_LOAD( "t68k.bin", 0x0000, 0x2f78, CRC(20a8d0d0) SHA1(544fd8bd8ed017115388c8b0f7a7a59a32253e43) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                     FLAGS */
-COMP( 2002, 68ksbc, 0,      0,      c68ksbc, c68ksbc, c68ksbc_state, empty_init, "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)
+COMP( 2002, 68ksbc, 0,      0,      c68ksbc, c68ksbc, c68ksbc_state, empty_init, "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

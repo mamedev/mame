@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <sstream>
 #include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
@@ -31,7 +32,7 @@
 ///
 /// \returns Number of arguments
 ///
-#define PNARGS(...) PNARGS_1(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+#define PNARGS(...) PNARGS_1(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
 #define PNARGS_2(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
 #define PNARGS_1(...) PMSVC_VARARG_BUG(PNARGS_2, (__VA_ARGS__))
@@ -77,6 +78,23 @@
 ///
 #define PSTRINGIFY_VA(...) PMSVC_VARARG_BUG(PCONCAT, (PSTRINGIFY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
 
+/// \brief Dispatch VARARG macro to specialized macros
+///
+/// ```
+/// #define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
+/// ```
+///
+/// Will pass varargs depending on number of arguments to
+///
+/// ```
+/// LOCAL_LIB_ENTRY_1(a1)
+/// LOCAL_LIB_ENTRY_2(a1 , a2)
+/// ```
+///
+/// \returns result of specialized macro
+///
+#define PCALLVARARG(MAC, ...) PMSVC_VARARG_BUG(PCONCAT, (MAC, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+
 // FIXME:: __FUNCTION__ may be not be supported by all compilers.
 
 #define PSOURCELOC() plib::source_location(__FILE__, __LINE__)
@@ -103,6 +121,10 @@ namespace plib
 		source_location(pstring file, pstring func, unsigned line) noexcept
 		: m_file(std::move(file)), m_func(std::move(func)), m_line(line), m_col(0)
 		{ }
+
+		PCOPYASSIGNMOVE(source_location, default)
+
+		~source_location() = default;
 
 		unsigned line() const noexcept { return m_line; }
 		unsigned column() const noexcept { return m_col; }
@@ -132,7 +154,7 @@ namespace plib
 	{
 	public:
 
-		using stream_ptr = plib::unique_ptr<std::istream>;
+		using stream_ptr = std::unique_ptr<std::istream>;
 
 		psource_t() noexcept = default;
 
@@ -149,10 +171,7 @@ namespace plib
 	/// Will return the given string when name matches.
 	/// Is used in preprocessor code to eliminate inclusion of certain files.
 	///
-	/// \tparam TS base stream class. Default is psource_t
-	///
-	template <typename TS = psource_t>
-	class psource_str_t : public TS
+	class psource_str_t : public psource_t
 	{
 	public:
 		psource_str_t(pstring name, pstring str)
@@ -162,10 +181,12 @@ namespace plib
 		PCOPYASSIGNMOVE(psource_str_t, delete)
 		~psource_str_t() noexcept override = default;
 
-		typename TS::stream_ptr stream(const pstring &name) override
+		typename psource_t::stream_ptr stream(const pstring &name) override
 		{
-			return (name == m_name) ?
-				plib::make_unique<std::stringstream>(m_str) : typename TS::stream_ptr(nullptr);
+			if (name == m_name)
+				return std::make_unique<std::stringstream>(m_str);
+
+			return psource_t::stream_ptr(nullptr);
 		}
 	private:
 		pstring m_name;
@@ -174,13 +195,13 @@ namespace plib
 
 	/// \brief Generic sources collection.
 	///
-	/// \tparam TS base stream class. Default is psource_t
+	/// \tparam ARENA memory arena, defaults to aligned_arena
 	///
-	template <typename TS = psource_t>
+	template <typename ARENA = aligned_arena>
 	class psource_collection_t
 	{
 	public:
-		using source_type = plib::unique_ptr<TS>;
+		using source_type = std::unique_ptr<psource_t>;
 		using list_t = std::vector<source_type>;
 
 		psource_collection_t() noexcept = default;
@@ -193,8 +214,8 @@ namespace plib
 			m_collection.push_back(std::move(src));
 		}
 
-		template <typename S = TS>
-		typename S::stream_ptr get_stream(pstring name)
+		template <typename S = psource_t>
+		typename psource_t::stream_ptr get_stream(pstring name)
 		{
 			for (auto &s : m_collection)
 			{
@@ -228,10 +249,31 @@ namespace plib
 		list_t m_collection;
 	};
 
+	/// \brief copy type S to type D byte by byte
+	///
+	/// The purpose of this copy function is to suppress compiler warnings.
+	/// Use at your own risk. This is dangerous.
+	///
+	/// \param s Source object
+	/// \param d Destination object
+	/// \tparam S Type of source object
+	/// \tparam D Type of destination object
+	template <typename S, typename D>
+	void reinterpret_copy(S &s, D &d)
+	{
+		static_assert(sizeof(D) >= sizeof(S), "size mismatch");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto *dp = reinterpret_cast<std::uint8_t *>(&d);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		const auto *sp = reinterpret_cast<std::uint8_t *>(&s);
+		std::copy(sp, sp + sizeof(S), dp);
+	}
+
 	namespace util
 	{
 		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
+		bool    exists(const pstring &filename);
 		pstring buildpath(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
@@ -250,14 +292,14 @@ namespace plib
 		{
 			auto it = std::find(con.begin(), con.end(), elem);
 			if (it != con.end())
-				return static_cast<std::size_t>(it - con.begin());
+				return narrow_cast<std::size_t>(it - con.begin());
 			return npos;
 		}
 
 		template <class C>
 		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
 		{
-			con.insert(con.begin() + static_cast<std::ptrdiff_t>(index), elem);
+			con.insert(con.begin() + narrow_cast<std::ptrdiff_t>(index), elem);
 		}
 
 		template <class C>
@@ -294,46 +336,12 @@ namespace plib
 	template <typename T>
 	std::size_t hash(const T *buf, std::size_t size)
 	{
-		std::size_t result = 5381;
+		std::size_t result = 5381; // NOLINT
 		for (const T* p = buf; p != buf + size; p++)
-			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p);
+			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ narrow_cast<std::size_t>(*p); // NOLINT
 		return result;
 	}
 
-	//============================================================
-	//  penum - strongly typed enumeration
-	//============================================================
-
-	struct penum_base
-	{
-	protected:
-		static int from_string_int(const pstring &str, const pstring &x);
-		static std::string nthstr(int n, const pstring &str);
-	};
-
 } // namespace plib
-
-#define P_ENUM(ename, ...) \
-	struct ename : public plib::penum_base { \
-		enum E { __VA_ARGS__ }; \
-		ename (E v) : m_v(v) { } \
-		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
-		bool set_from_string (const pstring &s) { \
-			int f = from_string_int(strings(), s); \
-			if (f>=0) { m_v = static_cast<E>(f); return true; } \
-			return false;\
-		} \
-		operator E() const noexcept {return m_v;} \
-		bool operator==(const ename &rhs) const noexcept {return m_v == rhs.m_v;} \
-		bool operator==(const E &rhs) const noexcept {return m_v == rhs;} \
-		std::string name() const { \
-			return nthstr(static_cast<int>(m_v), strings()); \
-		} \
-		private: E m_v; \
-		static pstring strings() {\
-			static const pstring lstrings = # __VA_ARGS__; \
-			return lstrings; \
-		} \
-	};
 
 #endif // PUTIL_H_

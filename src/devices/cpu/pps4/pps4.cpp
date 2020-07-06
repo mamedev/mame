@@ -123,7 +123,7 @@ device_memory_interface::space_config_vector pps4_device::memory_space_config() 
  */
 u8 pps4_device::M()
 {
-	u8 ret = m_data->read_byte(m_B & ~m_SAG);
+	u8 ret = m_data.read_byte(m_B & ~m_SAG);
 	m_SAG = 0;
 	return ret;
 }
@@ -135,7 +135,7 @@ u8 pps4_device::M()
  */
 void pps4_device::W(u8 data)
 {
-	m_data->write_byte(m_B & ~m_SAG, data);
+	m_data.write_byte(m_B & ~m_SAG, data);
 	m_SAG = 0;
 }
 
@@ -153,7 +153,7 @@ std::unique_ptr<util::disasm_interface> pps4_device::create_disassembler()
  */
 inline u8 pps4_device::ROP()
 {
-	const u8 op = m_cache->read_byte(m_P & 0xFFF);
+	const u8 op = m_cache.read_byte(m_P & 0xFFF);
 	m_Ip = m_I1;         // save previous opcode
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
@@ -169,7 +169,7 @@ inline u8 pps4_device::ROP()
  */
 inline u8 pps4_device::ARG()
 {
-	const u8 arg = m_cache->read_byte(m_P & 0xFFF);
+	const u8 arg = m_cache.read_byte(m_P & 0xFFF);
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
 	return arg;
@@ -1237,9 +1237,9 @@ void pps4_device::iIOL()
 {
 	u8 ac = (~m_A & 15);
 	m_I2 = ARG();
-	m_io->write_byte(m_I2, ac);
+	m_io.write_byte(m_I2, ac);
 	LOG("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac);
-	ac = m_io->read_byte(m_I2) & 15;
+	ac = m_io.read_byte(m_I2) & 15;
 	LOG("%s: port:%02x -> %x\n", __FUNCTION__, m_I2, ac);
 	m_A = ~ac & 15;
 }
@@ -1568,10 +1568,10 @@ void pps4_device::execute_run()
 
 void pps4_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	save_item(NAME(m_A));
 	save_item(NAME(m_X));
@@ -1656,11 +1656,12 @@ void pps4_2_device::device_reset()
 	m_DIO = 15;     // DIO clamp
 }
 
-READ16_MEMBER(pps4_device::address_bus_r)
+u16 pps4_device::address_bus_r(address_space &space)
 {
-	if (&space == m_io || &space == m_data)
+	int id = space.spacenum();
+	if (id == AS_IO || id == AS_DATA)
 		return m_B;
-	else if (&space == m_program)
+	else if (id == AS_PROGRAM)
 		return m_P;
 	else
 		return 0;

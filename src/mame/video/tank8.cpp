@@ -58,7 +58,7 @@ void tank8_state::set_pens()
 }
 
 
-WRITE8_MEMBER(tank8_state::video_ram_w)
+void tank8_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);

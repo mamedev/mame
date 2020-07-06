@@ -144,7 +144,7 @@ TODO:
 - schematics show 4 lines going from the 58XX I/O chip to the 26XX (starfield generator).
   Function and operation unknown.
 
-- Complete 62XX custom emulation (machine/namco62.c) (though it's quite different from 56XX and 58XX).
+- Complete 62XX custom emulation (machine/namco62.cpp) (though it's quite different from 56XX and 58XX).
 
 - Is the sprite generator the same as Phozon? This isn't clear yet. They are
   very similar, especially in the way the size flags are layed out.
@@ -161,7 +161,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gaplus_base_state::irq_1_ctrl_w)
+void gaplus_base_state::irq_1_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit & 1;
@@ -169,7 +169,7 @@ WRITE8_MEMBER(gaplus_base_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_base_state::irq_2_ctrl_w)
+void gaplus_base_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
@@ -177,7 +177,7 @@ WRITE8_MEMBER(gaplus_base_state::irq_2_ctrl_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_base_state::irq_3_ctrl_w)
+void gaplus_base_state::irq_3_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
@@ -185,7 +185,7 @@ WRITE8_MEMBER(gaplus_base_state::irq_3_ctrl_w)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_base_state::sreset_w)
+void gaplus_base_state::sreset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
@@ -193,7 +193,7 @@ WRITE8_MEMBER(gaplus_base_state::sreset_w)
 	m_namco_15xx->sound_enable_w(bit);
 }
 
-WRITE8_MEMBER(gaplus_base_state::freset_w)
+void gaplus_base_state::freset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( gaplus )
 	PORT_DIPNAME( 0x08, 0x08, "Round Advance" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, "30k 70k and every 70k" )
 	PORT_DIPSETTING(    0x01, "30k 100k and every 100k" )
 	PORT_DIPSETTING(    0x02, "30k 100k and every 200k" )
@@ -484,7 +484,7 @@ static const char *const gaplus_sample_names[] =
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::out_lamps0)
+void gaplus_state::out_lamps0(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0);
 	m_lamps[1] = BIT(data, 1);
@@ -492,7 +492,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps0)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-WRITE8_MEMBER(gaplus_state::out_lamps1)
+void gaplus_state::out_lamps1(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }

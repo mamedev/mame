@@ -189,9 +189,9 @@ protected:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_fire_trap;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_io;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	uint32_t m_prefix_base;   /* base address of the latest prefix segment */

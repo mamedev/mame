@@ -90,7 +90,7 @@ void k055555_device::K055555_write_reg(uint8_t regnum, uint8_t regdat)
 	m_regs[regnum] = regdat;
 }
 
-WRITE32_MEMBER( k055555_device::K055555_long_w )
+void k055555_device::K055555_long_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t regnum, regdat;
 
@@ -111,7 +111,7 @@ WRITE32_MEMBER( k055555_device::K055555_long_w )
 
 }
 
-WRITE16_MEMBER( k055555_device::K055555_word_w )
+void k055555_device::K055555_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0x00ff)
 	{

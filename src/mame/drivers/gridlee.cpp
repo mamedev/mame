@@ -168,7 +168,7 @@ void gridlee_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(gridlee_state::analog_port_r)
+uint8_t gridlee_state::analog_port_r(offs_t offset)
 {
 	int delta, sign, magnitude;
 	uint8_t newval;
@@ -250,7 +250,7 @@ void gridlee_state::poly17_init()
  *
  *************************************/
 
-READ8_MEMBER(gridlee_state::random_num_r)
+uint8_t gridlee_state::random_num_r()
 {
 	uint32_t cc;
 

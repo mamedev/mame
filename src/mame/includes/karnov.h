@@ -64,11 +64,11 @@ public:
 
 	u16 mcusim_r();
 	void mcusim_w(u16 data);
-	DECLARE_WRITE16_MEMBER(mcusim_ack_w);
-	DECLARE_WRITE16_MEMBER(mcusim_reset_w);
-	DECLARE_WRITE16_MEMBER(vint_ack_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	void playfield_w(offs_t offset, u16 data, u16 mem_mask);
+	void mcusim_ack_w(u16 data);
+	void mcusim_reset_w(u16 data);
+	void vint_ack_w(u16 data);
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void init_wndrplnt();
 	void init_karnov();
 	void init_karnovj();

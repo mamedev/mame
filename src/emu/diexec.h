@@ -7,6 +7,7 @@
     Device execution interfaces.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DIEXEC_H
 #define MAME_EMU_DIEXEC_H
 

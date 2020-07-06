@@ -94,45 +94,45 @@ void ultratnk_state::machine_reset()
 }
 
 
-READ8_MEMBER(ultratnk_state::wram_r)
+uint8_t ultratnk_state::wram_r(offs_t offset)
 {
 	return m_videoram[0x380 + offset];
 }
 
 
-READ8_MEMBER(ultratnk_state::analog_r)
+uint8_t ultratnk_state::analog_r(offs_t offset)
 {
 	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(ultratnk_state::coin_r)
+uint8_t ultratnk_state::coin_r(offs_t offset)
 {
 	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(ultratnk_state::collision_r)
+uint8_t ultratnk_state::collision_r(offs_t offset)
 {
 	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
-READ8_MEMBER(ultratnk_state::options_r)
+uint8_t ultratnk_state::options_r(offs_t offset)
 {
 	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::wram_w)
+void ultratnk_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[0x380 + offset] = data;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::collision_reset_w)
+void ultratnk_state::collision_reset_w(offs_t offset, uint8_t data)
 {
 	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::da_latch_w)
+void ultratnk_state::da_latch_w(uint8_t data)
 {
 	m_da_latch = data & 15;
 }
@@ -144,11 +144,11 @@ WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 }
 
 
-WRITE8_MEMBER(ultratnk_state::attract_w)
+void ultratnk_state::attract_w(uint8_t data)
 {
 	m_discrete->write(ULTRATNK_ATTRACT_EN, data & 1);
 }
-WRITE8_MEMBER(ultratnk_state::explosion_w)
+void ultratnk_state::explosion_w(uint8_t data)
 {
 	m_discrete->write(ULTRATNK_EXPLOSION_DATA, data & 15);
 }

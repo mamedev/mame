@@ -46,7 +46,7 @@ void cpc_pds_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_readwrite_handler(0xfbec,0xfbef, read8_delegate(*this, FUNC(cpc_pds_device::pio_r)), write8_delegate(*this, FUNC(cpc_pds_device::pio_w)));
+	space.install_readwrite_handler(0xfbec,0xfbef, read8sm_delegate(*this, FUNC(cpc_pds_device::pio_r)), write8sm_delegate(*this, FUNC(cpc_pds_device::pio_w)));
 }
 
 //-------------------------------------------------
@@ -59,12 +59,12 @@ void cpc_pds_device::device_reset()
 }
 
 
-READ8_MEMBER(cpc_pds_device::pio_r)
+uint8_t cpc_pds_device::pio_r(offs_t offset)
 {
 	return m_pio->read(offset);
 }
 
-WRITE8_MEMBER(cpc_pds_device::pio_w)
+void cpc_pds_device::pio_w(offs_t offset, uint8_t data)
 {
 	m_pio->write(offset,data);
 }

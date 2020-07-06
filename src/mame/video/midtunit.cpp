@@ -227,7 +227,7 @@ void midxunit_video_device::device_start()
  *
  *************************************/
 
-READ16_MEMBER(midtunit_video_device::midtunit_gfxrom_r)
+uint16_t midtunit_video_device::midtunit_gfxrom_r(offs_t offset)
 {
 	uint8_t *base = m_gfxrom->base() + m_gfxbank_offset[(offset >> 21) & 1];
 	offset = (offset & 0x01fffff) * 2;
@@ -235,7 +235,7 @@ READ16_MEMBER(midtunit_video_device::midtunit_gfxrom_r)
 }
 
 
-READ16_MEMBER(midwunit_video_device::midwunit_gfxrom_r)
+uint16_t midwunit_video_device::midwunit_gfxrom_r(offs_t offset)
 {
 	uint8_t *base = m_gfxrom->base() + m_gfxbank_offset[0];
 	offset *= 2;
@@ -250,7 +250,7 @@ READ16_MEMBER(midwunit_video_device::midwunit_gfxrom_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_vram_w)
+void midtunit_video_device::midtunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -270,7 +270,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_w)
 }
 
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_vram_data_w)
+void midtunit_video_device::midtunit_vram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
@@ -280,7 +280,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_data_w)
 }
 
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_vram_color_w)
+void midtunit_video_device::midtunit_vram_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
@@ -290,7 +290,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_color_w)
 }
 
 
-READ16_MEMBER(midtunit_video_device::midtunit_vram_r)
+uint16_t midtunit_video_device::midtunit_vram_r(offs_t offset)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -300,14 +300,14 @@ READ16_MEMBER(midtunit_video_device::midtunit_vram_r)
 }
 
 
-READ16_MEMBER(midtunit_video_device::midtunit_vram_data_r)
+uint16_t midtunit_video_device::midtunit_vram_data_r(offs_t offset)
 {
 	offset *= 2;
 	return (m_local_videoram[offset] & 0x00ff) | (m_local_videoram[offset + 1] << 8);
 }
 
 
-READ16_MEMBER(midtunit_video_device::midtunit_vram_color_r)
+uint16_t midtunit_video_device::midtunit_vram_color_r(offs_t offset)
 {
 	offset *= 2;
 	return (m_local_videoram[offset] >> 8) | (m_local_videoram[offset + 1] & 0xff00);
@@ -340,7 +340,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(midtunit_video_device::from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_control_w)
+void midtunit_video_device::midtunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    other important bits:
@@ -361,7 +361,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_control_w)
 }
 
 
-WRITE16_MEMBER(midwunit_video_device::midwunit_control_w)
+void midwunit_video_device::midwunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    other important bits:
@@ -379,7 +379,7 @@ WRITE16_MEMBER(midwunit_video_device::midwunit_control_w)
 }
 
 
-READ16_MEMBER(midwunit_video_device::midwunit_control_r)
+uint16_t midwunit_video_device::midwunit_control_r()
 {
 	return m_midtunit_control;
 }
@@ -392,14 +392,14 @@ READ16_MEMBER(midwunit_video_device::midwunit_control_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midxunit_video_device::midxunit_paletteram_w)
+void midxunit_video_device::midxunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!(offset & 1))
 		m_palette->write16(offset / 2, data, mem_mask);
 }
 
 
-READ16_MEMBER(midxunit_video_device::midxunit_paletteram_r)
+uint16_t midxunit_video_device::midxunit_paletteram_r(offs_t offset)
 {
 	return m_palette->read16(offset / 2);
 }
@@ -637,7 +637,7 @@ void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, i
  *
  *************************************/
 
-READ16_MEMBER(midtunit_video_device::midtunit_dma_r)
+uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
 {
 	/* rmpgwt sometimes reads register 0, expecting it to return the */
 	/* current DMA status; thus we map register 0 to register 1 */
@@ -694,7 +694,7 @@ READ16_MEMBER(midtunit_video_device::midtunit_dma_r)
  *           | ----------2----- | select top/bottom or left/right for reg 12/13
  */
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_dma_w)
+void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const uint8_t register_map[2][16] =
 	{

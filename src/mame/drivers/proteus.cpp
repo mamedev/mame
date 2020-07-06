@@ -84,18 +84,18 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(ptm_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o3_callback);
-	DECLARE_READ8_MEMBER(network_r);
-	DECLARE_WRITE8_MEMBER(network_w);
+	uint8_t network_r(offs_t offset);
+	void network_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(drive_register_r);
-	DECLARE_WRITE8_MEMBER(drive_register_w);
+	uint8_t drive_register_r();
+	void drive_register_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_READ8_MEMBER(fdc_inv_r);
-	DECLARE_WRITE8_MEMBER(fdc_inv_w);
+	uint8_t fdc_inv_r(offs_t offset);
+	void fdc_inv_w(offs_t offset, uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE8_MEMBER(enable_z80_w);
-	DECLARE_WRITE8_MEMBER(enable_6809_w);
+	void enable_z80_w(uint8_t data);
+	void enable_6809_w(uint8_t data);
 
 	void proteus_6809_mem(address_map &map);
 	void proteus_z80_mem(address_map &map);
@@ -160,18 +160,18 @@ WRITE_LINE_MEMBER(proteus_state::ptm_o3_callback)
 }
 
 
-READ8_MEMBER(proteus_state::network_r)
+uint8_t proteus_state::network_r(offs_t offset)
 {
 	return m_adlc->read(offset >> 1);
 }
 
-WRITE8_MEMBER(proteus_state::network_w)
+void proteus_state::network_w(offs_t offset, uint8_t data)
 {
 	m_adlc->write(offset >> 1, data);
 }
 
 
-WRITE8_MEMBER(proteus_state::drive_register_w)
+void proteus_state::drive_register_w(uint8_t data)
 {
 	/* drive select */
 	switch (data & 0x03)
@@ -197,7 +197,7 @@ WRITE8_MEMBER(proteus_state::drive_register_w)
 	}
 }
 
-READ8_MEMBER(proteus_state::drive_register_r)
+uint8_t proteus_state::drive_register_r()
 {
 	/* disk change */
 	return (m_floppy ? m_floppy->dskchg_r() : 1) << 1;
@@ -208,18 +208,18 @@ WRITE_LINE_MEMBER(proteus_state::motor_w)
 	if (m_floppy) m_floppy->mon_w(!state);
 }
 
-READ8_MEMBER(proteus_state::fdc_inv_r)
+uint8_t proteus_state::fdc_inv_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(proteus_state::fdc_inv_w)
+void proteus_state::fdc_inv_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
 
-WRITE8_MEMBER(proteus_state::enable_z80_w)
+void proteus_state::enable_z80_w(uint8_t data)
 {
 	logerror("%04X enable z80\n", m_maincpu->pc());
 	// Enable Z80 (store an address at E060 and when the 6809 comes back it'll load PC with that address)
@@ -227,7 +227,7 @@ WRITE8_MEMBER(proteus_state::enable_z80_w)
 	m_z80->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(proteus_state::enable_6809_w)
+void proteus_state::enable_6809_w(uint8_t data)
 {
 	logerror("%04X enable 6809\n", m_z80->pc());
 	// TODO: this is untested, not aware of any software that uses it

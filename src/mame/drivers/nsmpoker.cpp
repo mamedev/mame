@@ -92,9 +92,9 @@ private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
-	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
-	DECLARE_READ8_MEMBER(debug_r);
+	void nsmpoker_videoram_w(offs_t offset, uint8_t data);
+	void nsmpoker_colorram_w(offs_t offset, uint8_t data);
+	uint8_t debug_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void nsmpoker_palette(palette_device &palette) const;
 	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -109,14 +109,14 @@ private:
 *************************/
 
 
-WRITE8_MEMBER(nsmpoker_state::nsmpoker_videoram_w)
+void nsmpoker_state::nsmpoker_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(nsmpoker_state::nsmpoker_colorram_w)
+void nsmpoker_state::nsmpoker_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -169,12 +169,12 @@ INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
 	m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
-//WRITE8_MEMBER(nsmpoker_state::debug_w)
+//void nsmpoker_state::debug_w(uint8_t data)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-READ8_MEMBER(nsmpoker_state::debug_r)
+uint8_t nsmpoker_state::debug_r(offs_t offset)
 {
 	return BIT(machine().rand(), offset);
 }

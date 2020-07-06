@@ -23,17 +23,17 @@
 
 /* Video RAM Access */
 
-READ8_MEMBER( v1050_state::attr_r )
+uint8_t v1050_state::attr_r()
 {
 	return m_attr;
 }
 
-WRITE8_MEMBER( v1050_state::attr_w )
+void v1050_state::attr_w(uint8_t data)
 {
 	m_attr = data;
 }
 
-READ8_MEMBER( v1050_state::videoram_r )
+uint8_t v1050_state::videoram_r(offs_t offset)
 {
 	if (offset >= 0x2000)
 	{
@@ -43,7 +43,7 @@ READ8_MEMBER( v1050_state::videoram_r )
 	return m_video_ram[offset];
 }
 
-WRITE8_MEMBER( v1050_state::videoram_w )
+void v1050_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 

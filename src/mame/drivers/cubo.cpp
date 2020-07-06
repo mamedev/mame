@@ -342,7 +342,7 @@ public:
 	template <int P> DECLARE_READ_LINE_MEMBER(cd32_sel_mirror_input);
 
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void akiko_cia_0_port_a_write(uint8_t data);
 
 	void init_cubo();
 	void init_mgprem11();
@@ -406,7 +406,7 @@ WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
  *************************************/
 
 
-WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
+void cubo_state::akiko_cia_0_port_a_write(uint8_t data)
 {
 	/* bit 0 = cd audio mute */
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
@@ -1042,7 +1042,7 @@ void cubo_state::cubo(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(1024);
+	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
 	akiko_device &akiko(AKIKO(config, "akiko", 0));
 	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));

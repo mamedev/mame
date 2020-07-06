@@ -158,18 +158,18 @@ INPUT_PORTS_END
 //  D71055C PPI (PC)
 //-------------------------------------------------
 
-READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_a )
+uint8_t isa8_ibm_mfc_device::ppi0_i_a()
 {
 	// Read data from the Z80 PIU
 	return m_d71055c_1->pa_r();
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_b )
+void isa8_ibm_mfc_device::ppi0_o_b(uint8_t data)
 {
 	// Write data to the Z80 PIU - no action required
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_c )
+void isa8_ibm_mfc_device::ppi0_o_c(uint8_t data)
 {
 	// PC Port B /OBF (C1) -> Z80 Port B /STB (C2)
 	m_d71055c_1->pc2_w(BIT(data, 1));
@@ -191,7 +191,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_c )
 	m_pc_ppi_c = data;
 }
 
-READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_c )
+uint8_t isa8_ibm_mfc_device::ppi0_i_c()
 {
 	// Receive data bit 8
 	return BIT(m_z80_ppi_c, 5) << 7;
@@ -201,18 +201,18 @@ READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_c )
 //  D71055C PPI (Z80)
 //-------------------------------------------------
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_a )
+void isa8_ibm_mfc_device::ppi1_o_a(uint8_t data)
 {
 	// Write data to the PC PIU - no action required
 }
 
-READ8_MEMBER( isa8_ibm_mfc_device::ppi1_i_b )
+uint8_t isa8_ibm_mfc_device::ppi1_i_b()
 {
 	// Read data from the PC PIU
 	return m_d71055c_0->pb_r();
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
+void isa8_ibm_mfc_device::ppi1_o_c(uint8_t data)
 {
 	// PortA /OBF (C7) -> PortA /STB (C2)
 	m_d71055c_0->pc4_w(BIT(data, 7));
@@ -273,7 +273,7 @@ WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
 //  ISA interface
 //-------------------------------------------------
 
-READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
+uint8_t isa8_ibm_mfc_device::ibm_mfc_r(offs_t offset)
 {
 	uint8_t val;
 
@@ -306,7 +306,7 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 	return val;
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
+void isa8_ibm_mfc_device::ibm_mfc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -462,7 +462,7 @@ isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const ch
 void isa8_ibm_mfc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x2a20, 0x2a20 + 15, read8_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_r)), write8_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_w)));
+	m_isa->install_device(0x2a20, 0x2a20 + 15, read8sm_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_r)), write8sm_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_w)));
 }
 
 

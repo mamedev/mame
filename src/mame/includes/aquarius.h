@@ -84,17 +84,17 @@ private:
 	uint8_t m_scrambler;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(aquarius_videoram_w);
-	DECLARE_WRITE8_MEMBER(aquarius_colorram_w);
-	DECLARE_READ8_MEMBER(cassette_r);
-	DECLARE_WRITE8_MEMBER(cassette_w);
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_READ8_MEMBER(printer_r);
-	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(scrambler_w);
-	DECLARE_READ8_MEMBER(cartridge_r);
+	void aquarius_videoram_w(offs_t offset, uint8_t data);
+	void aquarius_colorram_w(offs_t offset, uint8_t data);
+	uint8_t cassette_r();
+	void cassette_w(uint8_t data);
+	uint8_t vsync_r();
+	void mapper_w(uint8_t data);
+	uint8_t printer_r();
+	void printer_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+	void scrambler_w(uint8_t data);
+	uint8_t cartridge_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
 	void aquarius_palette(palette_device &palette) const;
 	uint32_t screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -188,7 +188,7 @@ void segas18_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( segas18_state::misc_outputs_w )
+void segas18_state::misc_outputs_w(uint8_t data)
 {
 	// miscellaneous output
 	set_grayscale(~data & 0x40);
@@ -203,7 +203,7 @@ WRITE8_MEMBER( segas18_state::misc_outputs_w )
 }
 
 
-READ16_MEMBER( segas18_state::misc_io_r )
+uint16_t segas18_state::misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -222,12 +222,12 @@ READ16_MEMBER( segas18_state::misc_io_r )
 	}
 
 	if (!m_custom_io_r.isnull())
-		return m_custom_io_r(space, offset, mem_mask);
+		return m_custom_io_r(mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return m_mapper->open_bus_r();
 }
 
-WRITE16_MEMBER( segas18_state::misc_io_w )
+void segas18_state::misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -254,7 +254,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
 
 	if (!m_custom_io_w.isnull())
 	{
-		m_custom_io_w(space, offset, data, mem_mask);
+		m_custom_io_w(offset, data);
 		return;
 	}
 	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
@@ -268,7 +268,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
  *
  *************************************/
 
-WRITE8_MEMBER( segas18_state::rom_5874_bank_w )
+void segas18_state::rom_5874_bank_w(uint8_t data)
 {
 	if (m_romboard == ROM_BOARD_171_5874 || m_romboard == ROM_BOARD_171_SHADOW)
 	{
@@ -281,7 +281,7 @@ WRITE8_MEMBER( segas18_state::rom_5874_bank_w )
 }
 
 
-WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
+void segas18_state::rom_5987_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!ACCESSING_BITS_0_7)
 		return;
@@ -309,7 +309,7 @@ WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
 	}
 }
 
-WRITE16_MEMBER( segas18_state::rom_837_7525_bank_w )
+void segas18_state::rom_837_7525_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!ACCESSING_BITS_0_7)
 		return;
@@ -343,7 +343,7 @@ WRITE16_MEMBER( segas18_state::rom_837_7525_bank_w )
  *
  *************************************/
 
-READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
+uint16_t segas18_state::ddcrew_custom_io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -367,7 +367,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
  *
  *************************************/
 
-READ16_MEMBER( segas18_state::lghost_custom_io_r )
+uint16_t segas18_state::lghost_custom_io_r(offs_t offset)
 {
 	uint16_t result;
 	switch (offset)
@@ -383,7 +383,7 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 	return m_mapper->open_bus_r();
 }
 
-WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
+void segas18_state::lghost_custom_io_w(offs_t offset, uint16_t data)
 {
 	uint8_t pos_value_x, pos_value_y;
 
@@ -563,7 +563,7 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 }
 
 
-WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
+void segas18_state::lghost_gun_recoil_w(uint8_t data)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -579,7 +579,7 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
  *
  *************************************/
 
-READ16_MEMBER( segas18_state::wwally_custom_io_r )
+uint16_t segas18_state::wwally_custom_io_r(offs_t offset)
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
 		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(offset & 0x0006/2);
@@ -588,7 +588,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 }
 
 
-WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
+void segas18_state::wwally_custom_io_w(offs_t offset, uint16_t data)
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
 		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r();
@@ -602,7 +602,7 @@ WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
  *
  *************************************/
 
-WRITE8_MEMBER( segas18_state::soundbank_w )
+void segas18_state::soundbank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data);
 }
@@ -645,8 +645,7 @@ void segas18_state::sound_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
 	map(0xa000, 0xbfff).bankr("soundbank");
-	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
-	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -1376,7 +1375,7 @@ void segas18_state::system18(machine_config &config)
 	ym3438_device &ym2(YM3438(config, "ym2", 8000000));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000));
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000)); // ASSP (RF)5C68A
 	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 	rfsnd.set_addrmap(0, &segas18_state::pcm_map);
 }
@@ -3188,21 +3187,21 @@ void segas18_state::init_hamaway()
 void segas18_state::init_ddcrew()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::ddcrew_custom_io_r));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas18_state::ddcrew_custom_io_r));
 }
 
 void segas18_state::init_lghost()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::lghost_custom_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segas18_state::lghost_custom_io_w));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas18_state::lghost_custom_io_r));
+	m_custom_io_w = write16sm_delegate(*this, FUNC(segas18_state::lghost_custom_io_w));
 }
 
 void segas18_state::init_wwally()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::wwally_custom_io_r));
-	m_custom_io_w = write16_delegate(*this, FUNC(segas18_state::wwally_custom_io_w));
+	m_custom_io_r = read16sm_delegate(*this, FUNC(segas18_state::wwally_custom_io_r));
+	m_custom_io_w = write16sm_delegate(*this, FUNC(segas18_state::wwally_custom_io_w));
 }
 
 

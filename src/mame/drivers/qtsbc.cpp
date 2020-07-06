@@ -62,10 +62,10 @@ public:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 private:
-	DECLARE_READ8_MEMBER(memory_r);
-	DECLARE_WRITE8_MEMBER(memory_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	u8 memory_r(offs_t offset);
+	void memory_w(offs_t offset, u8 data);
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(rts_loopback_w);
 
 	virtual void machine_start() override;
@@ -84,7 +84,7 @@ private:
 };
 
 
-READ8_MEMBER(qtsbc_state::memory_r)
+u8 qtsbc_state::memory_r(offs_t offset)
 {
 	ioport_value jumpers = m_jumpers->read();
 	ioport_value dsw3 = m_dsw[2]->read();
@@ -115,7 +115,7 @@ READ8_MEMBER(qtsbc_state::memory_r)
 	}
 }
 
-WRITE8_MEMBER(qtsbc_state::memory_w)
+void qtsbc_state::memory_w(offs_t offset, u8 data)
 {
 #ifdef NOT_IMPLEMENTED_CURRENTLY
 	if ((offset & 0xfc00) >> 10 == m_dsw[1]->read())
@@ -131,7 +131,7 @@ WRITE8_MEMBER(qtsbc_state::memory_w)
 	}
 }
 
-READ8_MEMBER(qtsbc_state::io_r)
+u8 qtsbc_state::io_r(offs_t offset)
 {
 	if ((offset & 0xf8) >> 3 == (m_dsw[0]->read() & 0x1f))
 	{
@@ -170,7 +170,7 @@ READ8_MEMBER(qtsbc_state::io_r)
 	}
 }
 
-WRITE8_MEMBER(qtsbc_state::io_w)
+void qtsbc_state::io_w(offs_t offset, u8 data)
 {
 	if ((offset & 0x00f8) >> 3 == (m_dsw[0]->read() & 0x1f))
 	{

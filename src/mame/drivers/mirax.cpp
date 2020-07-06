@@ -150,15 +150,15 @@ private:
 	uint8_t m_flipscreen_x;
 	uint8_t m_flipscreen_y;
 
-	DECLARE_WRITE8_MEMBER(audio_w);
+	void audio_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	void sound_cmd_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter0_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter1_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(ay1_sel);
-	DECLARE_WRITE8_MEMBER(ay2_sel);
+	void ay1_sel(uint8_t data);
+	void ay2_sel(uint8_t data);
 
 	void mirax_palette(palette_device &palette) const;
 
@@ -270,18 +270,18 @@ void mirax_state::machine_start()
 	save_item(NAME(m_flipscreen_y));
 }
 
-WRITE8_MEMBER(mirax_state::audio_w)
+void mirax_state::audio_w(offs_t offset, uint8_t data)
 {
 	m_nAyCtrl=offset;
 }
 
-WRITE8_MEMBER(mirax_state::ay1_sel)
+void mirax_state::ay1_sel(uint8_t data)
 {
 	m_ay[0]->address_w(m_nAyCtrl);
 	m_ay[0]->data_w(data);
 }
 
-WRITE8_MEMBER(mirax_state::ay2_sel)
+void mirax_state::ay2_sel(uint8_t data)
 {
 	m_ay[1]->address_w(m_nAyCtrl);
 	m_ay[1]->data_w(data);
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mirax_state::sound_cmd_w)
+void mirax_state::sound_cmd_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

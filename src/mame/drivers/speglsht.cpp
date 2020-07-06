@@ -143,19 +143,19 @@ private:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	uint32_t m_videoreg;
 
-	DECLARE_READ32_MEMBER(shared_r);
-	DECLARE_WRITE32_MEMBER(shared_w);
-	DECLARE_WRITE32_MEMBER(videoreg_w);
-	DECLARE_WRITE32_MEMBER(cop_w);
-	DECLARE_READ32_MEMBER(cop_r);
-	DECLARE_READ32_MEMBER(irq_ack_clear);
+	uint32_t shared_r(offs_t offset);
+	void shared_w(offs_t offset, uint32_t data);
+	void videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void cop_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cop_r(offs_t offset);
+	uint32_t irq_ack_clear();
 
 	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(uint8_t data);
 	void speglsht_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);
@@ -182,7 +182,7 @@ void speglsht_state::machine_start()
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
+void speglsht_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_st0016_bank->set_entry(data);
 }
@@ -201,23 +201,23 @@ void speglsht_state::st0016_io(address_map &map)
 	//map(0xf0, 0xf0).r(FUNC(speglsht_state::st0016_dma_r));
 }
 
-READ32_MEMBER(speglsht_state::shared_r)
+uint32_t speglsht_state::shared_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-WRITE32_MEMBER(speglsht_state::shared_w)
+void speglsht_state::shared_w(offs_t offset, uint32_t data)
 {
 	m_shared[offset]=data&0xff;
 }
 
-WRITE32_MEMBER(speglsht_state::videoreg_w)
+void speglsht_state::videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_videoreg);
 }
 
 
-WRITE32_MEMBER(speglsht_state::cop_w)
+void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_ram[offset]);
 
@@ -228,7 +228,7 @@ WRITE32_MEMBER(speglsht_state::cop_w)
 }
 
 //matrix * vector
-READ32_MEMBER(speglsht_state::cop_r)
+uint32_t speglsht_state::cop_r(offs_t offset)
 {
 	int32_t *cop=(int32_t*)&m_cop_ram[0];
 
@@ -262,7 +262,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 	return 0;
 }
 
-READ32_MEMBER(speglsht_state::irq_ack_clear)
+uint32_t speglsht_state::irq_ack_clear()
 {
 	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;

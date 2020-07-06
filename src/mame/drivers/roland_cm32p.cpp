@@ -293,18 +293,18 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(midi_w);
+	void midi_w(u16 data);
 
-	DECLARE_READ8_MEMBER(lcd_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_READ16_MEMBER(port0_r);
-	DECLARE_READ8_MEMBER(pcmrom_r);
-	DECLARE_READ8_MEMBER(dsp_io_r);
-	DECLARE_WRITE8_MEMBER(dsp_io_w);
-	DECLARE_READ8_MEMBER(snd_io_r);
-	DECLARE_WRITE8_MEMBER(snd_io_w);
-	DECLARE_READ8_MEMBER(test_sw_r);
+	u8 lcd_ctrl_r();
+	void lcd_ctrl_w(u8 data);
+	void lcd_data_w(u8 data);
+	u16 port0_r();
+	u8 pcmrom_r(offs_t offset);
+	u8 dsp_io_r(offs_t offset);
+	void dsp_io_w(offs_t offset, u8 data);
+	u8 snd_io_r(offs_t offset);
+	void snd_io_w(offs_t offset, u8 data);
+	u8 test_sw_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
@@ -333,9 +333,9 @@ cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const 
 // screen update function from Roland D-110
 uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,gfx;
+	u8 y,ra,gfx;
 	uint16_t sy=0,x;
-	const uint8_t *data = lcd->render();
+	const u8 *data = lcd->render();
 	bitmap.fill(0);
 
 	for (y = 0; y < 2; y++)
@@ -380,24 +380,24 @@ void cm32p_state::machine_reset()
 	midi_pos = 0;
 }
 
-WRITE8_MEMBER(cm32p_state::lcd_ctrl_w)
+void cm32p_state::lcd_ctrl_w(u8 data)
 {
 	lcd->control_w(data);
 }
 
-READ8_MEMBER(cm32p_state::lcd_ctrl_r)
+u8 cm32p_state::lcd_ctrl_r()
 {
 	// The CM-64 service manual lists "D-110 LCD UNIT" for using PCM test mode, so I assume it works like that.
 	// However, the CM-32P firmware doesn't seem to ever read the status.
 	return lcd->control_r() >> 7;
 }
 
-WRITE8_MEMBER(cm32p_state::lcd_data_w)
+void cm32p_state::lcd_data_w(u8 data)
 {
 	lcd->data_w(data);
 }
 
-WRITE16_MEMBER(cm32p_state::midi_w)
+void cm32p_state::midi_w(u16 data)
 {
 	logerror("midi_out %02x\n", data);
 	midi = data;
@@ -405,7 +405,7 @@ WRITE16_MEMBER(cm32p_state::midi_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::midi_timer_cb)
 {
-	const static uint8_t midi_data[3] = { 0x9a, 0x40, 0x7f };
+	const static u8 midi_data[3] = { 0x9a, 0x40, 0x7f };
 	midi = midi_data[midi_pos++];
 	logerror("midi_in %02x\n", midi);
 	cpu->serial_w(midi);
@@ -413,23 +413,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::midi_timer_cb)
 		midi_timer->adjust(attotime::from_hz(1250));
 }
 
-READ16_MEMBER(cm32p_state::port0_r)
+u16 cm32p_state::port0_r()
 {
 	return service_port->read();
 }
 
-READ8_MEMBER(cm32p_state::pcmrom_r)
+u8 cm32p_state::pcmrom_r(offs_t offset)
 {
 	const u8* pcm_rom = memregion("pcm")->base();
 	return pcm_rom[offset];
 }
 
-READ8_MEMBER(cm32p_state::dsp_io_r)
+u8 cm32p_state::dsp_io_r(offs_t offset)
 {
 	return dsp_io_buffer[offset];
 }
 
-WRITE8_MEMBER(cm32p_state::dsp_io_w)
+void cm32p_state::dsp_io_w(offs_t offset, u8 data)
 {
 	dsp_io_buffer[offset] = data;
 	// do read/write to some external memory, makes the RCC-CPU check pass. (routine at 0x4679)
@@ -459,7 +459,7 @@ WRITE8_MEMBER(cm32p_state::dsp_io_w)
 	}
 }
 
-READ8_MEMBER(cm32p_state::snd_io_r)
+u8 cm32p_state::snd_io_r(offs_t offset)
 {
 	// lots of offset modification magic to achieve the following:
 	//  - offsets 00..1F are "sound chip read"
@@ -488,12 +488,12 @@ READ8_MEMBER(cm32p_state::snd_io_r)
 		sound_io_buffer[0x42] = (addr >>  8) & 0xFF;
 		sound_io_buffer[0x41] = (addr >> 16) & 0xFF;
 		sound_io_buffer[0x40] = (addr >> 24) & 0xFF;
-		return pcmrom_r(space, addr, 0xFF);
+		return pcmrom_r(addr);
 	}
 	return sound_io_buffer[offset];
 }
 
-WRITE8_MEMBER(cm32p_state::snd_io_w)
+void cm32p_state::snd_io_w(offs_t offset, u8 data)
 {
 	// register map
 	// ------------
@@ -514,7 +514,7 @@ WRITE8_MEMBER(cm32p_state::snd_io_w)
 	sound_io_buffer[offset] = data;
 }
 
-READ8_MEMBER(cm32p_state::test_sw_r)
+u8 cm32p_state::test_sw_r()
 {
 	return test_sw->read();
 }
@@ -580,8 +580,8 @@ void cm32p_state::init_cm32p()
 {
 	// Roland did a fair amount of scrambling on the address and data lines.
 	// Only the first 0x20 bytes of the ROMs are readable text in a raw dump.
-	uint8_t* src = static_cast<uint8_t*>(memregion("pcmorg")->base());
-	uint8_t* dst = static_cast<uint8_t*>(memregion("pcm")->base());
+	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
+	u8* dst = static_cast<u8*>(memregion("pcm")->base());
 	for (offs_t bank_ofs = 0x00; bank_ofs < 0x400000; bank_ofs += 0x080000)
 	{
 		offs_t dstpos;

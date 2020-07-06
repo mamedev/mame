@@ -66,7 +66,6 @@ DEFINE_DEVICE_TYPE(HD6845S,  hd6845s_device,  "hd6845s",  "Hitachi HD6845S CRTC"
 DEFINE_DEVICE_TYPE(SY6545_1, sy6545_1_device, "sy6545_1", "Synertek SY6545-1 CRTC")
 DEFINE_DEVICE_TYPE(SY6845E,  sy6845e_device,  "sy6845e",  "Synertek SY6845E CRTC")
 DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC")
-DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 CRTC")
 DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)")
 DEFINE_DEVICE_TYPE(MOS8563,  mos8563_device,  "mos8563",  "MOS 8563 VDC")
 DEFINE_DEVICE_TYPE(MOS8568,  mos8568_device,  "mos8568",  "MOS 8568 VDC")
@@ -210,6 +209,7 @@ uint8_t mc6845_device::register_r()
 		case 0x0d:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 0) & 0xff : 0; break;
 		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
+		// FIXME: status flag should not be reset if LPEN input is held high
 		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
 		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
 		case 0x1f:  transparent_update(); break;
@@ -1113,7 +1113,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= m_max_visible_y; y++)
+		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
@@ -1347,28 +1347,6 @@ void hd6345_device::device_start()
 }
 
 
-void ams40041_device::device_start()
-{
-	mc6845_device::device_start();
-
-	m_horiz_char_total =  113;
-	m_horiz_disp       =  80;
-	m_horiz_sync_pos   =  90;
-	m_sync_width       =  10;
-	m_vert_char_total  =  127;
-	m_vert_total_adj   =  6;
-	m_vert_disp        =  100;
-	m_vert_sync_pos    =  112;
-	m_mode_control     =  2;
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = false;
-	m_supports_status_reg_d5 = false;
-	m_supports_status_reg_d6 = false;
-	m_supports_status_reg_d7 = false;
-	m_supports_transparent = false;
-}
-
 void ams40489_device::device_start()
 {
 	mc6845_device::device_start();
@@ -1504,7 +1482,6 @@ void c6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
 void hd6345_device::device_reset() { mc6845_device::device_reset(); }
-void ams40041_device::device_reset() { mc6845_device::device_reset(); }
 void ams40489_device::device_reset() { mc6845_device::device_reset(); }
 
 void mos8563_device::device_reset()
@@ -1584,11 +1561,6 @@ hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
-ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
-{
-}
 
 ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, AMS40489, tag, owner, clock)

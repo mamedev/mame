@@ -14,10 +14,12 @@ Hardware notes:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
+
 #include "screen.h"
 
 // internal artwork
@@ -119,7 +121,7 @@ void exchess_state::lcd_data_w(u8 data)
 template<int N>
 void exchess_state::ram_address_w(u8 data)
 {
-	// P00-P17: RAM A0-A7
+	// P00-P07: RAM A0-A7
 	// P10-P11: RAM A8-A9
 	// P12: RAM CE
 	m_ram_address[N] = data;

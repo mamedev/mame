@@ -457,6 +457,8 @@ NETLIST_START(stuntcyc)
 
 	PROM_82S123(d7, GROUND, S1, S2, S3, S4, S5)
 	PARAM(d7.ROM, "004811.d7")
+	// The eprom is always enabled and outputs are only connected to logic inputs
+	PARAM(d7.FORCE_TRISTATE_LOGIC, 1)
 
 	ALIAS(MAX_SCORE_Q, d7.O6)
 

@@ -255,12 +255,12 @@ void h83048_device::device_reset()
 	syscr = 0x0b;
 }
 
-READ8_MEMBER(h83048_device::syscr_r)
+uint8_t h83048_device::syscr_r()
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h83048_device::syscr_w)
+void h83048_device::syscr_w(uint8_t data)
 {
 	syscr = data;
 	update_irq_filter();

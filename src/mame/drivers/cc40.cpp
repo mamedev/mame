@@ -119,18 +119,18 @@ private:
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_clock_divider();
 
-	DECLARE_READ8_MEMBER(sysram_r);
-	DECLARE_WRITE8_MEMBER(sysram_w);
-	DECLARE_READ8_MEMBER(bus_control_r);
-	DECLARE_WRITE8_MEMBER(bus_control_w);
-	DECLARE_WRITE8_MEMBER(power_w);
-	DECLARE_READ8_MEMBER(battery_r);
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(clock_control_r);
-	DECLARE_WRITE8_MEMBER(clock_control_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	u8 sysram_r(offs_t offset);
+	void sysram_w(offs_t offset, u8 data);
+	u8 bus_control_r();
+	void bus_control_w(u8 data);
+	void power_w(u8 data);
+	u8 battery_r();
+	u8 bankswitch_r();
+	void bankswitch_w(u8 data);
+	u8 clock_control_r();
+	void clock_control_w(u8 data);
+	u8 keyboard_r();
+	void keyboard_w(u8 data);
 
 	void cc40_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -238,7 +238,7 @@ HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
 
 ***************************************************************************/
 
-READ8_MEMBER(cc40_state::sysram_r)
+u8 cc40_state::sysram_r(offs_t offset)
 {
 	// read system ram, based on addressing configured in bus_control_w
 	if (offset < m_sysram_end[0] && m_sysram_size[0] != 0)
@@ -249,7 +249,7 @@ READ8_MEMBER(cc40_state::sysram_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(cc40_state::sysram_w)
+void cc40_state::sysram_w(offs_t offset, u8 data)
 {
 	// write system ram, based on addressing configured in bus_control_w
 	if (offset < m_sysram_end[0] && m_sysram_size[0] != 0)
@@ -258,12 +258,12 @@ WRITE8_MEMBER(cc40_state::sysram_w)
 		m_sysram[1][(offset - m_sysram_end[0]) & (m_sysram_size[1] - 1)] = data;
 }
 
-READ8_MEMBER(cc40_state::bus_control_r)
+u8 cc40_state::bus_control_r()
 {
 	return m_bus_control;
 }
 
-WRITE8_MEMBER(cc40_state::bus_control_w)
+void cc40_state::bus_control_w(u8 data)
 {
 	// d0,d1: auto enable clock divider on cartridge memory access (d0: area 1, d1: area 2)
 
@@ -291,7 +291,7 @@ WRITE8_MEMBER(cc40_state::bus_control_w)
 	m_bus_control = data;
 }
 
-WRITE8_MEMBER(cc40_state::power_w)
+void cc40_state::power_w(u8 data)
 {
 	// d0: power-on hold latch
 	m_power = data & 1;
@@ -301,18 +301,18 @@ WRITE8_MEMBER(cc40_state::power_w)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-READ8_MEMBER(cc40_state::battery_r)
+u8 cc40_state::battery_r()
 {
 	// d0: low battery sense line (0 = low power)
 	return m_battery_inp->read();
 }
 
-READ8_MEMBER(cc40_state::bankswitch_r)
+u8 cc40_state::bankswitch_r()
 {
 	return m_banks;
 }
 
-WRITE8_MEMBER(cc40_state::bankswitch_w)
+void cc40_state::bankswitch_w(u8 data)
 {
 	data &= 0x0f;
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 	m_banks = data;
 }
 
-READ8_MEMBER(cc40_state::clock_control_r)
+u8 cc40_state::clock_control_r()
 {
 	return m_clock_control;
 }
@@ -338,7 +338,7 @@ void cc40_state::update_clock_divider()
 	m_maincpu->set_clock_scale((m_clock_control & 8) ? (1.0 / (double)m_clock_divider) : 1);
 }
 
-WRITE8_MEMBER(cc40_state::clock_control_w)
+void cc40_state::clock_control_w(u8 data)
 {
 	data &= 0x0f;
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER(cc40_state::clock_control_w)
 	}
 }
 
-READ8_MEMBER(cc40_state::keyboard_r)
+u8 cc40_state::keyboard_r()
 {
 	u8 ret = 0;
 
@@ -366,7 +366,7 @@ READ8_MEMBER(cc40_state::keyboard_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cc40_state::keyboard_w)
+void cc40_state::keyboard_w(u8 data)
 {
 	// d(0-7): select keyboard column
 	m_key_select = data;
@@ -520,8 +520,7 @@ void cc40_state::machine_reset()
 
 	update_clock_divider();
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	bankswitch_w(space, 0, 0);
+	bankswitch_w(0);
 }
 
 void cc40_state::init_sysram(int chip, u16 size)
@@ -565,9 +564,8 @@ void cc40_state::machine_start()
 	init_sysram(0, 0x800); // default to 6KB
 	init_sysram(1, 0x800); // "
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	bus_control_w(space, 0, 0);
-	bankswitch_w(space, 0, 0);
+	bus_control_w(0);
+	bankswitch_w(0);
 
 	// zerofill other
 	m_power = 0;

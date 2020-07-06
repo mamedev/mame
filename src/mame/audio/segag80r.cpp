@@ -244,7 +244,7 @@ void segag80r_state::astrob_sound_board(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::astrob_sound_w)
+void segag80r_state::astrob_sound_w(offs_t offset, uint8_t data)
 {
 	static const float attack_resistor[10] =
 	{
@@ -438,7 +438,7 @@ void segag80r_state::sega005_sound_board(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
+void segag80r_state::sega005_sound_a_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
@@ -494,7 +494,7 @@ inline void segag80r_state::sega005_update_sound_data()
 }
 
 
-WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
+void segag80r_state::sega005_sound_b_w(uint8_t data)
 {
 	/*
 	       D6: manual timer clock (0->1)
@@ -593,7 +593,7 @@ void segag80r_state::spaceod_sound_board(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
+void segag80r_state::spaceod_sound_w(offs_t offset, uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;

@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+NOTE: This list is here only to document available dumps and it's not hooked up with MAME yet.
+-->
+
+<softwarelist name="nuon" description="NUON DVD-ROMs">
+
+	<software name="ballstic">
+		<description>Ballistic</description>
+		<year>2000</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="ballstic" sha1="92b386f176eecc7d3b1e13675ccaf0b60a543175" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freefall">
+		<description>FreeFall 3050 A.D.</description>
+		<year>200?</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="freefall" sha1="56540609dcdf3d5234a1d045b28cba58ba6adae8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="is3">
+		<description>Iron Soldier 3</description>
+		<year>2001</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="is3" sha1="47dec1bbb819342cf8bc2fee98fc7b18d1302503" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="merlinr">
+		<description>Merlin Racing</description>
+		<year>200?</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="merlinr" sha1="80116c3c9440492678f8f072c5fabd2cedb3034e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="spacinvx">
+		<description>Space Invaders XL</description>
+		<year>200?</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="spacinvx" sha1="76518e106ab04819f6b85cc3e1eea08968b7b249" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tempest3">
+		<description>Tempest 3000</description>
+		<year>200?</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="tempest3" sha1="48e44d3de2642bb7b4fc5a044caf4cb2e8ad5c25" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="toshsamp">
+		<description>Toshiba Sampler (11-1-2000)</description>
+		<year>200?</year>
+		<publisher>VM Labs, Inc.</publisher>
+		<part interface="dvdrom" name="dvdrom">
+			<diskarea name="dvdrom">
+				<disk name="toshsamp" sha1="e312c9cec7f11a4594c1a3340fbcc9f66a65e9b1" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

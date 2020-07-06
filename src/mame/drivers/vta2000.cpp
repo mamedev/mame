@@ -43,7 +43,7 @@ public:
 
 	void vta2000(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(output_00);
+	void output_00(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -52,14 +52,14 @@ private:
 	void io_map(address_map &map);
 
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_mainpit;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-WRITE8_MEMBER(vta2000_state::output_00)
+void vta2000_state::output_00(uint8_t data)
 {
 	m_mainpit->write_gate0(BIT(data, 4));
 }
@@ -186,7 +186,7 @@ void vta2000_state::vta2000(machine_config &config)
 	I8080(config, m_maincpu, XTAL(4'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vta2000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vta2000_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	PIT8253(config, m_mainpit, 0);
 	m_mainpit->set_clk<0>(500'000);
@@ -236,4 +236,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
-COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING )
+COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

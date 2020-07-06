@@ -213,25 +213,25 @@ private:
 	}
 
 	/* kenseim */
-	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
+	void cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// certain
 
-	DECLARE_WRITE8_MEMBER(mb8936_portc_w); // 20x LEDs
+	void mb8936_portc_w(uint8_t data); // 20x LEDs
 
 
 
 	// uncertain
-	DECLARE_WRITE8_MEMBER(cpu_portc_w); // 4 bit out (lamps, coinlock etc.?)
+	void cpu_portc_w(uint8_t data); // 4 bit out (lamps, coinlock etc.?)
 
-	DECLARE_READ8_MEMBER(cpu_portd_r);  // 4 bit in (comms flags from 68k)
+	uint8_t cpu_portd_r();  // 4 bit in (comms flags from 68k)
 
-	DECLARE_WRITE8_MEMBER(cpu_portd_w); // 4 bit out (command flags to 68k?)
-	DECLARE_WRITE8_MEMBER(cpu_porte_w); // 8 bit out (command to 68k?)
+	void cpu_portd_w(uint8_t data); // 4 bit out (command flags to 68k?)
+	void cpu_porte_w(uint8_t data); // 8 bit out (command to 68k?)
 
-	WRITE8_MEMBER(mb8936_porta_w); // maybe molesa output? (6-bits?)
-	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
-	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
+	void mb8936_porta_w(uint8_t data); // maybe molesa output? (6-bits?)
+	void mb8936_portb_w(uint8_t data); // maybe molesb output? (6-bits?)
+	void mb8936_portf_w(uint8_t data); // maybe strobe output?
 
 	void set_leds(uint32_t ledstates);
 
@@ -269,7 +269,7 @@ void kenseim_state::set_leds(uint32_t ledstates)
 }
 
 // could be wrong
-WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
+void kenseim_state::mb8936_portc_w(uint8_t data)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
@@ -306,7 +306,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 }
 
 
-WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
+void kenseim_state::mb8936_porta_w(uint8_t data) // maybe molesa output? (6-bits?)
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context().c_str(), data);
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 }
 
-WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
+void kenseim_state::mb8936_portb_w(uint8_t data) // maybe molesb output? (6-bits?)
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context().c_str(), data);
 
@@ -343,14 +343,14 @@ WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 
 }
 
-WRITE8_MEMBER(kenseim_state::mb8936_portf_w)
+void kenseim_state::mb8936_portf_w(uint8_t data)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
 	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context().c_str(), data);
 }
 
 
-WRITE8_MEMBER(kenseim_state::cpu_portc_w)
+void kenseim_state::cpu_portc_w(uint8_t data)
 {
 	// port direction is set to 4-in 4-out
 	// d4: coin counter
@@ -400,7 +400,7 @@ READ_LINE_MEMBER(kenseim_state::cmd_LVm_r)
 
 /* 68k side COMMS writes */
 
-WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
+void kenseim_state::cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -422,7 +422,7 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 
 /* Z80 side COMMS reads */
 
-READ8_MEMBER(kenseim_state::cpu_portd_r)
+uint8_t kenseim_state::cpu_portd_r()
 {
 	// port direction is set to 4-in 4-out
 	// d4: ACK
@@ -434,7 +434,7 @@ READ8_MEMBER(kenseim_state::cpu_portd_r)
 
 /* Z80 side COMMS writes */
 
-WRITE8_MEMBER(kenseim_state::cpu_portd_w)
+void kenseim_state::cpu_portd_w(uint8_t data)
 {
 	// port direction is set to 4-in 4-out
 	// d0: D9
@@ -446,7 +446,7 @@ WRITE8_MEMBER(kenseim_state::cpu_portd_w)
 	m_to_68k_cmd_LVm = data >> 2 & 1;
 }
 
-WRITE8_MEMBER(kenseim_state::cpu_porte_w)
+void kenseim_state::cpu_porte_w(uint8_t data)
 {
 	// DT1-DT8
 	m_to_68k_cmd_low = data;
@@ -695,7 +695,7 @@ ROM_END
 
 void kenseim_state::init_kenseim()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16s_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
 
 	init_cps1();
 

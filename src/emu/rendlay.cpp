@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    rendlay.c
+    rendlay.cpp
 
     Core rendering layout parser and manager.
 

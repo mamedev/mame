@@ -59,13 +59,13 @@ void hanaawas_state::hanaawas_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_videoram_w)
+void hanaawas_state::hanaawas_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
+void hanaawas_state::hanaawas_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 
@@ -74,7 +74,7 @@ WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
 	m_bg_tilemap->mark_tile_dirty((offset + (flip_screen() ? -1 : 1)) & 0x03ff);
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_portB_w)
+void hanaawas_state::hanaawas_portB_w(uint8_t data)
 {
 	/* bit 7 is flip screen */
 	if (flip_screen() != (~data & 0x80))

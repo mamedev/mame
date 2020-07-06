@@ -47,12 +47,12 @@ protected:
 private:
 	LC8670_LCD_UPDATE(svmu_lcd_update);
 	void svmu_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(prog_r);
-	DECLARE_WRITE8_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p7_r);
+	void page_w(uint8_t data);
+	uint8_t prog_r(offs_t offset);
+	void prog_w(offs_t offset, uint8_t data);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p7_r();
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void svmu_io_mem(address_map &map);
@@ -67,12 +67,12 @@ private:
 };
 
 
-WRITE8_MEMBER(svmu_state::page_w)
+void svmu_state::page_w(uint8_t data)
 {
 	m_page = data & 0x03;
 }
 
-READ8_MEMBER(svmu_state::prog_r)
+uint8_t svmu_state::prog_r(offs_t offset)
 {
 	if (m_page == 1)
 		return m_flash->read(offset);
@@ -82,7 +82,7 @@ READ8_MEMBER(svmu_state::prog_r)
 		return m_bios[offset];
 }
 
-WRITE8_MEMBER(svmu_state::prog_w)
+void svmu_state::prog_w(offs_t offset, uint8_t data)
 {
 	if (m_page == 1)
 		m_flash->write(offset, data);
@@ -104,12 +104,12 @@ WRITE8_MEMBER(svmu_state::prog_w)
 
 */
 
-READ8_MEMBER(svmu_state::p1_r)
+uint8_t svmu_state::p1_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(svmu_state::p1_w)
+void svmu_state::p1_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -124,7 +124,7 @@ WRITE8_MEMBER(svmu_state::p1_w)
     ---- ---x   5V detection
 */
 
-READ8_MEMBER(svmu_state::p7_r)
+uint8_t svmu_state::p7_r()
 {
 	return (ioport("BATTERY")->read()<<1);
 }

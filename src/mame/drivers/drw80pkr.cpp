@@ -78,17 +78,17 @@ private:
 	required_device<ay8912_device> m_aysnd;
 	required_memory_bank m_mainbank;
 
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void bus_w(uint8_t data);
+	void io_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_READ8_MEMBER(io_r);
+	uint8_t p1_r();
+	uint8_t p2_r();
+	uint8_t bus_r();
+	uint8_t io_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void drw80pkr_palette(palette_device &palette) const;
@@ -111,12 +111,12 @@ void drw80pkr_state::machine_start()
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(drw80pkr_state::p1_w)
+void drw80pkr_state::p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::p2_w)
+void drw80pkr_state::p2_w(uint8_t data)
 {
 	m_p2 = data;
 }
@@ -134,12 +134,12 @@ WRITE_LINE_MEMBER(drw80pkr_state::prog_w)
 	}
 }
 
-WRITE8_MEMBER(drw80pkr_state::bus_w)
+void drw80pkr_state::bus_w(uint8_t data)
 {
 	m_bus = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::io_w)
+void drw80pkr_state::io_w(offs_t offset, uint8_t data)
 {
 	uint16_t n_offs;
 
@@ -204,22 +204,22 @@ READ_LINE_MEMBER(drw80pkr_state::t1_r)
 	return m_t1;
 }
 
-READ8_MEMBER(drw80pkr_state::p1_r)
+uint8_t drw80pkr_state::p1_r()
 {
 	return m_p1;
 }
 
-READ8_MEMBER(drw80pkr_state::p2_r)
+uint8_t drw80pkr_state::p2_r()
 {
 	return m_p2;
 }
 
-READ8_MEMBER(drw80pkr_state::bus_r)
+uint8_t drw80pkr_state::bus_r()
 {
 	return m_bus;
 }
 
-READ8_MEMBER(drw80pkr_state::io_r)
+uint8_t drw80pkr_state::io_r(offs_t offset)
 {
 	uint8_t ret;
 	uint16_t kbdin;

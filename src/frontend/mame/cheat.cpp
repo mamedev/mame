@@ -79,9 +79,7 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 
-#include "debugger.h"
 #include "emuopts.h"
-#include "debug/debugcpu.h"
 
 #include <cstring>
 #include <iterator>
@@ -679,7 +677,7 @@ void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) cons
 
 cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, std::string const &filename, util::xml::data_node const &cheatnode)
 	: m_manager(manager)
-	, m_symbols(&globaltable)
+	, m_symbols(manager.machine(), &globaltable)
 	, m_state(SCRIPT_STATE_OFF)
 	, m_numtemp(DEFAULT_TEMP_VARIABLES)
 	, m_argindex(0)
@@ -1058,7 +1056,7 @@ constexpr int cheat_manager::CHEAT_VERSION;
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_disabled(true)
-	, m_symtable()
+	, m_symtable(machine)
 {
 	// if the cheat engine is disabled, we're done
 	if (!machine.options().cheat())
@@ -1080,19 +1078,6 @@ cheat_manager::cheat_manager(running_machine &machine)
 	m_symtable.add("frame", symbol_table::READ_ONLY, &m_framecount);
 	m_symtable.add("frombcd", 1, 1, execute_frombcd);
 	m_symtable.add("tobcd", 1, 1, execute_tobcd);
-
-	// we rely on the debugger expression callbacks; if the debugger isn't
-	// enabled, we must jumpstart them manually
-	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
-	{
-		m_cpu = std::make_unique<debugger_cpu>(machine);
-		m_cpu->configure_memory(m_symtable);
-	}
-	else
-	{
-		// configure for memory access (shared with debugger)
-		machine.debugger().cpu().configure_memory(m_symtable);
-	}
 
 	// load the cheats
 	reload();

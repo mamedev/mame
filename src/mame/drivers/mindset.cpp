@@ -330,7 +330,7 @@ protected:
 	required_device<dac_byte_interface> m_dac;
 	required_device_array<mindset_module, 6> m_modules;
 
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcps;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_gcps;
 
 	floppy_image_device *m_floppy[2];
 	u32 m_palette[16];
@@ -450,7 +450,7 @@ void mindset_state::machine_start()
 	m_yellow_led.resolve();
 	m_green_led.resolve();
 
-	m_gcps = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
+	m_maincpu->space(AS_PROGRAM).cache(m_gcps);
 	for(int i=0; i<2; i++)
 		m_floppy[i] = m_fdco[i]->get_device();
 
@@ -1000,20 +1000,20 @@ u16 (*const mindset_state::gcp_blend[8])(u16, u16) = {
 
 void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 {
-	u16 mode    = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  0) & 0xffff)));
-	u16 src_adr = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  2) & 0xffff)));
-	u16 src_sft = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  4) & 0xffff)));
-	u16 dst_adr = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  6) & 0xffff)));
-	u16 dst_sft = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  8) & 0xffff)));
-	u16 width   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 10) & 0xffff)));
-	u16 height  = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 12) & 0xffff)));
-	u16 sy      = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 14) & 0xffff)));
-	u16 dy      = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 16) & 0xffff)));
-	u16 rmask   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 18) & 0xffff)));
-	u16 src_seg = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 20) & 0xffff)));
-	u16 dst_seg = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 22) & 0xffff)));
-	u16 wmask   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 24) & 0xffff)));
-	u16 kmask   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 26) & 0xffff)));
+	u16 mode    = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr +  0) & 0xffff)));
+	u16 src_adr = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr +  2) & 0xffff)));
+	u16 src_sft = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr +  4) & 0xffff)));
+	u16 dst_adr = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr +  6) & 0xffff)));
+	u16 dst_sft = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr +  8) & 0xffff)));
+	u16 width   = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 10) & 0xffff)));
+	u16 height  = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 12) & 0xffff)));
+	u16 sy      = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 14) & 0xffff)));
+	u16 dy      = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 16) & 0xffff)));
+	u16 rmask   = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 18) & 0xffff)));
+	u16 src_seg = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 20) & 0xffff)));
+	u16 dst_seg = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 22) & 0xffff)));
+	u16 wmask   = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 24) & 0xffff)));
+	u16 kmask   = sw(m_gcps.read_word((packet_seg << 4) + ((packet_adr + 26) & 0xffff)));
 
 	// -f-w wnpi ktxm mm--
 	// f = fast (pure word copy)
@@ -1040,9 +1040,9 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 	if(mode & 0x200) {
 		// pattern fill
-		u16 src = m_gcps->read_word((src_seg << 4) + src_adr);
+		u16 src = m_gcps.read_word((src_seg << 4) + src_adr);
 		for(u16 w=0; w != width/2; w++) {
-			m_gcps->write_word((dst_seg << 4) + dst_adr, src);
+			m_gcps.write_word((dst_seg << 4) + dst_adr, src);
 			dst_adr += 2;
 		}
 
@@ -1053,7 +1053,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 			u16 src_cadr = src_adr;
 			u16 dst_cadr = dst_adr;
 			for(u32 w=0; w!=nw; w++) {
-				m_gcps->write_word((dst_seg << 4) + dst_cadr, m_gcps->read_word((src_seg << 4) + src_cadr));
+				m_gcps.write_word((dst_seg << 4) + dst_cadr, m_gcps.read_word((src_seg << 4) + src_cadr));
 				src_cadr += 2;
 				dst_cadr += 2;
 			}
@@ -1095,14 +1095,14 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 			u16 nw1 = nw;
 			u32 srcs = 0;
 			if(preload) {
-				srcs = sw(m_gcps->read_word((src_seg << 4) + src_cadr)) << src_do_sft;
+				srcs = sw(m_gcps.read_word((src_seg << 4) + src_cadr)) << src_do_sft;
 				if(mode & 0x100)
 					src_cadr += 2;
 			}
 			do {
-				srcs = (srcs << 16) | (sw(m_gcps->read_word((src_seg << 4) + src_cadr)) << src_do_sft);
+				srcs = (srcs << 16) | (sw(m_gcps.read_word((src_seg << 4) + src_cadr)) << src_do_sft);
 				u16 src = (srcs >> dst_do_sft) & rmask;
-				u16 dst = sw(m_gcps->read_word((dst_seg << 4) + dst_cadr));
+				u16 dst = sw(m_gcps.read_word((dst_seg << 4) + dst_cadr));
 				u16 res = blend(src, dst);
 				if(mode & 0x40) {
 					u16 tmask;
@@ -1132,7 +1132,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 				res = (dst & ~cmask) | (res & cmask);
 
-				m_gcps->write_word((dst_seg << 4) + dst_cadr, sw(res));
+				m_gcps.write_word((dst_seg << 4) + dst_cadr, sw(res));
 				if(mode & 0x100)
 					src_cadr += 2;
 				dst_cadr += 2;
@@ -1151,9 +1151,9 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 void mindset_state::gcp_w(u16)
 {
-	u16 packet_seg  = sw(m_gcps->read_word(0xbfd7a));
-	u16 packet_adr  = sw(m_gcps->read_word(0xbfd78));
-	u16 global_mode = sw(m_gcps->read_word(0xbfd76));
+	u16 packet_seg  = sw(m_gcps.read_word(0xbfd7a));
+	u16 packet_adr  = sw(m_gcps.read_word(0xbfd78));
+	u16 global_mode = sw(m_gcps.read_word(0xbfd76));
 
 	if(0)
 	logerror("GCP: start %04x:%04x mode %04x (%05x)\n", packet_seg, packet_adr, global_mode, m_maincpu->pc());
@@ -1166,7 +1166,7 @@ void mindset_state::gcp_w(u16)
 	}
 
 	// 100 = done, 200 = done too???, 400 = collision?
-	m_gcps->write_word(0xbfd74, m_gcps->read_word(0xbfd74) | 0x0700);
+	m_gcps.write_word(0xbfd74, m_gcps.read_word(0xbfd74) | 0x0700);
 
 	// Can trigger an irq, on mode & 2 (or is it 200?) (0x40 on 8282, ack on 0x41, which means the system 8042...)
 }

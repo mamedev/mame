@@ -2308,7 +2308,7 @@ static size_t dsp56156_op_bfop(dsp56156_core* cpustate, const uint16_t op, const
 	decode_BBB_bitmask(cpustate, BITS(op2,0xe000), &iVal);
 
 	workAddr = assemble_address_from_Pppppp_table(cpustate, BITS(op,0x0020), BITS(op,0x001f));
-	previousValue = cpustate->data->read_word(workAddr);
+	previousValue = cpustate->data.read_word(workAddr);
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
@@ -2374,7 +2374,7 @@ static size_t dsp56156_op_bfop_1(dsp56156_core* cpustate, const uint16_t op, con
 	decode_RR_table(cpustate, BITS(op,0x0003), &R);
 
 	workAddr = *((uint16_t*)R.addr);
-	previousValue = cpustate->data->read_word(workAddr);
+	previousValue = cpustate->data.read_word(workAddr);
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
@@ -3265,7 +3265,7 @@ static size_t dsp56156_op_movec(dsp56156_core* cpustate, const uint16_t op, uint
 	if (W)
 	{
 		/* Write D */
-		uint16_t value = cpustate->data->read_word(*((uint16_t*)R.addr)) ;
+		uint16_t value = cpustate->data.read_word(*((uint16_t*)R.addr)) ;
 		typed_pointer temp_src = { &value, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3307,7 +3307,7 @@ static size_t dsp56156_op_movec_1(dsp56156_core* cpustate, const uint16_t op, ui
 	if (W)
 	{
 		/* Write D */
-		uint16_t tempData = cpustate->data->read_word(memOffset);
+		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3351,7 +3351,7 @@ static size_t dsp56156_op_movec_2(dsp56156_core* cpustate, const uint16_t op, ui
 	if (W)
 	{
 		/* Write D */
-		uint16_t tempData = cpustate->data->read_word(memOffset);
+		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3402,7 +3402,7 @@ static size_t dsp56156_op_movec_3(dsp56156_core* cpustate, const uint16_t op, co
 		else
 		{
 			/* 16-bit long address */
-			uint16_t tempD = cpustate->data->read_word(op2);
+			uint16_t tempD = cpustate->data.read_word(op2);
 			typed_pointer tempTP = {&tempD, DT_WORD};
 			SetDestinationValue(tempTP, SD);
 		}
@@ -3480,7 +3480,7 @@ static size_t dsp56156_op_movec_5(dsp56156_core* cpustate, const uint16_t op, co
 	if (W)
 	{
 		/* Write D */
-		uint16_t tempData = cpustate->data->read_word(memOffset);
+		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3543,7 +3543,7 @@ static size_t dsp56156_op_movem(dsp56156_core* cpustate, const uint16_t op, uint
 	{
 		/* Read from Program Memory */
 		typed_pointer data;
-		uint16_t ldata = cpustate->program->read_word(*((uint16_t*)R.addr));
+		uint16_t ldata = cpustate->program.read_word(*((uint16_t*)R.addr));
 
 		data.addr = &ldata;
 		data.data_type = DT_WORD;
@@ -3597,7 +3597,7 @@ static size_t dsp56156_op_movep(dsp56156_core* cpustate, const uint16_t op, uint
 
 	if (W)
 	{
-		uint16_t data = cpustate->data->read_word(pp);
+		uint16_t data = cpustate->data.read_word(pp);
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -3636,7 +3636,7 @@ static size_t dsp56156_op_movep_1(dsp56156_core* cpustate, const uint16_t op, ui
 	/* A little different than most W if's - opposite read and write */
 	if (W)
 	{
-		uint16_t data = cpustate->data->read_word(*((uint16_t*)SD.addr));
+		uint16_t data = cpustate->data.read_word(*((uint16_t*)SD.addr));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -4663,7 +4663,7 @@ static void execute_x_memory_data_move(dsp56156_core* cpustate, const uint16_t o
 	if (W)
 	{
 		/* From X:<ea> to SD */
-		uint16_t data = cpustate->data->read_word(*((uint16_t*)R.addr));
+		uint16_t data = cpustate->data.read_word(*((uint16_t*)R.addr));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -4711,7 +4711,7 @@ static void execute_x_memory_data_move2(dsp56156_core* cpustate, const uint16_t 
 	if (W)
 	{
 		/* Write D */
-		uint16_t value = cpustate->data->read_word(*mem_offset);
+		uint16_t value = cpustate->data.read_word(*mem_offset);
 		typed_pointer tempV = {&value, DT_WORD};
 		SetDestinationValue(tempV, SD);
 	}
@@ -4739,7 +4739,7 @@ static void execute_x_memory_data_move_with_short_displacement(dsp56156_core* cp
 	if (W)
 	{
 		/* Write D */
-		uint16_t tempData = cpustate->data->read_word(memOffset);
+		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -4775,13 +4775,13 @@ static void execute_dual_x_memory_data_read(dsp56156_core* cpustate, const uint1
 		fatalerror("Dsp56156: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read.\n");
 
 	/* First memmove */
-	srcVal1 = cpustate->data->read_word(*((uint16_t*)R.addr));
+	srcVal1 = cpustate->data.read_word(*((uint16_t*)R.addr));
 	tempV.addr = &srcVal1;
 	tempV.data_type = DT_WORD;
 	SetDestinationValue(tempV, D1);
 
 	/* Second memmove */
-	srcVal2 = cpustate->data->read_word(R3);
+	srcVal2 = cpustate->data.read_word(R3);
 	tempV.addr = &srcVal2;
 	tempV.data_type = DT_WORD;
 	SetDestinationValue(tempV, D2);
@@ -4877,13 +4877,13 @@ static void SetDataMemoryValue(dsp56156_core* cpustate, typed_pointer source, ui
 {
 	switch(source.data_type)
 	{
-		case DT_BYTE:        cpustate->data->write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)               ) ) ; break ;
-		case DT_WORD:        cpustate->data->write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)             ) ) ; break ;
-		case DT_DOUBLE_WORD: cpustate->data->write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)         ) ) ; break ;
+		case DT_BYTE:        cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)               ) ) ; break ;
+		case DT_WORD:        cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)             ) ) ; break ;
+		case DT_DOUBLE_WORD: cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)         ) ) ; break ;
 
 		/* !!! Is this universal ??? */
 		/* !!! Forget not, yon shift-limiter !!! */
-		case DT_LONG_WORD:   cpustate->data->write_word(destinationAddr, (uint16_t)( ((*((uint64_t*)source.addr)) & 0x00000000ffff0000U) >> 16) ) ; break ;
+		case DT_LONG_WORD:   cpustate->data.write_word(destinationAddr, (uint16_t)( ((*((uint64_t*)source.addr)) & 0x00000000ffff0000U) >> 16) ) ; break ;
 	}
 }
 
@@ -4892,12 +4892,12 @@ static void SetProgramMemoryValue(dsp56156_core* cpustate, typed_pointer source,
 {
 	switch(source.data_type)
 	{
-		case DT_BYTE:        cpustate->program->write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)               ) ) ; break ;
-		case DT_WORD:        cpustate->program->write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)             ) ) ; break ;
-		case DT_DOUBLE_WORD: cpustate->program->write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)         ) ) ; break ;
+		case DT_BYTE:        cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)               ) ) ; break ;
+		case DT_WORD:        cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)             ) ) ; break ;
+		case DT_DOUBLE_WORD: cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)         ) ) ; break ;
 
 		/* !!! Is this universal ??? */
 		/* !!! Forget not, yon shift-limiter !!! */
-		case DT_LONG_WORD:   cpustate->program->write_word(destinationAddr, (uint16_t)( ((*((uint64_t*)source.addr)) & 0x00000000ffff0000U) >> 16) ) ; break ;
+		case DT_LONG_WORD:   cpustate->program.write_word(destinationAddr, (uint16_t)( ((*((uint64_t*)source.addr)) & 0x00000000ffff0000U) >> 16) ) ; break ;
 	}
 }

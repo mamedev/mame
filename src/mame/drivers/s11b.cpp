@@ -157,7 +157,7 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 		m_bgcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
+void s11b_state::bg_speech_clock_w(uint8_t data)
 {
 	if(m_bg_hc55516)
 	{
@@ -167,13 +167,13 @@ WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
 	}
 }
 
-WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
+void s11b_state::bg_speech_digit_w(uint8_t data)
 {
 	if(m_bg_hc55516)
 		m_bg_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( s11b_state::dig1_w )
+void s11b_state::dig1_w(uint8_t data)
 {
 	uint32_t seg = get_segment2();
 	seg |= data;
@@ -189,7 +189,7 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 	set_segment2(seg);
 }
 
-WRITE8_MEMBER( s11b_state::pia2c_pa_w )
+void s11b_state::pia2c_pa_w(uint8_t data)
 {
 	uint32_t seg = get_segment1();
 	seg |= (data<<8);
@@ -205,7 +205,7 @@ WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 	set_segment1(seg);
 }
 
-WRITE8_MEMBER( s11b_state::pia2c_pb_w )
+void s11b_state::pia2c_pb_w(uint8_t data)
 {
 	uint32_t seg = get_segment1();
 	seg |= data;
@@ -221,7 +221,7 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 	set_segment1(seg);
 }
 
-WRITE8_MEMBER( s11b_state::pia34_pa_w )
+void s11b_state::pia34_pa_w(uint8_t data)
 {
 	uint32_t seg = get_segment2();
 	seg |= (data<<8);

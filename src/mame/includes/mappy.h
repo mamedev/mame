@@ -42,7 +42,6 @@ public:
 	void superpac(machine_config &config);
 	void todruaga(machine_config &config);
 
-	void init_grobda();
 	void init_digdug2();
 
 protected:
@@ -78,12 +77,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(int_on_2_w);
 	DECLARE_WRITE_LINE_MEMBER(int_on_3_w);
 	DECLARE_WRITE_LINE_MEMBER(mappy_flip_w);
-	DECLARE_WRITE8_MEMBER(superpac_videoram_w);
-	DECLARE_WRITE8_MEMBER(mappy_videoram_w);
-	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
-	DECLARE_READ8_MEMBER(superpac_flipscreen_r);
-	DECLARE_WRITE8_MEMBER(mappy_scroll_w);
-	DECLARE_WRITE8_MEMBER(out_lamps);
+	void superpac_videoram_w(offs_t offset, uint8_t data);
+	void mappy_videoram_w(offs_t offset, uint8_t data);
+	void superpac_flipscreen_w(uint8_t data);
+	uint8_t superpac_flipscreen_r();
+	void mappy_scroll_w(offs_t offset, uint8_t data);
+	void out_lamps(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(superpac_tilemap_scan);
 	TILEMAP_MAPPER_MEMBER(mappy_tilemap_scan);
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);
@@ -104,6 +103,7 @@ private:
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
+	void grobda_cpu2_map(address_map &map);
 	void mappy_cpu1_map(address_map &map);
 	void mappy_cpu2_map(address_map &map);
 	void phozon_cpu1_map(address_map &map);

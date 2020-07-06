@@ -42,10 +42,10 @@ private:
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint16_t m_sector;
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_WRITE8_MEMBER(sector_low_w);
-	DECLARE_WRITE8_MEMBER(sector_high_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	void sector_low_w(uint8_t data);
+	void sector_high_w(uint8_t data);
 };
 
 // device type definition

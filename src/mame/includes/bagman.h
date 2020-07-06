@@ -36,19 +36,19 @@ protected:
 	// common
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
 
 	// bagman
-	DECLARE_WRITE8_MEMBER(ls259_w);
+	void ls259_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tmsprom_bit_w);
 	DECLARE_WRITE_LINE_MEMBER(tmsprom_csq0_w);
 	DECLARE_WRITE_LINE_MEMBER(tmsprom_csq1_w);
-	DECLARE_WRITE8_MEMBER(pal16r6_w);
-	DECLARE_READ8_MEMBER(pal16r6_r);
+	void pal16r6_w(offs_t offset, uint8_t data);
+	uint8_t pal16r6_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

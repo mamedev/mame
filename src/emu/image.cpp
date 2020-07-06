@@ -6,7 +6,6 @@
 
     Core image functions and definitions.
 
-
 ***************************************************************************/
 
 #include <cctype>

@@ -13,7 +13,8 @@
 #include "rendlay.h"
 #include "screen.h"
 
-#define LOG 0
+#define VERBOSE 0
+#include "logmacro.h"
 
 #define NEWBRAIN_VIDEO_RV               0x01
 #define NEWBRAIN_VIDEO_FS               0x02
@@ -32,10 +33,10 @@ void newbrain_state::tvl(uint8_t data, int a6)
 	/* latch data to video address counter bits A14-A7 */
 	m_tvl |= (data << 7);
 
-	if (LOG) logerror("%s %s TVL %04x\n", machine().time().as_string(), machine().describe_context(), m_tvl);
+	LOG("%s %s TVL %04x\n", machine().time().as_string(), machine().describe_context(), m_tvl);
 }
 
-WRITE8_MEMBER( newbrain_state::tvtl_w )
+void newbrain_state::tvtl_w(uint8_t data)
 {
 	/*
 
@@ -52,7 +53,7 @@ WRITE8_MEMBER( newbrain_state::tvtl_w )
 
 	*/
 
-	if (LOG) logerror("%s %s TVTL %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOG("%s %s TVTL %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	m_rv = BIT(data, 0);
 	m_fs = BIT(data, 1);

@@ -17,7 +17,7 @@
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj9195_state::palette_w)
+void nbmj9195_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_palette_ptr[offset] = data;
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj9195_state::palette_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::nb22090_palette_w)
+void nbmj9195_state::nb22090_palette_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 	int offs_h, offs_l;
@@ -116,7 +116,7 @@ void nbmj9195_state::blitter_w(int offset, int data, int vram)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::clutsel_w)
+void nbmj9195_state::clutsel_w(uint8_t data)
 {
 	m_clutsel = data;
 }
@@ -126,7 +126,7 @@ void nbmj9195_state::clut_w(int offset, int data, int vram)
 	m_clut[vram][((m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
-WRITE8_MEMBER(nbmj9195_state::gfxflag2_w)
+void nbmj9195_state::gfxflag2_w(uint8_t data)
 {
 	m_gfxflag2 = data;
 }
@@ -355,14 +355,14 @@ void nbmj9195_state::gfxdraw(int vram)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj9195_state::blitter_0_w){ blitter_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::blitter_1_w){ blitter_w(offset, data, 1); }
+void nbmj9195_state::blitter_0_w(offs_t offset, uint8_t data){ blitter_w(offset, data, 0); }
+void nbmj9195_state::blitter_1_w(offs_t offset, uint8_t data){ blitter_w(offset, data, 1); }
 
-READ8_MEMBER(nbmj9195_state::blitter_0_r){ return blitter_r(offset, 0); }
-READ8_MEMBER(nbmj9195_state::blitter_1_r){ return blitter_r(offset, 1); }
+uint8_t nbmj9195_state::blitter_0_r(offs_t offset){ return blitter_r(offset, 0); }
+uint8_t nbmj9195_state::blitter_1_r(offs_t offset){ return blitter_r(offset, 1); }
 
-WRITE8_MEMBER(nbmj9195_state::clut_0_w){ clut_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::clut_1_w){ clut_w(offset, data, 1); }
+void nbmj9195_state::clut_0_w(offs_t offset, uint8_t data){ clut_w(offset, data, 0); }
+void nbmj9195_state::clut_1_w(offs_t offset, uint8_t data){ clut_w(offset, data, 1); }
 
 /******************************************************************************
 

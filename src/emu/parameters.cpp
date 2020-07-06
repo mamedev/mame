@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, Aaron Giles
 /***************************************************************************
 
-    parameters.c
+    parameters.cpp
 
     Per-game parameters handling.
 

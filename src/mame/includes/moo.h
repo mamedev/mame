@@ -79,12 +79,12 @@ private:
 	optional_device<k054321_device> m_k054321;
 
 	emu_timer *m_dmaend_timer;
-	DECLARE_READ16_MEMBER(control2_r);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(moo_prot_w);
-	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	void sound_bankswitch_w(uint8_t data);
+	void moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void moobl_oki_bank_w(uint16_t data);
 	DECLARE_MACHINE_START(moo);
 	DECLARE_MACHINE_RESET(moo);
 	DECLARE_VIDEO_START(moo);

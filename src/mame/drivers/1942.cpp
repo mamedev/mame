@@ -86,7 +86,7 @@ constexpr XTAL AUDIO_CLOCK_1942P(MASTER_CLOCK_1942P/16);
 
 } // anonymous namespace
 
-WRITE8_MEMBER(_1942_state::_1942_bankswitch_w)
+void _1942_state::_1942_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
@@ -137,12 +137,12 @@ void _1942_state::_1942_map(address_map &map)
 	map(0xe000, 0xefff).ram();
 }
 
-WRITE8_MEMBER(_1942p_state::_1942p_f600_w)
+void _1942p_state::_1942p_f600_w(uint8_t data)
 {
 //  printf("_1942p_f600_w %02x\n", data);
 }
 
-WRITE8_MEMBER(_1942p_state::_1942p_palette_w)
+void _1942p_state::_1942p_palette_w(offs_t offset, uint8_t data)
 {
 	m_protopal[offset] = data;
 

@@ -188,8 +188,8 @@ public:
 
 	ps2_vif1_device* interface();
 
-	DECLARE_READ64_MEMBER(vif_r);
-	DECLARE_WRITE64_MEMBER(vif_w);
+	uint64_t vif_r(offs_t offset);
+	void vif_w(offs_t offset, uint64_t data);
 
 protected:
 	virtual void device_start() override;
@@ -230,8 +230,8 @@ protected:
 
 	void execute_xgkick(uint32_t rs) override;
 
-	DECLARE_READ32_MEMBER(vu1_reg_r);
-	DECLARE_WRITE32_MEMBER(vu1_reg_w);
+	uint32_t vu1_reg_r(offs_t offset);
+	void vu1_reg_w(offs_t offset, uint32_t data);
 
 	required_device<sonyvu1_device> m_vu1;
 

@@ -83,21 +83,21 @@ private:
 	uint8_t m_control;
 	uint8_t m_mux;
 
-	DECLARE_READ8_MEMBER(palette_low_r);
-	DECLARE_READ8_MEMBER(palette_high_r);
-	DECLARE_WRITE8_MEMBER(palette_low_w);
-	DECLARE_WRITE8_MEMBER(palette_high_w);
+	uint8_t palette_low_r(offs_t offset);
+	uint8_t palette_high_r(offs_t offset);
+	void palette_low_w(offs_t offset, uint8_t data);
+	void palette_high_w(offs_t offset, uint8_t data);
 	void set_palette(int offset);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	void control_w(uint8_t data);
+	void mux_w(uint8_t data);
 
-	DECLARE_READ32_MEMBER(muxed_inputs_r);
+	uint32_t muxed_inputs_r();
 
-	DECLARE_READ32_MEMBER(mjsenpu_speedup_r);
+	uint32_t mjsenpu_speedup_r();
 
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vram_w);
+	uint32_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -110,13 +110,13 @@ private:
 };
 
 
-READ8_MEMBER(mjsenpu_state::palette_low_r)
+uint8_t mjsenpu_state::palette_low_r(offs_t offset)
 {
 	return m_pal[(offset * 2) + 0];
 }
 
 
-READ8_MEMBER(mjsenpu_state::palette_high_r)
+uint8_t mjsenpu_state::palette_high_r(offs_t offset)
 {
 	return m_pal[(offset * 2) + 1];
 }
@@ -127,32 +127,32 @@ void mjsenpu_state::set_palette(int offset)
 	m_palette->set_pen_color(offset, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal6bit(paldata >> 10));
 }
 
-WRITE8_MEMBER(mjsenpu_state::palette_low_w)
+void mjsenpu_state::palette_low_w(offs_t offset, uint8_t data)
 {
 	m_pal[(offset * 2)+0] = data;
 	set_palette(offset);
 }
 
-WRITE8_MEMBER(mjsenpu_state::palette_high_w)
+void mjsenpu_state::palette_high_w(offs_t offset, uint8_t data)
 {
 	m_pal[(offset * 2)+1] = data;
 	set_palette(offset);
 }
 
 
-READ32_MEMBER(mjsenpu_state::vram_r)
+uint32_t mjsenpu_state::vram_r(offs_t offset)
 {
 	if (m_control & 0x01) return m_vram1[offset];
 	else return m_vram0[offset];
 }
 
-WRITE32_MEMBER(mjsenpu_state::vram_w)
+void mjsenpu_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_control & 0x01) COMBINE_DATA(&m_vram1[offset]);
 	else COMBINE_DATA(&m_vram0[offset]);
 }
 
-WRITE8_MEMBER(mjsenpu_state::control_w)
+void mjsenpu_state::control_w(uint8_t data)
 {
 	// bit 0x80 is always set? (sometimes disabled during screen transitions briefly, could be display enable?)
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER(mjsenpu_state::control_w)
 //      printf("control_w %02x\n", data);
 }
 
-WRITE8_MEMBER(mjsenpu_state::mux_w)
+void mjsenpu_state::mux_w(uint8_t data)
 {
 	if ((data != 0x80) &&
 		(data != 0x9e) &&
@@ -190,7 +190,7 @@ WRITE8_MEMBER(mjsenpu_state::mux_w)
 	m_mux = data;
 }
 
-READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
+uint32_t mjsenpu_state::muxed_inputs_r()
 {
 	switch (m_mux)
 	{
@@ -506,7 +506,7 @@ ROM_END
 
 
 
-READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
+uint32_t mjsenpu_state::mjsenpu_speedup_r()
 {
 	int pc = m_maincpu->pc();
 
@@ -538,7 +538,7 @@ void mjsenpu_state::init_mjsenpu()
    (loops for 744256 instructions)
 */
 	// not especially effective, might be wrong.
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32_delegate(*this, FUNC(mjsenpu_state::mjsenpu_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32smo_delegate(*this, FUNC(mjsenpu_state::mjsenpu_speedup_r)));
 }
 
 

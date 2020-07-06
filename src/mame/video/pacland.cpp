@@ -222,29 +222,29 @@ void pacland_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(pacland_state::videoram_w)
+void pacland_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(pacland_state::videoram2_w)
+void pacland_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(pacland_state::scroll0_w)
+void pacland_state::scroll0_w(offs_t offset, uint8_t data)
 {
 	m_scroll0 = data + 256 * offset;
 }
 
-WRITE8_MEMBER(pacland_state::scroll1_w)
+void pacland_state::scroll1_w(offs_t offset, uint8_t data)
 {
 	m_scroll1 = data + 256 * offset;
 }
 
-WRITE8_MEMBER(pacland_state::bankswitch_w)
+void pacland_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
 

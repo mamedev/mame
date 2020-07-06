@@ -46,21 +46,21 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
-	DECLARE_READ8_MEMBER(angeklds_ff_r) { return 0xff; };
-	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);
-	DECLARE_READ8_MEMBER(angelkds_main_sound_r);
-	DECLARE_WRITE8_MEMBER(angelkds_sub_sound_w);
-	DECLARE_READ8_MEMBER(angelkds_sub_sound_r);
-	DECLARE_WRITE8_MEMBER(angelkds_txvideoram_w);
-	DECLARE_WRITE8_MEMBER(angelkds_txbank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgtopvideoram_w);
-	DECLARE_WRITE8_MEMBER(angelkds_bgtopbank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgtopscroll_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgbotvideoram_w);
-	DECLARE_WRITE8_MEMBER(angelkds_bgbotbank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
-	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
+	uint8_t angeklds_ff_r() { return 0xff; };
+	void angelkds_cpu_bank_write(uint8_t data);
+	void angelkds_main_sound_w(offs_t offset, uint8_t data);
+	uint8_t angelkds_main_sound_r(offs_t offset);
+	void angelkds_sub_sound_w(offs_t offset, uint8_t data);
+	uint8_t angelkds_sub_sound_r(offs_t offset);
+	void angelkds_txvideoram_w(offs_t offset, uint8_t data);
+	void angelkds_txbank_write(uint8_t data);
+	void angelkds_bgtopvideoram_w(offs_t offset, uint8_t data);
+	void angelkds_bgtopbank_write(uint8_t data);
+	void angelkds_bgtopscroll_write(uint8_t data);
+	void angelkds_bgbotvideoram_w(offs_t offset, uint8_t data);
+	void angelkds_bgbotbank_write(uint8_t data);
+	void angelkds_bgbotscroll_write(uint8_t data);
+	void angelkds_layer_ctrl_write(uint8_t data);
 	void init_angelkds();
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);

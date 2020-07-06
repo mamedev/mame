@@ -107,19 +107,19 @@ private:
 	required_device<pcvideo_t1000_device> m_video;
 	required_device<ram_device> m_ram;
 
-	DECLARE_WRITE8_MEMBER ( pc_t1t_p37x_w );
-	DECLARE_READ8_MEMBER ( pc_t1t_p37x_r );
+	void pc_t1t_p37x_w(offs_t offset, uint8_t data);
+	uint8_t pc_t1t_p37x_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( tandy1000_pio_w );
-	DECLARE_READ8_MEMBER(tandy1000_pio_r);
-	DECLARE_READ8_MEMBER( tandy1000_bank_r );
-	DECLARE_WRITE8_MEMBER( tandy1000_bank_w );
-	DECLARE_WRITE8_MEMBER( nmi_vram_bank_w );
-	DECLARE_WRITE8_MEMBER( vram_bank_w );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_WRITE8_MEMBER( devctrl_w );
-	DECLARE_READ8_MEMBER( unk_r );
+	void tandy1000_pio_w(offs_t offset, uint8_t data);
+	uint8_t tandy1000_pio_r(offs_t offset);
+	uint8_t tandy1000_bank_r(offs_t offset);
+	void tandy1000_bank_w(offs_t offset, uint8_t data);
+	void nmi_vram_bank_w(uint8_t data);
+	void vram_bank_w(uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void devctrl_w(uint8_t data);
+	uint8_t unk_r();
 
 	int tandy1000_read_eeprom();
 	void tandy1000_write_eeprom(uint8_t data);
@@ -279,7 +279,7 @@ void tandy1000_state::tandy1000_write_eeprom(uint8_t data)
 	m_eeprom_clock=data&4;
 }
 
-WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
+void tandy1000_state::pc_t1t_p37x_w(offs_t offset, uint8_t data)
 {
 //  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", m_maincpu->pc( ),offset, data));
 	if (offset!=4)
@@ -293,7 +293,7 @@ WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 	}
 }
 
-READ8_MEMBER( tandy1000_state::pc_t1t_p37x_r )
+uint8_t tandy1000_state::pc_t1t_p37x_r(offs_t offset)
 {
 	int data = m_tandy_data[offset];
 //  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", m_maincpu->pc( ), offset, data));
@@ -309,7 +309,7 @@ READ8_MEMBER( tandy1000_state::pc_t1t_p37x_r )
    bit 3 output turbo mode
 */
 
-WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
+void tandy1000_state::tandy1000_pio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -335,7 +335,7 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
 	}
 }
 
-READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
+uint8_t tandy1000_state::tandy1000_pio_r(offs_t offset)
 {
 	int data=0xff;
 	switch (offset)
@@ -361,29 +361,29 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	return data;
 }
 
-WRITE8_MEMBER( tandy1000_state::nmi_vram_bank_w )
+void tandy1000_state::nmi_vram_bank_w(uint8_t data)
 {
 	m_mb->nmi_enable_w(data & 0x80);
-	vram_bank_w(space, 0, data & 0x1e);
+	vram_bank_w(data & 0x1e);
 	m_video->disable_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( tandy1000_state::vram_bank_w )
+void tandy1000_state::vram_bank_w(uint8_t data)
 {
 	m_vram_bank = (data >> 1) & 7;
 }
 
-WRITE8_MEMBER( tandy1000_state::devctrl_w )
+void tandy1000_state::devctrl_w(uint8_t data)
 {
 	m_video->disable_w((data & 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( tandy1000_state::unk_r )
+uint8_t tandy1000_state::unk_r()
 {
 	return 0; // status port?
 }
 
-READ8_MEMBER( tandy1000_state::vram_r )
+uint8_t tandy1000_state::vram_r(offs_t offset)
 {
 	uint8_t vram_base = (m_ram->size() >> 17) - 1;
 	if((m_vram_bank - vram_base) == (offset >> 17))
@@ -391,7 +391,7 @@ READ8_MEMBER( tandy1000_state::vram_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tandy1000_state::vram_w )
+void tandy1000_state::vram_w(offs_t offset, uint8_t data)
 {
 	uint8_t vram_base = (m_ram->size() >> 17) - 1;
 	if((m_vram_bank - vram_base) == (offset >> 17))
@@ -432,14 +432,14 @@ void tandy1000_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
 	if(m_maincpu->space(AS_PROGRAM).data_width() == 8)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)));
+				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
+				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
-READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
+uint8_t tandy1000_state::tandy1000_bank_r(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -456,7 +456,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 }
 
 
-WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
+void tandy1000_state::tandy1000_bank_w(offs_t offset, uint8_t data)
 {
 	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", machine().describe_context(), offset, data );
 

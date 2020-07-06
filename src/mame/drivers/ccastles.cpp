@@ -123,6 +123,7 @@
 #include "includes/ccastles.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"
@@ -237,7 +238,7 @@ void ccastles_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::irq_ack_w)
+void ccastles_state::irq_ack_w(uint8_t data)
 {
 	if (m_irq_state)
 	{
@@ -247,7 +248,7 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 }
 
 
-READ8_MEMBER(ccastles_state::leta_r)
+uint8_t ccastles_state::leta_r(offs_t offset)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
@@ -262,7 +263,7 @@ READ8_MEMBER(ccastles_state::leta_r)
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::nvram_recall_w)
+void ccastles_state::nvram_recall_w(uint8_t data)
 {
 	m_nvram_4b->recall(0);
 	m_nvram_4b->recall(1);
@@ -280,13 +281,13 @@ WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 }
 
 
-READ8_MEMBER(ccastles_state::nvram_r)
+uint8_t ccastles_state::nvram_r(address_space &space, offs_t offset)
 {
 	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space,offset) << 4);
 }
 
 
-WRITE8_MEMBER(ccastles_state::nvram_w)
+void ccastles_state::nvram_w(offs_t offset, uint8_t data)
 {
 	m_nvram_4b->write(offset, data);
 	m_nvram_4a->write(offset, data >> 4);

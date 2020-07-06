@@ -172,8 +172,8 @@ void capricorn_cpu_device::device_start()
 	// Flags
 	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%9s");
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_arp));
@@ -290,7 +290,7 @@ uint8_t capricorn_cpu_device::RM(ea_addr_t& addr)
 		res = m_reg[ addr & ARP_DRP_MASK ];
 	} else {
 		m_curr_addr = (uint16_t)(addr & ADDR_MASK);
-		res = m_program->read_byte(m_flatten ? m_start_addr : m_curr_addr);
+		res = m_program.read_byte(m_flatten ? m_start_addr : m_curr_addr);
 	}
 	addr++;
 	return res;
@@ -302,7 +302,7 @@ void capricorn_cpu_device::WM(ea_addr_t& addr , uint8_t v)
 		m_reg[ addr & ARP_DRP_MASK ] = v;
 	} else {
 		m_curr_addr = (uint16_t)(addr & ADDR_MASK);
-		m_program->write_byte(m_flatten ? m_start_addr : m_curr_addr , v);
+		m_program.write_byte(m_flatten ? m_start_addr : m_curr_addr , v);
 	}
 	addr++;
 }
@@ -311,7 +311,7 @@ uint8_t capricorn_cpu_device::fetch()
 {
 	m_genpc = read_u16(REG_PC | GP_REG_MASK);
 	start_mem_burst(m_genpc , false);
-	return m_cache->read_byte(m_genpc);
+	return m_cache.read_byte(m_genpc);
 }
 
 void capricorn_cpu_device::offset_pc(uint16_t offset)

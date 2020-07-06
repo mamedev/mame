@@ -18,7 +18,7 @@ public:
 	a26_rom_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
 	a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -53,8 +53,8 @@ public:
 	a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -76,8 +76,8 @@ public:
 	a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -94,8 +94,8 @@ public:
 	a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -125,8 +125,8 @@ public:
 	a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 };
 
 
@@ -139,10 +139,10 @@ public:
 	a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_READ8_MEMBER(read_bank) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_bank(address_space &space, offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -163,9 +163,9 @@ public:
 	a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -187,8 +187,8 @@ public:
 	a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -207,8 +207,8 @@ public:
 	a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -228,8 +228,8 @@ public:
 	a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -249,9 +249,9 @@ public:
 	a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_READ8_MEMBER(read_bank) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_bank(address_space &space, offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -268,8 +268,8 @@ public:
 	a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 };
 
 
@@ -282,8 +282,8 @@ public:
 	a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 };
 
 
@@ -296,8 +296,8 @@ public:
 	a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -317,8 +317,8 @@ public:
 	a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 };
 
 
@@ -331,7 +331,7 @@ public:
 	a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
 	// device-level overrides
@@ -348,7 +348,7 @@ public:
 	a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
 	// device-level overrides
@@ -368,7 +368,7 @@ public:
 	a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
 	// device-level overrides
@@ -385,8 +385,8 @@ public:
 	a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 };
 
 

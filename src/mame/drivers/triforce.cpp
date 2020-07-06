@@ -473,10 +473,10 @@ public:
 	void triforce_base(machine_config &config);
 
 private:
-	DECLARE_READ64_MEMBER(gc_pi_r);
-	DECLARE_WRITE64_MEMBER(gc_pi_w);
-	DECLARE_READ64_MEMBER(gc_exi_r);
-	DECLARE_WRITE64_MEMBER(gc_exi_w);
+	uint64_t gc_pi_r();
+	void gc_pi_w(uint64_t data);
+	uint64_t gc_exi_r();
+	void gc_exi_w(uint64_t data);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -484,21 +484,21 @@ private:
 	void gc_map(address_map &map);
 };
 
-READ64_MEMBER(triforce_state::gc_pi_r)
+uint64_t triforce_state::gc_pi_r()
 {
 	return 0;
 }
 
-WRITE64_MEMBER(triforce_state::gc_pi_w)
+void triforce_state::gc_pi_w(uint64_t data)
 {
 }
 
-READ64_MEMBER(triforce_state::gc_exi_r)
+uint64_t triforce_state::gc_exi_r()
 {
 	return 0;
 }
 
-WRITE64_MEMBER(triforce_state::gc_exi_w)
+void triforce_state::gc_exi_w(uint64_t data)
 {
 }
 
@@ -928,7 +928,7 @@ ROM_START( vs4jc )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0013c", 0, SHA1(9010371eac31bd8d211838ab7b73fc4887ee0b1c) )
+	DISK_IMAGE_READONLY( "gdt-0013c", 0, SHA1(b6483c83973bacb8b66bbeff4c26ae37b2b28ca9) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0391-jpn.data", 0x00, 0x50, CRC(0f2dbb73) SHA1(7b9d66abe85303b3e26b442a3a63feca1a0edbdb) )

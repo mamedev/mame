@@ -275,7 +275,7 @@ void i80286_cpu_device::device_start()
 	state_add( I286_VECTOR, "V", m_int_vector).formatstr("%02X");
 
 	state_add( I286_PC, "PC", m_pc).callimport().formatstr("%06X");
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%06X").noshow();
+	state_add<uint32_t>( STATE_GENPCBASE, "CURPC", [this] { return m_base[CS] + m_prev_ip; }).mask(0xffffff).noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
 	m_out_shutdown_func.resolve_safe();
@@ -316,7 +316,6 @@ void i80286_cpu_device::state_import(const device_state_entry &entry)
 		break;
 
 	case STATE_GENPC:
-	case STATE_GENPCBASE:
 		if (m_pc - m_base[CS] > m_limit[CS])
 		{
 			// TODO: should this call data_descriptor instead of ignoring jumps outside the current segment?
@@ -331,6 +330,7 @@ void i80286_cpu_device::state_import(const device_state_entry &entry)
 			}
 		}
 		m_ip = m_pc - m_base[CS];
+		m_prev_ip = m_ip;
 		break;
 	}
 }
@@ -769,7 +769,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 			m_limit[CS] = LIMIT(desc);
 			m_base[CS] = BASE(desc);
 			m_rights[CS] = RIGHTS(desc);
-			m_ip = offset;
+			m_prev_ip = m_ip = offset;
 		}
 		else
 		{ // systemdescriptor
@@ -862,7 +862,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 	}
 	else
 	{
-		m_ip = offset;
+		m_prev_ip = m_ip = offset;
 		m_sregs[CS]=selector;
 		m_base[CS]=selector<<4;
 		m_rights[CS]=0x93;
@@ -880,10 +880,10 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 	{
 		number = standard_irq_callback(0);
 
-		m_irq_state = CLEAR_LINE;
-		m_pending_irq &= ~INT_IRQ;
 		hwint = 1;
 	}
+
+	debugger_exception_hook(number);
 
 	if(!PM)
 	{
@@ -979,7 +979,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 			m_limit[CS] = LIMIT(gatedesc);
 			m_base[CS] = BASE(gatedesc);
 			m_rights[CS] = RIGHTS(gatedesc);
-			m_ip = GATEOFF(desc);
+			m_prev_ip = m_ip = GATEOFF(desc);
 			m_TF = 0;
 			m_NT = 0;
 			if(GATE(RIGHTS(desc)) == INTGATE)

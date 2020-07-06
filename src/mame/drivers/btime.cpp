@@ -167,7 +167,7 @@ enum
 };
 
 
-WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
+void btime_state::audio_nmi_enable_w(uint8_t data)
 {
 	/* for most games, this serves as the NMI enable for the audio CPU; however,
 	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
@@ -176,7 +176,7 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 		m_audionmi->in_w<0>(BIT(data, 0));
 }
 
-WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
+void btime_state::ay_audio_nmi_enable_w(uint8_t data)
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
@@ -380,7 +380,7 @@ INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
 }
 
 
-READ8_MEMBER(btime_state::zoar_dsw1_read)
+uint8_t btime_state::zoar_dsw1_read()
 {
 	return (!m_screen->vblank() << 7) | (ioport("DSW1")->read() & 0x7f);
 }
@@ -468,6 +468,13 @@ static INPUT_PORTS_START( btime3 ) // Used for btime3 and btimem
 	PORT_DIPSETTING(    0x00, "Sound Test Only" )
 	PORT_DIPSETTING(    0x10, "Cross Hatch Only" )
 	PORT_DIPSETTING(    0x20, "Normal Test" )  // Use Coin A to advance the tests
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "30000" )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x02, "80000"  )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cookrace )
@@ -2090,7 +2097,7 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-READ8_MEMBER(btime_state::wtennis_reset_hack_r)
+uint8_t btime_state::wtennis_reset_hack_r()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -2171,7 +2178,7 @@ void btime_state::init_protennb()
 
 void btime_state::init_wtennis()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(*this, FUNC(btime_state::wtennis_reset_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8smo_delegate(*this, FUNC(btime_state::wtennis_reset_hack_r)));
 
 	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);

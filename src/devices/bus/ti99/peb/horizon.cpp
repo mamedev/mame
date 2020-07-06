@@ -157,7 +157,7 @@ void horizon_ramdisk_device::nvram_write(emu_file &file)
 	file.write(buffer, nvramsize + ROSSIZE);
 }
 
-READ8Z_MEMBER(horizon_ramdisk_device::readz)
+void horizon_ramdisk_device::readz(offs_t offset, uint8_t *value)
 {
 	// 32K expansion
 	// According to the manual, "this memory is not affected by the HIDE switch"
@@ -289,7 +289,7 @@ void horizon_ramdisk_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(horizon_ramdisk_device::crureadz)
+void horizon_ramdisk_device::crureadz(offs_t offset, uint8_t *value)
 {
 	// There is no CRU read operation for the Horizon.
 	return;

@@ -85,50 +85,50 @@ void psychic5_state::set_background_palette_intensity()
   Memory handler
 ***************************************************************************/
 
-READ8_MEMBER(psychic5_state::vram_page_select_r)
+uint8_t psychic5_state::vram_page_select_r()
 {
 	return m_ps5_vram_page;
 }
 
-WRITE8_MEMBER(psychic5_state::vram_page_select_w)
+void psychic5_state::vram_page_select_w(uint8_t data)
 {
 	m_ps5_vram_page = data & 1;
 	m_vrambank->set_bank(data);
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_title_screen_w)
+void psychic5_state::psychic5_title_screen_w(uint8_t data)
 {
 	m_title_screen = data;
 }
 
 
 
-WRITE8_MEMBER(psychic5_state::sprite_col_w)
+void psychic5_state::sprite_col_w(offs_t offset, uint8_t data)
 {
 	m_ps5_palette_ram_sp[offset] = data;
 	change_palette(offset,m_ps5_palette_ram_sp, 0x000);
 }
 
-WRITE8_MEMBER(psychic5_state::bg_col_w)
+void psychic5_state::bg_col_w(offs_t offset, uint8_t data)
 {
 	m_ps5_palette_ram_bg[offset] = data;
 	change_palette(offset,m_ps5_palette_ram_bg, 0x100);
 }
 
-WRITE8_MEMBER(psychic5_state::tx_col_w)
+void psychic5_state::tx_col_w(offs_t offset, uint8_t data)
 {
 	m_ps5_palette_ram_tx[offset] = data;
 	change_palette(offset,m_ps5_palette_ram_tx, 0x200);
 }
 
 
-WRITE8_MEMBER(psychic5_state::fg_videoram_w)
+void psychic5_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER( psychic5_state::bg_videoram_w )
+void psychic5_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
@@ -136,7 +136,7 @@ WRITE8_MEMBER( psychic5_state::bg_videoram_w )
 
 
 
-WRITE8_MEMBER(psychic5_state::bombsa_unknown_w)
+void psychic5_state::bombsa_unknown_w(uint8_t data)
 {
 	m_bombsa_unknown = data;
 }

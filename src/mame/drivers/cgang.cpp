@@ -158,33 +158,33 @@ private:
 	// I/O handlers
 	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
-	DECLARE_WRITE8_MEMBER(main_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(main_firq_clear_w);
+	void main_irq_clear_w(u8 data);
+	void main_firq_clear_w(u8 data);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
 	void cg_motor_tick(int i);
 	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
 	void refresh_motor_output();
 
-	DECLARE_READ8_MEMBER(ppi1_b_r);
-	DECLARE_READ8_MEMBER(ppi1_c_r);
-	DECLARE_READ8_MEMBER(ppi2_a_r);
-	DECLARE_READ8_MEMBER(ppi2_b_r);
-	DECLARE_WRITE8_MEMBER(ppi2_c_w);
-	DECLARE_WRITE8_MEMBER(ppi3_a_w);
-	DECLARE_WRITE8_MEMBER(ppi3_b_w);
-	DECLARE_WRITE8_MEMBER(ppi3_c_w);
+	u8 ppi1_b_r();
+	u8 ppi1_c_r();
+	u8 ppi2_a_r();
+	u8 ppi2_b_r();
+	void ppi2_c_w(u8 data);
+	void ppi3_a_w(u8 data);
+	void ppi3_b_w(u8 data);
+	void ppi3_c_w(u8 data);
 	void set_en_sol(int i, int state);
-	DECLARE_WRITE8_MEMBER(ppi4_a_w);
-	DECLARE_WRITE8_MEMBER(ppi4_b_w);
-	DECLARE_WRITE8_MEMBER(ppi4_c_w);
+	void ppi4_a_w(u8 data);
+	void ppi4_b_w(u8 data);
+	void ppi4_c_w(u8 data);
 
-	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_WRITE8_MEMBER(spot_w);
-	DECLARE_WRITE8_MEMBER(output_spot_w) { m_spot_lamps[offset >> 6] = data; }
+	template<int N> void adpcm_w(u8 data);
+	void spot_w(u8 data);
+	void output_spot_w(offs_t offset, u8 data) { m_spot_lamps[offset >> 6] = data; }
 
-	DECLARE_WRITE8_MEMBER(ppi5_a_w);
-	DECLARE_WRITE8_MEMBER(ppi5_b_w);
-	DECLARE_READ8_MEMBER(ppi5_c_r);
+	void ppi5_a_w(u8 data);
+	void ppi5_b_w(u8 data);
+	u8 ppi5_c_r();
 
 	int m_watchdog_clk = 0;
 	int m_main_irq = 0;
@@ -279,12 +279,12 @@ WRITE_LINE_MEMBER(cgang_state::main_firq_w)
 	m_main_firq = state;
 }
 
-WRITE8_MEMBER(cgang_state::main_irq_clear_w)
+void cgang_state::main_irq_clear_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cgang_state::main_firq_clear_w)
+void cgang_state::main_firq_clear_w(u8 data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
@@ -359,7 +359,7 @@ void cgang_state::refresh_motor_output()
 
 // maincpu (PPI1-PPI4)
 
-READ8_MEMBER(cgang_state::ppi1_b_r)
+u8 cgang_state::ppi1_b_r()
 {
 	u8 data = 0xff;
 
@@ -376,7 +376,7 @@ READ8_MEMBER(cgang_state::ppi1_b_r)
 	return data;
 }
 
-READ8_MEMBER(cgang_state::ppi1_c_r)
+u8 cgang_state::ppi1_c_r()
 {
 	u8 data = 0x7f;
 
@@ -396,7 +396,7 @@ READ8_MEMBER(cgang_state::ppi1_c_r)
 	return data;
 }
 
-READ8_MEMBER(cgang_state::ppi2_a_r)
+u8 cgang_state::ppi2_a_r()
 {
 	u8 data = 0x60;
 
@@ -424,7 +424,7 @@ READ8_MEMBER(cgang_state::ppi2_a_r)
 	return data;
 }
 
-READ8_MEMBER(cgang_state::ppi2_b_r)
+u8 cgang_state::ppi2_b_r()
 {
 	u8 data = 0x1f;
 
@@ -436,7 +436,7 @@ READ8_MEMBER(cgang_state::ppi2_b_r)
 	return data;
 }
 
-WRITE8_MEMBER(cgang_state::ppi2_c_w)
+void cgang_state::ppi2_c_w(u8 data)
 {
 	// PC0: coincounter
 	// PC1: coinlock solenoid
@@ -449,7 +449,7 @@ WRITE8_MEMBER(cgang_state::ppi2_c_w)
 	m_misc_lamps[1] = BIT(data, 3);
 }
 
-WRITE8_MEMBER(cgang_state::ppi3_a_w)
+void cgang_state::ppi3_a_w(u8 data)
 {
 	// PA0-PA4: cosmogang motor direction
 	m_cg_motor_dir = data & 0x1f;
@@ -459,7 +459,7 @@ WRITE8_MEMBER(cgang_state::ppi3_a_w)
 		m_misc_lamps[i + 6] = BIT(data, i + 5);
 }
 
-WRITE8_MEMBER(cgang_state::ppi3_b_w)
+void cgang_state::ppi3_b_w(u8 data)
 {
 	// PB0-PB4: cosmogang motor power
 	m_cg_motor_on = data & 0x1f;
@@ -471,7 +471,7 @@ WRITE8_MEMBER(cgang_state::ppi3_b_w)
 		m_misc_lamps[i + 8] = BIT(data, i + 5);
 }
 
-WRITE8_MEMBER(cgang_state::ppi3_c_w)
+void cgang_state::ppi3_c_w(u8 data)
 {
 	// PC0-PC3: 7448
 	// PC4-PC7: 7445
@@ -488,7 +488,7 @@ void cgang_state::set_en_sol(int i, int state)
 		m_sol_filter[i]->adjust(attotime::from_msec(1), i << 1 | state);
 }
 
-WRITE8_MEMBER(cgang_state::ppi4_a_w)
+void cgang_state::ppi4_a_w(u8 data)
 {
 	// PA2-PA4: round leds
 	for (int i = 0; i < 3; i++)
@@ -499,7 +499,7 @@ WRITE8_MEMBER(cgang_state::ppi4_a_w)
 		set_en_sol(i, BIT(data, i + 5));
 }
 
-WRITE8_MEMBER(cgang_state::ppi4_b_w)
+void cgang_state::ppi4_b_w(u8 data)
 {
 	// PB0,PB1: energy crate solenoids (4-5)
 	for (int i = 0; i < 2; i++)
@@ -513,7 +513,7 @@ WRITE8_MEMBER(cgang_state::ppi4_b_w)
 	m_misc_lamps[5] = BIT(data, 7);
 }
 
-WRITE8_MEMBER(cgang_state::ppi4_c_w)
+void cgang_state::ppi4_c_w(u8 data)
 {
 	// PC0,PC1: gun xenon lamps
 	for (int i = 0; i < 2; i++)
@@ -538,7 +538,7 @@ WRITE8_MEMBER(cgang_state::ppi4_c_w)
 // audiocpu
 
 template<int N>
-WRITE8_MEMBER(cgang_state::adpcm_w)
+void cgang_state::adpcm_w(u8 data)
 {
 	m_adpcm[N]->port_w(data);
 
@@ -547,7 +547,7 @@ WRITE8_MEMBER(cgang_state::adpcm_w)
 	m_adpcm[N]->start_w(1);
 }
 
-WRITE8_MEMBER(cgang_state::spot_w)
+void cgang_state::spot_w(u8 data)
 {
 	// d0-d2: ufo boss spotlights
 	// d3-d7: cosmo spotlights
@@ -555,7 +555,7 @@ WRITE8_MEMBER(cgang_state::spot_w)
 	m_spot->matrix(1, data);
 }
 
-WRITE8_MEMBER(cgang_state::ppi5_a_w)
+void cgang_state::ppi5_a_w(u8 data)
 {
 	// PA0,PA1: ADPCM reset
 	m_adpcm[0]->reset_w(BIT(data, 0));
@@ -573,14 +573,14 @@ WRITE8_MEMBER(cgang_state::ppi5_a_w)
 	m_ufo_sol = BIT(data, 7);
 }
 
-WRITE8_MEMBER(cgang_state::ppi5_b_w)
+void cgang_state::ppi5_b_w(u8 data)
 {
 	// PB0-PB7: ufo lamps
 	for (int i = 0; i < 8; i++)
 		m_ufo_lamps[i] = BIT(data, i);
 }
 
-READ8_MEMBER(cgang_state::ppi5_c_r)
+u8 cgang_state::ppi5_c_r()
 {
 	u8 data = 0;
 

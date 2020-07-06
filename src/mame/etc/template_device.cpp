@@ -68,11 +68,11 @@ void xxx_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( xxx_device::read )
+uint8_t xxx_device::read(address_space &space, offs_t offset, uint8_t mem_mask = ~0)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( xxx_device::write )
+void xxx_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = ~0)
 {
 }

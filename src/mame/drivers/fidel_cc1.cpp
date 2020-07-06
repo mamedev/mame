@@ -10,6 +10,18 @@ Fidelity's 1st generation chess computers:
 
 * denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
 
+The first generation of chesscomputers didn't have an electronic chessboard.
+Some of them required a separate chessboard, others had a small chessboard
+attached to it (the latter applies to Fidelity).
+
+For those familiar with MAME's sensorboard interface and really want to use it
+for the old keypad-input machines, there is an awkward workaround: Start a 2nd
+instance of MAME with -sound none and load mephisto3 or mephisto2e, turn off
+the ESB 6000 board in the machine configuration, and set the video options to
+"Internal Layout (Board)". The same thing can be done with ccmk6.
+
+That being said, it's probably a better idea to use a real chessboard.
+
 *******************************************************************************
 
 Chess Challenger (1)
@@ -30,9 +42,9 @@ CC1 hardware overview:
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
 - 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
 
-Chess Challenger (upgraded version) is on the same hardware, but with double the
-ROM size, and they corrected the reversed chess notation. It was also offered as
-an upgrade to CC1. PCB label P179 C-3 9.77.
+Chess Challenger (upgraded version) released a few months later is on the same
+hardware, but with double the ROM size, and they corrected the reversed chess
+notation. It was also offered as an upgrade to CC1. PCB label P179 C-3 9.77.
 
 Chess Challenger (model UCC10) is on nearly the same PCB too, same label as CC3,
 with a small daughterboard for 8KB ROM. Again, it was also offered as an upgrade
@@ -41,8 +53,10 @@ to CC1, or CC3.
 Note that although these 2 newer versions are known as "Chess Challenger 3" and
 "Chess Challeger 10 C" nowadays, those are not the official titles. CC3 simply
 says "upgraded version" on the 1st page of the manual (even the newly sold ones,
-not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Fidelity
-started adding level numbers to their chesscomputer titles with CCX and CC7.
+not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Consumenta
+Computer(reseller of Fidelity chesscomputers) did name it Chess-Challenger 10 C.
+Officially, Fidelity started adding level numbers to their chesscomputer titles
+with CCX and CC7.
 
 ******************************************************************************/
 
@@ -95,9 +109,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(ppi_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	u8 ppi_porta_r();
+	void ppi_portb_w(u8 data);
+	void ppi_portc_w(u8 data);
 
 	u8 m_led_select;
 	u8 m_7seg_data;
@@ -128,7 +142,7 @@ void cc1_state::update_display()
 	m_display->matrix(m_led_select, m_7seg_data);
 }
 
-READ8_MEMBER(cc1_state::ppi_porta_r)
+u8 cc1_state::ppi_porta_r()
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
@@ -141,14 +155,14 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portb_w)
+void cc1_state::ppi_portb_w(u8 data)
 {
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portc_w)
+void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
 	if (~data & m_led_select & 0x40 && !m_delay->enabled())

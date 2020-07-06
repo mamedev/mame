@@ -163,13 +163,13 @@ void rpunch_state::scrollreg_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-WRITE8_MEMBER(rpunch_state::gga_w)
+void rpunch_state::gga_w(offs_t offset, u8 data)
 {
 	m_gga->write(offset >> 5, data & 0xff);
 }
 
 
-WRITE8_MEMBER(rpunch_state::gga_data_w)
+void rpunch_state::gga_data_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{

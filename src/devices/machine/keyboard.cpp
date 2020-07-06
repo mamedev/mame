@@ -16,7 +16,7 @@ In the machine config function:
 
 In the code:
 
-WRITE8_MEMBER( xxx_state::kbd_put )
+void xxx_state::kbd_put(u8 data)
 {
     (code to capture the key as it is pressed)
     (if your machine uses function keys, add your conversion code here)
@@ -158,7 +158,7 @@ INPUT_PORTS_START( generic_keyboard )
 	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('8')   PORT_CHAR('(')
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('9')   PORT_CHAR('(')
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('9')   PORT_CHAR(')')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('0')   PORT_CHAR('(')
+	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('0')   PORT_CHAR(')')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('0')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('-')   PORT_CHAR('_')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('-')   PORT_CHAR('=')

@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
-WRITE8_MEMBER(madalien_state::madalien_videoram_w)
+void madalien_state::madalien_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap_fg->mark_tile_dirty(offset);
@@ -224,7 +224,7 @@ void madalien_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_charram_w)
+void madalien_state::madalien_charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty((offset/8) & 0xff);

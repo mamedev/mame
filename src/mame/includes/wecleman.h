@@ -89,24 +89,24 @@ private:
 	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
 
-	DECLARE_READ16_MEMBER(wecleman_protection_r);
-	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
-	DECLARE_WRITE16_MEMBER(irqctrl_w);
-	DECLARE_WRITE16_MEMBER(selected_ip_w);
+	uint16_t wecleman_protection_r();
+	void wecleman_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irqctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void selected_ip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t selected_ip_r();
-	DECLARE_WRITE16_MEMBER(blitter_w);
-	DECLARE_READ8_MEMBER(multiply_r);
-	DECLARE_WRITE8_MEMBER(multiply_w);
-	DECLARE_WRITE8_MEMBER(hotchase_sound_control_w);
-	DECLARE_WRITE16_MEMBER(wecleman_txtram_w);
-	DECLARE_WRITE16_MEMBER(wecleman_pageram_w);
-	DECLARE_WRITE16_MEMBER(wecleman_videostatus_w);
-	DECLARE_WRITE16_MEMBER(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w);
-	DECLARE_WRITE16_MEMBER(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w);
-	DECLARE_WRITE8_MEMBER(wecleman_K00723216_bank_w);
-	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
-	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
-	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
+	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t multiply_r();
+	void multiply_w(offs_t offset, uint8_t data);
+	void hotchase_sound_control_w(offs_t offset, uint8_t data);
+	void wecleman_txtram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wecleman_pageram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wecleman_videostatus_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void wecleman_K00723216_bank_w(uint8_t data);
+	void wecleman_volume_callback(uint8_t data);
+	template<int Chip> uint8_t hotchase_k007232_r(offs_t offset);
+	template<int Chip> void hotchase_k007232_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
@@ -136,7 +136,7 @@ private:
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
 	K051316_CB_MEMBER(hotchase_zoom_callback_2);
 
-	DECLARE_WRITE8_MEMBER(hotchase_sound_hs_w);
+	void hotchase_sound_hs_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

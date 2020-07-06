@@ -67,8 +67,8 @@ private:
 	void rom_banksel_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_READ8_MEMBER(novram_data_r);
-	DECLARE_WRITE8_MEMBER(novram_data_w);
+	u8 novram_data_r(address_space &space, offs_t offset);
+	void novram_data_w(offs_t offset, u8 data);
 	void novram_recall_w(offs_t offset, u8 data);
 	void novram_store_w(u8 data);
 	void vscroll_w(offs_t offset, u8 data);

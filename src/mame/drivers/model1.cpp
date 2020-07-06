@@ -606,14 +606,14 @@ Notes:
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
 
-READ8_MEMBER( model1_state::dpram_r )
+u8 model1_state::dpram_r(offs_t offset)
 {
 	// insert waitstate
 	m_maincpu->adjust_icount(-1);
 	return m_dpram->right_r(offset);
 }
 
-WRITE8_MEMBER( model1_state::gen_outputs_w )
+void model1_state::gen_outputs_w(uint8_t data)
 {
 	// generic output lines, output to outx where x = bit
 	// eg. out0 = coin counter 1, see below for per-game descriptions
@@ -623,7 +623,7 @@ WRITE8_MEMBER( model1_state::gen_outputs_w )
 	m_digits[1] = data;
 }
 
-WRITE8_MEMBER( model1_state::vf_outputs_w )
+void model1_state::vf_outputs_w(uint8_t data)
 {
 	// 7654----  unknown (not used?)
 	// ----3---  start 2 lamp
@@ -635,7 +635,7 @@ WRITE8_MEMBER( model1_state::vf_outputs_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model1_state::vr_outputs_w )
+void model1_state::vr_outputs_w(uint8_t data)
 {
 	// 7-------  race leader lamp
 	// -6------  vr4 (green) lamp
@@ -650,7 +650,7 @@ WRITE8_MEMBER( model1_state::vr_outputs_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model1_state::swa_outputs_w )
+void model1_state::swa_outputs_w(uint8_t data)
 {
 	// 7-------  unknown (not used?)
 	// -6------  unknown (1 while in-game)
@@ -665,7 +665,7 @@ WRITE8_MEMBER( model1_state::swa_outputs_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model1_state::wingwar_outputs_w )
+void model1_state::wingwar_outputs_w(uint8_t data)
 {
 	// 7-------  unknown (not used?)
 	// -6------  view selector 4 lamp
@@ -679,7 +679,7 @@ WRITE8_MEMBER( model1_state::wingwar_outputs_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
+void model1_state::wingwar360_outputs_w(uint8_t data)
 {
 	// 7654----  unknown (not used?)
 	// ----3---  danger lamp
@@ -691,7 +691,7 @@ WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model1_state::netmerc_outputs_w )
+void model1_state::netmerc_outputs_w(uint8_t data)
 {
 	// 76------  unknown (not used?)
 	// --54----  mvd backlights
@@ -703,17 +703,17 @@ WRITE8_MEMBER( model1_state::netmerc_outputs_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model1_state::drive_board_w )
+void model1_state::drive_board_w(uint8_t data)
 {
 	m_digits[0] = data;
 }
 
-READ8_MEMBER( model1_state::r360_r )
+uint8_t model1_state::r360_r()
 {
 	return m_r360_state;
 }
 
-WRITE8_MEMBER( model1_state::r360_w )
+void model1_state::r360_w(uint8_t data)
 {
 	/*
 	    this uses the feedback board protocol
@@ -765,12 +765,12 @@ WRITE8_MEMBER( model1_state::r360_w )
 	}
 }
 
-READ16_MEMBER(model1_state::fifoin_status_r)
+u16 model1_state::fifoin_status_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(model1_state::bank_w)
+void model1_state::bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 
 	if(ACCESSING_BITS_0_7) {
@@ -808,7 +808,7 @@ IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 	return m_last_irq;
 }
 
-WRITE8_MEMBER(model1_state::irq_control_w)
+void model1_state::irq_control_w(u8 data)
 {
 	switch (data)
 	{

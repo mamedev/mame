@@ -11,7 +11,10 @@
 #include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
+#include "plib/putil.h"
 
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #define NETLIB_DEVICE_IMPL_ALIAS(p_alias, chip, p_name, p_def_param) \
@@ -24,22 +27,62 @@
 	NETLIB_DEVICE_IMPL_BASE(ns, chip, chip, p_name, p_def_param) \
 
 #define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
-	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
-			(const pstring &classname) \
+	static factory::element_t::uptr NETLIB_NAME(p_alias ## _c) () \
 	{ \
 		using devtype = factory::device_element_t<ns :: NETLIB_NAME(chip)>; \
-		return devtype::create(p_name, classname, p_def_param, __FILE__); \
+		factory::properties sl(p_def_param, PSOURCELOC()); \
+		return devtype::create(p_name, std::move(sl)); \
 	} \
 	\
+	extern factory::constructor_ptr_t decl_ ## p_alias; \
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
-	class device_t;
-	class nlparse_t;
-	class setup_t;
+	class core_device_t;
 	class netlist_state_t;
 
 namespace factory {
+
+	enum class element_type
+	{
+		BUILTIN,
+		MACRO
+	};
+
+	struct properties
+	{
+		properties(const pstring &defparam, plib::source_location &&sourceloc)
+		: m_defparam(defparam)
+		, m_sourceloc(std::move(sourceloc))
+		, m_type(element_type::BUILTIN)
+		{ }
+
+		~properties() = default;
+		PCOPYASSIGNMOVE(properties, default)
+
+		pstring defparam() const noexcept
+		{
+			return m_defparam;
+		}
+
+		plib::source_location source() const noexcept
+		{
+			return m_sourceloc;
+		}
+
+		element_type type() const noexcept { return m_type; }
+
+		properties &set_type(element_type t) noexcept
+		{
+			m_type = t;
+			return *this;
+		}
+	private:
+		pstring m_defparam;
+		plib::source_location m_sourceloc;
+		element_type m_type;
+	};
+
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
@@ -47,63 +90,73 @@ namespace factory {
 	class element_t
 	{
 	public:
-		element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param);
-		element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &sourcefile);
+
+		using dev_uptr = device_arena::unique_ptr<core_device_t>;
+		using uptr = host_arena::unique_ptr<element_t>;
+		using pointer = element_t *;
+
+		element_t(const pstring &name, properties &&props);
 		virtual ~element_t() = default;
 
 		PCOPYASSIGNMOVE(element_t, default)
 
-		virtual unique_pool_ptr<device_t> make_device(nlmempool &pool,
+		virtual dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) = 0;
 
-		virtual void macro_actions(nlparse_t &nparser, const pstring &name)
-		{
-			plib::unused_var(nparser);
-			plib::unused_var(name);
-		}
-
-		const pstring &name() const noexcept { return m_name; }
-		const pstring &classname() const noexcept { return m_classname; }
-		const pstring &param_desc() const noexcept { return m_def_param; }
-		const pstring &sourcefile() const noexcept { return m_sourcefile; }
-
+		pstring name() const noexcept { return m_name; }
+		pstring param_desc() const noexcept { return m_properties.defparam(); }
+		plib::source_location source() const noexcept { return m_properties.source(); }
+		element_type type() const noexcept { return m_properties.type(); }
 	private:
 		pstring m_name;                             ///< device name
-		pstring m_classname;                        ///< device class name
-		pstring m_def_param;                        ///< default parameter
-		pstring m_sourcefile;                       ///< source file
+		properties m_properties;                    ///< source file and other information and settings
 	};
 
-	template <class C>
+	template <class C, typename... Args>
 	class device_element_t : public element_t
 	{
 	public:
-		device_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: element_t(name, classname, def_param) { }
-		device_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &sourcefile)
-		: element_t(name, classname, def_param, sourcefile) { }
 
-		unique_pool_ptr<device_t> make_device(nlmempool &pool,
+		device_element_t(const pstring &name, properties &&props, Args&&... args)
+		: element_t(name, std::move(props))
+		, m_args(std::forward<Args>(args)...)
+		{ }
+
+
+		template <std::size_t... Is>
+		dev_uptr make_device(device_arena &pool,
+							netlist_state_t &anetlist,
+							const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
+		{
+			return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+		}
+
+		dev_uptr make_device(device_arena &pool,
+					netlist_state_t &anetlist,
+					const pstring &name, std::tuple<Args...>& args)
+		{
+			return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
+		}
+
+		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override
 		{
-			return pool.make_unique<C>(anetlist, name);
+			return make_device(pool, anetlist, name, m_args);
+			//return pool.make_unique<C>(anetlist, name);
 		}
 
-		static plib::unique_ptr<device_element_t<C>> create(const pstring &name,
-			const pstring &classname, const pstring &def_param,
-			const pstring &sourcefile)
+		static uptr create(const pstring &name, properties &&props, Args&&... args)
 		{
-			return plib::make_unique<device_element_t<C>>(name, classname, def_param, sourcefile);
+			return plib::make_unique<device_element_t<C, Args...>, host_arena>(name,
+				std::move(props), std::forward<Args>(args)...);
 		}
+	private:
+		std::tuple<Args...> m_args;
 	};
 
-	class list_t : public std::vector<plib::unique_ptr<element_t>>
+	class list_t : public std::vector<element_t::uptr>
 	{
 	public:
 		explicit list_t(log_type &alog);
@@ -111,19 +164,19 @@ namespace factory {
 
 		PCOPYASSIGNMOVE(list_t, delete)
 
-		template<class device_class>
-		void register_device(const pstring &name, const pstring &classname,
-			const pstring &def_param, const pstring &sourcefile)
+		template<class device_class, typename... Args>
+		void add(const pstring &name, properties &&props, Args&&... args)
 		{
-			register_device(device_element_t<device_class>::create(name, classname, def_param, sourcefile));
+			add(device_element_t<device_class, Args...>::create(name, std::move(props),
+				std::forward<Args>(args)...));
 		}
 
-		void register_device(plib::unique_ptr<element_t> &&factory) noexcept(false);
+		void add(element_t::uptr &&factory) noexcept(false);
 
-		element_t * factory_by_name(const pstring &devname) noexcept(false);
+		element_t::pointer factory_by_name(const pstring &devname) noexcept(false);
 
 		template <class C>
-		bool is_class(element_t *f) noexcept
+		bool is_class(element_t::pointer f) noexcept
 		{
 			return dynamic_cast<device_element_t<C> *>(f) != nullptr;
 		}
@@ -136,36 +189,27 @@ namespace factory {
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using constructor_ptr_t = plib::unique_ptr<element_t> (*)(const pstring &classname);
+	using constructor_ptr_t = element_t::uptr (*const)();
 
 	template <typename T>
-	plib::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
-			const pstring &def_param)
+	element_t::uptr constructor_t(const pstring &name, properties &&props)
 	{
-		return plib::make_unique<device_element_t<T>>(name, classname, def_param);
+		return plib::make_unique<device_element_t<T>, host_arena>(name, std::move(props));
 	}
 
 	// -----------------------------------------------------------------------------
-	// factory_lib_entry_t: factory class to wrap macro based chips/elements
+	// library_element_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
 	class library_element_t : public element_t
 	{
 	public:
 
-		library_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &source)
-		: element_t(name, classname, def_param, source)
-		{
-		}
+		library_element_t(const pstring &name, properties &&props);
 
-		unique_pool_ptr<device_t> make_device(nlmempool &pool,
+		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override;
-
-		void macro_actions(nlparse_t &nparser, const pstring &name) override;
-
-	private:
 	};
 
 	} // namespace factory

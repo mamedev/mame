@@ -173,25 +173,25 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
+void taitosj_state::taitosj_sndnmi_msk_w(uint8_t data)
 {
 	/* B0 is the sound nmi enable, active low */
 	m_soundnmi->in_w<0>((~data)&1);
 }
 
-WRITE8_MEMBER(taitosj_state::soundlatch_w)
+void taitosj_state::soundlatch_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_w_cb), this), data);
 }
 
 
-WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
+void taitosj_state::input_port_4_f0_w(uint8_t data)
 {
 	m_input_port_4_f0 = data >> 4;
 }
 
 // EPORT2
-WRITE8_MEMBER(taitosj_state::sound_semaphore2_w)
+void taitosj_state::sound_semaphore2_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_w_cb), this), data);
 }
@@ -341,7 +341,7 @@ TIMER_CALLBACK_MEMBER(taitosj_state::sound_semaphore2_clear_w_cb)
 }
 
 // RD5000
-READ8_MEMBER(taitosj_state::soundlatch_r)
+uint8_t taitosj_state::soundlatch_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -352,19 +352,19 @@ READ8_MEMBER(taitosj_state::soundlatch_r)
 }
 
 // RD5001
-READ8_MEMBER(taitosj_state::soundlatch_flags_r)
+uint8_t taitosj_state::soundlatch_flags_r()
 {
 	return (m_soundlatch_flag?8:0) | (m_sound_semaphore2?4:0) | 3;
 }
 
 // WR5000
-WRITE8_MEMBER(taitosj_state::soundlatch_clear7_w)
+void taitosj_state::soundlatch_clear7_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_clear7_w_cb), this), data);
 }
 
 // WR5001
-WRITE8_MEMBER(taitosj_state::sound_semaphore2_clear_w)
+void taitosj_state::sound_semaphore2_clear_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_clear_w_cb), this), data);
 }
@@ -1770,7 +1770,7 @@ DISCRETE_SOUND_START(taitosj_dacvol_discrete)
 	DISCRETE_OUTPUT(NODE_02, 9637)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
+void taitosj_state::taitosj_dacvol_w(uint8_t data)
 {
 	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
@@ -2851,7 +2851,7 @@ void taitosj_state::init_spacecr()
 	init_common();
 
 	/* install protection handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(*this, FUNC(taitosj_state::spacecr_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8smo_delegate(*this, FUNC(taitosj_state::spacecr_prot_r)));
 }
 
 void taitosj_state::init_alpine()
@@ -2859,8 +2859,8 @@ void taitosj_state::init_alpine()
 	init_common();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(*this, FUNC(taitosj_state::alpine_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8smo_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8smo_delegate(*this, FUNC(taitosj_state::alpine_protection_w)));
 }
 
 void taitosj_state::init_alpinea()
@@ -2868,8 +2868,8 @@ void taitosj_state::init_alpinea()
 	init_common();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(*this, FUNC(taitosj_state::alpinea_bankswitch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8smo_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8smo_delegate(*this, FUNC(taitosj_state::alpinea_bankswitch_w)));
 }
 
 void taitosj_state::init_junglhbr()
@@ -2877,7 +2877,7 @@ void taitosj_state::init_junglhbr()
 	init_common();
 
 	/* inverter on bits 0 and 1 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(*this, FUNC(taitosj_state::junglhbr_characterram_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8sm_delegate(*this, FUNC(taitosj_state::junglhbr_characterram_w)));
 }
 
 GAME( 1981, spaceskr,  0,        nomcu,    spaceskr, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Space Seeker", MACHINE_SUPPORTS_SAVE )

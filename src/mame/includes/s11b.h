@@ -24,13 +24,13 @@ public:
 	void init_s11b();
 	void init_s11b_invert();
 
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
+	void dig1_w(uint8_t data);
+	void pia2c_pa_w(uint8_t data);
+	void pia2c_pb_w(uint8_t data);
+	void pia34_pa_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
-	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
+	void bg_speech_clock_w(uint8_t data);
+	void bg_speech_digit_w(uint8_t data);
 
 protected:
 	void set_invert(bool inv) { m_invert = inv; }

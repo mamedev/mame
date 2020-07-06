@@ -93,7 +93,7 @@ ioport_device::ioport_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-READ8Z_MEMBER(ioport_device::readz)
+void ioport_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_connected != nullptr)
 		m_connected->readz(offset, value);
@@ -105,13 +105,13 @@ void ioport_device::write(offs_t offset, uint8_t data)
 		m_connected->write(offset, data);
 }
 
-SETADDRESS_DBIN_MEMBER(ioport_device::setaddress_dbin)
+void ioport_device::setaddress_dbin(offs_t offset, int state)
 {
 	if (m_connected != nullptr)
 		m_connected->setaddress_dbin(offset, state);
 }
 
-READ8Z_MEMBER(ioport_device::crureadz)
+void ioport_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if (m_connected != nullptr)
 		m_connected->crureadz(offset, value);

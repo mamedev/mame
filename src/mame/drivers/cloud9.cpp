@@ -206,7 +206,7 @@ void cloud9_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(cloud9_state::irq_ack_w)
+void cloud9_state::irq_ack_w(uint8_t data)
 {
 	if (m_irq_state)
 	{
@@ -216,7 +216,7 @@ WRITE8_MEMBER(cloud9_state::irq_ack_w)
 }
 
 
-READ8_MEMBER(cloud9_state::leta_r)
+uint8_t cloud9_state::leta_r(offs_t offset)
 {
 	return ioport(offset ? "TRACKX" : "TRACKY")->read();
 }
@@ -229,7 +229,7 @@ READ8_MEMBER(cloud9_state::leta_r)
  *
  *************************************/
 
-WRITE8_MEMBER(cloud9_state::nvram_recall_w)
+void cloud9_state::nvram_recall_w(uint8_t data)
 {
 	m_nvram->recall(0);
 	m_nvram->recall(1);
@@ -237,7 +237,7 @@ WRITE8_MEMBER(cloud9_state::nvram_recall_w)
 }
 
 
-WRITE8_MEMBER(cloud9_state::nvram_store_w)
+void cloud9_state::nvram_store_w(uint8_t data)
 {
 	m_nvram->store(0);
 	m_nvram->store(1);

@@ -76,6 +76,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist.h"
 
 #include "logmacro.h"
 
@@ -94,6 +95,7 @@ public:
 		, m_hpc3(*this, "hpc3")
 		, m_ioc2(*this, "ioc2")
 		, m_rtc(*this, "rtc")
+		, m_softlist(*this, "softlist")
 		, m_vino(*this, "vino")
 		, m_dmsd(*this, "dmsd")
 		, m_gio64(*this, "gio64")
@@ -113,9 +115,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE64_MEMBER(write_ram);
-	template <uint32_t addr_base> DECLARE_READ64_MEMBER(bus_error_r);
-	template <uint32_t addr_base> DECLARE_WRITE64_MEMBER(bus_error_w);
+	void write_ram(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
+	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
@@ -143,6 +145,7 @@ protected:
 	required_device<hpc3_device> m_hpc3;
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
+	required_device<software_list_device> m_softlist;
 	optional_device<vino_device> m_vino;
 	optional_device<saa7191_device> m_dmsd;
 	optional_device<gio64_device> m_gio64;
@@ -166,7 +169,7 @@ public:
 	void indigo2_4415(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(eisa_io_r);
+	uint32_t eisa_io_r();
 
 	void wd33c93_2(device_t *device);
 
@@ -178,7 +181,7 @@ private:
 };
 
 template <uint32_t addr_base>
-READ64_MEMBER(ip24_state::bus_error_r)
+uint64_t ip24_state::bus_error_r(offs_t offset, uint64_t mem_mask)
 {
 	logerror("Bus error (read)\n");
 	m_maincpu->bus_error();
@@ -187,20 +190,20 @@ READ64_MEMBER(ip24_state::bus_error_r)
 }
 
 template <uint32_t addr_base>
-WRITE64_MEMBER(ip24_state::bus_error_w)
+void ip24_state::bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	logerror("Bus error (write)\n");
 	m_maincpu->bus_error();
 	m_mem_ctrl->set_cpu_buserr(addr_base + (offset << 3), mem_mask);
 }
 
-READ32_MEMBER(ip22_state::eisa_io_r)
+uint32_t ip22_state::eisa_io_r()
 {
 	return 0xffffffff;
 }
 
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-WRITE64_MEMBER(ip24_state::write_ram)
+void ip24_state::write_ram(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
 	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)
@@ -379,6 +382,8 @@ void ip24_state::ip24_base(machine_config &config)
 
 	SGI_HAL2(config, m_hal2);
 	EEPROM_93C56_16BIT(config, m_eeprom);
+
+	SOFTWARE_LIST(config, m_softlist).set_original("sgi_mips");
 }
 
 void ip24_state::ip24(machine_config &config)
@@ -469,10 +474,12 @@ void ip22_state::indigo2_4415(machine_config &config)
 
 #define INDY_BIOS_R4K \
 	INDY_BIOS_R5K \
-	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
-	ROMX_LOAD( "ip24prom.070-9101-005.bin", 0x000000, 0x080000, CRC(f5e41008) SHA1(28b769b28218a1fcd0400dceef9a284dcfbdda5b), INDY_BIOS_FLAGS(1) ) \
+	ROM_SYSTEM_BIOS( 1, "b7", "Version 5.3 Rev B7 R4X00 IP24 Feb 16, 1995" ) \
+	ROMX_LOAD( "ip24prom.070-9101-008.bin", 0x000000, 0x080000, CRC(ee0b55c4) SHA1(a752a4aef7e2c6086b8b0244e9f064861a11870f), INDY_BIOS_FLAGS(1) ) \
 	ROM_SYSTEM_BIOS( 2, "b6", "Version 5.0 Rev B6 Sep 28, 1994" ) \
-	ROMX_LOAD( "ip24prom.070-9101-007.bin", 0x000000, 0x080000, CRC(70d8d1b1) SHA1(ade54cd2ecb7064957f8602894f05685e2f4e8fb), INDY_BIOS_FLAGS(2) )
+	ROMX_LOAD( "ip24prom.070-9101-007.bin", 0x000000, 0x080000, CRC(70d8d1b1) SHA1(ade54cd2ecb7064957f8602894f05685e2f4e8fb), INDY_BIOS_FLAGS(2) ) \
+	ROM_SYSTEM_BIOS( 3, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
+	ROMX_LOAD( "ip24prom.070-9101-005.bin", 0x000000, 0x080000, CRC(f5e41008) SHA1(28b769b28218a1fcd0400dceef9a284dcfbdda5b), INDY_BIOS_FLAGS(3) )
 
 /* SCC init ip225015
  * Channel A
@@ -528,7 +535,7 @@ ROM_START( indigo2_4415 )
 ROM_END
 
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
-COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
-COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
-COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1993, indigo2_4415, 0,         0,      indigo2_4415, ip24, ip22_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

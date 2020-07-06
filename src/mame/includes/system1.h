@@ -142,41 +142,41 @@ private:
 	int m_nobb_inport23_step;
 
 	// video handlers
-	DECLARE_WRITE8_MEMBER(common_videomode_w);
-	DECLARE_WRITE8_MEMBER(videomode_w);
-	DECLARE_WRITE8_MEMBER(videoram_bank_w);
-	DECLARE_READ8_MEMBER(mixer_collision_r);
-	DECLARE_WRITE8_MEMBER(mixer_collision_w);
-	DECLARE_WRITE8_MEMBER(mixer_collision_reset_w);
-	DECLARE_READ8_MEMBER(sprite_collision_r);
-	DECLARE_WRITE8_MEMBER(sprite_collision_w);
-	DECLARE_WRITE8_MEMBER(sprite_collision_reset_w);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	void common_videomode_w(u8 data);
+	void videomode_w(u8 data);
+	void videoram_bank_w(u8 data);
+	u8 mixer_collision_r(offs_t offset);
+	void mixer_collision_w(offs_t offset, u8 data);
+	void mixer_collision_reset_w(u8 data);
+	u8 sprite_collision_r(offs_t offset);
+	void sprite_collision_w(offs_t offset, u8 data);
+	void sprite_collision_reset_w(u8 data);
+	u8 videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, u8 data);
+	void paletteram_w(offs_t offset, u8 data);
 
 	// sound handlers
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(soundport_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	u8 sound_data_r();
+	void soundport_w(u8 data);
+	void sound_control_w(u8 data);
 
 	// misc handlers
-	DECLARE_WRITE8_MEMBER(mcu_control_w);
-	DECLARE_READ8_MEMBER(mcu_io_r);
-	DECLARE_WRITE8_MEMBER(mcu_io_w);
-	DECLARE_READ8_MEMBER(nob_mcu_latch_r);
-	DECLARE_WRITE8_MEMBER(nob_mcu_latch_w);
-	DECLARE_WRITE8_MEMBER(nob_mcu_status_w);
-	DECLARE_WRITE8_MEMBER(nob_mcu_control_p2_w);
-	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
-	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
-	DECLARE_READ8_MEMBER(nob_mcu_status_r);
-	DECLARE_READ8_MEMBER(nobb_inport1c_r);
-	DECLARE_READ8_MEMBER(nobb_inport22_r);
-	DECLARE_READ8_MEMBER(nobb_inport23_r);
-	DECLARE_WRITE8_MEMBER(nobb_outport24_w);
-	DECLARE_READ8_MEMBER(nob_start_r);
-	DECLARE_READ8_MEMBER(shtngmst_gunx_r);
+	void mcu_control_w(u8 data);
+	u8 mcu_io_r(offs_t offset);
+	void mcu_io_w(offs_t offset, u8 data);
+	u8 nob_mcu_latch_r();
+	void nob_mcu_latch_w(u8 data);
+	void nob_mcu_status_w(u8 data);
+	void nob_mcu_control_p2_w(u8 data);
+	u8 nob_maincpu_latch_r();
+	void nob_maincpu_latch_w(u8 data);
+	u8 nob_mcu_status_r();
+	u8 nobb_inport1c_r();
+	u8 nobb_inport22_r();
+	u8 nobb_inport23_r();
+	void nobb_outport24_w(u8 data);
+	u8 nob_start_r();
+	u8 shtngmst_gunx_r();
 
 	// video functions
 	TILE_GET_INFO_MEMBER(tile_get_info);

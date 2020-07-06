@@ -29,9 +29,9 @@ public:
 	void shuuz(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_READ16_MEMBER(leta_r);
-	DECLARE_READ16_MEMBER(special_port0_r);
+	void latch_w(uint16_t data);
+	uint16_t leta_r(offs_t offset);
+	uint16_t special_port0_r();
 
 	virtual void machine_start() override;
 

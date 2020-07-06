@@ -82,13 +82,13 @@ protected:
 	int   m_field;
 	std::array<bitmap_ind16, 2>  m_bitmap;    // bitmaps for fields
 
-	virtual DECLARE_WRITE8_MEMBER(refresh_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_WRITE8_MEMBER(popeye_videoram_w);
-	DECLARE_WRITE8_MEMBER(popeye_colorram_w);
-	virtual DECLARE_WRITE8_MEMBER(background_w);
-	DECLARE_WRITE8_MEMBER(popeye_portB_w);
+	virtual void refresh_w(offs_t offset, uint8_t data);
+	uint8_t protection_r(offs_t offset);
+	void protection_w(offs_t offset, uint8_t data);
+	void popeye_videoram_w(offs_t offset, uint8_t data);
+	void popeye_colorram_w(offs_t offset, uint8_t data);
+	virtual void background_w(offs_t offset, uint8_t data);
+	void popeye_portB_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void driver_start() override;
 	virtual void video_start() override;
@@ -141,12 +141,12 @@ protected:
 	uint8_t m_watchdog_counter;
 
 	virtual void driver_start() override;
-	virtual DECLARE_WRITE8_MEMBER(refresh_w) override;
+	virtual void refresh_w(offs_t offset, uint8_t data) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank) override;
 	virtual void maincpu_program_map(address_map &map) override;
 	virtual void decrypt_rom() override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	virtual DECLARE_WRITE8_MEMBER(background_w) override;
+	virtual void background_w(offs_t offset, uint8_t data) override;
 };
 
 class tpp2_noalu_state : public tpp2_state

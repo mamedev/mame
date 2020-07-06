@@ -20,7 +20,7 @@ public:
 
 	void program_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
+	void vt03_8000_mapper_w(offs_t offset, uint8_t data);
 
 	// 8-bit ports
 	auto write_0_callback() { return m_write_0_callback.bind(); }
@@ -73,38 +73,38 @@ protected:
 	uint32_t get_banks(uint8_t bnk);
 	void update_banks();
 	uint16_t decode_nt_addr(uint16_t addr);
-	DECLARE_WRITE8_MEMBER(vt03_410x_w);
-	DECLARE_READ8_MEMBER(vt03_410x_r);
+	void vt03_410x_w(offs_t offset, uint8_t data);
+	uint8_t vt03_410x_r(offs_t offset);
 	void scrambled_410x_w(uint16_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(spr_r);
-	DECLARE_READ8_MEMBER(chr_r);
-	DECLARE_WRITE8_MEMBER(chr_w);
+	uint8_t spr_r(offs_t offset);
+	uint8_t chr_r(offs_t offset);
+	void chr_w(offs_t offset, uint8_t data);
 	void scanline_irq(int scanline, int vblank, int blanked);
 	void hblank_irq(int scanline, int vblank, int blanked);
 	void video_irq(bool hblank, int scanline, int vblank, int blanked);
-	DECLARE_READ8_MEMBER(nt_r);
-	DECLARE_WRITE8_MEMBER(nt_w);
+	uint8_t nt_r(offs_t offset);
+	void nt_w(offs_t offset, uint8_t data);
 	int calculate_real_video_address(int addr, int extended, int readtype);
-	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(psg1_4014_r);
-	DECLARE_READ8_MEMBER(psg1_4015_r);
-	DECLARE_WRITE8_MEMBER(psg1_4015_w);
-	DECLARE_WRITE8_MEMBER(psg1_4017_w);
-	DECLARE_WRITE8_MEMBER(vt_dma_w);
-	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
+	void scrambled_8000_w(uint16_t offset, uint8_t data);
+	uint8_t psg1_4014_r();
+	uint8_t psg1_4015_r();
+	void psg1_4015_w(uint8_t data);
+	void psg1_4017_w(uint8_t data);
+	void vt_dma_w(uint8_t data);
+	void vt_fixed_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
-	DECLARE_WRITE8_MEMBER(vt03_4034_w);
+	void vt03_4034_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_WRITE8_MEMBER(in0_w);
+	uint8_t in0_r();
+	uint8_t in1_r();
+	void in0_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(extra_io_control_w);
-	DECLARE_READ8_MEMBER(extrain_01_r);
-	DECLARE_READ8_MEMBER(extrain_23_r);
-	DECLARE_WRITE8_MEMBER(extraout_01_w);
-	DECLARE_WRITE8_MEMBER(extraout_23_w);
-	DECLARE_READ8_MEMBER(rs232flags_region_r);
+	void extra_io_control_w(uint8_t data);
+	uint8_t extrain_01_r();
+	uint8_t extrain_23_r();
+	void extraout_01_w(uint8_t data);
+	void extraout_23_w(uint8_t data);
+	uint8_t rs232flags_region_r();
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -130,10 +130,10 @@ protected:
 	std::unique_ptr<uint8_t[]> m_chrram;
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
-	DECLARE_READ8_MEMBER(apu_read_mem);
+	uint8_t apu_read_mem(offs_t offset);
 
-	DECLARE_READ8_MEMBER(external_space_read);
-	DECLARE_WRITE8_MEMBER(external_space_write);
+	uint8_t external_space_read(offs_t offset);
+	void external_space_write(offs_t offset, uint8_t data);
 
 	void do_pal_timings_and_ppu_replacement(machine_config& config);
 
@@ -217,18 +217,18 @@ protected:
 
 	void nes_vt_cy_map(address_map& map);
 
-	DECLARE_READ8_MEMBER(vt03_41bx_r);
-	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
+	uint8_t vt03_41bx_r(offs_t offset);
+	void vt03_41bx_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt03_413x_r);
-	DECLARE_WRITE8_MEMBER(vt03_413x_w);
+	uint8_t vt03_413x_r(offs_t offset);
+	void vt03_413x_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt03_414f_r);
+	uint8_t vt03_414f_r();
 
-	DECLARE_READ8_MEMBER(vt03_415c_r);
+	uint8_t vt03_415c_r();
 
-	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
-	DECLARE_READ8_MEMBER(vt03_48ax_r);
+	void vt03_48ax_w(offs_t offset, uint8_t data);
+	uint8_t vt03_48ax_r(offs_t offset);
 
 	uint8_t m_413x[8]; // CY only?
 };
@@ -243,7 +243,7 @@ protected:
 
 	void nes_vt_bt_map(address_map& map);
 
-	DECLARE_WRITE8_MEMBER(vt03_412c_extbank_w);
+	void vt03_412c_extbank_w(uint8_t data);
 };
 
 class nes_vt_soc_4kram_hh_device : public nes_vt_soc_4kram_device
@@ -258,8 +258,8 @@ protected:
 
 	void nes_vt_hh_map(address_map& map);
 
-	DECLARE_READ8_MEMBER(vthh_414a_r);
-	DECLARE_WRITE8_MEMBER(vtfp_411d_w);
+	uint8_t vthh_414a_r();
+	void vtfp_411d_w(uint8_t data);
 
 };
 
@@ -275,12 +275,12 @@ protected:
 
 	void nes_vt_fp_map(address_map& map);
 
-	DECLARE_READ8_MEMBER(vtfp_4119_r);
-	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
-	DECLARE_WRITE8_MEMBER(vtfp_412c_extbank_w);
-	DECLARE_READ8_MEMBER(vtfp_412d_r);
-	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
-	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
+	uint8_t vtfp_4119_r();
+	void vtfp_411e_w(uint8_t data);
+	void vtfp_412c_extbank_w(uint8_t data);
+	uint8_t vtfp_412d_r();
+	void vtfp_4242_w(uint8_t data);
+	void vtfp_4a00_w(uint8_t data);
 };
 
 class nes_vt_soc_4kram_fp_pal_device : public nes_vt_soc_4kram_fp_device
@@ -305,7 +305,7 @@ protected:
 
 	void nes_vt_dg_map(address_map& map);
 
-	DECLARE_WRITE8_MEMBER(vt03_411c_w);
+	void vt03_411c_w(uint8_t data);
 };
 
 class nes_vt_soc_8kram_fa_device : public nes_vt_soc_8kram_dg_device
@@ -319,9 +319,9 @@ protected:
 
 	void nes_vt_fa_map(address_map& map);
 
-	DECLARE_READ8_MEMBER(vtfa_412c_r);
-	DECLARE_WRITE8_MEMBER(vtfa_412c_extbank_w);
-	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
+	uint8_t vtfa_412c_r();
+	void vtfa_412c_extbank_w(uint8_t data);
+	void vtfp_4242_w(uint8_t data);
 };
 
 

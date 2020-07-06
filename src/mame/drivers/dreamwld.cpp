@@ -175,11 +175,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(prot_p1_w);
-	DECLARE_WRITE8_MEMBER(prot_p2_w);
-	DECLARE_READ8_MEMBER(prot_p2_r);
+	void prot_p1_w(uint8_t data);
+	void prot_p2_w(uint8_t data);
+	uint8_t prot_p2_r();
 
-	DECLARE_WRITE32_MEMBER(to_prot_w);
+	void to_prot_w(uint32_t data);
 
 
 	template<int Layer> u16 vram_r(offs_t offset);
@@ -741,13 +741,13 @@ void dreamwld_state::machine_reset()
 	m_protlatch = 0;
 }
 
-WRITE8_MEMBER(dreamwld_state::prot_p1_w)
+void dreamwld_state::prot_p1_w(uint8_t data)
 {
 	logerror("%s:prot_p1_w %02x\n", machine().describe_context(), data);
 	m_port1_data = data;
 }
 
-WRITE8_MEMBER(dreamwld_state::prot_p2_w)
+void dreamwld_state::prot_p2_w(uint8_t data)
 {
 	logerror("%s:prot_p2_w %02x\n", machine().describe_context(), data);
 
@@ -776,7 +776,7 @@ WRITE8_MEMBER(dreamwld_state::prot_p2_w)
 	m_port2_data = data;
 }
 
-READ8_MEMBER(dreamwld_state::prot_p2_r)
+uint8_t dreamwld_state::prot_p2_r()
 {
 	// bit 2 is waited on before reading from port 0
 	// bit 3 is waited on after writing a byte
@@ -786,7 +786,7 @@ READ8_MEMBER(dreamwld_state::prot_p2_r)
 	return m_port2_data;
 }
 
-WRITE32_MEMBER(dreamwld_state::to_prot_w)
+void dreamwld_state::to_prot_w(uint32_t data)
 {
 	m_port2_data &= 0xfb; // lower bit 0x04 to indicate data sent?
 	logerror("%s:to_prot_w %08x\n", machine().describe_context(), data);

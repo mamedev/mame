@@ -20,7 +20,7 @@ void kaypro_state::kaypro_palette(palette_device &palette) const
 	palette.set_pen_color(2, rgb_t(0, 110, 0)); // low intensity green
 }
 
-uint32_t kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* The display consists of 80 columns and 24 rows. Each row is allocated 128 bytes of ram,
     but only the first 80 are used. The total video ram therefore is 0x0c00 bytes.
@@ -29,8 +29,8 @@ uint32_t kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind1
     During the "off" period of blanking, the first half is used. Only 5 pixels are
     connected from the rom to the shift register, the remaining pixels are held high. */
 
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
 
 	m_framecnt++;
 
@@ -38,7 +38,7 @@ uint32_t kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind1
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -46,7 +46,7 @@ uint32_t kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind1
 
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x]^0x80;
+					chr = m_vram[x]^0x80;
 
 					/* Take care of flashing characters */
 					if ((chr < 0x80) && (m_framecnt & 0x08))
@@ -71,10 +71,10 @@ uint32_t kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-uint32_t kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
 
 	m_framecnt++;
 
@@ -82,7 +82,7 @@ uint32_t kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -90,7 +90,7 @@ uint32_t kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &
 
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x];
+					chr = m_vram[x];
 
 					/* Take care of flashing characters */
 					if ((chr > 0x7f) && (m_framecnt & 0x08))
@@ -115,7 +115,7 @@ uint32_t kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-uint32_t kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -138,17 +138,17 @@ uint32_t kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb
 MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
-	uint16_t x;
-	uint8_t gfx,fg,bg;
+	u32 *p = &bitmap.pix32(y);
+	u16 x;
+	u8 gfx,fg,bg;
 
 	for (x = 0; x < x_count; x++)               // for each character
 	{
-		uint8_t inv=0;
+		u8 inv=0;
 		if (x == cursor_x) inv=0xff;
-		uint16_t mem = (ma + x) & 0x7ff;
-		uint8_t chr = m_p_videoram[mem];
-		uint8_t attr = m_p_videoram[mem | 0x800];
+		u16 mem = (ma + x) & 0x7ff;
+		u8 chr = m_vram[mem];
+		u8 attr = m_vram[mem | 0x800];
 
 		if ((attr & 3) == 3)
 		{
@@ -202,9 +202,9 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 
 void kaypro_state::mc6845_screen_configure()
 {
-	uint16_t width = m_mc6845_reg[1]*8-1;                         // width in pixels
-	uint16_t height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;                  // height in pixels
-	uint16_t bytes = m_mc6845_reg[1]*m_mc6845_reg[6]-1;                       // video ram needed -1
+	u16 width = m_mc6845_reg[1]*8-1;                         // width in pixels
+	u16 height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;                  // height in pixels
+	u16 bytes = m_mc6845_reg[1]*m_mc6845_reg[6]-1;                       // video ram needed -1
 
 	/* Resize the screen */
 	if ((width < 640) && (height < 400) && (bytes < 0x800)) /* bounds checking to prevent an assert or violation */
@@ -214,22 +214,22 @@ void kaypro_state::mc6845_screen_configure()
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro484_status_r )
+u8 kaypro_state::kaypro484_status_r()
 {
 /* Need bit 7 high or computer hangs */
 
 	return 0x80 | m_crtc->register_r();
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_index_w )
+void kaypro_state::kaypro484_index_w(u8 data)
 {
 	m_mc6845_ind = data & 0x1f;
 	m_crtc->address_w(data);
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
+void kaypro_state::kaypro484_register_w(u8 data)
 {
-	static const uint8_t mcmask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+	static const u8 mcmask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
 	if (m_mc6845_ind < 16)
 		m_mc6845_reg[m_mc6845_ind] = data & mcmask[m_mc6845_ind];   /* save data in register */
@@ -245,27 +245,23 @@ WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
 		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);   /* internal ULA address */
 }
 
-READ8_MEMBER( kaypro_state::kaypro_videoram_r )
+u8 kaypro_state::kaypro_videoram_r(offs_t offset)
 {
-	return m_p_videoram[offset];
+	return m_vram[offset];
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro_videoram_w )
+void kaypro_state::kaypro_videoram_w(offs_t offset, u8 data)
 {
-	m_p_videoram[offset] = data;
+	m_vram[offset] = data;
 }
 
-READ8_MEMBER( kaypro_state::kaypro484_videoram_r )
+u8 kaypro_state::kaypro484_videoram_r()
 {
-	return m_p_videoram[m_mc6845_video_address];
+	return m_vram[m_mc6845_video_address];
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro484_videoram_w )
+void kaypro_state::kaypro484_videoram_w(u8 data)
 {
-	m_p_videoram[m_mc6845_video_address] = data;
+	m_vram[m_mc6845_video_address] = data;
 }
 
-VIDEO_START_MEMBER(kaypro_state,kaypro)
-{
-	m_p_videoram = memregion("roms")->base()+0x3000;
-}

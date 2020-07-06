@@ -311,7 +311,7 @@ void arcadia_state::video_start()
 	}
 }
 
-READ8_MEMBER( arcadia_state::video_r )
+uint8_t arcadia_state::video_r(offs_t offset)
 {
 	uint8_t data=0;
 	switch (offset)
@@ -373,7 +373,7 @@ READ8_MEMBER( arcadia_state::video_r )
 	return data;
 }
 
-WRITE8_MEMBER( arcadia_state::video_w )
+void arcadia_state::video_w(offs_t offset, uint8_t data)
 {
 	m_reg.data[offset]=data;
 	switch (offset)

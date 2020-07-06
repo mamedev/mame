@@ -40,7 +40,7 @@ public:
 	void berlinp(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(input_r);
+	u8 input_r();
 
 	void berlin_mem(address_map &map);
 	void berlinp_mem(address_map &map);
@@ -57,7 +57,7 @@ private:
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(berlin_state::input_r)
+u8 berlin_state::input_r()
 {
 	if (m_board->mux_r() == 0xff)
 		return m_keys->read();
@@ -128,14 +128,18 @@ INPUT_PORTS_END
 void berlin_state::berlin(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &berlin_state::berlin_mem);
-	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), attotime::from_hz(750));
+
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000); // 750Hz
+	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
+	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
+
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_berlin);
 }

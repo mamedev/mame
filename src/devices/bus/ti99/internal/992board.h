@@ -19,9 +19,12 @@
 #pragma once
 
 #include "screen.h"
-#include "bus/ti99/ti99defs.h"
 #include "bus/hexbus/hexbus.h"
 #include "imagedev/cassette.h"
+
+#define TI992_CASSETTE   "cassette"
+#define TI992_VDC_TAG    "vdc"
+#define TI992_HEXBUS_TAG "hexbus"
 
 namespace bus { namespace ti99 { namespace internal {
 

@@ -15,10 +15,18 @@ Initially, it had a "Sound" button for turning the beeps off. This was later
 changed to the more useful "New Game". With Portachess, they added a "Save"
 switch which puts the MCU in halt state.
 
-Hardware notes (Sensor Computachess):
-- PCB label WA 001
-- HD44801 MCU @ ~400kHz
+Hardware notes:
+
+Sensor Computachess:
+- PCB label WA 001 600 002
+- Hitachi 44801A50 MCU @ ~400kHz
 - buzzer, 16 leds, button sensors chessboard
+
+Portachess II:
+- PCB label CXG223-600-001 (main pcb), CXG 211 600 101 (led pcb taken from
+  Advanced Star Chess, extra led row unused here)
+- Hitachi HD44801C89 MCU @ ~400kHz (serial 202: from Portachess 1985 version)
+- rest same as above
 
 HD44801A50 used in:
 - CXG Sensor Computachess (1981 version) - 1st use
@@ -50,7 +58,8 @@ HD44801C89 used in:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_scptchess.lh" // clickable
+#include "cxg_scptchess_v1.lh" // clickable
+#include "cxg_prtchess_v2.lh" // clickable
 
 
 namespace {
@@ -67,7 +76,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void scptchess(machine_config &config);
+	void scptchess_v1(machine_config &config);
+	void prtchess_v2(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(save_switch) { update_halt(); }
@@ -165,7 +175,7 @@ u16 scptchess_state::input_r()
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( scptchess )
+static INPUT_PORTS_START( shared_v1 )
 	PORT_START("IN.0")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound") // only hooked up on 1st version
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reverse Play")
@@ -176,8 +186,8 @@ static INPUT_PORTS_START( scptchess )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, save_switch, 0) PORT_NAME("Save Switch")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( prtchess )
-	PORT_INCLUDE( scptchess )
+static INPUT_PORTS_START( shared_v2 )
+	PORT_INCLUDE( shared_v1 )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -189,7 +199,7 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void scptchess_state::scptchess(machine_config &config)
+void scptchess_state::scptchess_v1(machine_config &config)
 {
 	/* basic machine hardware */
 	HD44801(config, m_maincpu, 400000);
@@ -204,12 +214,18 @@ void scptchess_state::scptchess(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 2);
-	config.set_default_layout(layout_cxg_scptchess);
+	config.set_default_layout(layout_cxg_scptchess_v1);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
+
+void scptchess_state::prtchess_v2(machine_config &config)
+{
+	scptchess_v1(config);
+	config.set_default_layout(layout_cxg_prtchess_v2);
 }
 
 
@@ -225,7 +241,7 @@ ROM_END
 
 ROM_START( prtchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) ) // 202 = Portachess model#
+	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
 ROM_END
 
 } // anonymous namespace
@@ -236,6 +252,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, scptchess, 0,         0, scptchess, scptchess, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, prtchess,  scptchess, 0, scptchess, prtchess,  scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    CMP MACHINE       INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, scptchess, 0,         0, scptchess_v1, shared_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, prtchess,  scptchess, 0, prtchess_v2,  shared_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

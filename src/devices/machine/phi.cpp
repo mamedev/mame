@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER(phi_device::ren_w)
 	set_ext_signal(PHI_488_REN , state);
 }
 
-WRITE8_MEMBER(phi_device::bus_dio_w)
+void phi_device::bus_dio_w(uint8_t data)
 {
 	update_pp();
 }
@@ -266,12 +266,12 @@ void phi_device::set_ext_signal(phi_488_signal_t signal , int state)
 	}
 }
 
-WRITE16_MEMBER(phi_device::reg16_w)
+void phi_device::reg16_w(offs_t offset, uint16_t data)
 {
 	int_reg_w(offset , data & REG_ALL_MASK);
 }
 
-READ16_MEMBER(phi_device::reg16_r)
+uint16_t phi_device::reg16_r(offs_t offset)
 {
 	uint16_t res;
 
@@ -334,14 +334,14 @@ READ16_MEMBER(phi_device::reg16_r)
 	return res;
 }
 
-WRITE8_MEMBER(phi_device::reg8_w)
+void phi_device::reg8_w(offs_t offset, uint8_t data)
 {
 	int_reg_w(offset , data);
 }
 
-READ8_MEMBER(phi_device::reg8_r)
+uint8_t phi_device::reg8_r(offs_t offset)
 {
-	return (uint8_t)reg16_r(space , offset , mem_mask);
+	return (uint8_t)reg16_r(offset);
 }
 
 void phi_device::device_start()

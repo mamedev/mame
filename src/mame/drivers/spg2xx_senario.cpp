@@ -66,8 +66,8 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(read_bypass) { return m_romregion[offset]; }
-	DECLARE_WRITE16_MEMBER(write_bypass) { logerror("Write to ROM area %08x %04x\n", offset, data); }
+	uint16_t read_bypass(offs_t offset) { return m_romregion[offset]; }
+	void write_bypass(offs_t offset, uint16_t data) { logerror("Write to ROM area %08x %04x\n", offset, data); }
 
 private:
 	required_region_ptr<uint16_t> m_romregion;
@@ -88,9 +88,9 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(portc_r);
+	uint16_t portc_r();
 
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	uint16_t m_portc_data;
@@ -233,7 +233,7 @@ void spg2xx_senario_cosmo_state::mem_map_flash_bypass(address_map &map)
 }
 
 
-WRITE16_MEMBER(spg2xx_senario_mil_state::portc_w)
+void spg2xx_senario_mil_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// -4-3 -2-1
 	// change when a button for that player is pressed, none of these seem to be for the LEDs on the controllers (or are they 'always on')
@@ -242,7 +242,7 @@ WRITE16_MEMBER(spg2xx_senario_mil_state::portc_w)
 	m_portc_data = data;
 }
 
-READ16_MEMBER(spg2xx_senario_mil_state::portc_r)
+uint16_t spg2xx_senario_mil_state::portc_r()
 {
 	uint16_t ret = m_io_p3->read() & 0xffaa; // 0xaa must be set to register all controllers as turned on
 	ret |= m_portc_data & 0x0055;

@@ -146,11 +146,11 @@ private:
 	u8 m_inp_mux;
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(switch_r);
+	void bank_w(u8 data);
+	u8 bank_r(offs_t offset);
+	void input_w(u8 data);
+	u8 input_r();
+	u8 switch_r();
 };
 
 void talkingbb_state::machine_start()
@@ -170,7 +170,7 @@ void talkingbb_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(talkingbb_state::bank_w)
+void talkingbb_state::bank_w(u8 data)
 {
 	// d0-d1: upper rom bank
 	// d2-d4: upper rom enable (bus conflict possible)
@@ -178,7 +178,7 @@ WRITE8_MEMBER(talkingbb_state::bank_w)
 	m_bank = data;
 }
 
-READ8_MEMBER(talkingbb_state::bank_r)
+u8 talkingbb_state::bank_r(offs_t offset)
 {
 	u32 hi = (~m_bank & 3) << 15;
 	u8 data = (m_bank & 4) ? 0xff : m_rom[offset | hi];
@@ -188,7 +188,7 @@ READ8_MEMBER(talkingbb_state::bank_r)
 	return data;
 }
 
-WRITE8_MEMBER(talkingbb_state::input_w)
+void talkingbb_state::input_w(u8 data)
 {
 	// no effect if P30 is low (never happens though)
 	if (~m_bank & 1)
@@ -200,7 +200,7 @@ WRITE8_MEMBER(talkingbb_state::input_w)
 	m_display->matrix(m_inp_mux, ~data & 7);
 }
 
-READ8_MEMBER(talkingbb_state::input_r)
+u8 talkingbb_state::input_r()
 {
 	// open bus if P30 is low (never happens though)
 	if (~m_bank & 1)
@@ -216,7 +216,7 @@ READ8_MEMBER(talkingbb_state::input_r)
 	return ~data;
 }
 
-READ8_MEMBER(talkingbb_state::switch_r)
+u8 talkingbb_state::switch_r()
 {
 	// d5: mode switch
 	return ~m_inputs[4]->read();

@@ -69,11 +69,11 @@ protected:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( peripheral_r );
-	DECLARE_WRITE8_MEMBER( peripheral_w );
+	uint8_t peripheral_r(offs_t offset);
+	void peripheral_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( omv_r );
-	DECLARE_WRITE8_MEMBER( omv_w );
+	uint8_t omv_r(offs_t offset);
+	void omv_w(offs_t offset, uint8_t data);
 
 	void omv_io_map(address_map &map);
 	void omv_map(address_map &map);
@@ -118,8 +118,8 @@ private:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r();
+	void ppi_pc_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void sf7000_io_map(address_map &map);

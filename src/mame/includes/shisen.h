@@ -36,10 +36,10 @@ private:
 	int m_gfxbank;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	void coin_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

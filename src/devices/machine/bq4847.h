@@ -13,9 +13,13 @@
 
 #pragma once
 
+#include "dirtc.h"
+
 // ======================> bq4874_device
 
-class bq4847_device : public device_t, public device_nvram_interface
+class bq4847_device : public device_t,
+					  public device_nvram_interface,
+					  public device_rtc_interface
 {
 public:
 	bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -39,6 +43,12 @@ public:
 	void connect_osc(bool conn);
 
 private:
+	// Inherited from device_rtc_interface
+	void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	bool rtc_feature_y2k()  const override { return false; }
+	bool rtc_feature_leap_year() const override { return true; }
+	bool rtc_battery_backed() const override { return true; }
+
 	// callback called when interrupt pin state changes (may be nullptr)
 	devcb_write_line    m_interrupt_cb;
 
@@ -66,16 +76,8 @@ private:
 	// Sanity-check BCD number
 	bool valid_bcd(uint8_t value, uint8_t min, uint8_t max);
 
-	// Convert to/from BCD
-	uint8_t to_bcd(uint8_t value);
-	uint8_t from_bcd(uint8_t value);
-
 	// Check bits in register
 	bool is_set(int number, uint8_t flag);
-
-	// AM-PM / 24h conversion (BCD)
-	uint8_t ampmto24(uint8_t ampm);
-	uint8_t ampmfrom24(uint8_t ampm);
 
 	// Increment BCD number
 	bool increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min);
@@ -83,12 +85,18 @@ private:
 	// Set/Reset one or more bits in the register
 	void set_register(int number, uint8_t bits, bool set);
 
-	// Copy register contents from the internal registers to SRAM or back
-	void transfer_to_int();
+	// Copy register contents from the internal registers to SRAM
 	void transfer_to_access();
 
 	// Check matching registers of time and alarm
 	bool check_match(int regint, int regalarm);
+
+	// Check whether this register is internal
+	bool is_internal_register(int regnum);
+
+	// Advance
+	bool advance_hours_bcd();
+	void advance_days_bcd();
 
 	// Timers
 	emu_timer *m_clock_timer;

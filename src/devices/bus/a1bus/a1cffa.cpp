@@ -68,7 +68,7 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 
 void a1bus_cffa_device::device_start()
 {
-	install_device(0xafe0, 0xafff, read8_delegate(*this, FUNC(a1bus_cffa_device::cffa_r)), write8_delegate(*this, FUNC(a1bus_cffa_device::cffa_w)));
+	install_device(0xafe0, 0xafff, read8sm_delegate(*this, FUNC(a1bus_cffa_device::cffa_r)), write8sm_delegate(*this, FUNC(a1bus_cffa_device::cffa_w)));
 	install_bank(0x9000, 0xafdf, "bank_cffa1", &m_rom[0]);
 
 	save_item(NAME(m_lastdata));
@@ -81,7 +81,7 @@ void a1bus_cffa_device::device_reset()
 	m_lastdata = 0;
 }
 
-READ8_MEMBER(a1bus_cffa_device::cffa_r)
+uint8_t a1bus_cffa_device::cffa_r(offs_t offset)
 {
 	switch (offset & 0xf)
 	{
@@ -97,7 +97,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 			break;
 
 		case 0x8:
-			m_lastdata = m_ata->read_cs0((offset & 0xf) - 8, 0xff);
+			m_lastdata = m_ata->cs0_r((offset & 0xf) - 8, 0xff);
 			return m_lastdata & 0x00ff;
 
 		case 0x9:
@@ -107,13 +107,13 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0((offset & 0xf) - 8, 0xff);
+			return m_ata->cs0_r((offset & 0xf) - 8, 0xff);
 	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
+void a1bus_cffa_device::cffa_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0xf)
 	{
@@ -132,7 +132,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 
 
 		case 0x8:
-			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
+			m_ata->cs0_w((offset & 0xf) - 8, data, 0xff);
 			break;
 
 		case 0x9:
@@ -142,7 +142,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
+			m_ata->cs0_w((offset & 0xf) - 8, data, 0xff);
 			break;
 
 	}

@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb, Ryan Holtz
 /***************************************************************************
 
-    rgbsse.c
+    rgbvmx.cpp
 
     VMX/Altivec optimised RGB utilities.
 

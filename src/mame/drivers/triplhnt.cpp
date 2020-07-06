@@ -54,7 +54,7 @@ WRITE_LINE_MEMBER(triplhnt_state::tape_control_w)
 }
 
 
-READ8_MEMBER(triplhnt_state::cmos_r)
+uint8_t triplhnt_state::cmos_r(offs_t offset)
 {
 	m_cmos_latch = offset;
 
@@ -62,21 +62,21 @@ READ8_MEMBER(triplhnt_state::cmos_r)
 }
 
 
-READ8_MEMBER(triplhnt_state::input_port_4_r)
+uint8_t triplhnt_state::input_port_4_r()
 {
 	m_watchdog->watchdog_reset();
 	return ioport("0C0B")->read();
 }
 
 
-READ8_MEMBER(triplhnt_state::misc_r)
+uint8_t triplhnt_state::misc_r(offs_t offset)
 {
 	m_latch->write_a0(offset);
 	return ioport("VBLANK")->read() | m_hit_code;
 }
 
 
-READ8_MEMBER(triplhnt_state::da_latch_r)
+uint8_t triplhnt_state::da_latch_r(offs_t offset)
 {
 	int cross_x = ioport("STICKX")->read();
 	int cross_y = ioport("STICKY")->read();

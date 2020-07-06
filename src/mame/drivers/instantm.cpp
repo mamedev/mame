@@ -42,8 +42,8 @@ public:
 	void instantm(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
+	u8 port01_r();
+	void port01_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 	void main_map(address_map &map);
@@ -58,13 +58,13 @@ private:
 };
 
 // return instruction from main cpu
-READ8_MEMBER( instantm_state::port01_r )
+u8 instantm_state::port01_r()
 {
 	return m_port01;
 }
 
 // tell maincpu the speech is done
-WRITE8_MEMBER( instantm_state::port01_w )
+void instantm_state::port01_w(u8 data)
 {
 	// bump to next bit of speech for now
 	if ((m_port01 & 15) < 15)

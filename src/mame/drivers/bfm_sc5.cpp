@@ -147,7 +147,7 @@ PL1 = Compact Flash Slot
 
 
 
-WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
+void bfm_sc5_state::sc5_duart_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// clearly a duart of some kind, write patterns are the same as SC4 games
 //  logerror("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
@@ -163,7 +163,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 
 }
 
-READ8_MEMBER( bfm_sc5_state::sc5_mux1_r )
+uint8_t bfm_sc5_state::sc5_mux1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -177,11 +177,11 @@ READ8_MEMBER( bfm_sc5_state::sc5_mux1_r )
 }
 
 
-WRITE8_MEMBER( bfm_sc5_state::sc5_mux1_w )
+void bfm_sc5_state::sc5_mux1_w(offs_t offset, uint8_t data)
 {
 	if ((offset&0xf)==0)
 	{
-		mux_output_w(space, (offset & 0x01f0)>>4, data);
+		mux_output_w((offset & 0x01f0)>>4, data);
 	}
 	else
 	{
@@ -191,11 +191,11 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux1_w )
 
 
 
-WRITE8_MEMBER( bfm_sc5_state::sc5_mux2_w )
+void bfm_sc5_state::sc5_mux2_w(offs_t offset, uint8_t data)
 {
 	if ((offset&0xf)==0)
 	{
-		mux_output2_w(space, (offset & 0x01f0)>>4, data);
+		mux_output2_w((offset & 0x01f0)>>4, data);
 	}
 	else
 	{
@@ -281,7 +281,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 INPUT_PORTS_START( bfm_sc5 )
 INPUT_PORTS_END
 
-READ8_MEMBER( bfm_sc5_state::sc5_10202F0_r )
+uint8_t bfm_sc5_state::sc5_10202F0_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -296,7 +296,7 @@ READ8_MEMBER( bfm_sc5_state::sc5_10202F0_r )
 	return 0;
 }
 
-WRITE8_MEMBER( bfm_sc5_state::sc5_10202F0_w )
+void bfm_sc5_state::sc5_10202F0_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -323,13 +323,13 @@ WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
 	logerror("bfm_sc5_duart_tx\n");
 }
 
-READ8_MEMBER(bfm_sc5_state::bfm_sc5_duart_input_r)
+uint8_t bfm_sc5_state::bfm_sc5_duart_input_r()
 {
 	logerror("bfm_sc5_duart_input_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
+void bfm_sc5_state::bfm_sc5_duart_output_w(uint8_t data)
 {
 	logerror("bfm_sc5_duart_output_w\n");
 }

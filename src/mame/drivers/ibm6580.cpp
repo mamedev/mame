@@ -152,34 +152,33 @@ public:
 	void ibm6580(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(pic_latch_w);
-	DECLARE_WRITE16_MEMBER(unk_latch_w);
+	void pic_latch_w(uint16_t data);
+	void unk_latch_w(uint16_t data);
 
-	DECLARE_WRITE8_MEMBER(p40_w);
-	DECLARE_READ8_MEMBER(p40_r);
+	void p40_w(offs_t offset, uint8_t data);
+	uint8_t p40_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(video_r);
+	void video_w(offs_t offset, uint8_t data);
+	uint8_t video_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(ppi_a_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
-	DECLARE_READ8_MEMBER(ppi_c_r);
+	uint8_t ppi_a_r();
+	void led_w(uint8_t data);
+	void ppi_c_w(uint8_t data);
+	uint8_t ppi_c_r();
 
 	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_strobe_w);
 
-	DECLARE_WRITE8_MEMBER(floppy_w);
-	DECLARE_READ8_MEMBER(floppy_r);
+	void floppy_w(offs_t offset, uint8_t data);
+	uint8_t floppy_r(offs_t offset);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_WRITE_LINE_MEMBER(floppy_intrq);
 	DECLARE_WRITE_LINE_MEMBER(floppy_hdl);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -220,7 +219,7 @@ private:
 };
 
 
-WRITE8_MEMBER(ibm6580_state::p40_w)
+void ibm6580_state::p40_w(offs_t offset, uint8_t data)
 {
 	LOG("___ %02x <- %02x\n", 0x40 + (offset << 1), data);
 
@@ -261,7 +260,7 @@ WRITE8_MEMBER(ibm6580_state::p40_w)
 	}
 }
 
-READ8_MEMBER(ibm6580_state::p40_r)
+uint8_t ibm6580_state::p40_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -283,7 +282,7 @@ READ8_MEMBER(ibm6580_state::p40_r)
 	return data;
 }
 
-WRITE8_MEMBER(ibm6580_state::video_w)
+void ibm6580_state::video_w(offs_t offset, uint8_t data)
 {
 	LOG("Video %02x <- %02x\n", 0xe000 + (offset << 1), data);
 
@@ -296,7 +295,7 @@ WRITE8_MEMBER(ibm6580_state::video_w)
 	}
 }
 
-READ8_MEMBER(ibm6580_state::video_r)
+uint8_t ibm6580_state::video_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -331,7 +330,7 @@ WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 		m_p40 |= 4;
 }
 
-WRITE16_MEMBER(ibm6580_state::pic_latch_w)
+void ibm6580_state::pic_latch_w(uint16_t data)
 {
 	LOG("PIC latch <- %02x\n", data);
 
@@ -348,14 +347,14 @@ WRITE16_MEMBER(ibm6580_state::pic_latch_w)
 	m_pic8259->ir7_w(data == 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(ibm6580_state::unk_latch_w)
+void ibm6580_state::unk_latch_w(uint16_t data)
 {
 	LOG("UNK latch <- %02x\n", data);
 
 	m_p40 |= 0x10;
 }
 
-WRITE8_MEMBER(ibm6580_state::led_w)
+void ibm6580_state::led_w(uint8_t data)
 {
 	output().set_value("led5", BIT(data, 7));
 	output().set_value("led6", BIT(data, 6));
@@ -417,7 +416,7 @@ WRITE8_MEMBER(ibm6580_state::led_w)
 	}
 }
 
-WRITE8_MEMBER(ibm6580_state::ppi_c_w)
+void ibm6580_state::ppi_c_w(uint8_t data)
 {
 	LOG("PPI Port C <- %02x\n", data);
 
@@ -433,7 +432,7 @@ WRITE8_MEMBER(ibm6580_state::ppi_c_w)
 	m_kbd->ack_w(BIT(data, 5));
 }
 
-READ8_MEMBER(ibm6580_state::ppi_c_r)
+uint8_t ibm6580_state::ppi_c_r()
 {
 	uint8_t data = 0;
 
@@ -444,7 +443,7 @@ READ8_MEMBER(ibm6580_state::ppi_c_r)
 	return data;
 }
 
-READ8_MEMBER(ibm6580_state::ppi_a_r)
+uint8_t ibm6580_state::ppi_a_r()
 {
 	uint8_t data = m_kb_fifo.dequeue();
 
@@ -486,13 +485,13 @@ WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(ibm6580_state::memory_read_byte)
+uint8_t ibm6580_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(ibm6580_state::memory_write_byte)
+void ibm6580_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
@@ -599,7 +598,7 @@ uint8_t ibm6580_state::floppy_mcu_command()
 	return data;
 }
 
-WRITE8_MEMBER(ibm6580_state::floppy_w)
+void ibm6580_state::floppy_w(offs_t offset, uint8_t data)
 {
 	LOG("Floppy %02x <- %02x\n", 0x8150 + (offset << 1), data);
 
@@ -629,7 +628,7 @@ WRITE8_MEMBER(ibm6580_state::floppy_w)
 	}
 }
 
-READ8_MEMBER(ibm6580_state::floppy_r)
+uint8_t ibm6580_state::floppy_r(offs_t offset)
 {
 	uint8_t data = 0;
 

@@ -32,8 +32,8 @@ namespace netlist
 			connect(m_feedback, m_Q);
 
 			// output
-			connect(m_RV.m_N, m_VDD);
-			register_subalias("3", m_RV.m_P);
+			connect(m_RV.N(), m_VDD);
+			register_subalias("3", m_RV.P());
 		}
 
 		NETLIB_RESETI();

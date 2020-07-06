@@ -29,7 +29,7 @@ public:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_READ8_MEMBER(ga_hack_r);
+	u8 ga_hack_r();
 
 	void mem_map(address_map &map);
 	void program_map(address_map &map);
@@ -42,7 +42,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(tv965_state::draw_character)
 {
 }
 
-READ8_MEMBER(tv965_state::ga_hack_r)
+u8 tv965_state::ga_hack_r()
 {
 	return 0x08;
 }

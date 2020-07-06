@@ -53,12 +53,12 @@ protected:
 	virtual uint8_t abcbus_xmemfl(offs_t offset) override;
 
 private:
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
+	uint8_t pio_pb_r();
+	void pio_pb_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( status_w );
+	void status_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

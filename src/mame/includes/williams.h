@@ -51,7 +51,7 @@ public:
 
 	u8 port_0_49way_r();
 	virtual u8 video_counter_r();
-	virtual DECLARE_WRITE8_MEMBER(watchdog_reset_w);
+	virtual void watchdog_reset_w(u8 data);
 
 	virtual TIMER_DEVICE_CALLBACK_MEMBER(va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(count240_callback);
@@ -92,7 +92,7 @@ protected:
 	virtual void vram_select_w(u8 data);
 	virtual void cmos_w(offs_t offset, u8 data);
 	void sinistar_vram_select_w(u8 data);
-	DECLARE_WRITE8_MEMBER(blitter_w);
+	void blitter_w(address_space &space, offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 
@@ -315,8 +315,8 @@ public:
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "williams2_tile"),
-		m_gain({ 0.8f, 0.73f, 0.81f }),
-		m_offset({ -0.27f, 0.0f, -0.22f })
+		m_gain(  { 0.25f, 0.25f, 0.25f }),
+		m_offset({ 0.00f, 0.00f, 0.00f })
 	{ }
 
 	void williams2_base(machine_config &config);
@@ -349,7 +349,7 @@ protected:
 
 	virtual TILE_GET_INFO_MEMBER(get_tile_info);
 	void bank_select_w(u8 data);
-	virtual DECLARE_WRITE8_MEMBER(watchdog_reset_w) override;
+	virtual void watchdog_reset_w(u8 data) override;
 	void segments_w(u8 data);
 
 	rgb_t calc_col(uint16_t lo, uint16_t hi);
@@ -418,7 +418,11 @@ class mysticm_state : public williams_d000_ram_state
 public:
 	mysticm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_d000_ram_state(mconfig, type, tag)
-	{ }
+	{
+		// overwrite defaults for mysticm
+		m_gain =   {   0.8f, 0.73f,  0.81f };
+		m_offset = { -0.27f, 0.00f, -0.22f };
+	}
 
 	void mysticm(machine_config &config);
 

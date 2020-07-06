@@ -2,9 +2,9 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Digital Microsystems DMS-86
+Digital Microsystems DMS-86
 
-        11/01/2010 Skeleton driver.
+2010-01-11 Skeleton driver.
 
 Monitor commands:
 A Display incoming terminal data in hex
@@ -50,21 +50,20 @@ public:
 	{ }
 
 	void dms86(machine_config &config);
-
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 private:
-	DECLARE_WRITE8_MEMBER(m1_ack_w);
+	void m1_ack_w(u8 data);
 
-	DECLARE_READ16_MEMBER(port9a_r);
-	DECLARE_READ16_MEMBER(port9c_r);
+	u16 port9a_r();
+	u16 port9c_r();
 	void kbd_put(u8 data);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	u8 m_term_data;
-	virtual void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device_array<z80sio_device, 2> m_sio;
@@ -78,7 +77,7 @@ WRITE_LINE_MEMBER(dms86_state::nmi_w)
 }
 
 
-WRITE8_MEMBER(dms86_state::m1_ack_w)
+void dms86_state::m1_ack_w(u8 data)
 {
 	m_sio[0]->z80daisy_decode(data);
 	m_sio[1]->z80daisy_decode(data);
@@ -86,14 +85,14 @@ WRITE8_MEMBER(dms86_state::m1_ack_w)
 }
 
 
-READ16_MEMBER(dms86_state::port9a_r)
+u16 dms86_state::port9a_r()
 {
 	return m_term_data ? 0x40 : 0;
 }
 
-READ16_MEMBER(dms86_state::port9c_r)
+u16 dms86_state::port9c_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -129,8 +128,9 @@ static INPUT_PORTS_START( dms86 )
 INPUT_PORTS_END
 
 
-void dms86_state::machine_reset()
+void dms86_state::machine_start()
 {
+	save_item(NAME(m_term_data));
 }
 
 void dms86_state::kbd_put(u8 data)
@@ -145,14 +145,7 @@ void dms86_state::dms86(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dms86_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dms86_state::io_map);
 
-	// According to the manual the clock is 14,765,600 / 4 but that couldn't possibly work.
-	// By maths, clock should be 9600*32*4*16 = 19,660,800 but not working either
-	// So, commented out because it makes the whole thing crawl, only get 18% on my machine
-	//clock_device &ctc_clock(CLOCK(config, "ctc_clock", 19660800)); //XTAL(14'745'600) / 4
-	//ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	//ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
-	//ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
-
+	// According to the manual the clock is 14,765,600 / 4 but that's wrong
 	Z80CTC(config, m_ctc, XTAL(14'745'600) / 3);
 	//m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);             // frame rate interrupt to maincpu
 	m_ctc->zc_callback<0>().set(m_sio[0], FUNC(z80sio_device::rxtxcb_w));  // SIO1 Ch B
@@ -188,4 +181,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS */
-COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

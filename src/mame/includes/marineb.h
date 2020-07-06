@@ -55,11 +55,11 @@ private:
 	bool     m_irq_mask;
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(marineb_videoram_w);
-	DECLARE_WRITE8_MEMBER(marineb_colorram_w);
-	DECLARE_WRITE8_MEMBER(marineb_column_scroll_w);
-	DECLARE_WRITE8_MEMBER(marineb_palette_bank_0_w);
-	DECLARE_WRITE8_MEMBER(marineb_palette_bank_1_w);
+	void marineb_videoram_w(offs_t offset, uint8_t data);
+	void marineb_colorram_w(offs_t offset, uint8_t data);
+	void marineb_column_scroll_w(uint8_t data);
+	void marineb_palette_bank_0_w(uint8_t data);
+	void marineb_palette_bank_1_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);

@@ -17,7 +17,7 @@ pc9801_snd_device::pc9801_snd_device(const machine_config &mconfig, device_type 
 {
 }
 
-READ8_MEMBER(pc9801_snd_device::opn_porta_r)
+uint8_t pc9801_snd_device::opn_porta_r()
 {
 	if(m_joy_sel & 0x80)
 		return ioport(m_joy_sel & 0x40 ? "PA2" : "PA1")->read();
@@ -25,7 +25,7 @@ READ8_MEMBER(pc9801_snd_device::opn_porta_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_snd_device::opn_portb_w) { m_joy_sel = data; }
+void pc9801_snd_device::opn_portb_w(uint8_t data) { m_joy_sel = data; }
 
 INPUT_PORTS_START(pc9801_joy_port)
 	PORT_START("PA1")

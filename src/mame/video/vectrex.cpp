@@ -73,12 +73,12 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 *********************************************************************/
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_r)
+uint8_t vectrex_base_state::vectrex_via_r(offs_t offset)
 {
 	return m_via6522_0->read(offset);
 }
 
-WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
+void vectrex_base_state::vectrex_via_w(offs_t offset, uint8_t data)
 {
 	attotime period;
 
@@ -275,7 +275,7 @@ void vectrex_base_state::vectrex_multiplexer(int mux)
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
+void vectrex_base_state::v_via_pb_w(uint8_t data)
 {
 	if (!(data & 0x80))
 	{
@@ -339,7 +339,7 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 
 	/* Cartridge bank-switching */
 	if (m_cart && ((data ^ m_via_out[PORTB]) & 0x40))
-		m_cart->write_bank(space, 0, data);
+		m_cart->write_bank(data);
 
 	/* Sound */
 	if (data & 0x10)
@@ -358,7 +358,7 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::v_via_pa_w)
+void vectrex_base_state::v_via_pa_w(uint8_t data)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
@@ -411,7 +411,7 @@ WRITE_LINE_MEMBER(vectrex_base_state::v_via_cb2_w)
 
 *****************************************************************/
 
-WRITE8_MEMBER(raaspec_state::raaspec_led_w)
+void raaspec_state::raaspec_led_w(uint8_t data)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
 				(data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,

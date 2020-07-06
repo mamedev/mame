@@ -210,7 +210,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_timer_event)
 	update_irqs();
 }
 
-READ16_MEMBER(jpmimpct_state::duart_1_r)
+uint16_t jpmimpct_state::duart_1_r(offs_t offset)
 {
 	struct duart_t &duart_1 = m_duart_1;
 	uint16_t val = 0xffff;
@@ -274,7 +274,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 	return val;
 }
 
-WRITE16_MEMBER(jpmimpct_state::duart_1_w)
+void jpmimpct_state::duart_1_w(offs_t offset, uint16_t data)
 {
 	struct duart_t &duart_1 = m_duart_1;
 	//int old_val;
@@ -360,7 +360,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_1_w)
     Communication with a touchscreen interface PCB
     is handled via UART B.
 */
-READ16_MEMBER(jpmimpct_state::duart_2_r)
+uint16_t jpmimpct_state::duart_2_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -401,7 +401,7 @@ READ16_MEMBER(jpmimpct_state::duart_2_r)
 /*
     Nothing important here?
 */
-WRITE16_MEMBER(jpmimpct_state::duart_2_w)
+void jpmimpct_state::duart_2_w(uint16_t data)
 {
 }
 
@@ -428,7 +428,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_2_w)
  *  9: Coin mechanism
  */
 
-READ16_MEMBER(jpmimpct_state::inputs1_r)
+uint16_t jpmimpct_state::inputs1_r(offs_t offset)
 {
 	uint16_t val = 0x00ff;
 
@@ -465,7 +465,7 @@ READ16_MEMBER(jpmimpct_state::inputs1_r)
  *  Sound control
  *
  *************************************/
-WRITE16_MEMBER(jpmimpct_state::volume_w)
+void jpmimpct_state::volume_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -474,7 +474,7 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 	}
 }
 
-WRITE16_MEMBER(jpmimpct_state::upd7759_w)
+void jpmimpct_state::upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -484,7 +484,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::upd7759_r)
+uint16_t jpmimpct_state::upd7759_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -500,12 +500,12 @@ READ16_MEMBER(jpmimpct_state::upd7759_r)
  *
  *************************************/
 
-READ16_MEMBER(jpmimpct_state::unk_r)
+uint16_t jpmimpct_state::unk_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmimpct_state::unk_w)
+void jpmimpct_state::unk_w(uint16_t data)
 {
 }
 
@@ -520,12 +520,12 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::jpmio_r)
+uint16_t jpmimpct_state::jpmio_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmimpct_state::jpmio_w)
+void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -882,7 +882,7 @@ void jpmimpct_state::jpmimpct(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(jpmimpct_state::hopper_b_r)
+uint8_t jpmimpct_state::hopper_b_r()
 {
 	int retval;
 	// B0 = 100p Hopper Out Verif
@@ -908,7 +908,7 @@ READ8_MEMBER(jpmimpct_state::hopper_b_r)
 	return retval;
 }
 
-READ8_MEMBER(jpmimpct_state::hopper_c_r)
+uint8_t jpmimpct_state::hopper_c_r()
 {
 	int retval;
 	// C0-C2 = Alpha
@@ -945,7 +945,7 @@ READ8_MEMBER(jpmimpct_state::hopper_c_r)
 	return retval;
 }
 
-WRITE8_MEMBER(jpmimpct_state::payen_a_w)
+void jpmimpct_state::payen_a_w(uint8_t data)
 {
 	m_motor[0] = (data & 0x01);
 	m_payen = (data & 0x10);
@@ -954,7 +954,7 @@ WRITE8_MEMBER(jpmimpct_state::payen_a_w)
 	m_hopinhibit = (data & 0x80);
 }
 
-WRITE8_MEMBER(jpmimpct_state::display_c_w)
+void jpmimpct_state::display_c_w(uint8_t data)
 {
 	//Reset 0x04, data 0x02, clock 0x01
 	m_vfd->por(data & 0x04);
@@ -1003,7 +1003,7 @@ MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
  *  8: Payslides
  *  9: Coin mechanism
  */
-READ16_MEMBER(jpmimpct_state::inputs1awp_r)
+uint16_t jpmimpct_state::inputs1awp_r(offs_t offset)
 {
 	uint16_t val = 0x00;
 
@@ -1060,22 +1060,22 @@ READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::optos_r)
+uint16_t jpmimpct_state::optos_r()
 {
 	return m_optic_pattern;
 }
 
-READ16_MEMBER(jpmimpct_state::prot_1_r)
+uint16_t jpmimpct_state::prot_1_r()
 {
 	return 0x01;
 }
 
-READ16_MEMBER(jpmimpct_state::prot_0_r)
+uint16_t jpmimpct_state::prot_0_r()
 {
 	return 0x00;
 }
 
-WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
+void jpmimpct_state::jpmioawp_w(offs_t offset, uint16_t data)
 {
 	int i,metno;
 	switch (offset)
@@ -1176,7 +1176,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::ump_r)
+uint16_t jpmimpct_state::ump_r()
 {
 	return 0xff;//0xffff;
 }

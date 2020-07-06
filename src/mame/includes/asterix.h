@@ -50,11 +50,11 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
 	required_device<k053251_device> m_k053251;
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_arm_nmi_w(uint8_t data);
+	void sound_irq_w(uint16_t data);
+	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void init_asterix();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

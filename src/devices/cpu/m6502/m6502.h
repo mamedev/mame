@@ -33,10 +33,11 @@ protected:
 
 	class memory_interface {
 	public:
-		address_space *program, *sprogram;
-		memory_access_cache<0, 0, ENDIANNESS_LITTLE> *cache, *scache;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache cprogram, csprogram;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific program;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific program14;
 
-		virtual ~memory_interface() {}
+		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
 		virtual uint8_t read_9(uint16_t adr);
 		virtual uint8_t read_sync(uint16_t adr) = 0;
@@ -47,10 +48,17 @@ protected:
 
 	class mi_default : public memory_interface {
 	public:
-		virtual ~mi_default() {}
+		virtual ~mi_default() = default;
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+	};
+
+	class mi_default14 : public mi_default {
+	public:
+		virtual ~mi_default14() = default;
+		virtual uint8_t read(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
@@ -269,6 +277,11 @@ protected:
 	virtual void execute_run() override;
 };
 
+class m6512_device : public m6502_device {
+public:
+	m6512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 enum {
 	M6502_PC = 1,
 	M6502_A,
@@ -286,5 +299,6 @@ enum {
 };
 
 DECLARE_DEVICE_TYPE(M6502, m6502_device)
+DECLARE_DEVICE_TYPE(M6512, m6512_device)
 
 #endif // MAME_CPU_M6502_M6502_H

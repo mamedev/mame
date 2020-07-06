@@ -132,12 +132,11 @@ private:
 	uint8_t m_bank = 0;
 	uint8_t m_layer = 0;
 
-	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(layer_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void sound_nmi_ack_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
+	void bank_w(uint8_t data);
+	void layer_w(uint8_t data);
+	void portc_w(uint8_t data);
 	void flipjack_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
 
@@ -240,7 +239,7 @@ MC6845_UPDATE_ROW(flipjack_state::update_row)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(flipjack_state::bank_w)
+void flipjack_state::bank_w(uint8_t data)
 {
 	// d0-d1: tile bank
 	// d2: prg bank
@@ -250,7 +249,7 @@ WRITE8_MEMBER(flipjack_state::bank_w)
 	m_prgbank->set_entry(BIT(data, 2));
 }
 
-WRITE8_MEMBER(flipjack_state::layer_w)
+void flipjack_state::layer_w(uint8_t data)
 {
 	// d0: flip screen
 	// d1: enable playfield layer
@@ -260,20 +259,20 @@ WRITE8_MEMBER(flipjack_state::layer_w)
 	m_layer = data;
 }
 
-WRITE8_MEMBER(flipjack_state::soundlatch_w)
+void flipjack_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	if (BIT(data, 7))
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::sound_nmi_ack_w)
+void flipjack_state::sound_nmi_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::portc_w)
+void flipjack_state::portc_w(uint8_t data)
 {
 	// vestigial hopper output?
 }

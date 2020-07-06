@@ -123,8 +123,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_brgb);
 	DECLARE_WRITE_LINE_MEMBER(write_brgc);
 
-	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
+	void ksm_ppi_porta_w(uint8_t data);
+	void ksm_ppi_portc_w(uint8_t data);
 
 	void ksm_io(address_map &map);
 	void ksm_mem(address_map &map);
@@ -151,7 +151,7 @@ private:
 	void update_brg(bool a, bool b, int c);
 
 	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
@@ -247,13 +247,13 @@ void ksm_state::video_start()
 	m_brg = timer_alloc(TIMER_ID_BRG);
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
+void ksm_state::ksm_ppi_porta_w(uint8_t data)
 {
 	LOG("PPI port A line %d\n", data);
 	m_video.line = data;
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
+void ksm_state::ksm_ppi_portc_w(uint8_t data)
 {
 	brgc = (data >> 5) & 3;
 
@@ -416,7 +416,7 @@ void ksm_state::ksm(machine_config &config)
 	I8080(config, m_maincpu, XTAL(15'400'000)/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksm_state::ksm_mem);
 	m_maincpu->set_addrmap(AS_IO, &ksm_state::ksm_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 

@@ -57,10 +57,10 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(portB_r);
-	DECLARE_WRITE8_MEMBER(portB_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t portB_r();
+	void portB_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -76,7 +76,7 @@ private:
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	DECLARE_WRITE8_MEMBER(dac_w);
+	void dac_w(uint8_t data);
 
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);

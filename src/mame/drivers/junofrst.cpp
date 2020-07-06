@@ -116,13 +116,13 @@ public:
 	void junofrst(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(i8039_irq_w);
-	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
-	DECLARE_READ8_MEMBER(portA_r);
-	DECLARE_WRITE8_MEMBER(portB_w);
+	void blitter_w(offs_t offset, uint8_t data);
+	void bankselect_w(uint8_t data);
+	void sh_irqtrigger_w(uint8_t data);
+	void i8039_irq_w(uint8_t data);
+	void i8039_irqen_and_status_w(uint8_t data);
+	uint8_t portA_r();
+	void portB_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -163,7 +163,7 @@ private:
           We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
 */
 
-WRITE8_MEMBER(junofrst_state::blitter_w)
+void junofrst_state::blitter_w(offs_t offset, uint8_t data)
 {
 	m_blitterdata[offset] = data;
 
@@ -216,13 +216,13 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::bankselect_w)
+void junofrst_state::bankselect_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
-READ8_MEMBER(junofrst_state::portA_r)
+uint8_t junofrst_state::portA_r()
 {
 	int timer;
 
@@ -238,7 +238,7 @@ READ8_MEMBER(junofrst_state::portA_r)
 }
 
 
-WRITE8_MEMBER(junofrst_state::portB_w)
+void junofrst_state::portB_w(uint8_t data)
 {
 	filter_rc_device *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
 	int i;
@@ -258,7 +258,7 @@ WRITE8_MEMBER(junofrst_state::portB_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
+void junofrst_state::sh_irqtrigger_w(uint8_t data)
 {
 	if (m_last_irq == 0 && data == 1)
 	{
@@ -270,13 +270,13 @@ WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::i8039_irq_w)
+void junofrst_state::i8039_irq_w(uint8_t data)
 {
 	m_i8039->set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
+void junofrst_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	if ((data & 0x80) == 0)
 		m_i8039->set_input_line(0, CLEAR_LINE);

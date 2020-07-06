@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( z80_io_r );
-	DECLARE_WRITE8_MEMBER( z80_io_w );
+	uint8_t z80_io_r(offs_t offset);
+	void z80_io_w(offs_t offset, uint8_t data);
 
 protected:
 	a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -51,8 +51,8 @@ private:
 	uint8_t m_z80ram[64*1024];
 	uint8_t *m_z80rom;
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
 
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);

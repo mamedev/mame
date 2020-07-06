@@ -23,7 +23,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(ultraman_state::sound_nmi_enable_w)
+void ultraman_state::sound_nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(BIT(data, 0));
 }

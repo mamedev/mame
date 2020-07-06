@@ -5,7 +5,9 @@
 
 #pragma once
 
-class x1_010_device : public device_t, public device_sound_interface, public device_rom_interface
+#include "dirom.h"
+
+class x1_010_device : public device_t, public device_sound_interface, public device_rom_interface<20>
 {
 public:
 	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

@@ -98,7 +98,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
 		, m_fdc (*this, "fdc")
@@ -108,25 +109,23 @@ public:
 
 	void amust(machine_config &config);
 
-	void init_amust();
-
 private:
 	enum
 	{
 		TIMER_BEEP_OFF
 	};
 
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_READ8_MEMBER(port05_r);
-	DECLARE_READ8_MEMBER(port06_r);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_READ8_MEMBER(port09_r);
-	DECLARE_READ8_MEMBER(port0a_r);
-	DECLARE_WRITE8_MEMBER(port0a_w);
-	DECLARE_WRITE8_MEMBER(port0d_w);
+	u8 port04_r();
+	void port04_w(u8 data);
+	u8 port05_r();
+	u8 port06_r();
+	void port06_w(u8 data);
+	u8 port08_r();
+	void port08_w(u8 data);
+	u8 port09_r();
+	u8 port0a_r();
+	void port0a_w(u8 data);
+	void port0d_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(hsync_w);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
@@ -137,6 +136,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void machine_reset() override;
+	void machine_start() override;
 	void do_int();
 
 	u8 m_port04;
@@ -149,10 +149,14 @@ private:
 	//bool m_intrq;
 	bool m_hsync;
 	bool m_vsync;
+	bool m_rom_in_map;
+	std::unique_ptr<u8[]> m_vram;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
@@ -172,7 +176,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-//WRITE8_MEMBER( amust_state::port00_w )
+//void amust_state::port00_w(u8 data)
 //{
 //  membank("bankr0")->set_entry(BIT(data, 6));
 //  m_fdc->dden_w(BIT(data, 5));
@@ -185,9 +189,8 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void amust_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0xf7ff).ram();
-	map(0xf800, 0xffff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0xf800, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
 }
 
 void amust_state::io_map(address_map &map)
@@ -270,39 +273,39 @@ WRITE_LINE_MEMBER( amust_state::vsync_w )
 	do_int();
 }
 
-READ8_MEMBER( amust_state::port04_r )
+u8 amust_state::port04_r()
 {
 	return m_port04;
 }
 
-WRITE8_MEMBER( amust_state::port04_w )
+void amust_state::port04_w(u8 data)
 {
 	m_port04 = data;
 }
 
-READ8_MEMBER( amust_state::port05_r )
+u8 amust_state::port05_r()
 {
 	return 0;
 }
 
-READ8_MEMBER( amust_state::port06_r )
+u8 amust_state::port06_r()
 {
 	return m_port06;
 }
 
 // BIT 5 low while writing to screen
-WRITE8_MEMBER( amust_state::port06_w )
+void amust_state::port06_w(u8 data)
 {
 	m_port06 = data;
 }
 
-READ8_MEMBER( amust_state::port08_r )
+u8 amust_state::port08_r()
 {
 	return m_port08;
 }
 
 // lower 8 bits of video address
-WRITE8_MEMBER( amust_state::port08_w )
+void amust_state::port08_w(u8 data)
 {
 	m_port08 = data;
 }
@@ -317,13 +320,13 @@ d5 - status of fdc intrq; loops till NZ
 d6 -
 d7 -
 */
-READ8_MEMBER( amust_state::port09_r )
+u8 amust_state::port09_r()
 {
 	logerror("%s\n",machine().describe_context());
 	return (ioport("P9")->read() & 0x1f) | m_port09;
 }
 
-READ8_MEMBER( amust_state::port0a_r )
+u8 amust_state::port0a_r()
 {
 	return m_port0a;
 }
@@ -335,7 +338,7 @@ with selecting which device causes interrupt?
 D0 ?
 Bit 4 low = beeper.
 Lower 3 bits = upper part of video address */
-WRITE8_MEMBER( amust_state::port0a_w )
+void amust_state::port0a_w(u8 data)
 {
 	m_port0a = data;
 
@@ -354,14 +357,14 @@ WRITE8_MEMBER( amust_state::port0a_w )
 	}
 }
 
-WRITE8_MEMBER( amust_state::port0d_w )
+void amust_state::port0d_w(u8 data)
 {
 	uint16_t video_address = m_port08 | ((m_port0a & 7) << 8);
-	m_p_videoram[video_address] = data;
+	m_vram[video_address] = data;
 }
 
 /* F4 Character Displayer */
-static const gfx_layout amust_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                  /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -375,7 +378,7 @@ static const gfx_layout amust_charlayout =
 };
 
 static GFXDECODE_START( gfx_amust )
-	GFXDECODE_ENTRY( "chargen", 0x0000, amust_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 MC6845_UPDATE_ROW( amust_state::crtc_update_row )
@@ -389,7 +392,7 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 	{
 		inv = (x == cursor_x) ? 0xff : 0;
 		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
+		chr = m_vram[mem];
 		if (ra < 8)
 			gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 		else
@@ -409,8 +412,7 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 
 void amust_state::machine_reset()
 {
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	m_rom_in_map = true;
 	m_port04 = 0;
 	m_port06 = 0;
 	m_port08 = 0;
@@ -421,16 +423,40 @@ void amust_state::machine_reset()
 	m_drq = false;
 	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
 	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
-	m_maincpu->set_state_int(Z80_PC, 0xf800);
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-void amust_state::init_amust()
+void amust_state::machine_start()
 {
-	u8 *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0xf800]);
-	membank("bankr0")->configure_entry(0, &main[0x10800]);
-	membank("bankw0")->configure_entry(0, &main[0xf800]);
+	m_vram = make_unique_clear<u8[]>(0x800);
+	save_pointer(NAME(m_vram), 0x800);
+	save_item(NAME(m_port04));
+	save_item(NAME(m_port06));
+	save_item(NAME(m_port08));
+	save_item(NAME(m_port09));
+	save_item(NAME(m_port0a));
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_drq));
+	//save_item(NAME(m_intrq));
+	save_item(NAME(m_hsync));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_rom_in_map));
 }
 
 void amust_state::amust(machine_config &config)
@@ -507,19 +533,17 @@ void amust_state::amust(machine_config &config)
 
 /* ROM definition */
 ROM_START( amust )
-	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mon_h.ic25", 0x10000, 0x1000, CRC(10dceac6) SHA1(1ef80039063f7a6455563d59f1bcc23e09eca369) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mon_h.ic25", 0x0000, 0x1000, CRC(10dceac6) SHA1(1ef80039063f7a6455563d59f1bcc23e09eca369) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "cg4.ic74",   0x000, 0x800, CRC(52e7b9d8) SHA1(cc6d457634eb688ccef471f72bddf0424e64b045) )
 
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "kbd_3.rom",  0x000, 0x800, CRC(d9441b35) SHA1(ce250ab1e892a13fd75182703f259855388c6bf4) )
-
-	ROM_REGION( 0x800, "videoram", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME               FLAGS
-COMP( 1983, amust, 0,      0,      amust,   amust, amust_state, init_amust, "Amust", "Amust Executive 816", MACHINE_NOT_WORKING )
+COMP( 1983, amust, 0,      0,      amust,   amust, amust_state, empty_init, "Amust", "Amust Executive 816", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

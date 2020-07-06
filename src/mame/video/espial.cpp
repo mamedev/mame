@@ -112,35 +112,35 @@ VIDEO_START_MEMBER(espial_state,netwars)
  *
  *************************************/
 
-WRITE8_MEMBER(espial_state::espial_videoram_w)
+void espial_state::espial_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_colorram_w)
+void espial_state::espial_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_attributeram_w)
+void espial_state::espial_attributeram_w(offs_t offset, uint8_t data)
 {
 	m_attributeram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_scrollram_w)
+void espial_state::espial_scrollram_w(offs_t offset, uint8_t data)
 {
 	m_scrollram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_flipscreen_w)
+void espial_state::espial_flipscreen_w(uint8_t data)
 {
 	m_flipscreen = data;
 	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);

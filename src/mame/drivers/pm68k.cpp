@@ -27,18 +27,18 @@ public:
 	{ }
 
 	void pm68k(machine_config &config);
-	void pm68k_mem(address_map &map);
+
 private:
+	void mem_map(address_map &map);
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-void pm68k_state::pm68k_mem(address_map &map)
+void pm68k_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).ram().share("rambase");
 	map(0x200000, 0x205fff).rom().region("roms", 0);
 	map(0x600000, 0x600007).rw("mpsc", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0xff00);
@@ -61,7 +61,7 @@ void pm68k_state::pm68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pm68k_state::pm68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pm68k_state::mem_map);
 
 	i8274_device& mpsc(I8274(config, "mpsc", 0));
 	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -101,4 +101,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  CLASS        INIT        COMPANY                FULLNAME  FLAGS
-COMP( 198?, pm68k, 0,      0,      pm68k,  pm68k, pm68k_state, empty_init, "Callan Data Systems", "PM68K",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 198?, pm68k, 0,      0,      pm68k,  pm68k, pm68k_state, empty_init, "Callan Data Systems", "PM68K",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

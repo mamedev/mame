@@ -38,7 +38,7 @@ public:
 	// construction/destruction
 	a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(pc_bios_r);
+	uint16_t pc_bios_r(offs_t offset);
 
 protected:
 	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -92,27 +92,27 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
-	DECLARE_READ8_MEMBER( pc_dma_read_byte );
-	DECLARE_WRITE8_MEMBER( pc_dma_write_byte );
-	DECLARE_READ8_MEMBER( pc_dma8237_1_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_2_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_3_dack_r );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_1_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_2_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_3_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_0_dack_w );
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_0_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
-	DECLARE_READ8_MEMBER( kbd_6502_r );
-	DECLARE_WRITE8_MEMBER( kbd_6502_w );
+	uint8_t kbd_6502_r(offs_t offset);
+	void kbd_6502_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
-	DECLARE_WRITE8_MEMBER(pc_page_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	void pc_page_w(offs_t offset, uint8_t data);
+	void nmi_enable_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(iochck_w);
 
 	void pc_select_dma_channel(int channel, bool state);

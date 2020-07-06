@@ -45,17 +45,17 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(nova2001_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_bg_videoram_w);
-	DECLARE_READ8_MEMBER(ninjakun_bg_videoram_r);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
-	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
+	void ninjakun_cpu1_io_A002_w(u8 data);
+	void ninjakun_cpu2_io_A002_w(u8 data);
+	void paletteram_w(offs_t offset, u8 data);
+	void fg_videoram_w(offs_t offset, u8 data);
+	void nova2001_bg_videoram_w(offs_t offset, u8 data);
+	void ninjakun_bg_videoram_w(offs_t offset, u8 data);
+	u8 ninjakun_bg_videoram_r(offs_t offset);
+	void scroll_x_w(u8 data);
+	void scroll_y_w(u8 data);
+	void nova2001_flipscreen_w(u8 data);
+	void pkunwar_flipscreen_w(u8 data);
 
 	DECLARE_VIDEO_START(nova2001);
 	void nova2001_palette(palette_device &palette) const;

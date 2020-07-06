@@ -22,11 +22,12 @@ namespace netlist
 	PERRMSGV(MF_DUPLICATE_NAME_DEVICE_LIST,         1, "Error adding {1} to device list. Duplicate name.")
 	PERRMSGV(MF_UNKNOWN_TYPE_FOR_OBJECT,            1, "Unknown type for object {1},")
 	PERRMSGV(MF_NET_1_DUPLICATE_TERMINAL_2,         2, "net {1}: duplicate terminal {2}")
+	PERRMSGV(MF_NULLPTR_FAMILY,                     2, "Unable to determine family for device {1} from model {2}")
 	PERRMSGV(MF_REMOVE_TERMINAL_1_FROM_NET_2,       2, "Can not remove terminal {1} from net {2}.")
 	PERRMSGV(MF_UNKNOWN_PARAM_TYPE,                 1, "Can not determine param_type for {1}")
 	PERRMSGV(MF_ERROR_CONNECTING_1_TO_2,            2, "Error connecting {1} to {2}")
 	PERRMSGV(MF_NO_SOLVER,                          0, "No solver found for this netlist although analog elements are present")
-	PERRMSGV(MF_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
+	PERRMSGV(ME_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
 	PERRMSGV(MW_ROM_NOT_FOUND,                      1, "Rom {1} not found")
 
 	// nl_factory.cpp
@@ -60,6 +61,7 @@ namespace netlist
 	PERRMSGV(MF_PARAM_COUNT_MISMATCH_2,             2, "Parameter count mismatch for {1} - only found {2}")
 	PERRMSGV(MF_PARAM_COUNT_EXCEEDED_2,             2, "Parameter count exceed for {1} - found {2}")
 	PERRMSGV(MF_UNKNOWN_OBJECT_TYPE_1,              1, "Unknown object type {1}")
+	PERRMSGV(MF_UNKNOWN_FAMILY_TYPE_1,              2, "Unknown family type {1} in model {2}")
 	PERRMSGV(MF_INVALID_NUMBER_CONVERSION_1_2,      2, "Invalid number conversion {1} : {2}")
 	PERRMSGV(MF_INVALID_ENUM_CONVERSION_1_2,        2, "Invalid element found {1} : {2}")
 	PERRMSGV(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST,1, "Error adding parameter {1} to parameter list")
@@ -81,12 +83,13 @@ namespace netlist
 	PERRMSGV(MF_MODEL_ERROR_ON_PAIR_1,              1, "Model error on pair {1}")
 	PERRMSGV(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2, 2, "Model parameters should be uppercase:{1} {2}")
 	PERRMSGV(MF_ENTITY_1_NOT_FOUND_IN_MODEL_2,      2, "Entity {1} not found in model {2}")
-	PERRMSGV(MF_UNKNOWN_NUMBER_FACTOR_IN_1,         1, "Unknown number factor in: {1}")
+	PERRMSGV(MF_UNKNOWN_NUMBER_FACTOR_IN_2,         2, "Unknown number factor in: {1}:{2}")
 	PERRMSGV(MF_MODEL_NUMBER_CONVERSION_ERROR,      4, "Can't convert {1}={2} to {3} for model {4}")
 	PERRMSGV(MF_NOT_FOUND_IN_SOURCE_COLLECTION,     1, "unable to find {1} in sources collection")
 
-	PERRMSGV(MW_OVERWRITING_PARAM_1_OLD_2_NEW_3,    3, "Overwriting {1} old <{2}> new <{3}>")
-	PERRMSGV(MW_CONNECTING_1_TO_ITSELF,             1, "Connecting {1} to itself. This may be right, though")
+	PERRMSGV(MI_OVERWRITING_PARAM_1_OLD_2_NEW_3,    3, "Overwriting {1} old <{2}> new <{3}>")
+	PERRMSGV(MW_CONNECTING_1_TO_ITSELF,             1, "Connecting net {1} to itself.")
+	PERRMSGV(MW_CONNECTING_1_TO_2_SAME_NET,         3, "Connecting terminals {1} and {2} which are already both on net {3}")
 	PERRMSGV(ME_NC_PIN_1_WITH_CONNECTIONS,          1, "Found NC (not connected) terminal {1} with connections")
 	PERRMSGV(MI_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS,1, "Found analog output {1} without connections")
 	PERRMSGV(MI_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS, 1, "Found logic output {1} without connections")
@@ -95,18 +98,29 @@ namespace netlist
 
 	PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,             1, "Found terminal {1} without a net")
 	PERRMSGV(MF_TERMINALS_WITHOUT_NET,              0, "Found terminals without a net")
+	PERRMSGV(ME_TRISTATE_NO_PROXY_FOUND_2,          2,
+		"Tristate output {1} on device {2} is not connected to a proxy. You "
+		"need to set parameter FORCE_TRISTATE_LOGIC for device {2} if "
+		"tristate enable inputs are all connected to fixed inputs. If this "
+		"is not the case: Review your netlist. Something is wrong.")
+	PERRMSGV(ME_TRISTATE_PROXY_FOUND_2,             2,
+		"The tristate output {1} on device {2} is connected to an analog net "
+		"but has been forced to act as a logic output. Parameter "
+		" FORCE_TRISTATE_LOGIC for device {2} needs to be disabled!.")
 
 	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Will be removed")
 
 	PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in sources collection")
 
-	PERRMSGV(MW_DEVICE_NOT_FOUND_FOR_HINT,          1, "Device not found for hint {1}")
-	PERRMSGV(MW_UNKNOWN_PARAMETER,                  1, "Unknown parameter {1}")
+	PERRMSGV(ME_DEVICE_NOT_FOUND_FOR_HINT,          1, "Device not found for hint {1}")
+	PERRMSGV(ME_UNKNOWN_PARAMETER,                  1, "Unknown parameter {1}")
+	PERRMSGV(MF_ERRORS_FOUND,                       1, "Counted {1} errors which need to be fixed")
 
 	// nlid_proxy.cpp
 
-	PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_2,     2, "D/A Proxy {1}: Found no valid combination of power terminals on device {2}")
+	PERRMSGV(MF_NO_POWER_TERMINALS_ON_DEVICE_2,     2, "D/A Proxy {1}: Found no valid combination of power terminals on device {2}")
 	PERRMSGV(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE, 5, "D/A Proxy: Found multiple power terminals on device {1}: {2} {3} {4} {5}")
+	PERRMSGV(MF_NULLPTR_FAMILY_NP,                  1, "Encountered nullptr to family in {1}")
 
 	// nld_matrix_solver.cpp
 
@@ -132,6 +146,14 @@ namespace netlist
 	// nld_mosfet.cpp
 
 	PERRMSGV(MW_MOSFET_THRESHOLD_VOLTAGE,           1, "Mosfet: Threshold voltage not specified for {1}")
+
+	// nld_bjt.cpp
+
+	PERRMSGV(MF_DEVICE_FRY_1,                       1,
+		"Please don't fry device {}. Most likely this error is caused by the"
+		" fact that you want to exclude the analog device from the netlist."
+		" This is not the right approach. If you want to exclude the device,"
+		" exclude the device altogether, i.e. by using #ifdef/#if statements.")
 
 	// nl_tool.cpp
 

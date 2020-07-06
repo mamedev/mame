@@ -206,17 +206,17 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 //#define USE_MCU
 
 
-WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)
+void nycaptor_state::sub_cpu_halt_w(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, (data) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_b_r)
+uint8_t nycaptor_state::nycaptor_b_r()
 {
 	return 1;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_by_r)
+uint8_t nycaptor_state::nycaptor_by_r()
 {
 	int port = ioport("LIGHTY")->read();
 
@@ -226,56 +226,56 @@ READ8_MEMBER(nycaptor_state::nycaptor_by_r)
 	return port - 8;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_bx_r)
+uint8_t nycaptor_state::nycaptor_bx_r()
 {
 	return (ioport("LIGHTX")->read() + 0x27) | 1;
 }
 
 
-WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
+void nycaptor_state::sound_cpu_reset_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r1)
+uint8_t nycaptor_state::nycaptor_mcu_status_r1()
 {
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
 	return (CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 2 : 0;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
+uint8_t nycaptor_state::nycaptor_mcu_status_r2()
 {
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
 }
 
-READ8_MEMBER(nycaptor_state::sound_status_r)
+uint8_t nycaptor_state::sound_status_r()
 {
 	return (m_soundlatch->pending_r() ? 1 : 0) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
 
 
-WRITE8_MEMBER(nycaptor_state::nmi_disable_w)
+void nycaptor_state::nmi_disable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(0);
 }
 
-WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
+void nycaptor_state::nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(1);
 }
 
-WRITE8_MEMBER(nycaptor_state::unk_w)
+void nycaptor_state::unk_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_generic_control_r)
+uint8_t nycaptor_state::nycaptor_generic_control_r()
 {
 	return m_generic_control_reg;
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_generic_control_w)
+void nycaptor_state::nycaptor_generic_control_w(uint8_t data)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data&0x08)>>3);
@@ -349,26 +349,26 @@ void nycaptor_state::sound_map(address_map &map)
 /* Cycle Shooting */
 
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r)
+uint8_t nycaptor_state::cyclshtg_mcu_status_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_r)
+uint8_t nycaptor_state::cyclshtg_mcu_r()
 {
 	return 7;
 }
 
-WRITE8_MEMBER(nycaptor_state::cyclshtg_mcu_w)
+void nycaptor_state::cyclshtg_mcu_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r1)
+uint8_t nycaptor_state::cyclshtg_mcu_status_r1()
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
+void nycaptor_state::cyclshtg_generic_control_w(uint8_t data)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data >> 2) & 3);
@@ -425,7 +425,7 @@ void nycaptor_state::cyclshtg_slave_map(address_map &map)
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
-READ8_MEMBER(nycaptor_state::unk_r)
+uint8_t nycaptor_state::unk_r()
 {
 	return machine().rand();
 }
@@ -575,8 +575,8 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            // IPT_START2 in some similar Taito games (eg: 'flstory')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            // "I/O ERROR" if active - code at 0x083d
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            // "I/O ERROR" if active - code at 0x083d
 
