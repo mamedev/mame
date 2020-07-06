@@ -1530,50 +1530,10 @@ void spg2xx_game_senwfit_state::init_senwfit()
 
 	for (int i = 0; i < len; i++)
 	{
-		int newaddr = bitswap<25>(i, 24, 23, 22, 21,  9,  20,     19, 18, 17, 16,    15, 14, 13, 12,    11, 10,   8,    7, 6, 5, 4,    3, 2, 1, 0);
+		int newaddr = bitswap<25>(i, 24,23,22,20,9,19,18,21,17,16,15,14,13,12,11,10,8,7,6,5,4,3,2,1,0);
 		buffer[i] = src[newaddr];
 	}
 	std::copy(buffer.begin(), buffer.end(), &src[0]);
-
-
-	for (int i = 0; i < len; i++)
-	{
-		int newaddr = bitswap<25>(i, 24, 23, 22, 21,   20,     18, 19, 17, 16,    15, 14, 13, 12,   11,  10, 9, 8,    7, 6, 5, 4,    3, 2, 1, 0);
-		buffer[i] = src[newaddr];
-	}
-	std::copy(buffer.begin(), buffer.end(), &src[0]);
-
-
-	for (int i = 0; i < len; i++)
-	{
-		int newaddr = bitswap<25>(i, 24, 23, 22, 21,   19,     20, 18, 17, 16,    15, 14, 13, 12,   11,  10, 9, 8,    7, 6, 5, 4,    3, 2, 1, 0);
-		buffer[i] = src[newaddr];
-	}
-	std::copy(buffer.begin(), buffer.end(), &src[0]);
-
-	for (int i = 0; i < len; i++)
-	{
-		int newaddr = bitswap<25>(i, 24, 23, 22, 20,   21,     19, 18, 17, 16,    15, 14, 13, 12,   11,  10, 9, 8,    7, 6, 5, 4,    3, 2, 1, 0);
-		buffer[i] = src[newaddr];
-	}
-	std::copy(buffer.begin(), buffer.end(), &src[0]);
-
-	for (int i = 0; i < len; i++)
-	{
-		int newaddr = bitswap<25>(i, 24, 23, 22, 21,   20,     19, 18, 17, 16,    15, 14, 13, 12,   11,  10, 9, 8,    7, 6, 5, 4,    3, 2, 1, 0);
-		buffer[i] = src[newaddr];
-	}
-	std::copy(buffer.begin(), buffer.end(), &src[0]);
-
-	FILE *fp;
-	char filename[256];
-	sprintf(filename,"decrypted_%s", machine().system().name);
-	fp=fopen(filename, "w+b");
-	if (fp)
-	{
-		fwrite(src, len, 1, fp);
-		fclose(fp);
-	}
 
 }
 
