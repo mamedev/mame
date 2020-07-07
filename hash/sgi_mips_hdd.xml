@@ -11,7 +11,7 @@ license:CC0
 	missing, run
 		setenv -f eaddr 08:00:69:12:34:56
 	to set the Ethernet interface address, and
-		setenv -f monitor h
+		setenv monitor h
 	to enable high resolution mode (1280x1024), then power cycle.
 
 	Unless otherwise specified, all images are based on default installs of the
@@ -58,6 +58,17 @@ license:CC0
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
 				<disk name="irix_6_5" sha1="87ab8431fb9be519d05343f6fc735a1730cff49d" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_22">
+		<description>IRIX 6.5.22</description>
+		<year>2003</year>
+		<publisher>SGI</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_6_5_22" sha1="02a015321dc31a08a08ff4751687bc474583190a" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
