@@ -688,7 +688,78 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="dlair">
-		<description>Dragon's Lair</description>
+		<description>Dragon's Lair (5.25")</description>
+		<year>1989</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 01 of 13].img" size="368640" crc="63e76372" sha1="46785065572152b6015ba4937fac577fc6cfc2a7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 02 of 13].img" size="368640" crc="371e335e" sha1="9466563a824aa2a9c2d359083c9f69a537784ff2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 03 of 13].img" size="368640" crc="809f39e5" sha1="0e61c6188ec32360055570c1b76399ec5e43f23d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 04 of 13].img" size="368640" crc="e7087a0c" sha1="d33322ebecdd9a3566d1358a3052187ce1b69758"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 05 of 13].img" size="368640" crc="24db0798" sha1="0a169a62fb16faf4e5a0ab721c8b537fbab5f78f"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 06 of 13].img" size="368640" crc="ba652ef1" sha1="14f054b2122c02796e1182e2c291230b31e2ec82"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 07 of 13].img" size="368640" crc="6e2af55c" sha1="da5ee6df23df16879fc55b6866722e06fba15602"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 08 of 13].img" size="368640" crc="e62f0ac2" sha1="688874136230366fff747787c1eb344dd778b52e"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 09 of 13].img" size="368640" crc="6c832f42" sha1="42747cb7c91e0d116bd8559c7e3893679875037f"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 10 of 13].img" size="368640" crc="90bead8d" sha1="f82a392fd6239e2306b68fc0f571caeddf8c11e3"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 11 of 13].img" size="368640" crc="bc826826" sha1="ee03b2428548f1c952879591804f5e9ef895d229"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 12 of 13].img" size="368640" crc="857c2bde" sha1="89e15fb47111771edfcb7652c803f0c65e7669b9"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 13 of 13].img" size="368640" crc="9b3235aa" sha1="8b800bcfa4b443ce719e83bb8e2e0f89fa946f44"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dlair35" cloneof="dlair">
+		<description>Dragon's Lair (3.5")</description>
 		<year>1989</year>
 		<publisher>Merit Software</publisher>
 		<info name="developer" value="Sullivan Bluth Interactive Media" />
@@ -9759,22 +9830,61 @@ has been replaced with an all-zero block. -->
 	</software>
 	
 	<software name="lsl2">
-		<description>Leisure Suit Larry Goes Looking for Love (In Several Wrong Places)</description>
-		<year>1988</year>
-		<publisher>Sierra</publisher>
+		<description>Leisure Suit Larry Goes Looking for Love (in Several Wrong Places) (5.25")</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Ver. 1.002.000 January 11, 89" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [5.25DD] [Disk 1 of 6].img" size="368640" crc="e88e484e" sha1="bc9a1560dddd7693f5bbd966ff7dbac1cfe27167"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [5.25DD] [Disk 2 of 6].img" size="368640" crc="8291e70d" sha1="a2d34c580b33db9ed890697e3d926206e4c4e22f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [5.25DD] [Disk 3 of 6].img" size="368640" crc="cf970896" sha1="135bd6bc669b7530e615c1e5c5658e9db43dbc52"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [5.25DD] [Disk 4 of 6].img" size="368640" crc="1b58a8ed" sha1="9d9bf39a2012522f1a5e2f8535368a8cc696bd6b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [5.25DD] [Disk 5 of 6].img" size="368640" crc="260f05a1" sha1="25354834527dde21a0705dc5216601dbaef4b4b3"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [5.25DD] [Disk 6 of 6].img" size="368640" crc="c22b5f3f" sha1="6c3d3aad5fdf86d6dca9c915053b49bc7369f0ec"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="lsl2_35" cloneof="lsl2">
+		<description>Leisure Suit Larry Goes Looking for Love (in Several Wrong Places) (3.5")</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Ver. 1.002.000 January 11, 89" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="leisure suit larry 2 (disk 1).img" size="737280" crc="d852af42" sha1="1feab542687a6984072faabd228976d6953238c1"/>
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [3.5DD] [Disk 1 of 3].img" size="737280" crc="0a201664" sha1="9cc61dec4fadfd1519e084ba7ecb007b070d0625"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="leisure suit larry 2 (disk 2).img" size="737280" crc="09153a59" sha1="a57ef10d7b5c6ffa393b0b296a7907c51728652a"/>
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [3.5DD] [Disk 2 of 3].img" size="737280" crc="09153a59" sha1="a57ef10d7b5c6ffa393b0b296a7907c51728652a"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="leisure suit larry 2 (disk 3).img" size="737280" crc="0a3b07f8" sha1="2a3732988e2265d3f352fa5f25330fb6602ab59d"/>
+				<rom name="Leisure Suit Larry 2 [Sierra] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="0a3b07f8" sha1="2a3732988e2265d3f352fa5f25330fb6602ab59d"/>
 			</dataarea>
 		</part>
 	</software>
