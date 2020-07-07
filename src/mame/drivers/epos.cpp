@@ -56,7 +56,7 @@ void epos_state::dealer_decrypt_rom(offs_t offset, uint8_t data)
 	else
 		m_counter = (m_counter - 1) & 0x03;
 
-//  logerror("PC %08x: ctr=%04x\n",m_maincpu->pc(), m_counter);
+	//logerror("PC %08x: ctr=%04x\n",m_maincpu->pc(), m_counter);
 
 	membank("bank1")->set_entry(m_counter);
 
@@ -84,6 +84,7 @@ void epos_state::dealer_map(address_map &map)
 	map(0x7000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).ram().share("videoram");
 }
+
 
 /*************************************
  *
@@ -149,6 +150,7 @@ void epos_state::flip_screen_w(uint8_t data)
 	m_ay_porta_multiplex = BIT(data, 6);
 }
 
+
 /*************************************
  *
  *  Port definitions
@@ -160,11 +162,9 @@ void epos_state::flip_screen_w(uint8_t data)
    the processor if an unexpected value is read. */
 
 static INPUT_PORTS_START( megadon )
+	// There are odd port mappings (old=new)
+	// 02=10, 04=40, 08=02, 10=20, 20=04, 40=08
 	PORT_START("DSW")
-
-// There are odd port mappings (old=new)
-// 02=10, 04=40, 08=02, 10=20, 20=04, 40=08
-
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -212,11 +212,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( suprglob )
+	// There are odd port mappings (old=new)
+	// 02=10, 04=40, 08=20, 10=02, 20=04, 40=08
 	PORT_START("DSW")
-
-// There are odd port mappings (old=new)
-// 02=10, 04=40, 08=20, 10=02, 20=04, 40=08
-
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -267,11 +265,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( igmo )
+	// There are odd port mappings (old=new)
+	// 02=10, 04=40, 08=20, 10=02, 20=04, 40=08
 	PORT_START("DSW")
-
-// There are odd port mappings (old=new)
-// 02=10, 04=40, 08=20, 10=02, 20=04, 40=08
-
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -320,12 +316,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( catapult )
-	PORT_INCLUDE(igmo)
-		PORT_MODIFY("DSW")
+	PORT_INCLUDE( igmo )
 
-// There are odd port mappings (old=new)
-// 02=08, 04=20, 08=40, 10=02, 20=10, 40=04
-
+	// There are odd port mappings (old=new)
+	// 02=08, 04=20, 08=40, 10=02, 20=10, 40=04
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -351,11 +346,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( eeekk )
+	// There are odd port mappings (old=new)
+	// 02=10, 04=40, 08=02, 10=20, 20=04, 40=08
 	PORT_START("DSW")
-
-// There are odd port mappings (old=new)
-// 02=10, 04=40, 08=02, 10=20, 20=04, 40=08
-
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -456,7 +449,7 @@ static INPUT_PORTS_START( dealer )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( beastf )
-	PORT_INCLUDE(dealer)
+	PORT_INCLUDE( dealer )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -476,6 +469,7 @@ static INPUT_PORTS_START( beastf )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -682,17 +676,17 @@ ROM_END
 
 ROM_START( igmo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "igmo-u10.732",   0x0000, 0x1000, CRC(a9f691a4) SHA1(e3f2dc41bd8760fc52e99b7e9faa12c7cf51ffe0) )
-	ROM_LOAD( "igmo-u9.732",    0x1000, 0x1000, CRC(3c133c97) SHA1(002b5aff6b947b6a9cbabeed5be798c1ddf2bda1) )
-	ROM_LOAD( "igmo-u8.732",    0x2000, 0x1000, CRC(5692f8d8) SHA1(6ab50775dff49330a85fbfb2d4d4c3a2e54df3d1) )
-	ROM_LOAD( "igmo-u7.732",    0x3000, 0x1000, CRC(630ae2ed) SHA1(0c293b6192e703b16ed20c277c706ae90773f477) )
-	ROM_LOAD( "igmo-u6.732",    0x4000, 0x1000, CRC(d3f20e1d) SHA1(c0e0b542ac020adc085ec90c2462c6544098447e) )
-	ROM_LOAD( "igmo-u5.732",    0x5000, 0x1000, CRC(e26bb391) SHA1(ba0e44c02fbb36e18e0d779d46bb992e6aba6cf1) )
-	ROM_LOAD( "igmo-u4.732",    0x6000, 0x1000, CRC(762a4417) SHA1(7fed5221950e3e1ce41c0b4ded44597a242a0177) )
-	ROM_LOAD( "igmo-u11.716",   0x7000, 0x0800, CRC(8c675837) SHA1(2725729693960b53ea01ebffa0a81df2cd425890) )
+	ROM_LOAD( "u10_igmo_i05134.u10", 0x0000, 0x1000, CRC(a9f691a4) SHA1(e3f2dc41bd8760fc52e99b7e9faa12c7cf51ffe0) )
+	ROM_LOAD( "u9_igmo_i05134.u9",   0x1000, 0x1000, CRC(3c133c97) SHA1(002b5aff6b947b6a9cbabeed5be798c1ddf2bda1) )
+	ROM_LOAD( "u8_igmo_i05134.u8",   0x2000, 0x1000, CRC(5692f8d8) SHA1(6ab50775dff49330a85fbfb2d4d4c3a2e54df3d1) )
+	ROM_LOAD( "u7_igmo_i05134.u7",   0x3000, 0x1000, CRC(630ae2ed) SHA1(0c293b6192e703b16ed20c277c706ae90773f477) )
+	ROM_LOAD( "u6_igmo_i05134.u6",   0x4000, 0x1000, CRC(d3f20e1d) SHA1(c0e0b542ac020adc085ec90c2462c6544098447e) )
+	ROM_LOAD( "u5_igmo_i05134.u5",   0x5000, 0x1000, CRC(e26bb391) SHA1(ba0e44c02fbb36e18e0d779d46bb992e6aba6cf1) )
+	ROM_LOAD( "u4_igmo_i05134.u4",   0x6000, 0x1000, CRC(762a4417) SHA1(7fed5221950e3e1ce41c0b4ded44597a242a0177) )
+	ROM_LOAD( "u11_igmo_i05134.u11", 0x7000, 0x0800, CRC(8c675837) SHA1(2725729693960b53ea01ebffa0a81df2cd425890) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
+	ROM_LOAD( "82s123.u66",          0x0000, 0x0020, CRC(1ba03ffe) SHA1(f5692c06ae6d20c010430c8d08f5c60e78d36dc9) )
 ROM_END
 
 
@@ -708,7 +702,7 @@ ROM_START( eeekk )
 	ROM_LOAD( "u11_e12063.u11", 0x7000, 0x0800, CRC(417faff0) SHA1(7965155ee32694ea9a10245db73d8beef229408c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74s288.u66", 0x0000, 0x0020, CRC(f2078c38) SHA1(7bfd49932a6fd8840514b7af93a64cedb248122d) )
+	ROM_LOAD( "74s288.u66",     0x0000, 0x0020, CRC(f2078c38) SHA1(7bfd49932a6fd8840514b7af93a64cedb248122d) )
 ROM_END
 
 
@@ -858,7 +852,7 @@ GAME( 1983, suprglob, 0,        epos,   suprglob, epos_state, empty_init, ROT270
 GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
 GAME( 1983, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
 /* EPOS TRISTAR 9000 PCB based */
