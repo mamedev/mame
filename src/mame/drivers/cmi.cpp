@@ -2281,28 +2281,28 @@ void cmi_state::cmi2x(machine_config &config)
 
 	// Channel cards
 	cmi01a_device &cmi01a_0(CMI01A_CHANNEL_CARD(config, "cmi01a_0", SYSTEM_CAS_CLOCK, 0));
-	cmi01a_0.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_0.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_0.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
 	cmi01a_device &cmi01a_1(CMI01A_CHANNEL_CARD(config, "cmi01a_1", SYSTEM_CAS_CLOCK, 1));
-	cmi01a_1.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_1.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_1.irq_callback().set(FUNC(cmi_state::channel_irq<1>));
 	cmi01a_device &cmi01a_2(CMI01A_CHANNEL_CARD(config, "cmi01a_2", SYSTEM_CAS_CLOCK, 2));
-	cmi01a_2.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_2.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_2.irq_callback().set(FUNC(cmi_state::channel_irq<2>));
 	cmi01a_device &cmi01a_3(CMI01A_CHANNEL_CARD(config, "cmi01a_3", SYSTEM_CAS_CLOCK, 3));
-	cmi01a_3.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_3.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_3.irq_callback().set(FUNC(cmi_state::channel_irq<3>));
 	cmi01a_device &cmi01a_4(CMI01A_CHANNEL_CARD(config, "cmi01a_4", SYSTEM_CAS_CLOCK, 4));
-	cmi01a_4.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_4.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_4.irq_callback().set(FUNC(cmi_state::channel_irq<4>));
 	cmi01a_device &cmi01a_5(CMI01A_CHANNEL_CARD(config, "cmi01a_5", SYSTEM_CAS_CLOCK, 5));
-	cmi01a_5.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_5.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_5.irq_callback().set(FUNC(cmi_state::channel_irq<5>));
 	cmi01a_device &cmi01a_6(CMI01A_CHANNEL_CARD(config, "cmi01a_6", SYSTEM_CAS_CLOCK, 6));
-	cmi01a_6.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_6.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_6.irq_callback().set(FUNC(cmi_state::channel_irq<6>));
 	cmi01a_device &cmi01a_7(CMI01A_CHANNEL_CARD(config, "cmi01a_7", SYSTEM_CAS_CLOCK, 7));
-	cmi01a_7.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_7.add_route(ALL_OUTPUTS, "mono", 0.12);
 	cmi01a_7.irq_callback().set(FUNC(cmi_state::channel_irq<7>));
 }
 
