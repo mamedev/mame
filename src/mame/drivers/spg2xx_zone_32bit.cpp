@@ -954,3 +954,5 @@ DENMARK
 */
 
 CONS( 200?, dnv200fs,   0, 0, zon32bit_bat, oplayer, denver_200in1_state, init_denver, "Denver", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+

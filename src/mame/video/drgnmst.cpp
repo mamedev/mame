@@ -258,3 +258,4 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	return 0;
 }
+

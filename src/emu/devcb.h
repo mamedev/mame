@@ -29,9 +29,12 @@
 //  DETECT PROBLEMATIC COMPILERS
 //**************************************************************************
 
-#ifndef MAME_DEVCB_GNUC_BROKEN_FRIEND
+#if defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ >= 8
 #define MAME_DEVCB_GNUC_BROKEN_FRIEND 1
-#endif
+#endif // __GNUC__ >= 8
+#endif // defined(__GNUC__) && !defined(__clang__)
+
 
 
 //**************************************************************************

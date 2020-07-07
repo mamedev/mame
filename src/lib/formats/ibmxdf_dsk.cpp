@@ -259,3 +259,4 @@ void ibmxdf_format::build_sector_description(const format &f, uint8_t *sectdata,
 }
 
 const floppy_format_type FLOPPY_IBMXDF_FORMAT = &floppy_image_format_creator<ibmxdf_format>;
+
