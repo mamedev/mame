@@ -144,9 +144,6 @@ void tms1k_base_device::device_start()
 	if (m_opla_b != nullptr && m_output_pla_table == nullptr)
 		set_output_pla(&m_opla_b->as_u16());
 
-	if (m_opla_b != nullptr && m_output_pla_table == nullptr)
-		set_output_pla(&m_opla_b->as_u16());
-
 	// zerofill
 	m_pc = 0;
 	m_sr = 0;

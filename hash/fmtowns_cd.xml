@@ -5532,24 +5532,6 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="fscmarty">
-		<!--
-		Origin: redump.org
-		<rom name="Free Software Collection MaRTy.1 (Japan).bin" size="158407200" crc="27d18712" sha1="4292643928136a6113f7e5b146ca1a9567023f8b"/>
-		<rom name="Free Software Collection MaRTy.1 (Japan).cue" size="106" crc="fa39270f" sha1="71418990c5fa33fca2976d0c521338a0e66ec659"/>
-		-->
-		<description>Free Software Collection Marty 1</description>
-		<year>1992</year>
-		<publisher>富士通 (Fujitsu)</publisher>
-		<info name="release" value="199211xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
-		<part name="cdrom" interface="fmt_cdrom">
-			<diskarea name="cdrom">
-				<disk name="free software collection marty.1 (japan)" sha1="25b54e516972dcd33eba8bb21c3d3f9f8c50d576" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="fshark">
 		<!--
 		Origin: Neo Kobe Collection

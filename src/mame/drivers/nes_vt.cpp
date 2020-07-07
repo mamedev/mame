@@ -185,28 +185,6 @@ public:
 	{ }
 };
 
-class nes_vt_waixing_alt_state : public nes_vt_waixing_state
-{
-public:
-	nes_vt_waixing_alt_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_waixing_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void machine_reset() override;
-};
-
-
-class nes_vt_timetp36_state : public nes_vt_state
-{
-public:
-	nes_vt_timetp36_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
-	{ }
-
-protected:
-};
-
 class nes_vt_hum_state : public nes_vt_state
 {
 public:
@@ -1345,13 +1323,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_senwld(machine_config &config)
-{
-	nes_vt_vh2009(config);
-
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-}
-
 static INPUT_PORTS_START( nes_vt_fp )
 	PORT_INCLUDE(nes_vt)
 
@@ -2160,7 +2131,6 @@ CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
 CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
@@ -2198,3 +2168,4 @@ CONS( 2015, rminitv,   0,  0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_state, empt
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt_fp_4x16mb,   nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
+

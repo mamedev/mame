@@ -33,7 +33,6 @@
 #include <initializer_list>
 #include <unordered_map>
 #include <vector>
-#include <initializer_list>
 
 //============================================================
 //  MACROS / New Syntax
