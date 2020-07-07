@@ -41659,7 +41659,7 @@ license:CC0
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="0x2000000">
-				<rom name="Ultraman - Confrontation Between Justice And Evil (Ul'traman - Konfrontatsiya mezhdu spravedlivost'yu i zlom) (Unl) (Rus) [YJ restored].gba" size="0x2000000" crc="4683dbb5" sha1="08a9530ce82a76e1be5e408ae99bdd90c42748e9" status="baddump" />
+				<rom name="Ultraman - Confrontation Between Justice And Evil (Unl) (Rus) [YJ restored].gba" size="0x2000000" crc="4683dbb5" sha1="08a9530ce82a76e1be5e408ae99bdd90c42748e9" status="baddump" />
 			</dataarea>
 		</part>
 	</software>	
