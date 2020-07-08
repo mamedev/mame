@@ -144,8 +144,7 @@
   * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
   * Mundial/Mondial (Italian/French),                 1987, Unknown.
   * Super 98 (3-hands, ICP-1),                        199?, Unknown.
-  * unknown animal-themed game (bottom),              199?, Unknown.
-  * unknown animal-themed game (top),                 199?, Unknown.
+  * unknown rocket/animal-themed poker,               199?, Unknown.
   * Mega Double Poker (conversion kit, set 1),        1990, Blitz System Inc.
   * Mega Double Poker (conversion kit, set 2),        1990, Blitz System Inc.
 
@@ -11410,19 +11409,26 @@ ROM_END
 
 /*-------------------------------------------------------------------------
 
-   Unknown animals themed banked game.
+  Unknown rocket/animals themed banked game.
 
-   It has 4 character's tiles:
-   A pig, a duck, a donkey, and a mouse.
-   Duck and mouse are very close to Disney's characters
-   Donald Duck and Mickey Mouse.
+  The game looks like a poker game using rockets instead of cards.
 
-   The PCB has a lot of wire-hacks doing a weird banking,
-   and other unknown things (maybe addressing scramble).
-   These hacks need to be documented.
+  But the game also has graphics tiles for 4 characters:
+  
+  - pig
+  - duck
+  - donkey
+  - mouse
+  
+  Duck and mouse are very close to Disney's characters Donald Duck
+  and Mickey Mouse.
 
-   Bottom and Top programs ROMs are soldered one over the other, and a wire
-   hack enable/disable each set through the CE pin.
+  The PCB has a lot of wire-hacks doing a weird banking,
+  and other unknown things (maybe addressing scramble).
+  These hacks need to be documented.
+
+  Bottom and Top programs ROMs are soldered one over the other, and a wire
+  hack enable/disable each set through the CE pin.
 
 ---------------------------------------------------------------------------
 
@@ -11458,26 +11464,12 @@ ROM_END
 -------------------------------------------------------------------------*/
 ROM_START( animpkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732_top.15a",     0x2000, 0x1000, CRC(ef6b36ff) SHA1(2ca520502ce32c4327f9bcc85d5c7b6e2f22eeb5) )
+	ROM_LOAD( "2732_top.17a",     0x3000, 0x1000, CRC(13fae924) SHA1(c1c92fdb6e7036e6d9349c9b017e9daf3577345b) )
+
+	ROM_REGION( 0x10000, "banked", 0 )
 	ROM_LOAD( "2732_bottom.15a",  0x2000, 0x1000, CRC(036f7639) SHA1(7d548dd71692fcde41c260a4a59ccdfa2aa5b07e) )
 	ROM_LOAD( "2732_bottom.17a",  0x3000, 0x1000, CRC(92c19e72) SHA1(034d077ede5608160ba882227e981751a5dde26d) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(             0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
-	ROM_LOAD( "2716.8a",  0x1000, 0x0800, CRC(21c9c7f1) SHA1(daa0eddd4f4a9eec0cff3aebe884792adf830238) )    // char ROM
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "2716.4a",  0x0000, 0x0800, CRC(0b7f11a2) SHA1(c5e347a377e307d12b2b2d2edf7c48be21ef5cdb) )    // characters gfx, bitplane 1
-	ROM_LOAD( "2716.5a",  0x0800, 0x0800, CRC(0b2c3c25) SHA1(c69b15c1cea9abc437b12211bc4087d4d5baf084) )    // characters gfx, bitplane 2
-	ROM_LOAD( "2716.7a",  0x1000, 0x0800, CRC(c48d17b0) SHA1(7c446339ab3aaa49004780fa90a3624b5a382cb1) )    // characters gfx, bitplane 3
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "bprom.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // PROM dump needed
-ROM_END
-
-ROM_START( animpkra )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2732_top.15a",  0x2000, 0x1000, CRC(ef6b36ff) SHA1(2ca520502ce32c4327f9bcc85d5c7b6e2f22eeb5) )
-	ROM_LOAD( "2732_top.17a",  0x3000, 0x1000, CRC(13fae924) SHA1(c1c92fdb6e7036e6d9349c9b017e9daf3577345b) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(             0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
@@ -12219,8 +12211,7 @@ GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                  // banked selectable program
 GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               MACHINE_NOT_WORKING )  // program checks zeropage registers for changes...
 
-GAME(  198?, animpkr,   0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown animal-themed game (bottom)",     MACHINE_NOT_WORKING )  // banked selectable program (bottom).
-GAME(  198?, animpkra,  animpkr,  pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown animal-themed game (top)",        MACHINE_NOT_WORKING )  // banked selectable program (top).
+GAME(  198?, animpkr,   0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_NOT_WORKING )  // banked program.
 
 GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
 GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time
