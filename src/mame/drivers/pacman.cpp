@@ -7718,7 +7718,7 @@ GAME( 1981, crush5,   crush,    crush4,   crush4,   pacman_state,  empty_init,  
 GAME( 1981, maketrax, crush,    korosuke, maketrax, pacman_state,  init_maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, maketrxb, crush,    korosuke, maketrax, pacman_state,  init_maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, korosuke, crush,    korosuke, korosuke, pacman_state,  init_maketrax, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
-GAME( 1981, crushrlf, crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (Famare SA PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushrlf, crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (FAMARE S.A. PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    korosuke, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl3, crush,    korosuke, mbrush,   pacman_state,  init_maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
