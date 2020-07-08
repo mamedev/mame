@@ -439,7 +439,6 @@ private:
 	uint8_t   m_map_sel[16];
 	std::unique_ptr<uint8_t[]>    m_map_ram[2];
 	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
-	uint8_t   m_ram_indices[2][PAGE_COUNT];
 	uint8_t   m_map_ram_latch;
 	int     m_cpu_active_space[2];
 	int     m_cpu_map_switch[2];
