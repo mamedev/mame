@@ -125,4 +125,5 @@ void ondra_state::machine_start()
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_bank_status));
 	save_item(NAME(m_bank_old));
+	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
 }

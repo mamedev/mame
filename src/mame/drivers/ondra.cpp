@@ -16,9 +16,11 @@ ToDo:
 - Sound is a speaker connected to a multivibrator circuit. There are 3 diodes
   from this circuit to allow a choice of 7 frequencies. We have used a buzzer
   with selected arbitrary frequencies, not having any idea what they should be.
-- Ondrav doesn't seem to accept any commands, only producing KOD 1 followed
-  by halt. You have to press Esc before trying again.
-- Cassette not working. Doesn't load from softlist, and don't know how to save.
+- Ondrav: can load from softlist. Load the tape then press Enter.
+- Ondrav: doesn't seem to accept any other commands, need instructions.
+  You have to press Esc before trying again.
+- Ondrat: Doesn't load from softlist
+- Cassette: don't know how to save.
 
 ******************************************************************************/
 
@@ -35,7 +37,7 @@ ToDo:
 void ondra_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0xdfff).ram();
+	map(0x4000, 0xdfff).bankrw("bank2");
 	map(0xe000, 0xffff).bankrw("bank3");
 }
 
