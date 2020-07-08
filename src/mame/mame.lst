@@ -9250,7 +9250,6 @@ bishi                           // GX575 (c) 1996 (Japan)
 sbishi                          // GX675 (c) 1998 (Japan)
 sbishik                         // GX675 (c) 1998 (Korea)
 sbishika                        // GX675 (c) 1998 (Korea)
-dobouchn                        //
 
 @source:bitel.cpp
 feap90                          //
@@ -18904,11 +18903,12 @@ tsukande
 mariorou
 
 @source:konmedal68k.cpp
-kzaurus
+dobouchn
+kattobas
 koropens
+kzaurus
 pwrchanc
 ymcapsul
-kattobas
 
 @source:quickpick5.cpp
 quickp5
