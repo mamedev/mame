@@ -40,6 +40,7 @@
 #define LM566_DIP NE566_DIP
 
 // alias LS devices to real devices
+#define TTL_74LS00_DIP TTL_7400_DIP
 #define TTL_74LS04_DIP TTL_7404_DIP     // Hex Inverting Gates
 #define TTL_74LS08_DIP TTL_7408_DIP     // Quad 2-Input AND Gates
 #define TTL_74LS21_DIP TTL_7421_DIP     // Dual 4-Input AND Gates

@@ -1133,7 +1133,7 @@ void cinemat_state::armora(machine_config &config)
 void cinemat_state::ripoff(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	RIP_OFF_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
+	RIPOFF_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_state::starcas(machine_config &config)

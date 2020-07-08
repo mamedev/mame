@@ -21,12 +21,15 @@
 #include "emu.h"
 #include "includes/cinemat.h"
 
+#include "audio/nl_armora.h"
+#include "audio/nl_ripoff.h"
 #include "audio/nl_spacewar.h"
 #include "audio/nl_speedfrk.h"
 #include "audio/nl_starcas.h"
 #include "audio/nl_starhawk.h"
 #include "audio/nl_sundance.h"
 #include "audio/nl_tailg.h"
+#include "audio/nl_warrior.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -330,82 +333,8 @@ void warrior_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(ARMOR_ATTACK_AUDIO, armora_audio_device, "armora_audio", "Armor Atrack Sound Board")
 
 armora_audio_device::armora_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, ARMOR_ATTACK_AUDIO, tag, owner, clock, 0x0e)
+	: cinemat_audio_device(mconfig, ARMOR_ATTACK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(armora), 5000.0)
 {
-}
-
-void armora_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	static const char *const sample_names[] =
-	{
-		"*armora",
-		"loexp",
-		"jeepfire",
-		"hiexp",
-		"tankfire",
-		"tankeng",
-		"beep",
-		"chopper",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(7);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
-
-void armora_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-	// execute on the rising edge of bit 0x01
-	if (rising_edge(curvals, oldvals, 0))
-		shiftreg_latch();
-
-	// on the rising edge of bit 4, clock bit 0x80 into the shift register
-	if (rising_edge(curvals, oldvals, 4))
-		shiftreg_clock(curvals >> 7);
-
-	// tank sound - 0=on, 1=off
-	// still not totally correct - should be multiple speeds based on remaining bits in shift reg
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(4, 4, true);
-	if (rising_edge(curvals, oldvals, 1))
-		m_samples->stop(4);
-
-	// beep sound - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(5, 5, true);
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->stop(5);
-
-	// chopper sound - 0=on, 1=off */
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(6, 6, true);
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->stop(6);
-}
-
-void armora_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-	// bits 0-4 control the tank sound speed
-
-	// lo explosion - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(0, 0);
-
-	// jeep fire - falling edge
-	if (falling_edge(curvals, oldvals, 5))
-		m_samples->start(1, 1);
-
-	// hi explosion - falling edge
-	if (falling_edge(curvals, oldvals, 6))
-		m_samples->start(2, 2);
-
-	// tank fire - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(3, 3);
 }
 
 
@@ -416,82 +345,11 @@ void armora_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
  *
  *************************************/
 
-DEFINE_DEVICE_TYPE(RIP_OFF_AUDIO, ripoff_audio_device, "ripoff_audio", "Rip Off Sound Board")
+DEFINE_DEVICE_TYPE(RIPOFF_AUDIO, ripoff_audio_device, "ripoff_audio", "Rip Off Sound Board")
 
 ripoff_audio_device::ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, RIP_OFF_AUDIO, tag, owner, clock, 0x98)
+	: cinemat_audio_device(mconfig, RIPOFF_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(ripoff), 5000.0)
 {
-}
-
-void ripoff_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	static const char *const sample_names[] =
-	{
-		"*ripoff",
-		"bonuslvl",
-		"eattack",
-		"shipfire",
-		"efire",
-		"explosn",
-		"bg1",
-		"bg2",
-		"bg3",
-		"bg4",
-		"bg5",
-		"bg6",
-		"bg7",
-		"bg8",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
-}
-
-void ripoff_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-	// execute on the rising edge of bit 2, latch the shift register
-	if (rising_edge(curvals, oldvals, 2))
-		shiftreg_latch();
-
-	// on the rising edge of bit 1, clock bit 0 into the shift register
-	if (rising_edge(curvals, oldvals, 1))
-		shiftreg_clock(curvals & 1);
-
-	// torpedo - falling edge
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(2, 2);
-
-	// laser - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(3, 3);
-
-	// explosion - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(4, 4);
-}
-
-void ripoff_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-	// background - 0=on, 1=off, selected by bits 0x38
-	if (falling_edge(curvals, oldvals, 2) || (((curvals ^ oldvals) & 0x38) && !BIT(curvals, 2)))
-		m_samples->start(5, 5 + ((curvals >> 5) & 7), true);
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->stop(5);
-
-	// beep - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(0, 0);
-
-	// motor - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 0))
-		m_samples->start(1, 1, true);
-	if (rising_edge(curvals, oldvals, 0))
-		m_samples->stop(1);
 }
 
 
@@ -657,7 +515,7 @@ void solarq_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
 DEFINE_DEVICE_TYPE(BOXING_BUGS_AUDIO, boxingb_audio_device, "boxingb_audio", "Boxing Bugs Sound Board")
 
 boxingb_audio_device::boxingb_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, RIP_OFF_AUDIO, tag, owner, clock, 0x0c)
+	: cinemat_audio_device(mconfig, BOXING_BUGS_AUDIO, tag, owner, clock, 0x0c)
 {
 }
 

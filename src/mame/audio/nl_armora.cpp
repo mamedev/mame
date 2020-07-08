@@ -8,7 +8,12 @@
 //
 // Known problems/issues:
 //
-//    * Not yet tested.
+//    * Worked pretty well the first time. No VCOs, hurray!
+//
+//    * The squeak on the tank treads is not right, need to
+//       understand what's going on.
+//
+//    * Entire schematic needs a verification pass.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -619,7 +624,7 @@ NETLIST_START(armora)
     // Unconnected inputs
     //
 
-    NET_C(GND, IC7.1, IC9.4, IC9.5, IC9.12, IC9.13, IC27.1)
+    NET_C(GND, IC7.1, IC9.4, IC9.5, IC9.12, IC9.13, IC27.1, IC27.2)
     NET_C(GND, IC24.2, IC24.3)	// part of final amp
 
     //
@@ -629,6 +634,6 @@ NETLIST_START(armora)
     HINT(IC7.2, NC)
     HINT(IC9.6, NC)
     HINT(IC9.11, NC)
-    HINT(IC27.2, NC)
+//    HINT(IC27.2, NC)
 
 NETLIST_END()

@@ -4,11 +4,17 @@
 //
 // Netlist for Rip Off
 //
-// Derived from the schematics in the Warrior manual.
+// Derived from the schematics in the Rip Off manual.
 //
 // Known problems/issues:
 //
-//    * Not yet tested.
+//    * Mostly works.
+//
+//    * Motor 1 sound dominates and needs verification.
+//
+//    * Voltage triggers for Motor 1 and Beep need a hack to
+//       work (reducing resistance on one resistor from 4.7K to 100)
+//       Need to understand why.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -22,6 +28,7 @@
 
 #define HLE_LASER_VCO (1)
 #define HLE_TORPEDO_VCO (1)
+#define HLE_BACKGROUND_VCOS (1)
 #define HACK_VOLTAGE_SWITCH (1)
 
 
@@ -32,8 +39,8 @@
 
 NETLIST_START(ripoff)
 
-#if (HLE_LASER_VCO && HLE_TORPEDO_VCO)
-	SOLVER(Solver, 48000000)
+#if (HLE_LASER_VCO && HLE_TORPEDO_VCO && HLE_BACKGROUND_VCOS)
+	SOLVER(Solver, 48000)
 #else
 	SOLVER(Solver, 48000000)
 #endif
@@ -385,6 +392,39 @@ NETLIST_START(ripoff)
 	NET_C(R26.2, R28.2, R30.2, R76.1, IC19.2) // also R50.1 if present
 	NET_C(IC19.3, GND)
 	NET_C(IC19.6, R76.2, D8.A, D6.A)
+
+#if (HLE_BACKGROUND_VCOS)
+	//
+	//    R2 = 0.89845: HP = (0-0.0200062*A0) + 0.0204003
+	//    R2 = 0.90151: HP = (0-0.00106970*A0*A0) - (0.0240156*A0) + 0.0186820
+	//    R2 = 0.91086: HP = (0-0.00171453*A0*A0*A0) - (0.0114284*A0*A0) - (0.0394674*A0) + 0.0152328
+	//    R2 = 0.91094: HP = (0-0.000160296*A0*A0*A0*A0) - (0.00304620*A0*A0*A0) - (0.0148767*A0*A0) - (0.0423484*A0) + 0.0148084
+	//    R2 = 0.91401: HP = (0-0.00108821*A0*A0*A0*A0*A0) - (0.0117727*A0*A0*A0*A0) - (0.0467536*A0*A0*A0) - (0.083301*A0*A0) - (0.081814*A0) + 0.0101518
+	//
+	VARCLOCK(BGCLK1, 1, "max(0.000001, (0-0.00171453*A0*A0*A0) - (0.0114284*A0*A0) - (0.0394674*A0) + 0.0152328)")
+	NET_C(BGCLK1.GND, GND)
+	NET_C(BGCLK1.VCC, I_V15)
+	NET_C(BGCLK1.A0, IC19.6)
+	NET_C(BGCLK1.Q, D10.A)
+	NET_C(D11.K, R83.1)
+	NET_C(GND, R77.1, R77.2, R78.1, R78.2, R79.1, R79.2, C30.1, C30.2, D6.K, D7.A, D7.K, IC20.2, IC20.3)
+	//
+	// Mapping from IC19.6 to D11.A:
+	//    R2 = 0.99821: HP = (0-0.000307729*A0) + 0.000259516
+	//    R2 = 0.99835: HP = (0.00000331128*A0*A0) - (0.000295475*A0) + 0.000264916
+	//    R2 = 0.99836: HP = (0-0.000000805228*A0*A0*A0) - (0.00000150987*A0*A0) - (0.000302576*A0) + 0.000263318
+	//    R2 = 0.99836: HP = (0.000000302855*A0*A0*A0*A0) + (0.00000170234*A0*A0*A0) + (0.00000496904*A0*A0) - (0.000297143*A0) + 0.000264127
+	//    R2 = 0.99837: HP = (0-0.000000114396*A0*A0*A0*A0*A0) - (0.000000907284*A0*A0*A0*A0) - (0.00000280583*A0*A0*A0) - (0.00000201193*A0*A0) - (0.000301139*A0) + 0.000263656
+	//
+	VARCLOCK(BGCLK2, 1, "max(0.000001, (0-0.000000805228*A0*A0*A0) - (0.00000150987*A0*A0) - (0.000302576*A0) + 0.000263318)")
+	NET_C(BGCLK2.GND, GND)
+	NET_C(BGCLK2.VCC, I_V15)
+	NET_C(BGCLK2.A0, IC19.6)
+	NET_C(BGCLK2.Q, D11.A)
+	NET_C(D10.K, R83.1)
+	NET_C(GND, R80.1, R80.2, R81.1, R81.2, R82.1, R82.2, C31.1, C31.2, D8.K, D9.A, D9.K, IC21.2, IC21.3)
+#else
+	NET_C(IC19.6, R76.2, D8.A, D6.A)
 	NET_C(D6.K, D7.A, R79.1, IC20.3)
 	NET_C(D7.K, GND)
 	NET_C(IC20.2, C30.2, R77.1)
@@ -396,6 +436,7 @@ NETLIST_START(ripoff)
 	NET_C(D9.K, GND)
 	NET_C(IC21.2, C31.2, R80.1)
 	NET_C(C31.1, GND)
+#endif
 	NET_C(R83.2, R84.2, Q10.B)
 	NET_C(R84.1, GND)
 	NET_C(Q10.E, GND)

@@ -139,12 +139,6 @@ class armora_audio_device : public cinemat_audio_device
 {
 public:
 	armora_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -152,12 +146,6 @@ class ripoff_audio_device : public cinemat_audio_device
 {
 public:
 	ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals) override;
 };
 
 
@@ -217,7 +205,7 @@ DECLARE_DEVICE_TYPE(SPEED_FREAK_AUDIO, speedfrk_audio_device)
 DECLARE_DEVICE_TYPE(TAIL_GUNNER_AUDIO, tailg_audio_device)
 DECLARE_DEVICE_TYPE(WARRIOR_AUDIO, warrior_audio_device)
 DECLARE_DEVICE_TYPE(ARMOR_ATTACK_AUDIO, armora_audio_device)
-DECLARE_DEVICE_TYPE(RIP_OFF_AUDIO, ripoff_audio_device)
+DECLARE_DEVICE_TYPE(RIPOFF_AUDIO, ripoff_audio_device)
 DECLARE_DEVICE_TYPE(SOLAR_QUEST_AUDIO, solarq_audio_device)
 DECLARE_DEVICE_TYPE(BOXING_BUGS_AUDIO, boxingb_audio_device)
 DECLARE_DEVICE_TYPE(STAR_CASTLE_AUDIO, starcas_audio_device)
