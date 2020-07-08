@@ -32356,7 +32356,6 @@ mrtnt                           // (c) 1983 Telko
 mschamp                         // hack by RAYGLO MFG "Zola-Puc" (c) 1992/1993
 mschamps                        // hack (hack of the Rayglo hack?)
 msheartb                        // hack
-mspacmbmc                       // bootleg (Marti Colls / Falgas)
 mspacii                         // bootleg
 mspacii2                        // bootleg
 mspacmab                        // bootleg
@@ -32373,6 +32372,8 @@ mspacmanbi                      // bootleg
 mspacmancr                      // bootleg on Crush Roller board
 mspacmat                        // hack
 mspacmbe                        // bootleg
+mspacmbmc                       // bootleg (Marti Colls / Falgas)
+mspacmbn                        // bootleg
 mspacmnf                        // hack
 mspacpls                        // hack
 newpuc2                         // hack
