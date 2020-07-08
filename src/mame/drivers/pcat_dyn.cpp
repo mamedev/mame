@@ -51,6 +51,21 @@ public:
 
 	void pcat_dyn(machine_config &config);
 
+	void init_x()
+	{
+		uint8_t *ROM = memregion("game_prg")->base();
+		{
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine().system().name);
+		FILE *fp = fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM, 0x80000, 1, fp);
+			fclose(fp);
+		}
+	}
+	}
+
 private:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_prgbank;
@@ -266,6 +281,7 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.1", 0x40000, 0x40000, CRC(8f96e2a8) SHA1(bc3ce8b99e6ff40e355df2c3f797f1fe88b3b219))
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))
 	ROM_LOAD("prom.3", 0xc0000, 0x40000, CRC(9352e965) SHA1(2bfb647ec27c60a8c821fdf7483199e1a444cea8))
+	ROM_FILL(0x334f6, 1, 0xeb) // skip prot(?) check
 
 	ROM_REGION(0x2000, "nvram", 0)
 	ROM_LOAD("prom.7", 0, 0x2000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
@@ -275,5 +291,5 @@ ROM_START(toursol1)
 ROM_END
 
 
-GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, empty_init, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, pcat_dyn_state, empty_init, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, init_x, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, pcat_dyn_state, init_x, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
