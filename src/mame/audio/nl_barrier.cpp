@@ -2,12 +2,10 @@
 // copyright-holders:Aaron Giles
 
 //
-// Netlist for Space Wars
+// Netlist for Barrier
 //
-// Derived from the Audio Board Schematic redrawn by William J.
-// Boucher at Biltronix.com. Part numbers are not present on the
-// schematic, so the equivalent part numbers were taken from the
-// Barrier schematics, which are quite similar.
+// Derived from the schematics in the Barrier manual. This sound
+// board is quite similar to Space Wars.
 //
 // Known problems/issues:
 //
@@ -18,12 +16,19 @@
 //       of this noise are pretty different compared to recordings
 //       of the original, and affects all the sounds.
 //
-//    * Poor performance when the explosion is triggered.
+//    * The schematics show a connection betwee U8.6 and
+//       R37.2; however, implementing this leads to a direct input
+//       from the noise source at all times to the summing amp.
+//       Suspecting this is a typo in the schematics.
+//
+//    * Unsure if Barrier should have the noisy background like
+//       Space Wars. Space Wars has a hard overall mute to suppress
+//       it when the game isn't running, but Barrier does not.
 //
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
-#include "nl_spacewar.h"
+#include "nl_barrier.h"
 
 
 //
@@ -37,18 +42,16 @@
 // Main netlist
 //
 
-NETLIST_START(spacewar)
+NETLIST_START(barrier)
 
 	SOLVER(Solver, 48000)
 
 	TTL_INPUT(I_OUT_0, 0)				// active high
 	TTL_INPUT(I_OUT_1, 0)				// active high
 	TTL_INPUT(I_OUT_2, 0)				// active high
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
 
-	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND)
-	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC)
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC)
 
 	CINEMAT_LOCAL_MODELS
 
@@ -67,10 +70,10 @@ NETLIST_START(spacewar)
 	RES(R9, RES_K(39))
 	RES(R10, RES_K(2.2))
 	RES(R11, 470)
-//	RES(R12, 0)				-- not present on Space Wars
+	RES(R12, RES_K(30))
 	RES(R13, RES_K(8.2))
-	RES(R14, 120)
-	RES(R15, RES_K(20))
+	RES(R14, RES_K(33))
+	RES(R15, RES_K(15))
 	RES(R16, RES_M(10))
 	RES(R17, RES_K(10))
 	RES(R18, RES_K(47))
@@ -94,10 +97,6 @@ NETLIST_START(spacewar)
 	RES(R36, RES_M(1))
 	RES(R37, RES_K(10))
 	RES(R38, RES_K(10))
-	RES(R40, 120)
-	RES(R41, RES_K(20))
-	RES(R42, RES_K(1))
-	RES(R43, RES_K(10))
 
 	CAP(C1, CAP_U(1))
 	CAP(C2, CAP_U(1))
@@ -105,8 +104,8 @@ NETLIST_START(spacewar)
 	CAP(C4, CAP_U(0.01))
 	CAP(C5, CAP_U(0.1))
 //	CAP(C6, CAP_U(4.7))		// not needed
-//	CAP(C7, 0)				// not present
-	CAP(C8, CAP_U(2.2))
+	CAP(C7, CAP_U(0.01))
+	CAP(C8, CAP_U(1))
 	CAP(C9, CAP_U(0.1))
 	CAP(C10, CAP_P(220))
 	CAP(C11, CAP_U(0.1))
@@ -116,13 +115,11 @@ NETLIST_START(spacewar)
 //	CAP(C15, CAP_U(50))		-- not needed
 //	CAP(C16, CAP_U(2.2))	-- not needed
 	CAP(C17, CAP_U(0.01))
-	CAP(C18, CAP_U(33))
+	CAP(C18, CAP_U(15))
 //	CAP(C19, CAP_U(50))		-- not needed
 //	CAP(C20, CAP_U(2.2))	-- not needed
 	CAP(C21, CAP_U(0.02))
 	CAP(C22, CAP_U(0.1))
-	CAP(C23, CAP_U(0.1))
-	CAP(C24, CAP_U(2.2))
 
 	D_1N914(CR1)
 	D_1N914(CR2)
@@ -173,12 +170,6 @@ NETLIST_START(spacewar)
 	NET_C(U9.4, I_VM15)
 	NET_C(U9.7, I_V15)
 
-	TL182_DIP(U10)			// Analog switch
-	NET_C(U10.6, I_V15)
-	NET_C(U10.7, I_V5)
-	NET_C(U10.8, GND)
-	NET_C(U10.9, I_VM15)
-
 	//
 	// Top-left until output from U1
 	//
@@ -195,17 +186,20 @@ NETLIST_START(spacewar)
 
 	NET_C(GND, R1.1, R1.2, R2.1, R2.2, CR1.A, CR1.K, CR2.A, CR2.K)
 #else
-	NET_C(I_V15, CR1.A, R2.2)
+	NET_C(I_V15, CR1.A)
 	NET_C(CR1.K, CR2.A)
 	NET_C(CR2.K, R1.2, Q1.B)
-	NET_C(R1.1, Q2.C, GND)
+	NET_C(R1.1, GND)
+	NET_C(I_V15, R2.2)
 	NET_C(R2.1, Q1.E)
 	NET_C(Q2.E, Q1.C, C1.1)
+	NET_C(Q2.C, GND)
 #endif
 
 	NET_C(C1.2, R3.2, U1.3)
-	NET_C(R3.1, GND, R5.1)
+	NET_C(R3.1, GND)
 	NET_C(U1.2, R5.2, R4.1)
+	NET_C(R5.1, GND)
 	NET_C(R4.2, U1.6)
 
 	//
@@ -215,9 +209,10 @@ NETLIST_START(spacewar)
 	NET_C(I_OUT_1, U2.13)
 	NET_C(U2.12, R6.1)
 	NET_C(R6.2, R7.1, C2.1, Q3.B)
-	NET_C(R7.2, I_V5, Q3.C)
+	NET_C(R7.2, I_V5)
 	NET_C(C2.2, GND)
 	NET_C(Q3.E, R11.2)
+	NET_C(Q3.C, I_V5)
 	NET_C(R11.1, CR3.A)
 
 	//
@@ -229,40 +224,39 @@ NETLIST_START(spacewar)
 	NET_C(U3.3, GND)
 	NET_C(R8.2, U3.6, R9.1)
 	NET_C(R9.2, CR3.K, C4.1, CR4.A, R10.2)
-	NET_C(R10.1, CR4.K, GND, C5.1)
-	NET_C(C4.2, C5.2, R13.1)
+	NET_C(R10.1, CR4.K, GND)
+	NET_C(C4.2, R12.1)
+	NET_C(R12.2, C5.2, R13.1)
+	NET_C(C5.1, GND)
 
 	//
 	// Big middle section, from C8 until output from R15/R41/R37
 	//
 
-	NET_C(U1.6, C8.1)
-	NET_C(C8.2, C24.2)
-	NET_C(C24.1, R24.1)
+	NET_C(U1.6, C8.2)
+	NET_C(C8.1, R24.1)
 	NET_C(R24.2, U8.2, C10.1, R16.1)
 	NET_C(U8.3, GND)
-	NET_C(U8.6, R16.2, C10.2, R31.2, R38.2)
-	NET_C(R38.1, U5.14, U5.1)
+	NET_C(U8.6, R16.2, C10.2, R31.1, R38.1, R13.2)
+	NET_C(R38.2, U5.14)
 	NET_C(I_OUT_2, U5.10)
-	NET_C(U5.13, R14.1)
-	NET_C(I_OUT_3, U5.5)
-	NET_C(U5.2, R40.1)
-	NET_C(R40.2, C23.2, R41.1)
-	NET_C(R41.2, R13.2)
-	NET_C(C23.1, GND)
-	NET_C(R37.2, R13.2)
+	NET_C(U5.13, C7.1)
+	NET_C(C7.2, R14.1)
+//	NET_C(R37.2, R13.2)		// Barrier connects noise source into summing amp -- wrong??
+	NET_C(R37.2, GND)
 	NET_C(R14.2, C9.2, R15.1)
 	NET_C(C9.1, GND)
 	NET_C(R15.2, R13.2)
 	NET_C(I_OUT_0, U2.9)
 	NET_C(U2.8, R25.1)
 	NET_C(R25.2, R26.1, C17.1, Q6.B, C18.1)
-	NET_C(R26.2, C17.2, I_V5, Q6.C)
+	NET_C(R26.2, C17.2, I_V5)
 	NET_C(C18.2, GND)
-	NET_C(Q6.E, R27.1)
-	NET_C(R27.2, CR5.A)
+	NET_C(Q6.E, R27.2)
+	NET_C(Q6.C, I_V5)
+	NET_C(R27.1, CR5.A)
 	NET_C(CR5.K, R33.2, CR6.A, R34.2, C21.2, C22.1)
-	NET_C(R31.1, R32.2, R33.1, Q7.E)
+	NET_C(R31.2, R32.2, R33.1, Q7.E)
 	NET_C(R32.1, Q7.B)
 	NET_C(Q7.C, CR6.K, R34.1, C21.1, GND)
 	NET_C(C22.2, R35.1)
@@ -274,13 +268,7 @@ NETLIST_START(spacewar)
 	// Final stage
 	//
 
-	NET_C(U10.1, U10.14, R13.2)
-	NET_C(I_OUT_4, U10.5, U2.1)
-	NET_C(U2.2, R42.1, U10.10)
-	NET_C(R42.2, I_V5)
-	NET_C(U10.2, R17.2, C11.1)
-	NET_C(U10.13, R43.2)
-	NET_C(R43.1, GND)
+	NET_C(R17.2, C11.1, R13.2)
 	NET_C(R17.1, R18.1, GND)
 	NET_C(C11.2, R18.2, R19.1)
 	NET_C(R19.2, GND)
@@ -291,5 +279,6 @@ NETLIST_START(spacewar)
 	//
 
 	NET_C(GND, U2.3, U2.5, U2.11)
+	NET_C(GND, U5.1, U5.2, U5.5, U2.1)
 
 NETLIST_END()

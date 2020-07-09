@@ -192,8 +192,8 @@ NETLIST_END()
 
 // super brain-dead model I threw together from a pair of 2N3904
 static NETLIST_START(_Q_2N6426)
-	QBJT_EB(Q1, "NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259 Ise=6.734 Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75 Tr=239.5n f=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)")	// 2N3904 NPN
-	QBJT_EB(Q2, "NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259 Ise=6.734 Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75 Tr=239.5n f=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)")	// 2N3904 NPN
+	QBJT_EB(Q1, "NPN")
+	QBJT_EB(Q2, "NPN")
 
 	ALIAS(B, Q1.B)
 	ALIAS(C, Q1.C)

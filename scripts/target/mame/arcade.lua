@@ -1569,6 +1569,8 @@ files {
 	MAME_DIR .. "src/mame/video/cinemat.cpp",
 	MAME_DIR .. "src/mame/audio/nl_armora.cpp",
 	MAME_DIR .. "src/mame/audio/nl_armora.h",
+	MAME_DIR .. "src/mame/audio/nl_barrier.cpp",
+	MAME_DIR .. "src/mame/audio/nl_barrier.h",
 	MAME_DIR .. "src/mame/audio/nl_cinemat_common.h",
 	MAME_DIR .. "src/mame/audio/nl_ripoff.cpp",
 	MAME_DIR .. "src/mame/audio/nl_ripoff.h",

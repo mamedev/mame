@@ -6,6 +6,5 @@
 #pragma once
 
 NETLIST_EXTERNAL(spacewar)
-NETLIST_EXTERNAL(barrier)
 
 #endif // MAME_AUDIO_NL_SPACEWAR_H
