@@ -348,7 +348,7 @@ armora_audio_device::armora_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(RIPOFF_AUDIO, ripoff_audio_device, "ripoff_audio", "Rip Off Sound Board")
 
 ripoff_audio_device::ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, RIPOFF_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(ripoff), 5000.0)
+	: cinemat_audio_device(mconfig, RIPOFF_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(ripoff), 20000.0)
 {
 }
 

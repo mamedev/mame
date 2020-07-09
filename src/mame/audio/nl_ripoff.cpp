@@ -8,13 +8,16 @@
 //
 // Known problems/issues:
 //
-//    * Mostly works.
-//
-//    * Motor 1 sound dominates and needs verification.
-//
 //    * Voltage triggers for Motor 1 and Beep need a hack to
 //       work (reducing resistance on one resistor from 4.7K to 100)
 //       Need to understand why.
+//
+//    * Motor 1 and beep sounds dominate the output. They are
+//       controlled by the current driven into the CCAs IC12 and
+//       IC6. Not sure if this overdrive is related to the problem
+//       with the switch above, but for now a hack is enabled to
+//       multiply the resistance by 5x going into the CCA, which
+//       seems to restore the balance to something reasonable.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -29,8 +32,13 @@
 #define HLE_LASER_VCO (1)
 #define HLE_TORPEDO_VCO (1)
 #define HLE_BACKGROUND_VCOS (1)
-#define HACK_VOLTAGE_SWITCH (1)
 
+//
+// Hacks
+//
+
+#define HACK_VOLTAGE_SWITCH (1)
+#define HACK_CCA_RESISTANCE (1)
 
 
 //
@@ -82,7 +90,11 @@ NETLIST_START(ripoff)
 	RES(R15, RES_K(15))
 	RES(R16, RES_K(2.7))
 	RES(R17, RES_K(2.7))
+#if (HACK_CCA_RESISTANCE)
+	RES(R18, RES_K(4100))
+#else
 	RES(R18, RES_K(820))
+#endif
 	RES(R19, RES_K(27))
 	RES(R20, RES_K(39))
 	RES(R21, RES_K(10))
@@ -100,7 +112,11 @@ NETLIST_START(ripoff)
 	RES(R33, RES_K(15))
 	RES(R34, RES_K(2.7))
 	RES(R35, RES_K(2.7))
+#if (HACK_CCA_RESISTANCE)
+	RES(R36, RES_M(5))
+#else
 	RES(R36, RES_M(1))
+#endif
 	RES(R37, RES_K(56))
 	RES(R38, RES_K(24))
 	RES(R39, RES_K(15))
@@ -424,7 +440,6 @@ NETLIST_START(ripoff)
 	NET_C(D10.K, R83.1)
 	NET_C(GND, R80.1, R80.2, R81.1, R81.2, R82.1, R82.2, C31.1, C31.2, D8.K, D9.A, D9.K, IC21.2, IC21.3)
 #else
-	NET_C(IC19.6, R76.2, D8.A, D6.A)
 	NET_C(D6.K, D7.A, R79.1, IC20.3)
 	NET_C(D7.K, GND)
 	NET_C(IC20.2, C30.2, R77.1)
@@ -480,7 +495,7 @@ NETLIST_START(ripoff)
 	NET_C(R16.1, GND)
 	NET_C(IC6.3, R17.2)
 	NET_C(R17.1, GND)
-//	NET_C(IC6.6, IC7.3) -- temporarily disable the beep sound
+	NET_C(IC6.6, IC7.3)
 
 	NET_C(IC7.6, IC7.2, C12.1)
 	NET_C(C12.2, R45.2)
