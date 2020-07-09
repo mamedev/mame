@@ -8,7 +8,7 @@
 //
 // Known problems/issues:
 //
-//    * Worked pretty well the first time. No VCOs, hurray!
+//    * Worked pretty well the first time.
 //
 //    * The squeak on the tank treads is not right, need to
 //       understand what's going on.
@@ -25,6 +25,7 @@
 // Optimizations
 //
 
+#define HLE_TANK_VCO (1)
 
 
 
@@ -34,7 +35,11 @@
 
 NETLIST_START(armora)
 
+#if (HLE_TANK_VCO)
     SOLVER(Solver, 48000)
+#else
+    SOLVER(Solver, 4800000)
+#endif
 
     TTL_INPUT(I_OUT_0, 0)				// active high
     TTL_INPUT(I_OUT_1, 0)				// active high
@@ -81,7 +86,7 @@ NETLIST_START(armora)
     RES(R27, RES_K(4.7))
     RES(R28, RES_K(2.7))
     RES(R29, RES_K(4.7))
-    RES(R30, RES_K(30))
+    RES(R30, RES_K(39))
     RES(R31, RES_K(12))
     RES(R32, RES_K(1))
     RES(R33, RES_K(240))
@@ -178,7 +183,7 @@ NETLIST_START(armora)
     CAP(C13, CAP_U(0.047))
     CAP(C14, CAP_U(0.47))
     CAP(C15, CAP_U(0.001))
-    CAP(C16, CAP_U(0.01))
+    CAP(C16, CAP_U(0.1))
     CAP(C17, CAP_U(0.0047))
     CAP(C18, CAP_U(2.2))
     CAP(C19, CAP_U(0.1))
@@ -283,7 +288,9 @@ NETLIST_START(armora)
 
     // IC14 was deleted from schematics
 
+#if (!HLE_TANK_VCO)
     LM566_DIP(IC15)
+#endif
 
     // IC16 was deleted from schematics
 
@@ -405,8 +412,8 @@ NETLIST_START(armora)
     NET_C(IC7.8, R8.1, IC13.12)
     NET_C(R8.2, I_V5)
     NET_C(IC13.8, R5.1, IC7.5)
-    NET_C(R5.2, I_V5)
     ALIAS(SH2_1, IC13.8)
+    NET_C(R5.2, I_V5)
     NET_C(IC13.9, IC7.11, R9.1, IC7.13)
     ALIAS(SH2_3, IC13.9)
     NET_C(R9.2, I_V5)
@@ -417,10 +424,27 @@ NETLIST_START(armora)
     ALIAS(SH2_2, R19.1)
     ALIAS(SH2_4, R20.1)
     ALIAS(SH2_6, R21.1)
-    NET_C(R19.2, R20.2, R21.2, R22.2, C18.1, R23.1, IC15.5, C15.2)
+    NET_C(R19.2, R20.2, R21.2, R22.2, C18.1, R23.1)
     NET_C(R22.1, GND)
     NET_C(C18.2, GND)
     NET_C(R23.2, I_V15)
+
+#if (HLE_TANK_VCO)
+    //
+    //    R2 = 0.98110: HP = (0.00000599036*A0) - 0.0000565124
+    //    R2 = 0.99782: HP = (0.00000194885*A0*A0) - (0.0000415989*A0) + 0.000233746
+    //    R2 = 0.99811: HP = (0.000000646112*A0*A0*A0) - (0.0000215063*A0*A0) + (0.000242010*A0) - 0.000908469
+    //    R2 = 0.99589: HP = (0.000000217354*A0*A0*A0*A0) - (0.0000098166*A0*A0*A0) + (0.000167248*A0*A0) - (0.00127054*A0) + 0.00363402
+    //    R2 = 0.92249: HP = (0.00000000630602*A0*A0*A0*A0*A0) - (0.000000220145*A0*A0*A0*A0) + (0.00000210638*A0*A0*A0) + (0.00000707526*A0*A0) - (0.000207037*A0) + 0.000836264
+    //
+	VARCLOCK(TANKCLK, 1, "max(0.000001, (0.000000646112*A0*A0*A0) - (0.0000215063*A0*A0) + (0.000242010*A0) - 0.000908469)")
+	NET_C(TANKCLK.GND, GND)
+	NET_C(TANKCLK.VCC, I_V5)
+    NET_C(R19.2, TANKCLK.A0)
+    NET_C(TANKCLK.Q, IC13.1)
+    NET_C(GND, R4.1, R4.2, R11.1, R11.2, R12.1, R12.2, R13.1, R13.2, C15.1, C15.2, C16.1, C16.2, C17.1, C17.2, D5.A, D5.K, D8.A, D8.K)
+#else
+    NET_C(IC15.5, R19.2, C15.2)
     NET_C(IC15.7, C17.1)
     NET_C(C17.2, GND)
     NET_C(IC15.1, GND)
@@ -435,6 +459,7 @@ NETLIST_START(armora)
     NET_C(R4.1, I_VM15)
     NET_C(Q1.C, IC13.1, R13.1)
     NET_C(R13.2, I_V5)
+#endif
 
     NET_C(IC7.12, R110.1, IC13.2)
     NET_C(R110.2, I_V5)
@@ -632,8 +657,24 @@ NETLIST_START(armora)
     //
 
     HINT(IC7.2, NC)
+    HINT(IC8.11, NC)    // QD
+    HINT(IC8.12, NC)    // QC
+    HINT(IC8.13, NC)    // QB
+    HINT(IC8.14, NC)    // QA
     HINT(IC9.6, NC)
     HINT(IC9.11, NC)
+    HINT(IC10.3, NC)    // QA
+    HINT(IC10.4, NC)    // QB
+    HINT(IC10.5, NC)    // QC
+    HINT(IC10.8, NC)    // QD
+    HINT(IC10.9, NC)    // QC
+    HINT(IC10.10, NC)   // QB
+    HINT(IC11.12, NC)   // QC
+    HINT(IC11.13, NC)   // QB
+    HINT(IC11.14, NC)   // QA
+    HINT(IC13.6, NC)
+    HINT(IC13.10, NC)
+    HINT(IC13.11, NC)
 //    HINT(IC27.2, NC)
 
 NETLIST_END()
