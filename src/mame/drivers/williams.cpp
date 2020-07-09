@@ -3389,7 +3389,7 @@ GAME( 1980, zero2,      defender, defender,       defender, defndjeu_state,     
 GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Star Trek (Defender bootleg)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1980, attackf,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (FAMARE S.A.)",                "Attack (Defender bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, attackf,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (Defender bootleg)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, galwars2,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (Defender bootleg)",  MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
 
 GAME( 1980, mayday,     0,        defender,       mayday,   mayday_state,         empty_init,    ROT0,   "Hoei",                 "Mayday (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
@@ -3442,7 +3442,6 @@ GAME( 1985, alienar,    0,        williams_muxed, alienar,  williams_muxed_state
 GAME( 1985, alienaru,   alienar,  williams_muxed, alienar,  williams_muxed_state, init_alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state,       init_lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
-
 
 
 // 2nd Generation Williams hardware with tilemaps
