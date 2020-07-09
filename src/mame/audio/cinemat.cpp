@@ -22,6 +22,7 @@
 #include "includes/cinemat.h"
 
 #include "audio/nl_armora.h"
+#include "audio/nl_barrier.h"
 #include "audio/nl_ripoff.h"
 #include "audio/nl_spacewar.h"
 #include "audio/nl_speedfrk.h"
