@@ -345,7 +345,7 @@ void simpsons_state::simpsons(machine_config &config)
 	// 6MHz dot clock
 	// horizontal: 16 cycles front porch, 32 cycles sync, 16 cycles back porch
 	// vertical: 16 lines front porch, 8 lines sync, 16 lines back porch
-	screen.set_raw(XTAL(24'000'000)/4, 384, 0, 320, 264, 0, 224);
+	screen.set_raw(XTAL(24'000'000)/4, 384, 0+16, 320-16, 264, 0, 224);
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_screen_update(FUNC(simpsons_state::screen_update_simpsons));
 	screen.set_palette("palette");
