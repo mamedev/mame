@@ -4115,7 +4115,7 @@ public:
 
 // config
 
-static INPUT_PORTS_START( gnw_boxing )
+static INPUT_PORTS_START( microvs_shared )
 	PORT_START("IN.0") // S1
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
@@ -4152,6 +4152,10 @@ static INPUT_PORTS_START( gnw_boxing )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gnw_boxing )
+	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
@@ -4207,42 +4211,7 @@ public:
 // config
 
 static INPUT_PORTS_START( gnw_dkong3 )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2) // Spray
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Spray
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.3") // S4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.4") // S5
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.5") // S6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.6") // S7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)") // factory test, unpopulated on PCB
@@ -4294,42 +4263,7 @@ public:
 // config
 
 static INPUT_PORTS_START( gnw_dkhockey )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2) // Hit
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Hit
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.3") // S4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.4") // S5
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.5") // S6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.6") // S7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)") // factory test, unpopulated on PCB
@@ -9326,150 +9260,150 @@ ROM_END
 //    YEAR  NAME         PARENT   COMP  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
 
 // Nintendo G&W: Silver/Gold (initial series is uncategorized, "Silver" was made up later)
-CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state,    empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_flagman, 0,          0, gnw_flagman, gnw_flagman, gnw_flagman_state, empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_state,  empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (Silver)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_manholeg,0,          0, gnw_manholeg,gnw_manholeg,gnw_manholeg_state,empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet (CN-17 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_lion,    0,          0, gnw_lion,    gnw_lion,    gnw_lion_state,    empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, gnw_ball,     0,           0, gnw_ball,     gnw_ball,     gnw_ball_state,     empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_flagman,  0,           0, gnw_flagman,  gnw_flagman,  gnw_flagman_state,  empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_vermin,   0,           0, gnw_vermin,   gnw_vermin,   gnw_vermin_state,   empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_fires,    0,           0, gnw_fires,    gnw_fires,    gnw_fires_state,    empty_init, "Nintendo", "Game & Watch: Fire (Silver)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, gnw_judge,    0,           0, gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_manholeg, 0,           0, gnw_manholeg, gnw_manholeg, gnw_manholeg_state, empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_helmet,   0,           0, gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (CN-17 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_lion,     0,           0, gnw_lion,     gnw_lion,     gnw_lion_state,     empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Wide Screen
-CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, spacebridge, gnw_fire,   0, spacebridge, gnw_fire,    gnw_fire_state,    empty_init, "Elektronika", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_tbridge, 0,          0, gnw_tbridge, gnw_tbridge, gnw_tbridge_state, empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_fireatk, 0,          0, gnw_fireatk, gnw_fireatk, gnw_fireatk_state, empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_stennis, 0,          0, gnw_stennis, gnw_stennis, gnw_stennis_state, empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_pchute,   0,           0, gnw_pchute,   gnw_pchute,   gnw_pchute_state,   empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_octopus,  0,           0, gnw_octopus,  gnw_octopus,  gnw_octopus_state,  empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_popeye,   0,           0, gnw_popeye,   gnw_popeye,   gnw_popeye_state,   empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_chef,     0,           0, gnw_chef,     gnw_chef,     gnw_chef_state,     empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, merrycook,    gnw_chef,    0, merrycook,    gnw_chef,     gnw_chef_state,     empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_mmouse,   0,           0, gnw_mmouse,   gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_egg,      gnw_mmouse,  0, gnw_egg,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, exospace,     gnw_mmouse,  0, exospace,     exospace,     gnw_mmouse_state,   empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "Elektronika", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_fireatk,  0,           0, gnw_fireatk,  gnw_fireatk,  gnw_fireatk_state,  empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_stennis,  0,           0, gnw_stennis,  gnw_stennis,  gnw_stennis_state,  empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Multi Screen
-CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_dkong,   0,          0, gnw_dkong,   gnw_dkong,   gnw_dkong_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_ghouse,  0,          0, gnw_ghouse,  gnw_ghouse,  gnw_ghouse_state,  empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_rshower, 0,          0, gnw_rshower, gnw_rshower, gnw_rshower_state, empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_lboat,   0,          0, gnw_lboat,   gnw_lboat,   gnw_lboat_state,   empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_pinball, 0,          0, gnw_pinball, gnw_pinball, gnw_pinball_state, empty_init, "Nintendo", "Game & Watch: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1985, gnw_bjack,   0,          0, gnw_bjack,   gnw_bjack,   gnw_bjack_state,   empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_squish,  0,          0, gnw_squish,  gnw_squish,  gnw_squish_state,  empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1987, gnw_bsweep,  0,          0, gnw_bsweep,  gnw_bsweep,  gnw_bsweep_state,  empty_init, "Nintendo", "Game & Watch: Bomb Sweeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_sbuster, 0,          0, gnw_sbuster, gnw_sbuster, gnw_sbuster_state, empty_init, "Nintendo", "Game & Watch: Safe Buster", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_gcliff,  0,          0, gnw_gcliff,  gnw_gcliff,  gnw_gcliff_state,  empty_init, "Nintendo", "Game & Watch: Gold Cliff", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, gnw_zelda,   0,          0, gnw_zelda,   gnw_zelda,   gnw_zelda_state,   empty_init, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_opanic,   0,           0, gnw_opanic,   gnw_opanic,   gnw_opanic_state,   empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_dkong,    0,           0, gnw_dkong,    gnw_dkong,    gnw_dkong_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_mickdon,  0,           0, gnw_mickdon,  gnw_mickdon,  gnw_mickdon_state,  empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_ghouse,   0,           0, gnw_ghouse,   gnw_ghouse,   gnw_ghouse_state,   empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_dkong2,   0,           0, gnw_dkong2,   gnw_dkong2,   gnw_dkong2_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_mario,    0,           0, gnw_mario,    gnw_mario,    gnw_mario_state,    empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_rshower,  0,           0, gnw_rshower,  gnw_rshower,  gnw_rshower_state,  empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_lboat,    0,           0, gnw_lboat,    gnw_lboat,    gnw_lboat_state,    empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_pinball,  0,           0, gnw_pinball,  gnw_pinball,  gnw_pinball_state,  empty_init, "Nintendo", "Game & Watch: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1985, gnw_bjack,    0,           0, gnw_bjack,    gnw_bjack,    gnw_bjack_state,    empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1986, gnw_squish,   0,           0, gnw_squish,   gnw_squish,   gnw_squish_state,   empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1987, gnw_bsweep,   0,           0, gnw_bsweep,   gnw_bsweep,   gnw_bsweep_state,   empty_init, "Nintendo", "Game & Watch: Bomb Sweeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, gnw_sbuster,  0,           0, gnw_sbuster,  gnw_sbuster,  gnw_sbuster_state,  empty_init, "Nintendo", "Game & Watch: Safe Buster", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, gnw_gcliff,   0,           0, gnw_gcliff,   gnw_gcliff,   gnw_gcliff_state,   empty_init, "Nintendo", "Game & Watch: Gold Cliff", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, gnw_zelda,    0,           0, gnw_zelda,    gnw_zelda,    gnw_zelda_state,    empty_init, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: New Wide Screen / Crystal Screen
-CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_state, empty_init, "Nintendo", "Game & Watch: Manhole (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_smbn,    gnw_smb,    0, gnw_smbn,    gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_climbern,gnw_climber,0, gnw_climbern,gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, gnw_mariotj, 0,          0, gnw_mariotj, gnw_mariotj, gnw_mariotj_state, empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, gnw_dkjr,     0,           0, gnw_dkjr,     gnw_dkjr,     gnw_dkjr_state,     empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_mariocm,  0,           0, gnw_mariocm,  gnw_mariocm,  gnw_mariocm_state,  empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_manhole,  0,           0, gnw_manhole,  gnw_manhole,  gnw_manhole_state,  empty_init, "Nintendo", "Game & Watch: Manhole (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1985, gnw_tfish,    0,           0, gnw_tfish,    gnw_tfish,    gnw_tfish_state,    empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1986, gnw_smb,      0,           0, gnw_smb,      gnw_smb,      gnw_smb_state,      empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, gnw_smbn,     gnw_smb,     0, gnw_smbn,     gnw_smb,      gnw_smb_state,      empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1986, gnw_climber,  0,           0, gnw_climber,  gnw_climber,  gnw_climber_state,  empty_init, "Nintendo", "Game & Watch: Climber (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, gnw_climbern, gnw_climber, 0, gnw_climbern, gnw_climber,  gnw_climber_state,  empty_init, "Nintendo", "Game & Watch: Climber (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1986, gnw_bfight,   0,           0, gnw_bfight,   gnw_bfight,   gnw_bfight_state,   empty_init, "Nintendo", "Game & Watch: Balloon Fight (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, gnw_bfightn,  gnw_bfight,  0, gnw_bfightn,  gnw_bfight,   gnw_bfight_state,   empty_init, "Nintendo", "Game & Watch: Balloon Fight (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, gnw_mariotj,  0,           0, gnw_mariotj,  gnw_mariotj,  gnw_mariotj_state,  empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Table Top / Panorama Screen (the first Table Top releases in Japan were called "Color Screen")
-CONS( 1983, gnw_mariocmt,0,          0, gnw_mariocmt,gnw_mariocmt,gnw_mariocmt_state,empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_snoopyp, 0,          0, gnw_snoopyp, gnw_snoopyp, gnw_snoopyp_state, empty_init, "Nintendo", "Game & Watch: Snoopy (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_popeyep, 0,          0, gnw_popeyep, gnw_popeyep, gnw_popeyep_state, empty_init, "Nintendo", "Game & Watch: Popeye (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_mbaway,  0,          0, gnw_mbaway,  gnw_mbaway,  gnw_mbaway_state,  empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_mmousep, 0,          0, gnw_mmousep, gnw_mmousep, gnw_mmousep_state, empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_dkcirc,  gnw_mmousep,0, gnw_dkcirc,  gnw_mmousep, gnw_mmousep_state, empty_init, "Nintendo", "Game & Watch: Donkey Kong Circus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_mariocmt, 0,           0, gnw_mariocmt, gnw_mariocmt, gnw_mariocmt_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_snoopyp,  0,           0, gnw_snoopyp,  gnw_snoopyp,  gnw_snoopyp_state,  empty_init, "Nintendo", "Game & Watch: Snoopy (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_popeyep,  0,           0, gnw_popeyep,  gnw_popeyep,  gnw_popeyep_state,  empty_init, "Nintendo", "Game & Watch: Popeye (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_dkjrp,    0,           0, gnw_dkjrp,    gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, gnw_mbaway,   0,           0, gnw_mbaway,   gnw_mbaway,   gnw_mbaway_state,   empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_mmousep,  0,           0, gnw_mmousep,  gnw_mmousep,  gnw_mmousep_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_dkcirc,   gnw_mmousep, 0, gnw_dkcirc,   gnw_mmousep,  gnw_mmousep_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong Circus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Super Color
-CONS( 1984, gnw_ssparky, 0,          0, gnw_ssparky, gnw_ssparky, gnw_ssparky_state, empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_cgrab,   0,          0, gnw_cgrab,   gnw_cgrab,   gnw_cgrab_state,   empty_init, "Nintendo", "Game & Watch: Crab Grab", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_ssparky,  0,           0, gnw_ssparky,  gnw_ssparky,  gnw_ssparky_state,  empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_cgrab,    0,           0, gnw_cgrab,    gnw_cgrab,    gnw_cgrab_state,    empty_init, "Nintendo", "Game & Watch: Crab Grab", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Micro Vs. System (actually, no official Game & Watch logo anywhere)
-CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_dkong3,  0,          0, gnw_dkong3,  gnw_dkong3,  gnw_dkong3_state,  empty_init, "Nintendo", "Micro Vs. System: Donkey Kong 3", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_dkhockey,0,          0, gnw_dkhockey,gnw_dkhockey,gnw_dkhockey_state,empty_init, "Nintendo", "Micro Vs. System: Donkey Kong Hockey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_boxing,   0,           0, gnw_boxing,   gnw_boxing,   gnw_boxing_state,   empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_dkong3,   0,           0, gnw_dkong3,   gnw_dkong3,   gnw_dkong3_state,   empty_init, "Nintendo", "Micro Vs. System: Donkey Kong 3", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_dkhockey, 0,           0, gnw_dkhockey, gnw_dkhockey, gnw_dkhockey_state, empty_init, "Nintendo", "Micro Vs. System: Donkey Kong Hockey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Konami
-CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, ktopgun,     0,          0, ktopgun,     ktopgun,     ktopgun_state,     empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kcontra,     0,          0, kcontra,     kcontra,     kcontra_state,     empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, ktmnt,       0,          0, ktmnt,       ktmnt,       ktmnt_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kgradius,    0,          0, kgradius,    kgradius,    kgradius_state,    empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kloneran,    0,          0, kloneran,    kloneran,    kloneran_state,    empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kblades,     0,          0, kblades,     kblades,     kblades_state,     empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, knfl,        0,          0, knfl,        knfl,        knfl_state,        empty_init, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state,      empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kdribble,     0,           0, kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, ktopgun,      0,           0, ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kcontra,      0,           0, kcontra,      kcontra,      kcontra_state,      empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, ktmnt,        0,           0, ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kgradius,     0,           0, kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kloneran,     0,           0, kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kblades,      0,           0, kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, knfl,         0,           0, knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kbilly,       0,           0, kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, kbucky,       0,           0, kbucky,       kbucky,       kbucky_state,       empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, kgarfld,      0,           0, kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Tiger 7-xxx/78-xxx models
-CONS( 1989, tgaunt,      0,          0, tgaunt,      tgaunt,      tgaunt_state,      empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state,      empty_init, "Tiger Electronics", "Robin Hood (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tkarnov,     0,          0, tkarnov,     tkarnov,     tkarnov_state,     empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tvindictr,   0,          0, tvindictr,   tvindictr,   tvindictr_state,   empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tbatman,     0,          0, tbatman,     tbatman,     tbatman_state,     empty_init, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tsharr2,     0,          0, tsharr2,     tsharr2,     tsharr2_state,     empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tstrider,    0,          0, tstrider,    tstrider,    tstrider_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tgoldnaxe,   0,          0, tgoldnaxe,   tgoldnaxe,   tgoldnaxe_state,   empty_init, "Tiger Electronics (licensed from Sega)", "Golden Axe (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, trobocop2,   0,          0, trobocop2,   trobocop2,   trobocop2_state,   empty_init, "Tiger Electronics", "Robocop 2 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, trockteer,   trobocop2,  0, trockteer,   trockteer,   trobocop2_state,   empty_init, "Tiger Electronics", "The Rocketeer (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, taltbeast,   0,          0, taltbeast,   taltbeast,   taltbeast_state,   empty_init, "Tiger Electronics (licensed from Sega)", "Altered Beast (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tsf2010,     0,          0, tsf2010,     tsf2010,     tsf2010_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010 - The Final Fight (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tswampt,     0,          0, tswampt,     tswampt,     tswampt_state,     empty_init, "Tiger Electronics", "Swamp Thing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tspidman,    0,          0, tspidman,    tspidman,    tspidman_state,    empty_init, "Tiger Electronics", "Spider-Man (handheld, Tiger 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, txmen,       0,          0, txmen,       txmen,       txmen_state,       empty_init, "Tiger Electronics", "X-Men (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tddragon3,   0,          0, tddragon3,   tddragon3,   tddragon3_state,   empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3 - The Rosetta Stone (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tflash,      0,          0, tflash,      tflash,      tflash_state,      empty_init, "Tiger Electronics", "The Flash (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tmchammer,   0,          0, tmchammer,   tmchammer,   tmchammer_state,   empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tbtoads,     0,          0, tbtoads,     tbtoads,     tbtoads_state,     empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, thook,       0,          0, thook,       thook,       thook_state,       empty_init, "Tiger Electronics", "Hook (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, tbttf,       0,          0, tbttf,       tbttf,       tbttf_state,       empty_init, "Tiger Electronics", "Back to the Future (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, taddams,     0,          0, taddams,     taddams,     taddams_state,     empty_init, "Tiger Electronics", "The Addams Family (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, thalone,     0,          0, thalone,     thalone,     thalone_state,     empty_init, "Tiger Electronics", "Home Alone (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, txmenpx,     0,          0, txmenpx,     txmenpx,     txmenpx_state,     empty_init, "Tiger Electronics", "X-Men - Project X (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, thalone2,    0,          0, thalone2,    thalone2,    thalone2_state,    empty_init, "Tiger Electronics", "Home Alone 2 - Lost in New York (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, tsonic,      0,          0, tsonic,      tsonic,      tsonic_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, trobocop3,   0,          0, trobocop3,   trobocop3,   trobocop3_state,   empty_init, "Tiger Electronics", "Robocop 3 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tdummies,    0,          0, tdummies,    tdummies,    tdummies_state,    empty_init, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tsfight2,    0,          0, tsfight2,    tsfight2,    tsfight2_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, twworld,     0,          0, twworld,     twworld,     twworld_state,     empty_init, "Tiger Electronics", "Wayne's World (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tjpark,      0,          0, tjpark,      tjpark,      tjpark_state,      empty_init, "Tiger Electronics", "Jurassic Park (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tsonic2,     0,          0, tsonic2,     tsonic2,     tsonic2_state,     empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tsddragon,   0,          0, tsddragon,   tsddragon,   tsddragon_state,   empty_init, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tdennis,     0,          0, tdennis,     tdennis,     tdennis_state,     empty_init, "Tiger Electronics", "Dennis the Menace (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tnmarebc,    0,          0, tnmarebc,    tnmarebc,    tnmarebc_state,    empty_init, "Tiger Electronics", "Nightmare Before Christmas (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
-CONS( 1993, ttransf2,    0,          0, ttransf2,    ttransf2,    ttransf2_state,    empty_init, "Tiger Electronics", "Transformers - Generation 2 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1994, topaliens,   0,          0, topaliens,   topaliens,   topaliens_state,   empty_init, "Tiger Electronics", "Operation: Aliens (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tmkombat,    0,          0, tmkombat,    tmkombat,    tmkombat_state,    empty_init, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1994, tshadow,     0,          0, tshadow,     tshadow,     tshadow_state,     empty_init, "Tiger Electronics", "The Shadow (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1994, tskelwarr,   0,          0, tskelwarr,   tskelwarr,   tskelwarr_state,   empty_init, "Tiger Electronics", "Skeleton Warriors - The Dark Crusade (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tbatfor,     0,          0, tbatfor,     tbatfor,     tbatfor_state,     empty_init, "Tiger Electronics", "Batman Forever - Double Dose of Doom (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tjdredd,     0,          0, tjdredd,     tjdredd,     tjdredd_state,     empty_init, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_state,   empty_init, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tkazaam,     0,          0, tkazaam,     tkazaam,     tkazaam_state,     empty_init, "Tiger Electronics", "Kazaam (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tgaunt,       0,           0, tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, trobhood,     tgaunt,      0, trobhood,     trobhood,     tgaunt_state,       empty_init, "Tiger Electronics", "Robin Hood (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tddragon,     0,           0, tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tkarnov,      0,           0, tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tvindictr,    0,           0, tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tgaiden,      0,           0, tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, tbatman,      0,           0, tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, tsharr2,      0,           0, tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, tstrider,     0,           0, tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, tgoldnaxe,    0,           0, tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Golden Axe (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, trobocop2,    0,           0, trobocop2,    trobocop2,    trobocop2_state,    empty_init, "Tiger Electronics", "Robocop 2 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, trockteer,    trobocop2,   0, trockteer,    trockteer,    trobocop2_state,    empty_init, "Tiger Electronics", "The Rocketeer (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, taltbeast,    0,           0, taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Altered Beast (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, tsf2010,      0,           0, tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010 - The Final Fight (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, tswampt,      0,           0, tswampt,      tswampt,      tswampt_state,      empty_init, "Tiger Electronics", "Swamp Thing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, tspidman,     0,           0, tspidman,     tspidman,     tspidman_state,     empty_init, "Tiger Electronics", "Spider-Man (handheld, Tiger 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, txmen,        0,           0, txmen,        txmen,        txmen_state,        empty_init, "Tiger Electronics", "X-Men (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, tddragon3,    0,           0, tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3 - The Rosetta Stone (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, tflash,       0,           0, tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, tmchammer,    0,           0, tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, tbtoads,      0,           0, tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1991, thook,        0,           0, thook,        thook,        thook_state,        empty_init, "Tiger Electronics", "Hook (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, tbttf,        0,           0, tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, taddams,      0,           0, taddams,      taddams,      taddams_state,      empty_init, "Tiger Electronics", "The Addams Family (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, thalone,      0,           0, thalone,      thalone,      thalone_state,      empty_init, "Tiger Electronics", "Home Alone (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, txmenpx,      0,           0, txmenpx,      txmenpx,      txmenpx_state,      empty_init, "Tiger Electronics", "X-Men - Project X (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, thalone2,     0,           0, thalone2,     thalone2,     thalone2_state,     empty_init, "Tiger Electronics", "Home Alone 2 - Lost in New York (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, tsonic,       0,           0, tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, trobocop3,    0,           0, trobocop3,    trobocop3,    trobocop3_state,    empty_init, "Tiger Electronics", "Robocop 3 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tdummies,     0,           0, tdummies,     tdummies,     tdummies_state,     empty_init, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tsfight2,     0,           0, tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, twworld,      0,           0, twworld,      twworld,      twworld_state,      empty_init, "Tiger Electronics", "Wayne's World (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tjpark,       0,           0, tjpark,       tjpark,       tjpark_state,       empty_init, "Tiger Electronics", "Jurassic Park (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tsonic2,      0,           0, tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tsddragon,    0,           0, tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tdennis,      0,           0, tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tnmarebc,     0,           0, tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
+CONS( 1993, ttransf2,     0,           0, ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers - Generation 2 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1994, topaliens,    0,           0, topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1993, tmkombat,     0,           0, tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1994, tshadow,      0,           0, tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1994, tskelwarr,    0,           0, tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors - The Dark Crusade (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1995, tbatfor,      0,           0, tbatfor,      tbatfor,      tbatfor_state,      empty_init, "Tiger Electronics", "Batman Forever - Double Dose of Doom (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1995, tjdredd,      0,           0, tjdredd,      tjdredd,      tjdredd_state,      empty_init, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1995, tapollo13,    0,           0, tapollo13,    tapollo13,    tapollo13_state,    empty_init, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1995, tgoldeye,     0,           0, tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1996, tkazaam,      0,           0, tkazaam,      tkazaam,      tkazaam_state,      empty_init, "Tiger Electronics", "Kazaam (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1996, tsjam,        0,           0, tsjam,        tsjam,        tsjam_state,        empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1996, tinday,       0,           0, tinday,       tinday,       tinday_state,       empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Tiger 72-xxx models
-CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1992, tbatmana,     0,           0, tbatmana,     tbatmana,     tbatmana_state,     empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Tronica
-CONS( 1983, trshutvoy,   0,          0, trshutvoy,   trshutvoy,   trshutvoy_state,   empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, tigarden,    trshutvoy,  0, tigarden,    trshutvoy,   trshutvoy_state,   empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, trsrescue,   0,          0, trsrescue,   trsrescue,   trsrescue_state,   empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
-CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, nummunch,     0,           0, nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
