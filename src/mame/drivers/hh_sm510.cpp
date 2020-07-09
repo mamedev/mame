@@ -4193,6 +4193,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Micro Vs. System: Donkey Kong 3 (model AK-302)
+  * PCB label AK-302M
   * Sharp SM511 label AK-302 299D (no decap)
   * wide lcd screen with custom segments, 1-bit sound
 
