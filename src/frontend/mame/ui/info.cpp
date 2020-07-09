@@ -293,10 +293,6 @@ std::string machine_info::warnings_string() const
 			buf << '\n';
 	}
 
-	// add the 'press OK' string
-	if (!buf.str().empty())
-		buf << _("\n\nPress any key to continue");
-
 	return buf.str();
 }
 
@@ -451,9 +447,8 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
 
 
 /*-------------------------------------------------
-  menu_game_info - handle the game information
-  menu
- -------------------------------------------------*/
+  menu_game_info - handle the game information menu
+-------------------------------------------------*/
 
 menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
@@ -477,9 +472,33 @@ void menu_game_info::handle()
 
 
 /*-------------------------------------------------
-  menu_image_info - handle the image information
-  menu
- -------------------------------------------------*/
+  menu_warn_info - handle the emulation warnings menu
+-------------------------------------------------*/
+
+menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+{
+}
+
+menu_warn_info::~menu_warn_info()
+{
+}
+
+void menu_warn_info::populate(float &customtop, float &custombottom)
+{
+	std::string tempstring = ui().machine_info().warnings_string();
+	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+}
+
+void menu_warn_info::handle()
+{
+	// process the menu
+	process(0);
+}
+
+
+/*-------------------------------------------------
+  menu_image_info - handle the image information menu
+-------------------------------------------------*/
 
 menu_image_info::menu_image_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
