@@ -28913,9 +28913,11 @@ m4elite                         // Elite (Barcrest)
 
 @source:mpu4vid.cpp
 v4addlad                        // Adders and Ladders
+v4addladd                       //
 v4addlad20                      //
 v4barqs2                        // Barquest 2 (v0.3)
-v4barqst                        // Barquest (v2.6d)
+v4barqst                        // Barquest (v2.6)
+v4barqstd                       //
 v4big40                         // Big 40
 v4bigfrt                        // Big Fruits
 v4bios                          // MPU4 Video Firmware
