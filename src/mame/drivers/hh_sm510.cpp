@@ -30,9 +30,9 @@ TODO:
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_climbern,
-  gnw_dkcirc, gnw_dkjrp, gnw_dkong3, gnw_gcliff, gnw_mariocmt, gnw_mariotj,
-  gnw_mbaway, gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp,
-  gnw_zelda
+  gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff, gnw_mariocmt,
+  gnw_mariotj, gnw_mbaway, gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster,
+  gnw_snoopyp, gnw_zelda
 
 ****************************************************************************
 
@@ -105,7 +105,7 @@ BU-201    sc   SM510   Spitball Sparky
 UD-202    sc   SM510   Crab Grab
 BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302    mvs  SM511   Donkey Kong 3
-HK-303*   mvs  SM511?  Donkey Kong Hockey
+HK-303    mvs  SM511   Donkey Kong Hockey
 YM-801    cs   SM511   Super Mario Bros. (assume same ROM as nws version)
 DR-802    cs   SM511   Climber            "
 BF-803    cs   SM511   Balloon Fight      "
@@ -4266,6 +4266,98 @@ ROM_START( gnw_dkong3 )
 
 	ROM_REGION( 292480, "screen", 0)
 	ROM_LOAD( "gnw_dkong3.svg", 0, 292480, CRC(980d2486) SHA1(8578bdf4a3814401d9a79867252ee09ed7df253c) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Micro Vs. System: Donkey Kong Hockey (model HK-303)
+  * PCB label HK-303M
+  * Sharp SM511 label HK-303 57XD (no decap)
+  * wide lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_dkhockey_state : public hh_sm510_state
+{
+public:
+	gnw_dkhockey_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkhockey(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_dkhockey )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2) // Hit
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Hit
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_dkhockey_state::gnw_dkhockey(machine_config &config)
+{
+	sm511_common(config, 1920, 579);
+}
+
+// roms
+
+ROM_START( gnw_dkhockey )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "hk-303.program", 0x0000, 0x1000, CRC(dc73eec7) SHA1(daaca286de326321335fd26d9b435b444787f609) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "hk-303.melody", 0x000, 0x100, BAD_DUMP CRC(3f61032c) SHA1(b0fd9077fb5e59ca2787c828c78c35116c48c245) ) // decap needed for verification
+
+	ROM_REGION( 263239, "screen", 0)
+	ROM_LOAD( "gnw_dkhockey.svg", 0, 263239, CRC(3a576c12) SHA1(9a7ca67c35fcfb5858227f3ef2a6027c877c64d3) )
 ROM_END
 
 
@@ -9305,6 +9397,7 @@ CONS( 1984, gnw_cgrab,   0,          0, gnw_cgrab,   gnw_cgrab,   gnw_cgrab_stat
 // Nintendo G&W: Micro Vs. System (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, gnw_dkong3,  0,          0, gnw_dkong3,  gnw_dkong3,  gnw_dkong3_state,  empty_init, "Nintendo", "Micro Vs. System: Donkey Kong 3", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1984, gnw_dkhockey,0,          0, gnw_dkhockey,gnw_dkhockey,gnw_dkhockey_state,empty_init, "Nintendo", "Micro Vs. System: Donkey Kong Hockey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Konami
 CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
