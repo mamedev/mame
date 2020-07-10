@@ -41,12 +41,16 @@
 
 // alias LS devices to real devices
 #define TTL_74LS00_DIP TTL_7400_DIP
+#define TTL_74LS02_DIP TTL_7402_DIP     // Quad 2-input Nor Gate
+#define TTL_74S04_DIP TTL_7404_DIP      // Hex Inverting Gates
 #define TTL_74LS04_DIP TTL_7404_DIP     // Hex Inverting Gates
 #define TTL_74LS08_DIP TTL_7408_DIP     // Quad 2-Input AND Gates
 #define TTL_74LS21_DIP TTL_7421_DIP     // Dual 4-Input AND Gates
+#define TTL_74LS74_DIP TTL_7474_DIP     // Dual D Flip Flop
 #define TTL_74LS75_DIP TTL_7475_DIP     // 4-Bit Bistable Latches with Complementary Outputs
 #define TTL_74LS86_DIP TTL_7486_DIP     // Quad 2-Input Exclusive-OR Gates
 #define TTL_74LS107_DIP TTL_74107_DIP
+#define TTL_74S113A_DIP TTL_74113A_DIP
 #define TTL_74LS123_DIP TTL_74123_DIP
 #define TTL_74LS125_DIP TTL_74125_DIP
 #define TTL_74LS163_DIP TTL_74163_DIP
