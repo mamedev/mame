@@ -436,15 +436,24 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 			uint8_t pen = line[offset + i];
 			int extra = tile >> 12;
 
-			int newpen = pen ^ (15 - extra);
-
-			if (newpen != 15)
+			// the test modes in many cases require the more complex logic here
+			// otherwise text is invisible, rgb patterns are not shown etc.
+			// this logic could still be incorrect
+			if (pen == 0)
 			{
-				bitmap.pix32(y, x + i) = m_palette->pen(newpen);
+				bitmap.pix32(y, x + i) = m_palette->pen(pen);
 			}
 			else
 			{
-				bitmap.pix32(y, x + i) = m_palette->pen(extra);
+				int newpen = pen ^ (15 - extra);
+				if (newpen == 15)
+				{
+					bitmap.pix32(y, x + i) = m_palette->pen(extra);
+				}
+				else
+				{
+					bitmap.pix32(y, x + i) = m_palette->pen(newpen);
+				}
 			}
 		}
 	}
