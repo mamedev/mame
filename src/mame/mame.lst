@@ -13042,6 +13042,15 @@ emu2                            //
 emax2                           //
 emu3                            //
 
+@source:emu68k.cpp
+carnaval                        //
+orbit9090                       //
+phatt                           //
+procuss                         //
+proteus1                        //
+proteusxr                       //
+vintkeys                        //
+
 @source:enigma2.cpp
 enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
 enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)

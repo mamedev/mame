@@ -2247,6 +2247,7 @@ createMESSProjects(_target, _subtarget, "emusys")
 files {
 	MAME_DIR .. "src/mame/drivers/emu2.cpp",
 	MAME_DIR .. "src/mame/drivers/emu3.cpp",
+	MAME_DIR .. "src/mame/drivers/emu68k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ensoniq")
