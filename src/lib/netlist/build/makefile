@@ -168,6 +168,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_7497.o \
 	$(NLOBJ)/devices/nld_74107.o \
+	$(NLOBJ)/devices/nld_74113.o \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74125.o \
 	$(NLOBJ)/devices/nld_74153.o \
@@ -244,7 +245,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend 
+.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend
 
 #-------------------------------------------------
 # all
