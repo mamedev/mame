@@ -3530,16 +3530,16 @@ ROM_START( v4mdice )
 	ROM_LOAD( "mdi25a__.8_0", 0x0000, 0x010000, CRC(c3b469d0) SHA1(00cd85bd9acd477f2ab4baf83e7bb10d763b1e93) )
 
 	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "md______.8_1", 0x000001, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
+	ROM_LOAD16_BYTE( "md______.8_2", 0x000000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
+	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
+	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
+
+	ROM_REGION( 0x800000, "altvideo", 0 ) // this doesn't work with the above base roms?
 	ROM_LOAD16_BYTE( "mdv58p1", 0x000001, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
 	ROM_LOAD16_BYTE( "mdv58p2", 0x000000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
 	ROM_LOAD16_BYTE( "mdv58p3", 0x100001, 0x080000, CRC(0d907e37) SHA1(b6ad78a4a7bc877d2152907df2317621f00bdc1c) )
 	ROM_LOAD16_BYTE( "mdv58p4", 0x100000, 0x080000, CRC(2e21c249) SHA1(d5192339313a8dd234cb164ca0094d9a7b64ccc2) )
-
-	ROM_REGION( 0x800000, "altvideo", 0 )
-	ROM_LOAD( "md______.8_1", 0x0000, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
-	ROM_LOAD( "md______.8_2", 0x0000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
-	ROM_LOAD( "md______.8_3", 0x0000, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
-	ROM_LOAD( "md______.8_4", 0x0000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
@@ -4014,10 +4014,9 @@ GAME(  199?, v4bloxd,    v4blox,   bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 // these will run in 'open door' mode otherwise they'll give payout shelf error
 
-GAME(  199?, v4vgpok,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4vgpok,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS ) // doesn't have payout so no shelf error, runs with door closed
 
 GAME(  199?, v4redhtp,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS ) // runs if open door
-
 
 GAME(  199?, v4bubbnk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS ) // runs if open door
 
@@ -4052,11 +4051,9 @@ GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
+GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
+
 // other issues
-
-GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  wrong MPU4 base rom?
-
-
 
 GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox? (doesn't boot, hangs on comms?)
 
