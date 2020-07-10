@@ -61,7 +61,7 @@ HD44780_PIXEL_UPDATE(emu68k_state::lcd_pixel_update)
 void emu68k_state::proteus1_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("program", 0);
-	map(0x600080, 0x680083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
+	map(0x600080, 0x600083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
 	map(0x600100, 0x60012f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0x800000, 0x8003ff).writeonly(); // ???
 	map(0xffc000, 0xffffff).ram();
@@ -82,7 +82,7 @@ void emu68k_state::proteusxr_map(address_map &map)
 void emu68k_state::vintkeys_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("program", 0);
-	map(0x600080, 0x680083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
+	map(0x600080, 0x600083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
 	map(0x600100, 0x60012f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0x800000, 0x8003ff).writeonly(); // ???
 	map(0xffc000, 0xffffff).ram();
@@ -91,7 +91,7 @@ void emu68k_state::vintkeys_map(address_map &map)
 void emu68k_state::phatt_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("program", 0);
-	map(0x600080, 0x680083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
+	map(0x600080, 0x600083).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write)).umask16(0x00ff);
 	map(0x600100, 0x60012f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0x800000, 0x8003ff).writeonly(); // ???
 	map(0xffc000, 0xffffff).ram();
@@ -150,7 +150,7 @@ void emu68k_state::proteus1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &emu68k_state::proteus1_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &emu68k_state::fc7_map);
 
-	MC68901(config, m_mfp, 10'000'000);
+	MC68901(config, m_mfp, 10'000'000); // FIXME: not the right type at all
 	m_mfp->set_timer_clock(2'500'000);
 	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_1); // TODO: verify level
 
@@ -177,7 +177,7 @@ void emu68k_state::proteusxr(machine_config &config)
 
 	// TODO: NVRAM = 2x CXK5864BP-12L + DS1210 + battery?
 
-	MC68901(config, m_mfp, 40_MHz_XTAL / 4);
+	MC68901(config, m_mfp, 40_MHz_XTAL / 4); // MC68901P
 	m_mfp->set_timer_clock(40_MHz_XTAL / 16); // TODO: determine divider
 	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_1); // TODO: verify level
 
