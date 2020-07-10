@@ -3217,8 +3217,7 @@ ROM_START( csilver )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 017F: B4 4C 0D : cjne  a,#$4C,$018F   (ID code 0x4c = World version)
-	// 3 bytes (always bit 0x08 set incorrectly) had to be hand fixed, hence 'BAD_DUMP'
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, BAD_DUMP CRC(c0266263) SHA1(27ac6fa4af7195f04249c04dec168ab82158704e) ) // dx-8.19a ?
+	ROM_LOAD( "dx-8.19a", 0x0000, 0x1000, CRC(c0266263) SHA1(27ac6fa4af7195f04249c04dec168ab82158704e) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
