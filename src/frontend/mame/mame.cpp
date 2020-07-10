@@ -311,6 +311,7 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
 
 	m_ui->set_startup_text("Initializing...", true);
+	machine.video().frame_update(); // force another video update, some video backends need it
 
 	return m_ui.get();
 }
