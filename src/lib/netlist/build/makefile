@@ -170,6 +170,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_7497.o \
 	$(NLOBJ)/devices/nld_74107.o \
+	$(NLOBJ)/devices/nld_74113.o \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74125.o \
 	$(NLOBJ)/devices/nld_74153.o \
