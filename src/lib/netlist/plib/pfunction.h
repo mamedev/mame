@@ -19,6 +19,36 @@ namespace plib {
 	//  function evaluation
 	//============================================================
 
+	enum rpn_cmd
+	{
+		ADD,
+		MULT,
+		SUB,
+		DIV,
+		EQ,
+		NE,
+		LT,
+		GT,
+		LE,
+		GE,
+		IF,
+		NEG,	// unary minus
+		POW,
+		LOG,
+		SIN,
+		COS,
+		MIN,
+		MAX,
+		RAND, /// random number between 0 and 1
+		TRUNC,
+
+		PUSH_CONST,
+		PUSH_INPUT,
+
+		LP, // Left parenthesis - for infix parsing
+		RP  // right parenthesis - for infix parsing
+	};
+
 	/// \brief Class providing support for evaluating expressions
 	///
 	///  \tparam NT Number type, should be float or double
@@ -26,36 +56,18 @@ namespace plib {
 	template <typename NT>
 	class pfunction
 	{
-		enum rpn_cmd
-		{
-			ADD,
-			MULT,
-			SUB,
-			DIV,
-			EQ,
-			NE,
-			LT,
-			GT,
-			LE,
-			GE,
-			IF,
-			NEG,	// unary minus
-			POW,
-			LOG,
-			SIN,
-			COS,
-			MIN,
-			MAX,
-			RAND, /// random number between 0 and 1
-			TRUNC,
-			PUSH_CONST,
-			PUSH_INPUT
-		};
 		struct rpn_inst
 		{
-			rpn_inst() : m_cmd(ADD), m_param(plib::constants<NT>::zero()) { }
+			rpn_inst() : m_cmd(ADD)
+			{
+				m_param.val = plib::constants<NT>::zero();
+			}
 			rpn_cmd m_cmd;
-			NT m_param;
+			union
+			{
+				NT          val;
+				std::size_t index;
+			} m_param;
 		};
 	public:
 

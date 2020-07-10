@@ -14,11 +14,50 @@
 #include <stack>
 #include <type_traits>
 #include <utility>
+#include <map>
 
 namespace plib {
 
 	static constexpr const std::size_t MAX_STACK = 32;
 
+	struct pcmd_t
+	{
+		rpn_cmd cmd;
+		int adj;
+		int prio;
+	};
+
+	static const std::map<pstring, pcmd_t> &pcmds()
+	{
+		static const std::map<pstring, pcmd_t> lpcmds =
+		{
+			{ "^",     { POW,   1, 30 } },
+			{ "neg",   { NEG,   0, 25 } },
+			{ "+",     { ADD,   1, 10 } },
+			{ "-",     { SUB,   1, 10 } },
+			{ "*",     { MULT,  1, 20 } },
+			{ "/",     { DIV,   1, 20 } },
+			{ "<",     { LT,    1,  9 } },
+			{ ">",     { GT,    1,  9 } },
+			{ "<=",    { LE,    1,  9 } },
+			{ ">=",    { GE,    1,  9 } },
+			{ "==",    { EQ,    1,  8 } },
+			{ "!=",    { NE,    1,  8 } },
+			{ "if",    { IF,    2,  0 } },
+			{ "pow",   { POW,   1,  0 } },
+			{ "log",   { LOG,   0,  0 } },
+			{ "sin",   { SIN,   0,  0 } },
+			{ "cos",   { COS,   0,  0 } },
+			{ "max",   { MAX,   1,  0 } },
+			{ "min",   { MIN,   1,  0 } },
+			{ "trunc", { TRUNC, 0,  0 } },
+			{ "rand",  { RAND, -1,  0 } },
+
+			{ "(",     { LP,    0,  1 } },
+			{ ")",     { RP,    0,  1 } },
+		};
+		return lpcmds;
+	}
 	// FIXME: Exa parsing conflicts with e,E parsing
 	template<typename F>
 	static const std::map<pstring, F> &units_si()
@@ -76,46 +115,12 @@ namespace plib {
 		for (const pstring &cmd : cmds)
 		{
 			rpn_inst rc;
-			if (cmd == "+")
-				{ rc.m_cmd = ADD; stk -= 1; }
-			else if (cmd == "-")
-				{ rc.m_cmd = SUB; stk -= 1; }
-			else if (cmd == "*")
-				{ rc.m_cmd = MULT; stk -= 1; }
-			else if (cmd == "/")
-				{ rc.m_cmd = DIV; stk -= 1; }
-			else if (cmd == "==")
-				{ rc.m_cmd = EQ; stk -= 1; }
-			else if (cmd == "!=")
-				{ rc.m_cmd = NE; stk -= 1; }
-			else if (cmd == "<")
-				{ rc.m_cmd = LT; stk -= 1; }
-			else if (cmd == ">")
-				{ rc.m_cmd = GT; stk -= 1; }
-			else if (cmd == "<=")
-				{ rc.m_cmd = LE; stk -= 1; }
-			else if (cmd == ">=")
-				{ rc.m_cmd = GE; stk -= 1; }
-			else if (cmd == "if")
-				{ rc.m_cmd = IF; stk -= 2; }
-			else if (cmd == "neg")
-				{ rc.m_cmd = NEG; stk -= 0; }
-			else if (cmd == "pow" || cmd == "^")
-				{ rc.m_cmd = POW; stk -= 1; }
-			else if (cmd == "log")
-				{ rc.m_cmd = LOG; stk -= 0; }
-			else if (cmd == "sin")
-				{ rc.m_cmd = SIN; stk -= 0; }
-			else if (cmd == "cos")
-				{ rc.m_cmd = COS; stk -= 0; }
-			else if (cmd == "max")
-				{ rc.m_cmd = MAX; stk -= 1; }
-			else if (cmd == "min")
-				{ rc.m_cmd = MIN; stk -= 1; }
-			else if (cmd == "trunc")
-				{ rc.m_cmd = TRUNC; stk -= 0; }
-			else if (cmd == "rand")
-				{ rc.m_cmd = RAND; stk += 1; }
+			auto p = pcmds().find(cmd);
+			if (p != pcmds().end())
+			{
+				rc.m_cmd = p->second.cmd;
+				stk -= p->second.adj;
+			}
 			else
 			{
 				for (std::size_t i = 0; i < inputs.size(); i++)
@@ -123,22 +128,22 @@ namespace plib {
 					if (inputs[i] == cmd)
 					{
 						rc.m_cmd = PUSH_INPUT;
-						rc.m_param = narrow_cast<NT>(i);
+						rc.m_param.index = i;
 						stk += 1;
 						break;
 					}
 				}
 				if (rc.m_cmd != PUSH_INPUT)
 				{
-					using fl_t = decltype(rc.m_param);
+					using fl_t = decltype(rc.m_param.val);
 					rc.m_cmd = PUSH_CONST;
 					bool err(false);
 					auto rs(plib::right(cmd,1));
 					auto r=units_si<fl_t>().find(rs);
 					if (r == units_si<fl_t>().end())
-						rc.m_param = plib::pstonum_ne<fl_t>(cmd, err);
+						rc.m_param.val = plib::pstonum_ne<fl_t>(cmd, err);
 					else
-						rc.m_param = plib::pstonum_ne<fl_t>(plib::left(cmd, cmd.size()-1), err) * r->second;
+						rc.m_param.val = plib::pstonum_ne<fl_t>(plib::left(cmd, cmd.size()-1), err) * r->second;
 					if (err)
 						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 					stk += 1;
@@ -151,7 +156,7 @@ namespace plib {
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
-			throw pexception(plib::pfmt("pfunction: stack count {1] different to one on <{2}>")(stk, expr));
+			throw pexception(plib::pfmt("pfunction: stack count {1} different to one on <{2}>")(stk, expr));
 	}
 
 	static bool is_number(const pstring &n)
@@ -172,23 +177,11 @@ namespace plib {
 
 	static int get_prio(const pstring &v)
 	{
-		if (v == "neg")
-			return 25;
+		auto p = pcmds().find(v);
+		if (p != pcmds().end())
+			return p->second.prio;
 		if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
 			return 0;
-		if (v == "(" || v == ")")
-			return 1;
-		if (v == "==" || v == "!=")
-			return 8;
-		if (v == "<" || v == ">" || v == "<=" || v == ">=")
-			return 9;
-		if (v == "+" || v == "-")
-			return 10;
-		if (v == "*" || v == "/")
-			return 20;
-		if (v == "^")
-			return 30;
-
 		return -1;
 	}
 
@@ -252,7 +245,7 @@ namespace plib {
 			{
 				if (i==0 || !(is_number(sexpr1[i-1]) || sexpr1[i-1] == ")" || is_id(sexpr1[i-1])))
 				{
-					sexpr.push_back("neg");
+					sexpr.emplace_back("neg");
 					sexpr.push_back(sexpr1[i+1]);
 					i+=2;
 				}
@@ -290,19 +283,19 @@ namespace plib {
 				opstk.push(x);
 			}
 			else {
-				int p = get_prio(s);
-				if (p>0)
+				int prio = get_prio(s);
+				if (prio>0)
 				{
 					if (opstk.empty())
 						opstk.push(s);
 					else
 					{
-						if (get_prio(opstk.top()) >= get_prio(s))
+						if (get_prio(opstk.top()) >= prio)
 							postfix.push_back(pop_check(opstk, expr));
 						opstk.push(s);
 					}
 				}
-				else if (p == 0) // Function or variable
+				else if (prio == 0) // Function or variable
 				{
 					if ((i+1<sexpr.size()) && sexpr[i+1] == "(")
 						opstk.push(s);
@@ -333,7 +326,8 @@ namespace plib {
 			lfsr ^= 0xB400U; // NOLINT: taps 15, 13, 12, 10
 		return narrow_cast<NT>(lfsr) / narrow_cast<NT>(0xffffU); // NOLINT
 	}
-
+#if 0
+	// Currently unused since no integral type pfunction defined
 	template <typename NT>
 	static inline std::enable_if_t<plib::is_integral<NT>::value, NT>
 	lfsr_random(std::uint16_t &lfsr) noexcept
@@ -344,7 +338,7 @@ namespace plib {
 			lfsr ^= 0xB400U; // NOLINT: taps 15, 13, 12, 10
 		return narrow_cast<NT>(lfsr);
 	}
-
+#endif
 	#define ST0 stack[ptr+1]
 	#define ST1 stack[ptr]
 	#define ST2 stack[ptr-1]
@@ -360,6 +354,8 @@ namespace plib {
 	{
 		std::array<value_type, MAX_STACK> stack = { plib::constants<value_type>::zero() };
 		unsigned ptr = 0;
+		constexpr auto zero = plib::constants<value_type>::zero();
+		constexpr auto one = plib::constants<value_type>::one();
 		stack[0] = plib::constants<value_type>::zero();
 		for (auto &rc : m_precompiled)
 		{
@@ -369,13 +365,13 @@ namespace plib {
 				OP(MULT, 1, ST2 * ST1)
 				OP(SUB,  1, ST2 - ST1)
 				OP(DIV,  1, ST2 / ST1)
-				OP(EQ,   1, ST2 == ST1 ? 1.0 : 0.0)
-				OP(NE,   1, ST2 != ST1 ? 1.0 : 0.0)
-				OP(GT,   1, ST2 > ST1 ? 1.0 : 0.0)
-				OP(LT,   1, ST2 < ST1 ? 1.0 : 0.0)
-				OP(LE,   1, ST2 <= ST1 ? 1.0 : 0.0)
-				OP(GE,   1, ST2 >= ST1 ? 1.0 : 0.0)
-				OP(IF,   2, (ST2 != 0.0) ? ST1 : ST0)
+				OP(EQ,   1, ST2 == ST1 ? one : zero)
+				OP(NE,   1, ST2 != ST1 ? one : zero)
+				OP(GT,   1, ST2 > ST1 ? one : zero)
+				OP(LT,   1, ST2 < ST1 ? one : zero)
+				OP(LE,   1, ST2 <= ST1 ? one : zero)
+				OP(GE,   1, ST2 >= ST1 ? one : zero)
+				OP(IF,   2, (ST2 != zero) ? ST1 : ST0)
 				OP(NEG,  0, -ST2)
 				OP(POW,  1, plib::pow(ST2, ST1))
 				OP(LOG,  0, plib::log(ST2))
@@ -388,10 +384,14 @@ namespace plib {
 					stack[ptr++] = lfsr_random<value_type>(m_lfsr);
 					break;
 				case PUSH_INPUT:
-					stack[ptr++] = values[narrow_cast<unsigned>(rc.m_param)];
+					stack[ptr++] = values[rc.m_param.index];
 					break;
 				case PUSH_CONST:
-					stack[ptr++] = rc.m_param;
+					stack[ptr++] = rc.m_param.val;
+					break;
+				// please compiler
+				case LP:
+				case RP:
 					break;
 			}
 		}
