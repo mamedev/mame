@@ -200,6 +200,7 @@ TODO:
 
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
+#include "v4addlad.lh"
 
 
 class mpu4vid_state : public mpu4_state
@@ -587,6 +588,8 @@ uint8_t mpu4vid_state::pia_ic5_porta_track_r()
  *  Input defintions
  *
  *************************************/
+
+
 
 static INPUT_PORTS_START( crmaze )
 	PORT_START("ORANGE1")
@@ -1043,6 +1046,7 @@ static INPUT_PORTS_START( turnover )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( adders )
 	PORT_START("ORANGE1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1069,16 +1073,16 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("B")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("A")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Pass")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Collect")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("C")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("B")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("A")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("C")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("B")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("A")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Continue")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1156,6 +1160,7 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
+
 
 WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 {
@@ -3954,9 +3959,9 @@ GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mat
 
 /* Quiz games - Questions decoded */
 
-GAME(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS,layout_v4addlad )
+GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS,layout_v4addlad )
+GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS,layout_v4addlad )
 
 GAME(  199?, v4strike,   v4bios,   mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4striked,  v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
