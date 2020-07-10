@@ -51,11 +51,6 @@ private:
 	uint8_t col;
 	uint8_t pixel;
 
-	uint8_t gigatron_random()
-	{
-		return machine().rand() & 0xff;
-	}
-
 	void blinkenlights(uint8_t data);
 	void video_draw(u8 data);
 	uint8_t inputs();
