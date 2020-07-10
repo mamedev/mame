@@ -3162,8 +3162,8 @@ ROM_START( v4bigfrt )
 	ROM_LOAD16_BYTE("bi______.2_4",  0x020001, 0x010000,  CRC(58f0dcb4) SHA1(79039d489f5ce3a1865fa92a2b6e8b002b63efcf))
 	ROM_LOAD16_BYTE("bi______.2_5",  0x040000, 0x010000,  CRC(512c6d1a) SHA1(1c9d04e7e59a95f6975e6d2d5e5def4c1a7777e0))
 	ROM_LOAD16_BYTE("bi______.2_6",  0x040001, 0x010000,  CRC(5df850ec) SHA1(5b455f4cfb19c551723f7fd5f4f95e5420f8682f))
-	ROM_LOAD16_BYTE("bi______.2_7",  0x050000, 0x010000,  CRC(9ea394a2) SHA1(3b9840627f7676aa7872d2bc022406a4ced7958f))
-	ROM_LOAD16_BYTE("bi______.2_8",  0x050001, 0x010000,  CRC(4aa1d37d) SHA1(3c1a3ccacdc33cd4a54b7bbf06ea4c33868705f4))
+	ROM_LOAD16_BYTE("bi______.2_7",  0x060000, 0x010000,  CRC(9ea394a2) SHA1(3b9840627f7676aa7872d2bc022406a4ced7958f))
+	ROM_LOAD16_BYTE("bi______.2_8",  0x060001, 0x010000,  CRC(4aa1d37d) SHA1(3c1a3ccacdc33cd4a54b7bbf06ea4c33868705f4))
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision BIOS ROMs, to be sorted into clones (could probably do so already, but let's not complicate things)*/
 	// protocol/20p/Rank Bingo
@@ -4036,6 +4036,8 @@ GAME(  199?, v4cshinf,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 GAME(  199?, v4sunbst,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )  // runs if open door
 
+GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS ) // runs if open door
+
 // these don't play in open door mode as they'll drop you to test mode, so need 'payout shelf' emulating.
 
 GAME(  1996, v4reno,     0,        bwbvid5,    mpu4,     mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS ) // runs if open door but then drops to test menu
@@ -4055,7 +4057,6 @@ GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwb
 GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  wrong MPU4 base rom?
 
 
-GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS ) // doesn't boot, invalid video code, check loading
 
 GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox? (doesn't boot, hangs on comms?)
 
