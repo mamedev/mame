@@ -3548,6 +3548,13 @@ ROM_START( v4mdice )
 ROM_END
 
 
+/* these are bad dumps, the first 2 are just 1/4 of mcobo4p1 / mcobo4p2, the 2nd 2 are 1/4 of mcop3vd / mcop4vd
+ROM_REGION( 0x800000, "altvideo", 0 )
+ROM_LOAD( "montecarloorbustvideoboardp1.bin", 0x0000, 0x020000, CRC(5fd2c5ee) SHA1(60194df160070754e1cce6558dedc87b7fc05044) )
+ROM_LOAD( "montecarloorbustvideoboardp2.bin", 0x0000, 0x020000, CRC(7f6747cb) SHA1(0a85c0199583c5c48012f627ec3e4c3d12e39859) )
+ROM_LOAD( "montecarloorbustvideoboardp3.bin", 0x0000, 0x020000, CRC(f3d4a37d) SHA1(e81df776bb220832b45a5f6d12e8831f17dbd10b) )
+ROM_LOAD( "montecarloorbustvideoboardp4.bin", 0x0000, 0x020000, CRC(94be9981) SHA1(fe5803102e5e301ad6659ed83d319f55aa62c33e) )
+*/
 
 ROM_START( v4monte )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3647,21 +3654,11 @@ ROM_START( v4monte )
 	ROM_LOAD( "mxi05___.2_1", 0x0000, 0x010000, CRC(de425b55) SHA1(2aa63bbd32c766e7e2d888345115c3185dc03bff) )
 	ROM_LOAD( "mxi10___.2_1", 0x0000, 0x010000, CRC(19077425) SHA1(e31da38a903345c65b083cac192555f1f4ba2e5a) )
 
-
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
 	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
-
-
-
-	ROM_REGION( 0x800000, "altvideo", 0 )
-	// these are bad dumps I think, they're 0x40000-0x60000 of the main roms?
-	ROM_LOAD( "montecarloorbustvideoboardp1.bin", 0x0000, 0x020000, CRC(5fd2c5ee) SHA1(60194df160070754e1cce6558dedc87b7fc05044) )
-	ROM_LOAD( "montecarloorbustvideoboardp2.bin", 0x0000, 0x020000, CRC(7f6747cb) SHA1(0a85c0199583c5c48012f627ec3e4c3d12e39859) )
-	ROM_LOAD( "montecarloorbustvideoboardp3.bin", 0x0000, 0x020000, CRC(f3d4a37d) SHA1(e81df776bb220832b45a5f6d12e8831f17dbd10b) )
-	ROM_LOAD( "montecarloorbustvideoboardp4.bin", 0x0000, 0x020000, CRC(94be9981) SHA1(fe5803102e5e301ad6659ed83d319f55aa62c33e) )
 
 	// this seems to be an alt (incomplete? set)
 	ROM_LOAD( "mn______.f_1", 0x0000, 0x080000, CRC(1a81b3fb) SHA1(bbf0fe7e48404962a2f2120734efe71dc1eed64c) ) // unmatched rom? (significant changes)
