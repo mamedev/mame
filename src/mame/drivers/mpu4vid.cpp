@@ -2071,7 +2071,7 @@ ROM_END
 
 ROM_START( v4tetrs1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tetv1int", 0x0000, 0x004000, CRC(98de975d) SHA1(5b4fc06aa8008d3967c68f364c47f8377a1ba9df) )
+	ROM_LOAD( "tetv1int", 0x0000, 0x004000, CRC(98de975d) SHA1(5b4fc06aa8008d3967c68f364c47f8377a1ba9df) ) // alt / earlier base ROM?
 
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "tetris22.p1",  0x000000, 0x10000, CRC(e81dd182) SHA1(28b460224abf6fe24b637542ccd1c84040674555) )
@@ -4002,8 +4002,8 @@ GAME(  199?, v4psi14d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_pri
 GAME(  199?, v4psi20d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psi214,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Payout Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Payout Tetris v 1.0? (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BWB TET1 Version 2.2) (MPU4 Video) (set 1)",GAME_FLAGS )
+GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BWB TET1 Version 2.2) (MPU4 Video) (set 2)",GAME_FLAGS )
 
 GAME(  199?, v4pztet,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
 GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
