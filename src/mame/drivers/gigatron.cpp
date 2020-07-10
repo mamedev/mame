@@ -75,7 +75,36 @@ void gigatron_state::video_start()
 
 void gigatron_state::video_draw(u8 data)
 {
-
+	uint8_t out = data;
+	uint8_t falling = machineOut & ~out;
+	
+	if (falling & VSYNC)
+	{
+		row = 0;
+		pixel = 0;
+	}
+	
+	if (falling & HSYNC)
+	{
+		col = 0;
+		row++;
+	}
+	
+	machineOut = out;
+	
+	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
+	{
+		return;
+	}
+	
+	if((row >= 0 && row < 480) && (col >= 0 && col < 640))
+	{
+		//uint16_t *dest;
+		//uint8_t tPixel = pixel;
+		//uint8_t r = (out << 6) & 0xC0;
+		//uint8_t g = (out << 4) & 0xC0;
+		//uint8_t b = (out << 2) & 0xC0;
+	}
 }
 
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
