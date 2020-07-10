@@ -3817,4 +3817,166 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- NetBSD -->
+
+	<software name="netbsd_1_6_2">
+		<description>NetBSD 1.6.2</description>
+		<year>2004</year> <!-- 10/04 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+		  <feature name="part_id" value="NetBSD 1.6.2 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="dd58f16cda1510a59ec64b02e6fb0b6b308587ad" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+		  <feature name="part_id" value="NetBSD 1.6.2 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="a542d0b3397632c125c279e4b50df0fa431b5fd9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_2_0">
+		<description>NetBSD 2.0</description>
+		<year>2004</year> <!-- 12/04 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="d8960cfffc55d87f8e83074346e0f670b7a7f024" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="073ceaa3db068938e11a4893fcec81ce533e1016" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_2_0_2">
+		<description>NetBSD 2.0.2</description>
+		<year>2005</year> <!-- 04/05 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0.2 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="45b78a683010aa75476ca987e48fa469b4cfa127" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.0.2 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="e74be0fe637d4ddc8e5bbe818d6c3876fce2f6ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_2_1">
+		<description>NetBSD 2.1</description>
+		<year>2005</year> <!-- 10/04 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.1 CD sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd" sha1="dd160526c51fc4976639a5ca872b6a38f8da9088" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 2.1 CD sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd" sha1="9c1dd6ae595aa44f68b21b574e4ede12ad23a6b1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_0">
+		<description>NetBSD 3.0</description>
+		<year>2005</year> <!-- 12/05 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_0" sha1="ce20c8a04f2013bf826bad0535931082535d564e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_0" sha1="9ab700a635e1816a8f1120b915b97875299686c7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_0_1">
+		<description>NetBSD 3.0.1</description>
+		<year>2006</year> <!-- 07/06 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.1 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_0_1" sha1="8c9fbcdfe31006d19c43cf1afdafa6a0926f868a" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.1 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_0_1" sha1="476c37f1154169a1443a82baf4cf5cde6847f1e1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_0_2">
+		<description>NetBSD 3.0.2</description>
+		<year>2006</year> <!-- 11/06 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.2 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_0_2" sha1="8785e73b09d99ee9eab7a6821c61fd6154ad1f0c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.0.2 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_0_2" sha1="86038dcdfeb5a4ad74c83a7cf0d37e2bfbc2e9f2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netbsd_3_1">
+		<description>NetBSD 3.1</description>
+		<year>2006</year> <!-- 11/06 -->
+		<publisher>The NetBSD Project</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.1 sgimipscd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sgimipscd_3_1" sha1="0258964ef25771d5c0107612be4190081568d689" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="NetBSD 3.1 sourcecd"/>
+			<!-- Origin: netbsd.org -->
+			<diskarea name="cdrom">
+				<disk name="sourcecd_3_1" sha1="55c55fe766674c84ba7db132f5e05cabc77ee5b0" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
