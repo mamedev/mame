@@ -3548,14 +3548,6 @@ ROM_START( v4mdice )
 ROM_END
 
 
-/* these are bad dumps, the first 2 are just 1/4 of mcobo4p1 / mcobo4p2, the 2nd 2 are 1/4 of mcop3vd / mcop4vd
-ROM_REGION( 0x800000, "altvideo", 0 )
-ROM_LOAD( "montecarloorbustvideoboardp1.bin", 0x0000, 0x020000, CRC(5fd2c5ee) SHA1(60194df160070754e1cce6558dedc87b7fc05044) )
-ROM_LOAD( "montecarloorbustvideoboardp2.bin", 0x0000, 0x020000, CRC(7f6747cb) SHA1(0a85c0199583c5c48012f627ec3e4c3d12e39859) )
-ROM_LOAD( "montecarloorbustvideoboardp3.bin", 0x0000, 0x020000, CRC(f3d4a37d) SHA1(e81df776bb220832b45a5f6d12e8831f17dbd10b) )
-ROM_LOAD( "montecarloorbustvideoboardp4.bin", 0x0000, 0x020000, CRC(94be9981) SHA1(fe5803102e5e301ad6659ed83d319f55aa62c33e) )
-*/
-
 ROM_START( v4monte )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "montecarloorbustmpu4cardrom.bin", 0x0000, 0x010000, CRC(44967b33) SHA1(92d35d1b0edcc2eef1062468722c80ef8208b437) ) // Monte Carlo Or Bust Release D (c)1996
@@ -3657,13 +3649,17 @@ ROM_START( v4monte )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
 	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcop3vd", 0x100001, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) )
+	ROM_LOAD16_BYTE( "mcop4vd", 0x100000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) )
+
+	ROM_REGION( 0x800000, "altvideo", 0 )
+	// these also pair with the same p1/p2 as above, but expect different MCU base ROM?
 	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
 	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
-	// this seems to be an alt (incomplete? set)
+	ROM_REGION( 0x800000, "altvideo2", 0 )
+	// this seems to be a loose video ROM from an otherwise undumped set? investigate, might belong to something else entirely.
 	ROM_LOAD( "mn______.f_1", 0x0000, 0x080000, CRC(1a81b3fb) SHA1(bbf0fe7e48404962a2f2120734efe71dc1eed64c) ) // unmatched rom? (significant changes)
-	ROM_LOAD( "mcop3vd", 0x0000, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) ) // alt p3 (significant changes)
-	ROM_LOAD( "mcop4vd", 0x0000, 0x080000, CRC(6eba1107) SHA1(c696b620781782c3b4045fe3550ab8e7e905661d) ) // alt p4 (significant changes
 
 	ROM_REGION( 0x10000, "unk", 0 ) // something else?
 	ROM_LOAD( "montvnd", 0x0000, 0x010000, CRC(9858bb1d) SHA1(a2d3de2cec7420cc6f7da2239bdc79d7c4b7394e) ) // this looks like a different MPU4 game? - check
@@ -4052,11 +4048,12 @@ GAME(  199?, v4gldrsh,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
+GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
+
 // other issues
 
 GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  wrong MPU4 base rom?
 
-GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS ) // wrong MPU4 base rom?
 
 GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS ) // doesn't boot, invalid video code, check loading
 
