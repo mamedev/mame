@@ -418,6 +418,27 @@
 	NET_REGISTER_DEVEXT(TTL_74107A, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_74113.cpp
+// ---------------------------------------------------------------------
+// usage       : TTL_74113(name, pCLK, pJ, pK, pCLRQ)
+// auto connect: VCC, GND
+#define TTL_74113(...)                                                 \
+	NET_REGISTER_DEVEXT(TTL_74113, __VA_ARGS__)
+
+// usage       : TTL_74113_DIP(name)
+#define TTL_74113_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74113_DIP, __VA_ARGS__)
+
+// usage       : TTL_74113A(name, pCLK, pJ, pK, pCLRQ)
+// auto connect: VCC, GND
+#define TTL_74113A(...)                                                \
+	NET_REGISTER_DEVEXT(TTL_74113A, __VA_ARGS__)
+
+// usage       : TTL_74113A_DIP(name)
+#define TTL_74113A_DIP(...)                                            \
+	NET_REGISTER_DEVEXT(TTL_74113A_DIP, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74123.cpp
 // ---------------------------------------------------------------------
 // usage       : TTL_74123(name)
