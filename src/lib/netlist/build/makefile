@@ -302,24 +302,24 @@ clang:
 		-mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wunreachable-code"
 
 clang-libc:
 	#clang-11 currently broken
-	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native 
 	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wunreachable-code" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
