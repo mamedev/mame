@@ -13314,6 +13314,9 @@ deathrac                        // (c) 1976 Exidy
 destdrby                        // (c) 1976 Exidy
 rhunting                        // bootleg of deathrac
 
+@source:exorterm.cpp
+exorterm155                     // (c) 1979 Motorola
+
 @source:exp85.cpp
 exp85                           //
 
