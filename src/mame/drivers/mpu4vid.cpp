@@ -3114,7 +3114,7 @@ FF_493D.P2  DDE5    27C040  30p/?15 data
 
 ROM_START( v4frfact )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	VID_BIOS // should use FFMPU416.P1  A209    27C512 .. find out which that is, if it's dumped
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
 
 	ROM_REGION( 0x800000, "video", 0 )
 	/* p1/p2 load the wrong way around? */
