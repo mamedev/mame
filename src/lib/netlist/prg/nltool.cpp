@@ -439,7 +439,7 @@ void tool_app_t::run_with_progress(netlist_tool_t &nt, netlist::netlist_time_ext
 			else
 			{
 				nt.exec().process_queue(next_sec - now);
-				pout("progress {1:4}s : {2}\r", elapsed_sec, pstring(elapsed_sec, '*'));
+				pout("progress {1:4}s : {2}\r", elapsed_sec, pstring(gsl::narrow_cast<std::size_t>(elapsed_sec), '*'));
 				pout.flush();
 			}
 			now = nt.exec().time();
@@ -1276,7 +1276,7 @@ int tool_app_t::execute()
 			convert();
 		else if (cmd == "tests")
 		{
-			return RUN_ALL_TESTS();
+			return PRUN_ALL_TESTS();
 		}
 		else
 		{
