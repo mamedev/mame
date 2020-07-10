@@ -434,14 +434,17 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t pen = line[offset + i];
+			int extra = tile >> 12;
 
-			if (pen != 0xf)
+			int newpen = pen ^ (15 - extra);
+
+			if (newpen != 15)
 			{
-				bitmap.pix32(y, x + i) = m_palette->pen(pen);
+				bitmap.pix32(y, x + i) = m_palette->pen(newpen);
 			}
 			else
 			{
-				bitmap.pix32(y, x + i) = m_palette->pen(tile>>12);
+				bitmap.pix32(y, x + i) = m_palette->pen(extra);
 			}
 		}
 	}
