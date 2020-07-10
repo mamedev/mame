@@ -676,6 +676,23 @@ private:
 	required_ioport m_io_p1;
 };
 
+class vt1682_lxts3_state : public vt_vt1682_state
+{
+public:
+	vt1682_lxts3_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag),
+		m_io_p1(*this, "IN0")
+	{ }
+
+	void vt1682_lxts3(machine_config& config);
+
+protected:
+	uint8_t uio_porta_r();
+
+private:
+	required_ioport m_io_p1;
+};
+
 class vt1682_exsport_state : public vt_vt1682_state
 {
 public:
@@ -5658,6 +5675,18 @@ static INPUT_PORTS_START( 110dance )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Pad Right") PORT_16WAY
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lxts3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( exsprt48 )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -5833,7 +5862,12 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_rightdac->add_route(0, "mono", 0.5);
 }
 
-
+uint8_t vt1682_lxts3_state::uio_porta_r()
+{
+	uint8_t ret = m_io_p1->read();
+	logerror("%s: porta_r returning: %02x (INPUTS)\n", machine().describe_context(), ret);
+	return ret;
+}
 
 uint8_t vt1682_dance_state::uio_porta_r()
 {
@@ -5893,6 +5927,28 @@ void vt1682_dance_state::vt1682_dance(machine_config& config)
 	m_uio->porta_in().set(FUNC(vt1682_dance_state::uio_porta_r));
 	m_uio->porta_out().set(FUNC(vt1682_dance_state::uio_porta_w));
 }
+
+void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
+{
+	vt_vt1682_ntscbase(config);
+	vt_vt1682_common(config);
+
+	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_PAL); // no opcode bitswap
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_lxts3_state::vt_vt1682_map);
+
+	m_leftdac->reset_routes();
+	m_rightdac->reset_routes();
+
+	config.device_remove(":lspeaker");
+	config.device_remove(":rspeaker");
+
+	SPEAKER(config, "mono").front_center();
+	m_leftdac->add_route(0, "mono", 0.5);
+	m_rightdac->add_route(0, "mono", 0.5);
+
+	m_uio->porta_in().set(FUNC(vt1682_lxts3_state::uio_porta_r));
+}
+
 
 
 void vt1682_wow_state::vt1682_wow(machine_config& config)
@@ -5987,12 +6043,18 @@ ROM_START( 110dance )
 	ROM_LOAD( "110songdancemat.bin", 0x00000, 0x2000000, CRC(cd668e41) SHA1(975bfe05f4cce047860b05766bc8539218f6014f) )
 ROM_END
 
+ROM_START( lxts3 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexibooktoystory_mx29lv640mt_00c2227e.bin", 0x00000, 0x800000, CRC(91344ae7) SHA1(597fc4a27dd1fb6e6f5fda1c4ea237c07e9dba71))
+ROM_END
+
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
 //  actually it appears that for the cart based systems these are 'fake systems' anyway, where the base unit is just a Famiclone but as soon as you plug in a cart none of
 //  the internal hardware gets used at all.
 
 CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
@@ -6049,3 +6111,5 @@ CONS( 200?, wowwg,  0,  0,  vt1682_wow, exsprt48, vt1682_wow_state, regular_init
 CONS( 200?, 110dance,  0,  0,  vt1682_dance, 110dance, vt1682_dance_state, regular_init, "<unknown>", "Retro Dance Mat (110 song Super StepMania + 9-in-1 games) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // NJ Pocket 60-in-1 (NJ-250) is meant to have similar games to the mini-games found in wowwg and 110dance, so almost certainly fits here
+
+CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // random number generation issues on 2 games, linescroll on racing games
