@@ -15,7 +15,6 @@
 
 #include <cstdint>
 #include <cassert>
-#include "x86emit.h"
 
 
 /***************************************************************************
@@ -31,6 +30,10 @@ constexpr int COMMENT_POOL_SIZE{MAX_COMMENTS * 40};
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+// use x86code * to reference generated code
+typedef uint8_t       x86code;
+
 
 /* code logging info */
 struct log_comment

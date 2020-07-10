@@ -89,7 +89,6 @@
 #include "drcuml.h"
 #include "drcbex86.h"
 
-// This is a trick to make it build on Android where the x86 SDK declares ::REG_Exx
 namespace drc {
 using namespace uml;
 
