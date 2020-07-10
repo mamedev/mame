@@ -1548,6 +1548,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hotmix_5">
+		<description>Hot Mix 5</description>
+		<year>1993</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_5" sha1="06e221fda5bb09c0ffcd23cbffa73cc1b503a980" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_7">
+		<description>Hot Mix 7</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-8101-007"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="hot_mix_7" sha1="cd2af0d9d29c288c85c3308ec5c2a6cc25b698cc" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmix_8">
 		<description>Hot Mix Volume 8</description>
 		<year>1994</year>
@@ -1746,11 +1772,112 @@ license:CC0
 		<description>SupportFolio 10/96</description>
 		<year>1996</year> <!-- 10/96 -->
 		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
+		<info name="version" value="1.2" /> <!-- as printed on the CDs -->
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0508-003"/>
+			<feature name="part_id" value="SupportFolio Information Resources 10/96"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_information_resources_10_96" sha1="d01876973667216e044bb8a959f6530575fdd70e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0603-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 10/96"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="supportfolio_irix_6_2_patches_10_96" sha1="55209bec451eb43fa27e8c65fe90d4b2c3157b73" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0604-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.1 Patches 10/96"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_and_6_1_patches_10_96" sha1="0f1d18a85a85fc97cfc69aaf8f6d1a8f8b500d71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sfolio_2_97">
+		<description>SupportFolio 2/97</description>
+		<year>1997</year> <!-- 2/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3" /> <!-- as printed on the CDs -->
+		<!-- CD 1 "SupportFolio Information Resources 2/97" missing -->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0603-002"/>
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 2/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_6_2_patches_2_97" sha1="4687cdc28d14a4d59a1887a6873119805a1c64aa" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0638-001"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.3/6.4 Patches 2/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_2_97" sha1="42eefd43f7377ae1e2a0d318b8118a67ae56b2df" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sfolio_4_97">
+		<description>SupportFolio 4/97</description>
+		<year>1997</year> <!-- 4/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<!-- CD 1 "SupportFolio Information Resources 4/97" missing -->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0603-003" />
+			<feature name="part_id" value="SupportFolio IRIX 6.2 Patches 4/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_6_2_patches_4_97" sha1="36a7630cc2b50cdbf059a3d167a04eb4d3aec6d2" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0638-002"/>
+			<feature name="part_id" value="SupportFolio IRIX 5.3/6.3/6.4 Patches 4/97"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_4_97" sha1="b33cc43486fe375d126b8e39178f69072b0310d3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_10_94">
+		<description>Support Advantage 10/94</description>
+		<year>1994</year> <!-- 10/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4024-001"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 10/94"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_Support_Libraries_10_94" sha1="643371e46dffed73f1d493a623d920233d79c5b1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_6_95">
+		<description>Support Advantage 6/95</description>
+		<year>1995</year> <!-- 6/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-4024-004"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 6/95"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_Support_Libraries_6_95" sha1="e24c4af01b54bf1a6ccae6a6291df53b116ffbcd" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0290-004"/>
+			<feature name="part_id" value="Support Advantage IRIX Patches 6/95"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="Support_Advantage_IRIX_Patches_6_95" sha1="e458a0076039d4fb1fe2cc5f6475670a86025087" />
 			</diskarea>
 		</part>
 	</software>
