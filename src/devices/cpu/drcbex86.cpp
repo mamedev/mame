@@ -784,7 +784,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	x86code *dst = base;
 
 	// generate code
-	const char *blockname = nullptr;
+	std::string blockname;
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
@@ -798,12 +798,12 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		}
 
 		// extract a blockname
-		if (blockname == nullptr)
+		if (blockname.empty())
 		{
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
 			else if (inst.opcode() == OP_HASH)
-				blockname = string_format("Code: mode=%d PC=%08X", (uint32_t)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
+				blockname = string_format("Code: mode=%d PC=%08X", (uint32_t)inst.param(0).immediate(), (offs_t)inst.param(1).immediate());
 		}
 
 		// generate code
@@ -816,7 +816,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 
 	// log it
 	if (m_log != nullptr)
-		x86log_disasm_code_range(m_log, (blockname == nullptr) ? "Unknown block" : blockname, base, m_cache.top());
+		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), base, m_cache.top());
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);

@@ -277,13 +277,4 @@ private:
 
 using drc::drcbe_x64;
 
-class ThrowableErrorHandler : public ErrorHandler
-{
-public:
-	void handleError(Error err, const char *message, BaseEmitter *origin) override
-	{
-		throw emu_fatalerror("asmjit error %d: %s", err, message);
-	}
-};
-
 #endif /* MAME_DEVICES_CPU_DRCBEX64_H */
