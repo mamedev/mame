@@ -331,6 +331,16 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		switch (state)
 		{
 		case 0:
+			if (show_gameinfo)
+				messagebox_text = machine_info().game_info_string();
+			if (!messagebox_text.empty())
+			{
+				messagebox_text.append("\n\nPress any key to continue");
+				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
+			}
+			break;
+
+		case 1:
 			messagebox_text = machine_info().warnings_string();
 			m_has_warnings = !messagebox_text.empty();
 			if (m_has_warnings && show_warnings)
@@ -339,13 +349,6 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 				messagebox_backcolor = machine_info().warnings_color();
 			}
-			break;
-
-		case 1:
-			if (show_gameinfo)
-				messagebox_text = machine_info().game_info_string();
-			if (!messagebox_text.empty())
-				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 			break;
 
 		case 2:
