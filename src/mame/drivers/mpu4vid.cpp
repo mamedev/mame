@@ -4002,11 +4002,11 @@ GAME(  199?, v4psi14d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_pri
 GAME(  199?, v4psi20d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psi214,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BWB TET1 Version 2.2) (MPU4 Video) (set 1)",GAME_FLAGS )
-GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BWB TET1 Version 2.2) (MPU4 Video) (set 2)",GAME_FLAGS )
+GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BwB TET1 Version 2.2) (MPU4 Video) (set 1)",GAME_FLAGS )
+GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BwB TET1 Version 2.2) (MPU4 Video) (set 2)",GAME_FLAGS )
 
-GAME(  199?, v4pztet,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
-GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
+GAME(  199?, v4pztet,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (BwB) (MPU4 Video, set 1)",GAME_FLAGS )
+GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (BwB) (MPU4 Video, set 2)",GAME_FLAGS ) // 'showcase' screen after title in attract
 
 // blox is an early version of Tetris?
 GAME(  199?, v4blox,     0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS ) // bad dump?
@@ -4020,20 +4020,20 @@ GAME(  199?, v4redhtp,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 GAME(  199?, v4bubbnk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS ) // runs if open door
 
-GAME(  199?, v4ovrmn3,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS ) // runs if open door
+GAME(  199?, v4ovrmn3,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (BwB) (MPU4 Video)",GAME_FLAGS ) // runs if open door
 
 GAME(  199?, v4mazbel,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS ) // runs if open door
 GAME(  199?, v4mazbla,   v4mazbel, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4rhmaz,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS ) // runs if open door
+GAME(  199?, v4rhmaz,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Mazooma Belle (BwB) (MPU4 Video)",GAME_FLAGS ) // runs if open door
  
 GAME(  199?, v4shpwnd,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS ) // runs if open door
 
-GAME(  199?, v4sixx,     0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS ) // runs if door open
+GAME(  199?, v4sixx,     0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","6-X (BwB) (MPU4 Video)",GAME_FLAGS ) // runs if door open
 
-GAME(  199?, v4cshinf,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS ) // runs if door open
+GAME(  199?, v4cshinf,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Cash Inferno (BwB) (MPU4 Video)",GAME_FLAGS ) // runs if door open
 
-GAME(  199?, v4sunbst,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )  // runs if open door
+GAME(  199?, v4sunbst,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Sunburst (BwB) (MPU4 Video)",GAME_FLAGS )  // runs if open door
 
 GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS ) // runs if open door
 
@@ -4041,29 +4041,29 @@ GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 GAME(  1996, v4reno,     0,        bwbvid5,    mpu4,     mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS ) // runs if open door but then drops to test menu
 
-GAME(  199?, v4big40,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
+GAME(  199?, v4big40,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
-GAME(  199?, v4dbltak,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
+GAME(  199?, v4dbltak,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Double Take (BwB) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
-GAME(  199?, v4gldrsh,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
+GAME(  199?, v4gldrsh,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
-GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
+GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
-GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
+GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (MPU4 Video)",GAME_FLAGS ) // drops to test mode with door open
 
-GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
+GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
 
 // other issues
 
-GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox? (doesn't boot, hangs on comms?)
+GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bullion Blox (BwB) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox? (doesn't boot, hangs on comms?)
 
-GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Megabucks Poker (BwB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
-GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Reno Casino (BwB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
 
 /* Uncertain BIOS */
-GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "Bwb","Fruit Factory (Bwb) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BwB","Fruit Factory (BwB) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
