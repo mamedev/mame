@@ -1226,8 +1226,9 @@ void mpu4vid_state::mpu4_68k_map_base(address_map &map)
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 //  map(0x810000, 0x81ffff).ram(); /* ? */
-	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
@@ -1255,8 +1256,9 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 	map(0x600000, 0x63ffff).ram(); /* The Mating Game has an extra 256kB RAM on the program card */
 //  map(0x640000, 0x7fffff).noprw(); /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
-	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
@@ -1274,8 +1276,9 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
-	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00000, 0xa0000f).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)); //Some games use this
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
@@ -1283,7 +1286,7 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	//map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::bwb_characteriser16_r), FUNC(mpu4vid_state::bwb_characteriser16_w)); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
+	//map(0xe05000, 0xe05001).rw(FUNC(mpu4vid_state::bwb_characteriser16_r), FUNC(mpu4vid_state::bwb_characteriser16_w)); // CHR
 }
 
 void mpu4vid_state::bwbvid5_68k_map(address_map &map)
@@ -1291,8 +1294,9 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
-	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff); //BT RAMDAC?
+	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
@@ -1398,6 +1402,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 
 	SCN2674(config, m_scn2674, VIDEO_MASTER_CLOCK / 8);
 	m_scn2674->intr_callback().set_inputline("video", M68K_IRQ_3);
+
 	m_scn2674->set_character_width(8);
 	m_scn2674->set_display_callback(FUNC(mpu4vid_state::display_pixels));
 	m_scn2674->set_addrmap(0, &mpu4vid_state::mpu4_vram);
