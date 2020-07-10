@@ -1069,7 +1069,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "");
 			poutprefix("///", "  @section {}_4 Function Table", d.id);
 			poutprefix("///", "");
-			if (!d.functiontable.empty())
+			if (d.functiontable.empty())
 				poutprefix("///", "  Please refer to the datasheet.");
 			else
 				poutprefix("///", "  {}", d.functiontable);

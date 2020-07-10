@@ -106,8 +106,8 @@ namespace devices
 		LIB_ENTRY(74107_dip)
 #endif
 		LIB_ENTRY(74107A)    // FIXME: implement missing DIP
+		LIB_ENTRY(74121)
 		LIB_ENTRY(74123)
-		LIB_ENTRY(74123_dip)
 		LIB_ENTRY(74125)
 		LIB_ENTRY(74126)
 		LIB_ENTRY(74153)
@@ -152,7 +152,7 @@ namespace devices
 		LIB_ENTRY(CD4020)
 		LIB_ENTRY(CD4066_GATE)
 		LIB_ENTRY(CD4316_GATE)
-		LIB_ENTRY(4538_dip)
+		LIB_ENTRY(4538)
 		LIB_ENTRY(schmitt_trigger)
 		// entries with suffix WI are legacy only
 		//ENTRY(4066,                 CD_4066,              "+A,B")
@@ -173,7 +173,7 @@ namespace devices
 		LIB_ENTRY(74365_dip)
 		LIB_ENTRY(82S16_dip)
 		LIB_ENTRY(82S115_dip)
-		LIB_ENTRY(9602_dip)
+		LIB_ENTRY(9602)
 		LIB_ENTRY(9310_dip)
 		LIB_ENTRY(9314_dip)
 		LIB_ENTRY(9316_dip)

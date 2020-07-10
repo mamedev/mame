@@ -1919,12 +1919,11 @@ namespace netlist
 	{
 	public:
 		template<class D, typename... Args>
-		object_array_base_t(D &dev, const std::initializer_list<const char *> &names, Args&&... args)
+		//object_array_base_t(D &dev, const std::initializer_list<const char *> &names, Args&&... args)
+		object_array_base_t(D &dev, std::array<const char *, N> &&names, Args&&... args)
 		{
-			passert_always_msg(names.size() == N, "initializer_list size mismatch");
-			std::size_t i = 0;
-			for (const auto &n : names)
-				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, pstring(names[i]), std::forward<Args>(args)...);
 		}
 
 		template<class D>
