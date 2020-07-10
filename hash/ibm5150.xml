@@ -443,7 +443,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1049469">
+			<dataarea name="flop" size="1011265">
 				<rom name="centipede.mfm" size="1011265" crc="29332053" sha1="d34519a6cd21ac50ada1d78b28be138e77128635"/>
 			</dataarea>
 		</part>
@@ -1715,7 +1715,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="551161">
+			<dataarea name="flop" size="550459">
 				<rom name="mspacman.mfm" size="550459" crc="1cc9488e" sha1="4fc2751e7a77ac9a8ccad888109246492617806c"/>
 			</dataarea>
 		</part>
