@@ -3143,7 +3143,7 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	mpu4_common2(config);
 	mpu4_type2_6reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -3156,7 +3156,7 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 	mpu4_common2(config);
 	mpu4_std_5reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -3168,7 +3168,7 @@ void mpu4_state::bwboki(machine_config &config)
 	mpu4_common2(config);
 	mpu4_bwb_5reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

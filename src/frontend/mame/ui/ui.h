@@ -223,6 +223,7 @@ public:
 	void show_mouse(bool status);
 	virtual bool is_menu_active() override;
 	bool can_paste();
+	bool found_machine_warnings() const { return m_has_warnings; }
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
@@ -261,7 +262,7 @@ private:
 	render_font *           m_font;
 	std::function<uint32_t (render_container &)> m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
-	uint32_t                  m_handler_param;
+	uint32_t                m_handler_param;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
@@ -274,6 +275,7 @@ private:
 	ui_options              m_ui_options;
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
+	bool                    m_has_warnings;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 

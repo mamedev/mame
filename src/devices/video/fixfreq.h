@@ -123,7 +123,7 @@ struct fixedfreq_monitor_state
 	fixedfreq_monitor_state(fixedfreq_monitor_desc &desc, fixedfreq_monitor_intf &intf)
 	: m_desc(desc),
 	m_intf(intf),
-	m_last_sync(0),
+	m_last_sync_val(0),
 	m_col(0),
 	m_last_x(0),
 	m_last_y(0),
@@ -145,7 +145,7 @@ struct fixedfreq_monitor_state
 		// FIXME: once moved to netlist this may no longer be necessary.
 		//        Only copies constructor init
 
-		m_last_sync = 0.0;
+		m_last_sync_val = 0.0;
 		m_col = rgb_t(0,0,0);
 		m_last_x = 0;
 		m_last_y = 0;
@@ -177,18 +177,11 @@ struct fixedfreq_monitor_state
 
 	void reset()
 	{
-		m_last_sync = 0;
+		m_last_sync_val = 0;
 		m_col = 0;
 		m_last_x = 0;
 		m_last_y = 0;
-		//m_last_sync_time = time_type(0);
-		//m_line_time = time_type(0);
-		//m_last_hsync_time = time_type(0);
-		//m_last_vsync_time = time_type(0);
-		//m_clock_period = time_type(0);
 		m_vsync_filter = 0;
-		//m_vsync_threshold = 0;
-		//m_vsync_filter_timeconst = 0;
 		m_sig_vsync = 0;
 		m_sig_composite = 0;
 		m_sig_field = 0;
@@ -206,7 +199,7 @@ struct fixedfreq_monitor_state
 	const fixedfreq_monitor_desc &m_desc;
 	fixedfreq_monitor_intf &m_intf;
 
-	double m_last_sync;
+	double m_last_sync_val;
 	uint32_t m_col;
 	float m_last_x;
 	int m_last_y;

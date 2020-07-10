@@ -96,6 +96,18 @@ private:
 };
 
 
+class menu_warn_info : public menu
+{
+public:
+	menu_warn_info(mame_ui_manager &mui, render_container &container);
+	virtual ~menu_warn_info() override;
+
+private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+};
+
+
 class menu_image_info : public menu
 {
 public:

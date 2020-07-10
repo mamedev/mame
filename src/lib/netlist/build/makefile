@@ -103,6 +103,7 @@ TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
 NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
+TESTOBJ = $(OBJ)/tests
 
 DEPEND = $(OBJ)/.depend
 
@@ -113,12 +114,13 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
 
-OBJS = $(POBJS) $(NLOBJS)
+OBJS = $(POBJS) $(NLOBJS) $(TESTOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
@@ -213,6 +215,9 @@ NLOBJS := \
 	$(NLOBJ)/macro/nlm_roms.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
 
+TESTOBJS := \
+	$(TESTOBJ)/test_pfunction.o \
+
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
 	$(VSBUILD/netlistlib.vcxproj.user \
@@ -235,7 +240,7 @@ ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy runtests
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -245,7 +250,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend
+.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend runtests
 
 #-------------------------------------------------
 # all
@@ -298,24 +303,24 @@ clang:
 		-mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wunreachable-code"
 
 clang-libc:
 	#clang-11 currently broken
-	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native
 	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wunreachable-code" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
@@ -328,6 +333,9 @@ nvcc:
 		--ftemplate-depth 1024  \
 		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
 		DEPENDCC=g++
+
+runtests:
+	./nltool$(EXESUFFIX) -c tests
 
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 

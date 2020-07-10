@@ -41,6 +41,8 @@ hle_hp_46060b_device::hle_hp_46060b_device(machine_config const &mconfig, char c
 void hle_hp_46060b_device::device_reset()
 {
 	m_fifo.clear();
+
+	mouse_x_delta = mouse_y_delta = 0;
 }
 
 int hle_hp_46060b_device::hil_poll()

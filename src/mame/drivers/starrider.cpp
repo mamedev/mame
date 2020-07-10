@@ -263,7 +263,6 @@
 #include "emupal.h"
 
 #include <algorithm>
-#include <memory>
 
 
 namespace {

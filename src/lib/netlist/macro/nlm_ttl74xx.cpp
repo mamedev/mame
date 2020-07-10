@@ -702,35 +702,169 @@ static NETLIST_START(TTL_74107_DIP)
 NETLIST_END()
 #endif
 
+//- Identifier:  TTL_74121_DIP
+//- Title: DM74121 One-Shot with Clear and Complementary Outputs
+//- Description: The DM74121 is a monostable multivibrator featuring both
+//-   positive and negative edge triggering with complementary
+//-   outputs. An internal 2kΩ timing resistor is provided for
+//-   design convenience minimizing component count and layout problems. this device can be used with a single external capacitor. Inputs (A) are active-LOW trigger transition
+//-   inputs and input (B) is and active-HIGH transition Schmitttrigger input that allows jitter-free triggering from inputs with
+//-   transition rates as slow as 1 volt/second. A high immunity
+//-   to VCC noise of typically 1.5V is also provided by internal
+//-   circuitry at the input stage.
+//-   To obtain optimum and trouble free operation please read
+//-   operating rules and one-shot application notes carefully
+//-   and observe recommendations.
+//-
+//- Pinalias: QQ,NC,A1,A2,B,Q,GND,NC,RINT,C,RC,NC,NC,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- Limitations:
+//-    Timing inaccuracies may occur for capacitances < 1nF. Please consult datasheet
+//-
+//- Example: 74123.cpp,74123_example
+//-
+//- FunctionTable:
+//-    https://pdf1.alldatasheet.com/datasheet-pdf/view/50894/FAIRCHILD/74121.html
+//-
+static NETLIST_START(TTL_74121_DIP)
 
-/*
- * DM74155/DM74156: Dual 2-Line to 4-Line Decoders/Demultiplexers
- *
- *      +-----+-------++-----------------+
- *      | B A | G1 C1 || 1Y0 1Y1 1Y2 1Y3 |
- *      +=====+=======++=================+
- *      | X X | 1  X  ||  1   1   1   1  |
- *      | 0 0 | 0  1  ||  0   1   1   1  |
- *      | 0 1 | 0  1  ||  1   0   1   1  |
- *      | 1 0 | 0  1  ||  1   1   0   1  |
- *      | 1 1 | 0  1  ||  1   1   1   0  |
- *      | X X | X  0  ||  1   1   1   1  |
- *      +-----+-------++-----------------+
- *
- *      +-----+-------++-----------------+
- *      | B A | G2 C2 || 2Y0 2Y1 2Y2 2Y3 |
- *      +=====+=======++=================+
- *      | X X | 1  X  ||  1   1   1   1  |
- *      | 0 0 | 0  0  ||  0   1   1   1  |
- *      | 0 1 | 0  0  ||  1   0   1   1  |
- *      | 1 0 | 0  0  ||  1   1   0   1  |
- *      | 1 1 | 0  0  ||  1   1   1   0  |
- *      | X X | X  1  ||  1   1   1   1  |
- *      +-----+-------++-----------------+
- *
- * Naming conventions follow National Semiconductor datasheet
- *
- */
+	TTL_74121(A)
+	RES(RINT, RES_K(2))
+	RES(RD,   RES_M(1000))
+
+	ALIAS(1, A.QQ)
+	//ALIAS(2", ); NC
+	ALIAS(3, A.A1)
+	ALIAS(4, A.A2)
+	ALIAS(5, A.B)
+	ALIAS(6, A.Q)
+	ALIAS(7, A.GND)
+
+	//ALIAS(8", ); NC
+	ALIAS(9,  RINT.1) // RINT
+	ALIAS(10, A.C) // CEXT
+	ALIAS(11, A.RC) // REXT
+	//ALIAS(12", ); NC
+	//ALIAS(13", ); NC
+	ALIAS(14, A.VCC)
+
+	NET_C(RINT.2, A.RC)
+
+	// Avoid error messages if RINT is not used.
+	NET_C(RINT.1, RD.2)
+	NET_C(RD.1, A.GND)
+
+NETLIST_END()
+
+//- Identifier:  TTL_74123_DIP
+//- Title: DM74123 Dual Retriggerable One-Shot with Clear and Complementary Outputs
+//- Description: The DM74123 is a dual retriggerable monostable multivibrator
+//-   capable of generating output pulses from a few
+//-   nano-seconds to extremely long duration up to 100% duty
+//-   cycle. Each device has three inputs permitting the choice of
+//-   either leading-edge or trailing edge triggering. Pin (A) is an
+//-   active-LOW transition trigger input and pin (B) is an activeHIGH transition trigger input. A LOW at the clear (CLR)
+//-   input terminates the output pulse: which also inhibits triggering. An internal connection from CLR to the input gate
+//-   makes it possible to trigger the circuit by a positive-going
+//-   signal on CLR as shown in the Truth Table.
+//-
+//-   To obtain the best and trouble free operation from this
+//-   device please read the Operating Rules as well as the
+//-   One–Shot Application Notes carefully and observe recommendations.
+//-
+//- Pinalias: A1,B1,CLRQ1,QQ1,Q2,C2,RC2,GND,A2,B2,CLRQ2,QQ2,Q1,C1,RC1,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- Limitations:
+//-    Timing inaccuracies may occur for capacitances < 1nF. Please consult datasheet
+//-
+//- Example: 74123.cpp,74123_example
+//-
+//- FunctionTable:
+//-    https://pdf1.alldatasheet.com/datasheet-pdf/view/50893/FAIRCHILD/DM74123.html
+//-
+static NETLIST_START(TTL_74123_DIP)
+
+	TTL_74123(A)
+	TTL_74123(B)
+
+	ALIAS(1, A.A)
+	ALIAS(2, A.B)
+	ALIAS(3, A.CLRQ)
+	ALIAS(4, A.QQ)
+	ALIAS(5, B.Q)
+	ALIAS(6, B.C) // CEXT
+	ALIAS(7, B.RC) // REXT
+	ALIAS(8, A.GND)
+
+	ALIAS(9, B.A)
+	ALIAS(10, B.B)
+	ALIAS(11, B.CLRQ)
+	ALIAS(12, B.QQ)
+	ALIAS(13, A.Q)
+	ALIAS(14, A.C) // CEXT
+	ALIAS(15, A.RC) // REXT
+	ALIAS(16, A.VCC)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+NETLIST_END()
+
+//- Identifier:  TTL_9602_DIP
+//- Title: DM9602 Dual Retriggerable, Resettable One Shots
+//- Description: These dual resettable, retriggerable one shots have two
+//-   inputs per function; one which is active HIGH, and one
+//-   which is active LOW. This allows the designer to employ
+//-   either leading-edge or trailing-edge triggering, which is
+//-   independent of input transition times. When input conditions for triggering are met, a new cycle starts and the
+//-   external capacitor is allowed to rapidly discharge and then
+//-   charge again. The retriggerable feature permits output
+//-   pulse widths to be extended. In fact a continuous true output can be maintained by having an input cycle time which
+//-   is shorter than the output cycle time. The output pulse may
+//-   then be terminated at any time by applying a LOW logic
+//-   level to the RESET pin. Retriggering may be inhibited by
+//-   either connecting the Q output to an active HIGH input, or
+//-   the Q output to an active LOW input.
+//-   The DM74123 is a dual retriggerable monostable multivibrator
+//-
+//- Pinalias: C1,RC1,CLRQ1,B1,A1,Q1,QQ1,GND,QQ2,Q2,A2,B2,CLRQ2,RC2,C2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- Limitations:
+//-    Timing inaccuracies may occur for capacitances < 1nF. Please consult datasheet
+//-
+//- Example: 74123.cpp,74123_example
+//-
+//- FunctionTable:
+//-    https://pdf1.alldatasheet.com/datasheet-pdf/view/51137/FAIRCHILD/DM9602.html
+//-
+static NETLIST_START(TTL_9602_DIP)
+
+	TTL_9602(A)
+	TTL_9602(B)
+
+	ALIAS(1, A.C) // C1
+	ALIAS(2, A.RC) // RC1
+	ALIAS(3, A.CLRQ)
+	ALIAS(4, A.B)
+	ALIAS(5, A.A)
+	ALIAS(6, A.Q)
+	ALIAS(7, A.QQ)
+	ALIAS(8, A.GND)
+
+	ALIAS(9, B.QQ)
+	ALIAS(10, B.Q)
+	ALIAS(11, B.A)
+	ALIAS(12, B.B)
+	ALIAS(13, B.CLRQ)
+	ALIAS(14, B.RC) // RC2
+	ALIAS(15, B.C) // C2
+	ALIAS(16, A.VCC)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+NETLIST_END()
 
 //- Identifier:  TTL_74125_DIP
 //- Title: SN74125 QUADRUPLE BUS BUFFERS WITH 3-STATE OUTPUTS
@@ -831,6 +965,35 @@ static NETLIST_START(TTL_74126_DIP)
 	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
 	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
 NETLIST_END()
+
+/*
+ * DM74155/DM74156: Dual 2-Line to 4-Line Decoders/Demultiplexers
+ *
+ *      +-----+-------++-----------------+
+ *      | B A | G1 C1 || 1Y0 1Y1 1Y2 1Y3 |
+ *      +=====+=======++=================+
+ *      | X X | 1  X  ||  1   1   1   1  |
+ *      | 0 0 | 0  1  ||  0   1   1   1  |
+ *      | 0 1 | 0  1  ||  1   0   1   1  |
+ *      | 1 0 | 0  1  ||  1   1   0   1  |
+ *      | 1 1 | 0  1  ||  1   1   1   0  |
+ *      | X X | X  0  ||  1   1   1   1  |
+ *      +-----+-------++-----------------+
+ *
+ *      +-----+-------++-----------------+
+ *      | B A | G2 C2 || 2Y0 2Y1 2Y2 2Y3 |
+ *      +=====+=======++=================+
+ *      | X X | 1  X  ||  1   1   1   1  |
+ *      | 0 0 | 0  0  ||  0   1   1   1  |
+ *      | 0 1 | 0  0  ||  1   0   1   1  |
+ *      | 1 0 | 0  0  ||  1   1   0   1  |
+ *      | 1 1 | 0  0  ||  1   1   1   0  |
+ *      | X X | X  1  ||  1   1   1   1  |
+ *      +-----+-------++-----------------+
+ *
+ * Naming conventions follow National Semiconductor datasheet
+ *
+ */
 
 static NETLIST_START(TTL_74155_DIP)
 	NET_REGISTER_DEV(TTL_74155A_GATE, A)
@@ -1682,6 +1845,9 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
+	LOCAL_LIB_ENTRY(TTL_74121_DIP)
+	LOCAL_LIB_ENTRY(TTL_74123_DIP)
+	LOCAL_LIB_ENTRY(TTL_9602_DIP)
 	LOCAL_LIB_ENTRY(TTL_74125_DIP)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
 #if (NL_USE_TRUTHTABLE_74107)

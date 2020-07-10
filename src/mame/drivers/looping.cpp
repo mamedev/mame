@@ -80,12 +80,12 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 
 #define MAIN_CPU_CLOCK      (12000000)
 #define SOUND_CLOCK         (8000000)
-#define COP_CLOCK           (SOUND_CLOCK/2)     /* unknown guess */
+#define COP_CLOCK           (SOUND_CLOCK/2)     // unknown guess
 #define TMS_CLOCK           (640000)
 
-/* the schematics are very blurry here and don't actually specify the clock */
-/* values; however, everything else about the sync chain implies the standard */
-/* 18.432MHz master clock, like is used in similar hardware of the time */
+/* the schematics are very blurry here and don't actually specify the clock
+   values; however, everything else about the sync chain implies the standard
+   18.432MHz master clock, like is used in similar hardware of the time */
 #define MASTER_CLOCK        (18432000)
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
@@ -120,7 +120,6 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
 		m_watchdog(*this, "watchdog")
 	{ }
 
@@ -136,13 +135,12 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	void looping_videoram_w(offs_t offset, uint8_t data);
-	void looping_colorram_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(level2_irq_set);
 	DECLARE_WRITE_LINE_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
-	DECLARE_WRITE_LINE_MEMBER(looping_souint_clr);
-	void looping_soundlatch_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(souint_clr);
 	DECLARE_WRITE_LINE_MEMBER(ballon_enable_w);
 	void out_0_w(uint8_t data);
 	void out_2_w(uint8_t data);
@@ -153,28 +151,28 @@ private:
 	DECLARE_READ_LINE_MEMBER(cop_serial_r);
 	void cop_l_w(uint8_t data);
 	uint8_t protection_r();
-	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
-	void looping_sound_sw(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(spcint);
+	void sound_sw(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void looping_palette(palette_device &palette) const;
-	uint32_t screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(looping_interrupt);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void looping_io_map(address_map &map);
-	void looping_map(address_map &map);
-	void looping_sound_io_map(address_map &map);
-	void looping_sound_map(address_map &map);
+	void io_map(address_map &map);
+	void map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	uint8_t m_cop_port_l;
 
-	/* tilemaps */
+	// tilemaps
 	tilemap_t * m_bg_tilemap;
 
 	required_device<tms9995_device> m_maincpu;
@@ -184,7 +182,6 @@ private:
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<watchdog_timer_device> m_watchdog;
 };
 
@@ -196,7 +193,7 @@ private:
  *
  *************************************/
 
-void looping_state::looping_palette(palette_device &palette) const
+void looping_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	static constexpr int resistances[3] = { 1000, 470, 220 };
@@ -279,27 +276,27 @@ WRITE_LINE_MEMBER(looping_state::flip_screen_y_w)
 }
 
 
-void looping_state::looping_videoram_w(offs_t offset, uint8_t data)
+void looping_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-void looping_state::looping_colorram_w(offs_t offset, uint8_t data)
+void looping_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 
-	/* odd bytes are column color attribute */
+	// odd bytes are column color attribute
 	if (offset & 1)
 	{
-		/* mark the whole column dirty */
+		// mark the whole column dirty
 		offs_t offs = (offset/2);
 		for (int i = 0; i < 0x20; i++)
 			m_bg_tilemap->mark_tile_dirty(i * 0x20 + offs);
 	}
 
-	/* even bytes are column scroll */
+	// even bytes are column scroll
 	else
 		m_bg_tilemap->set_scrolly(offset/2, data);
 }
@@ -342,7 +339,7 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-uint32_t looping_state::screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t looping_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -354,12 +351,13 @@ uint32_t looping_state::screen_update_looping(screen_device &screen, bitmap_ind1
 
 /*************************************
  *
- *  Machine init/reset
+ *  Machine start/reset
  *
  *************************************/
 
 void looping_state::machine_start()
 {
+	save_item(NAME(m_cop_port_l));
 }
 
 void looping_state::machine_reset()
@@ -367,6 +365,8 @@ void looping_state::machine_reset()
 	// Disable auto wait state generation by raising the READY line on reset
 	m_maincpu->ready_line(ASSERT_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
+
+	m_cop_port_l = 0;
 }
 
 /*************************************
@@ -375,7 +375,7 @@ void looping_state::machine_reset()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(looping_state::looping_interrupt)
+INTERRUPT_GEN_MEMBER(looping_state::interrupt)
 {
 	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
@@ -401,7 +401,7 @@ WRITE_LINE_MEMBER(looping_state::watchdog_w)
 }
 
 
-WRITE_LINE_MEMBER(looping_state::looping_souint_clr)
+WRITE_LINE_MEMBER(looping_state::souint_clr)
 {
 	logerror("Soundint clr = %d\n", state);
 	if (state == 0)
@@ -409,18 +409,12 @@ WRITE_LINE_MEMBER(looping_state::looping_souint_clr)
 }
 
 
-WRITE_LINE_MEMBER(looping_state::looping_spcint)
+WRITE_LINE_MEMBER(looping_state::spcint)
 {
 	logerror("Speech /int = %d\n", state==ASSERT_LINE? 1:0);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state==ASSERT_LINE? CLEAR_LINE : ASSERT_LINE);
 }
 
-
-void looping_state::looping_soundlatch_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
-}
 
 /*************************************
  *
@@ -428,7 +422,7 @@ void looping_state::looping_soundlatch_w(uint8_t data)
  *
  *************************************/
 
-void looping_state::looping_sound_sw(uint8_t data)
+void looping_state::sound_sw(uint8_t data)
 {
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
@@ -486,8 +480,8 @@ void looping_state::adc_w(uint8_t data) { osd_printf_debug("%04X:ADC write = %02
 
 WRITE_LINE_MEMBER(looping_state::plr2_w)
 {
-	/* set to 1 after IDLE, cleared to 0 during processing */
-	/* is this an LED on the PCB? */
+	/* set to 1 after IDLE, cleared to 0 during processing
+	   is this an LED on the PCB? */
 }
 
 
@@ -545,46 +539,46 @@ uint8_t looping_state::protection_r()
  *
  *************************************/
 
-void looping_state::looping_map(address_map &map)
+void looping_state::map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::looping_videoram_w)).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::videoram_w)).share(m_videoram);
 
-	map(0x9800, 0x983f).mirror(0x0700).ram().w(FUNC(looping_state::looping_colorram_w)).share("colorram");
-	map(0x9840, 0x987f).mirror(0x0700).ram().share("spriteram");
+	map(0x9800, 0x983f).mirror(0x0700).ram().w(FUNC(looping_state::colorram_w)).share(m_colorram);
+	map(0x9840, 0x987f).mirror(0x0700).ram().share(m_spriteram);
 	map(0x9880, 0x98ff).mirror(0x0700).ram();
 
 	map(0xb000, 0xb007).mirror(0x07f8).w("videolatch", FUNC(ls259_device::write_d0));
 
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(FUNC(looping_state::out_0_w));                 /* /OUT0 */
-	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
-	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(FUNC(looping_state::out_2_w));                /* /OUT2 */
+	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(FUNC(looping_state::out_0_w));                      // /OUT0
+	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); // /OUT1
+	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(FUNC(looping_state::out_2_w));                     // /OUT2
 	map(0xf803, 0xf803).mirror(0x03fc).rw(FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
 }
 
-void looping_state::looping_io_map(address_map &map)
+void looping_state::io_map(address_map &map)
 {
 	map(0x0800, 0x080f).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
 
-/* complete memory map derived from schematics */
-void looping_state::looping_sound_map(address_map &map)
+// complete memory map derived from schematics
+void looping_state::sound_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x3bff).ram();
-	map(0x3c00, 0x3c00).mirror(0x00f4).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x3c00, 0x3c00).mirror(0x00f4).rw(m_aysnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x3c01, 0x3c01).mirror(0x00f6).noprw();
-	map(0x3c02, 0x3c02).mirror(0x00f4).nopr().w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x3e00, 0x3e00).mirror(0x00f4).nopr().w("tms", FUNC(tms5220_device::data_w));
+	map(0x3c02, 0x3c02).mirror(0x00f4).nopr().w(m_aysnd, FUNC(ay8910_device::data_w));
+	map(0x3e00, 0x3e00).mirror(0x00f4).nopr().w(m_tms, FUNC(tms5220_device::data_w));
 	map(0x3e01, 0x3e01).mirror(0x00f6).noprw();
-	map(0x3e02, 0x3e02).mirror(0x00f4).r("tms", FUNC(tms5220_device::status_r)).nopw();
+	map(0x3e02, 0x3e02).mirror(0x00f4).r(m_tms, FUNC(tms5220_device::status_r)).nopw();
 }
 
-void looping_state::looping_sound_io_map(address_map &map)
+void looping_state::sound_io_map(address_map &map)
 {
 	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0));
 	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0));
@@ -625,14 +619,14 @@ void looping_state::looping(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MAIN_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::looping_map);
-	m_maincpu->set_addrmap(AS_IO, &looping_state::looping_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(looping_state::looping_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::map);
+	m_maincpu->set_addrmap(AS_IO, &looping_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(looping_state::interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
 	TMS9980A(config, m_audiocpu, SOUND_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &looping_state::sound_io_map);
 
 	cop420_cpu_device &cop(COP420(config, "mcu", COP_CLOCK));
 	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
@@ -654,41 +648,41 @@ void looping_state::looping(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(looping_state::screen_update_looping));
+	screen.set_screen_update(FUNC(looping_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_looping);
-	PALETTE(config, m_palette, FUNC(looping_state::looping_palette), 32);
+	PALETTE(config, m_palette, FUNC(looping_state::palette), 32);
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
 	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
 	videolatch.q_out_cb<6>().set(FUNC(looping_state::flip_screen_x_w));
 	videolatch.q_out_cb<7>().set(FUNC(looping_state::flip_screen_y_w));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INT_9980A_LEVEL2);
 
 	AY8910(config, m_aysnd, SOUND_CLOCK/4);
-	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_aysnd->port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	TMS5220(config, m_tms, TMS_CLOCK);
-	m_tms->irq_cb().set(FUNC(looping_state::looping_spcint));
+	m_tms->irq_cb().set(FUNC(looping_state::spcint));
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	ls259_device &sen0(LS259(config, "sen0")); // B3 on sound board
-	sen0.q_out_cb<0>().set(FUNC(looping_state::looping_souint_clr));
-	sen0.parallel_out_cb().set(FUNC(looping_state::looping_sound_sw));
+	sen0.q_out_cb<0>().set(FUNC(looping_state::souint_clr));
+	sen0.parallel_out_cb().set(FUNC(looping_state::sound_sw));
 
 	ls259_device &sen1(LS259(config, "sen1")); // A1 on sound board with outputs connected to 4016 at B1
 	sen1.q_out_cb<0>().set(FUNC(looping_state::ay_enable_w));
@@ -715,7 +709,7 @@ static INPUT_PORTS_START( looping )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("P2") /* cocktail? */
+	PORT_START("P2") // cocktail?
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -748,7 +742,7 @@ static INPUT_PORTS_START( looping )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-/* Same as 'looping' but additional "Infinite Lives" Dip Switch */
+// Same as 'looping' but additional "Infinite Lives" Dip Switch
 static INPUT_PORTS_START( skybump )
 	PORT_INCLUDE(looping)
 
@@ -769,25 +763,25 @@ INPUT_PORTS_END
  *************************************/
 
 ROM_START( loopingv )
-	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
 	ROM_LOAD( "vli3.5a",        0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
 	ROM_LOAD( "vli1.2a",        0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
 	ROM_LOAD( "l056-6.9a",      0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
 	ROM_LOAD( "vli9-5.8a",      0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
 
-	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
 	ROM_LOAD( "i-o.13c",        0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
 	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
+	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // COP420 microcontroller code
 /*
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_LOAD( "cop.bin",    0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
 */
-	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_LOAD( "cop.bin",    0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(           0x0000, 0x00c2)
 	ROM_CONTINUE(           0x00c2, 0x033e)
 	ROM_CONTINUE(           0x0000, 0x00c2)
@@ -800,31 +794,31 @@ ROM_START( loopingv )
 	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
 	ROM_LOAD( "18s030.11b",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( loopingva )
-	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
 	ROM_LOAD( "vli3.5a",        0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
 	ROM_LOAD( "vli-4-3",        0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
 	ROM_LOAD( "vli-8-4",        0x3000, 0x1000, CRC(611e1dbf) SHA1(0ab6669f1dec30c3f7bca49e158e4790a78fa308) )
 	ROM_LOAD( "l056-6.9a",      0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
 	ROM_LOAD( "vli9-5.8a",      0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
 
-	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
 	ROM_LOAD( "i-o-v2.13c",     0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
-	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
+	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) // speech
 	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // COP420 microcontroller code
 /*
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_LOAD( "cop.bin",    0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
 */
-	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_LOAD( "cop.bin",    0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(           0x0000, 0x00c2)
 	ROM_CONTINUE(           0x00c2, 0x033e)
 	ROM_CONTINUE(           0x0000, 0x00c2)
@@ -837,12 +831,12 @@ ROM_START( loopingva )
 	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
 	ROM_LOAD( "18s030.11b",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( looping )
-	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
 	ROM_LOAD( "loop551.bin",        0x0000, 0x1000, CRC(d6bb6db6) SHA1(074eb3bc101096bfe67c3107f306df829ae38548) )
 	ROM_LOAD( "loop552.bin",        0x1000, 0x1000, CRC(bc32956d) SHA1(6ef8d76df1d5b1ed52a4057eae2bf4eb394e4c54) )
 	ROM_LOAD( "loop553.bin",        0x2000, 0x1000, CRC(5f8b9aed) SHA1(32be61788e3d54b23d1663025365b1ab6b96dc91) )
@@ -851,14 +845,14 @@ ROM_START( looping )
 	ROM_LOAD( "loop556.bin",        0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
 	ROM_LOAD( "loop557.bin",        0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
 
-	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
 	ROM_LOAD( "loopc13.bin",        0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
 	ROM_LOAD( "loopa13.bin",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "loopa11.bin",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
+	ROM_LOAD( "loopa11.bin",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	/* taken from the other sets */
-	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_REGION( 0x1000, "mcu", 0 ) // COP420 microcontroller code
+	// taken from the other sets
+	ROM_LOAD( "cop.bin",    0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(           0x0000, 0x00c2)
 	ROM_CONTINUE(           0x00c2, 0x033e)
 	ROM_CONTINUE(           0x0000, 0x00c2)
@@ -868,33 +862,33 @@ ROM_START( looping )
 	ROM_CONTINUE(           0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "loopaa8.bin",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "loopaa8.bin",    0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "loopaa6.bin",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
 	ROM_LOAD( "loopvp1.bin",        0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( skybump )
-	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
 	ROM_LOAD( "cpu.5a",         0x0000, 0x2000, CRC(dca38df0) SHA1(86abe04cbabf81399f842f53668fe7a3f7ed3757) )
 	ROM_LOAD( "cpu.2a",         0x2000, 0x2000, CRC(6bcc211a) SHA1(245ebae3934df9c3920743a941546d96bb2e7c03) )
 	ROM_LOAD( "cpu.9a",         0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
 	ROM_LOAD( "cpu.8a",         0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
 
-	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
 	ROM_LOAD( "snd.13c",        0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
 	ROM_LOAD( "snd.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
 	ROM_LOAD( "snd.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // COP420 microcontroller code
 /*
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_LOAD( "cop.bin",    0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
 */
-	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_LOAD( "cop.bin",    0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(           0x0000, 0x00c2)
 	ROM_CONTINUE(           0x00c2, 0x033e)
 	ROM_CONTINUE(           0x0000, 0x00c2)
@@ -907,7 +901,7 @@ ROM_START( skybump )
 	ROM_LOAD( "vid.8a",         0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
 	ROM_LOAD( "vid.6a",         0x0800, 0x800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
 	ROM_LOAD( "vid.clr",        0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
@@ -924,13 +918,11 @@ void looping_state::init_looping()
 	int length = memregion("maincpu")->bytes();
 	uint8_t *rom = memregion("maincpu")->base();
 
-	m_cop_port_l = 0;
-
-	/* bitswap the TMS9995 ROMs */
+	// bitswap the TMS9995 ROMs
 	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
-	/* install protection handlers */
+	// install protection handlers
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8smo_delegate(*this, FUNC(looping_state::protection_r)));
 }
 
@@ -942,7 +934,7 @@ void looping_state::init_looping()
  *
  *************************************/
 
-GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingv,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingva, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
-GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)
+GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loopingv,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loopingva, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

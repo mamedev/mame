@@ -12,9 +12,7 @@
 
   - The board uses a battery backed ram for protection, mapped at $7c00-$7fff.
   - If the battery backup data is corrupt, it comes up with some sort of code entry screen.
-    As far as I can tell, you can't do anything with it.
-  - Replacing the battery backed ram with an eeprom is not really an option since the game stores the
-    current credits count in the battery backed ram.
+  - The game stores the current credits count in the battery backed ram.
   - System clock is 12 Mhz. The CPU clock is unknown.
   - The Alternate GFX mode is funky. Not only it has different bitmaps, but also the strings with the
     game options are truncated. Title is also truncated.
@@ -71,27 +69,27 @@
   - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809EP               8-bit microprocessor.
   - U2 : 28-pin IC  YES   ROM         M27128A (or M27512FI)          NMOS 128K 16K x 8 UV EPROM (or 64K x 8).
   - U3 : 28-pin IC  YES   ROM         M27128A (or M27512FI)          NMOS 128K 16K x 8 UV EPROM (or 64K x 8).
-  - U4 : 40-pin IC  YES   I/O         ST EF6821P                     PIA: Peripheral Interface Adapter.
-  - U5 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
-  - U6 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
-  - U7 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
-  - U8 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
-  - U9 : 40-pin IC  YES   CRTC        HD6845 / UM6845 / GS GM68A45S  CRT Controller.
-  - U10: 28-pin IC  YES   RAM         KM62256BLP-10                  32K x 8 Low Power CMOS Static RAM.
-  - U11: 14-pin IC  YES   TTL         SN74LS95BN                     4-bit Parallel-Access Shift Registers.
-  - U12: 14-pin IC  YES   TTL         SN74LS95BN                     4-bit Parallel-Access Shift Registers.
-  - U13: 20-pin IC  YES   TTL         SN74LS244N                     Octal Buffers and Line Drivers with 3-State output.
-  - U14: 20-pin IC  YES   TTL         HD74LS374                      Octal D-type Flip-Flops with noninverted 3-state output.
+  - U4 : 40-pin IC  YES   I/O         EF6821P                        PIA: Peripheral Interface Adapter.
+  - U5 : 16-pin IC  YES   TTL         74HC157                        Quad 2 Channel Multiplexer.
+  - U6 : 16-pin IC  YES   TTL         74HC157                        Quad 2 Channel Multiplexer.
+  - U7 : 16-pin IC  YES   TTL         74HC157                        Quad 2 Channel Multiplexer.
+  - U8 : 16-pin IC  YES   TTL         74HC157                        Quad 2 Channel Multiplexer.
+  - U9 : 40-pin IC  YES   CRTC        HD6845 / UM6845 / GM68A45S     CRT Controller.
+  - U10: 28-pin IC  YES   RAM         62256-10                       32K x 8 Low Power CMOS Static RAM.
+  - U11: 14-pin IC  YES   TTL         74LS95                         4-bit Parallel-Access Shift Registers.
+  - U12: 14-pin IC  YES   TTL         74LS95                         4-bit Parallel-Access Shift Registers.
+  - U13: 20-pin IC  YES   TTL         74LS244                        Octal Buffers and Line Drivers with 3-State output.
+  - U14: 20-pin IC  YES   TTL         74LS374                        Octal D-type Flip-Flops with noninverted 3-state output.
   - U15: 20-pin IC  YES   PLD         PALCE16V8H-25                  EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic.
   - U16: 20-pin IC  YES   PLD         PALCE16V8H-25                  EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic.
-  - U17: 14-pin IC  YES   TTL         HD74LS00P                      Quadruple 2-Input NAND Gates.
-  - U18: 14-pin IC  YES   TTL         KS74HCTLS86N                   Quad 2???Input Exclusive OR Gate.
+  - U17: 14-pin IC  YES   TTL         74LS00                         Quad 2-Input NAND Gates.
+  - U18: 14-pin IC  YES   TTL         74HCTLS86                      Quad 2-Input XOR Gates.
   - U19: 16-pin IC  YES   WATCHDOG    MAXIM MAX691                   Microprocessor Supervisory Circuits.
   - U20: 16-pin IC  YES   DARLINGTON  ULN2003                        7 NPN Darlington transistor pairs with high voltage and current capability.
 
 
                              M6809
-                           +---\/---+
+                           .---\/---.
                     GND   1|        |40 !HALT <--
                 --> !NMI  2|        |39 ETAL  <--
   PIA /IRQA & B --> !IRQ  3|        |38 EXTAL <--
@@ -112,10 +110,10 @@
                 <-- A10  18|        |23 A15   -->
                 <-- A11  19|        |22 A14   -->
                 <-- A12  20|        |21 A13   -->
-                           +--------+
+                           '--------'
 
                             PIA 6821
-                          +----\/----+
+                          .----\/----.
                       VSS |01      40| CA1 --- PIA CB1 (*)
   JAMMA S17 (2P_ST) - PA0 |02      39| CA2 --- U19(11). Watchdog/RESET
   JAMMA S14 (SRVSW) - PA1 |03      38| /IRQA - CPU M6809 !IRQ (03)
@@ -136,7 +134,7 @@
         PIA CA1 (*) - CB1 |18      23| /CS2
             U20(06) - CB2 |19      22| CS0
                       VCC |20      21| R/W
-                          +----------+
+                          '----------'
 
     (*) Lines CA1 and CB1 are tied together, being both IN.
         They are connected to JAMMA C16 (COIN1).
@@ -144,42 +142,35 @@
 
   U19:   *** MAX691 ***  Maxim MAX691 Microprocessor Supervisory Circuit.
                          (for battery backup power switching and watchdog).
-  leg 01 [VBATT] ---->
-  leg 02 [VOUT] ----->
-  leg 03 [VCC] ------> VCC
-  leg 04 [GND] ------> GND
-  leg 05 [BATT ON] -->
-  leg 06 [/LOWLINE] ->
-  leg 07 [OSC IN] ---> N/C \  Set 1.6 seconds as WD timeout.
-  leg 08 [OSC SEL] --> N/C /
-  leg 09 [PFI] ------>
-  leg 10 [/PFO] ----->
-  leg 11 [WDI] ------> PIA CA2
-  leg 12 [/CE OUT] -->
-  leg 13 [/CE IN] ---> GND
-  leg 14 [/WDO] ----->
-  leg 15 [/RESET] ---> CPU /RES (37)
-  leg 16 [RESET] ---->
+
+                          MAX691
+                        .---\/---.
+        <----- [VBATT]--|01    16|--[PFI] ------>
+        <------ [VOUT]--|02    15|--[/PFO] ----->
+    VCC <------- [VCC]--|03    14|--[WDI] ------> PIA CA2
+    GND <------- [GND]--|04    13|--[/CE OUT] -->
+        <--- [BATT ON]--|05    12|--[/CE IN] ---> GND
+        <-- [/LOWLINE]--|06    11|--[/WDO] ----->
+  * N/C <---- [OSC IN]--|07    10|--[/RESET] ---> CPU /RES (37)
+  * N/C <--- [OSC SEL]--|08    09|--[RESET] ---->
+                        '--------'
+
+  * Set 1.6 seconds as WD timeout.
 
 
-  U20:   *** ULN2003 ***
+  U20:   *** ULN2003 ***  High-voltage, high-current Darlington transistor array.
 
-  leg 01 --> N/C
-  leg 02 --> N/C
-  leg 03 --> N/C
-  leg 04 --> PIA PB2 (12)
-  leg 05 --> PIA PB3 (13)
-  leg 06 --> PIA CB2 (19)
-  leg 07 --> PIA PB7 (17)
-  leg 08 --> GND
-  leg 09 --> VCC
-  leg 10 --> CAP --> JAMMA(S10) +Speaker
-  leg 11 --> JAMMA(S26)
-  leg 12 --> JAMMA(C08) Coin Counter 1
-  leg 13 --> JAMMA(S08) Coin Counter 2
-  leg 14 --> N/C
-  leg 15 --> N/C
-  leg 16 --> N/C
+                   ULN2003
+                  .---\/---.
+           N/C <--|01    16|--> N/C
+           N/C <--|02    15|--> N/C
+           N/C <--|03    14|--> N/C
+  PIA PB2 (12) <--|04    13|--> JAMMA(S08) Coin Counter 2
+  PIA PB3 (13) <--|05    12|--> JAMMA(C08) Coin Counter 1
+  PIA CB2 (19) <--|06    11|--> JAMMA(S26)
+  PIA PB7 (17) <--|07    10|--> CAP --> JAMMA(S10) +Speaker
+           GND <--|08    09|--> VCC
+                  '--------'
 
 
   JP1:
@@ -201,6 +192,7 @@
 
 *******************************************************************************************************/
 
+
 #include "emu.h"
 #include "includes/truco.h"
 
@@ -212,9 +204,10 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL(12'000'000)          /* confirmed */
-#define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
-#define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
+#define MASTER_CLOCK    XTAL(12'000'000)	// confirmed
+#define CPU_CLOCK       (MASTER_CLOCK/16)	// guess
+#define CRTC_CLOCK      (MASTER_CLOCK/8)	// guess
+
 
 /*******************************************
 *           Read/Write Handlers            *
@@ -240,7 +233,7 @@ WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
 
 void truco_state::portb_w(uint8_t data)
 {
-	m_dac->write(BIT(data, 7)); /* Isolated the bit for Delta-Sigma DAC */
+	m_dac->write(BIT(data, 7));	// Isolated the bit for Delta-Sigma DAC
 
 	if (data & 0x7f)
 		logerror("Port B writes: %2x\n", data);
@@ -263,64 +256,49 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 
 void truco_state::main_map(address_map &map)
 {
-	map(0x0000, 0x17ff).ram();                                     /* General purpose RAM */
-	map(0x1800, 0x7bff).ram().share("videoram");                /* Video RAM */
-	map(0x7c00, 0x7fff).ram().share("battery_ram");             /* Battery backed RAM */
+	map(0x0000, 0x17ff).ram();							// General purpose RAM
+	map(0x1800, 0x7bff).ram().share("videoram");		// Video RAM
+	map(0x7c00, 0x7fff).ram().share("battery_ram");		// Battery backed RAM
 	map(0x8000, 0x8003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8004, 0x8004).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x8005, 0x8005).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x8008, 0xffff).rom();
 }
 /*
-CRTC:
+  CRTC MC6845 initialization routine at $a506 only set the first 14 registers (data at $a4e2)
+  
+  Register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13
+  Value:     0x5f  0x40  0x4d  0x06  0x0f  0x04  0x0c  0x0e  0x00  0x0f  0x00  0x00  0x00  0xc0
 
-00: 5f
-01: 40
-02: 4d
-03: 06
-04: 0f
-05: 04
-06: 0c
-07: 0e
-08: 00
-09: 0f
-0a: 00
-0b: 00
-0c: 00
-0d: c0
 */
+
 
 /*******************************************
 *         Input Ports Definition           *
 *******************************************/
 
 static INPUT_PORTS_START( truco )
-	PORT_START("P1")    /* IN0 */
-	PORT_DIPNAME( 0x01, 0x01, "IN0-1 (P2 START)" )
-	PORT_DIPSETTING (   0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN0-2 (SERVICE SW)" )
-	PORT_DIPSETTING (   0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN0-3 (P2 SELECT)" )
-	PORT_DIPSETTING (   0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN0-4 (COIN2)" )
-	PORT_DIPSETTING (   0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN0-5 (TILT SW)" )
-	PORT_DIPSETTING (   0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
-//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S17 (P2 START) */
-//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S14 (SERVICE SW) */
-//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA C26 (P2 SELECT) */
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S16 (COIN2) */
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S15 (TILT SW) */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )        /* Connected to JAMMA C22 (P1 BUTTON1) */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    /* Connected to JAMMA C18/21 (JOY UP & JOY RIGHT) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  /* Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT) */
+	PORT_START("P1")	// IN0
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S17 (P2 START)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S14 (SERVICE SW)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA C26 (P2 SELECT)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S16 (COIN2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S15 (TILT SW)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )		// Connected to JAMMA C22 (P1 BUTTON1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	// Connected to JAMMA C18/21 (JOY UP & JOY RIGHT)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	// Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT)
 
-	PORT_START("JMPRS") /* JP1-2 */
+	PORT_START("COIN")	// IN1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("JMPRS")	// JP1-2
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
@@ -345,49 +323,39 @@ static INPUT_PORTS_START( truco )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
-
-	PORT_START("COIN")  /* IN1 - FAKE - Used for coinup */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+/*******************************************
+*          Machine Start & Reset           *
+*******************************************/
 
 void truco_state::machine_start()
 {
 	save_item(NAME(m_trigger));
 }
 
-/*******************************************
-*       Machine Reset & Interrupts         *
-*******************************************/
-
 void truco_state::machine_reset()
 {
 	int a;
 
-	/* Setup the data on the battery backed RAM */
+	// Setup the data on the battery backed RAM
 
-	/* IRQ check */
+	// IRQ check
 	m_battery_ram[0x002] = 0x51;
 	m_battery_ram[0x024] = 0x49;
 	m_battery_ram[0x089] = 0x04;
 	m_battery_ram[0x170] = 0x12;
 	m_battery_ram[0x1a8] = 0xd5;
 
-	/* Mainloop check */
+	// mainloop check
 	m_battery_ram[0x005] = 0x04;
 	m_battery_ram[0x22B] = 0x46;
 	m_battery_ram[0x236] = 0xfb;
 	m_battery_ram[0x2fe] = 0x1D;
 	m_battery_ram[0x359] = 0x5A;
 
-	/* Boot check */
+	// boot check
 	a = ( m_battery_ram[0x000] << 8 ) | m_battery_ram[0x001];
 
 	a += 0x4d2;
@@ -397,9 +365,14 @@ void truco_state::machine_reset()
 	m_battery_ram[0x020] = m_battery_ram[0x011];
 }
 
+
+/*******************************************
+*           Interrupts Handling            *
+*******************************************/
+
 INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 {
-	/* coinup */
+	// coinup
 
 	if ( ioport("COIN")->read() & 1 )
 	{
@@ -414,17 +387,17 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 
 
 /*******************************************
-*              Machine Driver              *
+*              Machine Config              *
 *******************************************/
 
 void truco_state::truco(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6809(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &truco_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(truco_state::interrupt));
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));    /* 1.6 seconds */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));	// 1.6 seconds
 
 	pia6821_device &pia(PIA6821(config, "pia0", 0));
 	pia.readpa_handler().set_ioport("P1");
@@ -435,22 +408,22 @@ void truco_state::truco(machine_config &config)
 	pia.irqa_handler().set(FUNC(truco_state::pia_irqa_w));
 	pia.irqb_handler().set(FUNC(truco_state::pia_irqb_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));	// not accurate
 	screen.set_size(256, 192);
 	screen.set_visarea(0, 256-1, 0, 192-1);
 	screen.set_screen_update(FUNC(truco_state::screen_update));
 
 	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
 
-	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* Identified as UM6845 */
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));	// identified as UM6845
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
@@ -470,5 +443,6 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE        INIT         ROT   COMPANY           FULLNAME      FLAGS
+
+//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE        INIT        ROT    COMPANY           FULLNAME     FLAGS
 GAME( 198?, truco,   0,      truco,   truco,   truco_state, empty_init, ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )

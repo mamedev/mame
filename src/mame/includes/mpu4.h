@@ -20,7 +20,6 @@
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
 #define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
 
-
 #ifdef MAME_DEBUG
 #define MPU4VIDVERBOSE 1
 #else

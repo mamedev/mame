@@ -2247,6 +2247,7 @@ createMESSProjects(_target, _subtarget, "emusys")
 files {
 	MAME_DIR .. "src/mame/drivers/emu2.cpp",
 	MAME_DIR .. "src/mame/drivers/emu3.cpp",
+	MAME_DIR .. "src/mame/drivers/emu68k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ensoniq")
@@ -3776,7 +3777,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ondra.cpp",
 	MAME_DIR .. "src/mame/includes/ondra.h",
 	MAME_DIR .. "src/mame/machine/ondra.cpp",
-	MAME_DIR .. "src/mame/video/ondra.cpp",
 	MAME_DIR .. "src/mame/drivers/pmd85.cpp",
 	MAME_DIR .. "src/mame/includes/pmd85.h",
 	MAME_DIR .. "src/mame/machine/pmd85.cpp",

@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "includes/orion.h"
 
-#include "imagedev/cassette.h"
 #include "screen.h"
 
 
@@ -42,29 +41,24 @@ void orion_state::orion_romdisk_portc_w(uint8_t data)
 	m_romdisk_msb = data;
 }
 
-void orion_state::machine_start()
-{
-	m_video_mode_mask = 7;
-}
-
 uint8_t orion_state::orion128_system_r(offs_t offset)
 {
-	return m_ppi8255_2->read(offset & 3);
+	return m_ppi2->read(offset & 3);
 }
 
 void orion_state::orion128_system_w(offs_t offset, uint8_t data)
 {
-	m_ppi8255_2->write(offset & 3, data);
+	m_ppi2->write(offset & 3, data);
 }
 
 uint8_t orion_state::orion128_romdisk_r(offs_t offset)
 {
-	return m_ppi8255_1->read(offset & 3);
+	return m_ppi1->read(offset & 3);
 }
 
 void orion_state::orion128_romdisk_w(offs_t offset, uint8_t data)
 {
-	m_ppi8255_1->write(offset & 3, data);
+	m_ppi1->write(offset & 3, data);
 }
 
 void orion_state::orion_set_video_mode(int width)
@@ -75,9 +69,9 @@ void orion_state::orion_set_video_mode(int width)
 
 void orion_state::orion128_video_mode_w(uint8_t data)
 {
-	if ((data & 0x80)!=(m_orion128_video_mode & 0x80))
+	if (BIT(data, 7)!=BIT(m_orion128_video_mode, 7))
 	{
-		if ((data & 0x80)==0x80)
+		if (BIT(data, 7))
 		{
 			if (m_video_mode_mask == 31)
 			{
@@ -104,9 +98,9 @@ void orion_state::orion128_video_page_w(uint8_t data)
 {
 	if (m_orion128_video_page != data)
 	{
-		if ((data & 0x80)!=(m_orion128_video_page & 0x80))
+		if (BIT(data, 7)!=BIT(m_orion128_video_page, 7))
 		{
-			if ((data & 0x80)==0x80)
+			if (BIT(data, 7))
 			{
 				if (m_video_mode_mask == 31)
 				{
@@ -141,14 +135,38 @@ void orion_state::orion128_memory_page_w(uint8_t data)
 
 void orion_state::machine_reset()
 {
+	m_video_mode_mask = 7;
 	m_orion128_video_page = 0;
 	m_orion128_video_mode = 0;
 	m_orion128_memory_page = -1;
-	m_bank1->set_base(m_region_maincpu->base() + 0xf800);
+	m_bank1->set_base(m_rom + 0xf800);
 	m_bank2->set_base(m_ram->pointer() + 0xf000);
 	m_orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(384);
 	radio86_init_keyboard();
+}
+
+void orion_state::machine_start()
+{
+	save_item(NAME(m_tape_value));
+	save_item(NAME(m_orion128_video_mode));
+	save_item(NAME(m_orion128_video_page));
+	save_item(NAME(m_orion128_video_width));
+	save_item(NAME(m_video_mode_mask));
+	save_item(NAME(m_orionpro_pseudo_color));
+	save_item(NAME(m_romdisk_lsb));
+	save_item(NAME(m_romdisk_msb));
+	save_item(NAME(m_orion128_memory_page));
+	save_item(NAME(m_orionz80_memory_page));
+	save_item(NAME(m_orionz80_dispatcher));
+	save_item(NAME(m_speaker_data));
+	save_item(NAME(m_orionpro_ram0_segment));
+	save_item(NAME(m_orionpro_ram1_segment));
+	save_item(NAME(m_orionpro_ram2_segment));
+	save_item(NAME(m_orionpro_page));
+	save_item(NAME(m_orionpro_128_page));
+	save_item(NAME(m_orionpro_rom2_segment));
+	save_item(NAME(m_orionpro_dispatcher));
 }
 
 void orion_state::orion_disk_control_w(uint8_t data)
@@ -197,43 +215,26 @@ void orion_state::orion128_floppy_w(offs_t offset, uint8_t data)
 uint8_t orion_state::orionz80_floppy_rtc_r(offs_t offset)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
-	{
 		return m_rtc->read(offset-0x60);
-	}
 	else
-	{
 		return orion128_floppy_r(offset);
-	}
 }
 
 void orion_state::orionz80_floppy_rtc_w(offs_t offset, uint8_t data)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
-	{
 		m_rtc->write(offset-0x60,data);
-	}
 	else
-	{
 		orion128_floppy_w(offset,data);
-	}
-}
-
-
-void orion_z80_state::machine_start()
-{
-	m_video_mode_mask = 7;
 }
 
 void orion_state::orionz80_sound_w(uint8_t data)
 {
 	if (m_speaker_data == 0)
-	{
 		m_speaker_data = data;
-	}
 	else
-	{
 		m_speaker_data = 0;
-	}
+
 	m_speaker->level_w(m_speaker_data);
 
 }
@@ -242,7 +243,6 @@ void orion_state::orionz80_sound_fe_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 4));
 }
-
 
 void orion_state::orionz80_switch_bank()
 {
@@ -282,7 +282,7 @@ void orion_state::orionz80_switch_bank()
 		space.install_write_handler(0xff00, 0xffff, write8smo_delegate(*this, FUNC(orion_state::orionz80_sound_w)));
 
 		m_bank3->set_base(m_ram->pointer() + 0xf000);
-		m_bank5->set_base(m_region_maincpu->base() + 0xf800);
+		m_bank5->set_base(m_rom + 0xf800);
 
 	}
 	else
@@ -329,12 +329,12 @@ void orion_z80_state::machine_reset()
 	space.install_write_handler(0xff00, 0xffff, write8smo_delegate(*this, FUNC(orion_z80_state::orionz80_sound_w)));
 
 
-	m_bank1->set_base(m_region_maincpu->base() + 0xf800);
+	m_bank1->set_base(m_rom + 0xf800);
 	m_bank2->set_base(m_ram->pointer() + 0x4000);
 	m_bank3->set_base(m_ram->pointer() + 0xf000);
-	m_bank5->set_base(m_region_maincpu->base() + 0xf800);
+	m_bank5->set_base(m_rom + 0xf800);
 
-
+	m_video_mode_mask = 7;
 	m_orion128_video_page = 0;
 	m_orion128_video_mode = 0;
 	m_orionz80_memory_page = 0;
@@ -348,17 +348,14 @@ void orion_z80_state::machine_reset()
 INTERRUPT_GEN_MEMBER(orion_state::orionz80_interrupt)
 {
 	if ((m_orionz80_dispatcher & 0x40)==0x40)
-	{
 		device.execute().set_input_line(0, HOLD_LINE);
-	}
 }
 
 uint8_t orion_state::orionz80_io_r(offs_t offset)
 {
 	if (offset == 0xFFFD)
-	{
 		return m_ay8912->data_r();
-	}
+
 	return 0xff;
 }
 
@@ -383,12 +380,6 @@ void orion_state::orionz80_io_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-
-
-
-
-
 void orion_state::orionpro_bank_switch()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -397,9 +388,8 @@ void orion_state::orionpro_bank_switch()
 	uint8_t *ram = m_ram->pointer();
 
 	if (is128==1)
-	{
 		page = m_orionpro_128_page & 7;
-	}
+
 	space.install_write_bank(0x0000, 0x1fff, "bank1");
 	space.install_write_bank(0x2000, 0x3fff, "bank2");
 	space.install_write_bank(0x4000, 0x7fff, "bank3");
@@ -423,12 +413,12 @@ void orion_state::orionpro_bank_switch()
 	if ((m_orionpro_dispatcher & 0x10)==0x10)
 	{   // ROM1 enabled
 		space.unmap_write(0x0000, 0x1fff);
-		m_bank1->set_base(m_region_maincpu->base() + 0x20000);
+		m_bank1->set_base(m_rom + 0x20000);
 	}
 	if ((m_orionpro_dispatcher & 0x08)==0x08)
 	{   // ROM2 enabled
 		space.unmap_write(0x2000, 0x3fff);
-		m_bank2->set_base(m_region_maincpu->base() + 0x22000 + (m_orionpro_rom2_segment & 7) * 0x2000);
+		m_bank2->set_base(m_rom + 0x22000 + (m_orionpro_rom2_segment & 7) * 0x2000);
 	}
 
 	if ((m_orionpro_dispatcher & 0x02)==0x00)

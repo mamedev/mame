@@ -30,12 +30,11 @@ public:
 	spg2xx_game_marc101_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
 		m_prev_porta(0),
+		m_prev_portb(0),
 		m_toggle(false)
 	{ }
 
 	void marc101(machine_config &config);
-
-	void init_m489();
 
 protected:
 	void machine_start() override;
@@ -48,11 +47,28 @@ protected:
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	uint16_t m_prev_porta;
+	uint16_t m_prev_portb;
 	bool m_toggle;
 	emu_timer *m_pulse_timer;
 
 private:
 
+};
+
+class spg2xx_game_guitrbus_state : public spg2xx_game_marc101_state
+{
+public:
+	spg2xx_game_guitrbus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_marc101_state(mconfig, type, tag)
+	{ }
+
+	void guitrbus(machine_config &config);
+
+protected:
+
+	virtual uint16_t portb_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 class spg2xx_game_marc250_state : public spg2xx_game_marc101_state
@@ -121,6 +137,7 @@ void spg2xx_game_marc101_state::machine_reset()
 	spg2xx_game_state::machine_reset();
 	m_pulse_timer->adjust(attotime::never);
 	m_prev_porta = 0;
+	m_prev_portb = 0;
 	m_toggle = false;
 }
 
@@ -157,6 +174,15 @@ void spg2xx_game_marc101_state::marc101(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_marc101_state::porta_w));
 }
 
+void spg2xx_game_guitrbus_state::guitrbus(machine_config &config)
+{
+	spg2xx(config);
+
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_guitrbus_state::portb_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_guitrbus_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_guitrbus_state::portb_w));
+}
+
 
 // are these Port A behaviors related to IO A Special mode on the SoC?
 // the bits being tested do seem to be 'ExtClk2 / ExtClk1'
@@ -169,6 +195,72 @@ uint16_t spg2xx_game_marc101_state::porta_r()
 
 	return ret;
 }
+
+uint16_t spg2xx_game_guitrbus_state::portb_r()
+{
+	uint16_t ret = m_io_p2->read() &~ 0x0008;
+
+	ret |= m_toggle ? 0x0000 : 0x0008;
+
+	return ret;
+}
+
+void spg2xx_game_guitrbus_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	m_prev_porta = data;
+}
+
+void spg2xx_game_guitrbus_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	if ((data & 0x0002) != (m_prev_portb & 0x0002))
+	{
+		if ((data & 0x0002))
+		{
+			logerror("ext timer reset\n");
+			m_pulse_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
+		}
+	}
+
+	m_prev_portb = data;
+}
+
+
 
 
 void spg2xx_game_marc101_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -499,6 +591,28 @@ static INPUT_PORTS_START( m489 )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( guitrbus )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Red / Do")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Yellow / Re")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Purple / Mi")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green / Fa")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Blue / Sol")
+
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Logo (either WinFun or no logo)
+
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Whammy Bar")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Strum")
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 void spg2xx_game_wiwi18_state::init_wiwi18()
 {
@@ -542,9 +656,7 @@ void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t me
 	}
 }
 
-void spg2xx_game_marc101_state::init_m489()
-{
-}
+
 
 void spg2xx_game_marc101_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -750,7 +862,6 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 	}
 }
 
-
 ROM_START( foxsport )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "foxsports.bin", 0x000000, 0x1000000, CRC(a5092f49) SHA1(feb4d432486b17d6cd2aed8cefd3d084f77c1733) ) // only a tiny amount of data in the 2nd half, what's it used for (if anything)
@@ -775,7 +886,12 @@ ROM_END
 ROM_START( marc250 )
 	ROM_REGION( 0x10000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "m527.u6", 0x0000000, 0x10000000, CRC(4b856cab) SHA1(41c66bbdb0bb1442d7e11da18e9e6b20048445ba) )
-ROM_END                                          
+ROM_END    
+
+ROM_START( guitrbus )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "winfunguitar.bin", 0x000000, 0x400000, CRC(17419a27) SHA1(19377fcd18b08d3ae8e20de0244b3aaef1b5a66a) )
+ROM_END
 
 // box marked 'Wireless game console' 'Drahtlose Spielekonsole' 87 Sports games included : 18 hyper sports games, 69 arcade games.
 // Unit marked 'Hamy System' 'WiWi'
@@ -788,6 +904,11 @@ CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, 
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 
-CONS( 2014, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, init_m489, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, empty_init, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// has the following strings at the start of the ROM
+// "Copyright(C) 2009-2012 ShenZhen Multi-Content Software CO., LTD"
+// "LisencedTo: MCS"
+CONS( 2012, guitrbus,   0,        0, guitrbus,  guitrbus,  spg2xx_game_guitrbus_state,          empty_init,    "WinFun",  "Guitar Buster", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

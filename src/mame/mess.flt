@@ -257,6 +257,7 @@ emate.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
+emu68k.cpp
 enmirage.cpp
 ep64.cpp
 epic14e.cpp

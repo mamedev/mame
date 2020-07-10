@@ -824,8 +824,10 @@ void netlist_mame_stream_output_device::device_start()
 void netlist_mame_stream_output_device::device_reset()
 {
 	LOGDEVCALLS("reset %s\n", name());
+#if 0
 	m_cur = 0.0;
 	m_last_buffer_time = netlist::netlist_time_ext::zero();
+#endif
 }
 
 void netlist_mame_stream_output_device::sound_update_fill(std::size_t samples, stream_sample_t *target)
@@ -906,6 +908,7 @@ netlist_mame_device::netlist_mame_device(const machine_config &mconfig, device_t
 	, m_attotime_per_clock(attotime::zero)
 	, m_old(netlist::netlist_time_ext::zero())
 	, m_setup_func(nullptr)
+	, m_device_reset_called(false)
 {
 }
 
@@ -1045,6 +1048,10 @@ void netlist_mame_device::device_start()
 
 	m_old = netlist::netlist_time_ext::zero();
 	m_rem = netlist::netlist_time_ext::zero();
+	m_cur_time = attotime::zero;
+
+	m_device_reset_called = false;
+
 	LOGDEVCALLS("device_start exit\n");
 }
 
@@ -1061,10 +1068,17 @@ void netlist_mame_device::device_clock_changed()
 void netlist_mame_device::device_reset()
 {
 	LOGDEVCALLS("device_reset\n");
-	m_cur_time = attotime::zero;
-	m_old = netlist::netlist_time_ext::zero();
-	m_rem = netlist::netlist_time_ext::zero();
-	netlist().exec().reset();
+	if (!m_device_reset_called)
+	{
+		// netlists don't have a reset line, doing a soft-reset is pointless
+		// the only reason we call these here once after device_start
+		// is that netlist input devices may be started after the netlist device
+		// and because the startup code may trigger actions which need all
+		// devices set up.
+		netlist().free_setup_resources();
+		netlist().exec().reset();
+		m_device_reset_called = true;
+	}
 }
 
 void netlist_mame_device::device_stop()

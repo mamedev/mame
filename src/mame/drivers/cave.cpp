@@ -1220,7 +1220,7 @@ template<int Mask>
 void cave_state::z80_rombank_w(u8 data)
 {
 	if (data & ~Mask)
-		logerror("%s: Bank %02X\n", machine().describe_context(), data);
+		logerror("%s: Z80 Bank %02X\n", machine().describe_context(), data);
 
 	m_z80bank->set_entry(data & Mask);
 }
@@ -1741,19 +1741,7 @@ INPUT_PORTS_END
 
 // 6bpp tiles are accessible only 0x400 colors
 
-/* 8x8x4 tiles */
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{STEP4(0,1)},
-	{STEP8(0,4)},
-	{STEP8(0,4*8)},
-	8*8*4
-};
-
-/* 8x8x6 tiles (in a 8x8x8 layout) */
+// 8x8x6 tiles (in a 8x8x8 layout)
 static const gfx_layout layout_8x8x6 =
 {
 	8,8,
@@ -1765,8 +1753,8 @@ static const gfx_layout layout_8x8x6 =
 	8*8*8
 };
 
-/* 8x8x6 tiles (4 bits in one rom, 2 bits in the other,
-   unpacked in 2 pages of 4 bits) */
+// 8x8x6 tiles (4 bits in one rom, 2 bits in the other,
+// unpacked in 2 pages of 4 bits)
 static const gfx_layout layout_8x8x6_2 =
 {
 	8,8,
@@ -1778,7 +1766,7 @@ static const gfx_layout layout_8x8x6_2 =
 	8*8*4
 };
 
-/* 8x8x8 tiles */
+// 8x8x8 tiles
 static const gfx_layout layout_8x8x8 =
 {
 	8,8,
@@ -1790,39 +1778,68 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
-#if 0
-/* 16x16x8 Zooming Sprites - No need to decode them */
+// 16~x16~x4 Zooming Sprites - decode each 16 pixel lines
 static const gfx_layout layout_sprites =
 {
-	16,16,
+	16,1,
+	RGN_FRAC(1,1),
+	4,
+	{STEP4(0,1)},
+	{1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4,9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4},
+	{0},
+	16*4
+};
+
+// 16~x16~x4 Non-zooming Sprites - decode each 16 pixel lines
+static const gfx_layout layout_sprites_msb =
+{
+	16,1,
+	RGN_FRAC(1,1),
+	4,
+	{STEP4(0,1)},
+	{STEP16(0,4)},
+	{0},
+	16*4
+};
+
+// esprade, guwange uses 8bpp sprites instead 4bpp
+static const gfx_layout layout_sprites_8bpp =
+{
+	16,1,
 	RGN_FRAC(1,1),
 	8,
-	{STEP8(0,1)},
-	{STEP16(0,8)},
-	{STEP16(0,16*8)},
-	16*16*8
+	{STEP4(0,1), STEP4(4*4,1)},
+	{STEP4(4*4*2*0+3*4,-4),STEP4(4*4*2*1+3*4,-4),STEP4(4*4*2*2+3*4,-4),STEP4(4*4*2*3+3*4,-4)},
+	{0},
+	16*8
 };
-#endif
+
+static GFXDECODE_START( gfx_common_spr )
+	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites, 0x0000, 0x40 )
+GFXDECODE_END
 
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_dfeveron )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0400, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x0400, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
                                 Dodonpachi
 ***************************************************************************/
 
+// different gfx layout
+static GFXDECODE_START( gfx_ddonpach_spr )
+	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites_msb, 0x0000, 0x40 )
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_ddonpach )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x4000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8, 0x4000, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x4000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x4000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8,         0x4000, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -1830,18 +1847,20 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_donpachi )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0400, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x0400, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x0400, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
                                 Esprade
 ***************************************************************************/
 
+static GFXDECODE_START( gfx_esprade_spr )
+	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites_8bpp, 0x0000, 0x40 )
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_esprade )
-//  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x8, 0x4000, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8, 0x4000, 0x40 ) // [2] Layer 2
@@ -1852,19 +1871,22 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_hotdogst )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x0000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x0000, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
                                 Koro Koro Quest
 ***************************************************************************/
 
+// different sprite base palette
+static GFXDECODE_START( gfx_korokoro_spr )
+	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites, 0x3c00, 0x40 )
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_korokoro )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
 GFXDECODE_END
 
 /***************************************************************************
@@ -1872,9 +1894,8 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_mazinger )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x6, 0x0400, 0x10 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x6,         0x0400, 0x10 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -1882,27 +1903,39 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_ppsatan_0 )
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 0
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_ppsatan_spr_1 )
+	GFXDECODE_ENTRY( "sprites1", 0, layout_sprites, 0x3c00, 0x40 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ppsatan_1 )
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x0000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [1] Layer 1
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_ppsatan_spr_2 )
+	GFXDECODE_ENTRY( "sprites2", 0, layout_sprites, 0x3c00, 0x40 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ppsatan_2 )
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x0000, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
                                 Power Instinct 2
 ***************************************************************************/
 
+// expanded sprite color space
+static GFXDECODE_START( gfx_pwrinst2_spr )
+	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites_msb, 0x0000, 0x80 )
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_pwrinst2 )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0800, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x1000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x1800, 0x40 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "layer3", 0, layout_8x8x4, 0x2000, 0x40 ) // [3] Layer 3
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0800, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x1000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x1800, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer3", 0, gfx_8x8x4_packed_msb, 0x2000, 0x40 ) // [3] Layer 3
 GFXDECODE_END
 
 
@@ -1911,10 +1944,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_sailormn )
-//  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4,   0x0400, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4,   0x0800, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x6_2, 0x0c00, 0x10 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0800, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x6_2,       0x0c00, 0x10 ) // [2] Layer 2
 GFXDECODE_END
 
 
@@ -1923,7 +1955,6 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_uopoko )
-//  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 GFXDECODE_END
 
@@ -1981,6 +2012,8 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 	PALETTE(config, m_palette[0], palette_device::BLACK).set_format(palette_device::xGRB_555, 0x8000);
 
+	GFXDECODE(config, m_spr_gfxdecode[0], m_palette[0], gfx_common_spr);
+
 	for (int i = 0; i < layer; i++)
 	{
 		TMAP038(config, m_tilemap[i]);
@@ -2037,6 +2070,7 @@ void cave_state::ddonpach(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
+	m_spr_gfxdecode[0]->set_info(gfx_ddonpach_spr);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_ddonpach);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
@@ -2060,6 +2094,7 @@ void cave_state::donpachi(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
+	m_spr_gfxdecode[0]->set_info(gfx_ddonpach_spr);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_donpachi);
 	m_palette[0]->set_entries(0x1000/2);
 
@@ -2095,6 +2130,7 @@ void cave_state::esprade(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
+	m_spr_gfxdecode[0]->set_info(gfx_esprade_spr);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_esprade);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
@@ -2143,6 +2179,7 @@ void cave_state::guwange(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
+	m_spr_gfxdecode[0]->set_info(gfx_esprade_spr);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_esprade);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
@@ -2213,10 +2250,11 @@ void cave_state::korokoro(machine_config &config)
 	/* video hardware */
 	m_screen[0]->set_visarea(0, 320-1-2, 0, 240-1-1);
 
+	m_spr_gfxdecode[0]->set_info(gfx_korokoro_spr);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_korokoro);
 	m_palette[0]->set_entries(0x8000/2);
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,korokoro)
+	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_4bpp)
 
 	/* sound hardware */
 	add_ymz(config);
@@ -2412,6 +2450,9 @@ void cave_state::ppsatan(machine_config &config)
 	m_screen[2]->set_screen_update(FUNC(cave_state::screen_update_ppsatan_right));
 	TIMER(config, "int_timer_right").configure_generic(FUNC(cave_state::vblank_start_right));
 
+	m_spr_gfxdecode[0]->set_info(gfx_korokoro_spr);
+	GFXDECODE(config, m_spr_gfxdecode[1], m_palette[1], gfx_ppsatan_spr_1);
+	GFXDECODE(config, m_spr_gfxdecode[2], m_palette[2], gfx_ppsatan_spr_2);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_ppsatan_0);
 	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_ppsatan_1);
 	GFXDECODE(config, m_gfxdecode[2], m_palette[2], gfx_ppsatan_2);
@@ -2467,6 +2508,7 @@ void cave_state::pwrinst2(machine_config &config)
 	m_screen[0]->set_size(0x200, 240);
 	m_screen[0]->set_visarea(0x70, 0x70 + 0x140-1, 0, 240-1);
 
+	m_spr_gfxdecode[0]->set_info(gfx_pwrinst2_spr);
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_pwrinst2);
 	m_palette[0]->set_entries(0x5000/2);
 
@@ -2674,56 +2716,34 @@ void cave_state::uopoko(machine_config &config)
 
 ***************************************************************************/
 
-/* 4 bits -> 8 bits. Even and odd pixels are swapped */
 void cave_state::unpack_sprites(int chip)
 {
-	const u32 len    =   m_spriteregion[chip]->bytes();
-	u8 *rgn          =   m_spriteregion[chip]->base();
-	u8 *src          =   rgn + len / 2 - 1;
-	u8 *dst          =   rgn + len - 1;
-
-	while (dst > src)
+	gfx_element *gfx = m_spr_gfxdecode[chip]->gfx(0);
+	m_sprite_gfx_mask[chip] = 1;
+	const u32 needed = gfx->elements() * gfx->height() * gfx->width();
+	while (m_sprite_gfx_mask[chip] < needed)
 	{
-		const u8 data = *src--;
-		/* swap even and odd pixels */
-		*dst-- = data >> 4;     *dst-- = data & 0xF;
+		m_sprite_gfx_mask[chip] <<= 1;
 	}
+	m_sprite_gfx[chip] = make_unique_clear<u8[]>(m_sprite_gfx_mask[chip]);
+
+	u8 *dst = m_sprite_gfx[chip].get();
+	for (int e = 0; e < gfx->elements(); e++)
+	{
+		const u8 *data = gfx->get_data(e);
+		for (int y = 0; y < gfx->height(); y++)
+		{
+			const u8 *datatmp = data;
+			for (int x = 0; x < gfx->width(); x++)
+			{
+				*dst++ = *datatmp++;
+			}
+			data += gfx->rowbytes();
+		}
+	}
+	m_sprite_gfx_mask[chip]--;
 }
 
-
-/* 4 bits -> 8 bits. Even and odd pixels are not swapped */
-void cave_state::ddp_unpack_sprites(int chip)
-{
-	const u32 len    =   m_spriteregion[chip]->bytes();
-	u8 *rgn          =   m_spriteregion[chip]->base();
-	u8 *src          =   rgn + len / 2 - 1;
-	u8 *dst          =   rgn + len - 1;
-
-	while (dst > src)
-	{
-		const u8 data = *src--;
-		*dst-- = data & 0xf;     *dst-- = data >> 4;
-	}
-}
-
-
-/* 2 pages of 4 bits -> 8 bits */
-void cave_state::esprade_unpack_sprites(int chip)
-{
-	u8 *src      =   m_spriteregion[chip]->base();
-	u8 *dst      =   src + m_spriteregion[chip]->bytes();
-
-	while (src < dst)
-	{
-		const u8 data1 = src[0];
-		const u8 data2 = src[1];
-
-		src[0] = ((data1 & 0x0f) << 4) +  (data2 & 0x0f);
-		src[1] =  (data1 & 0xf0)       + ((data2 & 0xf0) >> 4);
-
-		src += 2;
-	}
-}
 
 /***************************************************************************
 
@@ -2771,7 +2791,7 @@ BP962A.U77  23C16000    GFX
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bp962a.u9",  0x00000, 0x80000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
+	ROM_REGION( 0x400000, "sprites0", 0 ) \
 	ROM_LOAD( "bp962a.u76", 0x000000, 0x200000, CRC(858da439) SHA1(33a3d2a3ec3fa3364b00e1e43b405e5030a5b2a3) ) \
 	ROM_LOAD( "bp962a.u77", 0x200000, 0x200000, CRC(ea2ba35e) SHA1(72487f21d44fe7be9a98068ce7f57a43c132945f) ) \
 	\
@@ -2908,7 +2928,7 @@ ROM_START( dfeveron )
 	ROM_LOAD16_BYTE( "cv01-u34.bin", 0x000000, 0x080000, CRC(be87f19d) SHA1(595239245df3835cdf5a99a6c62480465558d8d3) )
 	ROM_LOAD16_BYTE( "cv01-u33.bin", 0x000001, 0x080000, CRC(e53a7db3) SHA1(ddced29f78dc3cc89038757b6577ba2ba0d8b041) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cv01-u25.bin", 0x000000, 0x400000, CRC(a6f6a95d) SHA1(e1eb45cb5d0e6163edfd9d830633b913fb53c6ca) )
 	ROM_LOAD( "cv01-u26.bin", 0x400000, 0x400000, CRC(32edb62a) SHA1(3def74e1316b80cc25a8c3ac162cd7bcb8cc807c) )
 
@@ -3014,7 +3034,7 @@ ROM_START( feversos )
 	ROM_LOAD16_BYTE( "cv01-u34.sos", 0x000000, 0x080000, CRC(24ef3ce6) SHA1(42799eebbb2686a837b8972aec684143deadca59) )
 	ROM_LOAD16_BYTE( "cv01-u33.sos", 0x000001, 0x080000, CRC(64ff73fd) SHA1(7fc3a8469cec2361d373a4dac4a547c13ca5f709) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cv01-u25.bin", 0x000000, 0x400000, CRC(a6f6a95d) SHA1(e1eb45cb5d0e6163edfd9d830633b913fb53c6ca) )
 	ROM_LOAD( "cv01-u26.bin", 0x400000, 0x400000, CRC(32edb62a) SHA1(3def74e1316b80cc25a8c3ac162cd7bcb8cc807c) )
 
@@ -3049,7 +3069,7 @@ ROM_START( ddonpach )
 	ROM_LOAD16_BYTE( "b1.u27", 0x000000, 0x080000, CRC(b5cdc8d3) SHA1(58757b50e21a27e500a82c03f62cf02a85389926) )
 	ROM_LOAD16_BYTE( "b2.u26", 0x000001, 0x080000, CRC(6bbb063a) SHA1(e5de64b9c3efc0a38a2e0e16b78ee393bff63558) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "u50.bin", 0x000000, 0x200000, CRC(14b260ec) SHA1(33bda210302428d5500115d0c7a839cdfcb67d17) )
 	ROM_LOAD16_WORD_SWAP( "u51.bin", 0x200000, 0x200000, CRC(e7ba8cce) SHA1(ad74a6b7d53760b19587c4a6dbea937daa7e87ce) )
 	ROM_LOAD16_WORD_SWAP( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
@@ -3078,7 +3098,7 @@ ROM_START( ddonpachj )
 	ROM_LOAD16_BYTE( "u27.bin", 0x000000, 0x080000, CRC(2432ff9b) SHA1(fbc826c30553f6553ead40b312b73c049e8f4bf6) )
 	ROM_LOAD16_BYTE( "u26.bin", 0x000001, 0x080000, CRC(4f3a914a) SHA1(ae98eba049f1462aa1145f6959b9f9a32c97278f) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "u50.bin", 0x000000, 0x200000, CRC(14b260ec) SHA1(33bda210302428d5500115d0c7a839cdfcb67d17) )
 	ROM_LOAD16_WORD_SWAP( "u51.bin", 0x200000, 0x200000, CRC(e7ba8cce) SHA1(ad74a6b7d53760b19587c4a6dbea937daa7e87ce) )
 	ROM_LOAD16_WORD_SWAP( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
@@ -3107,7 +3127,7 @@ ROM_START( ddonpacha )
 	ROM_LOAD16_BYTE( "arrange_u27.bin", 0x000000, 0x080000, CRC(44b899ae) SHA1(798ec437d861b94fcd90c99a7015dd420887c788) )
 	ROM_LOAD16_BYTE( "arrange_u26.bin", 0x000001, 0x080000, CRC(727a09a8) SHA1(91876386855f19e8a3d8d1df71dfe9b3d98e9ea9) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )       /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )       /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "u50.bin", 0x000000, 0x200000, CRC(14b260ec) SHA1(33bda210302428d5500115d0c7a839cdfcb67d17) )
 	ROM_LOAD16_WORD_SWAP( "arrange_u51.bin", 0x200000, 0x200000, CRC(0f3e5148) SHA1(3016f4d075940feae691389606cd2aa7ac53849e) )
 	ROM_LOAD16_WORD_SWAP( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
@@ -3173,7 +3193,7 @@ ROM_START( donpachi )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prgu.u29",     0x00000, 0x80000, CRC(89c36802) SHA1(7857c726cecca5a4fce282e0d2b873774d2c1b1d) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD16_WORD_SWAP( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3206,7 +3226,7 @@ ROM_START( donpachij )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prg.u29",     0x00000, 0x80000, CRC(6be14af6) SHA1(5b1158071f160efeded816ae4c4edca1d00d6e05) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD16_WORD_SWAP( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3239,7 +3259,7 @@ ROM_START( donpachikr )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prgk.u26",    0x00000, 0x80000, CRC(bbaf4c8b) SHA1(0f9d42c8c4c5b69e3d39bf768bc4b663f66b4f36) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD16_WORD_SWAP( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3272,7 +3292,7 @@ ROM_START( donpachihk )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "37.u29",    0x00000, 0x80000, CRC(71f39f30) SHA1(08a028208f21c073d450a29061604f27775786a8) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD16_WORD_SWAP( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3313,7 +3333,7 @@ ROM_START( donpachijs )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prg.u29",     0x00000, 0x80000, CRC(810dbd42) SHA1(703a5aec90b595a1c5a679ab165643119ba6b2f3) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_WORD_SWAP( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD16_WORD_SWAP( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3357,10 +3377,10 @@ ROM_START( esprade )
 	ROM_LOAD16_BYTE( "u41.int", 0x000001, 0x080000, CRC(97c1b649) SHA1(37a56b7b9662219a356aee3f4b5cbb774ac4950e) )
 
 	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites */
-	ROM_LOAD16_BYTE( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
-	ROM_LOAD16_BYTE( "esp_u64.u64", 0x000001, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
-	ROM_LOAD16_BYTE( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
-	ROM_LOAD16_BYTE( "esp_u66.u66", 0x800001, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
+	ROM_LOAD32_WORD_SWAP( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
+	ROM_LOAD32_WORD_SWAP( "esp_u64.u64", 0x000002, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
+	ROM_LOAD32_WORD_SWAP( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
+	ROM_LOAD32_WORD_SWAP( "esp_u66.u66", 0x800002, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
 
 	ROM_REGION( 0x800000, "layer0", 0 ) /* Layer 0 */
 	ROM_LOAD( "esp_u54.u54", 0x000000, 0x400000, CRC(e7ca6936) SHA1(b7f5ab67071a1d9dd3d2c1cd2304d9cdad68850c) )
@@ -3386,10 +3406,10 @@ ROM_START( espradej )
 	ROM_LOAD16_BYTE( "u41_ver.2", 0x000001, 0x080000, CRC(734b3ef0) SHA1(f584227b85c347d62d5f179445011ce0f607bcfd) )
 
 	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites */
-	ROM_LOAD16_BYTE( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
-	ROM_LOAD16_BYTE( "esp_u64.u64", 0x000001, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
-	ROM_LOAD16_BYTE( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
-	ROM_LOAD16_BYTE( "esp_u66.u66", 0x800001, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
+	ROM_LOAD32_WORD_SWAP( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
+	ROM_LOAD32_WORD_SWAP( "esp_u64.u64", 0x000002, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
+	ROM_LOAD32_WORD_SWAP( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
+	ROM_LOAD32_WORD_SWAP( "esp_u66.u66", 0x800002, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
 
 	ROM_REGION( 0x800000, "layer0", 0 ) /* Layer 0 */
 	ROM_LOAD( "esp_u54.u54", 0x000000, 0x400000, CRC(e7ca6936) SHA1(b7f5ab67071a1d9dd3d2c1cd2304d9cdad68850c) )
@@ -3415,10 +3435,10 @@ ROM_START( espradejo )
 	ROM_LOAD16_BYTE( "u41.bin", 0x000001, 0x080000, CRC(def30539) SHA1(957ad0b06f06689ae71393572592f6b8f818603a) )
 
 	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites */
-	ROM_LOAD16_BYTE( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
-	ROM_LOAD16_BYTE( "esp_u64.u64", 0x000001, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
-	ROM_LOAD16_BYTE( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
-	ROM_LOAD16_BYTE( "esp_u66.u66", 0x800001, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
+	ROM_LOAD32_WORD_SWAP( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
+	ROM_LOAD32_WORD_SWAP( "esp_u64.u64", 0x000002, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
+	ROM_LOAD32_WORD_SWAP( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
+	ROM_LOAD32_WORD_SWAP( "esp_u66.u66", 0x800002, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
 
 	ROM_REGION( 0x800000, "layer0", 0 ) /* Layer 0 */
 	ROM_LOAD( "esp_u54.u54", 0x000000, 0x400000, CRC(e7ca6936) SHA1(b7f5ab67071a1d9dd3d2c1cd2304d9cdad68850c) )
@@ -3484,7 +3504,7 @@ ROM_START( gaia )
 	ROM_LOAD16_BYTE( "prg1.127", 0x000000, 0x080000, CRC(47b904b2) SHA1(58b9b55f59cf00f70b690a0371096e86f4d723c2) )
 	ROM_LOAD16_BYTE( "prg2.128", 0x000001, 0x080000, CRC(469b7794) SHA1(502f855c51005a866900b19c3a0a170d9ea02392) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )  /* Sprites */
+	ROM_REGION( 0x800000, "sprites0", 0 )  /* Sprites */
 	ROM_LOAD( "obj1.736", 0x000000, 0x400000, CRC(f4f84e5d) SHA1(8f445dd7a5c8a996939c211e5aec5742121a6e7e) )
 	ROM_LOAD( "obj2.738", 0x400000, 0x400000, CRC(15c2a9ce) SHA1(631eb2968395be86ef2403733e7d4ec769a013b9) )
 
@@ -3546,7 +3566,7 @@ ROM_START( theroes )
 	ROM_LOAD16_BYTE( "t-hero-epm1.u0127", 0x000000, 0x080000, CRC(09db7195) SHA1(6aa5aa80e3b74e405ed8f1b9b801ce4367756986) )
 	ROM_LOAD16_BYTE( "t-hero-epm0.u0129", 0x000001, 0x080000, CRC(2d4e3310) SHA1(7c3284a2adc7943db50933a209d037422f87f80b) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )  /* Sprites */
+	ROM_REGION( 0x800000, "sprites0", 0 )  /* Sprites */
 	ROM_LOAD( "t-hero-obj1.u0736", 0x000000, 0x400000, CRC(35090f7c) SHA1(035e6c12a87d9c7241eea34fc7e2170bec842acc) )
 	ROM_LOAD( "t-hero-obj2.u0738", 0x400000, 0x400000, CRC(71605108) SHA1(6070c26d8f22fafc81d97cacfef96ae652e355d0) )
 
@@ -3585,12 +3605,12 @@ ROM_START( guwange )
 	ROM_LOAD16_BYTE( "gu-u0129.bin", 0x000001, 0x080000, CRC(6c0e3b93) SHA1(aaad6569b9a7b6f9a315062f9fedfc95851c1bc6) )
 
 	ROM_REGION( 0x2000000, "sprites0", 0 )       /* Sprites */
-	ROM_LOAD16_BYTE( "u083.bin", 0x0000000, 0x800000, CRC(adc4b9c4) SHA1(3f9fb004e19187bbfa87ddfe8cfc69740656a1bd) )
-	ROM_LOAD16_BYTE( "u082.bin", 0x0000001, 0x800000, CRC(3d75876c) SHA1(705b8c2dbdc31e9516f429969f87988beec796d7) )
-	ROM_LOAD16_BYTE( "u086.bin", 0x1000000, 0x400000, CRC(188e4f81) SHA1(626074d81782a6de0b52406331b4b8561d3e36f5) )
-	ROM_RELOAD(                  0x1800000, 0x400000 )
-	ROM_LOAD16_BYTE( "u085.bin", 0x1000001, 0x400000, CRC(a7d5659e) SHA1(10abac022ebe106a3ca7186ff18ca2757f903033) )
-	ROM_RELOAD(                  0x1800001, 0x400000 )
+	ROM_LOAD32_WORD_SWAP( "u083.bin", 0x0000000, 0x800000, CRC(adc4b9c4) SHA1(3f9fb004e19187bbfa87ddfe8cfc69740656a1bd) )
+	ROM_LOAD32_WORD_SWAP( "u082.bin", 0x0000002, 0x800000, CRC(3d75876c) SHA1(705b8c2dbdc31e9516f429969f87988beec796d7) )
+	ROM_LOAD32_WORD_SWAP( "u086.bin", 0x1000000, 0x400000, CRC(188e4f81) SHA1(626074d81782a6de0b52406331b4b8561d3e36f5) )
+	ROM_RELOAD(                       0x1800000, 0x400000 )
+	ROM_LOAD32_WORD_SWAP( "u085.bin", 0x1000002, 0x400000, CRC(a7d5659e) SHA1(10abac022ebe106a3ca7186ff18ca2757f903033) )
+	ROM_RELOAD(                       0x1800002, 0x400000 )
 //  sprite bug fix?
 //  ROM_FILL(                    0x1800000, 0x800000, 0xff )
 
@@ -3622,12 +3642,12 @@ ROM_START( guwanges )
 	ROM_LOAD16_BYTE( "gu-u0129b.bin", 0x000001, 0x080000, CRC(a99c6b6c) SHA1(614a3cd1de9b325f73e461eaf250ff9cf773f4a5) )
 
 	ROM_REGION( 0x2000000, "sprites0", 0 )       /* Sprites */
-	ROM_LOAD16_BYTE( "u083.bin", 0x0000000, 0x800000, CRC(adc4b9c4) SHA1(3f9fb004e19187bbfa87ddfe8cfc69740656a1bd) )
-	ROM_LOAD16_BYTE( "u082.bin", 0x0000001, 0x800000, CRC(3d75876c) SHA1(705b8c2dbdc31e9516f429969f87988beec796d7) )
-	ROM_LOAD16_BYTE( "u086.bin", 0x1000000, 0x400000, CRC(188e4f81) SHA1(626074d81782a6de0b52406331b4b8561d3e36f5) )
-	ROM_RELOAD(                  0x1800000, 0x400000 )
-	ROM_LOAD16_BYTE( "u085.bin", 0x1000001, 0x400000, CRC(a7d5659e) SHA1(10abac022ebe106a3ca7186ff18ca2757f903033) )
-	ROM_RELOAD(                  0x1800001, 0x400000 )
+	ROM_LOAD32_WORD_SWAP( "u083.bin", 0x0000000, 0x800000, CRC(adc4b9c4) SHA1(3f9fb004e19187bbfa87ddfe8cfc69740656a1bd) )
+	ROM_LOAD32_WORD_SWAP( "u082.bin", 0x0000002, 0x800000, CRC(3d75876c) SHA1(705b8c2dbdc31e9516f429969f87988beec796d7) )
+	ROM_LOAD32_WORD_SWAP( "u086.bin", 0x1000000, 0x400000, CRC(188e4f81) SHA1(626074d81782a6de0b52406331b4b8561d3e36f5) )
+	ROM_RELOAD(                       0x1800000, 0x400000 )
+	ROM_LOAD32_WORD_SWAP( "u085.bin", 0x1000002, 0x400000, CRC(a7d5659e) SHA1(10abac022ebe106a3ca7186ff18ca2757f903033) )
+	ROM_RELOAD(                       0x1800002, 0x400000 )
 //  sprite bug fix?
 //  ROM_FILL(                    0x1800000, 0x800000, 0xff )
 
@@ -3710,7 +3730,7 @@ ROM_START( hotdogst )
 	ROM_REGION( 0x40000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "mp2.u19", 0x00000, 0x40000, CRC(ff979ebe) SHA1(4cb80086cfdc69a321c7f75455cef89e20488b76) )   // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp9.u55", 0x000000, 0x200000, CRC(258d49ec) SHA1(f39e30c82d8f680f248e1eb59d7c5acb479fa277) )
 	ROM_LOAD( "mp8.u54", 0x200000, 0x200000, CRC(bdb4d7b8) SHA1(0dd490988aa84b0e9a21ade5fd606b03eca13f6c) )
 
@@ -3781,7 +3801,7 @@ ROM_START( korokoro )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "mp-001_ver07.u0130", 0x000000, 0x080000, CRC(86c7241f) SHA1(c9f0ab63c4fe36df1300445e9bb0d5c6a1bb733f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x180000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x180000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp-001_ver01.u1066", 0x000000, 0x100000, CRC(c5c6af7e) SHA1(13ac26fd703672a01d629be4e5efe9fb8720a4fb) )
 	ROM_LOAD( "mp-001_ver01.u1051", 0x100000, 0x080000, CRC(fe5e28e8) SHA1(44da1a7d813b149f9bae351bbcbd0bc2d4c70e10) )  // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
@@ -3796,7 +3816,7 @@ ROM_START( crusherm )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "mp-003ver01.u0130", 0x000000, 0x080000, CRC(a4f56e6b) SHA1(1d3af7602c48a6b6c76c376dbc8ad3823b56868a) )
 
-	ROM_REGION( 0x200000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x200000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp-003ver01.u1067", 0x000000, 0x100000, CRC(268a4921) SHA1(8bb818466616051af01680b381af53b8b6a18428) )
 	ROM_LOAD( "mp-003ver01.u1066", 0x100000, 0x100000, CRC(79e77a6e) SHA1(9d03dd083769851d628ba6b3d77cfde9603e74f4) )
 
@@ -3843,7 +3863,7 @@ U55
 	ROM_REGION( 0x20000, "audiocpu", 0 ) \
 	ROM_LOAD( "mzs.u21", 0x00000, 0x20000, CRC(c5b4f7ed) SHA1(01f3cd1dd4045029260544e0e1c15dd08817012e) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites0", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x400000, "sprites0", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "bp943a-2.u56", 0x000000, 0x200000, CRC(97e13959) SHA1(c30b1093aacebafefcae701af767dd36fc55fac7) ) \
 	ROM_LOAD( "bp943a-3.u55", 0x200000, 0x080000, CRC(9c4957dd) SHA1(e775605a01b6cadc318855ac046dad03c4fc5bb4) ) \
 	\
@@ -3926,7 +3946,7 @@ ROM_START( metmqstr )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "bp947a.u20",  0x00000, 0x40000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "bp947a.u49", 0x000000, 0x200000, CRC(09749531) SHA1(6deeed2712241611ec3202c49a66beed28698af8) )
 	ROM_LOAD( "bp947a.u50", 0x200000, 0x200000, CRC(19cea8b2) SHA1(87fb29458074f0e4852237e0184b8b3b44b0eb29) )
 	ROM_LOAD( "bp947a.u51", 0x400000, 0x200000, CRC(c19bed67) SHA1(ac664a15512c0e8c8b701833aede95f53cd46a45) )
@@ -3962,7 +3982,7 @@ ROM_START( nmaster )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "bp947a.u20",  0x00000, 0x40000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
 
-	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "bp947a.u49", 0x000000, 0x200000, CRC(09749531) SHA1(6deeed2712241611ec3202c49a66beed28698af8) )
 	ROM_LOAD( "bp947a.u50", 0x200000, 0x200000, CRC(19cea8b2) SHA1(87fb29458074f0e4852237e0184b8b3b44b0eb29) )
 	ROM_LOAD( "bp947a.u51", 0x400000, 0x200000, CRC(c19bed67) SHA1(ac664a15512c0e8c8b701833aede95f53cd46a45) )
@@ -4013,7 +4033,7 @@ ROM_START( pacslot )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pa1-mprob.u41", 0x00000, 0x80000, CRC(56281370) SHA1(b75a7c5997adac14486cef7be4e41d113c86021f) )
 
-	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x100000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "pa1-obj0.u52", 0x00000, 0x80000, CRC(bf9232ce) SHA1(9a887a964e9a75e16c59dcf217c664404e74cc2a) )
 	ROM_LOAD16_BYTE( "pa1-obj1.u53", 0x00001, 0x80000, CRC(6eb76a04) SHA1(66c8e36bee4439c203a02b30898e4f741205d681) )
 
@@ -4057,7 +4077,7 @@ ROM_START( paceight )
 	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pae1-mpro.u41", 0x00000, 0x80000, CRC(bb026f97) SHA1(70d48f05275c64b25f37f03206219ef3ee9c0ee2) ) // 27c240
 
-	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x100000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "pae1-obj0.u52", 0x00000, 0x80000, CRC(2cd99155) SHA1(146ed2b3f2763232a60e6b238a16067d3ccfa959) ) // 27c040
 	ROM_LOAD16_BYTE( "pae1-obj1.u53", 0x00001, 0x80000, CRC(9ae2685b) SHA1(5eed5f00d28d803358c8ffaf42c4979af23a0a8c) ) // ""
 
@@ -4104,15 +4124,15 @@ ROM_START( ppsatan )
 	ROM_LOAD16_BYTE( "66a5.u79", 0x00000, 0x20000, CRC(60efeed3) SHA1(72095cef77065a8f1089273050f60a2e99582cf1) ) // checksum = 60D5 (OK?). 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "43b1.u61", 0x00001, 0x20000, CRC(f14e6287) SHA1(75c0465780a10ec8f533349b008f0d489bf362a5) ) // checksum = 43B1 (OK).  1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x200000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "ver1.0.u27", 0x00000, 0x80000, CRC(d1b02639) SHA1(19bbcf951a6ace91da72af9232f3d808afa8416c) )
 	ROM_LOAD16_BYTE( "ver1.0.u17", 0x00001, 0x80000, CRC(c66730ca) SHA1(75c18c80c1d2ced69edd4f013685c4eaf015049c) )
 
-	ROM_REGION( 0x200000 * 2, "sprites1", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x200000, "sprites1", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "ver1.0.u13", 0x00000, 0x80000, CRC(24c31e01) SHA1(c2c96bdd0a2a764ac0e1c8d64334d0ab76c46aa5) )
 	ROM_LOAD16_BYTE( "ver1.0.u19", 0x00001, 0x80000, CRC(ffbc6284) SHA1(05a735f3193218d32ad253c5abe21e1d00d1a5ca) )
 
-	ROM_REGION( 0x200000 * 2, "sprites2", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x200000, "sprites2", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "ver1.0.u15", 0x00000, 0x80000, CRC(24c31e01) SHA1(c2c96bdd0a2a764ac0e1c8d64334d0ab76c46aa5) )
 	ROM_LOAD16_BYTE( "ver1.0.u23", 0x00001, 0x80000, CRC(ffbc6284) SHA1(05a735f3193218d32ad253c5abe21e1d00d1a5ca) )
 
@@ -4165,7 +4185,7 @@ ROM_START( pwrinst2 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "g02.u3a", 0x00000, 0x20000, CRC(ebea5e1e) SHA1(4d3af9e5f29d0c1b26563f51250039c9e8bd3735) )
 
-	ROM_REGION( 0xe00000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0xe00000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -4210,7 +4230,7 @@ ROM_START( pwrinst2j )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "g02j.u3a", 0x00000, 0x20000, CRC(eead01f1) SHA1(0ced6755e471e0303fe397b3d54a5c799762ebd8) )
 
-	ROM_REGION( 0xe00000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0xe00000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -4309,7 +4329,7 @@ ROM_START( plegends )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "d19.u3", 0x00000, 0x40000, CRC(47598459) SHA1(4e9dcfebfbd160230768965e8c6e5ed446c1aa7b) ) /* Same as sound.u3 below, but twice the size? */
 
-	ROM_REGION( 0x1000000 * 2, "sprites0", 0 )       /* Sprites: * 2 */
+	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -4356,7 +4376,7 @@ ROM_START( plegendsj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "sound.u3", 0x00000, 0x20000, CRC(36f71520) SHA1(11d0a059ddba3e1aa4c54ccdde7b3f5c7bde482f) )
 
-	ROM_REGION( 0x1000000 * 2, "sprites0", 0 )       /* Sprites: * 2 */
+	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -4447,7 +4467,7 @@ BPSM.U77    23C16000    GFX
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
+	ROM_REGION( 0x400000, "sprites0", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
 	\
@@ -4530,7 +4550,7 @@ ROM_END
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
+	ROM_REGION( 0x400000, "sprites0", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
 	\
@@ -4613,7 +4633,7 @@ ROM_END
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
+	ROM_REGION( 0x400000, "sprites0", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
 	\
@@ -4711,7 +4731,7 @@ ROM_START( tekkencw )
 	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mpr0.u41", 0x00000, 0x80000, CRC(5b8919f3) SHA1(580298b6dc36527ab69889c848acab97726a6cc6) ) // 27c240
 
-	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x100000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "obj0.u52", 0x00000, 0x80000, CRC(6d3c0c76) SHA1(92f9c9beae222a2c2a3242f812030e08036c9963) ) // 27c040
 	ROM_LOAD16_BYTE( "obj1.u53", 0x00001, 0x80000, CRC(8069b731) SHA1(9f0409c28466503092b74f635602962d9f127de8) ) // ""
 
@@ -4751,7 +4771,7 @@ ROM_START( tekkenbs )
 	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "tbs1_mpr-0a.u41", 0x00000, 0x80000, CRC(625487d3) SHA1(6bdc0f0f9877eeb1041f8f5b0d44e41b83ddcc76) ) // 27c4002
 
-	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x100000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "tbs1_obj-0a.u52", 0x00000, 0x80000, CRC(a870481b) SHA1(644370e10b197832ee828b22e43f114d40740432) ) // 27c4001
 	ROM_LOAD16_BYTE( "tbs1_obj-1a.u53", 0x00001, 0x80000, CRC(73d8f520) SHA1(70ab5abeeaf0b3f5a263a7ece21d000a27148994) ) // ""
 
@@ -4791,7 +4811,7 @@ ROM_START( tjumpman )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "tj1_mpr-0c.u41", 0x00000, 0x80000, CRC(de3030b8) SHA1(5f2165ea039c34cab605ebddc0b61eadc47b1532) )
 
-	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x100000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "tj1_obj-0a.u52", 0x00000, 0x80000, CRC(b42cf8e8) SHA1(9ed7fb3574ed163a81f34a0d8cfa7a4661439932) )
 	ROM_LOAD16_BYTE( "tj1_obj-1a.u53", 0x00001, 0x80000, CRC(5f0124d7) SHA1(4d9cfa464159998c176a178c668273d128dedff8) )
 
@@ -4831,7 +4851,7 @@ ROM_START( uopoko )
 	ROM_LOAD16_BYTE( "u26.int", 0x000000, 0x080000, CRC(b445c9ac) SHA1(4dda1c6e19de629ea4d9061560c32a9f0deabd53) )
 	ROM_LOAD16_BYTE( "u25.int", 0x000001, 0x080000, CRC(a1258482) SHA1(7f4adc4a6d069032aaf3d93eb60fde16b59483f8) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* mask ROM */
 
 	ROM_REGION( 0x400000, "layer0", 0 ) /* Layer 0 */
@@ -4849,7 +4869,7 @@ ROM_START( uopokoj )
 	ROM_LOAD16_BYTE( "u26.bin", 0x000000, 0x080000, CRC(e7eec050) SHA1(cf3a77741029f96dbbec5ca7217a1723e4233cff) )
 	ROM_LOAD16_BYTE( "u25.bin", 0x000001, 0x080000, CRC(68cb6211) SHA1(a6db0bc2e3e54b6992a44b7d52395917e66db49b) )
 
-	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* mask ROM */
 
 	ROM_REGION( 0x400000, "layer0", 0 ) /* Layer 0 */
@@ -4949,7 +4969,7 @@ void cave_state::init_ddonpach()
 {
 	init_cave();
 
-	ddp_unpack_sprites(0);
+	unpack_sprites(0);
 	m_spritetype[0] = TYPE_NOZOOM;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 
@@ -4962,7 +4982,7 @@ void cave_state::init_donpachi()
 {
 	init_cave();
 
-	ddp_unpack_sprites(0);
+	unpack_sprites(0);
 	m_spritetype[0] = TYPE_NOZOOM;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 }
@@ -4971,7 +4991,7 @@ void cave_state::init_esprade()
 {
 	init_cave();
 
-	esprade_unpack_sprites(0);
+	unpack_sprites(0);
 	m_time_vblank_irq = 2000;   /**/
 
 #if 0       //ROM PATCH
@@ -4996,7 +5016,7 @@ void cave_state::init_guwange()
 {
 	init_cave();
 
-	esprade_unpack_sprites(0);
+	unpack_sprites(0);
 	m_time_vblank_irq = 2000;   /**/
 }
 
@@ -5013,8 +5033,8 @@ void cave_state::init_hotdogst()
 
 void cave_state::init_mazinger()
 {
-	u8 *src = memregion("sprites0")->base();
-	int len = memregion("sprites0")->bytes();
+	u8 *src = m_spriteregion[0]->base();
+	const u32 len = m_spriteregion[0]->bytes();
 
 	init_cave();
 
@@ -5025,7 +5045,7 @@ void cave_state::init_mazinger()
 	std::vector<u8> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
-			buffer[i ^ 0xdf88] = src[bitswap<24>(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
+			buffer[i ^ 0xdf88] = src[(i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
@@ -5063,8 +5083,8 @@ void cave_state::init_ppsatan()
 
 void cave_state::init_pwrinst2j()
 {
-	u8 *src = memregion("sprites0")->base();
-	int len = memregion("sprites0")->bytes();
+	u8 *src = m_spriteregion[0]->base();
+	const u32 len = m_spriteregion[0]->bytes();
 
 	init_cave();
 
@@ -5072,12 +5092,12 @@ void cave_state::init_pwrinst2j()
 
 	std::vector<u8> buffer(len);
 	{
-		for(int i = 0; i < len/2; i++)
+		for (u32 i = 0; i < len; i++)
 		{
-			int j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
+			u32 j = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
 			if(((j & 6) == 0) || ((j & 6) == 6))
 				j ^= 6;
-			buffer[j ^ 7] = (src[i] >> 4) | (src[i] << 4);
+			buffer[j ^ 7] = src[i];
 		}
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
@@ -5106,8 +5126,8 @@ void cave_state::init_pwrinst2()
 
 void cave_state::init_sailormn()
 {
-	u8 *src = memregion("sprites0")->base();
-	int len = memregion("sprites0")->bytes();
+	u8 *src = m_spriteregion[0]->base();
+	const u32 len = m_spriteregion[0]->bytes();
 
 	init_cave();
 
@@ -5119,7 +5139,7 @@ void cave_state::init_sailormn()
 	std::vector<u8> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
-			buffer[i ^ 0x950c4] = src[bitswap<24>(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
+			buffer[i ^ 0x950c4] = src[(i & ~0xffffff) | bitswap<24>(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 

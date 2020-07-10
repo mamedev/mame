@@ -170,10 +170,7 @@ TODO:
       - Get the BwB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
-      - Find out what causes the games to hang/reset in service mode
-        Probably down to AVDC interrupt timing, there seem to be a number of race conditions re: masks
-        that need sorting out with proper blank handling, etc. I'm using a scanline timer to drive an
-        approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
+      - EF9369 colour palette is still wrong in test modes.
  ***********************************************************************************************************/
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -228,15 +225,20 @@ public:
 		m_ptm(*this, "6840ptm_68k"),
 		m_trackx_port(*this, "TRACKX"),
 		m_tracky_port(*this, "TRACKY"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_4krow(0),
+		m_4ktable(nullptr)
 	{
 	}
 
 	void mpu4_vid(machine_config &config);
+	void mpu4_vid_strike(machine_config &config);
+
 	void bwbvid(machine_config &config);
 	void crmaze(machine_config &config);
 	void bwbvid5(machine_config &config);
 	void mating(machine_config &config);
+	void vid_oki(machine_config &config);
 
 	void init_crmazea();
 	void init_v4barqst2();
@@ -253,7 +255,7 @@ public:
 	void init_strikeit();
 	void init_v4wize();
 	void init_turnover();
-	void init_adders();
+	//void init_adders();
 	void init_mating();
 	void init_crmaze3a();
 	void init_skiltrek();
@@ -303,12 +305,21 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t vram_r(offs_t offset);
+	void ic3ss_vid_w(offs_t offset, uint8_t data);
 
 	void bwbvid5_68k_map(address_map &map);
 	void bwbvid_68k_map(address_map &map);
+	void mpu4_68k_map_base(address_map &map);
 	void mpu4_68k_map(address_map &map);
+	void mpu4_68k_map_strike(address_map &map);
 	void mpu4_vram(address_map &map);
 	void mpu4oki_68k_map(address_map &map);
+
+	void vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data);
+	uint8_t vidcharacteriser_4k_lookup_r(offs_t offset);
+	uint8_t m_4krow;
+	uint8_t *m_4ktable;
+
 };
 
 /*************************************
@@ -708,18 +719,18 @@ static INPUT_PORTS_START( mating )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill/Meter Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Yellow")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Red")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Red")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Left Yellow")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Yellow")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Red")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Right Yellow")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Right Red")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("100p Service?")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
@@ -1155,7 +1166,7 @@ void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
-	m_mod_number=4; //No AY chip
+	m_mod_number=2;
 	/* setup communications */
 	m_link7a_connected = 1;
 }
@@ -1180,21 +1191,33 @@ void mpu4vid_state::machine_reset()
 	m_chr_value     = 0;
 }
 
-void mpu4vid_state::mpu4_68k_map(address_map &map)
+void mpu4vid_state::mpu4_68k_map_base(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 //  map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+}
+
+void mpu4vid_state::mpu4_68k_map(address_map& map)
+{
+	mpu4_68k_map_base(map);
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 }
+
+void mpu4vid_state::mpu4_68k_map_strike(address_map& map)
+{
+	mpu4_68k_map_base(map);
+	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_r), FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_w)).umask16(0x00ff);
+}
+
 
 void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 {
@@ -1203,14 +1226,14 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 //  map(0x640000, 0x7fffff).noprw(); /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xffa040, 0xffa04f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0x00ff);  // 6840PTM on sampled sound board
-	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
 	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 //  map(0xfff000, 0xffffff).noprw(); /* Possible bug, reads and writes here */
@@ -1222,8 +1245,8 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00000, 0xa0000f).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)); //Some games use this
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
@@ -1239,8 +1262,8 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff); //BT RAMDAC?
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
@@ -1249,7 +1272,7 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
-	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
 }
 
@@ -1272,11 +1295,64 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 }
 
 
+//Sampled sound timer
+/*
+Unlike the standard setup, in MPU4 Video, the E clock is used for computation, so the chip frequency
+freq = (1000000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
+where [] means rounded up integer,
+t3L is the LSB of Clock 3,
+t3H is the MSB of Clock 3,
+and t1 is the initial value in clock 1.
+*/
+
+//O3 -> G1  O1 -> c2 o2 -> c1
+
+/* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
+calculate the oscillation frequency in advance. We're running the timer for interrupt
+purposes, but the frequency calculation is done by plucking the values out as they are written.*/
+void mpu4vid_state::ic3ss_vid_w(offs_t offset, uint8_t data)
+{
+	m_ptm_ic3ss->write(offset,data);
+
+	if (offset == 3)
+	{
+		m_t1 = data;
+	}
+	if (offset == 6)
+	{
+		m_t3h = data;
+	}
+	if (offset == 7)
+	{
+		m_t3l = data;
+	}
+
+	// E clock = VIDEO_MASTER_CLOCK / 10
+	
+	float num = (1000000/((m_t3l + 1)*(m_t3h + 1)));
+	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
+
+	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
+	int freq=num*denom2;
+
+	if (freq)
+	{
+		m_msm6376->set_unscaled_clock(freq);
+	}
+}
+
 
 void mpu4vid_state::mpu4_vid(machine_config &config)
 {
 	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_6809_map);
+
+
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
@@ -1300,7 +1376,6 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
 	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
 
-//  config.set_maximum_quantum(attotime::from_hz(960));
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 
@@ -1331,6 +1406,12 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
 }
 
+void mpu4vid_state::mpu4_vid_strike(machine_config& config)
+{
+	mpu4_vid(config);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
+}
+
 void mpu4vid_state::crmaze(machine_config &config)
 {
 	mpu4_vid(config);
@@ -1339,14 +1420,33 @@ void mpu4vid_state::crmaze(machine_config &config)
 	m_pia5->writepb_handler().set_nop();
 }
 
+void mpu4vid_state::vid_oki(machine_config &config)
+{
+	//On MPU4 Video, the sound board is clocked via the 68k E clock,
+	//and all samples are adjusted to fit the different clock speed.
+	PTM6840(config, m_ptm_ic3ss, VIDEO_MASTER_CLOCK / 10);
+	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
+	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
+	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
+	//m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
+	//m_ptm_ic3ss->irq_callback().set(FUNC(mpu4_state::cpu1_ptm_irq));
+
+	pia6821_device &pia_ic4ss(PIA6821(config, "pia_ic4ss", 0));
+	pia_ic4ss.readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
+	pia_ic4ss.writepa_handler().set(FUNC(mpu4vid_state::pia_gb_porta_w));
+	pia_ic4ss.writepb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_w));
+	pia_ic4ss.ca2_handler().set(FUNC(mpu4vid_state::pia_gb_ca2_w));
+	pia_ic4ss.cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
+}
+
 void mpu4vid_state::mating(machine_config &config)
 {
 	crmaze(config);
+	vid_oki(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4oki_68k_map);
 
-	mpu4_common2(config);
 
-	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //?
+	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //Adjusted by IC3 on sound board
 	msm6376.add_route(0, "lspeaker", 0.5);
 	msm6376.add_route(1, "rspeaker", 0.5);
 }
@@ -1439,7 +1539,44 @@ uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 }
 
 
+void mpu4vid_state::vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data)
+{
+	logerror("%04x write to characterizer %02x - %02x\n", m_videocpu->pcbase(), offset, data);
 
+	if (data == 0x00) // reset?
+	{
+		m_4krow = 0;
+		m_prot_col = 0;
+	}
+	else
+	{
+		m_prot_col = data & 0x3f; // 6-bit writes (upper 2 bits unused)
+	}
+}
+
+uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
+{
+	uint8_t ret = m_4ktable[m_4krow * 64 + m_prot_col];
+	m_4krow = ret;
+
+	// hack for v4strike, otherwise it reports questions as invalid, even if they decode properly
+	// is this a secondary security check, or are they mismatched for the version?
+	// it writes '03' to the characterizer, (the question revision or coincidence?)
+	// but expects 00 back for that check
+
+	if (m_videocpu->pcbase() == 0x32c4)
+	{
+		if (m_videocpu->state_int(M68K_A4) == 0xaab54)
+			ret = 0x00;
+	}
+
+	logerror("%04x read from characterizer %02x - %02x\n", m_videocpu->pcbase(), offset, ret);
+
+	return ret << 2; // 6-bit reads (lower 2 bits unused)
+}
+
+
+/*
 static mpu4_chr_table adders_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x84}, {0x18, 0x84}, {0x0F, 0xC4}, {0x13, 0x84}, {0x1B, 0x84},
 	{0x03, 0x9C}, {0x07, 0xF4}, {0x17, 0x04}, {0x1D, 0xCC}, {0x36, 0x24}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0x94},
@@ -1450,6 +1587,7 @@ static mpu4_chr_table adders_data[64] = {
 	{0x03, 0x9C}, {0x17, 0xF4}, {0x10, 0x04}, {0x1D, 0xCC}, {0x0E, 0x24}, {0x07, 0x9C}, {0x12, 0xF4}, {0x09, 0x04},
 	{0x0D, 0x94}, {0x1F, 0x14}, {0x16, 0x44}, {0x05, 0x8C}, {0x13, 0x34}, {0x1C, 0x04}, {0x02, 0x9C}, {0x00, 0x00}
 };
+*/
 
 static mpu4_chr_table crmaze_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x34}, {0x04, 0x14}, {0x10, 0x0C}, {0x18, 0x54}, {0x0F, 0x04}, {0x13, 0x24}, {0x1B, 0x34},
@@ -1539,6 +1677,7 @@ static mpu4_chr_table timemchn_data[64] = {
 	{0x0D, 0xC4}, {0x1F, 0x0C}, {0x16, 0xC4}, {0x05, 0x2C}, {0x13, 0xC4}, {0x1C, 0x0C}, {0x02, 0xD4}, {0x00, 0x00}
 };
 
+/*
 static mpu4_chr_table strikeit_data[64] = {
 	{0x00, 0x00}, {0x1A, 0xC4}, {0x04, 0xC4}, {0x10, 0x44}, {0x18, 0xC4}, {0x0F, 0x44}, {0x13, 0x44}, {0x1B, 0xC4},
 	{0x03, 0xCC}, {0x07, 0x3C}, {0x17, 0x5C}, {0x1D, 0x7C}, {0x36, 0x54}, {0x35, 0x24}, {0x2B, 0xC4}, {0x28, 0x4C},
@@ -1549,6 +1688,7 @@ static mpu4_chr_table strikeit_data[64] = {
 	{0x03, 0xCC}, {0x17, 0x1C}, {0x10, 0x7C}, {0x1D, 0x7C}, {0x0E, 0xD4}, {0x07, 0x8C}, {0x12, 0x1C}, {0x09, 0x5C},
 	{0x0D, 0x5C}, {0x1F, 0x5C}, {0x16, 0x7C}, {0x05, 0x74}, {0x13, 0x04}, {0x1C, 0xC4}, {0x02, 0xCC}, {0x00, 0x00}
 };
+*/
 
 static mpu4_chr_table turnover_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x1C}, {0x04, 0x6C}, {0x10, 0xA4}, {0x18, 0x0C}, {0x0F, 0x24}, {0x13, 0x0C}, {0x1B, 0x34},
@@ -1584,15 +1724,15 @@ static mpu4_chr_table quidgrid_data[64] = {
 };
 
 static mpu4_chr_table blank_data[72] = {
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
 };
 
 
@@ -1609,11 +1749,13 @@ static mpu4_chr_table prizeinv_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
+/*
 void mpu4vid_state::init_adders()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = adders_data;
 }
+*/
 
 void mpu4vid_state::init_crmaze()
 {
@@ -1674,7 +1816,9 @@ void mpu4vid_state::init_timemchn()
 void mpu4vid_state::init_strikeit()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = strikeit_data;
+	m_current_chr_table = nullptr;
+	m_4ktable = memregion( "video_prot" )->base();
+	m_4krow = 0;
 }
 
 void mpu4vid_state::init_turnover()
@@ -1702,7 +1846,7 @@ void mpu4vid_state::init_prizeinv()
 }
 
 static const bwb_chr_table cybcas_data1[5] = {
-//Magic number 724A
+//Magic num4ber 724A
 
 // PAL Codes
 // 0   1   2  3  4  5  6  7  8
@@ -2312,14 +2456,14 @@ ROM_START( v4turnov )
 	ROM_LOAD16_BYTE( "to.p6",   0x040001, 0x010000,  CRC(54c6afb7) SHA1(b724b87b6f4e47d220310b38c97be2fa73dcd617) )
 	ROM_LOAD16_BYTE( "to.p7",   0x060000, 0x010000,  CRC(acf19542) SHA1(ad46ffb3c2c078a8e3712eff27aa61f0d1a7c059) )
 	ROM_LOAD16_BYTE( "to.p8",   0x060001, 0x010000,  CRC(a5ca385d) SHA1(8df26a33ea7f5b577761c6f9d2fa4eaed74661f8) )
-	ROM_LOAD16_BYTE( "to.p9",   0x080000, 0x010000,  CRC(6e85fde3) SHA1(14868d58829e13987e66f52e1899c4385987a87b) )
-	ROM_LOAD16_BYTE( "to.p10",  0x080001, 0x010000,  CRC(fadd11a2) SHA1(2b2fbb0769ef6035688d495464f3ea3bc8c7c660) )
-	ROM_LOAD16_BYTE( "to.p11",  0x0a0000, 0x010000,  CRC(2d72a61a) SHA1(ce455ab6fea452f96a3ad365178e0e5a0b437867) )
-	ROM_LOAD16_BYTE( "to.p12",  0x0a0001, 0x010000,  CRC(a14eedb6) SHA1(219b887a334ff28a88ed2e50f0caff4b510cd549) )
-	ROM_LOAD16_BYTE( "to.p13",  0x0c0000, 0x010000,  CRC(3f66ef6b) SHA1(60be6d3f8da1f3084db15ac1bb2470e55c0271de) )
-	ROM_LOAD16_BYTE( "to.p14",  0x0c0001, 0x010000,  CRC(127ba65d) SHA1(e34dcd19efd31dc712daac940277bb17694ea61a) )
-	ROM_LOAD16_BYTE( "to.p15",  0x0e0000, 0x010000,  CRC(ad787e31) SHA1(314ba312adfc71e4b3b2d52355ec692c192b74eb) )
-	ROM_LOAD16_BYTE( "to.p16",  0x0e0001, 0x010000,  CRC(e635c942) SHA1(08f8b5fdb738647bc0b49938da05533be42a2d60) )
+	ROM_LOAD16_BYTE( "to.p9",   0x080000, 0x010000,  CRC(6e85fde3) SHA1(14868d58829e13987e66f52e1899c4385987a87b) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "to.p10",  0x080001, 0x010000,  CRC(fadd11a2) SHA1(2b2fbb0769ef6035688d495464f3ea3bc8c7c660) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "to.p11",  0x0a0000, 0x010000,  CRC(2d72a61a) SHA1(ce455ab6fea452f96a3ad365178e0e5a0b437867) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "to.p12",  0x0a0001, 0x010000,  CRC(a14eedb6) SHA1(219b887a334ff28a88ed2e50f0caff4b510cd549) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "to.p13",  0x0c0000, 0x010000,  CRC(3f66ef6b) SHA1(60be6d3f8da1f3084db15ac1bb2470e55c0271de) ) // ISSUE1 Q5 
+	ROM_LOAD16_BYTE( "to.p14",  0x0c0001, 0x010000,  CRC(127ba65d) SHA1(e34dcd19efd31dc712daac940277bb17694ea61a) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "to.p15",  0x0e0000, 0x010000,  CRC(ad787e31) SHA1(314ba312adfc71e4b3b2d52355ec692c192b74eb) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "to.p16",  0x0e0001, 0x010000,  CRC(e635c942) SHA1(08f8b5fdb738647bc0b49938da05533be42a2d60) ) // ISSUE1 Q8
 
 	ROM_REGION( 0x800000, "altvideo", 0 )
 	// seems to be an unmatched 2.2 revision rom
@@ -2342,16 +2486,16 @@ ROM_START( v4skltrk )
 	ROM_LOAD16_BYTE( "st.p2",  0x000001, 0x010000,  CRC(b62575c2) SHA1(06d75e8a364750663d329650720021279e195236) )
 	ROM_LOAD16_BYTE( "st.p3",  0x020000, 0x010000,  CRC(9506da76) SHA1(6ef28ab8ec1af455be8ecfab20243f0823dca7c1) )
 	ROM_LOAD16_BYTE( "st.p4",  0x020001, 0x010000,  CRC(6ab447bc) SHA1(d01c209dbf4d19a6a7f878fa54ff1cb51e7dcba5) )
-	ROM_LOAD16_BYTE( "st.q1",  0x040000, 0x010000,  CRC(4faca475) SHA1(69b498c543600b8e37ab0ed1863ba57845648f3c) )
-	ROM_LOAD16_BYTE( "st.q2",  0x040001, 0x010000,  CRC(9f2c5938) SHA1(85527c4c0b7a1e66576d56607d89750fab082580) )
-	ROM_LOAD16_BYTE( "st.q3",  0x060000, 0x010000,  CRC(6b6cb194) SHA1(aeac5dcc0827c17e758e3e821ae8a78a3a16ddce) )
-	ROM_LOAD16_BYTE( "st.q4",  0x060001, 0x010000,  CRC(ec57bc17) SHA1(d9f522739dbb190fb941ca654299bbedbb8fb703) )
-	ROM_LOAD16_BYTE( "st.q5",  0x080000, 0x010000,  CRC(7740a88b) SHA1(d9a683d3e0d6c1b4b59520f90f825124b7a61168) )
-	ROM_LOAD16_BYTE( "st.q6",  0x080001, 0x010000,  CRC(95e97796) SHA1(f1a8de0ad02aca31f79a4fe8ba5044546163e3c4) )
-	ROM_LOAD16_BYTE( "st.q7",  0x0a0000, 0x010000,  CRC(f3b8fe7f) SHA1(52d5be3f8cab419103f4727d0fb9d30f34c8f651) )
-	ROM_LOAD16_BYTE( "st.q8",  0x0a0001, 0x010000,  CRC(b85e75a2) SHA1(b7b03b090c0ec6d92e9a25abb7fec0507356bdfc) )
-	ROM_LOAD16_BYTE( "st.q9",  0x0c0000, 0x010000,  CRC(835f6001) SHA1(2cd9084c102d74bcb578c8ea22bbc9ea58f0ceab) )
-	ROM_LOAD16_BYTE( "st.qa",  0x0c0001, 0x010000,  CRC(3fc62a0e) SHA1(0628de4b962d3fcca3757cd4e89b3005c9bfd218) )
+	ROM_LOAD16_BYTE( "st.q1",  0x040000, 0x010000,  CRC(4faca475) SHA1(69b498c543600b8e37ab0ed1863ba57845648f3c) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "st.q2",  0x040001, 0x010000,  CRC(9f2c5938) SHA1(85527c4c0b7a1e66576d56607d89750fab082580) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "st.q3",  0x060000, 0x010000,  CRC(6b6cb194) SHA1(aeac5dcc0827c17e758e3e821ae8a78a3a16ddce) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "st.q4",  0x060001, 0x010000,  CRC(ec57bc17) SHA1(d9f522739dbb190fb941ca654299bbedbb8fb703) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "st.q5",  0x080000, 0x010000,  CRC(7740a88b) SHA1(d9a683d3e0d6c1b4b59520f90f825124b7a61168) ) // ISSUE1 Q5
+	ROM_LOAD16_BYTE( "st.q6",  0x080001, 0x010000,  CRC(95e97796) SHA1(f1a8de0ad02aca31f79a4fe8ba5044546163e3c4) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "st.q7",  0x0a0000, 0x010000,  CRC(f3b8fe7f) SHA1(52d5be3f8cab419103f4727d0fb9d30f34c8f651) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "st.q8",  0x0a0001, 0x010000,  CRC(b85e75a2) SHA1(b7b03b090c0ec6d92e9a25abb7fec0507356bdfc) ) // ISSUE1 Q8
+	ROM_LOAD16_BYTE( "st.q9",  0x0c0000, 0x010000,  CRC(835f6001) SHA1(2cd9084c102d74bcb578c8ea22bbc9ea58f0ceab) ) // ISSUE1 Q9
+	ROM_LOAD16_BYTE( "st.qa",  0x0c0001, 0x010000,  CRC(3fc62a0e) SHA1(0628de4b962d3fcca3757cd4e89b3005c9bfd218) ) // ISSUE1 Q10
 ROM_END
 
 ROM_START( v4skltrka )
@@ -2401,31 +2545,31 @@ ROM_START( v4time )
 	ROM_LOAD16_BYTE( "tm20.p2",  0x000001, 0x010000,  CRC(d13b56e4) SHA1(623e73995da93c07b51ce0a5843dba1f853529dd) )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
-	ROM_LOAD16_BYTE( "q12.p5" ,  0x040000, 0x010000,  CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) )
-	ROM_LOAD16_BYTE( "q11.p6" ,  0x040001, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) )
-	ROM_LOAD16_BYTE( "q14.p7" ,  0x060000, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) )
-	ROM_LOAD16_BYTE( "q13.p8" ,  0x060001, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) )
-	ROM_LOAD16_BYTE( "q16.p9" ,  0x080000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) )
-	ROM_LOAD16_BYTE( "q15.p10",  0x080001, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) )
-	ROM_LOAD16_BYTE( "q18.p11",  0x0a0000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) )
-	ROM_LOAD16_BYTE( "q17.p12",  0x0a0001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) )
-	ROM_LOAD16_BYTE( "q20.p13",  0x0c0000, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) )
-	ROM_LOAD16_BYTE( "q19.p14",  0x0c0001, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) )
+	ROM_LOAD16_BYTE( "q12.p5" ,  0x040000, 0x010000,  CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12
+	ROM_LOAD16_BYTE( "q11.p6" ,  0x040001, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
+	ROM_LOAD16_BYTE( "q14.p7" ,  0x060000, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) ) // ISSUE2 Q14
+	ROM_LOAD16_BYTE( "q13.p8" ,  0x060001, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
+	ROM_LOAD16_BYTE( "q16.p9" ,  0x080000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
+	ROM_LOAD16_BYTE( "q15.p10",  0x080001, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) ) // ISSUE2 Q15
+	ROM_LOAD16_BYTE( "q18.p11",  0x0a0000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
+	ROM_LOAD16_BYTE( "q17.p12",  0x0a0001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
+	ROM_LOAD16_BYTE( "q20.p13",  0x0c0000, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
+	ROM_LOAD16_BYTE( "q19.p14",  0x0c0001, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
 
 	ROM_REGION( 0x800000, "altvideo", 0 )
 	ROM_LOAD( "tmd.p1", 0x0000, 0x010000, CRC(e21045e0) SHA1(c4d0e80970ec8558db777a882edc5a0c80767375) )
 
 	ROM_REGION( 0x800000, "altquestion", 0 )
-	ROM_LOAD( "tm.q1", 0x0000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) )
-	ROM_LOAD( "tm.q2", 0x0000, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) )
-	ROM_LOAD( "tm.q3", 0x0000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) )
-	ROM_LOAD( "tm.q4", 0x0000, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) )
-	ROM_LOAD( "tm.q5", 0x0000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) )
-	ROM_LOAD( "tm.q6", 0x0000, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) )
-	ROM_LOAD( "tm.q7", 0x0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) )
-	ROM_LOAD( "tm.q8", 0x0000, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) )
-	ROM_LOAD( "tm.q9", 0x0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) )
-	ROM_LOAD( "tm.qa", 0x0000, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) )
+	ROM_LOAD( "tm.q1", 0x0000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
+	ROM_LOAD( "tm.q2", 0x0000, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
+	ROM_LOAD( "tm.q3", 0x0000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
+	ROM_LOAD( "tm.q4", 0x0000, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
+	ROM_LOAD( "tm.q5", 0x0000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
+	ROM_LOAD( "tm.q6", 0x0000, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
+	ROM_LOAD( "tm.q7", 0x0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
+	ROM_LOAD( "tm.q8", 0x0000, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
+	ROM_LOAD( "tm.q9", 0x0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
+	ROM_LOAD( "tm.qa", 0x0000, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
 ROM_END
 
 ROM_START( v4mate )
@@ -2496,12 +2640,36 @@ ROM_START( v4addlad )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
 
-	ROM_REGION( 0x800000, "altvideo", 0 )
-	ROM_LOAD16_BYTE( "ald_21.p1", 0x000000, 0x010000, CRC(ecc7c79c) SHA1(e03f470d0b83ed81af737a1d16a02528df733149) )
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
+ROM_END
 
-	ROM_REGION( 0x800000, "altvideo2", 0 ) // not sure what these are, they look like different hw??
-	ROM_LOAD16_BYTE( "a6ppl.p0", 0x00000, 0x020000, CRC(350da2df) SHA1(a390e0c7e1e624c17f0e254e0b99ef9dbf56269d) )
-	ROM_LOAD16_BYTE( "a6ppl.p1", 0x00001, 0x020000, CRC(63038aba) SHA1(8ec4e02109e872460a9598e469b59919cc5450dd) )
+ROM_START( v4addladd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ald_21.p1", 0x000000, 0x010000, CRC(ecc7c79c) SHA1(e03f470d0b83ed81af737a1d16a02528df733149) )
+	ROM_LOAD16_BYTE( "al_21.p2",  0x000001, 0x010000, CRC(d5909619) SHA1(eb8d978ed28cd3afab6b3c1274d79bc6b188d240) )
+	ROM_LOAD16_BYTE( "al_21.p3",  0x020000, 0x010000, CRC(5dc65d9f) SHA1(52dffb162a0e5649e056817e9db567cc7653538c) )
+	ROM_LOAD16_BYTE( "al_21.p4",  0x020001, 0x010000, CRC(17c77264) SHA1(321372c1c0d25cfc5a1302ccfd5680d9bf62d31b) )
+	ROM_LOAD16_BYTE( "al.q1",  0x040000, 0x10000,  CRC(b9b50b70) SHA1(1887ab00ee004e3f27902d6880fa31277a981891) )
+	ROM_LOAD16_BYTE( "al.q2",  0x040001, 0x10000,  CRC(1bed86ac) SHA1(8e6563b5441ad9ddd468a3d9ae906733fed7912a) )
+	ROM_LOAD16_BYTE( "al.q3",  0x060000, 0x10000,  CRC(294d8f28) SHA1(9f9aca491ba6c4dc5cfb91da867990a9610c3a28) )
+	ROM_LOAD16_BYTE( "al.q4",  0x060001, 0x10000,  CRC(aa3e9fbd) SHA1(59d0868f4c8b3f56ca31a11d2e6af83b202bb735) )
+	ROM_LOAD16_BYTE( "al.q5",  0x080000, 0x10000,  CRC(503f4193) SHA1(86df379c736598ba59446961bf0666e155164e1d) )
+	ROM_LOAD16_BYTE( "al.q6",  0x080001, 0x10000,  CRC(9fd77e52) SHA1(d8fdebb0fd57ab9ea9797dd386168581a45ebc62) )
+	ROM_LOAD16_BYTE( "al.q7",  0x0a0000, 0x10000,  CRC(cf3fa7c7) SHA1(fa1edf09c6d3a8b5737474117b0306ef64f7741c) )
+	ROM_LOAD16_BYTE( "al.q8",  0x0a0001, 0x10000,  CRC(55058a63) SHA1(cf9edef5264f4301be4ee11f221ab67a5183a603) )
+	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
+	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
+
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
 ROM_END
 
 ROM_START( v4addlad20 )
@@ -2524,15 +2692,21 @@ ROM_START( v4addlad20 )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
 
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
 ROM_END
 
 
-
+// for video CPU
+// bp 32c4,a0 == ffd001
+// (a4 == aab54) when doing startup questions check
 ROM_START( v4strike )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
-	ROM_REGION( 0x800000, "video", 0 )
+	ROM_REGION( 0x800000, "video", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "sils.p1", 0x000000, 0x020000,  CRC(66ed6696) SHA1(a6aa68eb212254213db5573dfb9da1e9e06a8e39) )
 	ROM_LOAD16_BYTE( "sil.p2",  0x000001, 0x020000,  CRC(1afc07b7) SHA1(38777d56192b640b003d8dbf4b793cee0c81d9b2) )
 	ROM_LOAD16_BYTE( "sil.p3",  0x040000, 0x020000,  CRC(40f5851c) SHA1(0e3dc0dd2a257a955a1f250556d047481ae87269) )
@@ -2540,7 +2714,18 @@ ROM_START( v4strike )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	ROM_LOAD( "strikeitlucky_questions",  0x0c0000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
+	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-4.bin",  0x100001, 0x020000,  CRC(6e84bd19) SHA1(318649fdd3cfec6f7ab0fa6d183a3b94f25a58f5) ) // ISSUE3 Q4 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
+	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
+
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4striked )
@@ -2555,7 +2740,18 @@ ROM_START( v4striked )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	ROM_LOAD( "strikeitlucky_questions",  0x0c0000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
+	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-4.bin",  0x100001, 0x020000,  CRC(6e84bd19) SHA1(318649fdd3cfec6f7ab0fa6d183a3b94f25a58f5) ) // ISSUE3 Q4 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
+	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
+
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4strike2 )
@@ -2570,7 +2766,18 @@ ROM_START( v4strike2 )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	ROM_LOAD( "strikeitlucky_questions",  0x0c0000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
+	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-4.bin",  0x100001, 0x020000,  CRC(6e84bd19) SHA1(318649fdd3cfec6f7ab0fa6d183a3b94f25a58f5) ) // ISSUE3 Q4 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
+	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
+
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4strike2d )
@@ -2585,7 +2792,18 @@ ROM_START( v4strike2d )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	ROM_LOAD( "strikeitlucky_questions",  0x0c0000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
+	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-4.bin",  0x100001, 0x020000,  CRC(6e84bd19) SHA1(318649fdd3cfec6f7ab0fa6d183a3b94f25a58f5) ) // ISSUE3 Q4 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
+	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
+	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
+
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4eyedwn )
@@ -2672,10 +2890,47 @@ ROM_START( v4barqst )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "bqd.p1", 0x000000, 0x010000, CRC(b574ea46) SHA1(0eb446fbf4f7fcd1b30f35631b4b521730ce26b4) )
-	ROM_LOAD16_BYTE( "bq.p2", 0x000001, 0x010000, CRC(b9ce9f2e) SHA1(9407a83d1713b641dc551dd73f357d99baebbba2) )
+	ROM_LOAD16_BYTE( "bq-6.p1", 0x000000, 0x010000, CRC(f5f81993) SHA1(5975da2b944a8e9cb4bb285d87d64740d9ec045b) )
+	ROM_LOAD16_BYTE( "bq-6.p2", 0x000001, 0x010000, CRC(b9ce9f2e) SHA1(9407a83d1713b641dc551dd73f357d99baebbba2) )
+	ROM_LOAD16_BYTE( "bq-iss4.p1", 0x020000, 0x010000, CRC(f8c9e00b) SHA1(b0081756667068eaaf02f34a161b52024e163018) )
+	ROM_LOAD16_BYTE( "bq-iss4.p2", 0x020001, 0x010000, CRC(211d7779) SHA1(c1d835dd4758f28b7bd4e81ea5d3316704fe8ff3) )
+	ROM_LOAD16_BYTE( "bq-iss4.p3", 0x040000, 0x010000, CRC(b6066dec) SHA1(63f66f004f6c66dc1bd61385407e1adb4a678ccd) )
+	ROM_LOAD16_BYTE( "bq-iss4.p4", 0x040001, 0x010000, CRC(71a2a3cf) SHA1(41d95d34b801f54bf4f1044d7bb88704c9a318a0) )
+	ROM_LOAD16_BYTE( "bq-iss4.p5", 0x060000, 0x010000, CRC(13cfb410) SHA1(fca72e403a8c150aba73fd501a1a7cfd62bd28ac) )
+	ROM_LOAD16_BYTE( "bq-iss4.p6", 0x060001, 0x010000, CRC(f8847e9d) SHA1(49213302f63efc6e2b6728fed98c0094d023c100) )
+	ROM_LOAD16_BYTE( "bq-iss4.p7", 0x080000, 0x010000, CRC(1f3b3d33) SHA1(117f7121123336e3b33a3d1838ddca9161a7868b) )
+	ROM_LOAD16_BYTE( "bq-iss4.p8", 0x080001, 0x010000, CRC(54007030) SHA1(65306938b2737f7423223eb0290ee69b2955176e) )
+	ROM_LOAD16_BYTE( "bq-iss4.p9", 0x0a0000, 0x010000, CRC(2971f5ca) SHA1(0de9b1d743243d6e127f5417485f1a9fa76d5399) )
+	ROM_LOAD16_BYTE( "bq-iss4.p10", 0x0a0001, 0x010000, CRC(d54f961f) SHA1(14273cf78371550dd525843b388915df567342ce) )
 
-	ROM_LOAD( "barquest_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "barquest.chr", 0x0000, 0x1000, CRC(bc9971fe) SHA1(902684318ad0755ee062a7f10e2c3171b5c4933f) )
+ROM_END
+
+ROM_START( v4barqstd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "bqd.p1", 0x000000, 0x010000, CRC(b574ea46) SHA1(0eb446fbf4f7fcd1b30f35631b4b521730ce26b4) )
+	ROM_LOAD16_BYTE( "bq.p2",  0x000001, 0x010000, CRC(b9ce9f2e) SHA1(9407a83d1713b641dc551dd73f357d99baebbba2) )
+	ROM_LOAD16_BYTE( "bq-iss4.p1", 0x020000, 0x010000, CRC(f8c9e00b) SHA1(b0081756667068eaaf02f34a161b52024e163018) )
+	ROM_LOAD16_BYTE( "bq-iss4.p2", 0x020001, 0x010000, CRC(211d7779) SHA1(c1d835dd4758f28b7bd4e81ea5d3316704fe8ff3) )
+	ROM_LOAD16_BYTE( "bq-iss4.p3", 0x040000, 0x010000, CRC(b6066dec) SHA1(63f66f004f6c66dc1bd61385407e1adb4a678ccd) )
+	ROM_LOAD16_BYTE( "bq-iss4.p4", 0x040001, 0x010000, CRC(71a2a3cf) SHA1(41d95d34b801f54bf4f1044d7bb88704c9a318a0) )
+	ROM_LOAD16_BYTE( "bq-iss4.p5", 0x060000, 0x010000, CRC(13cfb410) SHA1(fca72e403a8c150aba73fd501a1a7cfd62bd28ac) )
+	ROM_LOAD16_BYTE( "bq-iss4.p6", 0x060001, 0x010000, CRC(f8847e9d) SHA1(49213302f63efc6e2b6728fed98c0094d023c100) )
+	ROM_LOAD16_BYTE( "bq-iss4.p7", 0x080000, 0x010000, CRC(1f3b3d33) SHA1(117f7121123336e3b33a3d1838ddca9161a7868b) )
+	ROM_LOAD16_BYTE( "bq-iss4.p8", 0x080001, 0x010000, CRC(54007030) SHA1(65306938b2737f7423223eb0290ee69b2955176e) )
+	ROM_LOAD16_BYTE( "bq-iss4.p9", 0x0a0000, 0x010000, CRC(2971f5ca) SHA1(0de9b1d743243d6e127f5417485f1a9fa76d5399) )
+	ROM_LOAD16_BYTE( "bq-iss4.p10", 0x0a0001, 0x010000, CRC(d54f961f) SHA1(14273cf78371550dd525843b388915df567342ce) )
+
+	ROM_REGION( 0x1000, "video_prot", 0 )
+	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
+	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
+	ROM_LOAD( "barquest.chr", 0x0000, 0x1000, CRC(bc9971fe) SHA1(902684318ad0755ee062a7f10e2c3171b5c4933f) )
 ROM_END
 
 ROM_START( v4barqs2 )
@@ -3618,7 +3873,10 @@ ROM_END
 /* Complete sets */
 /* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger (not emulated) to record more information about the game operation, for security etc.
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
-The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
+The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994, despite
+the copyright dates recorded. 
+TODO: Sort these better given the wide variation in dates/versions/core code (SWP version id, for one thing).
+*/
 
 GAME(  199?, v4bios,     0,        mod2,       mpu4,     mpu4_state,    empty_init,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
@@ -3626,44 +3884,56 @@ GAME(  199?, v4bios,     0,        mod2,       mpu4,     mpu4_state,    empty_in
 
 GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
-GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
 GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
 
+GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
+
 GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
 GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
 GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
 GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
+GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
+
 GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
 
-GAME(  199?, v4turnov,   v4bios,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
-
-GAME(  1990, v4skltrk,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
-GAME(  1990, v4skltrka,  v4skltrk, mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
-GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
-
-GAME(  1989, v4addlad,   v4bios,   mpu4_vid,   adders,   mpu4vid_state, init_adders,    ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4addlad20, v4addlad, mpu4_vid,   adders,   mpu4vid_state, init_adders,    ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
-
-GAME(  1989, v4time,     v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
 
 //Year is a guess, based on the use of the 'Coin Man' logo
 GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
 GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS )//SWP 0.2D
 
-/* Games below are missing question ROMs */
+/* Quiz games - Questions decoded */
 
-GAME(  199?, v4strike,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4striked,  v4strike, mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4strike2,  v4strike, mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4strike2d, v4strike, mpu4_vid,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4strike,   v4bios,   mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4striked,  v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike2,  v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike2d, v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4barqst,   v4bios,   mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS )
+
+/* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
+
+GAME(  199?, v4turnov,   v4bios,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  1990, v4skltrk,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
+GAME(  1990, v4skltrka,  v4skltrk, mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
+
+GAME(  1989, v4time,     v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (MPU4 Video)",GAME_FLAGS )
+
+/* Quiz games - Games below are missing question ROMs */
+
+GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid,   mpu4,     mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
@@ -3673,8 +3943,7 @@ GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid,   mpu4,     mpu4vid_state, init_qui
 GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid,   mpu4,     mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid,   mpu4,     mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4barqst,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4barqs2,   v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4barqs2,   v4bios,   mpu4_vid,          mpu4,     mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4wize,     v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4wizea,    v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
@@ -3682,58 +3951,76 @@ GAME(  199?, v4wizea,    v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4w
 GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
 GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
-
-
-
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 
 GAME(  199?, v4vgpok,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4psi,      0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psia,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psib,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psi14d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psi20d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psi214,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
-// bad dump
-GAME(  199?, v4blox,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psia,     v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psib,     v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi14d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi20d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi214,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4blox,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS ) // bad dump
 GAME(  199?, v4bloxd,    v4blox,   bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
+
 GAME(  1996, v4reno,     0,        bwbvid5,    mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4bigfrt,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4bubbnk,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4mazbel,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4mazbla,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbla,   v4mazbel, bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4rhmaz,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4shpwnd,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4redhtp,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4tetrs1,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 1.0? (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4big40,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
-GAME(  199?, v4cshinf,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltak,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrsh,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
-GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 1.0? (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4pztet,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
 GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
-GAME(  199?, v4rhmaz,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sunbst,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sixx,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
-GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
+GAME(  199?, v4big40,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4cshinf,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4dbltak,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4gldrsh,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4mdice,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
+
+GAME(  199?, v4monte,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4ovrmn3,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4sunbst,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4timebn,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4sixx,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
+
+GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+
+GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
 /* Uncertain BIOS */
 GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Bwb","Fruit Factory (Bwb) (MPU4 Video)", GAME_FLAGS )
 
-
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
 GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,    ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )
