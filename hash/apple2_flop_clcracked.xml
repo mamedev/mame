@@ -37036,4 +37036,108 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="agalxsc">
+		<description>Apple Galaxian (StarCraft) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>StarCraft</publisher>
+		<info name="release" value="2020-06-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple galaxian (starcraft) (4am crack).dsk" size="143360" crc="f2015816" sha1="d7f2e879638238bf909eceb194a7f4a1c66c7754"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcjourn">
+		<description>Space Journey (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2020-06-28"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space journey (4am crack).dsk" size="143360" crc="963043ba" sha1="9d2b4f9caeef9b02df9f1bda17a42763c642e98a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xpmapsgl">
+		<description>Exploring Maps and Globes (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2020-06-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="exploring maps and globes (4am crack).dsk" size="143360" crc="b0dfae9b" sha1="29c79f3a45528e71db21639f2eed24af65a3f62b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="st1gpr2">
+		<description>Snooper Troops 1: The Case of the Granite Point Ghost (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2020-06-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="snooper troops and the case of the granite point ghost rev. 2 (4am crack).dsk" size="143360" crc="0d66db3e" sha1="0b922e12625060e7f272192241ab44cc4800195f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwawit">
+		<description>Newbery Winners: A Wrinkle in Time (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- a wrinkle in time (4am crack).dsk" size="143360" crc="d4637c5a" sha1="b12f12ea6de8898a8f7552527ba882b21c1e40ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwbtt">
+		<description>Newbery Winners: Bridge to Terabithia (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- bridge to terabithia (4am crack).dsk" size="143360" crc="f86a002a" sha1="5340a51606f2a963f413b032ac8ee198382e97c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwsndr">
+		<description>Newbery Winners: Sounder (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- sounder (4am crack).dsk" size="143360" crc="cb639f8e" sha1="64b3f80208f36df0cf24e2cc51f4419b3c2e26e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwtwg">
+		<description>Newbery Winners: The Westing Game (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- the westing game (4am crack).dsk" size="143360" crc="7479173c" sha1="88143a8b920f809a40854bff1f3207298cdaad4c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

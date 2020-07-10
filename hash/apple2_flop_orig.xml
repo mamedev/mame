@@ -14226,4 +14226,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mtarm410">
+		<description>Those Amazing Reading Machines IV (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-07-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="those amazing reading machines iv.woz" size="234810" crc="592ee96d" sha1="0c08795604e54300e1119b00d92b0311d24342d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspwm10">
+		<description>Speedway Math (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-07-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234765">
+				<rom name="speedway math.woz" size="234765" crc="a97daabb" sha1="8aeda33f513380483f9aa731468822b5327f3c55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mqflsh10">
+		<description>Quickflash! (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-07-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241419">
+				<rom name="quickflash.woz" size="241419" crc="24590b00" sha1="6e563223fc4ecc13ecad4de95e84e6bd36128e2b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
