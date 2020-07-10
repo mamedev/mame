@@ -182,7 +182,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_DIPSETTING( 0x10, "1 coin/1 credit - 2 coins/3 credits" )
 	PORT_DIPSETTING( 0x00, " 1 coin/1 credit" )
 
-	PORT_START("DSW1")  /* DSW C  (per game settings) */
+	PORT_START("DSW1")  // DSW C  (per game settings)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off )  )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -200,7 +200,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_sonic )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -221,7 +221,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gaxe2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Hard ) )
@@ -245,7 +245,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_col3 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( English ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Japanese ) )
@@ -268,7 +268,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_twc )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x01, 0x01, "Time" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x00, "Short" )
@@ -286,7 +286,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_sor2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -302,7 +302,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_bio )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "5" )
 	PORT_DIPSETTING( 0x01, "4" )
@@ -318,7 +318,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gslam )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x07, 0x04, DEF_STR ( Game_Time ) ) PORT_DIPLOCATION("SW3:1,2,3")
 	PORT_DIPSETTING( 0x00, "5:00" )
 	PORT_DIPSETTING( 0x01, "4:30" )
@@ -336,7 +336,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_mazin )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x02, "Initial Player" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "2" )
 	PORT_DIPSETTING( 0x01, "1" )
@@ -353,7 +353,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_soni2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -369,7 +369,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_shnb3 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -385,7 +385,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gunhe )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -398,7 +398,7 @@ static INPUT_PORTS_START ( mp_gunhe )
 	PORT_DIPSETTING( 0x0c, DEF_STR ( Normal ) )
 INPUT_PORTS_END
 
-/*MEGAPLAY specific*/
+// MEGAPLAY specific
 
 READ_LINE_MEMBER(mplay_state::start1_r)
 {
@@ -508,8 +508,8 @@ void mplay_state::bank_w(offs_t offset, uint8_t data)
 }
 
 
-/* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
-/* other io data/ctrl regs are dealt with exactly like in the console              */
+/* Megaplay BIOS handles regs[2] at start in a different way compared to MegaDrive
+   other I/O data/ctrl regs are dealt with exactly like in the console */
 
 uint8_t mplay_state::bios_6402_r()
 {
@@ -668,12 +668,12 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 
 void mplay_state::megaplay(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	md_ntsc(config);
 
-	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
+	/* The Megaplay has an extra BIOS CPU which drives an SMS VDP
 	   which includes an SN76496 for sound */
-	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
+	Z80(config, m_bioscpu, MASTER_CLOCK / 15); // ??
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mplay_state::megaplay_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mplay_state::megaplay_bios_io_map);
 
@@ -697,14 +697,14 @@ void mplay_state::megaplay(machine_config &config)
 
 	m_vdp->set_lcm_scaling(true);
 
-	/* New update functions to handle the extra layer */
+	// New update functions to handle the extra layer
 	subdevice<screen_device>("megadriv")->set_raw((XTAL(10'738'635) * 5)/2,
 			sega315_5124_device::WIDTH * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH) * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256) * 5,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
-	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
+	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); // ??
 	m_vdp1->set_screen("megadriv");
 	m_vdp1->set_hcounter_divide(5);
 	m_vdp1->set_is_pal(false);
@@ -721,9 +721,9 @@ void mplay_state::megaplay(machine_config &config)
 	ROM_LOAD( "315-5661.ic7",   0x000, 0x117, BAD_DUMP CRC(d8289e31) SHA1(a0e9134d9e8043a3660a2ce122cfd5d7f76773b9) ) /* GAL16V8, bruteforced but verified */ \
 	ROM_LOAD( "315-5653.ic56",  0x117, 0x117, BAD_DUMP CRC(fd5c4fb3) SHA1(6b2ba657836f3031d77602526416200e31d41a6e) ) /* GAL16V8, bruteforced but verified */ \
 	ROM_LOAD( "315-5651.ic8",   0x22e, 0x117, BAD_DUMP CRC(55c6cddb) SHA1(e1a968305ca7ea17e9021b31506ca087b84a8ab1) ) /* GAL16V8, bruteforced but verified */ \
-	ROM_LOAD( "315-5349a.ic54", 0x345, 0x104, NO_DUMP ) /* PAL16L8BCN */ \
+	ROM_LOAD( "315-5349a.ic54", 0x345, 0x104, BAD_DUMP CRC(825ea316) SHA1(f49edb6a3f9349330f7ff525ef60517ed276a663) ) /* PAL16L8BCN, bruteforced but verified */ \
 	ROM_LOAD( "315-5654.ic33",  0x449, 0x104, NO_DUMP ) /* PAL16L8BCN */ \
-	ROM_LOAD( "315-5655.ic34",  0x54d, 0x104, NO_DUMP ) /* PAL16L8BCN */
+	ROM_LOAD( "315-5655.ic34",  0x54d, 0x104, BAD_DUMP CRC(4a2d27d1) SHA1(ba79183e4b522d1b57a46a56fc7d9b85de24df36) ) /* PAL16L8BCN, bruteforced but verified */
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
@@ -767,7 +767,7 @@ ROM_START( mp_sonic ) // Sonic
 	MEGAPLAY_PLDS
 ROM_END
 
-/* this cart looks to be a conversion from something else.. sega rom numbers were missing
+/* this cart looks to be a conversion from something else... Sega rom numbers were missing
    but the code looks like it's probably real */
 // PCB  171-5834
 ROM_START( mp_col3 ) // Columns 3
