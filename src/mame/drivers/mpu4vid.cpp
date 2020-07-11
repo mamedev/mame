@@ -1185,6 +1185,120 @@ static INPUT_PORTS_START( adders )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( strike )
+	PORT_START("ORANGE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_STAND) PORT_NAME("Freeze")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_BET) PORT_NAME("Go On!")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("ORANGE2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Play")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Green (Left)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Yellow (Left)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Red (Left)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_START("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Help")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Green (Right)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Yellow (Right)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Red (Right)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT) PORT_NAME("Collect")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
+
+	PORT_START("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "1 Pound for change" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "Attract mode inhibit" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin alarm inhibit" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Single coin entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("AUX2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
+INPUT_PORTS_END
+
 WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 {
 	m_ptm->reset();
@@ -3984,10 +4098,10 @@ GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, 
 GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS,layout_v4addlad )
 GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,    ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS,layout_v4addlad )
 
-GAME(  199?, v4strike,   v4bios,   mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4striked,  v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4strike2,  v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4strike2d, v4strike, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike,   v4bios,   mpu4_vid_strike,   strike,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4striked,  v4strike, mpu4_vid_strike,   strike,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike2,  v4strike, mpu4_vid_strike,   strike,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4barqst,   v4bios,   mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   mpu4,     mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS )
@@ -4096,11 +4210,11 @@ GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwb
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
 
-GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS ) // runs if door open
+GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Miami Dice (Nova, German) (MPU4 Video)",GAME_FLAGS ) // runs if door open
 
-GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,    ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS ) // wrong base rom? or some other issue?
+GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // wrong base rom? or some other issue?
 
-GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )  // wrong base rom? or some other issue?
+GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Piccadilly Nights (Nova, German) (MPU4 Video)",GAME_FLAGS )  // wrong base rom? or some other issue?
 
