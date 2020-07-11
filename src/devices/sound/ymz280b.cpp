@@ -25,7 +25,7 @@
     hardware currently emulated that uses external handlers.
     It also happens to be the only one using 16-bit PCM.
 
-    Some other drivers (eg. bishi.c, bfm_sc4/5.c) also use ROM readback.
+    Some other drivers (eg. bishi.cpp, bfm_sc4/5.cpp) also use ROM readback.
 
 */
 
@@ -40,11 +40,11 @@
 
 #define MAX_SAMPLE_CHUNK    10000
 
-#define FRAC_BITS           14
-#define FRAC_ONE            (1 << FRAC_BITS)
-#define FRAC_MASK           (FRAC_ONE - 1)
+static constexpr unsigned FRAC_BITS = 9;
+static constexpr unsigned FRAC_ONE  = (1 << FRAC_BITS);
+static constexpr unsigned FRAC_MASK = (FRAC_ONE - 1);
 
-#define INTERNAL_BUFFER_SIZE    (1 << 15)
+//#define INTERNAL_BUFFER_SIZE    (1 << 15)
 #define INTERNAL_SAMPLE_RATE    (m_master_clock * 2.0)
 
 
@@ -84,14 +84,14 @@ void ymz280b_device::update_irq_state()
 
 void ymz280b_device::update_step(struct YMZ280BVoice *voice)
 {
-	double frequency;
+	int frequency;
 
 	/* compute the frequency */
 	if (voice->mode == 1)
-		frequency = m_master_clock * (double)((voice->fnum & 0x0ff) + 1) * (1.0 / 256.0);
+		frequency = voice->fnum & 0x0ff;
 	else
-		frequency = m_master_clock * (double)((voice->fnum & 0x1ff) + 1) * (1.0 / 256.0);
-	voice->output_step = (uint32_t)(frequency * (double)FRAC_ONE / INTERNAL_SAMPLE_RATE);
+		frequency = voice->fnum & 0x1ff;
+	voice->output_step = frequency + 1; // ((fnum + 1) * (input clock / 384)) / 256
 }
 
 
@@ -165,7 +165,7 @@ static void compute_tables()
 
 ***********************************************************************************************/
 
-int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, int16_t *buffer, int samples)
+int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, s16 *buffer, int samples)
 {
 	int position = voice->position;
 	int signal = voice->signal;
@@ -277,7 +277,7 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, int16_t *buffer, 
 
 ***********************************************************************************************/
 
-int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, int samples)
+int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, s16 *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -292,7 +292,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, i
 			val = read_byte(position / 2);
 
 			/* output to the buffer, scaling by the volume */
-			*buffer++ = (int8_t)val * 256;
+			*buffer++ = (s8)val * 256;
 			samples--;
 
 			/* next! */
@@ -315,7 +315,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, i
 			val = read_byte(position / 2);
 
 			/* output to the buffer, scaling by the volume */
-			*buffer++ = (int8_t)val * 256;
+			*buffer++ = (s8)val * 256;
 			samples--;
 
 			/* next! */
@@ -347,7 +347,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, i
 
 ***********************************************************************************************/
 
-int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, int16_t *buffer, int samples)
+int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, s16 *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -359,7 +359,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, int16_t *buffer, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (int16_t)((read_byte(position / 2 + 1) << 8) + read_byte(position / 2 + 0));
+			val = (s16)((read_byte(position / 2 + 1) << 8) + read_byte(position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -382,7 +382,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, int16_t *buffer, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (int16_t)((read_byte(position / 2 + 1) << 8) + read_byte(position / 2 + 0));
+			val = (s16)((read_byte(position / 2 + 1) << 8) + read_byte(position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -430,13 +430,13 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	for (v = 0; v < 8; v++)
 	{
 		struct YMZ280BVoice *voice = &m_voice[v];
-		int16_t prev = voice->last_sample;
-		int16_t curr = voice->curr_sample;
-		int16_t *curr_data = m_scratch.get();
-		int32_t *ldest = lacc;
-		int32_t *rdest = racc;
-		uint32_t new_samples, samples_left;
-		uint32_t final_pos;
+		s16 prev = voice->last_sample;
+		s16 curr = voice->curr_sample;
+		s16 *curr_data = m_scratch.get();
+		s32 *ldest = lacc;
+		s32 *rdest = racc;
+		u32 new_samples, samples_left;
+		u32 final_pos;
 		int remaining = samples;
 		int lvol = voice->output_left;
 		int rvol = voice->output_right;
@@ -446,7 +446,6 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		{
 			/* make sure next sound plays immediately */
 			voice->output_pos = FRAC_ONE;
-
 			continue;
 		}
 
@@ -454,7 +453,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* interpolate */
 		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
-			int interp_sample = (((int32_t)prev * (FRAC_ONE - voice->output_pos)) + ((int32_t)curr * voice->output_pos)) >> FRAC_BITS;
+			int interp_sample = (((s32)prev * (FRAC_ONE - voice->output_pos)) + ((s32)curr * voice->output_pos)) >> FRAC_BITS;
 			*ldest++ += interp_sample * lvol;
 			*rdest++ += interp_sample * rvol;
 			voice->output_pos += voice->output_step;
@@ -518,7 +517,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* interpolate */
 			while (remaining > 0 && voice->output_pos < FRAC_ONE)
 			{
-				int interp_sample = (((int32_t)prev * (FRAC_ONE - voice->output_pos)) + ((int32_t)curr * voice->output_pos)) >> FRAC_BITS;
+				int interp_sample = (((s32)prev * (FRAC_ONE - voice->output_pos)) + ((s32)curr * voice->output_pos)) >> FRAC_BITS;
 				*ldest++ += interp_sample * lvol;
 				*rdest++ += interp_sample * rvol;
 				voice->output_pos += voice->output_step;
@@ -571,7 +570,7 @@ void ymz280b_device::device_start()
 
 	/* allocate memory */
 	assert(MAX_SAMPLE_CHUNK < 0x10000);
-	m_scratch = std::make_unique<int16_t[]>(MAX_SAMPLE_CHUNK);
+	m_scratch = std::make_unique<s16[]>(MAX_SAMPLE_CHUNK);
 
 	/* state save */
 	save_item(NAME(m_current_register));
@@ -585,33 +584,31 @@ void ymz280b_device::device_start()
 	save_item(NAME(m_ext_readlatch));
 	save_item(NAME(m_ext_mem_address_hi));
 	save_item(NAME(m_ext_mem_address_mid));
-	for (int j = 0; j < 8; j++)
-	{
-		save_item(NAME(m_voice[j].playing), j);
-		save_item(NAME(m_voice[j].ended), j);
-		save_item(NAME(m_voice[j].keyon), j);
-		save_item(NAME(m_voice[j].looping), j);
-		save_item(NAME(m_voice[j].mode), j);
-		save_item(NAME(m_voice[j].fnum), j);
-		save_item(NAME(m_voice[j].level), j);
-		save_item(NAME(m_voice[j].pan), j);
-		save_item(NAME(m_voice[j].start), j);
-		save_item(NAME(m_voice[j].stop), j);
-		save_item(NAME(m_voice[j].loop_start), j);
-		save_item(NAME(m_voice[j].loop_end), j);
-		save_item(NAME(m_voice[j].position), j);
-		save_item(NAME(m_voice[j].signal), j);
-		save_item(NAME(m_voice[j].step), j);
-		save_item(NAME(m_voice[j].loop_signal), j);
-		save_item(NAME(m_voice[j].loop_step), j);
-		save_item(NAME(m_voice[j].loop_count), j);
-		save_item(NAME(m_voice[j].output_left), j);
-		save_item(NAME(m_voice[j].output_right), j);
-		save_item(NAME(m_voice[j].output_pos), j);
-		save_item(NAME(m_voice[j].last_sample), j);
-		save_item(NAME(m_voice[j].curr_sample), j);
-		save_item(NAME(m_voice[j].irq_schedule), j);
-	}
+
+	save_item(STRUCT_MEMBER(m_voice, playing));
+	save_item(STRUCT_MEMBER(m_voice, ended));
+	save_item(STRUCT_MEMBER(m_voice, keyon));
+	save_item(STRUCT_MEMBER(m_voice, looping));
+	save_item(STRUCT_MEMBER(m_voice, mode));
+	save_item(STRUCT_MEMBER(m_voice, fnum));
+	save_item(STRUCT_MEMBER(m_voice, level));
+	save_item(STRUCT_MEMBER(m_voice, pan));
+	save_item(STRUCT_MEMBER(m_voice, start));
+	save_item(STRUCT_MEMBER(m_voice, stop));
+	save_item(STRUCT_MEMBER(m_voice, loop_start));
+	save_item(STRUCT_MEMBER(m_voice, loop_end));
+	save_item(STRUCT_MEMBER(m_voice, position));
+	save_item(STRUCT_MEMBER(m_voice, signal));
+	save_item(STRUCT_MEMBER(m_voice, step));
+	save_item(STRUCT_MEMBER(m_voice, loop_signal));
+	save_item(STRUCT_MEMBER(m_voice, loop_step));
+	save_item(STRUCT_MEMBER(m_voice, loop_count));
+	save_item(STRUCT_MEMBER(m_voice, output_left));
+	save_item(STRUCT_MEMBER(m_voice, output_right));
+	save_item(STRUCT_MEMBER(m_voice, output_pos));
+	save_item(STRUCT_MEMBER(m_voice, last_sample));
+	save_item(STRUCT_MEMBER(m_voice, curr_sample));
+	save_item(STRUCT_MEMBER(m_voice, irq_schedule));
 
 #if YMZ280B_MAKE_WAVS
 	m_wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);
@@ -868,17 +865,19 @@ void ymz280b_device::write_to_register(int data)
 
 int ymz280b_device::compute_status()
 {
-	uint8_t result;
+	u8 result;
 
 	/* force an update */
 	m_stream->update();
 
 	result = m_status_register;
 
-	/* clear the IRQ state */
-	m_status_register = 0;
-	update_irq_state();
-
+	if (!machine().side_effects_disabled())
+	{
+		/* clear the IRQ state */
+		m_status_register = 0;
+		update_irq_state();
+	}
 	return result;
 }
 
@@ -898,9 +897,10 @@ u8 ymz280b_device::read(offs_t offset)
 			return 0xff;
 
 		/* read from external memory */
-		uint8_t ret = m_ext_readlatch;
+		u8 ret = m_ext_readlatch;
 		m_ext_readlatch = read_byte(m_ext_mem_address);
-		m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
+		if (!machine().side_effects_disabled())
+			m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
 		return ret;
 	}
 	else
@@ -924,7 +924,7 @@ void ymz280b_device::write(offs_t offset, u8 data)
 
 DEFINE_DEVICE_TYPE(YMZ280B, ymz280b_device, "ymz280b", "Yamaha YMZ280B PCMD8")
 
-ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, YMZ280B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
