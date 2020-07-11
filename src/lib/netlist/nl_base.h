@@ -160,7 +160,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 /// Please see \ref NETLIB_IS_TIMESTEP for an example.
 
 #define NETLIB_TIMESTEPI()                                                     \
-	public: virtual void timestep(nl_fptype step)  noexcept override
+	public: virtual void timestep(timestep_type ts_type, nl_fptype step)  noexcept override
 
 /// \brief Used to implement the body of the time stepping code.
 ///
@@ -171,7 +171,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 /// \param cname Name of object as given to \ref NETLIB_OBJECT
 ///
 #define NETLIB_TIMESTEP(cname)                                                 \
-	void NETLIB_NAME(cname) :: timestep(nl_fptype step) noexcept
+	void NETLIB_NAME(cname) :: timestep(timestep_type ts_type, nl_fptype step) noexcept
 
 #define NETLIB_DELEGATE(name) nldelegate(&this_type :: name, this)
 
@@ -200,10 +200,16 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 namespace netlist
 {
 
+	enum class timestep_type
+	{
+		FORWARD,  ///< forward time
+		RESTORE   ///< restore state before last forward
+	};
+
 	/// \brief Delegate type for device notification.
 	///
 	using nldelegate = plib::pmfp<void>;
-	using nldelegate_ts = plib::pmfp<void, nl_fptype>;
+	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
 	using nldelegate_dyn = plib::pmfp<void>;
 
 	//============================================================
@@ -1399,7 +1405,7 @@ namespace netlist
 		log_type & log();
 
 	public:
-		virtual void timestep(const nl_fptype st) noexcept { plib::unused_var(st); }
+		virtual void timestep(timestep_type ts_type, nl_fptype st) noexcept { plib::unused_var(ts_type, st); }
 		virtual void update_terminals() noexcept { }
 
 		virtual void update_param() noexcept {}

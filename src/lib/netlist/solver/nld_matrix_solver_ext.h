@@ -164,7 +164,21 @@ namespace solver
 			return false;
 		}
 
-		netlist_time compute_next_timestep(fptype cur_ts, fptype max_ts) override
+		void backup() override
+		{
+			const std::size_t iN = size();
+			for (std::size_t i = 0; i < iN; i++)
+				m_last_V[i] = static_cast<float_type>(this->m_terms[i].getV());
+		}
+
+		void restore() override
+		{
+			const std::size_t iN = size();
+			for (std::size_t i = 0; i < iN; i++)
+				this->m_terms[i].setV(static_cast<nl_fptype>(m_last_V[i]));
+		}
+
+		netlist_time compute_next_timestep(fptype cur_ts, fptype min_ts, fptype max_ts) override
 		{
 			fptype new_solver_timestep(max_ts);
 
@@ -176,7 +190,7 @@ namespace solver
 				const fptype DD_n = std::max(-fp_constants<fptype>::TIMESTEP_MAXDIFF(),
 					std::min(+fp_constants<fptype>::TIMESTEP_MAXDIFF(),(v - m_last_V[k])));
 
-				m_last_V[k] = v;
+				//m_last_V[k] = v;
 				const fptype hn = cur_ts;
 
 				fptype DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
@@ -187,11 +201,11 @@ namespace solver
 				if (plib::abs(DD2) > fp_constants<fptype>::TIMESTEP_MINDIV()) // avoid div-by-zero
 					new_net_timestep = plib::sqrt(m_params.m_dynamic_lte / plib::abs(nlconst::half()*DD2));
 				else
-					new_net_timestep = m_params.m_max_timestep;
+					new_net_timestep = max_ts;
 
 				new_solver_timestep = std::min(new_net_timestep, new_solver_timestep);
 			}
-			new_solver_timestep = std::max(new_solver_timestep, m_params.m_min_timestep);
+			new_solver_timestep = std::max(new_solver_timestep, min_ts);
 
 			// FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
 			return std::max(netlist_time::from_fp(new_solver_timestep), netlist_time::quantum() * 2);
