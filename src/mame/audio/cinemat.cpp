@@ -272,55 +272,8 @@ tailg_audio_device::tailg_audio_device(const machine_config &mconfig, const char
 DEFINE_DEVICE_TYPE(WARRIOR_AUDIO, warrior_audio_device, "warrior_audio", "Warrior Sound Board")
 
 warrior_audio_device::warrior_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, WARRIOR_AUDIO, tag, owner, clock, 0x1f)
+	: cinemat_audio_device(mconfig, WARRIOR_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(warrior), 50000.0)
 {
-}
-
-void warrior_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	static const char *const sample_names[] =
-	{
-		"*warrior",
-		"bgmhum1",
-		"bgmhum2",
-		"killed",
-		"fall",
-		"appear",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
-
-void warrior_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-	// normal level - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 0))
-		m_samples->start(0, 0, true);
-	if (rising_edge(curvals, oldvals, 0))
-		m_samples->stop(0);
-
-	// hi level - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(1, 1, true);
-	if (rising_edge(curvals, oldvals, 1))
-
-	// explosion - falling edge
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->start(2, 2);
-
-	// fall - falling edge
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(3, 3);
-
-	// appear - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(4, 4);
 }
 
 

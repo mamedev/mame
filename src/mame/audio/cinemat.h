@@ -127,11 +127,6 @@ class warrior_audio_device : public cinemat_audio_device
 {
 public:
 	warrior_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
 };
 
 
