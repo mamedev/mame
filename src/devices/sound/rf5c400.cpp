@@ -159,31 +159,39 @@ void rf5c400_device::device_start()
 	save_item(NAME(m_ext_mem_address));
 	save_item(NAME(m_ext_mem_data));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_channels); i++)
-	{
-		save_item(NAME(m_channels[i].startH), i);
-		save_item(NAME(m_channels[i].startL), i);
-		save_item(NAME(m_channels[i].freq), i);
-		save_item(NAME(m_channels[i].endL), i);
-		save_item(NAME(m_channels[i].endHloopH), i);
-		save_item(NAME(m_channels[i].loopL), i);
-		save_item(NAME(m_channels[i].pan), i);
-		save_item(NAME(m_channels[i].effect), i);
-		save_item(NAME(m_channels[i].volume), i);
-		save_item(NAME(m_channels[i].attack), i);
-		save_item(NAME(m_channels[i].decay), i);
-		save_item(NAME(m_channels[i].release), i);
-		save_item(NAME(m_channels[i].cutoff), i);
-		save_item(NAME(m_channels[i].pos), i);
-		save_item(NAME(m_channels[i].step), i);
-		save_item(NAME(m_channels[i].keyon), i);
-		save_item(NAME(m_channels[i].env_phase), i);
-		save_item(NAME(m_channels[i].env_level), i);
-		save_item(NAME(m_channels[i].env_step), i);
-		save_item(NAME(m_channels[i].env_scale), i);
-	}
+	save_item(STRUCT_MEMBER(m_channels, startH));
+	save_item(STRUCT_MEMBER(m_channels, startL));
+	save_item(STRUCT_MEMBER(m_channels, freq));
+	save_item(STRUCT_MEMBER(m_channels, endL));
+	save_item(STRUCT_MEMBER(m_channels, endHloopH));
+	save_item(STRUCT_MEMBER(m_channels, loopL));
+	save_item(STRUCT_MEMBER(m_channels, pan));
+	save_item(STRUCT_MEMBER(m_channels, effect));
+	save_item(STRUCT_MEMBER(m_channels, volume));
+	save_item(STRUCT_MEMBER(m_channels, attack));
+	save_item(STRUCT_MEMBER(m_channels, decay));
+	save_item(STRUCT_MEMBER(m_channels, release));
+	save_item(STRUCT_MEMBER(m_channels, cutoff));
+	save_item(STRUCT_MEMBER(m_channels, pos));
+	save_item(STRUCT_MEMBER(m_channels, step));
+	save_item(STRUCT_MEMBER(m_channels, keyon));
+	save_item(STRUCT_MEMBER(m_channels, env_phase));
+	save_item(STRUCT_MEMBER(m_channels, env_level));
+	save_item(STRUCT_MEMBER(m_channels, env_step));
+	save_item(STRUCT_MEMBER(m_channels, env_scale));
 
 	m_stream = stream_alloc(0, 2, clock() / 384);
+}
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void rf5c400_device::device_clock_changed()
+{
+	m_env_tables.init(clock());
+	m_stream->set_sample_rate(clock() / 384);
 }
 
 //-------------------------------------------------
