@@ -207,7 +207,7 @@ namespace netlist
 		template<typename T>
 		static netlist_sig_t trigfunc(const T &in)
 		{
-			return ((in[0]() | in[1]()) ^ 1) & in[0](); // ((m_A() | (m_B() ^ 1)) ^ 1) & m_CLRQ()
+			return ((in[0]() ^ 1) | (in[1]() ^ 1)) & in[2](); // (~A1 | ~A2) & B
 		}
 		template<typename T> static constexpr netlist_sig_t clear(const T &in) { plib::unused_var(in); return 1;}
 	};
