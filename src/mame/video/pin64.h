@@ -6,8 +6,6 @@
 #define PIN64_H
 
 #include <cstdio>
-#include <vector>
-#include <map>
 
 #define PIN64_ENABLE_CAPTURE (0)
 

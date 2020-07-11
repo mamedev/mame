@@ -3,7 +3,6 @@
 #ifndef MAME_MACHINE_ESQVFD_H
 #define MAME_MACHINE_ESQVFD_H
 
-#include <memory>
 #include <tuple>
 
 

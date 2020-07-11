@@ -5,12 +5,10 @@
  *
  */
 
-#include <vector>
-#include <algorithm>
-
 #include "emu.h"
 #include "video/segaic24.h"
 #include "includes/segas24.h"
+#include <algorithm>
 
 
 namespace {
