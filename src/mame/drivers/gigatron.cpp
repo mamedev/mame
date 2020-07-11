@@ -44,7 +44,7 @@ private:
 	void data_map(address_map &map);
 
 	uint16_t lights_changed;
-	
+
 	//Video Generation stuff
 	uint8_t machineOut;
 	uint8_t row;
@@ -54,7 +54,7 @@ private:
 	void blinkenlights(uint8_t data);
 	void video_draw(u8 data);
 	uint8_t inputs();
-	
+
 	std::unique_ptr<bitmap_ind16> m_bitmap_render;
 	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
 
@@ -72,26 +72,26 @@ void gigatron_state::video_draw(u8 data)
 {
 	uint8_t out = data;
 	uint8_t falling = machineOut & ~out;
-	
+
 	if (falling & VSYNC)
 	{
 		row = 0;
 		pixel = 0;
 	}
-	
+
 	if (falling & HSYNC)
 	{
 		col = 0;
 		row++;
 	}
-	
+
 	machineOut = out;
-	
+
 	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
 	{
 		return;
 	}
-	
+
 	if((row >= 0 && row < 480) && (col >= 0 && col < 640))
 	{
 		//uint16_t *dest;
@@ -169,6 +169,7 @@ void gigatron_state::gigatron(machine_config &config)
 }
 
 ROM_START( gigatron )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "v5a", "Gigatron ROM V5a")
 	ROMX_LOAD( "gigrom5a.rom",  0x0000, 0x20000, CRC(DCC071A6) SHA1(F82059BA0227FF48E4C687B90C8445DA30213EE2),ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v4", "Gigatron ROM V4")
