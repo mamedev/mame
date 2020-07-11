@@ -42,7 +42,6 @@
 
 static constexpr unsigned FRAC_BITS = 9;
 static constexpr unsigned FRAC_ONE  = (1 << FRAC_BITS);
-static constexpr unsigned FRAC_MASK = (FRAC_ONE - 1);
 
 //#define INTERNAL_BUFFER_SIZE    (1 << 15)
 #define INTERNAL_SAMPLE_RATE    (m_master_clock * 2.0)
