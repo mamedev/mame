@@ -5,6 +5,8 @@
     SH6578 NES clone hardware
     enhanced NES, different to VT / OneBus systems
 
+	"UMC 1997.2 A35551S" on CPU die (maxx6in1)
+
     video rendering is changed significantly compared to NES so not using NES PPU device
     has 256x256 pixel pages, attributes are stored next to tile numbers (not in their own table after them) etc.
 
