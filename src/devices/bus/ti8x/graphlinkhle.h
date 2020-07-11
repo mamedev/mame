@@ -22,8 +22,6 @@
 
 #include "diserial.h"
 
-#include <memory>
-
 
 namespace bus { namespace ti8x {
 

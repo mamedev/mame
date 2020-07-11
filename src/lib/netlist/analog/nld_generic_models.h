@@ -84,6 +84,11 @@ namespace analog
 			m_v = v;
 		}
 
+		void restore_state() noexcept
+		{
+			// no state used
+		}
+
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 
 	private:
@@ -145,6 +150,10 @@ namespace analog
 			const nl_fptype h(plib::reciprocal(step));
 			const nl_fptype G(cap * h + m_gmin);
 			return { G, - G * v };
+		}
+		void restore_state() noexcept
+		{
+			// this one has no state
 		}
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:

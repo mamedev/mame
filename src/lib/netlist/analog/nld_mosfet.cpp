@@ -297,16 +297,25 @@ namespace analog
 		{
 			if (m_capmod != 0)
 			{
-				//const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-				//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
-				const nl_fptype Ugd = m_Vgd; // Gate - Drain
-				const nl_fptype Ugs = m_Vgs; // Gate - Source
-				const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
-				const nl_fptype Ugb = Ugs - Ubs;
+				if (ts_type == timestep_type::FORWARD)
+				{
+					//const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+					//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
+					const nl_fptype Ugd = m_Vgd; // Gate - Drain
+					const nl_fptype Ugs = m_Vgs; // Gate - Source
+					const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
+					const nl_fptype Ugb = Ugs - Ubs;
 
-				m_cap_gb.timestep(m_Cgb, Ugb, step);
-				m_cap_gs.timestep(m_Cgs, Ugs, step);
-				m_cap_gd.timestep(m_Cgd, Ugd, step);
+					m_cap_gb.timestep(m_Cgb, Ugb, step);
+					m_cap_gs.timestep(m_Cgs, Ugs, step);
+					m_cap_gd.timestep(m_Cgd, Ugd, step);
+				}
+				else
+				{
+					m_cap_gb.restore_state();
+					m_cap_gs.restore_state();
+					m_cap_gd.restore_state();
+				}
 			}
 		}
 

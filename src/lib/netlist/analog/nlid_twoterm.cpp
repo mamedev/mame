@@ -132,11 +132,17 @@ namespace analog
 
 	NETLIB_TIMESTEP(L)
 	{
-		// Gpar should support convergence
-		m_I += m_G * deltaV();
-		m_G = step / m_L() + m_gmin;
-		set_mat( m_G, -m_G, -m_I,
-				-m_G,  m_G,  m_I);
+		if (ts_type == timestep_type::FORWARD)
+		{
+			m_last_I = m_I;
+			// Gpar should support convergence
+			m_I += m_G * deltaV();
+			m_G = step / m_L() + m_gmin;
+			set_mat( m_G, -m_G, -m_I,
+					-m_G,  m_G,  m_I);
+		}
+		else
+			m_I = m_last_I;
 	}
 
 	// ----------------------------------------------------------------------------------------

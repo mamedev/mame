@@ -318,8 +318,7 @@ void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 
 void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 {
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
+	m_exp->mreq_w(offset, data);
 }
 
 uint8_t spectrum_state::spectrum_rom_r(offs_t offset)

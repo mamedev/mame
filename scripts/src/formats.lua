@@ -823,6 +823,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fl1_dsk.h,FORMATS["FL1_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["FL1_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/fl1_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/fl1_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/flex_dsk.h,FORMATS["FLEX_DSK"] = true
 --------------------------------------------------
 
@@ -1586,6 +1598,18 @@ if (FORMATS["SC3000_BIT"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/sc3000_bit.cpp",
 		MAME_DIR.. "src/lib/formats/sc3000_bit.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/sdd_dsk.h,FORMATS["SDD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SDD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/sdd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/sdd_dsk.h",
 	}
 end
 

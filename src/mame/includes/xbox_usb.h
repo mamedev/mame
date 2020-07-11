@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <forward_list>
-
 struct OHCIEndpointDescriptor {
 	int mps; // MaximumPacketSize
 	int f; // Format

@@ -1241,6 +1241,26 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/exorterm.h,MACHINES["EXORTERM"] = true
+---------------------------------------------------
+
+if (MACHINES["EXORTERM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/exorterm.cpp",
+		MAME_DIR .. "src/devices/machine/exorterm.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/exorterm.cpp", GEN_DIR .. "emu/layout/exorterm155.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "exorterm155"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/f3853.h,MACHINES["F3853"] = true
 ---------------------------------------------------
 
@@ -1513,6 +1533,18 @@ if (MACHINES["ICM7170"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/icm7170.cpp",
 		MAME_DIR .. "src/devices/machine/icm7170.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ibm21s850.h,MACHINES["IBM21S850"] = true
+---------------------------------------------------
+
+if (MACHINES["IBM21S850"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
+		MAME_DIR .. "src/devices/machine/ibm21s850.h",
 	}
 end
 
@@ -3161,6 +3193,18 @@ if (MACHINES["TMS9914"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tms9914.cpp",
 		MAME_DIR .. "src/devices/machine/tms9914.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tsb12lv01a.h,MACHINES["TSB12LV01A"] = true
+---------------------------------------------------
+
+if (MACHINES["TSB12LV01A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tsb12lv01a.cpp",
+		MAME_DIR .. "src/devices/machine/tsb12lv01a.h",
 	}
 end
 

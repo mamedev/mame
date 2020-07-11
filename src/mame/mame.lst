@@ -102,7 +102,8 @@ undoukai                        // A17 (c) 1984 Taito
 
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 System Compumatic
-k7_olym                         //
+k7_olym                         // (c) 1994 K7 Kursaal
+sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios S.L.
 
 @source:4enraya.cpp
 4enraya                         // (c) 1990 IDSA
@@ -2399,6 +2400,7 @@ afire                           // Rene Pierre
 astrof                          // (c) [1980?]
 astrof2                         // (c) [1980?]
 astrof3                         // (c) [1980?]
+astroff                         // bootleg (Famaresa)
 spfghmk2                        // (c) [1979] Data East Corporation
 spfghmk22                       // (c) [1979] Data East Corporation
 sstarbtl                        // bootleg
@@ -13314,6 +13316,9 @@ deathrac                        // (c) 1976 Exidy
 destdrby                        // (c) 1976 Exidy
 rhunting                        // bootleg of deathrac
 
+@source:exorterm.cpp
+exorterm155                     // (c) 1979 Motorola
+
 @source:exp85.cpp
 exp85                           //
 
@@ -14280,6 +14285,8 @@ zerotime                        // hack (Petaco S.A.)
 galaktron                       // bootleg (Petaco S.A.)
 zerotimed                       // hack (Datamat)
 zerotimemc                      // hack (Marti Colls)
+zerotimeu                       // hack
+galaxcirsa                      // bootleg (Cirsa)
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
@@ -31788,6 +31795,7 @@ exsprt48
 itvg48
 wowwg
 110dance
+lxts3
 
 @source:newbrain.cpp
 newbrain                        //
@@ -41369,6 +41377,7 @@ mysticmp                        // (c) 1983 Prototype
 playball                        // (c) 1983
 robotron                        // (c) 1982
 robotronyo                      // (c) 1982
+robotronun                      // (c) 1982
 robotron87                      //
 robotron12                      //
 robotrontd                      //
@@ -41394,11 +41403,12 @@ rugrats                         // (c) 1983
 wiping                          // (c) 1982
 
 @source:witch.cpp
+keirinou                        // (c) 1987 Excellent System
 pbchmp95                        // (c) 1995 Veltmeijer Automaten
 witch                           // (c) 1992 Excellent System
 witchb                          // (c) 1992 Excellent System
 witchs                          // (c) 1992 Sega / Vic Tokai license
-keirinou
+witchstar                       // (c) 1994 Fovis Korea Co. Ltd.
 
 @source:wiz.cpp
 kungfut                         // (c) 1984 Seibu Kaihatsu

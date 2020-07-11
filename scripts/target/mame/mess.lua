@@ -497,6 +497,7 @@ MACHINES["E05A30"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["ER1400"] = true
 MACHINES["ER2055"] = true
+MACHINES["EXORTERM"] = true
 MACHINES["F3853"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
@@ -522,6 +523,7 @@ MACHINES["I8271"] = true
 MACHINES["I8279"] = true
 MACHINES["I8291A"] = true
 MACHINES["I8355"] = true
+--MACHINES["IBM21S850"] = true
 MACHINES["ICM7170"] = true
 MACHINES["IDECTRL"] = true
 MACHINES["IE15"] = true
@@ -672,6 +674,7 @@ MACHINES["TMS9914"] = true
 MACHINES["TPI6525"] = true
 MACHINES["TTL7400"] = true
 MACHINES["TTL7404"] = true
+--MACHINES["TSB12LV01A"] = true
 MACHINES["TTL74123"] = true
 MACHINES["TTL74145"] = true
 MACHINES["TTL74148"] = true
@@ -1005,6 +1008,7 @@ FORMATS["ESQ8_DSK"] = true
 FORMATS["EXCALI64_DSK"] = true
 FORMATS["FC100_CAS"] = true
 FORMATS["FDD_DSK"] = true
+FORMATS["FL1_DSK"] = true
 FORMATS["FLEX_DSK"] = true
 FORMATS["FM7_CAS"] = true
 FORMATS["FMSX_CAS"] = true
@@ -1066,6 +1070,7 @@ FORMATS["QL_DSK"] = true
 FORMATS["RK_CAS"] = true
 FORMATS["RX50_DSK"] = true
 FORMATS["SC3000_BIT"] = true
+FORMATS["SDD_DSK"] = true
 FORMATS["SF7000_DSK"] = true
 FORMATS["SMX_DSK"] = true
 FORMATS["SOL_CAS"] = true
@@ -1185,6 +1190,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"epson",
 		"ericsson",
 		"exidy",
+		"exorterm",
 		"fairch",
 		"fairlight",
 		"fidelity",
@@ -2317,6 +2323,11 @@ files {
 	MAME_DIR .. "src/mame/includes/sorcerer.h",
 	MAME_DIR .. "src/mame/machine/micropolis.cpp",
 	MAME_DIR .. "src/mame/machine/micropolis.h",
+}
+
+createMESSProjects(_target, _subtarget, "exorterm")
+files {
+	MAME_DIR .. "src/mame/drivers/exorterm.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fairch")

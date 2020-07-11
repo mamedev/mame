@@ -67,8 +67,6 @@
 
 #pragma once
 
-#include <forward_list>
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

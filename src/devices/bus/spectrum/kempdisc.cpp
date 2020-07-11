@@ -14,6 +14,8 @@
      COPY - tape to disc transfer utility
      FORMAT "discname": PRINT drive#, tracks#, sides#, steprate - format disc
 
+	Manual https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/hardware-info/k/KempstonDiscInterface_Manual.pdf
+
     Notes/TODO:
      - schematics is missing, actual I/O ports decode might be not right
      - find out port 0xDF 3 MSB bits wiring, probably FDC /DDEN, /MR
