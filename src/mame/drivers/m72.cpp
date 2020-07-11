@@ -454,19 +454,11 @@ void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-void m72_state::imgfight_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
 }
-
-
 
 void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -576,34 +568,15 @@ static const u8 nspirit_code[CODE_LEN] =
 };
 static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
-/* Image Fight */
-static const u8 imgfight_code[CODE_LEN] =
-{
-	0x68,0x00,0xa0,             // push 0a000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x38,0x38,0x50,   // mov [3838h], byte 050h
-	0xc6,0x06,0x3a,0x38,0x49,   // mov [383ah], byte 049h
-	0xc6,0x06,0x3c,0x38,0x43,   // mov [383ch], byte 043h
-	0xc6,0x06,0x3e,0x38,0x4b,   // mov [383eh], byte 04bh
-	0xc6,0x06,0x40,0x38,0x45,   // mov [3840h], byte 045h
-	0xc6,0x06,0x42,0x38,0x54,   // mov [3842h], byte 054h
-	0x68,0x00,0xb0,             // push 0b000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x00,0x09,0x49^0xff,  // mov [0900h], byte 049h
-	0xc6,0x06,0x00,0x0a,0x49^0xff,  // mov [0a00h], byte 049h
-	0xc6,0x06,0x00,0x0b,0x49^0xff,  // mov [0b00h], byte 049h
-	0xc6,0x06,0x20,0x09,0x49^0xff,  // mov [0920h], byte 049h
-	0xc6,0x06,0x21,0x09,0x4d^0xff,  // mov [0921h], byte 04dh
-	0xc6,0x06,0x22,0x09,0x41^0xff,  // mov [0922h], byte 041h
-	0xc6,0x06,0x23,0x09,0x47^0xff,  // mov [0923h], byte 047h
-	0x68,0x00,0xd0,             // push 0d000h
-	0x1f,                       // pop ds
-	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
-};
+/*
+// these are for the world set where we have the mcu anyway...
+static const u8 imgfight_crc[CRC_LEN] =  {  0xf8,0x91,0xc0,0x58, 0x04,0x33,0xb6,0xc5,
+												0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 // these are for the japan set where we have the mcu anyway...
 static const u8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
 												0xbf,0x37,0x92,0x94, 0x00,0x00 };
+*/
 
 /* Dragon Breed */
 static const u8 dbreedm72_code[CODE_LEN] =
@@ -672,12 +645,6 @@ void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::nspirit_sample_trigger_w)));
-}
-
-void m72_state::init_imgfight()
-{
-	install_protection_handler(imgfight_code,imgfightj_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::imgfight_sample_trigger_w)));
 }
 
 void m72_state::init_dbreedm72()
@@ -2079,10 +2046,10 @@ void m72_state::kengo(machine_config &config)
 	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
 }
 
-void m72_state::imgfightj(machine_config &config)
+void m72_state::imgfight(machine_config &config)
 {
 	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_state,imgfightj)
+	MCFG_VIDEO_START_OVERRIDE(m72_state,imgfight)
 }
 
 void m72_state::nspiritj(machine_config &config)
@@ -2712,7 +2679,7 @@ ROM_START( imgfight )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "if_c-pr-a.ic1",  0x00000, 0x01000, NO_DUMP )
+	ROM_LOAD( "if_c-pr-a.ic1",  0x00000, 0x01000, CRC(55f10458) SHA1(d520ec2b075c94d76d97e0105644ff96384b378c) ) /* i8751 MCU labeled  IF C-PR-A */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "if-c-00.ic53", 0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
@@ -4325,8 +4292,8 @@ GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m
 GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
 GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, imgfightj,   imgfight, imgfightj,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightb,   imgfight, imgfightb,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, which isn't hooked up correctly yet. Gives 'RAM NG 7' error
 
 GAME( 1989, loht,        0,        m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
