@@ -46,7 +46,7 @@
      - common Brazilian clones: usually use FD1797 instead of FD1793, no ROM bits D0/D7 swap, DOS ROM area 3CXX might be disabled, equiped with printer port.
        - CBI-95
        - SYNCHRON IDS91
-       - SYNCHRON IDS2001ne
+       - SYNCHRON IDS2001ne (added interface disable jumper)
        - ARCADE AR-20
      - MIDAS Gammadisk - 3 versions known to exists:
         - straight clone
@@ -85,7 +85,7 @@
       V3-V4: D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select (binary value).
       CBI clones: D5 - printer port /STROBE
     IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
-	  CBI clones: D5 - printer port BUSY
+      CBI clones: D5 - printer port BUSY, D4 - printer standard select jumper (ABICOMP / MSX1.1)
     IO read/write ports 0b0YYxx111 - access FDC ports YY
 
     So mostly the same as beta128, except for new BDI ROM_latch bit
@@ -201,6 +201,9 @@ ROM_START(betaplus)
 	ROM_RELOAD(0x2000,0x2000)
 	ROM_SYSTEM_BIOS(5, "cas87", "CAS DOS 1987") // 4.12 with texts translated
 	ROMX_LOAD("cas1987.bin", 0x0000, 0x2000, CRC(a6a9450c) SHA1(b54b173a9f11ed730804d94584a1679193993e3c), ROM_BIOS(5))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_SYSTEM_BIOS(6, "icdos", "IC-DOS JUMBO v2.0") // v4.11 with name text changed
+	ROMX_LOAD("icdos.bin", 0x0000, 0x2000, CRC(1398d13a) SHA1(bf8cee39eb4b2a09a3f07db4cb8e7952bce4d3dd), ROM_BIOS(6))
 	ROM_RELOAD(0x2000,0x2000)
 ROM_END
 

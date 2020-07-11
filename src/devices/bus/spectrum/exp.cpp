@@ -159,6 +159,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "d40.h"
 #include "intf1.h"
 #include "intf2.h"
+#include "floppyone.h"
 #include "fuller.h"
 #include "kempjoy.h"
 #include "kempdisc.h"
@@ -170,6 +171,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "plus2test.h"
 #include "protek.h"
 #include "specdrum.h"
+#include "speccydos.h"
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
@@ -187,6 +189,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
 	device.option_add("intf2", SPECTRUM_INTF2);
+	device.option_add("flpone", SPECTRUM_FLPONE);
 	device.option_add("fuller", SPECTRUM_FULLER);
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
 	device.option_add("kempdisc", SPECTRUM_KEMPDISC);
@@ -201,6 +204,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("d80", SPECTRUM_D80);
 	device.option_add("d80v2", SPECTRUM_D80V2);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
@@ -222,6 +226,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
