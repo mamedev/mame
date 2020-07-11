@@ -1333,6 +1333,7 @@ public:
 	void wcrdxtnd(machine_config &config);
 	void super21p(machine_config &config);
 	void caspoker(machine_config &config);
+	void icp_ext(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1421,6 +1422,7 @@ private:
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
 	void super21p_map(address_map &map);
+	void icp_ext_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -2151,6 +2153,20 @@ void goldnpkr_state::super21p_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+void goldnpkr_state::icp_ext_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x3fff).rom();
+	map(0x6000, 0x7fff).rom();
+}
+
 
 /*********************************************
 *                Input Ports                 *
@@ -2423,6 +2439,67 @@ static INPUT_PORTS_START( potnpkra )
 	PORT_DIPSETTING(    0x40, "Manual" )
 	PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( animpkr )
+	// Multiplexed - 4x5bits
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Coin 1 + Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-0 80") PORT_CODE(KEYCODE_G)
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Manual Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-3 02") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coin 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-3 10") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "High Pair (11-13)" ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )         	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4651,6 +4728,22 @@ void goldnpkr_state::pottnpkr(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::pottnpkr_map);
+
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void goldnpkr_state::icp_ext(machine_config &config)
+{
+	goldnpkr_base(config);
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::icp_ext_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
@@ -11464,12 +11557,10 @@ ROM_END
 -------------------------------------------------------------------------*/
 ROM_START( animpkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2732_top.15a",     0x2000, 0x1000, CRC(ef6b36ff) SHA1(2ca520502ce32c4327f9bcc85d5c7b6e2f22eeb5) )
-	ROM_LOAD( "2732_top.17a",     0x3000, 0x1000, CRC(13fae924) SHA1(c1c92fdb6e7036e6d9349c9b017e9daf3577345b) )
-
-	ROM_REGION( 0x10000, "banked", 0 )
 	ROM_LOAD( "2732_bottom.15a",  0x2000, 0x1000, CRC(036f7639) SHA1(7d548dd71692fcde41c260a4a59ccdfa2aa5b07e) )
 	ROM_LOAD( "2732_bottom.17a",  0x3000, 0x1000, CRC(92c19e72) SHA1(034d077ede5608160ba882227e981751a5dde26d) )
+	ROM_LOAD( "2732_top.15a",     0x6000, 0x1000, CRC(ef6b36ff) SHA1(2ca520502ce32c4327f9bcc85d5c7b6e2f22eeb5) )
+	ROM_LOAD( "2732_top.17a",     0x7000, 0x1000, CRC(13fae924) SHA1(c1c92fdb6e7036e6d9349c9b017e9daf3577345b) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(             0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
@@ -11481,7 +11572,7 @@ ROM_START( animpkr )
 	ROM_LOAD( "2716.7a",  0x1000, 0x0800, CRC(c48d17b0) SHA1(7c446339ab3aaa49004780fa90a3624b5a382cb1) )    // characters gfx, bitplane 3
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "bprom.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // PROM dump needed
+	ROM_LOAD( "bprom.bin", 0x0000, 0x0100, BAD_DUMP CRC(dc4c4728) SHA1(6c779cd32d5b8d659f971b30f63267d81ad57afb) ) // PROM dump needed
 ROM_END
 
 
@@ -12208,10 +12299,10 @@ GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 2)", MACHINE_NOT_WORKING, layout_goldnpkr )
 
-GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                  // banked selectable program
+GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                    // banked selectable program
 GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               MACHINE_NOT_WORKING )  // program checks zeropage registers for changes...
 
-GAME(  198?, animpkr,   0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_NOT_WORKING )  // banked program.
+GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
 
 GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
 GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time
