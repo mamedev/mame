@@ -15,6 +15,7 @@
 #include "tilemap.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
+#include "machine/gen_latch.h"
 
 
 class splashms_state : public driver_device
@@ -31,9 +32,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
+		m_scrollregs(*this, "scrollregs"),
 		m_spriteram(*this, "spriteram"),
 		m_msm(*this, "msm"),
-		m_bgdata(*this, "subcpu")
+		m_bgdata(*this, "subcpu"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void splashms(machine_config &config);
@@ -50,9 +53,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_scrollregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<msm5205_device> m_msm;
 	required_region_ptr<uint8_t> m_bgdata;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -75,7 +80,6 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap2;
 
-	void to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint8_t sub_bank_r(offs_t offset);
@@ -122,12 +126,6 @@ void splashms_state::sub_rombankselect_w(uint8_t data)
 uint8_t splashms_state::frommain_command_r()
 {
 	return m_subcmd;
-}
-
-void splashms_state::to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// soundlatch
-	logerror("to_sound_0x40000e_w %04x\n", data);
 }
 
 void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -265,7 +263,7 @@ void splashms_state::splashms_map(address_map &map)
 
 	map(0x0a0000, 0x0a1fff).ram();
 
-	map(0x0c0000, 0x0c000f).ram(); // scroll vals
+	map(0x0c0000, 0x0c000f).ram().share("scrollregs"); // scroll vals
 
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 
@@ -279,7 +277,7 @@ void splashms_state::splashms_map(address_map &map)
 
 	map(0x40000c, 0x40000d).r(FUNC(splashms_state::unknown_0x40000c_r));
 
-	map(0x40000e, 0x40000f).w(FUNC(splashms_state::to_sound_0x40000e_w));
+	map(0x40000e, 0x40000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0xff0000, 0xffffff).ram();
 }
@@ -308,6 +306,7 @@ void splashms_state::sound_map(address_map &map)
 	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
 	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
 }
 
 void splashms_state::machine_start()
@@ -468,6 +467,9 @@ void splashms_state::splashms(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x800);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_splashms);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
