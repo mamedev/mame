@@ -14,6 +14,8 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "sound/msm5205.h"
+#include "sound/3812intf.h"
 
 
 class splashms_state : public driver_device
@@ -28,7 +30,8 @@ public:
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_msm(*this, "msm")
 	{ }
 
 	void splashms(machine_config &config);
@@ -44,6 +47,7 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
+	required_device<msm5205_device> m_msm;
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -134,9 +138,7 @@ void splashms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 
-	// sound chip
-	map(0xe800, 0xe800).nopr().nopw();
-	map(0xe801, 0xe801).nopw();
+	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
 	map(0xf000, 0xf7ff).ram();
 }
@@ -151,7 +153,7 @@ void splashms_state::machine_start()
 static INPUT_PORTS_START( splashms )
 	PORT_START("IN0")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "0" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -172,13 +174,12 @@ static INPUT_PORTS_START( splashms )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "1" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -199,13 +200,11 @@ static INPUT_PORTS_START( splashms )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "2" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -232,7 +231,7 @@ static INPUT_PORTS_START( splashms )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "3" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -259,7 +258,7 @@ static INPUT_PORTS_START( splashms )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "4" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -284,7 +283,7 @@ static INPUT_PORTS_START( splashms )
 
 	PORT_START("IN5")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "5" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -354,12 +353,14 @@ void splashms_state::splashms(machine_config &config)
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &splashms_state::sound_map);
 
+	// YM3812 + OKI M5205
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 512-1, 0, 256-32-1);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_screen_update(FUNC(splashms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -369,6 +370,13 @@ void splashms_state::splashms(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	MSM5205(config, m_msm, XTAL(384'000));
+	//m_msm->vck_legacy_callback().set(FUNC(splashms_state::splash_msm5205_int)); /* IRQ handler */
+	//m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */     /* Sample rate = 384kHz/48 */
+	//m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 ROM_START( splashms )
