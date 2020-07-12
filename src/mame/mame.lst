@@ -37756,6 +37756,9 @@ splash                          // (c) 1992 - Ref 922804
 splash10                        // (c) 1992 - Ref 922804
 ringball                        // not a gaelco game but based on splash code
 
+@source:splash_ms.cpp
+splashms
+
 @source:splus.cpp
 spset005                        // (c) 1993 IGT - International Game Technology
 spset015                        // (c) 1993 IGT - International Game Technology

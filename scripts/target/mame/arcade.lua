@@ -1985,6 +1985,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rollext.cpp",
 	MAME_DIR .. "src/mame/drivers/splash.cpp",
 	MAME_DIR .. "src/mame/includes/splash.h",
+	MAME_DIR .. "src/mame/drivers/splash_ms.cpp",
 	MAME_DIR .. "src/mame/video/splash.cpp",
 	MAME_DIR .. "src/mame/drivers/targeth.cpp",
 	MAME_DIR .. "src/mame/includes/targeth.h",

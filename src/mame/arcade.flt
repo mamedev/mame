@@ -1179,6 +1179,7 @@ spiders.cpp
 spinb.cpp
 spirit76.cpp
 splash.cpp
+splash_ms.cpp
 splus.cpp
 spoker.cpp
 spool99.cpp
