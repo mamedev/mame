@@ -55,6 +55,7 @@ private:
 	required_device<msm5205_device> m_msm;
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -76,6 +77,15 @@ private:
 
 	void to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint8_t sub_bank_r(offs_t offset);
+	void sub_bank_w(offs_t offset, uint8_t data);
+
+	int m_subbankselect;
+
+	uint8_t m_bitmapram[0x20000];
+
+	void unknown_sub_port01_w(uint8_t data);
 };
 
 uint16_t splashms_state::unknown_0x400004_r()
@@ -89,9 +99,16 @@ uint16_t splashms_state::unknown_0x40000c_r()
 }
 
 
+void splashms_state::unknown_sub_port01_w(uint8_t data)
+{
+	logerror("unknown_sub_port01_w %02x\n", data);
+	m_subbankselect = data;
+}
+
+
 uint8_t splashms_state::unknown_sub_r()
 {
-	return machine().rand();
+	return 0x14;// machine().rand();
 }
 
 void splashms_state::to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -105,7 +122,19 @@ void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t
 	popmessage("to_subcpu_0x400004_w %04x\n", data);
 }
 
+uint8_t splashms_state::sub_bank_r(offs_t offset)
+{
+	logerror("sub_bank_r %04x with bank %02x\n", offset, m_subbankselect);
+	int rambank = m_subbankselect & 0x7;
+	return m_bitmapram[(rambank * 0x4000) + offset];
+}
 
+void splashms_state::sub_bank_w(offs_t offset, uint8_t data)
+{
+	logerror("sub_bank_w %04x with bank %02x (data %02x)\n", offset, m_subbankselect, data);
+	int rambank = m_subbankselect & 0x7;
+	m_bitmapram[(rambank * 0x4000) + offset] = data;
+}
 
 void splashms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -219,7 +248,7 @@ void splashms_state::splashms_map(address_map &map)
 void splashms_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).nopw(); // banking for 0x4000-0x7fff RAM?
+	map(0x01, 0x01).w(FUNC(splashms_state::unknown_sub_port01_w)); // banking for 0x4000-0x7fff RAM?
 
 	map(0x03, 0x03).r(FUNC(splashms_state::unknown_sub_r));
 }
@@ -227,7 +256,7 @@ void splashms_state::sub_portmap(address_map &map)
 void splashms_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x4000, 0x7fff).ram();
+	map(0x4000, 0x7fff).rw(FUNC(splashms_state::sub_bank_r), FUNC(splashms_state::sub_bank_w));
 
 	map(0xffff, 0xffff).nopr();
 }
@@ -245,6 +274,14 @@ void splashms_state::machine_start()
 {
 }
 
+void splashms_state::machine_reset()
+{
+	for (int i = 0; i < 0x20000; i++)
+	{
+		m_bitmapram[i] = 0x00;
+	}
+	m_subbankselect = 0;
+}
 
 
 
