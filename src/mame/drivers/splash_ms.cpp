@@ -462,7 +462,7 @@ void splashms_state::splash_adpcm_data_w(uint8_t data)
 
 void splashms_state::splash_adpcm_control_w(uint8_t data)
 {
-	m_msm->reset_w(!BIT(data, 0));
+	m_msm->reset_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER(splashms_state::splash_msm5205_int)
