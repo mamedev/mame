@@ -1089,8 +1089,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="bobbdayuk" cloneof="bobbday" supported="no">
+	<software name="bobbdayuk" cloneof="bobbday">
 		<description>Bob The Builder - Bob's Busy Day (UK)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -1236,8 +1235,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="carsr201" supported="no">
+	<software name="carsr201">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, rev. 201)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1317,8 +1315,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="carsfr105" cloneof="carsr201" supported="no">
+	<software name="carsfr105" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Quatre Roues (France, rev. 105)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1428,8 +1425,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlair1" cloneof="cinderla" supported="no">
+	<software name="cinderlair1" cloneof="cinderla">
 		<description>Disney Cenerentola - I desideri magici di Cenerentola (Italy, rev. 1)</description>
 		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -1489,8 +1485,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlafr105" cloneof="cinderla" supported="no">
+	<software name="cinderlafr105" cloneof="cinderla">
 		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (France, rev. 105)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1505,8 +1500,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlafr205" cloneof="cinderla" supported="no">
+	<software name="cinderlafr205" cloneof="cinderla">
 		<description>Walt Disney Cendrillon - Le rêve enchanté de Cendrillon (France, rev. 205)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1538,8 +1532,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlasr122" cloneof="cinderla" supported="no">
+	<software name="cinderlasr122" cloneof="cinderla">
 		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spain, rev. 122)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1658,8 +1651,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorar201" supported="no">
+	<software name="dorar201">
 		<description>Nickelodeon Dora the Explorer - Dora's Fix-it Adventure (USA, rev. 201)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1692,8 +1684,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorauk" cloneof="dorar201" supported="no">
+	<software name="dorauk" cloneof="dorar201">
 		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1727,8 +1718,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorafr105" cloneof="dorar201" supported="no">
+	<software name="dorafr105" cloneof="dorar201">
 		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (France, rev. 105)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1743,8 +1733,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorasr222" cloneof="dorar201" supported="no">
+	<software name="dorasr222" cloneof="dorar201">
 		<description>Nick Jr. Dora La Exploradora - La Aventura arregla-todo de Dora (Spain, rev. 222)</description>
 		<year>2007</year> <!-- 2009 on cart -->
 		<publisher>VTech</publisher>
@@ -1963,8 +1952,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="godiegor2" supported="no">
+	<software name="godiegor2">
 		<description>Nick Jr. Go Diego Go! - Save the Animal Familes! (USA, rev. 2?)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1979,8 +1967,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="godiegof" cloneof="godiegor2" supported="no">
+	<software name="godiegof" cloneof="godiegor2">
 		<description>Nickelodeon Go Diego! - À la rescousse des animaux! (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2047,8 +2034,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ltleinstnr5" supported="no">
+	<software name="ltleinstnr5">
 		<description>Disney's Little Einsteins (USA, rev. 5?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2080,8 +2066,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ltleinstnf" cloneof="ltleinstnr5" supported="no">
+	<software name="ltleinstnf" cloneof="ltleinstnr5">
 		<description>Disney - Les petits Einsteins - Le bal du soulier de verre (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2096,8 +2081,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ltleinstns" cloneof="ltleinstnr5" supported="no">
+	<software name="ltleinstn" cloneof="ltleinstnr5" supported="no">
 		<description>Disney's Little Einsteins (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2276,8 +2260,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="kungfupf" cloneof="kungfupuk" supported="no">
+	<software name="kungfupf" cloneof="kungfupuk">
 		<description>Kung Fu Panda - La Mission de Po (France)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -2292,8 +2275,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="kungfups" cloneof="kungfupuk" supported="no">
+	<software name="kungfups" cloneof="kungfupuk">
 		<description>Kung Fu Panda - Aventura en el Valle de la Paz (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -2359,7 +2341,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
+	<!-- Fatal error: UNSP: unknown opcode ff11 at 112212 -->
 	<software name="mannyf" supported="no">
 		<description>Disney Manny et ses outils (France)</description>
 		<year>2009</year>
@@ -2370,7 +2352,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
-				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="8388608" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" />
+				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="8388608" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2486,8 +2468,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mickeychf" cloneof="mickeychgr3" supported="no">
+	<software name="mickeychf" cloneof="mickeychgr3">
 		<description>Disney La Maison De Mickey (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2502,8 +2483,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mickeychs" cloneof="mickeychgr3" supported="no">
+	<software name="mickeychs" cloneof="mickeychgr3">
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2571,8 +2551,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="monstalnf" cloneof="monstalng" supported="no">
+	<software name="monstalnf" cloneof="monstalng">
 		<description>DreamWorks Monstres contre Aliens (France)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -2587,8 +2566,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="monstalns" cloneof="monstalng" supported="no">
+	<software name="monstalns" cloneof="monstalng">
 		<description>DreamWorks Monstruos contra Alienígenas (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2622,8 +2600,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mypuppys" cloneof="mypuppyg" supported="no">
+	<software name="mypuppys" cloneof="mypuppyg">
 		<description>Dakota y su mascota (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2722,8 +2699,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="noddyfr105" cloneof="noddy" supported="no">
+	<software name="noddyfr105" cloneof="noddy">
 		<description>Oui-Oui - Détective d'un Jour (France, rev. 105)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2840,8 +2816,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="upfr005" supported="no">
+	<software name="upfr005">
 		<description>Disney/Pixar Là-Haut (France, rev. 005)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2869,8 +2844,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, shows a "Please, connect the controller" message on screen. -->
-	<software name="upsr022" cloneof="upgr004" supported="no">
+	<software name="upsr022" cloneof="upgr004">
 		<description>Disney/Pixar Up (Spain, rev. 022)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2904,8 +2878,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="partyprkg" cloneof="partyprk" supported="no">
+	<software name="partyprkg" cloneof="partyprk">
 		<description>Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspaß (Germany)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2922,8 +2895,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="partyprkf" cloneof="partyprk" supported="no">
+	<software name="partyprkf" cloneof="partyprk">
 		<description>Cranium - Le Parc D'Attractions (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2938,8 +2910,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="partyprks" cloneof="partyprk" supported="no">
+	<software name="partyprks" cloneof="partyprk">
 		<description>Cranium - Parque de Atracciones de Cranium (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -2968,8 +2939,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ratatnl" supported="no">
+	<software name="ratatnl">
 		<description>Disney/Pixar Ratatouille - Remy's Nieuwe Recepten (Netherlands)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3003,8 +2973,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ratatf" supported="no">
+	<software name="ratatf">
 		<description>Disney/Pixar Ratatouille - Les nouvelles recettes de Rémy (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3019,8 +2988,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ratats" cloneof="ratatg" supported="no">
+	<software name="ratats" cloneof="ratatg">
 		<description>Disney/Pixar Ratatouille - Las recetas del Remy (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3037,8 +3005,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydor301" supported="no">
+	<software name="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (USA, rev. 301)</description>
 		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
@@ -3100,8 +3067,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydouk" cloneof="scoobydor301" supported="no">
+	<software name="scoobydouk" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (UK)</description>
 		<year>2007</year> <!-- (s07) -->
 		<publisher>VTech</publisher>
@@ -3114,8 +3080,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydoukr1" cloneof="scoobydor301" supported="no">
+	<software name="scoobydoukr1" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (UK, rev. 1?)</description>
 		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
@@ -3145,8 +3110,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydof" cloneof="scoobydor301" supported="no">
+	<software name="scoobydof" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Panique à Funland (France)</description>
 		<year>2004</year> <!-- (s04) -->
 		<publisher>VTech</publisher>
@@ -3163,8 +3127,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydofr105" cloneof="scoobydor301" supported="no">
+	<software name="scoobydofr105" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Panique à Funland (France, rev. 105)</description>
 		<year>2007</year> <!-- (s07) -->
 		<publisher>VTech</publisher>
@@ -3265,8 +3228,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="erniebrtf" cloneof="erniebrtg" supported="no">
+	<software name="erniebrtf" cloneof="erniebrtg">
 		<description>Les aventures de imagniares d'Ernest et Bart (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -3315,8 +3277,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3a" cloneof="shrek3" supported="no">
+	<software name="shrek3a" cloneof="shrek3">
 		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA, alt)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3350,8 +3311,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3uk" cloneof="shrek3" supported="no">
+	<software name="shrek3uk" cloneof="shrek3">
 		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (UK)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3382,8 +3342,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3f" cloneof="shrek3" supported="no">
+	<software name="shrek3f" cloneof="shrek3">
 		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3398,8 +3357,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3fr105" cloneof="shrek3" supported="no">
+	<software name="shrek3fr105" cloneof="shrek3">
 		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France, rev. 105)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3624,8 +3582,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermisr101" supported="no">
+	<software name="spidermisr101">
 		<description>Marvel Spider-Man &amp; Friends - Secret Missions (USA, rev. 101)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3690,8 +3647,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermisfr105" cloneof="spidermisr101" supported="no">
+	<software name="spidermisfr105" cloneof="spidermisr101">
 		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, rev. 105)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3706,8 +3662,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermisfr305" cloneof="spidermisr101" supported="no">
+	<software name="spidermisfr305" cloneof="spidermisr101">
 		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, rev. 305)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -3739,8 +3694,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermissr222" cloneof="spidermisr101" supported="no">
+	<software name="spidermissr222" cloneof="spidermisr101">
 		<description>Spider-Man y Amigos - Misiones Secretas (Spain, rev. 222)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -3968,8 +3922,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="thomasukr1" cloneof="thomas" supported="no">
+	<software name="thomasukr1" cloneof="thomas">
 		<description>Thomas &amp; Friends - Engines Working Together (UK, rev. 1?)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -4207,8 +4160,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wallei" supported="no">
+	<software name="wallei">
 		<description>Disney/Pixar Wall-E (Italy)</description>
 		<year>2009</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -4240,8 +4192,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wallef" cloneof="wallei" supported="no">
+	<software name="wallef" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (France)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -4256,8 +4207,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="walles" cloneof="wallei" supported="no">
+	<software name="walles" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -4274,8 +4224,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wallecn" cloneof="wallei" supported="no">
+	<software name="wallecn" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (China)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -4339,8 +4288,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="poohnlr123" cloneof="pooh" supported="no">
+	<software name="poohnlr123" cloneof="pooh">
 		<description>Disney's Winnie de Poeh - De wonderwereld van Poeh (Netherlands)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -4442,10 +4390,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
 	<!-- Cart labeled as "Disney My Friends Tigger and Pooh - En Busca de la Miel",
 	         but game on screen title is "Disney Winnie the Pooh - En Busca de la Miel". -->
-	<software name="poohsr122" cloneof="pooh" supported="no">
+	<software name="poohsr122" cloneof="pooh">
 		<description>Disney Winnie the Pooh - En Busca de la Miel (Spain, rev. 122)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -4513,8 +4460,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="redhoodf" cloneof="redhoodg" supported="no">
+	<software name="redhoodf" cloneof="redhoodg">
 		<description>Les aventures du Petit Chaperon Rouge (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4712,8 +4658,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wwavesg" supported="no"> <!-- Will be clone of "wwaves" once found and dumped. -->
+	<software name="wwavesg"> <!-- Will be clone of "wwaves" once found and dumped. -->
 		<description>Dolphis Wasser-abenteuer (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
