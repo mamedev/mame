@@ -13,6 +13,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class splashms_state : public driver_device
@@ -26,7 +27,8 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram")
 	{ }
 
 	void splashms(machine_config &config);
@@ -41,8 +43,10 @@ private:
 
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint16_t> m_videoram;
 
 	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -51,18 +55,64 @@ private:
 	void sub_portmap(address_map &map);
 	void sound_map(address_map &map);
 
+	uint16_t unknown_r();
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
+	tilemap_t *m_bg_tilemap;
+
 };
+
+uint16_t splashms_state::unknown_r()
+{
+	return machine().rand();
+}
+
+
+void splashms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
+
+TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap0)
+{
+	int tile = m_videoram[tile_index*2];
+	tileinfo.set(2,tile + 0x4000,0,0);
+}
+
+uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+void splashms_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap0)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+}
 
 
 void splashms_state::splashms_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x080000, 0x0fffff).ram();
+	map(0x080000, 0x080fff).ram().w(FUNC(splashms_state::vram_w)).share("videoram");
+
+	map(0x081000, 0x0fffff).ram();
 	
 	map(0x100000, 0x1007ff).ram(); 
 
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+
+	map(0x400000, 0x400001).r(FUNC(splashms_state::unknown_r));
+	map(0x400002, 0x400003).r(FUNC(splashms_state::unknown_r));
+	map(0x400004, 0x400005).r(FUNC(splashms_state::unknown_r)).nopw();
+	map(0x400006, 0x400007).r(FUNC(splashms_state::unknown_r));
+	map(0x400008, 0x400009).r(FUNC(splashms_state::unknown_r));
+
+	map(0x40000c, 0x40000d).r(FUNC(splashms_state::unknown_r));
+
+	map(0x40000e, 0x40000f).nopw();
+
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -80,9 +130,11 @@ void splashms_state::sub_map(address_map &map)
 
 void splashms_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
+	map(0x0000, 0xdfff).rom();
 
-	map(0xe800, 0xe800).nopr();
+	// sound chip
+	map(0xe800, 0xe800).nopr().nopw();
+	map(0xe801, 0xe801).nopw();
 
 	map(0xf000, 0xf7ff).ram();
 }
@@ -92,10 +144,7 @@ void splashms_state::machine_start()
 }
 
 
-uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
+
 
 static INPUT_PORTS_START( splashms )
 INPUT_PORTS_END
