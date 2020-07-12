@@ -571,11 +571,11 @@ static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7
 /*
 // these are for the world set where we have the mcu anyway...
 static const u8 imgfight_crc[CRC_LEN] =  {  0xf8,0x91,0xc0,0x58, 0x04,0x33,0xb6,0xc5,
-												0xbf,0x37,0x92,0x94, 0x00,0x00 };
+                                                0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 // these are for the japan set where we have the mcu anyway...
 static const u8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
-												0xbf,0x37,0x92,0x94, 0x00,0x00 };
+                                                0xbf,0x37,0x92,0x94, 0x00,0x00 };
 */
 
 /* Dragon Breed */
@@ -4075,6 +4075,40 @@ ROM_START( dkgensan )
 	ROM_LOAD( "gen-vo.bin",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
 ROM_END
 
+ROM_START( hharryb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "4-a-27c010a.bin", 0x00001, 0x20000, CRC(755c0874) SHA1(28ea0f7d700cc0119d8cb5693d0bcfef3da78c95) )
+	ROM_LOAD16_BYTE( "6-a-27c010a.bin", 0x00000, 0x20000, CRC(f10fb55c) SHA1(1bb0d56a29ca34b003c57faa9693b96413718608) )
+	ROM_LOAD16_BYTE( "3-a-27c512.bin",  0x60001, 0x10000, CRC(31b741c5) SHA1(46c1c4cea09477cc4989f3e06e08851d02743e62) )
+	ROM_RELOAD(                         0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "5-a-27c512.bin",  0x60000, 0x10000, CRC(b23e966c) SHA1(f506f6d1f4f7874070e91d1df8f141cca031ce29) )
+	ROM_RELOAD(                         0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "2-a-27c512.bin",   0x00000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "17-c-27c010a.bin",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )
+	ROM_LOAD( "16-c-27c010a.bin",    0x20000, 0x20000, CRC(def65294) SHA1(23f5d99fa9f604fde37cb52113bff233d9be1d25) )
+	ROM_LOAD( "14-c-27c010a.bin",    0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
+	ROM_LOAD( "15-c-27c010a.bin",    0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "13-b-27c010a.bin",   0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  // tiles
+	ROM_LOAD( "11-b-27c010a.bin",   0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
+	ROM_LOAD( "9-b-27c010a.bin",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
+	ROM_LOAD( "7-b-27c010a.bin",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
+
+	ROM_REGION( 0x20000, "samples", 0 )
+	ROM_LOAD( "1-a-27c010a.bin",   0x00000, 0x20000, CRC(faaacaff) SHA1(ea3a3920255c07aa9c0a7e0191eae257a9f7f558) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "19-c-82s129.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
+	ROM_LOAD( "18-c-82s129.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a-pal16l8.bin", 0x000, 0x104, CRC(1358c513) SHA1(7c8f44e4d63867d54e16fc29d168a27be5f4babf) )
+ROM_END
 
 ROM_START( cosmccop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -4332,6 +4366,7 @@ GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_
 /* M84 */
 GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryb,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "bootleg", "Hammerin' Harry (World, M84 hardware bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
