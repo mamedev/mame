@@ -5,18 +5,18 @@
     Proceed 1 - Commodore IEC Bus and printer interface
     (c) 1984 Logitek (Germany)
 
-	Allows to connect and use Commodore 1541 disk drive.
-	Components: Z8420 PIO, 8K ROM, 256x4 PROM, NMI button.
+    Allows to connect and use Commodore 1541 disk drive.
+    Components: Z8420 PIO, 8K ROM, 256x4 PROM, NMI button.
 
-	Photos and manual https://k1.spdns.de/Vintage/Sinclair/82/Peripherals/Disc%20Interfaces/Logitek%20Proceed%201%20C64%20Disc%20Interface/
+    Photos and manual https://k1.spdns.de/Vintage/Sinclair/82/Peripherals/Disc%20Interfaces/Logitek%20Proceed%201%20C64%20Disc%20Interface/
 
-	Notes / TODOs:
-	 - floppy drive access doesn't works with "Device timeout" error message.
-	   cause is not known, possible due to not correct IEC hookup or some Z80PIO emulation bugs.
+    Notes / TODOs:
+     - floppy drive access doesn't works with "Device timeout" error message.
+       cause is not known, possible due to not correct IEC hookup or some Z80PIO emulation bugs.
 
-	 - ROM paging performed by undumped PROM, current logic might be incorrect or innacurate.
-	   wiring: A0-A5 - Z80 A8-A13, A6 - PIO PB7, A7 - nc, /CE1 - A14, /CE2 - A15,
-	   Q1 - ROM A11, Q2 - ROM A10, Q3 - ROM /CE, Q4 - /ROMCS
+     - ROM paging performed by undumped PROM, current logic might be incorrect or innacurate.
+       wiring: A0-A5 - Z80 A8-A13, A6 - PIO PB7, A7 - nc, /CE1 - A14, /CE2 - A15,
+       Q1 - ROM A11, Q2 - ROM A10, Q3 - ROM /CE, Q4 - /ROMCS
 
 *********************************************************************/
 
