@@ -31,6 +31,7 @@ public:
 		m_paletteram(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
 		m_msm(*this, "msm")
 	{ }
 
@@ -47,6 +48,7 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram2;
 	required_device<msm5205_device> m_msm;
 
 	virtual void machine_start() override;
@@ -61,8 +63,11 @@ private:
 
 	uint16_t unknown_r();
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
 	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap2;
 
 };
 
@@ -78,15 +83,37 @@ void splashms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
+void splashms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap2->mark_tile_dirty(offset/2);
+}
+
 TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap0)
 {
 	int tile = m_videoram[tile_index*2];
-	int attr = m_videoram[(tile_index*2)+1] & 0xf;
-	tileinfo.set(2,tile + 0x4000,attr,0);
+	int attr = m_videoram[(tile_index*2)+1] & 0x3f;
+	int fx = (m_videoram[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(1,tile,attr,TILE_FLIPYX(fx));
+}
+
+TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap1)
+{
+	int tile = m_videoram2[tile_index*2];
+
+	int bank = (tile & 0x100)>>8;
+	tile &= 0xff;
+
+	int attr = m_videoram2[(tile_index*2)+1] & 0x3f;
+	int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(2+bank,tile,attr,TILE_FLIPYX(fx));
 }
 
 uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -94,6 +121,10 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void splashms_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap0)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  16,  16, 64, 32);
+
+	m_bg_tilemap->set_transparent_pen(15);
+
 }
 
 
@@ -102,9 +133,12 @@ void splashms_state::splashms_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 
 	map(0x080000, 0x081fff).ram().w(FUNC(splashms_state::vram_w)).share("videoram");
+	map(0x082000, 0x08ffff).ram();
 
-	map(0x082000, 0x0fffff).ram();
-	
+	map(0x090000, 0x091fff).ram().w(FUNC(splashms_state::vram2_w)).share("videoram2");
+	map(0x092000, 0x09ffff).ram();
+	map(0x0a0000, 0x0fffff).ram();
+
 	map(0x100000, 0x1007ff).ram(); 
 
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -171,9 +205,7 @@ static INPUT_PORTS_START( splashms )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 
 
@@ -197,9 +229,7 @@ static INPUT_PORTS_START( splashms )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("IN2")
@@ -332,11 +362,22 @@ static const gfx_layout tiles8x8x4_layout =
 	16 * 16
 };
 
+static const gfx_layout tiles16x16x4alt_layout =
+{
+	16,16,
+	0x100,
+	4,
+	{ 0,8,16,24 },
+	{ 0,1,2,3,4,5,6,7, (65536*2)+0,(65536*2)+1,(65536*2)+2,(65536*2)+3,(65536*2)+4,(65536*2)+5,(65536*2)+6,(65536*2)+7 },
+	{ STEP8(0,32),STEP8(65536,32) },
+	8 * 32
+};
+
 static GFXDECODE_START( gfx_splashms )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "fgtile", 0, tiles8x8x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "bgtile", 0x8000, tiles16x16x4alt_layout, 0, 16 )
 GFXDECODE_END
 
 void splashms_state::splashms(machine_config &config)
@@ -395,17 +436,13 @@ ROM_START( splashms )
 	ROM_REGION( 0x010000, "soundcpu", 0 )
 	ROM_LOAD( "snd_9-2_sp_916.ic6", 0x000000, 0x010000, CRC(5567fa22) SHA1(3993c733a0222ca292b60f409c78b45280a5fec6) )
 
-	ROM_REGION( 0xc0000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD32_BYTE( "8_sp_833.ic33", 0x000000, 0x020000, CRC(8ac7cd1f) SHA1(aad88db9a82f417774f1d5eef830cc97c0d4b0de) ) // 111xxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_826.ic26", 0x000001, 0x020000, CRC(b7ec71d8) SHA1(3d4b62559c0ba688b94e605594f3e8e9f2cbefa2) ) // 111xxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_818.ic18", 0x000002, 0x020000, CRC(ae62a832) SHA1(f825a186e25a1c292aa6f880055341ec14373c0b) ) // 111xxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_811.ic11", 0x000003, 0x020000, CRC(02e474b4) SHA1(11446655cb73ec4961339fa4ee41200f8b2b81d3) ) // 111xxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_837.ic37", 0x080000, 0x010000, CRC(3b544131) SHA1(e7fd97cb24b84739f2481efb1d232f86df4a3d8d) ) // 1xxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_830.ic30", 0x080001, 0x010000, CRC(09bb675b) SHA1(49c41ccfce1b0077c430c6bb38bc858aeaf87fb8) ) // has some garbage in the blank space of the paired ROMs
-	ROM_LOAD32_BYTE( "8_sp_822.ic22", 0x080002, 0x010000, CRC(621fcf26) SHA1(a7ff6b12fbbea1bba7c4a397a82ac2fb5c09558a) ) // 1xxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_815.ic15", 0x080003, 0x010000, CRC(5641b621) SHA1(e71df1ab5c9b2254495d99657477b52e8843d128) ) // 1xxxxxxxxxxxxxxx = 0xFF                          
+	ROM_REGION( 0x40000, "fgtile", ROMREGION_ERASEFF )
+	ROM_LOAD32_BYTE( "8_sp_837.ic37", 0x000000, 0x010000, CRC(3b544131) SHA1(e7fd97cb24b84739f2481efb1d232f86df4a3d8d) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD32_BYTE( "8_sp_830.ic30", 0x000001, 0x010000, CRC(09bb675b) SHA1(49c41ccfce1b0077c430c6bb38bc858aeaf87fb8) ) // has some garbage in the blank space of the paired ROMs
+	ROM_LOAD32_BYTE( "8_sp_822.ic22", 0x000002, 0x010000, CRC(621fcf26) SHA1(a7ff6b12fbbea1bba7c4a397a82ac2fb5c09558a) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD32_BYTE( "8_sp_815.ic15", 0x000003, 0x010000, CRC(5641b621) SHA1(e71df1ab5c9b2254495d99657477b52e8843d128) ) // 1xxxxxxxxxxxxxxx = 0xFF                          
                                    
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x080000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD32_BYTE( "5-1_sp_524.ic24", 0x000000, 0x010000, CRC(841c24c1) SHA1(70cb26033999f8184c51849e00bfcb2270f646e8) )
 	ROM_LOAD32_BYTE( "5-1_sp_518.ic18", 0x000001, 0x010000, CRC(499cb813) SHA1(4d22e58530ff8a85b7ffc8ae1ab5986215986b49) )
 	ROM_LOAD32_BYTE( "5-1_sp_512.ic12", 0x000002, 0x010000, CRC(8cb0b132) SHA1(894f84b6a8171ed8c22298ebf1303da020f747ee) )
@@ -414,6 +451,13 @@ ROM_START( splashms )
 	ROM_LOAD32_BYTE( "5-1_sp_519.ic19", 0x040001, 0x010000, CRC(69cc9e06) SHA1(85e1495d01e6986f9cd88d6cdbef194c623be111) ) // 11xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD32_BYTE( "5-1_sp_513.ic13", 0x040002, 0x010000, CRC(659d206f) SHA1(fc8e9ea2d45df83509de3986763cbfc0d4745983) ) // has some garbage in the blank space of the paired ROMs
 	ROM_LOAD32_BYTE( "5-1_sp_504.ic4",  0x040003, 0x010000, CRC(b6806390) SHA1(d95247bcd90bd7b7be355c267f023c19a9d60f66) ) // 11xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x080000, "bgtile", ROMREGION_ERASEFF )
+	ROM_LOAD32_BYTE( "8_sp_833.ic33", 0x000000, 0x020000, CRC(8ac7cd1f) SHA1(aad88db9a82f417774f1d5eef830cc97c0d4b0de) ) // 111xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD32_BYTE( "8_sp_826.ic26", 0x000001, 0x020000, CRC(b7ec71d8) SHA1(3d4b62559c0ba688b94e605594f3e8e9f2cbefa2) ) // 111xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD32_BYTE( "8_sp_818.ic18", 0x000002, 0x020000, CRC(ae62a832) SHA1(f825a186e25a1c292aa6f880055341ec14373c0b) ) // 111xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD32_BYTE( "8_sp_811.ic11", 0x000003, 0x020000, CRC(02e474b4) SHA1(11446655cb73ec4961339fa4ee41200f8b2b81d3) ) // 111xxxxxxxxxxxxxx = 0xFF
+
 
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "51-3_502_82s129.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // common PROM found on all? Modular System sets?
