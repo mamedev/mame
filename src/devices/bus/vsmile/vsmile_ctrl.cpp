@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cassert>
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -252,7 +252,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 	{
 		LOG("select deasserted, waiting to transmit\n");
 		m_tx_active = false;
-		m_rts_timer->adjust(attotime::from_msec(500));
+		//m_rts_timer->adjust(attotime::from_msec(2000));
 	}
 }
 
