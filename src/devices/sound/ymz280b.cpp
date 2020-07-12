@@ -40,8 +40,8 @@
 
 #define MAX_SAMPLE_CHUNK    10000
 
-static constexpr unsigned FRAC_BITS = 9;
-static constexpr unsigned FRAC_ONE  = (1 << FRAC_BITS);
+#define FRAC_BITS           9
+#define FRAC_ONE            (1 << FRAC_BITS)
 
 //#define INTERNAL_BUFFER_SIZE    (1 << 15)
 #define INTERNAL_SAMPLE_RATE    (m_master_clock * 2.0)
