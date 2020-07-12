@@ -16,9 +16,9 @@ namespace netlist
 	NETLIB_OBJECT(CD4013)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4013, "CD4XXX")
-		, m_D(*this, "DATA")
-		, m_RESET(*this, "RESET")
-		, m_SET(*this, "SET")
+		, m_D(*this, "DATA", NETLIB_DELEGATE(inputs))
+		, m_RESET(*this, "RESET", NETLIB_DELEGATE(inputs))
+		, m_SET(*this, "SET", NETLIB_DELEGATE(inputs))
 		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
@@ -28,9 +28,41 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-		NETLIB_HANDLERI(clk);
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_D.set_state(logic_t::STATE_INP_ACTIVE);
+			m_nextD = 0;
+		}
+
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const auto set(m_SET());
+			const auto reset(m_RESET());
+			if ((set ^ 1) & (reset ^ 1))
+			{
+				m_D.activate();
+				m_nextD = m_D();
+				m_CLK.activate_lh();
+			}
+			else
+			{
+				newstate_setreset(set, reset);
+				m_CLK.inactivate();
+				m_D.inactivate();
+			}
+		}
+
+		NETLIB_HANDLERI(clk)
+		{
+			newstate_clk(m_nextD);
+			m_CLK.inactivate();
+		}
 
 		logic_input_t m_D;
 		logic_input_t m_RESET;
@@ -91,37 +123,6 @@ namespace netlist
 		NETLIB_SUB(CD4013) m_A;
 		NETLIB_SUB(CD4013) m_B;
 	};
-
-	NETLIB_HANDLER(CD4013, clk)
-	{
-		newstate_clk(m_nextD);
-		m_CLK.inactivate();
-	}
-
-	NETLIB_UPDATE(CD4013)
-	{
-		const auto set(m_SET());
-		const auto reset(m_RESET());
-		if ((set ^ 1) & (reset ^ 1))
-		{
-			m_D.activate();
-			m_nextD = m_D();
-			m_CLK.activate_lh();
-		}
-		else
-		{
-			newstate_setreset(set, reset);
-			m_CLK.inactivate();
-			m_D.inactivate();
-		}
-	}
-
-	NETLIB_RESET(CD4013)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_D.set_state(logic_t::STATE_INP_ACTIVE);
-		m_nextD = 0;
-	}
 
 	NETLIB_RESET(CD4013_dip)
 	{

@@ -11,13 +11,15 @@
 
 namespace netlist { namespace devices {
 
+	// FIXME: tristate outputs?
+
 	NETLIB_OBJECT(CD4316_GATE)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4316_GATE, "CD4XXX")
 		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "_R")
-		, m_S(*this, "S")
-		, m_E(*this, "E")
+		, m_S(*this, "S", NETLIB_DELEGATE(inputs))
+		, m_E(*this, "E", NETLIB_DELEGATE(inputs))
 		, m_base_r(*this, "BASER", nlconst::magic(45.0))
 		{
 		}
@@ -27,16 +29,21 @@ namespace netlist { namespace devices {
 			m_R.set_R(plib::reciprocal(exec().gmin()));
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			m_R.change_state([this]()
 				{
-				if (m_S() && !m_E())
-					m_R.set_R(m_base_r());
-				else
-					m_R.set_R(plib::reciprocal(exec().gmin()));
+					if (m_S() && !m_E())
+						m_R.set_R(m_base_r());
+					else
+						m_R.set_R(plib::reciprocal(exec().gmin()));
 				}
 				, NLTIME_FROM_NS(1));
+		}
+
+		NETLIB_UPDATEI()
+		{
+			inputs();
 		}
 
 	private:
