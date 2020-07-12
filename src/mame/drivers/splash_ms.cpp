@@ -272,7 +272,7 @@ void splashms_state::splashms_map(address_map &map)
 	map(0x08e000, 0x08ffff).rw(FUNC(splashms_state::vram2_r), FUNC(splashms_state::vram2_w)); // mirror needed for paint dripping in attract
 	map(0x090000, 0x091fff).ram().rw(FUNC(splashms_state::vram2_r), FUNC(splashms_state::vram2_w)).share("videoram2");
 
-	map(0x0a0000, 0x0a1fff).ram();
+	map(0x0a0000, 0x0a1fff).ram(); // writes unused data from vram2 area here, but isn't a mirror (eg. has large paint can from attract during gameplay) unused?
 
 	map(0x0c0000, 0x0c000f).ram().share("scrollregs"); // scroll vals
 
@@ -314,8 +314,8 @@ void splashms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 
-	map(0xe000, 0xe000).w(FUNC(splashms_state::splash_adpcm_data_w));
-	map(0xe400, 0xe400).w(FUNC(splashms_state::splash_adpcm_control_w));
+	map(0xe000, 0xe000).w(FUNC(splashms_state::splash_adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(splashms_state::splash_adpcm_data_w));
 
 	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
