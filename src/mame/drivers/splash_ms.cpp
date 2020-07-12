@@ -95,11 +95,13 @@ private:
 
 uint16_t splashms_state::unknown_0x400004_r()
 {
+	logerror("%06x: unknown_0x400004_r\n", machine().describe_context());
 	return machine().rand();
 }
 
 uint16_t splashms_state::unknown_0x40000c_r()
 {
+	logerror("%06x: unknown_0x40000c_r\n", machine().describe_context());
 	return machine().rand();
 }
 
@@ -119,7 +121,7 @@ void splashms_state::sub_rombankselect_w(uint8_t data)
 
 uint8_t splashms_state::frommain_command_r()
 {
-	return m_subcmd;// machine().rand();
+	return m_subcmd;
 }
 
 void splashms_state::to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -137,7 +139,7 @@ void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t
 
 uint8_t splashms_state::sub_rombank_r(offs_t offset)
 {
-	logerror("sub_rombank_r %04x with bank %02x\n", offset, m_subrombankselect);
+//	logerror("sub_rombank_r %04x with bank %02x\n", offset, m_subrombankselect);
 	int rombank = m_subrombankselect & 0x7f;
 	return m_bgdata[(rombank * 0x8000) + offset];
 
@@ -146,14 +148,14 @@ uint8_t splashms_state::sub_rombank_r(offs_t offset)
 
 uint8_t splashms_state::sub_bank_r(offs_t offset)
 {
-	logerror("sub_bank_r %04x with bank %02x\n", offset, m_subbankselect);
+//	logerror("sub_bank_r %04x with bank %02x\n", offset, m_subbankselect);
 	int rambank = m_subbankselect & 0x7;
 	return m_bitmapram[(rambank * 0x4000) + offset];
 }
 
 void splashms_state::sub_bank_w(offs_t offset, uint8_t data)
 {
-	logerror("sub_bank_w %04x with bank %02x (data %02x)\n", offset, m_subbankselect, data);
+//	logerror("sub_bank_w %04x with bank %02x (data %02x)\n", offset, m_subbankselect, data);
 	int rambank = m_subbankselect & 0x7;
 	m_bitmapram[(rambank * 0x4000) + offset] = data;
 }
@@ -211,7 +213,7 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (int i = 0; i < 0x100; i+=2)
+	for (int i = 0x100-2; i >= 0; i-=2)
 	{
 		gfx_element *gfx = m_gfxdecode->gfx(0);
 
