@@ -19,9 +19,9 @@ namespace netlist
 	NETLIB_OBJECT(7474)
 	{
 		NETLIB_CONSTRUCTOR(7474)
-		, m_D(*this, "D")
-		, m_CLRQ(*this, "CLRQ")
-		, m_PREQ(*this, "PREQ")
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(inputs))
+		, m_PREQ(*this, "PREQ", NETLIB_DELEGATE(inputs))
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
@@ -31,9 +31,41 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-		NETLIB_HANDLERI(clk);
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_D.set_state(logic_t::STATE_INP_ACTIVE);
+			m_nextD = 0;
+		}
+
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		NETLIB_HANDLERI(clk)
+		{
+			newstate(m_nextD, !m_nextD);
+			m_CLK.inactivate();
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const auto preq(m_PREQ());
+			const auto clrq(m_CLRQ());
+			if (preq & clrq)
+			{
+				m_D.activate();
+				m_nextD = m_D();
+				m_CLK.activate_lh();
+			}
+			else
+			{
+				newstate(preq ^ 1, clrq ^ 1);
+				m_CLK.inactivate();
+				m_D.inactivate();
+			}
+		}
 
 		logic_input_t m_D;
 		logic_input_t m_CLRQ;
@@ -87,37 +119,6 @@ namespace netlist
 		NETLIB_SUB(7474) m_A;
 		NETLIB_SUB(7474) m_B;
 	};
-
-	NETLIB_HANDLER(7474, clk)
-	{
-		newstate(m_nextD, !m_nextD);
-		m_CLK.inactivate();
-	}
-
-	NETLIB_UPDATE(7474)
-	{
-		const auto preq(m_PREQ());
-		const auto clrq(m_CLRQ());
-		if (preq & clrq)
-		{
-			m_D.activate();
-			m_nextD = m_D();
-			m_CLK.activate_lh();
-		}
-		else
-		{
-			newstate(preq ^ 1, clrq ^ 1);
-			m_CLK.inactivate();
-			m_D.inactivate();
-		}
-	}
-
-	NETLIB_RESET(7474)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_D.set_state(logic_t::STATE_INP_ACTIVE);
-		m_nextD = 0;
-	}
 
 	NETLIB_RESET(7474_dip)
 	{

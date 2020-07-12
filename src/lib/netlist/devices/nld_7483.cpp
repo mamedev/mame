@@ -15,7 +15,7 @@ namespace netlist
 	NETLIB_OBJECT(7483)
 	{
 		NETLIB_CONSTRUCTOR(7483)
-		, m_C0(*this, "C0")
+		, m_C0(*this, "C0", NETLIB_DELEGATE(c0))
 		, m_A1(*this, "A1", NETLIB_DELEGATE(upd_a))
 		, m_A2(*this, "A2", NETLIB_DELEGATE(upd_a))
 		, m_A3(*this, "A3", NETLIB_DELEGATE(upd_a))
@@ -39,12 +39,42 @@ namespace netlist
 		{
 			m_lastr = 0;
 		}
-		NETLIB_UPDATEI();
-		NETLIB_HANDLERI(upd_a);
-		NETLIB_HANDLERI(upd_b);
+
+		NETLIB_UPDATEI()
+		{
+			c0();
+		}
 
 		friend class NETLIB_NAME(7483_dip);
 	private:
+		NETLIB_HANDLERI(c0)
+		{
+			auto r = static_cast<uint8_t>(m_a + m_b + m_C0());
+
+			if (r != m_lastr)
+			{
+				m_lastr = r;
+				m_S1.push((r >> 0) & 1, NLTIME_FROM_NS(23));
+				m_S2.push((r >> 1) & 1, NLTIME_FROM_NS(23));
+				m_S3.push((r >> 2) & 1, NLTIME_FROM_NS(23));
+				m_S4.push((r >> 3) & 1, NLTIME_FROM_NS(23));
+				m_C4.push((r >> 4) & 1, NLTIME_FROM_NS(23));
+			}
+		}
+
+		NETLIB_HANDLERI(upd_a)
+		{
+			m_a = static_cast<uint8_t>((m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3));
+			NETLIB_NAME(7483)::update();
+		}
+
+		NETLIB_HANDLERI(upd_b)
+		{
+			m_b = static_cast<uint8_t>((m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3));
+			NETLIB_NAME(7483)::update();
+		}
+
+
 		logic_input_t m_C0;
 		logic_input_t m_A1;
 		logic_input_t m_A2;
@@ -95,33 +125,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(7483) A;
 	};
-
-	NETLIB_HANDLER(7483, upd_a)
-	{
-		m_a = static_cast<uint8_t>((m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3));
-		NETLIB_NAME(7483)::update();
-	}
-
-	NETLIB_HANDLER(7483, upd_b)
-	{
-		m_b = static_cast<uint8_t>((m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3));
-		NETLIB_NAME(7483)::update();
-	}
-
-	NETLIB_UPDATE(7483)
-	{
-		auto r = static_cast<uint8_t>(m_a + m_b + m_C0());
-
-		if (r != m_lastr)
-		{
-			m_lastr = r;
-			m_S1.push((r >> 0) & 1, NLTIME_FROM_NS(23));
-			m_S2.push((r >> 1) & 1, NLTIME_FROM_NS(23));
-			m_S3.push((r >> 2) & 1, NLTIME_FROM_NS(23));
-			m_S4.push((r >> 3) & 1, NLTIME_FROM_NS(23));
-			m_C4.push((r >> 4) & 1, NLTIME_FROM_NS(23));
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(7483, "TTL_7483", "+A1,+A2,+A3,+A4,+B1,+B2,+B3,+B4,+C0,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7483_dip, "TTL_7483_DIP", "")

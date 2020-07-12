@@ -17,8 +17,8 @@ namespace netlist
 	NETLIB_OBJECT(74393)
 	{
 		NETLIB_CONSTRUCTOR(74393)
-		, m_CP(*this, "CP")
-		, m_MR(*this, "MR")
+		, m_CP(*this, "CP", NETLIB_DELEGATE(inputs))
+		, m_MR(*this, "MR", NETLIB_DELEGATE(inputs))
 		, m_Q(*this, {"Q0", "Q1", "Q2", "Q3"})
 		, m_cnt(*this, "m_cnt", 0)
 		, m_cp(*this, "m_cp", 0)
@@ -34,6 +34,11 @@ namespace netlist
 		}
 
 		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		NETLIB_HANDLERI(inputs)
 		{
 			netlist_sig_t last_cp = m_cp;
 			netlist_sig_t last_mr = m_mr;

@@ -19,8 +19,8 @@ namespace netlist
 		, m_CE1Q(*this, "CE1Q", NETLIB_DELEGATE(enq))
 		, m_CE2Q(*this, "CE2Q", NETLIB_DELEGATE(enq))
 		, m_CE3Q(*this, "CE3Q", NETLIB_DELEGATE(enq))
-		, m_WEQ(*this, "WEQ")
-		, m_DIN(*this, "DIN")
+		, m_WEQ(*this, "WEQ", NETLIB_DELEGATE(inputs))
+		, m_DIN(*this, "DIN", NETLIB_DELEGATE(inputs))
 		, m_DOUTQ(*this, "DOUTQ")
 		, m_ram(*this, "m_ram", 0)
 		, m_addr(*this, "m_addr", 0)
@@ -38,7 +38,30 @@ namespace netlist
 			m_addr = 0;
 			m_enq = 0;
 		}
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		friend class NETLIB_NAME(82S16_dip);
+	private:
+		// FIXME: timing!
+		// FIXME: optimize device (separate address decoder!)
+		NETLIB_HANDLERI(inputs)
+		{
+			if (!m_enq)
+			{
+				const decltype(m_addr)::value_type adr(m_addr);
+				if (!m_WEQ())
+				{
+					m_ram[adr >> 6] = (m_ram[adr >> 6]
+							& ~(static_cast<uint64_t>(1) << (adr & 0x3f)))
+							| (static_cast<uint64_t>(m_DIN()) << (adr & 0x3f));
+				}
+				m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
+			}
+		}
+
 		NETLIB_HANDLERI(addr)
 		{
 			uint8_t adr = 0;
@@ -73,8 +96,6 @@ namespace netlist
 			}
 		}
 
-		friend class NETLIB_NAME(82S16_dip);
-	private:
 		object_array_t<logic_input_t, 8> m_A;
 		logic_input_t m_CE1Q;
 		logic_input_t m_CE2Q;
@@ -120,23 +141,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(82S16) A;
 	};
-
-	// FIXME: timing!
-	// FIXME: optimize device (separate address decoder!)
-	NETLIB_UPDATE(82S16)
-	{
-		if (!m_enq)
-		{
-			const decltype(m_addr)::value_type adr(m_addr);
-			if (!m_WEQ())
-			{
-				m_ram[adr >> 6] = (m_ram[adr >> 6]
-						& ~(static_cast<uint64_t>(1) << (adr & 0x3f)))
-						| (static_cast<uint64_t>(m_DIN()) << (adr & 0x3f));
-			}
-			m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(82S16,     "TTL_82S16",     "")
 	NETLIB_DEVICE_IMPL(82S16_dip, "TTL_82S16_DIP", "")

@@ -18,13 +18,13 @@ namespace netlist
 	NETLIB_OBJECT(7448)
 	{
 		NETLIB_CONSTRUCTOR(7448)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_C(*this, "C")
-		, m_D(*this, "D")
-		, m_LTQ(*this, "LTQ")
-		, m_BIQ(*this, "BIQ")
-		, m_RBIQ(*this, "RBIQ")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_C(*this, "C", NETLIB_DELEGATE(inputs))
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
+		, m_LTQ(*this, "LTQ", NETLIB_DELEGATE(inputs))
+		, m_BIQ(*this, "BIQ", NETLIB_DELEGATE(inputs))
+		, m_RBIQ(*this, "RBIQ", NETLIB_DELEGATE(inputs))
 		, m_state(*this, "m_state", 0)
 		, m_Q(*this, {"a", "b", "c", "d", "e", "f", "g"})
 		, m_power_pins(*this)
@@ -35,7 +35,10 @@ namespace netlist
 		{
 			m_state = 0;
 		}
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 
 		friend class NETLIB_NAME(7448_dip);
 	private:
@@ -50,6 +53,36 @@ namespace netlist
 				for (std::size_t i = 0; i < 7; i++)
 					m_Q[i].push((t >> (6-i)) & 1, NLTIME_FROM_NS(100));
 				m_state = v;
+			}
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			if (!m_BIQ() || (m_BIQ() && !m_LTQ()))
+			{
+				m_A.inactivate();
+				m_B.inactivate();
+				m_C.inactivate();
+				m_D.inactivate();
+				m_RBIQ.inactivate();
+				if (m_BIQ() && !m_LTQ())
+				{
+					update_outputs(8);
+				}
+				else if (!m_BIQ())
+				{
+					update_outputs(15);
+				}
+			} else {
+				m_RBIQ.activate();
+				m_D.activate();
+				m_C.activate();
+				m_B.activate();
+				m_A.activate();
+				unsigned v = (m_A() << 0) | (m_B() << 1) | (m_C() << 2) | (m_D() << 3);
+				if ((!m_RBIQ() && (v==0)))
+						v = 15;
+				update_outputs(v);
 			}
 		}
 
@@ -97,7 +130,6 @@ namespace netlist
 	};
 	#endif
 
-
 	#if !(NL_USE_TRUTHTABLE_7448)
 
 #define BITS7(b6,b5,b4,b3,b2,b1,b0) ((b6)<<6) | ((b5)<<5) | ((b4)<<4) | ((b3)<<3) | ((b2)<<2) | ((b1)<<1) | ((b0)<<0)
@@ -121,36 +153,6 @@ namespace netlist
 			BITS7(   0, 0, 0, 1, 1, 1, 1 ),  /* 14 */
 			BITS7(   0, 0, 0, 0, 0, 0, 0 ),  /* 15 */
 	};
-
-	NETLIB_UPDATE(7448)
-	{
-		if (!m_BIQ() || (m_BIQ() && !m_LTQ()))
-		{
-			m_A.inactivate();
-			m_B.inactivate();
-			m_C.inactivate();
-			m_D.inactivate();
-			m_RBIQ.inactivate();
-			if (m_BIQ() && !m_LTQ())
-			{
-				update_outputs(8);
-			}
-			else if (!m_BIQ())
-			{
-				update_outputs(15);
-			}
-		} else {
-			m_RBIQ.activate();
-			m_D.activate();
-			m_C.activate();
-			m_B.activate();
-			m_A.activate();
-			unsigned v = (m_A() << 0) | (m_B() << 1) | (m_C() << 2) | (m_D() << 3);
-			if ((!m_RBIQ() && (v==0)))
-					v = 15;
-			update_outputs(v);
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7448_dip, "TTL_7448_DIP", "")
