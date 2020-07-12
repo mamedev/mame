@@ -103,8 +103,8 @@ void spectrum_speccydos_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", speccydos_floppies, "35dsdd", spectrum_speccydos_device::floppy_formats).enable_sound(true);	
-	FLOPPY_CONNECTOR(config, "fdc:1", speccydos_floppies, "35dsdd", spectrum_speccydos_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", speccydos_floppies, "525dsqd", spectrum_speccydos_device::floppy_formats).enable_sound(true);	
+	FLOPPY_CONNECTOR(config, "fdc:1", speccydos_floppies, "525dsqd", spectrum_speccydos_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", speccydos_floppies, nullptr, spectrum_speccydos_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", speccydos_floppies, nullptr, spectrum_speccydos_device::floppy_formats).enable_sound(true);
 
@@ -178,6 +178,7 @@ void spectrum_speccydos_device::pre_opcode_fetch(offs_t offset)
 	{
 		switch (offset)
 		{
+		case 0x0066:
 		case 0x1292:
 		case 0x1b41:
 			if (!BIT(m_control, 6))
