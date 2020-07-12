@@ -1655,6 +1655,13 @@ void avr8_device::timer2_tick()
 	{
 		switch (wgm2)
 		{
+		case WGM02_NORMAL:
+			if (count == 0xff)
+			{
+				m_r[AVR8_REGIDX_TIFR2] |= AVR8_TIFR2_TOV2_MASK;
+			}
+			break;
+
 		case WGM02_FAST_PWM:
 			if (reg == 0)
 			{
@@ -1868,11 +1875,12 @@ void avr8_device::timer4_tick()
 
 void avr8_device::update_timer_clock_source(uint8_t t, uint8_t clock_select)
 {
-	static const int s_prescale_values[8] =
+	static const int s_prescale_values[2][8] =
 	{
-		0, 1, 8, 64, 256, 1024, -1, -1
+		{ 0, 1, 8, 64, 256, 1024, -1, -1 }, // T0/T1/T3/T4/T5
+		{ 0, 1, 8, 32, 64, 128, 256, 1024 } // T2
 	};
-	m_timer_prescale[t] = s_prescale_values[clock_select];
+	m_timer_prescale[t] = s_prescale_values[(t == 2) ? 1 : 0][clock_select];
 
 	LOGMASKED((LOG_TIMER0 + t), "%s: update_timer_clock_source: t = %d, cs = %d\n", t, machine().describe_context(), clock_select);
 

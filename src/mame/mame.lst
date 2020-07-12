@@ -3092,6 +3092,10 @@ avigo_es                        // 1997 Avigo (Spanish)
 avigo_fr                        // 1997 Avigo (French)
 avigo_it                        // 1997 Avigo (Italian)
 
+@source:avrmax.cpp
+avrmax
+avrmaxg
+
 @source:avt.cpp
 avtbingo                        // (c) 1985 AVT
 avtnfl                          // (c) 1989 AVT

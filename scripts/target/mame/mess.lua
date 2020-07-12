@@ -2239,6 +2239,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "elektor")
 files {
+	MAME_DIR .. "src/mame/drivers/avrmax.cpp",
 	MAME_DIR .. "src/mame/drivers/ec65.cpp",
 	MAME_DIR .. "src/mame/drivers/elekscmp.cpp",
 	MAME_DIR .. "src/mame/drivers/junior.cpp",
