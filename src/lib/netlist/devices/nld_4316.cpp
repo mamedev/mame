@@ -16,11 +16,11 @@ namespace netlist { namespace devices {
 	NETLIB_OBJECT(CD4316_GATE)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4316_GATE, "CD4XXX")
-		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "_R")
 		, m_S(*this, "S", NETLIB_DELEGATE(inputs))
 		, m_E(*this, "E", NETLIB_DELEGATE(inputs))
 		, m_base_r(*this, "BASER", nlconst::magic(45.0))
+		, m_supply(*this)
 		{
 		}
 
@@ -47,12 +47,12 @@ namespace netlist { namespace devices {
 		}
 
 	private:
-		nld_power_pins             m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 
 		logic_input_t              m_S;
 		logic_input_t              m_E;
 		param_fp_t             m_base_r;
+		nld_power_pins             m_supply;
 	};
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")

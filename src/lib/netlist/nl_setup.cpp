@@ -1455,12 +1455,12 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	{
 		case family_type::CUSTOM:
 		case family_type::TTL:
+		case family_type::NMOS:
 			ret->m_vcc = "VCC";
 			ret->m_gnd = "GND";
 			break;
 		case family_type::MOS:
 		case family_type::CMOS:
-		case family_type::NMOS:
 		case family_type::PMOS:
 			ret->m_vcc = "VDD";
 			ret->m_gnd = "VSS";

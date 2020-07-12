@@ -2140,13 +2140,20 @@ namespace netlist
 	public:
 		using this_type = nld_power_pins;
 
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
-			const pstring &sGND = sPowerGND)
+		explicit nld_power_pins(device_t &owner)
+		: m_VCC(owner, owner.logic_family()->vcc_pin(), NETLIB_DELEGATE(noop))
+		, m_GND(owner, owner.logic_family()->gnd_pin(), NETLIB_DELEGATE(noop))
+		{
+		}
+
+#if 0
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC,
+			const pstring &sGND)
 		: m_VCC(owner, sVCC, NETLIB_DELEGATE(noop))
 		, m_GND(owner, sGND, NETLIB_DELEGATE(noop))
 		{
 		}
-
+#endif
 		const analog_input_t &VCC() const noexcept
 		{
 			return m_VCC;

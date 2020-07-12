@@ -14,12 +14,12 @@ namespace netlist
 	{
 	NETLIB_OBJECT(Am2847_shifter)
 	{
-		NETLIB_CONSTRUCTOR(Am2847_shifter)
+		NETLIB_CONSTRUCTOR_MODEL(Am2847_shifter, "CD4XXX")
 		, m_RC(*this, "RC", NETLIB_DELEGATE(inputs))
 		, m_IN(*this, "IN", NETLIB_DELEGATE(inputs))
 		, m_buffer(*this, "m_buffer", 0)
 		, m_OUT(*this, "OUT")
-		, m_power_pins(*this, "VSS", "VDD")
+		, m_power_pins(*this)
 		{
 		}
 

@@ -20,7 +20,7 @@ namespace netlist
 		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"})
 		, m_cnt(*this, "m_cnt", 0)
-		, m_supply(*this, "VDD", "VSS")
+		, m_supply(*this)
 		{
 		}
 

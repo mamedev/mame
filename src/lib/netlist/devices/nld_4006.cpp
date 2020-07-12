@@ -23,7 +23,7 @@ namespace netlist
 		, m_Q(*this, {"D1P4", "D1P4S", "D2P4", "D2P5", "D3P4", "D4P4", "D3P5"})
 		, m_d(*this, "m_d", 0)
 		, m_last_clock(*this, "m_last_clock", 0)
-		, m_supply(*this, "VDD", "VSS")
+		, m_supply(*this)
 		{
 		}
 
