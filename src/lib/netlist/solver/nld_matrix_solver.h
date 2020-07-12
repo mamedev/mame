@@ -330,6 +330,7 @@ namespace solver
 
 		state_var<std::size_t> m_stat_calculations;
 		state_var<std::size_t> m_stat_newton_raphson;
+		state_var<std::size_t> m_stat_newton_raphson_fail;
 		state_var<std::size_t> m_stat_vsolver_calls;
 
 		state_var<netlist_time_ext> m_last_step;

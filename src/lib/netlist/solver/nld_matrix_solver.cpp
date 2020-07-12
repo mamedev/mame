@@ -46,6 +46,7 @@ namespace solver
 		, m_iterative_total(*this, "m_iterative_total", 0)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
 		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
+		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
 		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
 		, m_fb_sync(*this, "FB_sync")
@@ -454,10 +455,8 @@ namespace solver
 		} while (this_resched && newton_loops < m_params.m_nr_loops);
 
 		m_stat_newton_raphson += newton_loops;
-#if 0
 		if (this_resched)
 			m_stat_newton_raphson_fail++;
-#endif
 		return this_resched;
 	}
 
@@ -489,9 +488,13 @@ namespace solver
 			resched = solve_nr_base();
 			next_time_step = compute_next_timestep(next_time_step.as_fp<nl_fptype>(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
 		}
-		// reschedule ....
+
+		if (m_stat_newton_raphson % 100 == 0)
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_2(100, this->name()));
+
 		if (resched && !m_Q_sync.net().is_queued())
 		{
+			// reschedule ....
 			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
 			// FIXME: test and enable - this is working better, though not optimal yet
 #if 0

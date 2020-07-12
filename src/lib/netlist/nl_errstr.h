@@ -133,7 +133,8 @@ namespace netlist
 	PERRMSGV(MF_UNHANDLED_ELEMENT_1_FOUND,          1, "setup_base:unhandled element <{1}> found")
 	PERRMSGV(MF_FOUND_TERM_WITH_MISSING_OTHERNET,   1, "found term with missing othernet {1}")
 
-	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,     1, "NEWTON_LOOPS exceeded on net {1}... reschedule")
+	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_2, 2, "NEWTON_LOOPS exceeded resolution invoked {1} times on net {2}")
+	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,     1, "NEWTON_LOOPS exceeded resolution failed on net {1} ... reschedule")
 
 	// nld_solver.cpp
 
