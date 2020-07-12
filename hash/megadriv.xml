@@ -13666,7 +13666,7 @@ but dumps still have to be confirmed.
 
 <!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
 	<software name="cutthrp" cloneof="cutthr">
-		<description>CutThroat Island (Prototye)</description>
+		<description>CutThroat Island (Prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
