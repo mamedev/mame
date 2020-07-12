@@ -64,9 +64,9 @@ namespace netlist
 		, m_R3(*this, "R3")
 		, m_ROUT(*this, "ROUT")
 		, m_RDIS(*this, "RDIS")
-		, m_RESET(*this, "RESET")     // Pin 4
-		, m_THRES(*this, "THRESH")    // Pin 6
-		, m_TRIG(*this, "TRIG")       // Pin 2
+		, m_RESET(*this, "RESET", NETLIB_DELEGATE(inputs))     // Pin 4
+		, m_THRES(*this, "THRESH", NETLIB_DELEGATE(inputs))    // Pin 6
+		, m_TRIG(*this, "TRIG", NETLIB_DELEGATE(inputs))       // Pin 2
 		, m_OUT(*this, "_OUT")        // to Pin 3 via ROUT
 		, m_last_out(*this, "m_last_out", false)
 		, m_ff(*this, "m_ff", false)
@@ -84,10 +84,65 @@ namespace netlist
 			connect(m_OUT, m_ROUT.N());
 		}
 
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		NETLIB_RESETI()
+		{
+			/* FIXME make resistances a parameter, properly model other variants */
+			m_R1.set_R(nlconst::magic(5000));
+			m_R2.set_R(nlconst::magic(5000));
+			m_R3.set_R(nlconst::magic(5000));
+			m_ROUT.set_R(nlconst::magic(20));
+			m_RDIS.set_R(nlconst::magic(R_OFF));
+
+			m_last_out = true;
+		}
 
 	private:
+		NETLIB_HANDLERI(inputs)
+		{
+			// FIXME: assumes GND is connected to 0V.
+
+			const auto reset = m_RESET();
+
+			if (!reset && m_last_reset)
+			{
+				m_ff = false;
+			}
+			else
+			{
+				const nl_fptype vt = clamp(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
+				const bool bthresh = (m_THRES() > vt);
+				const bool btrig = (m_TRIG() > clamp(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4)));
+
+				if (!btrig)
+					m_ff = true;
+				else if (bthresh)
+					m_ff = false;
+			}
+
+			const bool out = (!reset ? false : m_ff);
+
+			if (m_last_out && !out)
+			{
+				m_RDIS.solve_now();
+				m_OUT.push(m_R3.N()());
+				m_RDIS.set_R(nlconst::magic(R_ON));
+			}
+			else if (!m_last_out && out)
+			{
+				m_RDIS.solve_now();
+				// FIXME: Should be delayed by 100ns
+				m_OUT.push(m_R1.P()());
+				m_RDIS.set_R(nlconst::magic(R_OFF));
+			}
+			m_last_reset = reset;
+			m_last_out = out;
+		}
+
 		analog::NETLIB_SUB(R_base) m_R1;
 		analog::NETLIB_SUB(R_base) m_R2;
 		analog::NETLIB_SUB(R_base) m_R3;
@@ -138,59 +193,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(NE555) A;
 	};
-
-	NETLIB_RESET(NE555)
-	{
-		/* FIXME make resistances a parameter, properly model other variants */
-		m_R1.set_R(nlconst::magic(5000));
-		m_R2.set_R(nlconst::magic(5000));
-		m_R3.set_R(nlconst::magic(5000));
-		m_ROUT.set_R(nlconst::magic(20));
-		m_RDIS.set_R(nlconst::magic(R_OFF));
-
-		m_last_out = true;
-	}
-
-	NETLIB_UPDATE(NE555)
-	{
-		// FIXME: assumes GND is connected to 0V.
-
-		const auto reset = m_RESET();
-
-		if (!reset && m_last_reset)
-		{
-			m_ff = false;
-		}
-		else
-		{
-			const nl_fptype vt = clamp(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
-			const bool bthresh = (m_THRES() > vt);
-			const bool btrig = (m_TRIG() > clamp(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4)));
-
-			if (!btrig)
-				m_ff = true;
-			else if (bthresh)
-				m_ff = false;
-		}
-
-		const bool out = (!reset ? false : m_ff);
-
-		if (m_last_out && !out)
-		{
-			m_RDIS.solve_now();
-			m_OUT.push(m_R3.N()());
-			m_RDIS.set_R(nlconst::magic(R_ON));
-		}
-		else if (!m_last_out && out)
-		{
-			m_RDIS.solve_now();
-			// FIXME: Should be delayed by 100ns
-			m_OUT.push(m_R1.P()());
-			m_RDIS.set_R(nlconst::magic(R_OFF));
-		}
-		m_last_reset = reset;
-		m_last_out = out;
-	}
 
 	NETLIB_DEVICE_IMPL(NE555,     "NE555", "")
 	NETLIB_DEVICE_IMPL(NE555_dip, "NE555_DIP", "")
