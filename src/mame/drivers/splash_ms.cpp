@@ -3,8 +3,6 @@
 
 /*
 	Splash (Modular System)
-
-	-- how does the extra Z80 for the backgrounds work?
 */
 
 
@@ -69,7 +67,7 @@ private:
 
 	uint16_t unknown_0x400004_r();
 	uint16_t unknown_0x40000c_r();
-	uint8_t unknown_sub_r();
+	uint8_t frommain_command_r();
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
@@ -88,9 +86,10 @@ private:
 	int m_subrombankselect;
 
 	uint8_t m_bitmapram[0x20000];
+	uint8_t m_subcmd;
 
-	void unknown_sub_port01_w(uint8_t data);
-	void unknown_sub_port02_w(uint8_t data);
+	void sub_rambankselect_w(uint8_t data);
+	void sub_rombankselect_w(uint8_t data);
 
 };
 
@@ -105,22 +104,22 @@ uint16_t splashms_state::unknown_0x40000c_r()
 }
 
 
-void splashms_state::unknown_sub_port01_w(uint8_t data)
+void splashms_state::sub_rambankselect_w(uint8_t data)
 {
-	logerror("unknown_sub_port01_w %02x\n", data);
+	logerror("sub_rambankselect_w %02x\n", data);
 	m_subbankselect = data;
 }
 
-void splashms_state::unknown_sub_port02_w(uint8_t data)
+void splashms_state::sub_rombankselect_w(uint8_t data)
 {
-	logerror("unknown_sub_port02_w %02x\n", data);
+	logerror("sub_rombankselect_w %02x\n", data);
 	m_subrombankselect = data;
 }
 
 
-uint8_t splashms_state::unknown_sub_r()
+uint8_t splashms_state::frommain_command_r()
 {
-	return 0x14;// machine().rand();
+	return m_subcmd;// machine().rand();
 }
 
 void splashms_state::to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -131,7 +130,9 @@ void splashms_state::to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t 
 
 void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	popmessage("to_subcpu_0x400004_w %04x\n", data);
+	// no IRQ, subcpu just polls this
+	//popmessage("to_subcpu_0x400004_w %04x\n", data);
+	m_subcmd = data;
 }
 
 uint8_t splashms_state::sub_rombank_r(offs_t offset)
@@ -172,7 +173,7 @@ void splashms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap0)
 {
 	int tile = m_videoram[tile_index*2];
-	int attr = m_videoram[(tile_index*2)+1] & 0x3f;
+	int attr = m_videoram[(tile_index*2)+1] & 0x0f;
 	int fx = (m_videoram[(tile_index*2)+1] & 0xc0)>>6;
 
 	tileinfo.set(1,tile,attr,TILE_FLIPYX(fx));
@@ -185,7 +186,7 @@ TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap1)
 	int bank = (tile & 0x100)>>8;
 	tile &= 0xff;
 
-	int attr = m_videoram2[(tile_index*2)+1] & 0x3f;
+	int attr = m_videoram2[(tile_index*2)+1] & 0x0f;
 	int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
 
 	tileinfo.set(2+bank,tile,attr,TILE_FLIPYX(fx));
@@ -193,6 +194,20 @@ TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap1)
 
 uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int y = 0; y < 256; y++)
+	{
+		uint16_t* dst = &bitmap.pix16(y);
+
+		for (int x = 0; x < 512; x++)
+		{
+			uint8_t pix = m_bitmapram[(y * 512) + x];
+			dst[x] = pix + 0x100;
+		}
+	}
+
+	m_bg_tilemap2->set_scrollx(0, 64);
+	m_bg_tilemap->set_scrollx(0, 64);
+
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -204,7 +219,7 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		uint16_t attr1 = m_spriteram[i + 1];
 
 		uint16_t attr2 = m_spriteram[i + 0x100];
-		//uint16_t attr3 = m_spriteram[i + 0x101];
+		//uint16_t attr3 = m_spriteram[i + 0x101]; // unused?
 
 		int ypos = attr0 & 0x00ff;
 		int xpos = (attr1 & 0xff00)>>8;
@@ -219,7 +234,7 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-64,ypos-16,15);
 	}
 
 	return 0;
@@ -231,6 +246,7 @@ void splashms_state::video_start()
 	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  16,  16, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap2->set_transparent_pen(0);
 
 }
 
@@ -269,10 +285,10 @@ void splashms_state::splashms_map(address_map &map)
 void splashms_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(FUNC(splashms_state::unknown_sub_port01_w)); // banking for 0x4000-0x7fff RAM?
-	map(0x02, 0x02).w(FUNC(splashms_state::unknown_sub_port02_w)); // banking for 0x8000-0xffff ROM?
+	map(0x01, 0x01).w(FUNC(splashms_state::sub_rambankselect_w)); // banking for 0x4000-0x7fff RAM?
+	map(0x02, 0x02).w(FUNC(splashms_state::sub_rombankselect_w)); // banking for 0x8000-0xffff ROM?
 
-	map(0x03, 0x03).r(FUNC(splashms_state::unknown_sub_r));
+	map(0x03, 0x03).r(FUNC(splashms_state::frommain_command_r));
 }
 
 void splashms_state::sub_map(address_map &map)
@@ -294,6 +310,7 @@ void splashms_state::sound_map(address_map &map)
 
 void splashms_state::machine_start()
 {
+	save_item(NAME(m_bitmapram));
 }
 
 void splashms_state::machine_reset()
@@ -304,6 +321,7 @@ void splashms_state::machine_reset()
 	}
 	m_subbankselect = 0;
 	m_subrombankselect = 0;
+	m_subcmd = 0;
 }
 
 
@@ -443,7 +461,7 @@ void splashms_state::splashms(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_visarea(16, (16+368)-1, 0, 256-16-1);
 	m_screen->set_screen_update(FUNC(splashms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
