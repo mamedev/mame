@@ -4,6 +4,7 @@
 /*
 	Splash (Modular System)
 
+	-- how does the extra Z80 for the backgrounds work?
 */
 
 
@@ -63,7 +64,9 @@ private:
 	void sub_portmap(address_map &map);
 	void sound_map(address_map &map);
 
-	uint16_t unknown_r();
+	uint16_t unknown_0x400004_r();
+	uint16_t unknown_0x40000c_r();
+	uint8_t unknown_sub_r();
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
@@ -71,12 +74,37 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap2;
 
+	void to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
-uint16_t splashms_state::unknown_r()
+uint16_t splashms_state::unknown_0x400004_r()
 {
 	return machine().rand();
 }
+
+uint16_t splashms_state::unknown_0x40000c_r()
+{
+	return machine().rand();
+}
+
+
+uint8_t splashms_state::unknown_sub_r()
+{
+	return machine().rand();
+}
+
+void splashms_state::to_sound_0x40000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// soundlatch
+	logerror("to_sound_0x40000e_w %04x\n", data);
+}
+
+void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	popmessage("to_subcpu_0x400004_w %04x\n", data);
+}
+
 
 
 void splashms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -132,13 +160,16 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int xpos = (attr1 & 0xff00)>>8;
 		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
+		ypos = (0xff - ypos);
+		ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
+
 		int tile = (attr0 & 0xff00) >> 8;
 		tile |= (attr1 & 0x003f) << 8;
 
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16,(0xff-ypos)-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16,ypos-16,15);
 	}
 
 	return 0;
@@ -159,11 +190,14 @@ void splashms_state::splashms_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 
 	map(0x080000, 0x081fff).ram().w(FUNC(splashms_state::vram_w)).share("videoram");
-	map(0x082000, 0x08ffff).ram();
+
+	map(0x08ff00, 0x08ffff).ram(); // leftover?
 
 	map(0x090000, 0x091fff).ram().w(FUNC(splashms_state::vram2_w)).share("videoram2");
-	map(0x092000, 0x09ffff).ram();
-	map(0x0a0000, 0x0fffff).ram();
+
+	map(0x0a0000, 0x0a1fff).ram();
+
+	map(0x0c0000, 0x0c000f).ram(); // scroll vals
 
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 
@@ -171,13 +205,13 @@ void splashms_state::splashms_map(address_map &map)
 
 	map(0x400000, 0x400001).portr("IN0");
 	map(0x400002, 0x400003).portr("IN1");
-	map(0x400004, 0x400005).r(FUNC(splashms_state::unknown_r)).nopw();
+	map(0x400004, 0x400005).r(FUNC(splashms_state::unknown_0x400004_r)).w(FUNC(splashms_state::to_subcpu_0x400004_w));
 	map(0x400006, 0x400007).portr("IN3");
 	map(0x400008, 0x400009).portr("IN4"); // service mode in here
 
-	map(0x40000c, 0x40000d).r(FUNC(splashms_state::unknown_r));
+	map(0x40000c, 0x40000d).r(FUNC(splashms_state::unknown_0x40000c_r));
 
-	map(0x40000e, 0x40000f).nopw();
+	map(0x40000e, 0x40000f).w(FUNC(splashms_state::to_sound_0x40000e_w));
 
 	map(0xff0000, 0xffffff).ram();
 }
@@ -186,12 +220,16 @@ void splashms_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).nopw(); // banking for 0x4000-0x7fff RAM?
+
+	map(0x03, 0x03).r(FUNC(splashms_state::unknown_sub_r));
 }
 
 void splashms_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x7fff).ram();
+
+	map(0xffff, 0xffff).nopr();
 }
 
 void splashms_state::sound_map(address_map &map)
@@ -339,8 +377,6 @@ void splashms_state::splashms(machine_config &config)
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &splashms_state::sound_map);
-
-	// YM3812 + OKI M5205
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
