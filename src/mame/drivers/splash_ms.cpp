@@ -364,7 +364,7 @@ void splashms_state::splashms(machine_config &config)
 	m_screen->set_screen_update(FUNC(splashms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x800);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_splashms);
 
