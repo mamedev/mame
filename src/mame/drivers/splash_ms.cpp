@@ -70,7 +70,6 @@ private:
 	void sub_portmap(address_map &map);
 	void sound_map(address_map &map);
 
-	uint16_t unknown_0x400004_r();
 	uint16_t unknown_0x40000c_r();
 	uint8_t frommain_command_r();
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -95,13 +94,12 @@ private:
 	void sub_rambankselect_w(uint8_t data);
 	void sub_rombankselect_w(uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_adpcm_data_w(uint8_t data);
+	void splash_adpcm_control_w(uint8_t data);
+	int m_adpcm_data;
 };
 
-uint16_t splashms_state::unknown_0x400004_r()
-{
-	logerror("%06x: unknown_0x400004_r\n", machine().describe_context());
-	return machine().rand();
-}
 
 uint16_t splashms_state::unknown_0x40000c_r()
 {
@@ -194,6 +192,8 @@ TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap1)
 
 uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+//	bitmap.fill(0, cliprect);
+
 	for (int y = 0; y < 256; y++)
 	{
 		uint16_t* dst = &bitmap.pix16(y);
@@ -201,6 +201,7 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		for (int x = 0; x < 512; x++)
 		{
 			uint8_t pix = m_bitmapram[(y * 512) + x];
+			//if (pix)
 			dst[x] = pix + 0x100;
 		}
 	}
@@ -208,8 +209,10 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap2->set_scrollx(0, 64);
 	m_bg_tilemap->set_scrollx(0, 64);
 
+	m_bg_tilemap2->set_scrolly(0, -m_scrollregs[1]);
+	m_bg_tilemap->set_scrolly(0, -m_scrollregs[3]);
+
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (int i = 0x100-2; i >= 0; i-=2)
 	{
@@ -237,6 +240,8 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-64,ypos-16,15);
 	}
 
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -253,7 +258,7 @@ void splashms_state::video_start()
 
 void splashms_state::splashms_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
+	map(0x000000, 0x03ffff).rom(); // writes to 0x030000 on startup
 
 	map(0x080000, 0x081fff).ram().w(FUNC(splashms_state::vram_w)).share("videoram");
 
@@ -261,7 +266,7 @@ void splashms_state::splashms_map(address_map &map)
 
 	map(0x090000, 0x091fff).ram().w(FUNC(splashms_state::vram2_w)).share("videoram2");
 
-	map(0x0a0000, 0x0a1fff).ram();
+	map(0x0a0000, 0x0a1fff).ram(); // copies unused tilemap data here (vram2 format) leftover?
 
 	map(0x0c0000, 0x0c000f).ram().share("scrollregs"); // scroll vals
 
@@ -271,7 +276,7 @@ void splashms_state::splashms_map(address_map &map)
 
 	map(0x400000, 0x400001).portr("IN0");
 	map(0x400002, 0x400003).portr("IN1");
-	map(0x400004, 0x400005).r(FUNC(splashms_state::unknown_0x400004_r)).w(FUNC(splashms_state::to_subcpu_0x400004_w));
+	map(0x400004, 0x400005).w(FUNC(splashms_state::to_subcpu_0x400004_w));
 	map(0x400006, 0x400007).portr("IN3");
 	map(0x400008, 0x400009).portr("IN4"); // service mode in here
 
@@ -285,8 +290,8 @@ void splashms_state::splashms_map(address_map &map)
 void splashms_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(FUNC(splashms_state::sub_rambankselect_w)); // banking for 0x4000-0x7fff RAM?
-	map(0x02, 0x02).w(FUNC(splashms_state::sub_rombankselect_w)); // banking for 0x8000-0xffff ROM?
+	map(0x01, 0x01).w(FUNC(splashms_state::sub_rambankselect_w)); // banking for 0x4000-0x7fff RAM
+	map(0x02, 0x02).w(FUNC(splashms_state::sub_rombankselect_w)); // banking for 0x8000-0xffff ROM
 
 	map(0x03, 0x03).r(FUNC(splashms_state::frommain_command_r));
 }
@@ -302,6 +307,9 @@ void splashms_state::sub_map(address_map &map)
 void splashms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
+
+	map(0xe000, 0xe000).w(FUNC(splashms_state::splash_adpcm_data_w));
+	map(0xe400, 0xe400).w(FUNC(splashms_state::splash_adpcm_control_w));
 
 	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
@@ -441,6 +449,23 @@ static GFXDECODE_START( gfx_splashms )
 	GFXDECODE_ENTRY( "bgtile", 0x8000, tiles16x16x4alt_layout, 0, 16 )
 GFXDECODE_END
 
+void splashms_state::splash_adpcm_data_w(uint8_t data)
+{
+	m_adpcm_data = data;
+}
+
+void splashms_state::splash_adpcm_control_w(uint8_t data)
+{
+	m_msm->reset_w(!BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(splashms_state::splash_msm5205_int)
+{
+	m_msm->data_w(m_adpcm_data >> 4);
+	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
+}
+
+
 void splashms_state::splashms(machine_config &config)
 {
 	/* basic machine hardware */
@@ -454,6 +479,7 @@ void splashms_state::splashms(machine_config &config)
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &splashms_state::sound_map);
+	m_soundcpu->set_periodic_int(FUNC(splashms_state::nmi_line_pulse), attotime::from_hz(60*64));  
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -477,9 +503,9 @@ void splashms_state::splashms(machine_config &config)
 	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	//m_msm->vck_legacy_callback().set(FUNC(splashms_state::splash_msm5205_int)); /* IRQ handler */
-	//m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */     /* Sample rate = 384kHz/48 */
-	//m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+	m_msm->vck_legacy_callback().set(FUNC(splashms_state::splash_msm5205_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 ROM_START( splashms )
@@ -542,4 +568,4 @@ ROM_START( splashms )
 	ROM_LOAD( "snd_9-2_9359_gal16v8as.ic10", 0, 1, NO_DUMP )
 ROM_END
 
-GAME( 1991, splashms,  0,  splashms,  splashms,  splashms_state, empty_init, ROT0, "Gaelco", "Splash (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, splashms,  splash,  splashms,  splashms,  splashms_state, empty_init, ROT0, "Gaelco", "Splash (Modular System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
