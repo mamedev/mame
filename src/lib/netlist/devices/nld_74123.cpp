@@ -79,8 +79,8 @@ namespace netlist
 		//, m_power_pins(*this)
 		{
 
-			register_subalias("GND", m_RN.N());
-			register_subalias("VCC", m_RP.P());
+			register_subalias(pstring(D::gnd()), m_RN.N());
+			register_subalias(pstring(D::vcc()), m_RP.P());
 			register_subalias("C",   m_RN.N());
 			register_subalias("RC",  m_RN.P());
 
@@ -197,6 +197,9 @@ namespace netlist
 			return ((in[1]() | (in[2]() ^ 1)) ^ 1) & in[0](); // ((m_A() | (m_B() ^ 1)) ^ 1) & m_CLRQ()
 		}
 		template<typename T> static constexpr netlist_sig_t clear(const T &in) { return in[0]();}
+
+		static constexpr const char *vcc() { return "VCC"; }
+		static constexpr const char *gnd() { return "GND"; }
 	};
 
 	struct desc_74121 : public desc_74123
@@ -232,6 +235,8 @@ namespace netlist
 		{
 			return (in[1]() | (in[2]() ^ 1)); // m_A() | (m_B() ^ 1)
 		}
+		static constexpr const char *vcc() { return "VDD"; }
+		static constexpr const char *gnd() { return "VSS"; }
 	};
 
 	using NETLIB_NAME(74123) = NETLIB_NAME(74123_base)<desc_74123>;

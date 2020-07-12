@@ -61,6 +61,6 @@
 		NET_REGISTER_DEV(TTL_9602, name)
 
 #define CD4538(name)                                                         \
-		NET_REGISTER_DEV(TTL_4538, name)
+		NET_REGISTER_DEV(CD4538, name)
 
 #endif /* NLD_74123_H_ */

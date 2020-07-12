@@ -50,7 +50,7 @@ namespace devices
 		, m_ign(*this, "m_ign", 0)
 		, m_ttp(ttp)
 		/* FIXME: the family should provide the names of the power-terminals! */
-		, m_power_pins(*this)
+		, m_power_pins(*this, logic_family()->vcc_pin(), logic_family()->gnd_pin())
 		{
 			init(desc);
 		}
