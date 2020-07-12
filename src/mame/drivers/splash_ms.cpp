@@ -206,10 +206,10 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 	}
 
-	m_bg_tilemap2->set_scrollx(0, 64-(m_scrollregs[6]-0xc));
-	m_bg_tilemap->set_scrollx(0, 64);
-
+	m_bg_tilemap2->set_scrollx(0, 64-(m_scrollregs[0]-0x2));
 	m_bg_tilemap2->set_scrolly(0, -m_scrollregs[1]);
+
+	m_bg_tilemap->set_scrollx(0, 64-(m_scrollregs[2]));
 	m_bg_tilemap->set_scrolly(0, -m_scrollregs[3]);
 
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
