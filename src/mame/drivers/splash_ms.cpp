@@ -73,6 +73,8 @@ private:
 	uint16_t unknown_0x40000c_r();
 	uint8_t frommain_command_r();
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
@@ -160,6 +162,11 @@ void splashms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
+
+uint16_t splashms_state::vram2_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_videoram2[offset];
 }
 
 void splashms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -262,11 +269,10 @@ void splashms_state::splashms_map(address_map &map)
 
 	map(0x080000, 0x081fff).ram().w(FUNC(splashms_state::vram_w)).share("videoram");
 
-	map(0x08ff00, 0x08ffff).ram(); // leftover?
+	map(0x08e000, 0x08ffff).rw(FUNC(splashms_state::vram2_r), FUNC(splashms_state::vram2_w)); // mirror needed for paint dripping in attract
+	map(0x090000, 0x091fff).ram().rw(FUNC(splashms_state::vram2_r), FUNC(splashms_state::vram2_w)).share("videoram2");
 
-	map(0x090000, 0x091fff).ram().w(FUNC(splashms_state::vram2_w)).share("videoram2");
-
-	map(0x0a0000, 0x0a1fff).ram(); // copies unused tilemap data here (vram2 format) leftover?
+	map(0x0a0000, 0x0a1fff).ram();
 
 	map(0x0c0000, 0x0c000f).ram().share("scrollregs"); // scroll vals
 
