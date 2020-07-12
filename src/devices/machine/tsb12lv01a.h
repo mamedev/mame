@@ -26,6 +26,8 @@ public:
 	auto phy_read() { return m_phy_read_cb.bind(); }
 	auto phy_write() { return m_phy_write_cb.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER(phy_reset_w);
+
 private:
 	// device-level overrides
 	virtual void device_start() override;

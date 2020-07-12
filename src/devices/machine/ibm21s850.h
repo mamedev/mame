@@ -22,12 +22,19 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	auto reset_cb() { return m_reset_cb.bind(); }
+
 	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 
 private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	void power_on_reset();
+
+	static const device_timer_id TIMER_RESET = 0;
 
 	enum
 	{
@@ -127,6 +134,10 @@ private:
 	};
 
 	uint8_t m_regs[16];
+
+	emu_timer *m_reset_timer;
+
+	devcb_write_line m_reset_cb;
 };
 
 //device type definition

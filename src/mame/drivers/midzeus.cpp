@@ -41,7 +41,13 @@ The Grid         v1.2   10/18/2000
 
 #include "crusnexo.lh"
 
-#define LOG_FW			(0)
+#define LOG_FIREWIRE	(1 << 1)
+#define LOG_DISK		(1 << 2)
+#define LOG_DISK_JR		(1 << 3)
+#define LOG_UNKNOWN		(1 << 4)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 #define CPU_CLOCK       XTAL(60'000'000)
 
@@ -105,6 +111,8 @@ private:
 	void zeus2_timekeeper_w(offs_t offset, uint32_t data);
 	uint32_t crusnexo_leds_r(offs_t offset);
 	void crusnexo_leds_w(offs_t offset, uint32_t data);
+
+	void update_firewire_irq();
 
 	uint32_t	m_disk_asic[0x10];
 	int			m_fw_int_enable;
@@ -268,28 +276,34 @@ uint32_t midzeus2_state::disk_asic_r(offs_t offset)
 		// Bit 15:8 Version
 		case 0:
 			retVal = (retVal & 0xffff00ff) | 0x3300;
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC System Control Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Interrupt Status / Control
 		// 0x004: IFIFO Interrupt
 		// 0x200: Firewire
 		case 1:
 			retVal = (m_fw_int << 9);
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Interrupt Status/Ctrl Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Test
 		case 2:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Test(?) Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Wait State Config
 		case 3:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Wait State Config Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// IDE Config
 		case 4:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC IDE Config Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// PSRAM Config
 		case 5:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC PSRAM Config Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Unknown
 		default:
-			logerror("%06X:disk_asic_r(%X) Unknown\n", m_maincpu->pc(), offset);
+			LOGMASKED(LOG_DISK | LOG_UNKNOWN, "%s: Disk ASIC Unknown Read: %08x\n", machine().describe_context(), offset);
 			break;
 	}
 	return retVal;
@@ -306,28 +320,35 @@ void midzeus2_state::disk_asic_w(offs_t offset, uint32_t data)
 		// Bit 0: zeus reset
 		// Bit 3: io reset
 		case 0:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC System Control Write: %08x\n", machine().describe_context(), data);
 			break;
 		// Interrupt Status / Control
 		// 0x004: IFIFO Interrupt
 		// 0x200: Enable Firewire interrupt
 		case 1:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Interrupt Status/Ctrl Write: %08x\n", machine().describe_context(), data);
 			m_fw_int_enable = BIT(data, 9);
+			update_firewire_irq();
 			break;
 		// Test
 		case 2:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Test(?) Write: %08x\n", machine().describe_context(), data);
 			break;
 		// Wait State Config
 		case 3:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Wait State Config Write: %08x\n", machine().describe_context(), data);
 			break;
 		// IDE Config
 		case 4:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC IDE Config Write: %08x\n", machine().describe_context(), data);
 			break;
 		// PSRAM Config
 		case 5:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC PSRAM Config Write: %08x\n", machine().describe_context(), data);
 			break;
 		// Unknown
 		default:
-			logerror("%06X:disk_asic_w(%X)=%08X Unknown\n", m_maincpu->pc(), offset, data);
+			LOGMASKED(LOG_DISK | LOG_UNKNOWN, "%s: Disk ASIC Unknown Write: %08x = %08x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
@@ -502,7 +523,13 @@ void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 WRITE_LINE_MEMBER(midzeus2_state::firewire_irq)
 {
 	m_fw_int = state;
-	m_maincpu->set_input_line(TMS3203X_IRQ1, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
+	update_firewire_irq();
+}
+
+void midzeus2_state::update_firewire_irq()
+{
+	LOGMASKED(LOG_FIREWIRE, "%ssserting FW IRQ\n", (m_fw_int_enable && m_fw_int) ? "A" : "Dea");
+	m_maincpu->set_input_line(TMS3203X_IRQ3, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
@@ -727,6 +754,7 @@ void midzeus2_state::zeus2_map(address_map &map)
 	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32031_control_r), FUNC(midzeus2_state::tms32031_control_w)).share("tms32031_ctl");
 	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
 	map(0x8a0000, 0x8a00cf).rw(m_fw_link, FUNC(tsb12lv01a_device::read), FUNC(tsb12lv01a_device::write));
+	//map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus2_state::disk_asic_jr_r), FUNC(midzeus2_state::disk_asic_jr_w));
 	map(0x900000, 0x91ffff).rw(FUNC(midzeus2_state::zpram_r), FUNC(midzeus2_state::zpram_w)).share("nvram").mirror(0x020000);
 	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
@@ -1300,6 +1328,7 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_ioasic->set_upper(474);
 
 	IBM21S850(config, m_fw_phy, 0);
+	m_fw_phy->reset_cb().set(m_fw_link, FUNC(tsb12lv01a_device::phy_reset_w));
 
 	TSB12LV01A(config, m_fw_link, 0);
 	m_fw_link->int_cb().set(FUNC(midzeus2_state::firewire_irq));
