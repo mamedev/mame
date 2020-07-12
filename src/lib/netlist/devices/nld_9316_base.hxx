@@ -24,11 +24,11 @@ namespace netlist
 		{
 			NETLIB_CONSTRUCTOR(9316_base)
 			, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
-			, m_ENT(*this, "ENT")
+			, m_ENT(*this, "ENT", NETLIB_DELEGATE(other))
 			, m_RC(*this, "RC")
-			, m_LOADQ(*this, "LOADQ")
-			, m_ENP(*this, "ENP")
-			, m_CLRQ(*this, "CLRQ")
+			, m_LOADQ(*this, "LOADQ", NETLIB_DELEGATE(other))
+			, m_ENP(*this, "ENP", NETLIB_DELEGATE(other))
+			, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(other))
 			, m_ABCD(*this, {"A", "B", "C", "D"}, NETLIB_DELEGATE(abcd))
 			, m_Q(*this, { "QA", "QB", "QC", "QD" })
 			, m_cnt(*this, "m_cnt", 0)
@@ -47,7 +47,7 @@ namespace netlist
 				m_abcd = 0;
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(other)
 			{
 				const auto CLRQ(m_CLRQ());
 				m_ent = m_ENT();
@@ -67,6 +67,11 @@ namespace netlist
 					}
 				}
 				m_RC.push(m_ent && (m_cnt == D::MAXCNT::value), D::tRC::value(0));
+			}
+
+			NETLIB_UPDATEI()
+			{
+				other();
 			}
 
 			NETLIB_HANDLERI(clk)

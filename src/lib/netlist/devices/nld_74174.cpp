@@ -15,12 +15,12 @@ namespace devices
 	NETLIB_OBJECT(74174)
 	{
 		NETLIB_CONSTRUCTOR(74174)
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(sub))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4", "Q5", "Q6"})
 		, m_clrq(*this, "m_clr", 0)
 		, m_data(*this, "m_data", 0)
-		, m_D(*this, {"D1", "D2", "D3", "D4", "D5", "D6"})
-		, m_CLRQ(*this, "CLRQ")
+		, m_D(*this, {"D1", "D2", "D3", "D4", "D5", "D6"}, NETLIB_DELEGATE(other))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(other))
 		, m_power_pins(*this)
 		{
 		}
@@ -31,9 +31,35 @@ namespace devices
 			m_clrq = 0;
 			m_data = 0xFF;
 		}
-		NETLIB_UPDATEI();
 
-		NETLIB_HANDLERI(sub)
+		NETLIB_HANDLERI(other)
+		{
+			uint_fast8_t d = 0;
+			for (std::size_t i=0; i<6; i++)
+			{
+				d |= (m_D[i]() << i);
+			}
+			m_clrq = m_CLRQ();
+			if (!m_clrq)
+			{
+				for (std::size_t i=0; i<6; i++)
+				{
+					m_Q[i].push(0, NLTIME_FROM_NS(40));
+				}
+				m_data = 0;
+			} else if (d != m_data)
+			{
+				m_data = d;
+				m_CLK.activate_lh();
+			}
+		}
+
+		NETLIB_UPDATEI()
+		{
+			other();
+		}
+
+		NETLIB_HANDLERI(clk)
 		{
 			if (m_clrq)
 			{
@@ -93,28 +119,6 @@ namespace devices
 	private:
 		NETLIB_SUB(74174) A;
 	};
-
-	NETLIB_UPDATE(74174)
-	{
-		uint_fast8_t d = 0;
-		for (std::size_t i=0; i<6; i++)
-		{
-			d |= (m_D[i]() << i);
-		}
-		m_clrq = m_CLRQ();
-		if (!m_clrq)
-		{
-			for (std::size_t i=0; i<6; i++)
-			{
-				m_Q[i].push(0, NLTIME_FROM_NS(40));
-			}
-			m_data = 0;
-		} else if (d != m_data)
-		{
-			m_data = d;
-			m_CLK.activate_lh();
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(74174,   "TTL_74174", "+CLK,+D1,+D2,+D3,+D4,+D5,+D6,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74174_dip,"TTL_74174_DIP",          "")
