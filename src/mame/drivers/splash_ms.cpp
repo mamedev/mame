@@ -32,6 +32,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
+		m_spriteram(*this, "spriteram"),
 		m_msm(*this, "msm")
 	{ }
 
@@ -49,6 +50,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<msm5205_device> m_msm;
 
 	virtual void machine_start() override;
@@ -115,6 +117,30 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	for (int i = 0; i < 0x100; i+=2)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+
+		uint16_t attr0 = m_spriteram[i + 0];
+		uint16_t attr1 = m_spriteram[i + 1];
+
+		uint16_t attr2 = m_spriteram[i + 0x100];
+		//uint16_t attr3 = m_spriteram[i + 0x101];
+
+		int ypos = attr0 & 0x00ff;
+		int xpos = (attr1 & 0xff00)>>8;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
+
+		int tile = (attr0 & 0xff00) >> 8;
+		tile |= (attr1 & 0x003f) << 8;
+
+		int flipx = (attr1 & 0x0040);
+		int flipy = (attr1 & 0x0080);
+
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16,(0xff-ypos)-16,15);
+	}
+
 	return 0;
 }
 
@@ -139,17 +165,17 @@ void splashms_state::splashms_map(address_map &map)
 	map(0x092000, 0x09ffff).ram();
 	map(0x0a0000, 0x0fffff).ram();
 
-	map(0x100000, 0x1007ff).ram(); 
+	map(0x100000, 0x1007ff).ram().share("spriteram");
 
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x400000, 0x400001).portr("IN0");
 	map(0x400002, 0x400003).portr("IN1");
-	map(0x400004, 0x400005).portr("IN2").nopw();
+	map(0x400004, 0x400005).r(FUNC(splashms_state::unknown_r)).nopw();
 	map(0x400006, 0x400007).portr("IN3");
 	map(0x400008, 0x400009).portr("IN4"); // service mode in here
 
-	map(0x40000c, 0x40000d).portr("IN5");
+	map(0x40000c, 0x40000d).r(FUNC(splashms_state::unknown_r));
 
 	map(0x40000e, 0x40000f).nopw();
 
@@ -187,77 +213,25 @@ void splashms_state::machine_start()
 static INPUT_PORTS_START( splashms )
 	PORT_START("IN0")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "0" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 
-
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "1" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "2" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -310,34 +284,6 @@ static INPUT_PORTS_START( splashms )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("IN5")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "5" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x16x4_layout =
@@ -374,7 +320,7 @@ static const gfx_layout tiles16x16x4alt_layout =
 };
 
 static GFXDECODE_START( gfx_splashms )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "fgtile", 0, tiles8x8x4_layout, 0, 16 )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 16 )
 	GFXDECODE_ENTRY( "bgtile", 0x8000, tiles16x16x4alt_layout, 0, 16 )
@@ -442,7 +388,7 @@ ROM_START( splashms )
 	ROM_LOAD32_BYTE( "8_sp_822.ic22", 0x000002, 0x010000, CRC(621fcf26) SHA1(a7ff6b12fbbea1bba7c4a397a82ac2fb5c09558a) ) // 1xxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD32_BYTE( "8_sp_815.ic15", 0x000003, 0x010000, CRC(5641b621) SHA1(e71df1ab5c9b2254495d99657477b52e8843d128) ) // 1xxxxxxxxxxxxxxx = 0xFF                          
                                    
-	ROM_REGION( 0x080000, "sprites", ROMREGION_ERASEFF )
+	ROM_REGION( 0x080000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "5-1_sp_524.ic24", 0x000000, 0x010000, CRC(841c24c1) SHA1(70cb26033999f8184c51849e00bfcb2270f646e8) )
 	ROM_LOAD32_BYTE( "5-1_sp_518.ic18", 0x000001, 0x010000, CRC(499cb813) SHA1(4d22e58530ff8a85b7ffc8ae1ab5986215986b49) )
 	ROM_LOAD32_BYTE( "5-1_sp_512.ic12", 0x000002, 0x010000, CRC(8cb0b132) SHA1(894f84b6a8171ed8c22298ebf1303da020f747ee) )
