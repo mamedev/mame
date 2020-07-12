@@ -34,7 +34,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
-		m_msm(*this, "msm")
+		m_msm(*this, "msm"),
+		m_bgdata(*this, "subcpu")
 	{ }
 
 	void splashms(machine_config &config);
@@ -53,6 +54,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<msm5205_device> m_msm;
+	required_region_ptr<uint8_t> m_bgdata;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -80,12 +82,16 @@ private:
 
 	uint8_t sub_bank_r(offs_t offset);
 	void sub_bank_w(offs_t offset, uint8_t data);
+	uint8_t sub_rombank_r(offs_t offset);
 
 	int m_subbankselect;
+	int m_subrombankselect;
 
 	uint8_t m_bitmapram[0x20000];
 
 	void unknown_sub_port01_w(uint8_t data);
+	void unknown_sub_port02_w(uint8_t data);
+
 };
 
 uint16_t splashms_state::unknown_0x400004_r()
@@ -105,6 +111,12 @@ void splashms_state::unknown_sub_port01_w(uint8_t data)
 	m_subbankselect = data;
 }
 
+void splashms_state::unknown_sub_port02_w(uint8_t data)
+{
+	logerror("unknown_sub_port02_w %02x\n", data);
+	m_subrombankselect = data;
+}
+
 
 uint8_t splashms_state::unknown_sub_r()
 {
@@ -121,6 +133,15 @@ void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t
 {
 	popmessage("to_subcpu_0x400004_w %04x\n", data);
 }
+
+uint8_t splashms_state::sub_rombank_r(offs_t offset)
+{
+	logerror("sub_rombank_r %04x with bank %02x\n", offset, m_subrombankselect);
+	int rombank = m_subrombankselect & 0x7f;
+	return m_bgdata[(rombank * 0x8000) + offset];
+
+}
+
 
 uint8_t splashms_state::sub_bank_r(offs_t offset)
 {
@@ -249,6 +270,7 @@ void splashms_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).w(FUNC(splashms_state::unknown_sub_port01_w)); // banking for 0x4000-0x7fff RAM?
+	map(0x02, 0x02).w(FUNC(splashms_state::unknown_sub_port02_w)); // banking for 0x8000-0xffff ROM?
 
 	map(0x03, 0x03).r(FUNC(splashms_state::unknown_sub_r));
 }
@@ -258,7 +280,7 @@ void splashms_state::sub_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x7fff).rw(FUNC(splashms_state::sub_bank_r), FUNC(splashms_state::sub_bank_w));
 
-	map(0xffff, 0xffff).nopr();
+	map(0x8000, 0xffff).r(FUNC(splashms_state::sub_rombank_r));
 }
 
 void splashms_state::sound_map(address_map &map)
@@ -281,6 +303,7 @@ void splashms_state::machine_reset()
 		m_bitmapram[i] = 0x00;
 	}
 	m_subbankselect = 0;
+	m_subrombankselect = 0;
 }
 
 
@@ -444,7 +467,7 @@ ROM_START( splashms )
 	ROM_LOAD16_BYTE( "cpu1_6-1_sp_608a.ic8",  0x000001, 0x020000, CRC(befdbaf0) SHA1(94efdeec1e1311317ffd0fe3d5fdbb02e151b985) )
 	ROM_LOAD16_BYTE( "cpu1_6-1_sp_617a.ic17", 0x000000, 0x020000, CRC(080edb2b) SHA1(6104345bc72cd20051d66c04b97c9a365a88ec3f) )
 
-	ROM_REGION( 0x300000, "subcpu", 0 ) // extra Z80 for backgrounds!
+	ROM_REGION( 0x400000, "subcpu", ROMREGION_ERASE00 ) // extra Z80 for backgrounds!
 	ROM_LOAD( "cpu2_c_sp_c2.ic2", 0x000000, 0x080000, CRC(3a0be09f) SHA1(83abc10ff2c810c8451f583700f140f569e5b6ee) )
 	ROM_LOAD( "cpu2_c_sp_c3.ic3", 0x080000, 0x080000, CRC(c3dc5e9d) SHA1(ce5fb65935cfe225132242e058cd63fa33f9da63) )
 	ROM_LOAD( "cpu2_c_sp_c4.ic4", 0x100000, 0x080000, CRC(4d7b643d) SHA1(40bdcf7eedddc3244cb41530d10009b23b7ac473) )
