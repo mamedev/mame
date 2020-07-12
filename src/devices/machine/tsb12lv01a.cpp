@@ -15,9 +15,10 @@
 #define LOG_READS		(1 << 1)
 #define LOG_WRITES		(1 << 2)
 #define LOG_UNKNOWNS	(1 << 3)
-#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
+#define LOG_IRQS		(1 << 4)
+#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_IRQS)
 
-#define VERBOSE			(0)
+#define VERBOSE			(LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TSB12LV01A, tsb12lv01a_device, "tsb12lv01a", "TSB12LV01A IEEE 1394 Link Controller")
@@ -79,6 +80,7 @@ WRITE_LINE_MEMBER(tsb12lv01a_device::phy_reset_w)
 void tsb12lv01a_device::set_interrupt(uint32_t bit)
 {
 	m_int_status |= bit;
+	LOGMASKED(LOG_IRQS, "Setting IRQ: %08x\n", bit);
 	check_interrupts();
 }
 
@@ -90,7 +92,9 @@ void tsb12lv01a_device::check_interrupts()
 	else
 		m_int_status &= ~INT_INT;
 
-	m_int_cb((m_int_status & m_int_mask & INT_INT) ? 1 : 0);
+	const int state = (m_int_status & m_int_mask & INT_INT) ? 1 : 0;
+	LOGMASKED(LOG_IRQS, "Active IRQs: %08x, %sing IRQ\n", active_bits, state ? "rais" : "lower");
+	m_int_cb(state);
 }
 
 void tsb12lv01a_device::reset_tx()
@@ -247,6 +251,10 @@ void tsb12lv01a_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_phy_access |= phy_addr << PHY_PHYRXAD_SHIFT;
 				m_phy_access &= ~PHY_PHYRXDATA_MASK;
 				m_phy_access |= m_phy_read_cb(phy_addr);
+
+				if (phy_addr == 0)
+				{
+				}
 
 				m_int_status |= INT_PHYRRX;
 				check_interrupts();

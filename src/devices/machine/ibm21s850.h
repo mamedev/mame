@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*************************************************************
 
-  IBM 21S850 IEEE 1394 400Mb/s Physical Layer
+  IBM 21S850/1 IEEE 1394 400Mb/s Physical Layer
   Transceiver (PHY)
 
   Skeleton device
@@ -14,11 +14,9 @@
 
 #pragma once
 
-class ibm21s850_device : public device_t
+class ibm21s85x_base_device : public device_t
 {
 public:
-	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -26,7 +24,9 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 
-private:
+protected:
+	ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -36,7 +36,7 @@ private:
 
 	static const device_timer_id TIMER_RESET = 0;
 
-	enum
+	enum : uint32_t
 	{
 		PHYSICAL_ID_OFFS	= 0,
 		PHYSICAL_ID_SHIFT	= 2,
@@ -60,6 +60,10 @@ private:
 		ENHANCED_REGS_MASK	= 0x20,
 		NUM_PORTS_OFFS		= 2,
 		NUM_PORTS_MASK		= 0x1f,
+		SPEED_100MBIT		= 0,
+		SPEED_200MBIT		= 1,
+		SPEED_400MBIT		= 2,
+		SPEED_RESERVED		= 3,
 
 		ASTAT1_OFFS			= 3,
 		ASTAT1_SHIFT		= 6,
@@ -73,12 +77,6 @@ private:
 		CONNECTION1_MASK	= 0x04,
 		PEER_SPEED1_OFFS	= 3,
 		PEER_SPEED1_MASK	= 0x03,
-
-		ENV_OFFS			= 4,
-		ENV_SHIFT			= 6,
-		ENV_MASK			= 0xc0,
-		REG_COUNT_OFFS		= 4,
-		REG_COUNT_MASK		= 0x3f,
 
 		LPS_OFFS			= 11,
 		LPS_MASK			= 0x80,
@@ -102,6 +100,10 @@ private:
 		ARB_PHASE_MASK		= 0x18,
 		ARB_STATE_OFFS		= 12,
 		ARB_STATE_MASK		= 0x07,
+		PHASE_BUS_RESET		= 0,
+		PHASE_TREE_ID		= 1,
+		PHASE_SELF_ID		= 2,
+		PHASE_NORMAL		= 3,
 
 		LP_TEST_EN_OFFS			= 13,
 		LP_TEST_EN_MASK			= 0x40,
@@ -136,11 +138,73 @@ private:
 	uint8_t m_regs[16];
 
 	emu_timer *m_reset_timer;
-
 	devcb_write_line m_reset_cb;
+};
+
+class ibm21s850_device : public ibm21s85x_base_device
+{
+public:
+	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	virtual void device_reset() override;
+
+	enum : uint32_t
+	{
+		ENV_OFFS			= 4,
+		ENV_SHIFT			= 6,
+		ENV_MASK			= 0xc0,
+		REG_COUNT_OFFS		= 4,
+		REG_COUNT_MASK		= 0x3f
+	};
+};
+
+class ibm21s851_device : public ibm21s85x_base_device
+{
+public:
+	ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	virtual void device_reset() override;
+
+	enum : uint32_t
+	{
+		ASTAT2_OFFS			= 4,
+		ASTAT2_SHIFT		= 6,
+		ASTAT2_MASK			= 0xc0,
+		BSTAT2_OFFS			= 4,
+		BSTAT2_SHIFT		= 4,
+		BSTAT2_MASK			= 0x30,
+		CHILD2_OFFS			= 4,
+		CHILD2_MASK			= 0x08,
+		CONNECTION2_OFFS	= 4,
+		CONNECTION2_MASK	= 0x04,
+		PEER_SPEED2_OFFS	= 4,
+		PEER_SPEED2_MASK	= 0x03,
+
+		ASTAT3_OFFS			= 5,
+		ASTAT3_SHIFT		= 6,
+		ASTAT3_MASK			= 0xc0,
+		BSTAT3_OFFS			= 5,
+		BSTAT3_SHIFT		= 4,
+		BSTAT3_MASK			= 0x30,
+		CHILD3_OFFS			= 5,
+		CHILD3_MASK			= 0x08,
+		CONNECTION3_OFFS	= 5,
+		CONNECTION3_MASK	= 0x04,
+		PEER_SPEED3_OFFS	= 5,
+		PEER_SPEED3_MASK	= 0x03,
+
+		ENV_OFFS			= 6,
+		ENV_SHIFT			= 6,
+		ENV_MASK			= 0xc0,
+		REG_COUNT_OFFS		= 6,
+		REG_COUNT_MASK		= 0x3f
+	};
 };
 
 //device type definition
 DECLARE_DEVICE_TYPE(IBM21S850, ibm21s850_device)
+DECLARE_DEVICE_TYPE(IBM21S851, ibm21s851_device)
 
 #endif // MAME_MACHINE_IBM21S850_H

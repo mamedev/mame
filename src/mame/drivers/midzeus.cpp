@@ -46,7 +46,7 @@ The Grid         v1.2   10/18/2000
 #define LOG_DISK_JR		(1 << 3)
 #define LOG_UNKNOWN		(1 << 4)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_FIREWIRE)
 #include "logmacro.h"
 
 #define CPU_CLOCK       XTAL(60'000'000)
@@ -120,7 +120,7 @@ private:
 
 	required_device<zeus2_device> m_zeus;
 	required_device<tsb12lv01a_device> m_fw_link;
-	required_device<ibm21s850_device> m_fw_phy;
+	required_device<ibm21s851_device> m_fw_phy;
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;
 };
@@ -1327,13 +1327,13 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
 
-	IBM21S850(config, m_fw_phy, 0);
+	IBM21S851(config, m_fw_phy, 0);
 	m_fw_phy->reset_cb().set(m_fw_link, FUNC(tsb12lv01a_device::phy_reset_w));
 
 	TSB12LV01A(config, m_fw_link, 0);
 	m_fw_link->int_cb().set(FUNC(midzeus2_state::firewire_irq));
-	m_fw_link->phy_read().set(m_fw_phy, FUNC(ibm21s850_device::read));
-	m_fw_link->phy_write().set(m_fw_phy, FUNC(ibm21s850_device::write));
+	m_fw_link->phy_read().set(m_fw_phy, FUNC(ibm21s851_device::read));
+	m_fw_link->phy_write().set(m_fw_phy, FUNC(ibm21s851_device::write));
 }
 
 void midzeus2_state::crusnexo(machine_config &config)
