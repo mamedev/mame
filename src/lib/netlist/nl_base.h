@@ -627,7 +627,7 @@ namespace netlist
 			};
 
 			core_terminal_t(core_device_t &dev, const pstring &aname,
-					state_e state, nldelegate delegate = nldelegate());
+					state_e state, nldelegate delegate);
 			virtual ~core_terminal_t() noexcept = default;
 
 			PCOPYASSIGNMOVE(core_terminal_t, delete)
@@ -813,7 +813,7 @@ namespace netlist
 	public:
 
 		analog_t(core_device_t &dev, const pstring &aname, state_e state,
-			nldelegate delegate = nldelegate());
+			nldelegate delegate);
 
 		const analog_net_t & net() const noexcept;
 		analog_net_t & net() noexcept;
@@ -890,7 +890,7 @@ namespace netlist
 	{
 	public:
 		logic_t(device_t &dev, const pstring &aname,
-				state_e terminal_state, nldelegate delegate = nldelegate());
+				state_e terminal_state, nldelegate delegate);
 
 		logic_net_t & net() noexcept;
 		const logic_net_t &  net() const noexcept;
@@ -904,7 +904,7 @@ namespace netlist
 	{
 	public:
 		logic_input_t(device_t &dev, const pstring &aname,
-				nldelegate delegate = nldelegate());
+				nldelegate delegate);
 
 #if 0
 		template <class D>
@@ -933,7 +933,7 @@ namespace netlist
 		/// \brief Constructor
 		analog_input_t(core_device_t &dev,  ///< owning device
 				const pstring &aname,       ///< name of terminal
-				nldelegate delegate = nldelegate() ///< delegate
+				nldelegate delegate ///< delegate
 		);
 
 		/// \brief returns voltage at terminal.

@@ -16,10 +16,10 @@ namespace netlist
 	NETLIB_OBJECT(7477)
 	{
 		NETLIB_CONSTRUCTOR(7477)
-		, m_C1C2(*this, "C1C2")
-		, m_C3C4(*this, "C3C4")
+		, m_C1C2(*this, "C1C2", NETLIB_DELEGATE(inputs))
+		, m_C3C4(*this, "C3C4", NETLIB_DELEGATE(inputs))
 		, m_last_Q(*this, "m_last_Q", 0)
-		, m_D(*this, {"D1", "D2", "D3", "D4"})
+		, m_D(*this, {"D1", "D2", "D3", "D4"}, NETLIB_DELEGATE(inputs))
 		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
 		, m_power_pins(*this)
 		{
@@ -30,9 +30,41 @@ namespace netlist
 		{
 			m_last_Q = 0;
 		}
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 
-		void update_outputs(std::size_t start, std::size_t end);
+		NETLIB_HANDLERI(inputs)
+		{
+			netlist_sig_t c1c2 = m_C1C2();
+			netlist_sig_t c3c4 = m_C3C4();
+			if (c1c2 && c3c4)
+			{
+				update_outputs(0, 4);
+			}
+			else if (c1c2)
+			{
+				update_outputs(0, 2);
+			}
+			else if (c3c4)
+			{
+				update_outputs(2, 4);
+			}
+
+		}
+
+		void update_outputs(std::size_t start, std::size_t end)
+		{
+			for (std::size_t i=start; i<end; i++)
+			{
+				netlist_sig_t d = m_D[i]();
+				if (d != ((m_last_Q >> i) & 1))
+					m_Q[i].push(d, d != 0 ? NLTIME_FROM_NS(30) : NLTIME_FROM_NS(25));
+				m_last_Q &= ~(1 << i);
+				m_last_Q |= d << i;
+			}
+		}
 
 		friend class NETLIB_NAME(7477_dip);
 		friend class NETLIB_NAME(7475_dip);
@@ -47,19 +79,80 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(7475, 7477)
+	NETLIB_OBJECT(7475)
 	{
 		NETLIB_CONSTRUCTOR(7475)
+		, m_C1C2(*this, "C1C2", NETLIB_DELEGATE(inputs))
+		, m_C3C4(*this, "C3C4", NETLIB_DELEGATE(inputs))
+		, m_last_Q(*this, "m_last_Q", 0)
+		, m_D(*this, {"D1", "D2", "D3", "D4"}, NETLIB_DELEGATE(inputs))
+		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
 		, m_QQ(*this, {"QQ1", "QQ2", "QQ3", "QQ4"})
+		, m_power_pins(*this)
 		{
+			register_subalias("Q1", m_Q[0]);
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_RESETI()
+		{
+			m_last_Q = 0;
+		}
+
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			unsigned start_q = m_last_Q;
+
+			netlist_sig_t c1c2 = m_C1C2();
+			netlist_sig_t c3c4 = m_C3C4();
+			if (c1c2 && c3c4)
+			{
+				update_outputs(0, 4);
+			}
+			else if (c1c2)
+			{
+				update_outputs(0, 2);
+			}
+			else if (c3c4)
+			{
+				update_outputs(2, 4);
+			}
+
+			for (std::size_t i=0; i<4; i++)
+			{
+				unsigned last_bit = (m_last_Q >> i) & 1;
+				unsigned start_bit = (start_q >> i) & 1;
+				if (last_bit != start_bit)
+					m_QQ[i].push(last_bit ^ 1, last_bit != 0 ? NLTIME_FROM_NS(15) : NLTIME_FROM_NS(40));
+			}
+		}
+
+		void update_outputs(std::size_t start, std::size_t end)
+		{
+			for (std::size_t i=start; i<end; i++)
+			{
+				netlist_sig_t d = m_D[i]();
+				if (d != ((m_last_Q >> i) & 1))
+					m_Q[i].push(d, d != 0 ? NLTIME_FROM_NS(30) : NLTIME_FROM_NS(25));
+				m_last_Q &= ~(1 << i);
+				m_last_Q |= d << i;
+			}
+		}
 
 		friend class NETLIB_NAME(7477_dip);
 		friend class NETLIB_NAME(7475_dip);
 	private:
+		logic_input_t m_C1C2;
+		logic_input_t m_C3C4;
+		state_var<unsigned> m_last_Q;
+		object_array_t<logic_input_t, 4> m_D;
+		object_array_t<logic_output_t, 4> m_Q;
 		object_array_t<logic_output_t, 4> m_QQ;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT(7475_dip)
@@ -117,52 +210,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(7477) A;
 	};
-
-	NETLIB_UPDATE(7475)
-	{
-		unsigned start_q = m_last_Q;
-
-		NETLIB_NAME(7477)::update();
-
-		for (std::size_t i=0; i<4; i++)
-		{
-			unsigned last_bit = (m_last_Q >> i) & 1;
-			unsigned start_bit = (start_q >> i) & 1;
-			if (last_bit != start_bit)
-				m_QQ[i].push(last_bit ^ 1, last_bit != 0 ? NLTIME_FROM_NS(15) : NLTIME_FROM_NS(40));
-		}
-	}
-
-	void NETLIB_NAME(7477)::update_outputs(std::size_t start, std::size_t end)
-	{
-		for (std::size_t i=start; i<end; i++)
-		{
-			netlist_sig_t d = m_D[i]();
-			if (d != ((m_last_Q >> i) & 1))
-				m_Q[i].push(d, d != 0 ? NLTIME_FROM_NS(30) : NLTIME_FROM_NS(25));
-			m_last_Q &= ~(1 << i);
-			m_last_Q |= d << i;
-		}
-	}
-
-	NETLIB_UPDATE(7477)
-	{
-		netlist_sig_t c1c2 = m_C1C2();
-		netlist_sig_t c3c4 = m_C3C4();
-		if (c1c2 && c3c4)
-		{
-			update_outputs(0, 4);
-		}
-		else if (c1c2)
-		{
-			update_outputs(0, 2);
-		}
-		else if (c3c4)
-		{
-			update_outputs(2, 4);
-		}
-
-	}
 
 	NETLIB_DEVICE_IMPL(7475,     "TTL_7475",     "")
 	NETLIB_DEVICE_IMPL(7475_dip, "TTL_7475_DIP", "")

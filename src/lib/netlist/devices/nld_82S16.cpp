@@ -71,7 +71,7 @@ namespace netlist
 				adr |= (m_A[i]() << i);
 			}
 			m_addr = adr;
-			NETLIB_NAME(82S16)::update();
+			inputs();
 		}
 		NETLIB_HANDLERI(enq)
 		{
@@ -92,7 +92,7 @@ namespace netlist
 					m_A[i].activate();
 				m_WEQ.activate();
 				m_DIN.activate();
-				NETLIB_NAME(82S16)::update();
+				inputs();
 			}
 		}
 

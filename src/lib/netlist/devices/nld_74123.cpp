@@ -72,7 +72,7 @@ namespace netlist
 		, m_I(*this, D::names(), NETLIB_DELEGATE(ab_clear))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_CV(*this, "_CV") // internal
+		, m_CV(*this, "_CV", NETLIB_DELEGATE(cv)) // internal
 		, m_last_trig(*this, "m_last_trig", 0)
 		, m_state(*this, "m_state", 0)
 		, m_KP(plib::reciprocal(nlconst::one() + plib::exp(D::K())))
@@ -128,6 +128,11 @@ namespace netlist
 		}
 
 		NETLIB_UPDATEI()
+		{
+			cv();
+		}
+
+		NETLIB_HANDLERI(cv)
 		{
 			if (m_state == 1)
 			{

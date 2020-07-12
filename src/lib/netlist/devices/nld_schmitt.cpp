@@ -60,7 +60,7 @@ namespace netlist
 		NETLIB_OBJECT(schmitt_trigger)
 		{
 			NETLIB_CONSTRUCTOR(schmitt_trigger)
-				, m_A(*this, "A")
+				, m_A(*this, "A", NETLIB_DELEGATE(input))
 				, m_supply(*this)
 				, m_RVI(*this, "RVI")
 				, m_RVO(*this, "RVO")
@@ -87,6 +87,12 @@ namespace netlist
 
 			NETLIB_UPDATEI()
 			{
+				input();
+			}
+
+		private:
+			NETLIB_HANDLERI(input)
+			{
 				const auto va(m_A.Q_Analog() - m_supply.GND().Q_Analog());
 				if (m_last_state)
 				{
@@ -112,7 +118,6 @@ namespace netlist
 				}
 			}
 
-		private:
 			analog_input_t m_A;
 			NETLIB_NAME(power_pins) m_supply;
 			analog::NETLIB_SUB(twoterm) m_RVI;

@@ -717,7 +717,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm)
-	: analog_t(dev, aname, STATE_BIDIR)
+	: analog_t(dev, aname, STATE_BIDIR, nldelegate())
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
@@ -782,7 +782,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	logic_output_t::logic_output_t(device_t &dev, const pstring &aname, bool dummy)
-		: logic_t(dev, aname, STATE_OUT)
+		: logic_t(dev, aname, STATE_OUT, nldelegate())
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
 		plib::unused_var(dummy);
@@ -813,7 +813,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-		: analog_t(dev, aname, STATE_OUT)
+		: analog_t(dev, aname, STATE_OUT, nldelegate())
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
 		state().register_net(device_arena::owned_ptr<analog_net_t>(&m_my_net, false));

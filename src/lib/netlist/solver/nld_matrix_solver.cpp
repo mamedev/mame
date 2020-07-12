@@ -49,7 +49,7 @@ namespace solver
 		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
 		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
-		, m_fb_sync(*this, "FB_sync")
+		, m_fb_sync(*this, "FB_sync", nldelegate(&matrix_solver_t::fb_sync, this))
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{

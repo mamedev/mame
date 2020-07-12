@@ -23,10 +23,10 @@ namespace netlist
 	NETLIB_OBJECT(7497)
 	{
 		NETLIB_CONSTRUCTOR(7497)
-		, m_B(*this, {"B5", "B4", "B3", "B2", "B1", "B0"})
+		, m_B(*this, {"B5", "B4", "B3", "B2", "B1", "B0"}, NETLIB_DELEGATE(inputs))
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk_strb))
 		, m_STRBQ(*this, "STRBQ", NETLIB_DELEGATE(clk_strb))
-		, m_ENQ(*this, "ENQ", NETLIB_DELEGATE(enq))
+		, m_ENQ(*this, "ENQ", NETLIB_DELEGATE(inputs))
 		, m_UNITYQ(*this, "UNITYQ", NETLIB_DELEGATE(unity))
 		, m_CLR(*this, "CLR", NETLIB_DELEGATE(clr))
 		, m_Y(*this, "Y")
@@ -50,7 +50,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			enq();
+			inputs();
 		}
 
 		NETLIB_HANDLERI(noop) { }
@@ -101,7 +101,7 @@ namespace netlist
 
 		}
 
-		NETLIB_HANDLERI(enq)
+		NETLIB_HANDLERI(inputs)
 		{
 			m_rate = rate();
 			clk_strb();
@@ -145,9 +145,6 @@ namespace netlist
 			return a;
 		}
 	};
-
-
-
 
 	NETLIB_OBJECT(7497_dip)
 	{

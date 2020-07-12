@@ -255,6 +255,11 @@ namespace solver
 		// netdevice functions
 		NETLIB_UPDATEI()
 		{
+			fb_sync();
+		}
+
+		NETLIB_HANDLERI(fb_sync)
+		{
 			PFDEBUG(printf("update\n");)
 			const netlist_time new_timestep = solve(exec().time());
 			update_inputs();

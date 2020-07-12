@@ -65,13 +65,13 @@ namespace netlist
 		NETLIB_HANDLERI(upd_a)
 		{
 			m_a = static_cast<uint8_t>((m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3));
-			NETLIB_NAME(7483)::update();
+			c0();
 		}
 
 		NETLIB_HANDLERI(upd_b)
 		{
 			m_b = static_cast<uint8_t>((m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3));
-			NETLIB_NAME(7483)::update();
+			c0();
 		}
 
 

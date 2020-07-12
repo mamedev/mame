@@ -51,13 +51,11 @@ namespace netlist
 		///
 
 		template <typename FUNC>
-		class NETLIB_NAME(analog_callback) : public device_t
+		NETLIB_OBJECT(analog_callback)
 		{
 		public:
-			NETLIB_NAME(analog_callback)(netlist_state_t &anetlist,
-				const pstring &name, nl_fptype threshold, FUNC &&func)
-				: device_t(anetlist, name)
-				, m_in(*this, "IN")
+			NETLIB_CONSTRUCTOR_EX(analog_callback, nl_fptype threshold, FUNC &&func)
+				, m_in(*this, "IN", NETLIB_DELEGATE(in))
 				, m_threshold(threshold)
 				, m_last(*this, "m_last", 0)
 				, m_func(func)
@@ -70,6 +68,11 @@ namespace netlist
 			}
 
 			NETLIB_UPDATEI()
+			{
+				in();
+			}
+
+			NETLIB_HANDLERI(in)
 			{
 				const nl_fptype cur = m_in();
 				if (plib::abs(cur - m_last) > m_threshold)

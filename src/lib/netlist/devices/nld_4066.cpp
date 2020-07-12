@@ -33,7 +33,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR_MODEL(CD4066_GATE, "CD4XXX")
 		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "R")
-		, m_control(*this, "CTL")
+		, m_control(*this, "CTL", NETLIB_DELEGATE(control))
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
 		, m_last(*this, "m_last", false)
 		{
@@ -47,6 +47,12 @@ namespace netlist
 		}
 
 		NETLIB_UPDATEI()
+		{
+			control();
+		}
+
+	private:
+		NETLIB_HANDLERI(control)
 		{
 			nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
 			nl_fptype in = m_control() - m_supply.GND().Q_Analog();
@@ -71,7 +77,6 @@ namespace netlist
 			}
 		}
 
-	private:
 		nld_power_pins             m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 		analog_input_t             m_control;
