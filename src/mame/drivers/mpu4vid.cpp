@@ -1184,6 +1184,59 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( v4psi )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("ORANGE2")
+	// No. 17 to 24 according to test mode
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("BLACK1")
+	// No. 9 to 16
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Continue 30p")
+
+	PORT_MODIFY("BLACK2")
+	// No. 1 to 8
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Collect")
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start 30p")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start 50p")
+	
+	// TODO: dips, cfr. test mode
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( v4tetris )
+	PORT_INCLUDE( mpu4 )
+	
+	PORT_MODIFY("BLACK1")
+	// no up also according to cabinet panel
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	// buttons are actually repeated on both left and right on the cabinet panel,
+	// with joystick at center
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Rotate Left")
+	// left of main screen cab
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start (Practice Mode)")
+	// TODO: bit 5,6 unconfirmed if they behaves the same as vanilla MPU4
+	// (bit 7 certainly is door open)
+
+	PORT_MODIFY("BLACK2")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Rotate Right")
+	// right of main screen cab
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start (Prize Mode)")
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	// TODO: dips
+INPUT_PORTS_END
+
 
 WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 {
@@ -4023,22 +4076,23 @@ GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4o
 
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 
-GAME(  199?, v4psi,      0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psia,     v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psib,     v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
-GAME(  199?, v4psi14d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psi20d,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psi214,   v4psi,    bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
+// "payout shelf unplugged", can be bypassed by opening door
+GAME(  1991, v4psi,      0,        bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psia,     v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psib,     v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
+GAME(  1991, v4psi14d,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS ) // "incompatible mpu4 prom"
+GAME(  1991, v4psi20d,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi214,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS ) // "incompatible mpu4 prom"
 
-GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BwB TET1 Version 2.2) (MPU4 Video) (set 1)",GAME_FLAGS )
-GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BwB TET1 Version 2.2) (MPU4 Video) (set 2)",GAME_FLAGS )
-
-GAME(  199?, v4pztet,    0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (BwB) (MPU4 Video, set 1)",GAME_FLAGS )
-GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (BwB) (MPU4 Video, set 2)",GAME_FLAGS ) // 'showcase' screen after title in attract
-
+// Tetris games, all running on the same base code
+// TODO: identify the newest version and make everything else to be clone
+GAME(  199?, v4tetrs,    0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BwB TET1 Version 2.2) (MPU4 Video) (set 1)",GAME_FLAGS )
+GAME(  199?, v4tetrs1,   v4tetrs,  bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Tetris Payout (BwB TET1 Version 2.2) (MPU4 Video) (set 2)",GAME_FLAGS )
+GAME(  199?, v4pztet,    0,        bwbvid,     v4tetris,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (BwB) (MPU4 Video, set 1)",GAME_FLAGS )
+GAME(  199?, v4pzteta,   v4pztet,  bwbvid,     v4tetris,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Prize Tetris (BwB) (MPU4 Video, set 2)",GAME_FLAGS ) // 'showcase' screen after title in attract
 // blox is an early version of Tetris?
-GAME(  199?, v4blox,     0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS ) // bad dump?
-GAME(  199?, v4bloxd,    v4blox,   bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4blox,     0,        bwbvid,     v4tetris,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS ) // bad dump?
+GAME(  199?, v4bloxd,    v4blox,   bwbvid,     v4tetris,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
 
 // these will run in 'open door' mode otherwise they'll give payout shelf error
 
