@@ -22,6 +22,8 @@
 
 #define HLE_CLOCK_DIVIDER (1)
 #define HLE_CAPTURE_VCO (0)
+#define HLE_PHOTON_VCO (1)
+#define DISABLE_FIRE_CIRCUIT (1)
 
 
 
@@ -31,7 +33,9 @@
 
 NETLIST_START(solarq)
 
-    SOLVER(Solver, 48000)
+    SOLVER(Solver, 1000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
     TTL_INPUT(I_OUT_0, 0)				// active high
     TTL_INPUT(I_OUT_1, 0)				// active high
@@ -865,6 +869,36 @@ NETLIST_START(solarq)
     // Page 2, bottom-middle and top-right (fire)
     //
 
+#if (DISABLE_FIRE_CIRCUIT)
+    NET_C(GND, R98.1, R98.2)
+    NET_C(GND, R99.1, R99.2)
+    NET_C(GND, R100.1, R100.2)
+    NET_C(GND, R101.1, R101.2)
+    NET_C(GND, R102.1, R102.2)
+    NET_C(GND, R103.1, R103.2)
+    NET_C(GND, R104.1, R104.2)
+    NET_C(GND, R105.1, R105.2)
+    NET_C(GND, R106.1, R106.2)
+    NET_C(GND, R107.1, R107.2)
+    NET_C(GND, R108.1, R108.2)
+    NET_C(GND, R109.1, R109.2)
+    NET_C(GND, R110.1, R110.2)
+    NET_C(GND, R111.1, R111.2)
+    NET_C(GND, R112.1, R112.2)
+    NET_C(GND, R113.1, R113.2)
+    NET_C(GND, R114.1, R114.2)
+    NET_C(GND, R115.1, R115.2)
+    NET_C(GND, R116.1, R116.2)
+    NET_C(GND, R117.1, R117.2)
+    NET_C(GND, R118.1, R118.2)
+    NET_C(GND, R119.1, R119.2)
+    NET_C(GND, R120.1, R120.2)
+    NET_C(GND, C23.1, C23.2)
+    NET_C(GND, C24.1, C24.2)
+    NET_C(GND, C25.1, C25.2)
+    NET_C(GND, C26.1, C26.2)
+    NET_C(GND, U43.2, U43.3, U44.2, U44.3, U45.2, U45.3, U46.2, U46.3, U47.2, U47.3)
+#else
     NET_C(FIRE_M, R113.1, R114.1)
     NET_C(R113.2, I_V5, R115.2, Q14.E)
     NET_C(R114.2, R115.1, Q14.B)
@@ -892,13 +926,14 @@ NETLIST_START(solarq)
     NET_C(R109.1, GND)
     NET_C(U45.6, U45.2, R110.1, R103.1, R102.2)
     NET_C(R103.2, C24.1)
-    NET_C(C24.2, SJ)
+    NET_C(C24.2, GND) /*SJ*/ // temp
     NET_C(R110.2, R111.2, U46.3)
     NET_C(R111.1, R112.1, GND)
     NET_C(R112.2, U46.2)
     NET_C(U46.6, C25.2, R120.2, U47.3)
     NET_C(C25.1, R120.1, GND)
     NET_C(U47.2, U47.6, R101.2)
+#endif
 
     //
     // Page 2, bottom-right (AS0-2)
@@ -1093,12 +1128,50 @@ NETLIST_START(solarq)
     NET_C(R64.2, U38.6, R65.1)
     NET_C(U38.2, R71.1, C16.2, U39.2)
     NET_C(C16.1, GND)
+
+#if (HLE_PHOTON_VCO)
+    //
+    // The PHOTON VCO is modulated by the 555 timer U35,
+    // fed through some capacitors and an op-amp to
+    // produce a periodic charge/discharge curve. The
+    // output of the op-amp U36 tracks the final
+    // frequency pretty closely, but only if charge and
+    // discharge curves are considered separately. Use
+    // the raw U35.3 output as a switch to pick the
+    // appropriate curve.
+    //
+    // U35.3 on:
+    //    R2 = 0.95303: HP = (0.000454865*A0) - 0.000727100
+    //    R2 = 0.97158: HP = (0.0000320398*A0*A0) + (0.000096187*A0) + 0.000101501
+    //    R2 = 0.99149: HP = (0.0000173739*A0*A0*A0) - (0.000265948*A0*A0) + (0.00163589*A0) - 0.00222259
+    //    R2 = 0.99201: HP = (-0.00000151250*A0*A0*A0*A0) + (0.0000522525*A0*A0*A0) - (0.000547752*A0*A0) + (0.00256844*A0) - 0.00327534
+    //    R2 = 0.99549: HP = (0.00000220778*A0*A0*A0*A0*A0) - (0.000065312*A0*A0*A0*A0) + (0.000753266*A0*A0*A0) - (0.00418112*A0*A0) + (0.0113844*A0) - 0.0112392
+    //
+    // U35.3 off:
+    //    R2 = 0.18174: HP = (0.000065384*A0) + 0.000468783
+    //    R2 = 0.83543: HP = (-0.0000468095*A0*A0) + (0.000655196*A0) - 0.000641642
+    //    R2 = 0.99434: HP = (-0.0000088969*A0*A0*A0) + (0.000127464*A0*A0) - (0.000276787*A0) + 0.000661774
+    //    R2 = 0.99978: HP = (-0.000000655767*A0*A0*A0*A0) + (0.0000088937*A0*A0*A0) - (0.0000336865*A0*A0) + (0.000281719*A0) + 0.0000419612
+    //    R2 = 0.99987: HP = (0.0000000525584*A0*A0*A0*A0*A0) - (0.00000241385*A0*A0*A0*A0) + (0.0000304913*A0*A0*A0) - (0.000153608*A0*A0) + (0.000579685*A0) - 0.000223579
+    //
+	VARCLOCK(PHOTONCLK, 2, "max(0.000001,min(0.1,if(A1>2.5,(0.0000173739*A0*A0*A0) - (0.000265948*A0*A0) + (0.00163589*A0) - 0.00222259,(-0.0000088969*A0*A0*A0) + (0.000127464*A0*A0) - (0.000276787*A0) + 0.000661774)))")
+	NET_C(PHOTONCLK.GND, GND)
+	NET_C(PHOTONCLK.VCC, I_V5)
+	NET_C(PHOTONCLK.Q, PHOTONENV.A0)
+	NET_C(PHOTONCLK.A0, U36.6)
+	NET_C(PHOTONCLK.A1, U35.3)
+    AFUNC(PHOTONENV, 1, "if(A0>2.5,0.0038,-0.0038)")
+    NET_C(PHOTONENV.Q, U41.2)
+	NET_C(GND, U40.2, U40.3, R65.2, R66.1, R66.2, R69.2, R70.1, R70.2, R71.2, R72.1, R72.2, R73.2, D5.A, D5.K, D6.A, D6.K)
+#else
     NET_C(R65.2, U40.3, R70.1, R69.2)
     NET_C(U40.2, GND, D5.A)
     NET_C(D5.K, D6.K)
     NET_C(D6.A, R71.2, R72.2, R66.2)
     NET_C(U40.6, R66.1, R70.2)
     NET_C(R72.1, R73.2, U41.2)
+#endif
+
     NET_C(R73.1, GND)
     NET_C(U41.3, R74.2)
     NET_C(R74.1, GND)
@@ -1114,8 +1187,8 @@ NETLIST_START(solarq)
     NET_C(R79.1, GND)
     NET_C(Q10.B, R80.2)
     NET_C(R80.1, GND)
-    NET_C(Q10.C, C17.1)
-    NET_C(C17.2, I_VM15, R81.1)
+    NET_C(Q10.C, C17.1, R81.1)
+    NET_C(C17.2, I_VM15)
     NET_C(R81.2, U41.5)
 
     NET_C(U41.6, CS, R149.2, U49.3)
