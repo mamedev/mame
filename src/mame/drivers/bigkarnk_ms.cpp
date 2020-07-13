@@ -357,7 +357,7 @@ uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
 TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
 {
 	int tile = m_videoram1[tile_index*2];
-	int attr = m_videoram1[(tile_index*2)+1] & 0x0f;
+	int attr = m_videoram1[(tile_index*2)+1] & 0x1f;
 //	int fx = (m_videoram1[(tile_index*2)+1] & 0xc0)>>6;
 
 	// we rearranged the tile order for the 16x16 deode, so have to swap back here
@@ -373,10 +373,13 @@ TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap2)
 
 	tile &= 0x1fff;
 
-	int attr = m_videoram2[(tile_index*2)+1] & 0x0f;
+	int attr = m_videoram2[(tile_index*2)+1] & 0xff;
 	//int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
 
-	tileinfo.set(0,tile,attr,0);
+	int col = attr & 0x1f;
+
+
+	tileinfo.set(0,tile,col,0);
 }
 
 TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap3)
@@ -385,10 +388,12 @@ TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap3)
 
 	tile &= 0x1fff;
 
-	int attr = m_videoram3[(tile_index*2)+1] & 0x0f;
+	int attr = m_videoram3[(tile_index*2)+1] & 0xff;
 	//int fx = (m_videoram3[(tile_index*2)+1] & 0xc0)>>6;
 
-	tileinfo.set(0,tile,attr,0);
+	int col = attr & 0x1f;
+
+	tileinfo.set(0,tile,col,0);
 }
 
 uint16_t bigkarnk_ms_state::vram1_r(offs_t offset, uint16_t mem_mask)
@@ -434,7 +439,7 @@ void bigkarnk_ms_state::video_start()
 	m_bg_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap3)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
 
 	m_bg_tilemap1->set_transparent_pen(15);
-	m_bg_tilemap2->set_transparent_pen(15);
+	m_bg_tilemap2->set_transparent_pen(0);
 
 }
 
