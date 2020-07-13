@@ -286,7 +286,7 @@ Sound Board 9/2
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "tilemap.h"
 
 class bigkarnk_ms_state : public driver_device
 {
@@ -298,10 +298,15 @@ public:
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_videoram2(*this, "videoram2"),
+		m_videoram3(*this, "videoram3")
 	{ }
 
 	void bigkarnkm(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -311,12 +316,26 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram3;
 
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bigkarnkm_map(address_map &map);
+
+	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
+	uint16_t vram3_r(offs_t offset, uint16_t mem_mask);
+
+	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
+
+	tilemap_t *m_bg_tilemap2;
+	tilemap_t *m_bg_tilemap3;
 
 	uint16_t unknown_0x40000x_r();
 };
@@ -326,15 +345,75 @@ uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
 	return 0xffff;
 }
 
+
+TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
+{
+	int tile = m_videoram2[tile_index*2];
+
+	int bank = (tile & 0x1f00)>>8;
+	tile &= 0xff;
+
+	int attr = m_videoram2[(tile_index*2)+1] & 0x0f;
+	//int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(2+bank,tile,attr,0);
+}
+
+uint16_t bigkarnk_ms_state::vram2_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_videoram2[offset];
+}
+
+void bigkarnk_ms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap2->mark_tile_dirty(offset/2);
+}
+
+TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap2)
+{
+	int tile = m_videoram3[tile_index*2];
+
+	int bank = (tile & 0x1f00)>>8;
+	tile &= 0xff;
+
+	int attr = m_videoram3[(tile_index*2)+1] & 0x0f;
+	//int fx = (m_videoram3[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(2+bank,tile,attr,0);
+}
+
+uint16_t bigkarnk_ms_state::vram3_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_videoram3[offset];
+}
+
+void bigkarnk_ms_state::vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram3[offset]);
+	m_bg_tilemap3->mark_tile_dirty(offset/2);
+}
+
+
+
+void bigkarnk_ms_state::video_start()
+{
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+	m_bg_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+}
+
+
+
 void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
 	map(0x080000, 0x081fff).ram();
 
-	map(0x090000, 0x091fff).ram();
+	map(0x090000, 0x090fff).rw(FUNC(bigkarnk_ms_state::vram2_r), FUNC(bigkarnk_ms_state::vram2_w)).share("videoram2");
+	map(0x091000, 0x091fff).ram();
 
-	map(0x0a0000, 0x0a0fff).ram();
+	map(0x0a0000, 0x0a0fff).rw(FUNC(bigkarnk_ms_state::vram3_r), FUNC(bigkarnk_ms_state::vram3_w)).share("videoram3");
 
 	map(0x0c0000, 0x0c000f).ram();
 
@@ -408,10 +487,57 @@ static const gfx_layout tiles16x16x4_layout =
 	16 * 16 * 4
 };
 
+static const gfx_layout tiles16x16x4alt_layout =
+{
+	16,16,
+	0x100,
+	4,
+	{ 0,8,16,24 },
+	{ 0,1,2,3,4,5,6,7, (65536*2)+0,(65536*2)+1,(65536*2)+2,(65536*2)+3,(65536*2)+4,(65536*2)+5,(65536*2)+6,(65536*2)+7 },
+	{ STEP8(0,32),STEP8(65536,32) },
+	8 * 32
+};
+
+
 static GFXDECODE_START( gfx_bigkarnk_ms )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
+
+	// TODO: rearrange the ROM instead
+	GFXDECODE_ENTRY( "gfx2", 0x000000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x008000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x010000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x018000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x020000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x028000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x030000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x038000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x040000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x048000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x050000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x058000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x060000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x068000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x070000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x078000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x080000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x088000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x090000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x098000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0a0000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0a8000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0b0000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0b8000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0c0000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0c8000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0d0000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0d8000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0e0000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0e8000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0f0000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0f8000, tiles16x16x4alt_layout, 0, 16 )
 GFXDECODE_END
+
 
 void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 {
@@ -467,14 +593,14 @@ ROM_START( bigkarnkm )
 	ROM_LOAD32_BYTE( "5_ka.ic27",        0x000000, 0x020000, CRC(55509d96) SHA1(ddd064695ca7e8c2377f13484e385bf7ea7df610) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "8_ka_814.ic14",      0x000003, 0x020000, CRC(50e6cab6) SHA1(5af8b27f35a59611484ea35a2883b1e59d5c7517) )
-	ROM_LOAD32_BYTE( "8_ka_821.ic21",      0x000002, 0x020000, CRC(90c1d93e) SHA1(581a1e2f30e8b467c8d8f5c8e528c78c0c3904f2) )
-	ROM_LOAD32_BYTE( "8_ka_829.ic29",      0x000001, 0x020000, CRC(8c5df0ec) SHA1(15a5b847d6d035f27300435a03bd254dd9b3f99c) )
-	ROM_LOAD32_BYTE( "8_ka_836.ic36",      0x000000, 0x020000, CRC(43de75db) SHA1(419e7702d17c52365addb8bfda582e916762ead5) )
-	ROM_LOAD32_BYTE( "8_ka_815.ic15",      0x080003, 0x020000, CRC(59d79b33) SHA1(70b9c60a72e517ac70f807c918f0ad4dd6c98f98) )
-	ROM_LOAD32_BYTE( "8_ka_822.ic22",      0x080002, 0x020000, CRC(12fc89c0) SHA1(883144d0c453cd8f829b2209d9a8028b7f87d0d5) )
-	ROM_LOAD32_BYTE( "8_ka_830.ic30",      0x080001, 0x020000, CRC(9904ae87) SHA1(5df3b35185c53a64c0647d297a19b9c013a3b3c2) )
-	ROM_LOAD32_BYTE( "8_ka_837.ic37",      0x080000, 0x020000, CRC(f475eaa7) SHA1(8e5c7f0231d7f84bc377b756b99d055a4791e3bf) )
+	ROM_LOAD32_BYTE( "8_ka_815.ic15",      0x000003, 0x020000, CRC(59d79b33) SHA1(70b9c60a72e517ac70f807c918f0ad4dd6c98f98) )
+	ROM_LOAD32_BYTE( "8_ka_822.ic22",      0x000002, 0x020000, CRC(12fc89c0) SHA1(883144d0c453cd8f829b2209d9a8028b7f87d0d5) )
+	ROM_LOAD32_BYTE( "8_ka_830.ic30",      0x000001, 0x020000, CRC(9904ae87) SHA1(5df3b35185c53a64c0647d297a19b9c013a3b3c2) )
+	ROM_LOAD32_BYTE( "8_ka_837.ic37",      0x000000, 0x020000, CRC(f475eaa7) SHA1(8e5c7f0231d7f84bc377b756b99d055a4791e3bf) )
+	ROM_LOAD32_BYTE( "8_ka_814.ic14",      0x080003, 0x020000, CRC(50e6cab6) SHA1(5af8b27f35a59611484ea35a2883b1e59d5c7517) )
+	ROM_LOAD32_BYTE( "8_ka_821.ic21",      0x080002, 0x020000, CRC(90c1d93e) SHA1(581a1e2f30e8b467c8d8f5c8e528c78c0c3904f2) )
+	ROM_LOAD32_BYTE( "8_ka_829.ic29",      0x080001, 0x020000, CRC(8c5df0ec) SHA1(15a5b847d6d035f27300435a03bd254dd9b3f99c) )
+	ROM_LOAD32_BYTE( "8_ka_836.ic36",      0x080000, 0x020000, CRC(43de75db) SHA1(419e7702d17c52365addb8bfda582e916762ead5) )
 
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "51_p0502_n82s129n.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // common PROM found on all? Modular System sets?
