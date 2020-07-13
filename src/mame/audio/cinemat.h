@@ -155,19 +155,6 @@ class solarq_audio_device : public cinemat_audio_device
 {
 public:
 	solarq_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals) override;
-	virtual void shiftreg16_changed(u16 newvals, u16 oldvals) override;
-
-private:
-	u64 m_last_frame = 0;
-	float m_current_volume = 0;
-	float m_target_volume = 0;
 };
 
 

@@ -24,6 +24,7 @@
 #include "audio/nl_armora.h"
 #include "audio/nl_barrier.h"
 #include "audio/nl_ripoff.h"
+#include "audio/nl_solarq.h"
 #include "audio/nl_spacewar.h"
 #include "audio/nl_speedfrk.h"
 #include "audio/nl_starcas.h"
@@ -332,130 +333,8 @@ starcas_audio_device::starcas_audio_device(const machine_config &mconfig, const 
 DEFINE_DEVICE_TYPE(SOLAR_QUEST_AUDIO, solarq_audio_device, "solarq_audio", "Solar Quest Sound Board")
 
 solarq_audio_device::solarq_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SOLAR_QUEST_AUDIO, tag, owner, clock, 0x00)
+	: cinemat_audio_device(mconfig, SOLAR_QUEST_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(solarq), 5000.0)
 {
-}
-
-void solarq_audio_device::device_start()
-{
-	cinemat_audio_device::device_start();
-
-	save_item(NAME(m_last_frame));
-	save_item(NAME(m_current_volume));
-	save_item(NAME(m_target_volume));
-}
-
-void solarq_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	static const char *const sample_names[] =
-	{
-		"*solarq",
-		"bigexpl",
-		"smexpl",
-		"lthrust",
-		"slaser",
-		"pickup",
-		"nuke2",
-		"nuke1",
-		"music",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
-}
-
-void solarq_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-	// execute on the rising edge of bit 1, latch the shift register
-	if (rising_edge(curvals, oldvals, 1))
-		shiftreg_latch();
-
-	// clock music data on the rising edge of bit 0
-	if (rising_edge(curvals, oldvals, 0))
-		shiftreg16_latch();
-
-	// on the rising edge of bit 4, clock bit 7 into the shift register */
-	if (rising_edge(curvals, oldvals, 4))
-	{
-		shiftreg_clock(curvals >> 7);
-		shiftreg16_clock(curvals >> 7);
-	}
-}
-
-void solarq_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-	// loud explosion - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(0, 0);
-
-	// soft explosion - falling edge
-	if (falling_edge(curvals, oldvals, 6))
-		m_samples->start(1, 1);
-
-	// thrust - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 5))
-	{
-		m_target_volume = 1.0;
-		if (!m_samples->playing(2))
-			m_samples->start(2, 2, true);
-	}
-	if (rising_edge(curvals, oldvals, 5))
-		m_target_volume = 0;
-
-	// ramp the thrust volume
-	u64 curframe = framenum();
-	if (m_samples->playing(2) && curframe > m_last_frame)
-	{
-		if (m_current_volume > m_target_volume)
-			m_current_volume -= 0.078f;
-		if (m_current_volume < m_target_volume)
-			m_current_volume += 0.078f;
-		if (m_current_volume > 0)
-			m_samples->set_volume(2, m_current_volume);
-		else
-			m_samples->stop(2);
-		m_last_frame = curframe;
-	}
-
-	// fire - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(3, 3);
-
-	// capture - falling edge
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(4, 4);
-
-	// nuke - 1=on, 0=off
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->start(5, 5, true);
-	if (falling_edge(curvals, oldvals, 2))
-		m_samples->stop(5);
-
-	// photon - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(6, 6);
-}
-
-void solarq_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
-{
-	// start/stop the music sample on the high bit
-	if (rising_edge(curvals, oldvals, 15))
-		m_samples->start(7, 7, true);
-	if (falling_edge(curvals, oldvals, 15))
-		m_samples->stop(7);
-
-	/* set the frequency */
-	int freq = 56818.181818 / (4096 - (curvals & 0xfff));
-	m_samples->set_frequency(7, 44100 * freq / 1050);
-
-	/* set the volume */
-	int vol = (~curvals >> 12) & 7;
-	m_samples->set_volume(7, vol / 7.0);
 }
 
 

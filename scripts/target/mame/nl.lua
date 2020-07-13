@@ -216,6 +216,8 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_cinemat_common.h",
 	MAME_DIR .. "src/mame/audio/nl_ripoff.cpp",
 	MAME_DIR .. "src/mame/audio/nl_ripoff.h",
+	MAME_DIR .. "src/mame/audio/nl_solarq.cpp",
+	MAME_DIR .. "src/mame/audio/nl_solarq.h",
 	MAME_DIR .. "src/mame/audio/nl_spacewar.cpp",
 	MAME_DIR .. "src/mame/audio/nl_spacewar.h",
 	MAME_DIR .. "src/mame/audio/nl_speedfrk.cpp",
