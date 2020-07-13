@@ -222,6 +222,7 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
+		// wavetable
 		if (m_sound_en)
 			m_sound->wave_w(offset - 0x20, data);
 	}
