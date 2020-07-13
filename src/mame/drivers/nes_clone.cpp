@@ -183,6 +183,29 @@ static INPUT_PORTS_START( nes_clone )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( papsudok )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Auto Play")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Exit / Menu")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Start / Enter") // this is actually 2 buttons that map to the same input
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(1) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( dnce2000 )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Down-Left")
@@ -352,6 +375,7 @@ uint8_t nes_clone_suduko_state::rom_r(offs_t offset)
 
 void nes_clone_suduko_state::bank_w(uint8_t data)
 {
+	logerror("%04x: bank_w %02x\n", machine().describe_context(), data);
 	m_rombase = data;
 }
 
@@ -440,4 +464,5 @@ CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_sta
 
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, nes_clone, nes_clone_suduko_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (NES based?)", MACHINE_NOT_WORKING )
+// Alt. version was released with 'New York Times' titlescreen
+CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "<unknown>", "Plug and Play Sudoku Game (NES based)", MACHINE_NOT_WORKING ) // plays, but unclear how 'save' feature is meant to work
