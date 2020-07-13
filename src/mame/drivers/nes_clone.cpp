@@ -83,6 +83,8 @@ public:
 	{ }
 	void nes_clone_vtvppong(machine_config& config);
 
+	void init_vtvppong();
+
 private:
 	void nes_clone_vtvppong_map(address_map& map);
 };
@@ -402,18 +404,41 @@ void nes_clone_suduko_state::init_sudoku()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
-	for (int i=0;i<0x80000;i+=0x8000)
+
+}
+
+void nes_clone_vtvppong_state::init_vtvppong()
+{
+	u8 *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	std::vector<u8> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int newaddr = bitswap<18>(i, 17, 16, 15, 13, 14, 12, 	
+				11, 10, 9, 8, 
+				7, 6, 5, 4, 		
+				3, 2, 1, 0);
+		
+			buffer[i] = src[newaddr];
+		}
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+
+	if (1)
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s_%06x", machine().system().name,i);
+		sprintf(filename,"decrypted_%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(&src[i], 0x8000, 1, fp);
+			fwrite(&src[0], len, 1, fp);
 			fclose(fp);
 		}
 	}
+
 }
 
 
@@ -457,7 +482,7 @@ CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clo
 // "Flashback Mini 7800 uses normal NES-style hardware, together with a mapper chipset similar to the Waixing kk33xx cartridges (NES 2.0 Mapper 534)"
 CONS( 2004, afbm7800,  0,  0,  nes_clone,    nes_clone, nes_clone_state, init_nes_clone, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
 
-CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_nes_clone, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
+CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, init_nes_clone, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
