@@ -31688,6 +31688,7 @@ pjoypj001
 afbm7800
 dnce2000
 vtvppong
+papsudok
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -31705,7 +31706,6 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 ablpinb
-papsudok
 mc_dgear
 dgun2500
 dgun2561

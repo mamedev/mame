@@ -87,6 +87,25 @@ private:
 	void nes_clone_vtvppong_map(address_map& map);
 };
 
+class nes_clone_suduko_state : public nes_clone_state
+{
+public:
+	nes_clone_suduko_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_clone_state(mconfig, type, tag)
+	{ }
+
+	void init_sudoku();
+
+	void nes_clone_suduko(machine_config& config);
+
+private:
+	void nes_clone_suduko_map(address_map& map);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint8_t rom_r(offs_t offset);
+	void bank_w(uint8_t data);
+	int m_rombase;
+};
 
 void nes_clone_state::sprite_dma_w(address_space &space, uint8_t data)
 {
@@ -302,6 +321,83 @@ void nes_clone_vtvppong_state::nes_clone_vtvppong_map(address_map& map)
 }
 
 
+void nes_clone_suduko_state::machine_reset()
+{
+	nes_clone_state::machine_reset();
+	m_rombase = 0;
+}
+
+void nes_clone_suduko_state::machine_start()
+{
+	nes_clone_state::machine_start();
+	save_item(NAME(m_rombase));
+}
+
+void nes_clone_suduko_state::nes_clone_suduko(machine_config& config)
+{
+	nes_clone(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_suduko_state::nes_clone_suduko_map);
+}
+
+void nes_clone_suduko_state::nes_clone_suduko_map(address_map& map)
+{
+	nes_clone_basemap(map);
+	map(0x8000, 0xffff).rw(FUNC(nes_clone_suduko_state::rom_r), FUNC(nes_clone_suduko_state::bank_w));
+}
+
+uint8_t nes_clone_suduko_state::rom_r(offs_t offset)
+{
+	return m_mainrom[(offset + (m_rombase * 0x8000)) & (m_mainromsize - 1)];
+}
+
+void nes_clone_suduko_state::bank_w(uint8_t data)
+{
+	m_rombase = data;
+}
+
+
+void nes_clone_suduko_state::init_sudoku()
+{
+	u8 *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	std::vector<u8> buffer(len);
+	{
+		for (int i = 0; i < len; i += 8)
+		{
+			buffer[i+0] = src[i+5];
+			buffer[i+1] = src[i+4];
+			buffer[i+2] = src[i+7];
+			buffer[i+3] = src[i+6];
+			buffer[i+4] = src[i+1];
+			buffer[i+5] = src[i+0];
+			buffer[i+6] = src[i+3];
+			buffer[i+7] = src[i+2];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+
+	for (int i=0;i<0x80000;i+=0x8000)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s_%06x", machine().system().name,i);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&src[i], 0x8000, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
+ROM_START( papsudok )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
+ROM_END
+
 ROM_START( pjoypj001 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "powerjoy_pj001_lh28f008sc_89a6.bin", 0x00000, 0x100000, CRC(e655e0aa) SHA1(c96d3422e26451c366fee2151fedccb95014cbc7) )
@@ -341,3 +437,7 @@ CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvpp
 
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, init_nes_clone, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
+
+// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
+// Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
+CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, nes_clone, nes_clone_suduko_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (NES based?)", MACHINE_NOT_WORKING )
