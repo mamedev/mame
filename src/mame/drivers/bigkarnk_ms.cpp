@@ -297,7 +297,8 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	void bigkarnkm(machine_config &config);
@@ -309,19 +310,45 @@ private:
 
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bigkarnkm_map(address_map &map);
+
+	uint16_t unknown_0x40000x_r();
 };
 
+uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
+{
+	return 0xffff;
+}
 
 void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
+
+	map(0x080000, 0x081fff).ram();
+
+	map(0x090000, 0x091fff).ram();
+
+	map(0x0a0000, 0x0a0fff).ram();
+
+	map(0x0c0000, 0x0c000f).ram();
+
+	map(0x100000, 0x100fff).ram().share("spriteram");
+
+	map(0x102000, 0x103fff).ram();
+
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+
+	map(0x400000, 0x400001).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
+	map(0x400002, 0x400003).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
+	map(0x400006, 0x400007).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
+	map(0x400008, 0x400009).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
+	
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -333,6 +360,37 @@ void bigkarnk_ms_state::machine_start()
 
 uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
+	const int NUM_SPRITES = 0x200;
+
+	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+
+		uint16_t attr0 = m_spriteram[i + 0];
+		uint16_t attr1 = m_spriteram[i + 1];
+
+		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES + 1]; // unused?
+
+		int ypos = attr0 & 0x00ff;
+		int xpos = (attr1 & 0xff00)>>8;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
+
+		ypos = (0xff - ypos);
+		ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
+
+		int tile = (attr0 & 0xff00) >> 8;
+		tile |= (attr1 & 0x003f) << 8;
+
+		int flipx = (attr1 & 0x0040);
+		int flipy = (attr1 & 0x0080);
+
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-64,ypos-16,15);
+	}
+
+
 	return 0;
 }
 
@@ -351,7 +409,7 @@ static const gfx_layout tiles16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_bigkarnk_ms )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
 GFXDECODE_END
 
@@ -371,7 +429,7 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	m_screen->set_screen_update(FUNC(bigkarnk_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x400);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x400);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bigkarnk_ms);
 
@@ -392,19 +450,21 @@ ROM_START( bigkarnkm )
 	ROM_REGION( 0x020000, "audiodata", 0 )
 	ROM_LOAD( "snd_ka.ic11",   0x000000, 0x020000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASEFF ) // sprites (same rom subboard type as galpanic_ms.cpp)
-	ROM_LOAD32_BYTE( "5_ka.ic4",         0x000003, 0x020000, CRC(2bee07ea) SHA1(afd8769955314768db894e4e98f65422fc0dbb4f) )
-	ROM_LOAD32_BYTE( "5_ka.ic13",        0x000002, 0x020000, CRC(d55e3024) SHA1(71c84a76b08f8983f65ac4b99430eeb30dc3f8ea) )
-	ROM_LOAD32_BYTE( "5_ka.ic19",        0x000001, 0x020000, CRC(fc682c21) SHA1(c3fa9907fbe276bc4b74b79dda52713e702e441c) )
-	ROM_LOAD32_BYTE( "5_ka.ic25",        0x000000, 0x020000, CRC(1157b739) SHA1(fdea10f808f258409e19e41dedfb3d4699e7daa2) )
-	ROM_LOAD32_BYTE( "5_ka.ic5",         0x080003, 0x020000, CRC(507056f7) SHA1(e754c803f85862a37d2a48be6554ff5bc4128b4d) )
-	ROM_LOAD32_BYTE( "5_ka.ic14",        0x080002, 0x020000, CRC(ef936e76) SHA1(ed93b04a45c38c0fa7333f182beba33fafe17f38) )
-	ROM_LOAD32_BYTE( "5_ka.ic20",        0x080001, 0x020000, CRC(38854cd6) SHA1(b32efc1c621a9d8559c294f7431c219a05a37db6) )
-	ROM_LOAD32_BYTE( "5_ka.ic26",        0x080000, 0x020000, CRC(3f63c4ed) SHA1(e0dd3ec27e7aa0b7db1587e83d20d1b9333ca405) )
-	ROM_LOAD32_BYTE( "5_ka.ic6",         0x100003, 0x020000, CRC(2fdbc484) SHA1(6e8ac1a8bde8189b7ebf32c59185425c512ab911) )
-	ROM_LOAD32_BYTE( "5_ka.ic15",        0x100002, 0x020000, CRC(802128e4) SHA1(20cfdf28aa7ada404ceca236c6eb554dcaa8e633) )
-	ROM_LOAD32_BYTE( "5_ka.ic21",        0x100001, 0x020000, CRC(5ccc0f99) SHA1(ae2b2d4b2aa77a099ad2711032e6a05ab52789b9) )
-	ROM_LOAD32_BYTE( "5_ka.ic27",        0x100000, 0x020000, CRC(55509d96) SHA1(ddd064695ca7e8c2377f13484e385bf7ea7df610) )
+	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
+	ROM_LOAD32_BYTE( "5_ka.ic4",         0x080003, 0x020000, CRC(2bee07ea) SHA1(afd8769955314768db894e4e98f65422fc0dbb4f) )
+	ROM_LOAD32_BYTE( "5_ka.ic13",        0x080002, 0x020000, CRC(d55e3024) SHA1(71c84a76b08f8983f65ac4b99430eeb30dc3f8ea) )
+	ROM_LOAD32_BYTE( "5_ka.ic19",        0x080001, 0x020000, CRC(fc682c21) SHA1(c3fa9907fbe276bc4b74b79dda52713e702e441c) )
+	ROM_LOAD32_BYTE( "5_ka.ic25",        0x080000, 0x020000, CRC(1157b739) SHA1(fdea10f808f258409e19e41dedfb3d4699e7daa2) )
+
+	ROM_LOAD32_BYTE( "5_ka.ic5",         0x100003, 0x020000, CRC(507056f7) SHA1(e754c803f85862a37d2a48be6554ff5bc4128b4d) )
+	ROM_LOAD32_BYTE( "5_ka.ic14",        0x100002, 0x020000, CRC(ef936e76) SHA1(ed93b04a45c38c0fa7333f182beba33fafe17f38) )
+	ROM_LOAD32_BYTE( "5_ka.ic20",        0x100001, 0x020000, CRC(38854cd6) SHA1(b32efc1c621a9d8559c294f7431c219a05a37db6) )
+	ROM_LOAD32_BYTE( "5_ka.ic26",        0x100000, 0x020000, CRC(3f63c4ed) SHA1(e0dd3ec27e7aa0b7db1587e83d20d1b9333ca405) )
+
+	ROM_LOAD32_BYTE( "5_ka.ic6",         0x000003, 0x020000, CRC(2fdbc484) SHA1(6e8ac1a8bde8189b7ebf32c59185425c512ab911) )
+	ROM_LOAD32_BYTE( "5_ka.ic15",        0x000002, 0x020000, CRC(802128e4) SHA1(20cfdf28aa7ada404ceca236c6eb554dcaa8e633) )
+	ROM_LOAD32_BYTE( "5_ka.ic21",        0x000001, 0x020000, CRC(5ccc0f99) SHA1(ae2b2d4b2aa77a099ad2711032e6a05ab52789b9) )
+	ROM_LOAD32_BYTE( "5_ka.ic27",        0x000000, 0x020000, CRC(55509d96) SHA1(ddd064695ca7e8c2377f13484e385bf7ea7df610) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "8_ka_814.ic14",      0x000003, 0x020000, CRC(50e6cab6) SHA1(5af8b27f35a59611484ea35a2883b1e59d5c7517) )
