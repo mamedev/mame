@@ -490,4 +490,4 @@ CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_sta
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 // Alt. version was released with 'New York Times' titlescreen
-CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "<unknown>", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
+CONS( 200?, papsudok,     0,  0,  nes_clone_suduko, papsudok, nes_clone_suduko_state, init_sudoku, "Nice Code", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
