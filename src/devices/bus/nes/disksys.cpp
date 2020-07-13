@@ -23,6 +23,7 @@
 #include "disksys.h"
 #include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
+#include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
 	#define VERBOSE 1
@@ -54,6 +55,11 @@ static const floppy_interface nes_floppy_interface =
 void nes_disksys_device::device_add_mconfig(machine_config &config)
 {
 	LEGACY_FLOPPY(config, m_disk, 0, &nes_floppy_interface);
+
+	SPEAKER(config, "addon").front_center(); // connected to motherboard
+
+	RP2C33_SOUND(config, m_sound, XTAL(21'477'272)/12); // clock driven from motherboard?
+	m_sound->add_route(0, "addon", 0.2);
 }
 
 
@@ -102,6 +108,7 @@ nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char
 	, m_2c33_rom(*this, "drive")
 	, m_fds_data(nullptr)
 	, m_disk(*this, "floppy0")
+	, m_sound(*this, "rp2c33snd")
 	, irq_timer(nullptr)
 	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_transfer(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
 	, m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)
@@ -215,6 +222,8 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
+		if (m_sound_en)
+			m_sound->wave_w(offset - 0x20, data);
 		// wavetable
 	}
 
@@ -233,6 +242,7 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 		case 0x03:
 			// bit0 - Enable disk I/O registers
 			// bit1 - Enable sound I/O registers
+			m_sound_en = BIT(data, 1);
 			break;
 		case 0x04:
 			// write data out to disk
@@ -277,6 +287,8 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 		case 0x68:  // $4088 - Mod table write
 		case 0x69:  // $4089 - Wave write / master volume
 		case 0x6a:  // $408a - Envelope speed
+			if (m_sound_en)
+				m_sound->write(offset - 0x60, data);
 			break;
 	}
 }
@@ -284,11 +296,13 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 uint8_t nes_disksys_device::read_ex(offs_t offset)
 {
 	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
-	uint8_t ret;
+	uint8_t ret = 0x00;
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
 		// wavetable
+		if (m_sound_en)
+			ret = m_sound->wave_r(offset - 0x20);
 	}
 
 	switch (offset)
@@ -351,6 +365,9 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			break;
 		case 0x70:  // $4090 - Volume gain - write through $4080
 		case 0x72:  // $4092 - Mod gain - read through $4084
+			if (m_sound_en)
+				ret = m_sound->read(offset - 0x60);
+			break;
 		default:
 			ret = 0x00;
 			break;
