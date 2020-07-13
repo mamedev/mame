@@ -224,7 +224,6 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 	{
 		if (m_sound_en)
 			m_sound->wave_w(offset - 0x20, data);
-		// wavetable
 	}
 
 	switch (offset)
