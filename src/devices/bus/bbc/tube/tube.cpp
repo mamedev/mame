@@ -111,6 +111,7 @@ void bbc_tube_devices(device_slot_interface &device)
 {
 	device.option_add("6502",   BBC_TUBE_6502);    /* Acorn ANC01 6502 2nd processor */
 	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
+	device.option_add("z80w",   BBC_TUBE_Z80W);    /* Acorn ANC04 Z80 2nd processor (Winchester) */
 	device.option_add("32016",  BBC_TUBE_32016);   /* Acorn ANC05 32016 2nd processor */
 	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("80286",  BBC_TUBE_80286);   /* Acorn 80286 2nd Processor */
@@ -139,6 +140,7 @@ void bbc_extube_devices(device_slot_interface &device)
 {
 	device.option_add("6502",   BBC_TUBE_6502);     /* Acorn ANC01 6502 2nd processor */
 	device.option_add("z80",    BBC_TUBE_Z80);      /* Acorn ANC04 Z80 2nd processor */
+	device.option_add("z80w",   BBC_TUBE_Z80W);     /* Acorn ANC04 Z80 2nd processor (Winchester) */
 	device.option_add("32016",  BBC_TUBE_32016);    /* Acorn ANC05 32016 2nd processor */
 	device.option_add("arm",    BBC_TUBE_ARM);      /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("80286",  BBC_TUBE_80286);    /* Acorn 80286 2nd Processor */
