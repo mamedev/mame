@@ -31811,6 +31811,9 @@ newbrainmd                      //
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
 newsa                           // "Jeansole / Poby
 
+@source:news_38xx.cpp
+nws3860                         // Sony NEWS NWS-3860
+
 @source:news_68k.cpp
 nws1580                         // Sony NEWS NWS-1580
 
