@@ -892,6 +892,9 @@ BUSES["QL"] = true
 BUSES["QBUS"] = true
 BUSES["RS232"] = true
 BUSES["S100"] = true
+BUSES["SAMCOUPE_DRIVE_PORT"] = true
+BUSES["SAMCOUPE_EXPANSION"] = true
+BUSES["SAMCOUPE_MOUSE_PORT"] = true
 BUSES["SAT_CTRL"] = true
 BUSES["SATURN"] = true
 BUSES["SBUS"] = true
@@ -3388,9 +3391,6 @@ files {
 createMESSProjects(_target, _subtarget, "samcoupe")
 files {
 	MAME_DIR .. "src/mame/drivers/samcoupe.cpp",
-	MAME_DIR .. "src/mame/includes/samcoupe.h",
-	MAME_DIR .. "src/mame/machine/samcoupe.cpp",
-	MAME_DIR .. "src/mame/video/samcoupe.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samsung")

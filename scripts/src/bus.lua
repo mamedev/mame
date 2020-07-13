@@ -4276,3 +4276,65 @@ if (BUSES["RTPC_KBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/rtpc/kbd.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/samcoupe/drive/drive.h,BUSES["SAMCOUPE_DRIVE_PORT"] = true
+---------------------------------------------------
+
+if (BUSES["SAMCOUPE_DRIVE_PORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/drive.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/drive.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/modules.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/modules.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/atom.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/atom.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/floppy.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/drive/floppy.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/samcoupe/expansion/expansion.h,BUSES["SAMCOUPE_EXPANSION"] = true
+---------------------------------------------------
+
+if (BUSES["SAMCOUPE_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/modules.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/modules.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/blue_sampler.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/blue_sampler.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/dallas.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/dallas.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/onemeg.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/onemeg.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/spi.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/spi.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/voicebox.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/voicebox.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/samcoupe/mouse/mouse.h,BUSES["SAMCOUPE_MOUSE_PORT"] = true
+---------------------------------------------------
+
+if (BUSES["SAMCOUPE_MOUSE_PORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/samcoupe/mouse/mouseport.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/mouse/mouseport.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/mouse/modules.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/mouse/modules.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/mouse/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/mouse/mouse.h",
+	}
+end
