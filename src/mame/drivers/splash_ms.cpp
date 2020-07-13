@@ -16,6 +16,7 @@
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 #include "machine/gen_latch.h"
+#include "machine/bankdev.h"
 
 
 class splashms_state : public driver_device
@@ -32,11 +33,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
+		m_bitmapram(*this, "bitmapram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_spriteram(*this, "spriteram"),
 		m_msm(*this, "msm"),
 		m_bgdata(*this, "subcpu"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_subram(*this, "subrambank"),
+		m_subrom(*this, "subrombank")
 	{ }
 
 	void splashms(machine_config &config);
@@ -53,11 +57,14 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_bitmapram;
 	required_shared_ptr<uint16_t> m_scrollregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<msm5205_device> m_msm;
 	required_region_ptr<uint8_t> m_bgdata;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<address_map_bank_device> m_subram;
+	required_device<address_map_bank_device> m_subrom;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -83,14 +90,6 @@ private:
 
 	void to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint8_t sub_bank_r(offs_t offset);
-	void sub_bank_w(offs_t offset, uint8_t data);
-	uint8_t sub_rombank_r(offs_t offset);
-
-	int m_subbankselect;
-	int m_subrombankselect;
-
-	uint8_t m_bitmapram[0x20000];
 	uint8_t m_subcmd;
 
 	void sub_rambankselect_w(uint8_t data);
@@ -100,6 +99,10 @@ private:
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data;
+
+	void subrambank_map(address_map& map);
+	void subrombank_map(address_map& map);
+
 };
 
 
@@ -112,14 +115,14 @@ uint16_t splashms_state::unknown_0x40000c_r()
 
 void splashms_state::sub_rambankselect_w(uint8_t data)
 {
-	logerror("sub_rambankselect_w %02x\n", data);
-	m_subbankselect = data;
+//	logerror("sub_rambankselect_w %02x\n", data);
+	m_subram->set_bank(data&0x7);
 }
 
 void splashms_state::sub_rombankselect_w(uint8_t data)
 {
-	logerror("sub_rombankselect_w %02x\n", data);
-	m_subrombankselect = data;
+//	logerror("sub_rombankselect_w %02x\n", data);
+	m_subrom->set_bank(data & 0x7f);
 }
 
 
@@ -134,30 +137,6 @@ void splashms_state::to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t
 	//popmessage("to_subcpu_0x400004_w %04x\n", data);
 	m_subcmd = data;
 }
-
-uint8_t splashms_state::sub_rombank_r(offs_t offset)
-{
-//	logerror("sub_rombank_r %04x with bank %02x\n", offset, m_subrombankselect);
-	int rombank = m_subrombankselect & 0x7f;
-	return m_bgdata[(rombank * 0x8000) + offset];
-
-}
-
-
-uint8_t splashms_state::sub_bank_r(offs_t offset)
-{
-//	logerror("sub_bank_r %04x with bank %02x\n", offset, m_subbankselect);
-	int rambank = m_subbankselect & 0x7;
-	return m_bitmapram[(rambank * 0x4000) + offset];
-}
-
-void splashms_state::sub_bank_w(offs_t offset, uint8_t data)
-{
-//	logerror("sub_bank_w %04x with bank %02x (data %02x)\n", offset, m_subbankselect, data);
-	int rambank = m_subbankselect & 0x7;
-	m_bitmapram[(rambank * 0x4000) + offset] = data;
-}
-
 void splashms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
@@ -305,10 +284,10 @@ void splashms_state::sub_portmap(address_map &map)
 void splashms_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x4000, 0x7fff).rw(FUNC(splashms_state::sub_bank_r), FUNC(splashms_state::sub_bank_w));
-
-	map(0x8000, 0xffff).r(FUNC(splashms_state::sub_rombank_r));
+	map(0x4000, 0x7fff).m(m_subram, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xffff).m(m_subrom, FUNC(address_map_bank_device::amap8));
 }
+
 
 void splashms_state::sound_map(address_map &map)
 {
@@ -325,18 +304,13 @@ void splashms_state::sound_map(address_map &map)
 
 void splashms_state::machine_start()
 {
-	save_item(NAME(m_bitmapram));
 }
 
 void splashms_state::machine_reset()
 {
-	for (int i = 0; i < 0x20000; i++)
-	{
-		m_bitmapram[i] = 0x00;
-	}
-	m_subbankselect = 0;
-	m_subrombankselect = 0;
 	m_subcmd = 0;
+	m_subram->set_bank(0);
+	m_subrom->set_bank(0);
 }
 
 
@@ -471,6 +445,16 @@ WRITE_LINE_MEMBER(splashms_state::splash_msm5205_int)
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
 
+void splashms_state::subrambank_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram().share("bitmapram");
+}
+
+void splashms_state::subrombank_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("subcpu", 0x000000);
+}
+
 
 void splashms_state::splashms(machine_config &config)
 {
@@ -482,6 +466,10 @@ void splashms_state::splashms(machine_config &config)
 	Z80(config, m_subcpu, 12_MHz_XTAL/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &splashms_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &splashms_state::sub_portmap);
+
+	ADDRESS_MAP_BANK(config, m_subram).set_map(&splashms_state::subrambank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x4000);
+	ADDRESS_MAP_BANK(config, m_subrom).set_map(&splashms_state::subrombank_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x8000);
+
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &splashms_state::sound_map);
