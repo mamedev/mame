@@ -299,11 +299,14 @@ public:
 		m_paletteram(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram"),
+		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
-		m_videoram3(*this, "videoram3")
+		m_videoram3(*this, "videoram3"),
+		m_scrollregs(*this, "scrollregs")
 	{ }
 
 	void bigkarnkm(machine_config &config);
+	void init_bigkarnkm();
 
 protected:
 	virtual void video_start() override;
@@ -316,8 +319,10 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram1;
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_videoram3;
+	required_shared_ptr<uint16_t> m_scrollregs;
 
 	virtual void machine_start() override;
 
@@ -325,15 +330,19 @@ private:
 
 	void bigkarnkm_map(address_map &map);
 
+	uint16_t vram1_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram3_r(offs_t offset, uint16_t mem_mask);
 
+	void vram1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap3);
 	
+	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	tilemap_t *m_bg_tilemap3;
 
@@ -345,18 +354,52 @@ uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
 	return 0xffff;
 }
 
+TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
+{
+	int tile = m_videoram1[tile_index*2];
+	int attr = m_videoram1[(tile_index*2)+1] & 0x0f;
+//	int fx = (m_videoram1[(tile_index*2)+1] & 0xc0)>>6;
+
+	// we rearranged the tile order for the 16x16 deode, so have to swap back here
+	tile = ((tile & 0x300) >> 8) | ((tile & 0xff) << 2) | (tile & 0xfc00);
+
+	tileinfo.set(1,tile,attr,0);
+}
+
 
 TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap2)
 {
 	int tile = m_videoram2[tile_index*2];
 
-	int bank = (tile & 0x1f00)>>8;
-	tile &= 0xff;
+	tile &= 0x1fff;
 
 	int attr = m_videoram2[(tile_index*2)+1] & 0x0f;
 	//int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
 
-	tileinfo.set(2+bank,tile,attr,0);
+	tileinfo.set(0,tile,attr,0);
+}
+
+TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap3)
+{
+	int tile = m_videoram3[tile_index*2];
+
+	tile &= 0x1fff;
+
+	int attr = m_videoram3[(tile_index*2)+1] & 0x0f;
+	//int fx = (m_videoram3[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(0,tile,attr,0);
+}
+
+uint16_t bigkarnk_ms_state::vram1_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_videoram1[offset];
+}
+
+void bigkarnk_ms_state::vram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_bg_tilemap1->mark_tile_dirty(offset/2);
 }
 
 uint16_t bigkarnk_ms_state::vram2_r(offs_t offset, uint16_t mem_mask)
@@ -370,18 +413,6 @@ void bigkarnk_ms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_bg_tilemap2->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap3)
-{
-	int tile = m_videoram3[tile_index*2];
-
-	int bank = (tile & 0x1f00)>>8;
-	tile &= 0xff;
-
-	int attr = m_videoram3[(tile_index*2)+1] & 0x0f;
-	//int fx = (m_videoram3[(tile_index*2)+1] & 0xc0)>>6;
-
-	tileinfo.set(2+bank,tile,attr,0);
-}
 
 uint16_t bigkarnk_ms_state::vram3_r(offs_t offset, uint16_t mem_mask)
 {
@@ -398,8 +429,13 @@ void bigkarnk_ms_state::vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void bigkarnk_ms_state::video_start()
 {
+	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
 	m_bg_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap3)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+
+	m_bg_tilemap1->set_transparent_pen(15);
+	m_bg_tilemap2->set_transparent_pen(15);
+
 }
 
 
@@ -408,14 +444,14 @@ void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x080000, 0x081fff).ram();
+	map(0x080000, 0x081fff).rw(FUNC(bigkarnk_ms_state::vram1_r), FUNC(bigkarnk_ms_state::vram1_w)).share("videoram1");
 
 	map(0x090000, 0x090fff).rw(FUNC(bigkarnk_ms_state::vram2_r), FUNC(bigkarnk_ms_state::vram2_w)).share("videoram2");
 	map(0x091000, 0x091fff).ram();
 
 	map(0x0a0000, 0x0a0fff).rw(FUNC(bigkarnk_ms_state::vram3_r), FUNC(bigkarnk_ms_state::vram3_w)).share("videoram3");
 
-	map(0x0c0000, 0x0c000f).ram();
+	map(0x0c0000, 0x0c000f).ram().share("scrollregs");
 
 	map(0x100000, 0x100fff).ram().share("spriteram");
 
@@ -441,11 +477,25 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0, cliprect);
 
+	m_bg_tilemap3->set_scrollx(0, 112-(m_scrollregs[6]));
+	m_bg_tilemap3->set_scrolly(0, -m_scrollregs[7]);
+
+	m_bg_tilemap2->set_scrollx(0, 112-(m_scrollregs[0]-0x2));
+	m_bg_tilemap2->set_scrolly(0, -m_scrollregs[1]);
+	
+	m_bg_tilemap1->set_scrollx(0, 112-(m_scrollregs[2]));
+	m_bg_tilemap1->set_scrolly(0, -m_scrollregs[3]);
+
+	m_bg_tilemap3->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
+
+
 	const int NUM_SPRITES = 0x200;
 
 	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
 	{
-		gfx_element *gfx = m_gfxdecode->gfx(0);
+		gfx_element *gfx = m_gfxdecode->gfx(2);
 
 		uint16_t attr0 = m_spriteram[i + 0];
 		uint16_t attr1 = m_spriteram[i + 1];
@@ -466,7 +516,7 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-64,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-112,ypos-16,15);
 	}
 
 
@@ -490,52 +540,31 @@ static const gfx_layout tiles16x16x4_layout =
 static const gfx_layout tiles16x16x4alt_layout =
 {
 	16,16,
-	0x100,
+	RGN_FRAC(1,1),
 	4,
 	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7, (65536*2)+0,(65536*2)+1,(65536*2)+2,(65536*2)+3,(65536*2)+4,(65536*2)+5,(65536*2)+6,(65536*2)+7 },
-	{ STEP8(0,32),STEP8(65536,32) },
-	8 * 32
+	{ 0,1,2,3,4,5,6,7, 512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
+	{ STEP8(0,32), STEP8(256,32) },
+	32 * 32
+};
+
+static const gfx_layout tiles8x8x4_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,8,16,24 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,32) },
+	16 * 16
 };
 
 
 static GFXDECODE_START( gfx_bigkarnk_ms )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
 
-	// TODO: rearrange the ROM instead
-	GFXDECODE_ENTRY( "gfx2", 0x000000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x008000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x010000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x018000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x020000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x028000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x030000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x038000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x040000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x048000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x050000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x058000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x060000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x068000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x070000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x078000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x080000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x088000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x090000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x098000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0a0000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0a8000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0b0000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0b8000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0c0000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0c8000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0d0000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0d8000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0e0000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0e8000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0f0000, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0f8000, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4alt_layout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x4_layout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 32 )
 GFXDECODE_END
 
 
@@ -550,8 +579,8 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-16-1);
 	m_screen->set_screen_update(FUNC(bigkarnk_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -561,6 +590,30 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+}
+
+void bigkarnk_ms_state::init_bigkarnkm()
+{
+	// reorganize graphics into something we can decode with a single pass
+	uint8_t *src = memregion("gfx2")->base();
+	int len = memregion("gfx2")->bytes();
+
+	std::vector<uint8_t> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int j = bitswap<20>(i, 19,18,17,16,
+				
+				       15,12,		
+				       11,10,9,8,			
+				       7,6,5,				
+				         14,13,4,	
+				       3,2,1,0);
+			buffer[j] = src[i];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
 }
 
 ROM_START( bigkarnkm )
@@ -624,4 +677,4 @@ ROM_START( bigkarnkm )
 	ROM_LOAD( "snd_9348_gal16v8-25hb1.ic10", 0, 1, NO_DUMP )
 ROM_END
 
-GAME( 1991, bigkarnkm,  bigkarnk,  bigkarnkm,  bigkarnkm,  bigkarnk_ms_state, empty_init, ROT0, "Gaelco", "Big Karnak (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, bigkarnkm,  bigkarnk,  bigkarnkm,  bigkarnkm,  bigkarnk_ms_state, init_bigkarnkm, ROT0, "Gaelco", "Big Karnak (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
