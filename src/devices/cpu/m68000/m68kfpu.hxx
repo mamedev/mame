@@ -1514,8 +1514,11 @@ void fpgen_rm_reg(u16 w2)
 		}
 		case 0x25:      // FREM
 		{
+			s8 const mode = float_rounding_mode;
+			float_rounding_mode = float_round_nearest_even;
 			m_fpr[dst] = floatx80_rem(m_fpr[dst], source);
 			SET_CONDITION_CODES(m_fpr[dst]);
+			float_rounding_mode = mode;
 			m_icount -= 43;   // guess
 			break;
 		}
