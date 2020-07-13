@@ -331,9 +331,9 @@ private:
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
-
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap3);
+	
 	tilemap_t *m_bg_tilemap2;
 	tilemap_t *m_bg_tilemap3;
 
@@ -346,7 +346,7 @@ uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
 }
 
 
-TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
+TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap2)
 {
 	int tile = m_videoram2[tile_index*2];
 
@@ -370,7 +370,7 @@ void bigkarnk_ms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_bg_tilemap2->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap2)
+TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap3)
 {
 	int tile = m_videoram3[tile_index*2];
 
@@ -398,8 +398,8 @@ void bigkarnk_ms_state::vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void bigkarnk_ms_state::video_start()
 {
-	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
-	m_bg_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+	m_bg_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigkarnk_ms_state::get_tile_info_tilemap3)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
 }
 
 

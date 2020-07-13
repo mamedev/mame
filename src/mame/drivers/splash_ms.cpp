@@ -83,8 +83,8 @@ private:
 
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap2;
 
@@ -154,7 +154,7 @@ void splashms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_bg_tilemap2->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap0)
+TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap1)
 {
 	int tile = m_videoram[tile_index*2];
 	int attr = m_videoram[(tile_index*2)+1] & 0x0f;
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap0)
 	tileinfo.set(1,tile,attr,TILE_FLIPYX(fx));
 }
 
-TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap1)
+TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap2)
 {
 	int tile = m_videoram2[tile_index*2];
 
@@ -233,8 +233,8 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void splashms_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap0)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  16,  16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splashms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(15);
 	m_bg_tilemap2->set_transparent_pen(0);
