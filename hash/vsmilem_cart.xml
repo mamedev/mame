@@ -957,8 +957,7 @@ Language:
 		</part>
 	</software>
 
-	<!-- Fatal error: UNSP: illegal ALU optype 05 at 0001 -->
-	<software name="shrekfam" supported="no">
+	<software name="shrekfam">
 		<description>Shrek Forever After (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -974,8 +973,7 @@ Language:
 		</part>
 	</software>
 
-	<!-- Does not boot, just loops on the intro -->
-	<software name="shrekfamg" cloneof="shrekfam" supported="no">
+	<software name="shrekfamg" cloneof="shrekfam">
 		<description>Für immer Shrek (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -985,22 +983,21 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x1000000">
-				<rom name="vsmile84504.blob1.bin" size="0x0800000" crc="3f1c79e2" sha1="1b12b9b379dd942356e6ee6594c8b80dbb9db781" offset="0x0000000" />
-				<rom name="vsmile84504.blob2.bin" size="0x0800000" crc="78cf731b" sha1="9b1d1eed7bd216f4feca3160c31912b7c81e4efd" offset="0x0800000" />
+				<rom name="vsmile84504.blob1.bin" size="0x0800000" crc="3f1c79e2" sha1="1b12b9b379dd942356e6ee6594c8b80dbb9db781" offset="0x0800000" />
+				<rom name="vsmile84504.blob2.bin" size="0x0800000" crc="78cf731b" sha1="9b1d1eed7bd216f4feca3160c31912b7c81e4efd" offset="0x0000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Does not boot, just loops on the intro -->
-	<software name="shrekfamf" cloneof="shrekfam" supported="no">
+	<software name="shrekfamf" cloneof="shrekfam">
 		<description>Shrek 4 - Il était une fin (France)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084505(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="084505 - Shrek 4 (MOTION) (FR)_blob1.bin" size="0x0800000" crc="bb3d3e09" sha1="539f0948ec1dad3b2465990fcf053f2cacc7e766" offset="0x0000000" />
-				<rom name="084505 - Shrek 4 (MOTION) (FR)_blob2.bin" size="0x0800000" crc="7c633e07" sha1="a07b2439473be97bc1a785ae4050297ae0e5244a" offset="0x0800000" />
+				<rom name="084505 - Shrek 4 (MOTION) (FR)_blob1.bin" size="0x0800000" crc="bb3d3e09" sha1="539f0948ec1dad3b2465990fcf053f2cacc7e766" offset="0x0800000" />
+				<rom name="084505 - Shrek 4 (MOTION) (FR)_blob2.bin" size="0x0800000" crc="7c633e07" sha1="a07b2439473be97bc1a785ae4050297ae0e5244a" offset="0x0000000" />
 			</dataarea>
 		</part>
 	</software>

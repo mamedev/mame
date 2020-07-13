@@ -2081,7 +2081,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ltleinstn" cloneof="ltleinstnr5" supported="no">
+	<software name="ltleinstn" cloneof="ltleinstnr5">
 		<description>Disney's Little Einsteins (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2341,8 +2341,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Fatal error: UNSP: unknown opcode ff11 at 112212 -->
-	<software name="mannyf" supported="no">
+	<software name="mannyf">
 		<description>Disney Manny et ses outils (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2401,8 +2400,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- UNSP: illegal ALU optype 07 at 2a0001 -->
-	<software name="mickymagf" cloneof="mickymag" supported="no">
+	<software name="mickymagf" cloneof="mickymag">
 		<description>Disney Mickey - Mickey à la Recherche De Pluto (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -3142,8 +3140,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Does not boot, just shows a black screen -->
-	<software name="scoobydos" cloneof="scoobydor301" supported="no">
+	<software name="scoobydos" cloneof="scoobydor301">
 		<description>Scooby-Doo - Misterio en el Parque (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4144,7 +4141,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Fatal error: UNSP: illegal ALU optype 05 at 0001 -->
+	<!-- Fatal error: UNSP: unknown opcode e50b at e9a7 -->
 	<software name="toystor3i" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Italy)</description>
 		<year>2010</year>
@@ -4509,8 +4506,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Crashes MAME -->
-	<software name="techart" supported="no">
+	<software name="techart">
 		<description>V.Smile Art Studio (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4530,7 +4526,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="techartg" cloneof="techart" supported="no">
+	<software name="techartg" cloneof="techart">
 		<description>V.Smile Zeichenatelier (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4550,7 +4546,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="techartf" cloneof="techart" supported="no">
+	<software name="techartf" cloneof="techart">
 		<description>V.Smile Studio De Dessin (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4588,8 +4584,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Crashes MAME -->
-	<software name="techarts" cloneof="techart" supported="no">
+	<software name="techarts" cloneof="techart">
 		<description>V.Smile Estudio De Arte (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
