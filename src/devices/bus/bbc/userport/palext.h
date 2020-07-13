@@ -9,8 +9,8 @@
 **********************************************************************/
 
 
-#ifndef MAME_BUS_BBC_USERPORT_PALETTE_H
-#define MAME_BUS_BBC_USERPORT_PALETTE_H
+#ifndef MAME_BUS_BBC_USERPORT_PALEXT_H
+#define MAME_BUS_BBC_USERPORT_PALEXT_H
 
 #pragma once
 
@@ -21,13 +21,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class bbc_palette_device :
+class bbc_palext_device :
 	public device_t,
 	public device_bbc_userport_interface
 {
 protected:
 	// construction/destruction
-	bbc_palette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,7 +41,7 @@ protected:
 
 // ======================> bbc_chameleon_device
 
-class bbc_chameleon_device : public bbc_palette_device
+class bbc_chameleon_device : public bbc_palext_device
 {
 public:
 	// construction/destruction
@@ -57,7 +57,7 @@ protected:
 
 // ======================> bbc_cpalette_device
 
-class bbc_cpalette_device : public bbc_palette_device
+class bbc_cpalette_device : public bbc_palext_device
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::PALETTE; }
@@ -75,4 +75,4 @@ DECLARE_DEVICE_TYPE(BBC_CHAMELEON, bbc_chameleon_device)
 DECLARE_DEVICE_TYPE(BBC_CPALETTE, bbc_cpalette_device)
 
 
-#endif // MAME_BUS_BBC_USERPORT_PALETTE_H
+#endif // MAME_BUS_BBC_USERPORT_PALEXT_H

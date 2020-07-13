@@ -14,7 +14,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "palette.h"
+#include "palext.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -48,10 +48,10 @@ const tiny_rom_entry* bbc_chameleon_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  bbc_palette_device - constructor
+//  bbc_palext_device - constructor
 //-------------------------------------------------
 
-bbc_palette_device::bbc_palette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_palext_device::bbc_palext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
 	, m_palette(*this, ":palette")
@@ -60,12 +60,12 @@ bbc_palette_device::bbc_palette_device(const machine_config &mconfig, device_typ
 }
 
 bbc_chameleon_device::bbc_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_palette_device(mconfig, BBC_CHAMELEON, tag, owner, clock)
+	: bbc_palext_device(mconfig, BBC_CHAMELEON, tag, owner, clock)
 {
 }
 
 bbc_cpalette_device::bbc_cpalette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_palette_device(mconfig, BBC_CPALETTE, tag, owner, clock)
+	: bbc_palext_device(mconfig, BBC_CPALETTE, tag, owner, clock)
 {
 }
 
@@ -74,7 +74,7 @@ bbc_cpalette_device::bbc_cpalette_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void bbc_palette_device::device_start()
+void bbc_palext_device::device_start()
 {
 	memset(m_palette_ram, 0, sizeof(m_palette_ram));
 
