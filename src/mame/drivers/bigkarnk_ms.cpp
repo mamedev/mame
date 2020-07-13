@@ -464,10 +464,10 @@ void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0x400000, 0x400001).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
-	map(0x400002, 0x400003).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
-	map(0x400006, 0x400007).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
-	map(0x400008, 0x400009).r(FUNC(bigkarnk_ms_state::unknown_0x40000x_r));
+	map(0x400000, 0x400001).portr("IN0");
+	map(0x400002, 0x400003).portr("IN1");
+	map(0x400006, 0x400007).portr("IN2");
+	map(0x400008, 0x400009).portr("IN3");
 	
 	map(0xff0000, 0xffffff).ram();
 }
@@ -482,7 +482,7 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0, cliprect);
 
-	m_bg_tilemap3->set_scrollx(0, 112-(m_scrollregs[6]));
+	m_bg_tilemap3->set_scrollx(0, 112-(m_scrollregs[6]-0x4));
 	m_bg_tilemap3->set_scrolly(0, -m_scrollregs[7]);
 
 	m_bg_tilemap2->set_scrollx(0, 112-(m_scrollregs[0]-0x2));
@@ -529,6 +529,79 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 static INPUT_PORTS_START( bigkarnkm )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPSETTING(      0x0007, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0009, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, "Free Play (if Coin B too)" )
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPSETTING(      0x0070, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0090, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x00f0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x00d0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x00b0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, "Free Play (if Coin A too)" )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+		
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x0007, 0x0006, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:8,7,6")
+	PORT_DIPSETTING(      0x0007, "0" )
+	PORT_DIPSETTING(      0x0006, "1" )
+	PORT_DIPSETTING(      0x0005, "2" )
+	PORT_DIPSETTING(      0x0004, "3" )
+	PORT_DIPSETTING(      0x0003, "4" )
+	PORT_DIPSETTING(      0x0002, "5" )
+	PORT_DIPSETTING(      0x0001, "6" )
+	PORT_DIPSETTING(      0x0000, "7" )
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,4")
+	PORT_DIPSETTING(      0x0018, "1" )
+	PORT_DIPSETTING(      0x0010, "2" )
+	PORT_DIPSETTING(      0x0008, "3" )
+	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Impact" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x16x4_layout =
@@ -566,10 +639,9 @@ static const gfx_layout tiles8x8x4_layout =
 
 
 static GFXDECODE_START( gfx_bigkarnk_ms )
-
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4alt_layout, 0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x4_layout, 0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 32 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 32 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles8x8x4_layout, 0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
 GFXDECODE_END
 
 
@@ -600,20 +672,14 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 void bigkarnk_ms_state::init_bigkarnkm()
 {
 	// reorganize graphics into something we can decode with a single pass
-	uint8_t *src = memregion("gfx2")->base();
-	int len = memregion("gfx2")->bytes();
+	uint8_t *src = memregion("bgtile")->base();
+	int len = memregion("bgtile")->bytes();
 
 	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
 		{
-			int j = bitswap<20>(i, 19,18,17,16,
-				
-				       15,12,		
-				       11,10,9,8,			
-				       7,6,5,				
-				         14,13,4,	
-				       3,2,1,0);
+			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
 			buffer[j] = src[i];
 		}
 
@@ -634,7 +700,7 @@ ROM_START( bigkarnkm )
 	ROM_REGION( 0x020000, "audiodata", 0 )
 	ROM_LOAD( "snd_ka.ic11",   0x000000, 0x020000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
+	ROM_REGION( 0x180000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_ka.ic4",         0x080003, 0x020000, CRC(2bee07ea) SHA1(afd8769955314768db894e4e98f65422fc0dbb4f) )
 	ROM_LOAD32_BYTE( "5_ka.ic13",        0x080002, 0x020000, CRC(d55e3024) SHA1(71c84a76b08f8983f65ac4b99430eeb30dc3f8ea) )
 	ROM_LOAD32_BYTE( "5_ka.ic19",        0x080001, 0x020000, CRC(fc682c21) SHA1(c3fa9907fbe276bc4b74b79dda52713e702e441c) )
@@ -650,7 +716,7 @@ ROM_START( bigkarnkm )
 	ROM_LOAD32_BYTE( "5_ka.ic21",        0x000001, 0x020000, CRC(5ccc0f99) SHA1(ae2b2d4b2aa77a099ad2711032e6a05ab52789b9) )
 	ROM_LOAD32_BYTE( "5_ka.ic27",        0x000000, 0x020000, CRC(55509d96) SHA1(ddd064695ca7e8c2377f13484e385bf7ea7df610) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_LOAD32_BYTE( "8_ka_815.ic15",      0x000003, 0x020000, CRC(59d79b33) SHA1(70b9c60a72e517ac70f807c918f0ad4dd6c98f98) )
 	ROM_LOAD32_BYTE( "8_ka_822.ic22",      0x000002, 0x020000, CRC(12fc89c0) SHA1(883144d0c453cd8f829b2209d9a8028b7f87d0d5) )
 	ROM_LOAD32_BYTE( "8_ka_830.ic30",      0x000001, 0x020000, CRC(9904ae87) SHA1(5df3b35185c53a64c0647d297a19b9c013a3b3c2) )
