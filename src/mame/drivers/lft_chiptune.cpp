@@ -87,7 +87,7 @@ ROM_END
 
 ROM_START( hwchiptn )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "hwchiptn.bin", 0x0000, 0x2000, CRC(67458936) SHA1(26a86846a24dd974723a66bea6c22baf51c7bec9) )
+	ROM_LOAD( "hwchiptn.bin", 0x0000, 0x2000, CRC(0706eda8) SHA1(df227467bf4901978493efccaef6c4dfc32d5e62) )
 	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(bd7bc39f) SHA1(9d0ac37bb3ec8c95990fd37a962a17a95ce97aa0) )
 ROM_END
