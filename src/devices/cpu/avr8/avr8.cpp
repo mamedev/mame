@@ -92,7 +92,7 @@
 #define LOG_TIMERS          (LOG_TIMER0 | LOG_TIMER1 | LOG_TIMER2 | LOG_TIMER3 | LOG_TIMER4 | LOG_TIMER5)
 #define LOG_TIMER_TICKS     (LOG_TIMER0_TICK | LOG_TIMER1_TICK | LOG_TIMER2_TICK | LOG_TIMER3_TICK | LOG_TIMER4_TICK | LOG_TIMER5_TICK)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_BOOT | LOG_TIMERS | LOG_TIMER_TICKS | LOG_EEPROM | LOG_GPIO | LOG_WDOG | LOG_CLOCK | LOG_POWER \
-							 LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART)
+							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART)
 
 #define VERBOSE             (0)
 #include "logmacro.h"
@@ -870,6 +870,7 @@ void avr8_device::device_start()
 	// Misc.
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_interrupt_pending));
+	save_item(NAME(m_opcycles));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -1040,7 +1041,6 @@ inline uint8_t avr8_device::pop()
 
 void avr8_device::set_irq_line(uint16_t vector, int state)
 {
-	// Horrible hack, not accurate
 	if (state)
 	{
 		if (SREG_R(AVR8_SREG_I))
@@ -1058,17 +1058,16 @@ void avr8_device::set_irq_line(uint16_t vector, int state)
 	}
 }
 
-class CInterruptCondition
+struct interrupt_condition
 {
-	public:
-		uint8_t m_intindex;
-		uint8_t m_intreg;
-		uint8_t m_intmask;
-		uint8_t m_regindex;
-		uint8_t m_regmask;
+	uint8_t m_intindex;
+	uint8_t m_intreg;
+	uint8_t m_intmask;
+	uint8_t m_regindex;
+	uint8_t m_regmask;
 };
 
-static const CInterruptCondition s_int_conditions[AVR8_INTIDX_COUNT] =
+static const interrupt_condition s_int_conditions[AVR8_INTIDX_COUNT] =
 {
 	{ AVR8_INT_SPI_STC, AVR8_REGIDX_SPCR,   AVR8_SPCR_SPIE_MASK,     AVR8_REGIDX_SPSR,    AVR8_SPSR_SPIF_MASK },
 	{ AVR8_INT_T0COMPB, AVR8_REGIDX_TIMSK0, AVR8_TIMSK0_OCIE0B_MASK, AVR8_REGIDX_TIFR0,   AVR8_TIFR0_OCF0B_MASK },
@@ -1085,7 +1084,7 @@ static const CInterruptCondition s_int_conditions[AVR8_INTIDX_COUNT] =
 
 void avr8_device::update_interrupt(int source)
 {
-	const CInterruptCondition &condition = s_int_conditions[source];
+	const interrupt_condition &condition = s_int_conditions[source];
 
 	int intstate = 0;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
@@ -1101,7 +1100,7 @@ void avr8_device::update_interrupt(int source)
 
 void atmega328_device::update_interrupt(int source)
 {
-	const CInterruptCondition &condition = s_int_conditions[source];
+	const interrupt_condition &condition = s_int_conditions[source];
 
 	int intstate = 0;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
@@ -1115,7 +1114,7 @@ void atmega328_device::update_interrupt(int source)
 	}
 }
 
-static const CInterruptCondition s_mega644_int_conditions[AVR8_INTIDX_COUNT] =
+static const interrupt_condition s_mega644_int_conditions[AVR8_INTIDX_COUNT] =
 {
 	{ ATMEGA644_INT_SPI_STC, AVR8_REGIDX_SPCR,   AVR8_SPCR_SPIE_MASK,     AVR8_REGIDX_SPSR,    AVR8_SPSR_SPIF_MASK },
 	{ ATMEGA644_INT_T0COMPB, AVR8_REGIDX_TIMSK0, AVR8_TIMSK0_OCIE0B_MASK, AVR8_REGIDX_TIFR0,   AVR8_TIFR0_OCF0B_MASK },
@@ -1132,7 +1131,7 @@ static const CInterruptCondition s_mega644_int_conditions[AVR8_INTIDX_COUNT] =
 
 void atmega644_device::update_interrupt(int source)
 {
-	const CInterruptCondition &condition = s_mega644_int_conditions[source];
+	const interrupt_condition &condition = s_mega644_int_conditions[source];
 
 	int intstate = 0;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
@@ -1149,7 +1148,7 @@ void atmega644_device::update_interrupt(int source)
 //TODO: review this!
 void atmega1280_device::update_interrupt(int source)
 {
-	const CInterruptCondition &condition = s_mega644_int_conditions[source];
+	const interrupt_condition &condition = s_mega644_int_conditions[source];
 
 	int intstate = 0;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
@@ -1166,7 +1165,7 @@ void atmega1280_device::update_interrupt(int source)
 //TODO: review this!
 void atmega2560_device::update_interrupt(int source)
 {
-	const CInterruptCondition &condition = s_mega644_int_conditions[source];
+	const interrupt_condition &condition = s_mega644_int_conditions[source];
 
 	int intstate = 0;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
@@ -1224,20 +1223,17 @@ void avr8_device::timer_tick()
 	}
 }
 
-//  uint8_t ocr0[2] = { m_r[AVR8_REGIDX_OCR0A], m_r[AVR8_REGIDX_OCR0B] };
-//TODO  uint8_t ocf0[2] = { (1 << AVR8_TIFR0_OCF0A_SHIFT), (1 << AVR8_TIFR4_OCF0B_SHIFT) };
-//TODO  uint8_t int0[2] = { AVR8_INTIDX_OCF0A, AVR8_INTIDX_OCF0B };
-
-#define LOG_TIMER_0 0
-#define LOG_TIMER_5 0
 // Timer 0 Handling
 void avr8_device::timer0_tick()
 {
+	static const uint8_t s_ocf0[2] = { (1 << AVR8_TIFR0_OCF0A_SHIFT), (1 << AVR8_TIFR0_OCF0B_SHIFT) };
+	static const uint8_t s_int0[2] = { AVR8_INTIDX_OCF0A, AVR8_INTIDX_OCF0B };
+
 	LOGMASKED(LOG_TIMER0_TICK, "%s: AVR8_WGM0: %d\n", machine().describe_context(), AVR8_WGM0);
 	LOGMASKED(LOG_TIMER0_TICK, "%s: AVR8_TCCR0A_COM0B: %d\n", machine().describe_context(), AVR8_TCCR0A_COM0B);
 
 	uint8_t count = m_r[AVR8_REGIDX_TCNT0];
-	int32_t increment = m_timer_increment[0];
+	count++;
 
 	switch (AVR8_WGM0)
 	{
@@ -1253,10 +1249,16 @@ void avr8_device::timer0_tick()
 		switch (AVR8_TCCR0A_COM0B)
 		{
 		case 0: /* Normal Operation */
-			if (count == m_timer_top[0])
+			if (count == AVR8_OCR0A)
 			{
-				LOGMASKED(LOG_TIMER0, "%s: timer0: Set normal OC0B behavior\n", machine().describe_context());
-				m_timer_top[0] = 0;
+				m_r[AVR8_REGIDX_TIFR0] |= s_ocf0[AVR8_REG_A];
+				update_interrupt(s_int0[AVR8_REG_A]);
+				count = 0;
+			}
+			else if (count == AVR8_OCR0B)
+			{
+				m_r[AVR8_REGIDX_TIFR0] |= s_ocf0[AVR8_REG_B];
+				update_interrupt(s_int0[AVR8_REG_B]);
 			}
 			break;
 
@@ -1290,26 +1292,23 @@ void avr8_device::timer0_tick()
 		break;
 
 	case WGM02_FAST_PWM:
-	LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
-	break;
+		LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
+		break;
 
 	case WGM02_PWM_PC_CMP:
-	LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_PWM_PC_CMP: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
-	break;
+		LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_PWM_PC_CMP: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
+		break;
 
 	case WGM02_FAST_PWM_CMP:
-	LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM_CMP: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
-	break;
+		LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM_CMP: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
+		break;
 
 	default:
 		LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: update_timer0_compare_mode: Unknown waveform generation mode: %02x\n", machine().describe_context(), AVR8_WGM0);
 		break;
 	}
 
-	count = count & 0xff;
-
-	count += increment;
-	m_r[AVR8_REGIDX_TCNT0] = count & 0xff;
+	m_r[AVR8_REGIDX_TCNT0] = count;
 }
 
 void avr8_device::changed_tccr0a(uint8_t data)
@@ -1379,11 +1378,15 @@ inline void avr8_device::timer1_tick()
 	static const uint8_t s_int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
 	int32_t increment = m_timer_increment[1];
 
+	LOGMASKED(LOG_TIMER1_TICK, "%s: AVR8_WGM1: %d\n", machine().describe_context(), AVR8_WGM1);
+
 	for (int32_t reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
 	{
 		switch (m_wgm1)
 		{
 		case WGM1_CTC_OCR:
+			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1_count: %04x\n", machine().describe_context(), m_timer1_count);
+			LOGMASKED(LOG_TIMER1_TICK, "%s: OCR1%c: %04x\n", machine().describe_context(), reg ? 'A' : 'B', m_ocr1[reg]);
 			if (m_timer1_count == 0xffff)
 			{
 				m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
@@ -1409,9 +1412,6 @@ inline void avr8_device::timer1_tick()
 					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
 				}
-
-				m_r[AVR8_REGIDX_TIFR1] &= ~s_ocf1[reg];
-				update_interrupt(s_int1[reg]);
 			}
 			break;
 
@@ -1882,7 +1882,7 @@ void avr8_device::update_timer_clock_source(uint8_t t, uint8_t clock_select)
 	};
 	m_timer_prescale[t] = s_prescale_values[(t == 2) ? 1 : 0][clock_select];
 
-	LOGMASKED((LOG_TIMER0 + t), "%s: update_timer_clock_source: t = %d, cs = %d\n", t, machine().describe_context(), clock_select);
+	LOGMASKED((LOG_TIMER0 + t), "%s: update_timer_clock_source: t = %d, cs = %d\n", machine().describe_context(), t, clock_select);
 
 	if (m_timer_prescale[t] == 0xffff)
 	{
@@ -2250,56 +2250,67 @@ void avr8_device::regs_w(offs_t offset, uint8_t data)
 		break;
 
 	case AVR8_REGIDX_PORTA:
+		LOGMASKED(LOG_GPIO, "%s: PORTA Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTA, data);
 		m_r[AVR8_REGIDX_PORTA] = data;
 		break;
 
 	case AVR8_REGIDX_PORTB:
+		LOGMASKED(LOG_GPIO, "%s: PORTB Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTB, data);
 		m_r[AVR8_REGIDX_PORTB] = data;
 		break;
 
 	case AVR8_REGIDX_PORTC:
+		LOGMASKED(LOG_GPIO, "%s: PORTC Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTC, data);
 		m_r[AVR8_REGIDX_PORTC] = data;
 		break;
 
 	case AVR8_REGIDX_PORTD:
+		LOGMASKED(LOG_GPIO, "%s: PORTD Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTD, data);
 		m_r[AVR8_REGIDX_PORTD] = data;
 		break;
 
 	case AVR8_REGIDX_PORTE:
+		LOGMASKED(LOG_GPIO, "%s: PORTE Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTE, data);
 		m_r[AVR8_REGIDX_PORTE] = data;
 		break;
 
 	case AVR8_REGIDX_PORTF:
+		LOGMASKED(LOG_GPIO, "%s: PORTF Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTF, data);
 		m_r[AVR8_REGIDX_PORTF] = data;
 		break;
 
 	case AVR8_REGIDX_PORTG:
+		LOGMASKED(LOG_GPIO, "%s: PORTG Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTG, data);
 		m_r[AVR8_REGIDX_PORTG] = data;
 		break;
 
 	case AVR8_REGIDX_PORTH:
+		LOGMASKED(LOG_GPIO, "%s: PORTH Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTH, data);
 		m_r[AVR8_REGIDX_PORTH] = data;
 		break;
 
 	case AVR8_REGIDX_PORTJ:
+		LOGMASKED(LOG_GPIO, "%s: PORTJ Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTJ, data);
 		m_r[AVR8_REGIDX_PORTJ] = data;
 		break;
 
 	case AVR8_REGIDX_PORTK:
+		LOGMASKED(LOG_GPIO, "%s: PORTK Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTK, data);
 		m_r[AVR8_REGIDX_PORTK] = data;
 		break;
 
 	case AVR8_REGIDX_PORTL:
+		LOGMASKED(LOG_GPIO, "%s: PORTL Write: %02x\n", machine().describe_context(), data);
 		m_io->write_byte(AVR8_IO_PORTL, data);
 		m_r[AVR8_REGIDX_PORTL] = data;
 		break;
@@ -2327,12 +2338,12 @@ void avr8_device::regs_w(offs_t offset, uint8_t data)
 
 	case AVR8_REGIDX_OCR0A:
 		LOGMASKED(LOG_TIMER0, "%s: OCR0A = %02x\n", machine().describe_context(), data);
-		update_ocr0(AVR8_OCR0A, AVR8_REG_A);
+		update_ocr0(data, AVR8_REG_A);
 		break;
 
 	case AVR8_REGIDX_OCR0B:
 		LOGMASKED(LOG_TIMER0, "%s: OCR0B = %02x\n", machine().describe_context(), data);
-		update_ocr0(AVR8_OCR0B, AVR8_REG_B);
+		update_ocr0(data, AVR8_REG_B);
 		break;
 
 	case AVR8_REGIDX_TIFR0:
@@ -2408,7 +2419,12 @@ void avr8_device::regs_w(offs_t offset, uint8_t data)
 		break;
 
 	case AVR8_REGIDX_GPIOR1:
+		LOGMASKED(LOG_GPIO, "%s: GPIOR1 Write: %02x\n", machine().describe_context(), data);
+		m_r[offset] = data;
+		break;
+
 	case AVR8_REGIDX_GPIOR2:
+		LOGMASKED(LOG_GPIO, "%s: GPIOR2 Write: %02x\n", machine().describe_context(), data);
 		m_r[offset] = data;
 		break;
 
@@ -2813,6 +2829,8 @@ void avr8_device::regs_w(offs_t offset, uint8_t data)
 
 uint8_t avr8_device::regs_r(offs_t offset)
 {
+	uint8_t data = m_r[offset];
+
 	switch (offset)
 	{
 	case AVR8_REGIDX_R0:
@@ -2847,7 +2865,7 @@ uint8_t avr8_device::regs_r(offs_t offset)
 	case AVR8_REGIDX_R29:
 	case AVR8_REGIDX_R30:
 	case AVR8_REGIDX_R31:
-		return m_r[offset];
+		return data;
 
 	case AVR8_REGIDX_PINA:
 		// TODO: account for DDRA
@@ -2904,7 +2922,7 @@ uint8_t avr8_device::regs_r(offs_t offset)
 	case AVR8_REGIDX_PORTJ:
 	case AVR8_REGIDX_PORTK:
 	case AVR8_REGIDX_PORTL:
-		return m_r[offset];
+		return data;
 
 	case AVR8_REGIDX_DDRA:
 	case AVR8_REGIDX_DDRB:
@@ -2917,19 +2935,25 @@ uint8_t avr8_device::regs_r(offs_t offset)
 	case AVR8_REGIDX_DDRJ:
 	case AVR8_REGIDX_DDRK:
 	case AVR8_REGIDX_DDRL:
-		return m_r[offset];
+		return data;
 
 	// EEPROM registers
 	case AVR8_REGIDX_EECR:
 	case AVR8_REGIDX_EEDR:
-		return m_r[offset];
+		return data;
 
 	// Miscellaneous registers
 	// TODO: Implement readback for all applicable registers.
 
 	case AVR8_REGIDX_GPIOR0:
+		LOGMASKED(LOG_GPIO, "%s: GPIOR0 Read: %02x\n", machine().describe_context(), data);
+		return data;
 	case AVR8_REGIDX_GPIOR1:
+		LOGMASKED(LOG_GPIO, "%s: GPIOR1 Read: %02x\n", machine().describe_context(), data);
+		return data;
 	case AVR8_REGIDX_GPIOR2:
+		LOGMASKED(LOG_GPIO, "%s: GPIOR2 Read: %02x\n", machine().describe_context(), data);
+		return data;
 //    case AVR8_REGIDX_UCSR0B:   // TODO: needed for Replicator 1
 	case AVR8_REGIDX_SPDR:   // TODO: needed for Replicator 1
 	case AVR8_REGIDX_SPSR:   // TODO: needed for Replicator 1
@@ -2939,12 +2963,26 @@ uint8_t avr8_device::regs_r(offs_t offset)
 	case AVR8_REGIDX_SPH:
 	case AVR8_REGIDX_SREG:
 	case AVR8_REGIDX_TIMSK0:
+		LOGMASKED(LOG_TIMER0, "%s: TIMSK0 Read: %02x\n", machine().describe_context(), data);
+		return data;
 	case AVR8_REGIDX_TIMSK1:
+		LOGMASKED(LOG_TIMER1, "%s: TIMSK1 Read: %02x\n", machine().describe_context(), data);
+		return data;
 	case AVR8_REGIDX_TIMSK2:
-//    case AVR8_REGIDX_TIMSK3:  // TODO: needed for Replicator 1
+		LOGMASKED(LOG_TIMER2, "%s: TIMSK2 Read: %02x\n", machine().describe_context(), data);
+		return data;
+	case AVR8_REGIDX_TIMSK3:
+		LOGMASKED(LOG_TIMER3, "%s: TIMSK3 Read: %02x\n", machine().describe_context(), data);
+		return data;
 	case AVR8_REGIDX_TIMSK4:
+		LOGMASKED(LOG_TIMER4, "%s: TIMSK4 Read: %02x\n", machine().describe_context(), data);
+		return data;
 	case AVR8_REGIDX_TIMSK5:
-		return m_r[offset];
+		LOGMASKED(LOG_TIMER5, "%s: TIMSK5 Read: %02x\n", machine().describe_context(), data);
+		return data;
+	case AVR8_REGIDX_TIFR1:
+		//LOGMASKED(LOG_TIMER0, "%s: TIFR1 Read: %02x\n", machine().describe_context(), data);
+		return data;
 
 	// Two-wire registers
 	case AVR8_REGIDX_TWCR:
