@@ -283,10 +283,14 @@ Sound Board 9/2
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "sound/msm5205.h"
+#include "sound/3812intf.h"
+#include "machine/gen_latch.h"
 
 class bigkarnk_ms_state : public driver_device
 {
@@ -294,6 +298,9 @@ public:
 	bigkarnk_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_msm(*this, "msm"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
@@ -313,6 +320,9 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<msm5205_device> m_msm;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
@@ -329,6 +339,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bigkarnkm_map(address_map &map);
+	void sound_map(address_map &map);
 
 	uint16_t vram1_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
@@ -347,6 +358,11 @@ private:
 	tilemap_t *m_bg_tilemap3;
 
 	uint16_t unknown_0x40000x_r();
+
+	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_adpcm_data_w(uint8_t data);
+	void splash_adpcm_control_w(uint8_t data);
+	int m_adpcm_data;
 };
 
 uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
@@ -469,6 +485,8 @@ void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 	map(0x400006, 0x400007).portr("IN2");
 	map(0x400008, 0x400009).portr("IN3");
 	
+	map(0x40000e, 0x40000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -644,6 +662,35 @@ static GFXDECODE_START( gfx_bigkarnk_ms )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
 GFXDECODE_END
 
+void bigkarnk_ms_state::splash_adpcm_data_w(uint8_t data)
+{
+	m_adpcm_data = data;
+}
+
+void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
+{
+	m_msm->reset_w(BIT(data, 7));
+}
+
+WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
+{
+	m_msm->data_w(m_adpcm_data >> 4);
+	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
+}
+
+
+void bigkarnk_ms_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+
+	map(0xe000, 0xe000).w(FUNC(bigkarnk_ms_state::splash_adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(bigkarnk_ms_state::splash_adpcm_data_w));
+
+	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
+}
 
 void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 {
@@ -651,6 +698,11 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigkarnk_ms_state::bigkarnkm_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bigkarnk_ms_state::irq6_line_hold));
+
+	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &bigkarnk_ms_state::sound_map);
+	m_soundcpu->set_periodic_int(FUNC(bigkarnk_ms_state::nmi_line_pulse), attotime::from_hz(60*64));  
+
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -665,8 +717,18 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bigkarnk_ms);
 
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(bigkarnk_ms_state::splash_msm5205_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void bigkarnk_ms_state::init_bigkarnkm()
@@ -694,7 +756,7 @@ ROM_START( bigkarnkm )
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic11",  0x040001, 0x020000, CRC(30674ef3) SHA1(d1b29337068ed7323c104a48de593c9ac4668e66) )
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic20",  0x040000, 0x020000, CRC(332d6dea) SHA1(cd7e402642f57c12cb7405c49b75bfaa0d104421) )
 
-	ROM_REGION( 0x010000, "audiocpu", 0 )    /* Z80 code (uses YM3812 + M5205) */
+	ROM_REGION( 0x010000, "soundcpu", 0 )    /* Z80 code (uses YM3812 + M5205) */
 	ROM_LOAD( "snd_ka.ic6",   0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) )
 
 	ROM_REGION( 0x020000, "audiodata", 0 )
