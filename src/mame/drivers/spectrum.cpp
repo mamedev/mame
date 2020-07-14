@@ -786,7 +786,11 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
+#if 1 // change to 0 in order to get working "Proceed 1" VC1541 FDC
 	config.set_maximum_quantum(attotime::from_hz(60));
+#else
+	config.set_perfect_quantum(m_maincpu);
+#endif
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 

@@ -990,6 +990,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
 	connector.set_formats(c1541_device_base::floppy_formats);
+	connector.enable_sound(true);
 }
 
 

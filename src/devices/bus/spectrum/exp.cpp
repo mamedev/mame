@@ -171,6 +171,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "plus2test.h"
 #include "logitek.h"
 #include "protek.h"
+#include "sdi.h"
 #include "specdrum.h"
 #include "speccydos.h"
 #include "uslot.h"
@@ -206,6 +207,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("proceed", SPECTRUM_PROCEED);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("sdi", SPECTRUM_SDI);
 	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("uslot", SPECTRUM_USLOT);
