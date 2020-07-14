@@ -364,8 +364,8 @@ void nemesis_state::nemesis_filter_w(offs_t offset, uint8_t data)
 
 void nemesis_state::gx400_speech_w(offs_t offset, uint8_t data)
 {
-	m_vlm->rst(BIT(data, 4));
-	m_vlm->st(BIT(data, 5));
+	m_vlm->rst(BIT(offset, 4));
+	m_vlm->st(BIT(offset, 5));
 	// bits 3, 6 also used (one is OE for VLM data?)
 	// data is irrelevant for most writes
 
