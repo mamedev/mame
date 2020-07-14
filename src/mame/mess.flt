@@ -191,7 +191,6 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
-craft.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -494,6 +493,8 @@ leapster.cpp
 learnwin.cpp
 lee1214.cpp
 lft.cpp
+lft_chiptune.cpp
+lft_craft.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp

@@ -11261,11 +11261,6 @@ warzardr1                       // 23/10/1996 (c) 1996 (Japan)
 cpzodiac                        //
 cpzodiacj                       //
 
-@source:craft.cpp
-craft                           // Craft, by [lft] (2008)
-powernin                        // Power Ninja Action Challenge, by [lft] (2009)
-hwchiptn                        // The Hardware Chiptune Project, by [lft] (2007)
-
 @source:crazybal.cpp
 crazybal                        // EGS
 
@@ -19363,6 +19358,13 @@ ripribita                       // (c) 1997 LAI Games
 @source:lft.cpp
 lft1230                         //
 lft1510                         //
+
+@source:lft_chiptune.cpp
+powernin                        // Power Ninja Action Challenge, by [lft] (2009)
+hwchiptn                        // The Hardware Chiptune Project, by [lft] and kryo (2007)
+
+@source:lft_craft.cpp
+craft                           // Craft, by [lft] (2008)
 
 @source:lg-dvd.cpp
 lggp40                          //

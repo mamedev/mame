@@ -2498,7 +2498,8 @@ createMESSProjects(_target, _subtarget, "homebrew")
 files {
 	MAME_DIR .. "src/mame/drivers/4004clk.cpp",
 	MAME_DIR .. "src/mame/drivers/68ksbc.cpp",
-	MAME_DIR .. "src/mame/drivers/craft.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_chiptune.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_craft.cpp",
 	MAME_DIR .. "src/mame/drivers/dcebridge.cpp",
 	MAME_DIR .. "src/mame/drivers/homez80.cpp",
 	MAME_DIR .. "src/mame/drivers/p112.cpp",
