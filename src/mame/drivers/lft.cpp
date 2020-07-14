@@ -32,6 +32,8 @@ Note: Backspace/delete performs oddly.
 //#include "bus/s100/s100.h"
 
 
+namespace {
+
 class lft_state : public driver_device
 {
 public:
@@ -44,12 +46,13 @@ public:
 
 	void lft(machine_config &config);
 
-private:
+protected:
+	virtual void machine_reset() override;
 
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<scc8530_device> m_scc;
@@ -128,6 +131,8 @@ ROM_START( lft1510 )
 	ROM_LOAD16_BYTE( "1510lfod", 0x2001, 0x1000, CRC(ba8c23fc) SHA1(d4b82f69fccd653b31e7bd05ee884b323ff0007b) )
 	ROM_IGNORE(0x1000)
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

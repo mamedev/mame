@@ -1165,7 +1165,7 @@ void avr8_device::op_break(uint16_t op)
 void avr8_device::op_wdr(uint16_t op)
 {
 	LOGMASKED(LOG_WDOG, "%s: Watchdog reset opcode\n", machine().describe_context());
-	op_unimpl(op);
+	//op_unimpl(op);
 }
 
 void avr8_device::op_lpm(uint16_t op)
