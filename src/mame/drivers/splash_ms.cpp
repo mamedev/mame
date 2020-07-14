@@ -44,6 +44,7 @@ public:
 	{ }
 
 	void splashms(machine_config &config);
+	void init_splashms();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -167,13 +168,12 @@ TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap2)
 {
 	int tile = m_videoram2[tile_index*2];
 
-	int bank = (tile & 0x100)>>8;
-	tile &= 0xff;
+	tile &= 0x1ff;
 
 	int attr = m_videoram2[(tile_index*2)+1] & 0x0f;
 	int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
 
-	tileinfo.set(2+bank,tile,attr,TILE_FLIPYX(fx));
+	tileinfo.set(2,tile,attr,TILE_FLIPYX(fx));
 }
 
 uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -414,19 +414,19 @@ static const gfx_layout tiles8x8x4_layout =
 static const gfx_layout tiles16x16x4alt_layout =
 {
 	16,16,
-	0x100,
+	RGN_FRAC(1,1),
 	4,
 	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7, (65536*2)+0,(65536*2)+1,(65536*2)+2,(65536*2)+3,(65536*2)+4,(65536*2)+5,(65536*2)+6,(65536*2)+7 },
-	{ STEP8(0,32),STEP8(65536,32) },
-	8 * 32
+	{ 0,1,2,3,4,5,6,7, 512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
+	{ STEP8(0,32), STEP8(256,32) },
+	32 * 32
 };
+
 
 static GFXDECODE_START( gfx_splashms )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "fgtile", 0, tiles8x8x4_layout, 0, 16 )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 16 )
-	GFXDECODE_ENTRY( "bgtile", 0x8000, tiles16x16x4alt_layout, 0, 16 )
 GFXDECODE_END
 
 void splashms_state::splash_adpcm_data_w(uint8_t data)
@@ -502,6 +502,25 @@ void splashms_state::splashms(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
+void splashms_state::init_splashms()
+{
+	// reorganize graphics into something we can decode with a single pass
+	uint8_t *src = memregion("bgtile")->base();
+	int len = memregion("bgtile")->bytes();
+
+	std::vector<uint8_t> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
+			buffer[j] = src[i];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
+
 ROM_START( splashms )
 	ROM_REGION( 0x040000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cpu1_6-1_sp_608a.ic8",  0x000001, 0x020000, CRC(befdbaf0) SHA1(94efdeec1e1311317ffd0fe3d5fdbb02e151b985) )
@@ -562,4 +581,4 @@ ROM_START( splashms )
 	ROM_LOAD( "snd_9-2_9359_gal16v8as.ic10", 0, 1, NO_DUMP )
 ROM_END
 
-GAME( 1992, splashms,  splash,  splashms,  splashms,  splashms_state, empty_init, ROT0, "Gaelco", "Splash (Modular System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, splashms,  splash,  splashms,  splashms,  splashms_state, init_splashms, ROT0, "Gaelco", "Splash (Modular System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

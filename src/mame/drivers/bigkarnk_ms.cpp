@@ -291,6 +291,8 @@ Sound Board 9/2
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 #include "machine/gen_latch.h"
+#include "machine/bankdev.h"
+
 
 class bigkarnk_ms_state : public driver_device
 {
@@ -309,7 +311,8 @@ public:
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
-		m_scrollregs(*this, "scrollregs")
+		m_scrollregs(*this, "scrollregs"),
+		m_soundrom(*this, "soundrom")
 	{ }
 
 	void bigkarnkm(machine_config &config);
@@ -333,14 +336,17 @@ private:
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_videoram3;
 	required_shared_ptr<uint16_t> m_scrollregs;
+	required_device<address_map_bank_device> m_soundrom;
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bigkarnkm_map(address_map &map);
 	void sound_map(address_map &map);
-
+	void soundrom_map(address_map &map);
+	
 	uint16_t vram1_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram3_r(offs_t offset, uint16_t mem_mask);
@@ -485,6 +491,7 @@ void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 	map(0x400006, 0x400007).portr("IN2");
 	map(0x400008, 0x400009).portr("IN3");
 	
+	map(0x40000c, 0x40000d).noprw();
 	map(0x40000e, 0x40000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0xff0000, 0xffffff).ram();
@@ -511,7 +518,6 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	m_bg_tilemap3->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 
 	const int NUM_SPRITES = 0x200;
@@ -542,6 +548,7 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-112,ypos-16,15);
 	}
 
+	m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -669,7 +676,9 @@ void bigkarnk_ms_state::splash_adpcm_data_w(uint8_t data)
 
 void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
 {
+//	printf("splash_adpcm_control_w %02x\n", data);
 	m_msm->reset_w(BIT(data, 7));
+	m_soundrom->set_bank(data & 0xf);
 }
 
 WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
@@ -681,7 +690,9 @@ WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
 
 void bigkarnk_ms_state::sound_map(address_map &map)
 {
-	map(0x0000, 0xdfff).rom();
+	map(0x0000, 0x7fff).rom();
+	
+	map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xe000).w(FUNC(bigkarnk_ms_state::splash_adpcm_control_w));
 	map(0xe400, 0xe400).w(FUNC(bigkarnk_ms_state::splash_adpcm_data_w));
@@ -691,6 +702,12 @@ void bigkarnk_ms_state::sound_map(address_map &map)
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
 }
+
+void bigkarnk_ms_state::soundrom_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram().share("soundcpu");
+}
+
 
 void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 {
@@ -703,6 +720,7 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &bigkarnk_ms_state::sound_map);
 	m_soundcpu->set_periodic_int(FUNC(bigkarnk_ms_state::nmi_line_pulse), attotime::from_hz(60*64));  
 
+	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&bigkarnk_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -749,6 +767,13 @@ void bigkarnk_ms_state::init_bigkarnkm()
 	}
 }
 
+void bigkarnk_ms_state::machine_reset()
+{
+	m_soundrom->set_bank(0);
+}
+
+
+
 ROM_START( bigkarnkm )
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic8",   0x000001, 0x020000, CRC(ab71c1d3) SHA1(3174f1c68e4aa5b6053b118da1fed1f4001193b0) )
@@ -756,11 +781,9 @@ ROM_START( bigkarnkm )
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic11",  0x040001, 0x020000, CRC(30674ef3) SHA1(d1b29337068ed7323c104a48de593c9ac4668e66) )
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic20",  0x040000, 0x020000, CRC(332d6dea) SHA1(cd7e402642f57c12cb7405c49b75bfaa0d104421) )
 
-	ROM_REGION( 0x010000, "soundcpu", 0 )    /* Z80 code (uses YM3812 + M5205) */
-	ROM_LOAD( "snd_ka.ic6",   0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) )
-
-	ROM_REGION( 0x020000, "audiodata", 0 )
-	ROM_LOAD( "snd_ka.ic11",   0x000000, 0x020000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) )
+	ROM_REGION( 0x040000, "soundcpu", 0 )    /* Z80 code (uses YM3812 + M5205) */
+	ROM_LOAD( "snd_ka.ic6",    0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) )
+	ROM_LOAD( "snd_ka.ic11",   0x010000, 0x020000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) )
 
 	ROM_REGION( 0x180000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_ka.ic4",         0x080003, 0x020000, CRC(2bee07ea) SHA1(afd8769955314768db894e4e98f65422fc0dbb4f) )
