@@ -34,6 +34,15 @@
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Texas instrument datasheet
 //- Limitations: Internal resistor network currently fixed to 5k
+//-   If TRIG and TRESH are connected overshoot compensation will be enabled.
+//-   The approach is raw but delivers results (at 5 to 10 steps per discharge/charge)
+//-   within a couple of percent. Please take into account that any datasheet
+//-   formulas are idealistic. Neither capacitor, resistor, internal resistor
+//-   tolerances are taken into account. Nor are ambient temperature and chip
+//-   temperature. Thus the result is considered acceptable.
+//-   The datasheet states a maximum discharge of 200mA, this is not modelled
+//-   Instead an impedance of 1 Ohm is used.
+//-
 //- Example: ne555_astable.c,ne555_example
 //- FunctionTable:
 //-
@@ -49,8 +58,10 @@
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
 
+#include "plib/pmath.h"
+
 #define R_OFF (1E20)
-#define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
+#define R_ON  (1)
 
 namespace netlist
 {
@@ -71,6 +82,8 @@ namespace netlist
 		, m_last_out(*this, "m_last_out", false)
 		, m_ff(*this, "m_ff", false)
 		, m_last_reset(*this, "m_last_reset", false)
+		, m_overshoot(*this, "m_overshoot", 0.0)
+		, m_ovlimit(0.0)
 		{
 			register_subalias("GND",  m_R3.N());    // Pin 1
 			register_subalias("CONT", m_R1.N());    // Pin 5
@@ -99,6 +112,10 @@ namespace netlist
 			m_RDIS.set_R(nlconst::magic(R_OFF));
 
 			m_last_out = true;
+			// Check for astable setup, usually TRIG AND THRES connected. Enable
+			// overshoot compensation in this case.
+			if (m_TRIG.net() == m_THRES.net())
+				m_ovlimit = nlconst::magic(0.5);
 		}
 
 	private:
@@ -108,41 +125,53 @@ namespace netlist
 
 			const auto reset = m_RESET();
 
+			const nl_fptype vthresh = clamp_hl(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
+			const nl_fptype vtrig = clamp_hl(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4));
+
 			if (!reset && m_last_reset)
 			{
 				m_ff = false;
 			}
 			else
 			{
-				const nl_fptype vt = clamp(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
-				const bool bthresh = (m_THRES() > vt);
-				const bool btrig = (m_TRIG() > clamp(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4)));
+				const auto delta = m_THRES() + m_overshoot - vthresh;
+				const bool bthresh = (delta > 0.0);
+				const bool btrig = (m_TRIG() - m_overshoot > vtrig);
 
 				if (!btrig)
 					m_ff = true;
 				else if (bthresh)
+				{
 					m_ff = false;
+				}
 			}
 
 			const bool out = (!reset ? false : m_ff);
 
 			if (m_last_out && !out)
 			{
-				m_RDIS.solve_now();
+				m_overshoot += ((m_THRES() - vthresh)) * 2;
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), m_ovlimit);
+				m_RDIS.change_state([this]()
+					{
+						m_RDIS.set_R(nlconst::magic(R_ON));
+					});
 				m_OUT.push(m_R3.N()());
-				m_RDIS.set_R(nlconst::magic(R_ON));
 			}
 			else if (!m_last_out && out)
 			{
-				m_RDIS.solve_now();
+				m_overshoot += (vtrig - m_TRIG()) * 2;
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), m_ovlimit);
+				m_RDIS.change_state([this]()
+					{
+						m_RDIS.set_R(nlconst::magic(R_OFF));
+					});
 				// FIXME: Should be delayed by 100ns
 				m_OUT.push(m_R1.P()());
-				m_RDIS.set_R(nlconst::magic(R_OFF));
 			}
 			m_last_reset = reset;
 			m_last_out = out;
 		}
-
 		analog::NETLIB_SUB(R_base) m_R1;
 		analog::NETLIB_SUB(R_base) m_R2;
 		analog::NETLIB_SUB(R_base) m_R3;
@@ -157,17 +186,13 @@ namespace netlist
 		state_var<bool> m_last_out;
 		state_var<bool> m_ff;
 		state_var<bool> m_last_reset;
+		state_var<nl_fptype> m_overshoot;
+		nl_fptype m_ovlimit;
 
-		nl_fptype clamp(const nl_fptype v, const nl_fptype a, const nl_fptype b)
+		nl_fptype clamp_hl(const nl_fptype v, const nl_fptype a, const nl_fptype b) noexcept
 		{
-			nl_fptype ret = v;
-			nl_fptype vcc = m_R1.P()();
-
-			if (ret >  vcc - a)
-				ret = vcc - a;
-			if (ret < b)
-				ret = b;
-			return ret;
+			const nl_fptype vcc = m_R1.P()();
+			return plib::clamp(v, b, vcc - a);
 		}
 	};
 
