@@ -705,7 +705,7 @@ void bigkarnk_ms_state::sound_map(address_map &map)
 
 void bigkarnk_ms_state::soundrom_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram().share("soundcpu");
+	map(0x00000, 0x3ffff).rom().region("soundcpu", 0x000000);
 }
 
 
