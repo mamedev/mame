@@ -2,53 +2,52 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        PC/M by Miodrag Milanovic
+PC/M by Miodrag Milanovic
 
-        http://www.li-pro.net/pcm.phtml  (in German)
+http://www.li-pro.net/pcm.phtml  (in German)
 
-        12/05/2009 Preliminary driver.
+2009-05-12 Preliminary driver.
+2011-02-14 Added keyboard (from terminal).
+2020-07-15 Added banking
 
-        14/02/2011 Added keyboard (from terminal).
+Commands:
+1 select memory bank 1
+2 select memory bank 2
+B
+C start cp/m from the inbuilt CCP
+D Debugger
+Fx Format disk A or B
+G  Jump to address
+I List files on tape
+L filename.typ  Load file from tape
+R read from disk
+S filename aaaa / bbbb save a file to tape
+V verify
+W write to disk
+X
+Z set tape baud (1200, 2400, 3600 (default), 4800)
+filename   start running this .COM file
 
-        Commands:
-        1 select memory bank 1
-        2 select memory bank 2
-        B
-        C start cp/m from the inbuilt CCP
-        D Debugger
-        Fx Format disk A or B
-        G  Jump to address
-        I List files on tape
-        L filename.typ  Load file from tape
-        R read from disk
-        S filename aaaa / bbbb save a file to tape
-        V verify
-        W write to disk
-        X
-        Z set tape baud (1200, 2400, 3600 (default), 4800)
-        filename   start running this .COM file
+Therefore if you enter random input, it will lock up while trying to
+load up a file of that name. Filenames on disk and tape are of the
+standard 8.3 format. You must specify an extension.
 
-        Therefore if you enter random input, it will lock up while trying to
-        load up a file of that name. Filenames on disk and tape are of the
-        standard 8.3 format. You must specify an extension.
+Here is an example of starting the debugger, executing a command in
+it, then exiting back to the monitor.
 
-        Here is an example of starting the debugger, executing a command in
-        it, then exiting back to the monitor.
+D
+U
+Q
 
-        D
-        U
-        E
+In practice, the I and R commands produce an error, while all disk
+commands are directed to tape. The F command lists the files on a
+tape.
 
-        In practice, the I and R commands produce an error, while all disk
-        commands are directed to tape. The F command lists the files on a
-        tape.
-
-        ToDo:
-        - Add bankswitching
-        - Add NMI generator
-        - Find out if there really is any floppy-disk feature - the schematic
-          has no mention of it.
-        - Add the 6 LEDs.
+ToDo:
+- Add NMI generator
+- Find out if there really is any floppy-disk feature - the schematic
+  has no mention of it.
+- Add the 6 LEDs.
 
 ****************************************************************************/
 
@@ -60,6 +59,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
+#include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
@@ -72,40 +72,45 @@ public:
 	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
 		, m_pio_s(*this, "pio_s")
 		, m_pio_u(*this, "pio_u")
 		, m_ctc_s(*this, "ctc_s")
 		, m_ctc_u(*this, "ctc_u")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_p_videoram(*this, "videoram")
+		, m_vram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+		, m_bank(*this, {"bankr", "bankw", "bank2", "bank3"})
+	{ }
 
 	void pcm(machine_config &config);
 
 private:
-	uint8_t port85_r();
+	u8 port85_r();
 	DECLARE_WRITE_LINE_MEMBER( port82_w );
-	void port85_w(uint8_t data);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void port85_w(u8);
+	void port94_w(u8);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	bool m_cone;
-	uint8_t m_85;
+	u8 m_port85;
 	void machine_start() override;
+	void machine_reset() override;
 	required_device<z80_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<z80pio_device> m_pio_s;
 	required_device<z80pio_device> m_pio_u;
 	required_device<z80ctc_device> m_ctc_s;
 	required_device<z80ctc_device> m_ctc_u;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	optional_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;
+	required_memory_bank_array<4> m_bank;
 };
 
 
@@ -139,9 +144,9 @@ There is also a HALT LED, connected directly to the processor.
 */
 
 
-uint8_t pcm_state::port85_r()
+u8 pcm_state::port85_r()
 {
-	uint8_t data = m_85 & 0x7f;
+	u8 data = m_port85 & 0x7f;
 
 	if ((m_cass)->input() > 0.03)
 		data |= 0x80;
@@ -149,24 +154,46 @@ uint8_t pcm_state::port85_r()
 	return data;
 }
 
-void pcm_state::port85_w(uint8_t data)
+void pcm_state::port85_w(u8 data)
 {
-	if (BIT(data, 5))
-		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-	else
-		m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-
+	m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
-	m_85 = data;
+	m_port85 = data;
 }
 
+/* Banking:
+d0,d1,d2 - select which 64k bank (first 3 are internal)
+d3,d4,d5 - external
+d6 - force c000-ffff of 64k bank
+d7(low) - switch in the roms to 0000-1fff
+Real hardware can disable all ram and crash the system. We don't emulate that. */
 
+void pcm_state::port94_w(u8 data)
+{
+	u8 bank = BIT(data, 0, 3);
+	if (bank < 3)
+	{
+		m_bank[0]->set_entry(bank);
+		m_bank[1]->set_entry(bank);
+		m_bank[2]->set_entry(bank);
+		m_bank[3]->set_entry(bank);
+	}
+
+	if (BIT(data, 6))
+		m_bank[3]->set_entry(0); // via D13 and D51.1
+
+	if (!BIT(data, 7))
+	{
+		m_bank[0]->set_entry(3); // via D12 and D53.1
+		m_bank[1]->set_entry(3);
+	}
+}
 
 void pcm_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram().share("videoram");
+	map(0x0000, 0x1fff).bankr("bankr").bankw("bankw");
+	map(0x2000, 0xbfff).bankrw("bank2");
+	map(0xc000, 0xffff).bankrw("bank3");
 }
 
 void pcm_state::io_map(address_map &map)
@@ -178,8 +205,8 @@ void pcm_state::io_map(address_map &map)
 	map(0x88, 0x8B).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO
 	map(0x8C, 0x8F).rw(m_ctc_u, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // user CTC
 	map(0x90, 0x93).rw(m_pio_u, FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // user PIO
-	//map(0x94, 0x97) // bank select
-	//map(0x98, 0x9B) // NMI generator
+	map(0x94, 0x97).w(FUNC(pcm_state::port94_w));
+	//map(0x98, 0x9B) // NMI generator for debugging
 	//map(0x9C, 0x9F) // io ports available to the user
 	// disk controller?
 }
@@ -190,24 +217,40 @@ INPUT_PORTS_END
 
 void pcm_state::machine_start()
 {
+	u8* r = m_ram->pointer();
+	u8 *m = memregion("maincpu")->base();
+
+	m_vram.set_target(r+0xf800, 0x800); // Fix position of vram
+
 	save_item(NAME(m_cone));
-	save_item(NAME(m_85));
+	save_item(NAME(m_port85));
+
+	m_bank[0]->configure_entries(0, 3, r, 0x10000);
+	m_bank[1]->configure_entries(0, 4, r, 0x10000);
+	m_bank[2]->configure_entries(0, 3, r+0x2000, 0x10000);
+	m_bank[3]->configure_entries(0, 3, r+0xc000, 0x10000);
+	m_bank[0]->configure_entry(3, m);
 }
 
-uint32_t pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void pcm_state::machine_reset()
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0x400,x;
+	port94_w(0);   // setup initial state of banks
+}
+
+u32 pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0x400,x;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				chr = m_p_videoram[x];
+				chr = m_vram[x];
 
 				gfx = m_p_chargen[(chr<<3) | ra];
 
@@ -305,11 +348,14 @@ void pcm_state::pcm(machine_config &config)
 	m_ctc_s->zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 	m_ctc_s->zc_callback<1>().set("sio", FUNC(z80sio_device::rxtxcb_w));
 	m_ctc_s->zc_callback<2>().set(FUNC(pcm_state::port82_w));  // speaker
+
+	// internal ram: bank0 for cp/m; banks 1 and 2 are ram-drives; last 2k is dummy for rom-write
+	RAM(config, RAM_TAG).set_default_size("194K");
 }
 
 /* ROM definition */
 ROM_START( pcm )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v202", "Version 2.02" )
 	ROMX_LOAD( "bios_v202.d14", 0x0000, 0x0800, CRC(27c24892) SHA1(a97bf9ef075de91330dc0c7cfd3bb6c7a88bb585), ROM_BIOS(0))
 	ROMX_LOAD( "bios_v202.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(0))
