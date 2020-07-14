@@ -60,7 +60,7 @@ static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x
 #define SIX_REEL_1TO8  4    // Two reels on the meter drives
 #define SIX_REEL_5TO8  5    // Like FIVE_REEL_5TO8, but with an extra reel elsewhere
 #define SEVEN_REEL     6    // Mainly club machines, significant reworking of reel hardware
-#define FLUTTERBOX     7    // Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
+#define FLUTTERBOX     7    // A fan feature using a reel mux-like setup, but not actually a reel
 
 //Lamp extension
 #define NO_EXTENDER         0 // As originally designed
@@ -73,6 +73,8 @@ static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x
 #define CARD_A          1
 #define CARD_B          2
 #define CARD_C          3
+#define SIMPLE_CARD     4
+
 
 //Hopper info
 #define TUBES               0
@@ -159,6 +161,7 @@ public:
 	void init_m4_led_a();
 	void init_m4_led_b();
 	void init_m4_led_c();
+	void init_m4_led_simple();
 	void init_m4_andycp10c();
 	void init_m_blsbys();
 	void init_m_oldtmr();
@@ -232,7 +235,7 @@ protected:
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
-	void led_write_latch(int latch, int data, int column);
+	void led_write_extender(int latch, int data, int column);
 	void update_meters();
 	void ic23_update();
 	void ic24_output(int data);

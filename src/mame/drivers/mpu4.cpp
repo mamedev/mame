@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* these are the MPU4 set listings / set specific code, for hardware emulation see mpu4hw.c */
+/* these are the MPU4 set listings / set specific code, for hardware emulation see machine/mpu4.cpp */
 
 /* todo: driver inits (basic hw reel, protection configs etc.) should probably be moved here
          once the actual code for them is cleaned up and can be put into neater structures
