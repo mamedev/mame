@@ -14,13 +14,14 @@ namespace devices
 {
 	static constexpr const netlist_time delay = NLTIME_FROM_NS(30); // Worst-case through 3 levels of logic
 
+	// FIXME: stateless device, convert to TRUTHTABLE
 	NETLIB_OBJECT(7442)
 	{
 		NETLIB_CONSTRUCTOR(7442)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_C(*this, "C")
-		, m_D(*this, "D")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_C(*this, "C", NETLIB_DELEGATE(inputs))
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
 		, m_val(*this, "m_val", 0)
 		, m_last_val(*this, "m_last_val", 0)
 		, m_Q(*this, {"Q0", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9"})
@@ -29,11 +30,31 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
 		NETLIB_RESETI()
 		{
 			m_val = 0;
 			m_last_val = 0;
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const netlist_sig_t new_A = m_A();
+			const netlist_sig_t new_B = m_B();
+			const netlist_sig_t new_C = m_C();
+			const netlist_sig_t new_D = m_D();
+
+			m_last_val = m_val;
+			m_val = static_cast<uint8_t>((new_D << 3) | (new_C << 2) | (new_B << 1) | new_A);
+
+			if (m_last_val != m_val)
+			{
+				update_outputs();
+			}
 		}
 
 		void update_outputs() noexcept
@@ -82,22 +103,6 @@ namespace devices
 	private:
 		NETLIB_SUB(7442) A;
 	};
-
-	NETLIB_UPDATE(7442)
-	{
-		const netlist_sig_t new_A = m_A();
-		const netlist_sig_t new_B = m_B();
-		const netlist_sig_t new_C = m_C();
-		const netlist_sig_t new_D = m_D();
-
-		m_last_val = m_val;
-		m_val = static_cast<uint8_t>((new_D << 3) | (new_C << 2) | (new_B << 1) | new_A);
-
-		if (m_last_val != m_val)
-		{
-			update_outputs();
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(7442,     "TTL_7442",        "+A,+B,+C,+D,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7442_dip, "TTL_7442_DIP",    "")

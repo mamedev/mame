@@ -81,8 +81,8 @@ namespace netlist
 	NETLIB_OBJECT(7493)
 	{
 		NETLIB_CONSTRUCTOR(7493)
-		, m_R1(*this, "R1")
-		, m_R2(*this, "R2")
+		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
+		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
 		, m_a(*this, "_m_a", 0)
 		, m_bcd(*this, "_m_b", 0)
 		, m_r(*this, "_m_r", 0)
@@ -103,6 +103,11 @@ namespace netlist
 		}
 
 		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		NETLIB_HANDLERI(inputs)
 		{
 			if (!(m_R1() && m_R2()))
 			{

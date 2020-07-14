@@ -169,6 +169,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "mikroplus.h"
 #include "opus.h"
 #include "plus2test.h"
+#include "logitek.h"
 #include "protek.h"
 #include "specdrum.h"
 #include "speccydos.h"
@@ -186,6 +187,9 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("betacbi", SPECTRUM_BETACBI);
 	device.option_add("gamma", SPECTRUM_GAMMA);
 	device.option_add("beta128", SPECTRUM_BETA128);
+	device.option_add("d40", SPECTRUM_D40);
+	device.option_add("d80", SPECTRUM_D80);
+	device.option_add("d80v2", SPECTRUM_D80V2);
 	device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
 	device.option_add("intf2", SPECTRUM_INTF2);
@@ -200,9 +204,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("mprint", SPECTRUM_MPRINT);
 	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plusd", SPECTRUM_PLUSD);
-	device.option_add("d40", SPECTRUM_D40);
-	device.option_add("d80", SPECTRUM_D80);
-	device.option_add("d80v2", SPECTRUM_D80V2);
+	device.option_add("proceed", SPECTRUM_PROCEED);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);

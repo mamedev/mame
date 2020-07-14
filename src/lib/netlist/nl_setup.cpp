@@ -868,9 +868,13 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 		// no proxy needed, just merge existing terminal net
 		if (in.has_net())
 		{
-			if (&out.net() == &in.net())
-				log().warning(MW_CONNECTING_1_TO_2_SAME_NET(in.name(), out.name(), in.net().name()));
-			merge_nets(out.net(), in.net());
+			if (&out.net() != &in.net())
+				merge_nets(out.net(), in.net());
+			else
+				// Only an info - some ICs (CD4538) connect pins internally to GND
+				// and the schematics again externally. This will cause this warning.
+				// FIXME: Add a hint to suppress the warning.
+				log().info(MI_CONNECTING_1_TO_2_SAME_NET(in.name(), out.name(), in.net().name()));
 		}
 		else
 			add_terminal(out.net(), in);
@@ -1446,6 +1450,22 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	ret->m_high_VO = modv.m_OVH();
 	ret->m_R_low = modv.m_ORL();
 	ret->m_R_high = modv.m_ORH();
+
+	switch (ft)
+	{
+		case family_type::CUSTOM:
+		case family_type::TTL:
+		case family_type::NMOS:
+			ret->m_vcc = "VCC";
+			ret->m_gnd = "GND";
+			break;
+		case family_type::MOS:
+		case family_type::CMOS:
+		case family_type::PMOS:
+			ret->m_vcc = "VDD";
+			ret->m_gnd = "VSS";
+			break;
+	}
 
 	auto *retp = ret.get();
 

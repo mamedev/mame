@@ -96,6 +96,7 @@ attache.cpp
 aussiebyte.cpp
 ave_arb.cpp
 avigo.cpp
+avrmax.cpp
 ax20.cpp
 b16.cpp
 b2m.cpp
@@ -637,6 +638,7 @@ nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
+news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
 next.cpp

@@ -12,19 +12,22 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	// FIXME: optimize clock input
+
 	NETLIB_OBJECT(CD4006)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4006, "CD4XXX")
-		, m_CLOCK(*this, "CLOCK")
-		, m_I(*this, {"D1", "D2", "D3", "D4"})
+		, m_CLOCK(*this, "CLOCK", NETLIB_DELEGATE(inputs))
+		, m_I(*this, {"D1", "D2", "D3", "D4"}, NETLIB_DELEGATE(inputs))
 		, m_Q(*this, {"D1P4", "D1P4S", "D2P4", "D2P5", "D3P4", "D4P4", "D3P5"})
 		, m_d(*this, "m_d", 0)
 		, m_last_clock(*this, "m_last_clock", 0)
-		, m_supply(*this, "VDD", "VSS")
+		, m_supply(*this)
 		{
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			if (m_last_clock && !m_CLOCK())
 			{
@@ -56,6 +59,10 @@ namespace netlist
 			}
 		}
 
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 		friend class NETLIB_NAME(CD4006_dip);
 	private:
 		logic_input_t m_CLOCK;

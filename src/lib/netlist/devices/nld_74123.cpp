@@ -72,15 +72,15 @@ namespace netlist
 		, m_I(*this, D::names(), NETLIB_DELEGATE(ab_clear))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_CV(*this, "_CV") // internal
+		, m_CV(*this, "_CV", NETLIB_DELEGATE(cv)) // internal
 		, m_last_trig(*this, "m_last_trig", 0)
 		, m_state(*this, "m_state", 0)
 		, m_KP(plib::reciprocal(nlconst::one() + plib::exp(D::K())))
 		//, m_power_pins(*this)
 		{
 
-			register_subalias("GND", m_RN.N());
-			register_subalias("VCC", m_RP.P());
+			register_subalias(pstring(D::gnd()), m_RN.N());
+			register_subalias(pstring(D::vcc()), m_RP.P());
 			register_subalias("C",   m_RN.N());
 			register_subalias("RC",  m_RN.P());
 
@@ -128,6 +128,11 @@ namespace netlist
 		}
 
 		NETLIB_UPDATEI()
+		{
+			cv();
+		}
+
+		NETLIB_HANDLERI(cv)
 		{
 			if (m_state == 1)
 			{
@@ -197,6 +202,9 @@ namespace netlist
 			return ((in[1]() | (in[2]() ^ 1)) ^ 1) & in[0](); // ((m_A() | (m_B() ^ 1)) ^ 1) & m_CLRQ()
 		}
 		template<typename T> static constexpr netlist_sig_t clear(const T &in) { return in[0]();}
+
+		static constexpr const char *vcc() { return "VCC"; }
+		static constexpr const char *gnd() { return "GND"; }
 	};
 
 	struct desc_74121 : public desc_74123
@@ -232,6 +240,8 @@ namespace netlist
 		{
 			return (in[1]() | (in[2]() ^ 1)); // m_A() | (m_B() ^ 1)
 		}
+		static constexpr const char *vcc() { return "VDD"; }
+		static constexpr const char *gnd() { return "VSS"; }
 	};
 
 	using NETLIB_NAME(74123) = NETLIB_NAME(74123_base)<desc_74123>;

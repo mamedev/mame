@@ -523,7 +523,7 @@ void avr8_device::populate_add_flag_cache()
 			flags |= (((rd & 8) && (rr & 8)) || ((rr & 8) && !(res & 8)) || (!(res & 8) && (rd & 8))) ? AVR8_SREG_MASK_H : 0;
 			flags |= (((rd & 0x80) && (rr & 0x80) && !(res & 0x80)) | (!(rd & 0x80) & !(rr & 0x80) & (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
 			flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
-			flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
+			flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 			flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;
 			flags |= (((rd & 0x80) && (rr & 0x80)) || ((rr & 0x80) && !(res & 0x80)) || (!(res & 0x80) && (rd & 0x80))) ? AVR8_SREG_MASK_C : 0;
 			m_add_flag_cache[(rd << 8) | rr] = flags;
@@ -544,7 +544,7 @@ void avr8_device::populate_adc_flag_cache()
 				flags |= (((rd & 8) && (rr & 8)) || ((rr & 8) && !(res & 8)) || (!(res & 8) && (rd & 8))) ? AVR8_SREG_MASK_H : 0;
 				flags |= (((rd & 0x80) && (rr & 0x80) && !(res & 0x80)) | (!(rd & 0x80) & !(rr & 0x80) & (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
 				flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
-				flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
+				flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 				flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;
 				flags |= (((rd & 0x80) && (rr & 0x80)) || ((rr & 0x80) && !(res & 0x80)) || (!(res & 0x80) && (rd & 0x80))) ? AVR8_SREG_MASK_C : 0;
 				m_adc_flag_cache[(c << 16) | (rd << 8) | rr] = flags;
@@ -564,7 +564,7 @@ void avr8_device::populate_sub_flag_cache()
 			flags |= ((!(rd & 8) && (rr & 8)) || ((rr & 8) && (res & 8)) || ((res & 8) && !(rd & 8))) ? AVR8_SREG_MASK_H : 0;
 			flags |= (((rd & 0x80) && !(rr & 0x80) && !(res & 0x80)) || (!(rd & 0x80) && (rr & 0x80) && (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
 			flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
-			flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
+			flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 			flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;
 			flags |= ((!(rd & 0x80) && (rr & 0x80)) || ((rr & 0x80) && (res & 0x80)) || ((res & 0x80) && !(rd & 0x80))) ? AVR8_SREG_MASK_C : 0;
 			m_sub_flag_cache[(rd << 8) | rr] = flags;
@@ -587,7 +587,7 @@ void avr8_device::populate_sbc_flag_cache()
 					flags |= ((!(rd & 8) && (rr & 8)) || ((rr & 8) && (res & 8)) || ((res & 8) && !(rd & 8))) ? AVR8_SREG_MASK_H : 0;
 					flags |= (((rd & 0x80) && !(rr & 0x80) && !(res & 0x80)) || (!(rd & 0x80) && (rr & 0x80) && (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
 					flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
-					flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
+					flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 					flags |= (res == 0) ? (z ? AVR8_SREG_MASK_Z : 0) : 0;
 					flags |= ((!(rd & 0x80) && (rr & 0x80)) || ((rr & 0x80) && (res & 0x80)) || ((res & 0x80) && !(rd & 0x80))) ? AVR8_SREG_MASK_C : 0;
 					m_sbc_flag_cache[(z << 17) | (c << 16) | (rd << 8) | rr] = flags;
@@ -603,7 +603,7 @@ void avr8_device::populate_bool_flag_cache()
 	{
 		uint8_t flags = 0;
 		flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
-		flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
+		flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 		flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;
 		m_bool_flag_cache[res] = flags;
 	}
@@ -619,8 +619,8 @@ void avr8_device::populate_shift_flag_cache()
 			flags |= (rd & 1) ? AVR8_SREG_MASK_C : 0;
 			flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;
 			flags |= (rd & 0x80) ? AVR8_SREG_MASK_N : 0;
-			flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_C)) ? AVR8_SREG_MASK_V : 0;
-			flags |= ((SREG & AVR8_SREG_MASK_N) != (SREG & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
+			flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_C)) ? AVR8_SREG_MASK_V : 0;
+			flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 			m_shift_flag_cache[(rd << 8) | res] = flags;
 		}
 	}

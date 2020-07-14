@@ -3772,6 +3772,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/nyny.cpp",
 	MAME_DIR .. "src/mame/drivers/r2dtank.cpp",
 	MAME_DIR .. "src/mame/drivers/sigma21.cpp",
+	MAME_DIR .. "src/mame/drivers/sigmab31.cpp",
 	MAME_DIR .. "src/mame/drivers/sigmab52.cpp",
 	MAME_DIR .. "src/mame/drivers/sigmab98.cpp",
 	MAME_DIR .. "src/mame/drivers/spiders.cpp",

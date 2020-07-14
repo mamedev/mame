@@ -41,7 +41,7 @@
 #define MAX_SAMPLE_CHUNK    10000
 
 static constexpr unsigned FRAC_BITS = 9;
-static constexpr unsigned FRAC_ONE  = (1 << FRAC_BITS);
+static constexpr s32      FRAC_ONE = 1 << FRAC_BITS;
 
 //#define INTERNAL_BUFFER_SIZE    (1 << 15)
 #define INTERNAL_SAMPLE_RATE    (m_master_clock * 2.0)
@@ -452,7 +452,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* interpolate */
 		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
-			int interp_sample = (((s32)prev * (FRAC_ONE - voice->output_pos)) + ((s32)curr * voice->output_pos)) >> FRAC_BITS;
+			int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
 			*ldest++ += interp_sample * lvol;
 			*rdest++ += interp_sample * rvol;
 			voice->output_pos += voice->output_step;
@@ -516,7 +516,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* interpolate */
 			while (remaining > 0 && voice->output_pos < FRAC_ONE)
 			{
-				int interp_sample = (((s32)prev * (FRAC_ONE - voice->output_pos)) + ((s32)curr * voice->output_pos)) >> FRAC_BITS;
+				int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
 				*ldest++ += interp_sample * lvol;
 				*rdest++ += interp_sample * rvol;
 				voice->output_pos += voice->output_step;

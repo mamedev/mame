@@ -70,9 +70,14 @@ namespace devices
 
 	protected:
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			input();
+		}
 
 	private:
+		NETLIB_HANDLERI(input);
+
 		logic_output_t m_Q;
 		analog_input_t m_I;
 	};
@@ -109,9 +114,13 @@ namespace devices
 	protected:
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			input();
+		}
 
 	private:
+		NETLIB_HANDLERI(input);
 
 		static constexpr const nl_fptype G_OFF = nlconst::cgmin();
 

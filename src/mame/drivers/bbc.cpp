@@ -1407,17 +1407,12 @@ void bbcbp_state::abc110(machine_config &config)
 	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* Acorn Z80 co-processor */
-	m_tube->set_default_option("z80");
+	m_tube->set_default_option("z80w");
 	m_tube->set_fixed(true);
 
 	/* Acorn Winchester Disc 10MB */
 	m_1mhzbus->set_default_option("awhd");
 	m_1mhzbus->set_fixed(true);
-
-	/* software lists */
-	config.device_remove("cass_ls");
-	config.device_remove("flop_ls_b");
-	config.device_remove("flop_ls_b_orig");
 }
 
 
@@ -1437,9 +1432,6 @@ void bbcbp_state::acw443(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
-	config.device_remove("cass_ls");
-	config.device_remove("flop_ls_b");
-	config.device_remove("flop_ls_b_orig");
 }
 
 
@@ -1457,9 +1449,8 @@ void bbcbp_state::abc310(machine_config &config)
 	m_1mhzbus->set_default_option("awhd");
 	m_1mhzbus->set_fixed(true);
 
-	/* software lists */
-	config.device_remove("cass_ls");
-	config.device_remove("flop_ls_b");
+	/* Acorn Mouse */
+	m_userport->set_default_option("m512mouse");
 }
 
 

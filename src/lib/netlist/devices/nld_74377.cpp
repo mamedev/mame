@@ -18,9 +18,9 @@ namespace netlist
 	NETLIB_OBJECT(74377_GATE)
 	{
 		NETLIB_CONSTRUCTOR(74377_GATE)
-		, m_E(*this, "E")
-		, m_D(*this, "D")
-		, m_CP(*this, "CP")
+		, m_E(*this, "E", NETLIB_DELEGATE(inputs))
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
+		, m_CP(*this, "CP", NETLIB_DELEGATE(inputs))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_cp(*this, "m_cp", 0)
@@ -32,6 +32,12 @@ namespace netlist
 		{
 		}
 		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+	private:
+		NETLIB_HANDLERI(inputs)
 		{
 			netlist_sig_t last_cp = m_cp;
 
@@ -45,7 +51,6 @@ namespace netlist
 			}
 		}
 
-	private:
 		logic_input_t m_E;
 		logic_input_t m_D;
 		logic_input_t m_CP;

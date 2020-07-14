@@ -41,6 +41,10 @@ const sdd_format::format sdd_format::formats[] = {
 		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::MFM,
 		2000, 16, 80, 2, 256, {}, -1, {1,12,7,2,13,8,3,14,9,4,15,10,5,16,11,6}, 60, 22, 24
 	},
+	{   // 5"25 140K 35 track single sided double density
+		floppy_image::FF_525,  floppy_image::SSDD, floppy_image::MFM,
+		2000, 16, 35, 1, 256, {}, -1, {1,12,7,2,13,8,3,14,9,4,15,10,5,16,11,6}, 60, 22, 24
+	},
 	{   // 5"25 400K 80 track double sided single density
 		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::FM,
 		4000, 10, 80, 2, 256, {}, -1, {1,8,5,2,9,6,3,10,7,4}, 40, 11, 10

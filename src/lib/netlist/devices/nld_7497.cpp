@@ -23,10 +23,10 @@ namespace netlist
 	NETLIB_OBJECT(7497)
 	{
 		NETLIB_CONSTRUCTOR(7497)
-		, m_B(*this, {"B5", "B4", "B3", "B2", "B1", "B0"})
+		, m_B(*this, {"B5", "B4", "B3", "B2", "B1", "B0"}, NETLIB_DELEGATE(inputs))
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk_strb))
 		, m_STRBQ(*this, "STRBQ", NETLIB_DELEGATE(clk_strb))
-		, m_ENQ(*this, "ENQ")
+		, m_ENQ(*this, "ENQ", NETLIB_DELEGATE(inputs))
 		, m_UNITYQ(*this, "UNITYQ", NETLIB_DELEGATE(unity))
 		, m_CLR(*this, "CLR", NETLIB_DELEGATE(clr))
 		, m_Y(*this, "Y")
@@ -48,12 +48,64 @@ namespace netlist
 			m_lastclock = 0;
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 
 		NETLIB_HANDLERI(noop) { }
-		NETLIB_HANDLERI(unity);
-		NETLIB_HANDLERI(clr);
-		NETLIB_HANDLERI(clk_strb);
+
+		NETLIB_HANDLERI(unity)
+		{
+			newstate (m_state);
+		}
+
+		NETLIB_HANDLERI(clr)
+		{
+			m_cnt = 0;
+			clk_strb();
+		}
+
+		NETLIB_HANDLERI(clk_strb)
+		{
+			netlist_sig_t clk = m_CLK();
+
+			if (!m_lastclock && clk && !m_ENQ() && !m_CLR())
+			{
+				m_cnt++;
+				m_cnt &= 63;
+			}
+			m_lastclock = clk;
+
+			const netlist_sig_t clk_strb = (clk ^ 1) & (m_STRBQ() ^ 1);
+
+			const netlist_sig_t cntQ = m_cnt;
+
+			// NOR GATE
+			netlist_sig_t p1 = ((cntQ & 63)  == 31  && (m_rate & 32)) ||
+				((cntQ & 31)  == 15  && (m_rate & 16)) ||
+				((cntQ & 15)  == 7  && (m_rate & 8))  ||
+				((cntQ & 7) == 3  && (m_rate & 4))  ||
+				((cntQ & 3) == 1 && (m_rate & 2))  ||
+				((cntQ & 1) == 0 && (m_rate & 1));
+
+			p1 = (p1 & clk_strb) ^ 1;
+
+			newstate(p1);
+
+			// NAND gate
+			if ((m_cnt == 63) && !m_ENQ())
+				m_ENOUTQ.push(0, out_delay_CLK_Y[0]); // XXX timing
+			else
+				m_ENOUTQ.push(1, out_delay_CLK_Y[1]);
+
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			m_rate = rate();
+			clk_strb();
+		}
 
 		friend class NETLIB_NAME(7497_dip);
 
@@ -93,58 +145,6 @@ namespace netlist
 			return a;
 		}
 	};
-
-	NETLIB_UPDATE(7497)
-	{
-		m_rate = rate();
-		clk_strb();
-	}
-
-	NETLIB_HANDLER(7497, unity)
-	{
-		newstate (m_state);
-	}
-
-	NETLIB_HANDLER(7497, clr)
-	{
-		m_cnt = 0;
-		clk_strb();
-	}
-
-	NETLIB_HANDLER(7497, clk_strb)
-	{
-		netlist_sig_t clk = m_CLK();
-
-		if (!m_lastclock && clk && !m_ENQ() && !m_CLR())
-		{
-			m_cnt++;
-			m_cnt &= 63;
-		}
-		m_lastclock = clk;
-
-		const netlist_sig_t clk_strb = (clk ^ 1) & (m_STRBQ() ^ 1);
-
-		const netlist_sig_t cntQ = m_cnt;
-
-		// NOR GATE
-		netlist_sig_t p1 = ((cntQ & 63)  == 31  && (m_rate & 32)) ||
-			((cntQ & 31)  == 15  && (m_rate & 16)) ||
-			((cntQ & 15)  == 7  && (m_rate & 8))  ||
-			((cntQ & 7) == 3  && (m_rate & 4))  ||
-			((cntQ & 3) == 1 && (m_rate & 2))  ||
-			((cntQ & 1) == 0 && (m_rate & 1));
-
-		p1 = (p1 & clk_strb) ^ 1;
-
-		newstate(p1);
-
-		// NAND gate
-		if ((m_cnt == 63) && !m_ENQ())
-			m_ENOUTQ.push(0, out_delay_CLK_Y[0]); // XXX timing
-		else
-			m_ENOUTQ.push(1, out_delay_CLK_Y[1]);
-
-	}
 
 	NETLIB_OBJECT(7497_dip)
 	{

@@ -18,14 +18,20 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(9322_selector)
 		, m_parent(owner)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
 		, m_Y(*this, "Y")
 		, m_power_pins(*this)
 		{
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
+
+		// FIXME: Timing
+		NETLIB_HANDLERI(inputs);
 
 	public:
 		NETLIB_NAME(9322) &m_parent;
@@ -38,8 +44,8 @@ namespace netlist
 	NETLIB_OBJECT(9322)
 	{
 		NETLIB_CONSTRUCTOR(9322)
-		, m_SELECT(*this, "SELECT")
-		, m_STROBE(*this, "STROBE")
+		, m_SELECT(*this, "SELECT", NETLIB_DELEGATE(inputs))
+		, m_STROBE(*this, "STROBE", NETLIB_DELEGATE(inputs))
 		, m_1(*this, "A")
 		, m_2(*this, "B")
 		, m_3(*this, "C")
@@ -70,19 +76,40 @@ namespace netlist
 
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 
 		friend class NETLIB_NAME(9322_dip);
 	public:
 		logic_input_t m_SELECT;
 		logic_input_t m_STROBE;
 	private:
+		NETLIB_HANDLERI(inputs)
+		{
+			m_1.inputs();
+			m_2.inputs();
+			m_3.inputs();
+			m_4.inputs();
+		}
+
 		NETLIB_SUB(9322_selector) m_1;
 		NETLIB_SUB(9322_selector) m_2;
 		NETLIB_SUB(9322_selector) m_3;
 		NETLIB_SUB(9322_selector) m_4;
 
 	};
+
+	NETLIB_HANDLER(9322_selector, inputs)
+	{
+		if (m_parent.m_STROBE())
+			m_Y.push(0, NLTIME_FROM_NS(21));
+		else if (m_parent.m_SELECT())
+			m_Y.push(m_B(), NLTIME_FROM_NS(14));
+		else
+			m_Y.push(m_A(), NLTIME_FROM_NS(14));
+	}
 
 	NETLIB_OBJECT(9322_dip)
 	{
@@ -113,25 +140,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(9322) A;
 	};
-
-	// FIXME: Timing
-	NETLIB_UPDATE(9322_selector)
-	{
-		if (m_parent.m_STROBE())
-			m_Y.push(0, NLTIME_FROM_NS(21));
-		else if (m_parent.m_SELECT())
-			m_Y.push(m_B(), NLTIME_FROM_NS(14));
-		else
-			m_Y.push(m_A(), NLTIME_FROM_NS(14));
-	}
-
-	NETLIB_UPDATE(9322)
-	{
-		m_1.update();
-		m_2.update();
-		m_3.update();
-		m_4.update();
-	}
 
 	NETLIB_DEVICE_IMPL(9322,     "TTL_9322",     "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(9322_dip, "TTL_9322_DIP", "")

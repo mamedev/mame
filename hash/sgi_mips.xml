@@ -3824,14 +3824,14 @@ license:CC0
 		<year>2004</year> <!-- 10/04 -->
 		<publisher>The NetBSD Project</publisher>
 		<part name="cdrom1" interface="cdrom">
-		  <feature name="part_id" value="NetBSD 1.6.2 CD sgimipscd"/>
+			<feature name="part_id" value="NetBSD 1.6.2 CD sgimipscd"/>
 			<!-- Origin: netbsd.org -->
 			<diskarea name="cdrom">
 				<disk name="sgimipscd" sha1="dd58f16cda1510a59ec64b02e6fb0b6b308587ad" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
-		  <feature name="part_id" value="NetBSD 1.6.2 CD sourcecd"/>
+			<feature name="part_id" value="NetBSD 1.6.2 CD sourcecd"/>
 			<!-- Origin: netbsd.org -->
 			<diskarea name="cdrom">
 				<disk name="sourcecd" sha1="a542d0b3397632c125c279e4b50df0fa431b5fd9" />

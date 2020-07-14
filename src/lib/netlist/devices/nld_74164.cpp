@@ -11,6 +11,8 @@
 #include "nld_74164.h"
 #include "netlist/nl_base.h"
 
+// FIXME: clk input to be separated - only falling edge relevant
+
 namespace netlist
 {
 	namespace devices
@@ -18,15 +20,42 @@ namespace netlist
 	NETLIB_OBJECT(74164)
 	{
 		NETLIB_CONSTRUCTOR(74164)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_CLRQ(*this, "CLRQ")
-		, m_CLK(*this, "CLK")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_CLK(*this, "m_last_CLK", 0)
 		, m_Q(*this, {"QA", "QB", "QC", "QD", "QE", "QF", "QG", "QH"})
 		, m_power_pins(*this)
 		{
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			if (!m_CLRQ())
+			{
+				m_cnt = 0;
+			}
+			else if (m_CLK() && !m_last_CLK)
+			{
+				m_cnt = (m_cnt << 1) & 0xfe;
+				if (m_A() && m_B())
+				{
+					m_cnt |= 0x01;
+				}
+				else
+				{
+					m_cnt &= 0xfe;
+				}
+			}
+
+			m_last_CLK = m_CLK();
+
+			for (std::size_t i=0; i<8; i++)
+			{
+				m_Q[i].push((m_cnt >> i) & 1, NLTIME_FROM_NS(30));
+			}
 		}
 
 		NETLIB_RESETI()
@@ -35,7 +64,10 @@ namespace netlist
 			m_last_CLK = 0;
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 
 		friend class NETLIB_NAME(74164_dip);
 	private:
@@ -76,33 +108,6 @@ namespace netlist
 		NETLIB_SUB(74164) A;
 	};
 
-
-	NETLIB_UPDATE(74164)
-	{
-		if (!m_CLRQ())
-		{
-			m_cnt = 0;
-		}
-		else if (m_CLK() && !m_last_CLK)
-		{
-			m_cnt = (m_cnt << 1) & 0xfe;
-			if (m_A() && m_B())
-			{
-				m_cnt |= 0x01;
-			}
-			else
-			{
-				m_cnt &= 0xfe;
-			}
-		}
-
-		m_last_CLK = m_CLK();
-
-		for (std::size_t i=0; i<8; i++)
-		{
-			m_Q[i].push((m_cnt >> i) & 1, NLTIME_FROM_NS(30));
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(74164, "TTL_74164", "+A,+B,+CLRQ,+CLK,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74164_dip, "TTL_74164_DIP", "")

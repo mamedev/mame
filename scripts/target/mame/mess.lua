@@ -892,6 +892,9 @@ BUSES["QL"] = true
 BUSES["QBUS"] = true
 BUSES["RS232"] = true
 BUSES["S100"] = true
+BUSES["SAMCOUPE_DRIVE_PORT"] = true
+BUSES["SAMCOUPE_EXPANSION"] = true
+BUSES["SAMCOUPE_MOUSE_PORT"] = true
 BUSES["SAT_CTRL"] = true
 BUSES["SATURN"] = true
 BUSES["SBUS"] = true
@@ -1262,8 +1265,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ne",
 		"nec",
 		"netronic",
-		"news_68k",
-		"news_r3k",
 		"next",
 		"nintendo",
 		"nokia",
@@ -1314,6 +1315,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"slicer",
 		"snk",
 		"sony",
+		"sony_news",
 		"sord",
 		"special",
 		"stm",
@@ -2239,6 +2241,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "elektor")
 files {
+	MAME_DIR .. "src/mame/drivers/avrmax.cpp",
 	MAME_DIR .. "src/mame/drivers/ec65.cpp",
 	MAME_DIR .. "src/mame/drivers/elekscmp.cpp",
 	MAME_DIR .. "src/mame/drivers/junior.cpp",
@@ -2995,24 +2998,6 @@ files {
 	MAME_DIR .. "src/mame/includes/exp85.h",
 }
 
-createMESSProjects(_target, _subtarget, "news_68k")
-files {
-	MAME_DIR .. "src/mame/drivers/news_68k.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0266.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0266.h",
-	MAME_DIR .. "src/mame/machine/news_hid.cpp",
-	MAME_DIR .. "src/mame/machine/news_hid.h",
-}
-
-createMESSProjects(_target, _subtarget, "news_r3k")
-files {
-	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0448.h",
-	MAME_DIR .. "src/mame/machine/news_hid.cpp",
-	MAME_DIR .. "src/mame/machine/news_hid.h",
-}
-
 createMESSProjects(_target, _subtarget, "next")
 files {
 	MAME_DIR .. "src/mame/drivers/next.cpp",
@@ -3406,9 +3391,6 @@ files {
 createMESSProjects(_target, _subtarget, "samcoupe")
 files {
 	MAME_DIR .. "src/mame/drivers/samcoupe.cpp",
-	MAME_DIR .. "src/mame/includes/samcoupe.h",
-	MAME_DIR .. "src/mame/machine/samcoupe.cpp",
-	MAME_DIR .. "src/mame/video/samcoupe.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samsung")
@@ -3634,6 +3616,19 @@ files {
 	MAME_DIR .. "src/mame/drivers/pve500.cpp",
 	MAME_DIR .. "src/mame/drivers/smc777.cpp",
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "sony_news")
+files {
+	MAME_DIR .. "src/mame/drivers/news_68k.cpp",
+	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
+	MAME_DIR .. "src/mame/drivers/news_38xx.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0448.h",
+	MAME_DIR .. "src/mame/machine/dmac_0266.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0266.h",
+	MAME_DIR .. "src/mame/machine/news_hid.cpp",
+	MAME_DIR .. "src/mame/machine/news_hid.h",
 }
 
 createMESSProjects(_target, _subtarget, "sord")

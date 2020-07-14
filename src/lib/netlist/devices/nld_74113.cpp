@@ -17,10 +17,10 @@ namespace netlist
 	NETLIB_OBJECT(74113)
 	{
 		NETLIB_CONSTRUCTOR(74113)
-		, m_CLK(*this, "CLK")
-		, m_J(*this, "J")
-		, m_K(*this, "K")
-		, m_SETQ(*this, "SETQ")
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
+		, m_J(*this, "J", NETLIB_DELEGATE(inputs))
+		, m_K(*this, "K", NETLIB_DELEGATE(inputs))
+		, m_SETQ(*this, "SETQ", NETLIB_DELEGATE(inputs))
 		, m_last_CLK(*this, "m_last_CLK", 0)
 		, m_q(*this, "m_q", 0)
 		, m_Q(*this, "Q")
@@ -29,8 +29,51 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_RESETI()
+		{
+			m_last_CLK = 0;
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const auto JK = (m_J() << 1) | m_K();
+
+			if (m_SETQ())
+			{
+				if (!m_CLK() && m_last_CLK)
+				{
+					switch (JK)
+					{
+						case 1:             // (!m_J) & m_K))
+							m_q = 0;
+							break;
+						case 2:             // (m_J) & !m_K))
+							m_q = 1;
+							break;
+						case 3:             // (m_J) & m_K))
+							m_q ^= 1;
+							break;
+						default:
+						case 0:
+							break;
+					}
+				}
+			}
+			else
+			{
+				m_q = 1;
+			}
+
+			m_last_CLK = m_CLK();
+
+			m_Q.push(m_q, NLTIME_FROM_NS(20)); // FIXME: timing
+			m_QQ.push(m_q ^ 1, NLTIME_FROM_NS(20)); // FIXME: timing
+		}
+
+		NETLIB_UPDATEI()
+		{
+			inputs();
+		}
 
 	public:
 		logic_input_t m_CLK;
@@ -114,47 +157,6 @@ namespace netlist
 		NETLIB_SUB(74113A) m_A;
 		NETLIB_SUB(74113A) m_B;
 	};
-
-	NETLIB_RESET(74113)
-	{
-		m_last_CLK = 0;
-	}
-
-	NETLIB_UPDATE(74113)
-	{
-		const auto JK = (m_J() << 1) | m_K();
-
-		if (m_SETQ())
-		{
-			if (!m_CLK() && m_last_CLK)
-			{
-				switch (JK)
-				{
-					case 1:             // (!m_J) & m_K))
-						m_q = 0;
-						break;
-					case 2:             // (m_J) & !m_K))
-						m_q = 1;
-						break;
-					case 3:             // (m_J) & m_K))
-						m_q ^= 1;
-						break;
-					default:
-					case 0:
-						break;
-				}
-			}
-		}
-		else
-		{
-			m_q = 1;
-		}
-
-		m_last_CLK = m_CLK();
-
-		m_Q.push(m_q, NLTIME_FROM_NS(20)); // FIXME: timing
-		m_QQ.push(m_q ^ 1, NLTIME_FROM_NS(20)); // FIXME: timing
-	}
 
 	NETLIB_DEVICE_IMPL(74113, "TTL_74113", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74113A, "TTL_74113A", "+CLK,+J,+K,+CLRQ,@VCC,@GND")

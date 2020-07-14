@@ -15,9 +15,10 @@
 #define LOG_READS		(1 << 1)
 #define LOG_WRITES		(1 << 2)
 #define LOG_UNKNOWNS	(1 << 3)
-#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
+#define LOG_IRQS		(1 << 4)
+#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_IRQS)
 
-#define VERBOSE			(0)
+#define VERBOSE			(LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TSB12LV01A, tsb12lv01a_device, "tsb12lv01a", "TSB12LV01A IEEE 1394 Link Controller")
@@ -68,20 +69,32 @@ void tsb12lv01a_device::device_reset()
 	m_grf_status = 0x00000000;
 }
 
+WRITE_LINE_MEMBER(tsb12lv01a_device::phy_reset_w)
+{
+	if (state)
+	{
+		set_interrupt(INT_PHRST);
+	}
+}
+
 void tsb12lv01a_device::set_interrupt(uint32_t bit)
 {
 	m_int_status |= bit;
+	LOGMASKED(LOG_IRQS, "Setting IRQ: %08x\n", bit);
 	check_interrupts();
 }
 
 void tsb12lv01a_device::check_interrupts()
 {
-	if (m_int_status & 0x7fffffff)
-	{
-		m_int_status |= INT_INT;
-	}
 	const uint32_t active_bits = m_int_status & m_int_mask;
-	m_int_cb((active_bits & INT_INT) ? 1 : 0);
+	if (active_bits & 0x7fffffff)
+		m_int_status |= INT_INT;
+	else
+		m_int_status &= ~INT_INT;
+
+	const int state = (m_int_status & m_int_mask & INT_INT) ? 1 : 0;
+	LOGMASKED(LOG_IRQS, "Active IRQs: %08x, %sing IRQ\n", active_bits, state ? "rais" : "lower");
+	m_int_cb(state);
 }
 
 void tsb12lv01a_device::reset_tx()
@@ -195,11 +208,13 @@ void tsb12lv01a_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		case 0x0c:
 			LOGMASKED(LOG_WRITES, "%s: TSB12 Interrupt Status register write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_int_status &= ~m_int_status;
+			m_int_status &= ~data;
 			check_interrupts();
 			break;
 		case 0x10:
 			LOGMASKED(LOG_WRITES, "%s: TSB12 Interrupt Mask register write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			COMBINE_DATA(&m_int_mask);
+			check_interrupts();
 			break;
 		case 0x14:
 			LOGMASKED(LOG_WRITES, "%s: TSB12 Cycle Timer register write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -237,10 +252,15 @@ void tsb12lv01a_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_phy_access &= ~PHY_PHYRXDATA_MASK;
 				m_phy_access |= m_phy_read_cb(phy_addr);
 
+				if (phy_addr == 0)
+				{
+				}
+
 				m_int_status |= INT_PHYRRX;
 				check_interrupts();
 			}
-			m_phy_access &= ~(PHY_PHYRXDATA_MASK | PHY_PHYRXAD_MASK);
+
+			m_phy_access &= ~(PHY_PHYRGAD_MASK | PHY_PHYRGDATA_MASK);
 			m_phy_access |= data & (PHY_PHYRGAD_MASK | PHY_PHYRGDATA_MASK);
 			break;
 		case 0x30:

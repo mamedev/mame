@@ -439,6 +439,13 @@ namespace plib
 		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
 	}
 
+	template<class T>
+	constexpr const T& clamp( const T& v, const T& low, const T& high)
+	{
+	    gsl_Expects(high >= low);
+	    return (v < low) ? low : (high < v) ? high : v;
+	}
+
 	static_assert(noexcept(constants<double>::one()), "Not evaluated as constexpr");
 
 } // namespace plib
