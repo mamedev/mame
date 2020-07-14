@@ -56,6 +56,7 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
 private:
