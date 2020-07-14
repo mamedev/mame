@@ -6,7 +6,7 @@
 
     - Notes -
       Cycle counts are generally considered to be 100% accurate per-instruction, does not support mid-instruction
-      interrupts although no software has been countered yet that requires it. Evidence of cycle accuracy is given
+      interrupts although no software has been encountered yet that requires it. Evidence of cycle accuracy is given
       in the form of the demoscene 'wild' demo, Craft, by [lft], which uses an ATmega88 to write video out a 6-bit
       RGB DAC pixel-by-pixel, synchronously with the frame timing. Intentionally modifying the timing of any of
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
