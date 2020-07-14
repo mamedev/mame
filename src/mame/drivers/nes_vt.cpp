@@ -780,15 +780,6 @@ void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(nes_vt_base_state::extrain_3_r));
 }
 
-
-
-void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::vt_external_space_map_512kbyte);
-}
-
 void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -1437,10 +1428,6 @@ static INPUT_PORTS_START( duetpp )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sudoku )
-	PORT_INCLUDE(nes_vt)
-INPUT_PORTS_END
-
 // the test mode shows 2 gamepads, however this is not the control scheme the game uses
 // there is a reset button too but it doesn't seem to be a software switch
 static INPUT_PORTS_START( majgnc )
@@ -1520,42 +1507,6 @@ static INPUT_PORTS_START( timetp36 )
 INPUT_PORTS_END
 
 
-void nes_vt_sudoku_state::init_sudoku()
-{
-	u8 *src = memregion("mainrom")->base();
-	int len = memregion("mainrom")->bytes();
-
-	std::vector<u8> buffer(len);
-	{
-		for (int i = 0; i < len; i += 8)
-		{
-			buffer[i+0] = src[i+5];
-			buffer[i+1] = src[i+4];
-			buffer[i+2] = src[i+7];
-			buffer[i+3] = src[i+6];
-			buffer[i+4] = src[i+1];
-			buffer[i+5] = src[i+0];
-			buffer[i+6] = src[i+3];
-			buffer[i+7] = src[i+2];
-		}
-
-		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}
-
-	if (0)
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, len, 1, fp);
-			fclose(fp);
-		}
-	}
-}
-
 
 
 ROM_START( vdogdeme )
@@ -1594,9 +1545,9 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
-ROM_START( papsudok )
-	ROM_REGION( 0x80000, "mainrom", 0 )
-	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
+ROM_START( sudopptv )
+	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
 ROM_END
 
 ROM_START( mc_dgear )
@@ -1872,10 +1823,6 @@ ROM_START( majgnc )
 	ROM_LOAD( "majescogoldennuggetcasino_st29w800at_002000d7.bin", 0x00000, 0x100000, CRC(1a156a9d) SHA1(08be4079dd68c9cf05bb92e11a3da4f092d7cfea) )
 ROM_END
 
-ROM_START( sudopptv )
-	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
-ROM_END
 
 ROM_START( zudugo )
 	ROM_REGION( 0x400000, "mainrom", ROMREGION_ERASEFF )
@@ -2038,9 +1985,6 @@ CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, e
 // need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission?
 CONS( 200?, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Game Sporz", "Wireless Duet Play Ping-Pong", MACHINE_NOT_WORKING )
 
-// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
-// Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku_512kb, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
 
 
 // should be VT03 based

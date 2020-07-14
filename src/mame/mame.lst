@@ -31696,6 +31696,7 @@ pjoypj001
 afbm7800
 dnce2000
 vtvppong
+papsudok
 
 @source:nes_sh6578.cpp
 bandgpad
@@ -31703,6 +31704,7 @@ bandggcn
 cpatrolm
 ts_handy11
 ablwikid
+maxx6in1
 
 @source:nes_vt.cpp
 vdogdeme
@@ -31712,7 +31714,6 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 ablpinb
-papsudok
 mc_dgear
 dgun2500
 dgun2561
@@ -37769,6 +37770,9 @@ roldfroga                       // not a gaelco game but based on splash code
 splash                          // (c) 1992 - Ref 922804
 splash10                        // (c) 1992 - Ref 922804
 ringball                        // not a gaelco game but based on splash code
+
+@source:splash_ms.cpp
+splashms
 
 @source:splus.cpp
 spset005                        // (c) 1993 IGT - International Game Technology

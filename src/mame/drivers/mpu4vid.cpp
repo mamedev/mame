@@ -4265,11 +4265,11 @@ GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwb
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
 
-GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS ) // runs if door open
+GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Miami Dice (Nova, German) (MPU4 Video)",GAME_FLAGS ) // runs if door open
 
-GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,    ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS ) // wrong base rom? or some other issue?
+GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // wrong base rom? or some other issue?
 
-GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )  // wrong base rom? or some other issue?
+GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Piccadilly Nights (Nova, German) (MPU4 Video)",GAME_FLAGS )  // wrong base rom? or some other issue?
 
