@@ -213,7 +213,7 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 	screen_update_backgrounds(screen, bitmap, cliprect);
 
 	// scroll value is awkwardly in tileram, like the world cup 90 bootleg?
-	m_bg_tilemap2->set_scrollx(0, 48+m_videoram2[0xc00/2]);
+	m_bg_tilemap2->set_scrollx(0, 64+m_videoram2[0xc00/2]);
 	m_bg_tilemap2->set_scrolly(0, 48-m_videoram2[0xc02/2]);
 	
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
