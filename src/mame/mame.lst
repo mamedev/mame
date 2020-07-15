@@ -35370,6 +35370,9 @@ ccdelta1
 @source:saitek_exchess.cpp
 exchess
 
+@source:saitek_intchess.cpp
+intchess
+
 @source:saitek_leonardo.cpp
 galileo
 leonardo

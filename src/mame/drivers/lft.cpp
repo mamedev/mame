@@ -44,13 +44,11 @@ public:
 
 	void lft(machine_config &config);
 
-protected:
-	virtual void machine_reset() override;
-
 private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<scc8530_device> m_scc;

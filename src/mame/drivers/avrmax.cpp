@@ -67,14 +67,14 @@ private:
 	u8 input_r();
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
 };
 
 void avrmax_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
 }
 
 
@@ -85,7 +85,7 @@ void avrmax_state::machine_start()
 
 void avrmax_state::update_display()
 {
-	m_display->matrix(m_inp_mux, m_led_data);
+	m_display->matrix(m_inp_mux, m_7seg_data);
 }
 
 void avrmax_state::mux_w(u8 data)
@@ -98,7 +98,7 @@ void avrmax_state::mux_w(u8 data)
 void avrmax_state::led_w(u8 data)
 {
 	// PD0-PD7: 7seg data
-	m_led_data = ~data;
+	m_7seg_data = ~data;
 	update_display();
 }
 
