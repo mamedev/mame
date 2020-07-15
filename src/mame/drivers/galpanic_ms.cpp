@@ -119,9 +119,9 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
 	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
 
-	map(0x584000, 0x584fff).rw(FUNC(galspanic_ms_state::vram2_r), FUNC(galspanic_ms_state::vram2_w)).share("videoram2").mirror(0x003000); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
-	
 	map(0x581000, 0x581fff).ram();
+	map(0x584000, 0x584fff).rw(FUNC(galspanic_ms_state::vram2_r), FUNC(galspanic_ms_state::vram2_w)).share("videoram2"); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
+	map(0x585000, 0x58ffff).ram();
 
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -212,6 +212,12 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
 
+	// scroll value is awkwardly in tileram, like the world cup 90 bootleg?
+	m_bg_tilemap2->set_scrollx(0, 48+m_videoram2[0xc00/2]);
+	m_bg_tilemap2->set_scrolly(0, 48-m_videoram2[0xc02/2]);
+	
+	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
+
 	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
 	const int X_EXTRA_OFFSET = 240;
@@ -242,7 +248,6 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
 
-	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
