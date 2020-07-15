@@ -3,6 +3,16 @@
 // thanks-to:Berger, Achim
 /******************************************************************************
 
+
+Hardware notes:
+- Synertek 6502A @ ~1.1MHz
+- Synertek 6522 VIA
+- 2*4KB ROM(Synertek 2332), 2KB RAM(4*M5L2114LP)
+- 256 bytes PROM(MMI 6336-1J), 256x4 VRAM(2101-1), RF video
+- MM74C923N keyboard encoder, 20 buttons
+- tape deck with microphone
+- 4-digit 7seg display
+
 TODO: WIP
 
 ******************************************************************************/
@@ -220,20 +230,18 @@ void intchess_state::intchess(machine_config &config)
 
 
 
-
 /******************************************************************************
     ROM Definitions
 ******************************************************************************/
 
 ROM_START( intchess )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("lo.bin", 0xc000, 0x1000, CRC(eef04467) SHA1(5bdcb8d596b91aa06c6ef1ed53ef14d0d13f4194) ) // 2332
-	ROM_LOAD("hi.bin",  0xd000, 0x1000, CRC(7e6f85b4) SHA1(4cd15257eae04067160026f9a062a28581f46227) ) // "
+	ROM_LOAD("c45015_ytv-lrom.u9", 0xc000, 0x1000, CRC(eef04467) SHA1(5bdcb8d596b91aa06c6ef1ed53ef14d0d13f4194) ) // 2332
+	ROM_LOAD("c45016_ytv-hrom.u8", 0xd000, 0x1000, CRC(7e6f85b4) SHA1(4cd15257eae04067160026f9a062a28581f46227) ) // "
 
 	ROM_REGION( 0x100, "gfx", 0 )
-	ROM_LOAD( "prom.bin",   0x000, 0x100, CRC(bf8358e0) SHA1(880e0d9bd8a75874ba9e51dfb5999b8fcd321a4f) )
+	ROM_LOAD("igp.u15", 0x000, 0x100, CRC(bf8358e0) SHA1(880e0d9bd8a75874ba9e51dfb5999b8fcd321a4f) ) // 6336-1
 ROM_END
-
 
 } // anonymous namespace
 
@@ -243,5 +251,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1980, intchess, 0,      0, intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )

@@ -32097,6 +32097,9 @@ supercon
 diablo68                        //
 scorpio68                       //
 
+@source:novag_micro.cpp
+nmicro
+
 @source:novag_micro2.cpp
 nmicro2
 

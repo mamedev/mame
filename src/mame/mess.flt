@@ -651,6 +651,7 @@ notetaker.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
+novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
