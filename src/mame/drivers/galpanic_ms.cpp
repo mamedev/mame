@@ -276,7 +276,7 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 		{
 			uint16_t dat = (m_bg_rgb555_pixram[count] & 0xfffe)>>1;
 			dat += 2048;
-			dest[x] = dat;
+			dest[(x-1)&0xff] = dat;
 			count++;
 		}
 	}
