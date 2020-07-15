@@ -335,7 +335,7 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 		int flipx = 0; // different
 		int flipy = (attr2 & 0x4000);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-14,15);
 	}
 
 
