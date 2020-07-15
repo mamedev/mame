@@ -27,6 +27,11 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "machine/gen_latch.h"
+#include "machine/bankdev.h"
+#include "sound/msm5205.h"
 
 class galspanic_ms_state : public driver_device
 {
@@ -34,6 +39,7 @@ public:
 	galspanic_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
@@ -41,7 +47,10 @@ public:
 		m_fg_ind8_pixram(*this, "fg_ind8ram"),
 		m_bg_rgb555_pixram(*this, "bg_rgb555ram"),
 		m_videoram2(*this, "videoram2"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_msm(*this, "msm"),
+		m_soundrom(*this, "soundrom"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void newquiz(machine_config &config);
@@ -49,6 +58,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
@@ -58,8 +68,12 @@ private:
 	required_shared_ptr<uint16_t> m_bg_rgb555_pixram;
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<msm5205_device> m_msm;
+	required_device<address_map_bank_device> m_soundrom;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void galspanic_ms_palette(palette_device &palette) const;
 
@@ -69,6 +83,8 @@ private:
 	// comad
 	uint16_t comad_timer_r();
 	void newquiz_map(address_map &map);
+	void sound_map(address_map &map);
+	void soundrom_map(address_map &map);
 
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -76,6 +92,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
 
 	tilemap_t *m_bg_tilemap2;
+
+	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_adpcm_data_w(uint8_t data);
+	void splash_adpcm_control_w(uint8_t data);
+	int m_adpcm_data;
 
 };
 
@@ -137,7 +158,7 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 
-	map(0x80000e, 0x80000f).r(FUNC(galspanic_ms_state::comad_timer_r)).nopw();
+	map(0x80000e, 0x80000f).r(FUNC(galspanic_ms_state::comad_timer_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0x840000, 0x840001).ram();
 
@@ -156,6 +177,60 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 void galspanic_ms_state::machine_start()
 {
 }
+
+
+void galspanic_ms_state::machine_reset()
+{
+	m_soundrom->set_bank(2);
+}
+
+void galspanic_ms_state::splash_adpcm_data_w(uint8_t data)
+{
+	m_adpcm_data = data;
+}
+
+void galspanic_ms_state::splash_adpcm_control_w(uint8_t data)
+{
+	m_msm->reset_w(BIT(data, 7));
+
+	int bank = data & 0x7f;
+
+	if ((bank != 0x02) &&
+		(bank != 0x04) && (bank != 0x05) && (bank != 0x06) && (bank != 0x07) &&
+		(bank != 0x0c) && (bank != 0x0d) && (bank != 0x0e) && (bank != 0x0f))
+	{
+		logerror("splash_adpcm_control_w %02x\n", data);
+	}
+
+	m_soundrom->set_bank(bank & 0xf);
+}
+
+WRITE_LINE_MEMBER(galspanic_ms_state::splash_msm5205_int)
+{
+	m_msm->data_w(m_adpcm_data >> 4);
+	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
+}
+void galspanic_ms_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	
+	map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
+
+	map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
+
+	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
+}
+
+void galspanic_ms_state::soundrom_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("soundcpu", 0x000000);
+}
+
 
 void galspanic_ms_state::video_start()
 {
@@ -237,7 +312,7 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
 		ypos = (0xff - ypos);
-		ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
+		//ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
 
 		int tile = (attr0 & 0xff00) >> 8;
 		tile |= (attr1 & 0x003f) << 8;
@@ -369,21 +444,25 @@ void galspanic_ms_state::newquiz(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_galspanic_ms);
 
-// does not use original video hardware, will implement different hardware in driver instead
-//  KANEKO_TMAP(config, m_view2);
-//  m_view2->set_colbase(0x400);
-//  m_view2->set_offset(0x5b, 0x8, 256, 224);
-//  m_view2->set_palette(m_palette);
-//  m_view2->set_tile_callback(kaneko_view2_tilemap_device::view2_cb_delegate(FUNC(galspanic_ms_state::tile_callback), this));
-
-//  KANEKO_VU002_SPRITE(config, m_kaneko_spr);
-//  m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
-//  m_kaneko_spr->set_offsets(0, -0x40);
-//  m_kaneko_spr->set_palette(m_palette);
-//  m_kaneko_spr->set_color_base(0x100);
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &galspanic_ms_state::sound_map);
+	m_soundcpu->set_periodic_int(FUNC(galspanic_ms_state::nmi_line_pulse), attotime::from_hz(60*64));  
+
+	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&galspanic_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+
+	YM2203(config, "ymsnd1", XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, "ymsnd2", XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(galspanic_ms_state::splash_msm5205_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 
@@ -392,7 +471,7 @@ ROM_START( galpanicms )
 	ROM_LOAD16_BYTE( "cpu_ic17.bin",  0x000000, 0x80000, CRC(c65104e1) SHA1(189dde2a34b949bd1763d8ee0d74c86fead549b9) ) // AM27C040
 	ROM_LOAD16_BYTE( "cpu_ic8.bin",   0x000001, 0x20000, CRC(e2e201e5) SHA1(2a8257f66139178af951d701fd263144aacf2808) ) // AM27C010
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) // Z80 code
+	ROM_REGION( 0x40000, "soundcpu", 0 ) // Z80 code
 	ROM_LOAD( "snd_1.ic12", 0x000000, 0x10000, CRC(409e9233) SHA1(f13de7ddc00857c889250621ebccdae1b494cfd0) ) // TMS27C512
 
 	ROM_REGION16_BE( 0x100000, "userx", ROMREGION_ERASEFF ) // 68000 data @ 0x200000
