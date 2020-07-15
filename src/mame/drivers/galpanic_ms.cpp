@@ -323,16 +323,15 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 		int ypos = attr0 & 0x00ff;
 		int xpos = (attr1 & 0xff00)>>8;
-		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000; 
 
 		ypos = (0xff - ypos);
-		//ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
 
 		int tile = (attr0 & 0xff00) >> 8;
 		tile |= (attr1 & 0x003f) << 8;
 
-		int flipx = (attr1 & 0x0040);
-		int flipy = (attr1 & 0x0080);
+		int flipx = 0; // different
+		int flipy = (attr2 & 0x4000);
 
 		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
