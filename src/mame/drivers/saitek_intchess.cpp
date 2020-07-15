@@ -3,6 +3,7 @@
 // thanks-to:Berger, Achim
 /******************************************************************************
 
+SciSys Intelligent Chess
 
 Hardware notes:
 - Synertek 6502A @ ~1.1MHz
@@ -13,7 +14,10 @@ Hardware notes:
 - tape deck with microphone
 - 4-digit 7seg display
 
-TODO: WIP
+TODO:
+- colors are estimated from photos (black and white are obvious, but the green
+  and cyan are not standard 0x00ff00 / 0x00ffff)
+- video timing is unknown, sprite offsets are estimated from photos
 
 ******************************************************************************/
 
@@ -30,6 +34,7 @@ TODO: WIP
 #include "speaker.h"
 
 // internal artwork
+#include "saitek_intchess.lh" // clickable
 
 
 namespace {
@@ -107,12 +112,12 @@ void intchess_state::init_palette(palette_device &palette) const
 
 u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// draw chessboard
+	// draw chessboard background
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			bitmap.pix16(y, x) = ((x / 20) ^ (y / 16)) << 1 & 2;
 
-	// draw the pieces
+	// draw the sprites
 	for (int i = 0; i < 64; i++)
 	{
 		int code = (m_vram[i] & 7) << 2;
@@ -293,6 +298,7 @@ void intchess_state::intchess(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_saitek_intchess);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
