@@ -23,7 +23,9 @@
 
 NETLIST_START(speedfrk)
 
-	SOLVER(Solver, 48000)
+	SOLVER(Solver, 1000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
 	TTL_INPUT(I_OUT_0, 1)	// active low
 	TTL_INPUT(I_OUT_1, 1)	// active low

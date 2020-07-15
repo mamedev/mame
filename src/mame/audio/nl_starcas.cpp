@@ -74,10 +74,12 @@ NETLIST_START(wotw)
 
 	// 192k is not high enough to make the laser and background pitches high enough
 #if (HLE_BACKGROUND_VCO && HLE_LASER_VCO)
-	SOLVER(Solver, 48000)
+	SOLVER(Solver, 1000)
 #else
 	SOLVER(Solver, 4800000)
 #endif
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
 	TTL_INPUT(I_OUT_0, 0)		// active low
 	TTL_INPUT(I_OUT_1, 1)		// active low
@@ -488,7 +490,7 @@ NETLIST_START(wotw)
 	// full emulation at 1000x frequency and fitting a curve
 	// to the resulting dataset.
 	//
-	VARCLOCK(BGCLK, 1, "(0.00000215073*A0*A0*A0*A0) + (0.0000224782*A0*A0*A0) + (0.000090697*A0*A0) + (0.000175878*A0) + 0.000163685")
+	VARCLOCK(BGCLK, 1, "max(0.000001,min(0.1,(0.00000215073*A0*A0*A0*A0) + (0.0000224782*A0*A0*A0) + (0.000090697*A0*A0) + (0.000175878*A0) + 0.000163685))")
 	NET_C(BGCLK.GND, GND)
 	NET_C(BGCLK.VCC, I_V5)
 	NET_C(R17.2, R15.2, R18.2, BGCLK.A0, C12.2)
@@ -587,7 +589,7 @@ NETLIST_START(wotw)
 	// with a VARCLOCK tuned based on output from running
 	// the full simulation.
 	//
-	VARCLOCK(LASERCLK, 1, "(0.00000385462*A0*A0*A0*A0) + (0-0.000195567*A0*A0*A0) + (0.00372371*A0*A0) + (0-0.0315254*A0) + 0.100119")
+	VARCLOCK(LASERCLK, 1, "max(0.000001,min(0.1,(0.00000385462*A0*A0*A0*A0) - (0.000195567*A0*A0*A0) + (0.00372371*A0*A0) - (0.0315254*A0) + 0.100119))")
 	NET_C(LASERCLK.GND, GND)
 	NET_C(LASERCLK.VCC, I_V5)
 	NET_C(C23.2, LASERCLK.A0)
