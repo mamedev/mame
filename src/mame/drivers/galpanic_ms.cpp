@@ -18,6 +18,9 @@
     MOD51/3 - Sprite board (ROM sockets used for plug in board below)
     COMP AEREO MOD/5-1 (MODULAR SYSTEM 2) - Sprite ROM board, plugs into above, 24 sprite ROMs
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (CAR-0484/1 SOLD) with no chips, just routing along one edge
+
+
+	-- does the sound board have a MSM5205 or not?
 */
 
 
@@ -214,17 +217,20 @@ void galspanic_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9fff).ram();
+
+	map(0xc000, 0xc000).nopw();
 
 	//map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
 
-	map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
-	map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
+//	map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
+//	map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
 
-	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa002, 0xa003).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 
-	map(0x9000, 0x9fff).ram();
-	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
+	map(0xa008, 0xa008).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
+	map(0xa00a, 0xa00a).nopr();
 }
 
 void galspanic_ms_state::soundrom_map(address_map &map)
