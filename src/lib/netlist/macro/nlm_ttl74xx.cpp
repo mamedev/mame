@@ -1042,6 +1042,48 @@ static NETLIST_START(TTL_74156_DIP)
 NETLIST_END()
 
 /*
+ * DM74157: Quad 2-Input Multiplexor
+ *
+ *      +---+---+-------+---+
+ *      | E | S | I0 I1 | Z |
+ *      +===+===+=======+===+
+ *      | 1 | X |  X  X | 0 |
+ *      | 0 | 1 |  X  0 | 0 |
+ *      | 0 | 1 |  X  1 | 1 |
+ *      | 0 | 0 |  0  X | 0 |
+ *      | 0 | 0 |  1  X | 1 |
+ *      +---+---+-------+---+
+ *
+ * Naming conventions follow TI datasheet
+ *
+ */
+
+static NETLIST_START(TTL_74157_DIP)
+	NET_REGISTER_DEV(TTL_74157_GATE, A)
+	NET_REGISTER_DEV(TTL_74157_GATE, B)
+	NET_REGISTER_DEV(TTL_74157_GATE, C)
+	NET_REGISTER_DEV(TTL_74157_GATE, D)
+
+	NET_C(A.E, B.E, C.E, D.E)
+	NET_C(A.S, B.S, C.S, D.S)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.S,  /*     S |1     ++    16| VCC  */ A.VCC,
+		A.I,  /*   I0a |2           15| /E   */ A.E,
+		A.J,  /*   I1a |3           14| I0c  */ C.I,
+		A.O,  /*    Za |4   74157   13| I1c  */ C.J,
+		B.I,  /*   I0b |5           12| Zc   */ C.O,
+		B.J,  /*   I1b |6           11| I0d  */ D.I,
+		B.O,  /*    Zb |7           10| I1d  */ D.J,
+		A.GND,/*   GND |8            9| Zd   */ D.O
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
  *  DM74260: Dual 5-Input NOR Gates
  *                 _________
  *             Y = A+B+C+D+E
@@ -1758,6 +1800,16 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_74157_GATE, 4, 4, "")
+		TT_HEAD("E,S,I,J|O")
+		TT_LINE("1,X,X,X|0|14")
+		TT_LINE("0,1,X,0|0|14")
+		TT_LINE("0,1,X,1|1|14")
+		TT_LINE("0,0,0,X|0|14")
+		TT_LINE("0,0,1,X|1|14")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_74260_GATE, 5, 1, "")
 		TT_HEAD("A,B,C,D,E|Q ")
 		TT_LINE("0,0,0,0,0|1|10")
@@ -1855,6 +1907,7 @@ NETLIST_START(TTL74XX_lib)
 #endif
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
+	LOCAL_LIB_ENTRY(TTL_74157_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)

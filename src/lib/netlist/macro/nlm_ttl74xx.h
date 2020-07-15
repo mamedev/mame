@@ -302,6 +302,9 @@
 #define TTL_74156_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74156_DIP, name)
 
+#define TTL_74157_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74157_DIP, name)
+
 #define TTL_74260_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_74260_GATE, name)
 
