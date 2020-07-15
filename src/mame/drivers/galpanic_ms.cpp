@@ -52,6 +52,7 @@ public:
 		m_fg_ind8_pixram(*this, "fg_ind8ram"),
 		m_bg_rgb555_pixram(*this, "bg_rgb555ram"),
 		m_videoram2(*this, "videoram2"),
+		m_scrollram(*this, "scrollram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_msm(*this, "msm"),
 		m_soundrom(*this, "soundrom"),
@@ -74,6 +75,7 @@ private:
 	required_shared_ptr<uint16_t> m_fg_ind8_pixram;
 	required_shared_ptr<uint16_t> m_bg_rgb555_pixram;
 	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_scrollram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<msm5205_device> m_msm;
 	required_device<address_map_bank_device> m_soundrom;
@@ -153,7 +155,8 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
 
 	map(0x581000, 0x581fff).ram();
-	map(0x584000, 0x584fff).rw(FUNC(galspanic_ms_state::vram2_r), FUNC(galspanic_ms_state::vram2_w)).share("videoram2"); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
+	map(0x584000, 0x5847ff).rw(FUNC(galspanic_ms_state::vram2_r), FUNC(galspanic_ms_state::vram2_w)).share("videoram2"); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
+	map(0x584800, 0x584fff).ram().share("scrollram");
 	map(0x585000, 0x58ffff).ram();
 
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -248,7 +251,7 @@ void galspanic_ms_state::soundrom_map(address_map &map)
 
 void galspanic_ms_state::video_start()
 {
-	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galspanic_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galspanic_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 16);
 	m_bg_tilemap2->set_transparent_pen(15);
 }
 
@@ -301,9 +304,8 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
 
-	// scroll value is awkwardly in tileram, like the world cup 90 bootleg?
-	m_bg_tilemap2->set_scrollx(0, 64+m_videoram2[0xc00/2]);
-	m_bg_tilemap2->set_scrolly(0, 48-m_videoram2[0xc02/2]);
+	m_bg_tilemap2->set_scrollx(0, 64+m_scrollram[0x400/2]);
+	m_bg_tilemap2->set_scrolly(0, 48-m_scrollram[0x402/2]);
 	
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
