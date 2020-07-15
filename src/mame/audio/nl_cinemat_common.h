@@ -239,51 +239,47 @@ NETLIST_END()
 
 
 
+// *************************************************
+//  EQUIVALENT SUBSTITUTE FOR CA3080 IS NTE996
+//  (SAME 8-PIN DIP PINOUT)
+// *************************************************
 //
-// CA3080 models:
+//  CA3080 OPERATIONAL TRANSCONDUCTANCE AMPLIFIER
 //
-// 0: fast model - not 100% correct - but really fast
-// 1: mailing list model - this had C/E reversed, now corrected
-// 2: datasheet version -- most likely same as 1
-// 3: model derived from https://github.com/xxv/gedasymbols/blob/master/www/user/john_doty/models/opamp/ca3080.mod
-// 4: model derived from http://athena.ecs.csus.edu/~matthews/EEE_109/10_21/App_12.pdf
+//  SPICE (SIMULATION PROGRAM WITH INTEGRATED CIRCUIT EMPHASIS)
+//  SUBCIRCUIT
 //
-#define USE_CA3080_MODEL 0
+//  CONNECTIONS:
+//               INVERTING INPUT
+//                | NON-INVERTING INPUT
+//                |  |  NEGATIVE POWER SUPPLY
+//                |  |  |  I BIAS
+//                |  |  |  | OUTPUT
+//                |  |  |  |  |  POSITIVE POWER SUPPLY
+//                |  |  |  |  |  |
+//.SUBCKT CA3080  2  3  4  5  6  7
 
-// use the submodel above for CA3080
-#define CA3080_DIP(name) SUBMODEL(_CA3080_DIP, name)
+//
+// DIP mappings use the submodels below for CA3080
+//
+#define CA3080_FAST_DIP(name) SUBMODEL(_CA3080_FAST_DIP, name)
+#define CA3080_SLOW_DIP(name) SUBMODEL(_CA3080_SLOW_DIP, name)
 
-static NETLIST_START(_CA3080_DIP)
 
-	// *************************************************
-	//  EQUIVALENT SUBSTITUTE FOR CA3080 IS NTE996
-	//  (SAME 8-PIN DIP PINOUT)
-	// *************************************************
-	//
-	//  CA3080 OPERATIONAL TRANSCONDUCTANCE AMPLIFIER
-	//
-	//  SPICE (SIMULATION PROGRAM WITH INTEGRATED CIRCUIT EMPHASIS)
-	//  SUBCIRCUIT
-	//
-	//  CONNECTIONS:
-	//               INVERTING INPUT
-	//                | NON-INVERTING INPUT
-	//                |  |  NEGATIVE POWER SUPPLY
-	//                |  |  |  I BIAS
-	//                |  |  |  | OUTPUT
-	//                |  |  |  |  |  POSITIVE POWER SUPPLY
-	//                |  |  |  |  |  |
-	//.SUBCKT CA3080  2  3  4  5  6  7
-	//
+//
+// Default to the fast model unless otherwise directed
+//
+#ifndef CA3080_DIP
+#define CA3080_DIP CA3080_FAST_DIP
+#endif
 
-// These items are common to several models
-#define CA3080_D(name) DIODE(name, "D(IS=2p RS=5 BV=40 CJO=3p TT=6n)")
-#define CA3080_NPN(name) QBJT_EB(name, "NPN(IS=21.48f XTI=3 EG=1.11 VAF=80 BF=550 ISE=50f NE=1.5 IKF=10m XTB=1.5 BR=.1 ISC=10f NC=2 IKR=3m RC=10 CJC=800f MJC=.3333 VJC=.75 FC=.5 CJE=1.3p MJE=.3333 VJE=.75 TR=30n TF=400P ITF=30m XTF=1 VTF=10 CJS=5.8P MJS=.3333 VJS=.75)")
-#define CA3080_PNP(name) QBJT_EB(name, "PNP(IS=50f XTI=3 EG=1.11 VAF=80 BF=100 ISE=130f NE=1.5 IKF=1m XTB=1.5 BR=1 ISC=0 NC=2 IKR=0 RC=0 CJC=4p MJC=.3333 VJC=.75 FC=.5 CJE=1.4p MJE=.3333 VJE=.75 TR=500n TF=23n ITF=.1 XTF=1 VTF=10 CJS=5.5P MJS=.3333 VJS=.75)")
 
-#if (USE_CA3080_MODEL == 0)
-
-	// Fast model
+//
+// Fast model: works well for most cases in Cinematronics games,
+// except when used in a network with multiple CA3080's, due to
+// the presence of an AFUNC.
+//
+static NETLIST_START(_CA3080_FAST_DIP)
 	ALIAS(2, F.A0) // -
 	ALIAS(3, F.A1) // +
 	ALIAS(4, F.A2) // V-
@@ -295,8 +291,7 @@ static NETLIST_START(_CA3080_DIP)
 	NET_C(RI.1, F.A0)
 	NET_C(RI.2, F.A1)
 	// Delivers I0
-	//AFUNC(F, 5, "max(A2, min(A4, 19.2 * (A3 - A2) * (A0-A1)))")
-	AFUNC(F, 5, "max(0-0.5e-3, min(0.5e-3, 19.2 * (A3 - A2) * A0))")
+	AFUNC(F, 5, "max(-0.5e-3, min(0.5e-3, 19.2 * (A3 - A2) * A0))")
 	RES(RIABC, 1)
 	NET_C(RIABC.2, F.A2)
 	NET_C(RIABC.1, F.A3) // IB
@@ -304,92 +299,26 @@ static NETLIST_START(_CA3080_DIP)
 	ANALOG_INPUT(XGND, 0)
 	NET_C(XGND, VO.IN, VO.ON) // FIXME: assume symmetric supply
 	NET_C(F.Q, VO.IP)
+NETLIST_END()
 
-#elif (USE_CA3080_MODEL == 1)
 
-	// mailinglist version
-	CA3080_D(D1)
-	CA3080_D(D2)
-	CA3080_D(D3)
-	CA3080_D(D4)
-	CA3080_D(D5)
-	CA3080_D(D6)
-	CA3080_NPN(Q1)
-	CA3080_NPN(Q2)
-	CA3080_NPN(Q3)
-	CA3080_PNP(Q4)
-	CA3080_PNP(Q5)
-	CA3080_PNP(Q6)
-	CA3080_PNP(Q7)
-	CA3080_PNP(Q8)
-	CA3080_PNP(Q9)
-	CA3080_NPN(Q10)
-	CA3080_NPN(Q11)
+//
+// Slow model: derived from
+//    https://github.com/xxv/gedasymbols/blob/master/www/user/john_doty/models/opamp/ca3080.mod
+//
+// This seems to produce reasonable results as a slow drop-in
+// replacement for the fast model above in solarq, but is quite
+// slow. One advantage is that it works in a network with multiple
+// CA3080's.
+//
+static NETLIST_START(_CA3080_SLOW_DIP)
+//
+// These items are common to several models
+//
+#define CA3080_D(name) DIODE(name, "D(IS=2p RS=5 BV=40 CJO=3p TT=6n)")
+#define CA3080_NPN(name) QBJT_EB(name, "NPN(IS=21.48f XTI=3 EG=1.11 VAF=80 BF=550 ISE=50f NE=1.5 IKF=10m XTB=1.5 BR=.1 ISC=10f NC=2 IKR=3m RC=10 CJC=800f MJC=.3333 VJC=.75 FC=.5 CJE=1.3p MJE=.3333 VJE=.75 TR=30n TF=400P ITF=30m XTF=1 VTF=10 CJS=5.8P MJS=.3333 VJS=.75)")
+#define CA3080_PNP(name) QBJT_EB(name, "PNP(IS=50f XTI=3 EG=1.11 VAF=80 BF=100 ISE=130f NE=1.5 IKF=1m XTB=1.5 BR=1 ISC=0 NC=2 IKR=0 RC=0 CJC=4p MJC=.3333 VJC=.75 FC=.5 CJE=1.4p MJE=.3333 VJE=.75 TR=500n TF=23n ITF=.1 XTF=1 VTF=10 CJS=5.5P MJS=.3333 VJS=.75)")
 
-	ALIAS(2, Q1.B)
-	ALIAS(3, Q2.B)
-	ALIAS(4, Q3.E)
-	ALIAS(5, Q3.B)
-	ALIAS(6, Q8.C)
-	ALIAS(7, Q4.E)
-	NET_C(Q10.E, Q11.B, D6.A)
-	NET_C(Q8.C, Q9.C, Q10.C)
-	NET_C(Q7.B, Q9.E, D5.K)
-	NET_C(Q5.E, Q6.B, D2.K)
-	NET_C(Q1.C, Q4.C, Q5.B, D2.A)
-	NET_C(Q2.C, Q7.C, Q8.B, D4.A)
-	NET_C(Q1.E, Q2.E, Q3.C)
-	NET_C(Q3.B, D1.A)
-	NET_C(Q5.C, Q6.C, Q10.B, Q11.C)
-	NET_C(Q3.E, Q11.E, D1.K, D6.K)
-	NET_C(Q4.E, Q7.E, D3.A, D5.A)
-	NET_C(Q8.E, Q9.B, D4.K)
-	NET_C(Q4.B, Q6.E, D3.K)
-
-#elif (USE_CA3080_MODEL == 2)
-
-	// datasheet version
-	CA3080_D(D1)
-	CA3080_D(D2)
-	CA3080_D(D3)
-	CA3080_D(D4)
-	CA3080_D(D5)
-	CA3080_D(D6)
-	CA3080_NPN(Q1)
-	CA3080_NPN(Q2)
-	CA3080_NPN(Q3)
-	CA3080_PNP(Q4)
-	CA3080_PNP(Q5)
-	CA3080_PNP(Q6)
-	CA3080_PNP(Q7)
-	CA3080_PNP(Q8)
-	CA3080_PNP(Q9)
-	CA3080_NPN(Q10)
-	CA3080_NPN(Q11)
-
-	ALIAS(2, Q1.B)
-	ALIAS(3, Q2.B)
-	ALIAS(4, Q3.E)
-	ALIAS(5, Q3.B)
-	ALIAS(6, Q8.C)
-	ALIAS(7, Q4.E)
-	NET_C(Q1.C, Q4.C, D2.A, Q5.B)
-	NET_C(Q1.E, Q2.E, Q3.C)
-	NET_C(Q2.C, Q7.C, D4.A, Q8.B)
-	NET_C(Q3.B, D1.A)
-	NET_C(Q3.E, D1.K, Q11.E, D6.K)
-	NET_C(Q4.B, D3.K, Q6.E)
-	NET_C(Q4.E, D3.A, Q7.E, D5.A)
-	NET_C(Q5.C, Q6.C, Q11.C, Q10.B)
-	NET_C(Q5.E, D2.K, Q6.B)
-	NET_C(Q7.B, D5.K, Q9.E)
-	NET_C(Q8.C, Q9.C, Q10.C)
-	NET_C(Q8.E, D4.K, Q9.B)
-	NET_C(Q10.E, Q11.B, D6.A)
-
-#elif (USE_CA3080_MODEL == 3)
-
-	// model derived from https://github.com/xxv/gedasymbols/blob/master/www/user/john_doty/models/opamp/ca3080.mod
 	CA3080_D(D1)
 	CA3080_D(D2)
 	CA3080_NPN(Q1)
@@ -427,43 +356,6 @@ static NETLIST_START(_CA3080_DIP)
 	NET_C(Q7.E, Q8.C, Q8.B, Q9.B)       // N1N36
 	NET_C(Q4.C, Q5.E, Q10.E)            // N1N52
 	NET_C(Q11.B, Q12.C, Q12.B, Q13.E)   // N1N44
-
-#elif (USE_CA3080_MODEL == 4)
-
-	// model derived from http://athena.ecs.csus.edu/~matthews/EEE_109/10_21/App_12.pdf
-	CA3080_D(D1)
-	CA3080_D(D3)
-	CA3080_D(D5)
-	CA3080_D(D6)
-	CA3080_NPN(Q1)
-	CA3080_NPN(Q2)
-	CA3080_NPN(Q3)
-	CA3080_PNP(Q4)
-	CA3080_PNP(Q6)
-	CA3080_PNP(Q7)
-	CA3080_PNP(Q9)
-	CA3080_NPN(Q10)
-	CA3080_NPN(Q11)
-
-	ALIAS(2, Q1.B)
-	ALIAS(3, Q2.B)
-	ALIAS(4, Q3.E)
-	ALIAS(5, Q3.B)
-	ALIAS(6, Q9.C)
-	ALIAS(7, Q4.E)
-	NET_C(Q1.C, Q4.C, Q6.B)
-	NET_C(Q1.E, Q2.E, Q3.C)
-	NET_C(Q2.C, Q7.C, Q9.B)
-	NET_C(Q3.B, D1.A)
-	NET_C(Q3.E, Q11.E, D1.K, D6.K)
-	NET_C(Q4.B, Q6.E, D3.K)
-	NET_C(Q4.E, D3.A, Q7.E, D5.A)
-	NET_C(Q6.C, Q10.B, Q11.C)
-	NET_C(Q7.B, D5.K, Q9.E)
-	NET_C(Q9.C, Q10.C)
-	NET_C(Q10.E, Q11.B, D6.A)
-
-#endif
 NETLIST_END()
 
 
@@ -477,7 +369,8 @@ NETLIST_END()
 	LOCAL_SOURCE(_TL182_DIP) \
 	LOCAL_SOURCE(_Q_2N6426) \
 	LOCAL_SOURCE(_LM3900_DIP) \
-	LOCAL_SOURCE(_CA3080_DIP) \
+	LOCAL_SOURCE(_CA3080_FAST_DIP) \
+	LOCAL_SOURCE(_CA3080_SLOW_DIP) \
 
 
 #endif // MAME_AUDIO_NL_CINEMAT_COMMON_H

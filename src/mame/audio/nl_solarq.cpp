@@ -8,7 +8,20 @@
 //
 // Known problems/issues:
 //
-//    * WIP.
+//    * This was the most challenging netlist so far to get
+//       into realtime performance.
+//
+//    * The FIRE sound in particular uses a complex network
+//       of op-amps (mix of TL081 and CA3080) with lots of
+//       feedback. The default "fast" CA3080 is not sufficient
+//       here because it uses an instantaneous AFUNC which
+//       is bad in feedback loops, so instead we use the
+//       much slower 15xBJT model. Frontiers are used to
+//       isolate the two relevant CA3080s from the more
+//       common CA3080s used for final mixing.
+//
+//    * A few important frontiers are used to isolate parts
+//       of the circuit from one another.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -21,9 +34,10 @@
 //
 
 #define HLE_CLOCK_DIVIDER (1)
-#define HLE_CAPTURE_VCO (0)
+#define HLE_CAPTURE_VCO (1)
 #define HLE_PHOTON_VCO (1)
-#define DISABLE_FIRE_CIRCUIT (1)
+#define HLE_NOISE_CONVERT (1)
+#define ENABLE_FRONTIERS (1)
 
 
 
@@ -35,7 +49,7 @@ NETLIST_START(solarq)
 
     SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-5)
 
     TTL_INPUT(I_OUT_0, 0)				// active high
     TTL_INPUT(I_OUT_1, 0)				// active high
@@ -465,13 +479,15 @@ NETLIST_START(solarq)
     NET_C(U41.4, I_VM15)
     NET_C(U41.7, I_V15)
 
+#if (!HLE_CAPTURE_VCO)
     LM566_DIP(U42)
+#endif
 
     TL081_DIP(U43)			// Op. Amp.
     NET_C(U43.7, I_V15)
     NET_C(U43.4, I_VM15)
 
-    CA3080_DIP(U44) 		// Op. Amp.
+    CA3080_SLOW_DIP(U44) 		// Op. Amp.
     NET_C(U44.4, I_VM15)
     NET_C(U44.7, I_V15)
 
@@ -479,7 +495,7 @@ NETLIST_START(solarq)
     NET_C(U45.7, I_V15)
     NET_C(U45.4, I_VM15)
 
-    CA3080_DIP(U46) 		// Op. Amp.
+    CA3080_SLOW_DIP(U46) 		// Op. Amp.
     NET_C(U46.4, I_VM15)
     NET_C(U46.7, I_V15)
 
@@ -764,6 +780,10 @@ NETLIST_START(solarq)
     //
 
 #if (HLE_CLOCK_DIVIDER)
+    //
+    // No sense running a 20MHz clock just to run the
+    // divider; instead directly generate a 5Mhz clock
+    //
     ALIAS(_5MC_P, Y1.Q)
     NET_C(Y1.Q, U24.13)
     ALIAS(_5MC_M, U24.12)
@@ -832,7 +852,7 @@ NETLIST_START(solarq)
     HINT(U28.3, NC)
 
     NET_C(MACLK_P, U30.8)
-    NET_C(U30.13, U18.10, R11.1, C5.1)
+    NET_C(U30.13, U18.10)
     NET_C(U30.6, U18.5)
     NET_C(U30.5, U18.4)
     NET_C(U30.3, U18.9)
@@ -841,6 +861,18 @@ NETLIST_START(solarq)
     HINT(U30.10, NC)
     HINT(U30.4, NC)
 
+#if (HLE_NOISE_CONVERT)
+    //
+    // The TTL-to-analog conversion takes a noticeable
+    // amount of time, so just do it directly. The 4.2
+    // P-P value is observed from the original netlist.
+    //
+    AFUNC(NOISECONV, 1, "if(A0>2.5,-4.2,4.2)")
+    NET_C(U30.13, NOISECONV.A0)
+    ALIAS(NOISE, NOISECONV.Q)
+    NET_C(GND, C5.1, C5.2, R11.1, R11.2, R12.1, R12.2, R13.1, R13.2, R14.1, R14.2, U32.2, U32.3)
+#else
+    NET_C(U30.13, R11.1, C5.1)
     NET_C(R11.2, I_V5)
     NET_C(C5.2, R14.2, U32.3)
     NET_C(R14.1, GND)
@@ -848,6 +880,7 @@ NETLIST_START(solarq)
     NET_C(R12.1, GND)
     NET_C(R13.2, U32.6)
     ALIAS(NOISE, R13.2)
+#endif
 
     NET_C(U18.6, U18.12)
     NET_C(U18.8, U18.13)
@@ -869,36 +902,6 @@ NETLIST_START(solarq)
     // Page 2, bottom-middle and top-right (fire)
     //
 
-#if (DISABLE_FIRE_CIRCUIT)
-    NET_C(GND, R98.1, R98.2)
-    NET_C(GND, R99.1, R99.2)
-    NET_C(GND, R100.1, R100.2)
-    NET_C(GND, R101.1, R101.2)
-    NET_C(GND, R102.1, R102.2)
-    NET_C(GND, R103.1, R103.2)
-    NET_C(GND, R104.1, R104.2)
-    NET_C(GND, R105.1, R105.2)
-    NET_C(GND, R106.1, R106.2)
-    NET_C(GND, R107.1, R107.2)
-    NET_C(GND, R108.1, R108.2)
-    NET_C(GND, R109.1, R109.2)
-    NET_C(GND, R110.1, R110.2)
-    NET_C(GND, R111.1, R111.2)
-    NET_C(GND, R112.1, R112.2)
-    NET_C(GND, R113.1, R113.2)
-    NET_C(GND, R114.1, R114.2)
-    NET_C(GND, R115.1, R115.2)
-    NET_C(GND, R116.1, R116.2)
-    NET_C(GND, R117.1, R117.2)
-    NET_C(GND, R118.1, R118.2)
-    NET_C(GND, R119.1, R119.2)
-    NET_C(GND, R120.1, R120.2)
-    NET_C(GND, C23.1, C23.2)
-    NET_C(GND, C24.1, C24.2)
-    NET_C(GND, C25.1, C25.2)
-    NET_C(GND, C26.1, C26.2)
-    NET_C(GND, U43.2, U43.3, U44.2, U44.3, U45.2, U45.3, U46.2, U46.3, U47.2, U47.3)
-#else
     NET_C(FIRE_M, R113.1, R114.1)
     NET_C(R113.2, I_V5, R115.2, Q14.E)
     NET_C(R114.2, R115.1, Q14.B)
@@ -926,14 +929,13 @@ NETLIST_START(solarq)
     NET_C(R109.1, GND)
     NET_C(U45.6, U45.2, R110.1, R103.1, R102.2)
     NET_C(R103.2, C24.1)
-    NET_C(C24.2, GND) /*SJ*/ // temp
+    NET_C(C24.2, SJ)
     NET_C(R110.2, R111.2, U46.3)
     NET_C(R111.1, R112.1, GND)
     NET_C(R112.2, U46.2)
     NET_C(U46.6, C25.2, R120.2, U47.3)
     NET_C(C25.1, R120.1, GND)
     NET_C(U47.2, U47.6, R101.2)
-#endif
 
     //
     // Page 2, bottom-right (AS0-2)
@@ -1060,14 +1062,34 @@ NETLIST_START(solarq)
     NET_C(R87.2, Q12.B)
     NET_C(Q12.E, GND)
     NET_C(Q12.C, R88.1)
-    NET_C(R88.2, R89.1, C18.2, R90.2, C19.1, U42.5)
+    NET_C(R88.2, R89.1, C18.2, R90.2, C19.1)
     NET_C(R89.2, I_V15)
     NET_C(C18.1, GND)
     NET_C(R90.1, GND)
 
 #if (HLE_CAPTURE_VCO)
-    C19.1 -> U21.1
+    //
+    // The capture VCO actually doesn't sound bad at default
+    // settings, but still takes up a lot of horsepower, so
+    // HLE it as usual. The mappings aren't as good as they
+    // usually are, but the sound is short and the result is
+    // pretty indistinguishable from reality, so we'll go
+    // with it.
+    //
+    //    R2 = 0.87013: HP = (0.000085296*A0) - 0.000965124
+    //    R2 = 0.91754: HP = (0.0000395501*A0*A0) - (0.000953905*A0) + 0.00585023
+    //    R2 = 0.91858: HP = (-0.0000119561*A0*A0*A0) + (0.000513446*A0*A0) - (0.00720853*A0) + 0.0333386
+    //    R2 = 0.93063: HP = (-0.000085348*A0*A0*A0*A0) + (0.00450954*A0*A0*A0) - (0.089245*A0*A0) + (0.784128*A0) - 2.580951
+    //    R2 = 0.84993: HP = (0.00000301512*A0*A0*A0*A0*A0) - (0.000286000*A0*A0*A0*A0) + (0.0098476*A0*A0*A0) - (0.160207*A0*A0) + (1.255519*A0) - 3.832746
+    //
+	VARCLOCK(CAPTURECLK, 1, "max(0.000001,min(0.1,(-0.0000119561*A0*A0*A0) + (0.000513446*A0*A0) - (0.00720853*A0) + 0.0333386))")
+	NET_C(CAPTURECLK.GND, GND)
+	NET_C(CAPTURECLK.VCC, I_V5)
+	NET_C(CAPTURECLK.Q, U21.1)
+	NET_C(CAPTURECLK.A0, C19.1)
+	NET_C(GND, R91.1, R91.2, R92.1, R92.2, R93.1, R93.2, R94.1, R94.2, C19.2, C20.1, C20.2, C21.1, C21.2, D7.A, D7.K, D8.A, D8.K)
 #else
+    NET_C(R88.2, U42.5)
     NET_C(C19.2, U42.6, R91.1)
     NET_C(R91.2, I_V15, U42.8)
     NET_C(U42.7, C20.2)
@@ -1213,5 +1235,20 @@ NETLIST_START(solarq)
     HINT(U2.9, NC)
     HINT(U2.11, NC)
     HINT(U24.4, NC)
+
+#if (ENABLE_FRONTIERS)
+    //
+    // Isolate the NOISE consumers from one another; the first one
+    // in particular is a big win
+    //
+    OPTIMIZE_FRONTIER(R100.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R16.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R35.1, RES_M(1), 50)
+
+    //
+    // Isolate the CS sounds from the rest of the mixer (huge!)
+    //
+    OPTIMIZE_FRONTIER(U49.3, RES_M(1), 50)
+#endif
 
 NETLIST_END()
