@@ -83,13 +83,11 @@ TILE_GET_INFO_MEMBER(galspanic_ms_state::get_tile_info_tilemap2)
 {
 	int tile = m_videoram2[tile_index*2];
 
-	tile &= 0x1fff;
-
-	int attr = m_videoram2[(tile_index*2)+1] & 0xff;
+	//int attr = m_videoram2[(tile_index*2)+1] & 0xff;
 	//int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
 
-	int col = attr & 0x1f;
-
+	int col = (tile & 0xf000)>>12;
+	tile &= 0x0fff;
 
 	tileinfo.set(1,tile,col,0);
 }
@@ -149,7 +147,7 @@ void galspanic_ms_state::machine_start()
 void galspanic_ms_state::video_start()
 {
 	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galspanic_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
-	m_bg_tilemap2->set_transparent_pen(0);
+	m_bg_tilemap2->set_transparent_pen(15);
 }
 
 void galspanic_ms_state::galspanic_ms_palette(palette_device &palette) const
@@ -327,7 +325,7 @@ static const gfx_layout tiles16x16x4_layout =
 
 static GFXDECODE_START( gfx_galspanic_ms )
 	GFXDECODE_ENTRY( "kan_spr", 0, tiles16x16x4_layout, 0x100, 16 )
-	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0x400, 16 )
 GFXDECODE_END
 
 
@@ -418,7 +416,7 @@ ROM_START( galpanicms )
 	ROM_LOAD32_BYTE( "5_gp_521.ic21",        0x140001, 0x010000, CRC(00ed84f5) SHA1(d3704a0a0e0b3f0f6509f3ab80a7203794b61cca) )
 	ROM_LOAD32_BYTE( "5_gp_527.ic27",        0x140000, 0x010000, CRC(689a8fae) SHA1(b16c33f02966aff3796b9dc528d3c2ca08ae49b1) )
 
-	ROM_REGION( 0x40000, "bgtile", 0 ) // tilemap (less data than the encrypted layer on Gals Panic, probably no animation?)
+	ROM_REGION( 0x40000, "bgtile", ROMREGION_INVERT ) // tilemap (less data than the encrypted layer on Gals Panic, probably no animation?)
 	ROM_LOAD32_BYTE( "4_gp_401.ic17",        0x000003, 0x010000, CRC(cd7060f6) SHA1(c548b0ccdff0ae33a2b6eef3bf49d18bd0935321) ) // MC27C512AQ
 	ROM_LOAD32_BYTE( "4_gp_402.ic16",        0x000002, 0x010000, CRC(c4627916) SHA1(9d30251a3a7ac0198f89c797ae59285870d21033) ) // MC27C512AQ
 	ROM_LOAD32_BYTE( "4_gp_403.ic15",        0x000001, 0x010000, CRC(35d2bce4) SHA1(050e7adad47ea10a59761e59d8d4aee11960b0db) ) // MC27C512AQ
