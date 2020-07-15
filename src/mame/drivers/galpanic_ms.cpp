@@ -26,7 +26,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "tilemap.h"
 
 class galspanic_ms_state : public driver_device
 {
@@ -40,6 +40,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fg_ind8_pixram(*this, "fg_ind8ram"),
 		m_bg_rgb555_pixram(*this, "bg_rgb555ram"),
+		m_videoram2(*this, "videoram2"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
@@ -55,9 +56,11 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_fg_ind8_pixram;
 	required_shared_ptr<uint16_t> m_bg_rgb555_pixram;
+	required_shared_ptr<uint16_t> m_videoram2;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	virtual void machine_start() override;
+	virtual void video_start() override;
 	void galspanic_ms_palette(palette_device &palette) const;
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -67,7 +70,41 @@ private:
 	uint16_t comad_timer_r();
 	void newquiz_map(address_map &map);
 
+	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
+	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
+
+	tilemap_t *m_bg_tilemap2;
+
 };
+
+TILE_GET_INFO_MEMBER(galspanic_ms_state::get_tile_info_tilemap2)
+{
+	int tile = m_videoram2[tile_index*2];
+
+	tile &= 0x1fff;
+
+	int attr = m_videoram2[(tile_index*2)+1] & 0xff;
+	//int fx = (m_videoram2[(tile_index*2)+1] & 0xc0)>>6;
+
+	int col = attr & 0x1f;
+
+
+	tileinfo.set(1,tile,col,0);
+}
+
+uint16_t galspanic_ms_state::vram2_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_videoram2[offset];
+}
+
+void galspanic_ms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap2->mark_tile_dirty(offset/2);
+}
+
 
 uint16_t galspanic_ms_state::comad_timer_r()
 {
@@ -83,7 +120,7 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
 	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
 
-	map(0x584000, 0x587fff).ram(); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
+	map(0x584000, 0x584fff).rw(FUNC(galspanic_ms_state::vram2_r), FUNC(galspanic_ms_state::vram2_w)).share("videoram2").mirror(0x003000); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
 
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -107,6 +144,12 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 
 void galspanic_ms_state::machine_start()
 {
+}
+
+void galspanic_ms_state::video_start()
+{
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galspanic_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_ROWS,  16,  16, 32, 32);
+	m_bg_tilemap2->set_transparent_pen(0);
 }
 
 void galspanic_ms_state::galspanic_ms_palette(palette_device &palette) const
@@ -187,6 +230,8 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
+
+	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
