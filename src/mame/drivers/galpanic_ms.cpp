@@ -109,6 +109,7 @@ uint16_t galspanic_ms_state::comad_timer_r()
 	return (m_screen->vpos() & 0x07) << 8;
 }
 
+// lots of bad / leftover reads/writes from the original code in here
 void galspanic_ms_state::newquiz_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -119,6 +120,8 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
 
 	map(0x584000, 0x584fff).rw(FUNC(galspanic_ms_state::vram2_r), FUNC(galspanic_ms_state::vram2_w)).share("videoram2").mirror(0x003000); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
+	
+	map(0x581000, 0x581fff).ram();
 
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -128,15 +131,25 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 
 	map(0x704000, 0x7047ff).ram().share("spriteram"); // bootleg uses this instead?
 
+	map(0x780000, 0x78001f).ram();
+
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 
-	map(0x80000e, 0x80000f).r(FUNC(galspanic_ms_state::comad_timer_r));
+	map(0x80000e, 0x80000f).r(FUNC(galspanic_ms_state::comad_timer_r)).nopw();
+
+	map(0x840000, 0x840001).ram();
+
+	map(0x900000, 0x900001).ram();
+
+	map(0xa00000, 0xa00001).ram();
 
 	map(0xb00000, 0xbfffff).rom().region("user1", 0); // reads girl data here
 
 	map(0xc80000, 0xc8ffff).ram();
+
+	map(0xe00012, 0xe00013).ram();
 }
 
 
