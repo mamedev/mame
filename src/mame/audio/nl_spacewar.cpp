@@ -31,6 +31,7 @@
 //
 
 #define HLE_NOISE_GEN (1)
+#define ENABLE_FRONTIERS (1)
 
 
 //
@@ -39,7 +40,10 @@
 
 NETLIST_START(spacewar)
 
-	SOLVER(Solver, 48000)
+	SOLVER(Solver, 1000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+//	PARAM(Solver.MIN_TS_TS, 2e-5)
 
 	TTL_INPUT(I_OUT_0, 0)				// active high
 	TTL_INPUT(I_OUT_1, 0)				// active high
@@ -77,14 +81,14 @@ NETLIST_START(spacewar)
 	RES(R19, 820)
 //	POT(R20, RES_K(10))		-- part of final amp (not emulated)
 //	RES(R21, 150)			-- part of final amp (not emulated), not present on Space Wars
-//	RES(R22, 1.35)			-- part of final amp (not emulated), not present on Space Wars
-//	RES(R23, 1.35)			-- part of final amp (not emulated), not present on Space Wars
+//	RES(R22, 2.7)			-- part of final amp (not emulated), not present on Space Wars
+//	RES(R23, 2.7)			-- part of final amp (not emulated), not present on Space Wars
 	RES(R24, RES_K(47))
 	RES(R25, 150)
 	RES(R26, RES_K(160))
 	RES(R27, 750)
 //	RES(R28, RES_K(68))		-- part of final amp (not emulated), illegible on Space Wars
-//	POT(R29, RES_K(10))		-- part of final amp (not emulated), 50k on Space Wars?
+//	POT(R29, RES_K(10))		-- part of final amp (not emulated)
 //	RES(R30, 750)			-- part of final amp (not emulated)
 	RES(R31, 470)
 	RES(R32, RES_K(1))
@@ -95,7 +99,7 @@ NETLIST_START(spacewar)
 	RES(R37, RES_K(10))
 	RES(R38, RES_K(10))
 //	RES(R39, RES_K(120))
-	RES(R40, 120)
+	RES(R40, RES_K(120))
 	RES(R41, RES_K(20))
 	RES(R42, RES_K(1))
 	RES(R43, RES_K(10))
@@ -292,5 +296,26 @@ NETLIST_START(spacewar)
 	//
 
 	NET_C(GND, U2.3, U2.5, U2.11)
+
+	//
+	// Frontier optimizations
+	//
+
+#if (ENABLE_FRONTIERS)
+	// Separate each input into the summing network
+    OPTIMIZE_FRONTIER(R13.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R15.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R41.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R37.1, RES_M(1), 50)
+
+	// Decouple the Darlington BJTs from the sounds they enable
+    OPTIMIZE_FRONTIER(R27.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R11.2, RES_M(1), 50)
+
+	// Decouple the noise source from the downstream filters
+    OPTIMIZE_FRONTIER(C3.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R24.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R38.2, RES_M(1), 50)
+#endif
 
 NETLIST_END()
