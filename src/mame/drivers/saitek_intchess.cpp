@@ -25,6 +25,7 @@ TODO: WIP
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -43,7 +44,10 @@ public:
 		m_encoder(*this, "encoder"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	void intchess(machine_config &config);
@@ -59,6 +63,9 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<u8> m_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	// address maps
 	void main_map(address_map &map);
@@ -69,6 +76,9 @@ private:
 	void seg_w(u8 data);
 	void control_w(u8 data);
 	u8 control_r();
+
+	void init_palette(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u8 m_select = 0;
 	u8 m_7seg_data = 0;
@@ -84,13 +94,53 @@ void intchess_state::machine_start()
 
 
 /******************************************************************************
-    I/O
+    Video
 ******************************************************************************/
+
+void intchess_state::init_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, 0xa0, 0xb0, 0xff);
+	palette.set_pen_color(1, 0x00, 0x00, 0x00);
+	palette.set_pen_color(2, 0x50, 0x80, 0x20);
+	palette.set_pen_color(3, 0xff, 0xff, 0xff);
+}
+
+u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// draw chessboard
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			bitmap.pix16(y, x) = ((x / 20) ^ (y / 16)) << 1 & 2;
+
+	// draw the pieces
+	for (int i = 0; i < 64; i++)
+	{
+		int code = (m_vram[i] & 7) << 2;
+		int color = m_vram[i] >> 3 & 1;
+		int x = (i % 8) * 20 + 2;
+		int y = (i / 8) * 16;
+
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+0, color, 0, 0, x+8, y, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+1, color, 0, 0, x+8, y+8, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+2, color, 0, 0, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code+3, color, 0, 0, x, y+8, 0);
+	}
+
+	return 0;
+}
 
 void intchess_state::vram_w(offs_t offset, u8 data)
 {
+	// d0-d2: sprite index
+	// d3: color
+	// d4-d7: N/C (4-bit RAM chip)
 	m_vram[offset] = data & 0xf;
 }
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
 
 void intchess_state::update_display()
 {
@@ -190,6 +240,20 @@ static INPUT_PORTS_START( intchess )
 INPUT_PORTS_END
 
 
+static const gfx_layout layout_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
+
+static GFXDECODE_START( gfx_intchess )
+	GFXDECODE_ENTRY( "gfx", 0, layout_8x8, 0, 2 )
+GFXDECODE_END
 
 
 /******************************************************************************
@@ -216,8 +280,16 @@ void intchess_state::intchess(machine_config &config)
 	m_encoder->x4_rd_callback().set_ioport("X4");
 
 	// video hardware
-	//screen.screen_vblank().set(m_via, FUNC(via6522_device::write_cb2));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50); // PAL
+	m_screen->set_size(8*20 + 32, 8*16 + 32);
+	m_screen->set_visarea(0, 8*20-1, 0, 8*16-1);
+	m_screen->set_screen_update(FUNC(intchess_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_via, FUNC(via6522_device::write_cb2));
 
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intchess);
+	PALETTE(config, m_palette, FUNC(intchess_state::init_palette), 4);
 
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
@@ -252,4 +324,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, intchess, 0,      0, intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1980, intchess, 0,      0, intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
