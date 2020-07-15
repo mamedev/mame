@@ -411,22 +411,11 @@ static const gfx_layout tiles8x8x4_layout =
 	16 * 16
 };
 
-static const gfx_layout tiles16x16x4alt_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7, 512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
-	{ STEP8(0,32), STEP8(256,32) },
-	32 * 32
-};
-
 
 static GFXDECODE_START( gfx_splashms )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "fgtile", 0, tiles8x8x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0, 16 )
 GFXDECODE_END
 
 void splashms_state::splash_adpcm_data_w(uint8_t data)

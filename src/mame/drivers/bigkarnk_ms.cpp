@@ -640,17 +640,6 @@ static const gfx_layout tiles16x16x4_layout =
 	16 * 16 * 4
 };
 
-static const gfx_layout tiles16x16x4alt_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7, 512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
-	{ STEP8(0,32), STEP8(256,32) },
-	32 * 32
-};
-
 static const gfx_layout tiles8x8x4_layout =
 {
 	8,8,
@@ -664,7 +653,7 @@ static const gfx_layout tiles8x8x4_layout =
 
 
 static GFXDECODE_START( gfx_bigkarnk_ms )
-	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 32 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0, 32 )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles8x8x4_layout, 0, 32 )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
 GFXDECODE_END
@@ -676,9 +665,18 @@ void bigkarnk_ms_state::splash_adpcm_data_w(uint8_t data)
 
 void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
 {
-//	printf("splash_adpcm_control_w %02x\n", data);
 	m_msm->reset_w(BIT(data, 7));
-	m_soundrom->set_bank(data & 0xf);
+
+	int bank = data & 0x7f;
+
+	if ((data != 0x02) &&
+		(data != 0x04) && (data != 0x05) && (data != 0x06) && (data != 0x07) &&
+		(data != 0x0c) && (data != 0x0d) && (data != 0x0e) && (data != 0x0f))
+	{
+		logerror("splash_adpcm_control_w %02x\n", data);
+	}
+
+	m_soundrom->set_bank(bank & 0xf);
 }
 
 WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
@@ -782,8 +780,9 @@ ROM_START( bigkarnkm )
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic20",  0x040000, 0x020000, CRC(332d6dea) SHA1(cd7e402642f57c12cb7405c49b75bfaa0d104421) )
 
 	ROM_REGION( 0x040000, "soundcpu", 0 )    /* Z80 code (uses YM3812 + M5205) */
-	ROM_LOAD( "snd_ka.ic6",    0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) )
-	ROM_LOAD( "snd_ka.ic11",   0x010000, 0x020000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) )
+	ROM_LOAD( "snd_ka.ic6",    0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) ) // 0,1,2,3
+	ROM_LOAD( "snd_ka.ic11",   0x010000, 0x010000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) ) // 4,5,6,7
+	ROM_CONTINUE(0x30000,0x10000) // c,d,e,f
 
 	ROM_REGION( 0x180000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_ka.ic4",         0x080003, 0x020000, CRC(2bee07ea) SHA1(afd8769955314768db894e4e98f65422fc0dbb4f) )
