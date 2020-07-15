@@ -148,6 +148,15 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 		}
 	}
 
+	screen.priority().fill(0, cliprect);
+
+	return 0;
+}
+
+uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update_backgrounds(screen, bitmap, cliprect);
+
 	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
 	const int X_EXTRA_OFFSET = 240;
@@ -178,17 +187,6 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
 
-
-	screen.priority().fill(0, cliprect);
-
-	return 0;
-}
-
-uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	screen_update_backgrounds(screen, bitmap, cliprect);
-//  m_kaneko_spr->render_sprites(cliprect, m_spriteram, m_spriteram.bytes());
-//  m_kaneko_spr->copybitmap(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
