@@ -43,6 +43,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_ym1(*this, "ym1"),
+		m_ym2(*this, "ym2"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
@@ -62,6 +64,8 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<ym2203_device> m_ym1;
+	required_device<ym2203_device> m_ym2;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
@@ -88,6 +92,11 @@ private:
 	void newquiz_map(address_map &map);
 	void sound_map(address_map &map);
 	void soundrom_map(address_map &map);
+
+	uint8_t unk_r()
+	{
+		return machine().rand();
+	}
 
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -217,7 +226,8 @@ void galspanic_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9fff).ram();
+	map(0x9000, 0x97ff).ram().mirror(0x0800);
+
 
 	map(0xc000, 0xc000).nopw();
 
@@ -226,11 +236,8 @@ void galspanic_ms_state::sound_map(address_map &map)
 //	map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
 //	map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
 
-	map(0xa000, 0xa001).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa002, 0xa003).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-
-	map(0xa008, 0xa008).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
-	map(0xa00a, 0xa00a).nopr();
+	map(0xa000, 0xa001).rw(m_ym1, FUNC(ym2203_device::read), FUNC(ym2203_device::write)).mirror(0x0008);
+	map(0xa002, 0xa003).rw(m_ym2, FUNC(ym2203_device::read), FUNC(ym2203_device::write)).mirror(0x0008);
 }
 
 void galspanic_ms_state::soundrom_map(address_map &map)
@@ -461,10 +468,15 @@ void galspanic_ms_state::newquiz(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&galspanic_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+	//m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
-	YM2203(config, "ymsnd1", XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40);
-	YM2203(config, "ymsnd2", XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, m_ym1, XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_ym1->port_a_read_callback().set(FUNC(galspanic_ms_state::unk_r));
+	m_ym1->port_b_read_callback().set(FUNC(galspanic_ms_state::unk_r));
+
+	YM2203(config, m_ym2, XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_ym2->port_a_read_callback().set(FUNC(galspanic_ms_state::unk_r));
+	m_ym2->port_b_read_callback().set(FUNC(galspanic_ms_state::unk_r));
 
 	MSM5205(config, m_msm, XTAL(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(galspanic_ms_state::splash_msm5205_int));
