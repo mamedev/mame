@@ -46,8 +46,10 @@ tape.
 ToDo:
 - Add NMI generator
 - Find out if there really is any floppy-disk feature - the schematic
-  has no mention of it.
+  has no mention of it. (it might be the ram drives)
 - Add the 6 LEDs.
+- Need software
+- MNW until we can be sure it works as intended.
 
 ****************************************************************************/
 
@@ -207,7 +209,7 @@ void pcm_state::io_map(address_map &map)
 	map(0x90, 0x93).rw(m_pio_u, FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // user PIO
 	map(0x94, 0x97).w(FUNC(pcm_state::port94_w));
 	//map(0x98, 0x9B) // NMI generator for debugging
-	//map(0x9C, 0x9F) // io ports available to the user
+	map(0x9C, 0x9F); // io ports available to the user
 	// disk controller?
 }
 
@@ -379,4 +381,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
-COMP( 1988, pcm,  0,      0,      pcm,     pcm,   pcm_state, empty_init, "Mugler/Mathes", "PC/M",   MACHINE_SUPPORTS_SAVE )
+COMP( 1988, pcm,  0,      0,      pcm,     pcm,   pcm_state, empty_init, "Mugler/Mathes", "PC/M",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
