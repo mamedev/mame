@@ -213,8 +213,9 @@ WRITE_LINE_MEMBER(galspanic_ms_state::splash_msm5205_int)
 void galspanic_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	
-	map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0x8fff).ram();
+
+	//map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
 	map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
@@ -222,7 +223,7 @@ void galspanic_ms_state::sound_map(address_map &map)
 	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 
-	map(0xf000, 0xf7ff).ram();
+	map(0x9000, 0x9fff).ram();
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
 }
 
@@ -449,7 +450,7 @@ void galspanic_ms_state::newquiz(machine_config &config)
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &galspanic_ms_state::sound_map);
-	m_soundcpu->set_periodic_int(FUNC(galspanic_ms_state::nmi_line_pulse), attotime::from_hz(60*64));  
+//	m_soundcpu->set_periodic_int(FUNC(galspanic_ms_state::nmi_line_pulse), attotime::from_hz(60*64)); // no NMI here, just retn
 
 	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&galspanic_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
