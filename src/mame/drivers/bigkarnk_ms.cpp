@@ -669,9 +669,9 @@ void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
 
 	int bank = data & 0x7f;
 
-	if ((data != 0x02) &&
-		(data != 0x04) && (data != 0x05) && (data != 0x06) && (data != 0x07) &&
-		(data != 0x0c) && (data != 0x0d) && (data != 0x0e) && (data != 0x0f))
+	if ((bank != 0x02) &&
+		(bank != 0x04) && (bank != 0x05) && (bank != 0x06) && (bank != 0x07) &&
+		(bank != 0x0c) && (bank != 0x0d) && (bank != 0x0e) && (bank != 0x0f))
 	{
 		logerror("splash_adpcm_control_w %02x\n", data);
 	}
