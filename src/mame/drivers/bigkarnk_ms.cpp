@@ -520,7 +520,9 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
 
+	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
+	const int X_EXTRA_OFFSET = 112;
 
 	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
 	{
@@ -545,7 +547,7 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-112,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
 
 	m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);

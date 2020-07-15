@@ -37,6 +37,7 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_paletteram(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
 		m_fg_ind8_pixram(*this, "fg_ind8ram"),
 		m_bg_rgb555_pixram(*this, "bg_rgb555ram"),
 		m_gfxdecode(*this, "gfxdecode")
@@ -50,6 +51,7 @@ private:
 	required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_fg_ind8_pixram;
 	required_shared_ptr<uint16_t> m_bg_rgb555_pixram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,9 +88,9 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 
 	map(0x680000, 0x68001f).ram(); // was view2 tilemap regs
 
-	map(0x700000, 0x700fff).ram().share("spriteram"); // original spriteram? - drawing from here results in corrupt / missing sprites
+	map(0x700000, 0x700fff).ram().share("oldspriteram"); // original spriteram? - drawing from here results in corrupt / missing sprites
 
-	map(0x704000, 0x7047ff).ram().share("boot_spriteram"); // bootleg uses this instead?
+	map(0x704000, 0x7047ff).ram().share("spriteram"); // bootleg uses this instead?
 
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
@@ -145,6 +147,37 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 			count++;
 		}
 	}
+
+	// TODO, convert to device, share between Modualar System games
+	const int NUM_SPRITES = 0x200;
+	const int X_EXTRA_OFFSET = 240;
+
+	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+
+		uint16_t attr0 = m_spriteram[i + 0];
+		uint16_t attr1 = m_spriteram[i + 1];
+
+		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES + 1]; // unused?
+
+		int ypos = attr0 & 0x00ff;
+		int xpos = (attr1 & 0xff00)>>8;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
+
+		ypos = (0xff - ypos);
+		ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
+
+		int tile = (attr0 & 0xff00) >> 8;
+		tile |= (attr1 & 0x003f) << 8;
+
+		int flipx = (attr1 & 0x0040);
+		int flipy = (attr1 & 0x0080);
+
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
+	}
+
 
 	screen.priority().fill(0, cliprect);
 
@@ -249,7 +282,7 @@ static const gfx_layout tiles16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_galspanic_ms )
-	GFXDECODE_ENTRY( "kan_spr", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "kan_spr", 0, tiles16x16x4_layout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16x4_layout, 0, 16 )
 GFXDECODE_END
 
@@ -310,7 +343,7 @@ ROM_START( galpanicms )
 	ROM_LOAD16_BYTE( "cpu_ic26.bin", 0x080000, 0x40000, CRC(c7e2135b) SHA1(8cf0c21c9b64e48da458bc29cfb15e1a5189c551) ) //  D27C020
 	ROM_LOAD16_BYTE( "cpu_ic25.bin", 0x080001, 0x40000, CRC(406c2e3e) SHA1(ae229f01bdf0dea72a89c63b60f513a338fd8061) ) // AM27C020
 
-	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF ) // sprites (seems to be the same as Gals Panic but alt ROM arrangement / decoding)
+	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (seems to be the same as Gals Panic but alt ROM arrangement / decoding)
 	ROM_LOAD32_BYTE( "5_gp_501.ic1",         0x000003, 0x010000, CRC(55ce19e8) SHA1(6aee3a43c731f017427b9316a6d2a536d7d44d35) ) // all TMS27C512
 	ROM_LOAD32_BYTE( "5_gp_510.ic10",        0x000002, 0x010000, CRC(95cfabc0) SHA1(36708945b4a7c153e67c5f8d8a8a71e7b6cb0ca3) )
 	ROM_LOAD32_BYTE( "5_gp_516.ic16",        0x000001, 0x010000, CRC(93c82aa3) SHA1(70d9beda4e2a93f89d2f0589c9fdbdb2ba4c7d7a) )

@@ -200,15 +200,19 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (int i = 0x100-2; i >= 0; i-=2)
+	// TODO, convert to device, share between Modualar System games
+	const int NUM_SPRITES = 0x100;
+	const int X_EXTRA_OFFSET = 64;
+
+	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
 	{
 		gfx_element *gfx = m_gfxdecode->gfx(0);
 
 		uint16_t attr0 = m_spriteram[i + 0];
 		uint16_t attr1 = m_spriteram[i + 1];
 
-		uint16_t attr2 = m_spriteram[i + 0x100];
-		//uint16_t attr3 = m_spriteram[i + 0x101]; // unused?
+		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
 
 		int ypos = attr0 & 0x00ff;
 		int xpos = (attr1 & 0xff00)>>8;
@@ -223,7 +227,7 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-64,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
