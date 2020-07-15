@@ -44,6 +44,7 @@ public:
 	{ }
 
 	void newquiz(machine_config &config);
+	void init_galpanicms();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -82,7 +83,7 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
 	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
 
-	map(0x584000, 0x587fff).ram(); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'gfx3' tiles tho
+	map(0x584000, 0x587fff).ram(); // was view2 tilemaps (moved from 0x580000 on original) presumably still 'bgtile' tiles tho
 
 	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -281,7 +282,7 @@ static const gfx_layout tiles16x16x4_layout =
 
 static GFXDECODE_START( gfx_galspanic_ms )
 	GFXDECODE_ENTRY( "kan_spr", 0, tiles16x16x4_layout, 0x100, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -372,7 +373,7 @@ ROM_START( galpanicms )
 	ROM_LOAD32_BYTE( "5_gp_521.ic21",        0x140001, 0x010000, CRC(00ed84f5) SHA1(d3704a0a0e0b3f0f6509f3ab80a7203794b61cca) )
 	ROM_LOAD32_BYTE( "5_gp_527.ic27",        0x140000, 0x010000, CRC(689a8fae) SHA1(b16c33f02966aff3796b9dc528d3c2ca08ae49b1) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 ) // tilemap (less data than the encrypted layer on Gals Panic, probably no animation?)
+	ROM_REGION( 0x40000, "bgtile", 0 ) // tilemap (less data than the encrypted layer on Gals Panic, probably no animation?)
 	ROM_LOAD32_BYTE( "4_gp_401.ic17",        0x000003, 0x010000, CRC(cd7060f6) SHA1(c548b0ccdff0ae33a2b6eef3bf49d18bd0935321) ) // MC27C512AQ
 	ROM_LOAD32_BYTE( "4_gp_402.ic16",        0x000002, 0x010000, CRC(c4627916) SHA1(9d30251a3a7ac0198f89c797ae59285870d21033) ) // MC27C512AQ
 	ROM_LOAD32_BYTE( "4_gp_403.ic15",        0x000001, 0x010000, CRC(35d2bce4) SHA1(050e7adad47ea10a59761e59d8d4aee11960b0db) ) // MC27C512AQ
@@ -399,5 +400,23 @@ ROM_START( galpanicms )
 	ROM_LOAD( "cpu_647_gal16v8.ic7", 0, 1, NO_DUMP )
 ROM_END
 
+void galspanic_ms_state::init_galpanicms()
+{
+	// reorganize graphics into something we can decode with a single pass
+	uint8_t *src = memregion("bgtile")->base();
+	int len = memregion("bgtile")->bytes();
 
-GAME( 1991, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, empty_init, ROT90, "bootleg (Kaenko)", "New Quiz (Modular System bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+	std::vector<uint8_t> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
+			buffer[j] = src[i];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
+
+GAME( 1991, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, init_galpanicms, ROT90, "bootleg (Kaenko)", "New Quiz (Modular System bootleg of Gals Panic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
