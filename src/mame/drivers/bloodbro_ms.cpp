@@ -79,12 +79,13 @@ void bloodbro_ms_state::bloodbrom_map(address_map &map)
 
 	map(0x0e000e, 0x0e000f).nopw();
 
-	map(0x100000, 0x100fff).ram();
 
 	map(0x100000, 0x1003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100400, 0x1007ff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
+	map(0x100800, 0x100fff).ram();
+	map(0x101000, 0x1017ff).ram().share("spriteram");
+	map(0x101800, 0x101fff).ram();
 
-	map(0x101000, 0x101fff).ram().share("spriteram");
 	map(0x102000, 0x102001).nopw();
 
 	map(0x18d000, 0x18dfff).ram();
