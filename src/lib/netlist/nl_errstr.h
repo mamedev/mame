@@ -15,8 +15,6 @@ namespace netlist
 
 	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	static constexpr const char sHINT_NC[] = ".HINT_NC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-	static constexpr const char sPowerGND[] = "GND"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-	static constexpr const char sPowerVCC[] = "VCC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 
 	// nl_base.cpp
 
@@ -27,7 +25,6 @@ namespace netlist
 	PERRMSGV(MF_REMOVE_TERMINAL_1_FROM_NET_2,       2, "Can not remove terminal {1} from net {2}.")
 	PERRMSGV(MF_UNKNOWN_PARAM_TYPE,                 1, "Can not determine param_type for {1}")
 	PERRMSGV(MF_ERROR_CONNECTING_1_TO_2,            2, "Error connecting {1} to {2}")
-	PERRMSGV(MF_NO_SOLVER,                          0, "No solver found for this netlist although analog elements are present")
 	PERRMSGV(ME_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
 	PERRMSGV(MW_ROM_NOT_FOUND,                      1, "Rom {1} not found")
 
@@ -121,6 +118,9 @@ namespace netlist
 	PERRMSGV(ME_DEVICE_NOT_FOUND_FOR_HINT,          1, "Device not found for hint {1}")
 	PERRMSGV(ME_UNKNOWN_PARAMETER,                  1, "Unknown parameter {1}")
 	PERRMSGV(MF_ERRORS_FOUND,                       1, "Counted {1} errors which need to be fixed")
+
+	PERRMSGV(MF_NO_SOLVER,                          0, "No solver found for this netlist although analog elements are present")
+	PERRMSGV(MF_DELEGATE_NOT_SET_1,                 1, "delegate not set for terminal {1}")
 
 	// nlid_proxy.cpp
 

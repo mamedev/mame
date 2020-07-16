@@ -70,10 +70,17 @@ namespace analog
 
 	NETLIB_BASE_OBJECT(twoterm)
 	{
-		// FIXME locate use case of owned = true and eliminate them if possible
-		NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
-		, m_P(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "1", &m_N)
-		, m_N(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "2", &m_P)
+		NETLIB_CONSTRUCTOR(twoterm)
+		, m_P(*this, "1", &m_N, NETLIB_DELEGATE(termhandler))
+		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(termhandler))
+		{
+		}
+		//NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
+		template <class C>
+		NETLIB_NAME(twoterm)(C &owner, const pstring &name, nldelegate owner_delegate) \
+				: base_type(owner, name)
+		, m_P(owner, name + ".1", &m_N, owner_delegate)
+		, m_N(owner, name + ".2", &m_P, owner_delegate)
 		{
 		}
 
@@ -83,6 +90,7 @@ namespace analog
 	public:
 
 		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler);
 
 		solver::matrix_solver_t *solver() const noexcept;
 
@@ -196,7 +204,7 @@ namespace analog
 					-G,  G, nlconst::zero());
 		}
 
-		NETLIB_RESETI();
+		//NETLIB_RESETI();
 
 	protected:
 		//NETLIB_UPDATEI();

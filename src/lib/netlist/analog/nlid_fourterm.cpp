@@ -32,6 +32,11 @@ NETLIB_RESET(VCCS)
 
 NETLIB_UPDATE(VCCS)
 {
+	termhandler();
+}
+
+NETLIB_HANDLER(VCCS, termhandler)
+{
 	// only called if connected to a rail net ==> notify the solver to recalculate
 	if (!m_IP.net().is_rail_net())
 		m_IP.solve_now();

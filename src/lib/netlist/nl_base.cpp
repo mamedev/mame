@@ -507,12 +507,6 @@ namespace netlist
 			m_stats = owner.state().make_pool_object<stats_t>();
 	}
 
-	void core_device_t::set_default_delegate(detail::core_terminal_t &term)
-	{
-		if (!term.delegate().is_set())
-			term.set_delegate(nldelegate(&core_device_t::update, this));
-	}
-
 	log_type & core_device_t::log()
 	{
 		return state().log();
@@ -716,8 +710,8 @@ namespace netlist
 	// terminal_t
 	// ----------------------------------------------------------------------------------------
 
-	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm)
-	: analog_t(dev, aname, STATE_BIDIR, nldelegate())
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate)
+	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
@@ -771,8 +765,10 @@ namespace netlist
 
 	logic_input_t::logic_input_t(device_t &dev, const pstring &aname,
 			nldelegate delegate)
-			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate.is_set() ? delegate : dev.default_delegate())
+			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
 	{
+		if (!delegate.is_set())
+			throw nl_exception("delegate not set for {1}", this->name());
 		state().setup().register_term(*this);
 	}
 

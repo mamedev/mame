@@ -33,21 +33,15 @@ namespace analog
 
 	NETLIB_UPDATE(twoterm)
 	{
+		termhandler();
+	}
+
+	NETLIB_HANDLER(twoterm, termhandler)
+	{
 		// only called if connected to a rail net ==> notify the solver to recalculate
+		//printf("%s update\n", this->name().c_str());
 		solve_now();
 	}
-
-	// ----------------------------------------------------------------------------------------
-	// nld_R_base
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_RESET(R_base)
-	{
-		// FIXME: this reset is causing issues. Remove.
-		NETLIB_NAME(twoterm)::reset();
-		set_R(plib::reciprocal(exec().gmin()));
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// nld_POT
 	// ----------------------------------------------------------------------------------------

@@ -836,7 +836,7 @@ namespace netlist
 		/// @param dev core_devict_t object owning the terminal
 		/// @param aname name of this terminal
 		/// @param otherterm pointer to the sibling terminal
-		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm);
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate);
 
 		/// \brief Returns voltage of connected net
 		///
@@ -906,10 +906,6 @@ namespace netlist
 		logic_input_t(device_t &dev, const pstring &aname,
 				nldelegate delegate);
 
-#if 0
-		template <class D>
-		logic_input_t(D &dev, const pstring &aname);
-#endif
 		inline netlist_sig_t operator()() const noexcept;
 
 		void inactivate() noexcept;
@@ -1386,8 +1382,6 @@ namespace netlist
 		// Has to be set in device reset
 		void set_active_outputs(int n) noexcept { m_active_outputs = n; }
 
-		void set_default_delegate(detail::core_terminal_t &term);
-
 		// stats
 		struct stats_t
 		{
@@ -1477,8 +1471,6 @@ namespace netlist
 
 		~device_t() noexcept override = default;
 
-		//nldelegate default_delegate() { return nldelegate(&device_t::update, this); }
-		nldelegate default_delegate() { return { &core_device_t::update, dynamic_cast<core_device_t *>(this) }; }
 	protected:
 
 		//NETLIB_UPDATEI() { }
@@ -2146,14 +2138,6 @@ namespace netlist
 		{
 		}
 
-#if 0
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC,
-			const pstring &sGND)
-		: m_VCC(owner, sVCC, NETLIB_DELEGATE(noop))
-		, m_GND(owner, sGND, NETLIB_DELEGATE(noop))
-		{
-		}
-#endif
 		const analog_input_t &VCC() const noexcept
 		{
 			return m_VCC;

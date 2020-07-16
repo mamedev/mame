@@ -176,9 +176,9 @@ namespace analog
 	{
 		NETLIB_CONSTRUCTOR(QBJT_switch)
 		, m_modacc(m_model)
-		, m_RB(*this, "m_RB", true)
-		, m_RC(*this, "m_RC", true)
-		, m_BC(*this, "m_BC", true)
+		, m_RB(*this, "m_RB", NETLIB_DELEGATE(termhandler))
+		, m_RC(*this, "m_RC", NETLIB_DELEGATE(termhandler))
+		, m_BC(*this, "m_BC", NETLIB_DELEGATE(termhandler))
 		, m_gB(nlconst::cgmin())
 		, m_gC(nlconst::cgmin())
 		, m_V(nlconst::zero())
@@ -194,7 +194,19 @@ namespace analog
 		}
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			termhandler();
+		}
+		NETLIB_HANDLERI(termhandler)
+		{
+			auto *solv(m_RB.solver());
+			if (solv != nullptr)
+				solv->solve_now();
+			else
+				m_RC.solver()->solve_now();
+		}
+
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
@@ -223,9 +235,9 @@ namespace analog
 		, m_modacc(m_model)
 		, m_gD_BC(*this, "m_D_BC")
 		, m_gD_BE(*this, "m_D_BE")
-		, m_D_CB(*this, "m_D_CB", true)
-		, m_D_EB(*this, "m_D_EB", true)
-		, m_D_EC(*this, "m_D_EC", true)
+		, m_D_CB(*this, "m_D_CB", NETLIB_DELEGATE(termhandler))
+		, m_D_EB(*this, "m_D_EB", NETLIB_DELEGATE(termhandler))
+		, m_D_EC(*this, "m_D_EC", NETLIB_DELEGATE(termhandler))
 		, m_alpha_f(0)
 		, m_alpha_r(0)
 		{
@@ -256,7 +268,20 @@ namespace analog
 	protected:
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			termhandler();
+		}
+
+		NETLIB_HANDLERI(termhandler)
+		{
+			auto *solv(m_D_EB.solver());
+			if (solv != nullptr)
+				solv->solve_now();
+			else
+				m_D_CB.solver()->solve_now();
+		}
+
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
@@ -306,16 +331,6 @@ namespace analog
 		m_BC.set_G_V_I(exec().gmin() / nlconst::magic(10.0), zero, zero);
 
 	}
-
-	NETLIB_UPDATE(QBJT_switch)
-	{
-		auto *solv(m_RB.solver());
-		if (solv != nullptr)
-			solv->solve_now();
-		else
-			m_RC.solver()->solve_now();
-	}
-
 
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
@@ -370,15 +385,6 @@ namespace analog
 	// ----------------------------------------------------------------------------------------
 	// nld_Q - Ebers Moll
 	// ----------------------------------------------------------------------------------------
-
-	NETLIB_UPDATE(QBJT_EB)
-	{
-		auto *solv(m_D_EB.solver());
-		if (solv != nullptr)
-			solv->solve_now();
-		else
-			m_D_CB.solver()->solve_now();
-	}
 
 	NETLIB_RESET(QBJT_EB)
 	{
