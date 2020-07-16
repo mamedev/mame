@@ -262,5 +262,5 @@ ROM_START( phasor )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(49036547) SHA1(d98c4d02771e80499c56dd71ad3d07597102f9b7) )
 ROM_END
 
-/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS            INIT         COMPANY          FULLNAME */
-CONS(2010, phasor,   0,      0,      phasor,     empty_input, lft_phasor_state, empty_init, "Linus Ãkesson", "Phasor", MACHINE_IMPERFECT_GRAPHICS)
+/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS            INIT         COMPANY                 FULLNAME */
+CONS(2010, phasor,   0,      0,      phasor,     empty_input, lft_phasor_state, empty_init, "Linus \xc3\xa3kesson", "Phasor", MACHINE_IMPERFECT_GRAPHICS)

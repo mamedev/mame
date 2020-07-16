@@ -92,6 +92,6 @@ ROM_START( hwchiptn )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(bd7bc39f) SHA1(9d0ac37bb3ec8c95990fd37a962a17a95ce97aa0) )
 ROM_END
 
-/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS               INIT        COMPANY          FULLNAME */
-CONS(2007, hwchiptn, 0,      0,      chiptune,   empty_input, lft_chiptune_state, empty_init, "Linus Åkesson / kryo", "The Hardware Chiptune Project", 0)
-CONS(2009, powernin, 0,      0,      chiptune,   empty_input, lft_chiptune_state, empty_init, "Linus Åkesson", "Power Ninja Action Challenge", 0)
+/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS               INIT        COMPANY                 FULLNAME */
+CONS(2007, hwchiptn, 0,      0,      chiptune,   empty_input, lft_chiptune_state, empty_init, "Linus \xc3\xa3kesson / kryo", "The Hardware Chiptune Project", 0)
+CONS(2009, powernin, 0,      0,      chiptune,   empty_input, lft_chiptune_state, empty_init, "Linus \xc3\xa3kesson", "Power Ninja Action Challenge", 0)
