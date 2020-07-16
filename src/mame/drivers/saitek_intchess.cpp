@@ -5,26 +5,34 @@
 
 SciSys Intelligent Chess
 
+Development by Intelligent Games, the same group of people that worked on the
+Super System III and Mark V. The visual interface is an evolution of "Tolinka".
+
 Hardware notes:
 - Synertek 6502A @ ~1.1MHz
 - Synertek 6522 VIA
 - 2*4KB ROM(Synertek 2332), 2KB RAM(4*M5L2114LP)
 - 256 bytes PROM(MMI 6336-1J), 256x4 VRAM(2101-1), RF video
 - MM74C923N keyboard encoder, 20 buttons
-- tape deck with microphone
+- cassette deck with microphone
 - 4-digit 7seg display
 
 TODO:
+- cassette data input doesn't work
+- NMI is from the cassette deck, maybe for mixing microphone input?
 - colors are estimated from photos (black and white are obvious, but the green
   and cyan are not standard 0x00ff00 / 0x00ffff)
 - video timing is unknown, sprite offsets are estimated from photos
+- not sure about "Record" and "Reset" button labels, the rest is correct
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
 #include "machine/6522via.h"
 #include "machine/mm74c922.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
@@ -52,8 +60,11 @@ public:
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_cass(*this, "cassette")
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	void intchess(machine_config &config);
 
@@ -71,12 +82,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<cassette_image_device> m_cass;
 
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
-	void vram_w(offs_t offset, u8 data);
 	void update_display();
 	void seg_w(u8 data);
 	void control_w(u8 data);
@@ -84,6 +95,9 @@ private:
 
 	void init_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vram_w(offs_t offset, u8 data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(cass_input);
 
 	u8 m_select = 0;
 	u8 m_7seg_data = 0;
@@ -94,6 +108,14 @@ void intchess_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));
+}
+
+INPUT_CHANGED_MEMBER(intchess_state::reset_button)
+{
+	// assume that reset button is tied to 6502/6522
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+		m_via->reset();
 }
 
 
@@ -154,41 +176,36 @@ void intchess_state::update_display()
 
 void intchess_state::seg_w(u8 data)
 {
-	//printf("a_%X ",data);
-
 	// PA1-PA7: 7seg data
 	// PA0: ?
 	m_7seg_data = bitswap<8>(~data,0,1,2,3,4,5,6,7);
 	update_display();
-
-
-
 }
-
 
 void intchess_state::control_w(u8 data)
 {
-	//printf("b_%X ",data);
-
 	// PB0-PB3: digit select
 	m_select = data & 0xf;
 	update_display();
 
-	// PB5-PB7 to tape deck
+	// PB5-PB7 to cassette deck
 	// PB5: speaker
-	// PB6: ?
-	// PB7: output
 	m_dac->write(BIT(data, 5));
 
-
-
-	//printf("%d",data>>6&1);
+	// PB6: cassette input?
+	// PB7: cassette output
+	m_cass->output(BIT(data, 7) ? +1.0 : -1.0);
 }
 
 u8 intchess_state::control_r()
 {
 	// PB4: 74C923 data available
 	return m_encoder->da_r() ? 0x10 : 0x00;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(intchess_state::cass_input)
+{
+	m_via->write_pb6((m_cass->input() > +0.04) ? 1 : 0);
 }
 
 
@@ -209,41 +226,48 @@ void intchess_state::main_map(address_map &map)
 
 
 
-
 /******************************************************************************
     Input Ports
 ******************************************************************************/
 
 static INPUT_PORTS_START( intchess )
 	PORT_START("X1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // a1
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // e5
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // level
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // clear?
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // flash
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A 1 / Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E 5 / Queen")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Flash")
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // b2
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // f6
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // newgame?
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // enter
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // zuruck
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B 2 / Knight")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F 6 / King")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // c3
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // g7
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // modus
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F) // check?
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // altern?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C 3 / Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G 7 / White")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Mode")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Find")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Next Best")
 
 	PORT_START("X4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) // d4
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) // h8
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) // speichern?
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // setzen
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_B) // vor
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D 4 / Rook")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H 8 / Black")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Record")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Place")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Step")
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intchess_state, reset_button, 0) PORT_NAME("Reset")
 INPUT_PORTS_END
 
+
+
+/******************************************************************************
+    GFX Layouts
+******************************************************************************/
 
 static const gfx_layout layout_8x8 =
 {
@@ -259,6 +283,7 @@ static const gfx_layout layout_8x8 =
 static GFXDECODE_START( gfx_intchess )
 	GFXDECODE_ENTRY( "gfx", 0, layout_8x8, 0, 2 )
 GFXDECODE_END
+
 
 
 /******************************************************************************
@@ -304,6 +329,12 @@ void intchess_state::intchess(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+
+	// cassette
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	TIMER(config, "cass_input").configure_periodic(FUNC(intchess_state::cass_input), attotime::from_usec(10));
 }
 
 
@@ -330,4 +361,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, intchess, 0,      0, intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 1980, intchess, 0,      0, intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

@@ -9,11 +9,11 @@ It's a portable chesscomputer with sensory board. The MCU says "(C) CAL R & O3",
 though the program is supposedly by David Kittinger?
 
 Hardware notes:
-- Mostek 3875/42 (4KB ROM, 64 bytes executable RAM)
+- Mostek 3875/42 (4KB ROM, 64 bytes extra RAM)
 - buzzer, button sensors chessboard, 16+4 leds
 
-TODO:
-- memory switch? probably a hardware thing to power only the MCU
+MCU interrupts are unused. Its embedded extra RAM is battery-backed via MEM
+switch tied to pin #4 (VSB: RAM standby power).
 
 ******************************************************************************/
 
@@ -22,6 +22,7 @@ TODO:
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/sensorboard.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
@@ -82,10 +83,6 @@ void micro_state::machine_start()
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_control));
 	save_item(NAME(m_inp_mux));
-
-	// game relies on RAM filled with FF at power-on
-	for (int i = 0; i < 0x40; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte(i + 0xfc0, 0xff);
 }
 
 
@@ -163,7 +160,7 @@ void micro_state::main_map(address_map &map)
 {
 	map.global_mask(0xfff);
 	map(0x0000, 0x0fbf).rom();
-	map(0x0fc0, 0x0fff).ram();
+	map(0x0fc0, 0x0fff).ram().share("nvram");
 }
 
 void micro_state::main_io(address_map &map)
@@ -200,7 +197,7 @@ INPUT_PORTS_END
 void micro_state::micro(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // approximation
+	F8(config, m_maincpu, 4500000/2); // matches video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &micro_state::main_io);
 
@@ -209,9 +206,12 @@ void micro_state::micro(machine_config &config)
 	psu.write_a().set(FUNC(micro_state::control_w));
 	psu.write_b().set(FUNC(micro_state::led_w));
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 6);
