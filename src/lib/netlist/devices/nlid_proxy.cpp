@@ -89,10 +89,6 @@ namespace netlist
 	{
 	}
 
-	NETLIB_RESET(a_to_d_proxy)
-	{
-	}
-
 	NETLIB_HANDLER(a_to_d_proxy, input)
 	{
 		const auto v(m_I.Q_Analog());

@@ -176,8 +176,8 @@ namespace netlist
 			// register_subalias("13", ); -. NC
 			register_subalias("14", "A.CLKA");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7493) A;
 	};

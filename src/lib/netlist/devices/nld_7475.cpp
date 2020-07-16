@@ -178,8 +178,8 @@ namespace netlist
 			register_subalias("15", A.m_Q[1]);
 			register_subalias("16", A.m_Q[0]);
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7475) A;
 	};
@@ -205,8 +205,8 @@ namespace netlist
 			register_subalias("13", A.m_Q[1]);
 			register_subalias("14", A.m_Q[0]);
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7477) A;
 	};

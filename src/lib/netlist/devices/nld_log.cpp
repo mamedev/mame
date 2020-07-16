@@ -142,7 +142,7 @@ namespace netlist
 			log_value(static_cast<nl_fptype>(m_I() - m_I2()));
 		}
 
-		NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 		analog_input_t m_I2;
 	};
 

@@ -89,7 +89,7 @@ namespace netlist
 			register_subalias("VSS", "sub.VSS");
 		}
 
-		NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 
 		NETLIB_HANDLERI(inputs)
 		{

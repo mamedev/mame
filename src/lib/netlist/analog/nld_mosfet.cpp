@@ -162,7 +162,7 @@ namespace analog
 		NETLIB_IS_DYNAMIC(true)
 
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 
 		q_type qtype() const noexcept { return m_qtype; }
 		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }

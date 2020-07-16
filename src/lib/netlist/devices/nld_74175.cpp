@@ -119,8 +119,8 @@ namespace netlist
 			register_subalias("8",  "A.GND");
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74175) A;
 	};

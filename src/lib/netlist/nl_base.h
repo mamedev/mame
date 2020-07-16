@@ -1441,7 +1441,7 @@ namespace netlist
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
 	protected:
 
-		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
@@ -1473,7 +1473,7 @@ namespace netlist
 
 	protected:
 
-		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:

@@ -69,7 +69,7 @@ namespace devices
 		}
 
 	protected:
-		NETLIB_RESETI();
+		//NETLIB_RESETI();
 		NETLIB_UPDATEI()
 		{
 			input();

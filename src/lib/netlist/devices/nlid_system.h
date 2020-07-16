@@ -33,8 +33,8 @@ namespace devices
 		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
-		//NETLIB_UPDATEI() { }
-		//NETLIB_RESETI() { }
+		//NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 		//NETLIB_UPDATE_PARAMI() { }
 	public:
 		param_logic_t m_use_deactivate;
@@ -261,7 +261,7 @@ namespace devices
 		{
 		}
 
-		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 		NETLIB_RESETI() { m_Q.initial(0); }
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -286,7 +286,7 @@ namespace devices
 		{
 		}
 
-		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 		NETLIB_RESETI() { for (auto &q : m_Q) q.initial(0); }
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -310,7 +310,7 @@ namespace devices
 		{
 		}
 
-		//NETLIB_UPDATEI() {  }
+		//NETLIB_UPDATEI() {}
 		NETLIB_RESETI() { m_Q.initial(nlconst::zero()); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 
@@ -330,13 +330,13 @@ namespace devices
 		{
 		}
 
-		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 		NETLIB_UPDATE_PARAMI()
 		{
 			m_Q.push(nlconst::zero());
 		}
 
-		//NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 	protected:
 		analog_output_t m_Q;
 	};
@@ -354,8 +354,8 @@ namespace devices
 		}
 
 	protected:
-		//NETLIB_RESETI() { }
-		//NETLIB_UPDATEI() { }
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 
 	private:
 		NETLIB_HANDLERI(noop)

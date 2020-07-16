@@ -105,8 +105,8 @@ namespace netlist
 			register_subalias("9",     "A.GND");
 
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(2102A) A;
 	};

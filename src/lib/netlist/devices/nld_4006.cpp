@@ -95,7 +95,7 @@ namespace netlist
 			register_subalias("14", "A.VDD");
 
 		}
-		NETLIB_UPDATEI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(CD4006) A;
 	};

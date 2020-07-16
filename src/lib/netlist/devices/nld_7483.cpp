@@ -120,8 +120,8 @@ namespace netlist
 			register_subalias("15", A.m_S4);
 			register_subalias("16", A.m_B4);
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7483) A;
 	};

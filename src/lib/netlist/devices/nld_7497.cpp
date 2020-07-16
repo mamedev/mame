@@ -169,8 +169,8 @@ namespace netlist
 			register_subalias("15", A.m_B[2]); // B3
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7497) A;
 	};

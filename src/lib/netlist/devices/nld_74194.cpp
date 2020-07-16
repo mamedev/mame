@@ -123,8 +123,8 @@ namespace netlist
 			register_subalias("16", "VCC");
 
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74194) A;
 	};

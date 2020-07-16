@@ -340,6 +340,8 @@ namespace netlist
 				for (auto &dev : m_devices)
 					if (!plib::container::contains(d, dev.second.get()))
 					{
+						// FIXME: doesn't seem to be needed, use cases include
+						// analog output devices. Check and remove
 						log().verbose("\t ...{1}", dev.second->name());
 						dev.second->update();
 					}

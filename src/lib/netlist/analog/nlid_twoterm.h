@@ -32,7 +32,7 @@
 ///  current source. This is suitable to model voltage sources, current sources,
 ///  resistors, capacitors, inductances and diodes.
 ///
-////
+//
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
@@ -85,7 +85,7 @@ namespace analog
 		}
 
 		//NETLIB_UPDATE_TERMINALSI() { }
-		//NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 
 	public:
 
@@ -221,7 +221,7 @@ namespace analog
 
 	protected:
 
-		//NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 		NETLIB_RESETI()
 		{
 			set_R(std::max(m_R(), exec().gmin()));

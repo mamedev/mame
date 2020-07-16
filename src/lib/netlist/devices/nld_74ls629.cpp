@@ -227,7 +227,7 @@ namespace netlist
 			register_subalias("14",  m_B.m_RNG);
 		}
 
-		NETLIB_UPDATEI() { }
+		//NETLIB_UPDATEI() {}
 
 		NETLIB_RESETI()
 		{

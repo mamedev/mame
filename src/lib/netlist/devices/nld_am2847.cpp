@@ -147,8 +147,8 @@ namespace netlist
 			register_subalias("15", A.m_D.m_IN);
 			register_subalias("16", "A.VSS");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(AM2847) A;
 	};

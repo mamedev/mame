@@ -103,8 +103,8 @@ namespace netlist
 			connect("A.GND", "B.GND");
 			connect("A.VCC", "B.VCC");
 		}
-		NETLIB_UPDATEI() { }
-		NETLIB_RESETI() { }
+		//NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 
 	private:
 		NETLIB_SUB(74393) m_A;

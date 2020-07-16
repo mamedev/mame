@@ -128,8 +128,8 @@ namespace netlist
 			register_subalias("15", A.m_SH_LDQ);
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74166) A;
 	};

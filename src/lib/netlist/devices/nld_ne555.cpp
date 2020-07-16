@@ -214,7 +214,7 @@ namespace netlist
 		// The reset on R_Base executed after NE555 reset will
 		// overwrite values.
 		NETLIB_RESETI() { A.reset(); }
-		NETLIB_UPDATEI() {  }
+		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(NE555) A;
 	};
