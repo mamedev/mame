@@ -172,6 +172,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "logitek.h"
 #include "protek.h"
 #include "sdi.h"
+#include "sixword.h"
 #include "specdrum.h"
 #include "speccydos.h"
 #include "uslot.h"
@@ -210,6 +211,8 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("sdi", SPECTRUM_SDI);
 	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
+	device.option_add("swiftdisc", SPECTRUM_SWIFTDISC);
+	device.option_add("swiftdisc2", SPECTRUM_SWIFTDISC2);
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
 	device.option_add("uspeech", SPECTRUM_USPEECH);
@@ -232,6 +235,8 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
+	device.option_add("swiftdisc", SPECTRUM_SWIFTDISC);
+	device.option_add("swiftdisc2", SPECTRUM_SWIFTDISC2);
 	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 

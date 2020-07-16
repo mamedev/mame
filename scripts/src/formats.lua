@@ -1735,6 +1735,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/swd_dsk.h,FORMATS["SWD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SWD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/swd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/swd_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/tandy2k_dsk.h,FORMATS["TANDY2K_DSK"] = true
 --------------------------------------------------
 
