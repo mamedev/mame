@@ -39,6 +39,7 @@ public:
 	bloodbro_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode")
@@ -52,6 +53,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -78,6 +80,10 @@ void bloodbro_ms_state::bloodbrom_map(address_map &map)
 	map(0x0e000e, 0x0e000f).nopw();
 
 	map(0x100000, 0x100fff).ram();
+
+	map(0x100000, 0x1003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100400, 0x1007ff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
+
 	map(0x101000, 0x101fff).ram().share("spriteram");
 	map(0x102000, 0x102001).nopw();
 
@@ -154,7 +160,7 @@ static const gfx_layout tiles8x8x4_layout =
 */
 
 static GFXDECODE_START( gfx_bloodbro_ms )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 32 )
 GFXDECODE_END
@@ -181,7 +187,7 @@ void bloodbro_ms_state::bloodbrom(machine_config &config)
 	m_screen->set_screen_update(FUNC(bloodbro_ms_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x400);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bloodbro_ms);
 
@@ -264,6 +270,11 @@ ROM_START( bloodbrom )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b4.ic14",  0x00000, 0x20000, CRC(6b5254fa) SHA1(1e9e3096e5f29554fb8f8cb0df0e5157f940f8c9) )
 	
 	// ROMs for frontmost tile layer (text) are missing?
+	ROM_REGION( 0x80000, "gfx3", 0 ) // on another MOD 4/3 board
+	ROM_LOAD32_BYTE( "text.ic17",  0x00003, 0x20000, NO_DUMP )
+	ROM_LOAD32_BYTE( "text.ic16",  0x00002, 0x20000, NO_DUMP )
+	ROM_LOAD32_BYTE( "text.ic15",  0x00001, 0x20000, NO_DUMP )
+	ROM_LOAD32_BYTE( "text.ic14",  0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT ) // on MOD 51/1 board
 	ROM_LOAD32_BYTE( "51-1-b_bb503.ic3",   0x00003, 0x10000, CRC(9d2a382d) SHA1(734b495ace73f07c622f64b305dafe43099395c1) )
