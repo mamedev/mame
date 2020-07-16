@@ -95,7 +95,7 @@ const tiny_rom_entry *bbc_tube_z80_device::device_rom_region() const
 	return ROM_NAME( tube_z80 );
 }
 
-const tiny_rom_entry* bbc_tube_z80w_device::device_rom_region() const
+const tiny_rom_entry *bbc_tube_z80w_device::device_rom_region() const
 {
 	return ROM_NAME( tube_z80w );
 }
@@ -108,7 +108,7 @@ const tiny_rom_entry* bbc_tube_z80w_device::device_rom_region() const
 //  bbc_tube_z80_device - constructor
 //-------------------------------------------------
 
-bbc_tube_z80_device::bbc_tube_z80_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_z80(*this, "z80")
@@ -118,12 +118,12 @@ bbc_tube_z80_device::bbc_tube_z80_device(const machine_config& mconfig, device_t
 {
 }
 
-bbc_tube_z80_device::bbc_tube_z80_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80, tag, owner, clock)
 {
 }
 
-bbc_tube_z80w_device::bbc_tube_z80w_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_tube_z80w_device::bbc_tube_z80w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80W, tag, owner, clock)
 {
 }
@@ -135,9 +135,10 @@ bbc_tube_z80w_device::bbc_tube_z80w_device(const machine_config& mconfig, const 
 void bbc_tube_z80_device::device_start()
 {
 	m_ram = std::make_unique<uint8_t[]>(0x10000);
+	memset(m_ram.get(), 0xff, 0x10000);
 
 	/* register for save states */
-	save_pointer(NAME(m_ram), 0x100000);
+	save_pointer(NAME(m_ram), 0x10000);
 }
 
 //-------------------------------------------------
