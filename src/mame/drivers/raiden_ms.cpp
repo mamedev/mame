@@ -44,7 +44,9 @@ public:
 		m_screen(*this, "screen"),
 		m_ym1(*this, "ym1"),
 		m_ym2(*this, "ym2"),
-		m_msm(*this, "msm5205")
+		m_msm(*this, "msm5205"),
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void raidenm(machine_config &config);
@@ -61,6 +63,8 @@ private:
 	required_device<ym2203_device> m_ym1;
 	required_device<ym2203_device> m_ym2;
 	required_device<msm5205_device> m_msm;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -93,7 +97,7 @@ void raiden_ms_state::raidenm_map(address_map &map)
 	
 
 	map(0x0c000, 0x0cfff).ram();
-	map(0x0d800, 0x0dfff).ram();
+	map(0x0d800, 0x0dfff).ram().share("spriteram");
 
 	map(0xa0000, 0xfffff).rom();
 }
@@ -133,6 +137,37 @@ void raiden_ms_state::machine_start()
 
 uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
+	// TODO, convert to device, share between Modualar System games
+	const int NUM_SPRITES = 0x400;
+	const int X_EXTRA_OFFSET = 0;
+
+	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+
+		uint16_t attr0 = m_spriteram[i + 0];
+		uint16_t attr1 = m_spriteram[i + 1];
+
+		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES + 1]; // unused?
+
+		int ypos = attr0 & 0x00ff;
+		int xpos = (attr1 & 0xff00)>>8;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000; 
+
+		ypos = (0xff - ypos);
+
+		int tile = (attr0 & 0xff00) >> 8;
+		tile |= (attr1 & 0x003f) << 8;
+
+		int flipx = (attr1 & 0x0040);
+		int flipy = (attr2 & 0x4000);
+
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
+	}
+
 	return 0;
 }
 
