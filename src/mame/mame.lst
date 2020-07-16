@@ -19366,6 +19366,9 @@ hwchiptn                        // The Hardware Chiptune Project, by [lft] and k
 @source:lft_craft.cpp
 craft                           // Craft, by [lft] (2008)
 
+@source:lft_phasor.cpp
+phasor                          // Phasor, by [lft] (2010)
+
 @source:lg-dvd.cpp
 lggp40                          //
 

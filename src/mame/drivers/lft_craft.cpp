@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
- ATmega88-based demo platform by Linus Ã…kesson
+ Craft, an ATmega88-based demo by Linus Ãkesson
 
 **********************************************************************/
 
@@ -243,4 +243,4 @@ ROM_START( craft )
 ROM_END
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS            INIT        COMPANY          FULLNAME */
-CONS(2008, craft,    0,      0,      craft,      empty_input, lft_craft_state, empty_init, "Linus Ã…kesson", "Craft", MACHINE_IMPERFECT_GRAPHICS)
+CONS(2008, craft,    0,      0,      craft,      empty_input, lft_craft_state, empty_init, "Linus Ãkesson", "Craft", MACHINE_IMPERFECT_GRAPHICS)

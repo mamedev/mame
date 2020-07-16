@@ -1376,9 +1376,8 @@ inline void avr8_device::timer1_tick()
 
 	static const uint8_t s_ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
 	static const uint8_t s_int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
+	const uint16_t icr1 = AVR8_ICR1;
 	int32_t increment = m_timer_increment[1];
-
-	LOGMASKED(LOG_TIMER1_TICK, "%s: AVR8_WGM1: %d\n", machine().describe_context(), AVR8_WGM1);
 
 	for (int32_t reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
 	{
@@ -1484,9 +1483,78 @@ inline void avr8_device::timer1_tick()
 					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
 					break;
 				}
+			}
+			break;
 
-				m_r[AVR8_REGIDX_TIFR1] &= ~s_ocf1[reg];
+		case WGM1_FAST_PWM_ICR:
+			if (m_timer1_count == m_ocr1[reg])
+			{
+				switch (m_timer1_compare_mode[reg] & 3)
+				{
+				case 0: /* Normal Operation; OC1A/B disconnected */
+					break;
+
+				case 1: /* Toggle OC1A on compare match */
+					if (reg == 0)
+					{
+						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
+						m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) ^ (2 << reg));
+					}
+					break;
+
+				case 2: /* Clear OC1A/B on compare match */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
+					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
+					break;
+
+				case 3: /* Set OC1A/B on compare match */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
+					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) | (2 << reg));
+					break;
+				}
+
+				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
 				update_interrupt(s_int1[reg]);
+			}
+			else if (m_timer1_count == 0)
+			{
+				if (reg == 0)
+				{
+					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
+					update_interrupt(AVR8_INTIDX_TOV1);
+				}
+
+				switch (m_timer1_compare_mode[reg] & 3)
+				{
+				case 0: /* Normal Operation; OC1A/B disconnected */
+					break;
+
+				case 1: /* Toggle OC1A at BOTTOM*/
+					if (reg == 0)
+					{
+						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1A at BOTTOM\n", machine().describe_context());
+						m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) ^ (2 << reg));
+					}
+					break;
+
+				case 2: /* Set OC1A/B at BOTTOM*/
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c at BOTTOM\n", machine().describe_context(), reg ? 'B' : 'A');
+					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) | (2 << reg));
+					break;
+
+				case 3: /* Clear OC1A/B at BOTTOM */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c at BOTTOM\n", machine().describe_context(), reg ? 'B' : 'A');
+					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
+					break;
+				}
+			}
+
+			if (m_timer1_count == icr1 && reg == 1)
+			{
+				m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
+				update_interrupt(AVR8_INTIDX_TOV1);
+				m_timer1_count = 0;
+				increment = 0;
 			}
 			break;
 
