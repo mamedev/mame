@@ -1444,38 +1444,55 @@ ROM_START( upyoural )
 ROM_END
 
 
+/*
+For Danger Zone, the label format is:
+------------------------
+|(C)1986 Cinematronics | -> Copyright & Manufacturer
+|P/N 03-13823-00       | -> Part number with revision
+|DANGER ZONE      U012 | -> Game name & ROM PCB location
+------------------------
+
+NOTE: Only top board program ROMs were "03-" all other part numbers were "02-"
+
+For Danger Zone revision 2, only 13823 changed: it's label format is:
+------------------------
+|(C)1987Leland Corp.   | -> Copyright & Manufacturer
+|P/N 03-13823-02       | -> Part number with revision
+|D-ZONE chk=0208  U012t| -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( dangerz )
 	ROM_REGION( 0x20000, "master", 0 )
-	ROM_LOAD( "13823.12t",   0x00000, 0x10000, CRC(31604634) SHA1(0b3d4fea91faf41519888954a21a82827eae6e2a) )
-	ROM_LOAD( "13824.13t",   0x10000, 0x10000, CRC(381026c6) SHA1(16c810d162789154e3b5ad38545855370f73b679) )
+	ROM_LOAD( "03-13823-02.u012t",   0x00000, 0x10000, CRC(31604634) SHA1(0b3d4fea91faf41519888954a21a82827eae6e2a) ) /* This ROM's checksum is 0208 */
+	ROM_LOAD( "03-13824-00.u013",    0x10000, 0x10000, CRC(381026c6) SHA1(16c810d162789154e3b5ad38545855370f73b679) ) /* 2 PCBs verified as U013 and not "U013T" */
 
 	ROM_REGION( 0x28000, "slave", 0 )
-	ROM_LOAD( "13818.3",   0x00000, 0x04000, CRC(71863c5b) SHA1(18fdae631d0990815b07934d9cce73a41df9152f) )
-	ROM_LOAD( "13817.4",   0x10000, 0x02000, CRC(924bead3) SHA1(ba8dd39db9992b426968e5584c94a8b5ed7c0535) )
-	ROM_CONTINUE(          0x1c000, 0x02000 )
-	ROM_LOAD( "13818.5",   0x12000, 0x02000, CRC(403bdfea) SHA1(71b959c674e7583670e638ebbd44c75784f565c8) )
-	ROM_CONTINUE(          0x1e000, 0x02000 )
-	ROM_LOAD( "13819.6",   0x14000, 0x02000, CRC(1fee5f10) SHA1(0aee1e139e13528ec328a8a949f576bfca1892a1) )
-	ROM_CONTINUE(          0x20000, 0x02000 )
-	ROM_LOAD( "13820.7",   0x16000, 0x02000, CRC(42657a1e) SHA1(d5bb6b6a4bc121fea39809b3b2c891345b12f4d7) )
-	ROM_CONTINUE(          0x22000, 0x02000 )
-	ROM_LOAD( "13821.8",   0x18000, 0x02000, CRC(92f3e006) SHA1(134a2412ddc700473b70aec6331b1a65db3c7e29) )
-	ROM_CONTINUE(          0x24000, 0x02000 )
+	ROM_LOAD( "02-13816-00.u003",   0x00000, 0x04000, CRC(71863c5b) SHA1(18fdae631d0990815b07934d9cce73a41df9152f) ) /* part numbers here down start with "02", unlike the program ROMs */
+	ROM_LOAD( "02-13817-00.u004",   0x10000, 0x02000, CRC(924bead3) SHA1(ba8dd39db9992b426968e5584c94a8b5ed7c0535) )
+	ROM_CONTINUE(                   0x1c000, 0x02000 )
+	ROM_LOAD( "02-13818-00.u005",   0x12000, 0x02000, CRC(403bdfea) SHA1(71b959c674e7583670e638ebbd44c75784f565c8) )
+	ROM_CONTINUE(                   0x1e000, 0x02000 )
+	ROM_LOAD( "02-13819-00.u006",   0x14000, 0x02000, CRC(1fee5f10) SHA1(0aee1e139e13528ec328a8a949f576bfca1892a1) )
+	ROM_CONTINUE(                   0x20000, 0x02000 )
+	ROM_LOAD( "02-13820-00.u007",   0x16000, 0x02000, CRC(42657a1e) SHA1(d5bb6b6a4bc121fea39809b3b2c891345b12f4d7) )
+	ROM_CONTINUE(                   0x22000, 0x02000 )
+	ROM_LOAD( "02-13821-00.u008",   0x18000, 0x02000, CRC(92f3e006) SHA1(134a2412ddc700473b70aec6331b1a65db3c7e29) )
+	ROM_CONTINUE(                   0x24000, 0x02000 )
 
 	ROM_REGION( 0x0c000, "bg_gfx", 0 )
-	ROM_LOAD( "13801.93", 0x00000, 0x04000, CRC(f9ff55ec) SHA1(2eab55b3708def97f22a1f13d1faa0bfe19c18e9) )
-	ROM_LOAD( "13802.94", 0x04000, 0x04000, CRC(d4adbcbb) SHA1(dfd427d5a0db309cc7e056857c3b63a1b6e7769b) )
-	ROM_LOAD( "13803.95", 0x08000, 0x04000, CRC(9178ed76) SHA1(f05568eea53c38f46b16217e63b73194d3a3c500) )
+	ROM_LOAD( "02-13801-00.u093", 0x00000, 0x04000, CRC(f9ff55ec) SHA1(2eab55b3708def97f22a1f13d1faa0bfe19c18e9) )
+	ROM_LOAD( "02-13802-00.u094", 0x04000, 0x04000, CRC(d4adbcbb) SHA1(dfd427d5a0db309cc7e056857c3b63a1b6e7769b) )
+	ROM_LOAD( "02-13803-00.u095", 0x08000, 0x04000, CRC(9178ed76) SHA1(f05568eea53c38f46b16217e63b73194d3a3c500) )
 
 	ROM_REGION( 0x20000, "bg_prom", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
-	ROM_LOAD( "13809.70",  0x00000, 0x4000, CRC(e44eb9f5) SHA1(f15e4262eb96989cbd13a4cbf0b4a0ab390005aa) )
-	ROM_LOAD( "13804.92",  0x04000, 0x4000, CRC(6c23f1a5) SHA1(0de32ba7b5796bfe37b142fb892beb223f27c381) )
-	ROM_LOAD( "13805.69",  0x08000, 0x4000, CRC(e9c9f38b) SHA1(6a03cf9ab4d06f05d4fb846f14eab22467c79661) )
-	ROM_LOAD( "13808.91",  0x0c000, 0x4000, CRC(035534ad) SHA1(e4759992c479d039d6810f129fa2267e0e9527a2) )
-	ROM_LOAD( "13806.68",  0x10000, 0x4000, CRC(2dbd64d2) SHA1(eaa015c92daa9562f58e5ed1d153ecd3f1403546) )
-	ROM_LOAD( "13808.90",  0x14000, 0x4000, CRC(d5b4985d) SHA1(d9a5e331f6cf9b4abf9f5d739fadf0d6216fe994) )
-	ROM_LOAD( "13822.67",  0x18000, 0x4000, CRC(00ff3033) SHA1(ca183f28cb4732ebfc41b6c1651405fee28a9ec6) )
-	ROM_LOAD( "13810.89",  0x1c000, 0x4000, CRC(4f645973) SHA1(94bf12db53dc08eb917c17f1ba0d5a40922ff22c) )
+	ROM_LOAD( "02-13809-00.u070",  0x00000, 0x4000, CRC(e44eb9f5) SHA1(f15e4262eb96989cbd13a4cbf0b4a0ab390005aa) )
+	ROM_LOAD( "02-13804-00.u092",  0x04000, 0x4000, CRC(6c23f1a5) SHA1(0de32ba7b5796bfe37b142fb892beb223f27c381) )
+	ROM_LOAD( "02-13805-00.u069",  0x08000, 0x4000, CRC(e9c9f38b) SHA1(6a03cf9ab4d06f05d4fb846f14eab22467c79661) )
+	ROM_LOAD( "02-13808-00.u091",  0x0c000, 0x4000, CRC(035534ad) SHA1(e4759992c479d039d6810f129fa2267e0e9527a2) )
+	ROM_LOAD( "02-13806-00.u068",  0x10000, 0x4000, CRC(2dbd64d2) SHA1(eaa015c92daa9562f58e5ed1d153ecd3f1403546) )
+	ROM_LOAD( "02-13808-00.u090",  0x14000, 0x4000, CRC(d5b4985d) SHA1(d9a5e331f6cf9b4abf9f5d739fadf0d6216fe994) )
+	ROM_LOAD( "02-13822-00.u067",  0x18000, 0x4000, CRC(00ff3033) SHA1(ca183f28cb4732ebfc41b6c1651405fee28a9ec6) )
+	ROM_LOAD( "02-13810-00.u089",  0x1c000, 0x4000, CRC(4f645973) SHA1(94bf12db53dc08eb917c17f1ba0d5a40922ff22c) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-dangerz.bin", 0x0000, 0x0080, CRC(db2c632b) SHA1(0dda0895145ffab414b5ce6af6636176c19659e3) )
@@ -3356,7 +3373,7 @@ GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state, init_alley
 GAME( 1986, upyoural,   alleymas, leland,   upyoural,   leland_state, init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // prototype of Alley Master?
 
 /* odd master banks, small slave banks */
-GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state, init_dangerz,  ROT0,   "Cinematronics", "Danger Zone", 0 )
+GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state, init_dangerz,  ROT0,   "Cinematronics", "Danger Zone (rev 2)", 0 )
 
 /* small master banks + extra top board, small slave banks */
 GAME( 1987, basebal2,   0,        leland,   basebal2,   leland_state, init_basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
