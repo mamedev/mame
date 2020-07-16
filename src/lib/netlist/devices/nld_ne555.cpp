@@ -128,6 +128,10 @@ namespace netlist
 			const nl_fptype vthresh = clamp_hl(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
 			const nl_fptype vtrig = clamp_hl(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4));
 
+			// avoid artificial oscillation due to overshoot compensation when
+			// the control input is used.
+			const auto ovlimit = std::min(m_ovlimit, std::max(0.0, (vthresh - vtrig) / 3.0));
+
 			if (!reset && m_last_reset)
 			{
 				m_ff = false;
@@ -151,7 +155,9 @@ namespace netlist
 			if (m_last_out && !out)
 			{
 				m_overshoot += ((m_THRES() - vthresh)) * 2;
-				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), m_ovlimit);
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
+				//if (this->name() == "IC6_2")
+				//	printf("%f %s %f %f %f\n", exec().time().as_double(), this->name().c_str(), m_overshoot(), m_R2.P()(), m_THRES());
 				m_RDIS.change_state([this]()
 					{
 						m_RDIS.set_R(nlconst::magic(R_ON));
@@ -161,7 +167,7 @@ namespace netlist
 			else if (!m_last_out && out)
 			{
 				m_overshoot += (vtrig - m_TRIG()) * 2;
-				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), m_ovlimit);
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
 				m_RDIS.change_state([this]()
 					{
 						m_RDIS.set_R(nlconst::magic(R_OFF));
