@@ -13,7 +13,7 @@ license:CC0
 	<element name="orange"><rect><color red="0.8" green="0.5" blue="0.05" /></rect></element>
 
 	<element name="hl" defstate="0">
-		<text string=" "/>
+		<rect state="0"><color red="1" green="1" blue="1" /></rect>
 		<rect state="1"><color red="0.8" green="0.8" blue="0.8" /></rect>
 	</element>
 
