@@ -48,7 +48,7 @@ public:
 	{ }
 
 	void raidenm(machine_config &config);
-
+	void init_raidenm();
 
 protected:
 	virtual void machine_start() override;
@@ -70,6 +70,9 @@ private:
 	void raidenm_sound_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+
+	void descramble_16x16tiles(uint8_t* src, int len);
+
 };
 
 
@@ -143,8 +146,8 @@ static const gfx_layout tiles8x8x4_layout =
 static GFXDECODE_START( gfx_raiden_ms )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 32 )
 
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout, 0x000, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 32 )
 GFXDECODE_END
 
@@ -208,6 +211,29 @@ void raiden_ms_state::raidenm(machine_config &config)
 
 }
 
+// reorganize graphics into something we can decode with a single pass
+void raiden_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+{
+	std::vector<uint8_t> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
+			buffer[j] = src[i];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
+void raiden_ms_state::init_raidenm()
+{
+	descramble_16x16tiles(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+}
+
+
+
 ROM_START( raidenm )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // on red board
 	ROM_LOAD16_BYTE( "msraid_6-1-8086-1_rd603.u8",   0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
@@ -265,4 +291,4 @@ ROM_START( raidenm )
 	ROM_LOAD( "msraid_6-1-8086-1_645d_gal16v8.u27", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 199?, raidenm,  raiden,  raidenm,  raidenm,  raiden_ms_state, empty_init, ROT270, "bootleg (Gaelco / Ervisa)", "Raiden (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, raidenm,  raiden,  raidenm,  raidenm,  raiden_ms_state, init_raidenm, ROT270, "bootleg (Gaelco / Ervisa)", "Raiden (Modular System)", MACHINE_IS_SKELETON )
