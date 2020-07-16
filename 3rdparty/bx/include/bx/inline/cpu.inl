@@ -8,9 +8,9 @@
 #endif // BX_CPU_H_HEADER_GUARD
 
 #if BX_COMPILER_MSVC
-#	if BX_PLATFORM_WINRT
+#	if BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && (!BX_CPU_X86))
 #		include <windows.h>
-#	endif // BX_PLATFORM_WINRT
+#	endif // BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && (!BX_CPU_X86))
 
 #	if BX_CPU_X86
 #		include <emmintrin.h> // _mm_fence
@@ -88,16 +88,18 @@ namespace bx
 		asm volatile("":::"memory");
 #endif // BX_COMPILER
 	}
-
+	
 	inline void memoryBarrier()
 	{
-#if BX_PLATFORM_WINRT
-		MemoryBarrier();
-#elif BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC
+#   if BX_CPU_X86
 		_mm_mfence();
+#   else
+		MemoryBarrier();
+#   endif // BX_CPU_X86
 #else
 		__sync_synchronize();
-#endif // BX_COMPILER
+#endif // BX_COMPILER_MSVC
 	}
 
 	template<>
