@@ -88,9 +88,9 @@ namespace netlist
 	NETLIB_OBJECT(CD4066_GATE_DYNAMIC)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4066_GATE_DYNAMIC, "CD4XXX")
-		, m_R(*this, "R", true)
-		, m_DUM1(*this, "_DUM1", true)
-		, m_DUM2(*this, "_DUM2", true)
+		, m_R(*this, "R", NETLIB_DELEGATE(input))
+		, m_DUM1(*this, "_DUM1", NETLIB_DELEGATE(input))
+		, m_DUM2(*this, "_DUM2", NETLIB_DELEGATE(input))
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
 		, m_last(*this, "m_last", false)
 		, m_supply(*this)
