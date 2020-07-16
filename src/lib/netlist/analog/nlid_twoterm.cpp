@@ -43,6 +43,7 @@ namespace analog
 
 	NETLIB_RESET(R_base)
 	{
+		// FIXME: this reset is causing issues. Remove.
 		NETLIB_NAME(twoterm)::reset();
 		set_R(plib::reciprocal(exec().gmin()));
 	}
@@ -135,6 +136,7 @@ namespace analog
 		if (ts_type == timestep_type::FORWARD)
 		{
 			m_last_I = m_I;
+			m_last_G = m_G;
 			// Gpar should support convergence
 			m_I += m_G * deltaV();
 			m_G = step / m_L() + m_gmin;
@@ -142,7 +144,10 @@ namespace analog
 					-m_G,  m_G,  m_I);
 		}
 		else
+		{
 			m_I = m_last_I;
+			m_G = m_last_G;
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------

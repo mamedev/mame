@@ -415,9 +415,10 @@ namespace analog
 		NETLIB_CONSTRUCTOR(L)
 		, m_L(*this, "L", nlconst::magic(1e-6))
 		, m_gmin(nlconst::zero())
-		, m_G(nlconst::zero())
-		, m_I(nlconst::zero())
-		, m_last_I(nlconst::zero())
+		, m_G(*this, "m_G", nlconst::zero())
+		, m_I(*this, "m_I", nlconst::zero())
+		, m_last_I(*this, "m_last_I", nlconst::zero())
+		, m_last_G(*this, "m_last_G", nlconst::zero())
 		{
 			//register_term("1", m_P);
 			//register_term("2", m_N);
@@ -435,9 +436,10 @@ namespace analog
 		param_fp_t m_L;
 
 		nl_fptype m_gmin;
-		nl_fptype m_G;
-		nl_fptype m_I;
-		nl_fptype m_last_I;
+		state_var<nl_fptype> m_G;
+		state_var<nl_fptype> m_I;
+		state_var<nl_fptype> m_last_I;
+		state_var<nl_fptype> m_last_G;
 	};
 
 	/// \brief Class representing the diode model paramers.
