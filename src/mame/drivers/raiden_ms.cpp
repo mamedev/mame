@@ -230,6 +230,7 @@ void raiden_ms_state::init_raidenm()
 {
 	descramble_16x16tiles(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	// gfx3 is 8x8 tiles
 }
 
 
