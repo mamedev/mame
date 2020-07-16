@@ -369,6 +369,8 @@ private:
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data;
+
+	void descramble_16x16tiles(uint8_t* src, int len);
 };
 
 uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
@@ -686,8 +688,6 @@ WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
-
-
 void bigkarnk_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -749,12 +749,10 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void bigkarnk_ms_state::init_bigkarnkm()
-{
-	// reorganize graphics into something we can decode with a single pass
-	uint8_t *src = memregion("bgtile")->base();
-	int len = memregion("bgtile")->bytes();
 
+// reorganize graphics into something we can decode with a single pass
+void bigkarnk_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+{
 	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
@@ -766,6 +764,12 @@ void bigkarnk_ms_state::init_bigkarnkm()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+void bigkarnk_ms_state::init_bigkarnkm()
+{
+	descramble_16x16tiles(memregion("bgtile")->base(), memregion("bgtile")->bytes());
+}
+
 
 void bigkarnk_ms_state::machine_reset()
 {

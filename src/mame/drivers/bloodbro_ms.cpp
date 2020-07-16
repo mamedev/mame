@@ -61,6 +61,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bloodbrom_map(address_map &map);
+
+	void descramble_16x16tiles(uint8_t* src, int len);
 };
 
 
@@ -204,42 +206,27 @@ void bloodbro_ms_state::bloodbrom(machine_config &config)
 	MSM5205(config, "msm", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 }
 
-void bloodbro_ms_state::init_bloodbrom()
+// reorganize graphics into something we can decode with a single pass
+void bloodbro_ms_state::descramble_16x16tiles(uint8_t* src, int len)
 {
+	std::vector<uint8_t> buffer(len);
 	{
-		// reorganize graphics into something we can decode with a single pass
-		uint8_t* src = memregion("gfx1")->base();
-		int len = memregion("gfx1")->bytes();
-
-		std::vector<uint8_t> buffer(len);
+		for (int i = 0; i < len; i++)
 		{
-			for (int i = 0; i < len; i++)
-			{
-				int j = bitswap<20>(i, 19, 18, 17, 16, 15, 12, 11, 10, 9, 8, 7, 6, 5, 14, 13, 4, 3, 2, 1, 0);
-				buffer[j] = src[i];
-			}
-
-			std::copy(buffer.begin(), buffer.end(), &src[0]);
+			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
+			buffer[j] = src[i];
 		}
-	}
 
-	{
-		// reorganize graphics into something we can decode with a single pass
-		uint8_t* src = memregion("gfx2")->base();
-		int len = memregion("gfx2")->bytes();
-
-		std::vector<uint8_t> buffer(len);
-		{
-			for (int i = 0; i < len; i++)
-			{
-				int j = bitswap<20>(i, 19, 18, 17, 16, 15, 12, 11, 10, 9, 8, 7, 6, 5, 14, 13, 4, 3, 2, 1, 0);
-				buffer[j] = src[i];
-			}
-
-			std::copy(buffer.begin(), buffer.end(), &src[0]);
-		}
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+void bloodbro_ms_state::init_bloodbrom()
+{
+	descramble_16x16tiles(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+}
+
 
 
 

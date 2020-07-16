@@ -112,6 +112,7 @@ private:
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data;
 
+	void descramble_16x16tiles(uint8_t* src, int len);
 };
 
 TILE_GET_INFO_MEMBER(galspanic_ms_state::get_tile_info_tilemap2)
@@ -560,12 +561,9 @@ ROM_START( galpanicms )
 	ROM_LOAD( "cpu_647_gal16v8.ic7", 0, 1, NO_DUMP )
 ROM_END
 
-void galspanic_ms_state::init_galpanicms()
+// reorganize graphics into something we can decode with a single pass
+void galspanic_ms_state::descramble_16x16tiles(uint8_t* src, int len)
 {
-	// reorganize graphics into something we can decode with a single pass
-	uint8_t *src = memregion("bgtile")->base();
-	int len = memregion("bgtile")->bytes();
-
 	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
@@ -577,6 +575,12 @@ void galspanic_ms_state::init_galpanicms()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+void galspanic_ms_state::init_galpanicms()
+{
+	descramble_16x16tiles(memregion("bgtile")->base(), memregion("bgtile")->bytes());
+}
+
 
 
 GAME( 1991, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, init_galpanicms, ROT90, "bootleg (Kaenko)", "New Quiz (Modular System bootleg of Gals Panic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -103,6 +103,8 @@ private:
 
 	void subrambank_map(address_map& map);
 	void subrombank_map(address_map& map);
+	
+	void descramble_16x16tiles(uint8_t* src, int len);
 
 };
 
@@ -495,12 +497,9 @@ void splashms_state::splashms(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void splashms_state::init_splashms()
+// reorganize graphics into something we can decode with a single pass
+void splashms_state::descramble_16x16tiles(uint8_t* src, int len)
 {
-	// reorganize graphics into something we can decode with a single pass
-	uint8_t *src = memregion("bgtile")->base();
-	int len = memregion("bgtile")->bytes();
-
 	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
@@ -512,6 +511,13 @@ void splashms_state::init_splashms()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+void splashms_state::init_splashms()
+{
+	descramble_16x16tiles(memregion("bgtile")->base(), memregion("bgtile")->bytes());
+	// fgtile is 8x8 tiles
+}
+
 
 
 ROM_START( splashms )
