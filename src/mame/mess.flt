@@ -279,6 +279,7 @@ evmbug.cpp
 excali64.cpp
 exelv.cpp
 exorciser.cpp
+exorset.cpp
 exorterm.cpp
 exp85.cpp
 facit4440.cpp

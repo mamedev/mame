@@ -13327,6 +13327,9 @@ rhunting                        // bootleg of deathrac
 @source:exorciser.cpp
 exorciser                       // 1975 Motorola
 
+@source:exorset.cpp
+exorset                         // 1979 Motorola
+
 @source:exorterm.cpp
 exorterm155                     // (c) 1979 Motorola
 
