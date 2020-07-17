@@ -2,9 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Nanos
+Nanos
 
-        12/05/2009 Skeleton driver.
+2009-05-12 Skeleton driver.
+
+Status:
+- Waiting for a floppy disk. Need software to proceed.
 
 ****************************************************************************/
 
@@ -13,7 +16,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -32,24 +34,23 @@ public:
 	nanos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pio(*this, "z80pio")
-		, m_pio_0(*this, "z80pio_0")
-		, m_pio_1(*this, "z80pio_1")
-		, m_sio_0(*this, "z80sio_0")
-		, m_sio_1(*this, "z80sio_1")
-		, m_ctc_0(*this, "z80ctc_0")
-		, m_ctc_1(*this, "z80ctc_1")
-		, m_fdc(*this, "upd765")
-		, m_floppy(*this, "upd765:0")
-		, m_key_t(*this, "keyboard_timer")
-		, m_ram(*this, RAM_TAG)
-		, m_region_maincpu(*this, "maincpu")
-		, m_p_chargen(*this, "chargen")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_lines(*this, "LINE%u", 0U)
-		, m_linec(*this, "LINEC")
+		, m_pio(*this, "pio")
+		, m_pio0(*this, "pio0")
+		, m_pio1(*this, "pio1")
+		, m_sio0(*this, "sio0")
+		, m_sio1(*this, "sio1")
+		, m_ctc0(*this, "ctc0")
+		, m_ctc1(*this, "ctc1")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
+		, m_key_t(*this, "keyboard_timer")
+		, m_p_chargen(*this, "chargen")
+		, m_vram(*this, "videoram")
+		, m_io_keyboard(*this, "LINE%u", 0U)
+		, m_io_linec(*this, "LINEC")
 	{ }
 
 	void nanos(machine_config &config);
@@ -80,32 +81,32 @@ private:
 	uint8_t row_number(uint8_t code);
 
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<z80pio_device> m_pio;
-	required_device<z80pio_device> m_pio_0;
-	required_device<z80pio_device> m_pio_1;
-	required_device<z80sio_device> m_sio_0;
-	required_device<z80sio_device> m_sio_1;
-	required_device<z80ctc_device> m_ctc_0;
-	required_device<z80ctc_device> m_ctc_1;
+	required_device<z80pio_device> m_pio0;
+	required_device<z80pio_device> m_pio1;
+	required_device<z80sio_device> m_sio0;
+	required_device<z80sio_device> m_sio1;
+	required_device<z80ctc_device> m_ctc0;
+	required_device<z80ctc_device> m_ctc1;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<timer_device> m_key_t;
-	required_device<ram_device> m_ram;
-	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_ioport_array<7> m_lines;
-	required_ioport m_linec;
+	required_shared_ptr<u8> m_vram;
+	required_ioport_array<7> m_io_keyboard;
+	required_ioport m_io_linec;
 };
 
 
 
 void nanos_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr(m_bank1).bankw(m_bank3);
-	map(0x1000, 0xffff).bankrw(m_bank2);
+	map(0x0000, 0xf7ff).ram().share("mainram");
+	map(0x0000, 0x0fff).bankr(m_bank1);
+	map(0xf800, 0xffff).ram().share("videoram");
 }
 
 void nanos_state::tc_w(uint8_t data)
@@ -137,15 +138,15 @@ WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_config nanos_daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
-	{ "z80pio" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80sio_0" },
-	{ "z80ctc_0" },
-	{ "z80sio_1" },
-	{ "z80ctc_1" },
+	{ "pio" },
+	{ "pio0" },
+	{ "pio1" },
+	{ "sio0" },
+	{ "ctc0" },
+	{ "sio1" },
+	{ "ctc1" },
 	{ nullptr }
 };
 
@@ -157,17 +158,17 @@ void nanos_state::io_map(address_map &map)
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 
 	/* I/O card */
-	map(0x80, 0x83).rw(m_pio_0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x84, 0x87).rw(m_sio_0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x88, 0x8B).rw(m_pio_1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x8C, 0x8F).rw(m_ctc_0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).rw(m_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x84, 0x87).rw(m_sio0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x88, 0x8B).rw(m_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x8C, 0x8F).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* FDC card */
 	map(0x92, 0x92).w(FUNC(nanos_state::tc_w));
 	map(0x94, 0x95).m(m_fdc, FUNC(upd765a_device::map));
 	/* V24+IFSS card */
-	map(0xA0, 0xA3).rw(m_sio_0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0xA4, 0xA7).rw(m_ctc_1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xA0, 0xA3).rw(m_sio0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0xA4, 0xA7).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
 	//map(0xC0, 0xC7)
@@ -278,7 +279,7 @@ uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				if (ra < 8)
 				{
-					uint8_t chr = m_ram->pointer()[0xf800+ x];
+					uint8_t chr = m_vram[x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = m_p_chargen[(chr<<3) | ra ];
@@ -304,9 +305,10 @@ uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint8_t nanos_state::port_a_r()
 {
-	if (m_key_command==0)  {
+	if (m_key_command==0)
 		return m_key_pressed;
-	} else {
+	else
+	{
 		uint8_t retVal = m_last_code;
 		m_last_code = 0;
 		return retVal;
@@ -322,11 +324,8 @@ uint8_t nanos_state::port_b_r()
 void nanos_state::port_b_w(uint8_t data)
 {
 	m_key_command = BIT(data,1);
-	if (BIT(data,7)) {
-		m_bank1->set_base(m_region_maincpu->base());
-	} else {
-		m_bank1->set_base(m_ram->pointer());
-	}
+
+	m_bank1->set_entry(BIT(data,7));
 }
 
 uint8_t nanos_state::row_number(uint8_t code)
@@ -342,64 +341,70 @@ uint8_t nanos_state::row_number(uint8_t code)
 	return 0;
 }
 
+// TODO: clean this up when the machine starts to work.
 TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 {
 	uint8_t key_code = 0;
-	uint8_t shift = m_linec->read() & 0x02 ? 1 : 0;
-	uint8_t ctrl =  m_linec->read() & 0x01 ? 1 : 0;
+	bool shift = BIT(m_io_linec->read(), 1);
+	bool ctrl =  BIT(m_io_linec->read(), 0);
 	m_key_pressed = 0xff;
 	for(int i = 0; i < 7; i++)
 	{
-		uint8_t code = m_lines[i]->read();
+		uint8_t code = m_io_keyboard[i]->read();
 		if (code != 0)
 		{
-			if (i==0 && shift==0) {
+			if (i==0 && !shift)
 				key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-			}
-			if (i==0 && shift==1) {
+
+			if (i==0 && shift)
 				key_code = 0x20 + row_number(code) + 8*i; // for shifted numbers
-			}
-			if (i==1 && shift==0) {
-				if (row_number(code) < 4) {
+
+			if (i==1 && !shift)
+			{
+				if (row_number(code) < 4)
 					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-				} else {
+				else
 					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
-				}
 			}
-			if (i==1 && shift==1) {
-				if (row_number(code) < 4) {
+
+			if (i==1 && shift)
+			{
+				if (row_number(code) < 4)
 					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
-				} else {
+				else
 					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-				}
 			}
-			if (i>=2 && i<=4 && shift==1 && ctrl==0) {
+
+			if (i>=2 && i<=4 && shift && !ctrl)
 				key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
-			}
-			if (i>=2 && i<=4 && shift==0 && ctrl==0) {
+
+			if (i>=2 && i<=4 && !shift && !ctrl)
 				key_code = 0x40 + row_number(code) + (i-2)*8; // for big letters
-			}
-			if (i>=2 && i<=4 && ctrl==1) {
+
+			if (i>=2 && i<=4 && ctrl)
 				key_code = 0x00 + row_number(code) + (i-2)*8; // for CTRL + letters
-			}
-			if (i==5 && shift==1 && ctrl==0) {
-				if (row_number(code)<7) {
+
+			if (i==5 && shift && !ctrl)
+			{
+				if (row_number(code)<7)
 					key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
-				} else {
+				else
 					key_code = 0x40 + row_number(code) + (i-2)*8; // for signs it is switched
-				}
 			}
-			if (i==5 && shift==0 && ctrl==0) {
-				if (row_number(code)<7) {
+
+			if (i==5 && !shift && !ctrl)
+			{
+				if (row_number(code)<7)
 					key_code = 0x40 + row_number(code) + (i-2)*8; // for small letters
-				} else {
+				else
 					key_code = 0x60 + row_number(code) + (i-2)*8; // for signs it is switched
-				}
 			}
-			if (i==5 && shift==0 && ctrl==1) {
+
+			if (i==5 && !shift && ctrl)
 				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
-			}
-			if (i==6) {
+
+			if (i==6)
+			{
 				switch(row_number(code))
 				{
 					case 0: key_code = 0x11; break;
@@ -415,28 +420,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 			m_last_code = key_code;
 		}
 	}
-	if (key_code==0){
+
+	if (key_code==0)
 		m_key_pressed = 0xf7;
-	}
 }
 
 void nanos_state::machine_start()
 {
-	m_key_pressed = 0xff;
+	save_item(NAME(m_key_command));
+	save_item(NAME(m_last_code));
+	save_item(NAME(m_key_pressed));
+
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void nanos_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	space.install_write_bank(0x0000, 0x0fff, "bank3");
-	space.install_write_bank(0x1000, 0xffff, "bank2");
-
-	m_bank1->set_base(m_region_maincpu->base());
-	m_bank2->set_base(m_ram->pointer() + 0x1000);
-	m_bank3->set_base(m_ram->pointer());
-
-	m_floppy->get_device()->mon_w(false);
+	m_bank1->set_entry(1);
+	m_floppy->get_device()->mon_w(0);
+	m_key_pressed = 0xff;
 }
 
 FLOPPY_FORMATS_MEMBER( nanos_state::floppy_formats )
@@ -472,7 +475,7 @@ void nanos_state::nanos(machine_config &config)
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nanos_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &nanos_state::io_map);
-	m_maincpu->set_daisy_config(nanos_daisy_chain);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -487,29 +490,29 @@ void nanos_state::nanos(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
-	Z80CTC(config, m_ctc_0, XTAL(4'000'000));
-	m_ctc_0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc_0->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
-	m_ctc_0->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
-	m_ctc_0->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
+	Z80CTC(config, m_ctc0, XTAL(4'000'000));
+	m_ctc0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc0->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc0->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc0->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
-	Z80CTC(config, m_ctc_1, XTAL(4'000'000));
-	m_ctc_1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc_1->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
-	m_ctc_1->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
-	m_ctc_1->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
+	Z80CTC(config, m_ctc1, XTAL(4'000'000));
+	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc1->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc1->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc1->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
-	Z80PIO(config, m_pio_0, XTAL(4'000'000));
-	m_pio_0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	Z80PIO(config, m_pio0, XTAL(4'000'000));
+	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80PIO(config, m_pio_1, XTAL(4'000'000));
-	m_pio_1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	Z80PIO(config, m_pio1, XTAL(4'000'000));
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO(config, m_sio_0, XTAL(4'000'000));
-	m_sio_0->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
+	Z80SIO(config, m_sio0, XTAL(4'000'000));
+	m_sio0->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
-	Z80SIO(config, m_sio_1, XTAL(4'000'000));
-	m_sio_1->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
+	Z80SIO(config, m_sio1, XTAL(4'000'000));
+	m_sio1->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
 	Z80PIO(config, m_pio, XTAL(4'000'000));
 	m_pio->in_pa_callback().set(FUNC(nanos_state::port_a_r));
@@ -520,15 +523,12 @@ void nanos_state::nanos(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	FLOPPY_CONNECTOR(config, m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats);
 
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K");
-
-	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(24000));
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(240));
 }
 
 /* ROM definition */
 ROM_START( nanos )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "k7634_1.rom", 0x0000, 0x0800, CRC(8e34e6ac) SHA1(fd342f6effe991823c2a310737fbfcba213c4fe3))
 	ROM_LOAD( "k7634_2.rom", 0x0800, 0x0180, CRC(4e01b02b) SHA1(8a279da886555c7470a1afcbb3a99693ea13c237))
 
@@ -539,4 +539,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                                                FULLNAME  FLAGS */
-COMP( 1985, nanos, 0,      0,      nanos,   nanos, nanos_state, empty_init, "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow", "NANOS",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, nanos, 0,      0,      nanos,   nanos, nanos_state, empty_init, "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow", "NANOS",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
