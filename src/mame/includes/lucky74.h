@@ -27,7 +27,7 @@ public:
 	void lucky74(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
@@ -39,21 +39,21 @@ private:
 	void usart_8251_w(uint8_t data);
 	uint8_t copro_sm7831_r();
 	void copro_sm7831_w(uint8_t data);
-	void lucky74_fg_videoram_w(offs_t offset, uint8_t data);
-	void lucky74_fg_colorram_w(offs_t offset, uint8_t data);
-	void lucky74_bg_videoram_w(offs_t offset, uint8_t data);
-	void lucky74_bg_colorram_w(offs_t offset, uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void fg_colorram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void bg_colorram_w(offs_t offset, uint8_t data);
 	void ym2149_portb_w(uint8_t data);
 	void lamps_a_w(uint8_t data);
 	void lamps_b_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void lucky74_palette(palette_device &palette) const;
-	uint32_t screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);
-	void lucky74_map(address_map &map);
-	void lucky74_portmap(address_map &map);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void prg_map(address_map &map);
+	void portmap(address_map &map);
 
 	uint8_t m_ym2149_portb;
 	uint8_t m_usart_8251;
