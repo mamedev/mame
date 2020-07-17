@@ -884,7 +884,7 @@ function toolchain(_buildDir, _subDir)
 			"c++_static",
 			"c++abi",
 			"stdc++",
-			"gcc",
+			"android_support"
 		}
 		buildoptions_c {
 			"-Wno-strict-prototypes",
@@ -931,6 +931,7 @@ function toolchain(_buildDir, _subDir)
 			}
 			links {
 				"unwind",
+				"gcc",
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
