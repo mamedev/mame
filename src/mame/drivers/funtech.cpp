@@ -64,7 +64,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<8> m_lamps;
+	output_finder<6> m_lamps;
 
 	uint8_t m_vreg;
 
@@ -225,32 +225,25 @@ void fun_tech_corp_state::funtech_map(address_map &map)
 
 void fun_tech_corp_state::lamps_w(uint8_t data)
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 6; i++)
 		m_lamps[i] = BIT(data, i);
+
+	// bit 6 (0x40) is set when displaying a hand in poker, but there are only six lamp outputs
+	// bit 7 (0x80) is always set
 }
 
 void fun_tech_corp_state::coins_w(uint8_t data)
 {
 	if (data & 0x01) logerror("coins_w %02x\n", data);
 
-	// 80 = hopper motor?
+	machine().bookkeeping().coin_counter_w(4, BIT(data, 1)); // COUNTER HOPPER
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2)); // COUNTER A (coin A)
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3)); // COUNTER B (keyin B)
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 4)); // COUNTER C (coin C)
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 5)); // COUNTER D (coin D)
+	machine().bookkeeping().coin_counter_w(5, BIT(data, 6)); // COUNTER CREDIT OUT
+
 	m_hopper->motor_w(BIT(data, 7));
-
-	// 40 = ? sometimes
-
-	// 20 = coin 3 counter
-	machine().bookkeeping().coin_counter_w(2, data & 0x20 );
-
-	// 10 = coin 2 counter
-	machine().bookkeeping().coin_counter_w(1, data & 0x10 );
-
-	// 08 = coin 4 counter
-	machine().bookkeeping().coin_counter_w(3, data & 0x08 );
-
-	// 04 = coin 1 counter
-	machine().bookkeeping().coin_counter_w(0, data & 0x04 );
-
-	// 02 = used when hopper is used (coin out counter?)
 }
 
 void fun_tech_corp_state::vreg_w(uint8_t data)
@@ -295,8 +288,8 @@ static INPUT_PORTS_START( funtech )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_NAME("Coin A")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )         PORT_NAME("Coin C")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )         PORT_NAME("Coin D")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1, Take Score, Odds, Left Stop") // manual suggests Double Up and Odds are same line
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4, Double-Up")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1, Take Score, Odds, Left Stop") // shows odds in 8-liner game
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4, Double-Up") // manual suggests this shows odds, but it doesn't
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3, Small, Right Stop")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Hold 2, Big, Center Stop")
 
