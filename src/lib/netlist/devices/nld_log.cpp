@@ -53,11 +53,6 @@ namespace netlist
 			m_write_thread.join();
 		}
 
-		NETLIB_UPDATEI()
-		{
-			input();
-		}
-
 		NETLIB_HANDLERI(input)
 		{
 			log_value(static_cast<nl_fptype>(m_I()));
@@ -130,11 +125,6 @@ namespace netlist
 		, m_I2(*this, "I2", nldelegate(&NETLIB_NAME(logD)::input, this))
 		{
 			m_I.set_delegate(nldelegate(&NETLIB_NAME(logD)::input, this));
-		}
-
-		NETLIB_UPDATEI()
-		{
-			input();
 		}
 
 		NETLIB_HANDLERI(input)

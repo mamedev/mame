@@ -304,9 +304,14 @@ namespace netlist
 		// Currently analog input and logic input also
 		// push their outputs to queue.
 
+		std::vector<core_device_t *> devices_called;
 		log().verbose("Call update_param on all devices:");
 		for (auto & dev : m_devices)
+		{
 			dev.second->update_param();
+			if (!plib::container::contains(devices_called, dev.second.get()))
+				devices_called.push_back(dev.second.get());
+		}
 
 		// Step all devices once !
 		//
@@ -319,55 +324,31 @@ namespace netlist
 		{
 			case 0:
 			{
-				std::vector<core_device_t *> d;
 				std::vector<const nldelegate *> t;
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
 					for (auto & term : n->core_terms())
-						if (term->delegate().has_object())
+					{
+						n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
+						if (!plib::container::contains(t, &term->delegate()))
 						{
-							if (!plib::container::contains(t, &term->delegate()))
-							{
-								t.push_back(&term->delegate());
-								term->run_delegate();
-							}
-							// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-							auto *dev = reinterpret_cast<core_device_t *>(term->delegate().object());
-							if (!plib::container::contains(d, dev))
-								d.push_back(dev);
+							t.push_back(&term->delegate());
+							term->run_delegate();
 						}
+						// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+						auto *dev = reinterpret_cast<core_device_t *>(term->delegate().object());
+						if (!plib::container::contains(devices_called, dev))
+							devices_called.push_back(dev);
+					}
 				log().verbose("Devices not yet updated:");
 				for (auto &dev : m_devices)
-					if (!plib::container::contains(d, dev.second.get()))
+					if (!plib::container::contains(devices_called, dev.second.get()))
 					{
 						// FIXME: doesn't seem to be needed, use cases include
 						// analog output devices. Check and remove
-						log().verbose("\t ...{1}", dev.second->name());
-						dev.second->update();
+						log().error("\t Device {1} not yet updated", dev.second->name());
+						//dev.second->update();
 					}
-			}
-			break;
-			case 1:     // brute force backward
-			{
-				log().verbose("Using brute force backward startup strategy");
-
-				for (auto &n : m_nets)  // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
-					n->update_inputs();
-
-				std::size_t i = m_devices.size();
-				while (i>0)
-					m_devices[--i].second->update();
-
-				for (auto &n : m_nets)  // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
-					n->update_inputs();
-
-			}
-			break;
-			case 2:     // brute force forward
-			{
-				log().verbose("Using brute force forward startup strategy");
-				for (auto &d : m_devices)
-					d.second->update();
 			}
 			break;
 		}

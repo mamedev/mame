@@ -66,11 +66,6 @@ namespace netlist
 
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(74165_dip);
 	private:
 		object_array_t<logic_input_t, 8> m_DATA;
@@ -110,7 +105,6 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74165) A;
 	};

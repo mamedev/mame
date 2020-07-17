@@ -32,11 +32,6 @@ namespace netlist
 			m_last_CLK = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 	public:
 		NETLIB_HANDLERI(inputs)
 		{

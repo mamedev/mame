@@ -35,11 +35,6 @@ namespace netlist
 			m_nextD = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(inputs)
 		{
 			const auto set(m_SET());

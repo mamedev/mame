@@ -177,7 +177,6 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
 #define NETLIB_HANDLERI(name) void name() noexcept
-#define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override
 #define NETLIB_RESETI() virtual void reset() override
 
@@ -185,7 +184,11 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 #define NETLIB_SUB_UPTR(ns, chip) device_arena::unique_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() noexcept
+
+#if 0
+#define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
+#endif
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
@@ -1392,8 +1395,9 @@ namespace netlist
 		};
 
 		stats_t * stats() const noexcept { return m_stats.get(); }
-
+#if 0
 		virtual void update() noexcept { }
+#endif
 		virtual void reset() { }
 
 	protected:
@@ -1441,7 +1445,6 @@ namespace netlist
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
 	protected:
 
-		//NETLIB_UPDATEI() {}
 		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
@@ -1473,7 +1476,6 @@ namespace netlist
 
 	protected:
 
-		//NETLIB_UPDATEI() {}
 		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
@@ -1801,12 +1803,6 @@ namespace netlist
 			NETLIB_UPDATE_PARAMI()
 			{
 				m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-			}
-
-			NETLIB_UPDATEI()
-			{
-				// only called during start up.
-				// mainclock will step forced by main loop
 			}
 
 		public:

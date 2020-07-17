@@ -27,11 +27,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		void update_outputs(unsigned gt, unsigned lt, unsigned eq);
 
 		friend class NETLIB_NAME(7485_dip);
@@ -103,7 +98,6 @@ namespace netlist
 
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7485) A;
 	};

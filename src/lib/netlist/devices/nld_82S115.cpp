@@ -30,10 +30,6 @@ namespace netlist
 		{
 			m_last_O = 0;
 		}
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
 
 		friend class NETLIB_NAME(82S115_dip);
 	private:
@@ -114,7 +110,6 @@ namespace netlist
 			register_subalias("24", "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(82S115) A;
 	};

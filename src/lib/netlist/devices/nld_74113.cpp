@@ -70,11 +70,6 @@ namespace netlist
 			m_QQ.push(m_q ^ 1, NLTIME_FROM_NS(20)); // FIXME: timing
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 	public:
 		logic_input_t m_CLK;
 		logic_input_t m_J;

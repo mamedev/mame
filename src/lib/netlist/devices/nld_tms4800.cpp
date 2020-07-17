@@ -27,11 +27,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(TMS4800_dip);
 	private:
 		// FIXME: timing!
@@ -105,7 +100,6 @@ namespace netlist
 			register_subalias("16",     A.m_D[7]);
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(TMS4800) A;
 

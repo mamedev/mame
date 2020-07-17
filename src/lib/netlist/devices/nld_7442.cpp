@@ -30,11 +30,6 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_RESETI()
 		{
 			m_val = 0;
@@ -99,7 +94,6 @@ namespace devices
 			register_subalias("16", "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7442) A;
 	};

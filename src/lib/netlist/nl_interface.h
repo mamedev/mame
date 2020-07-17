@@ -67,11 +67,6 @@ namespace netlist
 				m_last = 0.0;
 			}
 
-			NETLIB_UPDATEI()
-			{
-				in();
-			}
-
 			NETLIB_HANDLERI(in)
 			{
 				const nl_fptype cur = m_in();
@@ -115,11 +110,6 @@ namespace netlist
 			{
 				const netlist_sig_t cur = m_in();
 				m_func(*this, cur);
-			}
-
-			NETLIB_UPDATEI()
-			{
-				in();
 			}
 
 		private:
@@ -186,11 +176,6 @@ namespace netlist
 				m_pos++;
 
 				m_Q.net().toggle_and_push_to_queue(m_sample_time);
-			}
-
-			NETLIB_UPDATEI()
-			{
-				feedback();
 			}
 
 		public:

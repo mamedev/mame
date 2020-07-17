@@ -57,7 +57,6 @@ namespace analog {
 		param_fp_t m_RI;
 
 	protected:
-		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(termhandler);
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -194,10 +193,6 @@ namespace analog {
 		param_fp_t m_RO;
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			termhandler();
-		}
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_HANDLERI(termhandler)
 		{
@@ -253,10 +248,6 @@ namespace analog {
 		param_fp_t m_RO;
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			termhandler();
-		}
 		//NETLIB_UPDATE_PARAMI();
 
 		NETLIB_HANDLERI(termhandler)

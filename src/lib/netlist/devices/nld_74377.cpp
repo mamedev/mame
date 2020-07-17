@@ -31,10 +31,6 @@ namespace netlist
 		NETLIB_RESETI()
 		{
 		}
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
 
 	private:
 		NETLIB_HANDLERI(inputs)

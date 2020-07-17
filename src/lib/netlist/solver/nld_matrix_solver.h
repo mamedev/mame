@@ -252,12 +252,6 @@ namespace solver
 				m_Q_sync.net().toggle_and_push_to_queue(delay);
 		}
 
-		// netdevice functions
-		NETLIB_UPDATEI()
-		{
-			fb_sync();
-		}
-
 		NETLIB_HANDLERI(fb_sync)
 		{
 			PFDEBUG(printf("update\n");)

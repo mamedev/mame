@@ -38,11 +38,6 @@ namespace netlist
 			m_addr = 0;
 			m_enq = 0;
 		}
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(82S16_dip);
 	private:
 		// FIXME: timing!
@@ -137,7 +132,6 @@ namespace netlist
 			register_subalias("16",    "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(82S16) A;
 	};

@@ -23,11 +23,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 	public:
 		void shift() noexcept
 		{
@@ -97,11 +92,6 @@ namespace netlist
 			m_last_CP = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			cp();
-		}
-
 		friend class NETLIB_NAME(AM2847_dip);
 	private:
 		NETLIB_HANDLERI(cp)
@@ -148,7 +138,6 @@ namespace netlist
 			register_subalias("16", "A.VSS");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(AM2847) A;
 	};

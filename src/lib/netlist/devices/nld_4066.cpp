@@ -46,11 +46,6 @@ namespace netlist
 			m_R.set_R(plib::reciprocal(exec().gmin()));
 		}
 
-		NETLIB_UPDATEI()
-		{
-			control();
-		}
-
 	private:
 		NETLIB_HANDLERI(control)
 		{
@@ -106,10 +101,6 @@ namespace netlist
 		{
 			// Start in off condition
 			// FIXME: is ROFF correct?
-		}
-
-		NETLIB_UPDATEI()
-		{
 		}
 
 		NETLIB_UPDATE_TERMINALSI()

@@ -59,10 +59,6 @@ namespace netlist
 			}
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
 		friend class NETLIB_NAME(CD4006_dip);
 	private:
 		logic_input_t m_CLOCK;
@@ -95,7 +91,6 @@ namespace netlist
 			register_subalias("14", "A.VDD");
 
 		}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(CD4006) A;
 	};

@@ -43,11 +43,6 @@ namespace devices
 
 		solver::static_compile_container create_solver_code(solver::static_compile_target target);
 
-		NETLIB_UPDATEI()
-		{
-			fb_step();
-		}
-
 		NETLIB_RESETI();
 		// NETLIB_UPDATE_PARAMI();
 

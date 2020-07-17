@@ -38,11 +38,6 @@ namespace netlist
 			m_last_Q = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(9334_dip);
 	private:
 		NETLIB_HANDLERI(inputs)
@@ -150,7 +145,6 @@ namespace netlist
 
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(9334) A;
 	};

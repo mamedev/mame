@@ -41,11 +41,6 @@ namespace netlist
 			//m_QQ.initial(1);
 		}
 
-		NETLIB_UPDATEI()
-		{
-			other();
-		}
-
 		NETLIB_HANDLERI(other)
 		{
 			if (!m_clrQ())

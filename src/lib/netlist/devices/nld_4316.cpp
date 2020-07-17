@@ -41,11 +41,6 @@ namespace netlist { namespace devices {
 				, NLTIME_FROM_NS(1));
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 	private:
 		analog::NETLIB_SUB(R_base) m_R;
 

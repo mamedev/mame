@@ -54,11 +54,6 @@ namespace netlist
 			m_last_CD = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(74192_dip);
 	private:
 		logic_input_t m_CLEAR;
@@ -160,7 +155,6 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74192) A;
 	};

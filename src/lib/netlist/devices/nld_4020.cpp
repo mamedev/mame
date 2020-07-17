@@ -37,11 +37,6 @@ namespace netlist
 			update_outputs(m_cnt);
 		}
 
-		NETLIB_UPDATEI()
-		{
-			ip();
-		}
-
 	public:
 		void update_outputs(const unsigned cnt) noexcept
 		{
@@ -104,11 +99,6 @@ namespace netlist
 			}
 			else
 				m_sub.m_IP.activate_hl();
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 	private:

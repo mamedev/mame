@@ -24,11 +24,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 	protected:
 		object_array_t<logic_input_t, 2> m_CEQ;
 		object_array_t<logic_input_t, 2> m_D;
@@ -53,11 +48,6 @@ namespace netlist
 		, m_D(*this, { "D1", "D2", "D3" }, NETLIB_DELEGATE(inputs) )
 		, m_Q(*this, "Q")
 		{
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 	protected:

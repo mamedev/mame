@@ -98,11 +98,6 @@ namespace netlist
 			connect(m_OUT, m_ROUT.N());
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_RESETI()
 		{
 			/* FIXME make resistances a parameter, properly model other variants */
@@ -234,7 +229,6 @@ namespace netlist
 		// The reset on R_Base executed after NE555 reset will
 		// overwrite values.
 		NETLIB_RESETI() { A.reset(); }
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(NE555) A;
 	};

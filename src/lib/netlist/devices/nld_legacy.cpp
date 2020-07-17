@@ -28,11 +28,6 @@ namespace netlist
 			m_QQ.initial(1);
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 	private:
 		NETLIB_HANDLERI(inputs)
 		{
@@ -71,11 +66,6 @@ namespace netlist
 		NETLIB_RESETI()
 		{
 			//m_Q.initial(0);
-		}
-
-		NETLIB_UPDATEI()
-		{
-			input();
 		}
 
 	private:

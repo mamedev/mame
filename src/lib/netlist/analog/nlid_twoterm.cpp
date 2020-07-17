@@ -31,11 +31,6 @@ namespace analog
 			solv->solve_now();
 	}
 
-	NETLIB_UPDATE(twoterm)
-	{
-		termhandler();
-	}
-
 	NETLIB_HANDLER(twoterm, termhandler)
 	{
 		// only called if connected to a rail net ==> notify the solver to recalculate

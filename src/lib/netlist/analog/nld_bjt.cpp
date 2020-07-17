@@ -142,7 +142,6 @@ namespace analog
 		NETLIB_IS_DYNAMIC(true)
 
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI();
 
 		bjt_type qtype() const noexcept { return m_qtype; }
 		bool is_qtype(bjt_type atype) const noexcept { return m_qtype == atype; }
@@ -194,10 +193,6 @@ namespace analog
 		}
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI()
-		{
-			termhandler();
-		}
 		NETLIB_HANDLERI(termhandler)
 		{
 			auto *solv(m_RB.solver());
@@ -268,11 +263,6 @@ namespace analog
 	protected:
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI()
-		{
-			termhandler();
-		}
-
 		NETLIB_HANDLERI(termhandler)
 		{
 			auto *solv(m_D_EB.solver());
@@ -301,15 +291,6 @@ namespace analog
 		NETLIB_SUB_UPTR(analog, C) m_CJC;
 	};
 
-
-	// ----------------------------------------------------------------------------------------
-	// nld_Q
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_UPDATE(QBJT)
-	{
-	//    netlist().solver()->schedule1();
-	}
 
 	// ----------------------------------------------------------------------------------------
 	// nld_QBJT_switch

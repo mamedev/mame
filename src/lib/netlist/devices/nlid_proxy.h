@@ -70,11 +70,6 @@ namespace devices
 
 	protected:
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI()
-		{
-			input();
-		}
-
 	private:
 		NETLIB_HANDLERI(input);
 
@@ -114,10 +109,6 @@ namespace devices
 	protected:
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI()
-		{
-			input();
-		}
 
 	private:
 		NETLIB_HANDLERI(input);

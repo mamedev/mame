@@ -38,11 +38,6 @@ namespace netlist
 			m_nextD = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(clk)
 		{
 			newstate(m_nextD, !m_nextD);

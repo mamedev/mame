@@ -89,7 +89,6 @@ namespace analog
 
 	public:
 
-		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(termhandler);
 
 		solver::matrix_solver_t *solver() const noexcept;
@@ -221,7 +220,6 @@ namespace analog
 
 	protected:
 
-		//NETLIB_UPDATEI() {}
 		NETLIB_RESETI()
 		{
 			set_R(std::max(m_R(), exec().gmin()));

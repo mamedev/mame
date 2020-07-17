@@ -30,10 +30,6 @@ namespace netlist
 		{
 			m_last_Q = 0;
 		}
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
 
 		NETLIB_HANDLERI(inputs)
 		{
@@ -96,11 +92,6 @@ namespace netlist
 		NETLIB_RESETI()
 		{
 			m_last_Q = 0;
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 		NETLIB_HANDLERI(inputs)
@@ -179,7 +170,6 @@ namespace netlist
 			register_subalias("16", A.m_Q[0]);
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7475) A;
 	};
@@ -206,7 +196,6 @@ namespace netlist
 			register_subalias("14", A.m_Q[0]);
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7477) A;
 	};

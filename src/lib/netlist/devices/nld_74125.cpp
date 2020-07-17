@@ -45,11 +45,9 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI()
-		{
-		}
+		//NETLIB_RESETI() {}
 
-		NETLIB_UPDATEI()
+		NETLIB_UPDATE_PARAMI()
 		{
 			// this one is only called during startup. Ensure all outputs
 			// are in a consistent state.

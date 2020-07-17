@@ -48,11 +48,6 @@ namespace netlist
 			m_lastclock = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(noop) { }
 
 		NETLIB_HANDLERI(unity)
@@ -170,7 +165,6 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(7497) A;
 	};

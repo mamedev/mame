@@ -31,11 +31,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(74365_dip);
 	private:
 		NETLIB_HANDLERI(inputs)
@@ -83,7 +78,6 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 		}
 		//NETLIB_RESETI() {}
-		//NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74365) A;
 	};
