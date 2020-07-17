@@ -369,6 +369,8 @@ private:
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data;
+
+	void descramble_16x16tiles(uint8_t* src, int len);
 };
 
 uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
@@ -520,7 +522,9 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
 
+	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
+	const int X_EXTRA_OFFSET = 112;
 
 	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
 	{
@@ -545,7 +549,7 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-112,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
 
 	m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
@@ -640,17 +644,6 @@ static const gfx_layout tiles16x16x4_layout =
 	16 * 16 * 4
 };
 
-static const gfx_layout tiles16x16x4alt_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7, 512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
-	{ STEP8(0,32), STEP8(256,32) },
-	32 * 32
-};
-
 static const gfx_layout tiles8x8x4_layout =
 {
 	8,8,
@@ -664,7 +657,7 @@ static const gfx_layout tiles8x8x4_layout =
 
 
 static GFXDECODE_START( gfx_bigkarnk_ms )
-	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 32 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0, 32 )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles8x8x4_layout, 0, 32 )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
 GFXDECODE_END
@@ -676,9 +669,18 @@ void bigkarnk_ms_state::splash_adpcm_data_w(uint8_t data)
 
 void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
 {
-//	printf("splash_adpcm_control_w %02x\n", data);
 	m_msm->reset_w(BIT(data, 7));
-	m_soundrom->set_bank(data & 0xf);
+
+	int bank = data & 0x7f;
+
+	if ((bank != 0x02) &&
+		(bank != 0x04) && (bank != 0x05) && (bank != 0x06) && (bank != 0x07) &&
+		(bank != 0x0c) && (bank != 0x0d) && (bank != 0x0e) && (bank != 0x0f))
+	{
+		logerror("splash_adpcm_control_w %02x\n", data);
+	}
+
+	m_soundrom->set_bank(bank & 0xf);
 }
 
 WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
@@ -686,8 +688,6 @@ WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
-
-
 void bigkarnk_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -749,12 +749,10 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void bigkarnk_ms_state::init_bigkarnkm()
-{
-	// reorganize graphics into something we can decode with a single pass
-	uint8_t *src = memregion("bgtile")->base();
-	int len = memregion("bgtile")->bytes();
 
+// reorganize graphics into something we can decode with a single pass
+void bigkarnk_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+{
 	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
@@ -766,6 +764,12 @@ void bigkarnk_ms_state::init_bigkarnkm()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+void bigkarnk_ms_state::init_bigkarnkm()
+{
+	descramble_16x16tiles(memregion("bgtile")->base(), memregion("bgtile")->bytes());
+}
+
 
 void bigkarnk_ms_state::machine_reset()
 {
@@ -782,8 +786,9 @@ ROM_START( bigkarnkm )
 	ROM_LOAD16_BYTE( "cpu_ka_6.ic20",  0x040000, 0x020000, CRC(332d6dea) SHA1(cd7e402642f57c12cb7405c49b75bfaa0d104421) )
 
 	ROM_REGION( 0x040000, "soundcpu", 0 )    /* Z80 code (uses YM3812 + M5205) */
-	ROM_LOAD( "snd_ka.ic6",    0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) )
-	ROM_LOAD( "snd_ka.ic11",   0x010000, 0x020000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) )
+	ROM_LOAD( "snd_ka.ic6",    0x000000, 0x010000, CRC(48a66be8) SHA1(0ca8e4ef5b5e257d56afda6946c5f2a0712917a3) ) // 0,1,2,3
+	ROM_LOAD( "snd_ka.ic11",   0x010000, 0x010000, CRC(8e53a6b8) SHA1(5082bbcb042216a6d58c654a52c98d75df700ac8) ) // 4,5,6,7
+	ROM_CONTINUE(0x30000,0x10000) // c,d,e,f
 
 	ROM_REGION( 0x180000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_ka.ic4",         0x080003, 0x020000, CRC(2bee07ea) SHA1(afd8769955314768db894e4e98f65422fc0dbb4f) )

@@ -103,6 +103,8 @@ private:
 
 	void subrambank_map(address_map& map);
 	void subrombank_map(address_map& map);
+	
+	void descramble_16x16tiles(uint8_t* src, int len);
 
 };
 
@@ -200,15 +202,19 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (int i = 0x100-2; i >= 0; i-=2)
+	// TODO, convert to device, share between Modualar System games
+	const int NUM_SPRITES = 0x100;
+	const int X_EXTRA_OFFSET = 64;
+
+	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
 	{
 		gfx_element *gfx = m_gfxdecode->gfx(0);
 
 		uint16_t attr0 = m_spriteram[i + 0];
 		uint16_t attr1 = m_spriteram[i + 1];
 
-		uint16_t attr2 = m_spriteram[i + 0x100];
-		//uint16_t attr3 = m_spriteram[i + 0x101]; // unused?
+		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
 
 		int ypos = attr0 & 0x00ff;
 		int xpos = (attr1 & 0xff00)>>8;
@@ -223,7 +229,7 @@ uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-64,ypos-16,15);
+		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
 	}
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -411,22 +417,11 @@ static const gfx_layout tiles8x8x4_layout =
 	16 * 16
 };
 
-static const gfx_layout tiles16x16x4alt_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7, 512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
-	{ STEP8(0,32), STEP8(256,32) },
-	32 * 32
-};
-
 
 static GFXDECODE_START( gfx_splashms )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "fgtile", 0, tiles8x8x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4alt_layout, 0, 16 )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles16x16x4_layout, 0, 16 )
 GFXDECODE_END
 
 void splashms_state::splash_adpcm_data_w(uint8_t data)
@@ -502,12 +497,9 @@ void splashms_state::splashms(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void splashms_state::init_splashms()
+// reorganize graphics into something we can decode with a single pass
+void splashms_state::descramble_16x16tiles(uint8_t* src, int len)
 {
-	// reorganize graphics into something we can decode with a single pass
-	uint8_t *src = memregion("bgtile")->base();
-	int len = memregion("bgtile")->bytes();
-
 	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
@@ -519,6 +511,13 @@ void splashms_state::init_splashms()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+void splashms_state::init_splashms()
+{
+	descramble_16x16tiles(memregion("bgtile")->base(), memregion("bgtile")->bytes());
+	// fgtile is 8x8 tiles
+}
+
 
 
 ROM_START( splashms )
