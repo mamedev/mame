@@ -192,7 +192,7 @@ void intchess_state::control_w(u8 data)
 	// PB5: speaker
 	m_dac->write(BIT(data, 5));
 
-	// PB6: cassette input?
+	// PB6: ?
 	// PB7: cassette output
 	m_cass->output(BIT(data, 7) ? +1.0 : -1.0);
 }
@@ -205,7 +205,14 @@ u8 intchess_state::control_r()
 
 TIMER_DEVICE_CALLBACK_MEMBER(intchess_state::cass_input)
 {
-	m_via->write_pb6((m_cass->input() > +0.04) ? 1 : 0);
+	static bool nmistate = false;
+	bool state = m_cass->input() < -0.04;
+
+	if (state != nmistate || 1)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+		nmistate = state;
+	}
 }
 
 
