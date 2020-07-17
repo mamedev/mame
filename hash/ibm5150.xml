@@ -6639,6 +6639,137 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcix10">
+		<description>IBM Personal Computer Interactive Executive (PC/IX) 1.00</description>
+		<year>1984</year>
+		<!-- developed by INTERACTIVE Systems Corporation for IBM -->
+		<publisher>IBM</publisher>
+		<!-- Origin: WinWorld -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6261-0"/>
+			<feature name="part_id" value="Maintenance"/>
+			<dataarea name="flop" size="368640">
+				<rom name="01MAINT.IMA" size="368640" crc="d2948105" sha1="eb4f132f0779b8835f41907e5bb29a2225c2c443"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6262-0"/>
+			<feature name="part_id" value="Core 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="02CORE1.IMA" size="368640" crc="a6fc76e0" sha1="dc8d8dd2b041f475547c7326354e33e709d068b6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6263-0"/>
+			<feature name="part_id" value="Core 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="03CORE2.IMA" size="368640" crc="3075f9b8" sha1="c3fad1fe431147c71f12eff73d33bd047cae15c3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6264-0"/>
+			<feature name="part_id" value="Core 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="04CORE3.IMA" size="368640" crc="683c8314" sha1="ecf4f8738dd7f654ea2fa51f363c76c5f84a05d6"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6265-0"/>
+			<feature name="part_id" value="Core 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="05CORE4.IMA" size="368640" crc="dedc1330" sha1="c185b40ac90a344a8c4694f3cdf15425ecc3af4b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6266-0"/>
+			<feature name="part_id" value="Core 5"/>
+			<dataarea name="flop" size="368640">
+				<rom name="06CORE5.IMA" size="368640" crc="45fb7668" sha1="1b92f98f1ed665109ad588814e0859d7df8a7d16"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6267-0"/>
+			<feature name="part_id" value="Core 6"/>
+			<dataarea name="flop" size="368640">
+				<rom name="07CORE6.IMA" size="368640" crc="d4b1fa1e" sha1="bc6437a1410a11c4d12ce5d90dec9abb3ff34103"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6268-0"/>
+			<feature name="part_id" value="Core 7"/>
+			<dataarea name="flop" size="368640">
+				<rom name="08CORE7.IMA" size="368640" crc="d3468cbe" sha1="024bc551f9ef7fafdbec0ab063252b1964acc161"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6269-0"/>
+			<feature name="part_id" value="Core 8"/>
+			<dataarea name="flop" size="368640">
+				<rom name="09CORE8.IMA" size="368640" crc="a9d6d06a" sha1="561f31d65465b851f480d843078ba38e187cd6cc"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="10PROG1.IMA" size="368640" crc="99e1f238" sha1="bd2bf980918c921d9eb7a355e670e68847ff0b6d"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="11PROG2.IMA" size="368640" crc="912bd367" sha1="28400a3f0cd345be0905890bc3cf22ce795e0732"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="12PROG3.IMA" size="368640" crc="7f8d93ee" sha1="f8cfb8be8c3881a80360b4fa8b4fd8134d6b80a2"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="13PROG4.IMA" size="368640" crc="fae2489b" sha1="23bc51d535526732c5f15ed5dc1db394d5cbc209"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Communications"/>
+			<dataarea name="flop" size="368640">
+				<rom name="14COMMS.IMA" size="368640" crc="64ef3326" sha1="b91a4f8152a248405fe2df05ea9fc4d621acfd99"/>
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="SCCS"/>
+			<dataarea name="flop" size="368640">
+				<rom name="15SCCS.IMA" size="368640" crc="b3496c93" sha1="b2f8bbeb17233e2aab6ad77962e39305fe283af1"/>
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="Text Processing"/>
+			<dataarea name="flop" size="368640">
+				<rom name="16TEXT.IMA" size="368640" crc="66969148" sha1="4a603e4b04f9819edfafa5d3e300c88c7fc2f8f9"/>
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="Special Purpose Subset"/>
+			<dataarea name="flop" size="368640">
+				<rom name="17SPECIA.IMA" size="368640" crc="6c10f1fc" sha1="5535e1882f6f42110c4b7da80ec0db15a07f2742"/>
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_5_25">
+			<feature name="part_id" value="Games"/>
+			<dataarea name="flop" size="368640">
+				<rom name="18GAMES.IMA" size="368640" crc="3c0edba6" sha1="23903c58a07c05f821a5b9fcb8dd42b1b587c4e8"/>
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_5_25">
+			<feature name="part_id" value="Accounting"/>
+			<dataarea name="flop" size="368640">
+				<rom name="19ACCNT.IMA" size="368640" crc="52e3229b" sha1="05a3d3bca0b93f139c1708e548d3c1a801c7fc35"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qnxdemo">
 		<description>QNX Demonstration (Apr 17th, 1989)</description>
 		<year>1989</year>
