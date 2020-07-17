@@ -83,14 +83,14 @@ namespace netlist
 	NETLIB_OBJECT(CD4066_GATE_DYNAMIC)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4066_GATE_DYNAMIC, "CD4XXX")
-		, m_R(*this, "R")
-		, m_DUM1(*this, "_DUM1")
-		, m_DUM2(*this, "_DUM2")
+		, m_R(*this, "R", NETLIB_DELEGATE(analog_input_changed))
+		, m_DUM1(*this, "_DUM1", NETLIB_DELEGATE(analog_input_changed))
+		, m_DUM2(*this, "_DUM2", NETLIB_DELEGATE(analog_input_changed))
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
 		, m_last(*this, "m_last", false)
 		, m_supply(*this)
 		{
-			register_subalias("CTL", m_DUM1.P());   // Cathode
+			register_subalias("CTL", m_DUM1.P());
 
 			connect(m_DUM1.P(), m_DUM2.P());
 			connect(m_DUM1.N(), m_R.P());
@@ -125,6 +125,12 @@ namespace netlist
 		NETLIB_IS_DYNAMIC(true)
 
 	private:
+
+		NETLIB_HANDLERI(analog_input_changed)
+		{
+			m_R.solve_now();
+		}
+
 		analog::nld_twoterm        m_R;
 		analog::nld_twoterm        m_DUM1;
 		analog::nld_twoterm        m_DUM2;
