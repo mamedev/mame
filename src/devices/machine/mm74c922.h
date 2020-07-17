@@ -86,6 +86,7 @@ private:
 	int m_y;                    // latched row
 
 	uint8_t m_data;             // data latch
+	uint8_t m_next_data;        // next value of data latch
 
 	bool m_da;                  // data available flag
 	bool m_next_da;             // next value of data available flag
