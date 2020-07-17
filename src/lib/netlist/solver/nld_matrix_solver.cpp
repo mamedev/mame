@@ -532,7 +532,7 @@ namespace solver
 		if (dynamic_device_count() != 0)
 		{
 			step(timestep_type::FORWARD, delta);
-			auto resched = solve_nr_base();
+			const auto resched = solve_nr_base();
 
 			if (resched)
 				return newton_loops_exceeded(delta);

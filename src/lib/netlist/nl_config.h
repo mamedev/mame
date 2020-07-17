@@ -97,6 +97,20 @@
 #define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)
 #endif
 
+/// \brief Use backward Euler integration
+///
+/// This will use backward Euler instead of trapezoidal integration.
+///
+/// FIXME: Longterm this will become a runtime setting. Only the capacitor model
+/// currently has a trapezoidal version and there is no support currently for
+/// variable capacitors.
+/// The change will have impact on timings since trapezoidal improves timing
+/// accuracy.
+
+#ifndef NL_USE_BACKWARD_EULER
+#define NL_USE_BACKWARD_EULER (1)
+#endif
+
 /// \brief  Use the truthtable implementation of 7448 instead of the coded device
 ///
 /// FIXME: Using truthtable is a lot slower than the explicit device
