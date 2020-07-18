@@ -33,7 +33,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void bank_w(u8 data);
+	void bank_w(offs_t offset, u8 data);
 	u8 ppi_r(offs_t offset);
 	void ppi_w(offs_t offset, u8 data);
 	void ppi_pa_w(u8 data);
@@ -57,9 +57,9 @@ void tecnodar_state::machine_start()
 }
 
 
-void tecnodar_state::bank_w(u8 data)
+void tecnodar_state::bank_w(offs_t offset, u8 data)
 {
-	m_rombank->set_entry(data & 0x07);
+	m_rombank->set_entry(offset & 0x07);
 }
 
 u8 tecnodar_state::ppi_r(offs_t offset)
@@ -104,7 +104,7 @@ void tecnodar_state::mem_map(address_map &map)
 void tecnodar_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(tecnodar_state::bank_w));
+	map(0x00, 0xff).w(FUNC(tecnodar_state::bank_w));
 }
 
 
