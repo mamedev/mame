@@ -59,16 +59,17 @@ IC10 = Hitachi HD74HC244P
 **************************************************************************
 
 Known machines using this hardware:
-_______________________________________________________________________________________________________________________________________________
-|Dumped | Name       | Manufacturer | Notes                                                               | Machine type                       |
-|-------|------------|--------------|---------------------------------------------------------------------|------------------------------------|
-|  NO   | Sagitario  | CIC Play     | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                              |
-|  YES  | Unknown    | Bifuca       | Added as "microdar". Standard Microdar SPD with Philips REF34VA     | Darts                              |
-|  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                              |
-|  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                              |
-|  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          | Darts                              |
-|  YES  | Far West   | Compumatic   | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting machine | 
-|_______|____________|______________|_____________________________________________________________________|____________________________________|
+_______________________________________________________________________________________________________________________________________
+|Dumped | Name       | Manufacturer | Notes                                                               | Machine type               |
+|-------|------------|--------------|---------------------------------------------------------------------|----------------------------|
+|  NO   | Sagitario  | CIC Play     | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                      |
+|  YES  | Unknown    | Bifuca       | Added as "microdar". Standard Microdar SPD with Philips REF34VA     | Darts                      |
+|  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
+|  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
+|  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
+|  YES  | Far West   | Compumatic   | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
+|  YES  | Unknown    | Compumatic   | Compumatic ProSPDP-V3 PCB (Philips REF34VA, but no other custom ICs)| Darts                      |
+|_______|____________|______________|_____________________________________________________________________|____________________________|
 
 There's a later revision of the Compumatic Microdar PCB (V5), smaller, with a standard Atmel AT89S51
 instead of the REF34 CPU.
@@ -91,6 +92,8 @@ public:
 	}
 
 	void microdar(machine_config &config);
+	void microdar_nvram(machine_config &config);
+	void prospdp(machine_config &config);
 
 private:
 	void prog_map(address_map &map);
@@ -118,101 +121,113 @@ void microdar_state::microdar(machine_config &config)
 	I80C51(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microdar_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &microdar_state::ext_map);
+}
 
+void microdar_state::microdar_nvram(machine_config &config)
+{
+	microdar(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // GM76C88ALK-15 + battery
-
 	I2C_24C16(config, m_eeprom); // 24LC16B
 
 	// Code also references some sort of serial RTC?
 }
 
+void microdar_state::prospdp(machine_config &config)
+{
+	microdar(config);
+	m_maincpu->set_clock(24_MHz_XTAL);
+}
+
+#define PHILIPS_REF34VA \
+	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00) \
+	ROM_LOAD("ref34va.ic1", 0x0000, 0x1000, NO_DUMP) \
+	ROM_FILL(0x0000, 1, 0x02) /* temporary LJMP to external init code */ \
+	ROM_FILL(0x0001, 1, 0x10) \
+	ROM_FILL(0x0002, 1, 0x1b) \
+	ROM_FILL(0x000b, 1, 0x02) /* temporary LJMP to interrupt handler */ \
+	ROM_FILL(0x000c, 1, 0x10) \
+	ROM_FILL(0x000d, 1, 0x15) \
+	ROM_FILL(0x001b, 1, 0x02) /* temporary LJMP to interrupt handler */ \
+	ROM_FILL(0x001c, 1, 0x10) \
+	ROM_FILL(0x001d, 1, 0x18) \
+	ROM_FILL(0x0058, 1, 0x32) /* RETI stubs */ \
+	ROM_FILL(0x00af, 1, 0x32) \
+	ROM_FILL(0x00c9, 1, 0x02) /* temporary LJMP to end of interrupt handler */ \
+	ROM_FILL(0x00ca, 1, 0x12) \
+	ROM_FILL(0x00cb, 1, 0xd1) \
+	ROM_FILL(0x0135, 1, 0x22) /* RET stubs */ \
+	ROM_FILL(0x0163, 1, 0x22) \
+	ROM_FILL(0x0185, 1, 0x22) \
+	ROM_FILL(0x01cf, 1, 0x22) \
+	ROM_FILL(0x02de, 1, 0x22) \
+	ROM_FILL(0x02fa, 1, 0x22) \
+	ROM_FILL(0x0308, 1, 0x22) \
+	ROM_FILL(0x0313, 1, 0x22) \
+	ROM_FILL(0x037d, 1, 0x22) \
+	ROM_FILL(0x03be, 1, 0x22) \
+	ROM_FILL(0x0496, 1, 0x22) \
+	ROM_FILL(0x04ce, 1, 0x22) \
+	ROM_FILL(0x0514, 1, 0x22) \
+	ROM_FILL(0x0520, 1, 0x22) \
+	ROM_FILL(0x0550, 1, 0x22) \
+	ROM_FILL(0x0574, 1, 0x22) \
+	ROM_FILL(0x05b4, 1, 0x22) \
+	ROM_FILL(0x05bb, 1, 0x22) \
+	ROM_FILL(0x05ca, 1, 0x22) \
+	ROM_FILL(0x05d8, 1, 0x22) \
+	ROM_FILL(0x0605, 1, 0x22) \
+	ROM_FILL(0x0638, 1, 0x22) \
+	ROM_FILL(0x068a, 1, 0x22) \
+	ROM_FILL(0x06a2, 1, 0x22) \
+	ROM_FILL(0x06bd, 1, 0x22) \
+	ROM_FILL(0x06db, 1, 0x22) \
+	ROM_FILL(0x0708, 1, 0x22) \
+	ROM_FILL(0x0715, 1, 0x22) \
+	ROM_FILL(0x072d, 1, 0x22) \
+	ROM_FILL(0x0744, 1, 0x22) \
+	ROM_FILL(0x0751, 1, 0x22) \
+	ROM_FILL(0x0767, 1, 0x22) \
+	ROM_FILL(0x0772, 1, 0x22) \
+	ROM_FILL(0x077d, 1, 0x22) \
+	ROM_FILL(0x07a4, 1, 0x22) \
+	ROM_FILL(0x07c2, 1, 0x22) \
+	ROM_FILL(0x0802, 1, 0x22) \
+	ROM_FILL(0x0836, 1, 0x22) \
+	ROM_FILL(0x087d, 1, 0x22) \
+	ROM_FILL(0x0893, 1, 0x22) \
+	ROM_FILL(0x0930, 1, 0x22) \
+	ROM_FILL(0x094a, 1, 0x22) \
+	ROM_FILL(0x095a, 1, 0x22) \
+	ROM_FILL(0x096a, 1, 0x22) \
+	ROM_FILL(0x097b, 1, 0x22) \
+	ROM_FILL(0x098f, 1, 0x22) \
+	ROM_FILL(0x09a3, 1, 0x22) \
+	ROM_FILL(0x09c0, 1, 0x22) \
+	ROM_FILL(0x0a21, 1, 0x22) \
+	ROM_FILL(0x0a54, 1, 0x22) \
+	ROM_FILL(0x0a63, 1, 0x22) \
+	ROM_FILL(0x0a73, 1, 0x22) \
+	ROM_FILL(0x0a90, 1, 0x22) \
+	ROM_FILL(0x0ae8, 1, 0x22) \
+	ROM_FILL(0x0abf, 1, 0x22) \
+	ROM_FILL(0x0ac7, 1, 0x22) \
+	ROM_FILL(0x0b11, 1, 0x22) \
+	ROM_FILL(0x0b7f, 1, 0x22) \
+	ROM_FILL(0x0bf1, 1, 0x22) \
+	ROM_FILL(0x0bf6, 1, 0x22) \
+	ROM_FILL(0x0c4a, 1, 0x22) \
+	ROM_FILL(0x0c59, 1, 0x22) \
+	ROM_FILL(0x0c64, 1, 0x22) \
+	ROM_FILL(0x0c99, 1, 0x22) \
+	ROM_FILL(0x0ca8, 1, 0x22) \
+	ROM_FILL(0x0cbd, 1, 0x22) \
+	ROM_FILL(0x0dac, 1, 0x22) \
+	ROM_FILL(0x0dca, 1, 0x22) \
+	ROM_FILL(0x0e6a, 1, 0x22)
 
 ROM_START(microdar)
-	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD("ref34va_k7v5534_9818h-.ic1", 0x0000, 0x1000, NO_DUMP)
-	ROM_FILL(0x0000, 1, 0x02) // temporary LJMP to external init code
-	ROM_FILL(0x0001, 1, 0x10)
-	ROM_FILL(0x0002, 1, 0x1b)
-	ROM_FILL(0x000b, 1, 0x02) // temporary LJMP to interrupt handler
-	ROM_FILL(0x000c, 1, 0x10)
-	ROM_FILL(0x000d, 1, 0x15)
-	ROM_FILL(0x001b, 1, 0x02) // temporary LJMP to interrupt handler
-	ROM_FILL(0x001c, 1, 0x10)
-	ROM_FILL(0x001d, 1, 0x18)
-	ROM_FILL(0x0058, 1, 0x32) // RETI stubs
-	ROM_FILL(0x00af, 1, 0x32)
-	ROM_FILL(0x00c9, 1, 0x02) // temporary LJMP to end of interrupt handler
-	ROM_FILL(0x00ca, 1, 0x12)
-	ROM_FILL(0x00cb, 1, 0xd1)
-	ROM_FILL(0x0135, 1, 0x22) // RET stubs
-	ROM_FILL(0x0163, 1, 0x22)
-	ROM_FILL(0x0185, 1, 0x22)
-	ROM_FILL(0x01cf, 1, 0x22)
-	ROM_FILL(0x02de, 1, 0x22)
-	ROM_FILL(0x02fa, 1, 0x22)
-	ROM_FILL(0x0308, 1, 0x22)
-	ROM_FILL(0x0313, 1, 0x22)
-	ROM_FILL(0x037d, 1, 0x22)
-	ROM_FILL(0x03be, 1, 0x22)
-	ROM_FILL(0x0496, 1, 0x22)
-	ROM_FILL(0x04ce, 1, 0x22)
-	ROM_FILL(0x0514, 1, 0x22)
-	ROM_FILL(0x0520, 1, 0x22)
-	ROM_FILL(0x0550, 1, 0x22)
-	ROM_FILL(0x0574, 1, 0x22)
-	ROM_FILL(0x05b4, 1, 0x22)
-	ROM_FILL(0x05bb, 1, 0x22)
-	ROM_FILL(0x05ca, 1, 0x22)
-	ROM_FILL(0x05d8, 1, 0x22)
-	ROM_FILL(0x0605, 1, 0x22)
-	ROM_FILL(0x0638, 1, 0x22)
-	ROM_FILL(0x068a, 1, 0x22)
-	ROM_FILL(0x06a2, 1, 0x22)
-	ROM_FILL(0x06bd, 1, 0x22)
-	ROM_FILL(0x06db, 1, 0x22)
-	ROM_FILL(0x0708, 1, 0x22)
-	ROM_FILL(0x0715, 1, 0x22)
-	ROM_FILL(0x072d, 1, 0x22)
-	ROM_FILL(0x0744, 1, 0x22)
-	ROM_FILL(0x0751, 1, 0x22)
-	ROM_FILL(0x0767, 1, 0x22)
-	ROM_FILL(0x0772, 1, 0x22)
-	ROM_FILL(0x077d, 1, 0x22)
-	ROM_FILL(0x07a4, 1, 0x22)
-	ROM_FILL(0x07c2, 1, 0x22)
-	ROM_FILL(0x0802, 1, 0x22)
-	ROM_FILL(0x0836, 1, 0x22)
-	ROM_FILL(0x087d, 1, 0x22)
-	ROM_FILL(0x0893, 1, 0x22)
-	ROM_FILL(0x0930, 1, 0x22)
-	ROM_FILL(0x094a, 1, 0x22)
-	ROM_FILL(0x095a, 1, 0x22)
-	ROM_FILL(0x096a, 1, 0x22)
-	ROM_FILL(0x097b, 1, 0x22)
-	ROM_FILL(0x098f, 1, 0x22)
-	ROM_FILL(0x09a3, 1, 0x22)
-	ROM_FILL(0x09c0, 1, 0x22)
-	ROM_FILL(0x0a21, 1, 0x22)
-	ROM_FILL(0x0a54, 1, 0x22)
-	ROM_FILL(0x0a63, 1, 0x22)
-	ROM_FILL(0x0a73, 1, 0x22)
-	ROM_FILL(0x0a90, 1, 0x22)
-	ROM_FILL(0x0ae8, 1, 0x22)
-	ROM_FILL(0x0abf, 1, 0x22)
-	ROM_FILL(0x0ac7, 1, 0x22)
-	ROM_FILL(0x0b11, 1, 0x22)
-	ROM_FILL(0x0b7f, 1, 0x22)
-	ROM_FILL(0x0bf1, 1, 0x22)
-	ROM_FILL(0x0bf6, 1, 0x22)
-	ROM_FILL(0x0c4a, 1, 0x22)
-	ROM_FILL(0x0c59, 1, 0x22)
-	ROM_FILL(0x0c64, 1, 0x22)
-	ROM_FILL(0x0c99, 1, 0x22)
-	ROM_FILL(0x0ca8, 1, 0x22)
-	ROM_FILL(0x0cbd, 1, 0x22)
-	ROM_FILL(0x0dac, 1, 0x22)
-	ROM_FILL(0x0dca, 1, 0x22)
-	ROM_FILL(0x0e6a, 1, 0x22)
+	// REF34VA K7V5534 9818h
+	PHILIPS_REF34VA
 
 	ROM_REGION(0x20000, "program", 0)
 	ROM_LOAD("compumatic_727.ic3", 0x00000, 0x20000, CRC(ccf973b6) SHA1(ab67e466849b3bbd8f24be041c979c3f833a32a8))
@@ -222,92 +237,8 @@ ROM_START(microdar)
 ROM_END
 
 ROM_START(cfarwest)
-	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD("ref34va_k8v2873_phr9920_0.ic12", 0x0000, 0x1000, NO_DUMP)
-	// Fills copied from 'microdar' without checking
-	ROM_FILL(0x0000, 1, 0x02) // temporary LJMP to external init code
-	ROM_FILL(0x0001, 1, 0x10)
-	ROM_FILL(0x0002, 1, 0x1b)
-	ROM_FILL(0x000b, 1, 0x02) // temporary LJMP to interrupt handler
-	ROM_FILL(0x000c, 1, 0x10)
-	ROM_FILL(0x000d, 1, 0x15)
-	ROM_FILL(0x001b, 1, 0x02) // temporary LJMP to interrupt handler
-	ROM_FILL(0x001c, 1, 0x10)
-	ROM_FILL(0x001d, 1, 0x18)
-	ROM_FILL(0x0058, 1, 0x32) // RETI stubs
-	ROM_FILL(0x00af, 1, 0x32)
-	ROM_FILL(0x00c9, 1, 0x02) // temporary LJMP to end of interrupt handler
-	ROM_FILL(0x00ca, 1, 0x12)
-	ROM_FILL(0x00cb, 1, 0xd1)
-	ROM_FILL(0x0135, 1, 0x22) // RET stubs
-	ROM_FILL(0x0163, 1, 0x22)
-	ROM_FILL(0x0185, 1, 0x22)
-	ROM_FILL(0x01cf, 1, 0x22)
-	ROM_FILL(0x02de, 1, 0x22)
-	ROM_FILL(0x02fa, 1, 0x22)
-	ROM_FILL(0x0308, 1, 0x22)
-	ROM_FILL(0x0313, 1, 0x22)
-	ROM_FILL(0x037d, 1, 0x22)
-	ROM_FILL(0x03be, 1, 0x22)
-	ROM_FILL(0x0496, 1, 0x22)
-	ROM_FILL(0x04ce, 1, 0x22)
-	ROM_FILL(0x0514, 1, 0x22)
-	ROM_FILL(0x0520, 1, 0x22)
-	ROM_FILL(0x0550, 1, 0x22)
-	ROM_FILL(0x0574, 1, 0x22)
-	ROM_FILL(0x05b4, 1, 0x22)
-	ROM_FILL(0x05bb, 1, 0x22)
-	ROM_FILL(0x05ca, 1, 0x22)
-	ROM_FILL(0x05d8, 1, 0x22)
-	ROM_FILL(0x0605, 1, 0x22)
-	ROM_FILL(0x0638, 1, 0x22)
-	ROM_FILL(0x068a, 1, 0x22)
-	ROM_FILL(0x06a2, 1, 0x22)
-	ROM_FILL(0x06bd, 1, 0x22)
-	ROM_FILL(0x06db, 1, 0x22)
-	ROM_FILL(0x0708, 1, 0x22)
-	ROM_FILL(0x0715, 1, 0x22)
-	ROM_FILL(0x072d, 1, 0x22)
-	ROM_FILL(0x0744, 1, 0x22)
-	ROM_FILL(0x0751, 1, 0x22)
-	ROM_FILL(0x0767, 1, 0x22)
-	ROM_FILL(0x0772, 1, 0x22)
-	ROM_FILL(0x077d, 1, 0x22)
-	ROM_FILL(0x07a4, 1, 0x22)
-	ROM_FILL(0x07c2, 1, 0x22)
-	ROM_FILL(0x0802, 1, 0x22)
-	ROM_FILL(0x0836, 1, 0x22)
-	ROM_FILL(0x087d, 1, 0x22)
-	ROM_FILL(0x0893, 1, 0x22)
-	ROM_FILL(0x0930, 1, 0x22)
-	ROM_FILL(0x094a, 1, 0x22)
-	ROM_FILL(0x095a, 1, 0x22)
-	ROM_FILL(0x096a, 1, 0x22)
-	ROM_FILL(0x097b, 1, 0x22)
-	ROM_FILL(0x098f, 1, 0x22)
-	ROM_FILL(0x09a3, 1, 0x22)
-	ROM_FILL(0x09c0, 1, 0x22)
-	ROM_FILL(0x0a21, 1, 0x22)
-	ROM_FILL(0x0a54, 1, 0x22)
-	ROM_FILL(0x0a63, 1, 0x22)
-	ROM_FILL(0x0a73, 1, 0x22)
-	ROM_FILL(0x0a90, 1, 0x22)
-	ROM_FILL(0x0ae8, 1, 0x22)
-	ROM_FILL(0x0abf, 1, 0x22)
-	ROM_FILL(0x0ac7, 1, 0x22)
-	ROM_FILL(0x0b11, 1, 0x22)
-	ROM_FILL(0x0b7f, 1, 0x22)
-	ROM_FILL(0x0bf1, 1, 0x22)
-	ROM_FILL(0x0bf6, 1, 0x22)
-	ROM_FILL(0x0c4a, 1, 0x22)
-	ROM_FILL(0x0c59, 1, 0x22)
-	ROM_FILL(0x0c64, 1, 0x22)
-	ROM_FILL(0x0c99, 1, 0x22)
-	ROM_FILL(0x0ca8, 1, 0x22)
-	ROM_FILL(0x0cbd, 1, 0x22)
-	ROM_FILL(0x0dac, 1, 0x22)
-	ROM_FILL(0x0dca, 1, 0x22)
-	ROM_FILL(0x0e6a, 1, 0x22)
+	// REF34VA K8V2873 Phr9920 0
+	PHILIPS_REF34VA
 
 	ROM_REGION(0x20000, "program", 0)
 	ROM_LOAD("farwest_pistola.ic3", 0x00000, 0x20000, CRC(ad68a0e8) SHA1(157a6a84f31e05d289e2fc67099fcff2887a84b9))
@@ -315,5 +246,20 @@ ROM_START(cfarwest)
 	// No EEPROM on this PCB
 ROM_END
 
-GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)", MACHINE_IS_SKELETON_MECHANICAL)
+// Compumatic ProSPDP-V3 PCB
+ROM_START(prospdp)
+	// REF34VA K0V951 Phr0038 F
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x80000, "program", 0)
+	ROM_LOAD("28sf040a.ic3", 0x00000, 0x80000, CRC(f5727a08) SHA1(f4185afc62c1d1f6cb6c772ea40062ced9b2130a))
+
+	// No EEPROM on this PCB
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
+ROM_END
+
+GAME(199?, microdar, 0, microdar_nvram, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest, 0, microdar,       microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, prospdp,  0, prospdp,        microdar, microdar_state, empty_init, ROT0, "Compumatic",          "ProSPDP",               MACHINE_IS_SKELETON_MECHANICAL)
