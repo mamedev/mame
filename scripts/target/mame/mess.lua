@@ -1044,6 +1044,7 @@ FORMATS["LVIV_LVT"] = true
 FORMATS["M20_DSK"] = true
 FORMATS["M5_DSK"] = true
 FORMATS["MBEE_CAS"] = true
+FORMATS["MDOS_DSK"] = true
 FORMATS["MFM_HD"] = true
 FORMATS["MM_DSK"] = true
 FORMATS["MS0515_DSK"] = true
