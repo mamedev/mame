@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/tms9928a.h"
@@ -21,12 +22,18 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ppi(*this, "ppi")
+		, m_eeprom(*this, "eeprom")
+		, m_rombank(*this, "rombank")
 	{
 	}
 
 	void tecnodar(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	void bank_w(u8 data);
 	u8 ppi_r(offs_t offset);
 	void ppi_w(offs_t offset, u8 data);
 	void ppi_pa_w(u8 data);
@@ -38,8 +45,22 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_memory_bank m_rombank;
 };
 
+
+void tecnodar_state::machine_start()
+{
+	m_rombank->configure_entries(0, 8, memregion("banked")->base(), 0x4000);
+	m_rombank->set_entry(0);
+}
+
+
+void tecnodar_state::bank_w(u8 data)
+{
+	m_rombank->set_entry(data & 0x07);
+}
 
 u8 tecnodar_state::ppi_r(offs_t offset)
 {
@@ -53,7 +74,9 @@ void tecnodar_state::ppi_w(offs_t offset, u8 data)
 
 void tecnodar_state::ppi_pa_w(u8 data)
 {
-	logerror("%s: Writing %02X to PPI port A\n", machine().describe_context(), data);
+	m_eeprom->cs_write(BIT(data, 0));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->di_write(BIT(data, 2));
 }
 
 void tecnodar_state::ppi_pb_w(u8 data)
@@ -69,11 +92,11 @@ void tecnodar_state::ppi_pc_w(u8 data)
 void tecnodar_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("program", 0);
-	//map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8002, 0x8002).select(0x60).rw(FUNC(tecnodar_state::ppi_r), FUNC(tecnodar_state::ppi_w));
 	map(0x8004, 0x8004).w("psg", FUNC(ay8910_device::data_w));
-	map(0x8008, 0x8008).w("psg", FUNC(ay8910_device::address_w));
-	map(0x800c, 0x800c).r("psg", FUNC(ay8910_device::data_r));
+	map(0x8008, 0x8008).r("psg", FUNC(ay8910_device::data_r));
+	map(0x800c, 0x800c).w("psg", FUNC(ay8910_device::address_w));
 	map(0x8010, 0x8011).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 	map(0xc000, 0xc7ff).ram();
 }
@@ -81,7 +104,7 @@ void tecnodar_state::mem_map(address_map &map)
 void tecnodar_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).nopw();
+	map(0x00, 0x00).w(FUNC(tecnodar_state::bank_w));
 }
 
 
@@ -118,13 +141,16 @@ void tecnodar_state::tecnodar(machine_config &config)
 {
 	Z80(config, m_maincpu, 10.245_MHz_XTAL / 3); // GoldStar Z8400APS; divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecnodar_state::mem_map);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tecnodar_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &tecnodar_state::io_map);
 	// NMI is some sort of reset control
 
 	I8255(config, m_ppi); // TMP82C55AP-2
 	m_ppi->out_pa_callback().set(FUNC(tecnodar_state::ppi_pa_w));
 	m_ppi->out_pb_callback().set(FUNC(tecnodar_state::ppi_pb_w));
+	m_ppi->in_pc_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).bit(0);
 	m_ppi->out_pc_callback().set(FUNC(tecnodar_state::ppi_pc_w));
+
+	EEPROM_93C46_8BIT(config, m_eeprom); // unknown 8-pin IC
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
