@@ -22647,6 +22647,7 @@ dm3270                          //
 @source:microdar.cpp
 microdar                        //
 cfarwest                        // (c) 1997 Compumatic
+prospdp                         // (c) 1997 Compumatic
 
 @source:microdec.cpp
 md2                             //
