@@ -17,7 +17,7 @@
         0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Communications Controller) Write
         0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
         0xe80000 - 0xefffff     Rockwell 6522 VIA
-        0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
+        0xf00000 - 0xffffef     Open bus??? (the ROM appears to be accessing here)
         0xfffff0 - 0xffffff     Auto Vector
 
     Interrupts:
@@ -36,6 +36,9 @@
         SCC:
             PB_EXT (DCDB)  from mouse Y circuitry
             PA_EXT (DCDA)  from mouse X circuitry
+
+    The MC68000's FC outputs are not used even for autovectoring. The
+    VIA's address range is overdecoded to generate VPA for both.
 
 SCC Init:
 
