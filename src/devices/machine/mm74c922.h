@@ -56,6 +56,7 @@ public:
 	auto x2_rd_callback() { return m_read_x[1].bind(); }
 	auto x3_rd_callback() { return m_read_x[2].bind(); }
 	auto x4_rd_callback() { return m_read_x[3].bind(); }
+	auto data_tri_callback() { return m_tristate_data.bind(); }
 
 	uint8_t read();
 
@@ -75,6 +76,7 @@ private:
 
 	devcb_write_line m_write_da;
 	devcb_read8::array<4> m_read_x;
+	devcb_read8 m_tristate_data;
 
 	double m_cap_osc;
 	double m_cap_debounce;

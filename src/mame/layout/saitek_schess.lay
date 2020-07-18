@@ -323,6 +323,7 @@ license:CC0
 
 <!-- buttons -->
 
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="black"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
 	<element name="rmask"><rect><color red="0.73" green="0.03" blue="0.09" /></rect></element>
 
@@ -359,15 +360,42 @@ license:CC0
 	<element name="text_p6"><image file="chess/wp.png"></image></element>
 
 	<group name="buttons">
-		<bounds x="-1" y="0" width="20" height="30" />
+		<bounds x="-1" y="-1" width="20" height="31" />
 
-		<element ref="text_p1"><bounds x="1.6" y="0" width="1.8" height="1.8" /></element>
-		<element ref="text_p2"><bounds x="7.6" y="0" width="1.8" height="1.8" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="-0.2" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="5.8"  y="-0.2" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.8" y="-0.2" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="3.8"  width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="5.8"  y="3.8"  width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.8" y="3.8"  width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="7.8"  width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="5.8"  y="7.8"  width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.8" y="7.8"  width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="11.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="5.8"  y="11.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.8" y="11.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="15.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="5.8"  y="15.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.8" y="15.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="19.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="5.8"  y="19.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.8" y="19.8" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="-0.2" y="25.55" width="5.4" height="3.4" /></element>
+		<element ref="blackb"><bounds x="11.6" y="25.35" width="5.8" height="3.8" /></element>
+
+		<element ref="text_p1"><bounds x="1.6"  y="0" width="1.8" height="1.8" /></element>
+		<element ref="text_p2"><bounds x="7.6"  y="0" width="1.8" height="1.8" /></element>
 		<element ref="text_p3"><bounds x="13.6" y="0" width="1.8" height="1.8" /></element>
-		<element ref="text_p5"><bounds x="1.6" y="4" width="1.8" height="1.8" /></element>
-		<element ref="text_p4"><bounds x="7.6" y="4" width="1.8" height="1.8" /></element>
+		<element ref="text_p5"><bounds x="1.6"  y="4" width="1.8" height="1.8" /></element>
+		<element ref="text_p4"><bounds x="7.6"  y="4" width="1.8" height="1.8" /></element>
 		<element ref="text_p6"><bounds x="13.6" y="4" width="1.8" height="1.8" /></element>
-		<element ref="rmask" blend="multiply"><bounds x="0" y="0" width="20" height="20" /></element>
+
+		<element ref="rmask" blend="multiply"><bounds x="1.6"  y="0" width="1.8" height="1.8" /></element>
+		<element ref="rmask" blend="multiply"><bounds x="7.6"  y="0" width="1.8" height="1.8" /></element>
+		<element ref="rmask" blend="multiply"><bounds x="13.6" y="0" width="1.8" height="1.8" /></element>
+		<element ref="rmask" blend="multiply"><bounds x="1.6"  y="4" width="1.8" height="1.8" /></element>
+		<element ref="rmask" blend="multiply"><bounds x="7.6"  y="4" width="1.8" height="1.8" /></element>
+		<element ref="rmask" blend="multiply"><bounds x="13.6" y="4" width="1.8" height="1.8" /></element>
 
 		<element ref="text_l1"><bounds x="0" y="8.4" width="5" height="0.9" /></element>
 		<element ref="text_l2a"><bounds x="6" y="8" width="5" height="0.9" /></element>
@@ -430,25 +458,25 @@ license:CC0
 		<element name="9.1" ref="led"><bounds x="14.07" y="21.85" width="0.86" height="0.86" /></element>
 		<element name="9.0" ref="led"><bounds x="2.07" y="27.4" width="0.86" height="0.86" /></element>
 
-		<element ref="hl" inputtag="IN.0" inputmask="0x80"><bounds x="0"  y="0" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x80"><bounds x="6"  y="0" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x40"><bounds x="12" y="0" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.0" inputmask="0x40"><bounds x="0"  y="4" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.2" inputmask="0x80"><bounds x="6"  y="4" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.2" inputmask="0x40"><bounds x="12" y="4" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.0" inputmask="0x20"><bounds x="0"  y="8" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x10"><bounds x="6"  y="8" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.2" inputmask="0x20"><bounds x="12" y="8" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.0" inputmask="0x10"><bounds x="0"  y="12" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x20"><bounds x="6"  y="12" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.2" inputmask="0x10"><bounds x="12" y="12" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.0" inputmask="0x08"><bounds x="0"  y="16" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x08"><bounds x="6"  y="16" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.2" inputmask="0x08"><bounds x="12" y="16" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.0" inputmask="0x04"><bounds x="0"  y="20" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x04"><bounds x="6"  y="20" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.2" inputmask="0x04"><bounds x="12" y="20" width="5" height="3" /><color alpha="0.15" /></element>
-		<element ref="hl" inputtag="IN.1" inputmask="0x02"><bounds x="12" y="25.75" width="5" height="3" /><color alpha="0.15" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x80"><bounds x="0"  y="0" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x80"><bounds x="6"  y="0" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x40"><bounds x="12" y="0" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x40"><bounds x="0"  y="4" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x80"><bounds x="6"  y="4" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x40"><bounds x="12" y="4" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x20"><bounds x="0"  y="8" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x10"><bounds x="6"  y="8" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x20"><bounds x="12" y="8" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x10"><bounds x="0"  y="12" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x20"><bounds x="6"  y="12" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x10"><bounds x="12" y="12" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x08"><bounds x="0"  y="16" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x08"><bounds x="6"  y="16" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x08"><bounds x="12" y="16" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x04"><bounds x="0"  y="20" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x04"><bounds x="6"  y="20" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x04"><bounds x="12" y="20" width="5" height="3" /><color alpha="0.1" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x02"><bounds x="12" y="25.75" width="5" height="3" /><color alpha="0.1" /></element>
 	</group>
 
 
@@ -460,7 +488,8 @@ license:CC0
 		<group ref="sb_board"><bounds x="10" y="10" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-4.5" y="10" width="10" height="80" /></group>
 
-		<group ref="buttons"><bounds x="96" y="40" width="34.75" height="52.125" /></group>
+		<element ref="black"><bounds x="93" y="6" width="39" height="88" /></element>
+		<group ref="buttons"><bounds x="96" y="38.25" width="34.75" height="54" /></group>
 
 		<repeat count="8">
 			<param name="x" start="10" increment="10" />

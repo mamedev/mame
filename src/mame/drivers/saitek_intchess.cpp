@@ -317,6 +317,7 @@ void intchess_state::intchess(machine_config &config)
 	m_encoder->x2_rd_callback().set_ioport("X2");
 	m_encoder->x3_rd_callback().set_ioport("X3");
 	m_encoder->x4_rd_callback().set_ioport("X4");
+	m_encoder->data_tri_callback().set(m_encoder, FUNC(mm74c923_device::read));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

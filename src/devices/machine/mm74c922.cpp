@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(MM74C923, mm74c923_device, "mm74c923", "MM74C923 20-Key Encod
 
 mm74c922_device::mm74c922_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int max_y) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_write_da(*this), m_read_x(*this),
+	m_write_da(*this), m_read_x(*this), m_tristate_data(*this),
 	m_cap_osc(0), m_cap_debounce(0),
 	m_max_y(max_y),
 	m_inhibit(false),
@@ -66,6 +66,7 @@ void mm74c922_device::device_start()
 	// resolve callbacks
 	m_write_da.resolve_safe();
 	m_read_x.resolve_all_safe((1 << m_max_y) - 1);
+	m_tristate_data.resolve_safe((1 << m_max_y) - 1);
 
 	// set initial values
 	change_output_lines();
@@ -163,7 +164,7 @@ void mm74c922_device::detect_keypress()
 			// key released
 			m_inhibit = false;
 			m_next_da = false;
-			m_next_data = (1 << m_max_y) - 1; // high-Z
+			m_next_data = m_tristate_data(); // high-Z
 
 			LOG("MM74C922 Key Released\n");
 		}

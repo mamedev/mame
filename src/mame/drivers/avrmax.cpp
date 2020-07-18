@@ -106,7 +106,7 @@ u8 avrmax_state::input_r()
 {
 	u8 data = 0;
 
-	// PB0-PB3: multiplexed inputs
+	// PB0-PB2: multiplexed inputs
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
@@ -231,5 +231,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 2009, avrmax,  0,      0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 2009, avrmaxg, avrmax, 0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'
+CONS( 2009, avrmax,  0,      0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 2009, avrmaxg, avrmax, 0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'

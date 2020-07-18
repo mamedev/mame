@@ -824,6 +824,7 @@ rzone.cpp
 sacstate.cpp
 sag.cpp
 sage2.cpp
+saitek_ccompan.cpp
 saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp

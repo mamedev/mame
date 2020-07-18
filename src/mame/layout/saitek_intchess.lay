@@ -64,11 +64,10 @@ license:CC0
 	<element name="text_p6"><image file="chess/bk.png" /></element>
 
 
-<!-- build screen -->
+<!-- chesscomputer -->
 
-	<view name="Internal Layout">
+	<group name="main">
 		<bounds left="-2" right="48" top="46.5" bottom="124" />
-		<screen index="0"><bounds x="-2" y="46.5" width="50" height="37.5" /></screen>
 
 		<bezel name="digit0" element="digit"><bounds x="15" y="88" width="4" height="6" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="19" y="88" width="4" height="6" /></bezel>
@@ -182,6 +181,20 @@ license:CC0
 		<bezel element="text_l24"><bounds x="22" y="105.5" width="8" height="1.1" /></bezel>
 		<bezel element="text_l25"><bounds x="34" y="105.5" width="8" height="1.1" /></bezel>
 		<bezel element="text_l26"><bounds x="40" y="105.5" width="8" height="1.1" /></bezel>
+	</group>
 
+
+<!-- build screen -->
+
+	<view name="Internal Layout (Full)">
+		<bounds left="-2" right="48" top="46.5" bottom="124" />
+		<group ref="main"><bounds left="-2" right="48" top="46.5" bottom="124" /></group>
+		<screen index="0"><bounds x="-2" y="46.5" width="50" height="37.5" /></screen>
 	</view>
+
+	<view name="Internal Layout (Main Unit)">
+		<bounds left="-2" right="48" top="87" bottom="124" />
+		<group ref="main"><bounds left="-2" right="48" top="46.5" bottom="124" /></group>
+	</view>
+
 </mamelayout>

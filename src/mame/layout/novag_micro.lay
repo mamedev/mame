@@ -476,10 +476,10 @@ license:CC0
 		<element ref="white2"><bounds x="64.9" y="95.4" width="6.2" height="2.7" /></element>
 		<element ref="white2"><bounds x="74.9" y="95.4" width="6.2" height="2.7" /></element>
 
-		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x80"><bounds x="4.5" y="95" width="7" height="3.5" /></element>
-		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x40"><bounds x="14.5" y="95" width="7" height="3.5" /></element>
-		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x20"><bounds x="24.5" y="95" width="7" height="3.5" /></element>
-		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x10"><bounds x="34.5" y="95" width="7" height="3.5" /></element>
+		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x10"><bounds x="4.5" y="95" width="7" height="3.5" /></element>
+		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x20"><bounds x="14.5" y="95" width="7" height="3.5" /></element>
+		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x40"><bounds x="24.5" y="95" width="7" height="3.5" /></element>
+		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x80"><bounds x="34.5" y="95" width="7" height="3.5" /></element>
 		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x01"><bounds x="44.5" y="95" width="7" height="3.5" /></element>
 		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x02"><bounds x="54.5" y="95" width="7" height="3.5" /></element>
 		<element ref="button" blend="multiply" inputtag="IN.0" inputmask="0x04"><bounds x="64.5" y="95" width="7" height="3.5" /></element>

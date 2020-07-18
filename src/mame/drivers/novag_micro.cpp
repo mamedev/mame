@@ -12,7 +12,7 @@ Hardware notes:
 - Mostek 3875/42 (4KB ROM, 64 bytes extra RAM)
 - buzzer, button sensors chessboard, 16+4 leds
 
-MCU interrupts are unused. Its embedded extra RAM is battery-backed via MEM
+MCU interrupts are unused. MCU embedded extra RAM is battery-backed via MEM
 switch tied to pin #4 (VSB: RAM standby power).
 
 ******************************************************************************/
@@ -109,18 +109,19 @@ u8 micro_state::input_r()
 	u8 data = 0;
 
 	// P10-P17: multiplexed inputs
+	// read chessboard
+	u8 cb_mux = (m_inp_mux & 0xfc) | (m_control >> 5 & 3);
+	cb_mux = bitswap<8>(cb_mux,4,5,6,7,1,0,3,2);
+
+	for (int i = 0; i < 8; i++)
+		if (BIT(cb_mux, i))
+			data |= bitswap<8>(m_board->read_file(i),4,5,6,7,3,2,1,0);
+
 	// read buttons
 	if (m_control & 0x10)
 		data |= m_inputs->read();
 
-	// read chessboard
-	u8 cb_mux = (m_inp_mux & 0xfc) | (m_control >> 5 & 3);
-	cb_mux = bitswap<8>(cb_mux,4,5,6,7,1,0,3,2);
-	for (int i = 0; i < 8; i++)
-		if (BIT(cb_mux, i))
-			data |= m_board->read_file(i);
-
-	return bitswap<8>(data,4,5,6,7,3,2,1,0);
+	return data;
 }
 
 void micro_state::control_w(u8 data)
@@ -182,10 +183,10 @@ static INPUT_PORTS_START( micro )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Sound / Queen")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Take Back / King")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("New Game / Knight")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("B/W")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("B/W")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("New Game / Knight")
 INPUT_PORTS_END
 
 
