@@ -78,11 +78,13 @@ ROM_START(beta128)
 	ROM_REGION(0x4000, "rom", 0)
 	ROM_DEFAULT_BIOS("trd503")
 
-	// original
+	// original, but in plain form, should be replaced with "proper dumps" with data bits 0 and 7 swapped
 	ROM_SYSTEM_BIOS(0, "trd501", "TR-DOS v5.01")
 	ROMX_LOAD("trd501.rom", 0x0000, 0x4000, CRC(3e3cdd4c) SHA1(8303ba0cc79daa6c04cd1e6ce27e8b6886a3f0de), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "trd503", "TR-DOS v5.03")
-	ROMX_LOAD("trd503.rom", 0x0000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "trd502", "TR-DOS v5.02")
+	ROMX_LOAD("trd502.rom", 0x0000, 0x4000, CRC(64f0fcf8) SHA1(862e0af2245f68fca3d6a5b10186d09fd1faee55), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "trd503", "TR-DOS v5.03")
+	ROMX_LOAD("trd503.rom", 0x0000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(2))
 
 	// clone/homebrew modifications based on original v5.03
 	ROM_SYSTEM_BIOS(2, "trd504t", "TR-DOS v5.04T (hack)")
