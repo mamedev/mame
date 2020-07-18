@@ -359,12 +359,12 @@ brk_ce_imp
 	dec_SP_ce();
 	write(SP, PC);
 	dec_SP_ce();
-	write(SP, irq_taken || nmi_state ? P & ~F_B : P);
+	write(SP, irq_taken || nmi_pending ? P & ~F_B : P);
 	dec_SP_ce();
-	if(nmi_state) {
+	if(nmi_pending) {
 		PC = read_arg(0xfffa);
 		PC = set_h(PC, read_arg(0xfffb));
-		nmi_state = false;
+		nmi_pending = false;
 	} else {
 		PC = read_arg(0xfffe);
 		PC = set_h(PC, read_arg(0xffff));
