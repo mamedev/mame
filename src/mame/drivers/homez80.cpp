@@ -32,53 +32,49 @@ public:
 	homez80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_vram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void homez80(machine_config &config);
 
 private:
 
-	uint8_t homez80_keyboard_r(offs_t offset);
+	u8 homez80_keyboard_r(offs_t offset);
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void homez80_io(address_map &map);
-	void homez80_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	bool m_irq;
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<16> m_io_keyboard;
 };
 
 
-uint8_t homez80_state::homez80_keyboard_r(offs_t offset)
+u8 homez80_state::homez80_keyboard_r(offs_t offset)
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"LINE%d",offset);
-	return ioport(kbdrow)->read();
+	return m_io_keyboard[offset]->read();
 }
 
-void homez80_state::homez80_mem(address_map &map)
+void homez80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).rom();  // Monitor
-	map(0x2000, 0x23ff).ram().share("videoram"); // Video RAM
-	map(0x7020, 0x702f).r(FUNC(homez80_state::homez80_keyboard_r));
-	map(0x8000, 0xffff).ram();  // 32 K RAM
+	map(0x0000, 0x0fff).rom();    // 27C256 (A12,13,14 tied high)
+	map(0x2000, 0x23ff).mirror(0x0c00).ram().share("videoram");   // IC13, UM61256 (A10-14 tied low)
+	map(0x7000, 0x700f).mirror(0x0ff0).r(FUNC(homez80_state::homez80_keyboard_r));
+	map(0x8000, 0xffff).ram();    // 61256 (32K)
 }
 
-void homez80_state::homez80_io(address_map &map)
-{
-	map.unmap_value_high();
-}
 
 /* Input ports */
 INPUT_PORTS_START( homez80 )
-	PORT_START("LINE0")
+	PORT_START("X0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
@@ -87,16 +83,16 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
-	PORT_START("LINE1")
+	PORT_START("X1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE // crude, just another shift key
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_START("LINE2")
+	PORT_START("X2")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -105,16 +101,16 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_START("LINE3")
+	PORT_START("X3")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)
-	PORT_START("LINE4")
+	PORT_START("X4")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
@@ -123,7 +119,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)
-	PORT_START("LINE5")
+	PORT_START("X5")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)
@@ -132,7 +128,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)
-	PORT_START("LINE6")
+	PORT_START("X6")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)
@@ -141,7 +137,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)
-	PORT_START("LINE7")
+	PORT_START("X7")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)
@@ -150,25 +146,25 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)
-	PORT_START("LINE8")
+	PORT_START("X8")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SCRLOCK)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PRTSCR)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SCRLOCK) // nothing
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PRTSCR)  // nothing
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) // nothing
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_START("LINE9")
+	PORT_START("X9")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PAUSE)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PAUSE) // nothing
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_START("LINE10")
+	PORT_START("X10")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -177,7 +173,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)
-	PORT_START("LINE11")
+	PORT_START("X11")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -186,7 +182,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)
-	PORT_START("LINE12")
+	PORT_START("X12")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -195,7 +191,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)
-	PORT_START("LINE13")
+	PORT_START("X13")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)
@@ -204,7 +200,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)
-	PORT_START("LINE14")
+	PORT_START("X14")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)
@@ -213,7 +209,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)
-	PORT_START("LINE15")
+	PORT_START("X15")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)
@@ -230,10 +226,15 @@ void homez80_state::machine_reset()
 	m_irq = 0;
 }
 
-uint32_t homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void homez80_state::machine_start()
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	save_item(NAME(m_irq));
+}
+
+u32 homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
@@ -243,7 +244,7 @@ uint32_t homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			for (x = ma; x < ma+32; x++)
 			{
-				chr = m_p_videoram[x];
+				chr = m_vram[x];
 
 				/* get pattern of pixels for that character scanline */
 				gfx = m_p_chargen[ (chr<<3) | ra];
@@ -265,7 +266,7 @@ uint32_t homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-const gfx_layout homez80_charlayout =
+const gfx_layout charlayout =
 {
 	8, 8,               /* 8x8 characters */
 	256,                /* 256 characters */
@@ -277,7 +278,7 @@ const gfx_layout homez80_charlayout =
 };
 
 static GFXDECODE_START( gfx_homez80 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, homez80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -291,8 +292,7 @@ void homez80_state::homez80(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &homez80_state::homez80_mem);
-	m_maincpu->set_addrmap(AS_IO, &homez80_state::homez80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homez80_state::mem_map);
 	m_maincpu->set_periodic_int(FUNC(homez80_state::homez80_interrupt), attotime::from_hz(50));
 
 	/* video hardware */
@@ -310,14 +310,14 @@ void homez80_state::homez80(machine_config &config)
 
 /* ROM definition */
 ROM_START( homez80 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "sysrom.bin",  0x0000, 0x1000, CRC(37ca7545) SHA1(3f597d7e45b1ab211d5bd4a99abb21915723c357) )
 
 	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD( "chargen.bin", 0x0000, 0x0800, CRC(93243be3) SHA1(718efc06c131843c15383e50af23f3a5cf44dd9b) )
+	ROM_LOAD( "chargen.ic12", 0x0000, 0x0800, CRC(93243be3) SHA1(718efc06c131843c15383e50af23f3a5cf44dd9b) ) // 27C256, A11/12/13/14 tied low.
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                 FLAGS */
-COMP( 2008, homez80, 0,      0,      homez80, homez80, homez80_state, empty_init, "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)
+COMP( 2008, homez80, 0,      0,      homez80, homez80, homez80_state, empty_init, "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
