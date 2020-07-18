@@ -50,11 +50,14 @@
 #define TTL_74LS75_DIP TTL_7475_DIP     // 4-Bit Bistable Latches with Complementary Outputs
 #define TTL_74LS86_DIP TTL_7486_DIP     // Quad 2-Input Exclusive-OR Gates
 #define TTL_74LS107_DIP TTL_74107_DIP
+#define TTL_74S113_DIP TTL_74113_DIP
 #define TTL_74S113A_DIP TTL_74113A_DIP
 #define TTL_74LS123_DIP TTL_74123_DIP
 #define TTL_74LS125_DIP TTL_74125_DIP
+#define TTL_74LS157_DIP TTL_74157_DIP
 #define TTL_74LS163_DIP TTL_74163_DIP
 #define TTL_74LS164_DIP TTL_74164_DIP
+#define TTL_74LS191_DIP TTL_74191_DIP
 #define TTL_74LS259_DIP TTL_9334_DIP	// Seems to be pin-compatible
 #define TTL_74LS377_DIP TTL_74377_DIP
 #define TTL_74LS393_DIP TTL_74393_DIP
@@ -89,6 +92,9 @@
 
 // SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N6292
 #define Q_2N6292(name) QBJT_EB(name, "NPN(IS=9.3092e-13 BF=2021.8 NF=0.85 VAF=63.2399 IKF=1 ISE=1.92869e-13 NE=1.97024 BR=40.0703 NR=1.5 VAR=0.89955 IKR=10 ISC=4.92338e-16 NC=3.9992 RB=6.98677 IRB=0.1 RBM=0.1 RE=0.0001 RC=0.326141 XTB=0.1 XTI=2.86739 EG=1.206 CJE=1.84157e-10 VJE=0.99 MJE=0.347174 TF=6.73756e-09 XTF=1.49917 VTF=0.997395 ITF=0.998426 CJC=1.06717e-10 VJC=0.942694 MJC=0.245406 XCJC=0.8 FC=0.533405 CJS=0 VJS=0.75 MJS=0.5 TR=6.0671e-08 PTF=0 KF=0 AF=1)")
+
+// SPICE model taken from http://ltwiki.org/files/LTspiceIV/Vendor%20List/Fairchild/2N/index.html
+#define Q_2N5210(name) QBJT_EB(name, "NPN(Is=5.911f Xti=3 Eg=1.11 Vaf=62.37 Bf=809.9 Ne=1.358 Ise=5.911f Ikf=14.26m Xtb=1.5 Br=1.287 Nc=2 Isc=0 Ikr=0 Rc=1.61 Cjc=4.017p Mjc=.3174 Vjc=.75 Fc=.5 Cje=4.973p Mje=.4146 Vje=.75 Tr=4.68n Tf=820.9p Itf=.35 Vtf=4 Xtf=7 Rb=10)")
 
 
 

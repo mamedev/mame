@@ -136,10 +136,6 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-
-private:
-	float m_target_volume;
-	float m_current_volume;
 };
 
 

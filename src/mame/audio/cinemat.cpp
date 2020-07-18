@@ -23,6 +23,7 @@
 
 #include "audio/nl_armora.h"
 #include "audio/nl_barrier.h"
+#include "audio/nl_boxingb.h"
 #include "audio/nl_ripoff.h"
 #include "audio/nl_solarq.h"
 #include "audio/nl_spacewar.h"
@@ -348,120 +349,8 @@ solarq_audio_device::solarq_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(BOXING_BUGS_AUDIO, boxingb_audio_device, "boxingb_audio", "Boxing Bugs Sound Board")
 
 boxingb_audio_device::boxingb_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, BOXING_BUGS_AUDIO, tag, owner, clock, 0x0c)
+	: cinemat_audio_device(mconfig, BOXING_BUGS_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(boxingb), 5000.0)
 {
-}
-
-void boxingb_audio_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	static const char *const sample_names[] =
-	{
-		"*boxingb",
-		"softexpl",
-		"loudexpl",
-		"chirp",
-		"eggcrack",
-		"bugpusha",
-		"bugpushb",
-		"bugdie",
-		"beetle",
-		"music",
-		"cannon",
-		"bounce",
-		"bell",
-		nullptr
-	};
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(12);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
-
-void boxingb_audio_device::inputs_changed(u8 curvals, u8 oldvals)
-{
-	// execute on the rising edge of bit 1
-	if (rising_edge(curvals, oldvals, 1))
-		shiftreg_latch();
-
-	// execute on the rising edge of bit 0
-	if (rising_edge(curvals, oldvals, 0))
-		shiftreg16_latch();
-
-	// on the rising edge of bit 4, clock bit 7 into the shift register
-	if (rising_edge(curvals, oldvals, 4))
-	{
-		shiftreg_clock(curvals >> 7);
-		shiftreg16_clock(curvals >> 7);
-	}
-
-	// bounce - rising edge
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->start(10, 10);
-
-	// bell - falling edge
-	if (falling_edge(curvals, oldvals, 3))
-		m_samples->start(11, 11);
-}
-
-void boxingb_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
-{
-	// soft explosion - falling edge
-	if (falling_edge(curvals, oldvals, 7))
-		m_samples->start(0, 0);
-
-	// loud explosion - falling edge
-	if (falling_edge(curvals, oldvals, 6))
-		m_samples->start(1, 1);
-
-	// chirping birds - 0=on, 1=off
-	if (falling_edge(curvals, oldvals, 5))
-		m_samples->start(2, 2);
-	if (rising_edge(curvals, oldvals, 5))
-		m_samples->stop(2);
-
-	// egg cracking - falling edge
-	if (falling_edge(curvals, oldvals, 4))
-		m_samples->start(3, 3);
-
-	// bug pushing A - rising edge
-	if (rising_edge(curvals, oldvals, 3))
-		m_samples->start(4, 4);
-
-	// bug pushing B - rising edge
-	if (rising_edge(curvals, oldvals, 2))
-		m_samples->start(5, 5);
-
-	// bug dying - falling edge
-	if (falling_edge(curvals, oldvals, 1))
-		m_samples->start(6, 6);
-
-	// beetle on screen - falling edge
-	if (falling_edge(curvals, oldvals, 0))
-		m_samples->start(7, 7);
-}
-
-void boxingb_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
-{
-	// start/stop the music sample on the high bit
-	if (rising_edge(curvals, oldvals, 15))
-		m_samples->start(8, 8, true);
-	if (falling_edge(curvals, oldvals, 15))
-		m_samples->stop(8);
-
-	// set the frequency
-	int freq = 56818.181818 / (4096 - (curvals & 0xfff));
-	m_samples->set_frequency(8, 44100 * freq / 1050);
-
-	// set the volume
-	int vol = (~curvals >> 12) & 3;
-	m_samples->set_volume(8, vol / 3.0);
-
-	// cannon - falling edge
-	if (rising_edge(curvals, oldvals, 14))
-		m_samples->start(9, 9);
 }
 
 

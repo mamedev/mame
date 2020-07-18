@@ -1146,16 +1146,15 @@ void cinemat_state::starcas(machine_config &config)
 void cinemat_64level_state::solarq(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	SOLAR_QUEST_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x93);
+	SOLAR_QUEST_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch);
 }
 
 void cinemat_color_state::boxingb(machine_config &config)
 {
 	cinemat_jmi_32k(config);
-	BOXING_BUGS_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
+	BOXING_BUGS_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch);
 	m_screen->set_visarea(0, 1024, 0, 788);
-
-	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
+//	m_outlatch->q_out_cb<7>().append(FUNC(cinemat_state::mux_select_w));
 }
 
 void cinemat_state::wotw(machine_config &config)
@@ -1535,11 +1534,7 @@ void qb3_state::init_qb3()
 	save_item(NAME(m_qb3_lasty));
 }
 
-void cinemat_64level_state::init_solarq()
-{
-	save_item(NAME(m_target_volume));
-	save_item(NAME(m_current_volume));
-}
+
 
 /*************************************
  *
@@ -1566,7 +1561,7 @@ GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empt
 GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, init_solarq,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest (rev 10 8 81)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
+GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, empty_init,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest (rev 10 8 81)", MACHINE_SUPPORTS_SAVE, layout_solarq )
 GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_SUPPORTS_SAVE, layout_wotw )
 GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_SUPPORTS_SAVE )
