@@ -37,7 +37,7 @@
 class raiden_ms_state : public driver_device
 {
 public:
-	raiden_ms_state(const machine_config& mconfig, device_type type, const char* tag) :
+	raiden_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -57,7 +57,7 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void raidenm(machine_config& config);
+	void raidenm(machine_config &config);
 	void init_raidenm();
 
 protected:
