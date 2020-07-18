@@ -490,12 +490,12 @@ namespace solver
 		}
 
 		if (m_stat_newton_raphson % 100 == 0)
-			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_2(100, this->name()));
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3(100, this->name(), exec().time().as_double() * 1e6));
 
 		if (resched && !m_Q_sync.net().is_queued())
 		{
 			// reschedule ....
-			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2(this->name(), exec().time().as_double() * 1e6));
 			// FIXME: test and enable - this is working better, though not optimal yet
 #if 0
 			// Don't store, the result can not be used
