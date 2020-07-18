@@ -41,7 +41,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_soundcpu(*this, "soundcpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ym1(*this, "ym1"),
@@ -53,7 +53,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_videoram3(*this, "videoram3")
+		m_videoram3(*this, "videoram3"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void raidenm(machine_config& config);
@@ -66,7 +67,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_soundcpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ym2203_device> m_ym1;
@@ -79,6 +80,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_videoram3;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8); };
 	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);  };
@@ -89,7 +91,15 @@ private:
 
 	void raidenm_map(address_map &map);
 	void raidenm_sub_map(address_map &map);
-	void raidenm_sound_map(address_map &map);
+
+	u8 sound_status_r();
+	void sound_command_w(u8 data);
+	void adpcm_w(u8 data);
+	void audio_map(address_map& map);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	u8 m_adpcm_data;
+
+	void unk_snd_dffx_w(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
@@ -113,15 +123,14 @@ void raiden_ms_state::raidenm_map(address_map &map)
 {
 	map(0x00000, 0x06fff).ram();
 	map(0x07000, 0x07fff).ram();
-	map(0x08000, 0x08fff).ram();
 	map(0x0a000, 0x0afff).ram().share("shared_ram");
 
 	map(0x0b000, 0x0b001).portr("P1");
 	map(0x0b002, 0x0b003).portr("P2");
 	map(0x0b004, 0x0b005).portr("P3");
-	map(0x0b008, 0x0b009).portr("P4");
+	map(0x0b006, 0x0b007).nopw();
+	map(0x0b008, 0x0b009).rw(FUNC(raiden_ms_state::sound_status_r), FUNC(raiden_ms_state::sound_command_w)).umask16(0xff00);
 
-	map(0x0b006, 0x0b007).ram();
 
 	map(0x0c000, 0x0cfff).ram().w(FUNC(raiden_ms_state::vram_w)).share("videoram");
 	map(0x0d800, 0x0dfff).ram().share("spriteram");
@@ -153,22 +162,60 @@ void raiden_ms_state::raidenm_sub_map(address_map &map)
 }
 
 
-void raiden_ms_state::raidenm_sound_map(address_map &map)
+u8 raiden_ms_state::sound_status_r()
+{
+	return 0;
+}
+
+void raiden_ms_state::sound_command_w(u8 data)
+{
+	m_soundlatch->write(data & 0xff);
+}
+
+
+void raiden_ms_state::adpcm_w(u8 data)
+{
+//  membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
+	m_msm->reset_w(BIT(data, 4));
+
+	m_adpcm_data = data & 0xf;
+	//m_msm->data_w(data & 0xf);
+//  m_msm->vclk_w(BIT(data, 7));
+	//m_msm->vclk_w(1);
+	//m_msm->vclk_w(0);
+}
+
+void raiden_ms_state::unk_snd_dffx_w(offs_t offset, u8 data)
+{
+
+}
+
+void raiden_ms_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-
-	map(0xdff0, 0xdfff).ram();
-
+	map(0x8000, 0x8000).w(FUNC(raiden_ms_state::adpcm_w));
+	map(0x8000, 0xbfff).bankr("sound_bank");
 	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd7ff).ram();
+	// area 0xdff0-5 is never ever readback, applying a RAM mirror causes sound to go significantly worse,
+	// what they are even for?  (offset select bankswitch rather than data select?)
+	map(0xdff0, 0xdfff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(raiden_ms_state::unk_snd_dffx_w));
 	map(0xe000, 0xe001).w(m_ym1, FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w(m_ym2, FUNC(ym2203_device::write));
 	map(0xe008, 0xe009).r(m_ym1, FUNC(ym2203_device::read));
 	map(0xe00a, 0xe00b).r(m_ym2, FUNC(ym2203_device::read));
 }
 
+WRITE_LINE_MEMBER(raiden_ms_state::adpcm_int)
+{
+	m_msm->data_w(m_adpcm_data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
 
 void raiden_ms_state::machine_start()
 {
+	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
 
@@ -365,7 +412,7 @@ static INPUT_PORTS_START( raidenm )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P4")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x16x4_layout =
@@ -419,8 +466,8 @@ void raiden_ms_state::raidenm(machine_config &config)
 	V30(config, m_subcpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_sub_map);
 
-	Z80(config, m_soundcpu, 24_MHz_XTAL / 8); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
-	m_soundcpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_sound_map);
+	Z80(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::audio_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
@@ -436,26 +483,25 @@ void raiden_ms_state::raidenm(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_raiden_ms);
 	
+	GENERIC_LATCH_8(config, m_soundlatch);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	YM2203(config, m_ym1, 24_MHz_XTAL / 8); // unknown clock
+	YM2203(config, m_ym1, XTAL(4'000'000)/4); // unknown clock
 	m_ym1->add_route(0, "mono", 0.15);
 	m_ym1->add_route(1, "mono", 0.15);
 	m_ym1->add_route(2, "mono", 0.15);
 	m_ym1->add_route(3, "mono", 0.10);
 
-	YM2203(config, m_ym2, 24_MHz_XTAL / 8); // unknown clock
+	YM2203(config, m_ym2, XTAL(4'000'000)/4); // unknown clock
 	m_ym2->add_route(0, "mono", 0.15);
 	m_ym2->add_route(1, "mono", 0.15);
 	m_ym2->add_route(2, "mono", 0.15);
 	m_ym2->add_route(3, "mono", 0.10);
 
 	MSM5205(config, m_msm, XTAL(384'000)); // unknown clock
-//	m_msm->vck_legacy_callback().set(FUNC(toki_ms_state::adpcm_int));
-//	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unverified
+	m_msm->vck_legacy_callback().set(FUNC(raiden_ms_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unverified
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 }
@@ -495,7 +541,7 @@ ROM_START( raidenm )
 	ROM_LOAD16_BYTE( "msraid_6-1-8086-1_rd606b.u19", 0x0c0001, 0x20000, CRC(58eac0b6) SHA1(618813c7593d13271d2826739f24e08dda400b0d) )
 	ROM_LOAD16_BYTE( "msraid_6-1-8086-1_rd605b.u18", 0x0c0000, 0x20000, CRC(251fef93) SHA1(818095a77cb94fd4acc9eb26954615ee93e8432c) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) // on MOD 1/5 board
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on MOD 1/5 board
 	ROM_LOAD( "msraid_1-5_rd101.ic12",  0x00000, 0x10000, CRC(2b76e371) SHA1(4c9732950f576e498d02fde485ba92fb293d5594) )
 
 	// dumper's note: ROMs [rd4b1, rd4b2, rb4b3, rd4b4] and [rd4a1, rd4a2, rb4a3, rd4a4] have a strange setup
