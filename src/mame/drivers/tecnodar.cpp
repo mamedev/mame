@@ -23,7 +23,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ppi(*this, "ppi")
 		, m_eeprom(*this, "eeprom")
+		, m_psg(*this, "psg")
 		, m_rombank(*this, "rombank")
+		, m_coins(*this, "COINS")
+		, m_inputs(*this, "IN%u", 0U)
+		, m_input_select(0xffff)
 	{
 	}
 
@@ -34,6 +38,7 @@ protected:
 
 private:
 	void bank_w(offs_t offset, u8 data);
+	u8 inputs_r();
 	u8 ppi_r(offs_t offset);
 	void ppi_w(offs_t offset, u8 data);
 	void ppi_pa_w(u8 data);
@@ -46,7 +51,12 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<ay8910_device> m_psg;
 	required_memory_bank m_rombank;
+	required_ioport m_coins;
+	required_ioport_array<16> m_inputs;
+
+	u16 m_input_select;
 };
 
 
@@ -54,12 +64,24 @@ void tecnodar_state::machine_start()
 {
 	m_rombank->configure_entries(0, 8, memregion("banked")->base(), 0x4000);
 	m_rombank->set_entry(0);
+
+	save_item(NAME(m_input_select));
 }
 
 
 void tecnodar_state::bank_w(offs_t offset, u8 data)
 {
-	m_rombank->set_entry(offset & 0x07);
+	m_rombank->set_entry((offset & 0x0c) >> 2 | (offset & 0x01) << 2);
+}
+
+u8 tecnodar_state::inputs_r()
+{
+	u8 ret = 0xf;
+	for (int i = 0; i < 16; i++)
+		if (!BIT(m_input_select, i))
+			ret &= m_inputs[i]->read();
+
+	return (ret << 4) | m_coins->read();
 }
 
 u8 tecnodar_state::ppi_r(offs_t offset)
@@ -77,16 +99,21 @@ void tecnodar_state::ppi_pa_w(u8 data)
 	m_eeprom->cs_write(BIT(data, 0));
 	m_eeprom->clk_write(BIT(data, 1));
 	m_eeprom->di_write(BIT(data, 2));
+
+	m_input_select = (m_input_select & 0xff00) | data;
 }
 
 void tecnodar_state::ppi_pb_w(u8 data)
 {
+	if (!BIT(data, 7))
+		m_psg->reset(); // maybe
+
 	logerror("%s: Writing %02X to PPI port B\n", machine().describe_context(), data);
 }
 
 void tecnodar_state::ppi_pc_w(u8 data)
 {
-	logerror("%s: Writing %02X to PPI port C\n", machine().describe_context(), data);
+	m_input_select = u16(data) << 8 | (m_input_select & 0x00ff);
 }
 
 void tecnodar_state::mem_map(address_map &map)
@@ -131,9 +158,111 @@ static INPUT_PORTS_START(tecnodar)
 	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unused))
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
+
+	PORT_START("COINS")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN0")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN1")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN2")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN3")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN4")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN5")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN6")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN7")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN8")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN9")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN10")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN11")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN12")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN13")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN14")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN15")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 
@@ -161,9 +290,10 @@ void tecnodar_state::tecnodar(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &psg(AY8910(config, "psg", 10.245_MHz_XTAL / 6)); // Microchip AY38910A/P; divider not verified
-	psg.port_a_read_callback().set_ioport("DSW");
-	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, m_psg, 10.245_MHz_XTAL / 6); // Microchip AY38910A/P; divider not verified
+	m_psg->port_a_read_callback().set_ioport("DSW");
+	m_psg->port_b_read_callback().set(FUNC(tecnodar_state::inputs_r));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
