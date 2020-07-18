@@ -36,12 +36,13 @@
 class raiden_ms_state : public driver_device
 {
 public:
-	raiden_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
+	raiden_ms_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_ym1(*this, "ym1"),
 		m_ym2(*this, "ym2"),
 		m_msm(*this, "msm5205"),
@@ -49,7 +50,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	void raidenm(machine_config &config);
+	void raidenm(machine_config& config);
 	void init_raidenm();
 
 protected:
@@ -60,12 +61,17 @@ private:
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<ym2203_device> m_ym1;
 	required_device<ym2203_device> m_ym2;
 	required_device<msm5205_device> m_msm;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8); };
+	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);  };
+	void pal_write16(offs_t offset, u16 data, u16 mem_mask = ~0) { m_palette->write16(offset, ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8), ((mem_mask & 0xff00) >> 8) | ((mem_mask & 0x00ff) << 8)); };
+	void pal_write16_ext(offs_t offset, u16 data, u16 mem_mask = ~0) { m_palette->write16_ext(offset, ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8), ((mem_mask & 0xff00) >> 8) | ((mem_mask & 0x00ff) << 8)); };
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -96,7 +102,7 @@ void raiden_ms_state::raidenm_map(address_map &map)
 
 	
 
-	map(0x0c000, 0x0cfff).ram();
+	map(0x0c000, 0x0cfff).ram(); // text layer
 	map(0x0d800, 0x0dfff).ram().share("spriteram");
 
 	map(0xa0000, 0xfffff).rom();
@@ -106,7 +112,9 @@ void raiden_ms_state::raidenm_sub_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
 	map(0x02000, 0x02fff).ram();
-	map(0x03000, 0x03fff).ram();
+	map(0x03000, 0x033ff).ram().rw(FUNC(raiden_ms_state::pal_read16), FUNC(raiden_ms_state::pal_write16)).share("palette");
+	map(0x03400, 0x037ff).ram().rw(FUNC(raiden_ms_state::pal_read16_ext), FUNC(raiden_ms_state::pal_write16_ext)).share("palette_ext");
+	map(0x03800, 0x03fff).ram();
 
 	map(0x07ffe, 0x07fff).ram();
 
@@ -140,8 +148,8 @@ uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(0, cliprect);
 
 	// TODO, convert to device, share between Modualar System games
-	const int NUM_SPRITES = 0x400;
-	const int X_EXTRA_OFFSET = 0;
+	const int NUM_SPRITES = 0x200;
+	const int X_EXTRA_OFFSET = 256;
 
 	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
 	{
@@ -398,7 +406,7 @@ static const gfx_layout tiles8x8x4_layout =
 
 
 static GFXDECODE_START( gfx_raiden_ms )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
 
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 32 )
@@ -437,10 +445,10 @@ void raiden_ms_state::raidenm(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(raiden_ms_state::vblank_irq));
 
-	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x400);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_raiden_ms);
-
+	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
