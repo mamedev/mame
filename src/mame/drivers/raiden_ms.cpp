@@ -310,8 +310,8 @@ uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 		int tile = (attr0 & 0xff00) >> 8;
 		tile |= (attr1 & 0x003f) << 8;
 
-		int flipx = (attr1 & 0x0040);
 		int flipy = (attr2 & 0x4000);
+		int flipx = (attr2 & 0x2000);
 
 		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - Y_EXTRA_OFFSET, 15);
 	}
