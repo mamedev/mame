@@ -3045,33 +3045,62 @@ Core Input Options
 
 **-joystick_map** *<map>* / **-joymap** *<map>*
 
-    Controls how joystick values map to digital joystick controls. MAME accepts
-    all joystick input from the system as analog data.  For true analog
-    joysticks, this needs to be mapped down to the usual 4-way or 8-way digital
-    joystick values.  To do this, MAME divides the analog range into a 9x9 grid.
-    It then takes the joystick axis position (for X and Y axes only), maps it to
-    this grid, and then looks up a translation from a joystick map.  This
+    Controls how analog joystick values map to digital joystick controls.   
+    
+    Systems such as Pac-Man use a 4-way digital joystick and will exhibit
+    undesired behavior when a diagonal is triggered; in the case of Pac-Man,
+    movement will stop completely at intersections when diagonals are triggered
+    and the game will be considerably harder to play correctly.  Many other
+    arcade cabinets used 4-way or 8-way joysticks (as opposed to full analog
+    joysticks), so for true analog joysticks such as flight sticks and analog
+    thumb sticks, this then needs to be mapped down to the expected
+    4-way or 8-way digital joystick values.
+    
+    To do this, MAME divides the analog range into a 9x9 grid that looks
+    like this:
+    
+    **insert 9x9 grid picture here**
+    
+    MAME then takes the joystick axis position (for X and Y axes only), maps it
+    to this grid, and then looks up a translation from a joystick map.  This
     parameter allows you to specify the map.
+
+    For instance, an 8-way joystick map traditionally looks like this:
+
+    **insert 8-way map picture here**
+
+    This mapping gives considerable leeway to the angles accepted for a given
+    direction, so that being approximately in the area of the direction you want
+    will give you the results you want.  Without that, if you were slightly off
+    center while holding the stick left, it would not recognize the action
+    correctly.
 
     The default is ``auto``, which means that a standard 8-way, 4-way, or 4-way
     diagonal map is selected automatically based on the input port configuration
     of the current system.
 
-    Maps are defined as a string of numbers and characters. Since the grid is
-    9x9, there are a total of 81 characters necessary to define a complete map.
-    Below is an example map for an 8-way joystick:
+    Generally you will want to set up the **-joystick_map** setting in the
+    per-system ``<system>.ini`` file as opposed to the main ``MAME.INI``
+    file so that the mapping only affects the systems you want it to.  See 
+    :ref:`Multiple Configuration Files <advanced-multi-CFG>` for further
+    details on per-system configuration.
 
-		+-------------+---------------------------------------------------------+
-		| | 777888999 |                                                         |
-		| | 777888999 | | Note that the numeric digits correspond to the keys   |
-		| | 777888999 | | on a numeric keypad. So '7' maps to up+left, '4' maps |
-		| | 444555666 | | to left, '5' maps to neutral, etc. In addition to the |
-		| | 444555666 | | numeric values, you can specify the character 's',    |
-		| | 444555666 | | which means "sticky". In this case, the value of the  |
-		| | 111222333 | | map is the same as it was the last time a non-sticky  |
-		| | 111222333 | | value was read.                                       |
-		| | 111222333 |                                                         |
-		+-------------+---------------------------------------------------------+
+    Maps are defined as a string of numbers and characters. Since the grid is
+    9x9, there are a total of 81 characters necessary to define a complete
+    map.  Below is an example map for an 8-way joystick that matches the
+    picture shown above:
+
+		+-------------+--------------------------------------------------------+
+		| | 777888999 |                                                        |
+		| | 777888999 | | Note that the numeric digits correspond to the keys  |
+		| | 777888999 | | on a numeric keypad. So '7' maps to up+left, '4' maps|
+		| | 444555666 | | to left, '5' maps to neutral, etc. In addition to the|
+		| | 444555666 | | numeric values, you can specify the character 's',   |
+		| | 444555666 | | which means "sticky".  Sticky map positions will keep|
+		| | 111222333 | | the output the same as the last non-sticky input sent|
+		| | 111222333 | | to the system.                                       |
+		| | 111222333 |                                                        |
+		+-------------+--------------------------------------------------------+
 
     To specify the map for this parameter, you can specify a string of rows
     separated by a '.' (which indicates the end of a row), like so:
@@ -3106,6 +3135,47 @@ Core Input Options
     The remaining three rows are also missing, so they are assumed to be the
     up/down mirrors of the first three rows, giving three final rows of
     111222333.
+
+    With 4-way games, sticky becomes important to avoid problems with
+    diagonals.  Typically you would choose a map that looks something like this:
+
+    **insert 9x9 4-way sticky grid picture here**
+
+    This means that if you press left, then roll the stick towards up (without
+    re-centering it) you'll pass through the sticky section in the corner.  As
+    you do, MAME will read that sticky corner as **left** as that's the last
+    non-sticky input it received.  As the roll gets into the upward space of
+    the map, this then switches to an up motion.
+
+    This map would look somewhat like:
+
+		+-------------+---------------------------------------------------------+
+		| | s8888888s |                                                         |
+		| | 4s88888s6 | | For this mapping, we have a wide range for the        |
+		| | 44s888s66 | | cardinal directions on 8, 4, 6, and 2.  We have sticky|
+		| | 444555666 | | on the meeting points between those cardinal          |
+		| | 444555666 | | directions where the appropriate direction isn't      |
+		| | 444555666 | | going to be completely obvious.                       |
+		| | 44s222s66 |                                                         |
+		| | 4s22222s6 |                                                         |
+		| | s2222222s |                                                         |
+		+-------------+---------------------------------------------------------+
+
+    To specify the map for this parameter, you can specify a string of rows
+    separated by a '.' (which indicates the end of a row), like so:
+
+    +-------------------------------------------------------------------------------------------------------+
+    | **-joymap s8888888s.4s88888s6.44s888s66.444555666.444555666.444555666.44s222s66.4s22222s6.s2222222s** |
+    +-------------------------------------------------------------------------------------------------------+
+
+    Like before, because of the symmetry between top and bottom and left and
+    right, we can shorten this down to:
+
+    +------------------------------+
+    | **-joymap s8.4s8.44s8.4445** |
+    +------------------------------+
+    
+
 
 .. _mame-commandline-joystickdeadzone:
 
