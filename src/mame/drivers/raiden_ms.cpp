@@ -49,8 +49,9 @@ public:
 		m_msm(*this, "msm5205"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram")
-		//m_videoram2(*this, "videoram2"),
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_videoram3(*this, "videoram3")
 	{ }
 
 	void raidenm(machine_config& config);
@@ -72,6 +73,8 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram3;
 
 	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8); };
 	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);  };
@@ -89,9 +92,16 @@ private:
 	void descramble_16x16tiles(uint8_t* src, int len);
 
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
-	tilemap_t *m_bg_tilemap;
+	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap3);
+
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap2;
+	tilemap_t *m_bg_tilemap3;
 };
 
 
@@ -120,7 +130,8 @@ void raiden_ms_state::raidenm_map(address_map &map)
 void raiden_ms_state::raidenm_sub_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
-	map(0x02000, 0x02fff).ram();
+	map(0x02000, 0x027ff).ram().w(FUNC(raiden_ms_state::vram2_w)).share("videoram2");
+	map(0x02800, 0x02fff).ram().w(FUNC(raiden_ms_state::vram3_w)).share("videoram3");
 	map(0x03000, 0x033ff).ram().rw(FUNC(raiden_ms_state::pal_read16), FUNC(raiden_ms_state::pal_write16)).share("palette");
 	map(0x03400, 0x037ff).ram().rw(FUNC(raiden_ms_state::pal_read16_ext), FUNC(raiden_ms_state::pal_write16_ext)).share("palette_ext");
 	map(0x03800, 0x03fff).ram();
@@ -158,6 +169,18 @@ void raiden_ms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
+void raiden_ms_state::vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap2->mark_tile_dirty(offset);
+}
+
+void raiden_ms_state::vram3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram3[offset]);
+	m_bg_tilemap3->mark_tile_dirty(offset);
+}
+
 TILE_GET_INFO_MEMBER(raiden_ms_state::get_tile_info_tilemap1)
 {
 	int tiledata = m_videoram[tile_index];
@@ -167,15 +190,39 @@ TILE_GET_INFO_MEMBER(raiden_ms_state::get_tile_info_tilemap1)
 	tileinfo.set(3, tile, color, 0);
 }
 
+TILE_GET_INFO_MEMBER(raiden_ms_state::get_tile_info_tilemap2)
+{
+	int tile = m_videoram2[tile_index];
+	tileinfo.set(1, tile & 0xfff, tile >> 12, 0);
+}
+
+TILE_GET_INFO_MEMBER(raiden_ms_state::get_tile_info_tilemap3)
+{
+	int tile = m_videoram3[tile_index];
+	tileinfo.set(2, tile & 0xfff, tile >> 12, 0);
+}
+
+
 void raiden_ms_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_ms_state::get_tile_info_tilemap1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(15);
+
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_ms_state::get_tile_info_tilemap2)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	//m_bg_tilemap2->set_transparent_pen(15);
+
+	m_bg_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_ms_state::get_tile_info_tilemap3)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg_tilemap3->set_transparent_pen(15);
+
 }
 
 uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
+
+	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap3->draw(screen, bitmap, cliprect, 0, 0);
+
 
 	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
@@ -331,11 +378,11 @@ static const gfx_layout tiles8x8x4_layout =
 
 
 static GFXDECODE_START( gfx_raiden_ms )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
 
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x000, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x300, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 16 )
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(raiden_ms_state::vblank_irq)
@@ -439,13 +486,13 @@ ROM_START( raidenm )
 	// dumper's note: ROMs [rd4b1, rd4b2, rb4b3, rd4b4] and [rd4a1, rd4a2, rb4a3, rd4a4] have a strange setup
 	// with pins 32, 31 and 31 soldered together and pin 2 connected between all four chips, while the sockets are for 28 pin chips
 	// (with 27C512 silkscreened on the PCB behind the chips)
-	ROM_REGION( 0x80000, "gfx1", 0 ) // on one of the MOD 4/3 boards
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) // on one of the MOD 4/3 boards
 	ROM_LOAD32_BYTE( "msraid_4-3-1_rd4b1.ic17",  0x00003, 0x20000, CRC(ff35b830) SHA1(fb552b2aa50aed12c3adb6ef9032a438adf6f37f) )
 	ROM_LOAD32_BYTE( "msraid_4-3-1_rd4b2.ic16",  0x00002, 0x20000, CRC(da0b2fca) SHA1(4ffe177587759ea03e73bcc5c36bedc869653ce5) )
 	ROM_LOAD32_BYTE( "msraid_4-3-1_rd4b3.ic15",  0x00001, 0x20000, CRC(00e5953f) SHA1(488ac889a587bf4108be424faa9123abe73b5246) )
 	ROM_LOAD32_BYTE( "msraid_4-3-1_rd4b4.ic14",  0x00000, 0x20000, CRC(932f8407) SHA1(0c7a0b18bbc3ac1f30bdb0ba4466c1e253130305) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) // on another MOD 4/3 board
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_INVERT ) // on another MOD 4/3 board
 	ROM_LOAD32_BYTE( "msraid_4-3-2_rd4a1.ic17",  0x00003, 0x20000, CRC(32892554) SHA1(8136626bf7073cdf19a8a38d19f6d0c52405df16) )
 	ROM_LOAD32_BYTE( "msraid_4-3-2_rd4a2.ic16",  0x00002, 0x20000, CRC(cb325246) SHA1(f0a7bf8b1b5145541af78eba0375392a3030e2d9) )
 	ROM_LOAD32_BYTE( "msraid_4-3-2_rd4a3.ic15",  0x00001, 0x20000, CRC(7554acef) SHA1(ec418ef2246c889d0e308925e11b1d3328bd83f9) )
