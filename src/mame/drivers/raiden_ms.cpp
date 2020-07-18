@@ -48,6 +48,8 @@ public:
 		m_ym2(*this, "ym2"),
 		m_msm(*this, "msm5205"),
 		m_spriteram(*this, "spriteram"),
+		m_scrollram1(*this, "scrollram1"),
+		m_scrollram2(*this, "scrollram2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
@@ -71,6 +73,8 @@ private:
 	required_device<ym2203_device> m_ym2;
 	required_device<msm5205_device> m_msm;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_scrollram1;
+	required_shared_ptr<uint16_t> m_scrollram2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
@@ -119,10 +123,11 @@ void raiden_ms_state::raidenm_map(address_map &map)
 
 	map(0x0b006, 0x0b007).ram();
 
-	
-
 	map(0x0c000, 0x0cfff).ram().w(FUNC(raiden_ms_state::vram_w)).share("videoram");
 	map(0x0d800, 0x0dfff).ram().share("spriteram");
+
+	map(0x0f100, 0x0f103).ram().share("scrollram1");
+	map(0x0f900, 0x0f903).ram().share("scrollram2");
 
 	map(0xa0000, 0xfffff).rom();
 }
@@ -136,9 +141,13 @@ void raiden_ms_state::raidenm_sub_map(address_map &map)
 	map(0x03400, 0x037ff).ram().rw(FUNC(raiden_ms_state::pal_read16_ext), FUNC(raiden_ms_state::pal_write16_ext)).share("palette_ext");
 	map(0x03800, 0x03fff).ram();
 
+	map(0x04000, 0x04fff).ram().share("shared_ram");
+
 	map(0x07ffe, 0x07fff).ram();
 
-	map(0x04000, 0x04fff).ram().share("shared_ram");
+	map(0x08000, 0x08001).nopw();
+	map(0x0a000, 0x0a001).nopw();
+	map(0x0e800, 0x0e801).nopw();
 
 	map(0xc0000, 0xfffff).rom();
 }
@@ -220,18 +229,24 @@ uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 {
 	bitmap.fill(0, cliprect);
 
+	m_bg_tilemap3->set_scrollx(0, 64 + (((m_scrollram1[0] & 0xff00) >> 8) | ((m_scrollram1[0] & 0x00ff) << 8)));
+	m_bg_tilemap3->set_scrolly(0, 17 + (((m_scrollram1[1] & 0xff00) >> 8) | ((m_scrollram1[1] & 0x00ff) << 8)));
+
+	m_bg_tilemap2->set_scrollx(0, 64 + (((m_scrollram2[0] & 0xff00) >> 8) | ((m_scrollram2[0] & 0x00ff) << 8)));
+	m_bg_tilemap2->set_scrolly(0, 17 + (((m_scrollram2[1] & 0xff00) >> 8) | ((m_scrollram2[1] & 0x00ff) << 8)));
+
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap3->draw(screen, bitmap, cliprect, 0, 0);
 
 
 	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
-	const int X_EXTRA_OFFSET = 256;
-	const int Y_EXTRA_OFFSET = 24;
+	const int X_EXTRA_OFFSET = 256-16;
+	const int Y_EXTRA_OFFSET = 30;
 
-	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
+	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
 	{
-		gfx_element *gfx = m_gfxdecode->gfx(0);
+		gfx_element* gfx = m_gfxdecode->gfx(0);
 
 		uint16_t attr0 = m_spriteram[i + 0];
 		uint16_t attr1 = m_spriteram[i + 1];
@@ -240,8 +255,8 @@ uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES + 1]; // unused?
 
 		int ypos = attr0 & 0x00ff;
-		int xpos = (attr1 & 0xff00)>>8;
-		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000; 
+		int xpos = (attr1 & 0xff00) >> 8;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
 		ypos = (0xff - ypos);
 
@@ -251,7 +266,7 @@ uint32_t raiden_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr2 & 0x4000);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-Y_EXTRA_OFFSET,15);
+		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - Y_EXTRA_OFFSET, 15);
 	}
 
 	m_bg_tilemap->set_scrolly(0, 16);
