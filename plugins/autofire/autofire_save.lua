@@ -81,10 +81,6 @@ function lib:save_settings(buttons)
 	local json = require('json')
 	local settings = serialize_settings(buttons)
 	local data = json.stringify(settings, {indent = true})
-	if string.len(data) <= 2 then
-		os.remove(path .. get_settings_filename())
-		return
-	end
 	local file = io.open(path .. get_settings_filename(), 'w')
 	if file then
 		file:write(data)
