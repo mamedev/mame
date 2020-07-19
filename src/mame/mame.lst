@@ -37746,6 +37746,8 @@ itvg49
 zone60                          // Zone 60
 zone100                         //
 lx_jg7415                       //
+zonemini
+react
 
 @source:spg2xx_zone_32bit.cpp
 mywicodx                        //
