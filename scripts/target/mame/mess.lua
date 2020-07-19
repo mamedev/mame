@@ -2833,7 +2833,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/primo.cpp",
 	MAME_DIR .. "src/mame/includes/primo.h",
 	MAME_DIR .. "src/mame/machine/primo.cpp",
-	MAME_DIR .. "src/mame/video/primo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "microsoft")

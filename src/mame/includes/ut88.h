@@ -127,9 +127,5 @@ private:
 	output_finder<6> m_digits;
 };
 
-/*----------- defined in video/ut88.c -----------*/
-
-extern const gfx_layout ut88_charlayout;
-
 
 #endif // MAME_INCLUDES_UT88_H
