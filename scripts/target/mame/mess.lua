@@ -1889,7 +1889,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/b2m.cpp",
 	MAME_DIR .. "src/mame/includes/b2m.h",
 	MAME_DIR .. "src/mame/machine/b2m.cpp",
-	MAME_DIR .. "src/mame/video/b2m.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "bondwell")
