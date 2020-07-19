@@ -48,6 +48,8 @@ namespace netlist
 
 		NETLIB_DESTRUCTOR(log)
 		{
+			if (m_reset)
+				log_value(m_I());
 			m_sem_w.release();
 			m_done = true;
 			m_write_thread.join();
@@ -68,9 +70,7 @@ namespace netlist
 				if (m_w >= BUFFERS)
 					m_w = 0;
 			}
-			/* use pstring::sprintf, it is a LOT faster */
 			m_buffers[m_w].push_back({exec().time(), val});
-			//m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
 		}
 
 		NETLIB_RESETI() { m_reset = true; }
@@ -90,6 +90,7 @@ namespace netlist
 				auto &b = m_buffers[m_r];
 
 				for (auto &e : b)
+					/* use pstring::sprintf, it is a LOT faster */
 					m_writer.writeline(plib::pfmt("{1:.9} {2}").e(e.t.as_fp<nl_fptype>()).e(e.v));
 				b.clear();
 				m_sem_r.release();
