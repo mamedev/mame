@@ -1185,9 +1185,11 @@ static INPUT_PORTS_START( bigrun )
 	PORT_DIPSETTING(    0x02, "2 (Green-White Car)" )
 	PORT_DIPSETTING(    0x04, "3 (Red-White Car)" )
 	PORT_DIPSETTING(    0x06, "4 (Yellow Car)" )
-	PORT_DIPNAME( 0x08, 0x00, "Enable Linking" ) PORT_DIPLOCATION("SW1:4") // The manual states this set to "ON" when linking games
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	/* The manual states SW1:4 always set to ON when linking games but doesn't mention if
+	setting SW1:4 OFF disables linking */
+	PORT_DIPNAME( 0x08, 0x00, "Enable Linking" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1303,9 +1305,9 @@ static INPUT_PORTS_START( cischeat )
 	PORT_DIPSETTING(    0x02, "2 (Blue Car)" )
 	PORT_DIPSETTING(    0x04, "3 (Yellow Car)" )
 	PORT_DIPSETTING(    0x06, "4 (Green Car)" )
-	PORT_DIPNAME( 0x08, 0x08, "Enable Linking" ) PORT_DIPLOCATION("SW1:4") // The manual states this set to "ON" when linking games
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "Enable Linking" ) PORT_DIPLOCATION("SW1:4") // Same as bigrun, the manual states this set to ON when linking games
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
