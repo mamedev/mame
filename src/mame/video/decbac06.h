@@ -8,6 +8,10 @@
 #include "screen.h"
 #include "tilemap.h"
 
+#include <memory>
+#include <utility>
+
+
 typedef device_delegate<void (tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags)> decbac06_tile_cb_delegate;
 
 class deco_bac06_device : public device_t

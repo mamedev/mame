@@ -61,8 +61,13 @@
 
 #include <zlib.h>
 
-#include <utility>
+#include <algorithm>
+#include <iterator>
+#include <list>
+#include <memory>
 #include <queue>
+#include <utility>
+#include <vector>
 
 #define AS_IO16             1
 
