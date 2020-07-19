@@ -29,10 +29,10 @@ TODO:
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
-  verification is wanted for: gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_climbern,
-  gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff, gnw_mariocmt,
-  gnw_mariotj, gnw_mbaway, gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster,
-  gnw_snoopyp, gnw_zelda
+  verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
+  gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
+  gnw_mariocmt, gnw_mariotj, gnw_mbaway, gnw_mmousep, gnw_pinball, gnw_popeyep,
+  gnw_sbuster, gnw_snoopyp, gnw_zelda
 
 ****************************************************************************
 
@@ -4293,6 +4293,86 @@ ROM_START( gnw_dkhockey )
 
 	ROM_REGION( 263239, "screen", 0)
 	ROM_LOAD( "gnw_dkhockey.svg", 0, 263239, CRC(3a576c12) SHA1(9a7ca67c35fcfb5858227f3ef2a6027c877c64d3) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Telko Bassmate Computer (model BM-501)
+  * PCB label BM-501
+  * Sharp SM511 label BM-501 556AA (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+  The Bassmate Computer was produced for Telko by Nintendo as an OEM product
+  and sold under different brands, i.e. Telko, KMV and Probe 2000.
+
+  The hardware is identical as G&W Multi Screen, but it's not part of the game
+  series.
+
+***************************************************************************/
+
+class bassmate_state : public hh_sm510_state
+{
+public:
+	bassmate_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void bassmate(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( bassmate )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Compute")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wind")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Cover")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time of Day")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wtr. Temp F")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wtr. Clarity")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Structure")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wtr. Depth(FT)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Season")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+void bassmate_state::bassmate(machine_config &config)
+{
+	sm511_dualv(config, 1920/2, 1253/2, 1920/2, 1273/2);
+}
+
+// roms
+
+ROM_START( bassmate )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bm-501.program", 0x0000, 0x1000, CRC(9bdd0501) SHA1(986b3b84184a987ae383c325700df21d8915f0e2) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bm-501.melody", 0x000, 0x100, BAD_DUMP CRC(fbe15600) SHA1(8be64792fffe5b8913a55b9b2624dd57dc238be7) ) // decap needed for verification
+
+	ROM_REGION( 42305, "screen_top", 0)
+	ROM_LOAD( "bassmate_top.svg", 0, 42305, CRC(0cc056fe) SHA1(4d0e5b115adf513f5b3148ca7e39e0acbafd925c) )
+
+	ROM_REGION( 19775, "screen_bottom", 0)
+	ROM_LOAD( "bassmate_bottom.svg", 0, 19775, CRC(9561d52d) SHA1(903ef3944810c0efdc02f46a619891c1ef17c483) )
 ROM_END
 
 
@@ -9333,6 +9413,9 @@ CONS( 1984, gnw_cgrab,    0,           0, gnw_cgrab,    gnw_cgrab,    gnw_cgrab_
 CONS( 1984, gnw_boxing,   0,           0, gnw_boxing,   gnw_boxing,   gnw_boxing_state,   empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, gnw_dkong3,   0,           0, gnw_dkong3,   gnw_dkong3,   gnw_dkong3_state,   empty_init, "Nintendo", "Micro Vs. System: Donkey Kong 3", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, gnw_dkhockey, 0,           0, gnw_dkhockey, gnw_dkhockey, gnw_dkhockey_state, empty_init, "Nintendo", "Micro Vs. System: Donkey Kong Hockey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+// Telko
+CONS( 1984, bassmate,     0,           0, bassmate,     bassmate,     bassmate_state,     empty_init, "Telko", "Bassmate Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Konami
 CONS( 1989, kdribble,     0,           0, kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
