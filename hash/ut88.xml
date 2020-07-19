@@ -2,14 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+These are for ut88 only - not for ut88mini
+
 -->
 <softwarelist name="ut88" description="UT-88 cassettes">
 
 
-	<software name="basic80">
+	<software name="basic80"><!-- bad load. There's odd white squares on the screen -->
 		<description>Mikro/80 BASIC</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="I, start tape, G" />
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="6665">
 				<rom name="basic80.rku" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d"/>
@@ -17,6 +21,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- The only way to use this is to start in the debugger and load and run cpm256. Then g f800 to get back to the monitor.
+			Then load this tape in the usual manner, then G 100. It will start and expect to load another tape, but after that it
+			hangs. What is it supposed to do? -->
 	<software name="chscom">
 		<description>Changer (v1.1) (CP/M)</description>
 		<year>19??</year>
@@ -28,10 +35,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cpm35">
+	<software name="cpm35" supported="no"><!-- hangs at start -->
 		<description>CP/M (v2.2, 35K)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="I, start tape, G" />
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="6239">
 				<rom name="cpm35.rku" size="6239" crc="655a749b" sha1="e46527bf8eb4e63a090a9161fa88243efd0f40c9"/>
@@ -43,6 +51,7 @@ license:CC0
 		<description>CP/M (v2.2, 256K)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="I, start tape, G" />
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="7945">
 				<rom name="cpm64.rku" size="7945" crc="8041af21" sha1="19e7378328e0bbfe1303225099842fd377ccf5d2"/>
@@ -54,6 +63,7 @@ license:CC0
 		<description>Tetris</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="I, start tape, G" />
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="1641">
 				<rom name="tetris.rku" size="1641" crc="e7373ec6" sha1="7786302a63bf882060a883434cbfba24ad8022ac"/>

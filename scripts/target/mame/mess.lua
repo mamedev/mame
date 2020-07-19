@@ -1995,7 +1995,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ut88.cpp",
 	MAME_DIR .. "src/mame/includes/ut88.h",
 	MAME_DIR .. "src/mame/machine/ut88.cpp",
-	MAME_DIR .. "src/mame/video/ut88.cpp",
 	MAME_DIR .. "src/mame/drivers/vector06.cpp",
 	MAME_DIR .. "src/mame/includes/vector06.h",
 	MAME_DIR .. "src/mame/machine/vector06.cpp",
