@@ -68,7 +68,7 @@ ________________________________________________________________________________
 |  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
 |  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
 |  YES  | Far West   | Compumatic   | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
-|  YES  | Unknown    | Compumatic   | Compumatic ProSPDP-V3 PCB (Philips REF34VA, but no other custom ICs)| Darts                      |
+|  YES  | Unknown    | Compumatic   | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
 |_______|____________|______________|_____________________________________________________________________|____________________________|
 
 There's a later revision of the Compumatic Microdar PCB (V5), smaller, with a standard Atmel AT89S51
@@ -92,7 +92,6 @@ public:
 	}
 
 	void microdar(machine_config &config);
-	void microdar_nvram(machine_config &config);
 	void prospdp(machine_config &config);
 
 private:
@@ -121,13 +120,9 @@ void microdar_state::microdar(machine_config &config)
 	I80C51(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microdar_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &microdar_state::ext_map);
-}
 
-void microdar_state::microdar_nvram(machine_config &config)
-{
-	microdar(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // GM76C88ALK-15 + battery
-	I2C_24C16(config, m_eeprom); // 24LC16B
+	I2C_24C16(config, m_eeprom);
 
 	// Code also references some sort of serial RTC?
 }
@@ -246,7 +241,51 @@ ROM_START(cfarwest)
 	// No EEPROM on this PCB
 ROM_END
 
-// Compumatic ProSPDP-V3 PCB
+/* Compumatic ProSPDP-V3 PCB
+  ____________________________________________________________________________________________________
+__|_  ________ ___ ___ ___ __________ ____________ ________ __________ ____ ________ __________       |
+|   ||_CN105_| 110 123 119 |__CN125_| |__CN124___| |_CN121| |__CN112_|CN127 |_CN128| |__CN103_|   ___ |
+| C |                                               _______ __________                          : |C ||
+| N |                                               |CN116| |__CN115_|  BATTERY 3.6V              |N ||
+| 1 |   ______               ______   ______       ______                                         |1 ||
+| 1 | CD4514BCWM             MM74HC   MM74HC     CD4514BCWM           ______       ___________    |0 ||
+| 3 |  ___________  _____   _____       _____________        ______   MM74HC       |COMPUMATIC|   |6 ||
+|   |  |UDN2981A_| 74HC00D 74HC00D   :  GM76C88ALK-15        MM74HC   ______       | REF0096  |Xtal__||
+|   |  ___________        ______      _______________  ___   ______   |HC367       |__________|   |C ||
+|   |: |TD62683AP|        MM74HC      |  28SF040A   | 24C16N TLC77051P               Xtal 16.000  |N ||
+|   |: ___________                    |_____________|           __________  ____                  |1 ||
+|   |: |TD62683AP|    _____           _________________      ATF16V8B-15PC LM358                  |0 ||
+|   |: ___________    |REF |          |PHILIPS REF34VA| Xtal     _________                TEST    |9 ||
+|   |  |TD62683AP|    |8032|   ____   |_______________| 24.000   |ULN2803A|              SWITCH   |__||
+|___|                 |____|   CN122                                                             CN102|
+  | ________       _________   ____  _______________  ___________________ _____ _________  ________   |
+  | |_CN101_|      |__CN111_|  CN126 |___CN108______| |_____CN107________|CN114 |_CN118_| |_CN120_|   |
+  |___________________________________________________________________________________________________|
+
+CN101 = DISPLAY INFO
+CN102 = SPEAKER
+CN103 = CARD/NOTE
+CN105 = 6 pin: GND, RX, TX, TEL, CTL, 12V
+CN106 = EXPANSION
+CN107 = POWER SUPPLY
+CN108 = BUTTON PRO
+CN109 = PAN-LED
+CN110 = 2 pin: GND / KEY
+CN111 = ACCEPTOR
+CN112 = TARGET A
+CN113 = DISPLAY
+CN114 = 2 pin: GND, DISP
+CN116 = 3 pin: BI, SS, SM
+CN118 = GUN A
+CN120 = GUN B
+CN122 = ICC (3 pin: T, GND, X)
+CN123 = CNT, +12
+CN124 = INTA PRO
+CN125 = LED-RING
+CN126 = COIN
+CN127 = FDD (4 pin: +5, FDD, GND, +12)
+CN128 = TROB (5 pin: BUL, OUL, REL, THL, +12)
+*/
 ROM_START(prospdp)
 	// REF34VA K0V951 Phr0038 F
 	PHILIPS_REF34VA
@@ -254,12 +293,13 @@ ROM_START(prospdp)
 	ROM_REGION(0x80000, "program", 0)
 	ROM_LOAD("28sf040a.ic3", 0x00000, 0x80000, CRC(f5727a08) SHA1(f4185afc62c1d1f6cb6c772ea40062ced9b2130a))
 
-	// No EEPROM on this PCB
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24c16n.ic8", 0x000, 0x800, NO_DUMP)
 
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
 ROM_END
 
-GAME(199?, microdar, 0, microdar_nvram, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest, 0, microdar,       microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, prospdp,  0, prospdp,        microdar, microdar_state, empty_init, ROT0, "Compumatic",          "ProSPDP",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, prospdp,  0, prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "ProSPDP",               MACHINE_IS_SKELETON_MECHANICAL)
