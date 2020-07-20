@@ -28965,16 +28965,16 @@ v4bubbnk                        // Bubbly Bonk
 v4bulblx                        // Bullion Blox
 v4cmaze                         // The Crystal Maze (v1.3)
 v4cmaze2                        // The New Crystal Maze Featuring Ocean Zone
-v4cmaze2a                       //
+v4cmaze2_amld                       //
 v4cmaze2b                       //
 v4cmaze2c                       //
 v4cmaze2d                       //
 v4cmaze3                        // The Crystal Maze Team Challenge
-v4cmaze3a                       //
+v4cmaze3_amld                       //
 v4cmaze3b                       //
 v4cmaze3c                       //
 v4cmaze3d                       //
-v4cmazea                        //
+v4cmaze_amld                        //
 v4cmazeb                        //
 v4cmazec                        //
 v4cmazed                        //
@@ -29000,11 +29000,11 @@ v4opt3d                         //
 v4ovrmn3                        // Over Moon Pt3
 v4picdil                        // Piccadilly Nights
 v4psi                           // Prize Space Invaders
-v4psia                          //
-v4psib                          //
-v4psi14d                        //
-v4psi20d                        //
-v4psi214                        //
+v4psibc                          //
+v4psi14                          //
+v4psibcd                        //
+v4psid                        //
+v4psi14a                        //
 v4pztet                         // Prize Tetris
 v4pzteta                        //
 v4quidgr                        // Ten Quid Grid
