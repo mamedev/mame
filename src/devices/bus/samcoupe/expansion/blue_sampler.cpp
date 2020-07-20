@@ -67,6 +67,8 @@ sam_blue_sound_sampler_device::sam_blue_sound_sampler_device(const machine_confi
 
 void sam_blue_sound_sampler_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_portc));
 }
 
 
