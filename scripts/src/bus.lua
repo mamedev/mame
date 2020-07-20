@@ -4320,6 +4320,8 @@ if (BUSES["SAMCOUPE_EXPANSION"]~=null) then
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/onemeg.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.cpp",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sdide.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sdide.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.cpp",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/spi.cpp",
