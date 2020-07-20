@@ -21,6 +21,18 @@
 #include "nl_cinemat_common.h"
 
 
+//
+// Optimizations
+//
+
+#define HLE_CLOCK_GENERATOR (1)
+#define HLE_CLOCK_INPUT (1)
+
+
+//
+// Main netlist
+//
+
 NETLIST_START(speedfrk)
 
 	SOLVER(Solver, 1000)
@@ -207,10 +219,10 @@ NETLIST_START(speedfrk)
 	NET_C(J4_2.GND, GND)
 	NET_C(J4_2.VCC, I_V5)
 
+#if (HLE_CLOCK_GENERATOR)
 	//
 	// Skip the clock generator and just do it directly
 	//
-#if 1
 	CLOCK(C2MHZ, 2000000)
 	NET_C(C2MHZ.GND, GND)
 	NET_C(C2MHZ.VCC, I_V5)
@@ -223,13 +235,23 @@ NETLIST_START(speedfrk)
 	ALIAS(C2MHZ, U10.6)
 #endif
 
+#if (HLE_CLOCK_INPUT)
+	//
+	// The clock input from the main PCB is run through a voltage
+	// converter which eats a lot of time and is unnecessary since
+	// we're just generating a TTL signal already.
+	//
+	NET_C(J4_2.Q, U5.12)
+	NET_C(GND, R27.1, R27.2, R28.1, R28.2, R29.1, R29.2, CR3.A, CR3.K, U3.2, U3.3)
+#else
 	NET_C(J4_2.Q, U3.3)
 	NET_C(R27.1, GND)
 	NET_C(R27.2, U3.2, R28.1)
 	NET_C(R28.2, I_V5)
 	NET_C(U3.6, R29.1)
-
 	NET_C(R29.2, CR3.K, U5.12)
+#endif
+
 	NET_C(CR3.A, GND)
 	NET_C(U5.1, R41.1)
 	NET_C(R41.2, I_V5)
@@ -270,7 +292,7 @@ NETLIST_START(speedfrk)
 	NET_C(Q3.E, GND)
 	NET_C(Q3.C, R13.1)
 	NET_C(R13.2, GND)
-	ALIAS(START_LIGHT, R13.2)
+	ALIAS(LAMP, R13.2)
 
 	NET_C(U19.11, U20.1)
 	NET_C(U20.9, R42.1)
