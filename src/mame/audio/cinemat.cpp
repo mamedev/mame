@@ -47,7 +47,6 @@
 
 cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_samples(*this, "samples")
 	, m_out_input(*this, "sound_nl:out_%u", 0)
 	, m_inputs_mask(inputs_mask)
 	, m_netlist(netlist)
@@ -102,11 +101,6 @@ void cinemat_audio_device::device_add_mconfig(machine_config &config)
 
 void cinemat_audio_device::device_start()
 {
-	save_item(NAME(m_inputs));
-	save_item(NAME(m_shiftreg));
-	save_item(NAME(m_shiftreg_accum));
-	save_item(NAME(m_shiftreg16));
-	save_item(NAME(m_shiftreg16_accum));
 #if ENABLE_NETLIST_LOGGING
 	m_logfile = fopen("cinemat.csv", "w");
 #endif
@@ -126,52 +120,19 @@ void cinemat_audio_device::input_set(int bit, int state)
 	m_inputs = (m_inputs & ~(1 << bit)) | ((state & 1) << bit);
 	if (oldvals != m_inputs)
 	{
-		log_changes(m_inputs, oldvals, "I_OUT", m_inputs_mask);
+#if ENABLE_NETLIST_LOGGING
+		attotime time = machine().scheduler().time();
+		for (int bit = 0; bit < 8; bit++)
+			if (((m_inputs_mask >> bit) & 1) != 0)
+				if ((((m_inputs ^ oldvals) >> bit) & 1) != 0)
+					fprintf(m_logfile, "%s,I_OUT_%u.IN,%d\n", time.as_string(), bit, (m_inputs >> bit) & 1);
+#endif
 		for (int index = 0; index < 8; index++)
 			if (m_out_input[index] != nullptr)
 				m_out_input[index]->write_line(BIT(m_inputs, index));
-		inputs_changed(m_inputs, oldvals);
 	}
 }
 
-void cinemat_audio_device::shiftreg_latch()
-{
-	u8 oldvals = m_shiftreg;
-	m_shiftreg = m_shiftreg_accum;
-	if (oldvals != m_shiftreg)
-		shiftreg_changed(m_shiftreg, oldvals);
-}
-
-void cinemat_audio_device::shiftreg16_latch()
-{
-	u16 oldvals = m_shiftreg16;
-	m_shiftreg16 = m_shiftreg16_accum;
-	if (oldvals != m_shiftreg16)
-		shiftreg16_changed(m_shiftreg16, oldvals);
-}
-
-void cinemat_audio_device::shiftreg_set(int bit, int val)
-{
-	u8 oldvals = m_shiftreg;
-	u8 mask = 1 << bit;
-	m_shiftreg = (m_shiftreg & ~mask) | ((val & 1) << bit);
-		shiftreg_changed(m_shiftreg, oldvals);
-}
-
-void cinemat_audio_device::inputs_changed(u8 newvals, u8 oldvals)
-{
-	// overridden by base class if needed
-}
-
-void cinemat_audio_device::shiftreg_changed(u8 newvals, u8 oldvals)
-{
-	// overridden by base class if needed
-}
-
-void cinemat_audio_device::shiftreg16_changed(u16 newvals, u16 oldvals)
-{
-	// overridden by base class if needed
-}
 
 
 

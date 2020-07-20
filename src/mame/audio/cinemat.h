@@ -8,7 +8,6 @@
 #include "machine/74259.h"
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
-#include "sound/samples.h"
 
 // log to cinemat.csv for nltool playback/analysis
 #define ENABLE_NETLIST_LOGGING		(1)
@@ -17,7 +16,7 @@
 class cinemat_audio_device : public device_t
 {
 public:
-	cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &) = nullptr, double output_scale = 0);
+	cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale);
 
 	void configure_latch_inputs(ls259_device &latch, u8 mask = 0);
 
@@ -27,50 +26,13 @@ protected:
 	virtual void device_stop() override;
 
 	template<int _Index> DECLARE_WRITE_LINE_MEMBER(sound_w) { input_set(_Index, state); }
-
-	// only used for sample hacks
-	u64 framenum() { return machine().scheduler().time().as_ticks(38); }
-
-	bool rising_edge(u16 newval, u16 oldval, int bit) const { u16 mask = 1 << bit; return ((oldval & mask) == 0 && (newval & mask) != 0); }
-	bool falling_edge(u16 newval, u16 oldval, int bit) const { u16 mask = 1 << bit; return ((oldval & mask) != 0 && (newval & mask) == 0); }
-
-	void shiftreg_clock(int bit) { m_shiftreg_accum = (m_shiftreg_accum >> 1) | (bit << 7); }
-	void shiftreg16_clock(int bit) { m_shiftreg16_accum = (m_shiftreg16_accum >> 1) | (bit << 15); }
-
 	void input_set(int bit, int state);
-	void shiftreg_latch();
-	void shiftreg16_latch();
-	void shiftreg_set(int bit, int val);
 
-	virtual void inputs_changed(u8 newvals, u8 oldvals);
-	virtual void shiftreg_changed(u8 newvals, u8 oldvals);
-	virtual void shiftreg16_changed(u16 newvals, u16 oldvals);
-
-	optional_device<samples_device> m_samples;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_out_input;
 
 private:
-	template<typename _Type>
-	void log_changes(_Type newvals, _Type oldvals, const char *name_prefix, _Type mask = _Type(~0))
-	{
-	#if ENABLE_NETLIST_LOGGING
-		if (m_logfile != nullptr)
-		{
-			attotime time = machine().scheduler().time();
-			for (int bit = 0; bit < 8 * sizeof(_Type); bit++)
-				if (((mask >> bit) & 1) != 0)
-					if ((((newvals ^ oldvals) >> bit) & 1) != 0)
-						fprintf(m_logfile, "%s,%s_%u.IN,%d\n", time.as_string(), name_prefix, bit, (newvals >> bit) & 1);
-		}
-	#endif
-	}
-
 	u8 m_inputs = 0xff;
 	u8 m_inputs_mask = 0xff;
-	u8 m_shiftreg = 0xff;
-	u8 m_shiftreg_accum = 0xff;
-	u16 m_shiftreg16 = 0xffff;
-	u16 m_shiftreg16_accum = 0xffff;
 	void (*m_netlist)(netlist::nlparse_t &) = nullptr;
 	double m_output_scale = 0;
 
