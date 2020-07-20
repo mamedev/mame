@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SAM_ATOM_HDD, sam_atom_hdd_device, "sam_atom_hdd", "SAM Coupe
 
 void sam_atom_hdd_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, nullptr, nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 }
 
 
@@ -49,6 +49,10 @@ sam_atom_hdd_device::sam_atom_hdd_device(const machine_config &mconfig, const ch
 
 void sam_atom_hdd_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_address_latch));
+	save_item(NAME(m_read_latch));
+	save_item(NAME(m_write_latch));
 }
 
 
