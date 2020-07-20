@@ -33,7 +33,7 @@
 // Optimizations
 //
 
-#define HLE_CLOCK_DIVIDER (1)
+#define HLE_MUSIC_CLOCK (1)
 #define HLE_CAPTURE_VCO (1)
 #define HLE_PHOTON_VCO (1)
 #define HLE_NOISE_CONVERT (1)
@@ -311,13 +311,11 @@ NETLIST_START(solarq)
 //  Q_2N6292(Q22)           // NPN -- part of final amp (not emulated)
 //  Q_2N6107(Q23)           // PNP -- part of final amp (not emulated)
 
-#if (HLE_CLOCK_DIVIDER)
-    CLOCK(Y1, 5000000)
-#else
+#if (!HLE_MUSIC_CLOCK)
     CLOCK(Y1, 20000000)
-#endif
     NET_C(Y1.GND, GND)
     NET_C(Y1.VCC, I_V5)
+#endif
 
     TTL_7414_DIP(U1)		// Hex Inverter
     NET_C(U1.7, GND)
@@ -775,20 +773,40 @@ NETLIST_START(solarq)
     NET_C(U14.9, NBCLK_P)
     NET_C(U2.12, U14.11)
 
+#if (HLE_MUSIC_CLOCK)
+    //
+    // The 20MHz clock (Y1) is divided by 4 via a pair
+    // of JK flip-flops (U25) to 5MHz. That signal is only
+    // used to clock a 74LS163 counter (U26) that divides
+    // the clock by 9 via a preset value. It then goes
+    // through another JK flip-flop (U27) for another
+    // divide by 2, ending up at 277778Hz. No sense in
+    // running all this manually.
+    //
+    CLOCK(MUSICCLK, 277778)
+    NET_C(MUSICCLK.VCC, I_V5)
+    NET_C(MUSICCLK.GND, GND)
+    NET_C(_227KC_P, MUSICCLK.Q)
+    NET_C(MUSICCLK.Q, U24.13)
+    NET_C(_227KC_M, U24.12)
+    NET_C(GND, R9.1, R9.2, R10.1, R10.2, R161.1, R161.2, C4.1, C4.2)
+    NET_C(GND, U15.1, U15.2, U15.3, U15.4)
+    NET_C(GND, U24.1, U24.5)
+    NET_C(GND, U25.1, U25.2, U25.3, U25.4, U25.10, U25.11, U25.12, U25.13)
+    NET_C(GND, U26.1, U26.2, U26.3, U26.4, U26.5, U26.6, U26.7, U26.9, U26.10)
+    NET_C(GND, U27.1, U27.4, U27.12)
+    NET_C(HIC_P, U27.13)
+
+#else
+
     //
     // Page 2, top-left (clock)
     //
 
-#if (HLE_CLOCK_DIVIDER)
     //
-    // No sense running a 20MHz clock just to run the
-    // divider; instead directly generate a 5Mhz clock
+    // This is just here for documentation; the crystal is
+    // not modelled for this circuit.
     //
-    ALIAS(_5MC_P, Y1.Q)
-    NET_C(Y1.Q, U24.13)
-    ALIAS(_5MC_M, U24.12)
-    NET_C(GND, R9.1, R9.2, R10.1, R10.2, C4.1, C4.2, U24.5, U24.1, U25.1, U25.2, U25.3, U25.4, U25.10, U25.11, U25.12, U25.13)
-#else
     NET_C(U24.5, R9.1, C4.1)
     NET_C(U24.6, R9.2, Y1.1)
     NET_C(Y1.2, R10.1, U24.1)
@@ -798,7 +816,6 @@ NETLIST_START(solarq)
     NET_C(U25.5, U25.13)
     ALIAS(_5MC_P, U25.9)
     ALIAS(_5MC_M, U25.8)
-#endif
 
     //
     // Page 2, middle-left
@@ -822,6 +839,7 @@ NETLIST_START(solarq)
     NET_C(HIC_P, U27.1, U27.4, U27.13)
     NET_C(_227KC_P, U27.3)
     NET_C(_227KC_M, U27.2)
+#endif
 
     //
     // Page 2, top-middle

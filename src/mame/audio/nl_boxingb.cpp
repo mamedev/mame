@@ -29,7 +29,8 @@
 // Optimizations
 //
 
-#define HLE_CLOCK_DIVIDER (1)
+#define HLE_SFX_CLOCK (1)
+#define HLE_MUSIC_CLOCK (1)
 #define HLE_CHIRPING_VCO (1)
 #define HLE_DYING_BUG_VCO (1)
 #define HLE_CRACKING_VCO (1)
@@ -424,13 +425,11 @@ NETLIST_START(boxingb)
     D_1N914(D29)
     D_1N914(D30)
 
-#if (HLE_CLOCK_DIVIDER)
-    CLOCK(Y1, 5000000)
-#else
+#if (!HLE_MUSIC_CLOCK)
     CLOCK(Y1, 20000000)
-#endif
     NET_C(Y1.GND, GND)
     NET_C(Y1.VCC, I_V5)
+#endif
 
     TTL_74LS393_DIP(U1) 	// Dual 4-Stage Binary Counter
     NET_C(U1.7, GND)
@@ -758,6 +757,26 @@ NETLIST_START(boxingb)
     // Page 1, bottom-right
     //
 
+#if (HLE_SFX_CLOCK)
+    //
+    // A 20MHz crystal (Y1) is divided by 4 by a pair of
+    // JK flip flops (U23) to 5MHz. This is fed to a
+    // 74LS393 counter (U13) and the divide-by-16 output
+    // is divided again by a JK flip flop (U9) into a
+    // 156250Hz counter. Skip the work of dividing this
+    // manually and just create a clock directly.
+    //
+    CLOCK(SFXCLOCK, 156250)
+    NET_C(SFXCLOCK.GND, GND)
+    NET_C(SFXCLOCK.VCC, I_V5)
+    NET_C(SFXCLOCK.Q, U29.3, U2.5)
+    NET_C(U2.6, U29.11)
+    NET_C(GND, U13.12, U13.13)
+    NET_C(GND, U9.9, U9.10, U9.11)
+#else
+    NET_C(U25.5, GND)   // unused inverter borrowed
+    HINT(U2.6, NC)      // for HLE SFX clock
+
     ALIAS(_5MHZ_M, U13.13)
     NET_C(U13.12, GND)
     NET_C(U13.8, U9.9)
@@ -765,10 +784,11 @@ NETLIST_START(boxingb)
     HINT(U13.10, NC)
     HINT(U13.11, NC)
 
-    ALIAS(HID_P, U9.8)
     NET_C(U9.8, U9.10, U9.11)
     NET_C(U9.5, U29.3)
     NET_C(U9.6, U29.11)
+#endif
+    ALIAS(HID_P, U9.8)
 
     NET_C(U29.2, BCLK_M)
     NET_C(HIB_P, U29.4, U29.1)
@@ -1437,16 +1457,30 @@ NETLIST_START(boxingb)
     // Page 6, middle-left
     //
 
-#if (HLE_CLOCK_DIVIDER)
+#if (HLE_MUSIC_CLOCK)
     //
-    // No sense running a 20MHz clock just to run the
-    // divider; instead directly generate a 5Mhz clock
+    // The 20MHz clock (Y1) is divided by 4 via a pair
+    // of JK flip-flops (U23) to 5MHz. That signal is
+    // used to clock a 74LS163 counter (U43) that divides
+    // the clock by 9 via a preset value. It then goes
+    // through another JK flip-flop (U33) for another
+    // divide by 2, ending up at 277778Hz. No sense in
+    // running all this manually.
     //
-    ALIAS(_5MHZ_P, Y1.Q)
-    NET_C(Y1.Q, U2.13)
-    NET_C(_5MHZ_M, U2.12)
-    NET_C(GND, R178.1, R178.2, R179.1, R179.2, C68.1, C68.2, U2.1, U2.3, U23.1, U23.2, U23.3, U23.4, U23.10, U23.11, U23.12, U23.13)
+    CLOCK(MUSICCLK, 277778)
+    NET_C(MUSICCLK.VCC, I_V5)
+    NET_C(MUSICCLK.GND, GND)
+    ALIAS(_227KC_P, MUSICCLK.Q)
+    NET_C(MUSICCLK.Q, U2.13)
+    ALIAS(_227KC_M, U2.12)
+    NET_C(GND, R178.1, R178.2, R179.1, R179.2, R204.1, R204.2, C68.1, C68.2)
+    NET_C(GND, U2.1, U2.3)
+    NET_C(GND, U23.1, U23.2, U23.3, U23.4, U23.10, U23.11, U23.12, U23.13)
 #else
+    //
+    // This is just here for documentation; the crystal is
+    // not modelled for this circuit.
+    //
     NET_C(U2.3, R178.1, C68.1)
     NET_C(R178.2, U2.4, Y1.1)
     NET_C(Y1.2, R179.1, U2.1)
@@ -1502,6 +1536,14 @@ NETLIST_START(boxingb)
     // Page 6, bottom-middle
     //
 
+#if (HLE_MUSIC_CLOCK)
+    NET_C(_227KC_P, U44.3)
+    NET_C(_227KC_M, U44.11)
+    NET_C(GND, U24.1, U24.2, U24.3, U24.4)
+    NET_C(GND, U33.1, U33.4, U33.12)
+    NET_C(GND, U43.1, U43.2, U43.3, U43.4, U43.5, U43.6, U43.7, U43.9, U43.10)
+    NET_C(HIC_P, U33.13)
+#else
     NET_C(HIC_P, U43.5, U43.3, U43.1, U43.10, U43.7)
     NET_C(GND, U43.6, U43.4)
     NET_C(_5MHZ_P, U43.2)
@@ -1523,6 +1565,7 @@ NETLIST_START(boxingb)
     ALIAS(_227KC_P, U33.3)
     NET_C(U33.2, U44.11)
     ALIAS(_227KC_M, U33.2)
+#endif
 
     NET_C(HIA_P, U44.4, U44.1, U44.10, U44.13)
     ALIAS(MACLK_M, U44.2)
@@ -1649,13 +1692,12 @@ NETLIST_START(boxingb)
     // Unconnected inputs
     //
 
-    NET_C(U2.5, U2.9, U2.11, U9.1, U9.4, U9.12, U9.13, U15.1, U15.2, U20.4, U20.6, U20.8, U20.10, U20.12, U33.8, U33.9, U33.10, U33.11, U35.5, U35.6, U40.1, U40.3, U40.5)
+    NET_C(U2.9, U2.11, U9.1, U9.4, U9.12, U9.13, U15.1, U15.2, U20.4, U20.6, U20.8, U20.10, U20.12, U33.8, U33.9, U33.10, U33.11, U35.5, U35.6, U40.1, U40.3, U40.5)
 
     //
     // Unconnected outputs
     //
 
-    HINT(U2.6, NC)
     HINT(U2.8, NC)
     HINT(U2.10, NC)
     HINT(U40.2, NC)
