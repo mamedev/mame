@@ -13,19 +13,26 @@
 #include "emu.h"
 #include "cpu/gigatron/gigatron.h"
 #include "screen.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define MAIN_CLOCK 6250000
 #define VSYNC      0x80
 #define HSYNC      0x40
 
+//**************************************************************************
+//  Driver Definition
+//**************************************************************************
+
 class gigatron_state : public driver_device
 {
 public:
 	gigatron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_io_inputs(*this, "GAMEPAD")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
+		, m_io_inputs(*this, "GAMEPAD")
 	{
 	}
 
@@ -43,24 +50,30 @@ private:
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
 
-	uint16_t lights_changed;
-
+	uint16_t m_lc; //Lights Changed
+	
 	//Video Generation stuff
-	uint8_t machineOut;
-	uint8_t row;
-	uint8_t col;
-	uint8_t pixel;
+	uint8_t m_out;
+	uint8_t m_row;
+	uint8_t m_col;
+	uint8_t m_pixel;
 
 	void blinkenlights(uint8_t data);
 	void video_draw(u8 data);
 	uint8_t inputs();
-
+	void port_outx(uint8_t data);
+	
 	std::unique_ptr<bitmap_ind16> m_bitmap_render;
 	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
-
+	
 	required_device<gigatron_cpu_device> m_maincpu;
+	required_device<dac_byte_interface> m_dac;
 	required_ioport m_io_inputs;
 };
+
+//**************************************************************************
+//  Video
+//**************************************************************************
 
 void gigatron_state::video_start()
 {
@@ -71,28 +84,28 @@ void gigatron_state::video_start()
 void gigatron_state::video_draw(u8 data)
 {
 	uint8_t out = data;
-	uint8_t falling = machineOut & ~out;
-
+	uint8_t falling = m_out & ~out;
+	
 	if (falling & VSYNC)
 	{
-		row = 0;
-		pixel = 0;
+		m_row = 0;
+		m_pixel = 0;
 	}
-
+	
 	if (falling & HSYNC)
 	{
-		col = 0;
-		row++;
+		m_col = 0;
+		m_row++;
 	}
-
-	machineOut = out;
-
+	
+	m_out = out;
+	
 	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
 	{
 		return;
 	}
-
-	if((row >= 0 && row < 480) && (col >= 0 && col < 640))
+	
+	if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
 	{
 		//uint16_t *dest;
 		//uint8_t tPixel = pixel;
@@ -107,6 +120,10 @@ uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
+//**************************************************************************
+//  Memory Map
+//**************************************************************************
+
 void gigatron_state::prog_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
@@ -117,24 +134,9 @@ void gigatron_state::data_map(address_map &map)
 	map(0x0000, 0x7fff).ram();
 }
 
-void gigatron_state::machine_start()
-{
-}
-
-void gigatron_state::machine_reset()
-{
-}
-
-void gigatron_state::blinkenlights(uint8_t data)
-{
-	uint16_t light = data & 0xF;
-	lights_changed ^= light;
-}
-
-uint8_t gigatron_state::inputs()
-{
-	return m_io_inputs->read() ^ 0xFF;
-}
+//**************************************************************************
+//  Machine
+//**************************************************************************
 
 static INPUT_PORTS_START(gigatron)
 	PORT_START("GAMEPAD")
@@ -148,12 +150,43 @@ static INPUT_PORTS_START(gigatron)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("A Button") PORT_PLAYER(1)    // A Button
 INPUT_PORTS_END
 
+void gigatron_state::machine_start()
+{
+	save_item(NAME(m_lc));
+	save_item(NAME(m_out));
+	save_item(NAME(m_row));
+	save_item(NAME(m_col));
+	save_item(NAME(m_pixel));
+}
+
+void gigatron_state::machine_reset()
+{
+	m_dac->write(0);
+}
+
+void gigatron_state::port_outx(uint8_t data)
+{
+	blinkenlights(data & 0x0F);
+	m_dac->write((data & 0xF0) >> 4);
+}
+
+void gigatron_state::blinkenlights(uint8_t data)
+{
+	uint16_t light = data & 0xF;
+	m_lc ^= light;
+}
+
+uint8_t gigatron_state::inputs()
+{
+	return m_io_inputs->read() ^ 0xFF;
+}
+
 void gigatron_state::gigatron(machine_config &config)
 {
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
-	m_maincpu->outx_cb().set(FUNC(gigatron_state::blinkenlights));
+	m_maincpu->outx_cb().set(FUNC(gigatron_state::port_outx));
 	m_maincpu->out_cb().set(FUNC(gigatron_state::video_draw));
 	m_maincpu->ir_cb().set(FUNC(gigatron_state::inputs));
 
@@ -165,11 +198,14 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	/* sound hardware */
-	//SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "speaker").front_center();
+	DAC_4BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( gigatron )
-	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "v5a", "Gigatron ROM V5a")
 	ROMX_LOAD( "gigrom5a.rom",  0x0000, 0x20000, CRC(DCC071A6) SHA1(F82059BA0227FF48E4C687B90C8445DA30213EE2),ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v4", "Gigatron ROM V4")
