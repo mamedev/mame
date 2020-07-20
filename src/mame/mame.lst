@@ -28957,7 +28957,21 @@ v4barqs2                        // Barquest 2 (v0.3)
 v4barqst                        // Barquest (v2.6)
 v4barqstd                       //
 v4big40                         // Big 40
+v4big40a
+v4big40b
+v4big40c
+v4big40d
+v4big40e
+v4big40f
+v4big40g
+v4big40h
+v4big40i
+v4big40j
+v4big40k
 v4bigfrt                        // Big Fruits
+v4bigfrta
+v4bigfrtb
+v4bigfrtc
 v4bios                          // MPU4 Video Firmware
 v4blox                          // Blox
 v4bloxd                         //
@@ -28982,10 +28996,33 @@ v4cmazedat                      //
 v4cshinf                        // Cash Inferno
 v4cybcas                        // Cyber Casino
 v4dbltak                        // Double Take
+v4dbltaka
+v4dbltakb
 v4eyedwn                        // Eyes Down
 v4eyedwnd                       //
 v4frfact                        // Fruit Factory
 v4gldrsh                        // Gold Rush
+v4gldrsha
+v4gldrshb
+v4gldrshc
+v4gldrshd
+v4gldrshe
+v4gldrshf
+v4gldrshg
+v4gldrshh
+v4gldrshi
+v4gldrshj
+v4gldrshk
+v4gldrshl
+v4gldrshm
+v4gldrshn
+v4gldrsho
+v4gldrshp
+v4gldrshq
+v4gldrshr
+v4gldrshs
+v4gldrsht
+v4gldrshu
 v4mate                          // The Mating Game
 v4mated                         //
 v4mazbel                        // Mazooma Belle
