@@ -38,7 +38,8 @@ void sam_dallas_clock_device::device_add_mconfig(machine_config &config)
 sam_dallas_clock_device::sam_dallas_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SAM_DALLAS_CLOCK, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
-	m_rtc(*this, "rtc")
+	m_rtc(*this, "rtc"),
+	m_print(0)
 {
 }
 
