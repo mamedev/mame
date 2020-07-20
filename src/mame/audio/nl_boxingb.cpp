@@ -17,12 +17,26 @@
 
 
 //
+// Hacks/workarounds
+//
+
+#define HACK_SIMPLIFY_INPUTS (1)
+#define HACK_VOLTAGE_SWITCH (1)
+
+
+
+//
 // Optimizations
 //
 
-#define SIMPLIFY_INPUTS (1)
 #define HLE_CLOCK_DIVIDER (1)
-#define ENABLE_FRONTIERS (0)
+#define HLE_CHIRPING_VCO (1)
+#define HLE_DYING_BUG_VCO (1)
+#define HLE_CRACKING_VCO (1)
+#define HLE_BEETLE_VCO (1)
+#define HLE_BOUNCE_VCO (1)
+#define HLE_CANNON_VCO (1)
+#define ENABLE_FRONTIERS (1)
 
 
 
@@ -125,7 +139,11 @@ NETLIST_START(boxingb)
     RES(R73, RES_K(2))
     RES(R74, RES_K(910))
     RES(R75, 390)
+#if (HACK_VOLTAGE_SWITCH)
+    RES(R76, 100)
+#else
     RES(R76, RES_K(4.7))
+#endif
     RES(R77, RES_K(2.7))
     RES(R78, RES_K(4.7))
     RES(R79, RES_K(39))
@@ -141,7 +159,11 @@ NETLIST_START(boxingb)
     RES(R89, RES_K(20))
     RES(R90, RES_K(2))
     RES(R91, RES_K(20))
+#if (HACK_VOLTAGE_SWITCH)
+    RES(R92, 100)
+#else
     RES(R92, RES_K(4.7))
+#endif
     RES(R93, RES_K(2.7))
     RES(R94, RES_K(4.7))
     RES(R95, RES_K(39))
@@ -588,11 +610,17 @@ NETLIST_START(boxingb)
     NET_C(U50.7, GND)
     NET_C(U50.14, I_V5)
 
+#if (!HLE_CHIRPING_VCO)
 	LM566_DIP(U51)			// 566 VCO
+#endif
 
+#if (!HLE_DYING_BUG_VCO)
 	LM566_DIP(U52)			// 566 VCO
+#endif
 
+#if (!HLE_CRACKING_VCO)
 	LM566_DIP(U53)			// 566 VCO
+#endif
 
     TL081_DIP(U54)			// Op. Amp.
     NET_C(U54.7, I_V15)
@@ -602,9 +630,13 @@ NETLIST_START(boxingb)
     NET_C(U55.7, I_V15)
     NET_C(U55.4, I_VM15)
 
+#if (!HLE_BEETLE_VCO)
 	LM566_DIP(U56)			// 566 VCO
+#endif
 
+#if (!HLE_BOUNCE_VCO)
 	LM566_DIP(U57)			// 566 VCO
+#endif
 
     LM555_DIP(U58)
 
@@ -612,7 +644,9 @@ NETLIST_START(boxingb)
     NET_C(U59.4, I_VM15)
     NET_C(U59.7, I_V15)
 
+#if (!HLE_CANNON_VCO)
 	LM566_DIP(U60)			// 566 VCO
+#endif
 
     CA3080_DIP(U61) 		// Op. Amp.
     NET_C(U61.4, I_VM15)
@@ -752,11 +786,11 @@ NETLIST_START(boxingb)
 
     NET_C(_588USEC_P, U1.1)
     NET_C(U1.2, GND)
-    NET_C(U1.6, U1.12)
+    NET_C(U1.6, U1.13)
     HINT(U1.5, NC)
     HINT(U1.4, NC)
     HINT(U1.3, NC)
-    NET_C(U1.13, GND)
+    NET_C(U1.12, GND)
     HINT(U1.8, NC)
     HINT(U1.9, NC)
     NET_C(U1.10, U11.8, U32.1)
@@ -800,12 +834,32 @@ NETLIST_START(boxingb)
     NET_C(R27.2, Q5.B)
     NET_C(Q5.E, GND)
     NET_C(Q5.C, R29.1)
-    NET_C(R29.2, R28.1, C14.1, R30.2, C15.2, U51.5)
+    NET_C(R29.2, R28.1, C14.1, R30.2, C15.2)
     NET_C(R28.2, I_V15)
     NET_C(C14.2, GND)
     NET_C(R30.1, GND)
-    NET_C(C15.1, U51.6, R31.1)
-    NET_C(R31.2, I_V15, U51.8)
+    NET_C(C15.1, R31.1)
+    NET_C(R31.2, I_V15)
+
+#if (HLE_CHIRPING_VCO)
+    //
+    // Standard mapping:
+    //    R2 = 0.91650: HP = (0.0000123028*A0) - 0.000136645
+    //    R2 = 0.98600: HP = (0.00000750231*A0*A0) - (0.000183288*A0) + 0.00113698
+    //    R2 = 0.99008: HP = (0.00000414207*A0*A0*A0) - (0.000154885*A0*A0) + (0.00193729*A0) - 0.0080873
+    //    R2 = 0.98800: HP = (0.00000603082*A0*A0*A0*A0) - (0.000311647*A0*A0*A0) + (0.00604258*A0*A0) - (0.0520898*A0) + 0.168437
+    //    R2 = 0.98586: HP = (0.000000081416*A0*A0*A0*A0*A0) - (0.00000284650*A0*A0*A0*A0) + (0.0000136226*A0*A0*A0) + (0.000571759*A0*A0) - (0.0083734*A0) + 0.0333905
+    //
+	VARCLOCK(CHIRPCLK, 1, "max(0.000001,min(0.1,(0.000000081416*A0*A0*A0*A0*A0) - (0.00000284650*A0*A0*A0*A0) + (0.0000136226*A0*A0*A0) + (0.000571759*A0*A0) - (0.0083734*A0) + 0.0333905))")
+	NET_C(CHIRPCLK.GND, GND)
+	NET_C(CHIRPCLK.VCC, I_V5)
+	NET_C(CHIRPCLK.A0, C15.2)
+	NET_C(CHIRPCLK.Q, U41.1)
+	NET_C(GND, R32.1, R32.2, R33.1, R33.2, R205.1, R205.2, C16.1, C16.2, C17.1, C17.2, D13.A, D13.K, D14.A, D14.K)
+#else
+    NET_C(R29.2, U51.5)
+    NET_C(C15.1, U51.6)
+    NET_C(R31.2, U51.8)
     NET_C(U51.7, C16.1)
     NET_C(C16.2, GND)
     NET_C(U51.1, GND)
@@ -819,6 +873,7 @@ NETLIST_START(boxingb)
     NET_C(D14.A, GND)
     NET_C(Q6.C, R33.1, U41.1)
     NET_C(R33.2, I_V5)
+#endif
 
     NET_C(U41.2, RANDOM_NOISE_P)
     HINT(U41.6, NC)
@@ -850,12 +905,32 @@ NETLIST_START(boxingb)
     NET_C(R39.2, Q8.B)
     NET_C(Q8.E, GND)
     NET_C(Q8.C, R41.1)
-    NET_C(R41.2, R40.1, C18.1, R42.2, C19.2, U52.5)
+    NET_C(R41.2, R40.1, C18.1, R42.2, C19.2)
     NET_C(R40.2, I_V15)
     NET_C(C18.2, GND)
     NET_C(R42.1, GND)
-    NET_C(C19.1, U52.6, R43.1)
-    NET_C(R43.2, I_V15, U52.8)
+    NET_C(R43.2, I_V15)
+    NET_C(C19.1, R43.1)
+
+#if (HLE_DYING_BUG_VCO)
+    //
+    // Standard mapping:
+    //    R2 = 0.94234: HP = (0.0000126953*A0) - 0.000142795
+    //    R2 = 0.99216: HP = (0.0000085544*A0*A0) - (0.000211995*A0) + 0.00132411
+    //    R2 = 0.99610: HP = (0.00000512381*A0*A0*A0) - (0.000194224*A0*A0) + (0.00245729*A0) - 0.0103626
+    //    R2 = 0.99646: HP = (0.00000347185*A0*A0*A0*A0) - (0.000178231*A0*A0*A0) + (0.00343236*A0*A0) - (0.0293814*A0) + 0.094321
+    //    R2 = 0.99644: HP = (0.000000064673*A0*A0*A0*A0*A0) - (0.00000153002*A0*A0*A0*A0) - (0.0000269128*A0*A0*A0) + (0.00118283*A0*A0) - (0.0128917*A0) + 0.0465240
+    //
+	VARCLOCK(DYINGCLK, 1, "max(0.000001,min(0.1,(0.000000064673*A0*A0*A0*A0*A0) - (0.00000153002*A0*A0*A0*A0) - (0.0000269128*A0*A0*A0) + (0.00118283*A0*A0) - (0.0128917*A0) + 0.0465240))")
+	NET_C(DYINGCLK.GND, GND)
+	NET_C(DYINGCLK.VCC, I_V5)
+	NET_C(DYINGCLK.A0, C19.2)
+	NET_C(DYINGCLK.Q, U42.1)
+	NET_C(GND, R44.1, R44.2, R45.1, R45.2, R46.1, R46.2, C20.1, C20.2, C21.1, C21.2, D15.A, D15.K, D16.A, D16.K)
+#else
+    NET_C(C19.2, U52.5)
+    NET_C(C19.1, U52.6)
+    NET_C(R43.2, U52.8)
     NET_C(U52.7, C20.1)
     NET_C(C20.2, GND)
     NET_C(U52.1, GND)
@@ -869,6 +944,7 @@ NETLIST_START(boxingb)
     NET_C(D16.A, GND)
     NET_C(Q9.C, R45.1, U42.1)
     NET_C(R45.2, I_V5)
+#endif
 
     NET_C(_327USEC_P, U32.13)
     NET_C(U32.12, GND)
@@ -906,11 +982,31 @@ NETLIST_START(boxingb)
     NET_C(Q11.E, GND)
     NET_C(R60.2, Q11.B)
     NET_C(Q11.C, R62.1)
-    NET_C(R62.2, R61.1, C24.1, R63.2, C25.2, U53.5)
+    NET_C(R62.2, R61.1, C24.1, R63.2, C25.2)
     NET_C(C24.2, GND)
     NET_C(R63.1, GND)
-    NET_C(R61.2, R64.2, U53.8, I_V15)
-    NET_C(C25.1, R64.1, U53.6)
+    NET_C(R61.2, R64.2, I_V15)
+    NET_C(C25.1, R64.1)
+
+#if (HLE_CRACKING_VCO)
+    //
+    // Standard mapping:
+    //    R2 = 0.89585: HP = (0.0000175988*A0) - 0.000207278
+    //    R2 = 0.98810: HP = (0.0000104596*A0*A0) - (0.000261248*A0) + 0.00164623
+    //    R2 = 0.99788: HP = (0.00000629669*A0*A0*A0) - (0.000240194*A0*A0) + (0.00305980*A0) - 0.0129994
+    //    R2 = 0.99873: HP = (0.00000350292*A0*A0*A0*A0) - (0.000179267*A0*A0*A0) + (0.00344234*A0*A0) - (0.0293869*A0) + 0.094097
+    //    R2 = 0.99653: HP = (0.000000075716*A0*A0*A0*A0*A0) - (0.00000154725*A0*A0*A0*A0) - (0.0000446414*A0*A0*A0) + (0.00164941*A0*A0) - (0.0174578*A0) + 0.0623765
+    //
+	VARCLOCK(CRACKINGCLK, 1, "max(0.000001,min(0.1,(0.000000064673*A0*A0*A0*A0*A0) - (0.00000153002*A0*A0*A0*A0) - (0.0000269128*A0*A0*A0) + (0.00118283*A0*A0) - (0.0128917*A0) + 0.0465240))")
+	NET_C(CRACKINGCLK.GND, GND)
+	NET_C(CRACKINGCLK.VCC, I_V5)
+	NET_C(CRACKINGCLK.A0, C25.2)
+	NET_C(CRACKINGCLK.Q, U22.13)
+	NET_C(GND, R65.1, R65.2, R66.1, R66.2, R67.1, R67.2, C26.1, C26.2, C27.1, C27.2, D17.A, D17.K, D18.A, D18.K)
+#else
+    NET_C(R61.2, U53.8)
+    NET_C(C25.1, U53.6)
+    NET_C(R62.2, U53.5)
     NET_C(U53.7, C26.1)
     NET_C(C26.2, GND)
     NET_C(U53.1, GND)
@@ -924,6 +1020,7 @@ NETLIST_START(boxingb)
     NET_C(D18.A, GND)
     NET_C(Q12.C, R66.1, U22.13)
     NET_C(R66.2, I_V5)
+#endif
 
     NET_C(EGG_CRACKING_M, U22.12)
     NET_C(U22.8, R68.1)
@@ -960,11 +1057,31 @@ NETLIST_START(boxingb)
     NET_C(R81.2, Q14.B)
     NET_C(Q14.E, GND)
     NET_C(Q14.C, R83.1)
-    NET_C(R83.2, R82.1, C31.1, R84.2, C32.2, U56.5)
+    NET_C(R83.2, R82.1, C31.1, R84.2, C32.2)
     NET_C(C31.2, GND)
     NET_C(R84.1, GND)
-    NET_C(R82.2, I_V15, R85.2, U56.8)
-    NET_C(R85.1, U56.6, C32.1)
+    NET_C(R82.2, I_V15, R85.2)
+    NET_C(R85.1, C32.1)
+
+#if (HLE_BEETLE_VCO)
+    //
+    // Standard mapping:
+    //    R2 = 0.92906: HP = (0.000127227*A0) - 0.00149583
+    //    R2 = 0.97372: HP = (0.000086592*A0*A0) - (0.00218553*A0) + 0.0139420
+    //    R2 = 0.97589: HP = (0.000063925*A0*A0*A0) - (0.00248748*A0*A0) + (0.0323532*A0) - 0.140489
+    //    R2 = 0.97153: HP = (-0.00000615887*A0*A0*A0*A0) + (0.000395273*A0*A0*A0) - (0.0091707*A0*A0) + (0.092250*A0) - 0.341743
+    //    R2 = 0.96812: HP = (0.00000145563*A0*A0*A0*A0*A0) - (0.0000505655*A0*A0*A0*A0) + (0.000151855*A0*A0*A0) + (0.0134189*A0*A0) - (0.189302*A0) + 0.763397
+    //
+	VARCLOCK(BEETLECLK, 1, "max(0.000001,min(0.1,(0.00000145563*A0*A0*A0*A0*A0) - (0.0000505655*A0*A0*A0*A0) + (0.000151855*A0*A0*A0) + (0.0134189*A0*A0) - (0.189302*A0) + 0.763397))")
+	NET_C(BEETLECLK.GND, GND)
+	NET_C(BEETLECLK.VCC, I_V5)
+	NET_C(BEETLECLK.A0, C32.2)
+	NET_C(BEETLECLK.Q, U22.1)
+	NET_C(GND, R86.1, R86.2, R87.1, R87.2, R88.1, R88.2, C33.1, C33.2, C34.1, C34.2, D19.A, D19.K, D20.A, D20.K)
+#else
+    NET_C(R83.2, U56.5)
+    NET_C(R82.2, U56.8)
+    NET_C(R85.1, U56.6)
     NET_C(U56.7, C33.1)
     NET_C(C33.2, GND)
     NET_C(U56.1, GND)
@@ -978,6 +1095,7 @@ NETLIST_START(boxingb)
     NET_C(D20.A, GND)
     NET_C(Q15.C, R87.1, U22.1)
     NET_C(R87.2, I_V5)
+#endif
 
     NET_C(BEETLE_ON_SCREEN_M, U22.2)
     HINT(U22.6, NC)
@@ -1003,7 +1121,7 @@ NETLIST_START(boxingb)
     NET_C(R97.2, Q17.B)
     NET_C(Q17.E, GND)
     NET_C(Q17.C, R99.1)
-    NET_C(R99.2, R98.1, C36.1, R101.2, U57.5, C39.2, R102.2)
+    NET_C(R99.2, R98.1, C36.1, R101.2, C39.2, R102.2)
     NET_C(R98.2, I_V15)
     NET_C(C36.2, GND)
     NET_C(R101.1, GND)
@@ -1018,6 +1136,36 @@ NETLIST_START(boxingb)
     NET_C(U58.3, C37.2)
     NET_C(C37.1, R102.1)
 
+    NET_C(C39.1, R108.1)
+    NET_C(R108.2, I_V15)
+#if (HLE_BOUNCE_VCO)
+    //
+    // Unlike all the other VCOs, this one doesn't go directly into a
+    // TTL device. The actual square wave is tapered from the top and
+    // slightly modulated with the frequency, but it makes little
+    // practical difference, so we just scale the output square wave
+    // to +/-5V as input to R109.
+    //
+    // Standard mapping:
+    //    R2 = 0.89933: HP = (0.00476268*A0) - 0.0576442
+    //    R2 = 0.97773: HP = (0.00311005*A0*A0) - (0.079281*A0) + 0.509096
+    //    R2 = 0.97985: HP = (0.00115078*A0*A0*A0) - (0.0435380*A0*A0) + (0.550407*A0) - 2.321385
+    //    R2 = 0.97985: HP = (0.0000369937*A0*A0*A0*A0) - (0.000849582*A0*A0*A0) - (0.00300315*A0*A0) + (0.185593*A0) - 1.090973
+    //    R2 = 0.24613: HP = (-0.000199982*A0*A0*A0*A0*A0) + (0.0134882*A0*A0*A0*A0) - (0.362557*A0*A0*A0) + (4.857498*A0*A0) - (32.45284*A0) + 86.5278
+    //
+	VARCLOCK(BOUNCECLK, 1, "max(0.000001,min(0.1,((0.00115078*A0*A0*A0) - (0.0435380*A0*A0) + (0.550407*A0) - 2.321385))")
+	NET_C(BOUNCECLK.GND, GND)
+	NET_C(BOUNCECLK.VCC, I_V5)
+	NET_C(BOUNCECLK.A0, C39.2)
+	NET_C(BOUNCECLK.Q, BOUNCEENV.A0)
+    AFUNC(BOUNCEENV, 1, "if(A0>2.5,5,-5)")
+    NET_C(BOUNCEENV, R109.1)
+	NET_C(GND, C40.1, C40.2)
+	NET_C(GND, C42.1, C42.2)
+#else
+    NET_C(C39.1, U57.6)
+    NET_C(R108.2, U57.8)
+    NET_C(R99.2, U57.5)
     NET_C(C39.1, U57.6, R108.1)
     NET_C(R108.2, I_V15, U57.8)
     NET_C(U57.7, C40.1)
@@ -1026,6 +1174,8 @@ NETLIST_START(boxingb)
     HINT(U57.4, NC)
     NET_C(U57.3, C42.2)
     NET_C(C42.1, R109.1)
+#endif
+
     NET_C(R109.2, R111.2, U59.2)
     NET_C(R111.1, GND)
     NET_C(U59.3, R112.2)
@@ -1061,11 +1211,31 @@ NETLIST_START(boxingb)
     NET_C(R117.2, Q21.B)
     NET_C(Q21.E, GND)
     NET_C(Q21.C, R119.1)
-    NET_C(R119.2, R118.1, C43.1, R120.2, C44.2, U60.5)
-    NET_C(R118.2, I_V15, R121.2, U60.8)
+    NET_C(R119.2, R118.1, C43.1, R120.2, C44.2)
+    NET_C(R118.2, I_V15, R121.2)
     NET_C(C43.2, GND)
     NET_C(R120.1, GND)
-    NET_C(C44.1, R121.1, U60.6)
+    NET_C(C44.1, R121.1)
+
+#if (HLE_CANNON_VCO)
+    //
+    // Standard mapping:
+    //    R2 = 0.96910: HP = (0.000125667*A0) - 0.00142938
+    //    R2 = 0.99026: HP = (0.000076462*A0*A0) - (0.00189006*A0) + 0.0117720
+    //    R2 = 0.99181: HP = (0.0000429163*A0*A0*A0) - (0.00161661*A0*A0) + (0.0203246*A0) - 0.085173
+    //    R2 = 0.99203: HP = (0.0000167801*A0*A0*A0*A0) - (0.000839548*A0*A0*A0) + (0.0157634*A0*A0) - (0.131604*A0) + 0.412204
+    //    R2 = 0.99209: HP = (0.00000283657*A0*A0*A0*A0*A0) - (0.000141443*A0*A0*A0*A0) + (0.00257240*A0*A0*A0) - (0.0192167*A0*A0) + (0.0334224*A0) + 0.148265
+    //
+	VARCLOCK(CANNONCLK, 1, "max(0.000001,min(0.1,(0.00000283657*A0*A0*A0*A0*A0) - (0.000141443*A0*A0*A0*A0) + (0.00257240*A0*A0*A0) - (0.0192167*A0*A0) + (0.0334224*A0) + 0.148265))")
+	NET_C(CANNONCLK.GND, GND)
+	NET_C(CANNONCLK.VCC, I_V5)
+	NET_C(CANNONCLK.A0, C44.2)
+	NET_C(CANNONCLK.Q, U13.1)
+	NET_C(GND, R122.1, R122.2, R123.1, R123.2, R124.1, R124.2, C75.1, C75.2, C45.1, C45.2, D21.A, D21.K, D22.A, D22.K)
+#else
+    NET_C(R119.2, U60.5)
+    NET_C(R118.2, U60.8)
+    NET_C(C44.1, U60.6)
     NET_C(U60.7, C75.1)
     NET_C(C75.2, GND)
     NET_C(U60.1, GND)
@@ -1079,6 +1249,7 @@ NETLIST_START(boxingb)
     NET_C(D22.A, GND)
     NET_C(Q22.C, R123.1, U13.1)
     NET_C(R123.2, I_V5)
+#endif
 
     NET_C(CANNON_M, U13.2)
     HINT(U13.6, NC)
@@ -1191,7 +1362,12 @@ NETLIST_START(boxingb)
     NET_C(U50.2, U49.1)
     ALIAS(DATA_P, U50.2)
 
-#if (SIMPLIFY_INPUTS)
+#if (HACK_SIMPLIFY_INPUTS)
+    //
+    // Several of the inputs go through several rounds of inverters
+    // diodes and pullups, and eventually something goes wrong.
+    // Bypassing these extra devices helps make the inputs reliable.
+    //
     NET_C(I_OUT_4, U30.13)
     NET_C(GND, D26.A, D26.K, U50.13, U50.12, U40.9, R177.1, R177.2, C67.1, C67.2)
 #else
@@ -1287,7 +1463,7 @@ NETLIST_START(boxingb)
     // Page 6, bottom-left
     //
 
-#if (SIMPLIFY_INPUTS)
+#if (HACK_SIMPLIFY_INPUTS)
     NET_C(I_OUT_1, U30.9)
     NET_C(GND, D27.A, D27.K, U50.3, U50.4, U40.13, R180.1, R180.2, C69.1, C69.2)
 #else
@@ -1301,7 +1477,7 @@ NETLIST_START(boxingb)
     NET_C(U30.8, U30.5)
     ALIAS(SLATCH_P, U30.6)
 
-#if (SIMPLIFY_INPUTS)
+#if (HACK_SIMPLIFY_INPUTS)
     NET_C(I_OUT_0, U30.11)
     NET_C(GND, D28.A, D28.K, U50.11, U50.10, U40.11, R181.1, R181.2, C70.1, C70.2)
 #else
@@ -1491,6 +1667,10 @@ NETLIST_START(boxingb)
 //    HINT(U24.4, NC)
 
 #if (ENABLE_FRONTIERS)
+    //
+    // Isolate the CS sounds from the rest of the mixer
+    //
+    OPTIMIZE_FRONTIER(U55.3, RES_M(1), 50)
 #endif
 
 NETLIST_END()
