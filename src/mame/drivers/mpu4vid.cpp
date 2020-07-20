@@ -4141,7 +4141,7 @@ ROM_START( v4monteg )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-//----
+//---- no compatible video ROMs
 
 ROM_START( v4monteh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4553,25 +4553,34 @@ ROM_START( v4monteao )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteap )
+// good again
+
+ROM_START( v4monte9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mni20s__.940", 0x0000, 0x010000, CRC(13ac85ab) SHA1(f1d65613787dc1312ad68bd49dcb5a9a8bc1093c) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-
-ROM_START( v4monteaq )
+ROM_START( v4monte9a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mnixes__.940", 0x0000, 0x010000, CRC(2310b260) SHA1(309d5e34c811866cbef634032fddc53ca0b78966) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
@@ -4579,168 +4588,224 @@ ROM_START( v4monteaq )
 ROM_END
 
 
-ROM_START( v4montear )
+ROM_START( v4monte9b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_xesb_.940", 0x0000, 0x010000, CRC(b4ec4a65) SHA1(e360704a434dde21c6fb794f2b75ecd4b8cea2b5) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteas )
+ROM_START( v4monte9c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_xea__.940", 0x0000, 0x010000, CRC(b78e4533) SHA1(5084f5434c0ee727e6b15422b5fc5d33a7e732d8) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteat )
+ROM_START( v4monte9d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_xeab_.940", 0x0000, 0x010000, CRC(410ad2a0) SHA1(0f781bc89837e7def08f71589834ccbdadca6409) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteau )
+ROM_START( v4monte9e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_xes__.940", 0x0000, 0x010000, CRC(4268ddf6) SHA1(e81cc5f429ae8c3e868ac6301b60b7a0acd2d190) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteav )
+ROM_START( v4monte9f )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_x7s__.9a0", 0x0000, 0x010000, CRC(6860254d) SHA1(a0247ec07f2ec13fadc543986d27b5763d799f9b) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteaw )
+ROM_START( v4monte9g )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_20ab_.940", 0x0000, 0x010000, CRC(71b6e56b) SHA1(b87b488398b5554b63324b3c8d47f5ed2210026d) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteax )
+ROM_START( v4monte9h )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_20a__.940", 0x0000, 0x010000, CRC(873272f8) SHA1(7097987c175fc441a6ae6f1a7a0dec3ef5bf53a5) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteay )
+ROM_START( v4monte9i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_20sb_.940", 0x0000, 0x010000, CRC(84507dae) SHA1(1a2fb9514cbcb44f324574fc913a7f1f5d321e53) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteaz )
+ROM_START( v4monte9j )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_27s__.9a0", 0x0000, 0x010000, CRC(58dc1286) SHA1(d90fe58b612d438c082fb7dac8db82bec3faabf9) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4monteba )
+ROM_START( v4monte9k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_27sd_.9a0", 0x0000, 0x010000, CRC(1379f527) SHA1(e9b84b8844be7c26f2e7db731c48b0c6d2bfd689) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4montebb )
+ROM_START( v4monte9l )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_37s__.9a0", 0x0000, 0x010000, CRC(d7ce79a8) SHA1(6daa848f79ad65bd2567afbacee2dcbb60317f29) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4montebc )
+ROM_START( v4monte9m )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_37sd_.9a0", 0x0000, 0x010000, CRC(9c6b9e09) SHA1(1b0d35c2ba906b1e478e58d66fc5432cdf05f36b) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4montebd )
+ROM_START( v4monte9n )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_x7sd_.9a0", 0x0000, 0x010000, CRC(23c5c2ec) SHA1(42568dd981a65c34ae7e25c201ccc90c109bf32e) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
 	ROM_LOAD( "mcosndb.bin", 0x080000, 0x080000, CRC(fcbad433) SHA1(a8cd32ca5a17e3c35701a7eac3e9ef741aa04105) )
 ROM_END
 
-ROM_START( v4montebe )
+ROM_START( v4monte9o )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mn_20s__.940", 0x0000, 0x010000, CRC(72d4ea3d) SHA1(bf2d3279550351069ccc04064dc3b6966b11ee12) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	//ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "mcobo4p1", 0x000001, 0x080000, CRC(aaa594f0) SHA1(2bcb13d8b93911a69c181d6f0be43397baf8cbc8) )
+	ROM_LOAD16_BYTE( "mcobo4p2", 0x000000, 0x080000, CRC(ab94c22a) SHA1(a8a0ed992c0b95fb763aea37f78c8d7a53732509) )
+	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
+	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcosnda.bin", 0x000000, 0x080000, CRC(801ea236) SHA1(531841d6a4d67f502e93f8d74f3b247ccc46208f) )
@@ -4766,11 +4831,6 @@ ROM_START( v4montezz )
 	ROM_LOAD( "mxi10___.2_1", 0x0000, 0x010000, CRC(19077425) SHA1(e31da38a903345c65b083cac192555f1f4ba2e5a) )
 
 	ROM_REGION( 0x800000, "video", 0 )
-	// these also pair with the same p1/p2 as above, but expect different MCU base ROM?
-	ROM_LOAD16_BYTE( "mcobo4p3", 0x100001, 0x080000, CRC(ebe851df) SHA1(61d37a7f91480592da6f5b6ee7ef4b6097ee5c65) )
-	ROM_LOAD16_BYTE( "mcobo4p4", 0x100000, 0x080000, CRC(49b0cfd7) SHA1(51fe74371bdac3c507a04aa9faeb522640d1cdf7) )
-
-	ROM_REGION( 0x800000, "altvideo", 0 )
 	// this seems to be a loose video ROM from an otherwise undumped set? investigate, might belong to something else entirely.
 	ROM_LOAD( "mn______.f_1", 0x0000, 0x080000, CRC(1a81b3fb) SHA1(bbf0fe7e48404962a2f2120734efe71dc1eed64c) ) // unmatched rom? (significant changes)
 
@@ -5273,68 +5333,69 @@ GAME(  199?, v4timebnc,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4timebnd,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 5) (MPU4 Video)",GAME_FLAGS ) 
 GAME(  199?, v4timebne,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
 
-GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montea,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 2) (MPU4 Video)",GAME_FLAGS ) // no video roms
-GAME(  199?, v4monteb,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 3) (MPU4 Video)",GAME_FLAGS ) // no video roms 
-GAME(  199?, v4montec,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 4) (MPU4 Video)",GAME_FLAGS ) // no video roms
-GAME(  199?, v4monted,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 5) (MPU4 Video)",GAME_FLAGS ) // no video roms
-
-GAME(  199?, v4montee,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montef,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 7) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteg,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 8) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteh,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 9) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montei,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 10) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montej,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 11) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montek,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 12) (MPU4 Video)",GAME_FLAGS ) 
-
-
-GAME(  199?, v4montel,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 13) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montem,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 14) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monten,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 15) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteo,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 16) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montep,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 17) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteq,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 18) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monter,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 19) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montes,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 20) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montet,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 21) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteu,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 22) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montev,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 23) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montew,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 24) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montex,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 25) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montey,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 26) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montez,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 27) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaa,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 28) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteab,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 29) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteac,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 30) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montead,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 31) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteae,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 32) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaf,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 33) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteag,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 34) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteah,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 35) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteai,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 36) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaj,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 37) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteak,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 38) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteal,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 39) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteam,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 40) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montean,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 41) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 42) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteap,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 43) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaq,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 44) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montear,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 45) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteas,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 46) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteat,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 47) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteau,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 48) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteav,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 49) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaw,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 50) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteax,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 51) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteay,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 52) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 53) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteba,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 54) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montebb,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 55) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montebc,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 56) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montebd,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 57) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montebe,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 58) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (set 59) (MPU4 Video)",GAME_FLAGS ) 
+// Release D
+GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montea,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4monteb,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montec,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4monted,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montee,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montef,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 7) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteg,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 8) (MPU4 Video)",GAME_FLAGS ) 
+// Release 9
+GAME(  199?, v4monte9,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9a,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9b,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9c,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 4) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9d,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 5) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9e,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9f,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 7) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9g,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 8) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9h,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 9) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9i,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 10) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9j,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 11) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9k,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 12) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9l,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 13) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9m,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 14) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9n,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 15) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9o,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 16) (MPU4 Video)",GAME_FLAGS ) 
+// no suitable 68k ROMs for these
+GAME(  199?, v4monteh,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montei,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montej,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montek,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 4) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montel,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 5) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montem,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monten,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 7) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteo,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 8) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montep,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 9) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteq,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 10) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monter,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 11) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montes,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 12) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montet,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 13) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteu,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 14) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montev,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 15) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montew,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 16) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montex,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 17) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montey,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 18) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montez,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 19) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteaa,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 20) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteab,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 21) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteac,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 22) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montead,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 23) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteae,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 24) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteaf,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 25) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteag,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 26) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteah,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 27) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteai,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 28) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteaj,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 29) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteak,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 30) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteal,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 31) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteam,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 32) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montean,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 33) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 34) (MPU4 Video)",GAME_FLAGS ) 
+// mismatched ROMs
+GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 35) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
 
