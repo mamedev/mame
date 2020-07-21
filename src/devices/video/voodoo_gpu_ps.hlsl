@@ -468,7 +468,7 @@ float4 ColorCombine(float4 c_other, float4 c_local, Combine_Struct ctrl, float m
 	dst *= blendFactor;
 
 	// truncate  TODO: check this
-	dst = floor(dst * 255.0f) / 255.0f;
+	dst = floor(dst * 512.0f) / 512.0f;
 
 	switch (ctrl.c_add_aclocal) {
 	case 0:
