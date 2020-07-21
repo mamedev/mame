@@ -24,7 +24,7 @@
     - puzzli: emulate hblank irq and fix video routines here (water effect not emulated,
       confirmed on PCB ref). Are the screen_ctrl_w "led" bits actually buffer latches
       for the layers? They get written in the middle of the screen, may also be v2 specific.
-    - Unemulated flip screen.
+    - Unemulated/Unverified scrolling in flip screen.
 
 ============================================================================
 
@@ -271,6 +271,8 @@ imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, devi
 	, m_support_16x16(has_ext_tiles)
 	, m_tilemap_scrolldx{0, 0, 0}
 	, m_tilemap_scrolldy{0, 0, 0}
+	, m_tilemap_flip_scrolldx{0, 0, 0}
+	, m_tilemap_flip_scrolldy{0, 0, 0}
 	, m_spriteram_buffered(false)
 {
 }
@@ -1066,8 +1068,8 @@ void imagetek_i4100_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bi
 
 				if (m_screen_flip)
 				{
-					flipx = !flipx;     x = max_x - x - width;
-					flipy = !flipy;     y = max_y - y - height;
+					flipx = !flipx;     x = max_x - x - ((width * sprite_ptr->zoom) >> 16);
+					flipy = !flipy;     y = max_y - y - ((height * sprite_ptr->zoom) >> 16);
 				}
 
 				draw_spritegfx(screen, bitmap, cliprect,
@@ -1184,54 +1186,27 @@ void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bi
 	int const windowwidth  = width >> 2;
 	int const windowheight = height >> 3;
 
-	int const dx = m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
-	int const dy = m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
+	int const dx = m_screen_flip ? m_tilemap_flip_scrolldx[layer] : m_tilemap_scrolldx[layer];
+	int const dy = m_screen_flip ? m_tilemap_flip_scrolldy[layer] : m_tilemap_scrolldy[layer];
 
 	sx += dx;
 	sy += dy;
 
-	int min_x, max_x, min_y, max_y;
-
-	// TODO : allow cliprect related drawing with flipscreen
-	if (dx != 0)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		min_x = 0;
-		max_x = scrwidth - 1;
-	}
-	else
-	{
-		min_x = cliprect.min_x;
-		max_x = cliprect.max_x;
-	}
-
-	if (dy != 0)
-	{
-		min_y = 0;
-		max_y = scrheight - 1;
-	}
-	else
-	{
-		min_y = cliprect.min_y;
-		max_y = cliprect.max_y;
-	}
-
-	int draw_y = m_screen_flip ? scrheight - min_y - 1 : min_y;
-	int draw_inc = m_screen_flip ? -1 : 1;
-
-	for (int y = min_y; y <= max_y; draw_y += draw_inc, y++)
-	{
-		int const scrolly = (sy + y - wy) & (windowheight - 1);
+		int const resy = (sy + y - wy);
+		int const scrolly = (m_screen_flip ? (scrheight - resy - 1) : resy) & (windowheight - 1);
 		int srcline = (wy + scrolly) & (height - 1);
 		int const srctilerow = srcline >> tileshift;
 		srcline &= tilemask;
 
-		u32 *dst = &bitmap.pix32(draw_y);
-		u8 *priority_baseaddr = &priority_bitmap.pix8(draw_y);
+		u32 *dst = &bitmap.pix32(y);
+		u8 *priority_baseaddr = &priority_bitmap.pix8(y);
 
-		int draw_x = m_screen_flip ? scrwidth - min_x - 1 : min_x;
-		for (int x = min_x; x <= max_x; draw_x += draw_inc, x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int const scrollx = (sx + x - wx) & (windowwidth - 1);
+			int const resx = (sx + x - wx);
+			int const scrollx = (m_screen_flip ? (scrwidth - resx - 1) : resx) & (windowwidth - 1);
 			int srccol = (wx + scrollx) & (width - 1);
 			int const srctilecol = srccol >> tileshift;
 			srccol &= tilemask;
@@ -1244,8 +1219,8 @@ void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bi
 
 			if (draw)
 			{
-				dst[draw_x] = dat;
-				priority_baseaddr[draw_x] = pcode;
+				dst[x] = dat;
+				priority_baseaddr[x] = pcode;
 			}
 		}
 	}

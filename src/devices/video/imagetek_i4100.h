@@ -32,8 +32,24 @@ public:
 
 	void map(address_map &map);
 
-	void set_tmap_xoffsets(int x1, int x2, int x3) { m_tilemap_scrolldx[0] = x1; m_tilemap_scrolldx[1] = x2; m_tilemap_scrolldx[2] = x3; }
-	void set_tmap_yoffsets(int y1, int y2, int y3) { m_tilemap_scrolldy[0] = y1; m_tilemap_scrolldy[1] = y2; m_tilemap_scrolldy[2] = y3; }
+	void set_tmap_flip_xoffsets(int x1, int x2, int x3) { m_tilemap_flip_scrolldx[0] = x1; m_tilemap_flip_scrolldx[1] = x2; m_tilemap_flip_scrolldx[2] = x3; }
+	void set_tmap_flip_yoffsets(int y1, int y2, int y3) { m_tilemap_flip_scrolldy[0] = y1; m_tilemap_flip_scrolldy[1] = y2; m_tilemap_flip_scrolldy[2] = y3; }
+	void set_tmap_xoffsets(int x1, int x2, int x3)
+	{
+		m_tilemap_scrolldx[0] = x1;
+		m_tilemap_scrolldx[1] = x2;
+		m_tilemap_scrolldx[2] = x3;
+		// default flip xoffset
+		set_tmap_flip_xoffsets(-x1, -x2, -x3);
+	}
+	void set_tmap_yoffsets(int y1, int y2, int y3)
+	{
+		m_tilemap_scrolldy[0] = y1;
+		m_tilemap_scrolldy[1] = y2;
+		m_tilemap_scrolldy[2] = y3;
+		// default flip yoffset
+		set_tmap_flip_yoffsets(-y1, -y2, -y3);
+	}
 
 	auto blit_irq_cb() { return m_blit_irq_cb.bind(); }
 	void set_spriteram_buffered(bool buffer) { m_spriteram_buffered = buffer; }
@@ -97,6 +113,8 @@ protected:
 	const bool m_support_8bpp, m_support_16x16;
 	int  m_tilemap_scrolldx[3];
 	int  m_tilemap_scrolldy[3];
+	int  m_tilemap_flip_scrolldx[3];
+	int  m_tilemap_flip_scrolldy[3];
 	bool m_spriteram_buffered;
 
 	void blt_write(const int tmap, const offs_t offs, const u16 data, const u16 mask);
