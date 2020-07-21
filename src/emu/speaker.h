@@ -26,12 +26,13 @@
 #pragma once
 
 
+#ifndef SPEAKER_TRACK_MAX_SAMPLE
 #ifdef MAME_DEBUG
 #define SPEAKER_TRACK_MAX_SAMPLE (1)
 #else
 #define SPEAKER_TRACK_MAX_SAMPLE (0)
 #endif
-
+#endif
 
 
 //**************************************************************************
