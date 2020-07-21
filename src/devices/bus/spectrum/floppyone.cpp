@@ -21,7 +21,7 @@
      !FORMAT "diskname";"password";tracks - format disk, if disk was already formatted you'll be prompted for password.
      !6=n - set text mode, 0 - regular 32-column, 3 - 64-column
 	 !B=rs232delay, 0=use parallel printer (default)
-	There is more of special "!x=n" commands, but theirs functions is not known, manual is missing.
+    There is more of special "!x=n" commands, but theirs functions is not known, manual is missing.
     Some information about this device https://worldofspectrum.org/forums/discussion/42944/rocky-gush-floppy-drive-interface/p1
 
     Notes / TODOs:
