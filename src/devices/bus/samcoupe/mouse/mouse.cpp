@@ -65,6 +65,12 @@ void sam_mouse_device::device_start()
 {
 	// allocate timer
 	m_reset = timer_alloc();
+
+	// register for savestates
+	save_item(NAME(m_mouse_index));
+	save_pointer(NAME(m_mouse_data), 9);
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
 }
 
 //-------------------------------------------------

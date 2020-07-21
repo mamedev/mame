@@ -6,6 +6,9 @@
 
 /*
 
+Other known undumped international versions:
+- Genius Pro 2000 (French version of Genius Tabletop Black Magic CX)
+
 Leader 8008 CX (German version)
 
 +---+-----------+-----+-----------------------+-----+-----+-----+

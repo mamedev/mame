@@ -2,25 +2,25 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    ATOM hard disk interface for SAM Coupe
+    S D IDE Adapter for SAM Coupe
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "atom.h"
+#include "sdide.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAM_ATOM_HDD, sam_atom_hdd_device, "sam_atom_hdd", "SAM Coupe ATOM HDD interface")
+DEFINE_DEVICE_TYPE(SAM_SDIDE, sam_sdide_device, "sam_sdide", "S D IDE Adapter")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void sam_atom_hdd_device::device_add_mconfig(machine_config &config)
+void sam_sdide_device::device_add_mconfig(machine_config &config)
 {
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 }
@@ -31,15 +31,16 @@ void sam_atom_hdd_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  sam_atom_hdd_device - constructor
+//  sam_sdide_device - constructor
 //-------------------------------------------------
 
-sam_atom_hdd_device::sam_atom_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SAM_ATOM_HDD, tag, owner, clock),
-	device_samcoupe_drive_interface(mconfig, *this),
+sam_sdide_device::sam_sdide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SAM_SDIDE, tag, owner, clock),
+	device_samcoupe_expansion_interface(mconfig, *this),
 	m_ata(*this, "ata"),
 	m_address_latch(0),
-	m_read_latch(0x00), m_write_latch(0x00)
+	m_data_latch(0),
+	m_data_pending(false)
 {
 }
 
@@ -47,12 +48,12 @@ sam_atom_hdd_device::sam_atom_hdd_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void sam_atom_hdd_device::device_start()
+void sam_sdide_device::device_start()
 {
 	// register for savestates
 	save_item(NAME(m_address_latch));
-	save_item(NAME(m_read_latch));
-	save_item(NAME(m_write_latch));
+	save_item(NAME(m_data_latch));
+	save_item(NAME(m_data_pending));
 }
 
 
@@ -60,15 +61,16 @@ void sam_atom_hdd_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint8_t sam_atom_hdd_device::read(offs_t offset)
+uint8_t sam_sdide_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch (offset)
+	switch (offset & 0xff)
 	{
-		// high byte
-		case 0x06:
-			if (BIT(m_address_latch, 5))
+		case 0xbd: // data
+			if (m_data_pending)
+				data = m_data_latch;
+			else
 			{
 				uint16_t result = 0;
 
@@ -77,44 +79,38 @@ uint8_t sam_atom_hdd_device::read(offs_t offset)
 				if (BIT(m_address_latch, 4) == 0)
 					result = m_ata->cs1_r(m_address_latch & 0x07);
 
-				m_read_latch = result;
-				data = result >> 8;
+				m_data_latch = result >> 8;
+				data = result;
 			}
-			break;
 
-		// low byte
-		case 0x07:
-			data = m_read_latch;
+			m_data_pending = !m_data_pending;
 			break;
 	}
 
 	return data;
 }
 
-void sam_atom_hdd_device::write(offs_t offset, uint8_t data)
+void sam_sdide_device::iorq_w(offs_t offset, uint8_t data)
 {
-	switch (offset)
+	switch (offset & 0xff)
 	{
-		// control
-		case 0x05:
-			if (BIT(data, 5))
-				m_address_latch = data;
-			break;
-
-		// high byte
-		case 0x06:
-			m_write_latch = data;
-			break;
-
-		// low byte
-		case 0x07:
-			if (BIT(m_address_latch, 5))
+		case 0xbd: // data
+			if (!m_data_pending)
+				m_data_latch = data;
+			else
 			{
 				if (BIT(m_address_latch, 3) == 0)
-					m_ata->cs0_w(m_address_latch & 0x07, (m_write_latch << 8) | data);
+					m_ata->cs0_w(m_address_latch & 0x07, (data << 8) | m_data_latch);
 				if (BIT(m_address_latch, 4) == 0)
-					m_ata->cs1_w(m_address_latch & 0x07, (m_write_latch << 8) | data);
+					m_ata->cs1_w(m_address_latch & 0x07, (data << 8) | m_data_latch);
 			}
+
+			m_data_pending = !m_data_pending;
+			break;
+
+		case 0xbf: // register select
+			m_address_latch = data;
+			m_data_pending = false;
 			break;
 	}
 }

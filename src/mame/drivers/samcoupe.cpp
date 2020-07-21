@@ -122,6 +122,8 @@ private:
 		INT_MIDIOUT = 0x10
 	};
 
+	void postload();
+
 	// video
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -425,8 +427,8 @@ void samcoupe_state::draw_mode3_line(int y, int hpos)
 void samcoupe_state::draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, uint8_t mask)
 {
 	/* extract colors from attribute */
-	uint8_t ink = m_clut[(m_attribute >> 3) & 0x0f];
-	uint8_t pap = m_clut[((m_attribute >> 3) & 0x08) | (m_attribute & 0x07)];
+	uint8_t ink = m_clut[((m_attribute >> 3) & 0x08) | (m_attribute & 0x07)];
+	uint8_t pap = m_clut[(m_attribute >> 3) & 0x0f];
 
 	/* draw block of 8 pixels (doubled to 16) */
 	for (int i = 0; i < SAM_BLOCK; i++)
@@ -549,6 +551,12 @@ INTERRUPT_GEN_MEMBER(samcoupe_state::samcoupe_frame_interrupt)
 	samcoupe_irq(INT_FRAME);
 }
 
+void samcoupe_state::postload()
+{
+	// restore videoram pointer
+	vmpr_w(m_vmpr);
+}
+
 void samcoupe_state::machine_start()
 {
 	// make sure the ram device is already running
@@ -560,6 +568,18 @@ void samcoupe_state::machine_start()
 	/* schedule our video updates */
 	m_video_update_timer = timer_alloc(TIMER_VIDEO_UPDATE);
 	m_video_update_timer->adjust(m_screen->time_until_pos(0, 0));
+
+	// register for save states
+	save_item(NAME(m_lmpr));
+	save_item(NAME(m_hmpr));
+	save_item(NAME(m_vmpr));
+	save_item(NAME(m_border));
+	save_item(NAME(m_clut), 16);
+	save_item(NAME(m_line_int));
+	save_item(NAME(m_status));
+	save_item(NAME(m_attribute));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(samcoupe_state::postload), this));
 }
 
 void samcoupe_state::machine_reset()
@@ -981,4 +1001,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", 0 )
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", MACHINE_SUPPORTS_SAVE )

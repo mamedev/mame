@@ -2485,6 +2485,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/printer.h",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
+		MAME_DIR .. "src/devices/bus/centronics/samdac.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/samdac.h",
 	}
 
 	dependency {
@@ -4320,6 +4322,8 @@ if (BUSES["SAMCOUPE_EXPANSION"]~=null) then
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/onemeg.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.cpp",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sdide.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sdide.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.cpp",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/spi.cpp",
