@@ -2176,31 +2176,283 @@ ROM_START( v4reno )
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
-
-
-	ROM_REGION( 0x800000, "altmain", 0 ) // alt revs of MPU4 interface ROM
-	ROM_LOAD("rri20s__.a_0",    0x00000, 0x10000,   CRC(0fb9686a) SHA1(a403d4424897fcdc343b277aa0caa032ed970747) )
-	ROM_LOAD("rrixes__.a_0",    0x00000, 0x10000,   CRC(3f055fa1) SHA1(ee6561d6849e5150d7b7b5585e8ed8176e706aeb) )
-	ROM_LOAD("rr_20ab_.a_0",    0x00000, 0x10000,   CRC(6da308aa) SHA1(c1f418592942a9f68aac9a5a6f91911b96861d48) )
-	ROM_LOAD("rr_20a_p.a_0",    0x00000, 0x10000,   CRC(0dc6b163) SHA1(5a666dec859807cab6478b06f38473997fe49cd6) )
-	ROM_LOAD("rr_20a__.a_0",    0x00000, 0x10000,   CRC(9b279f39) SHA1(9e9e80fdc8517a314bac15a5087d7619a84c1e00) )
-	ROM_LOAD("rr_20bgp.a_0",    0x00000, 0x10000,   CRC(7175112b) SHA1(799c822a6dabcf2a7d67b2ef81273a0fba6cf3d9) )
-	ROM_LOAD("rr_20bg_.a_0",    0x00000, 0x10000,   CRC(e7943f71) SHA1(490af3fc7d3506ca9c5c049a6fcffb856bf28d1e) )
-	ROM_LOAD("rr_20btp.a_0",    0x00000, 0x10000,   CRC(c73e1c28) SHA1(37c5b984311439906cae2ba48aab249caeb1f2ab) )
-	ROM_LOAD("rr_20bt_.a_0",    0x00000, 0x10000,   CRC(51df3272) SHA1(c9cc06556e79e09b9b3cd9816b6f7dde92dadfe7) )
-	ROM_LOAD("rr_20sbp.a_0",    0x00000, 0x10000,   CRC(0ea4be35) SHA1(2e3950bcc01f4c1ce53873b552cb156a91c74e85) )
-	ROM_LOAD("rr_20sb_.a_0",    0x00000, 0x10000,   CRC(9845906f) SHA1(693e480d548482c073644513803ddd4e5ed0694c) )
-	ROM_LOAD("rr_20s__.a_0",    0x00000, 0x10000,   CRC(6ec107fc) SHA1(46ac2bbb19ff4d562fa2e0029e9831be0bec5def) )
-	ROM_LOAD("rr_27sd_.a60",    0x00000, 0x10000,   CRC(0f6c18e6) SHA1(23f07d1ed2340e73abcf6b86581bc5dd768dbab5) )
-	ROM_LOAD("rr_37sd_.a60",    0x00000, 0x10000,   CRC(807e73c8) SHA1(202d621cead9b2af8fef12ea0d07a6fce6262518) )
-	ROM_LOAD("rr_37s__.a60",    0x00000, 0x10000,   CRC(cbdb9469) SHA1(bc802b4c15451feebc332944f6bc09c7fb20ea20) )
-	ROM_LOAD("rr_x7sd_.a60",    0x00000, 0x10000,   CRC(3fd02f2d) SHA1(49ae60e8bdc6681482272d31eefc0098cc6c9667) )
-	ROM_LOAD("rr_x7s__.a60",    0x00000, 0x10000,   CRC(7475c88c) SHA1(0425e722321d4f365f6e90de5159721ac8a9d0d2) )
-	ROM_LOAD("rr_xeadp.a_0",    0x00000, 0x10000,   CRC(76df6109) SHA1(fbc76a9612a48f1b589e43e2f920459ed6c32c57) )
-	ROM_LOAD("rr_xead_.a_0",    0x00000, 0x10000,   CRC(e03e4f53) SHA1(17b4bdf82393aacf74765f04fc0d9b1f683114cc) )
-	ROM_LOAD("rr_xea_p.a_0",    0x00000, 0x10000,   CRC(3d7a86a8) SHA1(98bb8b2c0705219536720eef404c7bbc14a85793) )
-	ROM_LOAD("rr_xea__.a_0",    0x00000, 0x10000,   CRC(ab9ba8f2) SHA1(52b77aa66980fa552d286225919fca9910f48326) )
 ROM_END
+
+ROM_START( v4renoa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rri20s__.a_0",    0x00000, 0x10000,   CRC(0fb9686a) SHA1(a403d4424897fcdc343b277aa0caa032ed970747) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rrixes__.a_0",    0x00000, 0x10000,   CRC(3f055fa1) SHA1(ee6561d6849e5150d7b7b5585e8ed8176e706aeb) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20ab_.a_0",    0x00000, 0x10000,   CRC(6da308aa) SHA1(c1f418592942a9f68aac9a5a6f91911b96861d48) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renod )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20a_p.a_0",    0x00000, 0x10000,   CRC(0dc6b163) SHA1(5a666dec859807cab6478b06f38473997fe49cd6) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20a__.a_0",    0x00000, 0x10000,   CRC(9b279f39) SHA1(9e9e80fdc8517a314bac15a5087d7619a84c1e00) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+
+ROM_START( v4renof )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20bgp.a_0",    0x00000, 0x10000,   CRC(7175112b) SHA1(799c822a6dabcf2a7d67b2ef81273a0fba6cf3d9) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renog )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20bg_.a_0",    0x00000, 0x10000,   CRC(e7943f71) SHA1(490af3fc7d3506ca9c5c049a6fcffb856bf28d1e) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20btp.a_0",    0x00000, 0x10000,   CRC(c73e1c28) SHA1(37c5b984311439906cae2ba48aab249caeb1f2ab) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20bt_.a_0",    0x00000, 0x10000,   CRC(51df3272) SHA1(c9cc06556e79e09b9b3cd9816b6f7dde92dadfe7) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20sbp.a_0",    0x00000, 0x10000,   CRC(0ea4be35) SHA1(2e3950bcc01f4c1ce53873b552cb156a91c74e85) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renok )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20sb_.a_0",    0x00000, 0x10000,   CRC(9845906f) SHA1(693e480d548482c073644513803ddd4e5ed0694c) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renol )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_20s__.a_0",    0x00000, 0x10000,   CRC(6ec107fc) SHA1(46ac2bbb19ff4d562fa2e0029e9831be0bec5def) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renom )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_27sd_.a60",    0x00000, 0x10000,   CRC(0f6c18e6) SHA1(23f07d1ed2340e73abcf6b86581bc5dd768dbab5) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renon )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_37sd_.a60",    0x00000, 0x10000,   CRC(807e73c8) SHA1(202d621cead9b2af8fef12ea0d07a6fce6262518) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_37s__.a60",    0x00000, 0x10000,   CRC(cbdb9469) SHA1(bc802b4c15451feebc332944f6bc09c7fb20ea20) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+
+ROM_START( v4renop )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_x7sd_.a60",    0x00000, 0x10000,   CRC(3fd02f2d) SHA1(49ae60e8bdc6681482272d31eefc0098cc6c9667) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renoq )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_x7s__.a60",    0x00000, 0x10000,   CRC(7475c88c) SHA1(0425e722321d4f365f6e90de5159721ac8a9d0d2) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renor )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_xeadp.a_0",    0x00000, 0x10000,   CRC(76df6109) SHA1(fbc76a9612a48f1b589e43e2f920459ed6c32c57) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renos )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_xead_.a_0",    0x00000, 0x10000,   CRC(e03e4f53) SHA1(17b4bdf82393aacf74765f04fc0d9b1f683114cc) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_xea_p.a_0",    0x00000, 0x10000,   CRC(3d7a86a8) SHA1(98bb8b2c0705219536720eef404c7bbc14a85793) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4renou )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_xea__.a_0",    0x00000, 0x10000,   CRC(ab9ba8f2) SHA1(52b77aa66980fa552d286225919fca9910f48326) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
 
 
 ROM_START( v4reno8 )
@@ -7188,7 +7440,6 @@ GAME(  199?, v4redhtpy,  v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4redhtpz,  v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3) (set 27) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpaa, v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3) (set 28) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpab, v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3) (set 29) (MPU4 Video)",GAME_FLAGS )
-
 // 'version 1.9' 68k ROMs - different numbering format?
 GAME(  199?, v4redhtparc,v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Arcade, Cash+Tokens, 1993 Awards, 20p Fixed, Version 1.9) (MPU4 Video)",GAME_FLAGS )
 // release 2 68k ROMs
@@ -7311,7 +7562,30 @@ GAME(  199?, v4bigfrtb,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4bigfrtc,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 4) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  1996, v4reno,     0,        bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p/10GBP Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoa,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renob,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoc,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renod,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoe,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 6) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renof,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 7) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renog,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 8) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoh,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 9) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoi,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 10) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoj,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 11) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renok,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 12) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renol,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 13) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renom,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 14) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renon,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 15) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoo,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 16) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renop,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 17) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renoq,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 18) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renor,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 19) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renos,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 20) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renot,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 21) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renou,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A) (set 22) (MPU4 Video)",GAME_FLAGS )
+// older 68k version
 GAME(  1996, v4reno8,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 8) (MPU4 Video)",GAME_FLAGS )
+// 68k ROMs below have no matching base roms
 GAME(  1996, v4reno7,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 7) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 GAME(  1996, v4reno5,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
