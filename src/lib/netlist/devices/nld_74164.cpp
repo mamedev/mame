@@ -56,17 +56,13 @@ namespace netlist
 
 		NETLIB_HANDLERI(clk)
 		{
-			m_cnt = (m_cnt << 1);
-			if (m_ab == 3)
-			{
-				m_cnt |= 1;
-			}
+			m_cnt = (m_cnt << 1) | m_ab;
 			m_Q.push(m_cnt, NLTIME_FROM_NS(30));
 		}
 
 		NETLIB_HANDLERI(ab)
 		{
-			m_ab = static_cast<unsigned>(m_AB());
+			m_ab = static_cast<unsigned>((m_AB() == 3) ? 1 : 0);
 		}
 
 		friend class NETLIB_NAME(74164_dip);
