@@ -17172,6 +17172,7 @@ tqst                            // (c) ACE?
 trivialp                        // (c) 1996
 trivialpd                       // (c) 1996
 trivialpo                       // (c) 1996
+jpmreno
 
 @source:jpmimpctsw.cpp
 j6aceclb                        // Ace Of Clubs (Crystal)
@@ -29129,6 +29130,9 @@ v4redhtpunk
 v4redhtp2z
 v4rencas                        // Reno Casino
 v4reno                          // Reno Reels
+v4reno8
+v4reno7
+v4reno5
 v4rhmaz                         // Red Hot Mazooma Belle
 v4shpwnd                        // Shop Window
 v4sixx                          // 6-X

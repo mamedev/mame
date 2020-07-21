@@ -2177,20 +2177,10 @@ ROM_START( v4reno )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 
-	ROM_REGION( 0x800000, "altvideo", 0 ) // alt revs of the video roms?
-	ROM_LOAD16_BYTE( "reno reels 5-1",    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
-	ROM_LOAD16_BYTE( "reno reels 5-2",    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
-	ROM_LOAD16_BYTE( "reno_71_27c040.bin",0x000000, 0x080000,  CRC(c1125c51) SHA1(a461049cd3768096c03f3a5149cdef31d0ab447e) )
-	ROM_LOAD16_BYTE( "reno_72_27c040.bin",0x000001, 0x080000,  CRC(31773743) SHA1(e1245f6b35c9049b3d1478e93fb1b6cfff34733e) )
-	ROM_LOAD16_BYTE( "rr8p1",             0x000000, 0x080000,  CRC(68992dd3) SHA1(75ab1cd02ac627b6191e9b61ee7c072029becaeb) )
-	ROM_LOAD16_BYTE( "rr8p2",             0x000001, 0x080000,  CRC(b859020e) SHA1(811ccac82d022ceccc83f1bf6c6b4de6cc313e14) )
-	ROM_LOAD16_BYTE( "rr______.8_1",      0x000000, 0x080000,  CRC(eca43ed4) SHA1(e2e4e5d3d4b659ddd74c120316b9658708e188f1) )
-	ROM_LOAD16_BYTE( "rr______.8_2",      0x000001, 0x080000,  CRC(c3f25586) SHA1(7335708a7d90c7fbd0088bb6ee5ce0255b9b18ab) )
 
 	ROM_REGION( 0x800000, "altmain", 0 ) // alt revs of MPU4 interface ROM
 	ROM_LOAD("rri20s__.a_0",    0x00000, 0x10000,   CRC(0fb9686a) SHA1(a403d4424897fcdc343b277aa0caa032ed970747) )
 	ROM_LOAD("rrixes__.a_0",    0x00000, 0x10000,   CRC(3f055fa1) SHA1(ee6561d6849e5150d7b7b5585e8ed8176e706aeb) )
-	ROM_LOAD("rrv8ss",          0x00000, 0x10000,   CRC(a37383a5) SHA1(6c2563967546d810f2c50aa9a269bb1369014c18) )
 	ROM_LOAD("rr_20ab_.a_0",    0x00000, 0x10000,   CRC(6da308aa) SHA1(c1f418592942a9f68aac9a5a6f91911b96861d48) )
 	ROM_LOAD("rr_20a_p.a_0",    0x00000, 0x10000,   CRC(0dc6b163) SHA1(5a666dec859807cab6478b06f38473997fe49cd6) )
 	ROM_LOAD("rr_20a__.a_0",    0x00000, 0x10000,   CRC(9b279f39) SHA1(9e9e80fdc8517a314bac15a5087d7619a84c1e00) )
@@ -2210,13 +2200,47 @@ ROM_START( v4reno )
 	ROM_LOAD("rr_xead_.a_0",    0x00000, 0x10000,   CRC(e03e4f53) SHA1(17b4bdf82393aacf74765f04fc0d9b1f683114cc) )
 	ROM_LOAD("rr_xea_p.a_0",    0x00000, 0x10000,   CRC(3d7a86a8) SHA1(98bb8b2c0705219536720eef404c7bbc14a85793) )
 	ROM_LOAD("rr_xea__.a_0",    0x00000, 0x10000,   CRC(ab9ba8f2) SHA1(52b77aa66980fa552d286225919fca9910f48326) )
-
-
-	ROM_REGION( 0x800000, "altsnd", 0 ) // alt revs of the sound roms?
-	ROM_LOAD( "reno reels sound 1a",  0x000000, 0x080000,  CRC(a8b7bba7) SHA1(5fa3512a6fdcf512fafa6261b3a99922a00d6874) ) // bad dump, only one ROM?
-
 ROM_END
 
+
+ROM_START( v4reno8 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rrv8ss",          0x00000, 0x10000,   CRC(a37383a5) SHA1(6c2563967546d810f2c50aa9a269bb1369014c18) )
+
+	ROM_REGION( 0x800000, "video2", 0 ) // Release 8, good
+	ROM_LOAD16_BYTE( "rr______.8_1",      0x000001, 0x080000,  CRC(eca43ed4) SHA1(e2e4e5d3d4b659ddd74c120316b9658708e188f1) )
+	ROM_LOAD16_BYTE( "rr______.8_2",      0x000000, 0x080000,  CRC(c3f25586) SHA1(7335708a7d90c7fbd0088bb6ee5ce0255b9b18ab) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4reno7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("release7.mpu4",          0x00000, 0x10000,  NO_DUMP )
+
+	ROM_REGION( 0x800000, "video7", 0 ) // Release 7
+	ROM_LOAD16_BYTE( "rr8p1",             0x000001, 0x080000,  CRC(68992dd3) SHA1(75ab1cd02ac627b6191e9b61ee7c072029becaeb) )
+	ROM_LOAD16_BYTE( "rr8p2",             0x000000, 0x080000,  CRC(b859020e) SHA1(811ccac82d022ceccc83f1bf6c6b4de6cc313e14) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
+
+ROM_START( v4reno5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("release5.mpu4",          0x00000, 0x10000,  NO_DUMP )
+
+	ROM_REGION( 0x800000, "video5", 0 ) // Release 5
+	ROM_LOAD16_BYTE( "reno reels 5-1",    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
+	ROM_LOAD16_BYTE( "reno reels 5-2",    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+ROM_END
 
 
 ROM_START( v4redhtp ) // ok
@@ -3644,9 +3668,6 @@ ROM_START( v4big40k )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "b4__snd_.1_a", 0x0000, 0x080000, CRC(2d630b87) SHA1(e4be02a1356735c47934f8f30e1e2462bf28968c) )
 ROM_END
-
-
-
 
 
 ROM_START( v4bulblx )
@@ -5405,7 +5426,10 @@ GAME(  199?, v4bigfrtc,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 
 // these don't play in open door mode as they'll drop you to test mode, so need 'payout shelf' emulating.
 
-GAME(  1996, v4reno,     0,        bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4reno,     0,        bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release A, 20p/10GBP Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4reno8,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release 8) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4reno7,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release 7) (MPU4 Video)",GAME_FLAGS ) // no base ROM
+GAME(  1996, v4reno5,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
 // v4big40 sets  black screen after the initial boot, are they complete?
 GAME(  199?, v4big40,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 1) (MPU4 Video)",GAME_FLAGS )
