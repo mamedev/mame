@@ -22,7 +22,7 @@ the ESB 6000 board in the machine configuration, and set the video options to
 
 That being said, it's probably a better idea to use a real chessboard.
 
-*******************************************************************************
+===============================================================================
 
 Chess Challenger (1)
 --------------------

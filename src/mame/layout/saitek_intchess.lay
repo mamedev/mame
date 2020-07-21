@@ -43,8 +43,8 @@ license:CC0
 	<element name="text_l03"><text string="NEW GAME"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 
 	<element name="text_l11"><text string="MODE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l12"><text string="CLEAR SQUARE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l13"><text string="CLEAR BOARD"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_l12"><text string="C SQUARE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_l13"><text string="C BOARD"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 	<element name="text_l14"><text string="PLACE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 	<element name="text_l15"><text string="FIND"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 	<element name="text_l16"><text string="NEXT BEST"><color red="0.66" green="0.66" blue="0.66" /></text></element>

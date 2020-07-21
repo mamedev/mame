@@ -414,9 +414,9 @@ static INPUT_PORTS_START( eas )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz" )
-	PORT_CONFSETTING(    0x01, "3.57MHz" )
-	PORT_CONFSETTING(    0x02, "4MHz" )
+	PORT_CONFSETTING(    0x00, "3MHz (original)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (Privat)" )
+	PORT_CONFSETTING(    0x02, "4MHz (Glasgow)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easc )
@@ -424,9 +424,9 @@ static INPUT_PORTS_START( easc )
 
 	PORT_MODIFY("FAKE") // default to 4MHz
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz" )
-	PORT_CONFSETTING(    0x01, "3.57MHz" )
-	PORT_CONFSETTING(    0x02, "4MHz" )
+	PORT_CONFSETTING(    0x00, "3MHz (original)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (Privat)" )
+	PORT_CONFSETTING(    0x02, "4MHz (Glasgow)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc )

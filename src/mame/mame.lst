@@ -10544,6 +10544,7 @@ compis2                         // 1985 Telenova Compis
 @source:compuchess.cpp
 ccmk1                           // Chess Champion MK I
 cmpchess
+cmpchess2
 cncchess
 
 @source:compmahj.cpp
@@ -35686,6 +35687,7 @@ ccompan
 
 @source:saitek_chesstrv.cpp
 chesstrv
+chesstrvi
 
 @source:saitek_corona.cpp
 corona

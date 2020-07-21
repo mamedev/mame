@@ -4336,12 +4336,12 @@ static INPUT_PORTS_START( bassmate )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wind")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Cover")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time of Day")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wtr. Temp F")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Temp F")
 
 	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wtr. Clarity")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Clarity")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Structure")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wtr. Depth(FT)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Depth(ft)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Season")
 
 	PORT_START("ACL")
@@ -4351,7 +4351,6 @@ static INPUT_PORTS_START( bassmate )
 	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 void bassmate_state::bassmate(machine_config &config)

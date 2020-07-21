@@ -1181,7 +1181,7 @@ static INPUT_PORTS_START( rchase )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_MODIFY("COINAGE") // like with the other games, set all 0x00 for Free Play
+	PORT_MODIFY("COINAGE") // like with the other games, set all switches to 0x00 for Free Play
 	PORT_DIPNAME( 0x03, 0x03, "Coin to Credit" ) PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
