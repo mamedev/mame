@@ -4031,37 +4031,107 @@ ROM_START( v4frfact )
 	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
 
 	ROM_REGION( 0x800000, "video", 0 )
-	/* p1/p2 load the wrong way around? */
 	ROM_LOAD16_BYTE( "ff_40d.p1", 0x000001, 0x080000, CRC(c91fd349) SHA1(18c36612ee9fed6f12bb3dbf08f6740cf2a463c2) )
 	ROM_LOAD16_BYTE( "ff_40d.p2", 0x000000, 0x080000, CRC(e7555936) SHA1(0af7a0be17735831eb037c4bc55d35891a608b23) )
-
 	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
 	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
 	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
 	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
 	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
 	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	// 30p/?15
-	ROM_LOAD16_BYTE( "ff_493.p1", 0x000001, 0x080000, CRC(1a88e0e6) SHA1(198fffd0d98d557462485b1ca6e3460199e03924) )
-	ROM_LOAD16_BYTE( "ff_493.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
-	// 30p/?15 data
-	ROM_LOAD16_BYTE( "ff_493d.p1", 0x000001, 0x080000, CRC(1a88e0e6) SHA1(198fffd0d98d557462485b1ca6e3460199e03924) )
-	ROM_LOAD16_BYTE( "ff_493d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
-	// 25p/?15
-	ROM_LOAD16_BYTE( "ff_393.p1", 0x000001, 0x080000, CRC(35011cab) SHA1(9e381db93dbe1f71d40b152ae6c68ea7a7b9728c) )
-	ROM_LOAD16_BYTE( "ff_393.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
-	// 25p/?15 data
-	ROM_LOAD16_BYTE( "ff_393d.p1", 0x000001, 0x080000, CRC(35011cab) SHA1(9e381db93dbe1f71d40b152ae6c68ea7a7b9728c) )
-	ROM_LOAD16_BYTE( "ff_393d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
-	// 20p/?15
-	ROM_LOAD16_BYTE( "ff_293.p1", 0x000001, 0x080000, CRC(4787bc3d) SHA1(a1d53f1640c6d829c9fee8c72057b2801aac4cb2) )
-	ROM_LOAD16_BYTE( "ff_293.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
-	// 20p/?15 data
-	ROM_LOAD16_BYTE( "ff_293d.p1", 0x000001, 0x080000, CRC(4787bc3d) SHA1(a1d53f1640c6d829c9fee8c72057b2801aac4cb2) )
-	ROM_LOAD16_BYTE( "ff_293d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
 ROM_END
+
+ROM_START( v4frfacta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ff_493.p1", 0x000001, 0x080000, CRC(1a88e0e6) SHA1(198fffd0d98d557462485b1ca6e3460199e03924) ) // 30p/?15
+	ROM_LOAD16_BYTE( "ff_493.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
+ROM_END
+
+ROM_START( v4frfactb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ff_493d.p1", 0x000001, 0x080000, CRC(1a88e0e6) SHA1(198fffd0d98d557462485b1ca6e3460199e03924) ) 	// 30p/?15 data
+	ROM_LOAD16_BYTE( "ff_493d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
+ROM_END
+
+ROM_START( v4frfactc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ff_393.p1", 0x000001, 0x080000, CRC(35011cab) SHA1(9e381db93dbe1f71d40b152ae6c68ea7a7b9728c) ) 	// 25p/?15
+	ROM_LOAD16_BYTE( "ff_393.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
+ROM_END
+
+ROM_START( v4frfactd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ff_393d.p1", 0x000001, 0x080000, CRC(35011cab) SHA1(9e381db93dbe1f71d40b152ae6c68ea7a7b9728c) ) 	// 25p/?15 data
+	ROM_LOAD16_BYTE( "ff_393d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
+ROM_END
+
+ROM_START( v4frfacte )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ff_293.p1", 0x000001, 0x080000, CRC(4787bc3d) SHA1(a1d53f1640c6d829c9fee8c72057b2801aac4cb2) ) 	// 20p/?15
+	ROM_LOAD16_BYTE( "ff_293.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
+ROM_END
+
+ROM_START( v4frfactf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ffmpu416_a209.p1",  0x00000, 0x10000, NO_DUMP ) // should use "FFMPU416.P1  A209    27C512" according to text file, but ROM was not in archive
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ff_293d.p1", 0x000001, 0x080000, CRC(4787bc3d) SHA1(a1d53f1640c6d829c9fee8c72057b2801aac4cb2) ) 	// 20p/?15 data
+	ROM_LOAD16_BYTE( "ff_293d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p3", 0x100001, 0x080000, CRC(a043a1f6) SHA1(0e591f0e7ecdf8b390a20ee826705a22ed6923d5) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p4", 0x100000, 0x080000, CRC(58226ff5) SHA1(f2647e43da69e8aa2f78d46f3cfc553440213c36) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p5", 0x200001, 0x080000, CRC(9bfc6da8) SHA1(969c4a84392c28d61e87482e7f881bdfda79f879) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p6", 0x200000, 0x080000, CRC(240cdfd3) SHA1(8ccf199aff929813df554d957e84484a482c98c6) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p7", 0x300001, 0x080000, CRC(42d3bd01) SHA1(6d07875e8f251c3c9c4e7f48ae886b8069c20897) )
+	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
+ROM_END
+
+
 
 /* BWB */
 ROM_START( v4bigfrt )
@@ -7710,9 +7780,37 @@ ROM_START( v4megbuk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc_xc___.2_0", 0x0000, 0x010000, CRC(372ed757) SHA1(ce9d13bc546b7e64ee377627577b3ae0848e8659) )
 
-	ROM_REGION( 0x10000, "altmain", 0 ) // alt MPU4 interface ROMS
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4megbuka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc_xc_b_.2_0", 0x0000, 0x010000, CRC(c1aa40c4) SHA1(c1ce0bf5929ccba6d5e4ad7508e41d1df8fe10f2) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4megbukb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc_xc_d_.2_0", 0x0000, 0x010000, CRC(7c8b30f6) SHA1(d851fc2dcb5cf72d0b63ce6fe47b0350faa94356) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4megbukc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc_xc_k_.2_0", 0x0000, 0x010000, CRC(8a0fa765) SHA1(d687a324223ac1d32a312c8666f63772dc5d9e2b) )
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -7724,20 +7822,10 @@ ROM_END
 
 
 
+
 ROM_START( v4rencas )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc_20a__.3_0", 0x0000, 0x010000, CRC(9727f862) SHA1(7815bef16fa7304108d553bbf897376ce2a45ad6) )
-
-	ROM_REGION( 0x10000, "altmain", 0 ) // alt MPU4 interface ROMS
-	ROM_LOAD( "rc_20ab_.3_0", 0x0000, 0x010000, CRC(61a36ff1) SHA1(33a8bd624e995acc43757689988aee1ac79939f1) )
-	ROM_LOAD( "rc_20ad_.3_0", 0x0000, 0x010000, CRC(dc821fc3) SHA1(2b7ae1b971d137e4f9dc36bf482d3f69f6737a94) )
-	ROM_LOAD( "rc_20ak_.3_0", 0x0000, 0x010000, CRC(2a068850) SHA1(87d439e3e03fb5a9ba225dea37d0aaa8e2f475f9) )
-	ROM_LOAD( "rc_20s__.3_0", 0x0000, 0x010000, CRC(62c160a7) SHA1(ea0979ebe0a12f58b15825e1a4074385453e839c) )
-	ROM_LOAD( "rc_20sb_.3_0", 0x0000, 0x010000, CRC(9445f734) SHA1(74cff30e57a7cc856e72c1bfd8ab2d8d259a2b72) )
-	ROM_LOAD( "rc_20sd_.3_0", 0x0000, 0x010000, CRC(29648706) SHA1(649aed977028a57664f181bc159663c93fe86e67) )
-	ROM_LOAD( "rc_20sk_.3_0", 0x0000, 0x010000, CRC(dfe01095) SHA1(bf7c2b93bce4d5caa3c56ff948439acc99efd75b) )
-	ROM_LOAD( "rci20___.3_0", 0x0000, 0x010000, CRC(03b90f31) SHA1(89c73b74751a648686480a17071b231fdfd9002d) )
-	ROM_LOAD( "rci20_d_.3_0", 0x0000, 0x010000, CRC(481ce890) SHA1(2fe493728acc2aa0398fcc6559bce572ce921274) )
 
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
@@ -7746,8 +7834,104 @@ ROM_START( v4rencas )
 	/* none present */
 ROM_END
 
+ROM_START( v4rencasa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20ab_.3_0", 0x0000, 0x010000, CRC(61a36ff1) SHA1(33a8bd624e995acc43757689988aee1ac79939f1) )
 
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencasb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20ad_.3_0", 0x0000, 0x010000, CRC(dc821fc3) SHA1(2b7ae1b971d137e4f9dc36bf482d3f69f6737a94) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencasc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20ak_.3_0", 0x0000, 0x010000, CRC(2a068850) SHA1(87d439e3e03fb5a9ba225dea37d0aaa8e2f475f9) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencasd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20s__.3_0", 0x0000, 0x010000, CRC(62c160a7) SHA1(ea0979ebe0a12f58b15825e1a4074385453e839c) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencase )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20sb_.3_0", 0x0000, 0x010000, CRC(9445f734) SHA1(74cff30e57a7cc856e72c1bfd8ab2d8d259a2b72) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencasf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20sd_.3_0", 0x0000, 0x010000, CRC(29648706) SHA1(649aed977028a57664f181bc159663c93fe86e67) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencasg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc_20sk_.3_0", 0x0000, 0x010000, CRC(dfe01095) SHA1(bf7c2b93bce4d5caa3c56ff948439acc99efd75b) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencash )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rci20___.3_0", 0x0000, 0x010000, CRC(03b90f31) SHA1(89c73b74751a648686480a17071b231fdfd9002d) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rencasi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rci20_d_.3_0", 0x0000, 0x010000, CRC(481ce890) SHA1(2fe493728acc2aa0398fcc6559bce572ce921274) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
 
 
 
@@ -8165,7 +8349,7 @@ GAME(  199?, v4monteal,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4monteam,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 32) (MPU4 Video)",GAME_FLAGS ) 
 GAME(  199?, v4montean,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 33) (MPU4 Video)",GAME_FLAGS ) 
 GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 34) (MPU4 Video)",GAME_FLAGS ) 
-// mismatched ROMs
+// only have a single loose 68k ROM from this which doesn't match any other set
 GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 35) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 1) (MPU4 Video)",GAME_FLAGS )
@@ -8197,14 +8381,33 @@ GAME(  1995, v4mdice5,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwb
 
 // other issues
 
+// no video ROMs dumped!
+GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Megabucks Poker (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4megbuka,  v4megbuk, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Megabucks Poker (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4megbukb,  v4megbuk, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Megabucks Poker (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4megbukc,  v4megbuk, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Megabucks Poker (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Megabucks Poker (BWB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
-
-GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+// no video ROMs dumped!
+GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasa,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasb,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasc,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasd,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencase,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 6) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasf,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 7) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasg,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 8) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencash,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 9) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rencasi,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (set 10) (MPU4 Video)",GAME_FLAGS )
 
 
 /* Uncertain BIOS */
-GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacta,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactb,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactc,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactd,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacte,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BWB video in the BIOS rom tho */
