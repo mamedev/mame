@@ -812,7 +812,7 @@ void device_t::device_pre_save()
 
 
 //-------------------------------------------------
-//  device_post_load - called after the loading a
+//  device_post_load - called after loading a
 //  saved state, so that registered variables can
 //  be expanded as necessary
 //-------------------------------------------------
@@ -1095,7 +1095,7 @@ void device_interface::interface_pre_save()
 
 
 //-------------------------------------------------
-//  interface_post_load - called after the loading a
+//  interface_post_load - called after loading a
 //  saved state, so that registered variables can
 //  be expanded as necessary
 //-------------------------------------------------

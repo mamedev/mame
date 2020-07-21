@@ -58,7 +58,7 @@ void device_memory_interface::set_addrmap(int spacenum, address_map_constructor 
 
 //-------------------------------------------------
 //  memory_translate - translate from logical to
-//  phyiscal addresses; designed to be overridden
+//  physical addresses; designed to be overridden
 //  by the actual device implementation if address
 //  translation is supported
 //-------------------------------------------------
