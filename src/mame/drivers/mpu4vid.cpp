@@ -5154,17 +5154,180 @@ ROM_START( v4rhmaz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_10___.4_0", 0x0000, 0x010000, CRC(5e9b282e) SHA1(d40744ae4cb36e49398f2f2e91274f9a1ecbe018) )
 
-	ROM_REGION( 0x10000, "altmain", 0 ) // alt MPU4 interface ROMS
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmaza )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_10_b_.4_0", 0x0000, 0x010000, CRC(a81fbfbd) SHA1(24fda5a2eaa7291ad4869d2f3061798360c5e862) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_10_d_.4_0", 0x0000, 0x010000, CRC(153ecf8f) SHA1(a1d67c2298bbd008be69b7ae7b3b92669972e37f) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_20___.4_0", 0x0000, 0x010000, CRC(8c5811a6) SHA1(2b51776e7dc78c322173708c6426b9eafde84870) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_20_b_.4_0", 0x0000, 0x010000, CRC(7adc8635) SHA1(8af3c8f332ca877f82940bc2a4e7abc4d37d6f48) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmaze )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_20_bl.4_0", 0x0000, 0x010000, CRC(244c3e2c) SHA1(c764fe5a5ec74a4c4bb8bfea1bab2e8ae95cc4e7) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_20_d_.4_0", 0x0000, 0x010000, CRC(c7fdf607) SHA1(eab05365451d66e23163cbed433921bcbd415022) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_xc___.4_0", 0x0000, 0x010000, CRC(bce4266d) SHA1(018419adc7ee4af6c183868d1b7c3ef0cab8a837) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_xc_b_.4_0", 0x0000, 0x010000, CRC(4a60b1fe) SHA1(8effdbcf89aa942c434ebbb5e7127c357608d83f) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_xc_d_.4_0", 0x0000, 0x010000, CRC(f741c1cc) SHA1(576e250319ea2269982cfd6b5ea68ae4a26f81f2) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rm_xc_k_.4_0", 0x0000, 0x010000, CRC(01c5565f) SHA1(293b7591cd73d12552db751629a60aa315433dbf) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "rm______.4_1", 0x000000, 0x010000, CRC(51af0692) SHA1(74e52d63adeaaa1f0949dad60f5d4ca1635d2261) )
+	ROM_LOAD16_BYTE( "rm______.4_2", 0x000001, 0x010000, CRC(2c0971ee) SHA1(7ee22c7bf0e0dcc548537a6418d56c7088a699a0) )
+	ROM_LOAD16_BYTE( "rm______.4_3", 0x020000, 0x010000, CRC(b7981930) SHA1(d4356dcbbfda7486a684d8c8d375648dd0f8e200) )
+	ROM_LOAD16_BYTE( "rm______.4_4", 0x020001, 0x010000, CRC(1bc71ac8) SHA1(ac0f56d974a4aba143cb3b8cad8a65dc25b3e145) )
+	ROM_LOAD16_BYTE( "rm______.4_5", 0x040000, 0x010000, CRC(71460efc) SHA1(3ae79df9d3ec83abdde059827e06e81316026380) )
+	ROM_LOAD16_BYTE( "rm______.4_6", 0x040001, 0x010000, CRC(471678de) SHA1(919394768314bc8707f93875528dca33bcf7e09c) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4rhmazk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rmixc___.4_0", 0x0000, 0x010000, CRC(dd9c49fb) SHA1(649eb1d5fd05698e60094fe7225413da4971d65b) )
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -5178,6 +5341,11 @@ ROM_START( v4rhmaz )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	/* none present */
 ROM_END
+
+
+
+
+
 
 ROM_START( v4sunbst )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5819,7 +5987,9 @@ GAME(  199?, v4wizea,    v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4
 GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
 GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
-/* Games below are newer BWB games and use their own BIOS ROMs and hardware setups*/
+/* ----------------------------------------------------------------  */
+/* Games below are newer BWB games and use their own game and revision specific MPU4 base ROMs (which must be correctly paired with video ROMs of the same revision) and sometimes differing hardware setups */
+/* ----------------------------------------------------------------  */
 
 // "payout shelf unplugged", can be bypassed by opening door
 GAME(  1991, v4psi,      0,        bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (MPU4 Video)",GAME_FLAGS )
@@ -5876,12 +6046,23 @@ GAME(  199?, v4ovrmn3b,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4ovrmn3c,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4ovrmn3d,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4mazbel,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbel,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v2.5) (Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4mazbel15, v4mazbel, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4mazbel15a,v4mazbel, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5) (set 2) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4rhmaz,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (MPU4 Video)",GAME_FLAGS )
- 
+GAME(  199?, v4rhmaz,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmaza,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazb,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazc,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazd,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmaze,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 6) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazf,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 7) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazg,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 8) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazh,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 9) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazi,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 10) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazj,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 11) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazk,   v4rhmaz,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (set 12) (MPU4 Video)",GAME_FLAGS )
+
 GAME(  199?, v4shpwnd,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4sixx,     0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (MPU4 Video)",GAME_FLAGS )
