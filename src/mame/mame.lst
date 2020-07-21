@@ -17172,6 +17172,7 @@ tqst                            // (c) ACE?
 trivialp                        // (c) 1996
 trivialpd                       // (c) 1996
 trivialpo                       // (c) 1996
+jpmreno
 
 @source:jpmimpctsw.cpp
 j6aceclb                        // Ace Of Clubs (Crystal)
@@ -25302,6 +25303,17 @@ m4monte__j                      //
 m4monte__k                      //
 m4monte__l                      //
 m4monte__m                      //
+m4montez
+m4monteza
+m4montezb
+m4montezc
+m4montezd
+m4monteze
+m4montezf
+m4montezg
+m4montezh
+m4montezi
+m4montezj
 m4nudbnk                        // Nudge Banker (Barcrest)
 m4nudbnk__a                     //
 m4nudbnk__b                     //
@@ -28958,12 +28970,33 @@ v4barqs2                        // Barquest 2 (v0.3)
 v4barqst                        // Barquest (v2.6)
 v4barqstd                       //
 v4big40                         // Big 40
+v4big40a
+v4big40b
+v4big40c
+v4big40d
+v4big40e
+v4big40f
+v4big40g
+v4big40h
+v4big40i
+v4big40j
+v4big40k
 v4bigfrt                        // Big Fruits
+v4bigfrta
+v4bigfrtb
+v4bigfrtc
 v4bios                          // MPU4 Video Firmware
 v4blox                          // Blox
 v4bloxd                         //
 v4bubbnk                        // Bubbly Bonk
+v4bubbnka
+v4bubbnkb
+v4bubbnkc
+v4bubbnkd
 v4bulblx                        // Bullion Blox
+v4bulblxa
+v4bulblxb
+v4bulblxc
 v4cmaze                         // The Crystal Maze (v1.3)
 v4cmaze2                        // The New Crystal Maze Featuring Ocean Zone
 v4cmaze2_amld                       //
@@ -28981,24 +29014,166 @@ v4cmazec                        //
 v4cmazed                        //
 v4cmazedat                      //
 v4cshinf                        // Cash Inferno
+v4cshinfa
+v4cshinfb
+v4cshinfc
+v4cshinfd
+v4cshinfe
+v4cshinff
+v4cshinfg
+v4cshinfh
+v4cshinfi
+v4cshinfj
+v4cshinfk
+v4cshinfl
+v4cshinfm
+v4cshinfn
+v4cshinfo
+v4cshinfp
+v4cshinfq
+v4cshinfr
+v4cshinfs
+v4cshinft
+v4cshinfu
+v4cshinfv
+v4cshinfw
 v4cybcas                        // Cyber Casino
 v4dbltak                        // Double Take
+v4dbltaka
+v4dbltakb
 v4eyedwn                        // Eyes Down
 v4eyedwnd                       //
 v4frfact                        // Fruit Factory
+v4frfacta
+v4frfactb
+v4frfactc
+v4frfactd
+v4frfacte
+v4frfactf
 v4gldrsh                        // Gold Rush
+v4gldrsha
+v4gldrshb
+v4gldrshc
+v4gldrshd
+v4gldrshe
+v4gldrshf
+v4gldrshg
+v4gldrshh
+v4gldrshi
+v4gldrshj
+v4gldrshk
+v4gldrshl
+v4gldrshm
+v4gldrshn
+v4gldrsho
+v4gldrshp
+v4gldrshq
+v4gldrshr
+v4gldrshs
+v4gldrsht
+v4gldrshu
 v4mate                          // The Mating Game
 v4mated                         //
 v4mazbel                        // Mazooma Belle
-v4mazbla                        //
+v4mazbel15                        //
+v4mazbel15a
 v4mdice                         // Miami Dice
+v4mdicea
+v4mdiceb
+v4mdicec
+v4mdiced
+v4mdicee
+v4mdicef
+v4mdiceg
+v4mdiceh
+v4mdicei
+v4mdicej
+v4mdicek
+v4mdicel
+v4mdicem
+v4mdicen
+v4mdiceo
+v4mdicep
+v4mdiceq
+v4mdicer
+v4mdices
+v4mdicet
+v4mdiceu
+v4mdicev
+v4mdicew
+v4mdice5
 v4megbuk                        // Megabucks Poker
+v4megbuka
+v4megbukb
+v4megbukc
 v4miami                         // Miami Dice
 v4missis                        // Mississippi Lady
 v4monte                         // Monte Carlo Or Bust
+v4montea
+v4monteb
+v4montec
+v4monted
+v4montee
+v4montef
+v4monteg
+v4monteh
+v4montei
+v4montej
+v4montek
+v4montel
+v4montem
+v4monten
+v4monteo
+v4montep
+v4monteq
+v4monter
+v4montes
+v4montet
+v4monteu
+v4montev
+v4montew
+v4montex
+v4montey
+v4montez
+v4monteaa
+v4monteab
+v4monteac
+v4montead
+v4monteae
+v4monteaf
+v4monteag
+v4monteah
+v4monteai
+v4monteaj
+v4monteak
+v4monteal
+v4monteam
+v4montean
+v4monteao
+v4monte9
+v4monte9a
+v4monte9b
+v4monte9c
+v4monte9d
+v4monte9e
+v4monte9f
+v4monte9g
+v4monte9h
+v4monte9i
+v4monte9j
+v4monte9k
+v4monte9l
+v4monte9m
+v4monte9n
+v4monte9o
+v4montezz
 v4opt3                          // Option 3
 v4opt3d                         //
 v4ovrmn3                        // Over Moon Pt3
+v4ovrmn3a
+v4ovrmn3b
+v4ovrmn3c
+v4ovrmn3d
 v4picdil                        // Piccadilly Nights
 v4psi                           // Prize Space Invaders
 v4psibc                          //
@@ -29007,17 +29182,128 @@ v4psibcd                        //
 v4psid                        //
 v4psi14a                        //
 v4pztet                         // Prize Tetris
-v4pzteta                        //
+v4pzteta
+v4pztetb                        //
+v4pztetc
 v4quidgr                        // Ten Quid Grid
 v4quidgr2                       //
 v4quidgr2d                      //
 v4quidgrd                       //
 v4redhtp                        // Red Hot Poker
+v4redhtpa
+v4redhtpb
+v4redhtpc
+v4redhtpd
+v4redhtpe
+v4redhtpf
+v4redhtpg
+v4redhtph
+v4redhtpi
+v4redhtpj
+v4redhtpk
+v4redhtpl
+v4redhtpm
+v4redhtpn
+v4redhtpo
+v4redhtpp
+v4redhtpq
+v4redhtpr
+v4redhtps
+v4redhtpt
+v4redhtpu
+v4redhtpv
+v4redhtpw
+v4redhtpx
+v4redhtpy
+v4redhtpz
+v4redhtpaa
+v4redhtpab
+v4redhtparc
+v4redhtpunk
+v4redhtp2
+v4redhtp2a
+v4redhtp2b
+v4redhtp2c
+v4redhtp2d
+v4redhtp2e
+v4redhtp2f
+v4redhtp2g
+v4redhtp2z
 v4rencas                        // Reno Casino
+v4rencasa
+v4rencasb
+v4rencasc
+v4rencasd
+v4rencase
+v4rencasf
+v4rencasg
+v4rencash
+v4rencasi
 v4reno                          // Reno Reels
+v4renoa
+v4renob
+v4renoc
+v4renod
+v4renoe
+v4renof
+v4renog
+v4renoh
+v4renoi
+v4renoj
+v4renok
+v4renol
+v4renom
+v4renon
+v4renoo
+v4renop
+v4renoq
+v4renor
+v4renos
+v4renot
+v4renou
+v4reno8
+v4reno7
+v4reno5
 v4rhmaz                         // Red Hot Mazooma Belle
+v4rhmaza
+v4rhmazb
+v4rhmazc
+v4rhmazd
+v4rhmaze
+v4rhmazf
+v4rhmazg
+v4rhmazh
+v4rhmazi
+v4rhmazj
+v4rhmazk
 v4shpwnd                        // Shop Window
+v4shpwnda
+v4shpwndb
+v4shpwndc
+v4shpwndd
+v4shpwnde
+v4shpwndf
+v4shpwndg
+v4shpwndh
+v4shpwndi
+v4shpwndj
+v4shpwndk
+v4shpwndl
+v4shpwndm
 v4sixx                          // 6-X
+v4sixxa
+v4sixxb
+v4sixxc
+v4sixxd
+v4sixxe
+v4sixxf
+v4sixxg
+v4sixxh
+v4sixxi
+v4sixxj
+v4sixxk
+v4sixxl
+v4sixxm
 v4sklcsh                        // Skill Cash
 v4skltrk                        // Skill Trek
 v4skltrka                       //
@@ -29026,10 +29312,36 @@ v4strike2                       //
 v4strike2d                      //
 v4striked                       //
 v4sunbst                        // Sunburst
+v4sunbsta
+v4sunbstb
+v4sunbstc
+v4sunbstd
+v4sunbste
+v4sunbstf
+v4sunbstg
+v4sunbsth
+v4sunbsti
+v4sunbstj
+v4sunbstk
+v4sunbstl
+v4sunbstm
+v4sunbstn
+v4sunbsto
+v4sunbstp
+v4sunbstq
+v4sunbstr
+v4sunbsts
+v4sunbstt
+v4sunbstu
 v4tetrs                         // BwB Tetris v 2.2
 v4tetrs1                        // BwB Tetris v 1.0
 v4time                          // Time Machine
 v4timebn                        // Time Bandit
+v4timebna
+v4timebnb
+v4timebnc
+v4timebnd
+v4timebne
 v4turnov                        // Turnover
 v4vgpok                         // Vegas Poker (prototype release 2)
 v4wize                          // Wize Move (v1.3d)
