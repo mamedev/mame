@@ -985,6 +985,7 @@ static INPUT_PORTS_START( v4pztet )
 	PORT_MODIFY("BLACK1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start (Practice Mode)")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start (Prize Mode)")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM)  // Prize Shelf Opto (v4bulblx will hang on boot without an error message otherise)
 
 	PORT_MODIFY("BLACK2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
