@@ -1267,6 +1267,8 @@ void voodoo_gpu::DrawTriangle()
 	//	maxSize = m_trianglePoints.size();
 	//	printf("DrawTriangle: num=%lli\n", m_trianglePoints.size()/3);
 	//}
+	//printf("DrawTriangle: num=%lli\n", m_trianglePoints.size() / 3);
+
 	// Check for pixels that haven't been drawn
 	if (m_pixels_ready)
 		DrawPixels();
@@ -1361,6 +1363,7 @@ void voodoo_gpu::DrawPixels()
 	//	maxSize = m_pixelPoints.size();
 	//	printf("DrawPixels: num=%lli\n", m_pixelPoints.size());
 	//}
+	//printf("DrawPixels: num=%lli\n", m_pixelPoints.size());
 
 	// Check for pending LFB direct writes
 	if (0 && m_lfb_write_ready)
@@ -1911,13 +1914,14 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 {
 	Tex_Map_List_Struct new_map;
 	uint32_t minLod = ((texLod >> 0) & 0x3f) >> 2;
+	uint32_t maxLod = ((texLod >> 6) & 0x3f) >> 2;
 	uint32_t mapIndex = desc.texBase[minLod] + index;
 	if (m_texMap.find(mapIndex) == m_texMap.end())
 	{
 		if (m_texMap.size() == MAX_TEX)
 		{
-			//printf("voodoo_gpu::CreateTexture mapIndex: %08X. Removing oldest enty\n", mapIndex);
 			// Erase the oldest entry
+			//printf("voodoo_gpu::CreateTexture mapIndex: %08X. Removing oldest entry %08X\n", mapIndex, m_texHist.front());
 			Tex_Map_List_Struct old_map = m_texMap[m_texHist.front()];
 			SAFE_RELEASE(old_map.texTexture);
 			SAFE_RELEASE(old_map.texRV);
@@ -1925,7 +1929,6 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 			m_texMap.erase(m_texHist.front());
 			m_texHist.pop_front();
 		}
-		//printf("voodoo_gpu::CreateTexture mapIndex: %08X\n", mapIndex);
 		// Create the new entries
 		// Create gpu texture
 		D3D11_TEXTURE2D_DESC texDesc;
@@ -1983,11 +1986,12 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		m_gpu->CreateSamplerState(&sampDesc, &new_map.texSampler);
 
 		// Copy texture data to buffer
-		uint32_t *srcBuff;
+		// Create a buffer sized to largest texture
+		uint32_t srcBuff[256 * 256];
 		uint32_t texel0;
 		uint32_t result;
 		//uint32_t size = 0;
-		for (size_t mipLevel = minLod; mipLevel <= 8; mipLevel++)
+		for (size_t mipLevel = minLod; mipLevel <= maxLod; mipLevel++)
 		{
 			uint32_t texbase = desc.texBase[mipLevel];
 			// Create temporary buffer space for texture
@@ -1995,14 +1999,12 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 			if (width == 0) width = 1;
 			size_t height = (desc.tSize >> mipLevel);
 			if (height == 0) height = 1;
-			srcBuff = new uint32_t[width * height];
 			// Copy data if lod is defined
 			if (desc.lodMask & (1 << mipLevel)) {
-				
 				//if (desc.texFormat < 8)
 				//	size += width * height;
 				//else
-				//	size += (width * height) * 2;
+				//	size += (width * height) << 1;
 				for (size_t loc = 0; loc < width * height; loc++)
 				{
 					/* fetch texel data */
@@ -2026,12 +2028,13 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 				}
 			}
 			m_context->UpdateSubresource(new_map.texTexture, mipLevel, NULL, srcBuff, width * 4, 0);
-			delete[] srcBuff;
 		}
 		// Add the new data to the map
 		m_texMap[mapIndex] = new_map;
 		m_texHist.push_back(mapIndex);
 		//printf("New texture(%d): base: %08x size: %5d lodMin: %.2f lodMax: %.2f totalTex: %d\n", index, desc.texBase[minLod], size, double(texLod&0x3f)/4.0, double(texLod & 0xfc0)/256.0, int(m_texHist.size()));
+		//printf("voodoo_gpu::CreateTexture index: %d minLod: %d maxLod: %d lodMask: %08X texMode: %08X size: 0x%6x mapIndex: %08X\n",
+		//	index, minLod, maxLod, desc.lodMask, texMode, size, mapIndex);
 	}
 
 	// Update cb tex control

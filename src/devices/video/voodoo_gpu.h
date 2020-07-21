@@ -37,7 +37,7 @@ using DirectX::XMFLOAT4;
 #define NUM_TEX 2
 
 // Number of textures for use by TMUs
-#define MAX_TEX 1024
+#define MAX_TEX 2048
 
 // Dither Texture t and s register offset
 #define DITH_TEX_OFFSET 0
@@ -245,6 +245,7 @@ public:
 	void CreateTexture(texDescription &desc, int index, uint32_t &texMode, uint32_t &texLod, uint32_t &texDetail);
 	// Pushes a triangle onto the triangle processing queue
 	void PushTriangle(ShaderVertex *triangleVertices, uint16_t *dst, int drawIndex);
+	int NumTrianglePending() { return m_trianglePoints.size() / 3; };
 	// Pushes a pixel onto LFB 3d processing queue
 	void PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst, int drawIndex);
 	// Pushes a RGB write onto the lfb write queue
