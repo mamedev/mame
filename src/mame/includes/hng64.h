@@ -385,10 +385,6 @@ private:
 	void hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint8_t hng64_comm_space_r(offs_t offset);
-	void hng64_comm_space_w(offs_t offset, uint8_t data);
-	uint8_t hng64_comm_mmu_r(offs_t offset);
-	void hng64_comm_mmu_w(offs_t offset, uint8_t data);
 
 	// shared ram access
 	uint8_t ioport0_r();
@@ -431,13 +427,7 @@ private:
 
 	void set_irq(uint32_t irq_vector);
 	uint32_t m_irq_pending;
-	uint8_t *m_comm_rom;
-	std::unique_ptr<uint8_t[]> m_comm_ram;
-	uint8_t m_mmu_regs[8];
-	uint32_t m_mmua[6];
-	uint16_t m_mmub[6];
-	uint8_t read_comm_data(uint32_t offset);
-	void write_comm_data(uint32_t offset,uint8_t data);
+
 	TIMER_CALLBACK_MEMBER(comhack_callback);
 	emu_timer *m_comhack_timer;
 

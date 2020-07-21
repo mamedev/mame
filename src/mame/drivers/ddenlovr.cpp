@@ -10685,7 +10685,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 void ddenlovr_state::daimyojn(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(20'000'000) / 2);
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::daimyojn_portmap);
 

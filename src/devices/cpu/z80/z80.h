@@ -148,13 +148,13 @@ protected:
 	void leave_halt();
 	uint8_t in(uint16_t port);
 	void out(uint16_t port, uint8_t value);
-	uint8_t rm(uint16_t addr);
+	virtual uint8_t rm(uint16_t addr);
 	void rm16(uint16_t addr, PAIR &r);
-	void wm(uint16_t addr, uint8_t value);
+	virtual void wm(uint16_t addr, uint8_t value);
 	void wm16(uint16_t addr, PAIR &r);
-	uint8_t rop();
-	uint8_t arg();
-	uint16_t arg16();
+	virtual uint8_t rop();
+	virtual uint8_t arg();
+	virtual uint16_t arg16();
 	void eax();
 	void eay();
 	void pop(PAIR &r);
