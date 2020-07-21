@@ -13,6 +13,8 @@
 #include "softlist.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "formats/fl1_dsk.h"
 
 //**************************************************************************
@@ -47,16 +49,22 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
+	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; };
+
 	required_memory_region m_rom;
 	required_memory_region m_prom;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<spectrum_expansion_slot_device> m_exp;
+	required_device<centronics_device> m_centronics;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport m_sw1;
 	required_ioport m_sw2;
 
 	int m_romcs, m_if1cs;
 	u8 m_ram[0x1000];
+	int m_busy;
+	uint8_t m_shifter;
 };
 
 

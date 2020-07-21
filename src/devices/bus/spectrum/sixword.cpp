@@ -12,16 +12,18 @@
     How to use:
     Press "Interrupt" button and you'll get into console where you may type commands, like:
      C[AT] [drive] - list disk contents, drive 0-3
+     D[ATE] [dd-mm-yy] - set current date, or show firmware build date
      F[ORMAT] diskname - format disk
      S[AVE] filename - save snapshot to disk
      L[OAD] filename - load snapshot from disk
      A[LTER] address data - change value in RAM
      Q[UIT] - return to BASIC/game
      * - reset
-    Starting form Swift Disc O/S V2 most of commands may be called from BASIC using syntax like "COMMAND %drive;"filename"", for example:
+    Starting from Swift Disc O/S V2 most of commands may be called from BASIC using syntax like "COMMAND %drive;"filename"", for example:
      CAT %0
      LOAD %0;"game"
     and so on, plus additional commands for sequential file access.
+     FORMAT %#4;"T",1200,79 - printer setup: channel 4, text mode, 1200 baud, 79 column
 
     Manual: https://k1.spdns.de/Vintage/Sinclair/82/Peripherals/Disc%20Interfaces/SixWord%20Swift%20Disc%20Interface/Swift%20Disc%20Operating%20Manual.pdf
 
@@ -30,12 +32,13 @@
     (c) 1989 SIXWORD ltd (UK)
 
     Same as above but extended to 32KB ROM, most of discrete ICs replaced with PALs, smaller form factor.
+    Was available in several favours - with serial or parallel printer port.
     It seems RAM was planned to be extended to 16KB, but 2nd RAM IC is not populated on known devices.
-    Was available in several favours - with or without printer port, various number of supported drives, etc.
-    Dumped v4.2 firmware supports 2 disk drives, but hardware still supports up to 4x.
+    Dumped v4.2 firmware supports only 2 disk drives (but PCB still have wired drive 3 and 4 select) and serial port.
 
     Notes / TODOs:
-     - serial printer interface not hooked
+     - serial out not working properly with v4.2 ROM, it produce short TX low pulse after each character, which (mistakenly) considered as start bit by current diserial.cpp.
+     - parallel port hookup based on ROM disassembly and may be not accurate (i.e. ports may require to be enabled by some of m_control bits, or something like that)
 
 *********************************************************************/
 
@@ -68,6 +71,15 @@ INPUT_PORTS_START(swiftdisc)
 	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
+INPUT_PORTS_START(swiftdisc2)
+	PORT_INCLUDE(swiftdisc)
+
+	PORT_START("CONF")
+	PORT_CONFNAME(0x01, 0x01, "Printer intrface")
+	PORT_CONFSETTING(0x01, "Serial")
+	PORT_CONFSETTING(0x00, "Parallel")
+INPUT_PORTS_END
+
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
@@ -75,6 +87,11 @@ INPUT_PORTS_END
 ioport_constructor spectrum_swiftdisc_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(swiftdisc);
+}
+
+ioport_constructor spectrum_swiftdisc2_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(swiftdisc2);
 }
 
 //-------------------------------------------------
@@ -138,10 +155,21 @@ void spectrum_swiftdisc_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", swiftdisc_floppies, nullptr, spectrum_swiftdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", swiftdisc_floppies, nullptr, spectrum_swiftdisc_device::floppy_formats).enable_sound(true);
 
+	RS232_PORT(config, m_rs232, default_rs232_devices, "printer");
+
 	// passthru
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+}
+
+void spectrum_swiftdisc2_device::device_add_mconfig(machine_config &config)
+{
+	spectrum_swiftdisc_device::device_add_mconfig(config);
+
+	// parallel printer port
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
+	m_centronics->busy_handler().set(FUNC(spectrum_swiftdisc2_device::busy_w));
 }
 
 const tiny_rom_entry *spectrum_swiftdisc_device::device_rom_region() const
@@ -169,6 +197,7 @@ spectrum_swiftdisc_device::spectrum_swiftdisc_device(const machine_config &mconf
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_exp(*this, "exp")
+	, m_rs232(*this, "rs232")
 	, m_joy(*this, "JOY")
 {
 }
@@ -180,6 +209,8 @@ spectrum_swiftdisc_device::spectrum_swiftdisc_device(const machine_config &mconf
 
 spectrum_swiftdisc2_device::spectrum_swiftdisc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: spectrum_swiftdisc_device(mconfig, SPECTRUM_SWIFTDISC2, tag, owner, clock)
+	, m_centronics(*this, "centronics")
+	, m_conf(*this, "CONF")
 {
 }
 
@@ -202,6 +233,8 @@ void spectrum_swiftdisc2_device::device_start()
 {
 	spectrum_swiftdisc_device::device_start();
 	save_item(NAME(m_rambank));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_txd_on));
 }
 
 //-------------------------------------------------
@@ -213,12 +246,17 @@ void spectrum_swiftdisc_device::device_reset()
 	m_romcs = 0;
 	m_rombank = 0;
 	m_control = 0;
+	m_rs232->write_txd(1);
 }
 
 void spectrum_swiftdisc2_device::device_reset()
 {
 	spectrum_swiftdisc_device::device_reset();
 	m_rambank = 0;
+	m_busy = 0;
+	m_txd_on = 0;
+	m_rs232->write_dtr(1);
+	m_centronics->write_strobe(1);
 }
 
 //**************************************************************************
@@ -268,7 +306,12 @@ uint8_t spectrum_swiftdisc_device::mreq_r(offs_t offset)
 			if (!BIT(offset, 3))
 				data = m_fdc->read(offset & 3);
 			else
-				data = 0; // D0 - DTR input, D1 - RX input
+			{
+				// D0 - RS232 DSR, D1 - RS232 RX
+				data &= ~3;
+				data |= m_rs232->dsr_r() << 0;
+				data |= m_rs232->rxd_r() << 1;
+			}
 			break;
 		}
 	}
@@ -306,8 +349,9 @@ void spectrum_swiftdisc_device::mreq_w(offs_t offset, uint8_t data)
 				m_rombank &= ~0x2000;
 				m_rombank |= BIT(data, 5) << 13;
 
+				// D3 - RS232 /TX
+				m_rs232->write_txd(!BIT(data, 3));
 				m_control = data;
-				// D3 - /TX output
 			}
 			break;
 		case 0x1000:
@@ -387,7 +431,7 @@ uint8_t spectrum_swiftdisc2_device::mreq_r(offs_t offset)
 			if (!BIT(offset, 4))
 				data = m_fdc->read(offset & 3);
 			else
-				data &= ~1; // D0 - nc, but seems was planned to do something, leftover from prev version ?
+				data = control_r();
 			break;
 		}
 	}
@@ -436,22 +480,35 @@ uint8_t spectrum_swiftdisc2_device::iorq_r(offs_t offset)
 	uint8_t data = m_exp->iorq_r(offset);
 
 	if (m_romcs && (offset & 0xf890) == 0x3000)
-		data &= ~1; // IO port mirror
+		data &= control_r();
 
 	if (!BIT(offset, 5) && !BIT(m_control, 3))
 		data = m_joy->read();
 
-	if (BIT(m_control, 2))
+	if (m_conf->read())
 	{
-		if (!BIT(offset, 3))
+		if (BIT(m_control, 2))
 		{
-			data |= 0x80; // D7 - /serial input
+			if (!BIT(offset, 3)) // port F7
+			{
+				// D7 - RS232 /RX
+				data &= ~(m_rs232->rxd_r() << 7);
+			}
+			if (!BIT(offset, 4)) // port EF
+			{
+				data &= ~4;
+				data |= 0x0b;
+				// D3 - RS232 /DSR
+				data &= ~(m_rs232->dsr_r() << 3);
+			}
 		}
-		if (!BIT(offset, 4))
+	}
+	else
+	{
+		if (!BIT(offset, 3)) // port F7
 		{
-			data &= ~0x0f;
-			data |= 3;
-			data |= 8;  // D3 - /serial input
+			// D7 - Centronics /BUSY
+			data &= ~(m_busy << 7);
 		}
 	}
 
@@ -463,20 +520,55 @@ void spectrum_swiftdisc2_device::iorq_w(offs_t offset, uint8_t data)
 	if (m_romcs && (offset & 0xf890) == 0x3000)
 		control_w(data);
 
-	if (BIT(m_control, 2))
+	if (m_conf->read())
 	{
-		if (!BIT(offset, 3))
+		if (BIT(m_control, 2))
 		{
-			// D0 - /serial output
+			if (!BIT(offset, 3)) // port F7
+			{
+				// D0 - RS232 /TX
+				if (m_txd_on)
+					m_rs232->write_txd(!BIT(data, 0));
+			}
+			if (!BIT(offset, 4)) // port EF
+			{
+				// D0 - 0=reset /TX latch (set output to 1)
+				// D4 - RS232 /DTR
+				m_txd_on = BIT(data, 0);
+				if (!m_txd_on)
+					m_rs232->write_txd(1);
+				m_rs232->write_dtr(!BIT(data, 4));
+			}
 		}
-		if (!BIT(offset, 4))
+	}
+	else
+	{
+		if (!BIT(offset, 3)) // F7
 		{
-			// D0 - 0=reset above latch
-			// D4 - /serial output
+			// D0 - Centronics /STROBE
+			m_centronics->write_strobe(BIT(data, 0));
+		}
+		if (!BIT(offset, 4)) // EF
+		{
+			// D0 - D7 - Centronics data
+			m_centronics->write_data0(BIT(data, 0));
+			m_centronics->write_data1(BIT(data, 1));
+			m_centronics->write_data2(BIT(data, 2));
+			m_centronics->write_data3(BIT(data, 3));
+			m_centronics->write_data4(BIT(data, 4));
+			m_centronics->write_data5(BIT(data, 5));
+			m_centronics->write_data6(BIT(data, 6));
+			m_centronics->write_data7(BIT(data, 7));
 		}
 	}
 
 	m_exp->iorq_w(offset, data);
+}
+
+uint8_t spectrum_swiftdisc2_device::control_r()
+{
+	// D0 - printer interface type, 0 - parallel, 1 - serial
+	return 0xfe | m_conf->read();
 }
 
 void spectrum_swiftdisc2_device::control_w(uint8_t data)

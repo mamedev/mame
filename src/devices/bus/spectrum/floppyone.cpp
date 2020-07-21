@@ -3,7 +3,7 @@
 /*********************************************************************
 
     FloppyOne DOS Interface
-    (c) 1984/5 Rocky P. Gush
+    (c) 1984/5 Rocky P. Gush (RSA)
 
     FD1791-based floppy drive and printer interface with 4K RAM and 8K ROM
     Was mainly designed as tape replacement, and sort of emulate how tapes works,
@@ -20,12 +20,13 @@
      SAVE "name" - save program
      !FORMAT "diskname";"password";tracks - format disk, if disk was already formatted you'll be prompted for password.
      !6=n - set text mode, 0 - regular 32-column, 3 - 64-column
-    There is more of special "!x=n" commands, but theirs functions is not known, manual is missing.
+	 !B=rs232delay, 0=use parallel printer (default)
+	There is more of special "!x=n" commands, but theirs functions is not known, manual is missing.
     Some information about this device https://worldofspectrum.org/forums/discussion/42944/rocky-gush-floppy-drive-interface/p1
 
     Notes / TODOs:
      - Interface1 compatibility mode is not well understood and not fully implemented
-     - Serial printer interface not implemented
+     - RS232 partially implemented
 
 *********************************************************************/
 
@@ -118,6 +119,12 @@ void spectrum_flpone_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", flpone_floppies, nullptr, spectrum_flpone_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", flpone_floppies, nullptr, spectrum_flpone_device::floppy_formats).enable_sound(true);
 
+	// parallel printer port
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(spectrum_flpone_device::busy_w));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+
 	// passthru
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
@@ -146,6 +153,8 @@ spectrum_flpone_device::spectrum_flpone_device(const machine_config &mconfig, co
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_exp(*this, "exp")
+	, m_centronics(*this, "centronics")
+	, m_rs232(*this, "rs232")
 	, m_sw1(*this, "SW1")
 	, m_sw2(*this, "SW2")
 {
@@ -161,6 +170,8 @@ void spectrum_flpone_device::device_start()
 
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_ram));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_shifter));
 }
 
 //-------------------------------------------------
@@ -171,6 +182,8 @@ void spectrum_flpone_device::device_reset()
 {
 	m_romcs = 0;
 	m_if1cs = 0;
+	m_busy = 1;
+	m_shifter = 0;
 }
 
 //**************************************************************************
@@ -223,10 +236,14 @@ uint8_t spectrum_flpone_device::mreq_r(offs_t offset)
 			case 0: case 8:
 				data = m_fdc->read(offset & 3);
 				break;
-			case 4: // D5 - printer BUSY / /BUSY
-				data = 0;
+			case 4: // D5 - Centronics /BUSY / RS232 /DSR
+				data &= ~(m_busy << 5);
+				//data &= ~(m_rs232->dsr_r() << 5); // TODO findout how both of these combined at same bit
 				break;
-			case 0xc: // printer STROBE pulse
+			case 0xc: // Centronics STROBE pulse
+				m_centronics->write_strobe(1);
+				m_centronics->write_strobe(0);
+				m_centronics->write_strobe(1);
 				break;
 			}
 			break;
@@ -254,7 +271,19 @@ void spectrum_flpone_device::mreq_w(offs_t offset, uint8_t data)
 			case 0: case 8:
 				m_fdc->write(offset & 3, data);
 				break;
-			case 4: // D7 - printer serial data
+			case 4: // D7 - Centronics shifter data / RS232 TX
+				m_shifter = (m_shifter << 1) | BIT(data, 7);
+
+				m_centronics->write_data0(BIT(m_shifter, 0));
+				m_centronics->write_data1(BIT(m_shifter, 1));
+				m_centronics->write_data2(BIT(m_shifter, 2));
+				m_centronics->write_data3(BIT(m_shifter, 3));
+				m_centronics->write_data4(BIT(m_shifter, 4));
+				m_centronics->write_data5(BIT(m_shifter, 5));
+				m_centronics->write_data6(BIT(m_shifter, 6));
+				m_centronics->write_data7(BIT(m_shifter, 7));
+
+				m_rs232->write_txd(BIT(data, 7));
 				break;
 			case 0xc:
 			{
