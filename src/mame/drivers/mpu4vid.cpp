@@ -2207,7 +2207,7 @@ ROM_START( v4reno8 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rrv8ss",          0x00000, 0x10000,   CRC(a37383a5) SHA1(6c2563967546d810f2c50aa9a269bb1369014c18) )
 
-	ROM_REGION( 0x800000, "video2", 0 ) // Release 8, good
+	ROM_REGION( 0x800000, "video", 0 ) // Release 8, good
 	ROM_LOAD16_BYTE( "rr______.8_1",      0x000001, 0x080000,  CRC(eca43ed4) SHA1(e2e4e5d3d4b659ddd74c120316b9658708e188f1) )
 	ROM_LOAD16_BYTE( "rr______.8_2",      0x000000, 0x080000,  CRC(c3f25586) SHA1(7335708a7d90c7fbd0088bb6ee5ce0255b9b18ab) )
 
@@ -2220,7 +2220,7 @@ ROM_START( v4reno7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("release7.mpu4",          0x00000, 0x10000,  NO_DUMP )
 
-	ROM_REGION( 0x800000, "video7", 0 ) // Release 7
+	ROM_REGION( 0x800000, "video", 0 ) // Release 7
 	ROM_LOAD16_BYTE( "rr8p1",             0x000001, 0x080000,  CRC(68992dd3) SHA1(75ab1cd02ac627b6191e9b61ee7c072029becaeb) )
 	ROM_LOAD16_BYTE( "rr8p2",             0x000000, 0x080000,  CRC(b859020e) SHA1(811ccac82d022ceccc83f1bf6c6b4de6cc313e14) )
 
@@ -2233,7 +2233,7 @@ ROM_START( v4reno5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("release5.mpu4",          0x00000, 0x10000,  NO_DUMP )
 
-	ROM_REGION( 0x800000, "video5", 0 ) // Release 5
+	ROM_REGION( 0x800000, "video", 0 ) // Release 5
 	ROM_LOAD16_BYTE( "reno reels 5-1",    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
 	ROM_LOAD16_BYTE( "reno reels 5-2",    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
 
@@ -4088,17 +4088,26 @@ ROM_START( v4mdice )
 	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
 	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
 
-	ROM_REGION( 0x800000, "altvideo", 0 ) // this doesn't work with the above base roms?
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
+	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
+ROM_END
+
+ROM_START( v4mdicea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mpu4.rom", 0x0000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "video", 0 ) // this doesn't work with the above base roms?
 	ROM_LOAD16_BYTE( "mdv58p1", 0x000001, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
 	ROM_LOAD16_BYTE( "mdv58p2", 0x000000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
 	ROM_LOAD16_BYTE( "mdv58p3", 0x100001, 0x080000, CRC(0d907e37) SHA1(b6ad78a4a7bc877d2152907df2317621f00bdc1c) )
 	ROM_LOAD16_BYTE( "mdv58p4", 0x100000, 0x080000, CRC(2e21c249) SHA1(d5192339313a8dd234cb164ca0094d9a7b64ccc2) )
 
-
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
+
 
 	/* Some roms were simply in a set marked as Monte Carlo, but the 2 letter code mn) is the same */
 	/* The roms were a mixture of
@@ -5543,7 +5552,8 @@ GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 // mismatched ROMs
 GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 35) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
+GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (Release 8) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
+GAME(  1995, v4mdicea,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (Release ?) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
 // other issues
 
