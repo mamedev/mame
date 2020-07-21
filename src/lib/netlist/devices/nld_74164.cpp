@@ -20,59 +20,63 @@ namespace netlist
 	NETLIB_OBJECT(74164)
 	{
 		NETLIB_CONSTRUCTOR(74164)
-		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
-		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
-		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(inputs))
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
+		, m_AB(*this, {"A", "B"}, NETLIB_DELEGATE(ab))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(clrq))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_cnt(*this, "m_cnt", 0)
-		, m_last_CLK(*this, "m_last_CLK", 0)
+		, m_ab(*this, "m_ab", 0)
 		, m_Q(*this, {"QA", "QB", "QC", "QD", "QE", "QF", "QG", "QH"})
 		, m_power_pins(*this)
 		{
 		}
 
-		NETLIB_HANDLERI(inputs)
+	private:
+		NETLIB_RESETI()
 		{
-			if (!m_CLRQ())
-			{
-				m_cnt = 0;
-			}
-			else if (m_CLK() && !m_last_CLK)
-			{
-				m_cnt = (m_cnt << 1) & 0xfe;
-				if (m_A() && m_B())
-				{
-					m_cnt |= 0x01;
-				}
-				else
-				{
-					m_cnt &= 0xfe;
-				}
-			}
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_cnt = 0;
+		}
 
-			m_last_CLK = m_CLK();
-
-			for (std::size_t i=0; i<8; i++)
+		NETLIB_HANDLERI(clrq)
+		{
+			if (m_CLRQ())
 			{
-				m_Q[i].push((m_cnt >> i) & 1, NLTIME_FROM_NS(30));
+				m_CLK.activate_lh();
+			}
+			else
+			{
+				m_CLK.inactivate();
+				if (m_cnt != 0)
+				{
+					m_cnt = 0;
+					m_Q.push(0, NLTIME_FROM_NS(30));
+				}
 			}
 		}
 
-		NETLIB_RESETI()
+		NETLIB_HANDLERI(clk)
 		{
-			m_cnt = 0;
-			m_last_CLK = 0;
+			m_cnt = (m_cnt << 1);
+			if (m_ab == 3)
+			{
+				m_cnt |= 1;
+			}
+			m_Q.push(m_cnt, NLTIME_FROM_NS(30));
+		}
+
+		NETLIB_HANDLERI(ab)
+		{
+			m_ab = static_cast<unsigned>(m_AB());
 		}
 
 		friend class NETLIB_NAME(74164_dip);
 	private:
-		logic_input_t m_A;
-		logic_input_t m_B;
+		object_array_t<logic_input_t, 2> m_AB;
 		logic_input_t m_CLRQ;
 		logic_input_t m_CLK;
 
 		state_var<unsigned> m_cnt;
-		state_var<unsigned> m_last_CLK;
+		state_var<unsigned> m_ab;
 
 		object_array_t<logic_output_t, 8> m_Q;
 		nld_power_pins m_power_pins;
@@ -83,8 +87,8 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(74164_dip)
 		, A(*this, "A")
 		{
-			register_subalias("1", A.m_A);
-			register_subalias("2", A.m_B);
+			register_subalias("1", A.m_AB[0]);
+			register_subalias("2", A.m_AB[1]);
 			register_subalias("3", A.m_Q[0]);
 			register_subalias("4", A.m_Q[1]);
 			register_subalias("5", A.m_Q[2]);
