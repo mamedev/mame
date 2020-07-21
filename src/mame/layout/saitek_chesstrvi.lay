@@ -150,9 +150,9 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-0.775" right="31.775" top="20" bottom="39.3" />
 
-		<bezel element="white2"><bounds x="-0.775" y="20" width="32.55" height="7.5" /></bezel>
-		<bezel element="black2"><bounds x="7.85" y="20.85" width="15.3" height="5.8" /></bezel>
-		<group ref="digits"><bounds x="8" y="21" width="15" height="5.5" /></group>
+		<bezel element="white2"><bounds x="-0.775" y="20" width="32.55" height="7.7" /></bezel>
+		<bezel element="black2"><bounds x="7.85" y="20.85" width="15.3" height="6.0" /></bezel>
+		<group ref="digits"><bounds x="8" y="21" width="15" height="5.7" /></group>
 		<group ref="buttons"><bounds x="-1" y="28.5" width="32" height="10.1" /></group>
 	</view>
 
