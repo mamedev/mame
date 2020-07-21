@@ -29172,13 +29172,14 @@ v4psibcd                        //
 v4psid                        //
 v4psi14a                        //
 v4pztet                         // Prize Tetris
-v4pzteta                        //
+v4pzteta
+v4pztetb                        //
+v4pztetc
 v4quidgr                        // Ten Quid Grid
 v4quidgr2                       //
 v4quidgr2d                      //
 v4quidgrd                       //
 v4redhtp                        // Red Hot Poker
-v4redhtp2
 v4redhtpa
 v4redhtpb
 v4redhtpc
@@ -29209,6 +29210,14 @@ v4redhtpaa
 v4redhtpab
 v4redhtparc
 v4redhtpunk
+v4redhtp2
+v4redhtp2a
+v4redhtp2b
+v4redhtp2c
+v4redhtp2d
+v4redhtp2e
+v4redhtp2f
+v4redhtp2g
 v4redhtp2z
 v4rencas                        // Reno Casino
 v4reno                          // Reno Reels
