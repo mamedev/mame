@@ -690,11 +690,12 @@ NETLIST_START(ripoff)
 	// Split explosion/beep/motor from other sources
 	//
     OPTIMIZE_FRONTIER(R45.2, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(IC7.3, RES_M(1), 50)
 
 	//
 	// Split noise generator from consumers
 	//
-    OPTIMIZE_FRONTIER(R4.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R1.1, RES_M(1), 50)
 #endif
 
 NETLIST_END()

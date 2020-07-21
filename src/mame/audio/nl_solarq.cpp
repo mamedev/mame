@@ -1260,8 +1260,8 @@ NETLIST_START(solarq)
     // in particular is a big win
     //
     OPTIMIZE_FRONTIER(R100.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R16.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R35.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R15.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R34.1, RES_M(1), 50)
 
     //
     // Isolate the CS sounds from the rest of the mixer (huge!)

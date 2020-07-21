@@ -34,6 +34,7 @@
 
 #define HLE_BACKGROUND_VCO (1)
 #define HLE_LASER_VCO (1)
+#define ENABLE_FRONTIERS (1)
 
 
 //
@@ -790,6 +791,19 @@ NETLIST_START(wotw)
 	HINT(IC13.8, NC)
 	HINT(IC13.10, NC)
 	HINT(IC13.11, NC)
+
+#if (ENABLE_FRONTIERS)
+	//
+	// Disconnect noise source from consumers
+	//
+    OPTIMIZE_FRONTIER(IC15.3, RES_M(1), 50)
+
+	//
+	// Split noise outputs from output outputs before the mixer
+	//
+    OPTIMIZE_FRONTIER(IC26.3, RES_M(1), 50)
+#endif
+
 NETLIST_END()
 
 #endif
