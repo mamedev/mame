@@ -23,12 +23,16 @@ public:
 	// construction/destruction
 	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	// common config
+	void s11_bg_core(machine_config &config);
+
 	// note to keep synchronization working, the host machine should have synchronization timer expired delegates
 	// before writing to the following 3 things:
 	DECLARE_WRITE_LINE_MEMBER(extra_w); // external write to board CB2 (J4 pin 12), does anything actually do this?
 	DECLARE_WRITE_LINE_MEMBER(ctrl_w); // external write to board CB1 (J4 pin 13)
 	void data_w(uint8_t data); // external write to board data bus (J4 pins 3 thru 10 for D0-D7)
-	virtual void device_reset() override; // external write to board /RESET (J4 pin 18)
+	virtual void device_reset() override; // power up reset
+	DECLARE_WRITE_LINE_MEMBER(resetq_w); // external write to board /RESET (J4 pin 18)
 
 	// callbacks
 	auto cb2_cb() { return m_cb2_cb.bind(); }
@@ -38,6 +42,9 @@ public:
 
 	void s11c_bg_map(address_map &map);
 protected:
+	// constructor with overridable type for subclass
+	s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	// overrides
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -45,7 +52,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(deferred_cb2_w);
 	TIMER_CALLBACK_MEMBER(deferred_pb_w);
 
-private:
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
 	required_device<hc55516_device> m_hc55516;
@@ -53,9 +59,12 @@ private:
 	required_memory_bank m_cpubank;
 	required_region_ptr<uint8_t> m_rom;
 
+private:
 	devcb_write_line m_cb2_cb;
 	devcb_write8 m_pb_cb;
 
+	void common_reset(); // common reset function used by both internal and external reset
+	uint8_t m_old_resetq_state;
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 	void pia40_pb_w(uint8_t data);
 
@@ -64,6 +73,15 @@ private:
 	void bgbank_w(uint8_t data);
 };
 
+class s11_bg_device : public s11c_bg_device
+{
+public:
+	s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
 DECLARE_DEVICE_TYPE(S11C_BG, s11c_bg_device)
+DECLARE_DEVICE_TYPE(S11_BG, s11_bg_device)
 
 #endif // MAME_AUDIO_S11C_BG_H

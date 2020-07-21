@@ -305,6 +305,7 @@ void s11b_state::s11b(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
@@ -337,7 +338,7 @@ void s11b_state::s11b(machine_config &config)
 
 	/* Add the background music card */
 	SPEAKER(config, "bg").front_center();
-	S11C_BG(config, m_bg);
+	S11_BG(config, m_bg);
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 	m_bg->set_romregion(m_bgcpu);

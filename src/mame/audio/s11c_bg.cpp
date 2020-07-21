@@ -10,7 +10,7 @@
  * The interface connector for this board is a 20 pin header J4 with the following pinout:
  *
  *            +--------+
- *        GND |  1   2 | NC 
+ *        GND |  1   2 | NC
  *        PB0 |  3   4 | PB1
  *        PB2 |  5   6 | PB3
  *        PB4 |  7   8 | PB5
@@ -28,7 +28,7 @@
  *
  * The actual full pinout of the connector, from the System 11 end is:
  *        +--------+
- *    GND |  1   2 | BLANKING 
+ *    GND |  1   2 | BLANKING
  *    MD0 |  3   4 | MD1
  *    MD2 |  5   6 | MD3
  *    MD4 |  7   8 | MD5
@@ -85,7 +85,7 @@
  * sockets for 27c010 chips, instead of 28 pin sockets. Despite this, the board is fully backwards compatible
  * with the D-11581-20xx, including the mixing resistors.
  * The highest ROM address bit for all 3 roms (as shown in the High Impact Football schematics,
- * but omitted from the prototype FunHouse Schematics) is driven by the rom banking register 0x7800 bit 4, which
+ * but omitted from the prototype FunHouse Schematics) is driven by the rom banking register 0x7800 bit 3, which
  * is unused/unconnected on all other board revisions.
  * The 32 pin EPROM socket pins 1(VPP), 31(/PGM), 32(VCC) and 30(NC) are all tied to VCC.
  * Jumpers W2, W3, W10 and W11 act the same as they do on D-11581-20xx, just offset down in the socket by 2 pins.
@@ -196,10 +196,11 @@
 #include "sound/volt_reg.h"
 
 
-DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Music")
+DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Music Board")
+DEFINE_DEVICE_TYPE(S11_BG, s11_bg_device, "s11_bg", "Williams System 11 Background Music Board")
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S11C_BG,tag,owner,clock)
+	: device_t(mconfig,S11C_BG,tag,owner,clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "bgcpu")
 	, m_ym2151(*this, "ym2151")
@@ -209,6 +210,29 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 	, m_rom(*this, finder_base::DUMMY_TAG)
 	, m_cb2_cb(*this)
 	, m_pb_cb(*this)
+	, m_old_resetq_state(ASSERT_LINE)
+{
+}
+
+// constructor with overridable type for subclass
+s11c_bg_device::s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig,type,tag,owner,clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "bgcpu")
+	, m_ym2151(*this, "ym2151")
+	, m_hc55516(*this, "hc55516_bg")
+	, m_pia40(*this, "pia40")
+	, m_cpubank(*this, "bgbank")
+	, m_rom(*this, finder_base::DUMMY_TAG)
+	, m_cb2_cb(*this)
+	, m_pb_cb(*this)
+	, m_old_resetq_state(ASSERT_LINE)
+{
+}
+
+// subclass definition
+s11_bg_device::s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s11c_bg_device(mconfig,S11_BG,tag,owner,clock)
 {
 }
 
@@ -266,7 +290,17 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->portb_w(data);
 }
 
-void s11c_bg_device::device_add_mconfig(machine_config &config)
+WRITE_LINE_MEMBER( s11c_bg_device::resetq_w )
+{
+	if ((m_old_resetq_state != CLEAR_LINE) && (state == CLEAR_LINE))
+	{
+		logerror("S11 bg device received reset request\n");
+		common_reset();
+	}
+	m_old_resetq_state = state;
+}
+
+void s11c_bg_device::s11_bg_core(machine_config &config)
 {
 	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map);
@@ -281,8 +315,6 @@ void s11c_bg_device::device_add_mconfig(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.6);
-
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
@@ -292,6 +324,18 @@ void s11c_bg_device::device_add_mconfig(machine_config &config)
 	m_pia40->irqb_handler().set_inputline(m_cpu, INPUT_LINE_NMI);
 }
 
+void s11c_bg_device::device_add_mconfig(machine_config &config)
+{
+	s11_bg_core(config);
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.6); // cvsd is twice as loud on the sys11c version
+}
+
+void s11_bg_device::device_add_mconfig(machine_config &config)
+{
+	s11_bg_core(config);
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.3);
+}
+
 void s11c_bg_device::device_start()
 {
 	/* resolve lines */
@@ -299,12 +343,17 @@ void s11c_bg_device::device_start()
 	m_pb_cb.resolve();
 }
 
-void s11c_bg_device::device_reset()
+void s11c_bg_device::common_reset()
 {
 	m_cpubank->configure_entries(0, 16, &m_rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
 	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+void s11c_bg_device::device_reset()
+{
+	common_reset();
 }
 
 void s11c_bg_device::bg_cvsd_clock_set_w(uint8_t data)

@@ -190,6 +190,7 @@ void s11c_state::s11c(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11b_state::pia34_pb_w));
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	m_pia34->cb2_handler().set(FUNC(s11b_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
@@ -207,8 +208,10 @@ void s11c_state::s11c(machine_config &config)
 	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
-// Unless otherwise noted, assume jumpers W2/W3 are set so W2 is shorted, W3 open (U4 and U19 are 27512)
-// and (assuming the board has W10/W11) W10/W11 are set so W10 is shorted, W11 open (U20 is 27512)
+// Unless otherwise noted, assume S11 Background Sound Board jumpers W2/W3 are
+// set so W2 is shorted, W3 open (U4 and U19 are 27512) and (assuming the board
+// installed has jumpers W10/W11) W10/W11 are set so W10 is shorted, W11 open
+// (U20 is 27512)
 /*--------------------
 / Bugs Bunny Birthday Ball 11/90
 /--------------------*/
