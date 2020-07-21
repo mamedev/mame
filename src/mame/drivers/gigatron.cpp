@@ -206,6 +206,7 @@ void gigatron_state::gigatron(machine_config &config)
 }
 
 ROM_START( gigatron )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "v5a", "Gigatron ROM V5a")
 	ROMX_LOAD( "gigrom5a.rom",  0x0000, 0x20000, CRC(DCC071A6) SHA1(F82059BA0227FF48E4C687B90C8445DA30213EE2),ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v4", "Gigatron ROM V4")
