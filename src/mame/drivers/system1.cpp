@@ -815,6 +815,16 @@ void system1_state::system1_pio_io_map(address_map &map)
 	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
+void system1_state::blockgal_pio_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x00).mirror(0x03).portr("P1");
+	map(0x04, 0x04).mirror(0x03).portr("P2");
+	map(0x08, 0x08).mirror(0x03).portr("SYSTEM");
+	map(0x0d, 0x0d).mirror(0x02).portr("SWA");    // DIP2
+	map(0x10, 0x10).mirror(0x03).portr("SWB");    // DIP1
+	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /*************************************
  *
@@ -1907,6 +1917,36 @@ Useful addresses:
 */
 
 static INPUT_PORTS_START( blockgal )
+	PORT_INCLUDE( system1_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_REVERSE
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_REVERSE PORT_COCKTAIL
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_MODIFY("SWB")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, "10k 30k 60k 100k 150k" )
+	PORT_DIPSETTING(    0x00, "30k 50k 100k 200k 300k" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( blockgalb )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("P1")
@@ -2243,6 +2283,12 @@ void system1_state::sys1pioxb(machine_config &config)
 	sys1pio(config);
 	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
 	encrypted_sys1pio_maps(config);
+}
+
+void system1_state::blockgal(machine_config &config)
+{
+	sys1pioxb(config);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::blockgal_pio_io_map);
 }
 
 void system1_state::sys1ppix_315_5178(machine_config &config)
@@ -5582,7 +5628,7 @@ GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, i
 GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
 GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgal,   0,        sys1pioxb,         blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, blockgal,   0,        blockgal,          blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
 GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, init_bank44,       ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
@@ -5612,6 +5658,6 @@ GAME( 2009, wbmlvcd,    wbml,     sys2xboot,         wbml,      system1_state, i
 GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, init_dakkochn,     ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, init_bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blockgalb,  blockgal, sys2x,             blockgalb, system1_state, init_bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, init_wbml,         ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, init_bootsys2,     ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )

@@ -162,7 +162,6 @@ namespace analog
 		NETLIB_IS_DYNAMIC(true)
 
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI() { }
 
 		q_type qtype() const noexcept { return m_qtype; }
 		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
@@ -182,9 +181,9 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR(MOSFET)
-		, m_DG(*this, "m_DG", true)
-		, m_SG(*this, "m_SG", true)
-		, m_SD(*this, "m_SD", true)
+		, m_DG(*this, "m_DG", NETLIB_DELEGATE(termhandler))
+		, m_SG(*this, "m_SG", NETLIB_DELEGATE(termhandler))
+		, m_SD(*this, "m_SD", NETLIB_DELEGATE(termhandler))
 		, m_D_BD(*this, "m_D_BD")
 #if (!BODY_CONNECTED_TO_SOURCE)
 		, m_D_BS(*this, "m_D_BS")
@@ -332,7 +331,16 @@ namespace analog
 			#endif
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler)
+		{
+			// FIXME: This should never be called
+			if (!m_SG.P().net().is_rail_net())
+				m_SG.P().solve_now();   // Basis
+			else if (!m_SG.N().net().is_rail_net())
+				m_SG.N().solve_now();   // Emitter
+			else
+				m_DG.N().solve_now();   // Collector
+		}
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
@@ -437,17 +445,6 @@ namespace analog
 	// ----------------------------------------------------------------------------------------
 	// MOSFET
 	// ----------------------------------------------------------------------------------------
-
-	NETLIB_UPDATE(MOSFET)
-	{
-		// FIXME: This should never be called
-		if (!m_SG.P().net().is_rail_net())
-			m_SG.P().solve_now();   // Basis
-		else if (!m_SG.N().net().is_rail_net())
-			m_SG.N().solve_now();   // Emitter
-		else
-			m_DG.N().solve_now();   // Collector
-	}
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
 	{

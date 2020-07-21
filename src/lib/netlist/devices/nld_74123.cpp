@@ -127,11 +127,6 @@ namespace netlist
 			m_last_trig = m_trig;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			cv();
-		}
-
 		NETLIB_HANDLERI(cv)
 		{
 			if (m_state == 1)

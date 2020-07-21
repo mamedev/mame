@@ -2,20 +2,23 @@
 // copyright-holders:Miodrag Milanovic, Sergey Svishchev
 /***************************************************************************
 
-    Robotron A7150
+Robotron A7150
 
-    04/10/2009 Skeleton driver.
+2009-10-04 Skeleton driver.
 
-    http://www.robotrontechnik.de/index.htm?/html/computer/a7150.htm
+http://www.robotrontechnik.de/index.htm?/html/computer/a7150.htm
 
-    http://www.tiffe.de/Robotron/MMS16/
-    - Confidence test is documented in A7150_Rechner...pdf, pp. 112-119
-    - Internal test of KGS -- in KGS-K7070.pdf, pp. 19-23
+http://www.tiffe.de/Robotron/MMS16/
+- Confidence test is documented in A7150_Rechner...pdf, pp. 112-119
+- Internal test of KGS -- in KGS-K7070.pdf, pp. 19-23
 
-    To do:
-    - MMS16 (Multibus clone) and slot devices
-    - native keyboard
-    - A7100 model
+After about a minute, the self-test will appear.
+
+To do:
+- Machine hangs when screen should scroll
+- MMS16 (Multibus clone) and slot devices
+- native keyboard
+- A7100 model
 
 ****************************************************************************/
 
@@ -109,8 +112,8 @@ private:
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
 
-	void a7150_io(address_map &map);
-	void a7150_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	void k7070_cpu_banked(address_map &map);
 	void k7070_cpu_io(address_map &map);
 	void k7070_cpu_mem(address_map &map);
@@ -313,14 +316,14 @@ void a7150_state::a7150_kgs_w(offs_t offset, uint8_t data)
 }
 
 
-void a7150_state::a7150_mem(address_map &map)
+void a7150_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xf7fff).ram();
-	map(0xf8000, 0xfffff).rom().region("user1", 0);
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void a7150_state::a7150_io(address_map &map)
+void a7150_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
@@ -448,6 +451,12 @@ void a7150_state::machine_reset()
 
 void a7150_state::machine_start()
 {
+	save_item(NAME(m_kgs_msel));
+	save_item(NAME(m_kgs_iml));
+	save_item(NAME(m_kgs_datao));
+	save_item(NAME(m_kgs_datai));
+	save_item(NAME(m_kgs_ctrl));
+	save_item(NAME(m_ifss_loopback));
 }
 
 static const z80_daisy_config k7070_daisy_chain[] =
@@ -469,8 +478,8 @@ static const z80_daisy_config k7070_daisy_chain[] =
 void a7150_state::a7150(machine_config &config)
 {
 	I8086(config, m_maincpu, XTAL(9'832'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
-	m_maincpu->set_addrmap(AS_IO, &a7150_state::a7150_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &a7150_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
 	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
@@ -567,7 +576,7 @@ void a7150_state::a7150(machine_config &config)
 
 /* ROM definition */
 ROM_START( a7150 )
-	ROM_REGION16_LE( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("2.3")
 
 	// A7100
@@ -596,7 +605,7 @@ ROM_START( a7150 )
 	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60), ROM_BIOS(3) | ROM_SKIP(1))
 	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946), ROM_BIOS(3) | ROM_SKIP(1))
 
-	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100
 	ROM_LOAD( "kgs7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
 //  ROM_LOAD( "kgs7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
@@ -606,4 +615,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
-COMP( 1986, a7150, 0,      0,      a7150,   a7150, a7150_state, empty_init, "VEB Robotron", "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1986, a7150, 0,      0,      a7150,   a7150, a7150_state, empty_init, "VEB Robotron", "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

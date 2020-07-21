@@ -35,10 +35,6 @@ namespace netlist
 		{
 			m_state = 0;
 		}
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
 
 		friend class NETLIB_NAME(7448_dip);
 	private:

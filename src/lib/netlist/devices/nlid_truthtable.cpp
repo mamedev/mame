@@ -78,12 +78,6 @@ namespace devices
 			set_active_outputs(active_outputs);
 		}
 
-		// update is only called during startup here ...
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(inputs)
 		{
 #if USE_TT_ALTERNATIVE

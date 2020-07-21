@@ -86,11 +86,6 @@ namespace netlist
 				}
 			}
 
-			NETLIB_UPDATEI()
-			{
-				ce<0>(); // only called during setup
-			}
-
 			state_var<bool> m_enabled;
 			param_logic_t m_TE;
 			object_array_t<logic_input_t, D::address_width::value> m_A;

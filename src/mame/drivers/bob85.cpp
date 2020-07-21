@@ -46,8 +46,8 @@ public:
 	void bob85(machine_config &config);
 
 private:
-	void bob85_io(address_map &map);
-	void bob85_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	uint8_t bob85_keyboard_r();
 	void bob85_7seg_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
@@ -57,8 +57,7 @@ private:
 	uint8_t m_count_key;
 	u16 m_casscnt;
 	bool m_cassold, m_cassbit;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	void machine_start() override;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
@@ -145,14 +144,14 @@ void bob85_state::bob85_7seg_w(offs_t offset, uint8_t data)
 	m_digits[offset] = bitswap<8>( data,3,2,1,0,7,6,5,4 );
 }
 
-void bob85_state::bob85_mem(address_map &map)
+void bob85_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x02ff).rom();
 	map(0x0600, 0x09ff).ram();
 }
 
-void bob85_state::bob85_io(address_map &map)
+void bob85_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0a, 0x0a).r(FUNC(bob85_state::bob85_keyboard_r));
@@ -191,8 +190,14 @@ static INPUT_PORTS_START( bob85 )
 	PORT_BIT(0xC0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-void bob85_state::machine_reset()
+void bob85_state::machine_start()
 {
+	m_digits.resolve();
+	save_item(NAME(m_prev_key));
+	save_item(NAME(m_count_key));
+	save_item(NAME(m_casscnt));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassbit));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( bob85_state::kansas_r )
@@ -229,8 +234,8 @@ void bob85_state::bob85(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(5'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::bob85_mem);
-	m_maincpu->set_addrmap(AS_IO, &bob85_state::bob85_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &bob85_state::io_map);
 	m_maincpu->in_sid_func().set(FUNC(bob85_state::sid_r));
 	m_maincpu->out_sod_func().set(FUNC(bob85_state::sod_w));
 
@@ -247,11 +252,11 @@ void bob85_state::bob85(machine_config &config)
 
 /* ROM definition */
 ROM_START( bob85 )
-	ROM_REGION( 0x600, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0300, "maincpu", 0 )
 	ROM_LOAD( "bob85.rom", 0x0000, 0x0300, BAD_DUMP CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6) ) // should be 6 separate 74S287's (256x4)
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1984, bob85, 0,      0,      bob85,   bob85, bob85_state, empty_init, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)
+COMP( 1984, bob85, 0,      0,      bob85,   bob85, bob85_state, empty_init, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

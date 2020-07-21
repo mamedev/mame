@@ -25,11 +25,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		// FIXME: Timing
 		NETLIB_HANDLERI(inputs);
 
@@ -74,11 +69,6 @@ namespace netlist
 			register_subalias("GND", "A.GND");
 			register_subalias("VCC", "B.VCC");
 
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 		friend class NETLIB_NAME(9322_dip);
@@ -135,8 +125,7 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 		}
 
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(9322) A;
 	};

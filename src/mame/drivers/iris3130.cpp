@@ -43,6 +43,8 @@
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
 
+#include <vector>
+
 #define LOG_RTC             (1 << 0)
 #define LOG_INVALID_SEGMENT (1 << 1)
 #define LOG_OTHER           (1 << 2)

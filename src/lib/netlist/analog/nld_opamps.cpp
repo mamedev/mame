@@ -183,11 +183,6 @@ namespace netlist
 
 		}
 
-		NETLIB_UPDATEI()
-		{
-			supply();
-		}
-
 		NETLIB_HANDLERI(supply)
 		{
 			const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;

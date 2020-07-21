@@ -1,13 +1,48 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * s11c_bg.cpp - Williams D-11581 "Audio Board" (M68B09E + YM2151 + HC55516 + DAC)
+ * s11c_bg.cpp - Williams D-11581 "Audio Board" PCB trace part number: 5766-12130-00 REV A.
+ * (M68B09E + YM2151 + HC555xx + DAC)
+ *
  * Used by Williams System 11A (F-14), all System 11B (except Jokerz) and all System 11C pinballs
- * Used by Midway Y-Unit Arcade Hardware (for Smash TV and High Impact Football)
- * Used by the prototype version of Funhouse pinball for the WPC Alphanumeric system
+ * Used by Midway Y-Unit Arcade Hardware (for Smash TV only; see below for High Impact Football)
+ *
+ * The interface connector for this board is a 20 pin header J4 with the following pinout:
+ *
+ *            +--------+
+ *        GND |  1   2 | NC 
+ *        PB0 |  3   4 | PB1
+ *        PB2 |  5   6 | PB3
+ *        PB4 |  7   8 | PB5
+ *        PB6 |  9  10 | PB7
+ *         NC | 11  12 | CB2 (/stbr)
+ * (/stb) CB1 | 13  14 | NC
+ *         NC | 15  16 | NC
+ *         NC | 17  18 | /RESET
+ *         NC | 19  20 | NC
+ *            +--------+
+ *
+ * Technically:
+ * CB1 Pin 13 is 'strobe in' and is asserted low to write to the sound board
+ * CB2 Pin 12 is 'strobe out' and is asserted low to indicate the sound board has written and needs the mainboard to read its bus
+ *
+ * The actual full pinout of the connector, from the System 11 end is:
+ *        +--------+
+ *    GND |  1   2 | BLANKING 
+ *    MD0 |  3   4 | MD1
+ *    MD2 |  5   6 | MD3
+ *    MD4 |  7   8 | MD5
+ *    MD6 |  9  10 | MD7
+ *   LCB1 | 11  12 | MCB1
+ *   MCB2 | 13  14 | /RESET
+ *   LCA1 | 15  16 | MCA1
+ *    R/W | 17  18 | MCA2
+ *      E | 19  20 | NC
+ *        +--------+
+ *
  *
  * The mixing resistors before the MC1458 differ between the D-11581, D-11581-20xx (System 11C), and D-1129x board schematics:
- *                 D-1129x    D-11581        D-11581-20xx
+ *                 D-1129x    D-11581        D-11581-20xx (and A-13971-500xx)
  * CPU_SOUND       R32 2.2k   R12 2.2k       R12 4.7k
  * YM2151 CH1      R33 10k    R14 10k        R14 20k
  * YM2151 CH2      R34 10k    R15 10k        R15 20k
@@ -41,6 +76,22 @@
  * W11 - linked w/W2+W3    : EPROM U20 is a 2764, 27128 or 27256 (where pin 1 must be high)
 
 
+ * NOTE: A board called A-13971-50003 is used on Midway Y-Unit Arcade Hardware High Impact Football,
+ * and on the first 500 or so Funhouse Pinball machines. (Later Funhouse pinballs use the A-12738-50003
+ * WPC Sound board, mentioned in the CVSD filtering section below. Despite its earlier part number, the
+ * A-12738-50003 WPC Sound Board is a newer design, with the A-13971-50003 mentioned here seemingly produced
+ * later as a stopgap due to development or production issues with the WPC Sound Board.)
+ * The A-13971-50003 board is ALMOST the same as the D-11581-20xx System 11C version, except it has 32 pin
+ * sockets for 27c010 chips, instead of 28 pin sockets. Despite this, the board is fully backwards compatible
+ * with the D-11581-20xx, including the mixing resistors.
+ * The highest ROM address bit for all 3 roms (as shown in the High Impact Football schematics,
+ * but omitted from the prototype FunHouse Schematics) is driven by the rom banking register 0x7800 bit 4, which
+ * is unused/unconnected on all other board revisions.
+ * The 32 pin EPROM socket pins 1(VPP), 31(/PGM), 32(VCC) and 30(NC) are all tied to VCC.
+ * Jumpers W2, W3, W10 and W11 act the same as they do on D-11581-20xx, just offset down in the socket by 2 pins.
+ * This means this board is fully backwards compatible with D-11581-20xx.
+
+
 
  * Williams D-11297/D-11298 "BG Music & Speech Board":
  * D-11297/D-11298 is the predecessor to D-11581, and is fully compatible with it.
@@ -50,7 +101,7 @@
  * D-11298 (CVSD unpopulated): Millionaire!
 
  * Unlike the later D-11581 board which has mono output only, the D-11297/8 board
- * has provisions for stereo output from the ym2151, but it is unclear if these were
+ * has provisions for stereo output from the YM2151, but it is unclear if these were
  * ever populated on any shipping boards.
 
  * D-1129x Jumpers:
@@ -84,17 +135,18 @@
  * [1] Logically there should be a capacitor to ground at c1 of value 1800uf,
  *     but this was omitted on the D-11297 board, possibly in error, and this
  *     omission carried over to future sound boards including all versions of the D-11581.
- *     The WPC-AN sound board, A-12738-50xxx, fixed this by completely redesigning the filters
- *     for both the ym2151 and cvsd.
+ *     The later WPC Sound board, A-12738-500xx, fixed this by completely redesigning the filters
+ *     for both the YM2151 and CVSD.
  *
  * This circuit would be a 4th order (cascaded 2nd order) op-amp multifeedback lowpass filter,
  *  but because of the capacitor omitted, it is actually a first order-with-gain lowpass,
  *  cascaded into a 2nd order lowpass, forming a 3rd order filter.
  *
  * This same exact circuit, same component values (but including the capacitor missing here),
- * appears on the System 11 and System 11A mainboards.
+ * appears on the System 11 and System 11A mainboards, where it forms a 4th order filter.
  * System 11B changed the components slightly, presumably so the CVSD produced on the mainboard
- * sounded a bit different tone-wise to the CVSD produced from the Audio Board.
+ * sounded a bit different tone-wise to the CVSD produced from the Audio Board, or to reduce the
+ * number of distinct part values to reduce cost per board.
 
 
 
@@ -249,7 +301,7 @@ void s11c_bg_device::device_start()
 
 void s11c_bg_device::device_reset()
 {
-	m_cpubank->configure_entries(0, 8, &m_rom[0x10000], 0x8000);
+	m_cpubank->configure_entries(0, 16, &m_rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
 	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -266,8 +318,17 @@ void s11c_bg_device::bg_cvsd_digit_clock_clear_w(uint8_t data)
 	m_hc55516->digit_w(data&1);
 }
 
+/*
+	Rom mapping for the 4 banking bits:
+	3 2 1 0
+	r q 0 0 -  U4, A15 q, A16 r
+	r q 0 1 - U19, A15 q, A16 r
+	r q 1 0 - U20, A15 q, A16 r
+	x x 1 1 - open bus
+	for ease of loading the roms, we swap the bits to the order '1 0 3 2'
+*/
 void s11c_bg_device::bgbank_w(uint8_t data)
 {
-	uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
-	m_cpubank->set_entry(bank);
+	uint8_t bank = bitswap<8>(data,7,6,5,4,1,0,3,2);
+	m_cpubank->set_entry(bank&0xf);
 }

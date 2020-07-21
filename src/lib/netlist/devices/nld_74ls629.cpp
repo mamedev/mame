@@ -65,11 +65,6 @@ namespace netlist
 			m_inc = netlist_time::zero();
 		}
 
-		NETLIB_UPDATEI()
-		{
-			fb();
-		}
-
 	public:
 		logic_input_t m_FB;
 		logic_output_t m_Y;
@@ -118,11 +113,6 @@ namespace netlist
 			m_R_FC.set_R( nlconst::magic(90000.0));
 			m_R_RNG.set_R(nlconst::magic(90000.0));
 			m_clock.reset();
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -227,7 +217,6 @@ namespace netlist
 			register_subalias("14",  m_B.m_RNG);
 		}
 
-		NETLIB_UPDATEI() { }
 
 		NETLIB_RESETI()
 		{

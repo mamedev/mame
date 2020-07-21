@@ -1422,6 +1422,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/xtide.h",
 		MAME_DIR .. "src/devices/bus/isa/side116.cpp",
 		MAME_DIR .. "src/devices/bus/isa/side116.h",
+		MAME_DIR .. "src/devices/bus/isa/acb2072.cpp",
+		MAME_DIR .. "src/devices/bus/isa/acb2072.h",
 		MAME_DIR .. "src/devices/bus/isa/aha1542b.cpp",
 		MAME_DIR .. "src/devices/bus/isa/aha1542b.h",
 		MAME_DIR .. "src/devices/bus/isa/aha1542c.cpp",
@@ -2483,6 +2485,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/printer.h",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
+		MAME_DIR .. "src/devices/bus/centronics/samdac.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/samdac.h",
 	}
 
 	dependency {
@@ -3786,6 +3790,10 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/plus2test.h",
 		MAME_DIR .. "src/devices/bus/spectrum/protek.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/protek.h",
+		MAME_DIR .. "src/devices/bus/spectrum/sdi.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/sdi.h",
+		MAME_DIR .. "src/devices/bus/spectrum/sixword.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/sixword.h",
 		MAME_DIR .. "src/devices/bus/spectrum/speccydos.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/speccydos.h",
 		MAME_DIR .. "src/devices/bus/spectrum/specdrum.cpp",
@@ -4314,6 +4322,8 @@ if (BUSES["SAMCOUPE_EXPANSION"]~=null) then
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/onemeg.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.cpp",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sambus.h",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sdide.cpp",
+		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sdide.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.cpp",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/sid.h",
 		MAME_DIR .. "src/devices/bus/samcoupe/expansion/spi.cpp",

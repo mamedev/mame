@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <forward_list>
+
 
 //**************************************************************************
 //  FORWARD DECLARATIONS

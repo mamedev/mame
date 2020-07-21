@@ -67,14 +67,14 @@ private:
 	u8 input_r();
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
 };
 
 void avrmax_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
 }
 
 
@@ -85,7 +85,7 @@ void avrmax_state::machine_start()
 
 void avrmax_state::update_display()
 {
-	m_display->matrix(m_inp_mux, m_led_data);
+	m_display->matrix(m_inp_mux, m_7seg_data);
 }
 
 void avrmax_state::mux_w(u8 data)
@@ -98,7 +98,7 @@ void avrmax_state::mux_w(u8 data)
 void avrmax_state::led_w(u8 data)
 {
 	// PD0-PD7: 7seg data
-	m_led_data = ~data;
+	m_7seg_data = ~data;
 	update_display();
 }
 
@@ -106,7 +106,7 @@ u8 avrmax_state::input_r()
 {
 	u8 data = 0;
 
-	// PB0-PB3: multiplexed inputs
+	// PB0-PB2: multiplexed inputs
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
@@ -231,5 +231,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 2009, avrmax,  0,      0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 2009, avrmaxg, avrmax, 0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'
+CONS( 2009, avrmax,  0,      0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 2009, avrmaxg, avrmax, 0, avrmax,  avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'

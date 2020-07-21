@@ -222,7 +222,7 @@ uint16_t segas18_state::misc_io_r(address_space &space, offs_t offset, uint16_t 
 	}
 
 	if (!m_custom_io_r.isnull())
-		return m_custom_io_r(mem_mask);
+		return m_custom_io_r(offset);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return m_mapper->open_bus_r();
 }

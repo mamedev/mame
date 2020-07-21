@@ -284,6 +284,7 @@ SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
 SOUNDS["S_DSP"] = true
 SOUNDS["KS0164"] = true
+--SOUNDS["RP2C33_SOUND"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -2003,6 +2004,7 @@ files {
 	MAME_DIR .. "src/mame/video/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.h",
+	MAME_DIR .. "src/mame/drivers/gaelcof3.cpp",
 	MAME_DIR .. "src/mame/drivers/gaelcopc.cpp",
 	MAME_DIR .. "src/mame/drivers/goldart.cpp",
 	MAME_DIR .. "src/mame/drivers/glass.cpp",
@@ -2013,6 +2015,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rollext.cpp",
 	MAME_DIR .. "src/mame/drivers/splash.cpp",
 	MAME_DIR .. "src/mame/includes/splash.h",
+	MAME_DIR .. "src/mame/drivers/splash_ms.cpp",
 	MAME_DIR .. "src/mame/video/splash.cpp",
 	MAME_DIR .. "src/mame/drivers/targeth.cpp",
 	MAME_DIR .. "src/mame/includes/targeth.h",
@@ -5036,6 +5039,7 @@ files {
 	MAME_DIR .. "src/mame/includes/taxidriv.h",
 	MAME_DIR .. "src/mame/video/taxidriv.cpp",
 	MAME_DIR .. "src/mame/drivers/teamjocs.cpp",
+	MAME_DIR .. "src/mame/drivers/tecnodar.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",
 	MAME_DIR .. "src/mame/drivers/thedeep.cpp",
 	MAME_DIR .. "src/mame/includes/thedeep.h",

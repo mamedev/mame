@@ -37,10 +37,6 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
 
 		NETLIB_HANDLERI(inputs)
 		{
@@ -115,8 +111,7 @@ namespace devices
 			// register_subalias("13", ); --> NC
 			register_subalias("14", "A.A");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(7492) A;
 	};

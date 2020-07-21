@@ -1629,11 +1629,11 @@ void setup_t::prepare_to_run()
 
 	for (auto &n : m_nlstate.nets())
 		for (auto & term : n->core_terms())
-		{
-			core_device_t *dev = &term->device();
-			dev->set_default_delegate(*term);
-		}
-
+			if (!term->delegate().is_set())
+			{
+				log().fatal(MF_DELEGATE_NOT_SET_1(term->name()));
+				throw nl_exception(MF_DELEGATE_NOT_SET_1(term->name()));
+			}
 }
 
 // ----------------------------------------------------------------------------------------

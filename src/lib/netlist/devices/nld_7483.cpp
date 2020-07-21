@@ -40,11 +40,6 @@ namespace netlist
 			m_lastr = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			c0();
-		}
-
 		friend class NETLIB_NAME(7483_dip);
 	private:
 		NETLIB_HANDLERI(c0)
@@ -120,8 +115,7 @@ namespace netlist
 			register_subalias("15", A.m_S4);
 			register_subalias("16", A.m_B4);
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(7483) A;
 	};

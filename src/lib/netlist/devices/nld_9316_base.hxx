@@ -69,11 +69,6 @@ namespace netlist
 				m_RC.push(m_ent && (m_cnt == D::MAXCNT::value), D::tRC::value(0));
 			}
 
-			NETLIB_UPDATEI()
-			{
-				other();
-			}
-
 			NETLIB_HANDLERI(clk)
 			{
 				if (!D::ASYNC::value && !m_CLRQ())

@@ -33,11 +33,6 @@ namespace netlist
 			m_cnt = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(inputs)
 		{
 			netlist_sig_t last_cp = m_cp;
@@ -103,8 +98,7 @@ namespace netlist
 			connect("A.GND", "B.GND");
 			connect("A.VCC", "B.VCC");
 		}
-		NETLIB_UPDATEI() { }
-		NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 
 	private:
 		NETLIB_SUB(74393) m_A;

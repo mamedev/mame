@@ -38,11 +38,6 @@ namespace netlist
 			m_last_Q = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(9314_dip);
 	private:
 		NETLIB_HANDLERI(inputs)

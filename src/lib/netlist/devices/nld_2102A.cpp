@@ -60,11 +60,6 @@ namespace netlist
 			}
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(2102A_dip);
 	private:
 		object_array_t<logic_input_t, 10> m_A;
@@ -105,8 +100,7 @@ namespace netlist
 			register_subalias("9",     "A.GND");
 
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(2102A) A;
 	};

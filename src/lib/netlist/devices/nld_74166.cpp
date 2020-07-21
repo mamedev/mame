@@ -84,11 +84,6 @@ namespace netlist
 			m_QH.push(qh, delay); //FIXME
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(74166_dip);
 	private:
 		object_array_t<logic_input_t, 8> m_DATA;
@@ -128,8 +123,7 @@ namespace netlist
 			register_subalias("15", A.m_SH_LDQ);
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(74166) A;
 	};

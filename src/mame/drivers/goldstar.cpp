@@ -2212,7 +2212,7 @@ static INPUT_PORTS_START( cmast91 )
 
 	PORT_INCLUDE( cmv4_dsw5 )
 	PORT_MODIFY("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:1")  /* normally Display of Doll On Demo, but no whores in this set */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:1")  /* normally Display of Doll On Demo, but no ladies in this set */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Coin In Limit OK */
@@ -2223,7 +2223,7 @@ static INPUT_PORTS_START( cmast91 )
 	PORT_DIPNAME( 0x40, 0x40, "Skill Stop" )                    PORT_DIPLOCATION("DSW5:7")  /* OK */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:8")  /* normally Test Mode For Disp. Of Doll, but no whores in this set */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:8")  /* normally Test Mode For Disp. Of Doll, but no ladies in this set */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -18433,6 +18433,20 @@ void wingco_state::init_lucky8f() // TODO: simplify
 	}
 }
 
+void wingco_state::init_lucky8l()
+{
+	// rearrange the 57C49B-35 contents to what MAME expects
+	uint8_t *proms = memregion("proms")->base();
+
+	for (uint8_t i = 0; i < 0x80; i++)
+	{
+		uint8_t bits74 = proms[i] >> 4;
+		uint8_t bits30 = proms[i] & 0x0f;
+		proms[i] = bits30;
+		proms[i + 0x100] = bits74;
+	}
+}
+
 void wingco_state::init_super972()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -19229,7 +19243,7 @@ GAMEL( 1991, lucky8h,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init
 GAMEL( 1989, lucky8i,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 199?, lucky8j,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8k,   lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8l,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
+GAMEL( 1989, lucky8l,   lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...

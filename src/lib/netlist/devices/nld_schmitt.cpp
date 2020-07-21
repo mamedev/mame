@@ -85,11 +85,6 @@ namespace netlist
 				m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
 			}
 
-			NETLIB_UPDATEI()
-			{
-				input();
-			}
-
 		private:
 			NETLIB_HANDLERI(input)
 			{

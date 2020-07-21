@@ -35,11 +35,6 @@ namespace netlist
 			m_nextD = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(inputs)
 		{
 			const auto set(m_SET());
@@ -116,21 +111,13 @@ namespace netlist
 			connect("A.VSS", "B.VSS");
 			connect("A.VDD", "B.VDD");
 		}
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
+		//NETLIB_UPDATEI();
+		//NETLIB_RESETI();
 
 	private:
 		NETLIB_SUB(CD4013) m_A;
 		NETLIB_SUB(CD4013) m_B;
 	};
-
-	NETLIB_RESET(CD4013_dip)
-	{
-	}
-
-	NETLIB_UPDATE(CD4013_dip)
-	{
-	}
 
 	NETLIB_DEVICE_IMPL(CD4013, "CD4013", "+CLOCK,+DATA,+RESET,+SET,@VDD,@VSS")
 	NETLIB_DEVICE_IMPL(CD4013_dip, "CD4013_DIP", "")

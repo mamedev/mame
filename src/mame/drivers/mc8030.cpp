@@ -34,7 +34,6 @@ class mc8030_state : public driver_device
 public:
 	mc8030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 	{ }
 
@@ -52,12 +51,13 @@ private:
 	uint8_t asp_port_b_r();
 	void asp_port_a_w(uint8_t data);
 	void asp_port_b_w(uint8_t data);
+	void machine_start() override;
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_region_ptr<uint8_t> m_p_videoram;
+	std::unique_ptr<u8[]> m_vram;
 	required_device<z80_device> m_maincpu;
 };
 
@@ -113,9 +113,9 @@ void mc8030_state::vis_w(offs_t offset, uint8_t data)
 	uint16_t addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
 	uint8_t c = 1 << (data & 7);
 	if (BIT(offset, 0))
-		m_p_videoram[addr] |= c;
+		m_vram[addr] |= c;
 	else
-		m_p_videoram[addr] &= ~c;
+		m_vram[addr] &= ~c;
 }
 
 void mc8030_state::eprom_prog_w(uint8_t data)
@@ -154,7 +154,7 @@ uint32_t mc8030_state::screen_update_mc8030(screen_device &screen, bitmap_ind16 
 		{
 			for (x = ma; x < ma + 64; x++)
 			{
-				gfx = m_p_videoram[x^0x3fff];
+				gfx = m_vram[x^0x3fff];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -183,6 +183,11 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
+void mc8030_state::machine_start()
+{
+	m_vram = make_unique_clear<u8[]>(0x4000);
+	save_pointer(NAME(m_vram), 0x4000);
+}
 
 void mc8030_state::mc8030(machine_config &config)
 {
@@ -245,15 +250,13 @@ void mc8030_state::mc8030(machine_config &config)
 
 /* ROM definition */
 ROM_START( mc8030 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "zve_1.rom", 0x0000, 0x0800, CRC(31ec0159) SHA1(a97ea9eb733c462e77d625a7942134e45d911c0a))
 	ROM_LOAD( "zve_2.rom", 0x0800, 0x0800, CRC(5104983d) SHA1(7516274904042f4fc6813aa8b2a75c0a64f9b937))
 	ROM_LOAD( "zve_3.rom", 0x1000, 0x0800, CRC(4bcfd727) SHA1(d296e587098e70270ad60db8edaa685af368b849))
 	ROM_LOAD( "zve_4.rom", 0x1800, 0x0800, CRC(f949ae43) SHA1(68c324cf5578497db7ae65da5695fcb30493f612))
 	ROM_LOAD( "spe_1.rom", 0x2000, 0x0400, CRC(826f609c) SHA1(e77ff6c180f5a6d7756d076173ae264a0e26f066))
 	ROM_LOAD( "spe_2.rom", 0x2400, 0x0400, CRC(98320040) SHA1(6baf87e196f1ccdf44912deafa6042becbfb0679))
-
-	ROM_REGION( 0x4000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "user1", 0 )
 	// marked as "80.3x"
@@ -293,4 +296,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8030, 0,      0,      mc8030,  mc8030, mc8030_state, empty_init, "VEB Elektronik Gera", "MC-80.30/31", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | ORIENTATION_FLIP_X )
+COMP( 198?, mc8030, 0,      0,      mc8030,  mc8030, mc8030_state, empty_init, "VEB Elektronik Gera", "MC-80.30/31", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | ORIENTATION_FLIP_X | MACHINE_SUPPORTS_SAVE )

@@ -82,7 +82,7 @@ Fairchild 3850PK CPU @ 2MHz (LC circuit), 3853PK
 // internal artwork
 #include "cmpchess.lh" // clickable
 #include "novag_mk1.lh" // clickable
-#include "cncchess.lh" // clickable
+#include "conic_cchess.lh" // clickable
 
 
 namespace {
@@ -383,7 +383,7 @@ void cmpchess_state::cnc(machine_config &config)
 	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
 	subdevice<f3853_device>("smi")->set_clock(2000000);
 
-	config.set_default_layout(layout_cncchess);
+	config.set_default_layout(layout_conic_cchess);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

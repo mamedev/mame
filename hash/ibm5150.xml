@@ -6639,6 +6639,137 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcix10">
+		<description>IBM Personal Computer Interactive Executive (PC/IX) 1.00</description>
+		<year>1984</year>
+		<!-- developed by INTERACTIVE Systems Corporation for IBM -->
+		<publisher>IBM</publisher>
+		<!-- Origin: WinWorld -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6261-0"/>
+			<feature name="part_id" value="Maintenance"/>
+			<dataarea name="flop" size="368640">
+				<rom name="01MAINT.IMA" size="368640" crc="d2948105" sha1="eb4f132f0779b8835f41907e5bb29a2225c2c443"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6262-0"/>
+			<feature name="part_id" value="Core 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="02CORE1.IMA" size="368640" crc="a6fc76e0" sha1="dc8d8dd2b041f475547c7326354e33e709d068b6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6263-0"/>
+			<feature name="part_id" value="Core 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="03CORE2.IMA" size="368640" crc="3075f9b8" sha1="c3fad1fe431147c71f12eff73d33bd047cae15c3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6264-0"/>
+			<feature name="part_id" value="Core 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="04CORE3.IMA" size="368640" crc="683c8314" sha1="ecf4f8738dd7f654ea2fa51f363c76c5f84a05d6"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6265-0"/>
+			<feature name="part_id" value="Core 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="05CORE4.IMA" size="368640" crc="dedc1330" sha1="c185b40ac90a344a8c4694f3cdf15425ecc3af4b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6266-0"/>
+			<feature name="part_id" value="Core 5"/>
+			<dataarea name="flop" size="368640">
+				<rom name="06CORE5.IMA" size="368640" crc="45fb7668" sha1="1b92f98f1ed665109ad588814e0859d7df8a7d16"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6267-0"/>
+			<feature name="part_id" value="Core 6"/>
+			<dataarea name="flop" size="368640">
+				<rom name="07CORE6.IMA" size="368640" crc="d4b1fa1e" sha1="bc6437a1410a11c4d12ce5d90dec9abb3ff34103"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6268-0"/>
+			<feature name="part_id" value="Core 7"/>
+			<dataarea name="flop" size="368640">
+				<rom name="08CORE7.IMA" size="368640" crc="d3468cbe" sha1="024bc551f9ef7fafdbec0ab063252b1964acc161"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_number" value="LY20-6269-0"/>
+			<feature name="part_id" value="Core 8"/>
+			<dataarea name="flop" size="368640">
+				<rom name="09CORE8.IMA" size="368640" crc="a9d6d06a" sha1="561f31d65465b851f480d843078ba38e187cd6cc"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="10PROG1.IMA" size="368640" crc="99e1f238" sha1="bd2bf980918c921d9eb7a355e670e68847ff0b6d"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="11PROG2.IMA" size="368640" crc="912bd367" sha1="28400a3f0cd345be0905890bc3cf22ce795e0732"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="12PROG3.IMA" size="368640" crc="7f8d93ee" sha1="f8cfb8be8c3881a80360b4fa8b4fd8134d6b80a2"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Programming Subset 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="13PROG4.IMA" size="368640" crc="fae2489b" sha1="23bc51d535526732c5f15ed5dc1db394d5cbc209"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Communications"/>
+			<dataarea name="flop" size="368640">
+				<rom name="14COMMS.IMA" size="368640" crc="64ef3326" sha1="b91a4f8152a248405fe2df05ea9fc4d621acfd99"/>
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="SCCS"/>
+			<dataarea name="flop" size="368640">
+				<rom name="15SCCS.IMA" size="368640" crc="b3496c93" sha1="b2f8bbeb17233e2aab6ad77962e39305fe283af1"/>
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="Text Processing"/>
+			<dataarea name="flop" size="368640">
+				<rom name="16TEXT.IMA" size="368640" crc="66969148" sha1="4a603e4b04f9819edfafa5d3e300c88c7fc2f8f9"/>
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="Special Purpose Subset"/>
+			<dataarea name="flop" size="368640">
+				<rom name="17SPECIA.IMA" size="368640" crc="6c10f1fc" sha1="5535e1882f6f42110c4b7da80ec0db15a07f2742"/>
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_5_25">
+			<feature name="part_id" value="Games"/>
+			<dataarea name="flop" size="368640">
+				<rom name="18GAMES.IMA" size="368640" crc="3c0edba6" sha1="23903c58a07c05f821a5b9fcb8dd42b1b587c4e8"/>
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_5_25">
+			<feature name="part_id" value="Accounting"/>
+			<dataarea name="flop" size="368640">
+				<rom name="19ACCNT.IMA" size="368640" crc="52e3229b" sha1="05a3d3bca0b93f139c1708e548d3c1a801c7fc35"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qnxdemo">
 		<description>QNX Demonstration (Apr 17th, 1989)</description>
 		<year>1989</year>
@@ -8031,6 +8162,30 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="bloodwyc">
+		<description>Bloodwych (USA)</description>
+		<year>1991</year>
+		<publisher>Konami</publisher>
+		<info name="developer" value="Mirrorsoft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Bloodwych (USA) [Konami] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="481b0339" sha1="bb15ff6796f450c54282fc5c7db4aa22a844e146"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bloodwyca" cloneof="bloodwyc">
+		<description>Bloodwych (Quest &amp; Glory Compilation) (Euro)</description>
+		<year>1991</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="developer" value="Mirrorsoft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Bloodwych (Quest &amp; Glory Compilation) (Euro) [Ubi Soft] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5e77657e" sha1="e696c4f620b138f67f3fbea3730cd16ea74476e6"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="bluesbro">
 		<!-- Dumped via Kryoflux -->
 		<description>The Blues Brothers</description>
@@ -8164,7 +8319,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="cadaver35" cloneof="cadaver">
-		<description>Cadaver (3.5", Quest and Glory Compilation)</description>
+		<description>Cadaver (3.5", Quest &amp; Glory Compilation)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
 		<info name="developer" value="Bitmap Brothers" />
@@ -8446,6 +8601,92 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="laurabow">
+		<description>The Colonel's Bequest (5.25")</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000.046" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 01 of 10].img" size="368640" crc="c2c2801b" sha1="95118dac5ee6232413e282397f047f70c2a5ca95"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 02 of 10].img" size="368640" crc="793af3e9" sha1="37cc73635c32a6a23934676d9c04e40b17be48b9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 03 of 10].img" size="368640" crc="f0db56de" sha1="6b1e5624a63cb98896da397084242f9b7e11f6fd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 04 of 10].img" size="368640" crc="b50d5d25" sha1="14901e38dddf7fda09f5ba70de016584ef988d21"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 05 of 10].img" size="368640" crc="c25e531d" sha1="d2c4a8439d396a1eaea1ad8cd3b533071a8bb69f"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 06 of 10].img" size="368640" crc="f19693f3" sha1="9fcee8c6dbcc6e9b10e8582aaddcb774608a3e84"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 07 of 10].img" size="368640" crc="eec57cd1" sha1="a8468d3c8505fa80e71f658356e7ce3387877699"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 08 of 10].img" size="368640" crc="ee0c8b6f" sha1="17284ab1dd6e45cc3c968d35a3e5e2785071e153"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 09 of 10].img" size="368640" crc="b8badbd5" sha1="5b5fac0fa5acdbe4d9c987e992afe6526db0edbb"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 10 of 10].img" size="368640" crc="77d189bd" sha1="6a51026779cf8c2495e04195fe2d15708bf40f51"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="laurabw35" cloneof="laurabow">
+		<description>The Colonel's Bequest (3.5")</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000.046" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 1 of 4].img" size="737280" crc="d3f80650" sha1="e4119b36a02230acf42498879ab7570a183f35b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 2 of 4].img" size="737280" crc="61663864" sha1="02865bc61fe45a8031c608ec7c76ef9f05ac8ae3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 3 of 4].img" size="737280" crc="1e6c2f9b" sha1="95f5673450c7f81d296887506e7109b45d022b32"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 4 of 4].img" size="737280" crc="a35399e0" sha1="da4d4814782be5a14429c193e66993764a1cd0cc"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="colossus4">
 		<description>Colossus Bridge 4</description>
 		<year>1988</year>
@@ -13026,9 +13267,21 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="xenon2">
-		<description>Xenon 2: Megablast (Power Pack Compilation)</description>
+		<description>Xenon 2: Megablast</description>
 		<year>1990</year>
 		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="The Assembly Line - The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xenon 2 [Mirrorsoft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ae093ac1" sha1="1167c3a0af77690f3ede783772773a840fbae34a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenon2a" cloneof="xenon2">
+		<description>Xenon 2: Megablast (Power Pack Compilation)</description>
+		<year>1990</year>
+		<publisher>Beau Jolly - Mirrorsoft</publisher>
 		<info name="developer" value="The Assembly Line - The Bitmap Brothers" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">

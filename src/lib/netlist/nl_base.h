@@ -177,7 +177,6 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
 #define NETLIB_HANDLERI(name) void name() noexcept
-#define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override
 #define NETLIB_RESETI() virtual void reset() override
 
@@ -185,7 +184,11 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 #define NETLIB_SUB_UPTR(ns, chip) device_arena::unique_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() noexcept
+
+#if 0
+#define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
+#endif
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
@@ -836,7 +839,7 @@ namespace netlist
 		/// @param dev core_devict_t object owning the terminal
 		/// @param aname name of this terminal
 		/// @param otherterm pointer to the sibling terminal
-		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm);
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate);
 
 		/// \brief Returns voltage of connected net
 		///
@@ -906,10 +909,6 @@ namespace netlist
 		logic_input_t(device_t &dev, const pstring &aname,
 				nldelegate delegate);
 
-#if 0
-		template <class D>
-		logic_input_t(D &dev, const pstring &aname);
-#endif
 		inline netlist_sig_t operator()() const noexcept;
 
 		void inactivate() noexcept;
@@ -1386,8 +1385,6 @@ namespace netlist
 		// Has to be set in device reset
 		void set_active_outputs(int n) noexcept { m_active_outputs = n; }
 
-		void set_default_delegate(detail::core_terminal_t &term);
-
 		// stats
 		struct stats_t
 		{
@@ -1398,8 +1395,9 @@ namespace netlist
 		};
 
 		stats_t * stats() const noexcept { return m_stats.get(); }
-
+#if 0
 		virtual void update() noexcept { }
+#endif
 		virtual void reset() { }
 
 	protected:
@@ -1447,7 +1445,6 @@ namespace netlist
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
 	protected:
 
-		//NETLIB_UPDATEI() { }
 		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
@@ -1477,11 +1474,8 @@ namespace netlist
 
 		~device_t() noexcept override = default;
 
-		//nldelegate default_delegate() { return nldelegate(&device_t::update, this); }
-		nldelegate default_delegate() { return { &core_device_t::update, dynamic_cast<core_device_t *>(this) }; }
 	protected:
 
-		//NETLIB_UPDATEI() { }
 		//NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
@@ -1809,12 +1803,6 @@ namespace netlist
 			NETLIB_UPDATE_PARAMI()
 			{
 				m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-			}
-
-			NETLIB_UPDATEI()
-			{
-				// only called during start up.
-				// mainclock will step forced by main loop
 			}
 
 		public:
@@ -2146,14 +2134,6 @@ namespace netlist
 		{
 		}
 
-#if 0
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC,
-			const pstring &sGND)
-		: m_VCC(owner, sVCC, NETLIB_DELEGATE(noop))
-		, m_GND(owner, sGND, NETLIB_DELEGATE(noop))
-		{
-		}
-#endif
 		const analog_input_t &VCC() const noexcept
 		{
 			return m_VCC;

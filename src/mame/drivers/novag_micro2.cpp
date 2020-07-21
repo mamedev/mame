@@ -7,18 +7,18 @@ Novag Micro II (model 821)
 
 This program was used in several Novag chesscomputers:
 - Novag Micro II (1st use)
+- Novag Micro III
 - Novag Presto
 - Novag Octo
 
 suspected, to be confirmed:
-- Novag Micro III
 - Novag Allegro
 - Novag Piccolo
 - Novag Alto
 
 Hardware notes:
 
-Micro II:
+Micro II, Micro III(same pcb):
 - Mitsubishi M5L8049-079P-6, 6MHz XTAL
 - buzzer, 20 leds, 8*8 chessboard buttons
 
@@ -31,7 +31,7 @@ Octo (listed differences):
 - speaker circuit is a bit different, not sure why
 
 Note that even though the MCUs are different, internal ROM contents is
-identical for Micro II, Presto, Octo.
+identical for Micro II/III, Presto, Octo.
 
 TODO:
 - controls are too sensitive, is there a bug in the CPU core timer emulation?
@@ -222,7 +222,7 @@ void micro2_state::micro2(machine_config &config)
 
 ROM_START( nmicro2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("8049_8210", 0x0000, 0x0800, CRC(29a0eb4c) SHA1(e058d6018e53ddcaa3b5ec25b33b8bff091b04db) )
+	ROM_LOAD("8049_8210.u1", 0x0000, 0x0800, CRC(29a0eb4c) SHA1(e058d6018e53ddcaa3b5ec25b33b8bff091b04db) )
 ROM_END
 
 } // anonymous namespace

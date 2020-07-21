@@ -38,11 +38,6 @@ namespace netlist
 			m_nextD = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(clk)
 		{
 			newstate(m_nextD, !m_nextD);
@@ -112,21 +107,13 @@ namespace netlist
 			connect("A.GND", "B.GND");
 			connect("A.VCC", "B.VCC");
 		}
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
+		//NETLIB_UPDATEI();
+		//NETLIB_RESETI();
 
 	private:
 		NETLIB_SUB(7474) m_A;
 		NETLIB_SUB(7474) m_B;
 	};
-
-	NETLIB_RESET(7474_dip)
-	{
-	}
-
-	NETLIB_UPDATE(7474_dip)
-	{
-	}
 
 	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7474_dip, "TTL_7474_DIP", "")

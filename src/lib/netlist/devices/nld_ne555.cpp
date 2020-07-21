@@ -83,6 +83,7 @@ namespace netlist
 		, m_ff(*this, "m_ff", false)
 		, m_last_reset(*this, "m_last_reset", false)
 		, m_overshoot(*this, "m_overshoot", 0.0)
+		, m_undershoot(*this, "m_undershoot", 0.0)
 		, m_ovlimit(0.0)
 		{
 			register_subalias("GND",  m_R3.N());    // Pin 1
@@ -95,11 +96,6 @@ namespace netlist
 			connect(m_R2.N(), m_R3.P());
 			connect(m_RDIS.N(), m_R3.N());
 			connect(m_OUT, m_ROUT.N());
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 		NETLIB_RESETI()
@@ -128,16 +124,23 @@ namespace netlist
 			const nl_fptype vthresh = clamp_hl(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
 			const nl_fptype vtrig = clamp_hl(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4));
 
+			// avoid artificial oscillation due to overshoot compensation when
+			// the control input is used.
+			const auto ovlimit = std::min(m_ovlimit, std::max(0.0, (vthresh - vtrig) / 3.0));
+
 			if (!reset && m_last_reset)
 			{
 				m_ff = false;
 			}
 			else
 			{
-				const auto delta = m_THRES() + m_overshoot - vthresh;
-				const bool bthresh = (delta > 0.0);
+#if (NL_USE_BACKWARD_EULER)
+				const bool bthresh = (m_THRES() + m_overshoot > vthresh);
 				const bool btrig = (m_TRIG() - m_overshoot > vtrig);
-
+#else
+				const bool bthresh = (m_THRES() + m_overshoot > vthresh);
+				const bool btrig = (m_TRIG() - m_undershoot > vtrig);
+#endif
 				if (!btrig)
 					m_ff = true;
 				else if (bthresh)
@@ -150,8 +153,14 @@ namespace netlist
 
 			if (m_last_out && !out)
 			{
-				m_overshoot += ((m_THRES() - vthresh)) * 2;
-				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), m_ovlimit);
+#if (NL_USE_BACKWARD_EULER)
+				m_overshoot += ((m_THRES() - vthresh)) * 2.0;
+#else
+				m_overshoot += ((m_THRES() - vthresh));
+#endif
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
+				//if (this->name() == "IC6_2")
+				//	printf("%f %s %f %f %f\n", exec().time().as_double(), this->name().c_str(), m_overshoot(), m_R2.P()(), m_THRES());
 				m_RDIS.change_state([this]()
 					{
 						m_RDIS.set_R(nlconst::magic(R_ON));
@@ -160,8 +169,13 @@ namespace netlist
 			}
 			else if (!m_last_out && out)
 			{
-				m_overshoot += (vtrig - m_TRIG()) * 2;
-				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), m_ovlimit);
+#if (NL_USE_BACKWARD_EULER)
+				m_overshoot += (vtrig - m_TRIG()) * 2.0;
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
+#else
+				m_undershoot += (vtrig - m_TRIG());
+				m_undershoot = plib::clamp(m_undershoot(), nlconst::zero(), ovlimit);
+#endif
 				m_RDIS.change_state([this]()
 					{
 						m_RDIS.set_R(nlconst::magic(R_OFF));
@@ -187,6 +201,7 @@ namespace netlist
 		state_var<bool> m_ff;
 		state_var<bool> m_last_reset;
 		state_var<nl_fptype> m_overshoot;
+		state_var<nl_fptype> m_undershoot;
 		nl_fptype m_ovlimit;
 
 		nl_fptype clamp_hl(const nl_fptype v, const nl_fptype a, const nl_fptype b) noexcept
@@ -214,7 +229,6 @@ namespace netlist
 		// The reset on R_Base executed after NE555 reset will
 		// overwrite values.
 		NETLIB_RESETI() { A.reset(); }
-		NETLIB_UPDATEI() {  }
 	private:
 		NETLIB_SUB(NE555) A;
 	};

@@ -189,9 +189,10 @@ bbc_tube_zep100m_device::bbc_tube_zep100m_device(const machine_config &mconfig, 
 void bbc_tube_zep100_device::device_start()
 {
 	m_ram = std::make_unique<uint8_t[]>(0x10000);
+	memset(m_ram.get(), 0xff, 0x10000);
 
 	/* register for save states */
-	save_pointer(NAME(m_ram), 0x100000);
+	save_pointer(NAME(m_ram), 0x10000);
 }
 
 //-------------------------------------------------

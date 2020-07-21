@@ -15,8 +15,13 @@
 
    How to enter statistics mode:
     - press Test button, "CODE" text will appear
-    - repeat 4x times: press and hold Test button until "INPUT" text appears, release button
-   You may press "Clear stats" key few times to clear all the non-volatile play statistics.
+    - repeat 4x times
+      - press Test button (code_digit - 1) times
+      - press and hold Test button until "INPUT" text appears
+      - release Test button
+    Currently we use 0000 hardware code, in such case game will accept any code sequence.
+   Now you may press "Clear stats" key few times to clear all the non-volatile play statistics.
+   Or press "Clear stats" once, then hold for a several seconds, and then press again - game will clear NVRAM and also raise few flags, effect is not known.
 
 */
 
@@ -82,6 +87,7 @@ protected:
 	void lamps_w(u8 data);
 	u8 ppi2a_r();
 	void ppi2c_w(u8 data);
+	u8 code_r(offs_t offset);
 
 	std::unique_ptr<u8[]> m_sram;
 	bool m_sram_en;
@@ -124,7 +130,7 @@ void dinaris_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_cold_boot = 1;
 		break;
 	default:
-		throw emu_fatalerror("Unknown id in special_state::device_timer");
+		throw emu_fatalerror("Unknown id in dinaris_state::device_timer");
 	}
 }
 
@@ -152,11 +158,11 @@ void dinaris_state::dice_mem(address_map &map)
 
 void dinaris_state::dice_io(address_map &map)
 {
-	map.global_mask(0xff);
+	map.global_mask(0x000f);
 	map(0x00, 0x03).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x0c, 0x0d).nopr(); // test mode access code, DIPSW maybe ?
+	map(0x0c, 0x0d).r(FUNC(dinaris_state::code_r)).mirror(0x02);
 }
 
 // borrowed from Specialist MX, probably wrong
@@ -167,7 +173,7 @@ static constexpr rgb_t specimx_pens[16] = {
 	{ 0x00, 0xaa, 0xaa }, // 3
 	{ 0xaa, 0x00, 0x00 }, // 4
 	{ 0xaa, 0x00, 0xaa }, // 5
-	{ 0xaa, 0x55, 0x00 }, // 6
+	{ 0xaa, 0xaa, 0x00 }, // 6
 	{ 0xaa, 0xaa, 0xaa }, // 7
 	{ 0x55, 0x55, 0x55 }, // 8
 	{ 0x55, 0x55, 0xff }, // 9
@@ -186,6 +192,7 @@ void dinaris_state::dice_palette(palette_device &palette) const
 
 u32 dinaris_state::screen_update_dice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// note: attribute area bytes set colors for 4x2 pix screen elements, not 8x1 like Specialist MX.
 	for (int x = 0; x < 48; x++)
 	{
 		for (int y = 0; y < 256; y++)
@@ -228,20 +235,24 @@ void dinaris_state::ppi2c_w(u8 data)
 	m_hopper->motor_w(((data & 0x68) == 0x60) ? 1 : 0);
 }
 
+u8 dinaris_state::code_r(offs_t offset)
+{
+	// it is not clear how statistics mode code was set, related components was removed from PCB
+	// currently we return 0 so game will accept any code sequence
+	return 0x0000 >> (offset * 8);
+}
+
 void dinaris_state::dice(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, 2000000); // guess
+	Z80(config, m_maincpu, XTAL(8'000'000) / 4); // not confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &dinaris_state::dice_mem);
 	m_maincpu->set_addrmap(AS_IO, &dinaris_state::dice_io);
 	m_maincpu->set_vblank_int("screen", FUNC(dinaris_state::irq0_line_hold));
 
 	// Video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(384, 256);
-	screen.set_visarea(0, 384 - 1, 0, 256 - 1);
+	screen.set_raw(XTAL(8'000'000), 512, 0, 384, 312, 0, 256);
 	screen.set_screen_update(FUNC(dinaris_state::screen_update_dice));
 	screen.set_palette(m_palette);
 
@@ -252,11 +263,11 @@ void dinaris_state::dice(machine_config &config)
 	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(2000000); // guess
+	m_pit->set_clk<0>(XTAL(8'000'000) / 4);
 	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
-	m_pit->set_clk<1>(2000000); // guess
+	m_pit->set_clk<1>(XTAL(8'000'000) / 4);
 	m_pit->out_handler<1>().set("custom", FUNC(specimx_sound_device::set_input_ch1));
-	m_pit->set_clk<2>(2000000); // guess
+	m_pit->set_clk<2>(XTAL(8'000'000) / 4);
 	m_pit->out_handler<2>().set("custom", FUNC(specimx_sound_device::set_input_ch2));
 
 	// Devices

@@ -10,6 +10,8 @@
 
 #include "diserial.h"
 
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

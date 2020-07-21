@@ -191,7 +191,6 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
-craft.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -278,6 +277,7 @@ eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
+exorciser.cpp
 exorterm.cpp
 exp85.cpp
 facit4440.cpp
@@ -494,6 +494,9 @@ leapster.cpp
 learnwin.cpp
 lee1214.cpp
 lft.cpp
+lft_chiptune.cpp
+lft_craft.cpp
+lft_phasor.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp
@@ -650,6 +653,7 @@ notetaker.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
+novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
@@ -820,11 +824,13 @@ rzone.cpp
 sacstate.cpp
 sag.cpp
 sage2.cpp
+saitek_ccompan.cpp
 saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_exchess.cpp
+saitek_intchess.cpp
 saitek_leonardo.cpp
 saitek_mark5.cpp
 saitek_minichess.cpp

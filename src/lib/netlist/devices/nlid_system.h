@@ -28,13 +28,12 @@ namespace devices
 	{
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
+		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
 		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
 		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
-		NETLIB_UPDATEI() { }
-		//NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 		//NETLIB_UPDATE_PARAMI() { }
 	public:
 		param_logic_t m_use_deactivate;
@@ -64,11 +63,6 @@ namespace devices
 		NETLIB_UPDATE_PARAMI()
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-		}
-
-		NETLIB_UPDATEI()
-		{
-			fb();
 		}
 
 		NETLIB_HANDLERI(fb)
@@ -118,11 +112,6 @@ namespace devices
 		}
 		//NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI()
-
-		NETLIB_UPDATEI()
-		{
-			fb();
-		}
 
 	private:
 		NETLIB_HANDLERI(fb)
@@ -192,11 +181,6 @@ namespace devices
 
 		}
 
-		NETLIB_UPDATEI()
-		{
-			first();
-		}
-
 		NETLIB_RESETI()
 		{
 			m_cnt = 0;
@@ -261,7 +245,6 @@ namespace devices
 		{
 		}
 
-		NETLIB_UPDATEI() { }
 		NETLIB_RESETI() { m_Q.initial(0); }
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -286,7 +269,6 @@ namespace devices
 		{
 		}
 
-		NETLIB_UPDATEI() { }
 		NETLIB_RESETI() { for (auto &q : m_Q) q.initial(0); }
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -310,7 +292,6 @@ namespace devices
 		{
 		}
 
-		NETLIB_UPDATEI() {  }
 		NETLIB_RESETI() { m_Q.initial(nlconst::zero()); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 
@@ -329,11 +310,13 @@ namespace devices
 		, m_Q(*this, "Q")
 		{
 		}
-		NETLIB_UPDATEI()
+
+		NETLIB_UPDATE_PARAMI()
 		{
 			m_Q.push(nlconst::zero());
 		}
-		NETLIB_RESETI() { }
+
+		//NETLIB_RESETI() {}
 	protected:
 		analog_output_t m_Q;
 	};
@@ -351,8 +334,7 @@ namespace devices
 		}
 
 	protected:
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
+		//NETLIB_RESETI() {}
 
 	private:
 		NETLIB_HANDLERI(noop)
@@ -371,8 +353,8 @@ namespace devices
 	{
 	public:
 		NETLIB_CONSTRUCTOR(frontier)
-		, m_RIN(*this, "m_RIN", true)
-		, m_ROUT(*this, "m_ROUT", true)
+		, m_RIN(*this, "m_RIN", NETLIB_DELEGATE(input))
+		, m_ROUT(*this, "m_ROUT", NETLIB_DELEGATE(input))
 		, m_I(*this, "_I", NETLIB_DELEGATE(input))
 		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", nlconst::magic(1.0e6))
@@ -392,11 +374,6 @@ namespace devices
 		{
 			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
 			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
-		}
-
-		NETLIB_UPDATEI()
-		{
-			input();
 		}
 
 	private:
@@ -441,11 +418,6 @@ namespace devices
 		NETLIB_RESETI()
 		{
 			//m_Q.initial(0.0);
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 		NETLIB_HANDLERI(inputs)
@@ -505,11 +477,6 @@ namespace devices
 		param_fp_t m_ROFF;
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			input();
-		}
-
 		NETLIB_HANDLERI(input)
 		{
 			const netlist_sig_t state = m_I();
@@ -562,11 +529,6 @@ namespace devices
 		//NETLIB_UPDATE_PARAMI();
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			input();
-		}
-
 		NETLIB_HANDLERI(input)
 		{
 			const netlist_sig_t state = m_I();
@@ -625,11 +587,6 @@ namespace devices
 		NETLIB_RESETI()
 		{
 			m_last_state = 0;
-		}
-
-		NETLIB_UPDATEI()
-		{
-			inputs();
 		}
 
 		//NETLIB_UPDATE_PARAMI();
@@ -710,11 +667,6 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI()
-		{
-			input();
-		}
-
 		NETLIB_HANDLERI(input)
 		{
 			nl_fptype val = m_dis.var()(m_mt.var());

@@ -50,11 +50,6 @@ namespace netlist
 			m_shift = 0x1ffff;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_UPDATE_PARAMI()
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_FREQ()));

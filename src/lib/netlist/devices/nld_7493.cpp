@@ -102,11 +102,6 @@ namespace netlist
 			m_CLKB.set_state(logic_t::STATE_INP_HL);
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		NETLIB_HANDLERI(inputs)
 		{
 			if (!(m_R1() && m_R2()))
@@ -176,8 +171,7 @@ namespace netlist
 			// register_subalias("13", ); -. NC
 			register_subalias("14", "A.CLKA");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(7493) A;
 	};

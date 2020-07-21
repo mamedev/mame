@@ -31,7 +31,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	uint8_t keyboard_r();

@@ -54,11 +54,6 @@ namespace devices
 			}
 		}
 
-		NETLIB_UPDATEI()
-		{
-			other();
-		}
-
 		NETLIB_HANDLERI(clk)
 		{
 			if (m_clrq)
@@ -114,8 +109,7 @@ namespace devices
 			register_subalias("8", "A.GND");
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(74174) A;
 	};

@@ -6,18 +6,20 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_MACHINE_PDP11_H_
-#define MAME_MACHINE_PDP11_H_
+#ifndef MAME_MACHINE_PDP11_H
+#define MAME_MACHINE_PDP11_H
+
+#pragma once
 
 // bit definitions for generic device CSR
 
 enum : uint16_t
 {
-	CSR_GO =	0000001,
-	CSR_IE =	0000100,	// interrupt enable
-	CSR_DONE =	0000200,
-	CSR_BUSY =	0004000,
-	CSR_ERR =	0100000
+	CSR_GO =    0000001,
+	CSR_IE =    0000100,    // interrupt enable
+	CSR_DONE =  0000200,
+	CSR_BUSY =  0004000,
+	CSR_ERR =   0100000
 };
 
 
@@ -32,4 +34,4 @@ enum : uint16_t
 	do { *_storage = ((*_storage & ~_mask) | (_data & _mask)); } while (0)
 
 
-#endif /* MAME_MACHINE_PDP11_H_ */
+#endif // MAME_MACHINE_PDP11_H

@@ -308,6 +308,7 @@ SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
 SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
+SOUNDS["RP2C33_SOUND"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -551,6 +552,7 @@ MACHINES["LSI53C810"] = true
 MACHINES["M3002"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
+MACHINES["M68SFDC"] = true
 MACHINES["M6M80011AP"] = true
 MACHINES["MB14241"] = true
 MACHINES["MB3773"] = true
@@ -1042,6 +1044,7 @@ FORMATS["LVIV_LVT"] = true
 FORMATS["M20_DSK"] = true
 FORMATS["M5_DSK"] = true
 FORMATS["MBEE_CAS"] = true
+FORMATS["MDOS_DSK"] = true
 FORMATS["MFM_HD"] = true
 FORMATS["MM_DSK"] = true
 FORMATS["MS0515_DSK"] = true
@@ -1084,6 +1087,7 @@ FORMATS["SPC1000_CAS"] = true
 FORMATS["ST_DSK"] = true
 FORMATS["SVI_CAS"] = true
 FORMATS["SVI_DSK"] = true
+FORMATS["SWD_DSK"] = true
 FORMATS["TANDY2K_DSK"] = true
 FORMATS["THOM_CAS"] = true
 FORMATS["THOM_DSK"] = true
@@ -1885,7 +1889,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/b2m.cpp",
 	MAME_DIR .. "src/mame/includes/b2m.h",
 	MAME_DIR .. "src/mame/machine/b2m.cpp",
-	MAME_DIR .. "src/mame/video/b2m.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "bondwell")
@@ -1992,7 +1995,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ut88.cpp",
 	MAME_DIR .. "src/mame/includes/ut88.h",
 	MAME_DIR .. "src/mame/machine/ut88.cpp",
-	MAME_DIR .. "src/mame/video/ut88.cpp",
 	MAME_DIR .. "src/mame/drivers/vector06.cpp",
 	MAME_DIR .. "src/mame/includes/vector06.h",
 	MAME_DIR .. "src/mame/machine/vector06.cpp",
@@ -2498,7 +2500,9 @@ createMESSProjects(_target, _subtarget, "homebrew")
 files {
 	MAME_DIR .. "src/mame/drivers/4004clk.cpp",
 	MAME_DIR .. "src/mame/drivers/68ksbc.cpp",
-	MAME_DIR .. "src/mame/drivers/craft.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_chiptune.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_craft.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_phasor.cpp",
 	MAME_DIR .. "src/mame/drivers/dcebridge.cpp",
 	MAME_DIR .. "src/mame/drivers/homez80.cpp",
 	MAME_DIR .. "src/mame/drivers/p112.cpp",
@@ -2829,7 +2833,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/primo.cpp",
 	MAME_DIR .. "src/mame/includes/primo.h",
 	MAME_DIR .. "src/mame/machine/primo.cpp",
-	MAME_DIR .. "src/mame/video/primo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "microsoft")
@@ -2898,6 +2901,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "motorola")
 files {
+	MAME_DIR .. "src/mame/drivers/exorciser.cpp",
 	MAME_DIR .. "src/mame/drivers/m6805evs.cpp",
 	MAME_DIR .. "src/mame/drivers/m68705prg.cpp",
 	MAME_DIR .. "src/mame/drivers/mekd1.cpp",
@@ -3080,6 +3084,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_const.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_micro.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_micro2.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
@@ -3369,10 +3374,12 @@ files {
 
 createMESSProjects(_target, _subtarget, "saitek")
 files {
+	MAME_DIR .. "src/mame/drivers/saitek_ccompan.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_cp2000.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_exchess.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_intchess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_leonardo.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_minichess.cpp",

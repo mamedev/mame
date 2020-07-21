@@ -11,12 +11,11 @@
     Photos and manual https://k1.spdns.de/Vintage/Sinclair/82/Peripherals/Disc%20Interfaces/Logitek%20Proceed%201%20C64%20Disc%20Interface/
 
     Notes / TODOs:
-     - floppy drive access doesn't works with "Device timeout" error message.
-       cause is not known, possible due to not correct IEC hookup or some Z80PIO emulation bugs.
+    - require "quantum perfect" host machine config, otherwise floppy drive access doesn't work with "Device timeout" error message.
 
-     - ROM paging performed by undumped PROM, current logic might be incorrect or innacurate.
-       wiring: A0-A5 - Z80 A8-A13, A6 - PIO PB7, A7 - nc, /CE1 - A14, /CE2 - A15,
-       Q1 - ROM A11, Q2 - ROM A10, Q3 - ROM /CE, Q4 - /ROMCS
+    - ROM paging performed by undumped PROM, current logic might be innacurate.
+      wiring: A0-A5 - Z80 A8-A13, A6 - PIO PB7, A7 - nc, /CE1 - A14, /CE2 - A15,
+      Q1 - ROM A11, Q2 - ROM A10, Q3 - ROM /CE, Q4 - /ROMCS
 
 *********************************************************************/
 
@@ -28,7 +27,7 @@
     DEVICE DEFINITIONS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SPECTRUM_PROCEED, spectrum_proceed_device, "spectrum_proceed", "Proceed 1 Interface")
+DEFINE_DEVICE_TYPE(SPECTRUM_PROCEED, spectrum_proceed_device, "spectrum_proceed", "Logitek Proceed 1 Interface")
 
 
 //-------------------------------------------------
@@ -69,13 +68,11 @@ void spectrum_proceed_device::device_add_mconfig(machine_config &config)
 {
 	Z80PIO(config, m_z80pio, 3500000);
 	m_z80pio->out_pa_callback().set(FUNC(spectrum_proceed_device::pioa_w));
-	m_z80pio->in_pb_callback().set(FUNC(spectrum_proceed_device::piob_r)); // this works
+	m_z80pio->in_pb_callback().set(FUNC(spectrum_proceed_device::piob_r));
 	m_z80pio->out_pb_callback().set(FUNC(spectrum_proceed_device::piob_w));
 	m_z80pio->out_int_callback().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
-	//m_iec->clk_callback().set(m_z80pio, FUNC(z80pio_device::pb3_w)); // this not working, pio bugs ?
-	//m_iec->data_callback().set(m_z80pio, FUNC(z80pio_device::pb2_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_z80pio, FUNC(z80pio_device::pb0_w));
@@ -198,7 +195,7 @@ void spectrum_proceed_device::pioa_w(uint8_t data)
 
 uint8_t spectrum_proceed_device::piob_r()
 {
-	u8 data = 0xf2;
+	u8 data = 0;
 
 	data |= m_iec->clk_r() << 3;
 	data |= m_iec->data_r() << 2;
@@ -213,5 +210,4 @@ void spectrum_proceed_device::piob_w(uint8_t data)
 	m_iec->host_clk_w(BIT(data, 5));
 	m_iec->host_data_w(BIT(data, 4));
 	m_centronics->write_strobe(BIT(data, 1));
-	//logerror("PB %02X\n", data);
 }

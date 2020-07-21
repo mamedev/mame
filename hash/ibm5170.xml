@@ -9042,7 +9042,7 @@ license:CC0
 	</software>
 
 	<software name="b17">
-		<description>B-17 Flying Fortress</description>
+		<description>B-17 Flying Fortress (3.5")</description>
 		<year>1992</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9063,6 +9063,37 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="B-17 Flying Fortress (1992)(MicroProse)(Disk 4 of 4).dsk" size="1474560" crc="cc028485" sha1="68ade93d34ae98167d1fe25f237f17328e847a76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b17_525" cloneof="b17">
+		<description>B-17 Flying Fortress (5.25")</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="B-17 Flying Fortress [MicroProse] [1992] [5.25HD] [Disk A].img" size="1228800" crc="641a5f5c" sha1="58f1901778345507d3b5ad3d328983a134858f6c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="B-17 Flying Fortress [MicroProse] [1992] [5.25HD] [Disk B].img" size="1228800" crc="ff8885d9" sha1="523e5309376392d27ab0562b7d8f420eee3bab49"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="B-17 Flying Fortress [MicroProse] [1992] [5.25HD] [Disk C].img" size="1228800" crc="ff34c38e" sha1="c4bbde9b1ede796e3dc8e0a98778dd2c85ed1103"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="B-17 Flying Fortress [MicroProse] [1992] [5.25HD] [Disk D].img" size="1228800" crc="68e361b5" sha1="65f12941e448e9585fe684c584b51babebb746af"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="B-17 Flying Fortress [MicroProse] [1992] [5.25HD] [Disk E].img" size="1228800" crc="2d11c55e" sha1="bc18cefd20f39cfa85d23eece42315d262da1cac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13594,6 +13625,7 @@ license:CC0
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="Particle Systems" />
+		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="0d95139a" sha1="3444dcff49f379efc4d1e62a89415816ea6c179a"/>

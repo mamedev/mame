@@ -64,11 +64,6 @@ namespace netlist
 			m_last_CLK = 0;
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		friend class NETLIB_NAME(74164_dip);
 	private:
 		logic_input_t m_A;

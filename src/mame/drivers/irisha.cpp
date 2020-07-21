@@ -2,16 +2,23 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Irisha driver by Miodrag Milanovic
+Irisha driver by Miodrag Milanovic
 
-        2008-03-27 Preliminary driver.
+2008-03-27 Preliminary driver.
 
-        Jump addresses:
-        Option 1: 0800 (Monitor - the only choice that works)
-        Option 2: 046E
-        Option 3: 0423 (then jumps to 4000)
-        Option 4: 0501
-        Option 5: 042E
+Jump addresses:
+  Option 1: 0800 (Monitor - the only choice that works)
+  Option 2: 046E
+  Option 3: 0423 (then jumps to 4000)
+  Option 4: 0501
+  Option 5: 042E
+
+TODO:
+- Fix options 2,3,4,5
+- Other emulator has yellow text on blue background
+- Need info on fdc (used in option 3) ports 20-2F,38
+- Currently no way to load or save software, and does any exist?
+- Other emulator has clones/variants with different menus
 
 ****************************************************************************/
 
@@ -34,27 +41,27 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
-		, m_pit(*this, "pit8253")
+		, m_pit(*this, "pit")
 		, m_speaker(*this, "speaker")
-		, m_keyboard(*this, "LINE%u", 0)
+		, m_keyboard(*this, "LINE%u", 0U)
 	{ }
 
 	void irisha(machine_config &config);
 
 private:
-	uint8_t irisha_keyboard_r();
-	uint8_t irisha_8255_portb_r();
-	uint8_t irisha_8255_portc_r();
-	void irisha_8255_porta_w(uint8_t data);
-	void irisha_8255_portb_w(uint8_t data);
-	void irisha_8255_portc_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t portb_r();
+	uint8_t portc_r();
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	TIMER_CALLBACK_MEMBER(irisha_key);
-	uint32_t screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
-	void irisha_io(address_map &map);
-	void irisha_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	bool m_sg1_line;
 	bool m_keypressed;
@@ -63,8 +70,8 @@ private:
 	uint8_t m_ppi_portc;
 	emu_timer *m_key_timer;
 	void update_speaker();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<speaker_sound_device> m_speaker;
@@ -73,20 +80,20 @@ private:
 
 
 /* Address maps */
-void irisha_state::irisha_mem(address_map &map)
+void irisha_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();  // ROM
-	map(0x4000, 0xdfff).ram();  // RAM
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xdfff).ram();
 	map(0xe000, 0xffff).ram().share("videoram");
 }
 
-void irisha_state::irisha_io(address_map &map)
+void irisha_state::io_map(address_map &map)
 {
-	map(0x04, 0x05).r(FUNC(irisha_state::irisha_keyboard_r));
+	map(0x04, 0x05).r(FUNC(irisha_state::keyboard_r));
 	map(0x06, 0x07).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x0B).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x0C, 0x0F).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).mask(0x01);
-	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0C, 0x0F).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).mask(0x01);
+	map(0x10, 0x13).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 /* Input ports */
@@ -198,7 +205,7 @@ INPUT_PORTS_END
 
 *************************************************/
 
-uint32_t irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t irisha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t gfx;
 	uint16_t y,ma=0,x;
@@ -228,7 +235,7 @@ uint32_t irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 
 }
 
 /* F4 Character Displayer */
-static const gfx_layout irisha_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -242,7 +249,7 @@ static const gfx_layout irisha_charlayout =
 };
 
 static GFXDECODE_START( gfx_irisha )
-	GFXDECODE_ENTRY( "maincpu", 0x3800, irisha_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x3800, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -252,7 +259,7 @@ GFXDECODE_END
 
 *************************************************/
 
-uint8_t irisha_state::irisha_8255_portb_r()
+uint8_t irisha_state::portb_r()
 {
 	if (m_keypressed==1)
 	{
@@ -263,13 +270,13 @@ uint8_t irisha_state::irisha_8255_portb_r()
 	return 0x00;
 }
 
-uint8_t irisha_state::irisha_8255_portc_r()
+uint8_t irisha_state::portc_r()
 {
 	logerror("irisha_8255_portc_r\n");
 	return 0;
 }
 
-void irisha_state::irisha_8255_porta_w(uint8_t data)
+void irisha_state::porta_w(uint8_t data)
 {
 	logerror("irisha_8255_porta_w %02x\n",data);
 
@@ -278,12 +285,12 @@ void irisha_state::irisha_8255_porta_w(uint8_t data)
 	update_speaker();
 }
 
-void irisha_state::irisha_8255_portb_w(uint8_t data)
+void irisha_state::portb_w(uint8_t data)
 {
 	logerror("irisha_8255_portb_w %02x\n",data);
 }
 
-void irisha_state::irisha_8255_portc_w(uint8_t data)
+void irisha_state::portc_w(uint8_t data)
 {
 	//logerror("irisha_8255_portc_w %02x\n",data);
 
@@ -329,7 +336,7 @@ TIMER_CALLBACK_MEMBER(irisha_state::irisha_key)
 	m_keyboard_cnt = 0;
 }
 
-uint8_t irisha_state::irisha_keyboard_r()
+uint8_t irisha_state::keyboard_r()
 {
 	uint8_t keycode = 0xff;
 
@@ -352,6 +359,11 @@ void irisha_state::machine_start()
 {
 	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
 	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
+	save_item(NAME(m_sg1_line));
+	save_item(NAME(m_keypressed));
+	save_item(NAME(m_keyboard_cnt));
+	save_item(NAME(m_ppi_porta));
+	save_item(NAME(m_ppi_portc));
 }
 
 void irisha_state::machine_reset()
@@ -368,8 +380,8 @@ void irisha_state::irisha(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &irisha_state::irisha_mem);
-	m_maincpu->set_addrmap(AS_IO, &irisha_state::irisha_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &irisha_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &irisha_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -377,7 +389,7 @@ void irisha_state::irisha(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(320, 200);
 	screen.set_visarea(0, 320-1, 0, 200-1);
-	screen.set_screen_update(FUNC(irisha_state::screen_update_irisha));
+	screen.set_screen_update(FUNC(irisha_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_irisha);
@@ -392,32 +404,32 @@ void irisha_state::irisha(machine_config &config)
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(16_MHz_XTAL / 9);
-	m_pit->out_handler<0>().set("pic8259", FUNC(pic8259_device::ir0_w));
+	m_pit->out_handler<0>().set("pic", FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(16_MHz_XTAL / 9 / 8 / 8);
 	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
 	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
 	m_pit->set_clk<2>(16_MHz_XTAL / 9);
 	m_pit->out_handler<2>().set(FUNC(irisha_state::speaker_w));
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.out_pa_callback().set(FUNC(irisha_state::irisha_8255_porta_w));
-	ppi.in_pb_callback().set(FUNC(irisha_state::irisha_8255_portb_r));
-	ppi.out_pb_callback().set(FUNC(irisha_state::irisha_8255_portb_w));
-	ppi.in_pc_callback().set(FUNC(irisha_state::irisha_8255_portc_r));
-	ppi.out_pc_callback().set(FUNC(irisha_state::irisha_8255_portc_w));
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(irisha_state::porta_w));
+	ppi.in_pb_callback().set(FUNC(irisha_state::portb_r));
+	ppi.out_pb_callback().set(FUNC(irisha_state::portb_w));
+	ppi.in_pc_callback().set(FUNC(irisha_state::portc_r));
+	ppi.out_pc_callback().set(FUNC(irisha_state::portc_w));
 
-	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259_device &pic8259(PIC8259(config, "pic", 0));
 	pic8259.out_int_callback().set_inputline(m_maincpu, 0);
 }
 
 /* ROM definition */
 
 ROM_START( irisha )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "ir_bootm.bin", 0x0000, 0x2000, CRC(7f9f4f0e) SHA1(05f97e1a1d7a15f4451129dba6c0bddc87ea748e))
 	ROM_LOAD( "ir_conou.bin", 0x2000, 0x2000, CRC(bf92beed) SHA1(696c482ba53bc6261db11061ecc7141c67f1d820))
 ROM_END
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1983, irisha,      0,      0, irisha,  irisha, irisha_state, empty_init, "MGU",   "Irisha", MACHINE_NOT_WORKING)
+COMP( 1983, irisha,      0,      0, irisha,  irisha, irisha_state, empty_init, "MGU",   "Irisha", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -27,11 +27,6 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI()
-		{
-			inputs();
-		}
-
 		void update_outputs(unsigned gt, unsigned lt, unsigned eq);
 
 		friend class NETLIB_NAME(7485_dip);
@@ -102,8 +97,7 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(7485) A;
 	};
