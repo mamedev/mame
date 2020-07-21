@@ -167,7 +167,7 @@ timer driven, the video is capable of various raster effects etc.)
 
 TODO:
       - Correctly implement characteriser protection for each game.
-      - Get the BwB games running
+      - Get the BWB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
       - Layouts needed for the other working games, and DIP switches need checking/altering (no test mode?)
@@ -1807,7 +1807,7 @@ static mpu4_chr_table blank_data[72] = {
 
 #if 0
 static const bwb_chr_table prizeinv_data1[5] = {
-//This is all wrong, but without BwB Vid booting,
+//This is all wrong, but without BWB Vid booting,
 //I can't find the right values. These should be close though
 	{0x67},{0x17},{0x0f},{0x24},{0x3c},
 };
@@ -3300,7 +3300,7 @@ ROM_START( v4frfact )
 	ROM_LOAD16_BYTE( "ff_293d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
 ROM_END
 
-/* BwB */
+/* BWB */
 ROM_START( v4bigfrt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("bi_xca__.2_0",  0x00000, 0x10000,  CRC(bdba5ce9) SHA1(e4bce58957230183b96f9d3155575005ffb002c8)) 	// standard/stake Key
@@ -4093,11 +4093,11 @@ ROM_START( v4mdice )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
 
-ROM_START( v4mdicea )
+ROM_START( v4mdice5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mpu4.rom", 0x0000, 0x010000, NO_DUMP )
+	ROM_LOAD( "release5_mpu4.rom", 0x0000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x800000, "video", 0 ) // this doesn't work with the above base roms?
+	ROM_REGION( 0x800000, "video", 0 ) // release 5 of Miami Dice based on internal strings
 	ROM_LOAD16_BYTE( "mdv58p1", 0x000001, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
 	ROM_LOAD16_BYTE( "mdv58p2", 0x000000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
 	ROM_LOAD16_BYTE( "mdv58p3", 0x100001, 0x080000, CRC(0d907e37) SHA1(b6ad78a4a7bc877d2152907df2317621f00bdc1c) )
@@ -5365,210 +5365,210 @@ GAME(  199?, v4wizea,    v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4
 GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
 GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
-/* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
+/* Games below are newer BWB games and use their own BIOS ROMs and hardware setups*/
 
 // "payout shelf unplugged", can be bypassed by opening door
-GAME(  1991, v4psi,      0,        bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4psid,     v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi,      0,        bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psid,     v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (Datapak) (MPU4 Video)",GAME_FLAGS )
 // the 68k ROMs are bad on these (one missing)
-GAME(  1991, v4psi14,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 14\" Version 1.1, set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4psi14a,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 14\" Version 1.1, set 2) (MPU4 Video)",GAME_FLAGS )
-// these show BwB and Barcrest (older game release 'INV1' but higher version of it)
-GAME(  1991, v4psibc,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (MPU4 Video)",GAME_FLAGS_OK )
-GAME(  1991, v4psibcd,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BwB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi14,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 14\" Version 1.1, set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi14a,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 14\" Version 1.1, set 2) (MPU4 Video)",GAME_FLAGS )
+// these show BWB and Barcrest (older game release 'INV1' but higher version of it)
+GAME(  1991, v4psibc,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (MPU4 Video)",GAME_FLAGS_OK )
+GAME(  1991, v4psibcd,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 
 // Tetris games, these were all sold as different machines so are not set as clones
-GAME(  1989, v4tetrs,    0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BwB / Barcrest","Tetris Payout (BWB TET1 Version 2.2, set 1) (MPU4 Video)",GAME_FLAGS_OK )
-GAME(  1989, v4tetrs1,   v4tetrs,  bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BwB / Barcrest","Tetris Payout (BWB TET1 Version 2.2, set 2) (MPU4 Video)",GAME_FLAGS_OK )
+GAME(  1989, v4tetrs,    0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Tetris Payout (BWB TET1 Version 2.2, set 1) (MPU4 Video)",GAME_FLAGS_OK )
+GAME(  1989, v4tetrs1,   v4tetrs,  bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Tetris Payout (BWB TET1 Version 2.2, set 2) (MPU4 Video)",GAME_FLAGS_OK )
 // Blox is an later version of Payout Tetris, without Tetris license? (SJM = Stuart McArthur?)
-GAME(  1990, v4blox,     0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BwB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (MPU4 Video)",GAME_FLAGS_OK )
-GAME(  1990, v4bloxd,    v4blox,   bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BwB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1990, v4blox,     0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (MPU4 Video)",GAME_FLAGS_OK )
+GAME(  1990, v4bloxd,    v4blox,   bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 //
-GAME(  1994, v4pztet,    0,        bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BwB",           "Prize Tetris (BwB) (MPU4 Video)",GAME_FLAGS_OK )
-GAME(  1994, v4pzteta,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BwB",           "Prize Tetris (BwB) (Showcase) (MPU4 Video)",GAME_FLAGS_OK ) // screen telling you to exchange tickets for prizes in the 'showcase' during attract
+GAME(  1994, v4pztet,    0,        bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (MPU4 Video)",GAME_FLAGS_OK )
+GAME(  1994, v4pzteta,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Showcase) (MPU4 Video)",GAME_FLAGS_OK ) // screen telling you to exchange tickets for prizes in the 'showcase' during attract
 // this appears to be a version of Prize Tetris without the Tetris license
-GAME(  1994, v4bulblx,   0,        bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BwB",           "Bullion Blox (BwB) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4bulblx,   0,        bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (MPU4 Video)",GAME_FLAGS )
 
 // doesn't have payout so no shelf error (no payout on prototype?), runs with door closed
 
-GAME(  199?, v4vgpok,    0,        bwbvid,     v4vgpok,    mpu4vid_state, init_bwbhack,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS_OK )
+GAME(  199?, v4vgpok,    0,        bwbvid,     v4vgpok,    mpu4vid_state, init_bwbhack,     ROT0, "BWB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS_OK )
 
 // boot and run
 
-GAME(  199?, v4redhtp,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpb,  v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (Release 3, 20p Switchable to 10p, All - Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtp,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpb,  v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, All - Cash) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4redhtparc,v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (Arcade, Cash+Tokens, 1993 Awards, 20p Fixed, Version 1.9) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtparc,v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Arcade, Cash+Tokens, 1993 Awards, 20p Fixed, Version 1.9) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1993, v4redhtp2,  v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (Release 2, 1993, 5p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
+GAME(  1993, v4redhtp2,  v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993, 5p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
 // this is older despite still being 'release 2'
-GAME(  1992, v4redhtp2z, v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (Release 2, 1992, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
+GAME(  1992, v4redhtp2z, v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1992, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
 // no matching 68k ROMs for this one
-GAME(  199?, v4redhtpunk,v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Poker (unknown release) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpunk,v4redhtp, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (unknown release) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4bubbnk,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bubbnk,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4ovrmn3,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (BwB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3a,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (BwB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3b,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (BwB) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3c,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (BwB) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3d,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Over Moon Pt3 (BwB) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3a,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3b,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3c,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3d,  v4ovrmn3, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4mazbel,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4mazbla,   v4mazbel, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbel,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbla,   v4mazbel, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4rhmaz,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Red Hot Mazooma Belle (BwB) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmaz,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (MPU4 Video)",GAME_FLAGS )
  
-GAME(  199?, v4shpwnd,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwnd,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4sixx,     0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","6-X (BwB) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sixx,     0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4cshinf,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Cash Inferno (BwB) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinf,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4sunbst,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Sunburst (BwB) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbst,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (MPU4 Video)",GAME_FLAGS ) 
 
-GAME(  199?, v4bigfrt,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bigfrta,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bigfrtb,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bigfrtc,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big Fruits (v2.0?) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bigfrt,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bigfrta,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bigfrtb,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bigfrtc,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 4) (MPU4 Video)",GAME_FLAGS )
 
 // these don't play in open door mode as they'll drop you to test mode, so need 'payout shelf' emulating.
 
-GAME(  1996, v4reno,     0,        bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release A, 20p/10GBP Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4reno8,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release 8) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4reno7,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release 7) (MPU4 Video)",GAME_FLAGS ) // no base ROM
-GAME(  1996, v4reno5,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BwB","Reno Reels (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
+GAME(  1996, v4reno,     0,        bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p/10GBP Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4reno8,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 8) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4reno7,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 7) (MPU4 Video)",GAME_FLAGS ) // no base ROM
+GAME(  1996, v4reno5,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
 // v4big40 sets  black screen after the initial boot, are they complete?
-GAME(  199?, v4big40,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40a,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40b,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40c,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40d,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40e,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 6) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40f,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 7) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40g,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 8) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40h,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 9) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40i,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 10) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40j,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 11) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40k,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Big 40 Poker (BwB) (set 12) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40a,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40b,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40c,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40d,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40e,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 6) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40f,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 7) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40g,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 8) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40h,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 9) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40i,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 10) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40j,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 11) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40k,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 12) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4dbltak,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Double Take (BwB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltaka,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Double Take (BwB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltakb,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Double Take (BwB) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltak,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltaka,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltakb,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4gldrsh,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, All - Cash) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrsht,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, All - Cash) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshk,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, All - Cash) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshl,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 25p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshm,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 25p Fixed, All - Cash) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshn,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/25p, All - Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrsho,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/25p, All - Cash) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshu,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/10p/5p, All - Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshc,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshd,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrsha,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshf,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshb,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshg,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshe,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshj,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshh,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshi,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, 20p Fixed, Cash+Token) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshp,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshq,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Showcase) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshr,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4gldrshs,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Gold Rush (BwB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Showcase) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrsh,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrsht,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshk,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshl,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 25p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshm,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 25p Fixed, All - Cash) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshn,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/25p, All - Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrsho,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/25p, All - Cash) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshu,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, All - Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshc,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshd,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrsha,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshf,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshb,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshg,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshe,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshj,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Showcase) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshh,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshi,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, Cash+Token) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshp,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshq,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Showcase) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshr,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4gldrshs,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Showcase) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4timebn,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebna,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebnb,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 3) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebnc,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 4) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebnd,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 5) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebne,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Time Bandit (BwB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebn,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebna,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebnb,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebnc,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 4) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebnd,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 5) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebne,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
 
 // Release D
-GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montea,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4monteb,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4montec,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4monted,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4montee,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 6) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montef,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 7) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteg,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release D, set 8) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montea,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4monteb,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montec,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4monted,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montee,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montef,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 7) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteg,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, set 8) (MPU4 Video)",GAME_FLAGS ) 
 // Release 9
-GAME(  199?, v4monte9,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9a,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9b,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 3) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9c,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 4) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9d,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 5) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9e,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 6) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9f,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 7) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9g,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 8) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9h,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 9) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9i,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 10) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9j,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 11) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9k,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 12) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9l,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 13) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9m,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 14) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9n,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 15) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9o,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release 9, set 16) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9a,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9b,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9c,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 4) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9d,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 5) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9e,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9f,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 7) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9g,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 8) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9h,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 9) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9i,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 10) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9j,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 11) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9k,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 12) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9l,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 13) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9m,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 14) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9n,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 15) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9o,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, set 16) (MPU4 Video)",GAME_FLAGS ) 
 // no suitable 68k ROMs for these
-GAME(  199?, v4monteh,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montei,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montej,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 3) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montek,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 4) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montel,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 5) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montem,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 6) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monten,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 7) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteo,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 8) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montep,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 9) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteq,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 10) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monter,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 11) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montes,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 12) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montet,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 13) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteu,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 14) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montev,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 15) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montew,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 16) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montex,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 17) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montey,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 18) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montez,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 19) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaa,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 20) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteab,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 21) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteac,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 22) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montead,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 23) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteae,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 24) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaf,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 25) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteag,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 26) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteah,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 27) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteai,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 28) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteaj,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 29) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteak,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 30) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteal,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 31) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteam,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 32) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4montean,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 33) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 34) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteh,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montei,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montej,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montek,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 4) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montel,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 5) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montem,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monten,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 7) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteo,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 8) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montep,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 9) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteq,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 10) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monter,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 11) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montes,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 12) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montet,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 13) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteu,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 14) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montev,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 15) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montew,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 16) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montex,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 17) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montey,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 18) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montez,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 19) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteaa,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 20) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteab,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 21) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteac,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 22) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montead,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 23) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteae,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 24) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteaf,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 25) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteag,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 26) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteah,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 27) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteai,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 28) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteaj,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 29) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteak,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 30) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteal,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 31) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteam,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 32) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4montean,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 33) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 34) (MPU4 Video)",GAME_FLAGS ) 
 // mismatched ROMs
-GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BwB","Monte Carlo Or Bust (BwB) (Release ?, set 35) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 35) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (Release 8) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
-GAME(  1995, v4mdicea,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BwB","Miami Dice (BwB) (Release ?) (MPU4 Video)",GAME_FLAGS ) // no base ROM
+GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?  drops to test mode with door open
+GAME(  1995, v4mdice5,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
 // other issues
 
 
-GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Megabucks Poker (BwB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?, v4megbuk,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Megabucks Poker (BWB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
-GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BwB","Reno Casino (BwB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?, v4rencas,   0,        bwbvid,     mpu4,     mpu4vid_state, init_bwbhack,     ROT0, "BWB","Reno Casino (BWB) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
 
 /* Uncertain BIOS */
-GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BwB","Fruit Factory (BwB) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
-/* All contain BwB video in the BIOS rom tho */
-/* These seem to use the other palette chip (BT471). and use the German BwB bank setup, so may need more work */
+/* All contain BWB video in the BIOS rom tho */
+/* These seem to use the other palette chip (BT471). and use the German BWB bank setup, so may need more work */
 GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Miami Dice (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
