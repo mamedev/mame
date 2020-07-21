@@ -15,10 +15,10 @@ namespace netlist
 	NETLIB_OBJECT(9314)
 	{
 		NETLIB_CONSTRUCTOR(9314)
-		, m_EQ(*this, "EQ")
-		, m_MRQ(*this, "MRQ")
-		, m_SQ(*this, {"S0Q", "S1Q", "S2Q", "S3Q"})
-		, m_D(*this, {"D0", "D1", "D2", "D3"})
+		, m_EQ(*this, "EQ", NETLIB_DELEGATE(inputs))
+		, m_MRQ(*this, "MRQ", NETLIB_DELEGATE(inputs))
+		, m_SQ(*this, {"S0Q", "S1Q", "S2Q", "S3Q"}, NETLIB_DELEGATE(inputs))
+		, m_D(*this, {"D0", "D1", "D2", "D3"}, NETLIB_DELEGATE(inputs))
 		, m_Q(*this, {"Q0", "Q1", "Q2", "Q3"})
 		, m_last_EQ(*this, "m_last_EQ", 0)
 		, m_last_MRQ(*this, "m_last_MRQ", 0)
@@ -38,10 +38,38 @@ namespace netlist
 			m_last_Q = 0;
 		}
 
-		NETLIB_UPDATEI();
-
 		friend class NETLIB_NAME(9314_dip);
 	private:
+		NETLIB_HANDLERI(inputs)
+		{
+			netlist_time delay = NLTIME_FROM_NS(24); //FIXME!
+			if (!m_MRQ())
+			{
+				/* Reset! */
+				for (std::size_t i=0; i<4; i++)
+					m_Q[i].push(0, delay);
+			} else {
+				for (std::size_t i=0; i<4; i++)
+				{
+					if (m_SQ[i]())
+					{
+						/* R-S Mode */
+						// FIXME: R-S mode is not yet implemented!
+					}
+					else
+					{
+						/* D Mode */
+						if (!m_EQ())
+						{
+							m_Q[i].push(m_D[i](), delay);
+							m_last_Q &= ~(1 << i);
+							m_last_Q |= (m_D[i]() << i);
+						}
+					}
+				}
+			}
+		}
+
 		logic_input_t m_EQ;
 		logic_input_t m_MRQ;
 		object_array_t<logic_input_t, 4> m_SQ;
@@ -82,36 +110,6 @@ namespace netlist
 		private:
 			NETLIB_SUB(9314) A;
 	};
-
-	NETLIB_UPDATE(9314)
-	{
-		netlist_time delay = NLTIME_FROM_NS(24); //FIXME!
-		if (!m_MRQ())
-		{
-			/* Reset! */
-			for (std::size_t i=0; i<4; i++)
-				m_Q[i].push(0, delay);
-		} else {
-			for (std::size_t i=0; i<4; i++)
-			{
-				if (m_SQ[i]())
-				{
-					/* R-S Mode */
-					// FIXME: R-S mode is not yet implemented!
-				}
-				else
-				{
-					/* D Mode */
-					if (!m_EQ())
-					{
-						m_Q[i].push(m_D[i](), delay);
-						m_last_Q &= ~(1 << i);
-						m_last_Q |= (m_D[i]() << i);
-					}
-				}
-			}
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(9314,     "TTL_9314",     "+EQ,+MRQ,+S0Q,+S1Q,+S2Q,+S3Q,+D0,+D1,+D2,+D3,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(9314_dip, "TTL_9314_DIP", "")

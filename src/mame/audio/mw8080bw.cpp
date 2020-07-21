@@ -715,6 +715,24 @@ void seawolf_audio_device::device_start()
  *
  *************************************/
 
+// Sound board volume potentiometers. By default, these are all set to their
+// midpoint values.
+
+static INPUT_PORTS_START(gunfight_audio)
+	PORT_START("POT_1_LEFT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Left Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_left_master_vol")
+	PORT_START("POT_2_RIGHT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Right Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_master_vol")
+	PORT_START("POT_3_LEFT_SHOT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Left Shot Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_left_shot_vol")
+	PORT_START("POT_4_RIGHT_SHOT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Right Shot Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_shot_vol")
+	PORT_START("POT_5_LEFT_HIT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Left Hit Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_left_hit_vol")
+	PORT_START("POT_6_RIGHT_HIT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Right Hit Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_hit_vol")
+INPUT_PORTS_END
+
 gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, GUNFIGHT_AUDIO, tag, owner, clock),
 	m_left_shot(*this, "sound_nl:left_shot"),
@@ -733,10 +751,10 @@ void gunfight_audio_device::write(u8 data)
 	// the 74175 latches and inverts the top 4 bits
 	switch ((~data >> 4) & 0x0f)
 	{
-	case 0x01: // LEFT SHOOT sound (left speaker)
+	case 0x01: // LEFT SHOT sound (left speaker)
 		m_left_shot->write_line(1);
 		break;
-	case 0x02: // RIGHT SHOOT sound (right speaker)
+	case 0x02: // RIGHT SHOT sound (right speaker)
 		m_right_shot->write_line(1);
 		break;
 	case 0x03: // LEFT HIT sound (left speaker)
@@ -770,15 +788,30 @@ void gunfight_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:left_hit",   "I_LEFT_HIT.IN",  0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:right_hit",  "I_RIGHT_HIT.IN",  0);
 
-	// Multipliers set so that the highest output spikes of
-	// +/- 3 volts at mid potentiometer settings give safe
-	// non-clipping sample values of +/- 30,000. This would
-	// lead to clipping if all the potentiometers were set to max,
-	// but that's unlikely to happen, since the potentiometers are
-	// currently fixed and even on the real machine were service
-	// adjustments only.
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(30000.0 / 3.0, 0.0);
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(30000.0 / 3.0, 0.0);
+	// With all the volume potentiometers at their default midpoint
+	// settings, the highest output spikes are around +/- 3 volts, for an
+	// extreme output swing of 6 volts. Gun Fight's audio power amplifiers
+	// are configured with a voltage gain of 15 and have a single power
+	// supply of about 22 volts, so they will definitely clip the highest
+	// output peaks, but we don't model them. Instead, be cautious: scale
+	// the outputs before the power amps so that the highest output spikes
+	// of +/- 3 volts just reach the clipping limits for signed 16-bit
+	// samples.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(32767.0 / 3.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(32767.0 / 3.0, 0.0);
+
+	// Netlist volume-potentiometer interfaces
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_master_vol", "R103.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_right_master_vol", "R203.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_shot_vol", "R123.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_right_shot_vol", "R223.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_hit_vol", "R110.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_right_hit_vol", "R210.DIAL");
+}
+
+ioport_constructor gunfight_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(gunfight_audio);
 }
 
 void gunfight_audio_device::device_start()

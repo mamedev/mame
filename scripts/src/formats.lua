@@ -823,6 +823,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fl1_dsk.h,FORMATS["FL1_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["FL1_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/fl1_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/fl1_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/flex_dsk.h,FORMATS["FLEX_DSK"] = true
 --------------------------------------------------
 
@@ -1591,6 +1603,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/sdd_dsk.h,FORMATS["SDD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SDD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/sdd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/sdd_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sf7000_dsk.h,FORMATS["SF7000_DSK"] = true
 --------------------------------------------------
 
@@ -1706,6 +1730,18 @@ if (FORMATS["SVI_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/svi_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/svi_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/swd_dsk.h,FORMATS["SWD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SWD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/swd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/swd_dsk.h",
 	}
 end
 

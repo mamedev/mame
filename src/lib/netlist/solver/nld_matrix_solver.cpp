@@ -46,9 +46,10 @@ namespace solver
 		, m_iterative_total(*this, "m_iterative_total", 0)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
 		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
+		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
 		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
-		, m_fb_sync(*this, "FB_sync")
+		, m_fb_sync(*this, "FB_sync", nldelegate(&matrix_solver_t::fb_sync, this))
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{
@@ -428,69 +429,124 @@ namespace solver
 
 	void matrix_solver_t::reset()
 	{
-		m_last_step = netlist_time_ext::zero();
+		//m_last_step = netlist_time_ext::zero();
 	}
 
-	void matrix_solver_t::step(netlist_time delta) noexcept
+	void matrix_solver_t::step(timestep_type ts_type, netlist_time delta) noexcept
 	{
 		const auto dd(delta.as_fp<fptype>());
 		for (auto &d : m_step_funcs)
-			d(dd);
+			d(ts_type, dd);
+	}
+
+	bool matrix_solver_t::solve_nr_base()
+	{
+		bool this_resched(false);
+		std::size_t newton_loops = 0;
+		do
+		{
+			update_dynamic();
+			// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
+			this->m_stat_calculations++;
+			this->vsolve_non_dynamic();
+			this_resched = this->check_err();
+			this->store();
+			newton_loops++;
+		} while (this_resched && newton_loops < m_params.m_nr_loops);
+
+		m_stat_newton_raphson += newton_loops;
+		if (this_resched)
+			m_stat_newton_raphson_fail++;
+		return this_resched;
+	}
+
+	netlist_time matrix_solver_t::newton_loops_exceeded(netlist_time delta)
+	{
+		netlist_time next_time_step;
+		bool resched(false);
+
+		restore();
+		step(timestep_type::RESTORE, delta);
+
+		for (std::size_t i=0; i< 10; i++)
+		{
+			backup();
+			step(timestep_type::FORWARD, netlist_time::from_fp(m_params.m_min_ts_ts()));
+			resched = solve_nr_base();
+			// update timestep calculation
+			next_time_step = compute_next_timestep(m_params.m_min_ts_ts(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
+			delta -= netlist_time_ext::from_fp(m_params.m_min_ts_ts());
+		}
+		// try remaining time using compute_next_timestep
+		while (delta > netlist_time::zero())
+		{
+			if (next_time_step > delta)
+				next_time_step = delta;
+			backup();
+			step(timestep_type::FORWARD, next_time_step);
+			delta -= next_time_step;
+			resched = solve_nr_base();
+			next_time_step = compute_next_timestep(next_time_step.as_fp<nl_fptype>(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
+		}
+
+		if (m_stat_newton_raphson % 100 == 0)
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3(100, this->name(), exec().time().as_double() * 1e6));
+
+		if (resched && !m_Q_sync.net().is_queued())
+		{
+			// reschedule ....
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2(this->name(), exec().time().as_double() * 1e6));
+			// FIXME: test and enable - this is working better, though not optimal yet
+#if 0
+			// Don't store, the result can not be used
+			return netlist_time::from_fp(m_params.m_nr_recalc_delay());
+#else
+			//restore(); // restore old voltages
+			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
+#endif
+		}
+		if (m_params.m_dynamic_ts)
+			return next_time_step;
+
+		return netlist_time::from_fp(m_params.m_max_timestep);
 	}
 
 	netlist_time matrix_solver_t::solve(netlist_time_ext now)
 	{
-		const netlist_time_ext delta = now - m_last_step();
+		netlist_time_ext delta = now - m_last_step();
+		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!
 		if (delta < netlist_time_ext::quantum())
+		{
+			PFDEBUG(printf("solve return\n");)
 			return netlist_time::zero();
+		}
 
+		backup(); // save voltages for backup and timestep calculation
 		// update all terminals for new time step
 		m_last_step = now;
-		step(static_cast<netlist_time>(delta));
 
 		++m_stat_vsolver_calls;
 		if (dynamic_device_count() != 0)
 		{
-			bool this_resched(false);
-			std::size_t newton_loops = 0;
-			do
-			{
-				update_dynamic();
-				// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
-				this->m_stat_calculations++;
-				this->vsolve_non_dynamic();
-				this_resched = this->check_err();
-				this->store();
-				newton_loops++;
-			} while (this_resched && newton_loops < m_params.m_nr_loops);
+			step(timestep_type::FORWARD, delta);
+			const auto resched = solve_nr_base();
 
-			m_stat_newton_raphson += newton_loops;
-			// reschedule ....
-			if (this_resched && !m_Q_sync.net().is_queued())
-			{
-				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
-				// FIXME: test and enable - this is working better, though not optimal yet
-#if 0
-				// Don't store, the result can not be used
-				return netlist_time::from_fp(m_params.m_nr_recalc_delay());
-#else
-				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
-#endif
-			}
+			if (resched)
+				return newton_loops_exceeded(delta);
 		}
 		else
 		{
+			step(timestep_type::FORWARD, delta);
 			this->m_stat_calculations++;
 			this->vsolve_non_dynamic();
 			this->store();
 		}
 
-
 		if (m_params.m_dynamic_ts)
-			return compute_next_timestep(delta.as_fp<fptype>(), m_params.m_max_timestep);
+			return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_min_timestep, m_params.m_max_timestep);
 
 		return netlist_time::from_fp(m_params.m_max_timestep);
 	}

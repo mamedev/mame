@@ -23,8 +23,7 @@ namespace factory {
 		{
 		}
 	protected:
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
+		//NETLIB_RESETI() {}
 	};
 
 	element_t::element_t(const pstring &name, properties &&props)

@@ -109,7 +109,7 @@ void bbc_userport_slot_device::pb_w(uint8_t data)
 #include "beebspch.h"
 //#include "digitiser.h"
 //#include "ev1.h"
-#include "palette.h"
+#include "palext.h"
 #include "pointer.h"
 #include "usersplit.h"
 //#include "vci.h"

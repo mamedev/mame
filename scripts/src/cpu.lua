@@ -44,7 +44,6 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
-		MAME_DIR .. "src/devices/cpu/x86emit.h",
 	}
 end
 

@@ -30,7 +30,7 @@ NETLIB_RESET(VCCS)
 	m_ON1.set_go_gt(-m_mult, nlconst::zero());
 }
 
-NETLIB_UPDATE(VCCS)
+NETLIB_HANDLER(VCCS, termhandler)
 {
 	// only called if connected to a rail net ==> notify the solver to recalculate
 	if (!m_IP.net().is_rail_net())

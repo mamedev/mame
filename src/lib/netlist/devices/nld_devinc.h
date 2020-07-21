@@ -418,6 +418,27 @@
 	NET_REGISTER_DEVEXT(TTL_74107A, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_74113.cpp
+// ---------------------------------------------------------------------
+// usage       : TTL_74113(name, pCLK, pJ, pK, pCLRQ)
+// auto connect: VCC, GND
+#define TTL_74113(...)                                                 \
+	NET_REGISTER_DEVEXT(TTL_74113, __VA_ARGS__)
+
+// usage       : TTL_74113_DIP(name)
+#define TTL_74113_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74113_DIP, __VA_ARGS__)
+
+// usage       : TTL_74113A(name, pCLK, pJ, pK, pCLRQ)
+// auto connect: VCC, GND
+#define TTL_74113A(...)                                                \
+	NET_REGISTER_DEVEXT(TTL_74113A, __VA_ARGS__)
+
+// usage       : TTL_74113A_DIP(name)
+#define TTL_74113A_DIP(...)                                            \
+	NET_REGISTER_DEVEXT(TTL_74113A_DIP, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74123.cpp
 // ---------------------------------------------------------------------
 // usage       : TTL_74123(name)
@@ -1037,6 +1058,10 @@
 #define TTL_74156B_GATE(...)                                           \
 	NET_REGISTER_DEVEXT(TTL_74156B_GATE, __VA_ARGS__)
 
+// usage       : TTL_74157_GATE(name)
+#define TTL_74157_GATE(...)                                            \
+	NET_REGISTER_DEVEXT(TTL_74157_GATE, __VA_ARGS__)
+
 // usage       : TTL_74260_GATE(name)
 #define TTL_74260_GATE(...)                                            \
 	NET_REGISTER_DEVEXT(TTL_74260_GATE, __VA_ARGS__)
@@ -1154,6 +1179,10 @@
 // usage       : TTL_74156_DIP(name)
 #define TTL_74156_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74156_DIP, __VA_ARGS__)
+
+// usage       : TTL_74157_DIP(name)
+#define TTL_74157_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74157_DIP, __VA_ARGS__)
 
 // usage       : TTL_74260_DIP(name)
 #define TTL_74260_DIP(...)                                             \

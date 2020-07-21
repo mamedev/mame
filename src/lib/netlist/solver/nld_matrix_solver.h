@@ -20,6 +20,10 @@
 
 #include <numeric>
 
+//FIXME: remove again
+
+#define PFDEBUG(x)
+
 namespace netlist
 {
 namespace solver
@@ -80,6 +84,7 @@ namespace solver
 			netlist_time::quantum().as_fp<nl_fptype>()) ///< Delay to next solve attempt if nr loops exceeded
 		, m_parallel(parent, "PARALLEL", 0)
 
+		, m_min_ts_ts(parent, "MIN_TS_TS", nlconst::magic(1e-9)) ///< The minimum times step for solvers with time stepping devices.
 		// automatic time step
 		, m_dynamic_ts(parent, "DYNAMIC_TS", false)     ///< Use dynamic time stepping
 		, m_dynamic_lte(parent, "DYNAMIC_LTE", nlconst::magic(1e-5))    ///< dynamic time stepping slope
@@ -118,7 +123,8 @@ namespace solver
 		param_logic_t  m_pivot;
 		param_fp_t m_nr_recalc_delay;
 		param_int_t m_parallel;
-		param_logic_t  m_dynamic_ts;
+		param_fp_t m_min_ts_ts;
+		param_logic_t m_dynamic_ts;
 		param_fp_t m_dynamic_lte;
 		param_fp_t m_dynamic_min_ts;
 		param_enum_t<matrix_sort_type_e> m_sort_type;
@@ -237,12 +243,18 @@ namespace solver
 				update_inputs();
 			}
 			f();
-			m_Q_sync.net().toggle_and_push_to_queue(delay);
+			if ((delay == netlist_time::quantum()) && (timestep_device_count() > 0))
+			{
+				PFDEBUG(printf("here2\n");)
+				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_ts_ts()));
+			}
+			else
+				m_Q_sync.net().toggle_and_push_to_queue(delay);
 		}
 
-		// netdevice functions
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(fb_sync)
 		{
+			PFDEBUG(printf("update\n");)
 			const netlist_time new_timestep = solve(exec().time());
 			update_inputs();
 
@@ -271,9 +283,11 @@ namespace solver
 			const solver_parameters_t *params);
 
 		virtual void vsolve_non_dynamic() = 0;
-		virtual netlist_time compute_next_timestep(fptype cur_ts, fptype max_ts) = 0;
+		virtual netlist_time compute_next_timestep(fptype cur_ts, fptype min_ts, fptype max_ts) = 0;
 		virtual bool check_err() const = 0;
 		virtual void store() = 0;
+		virtual void backup() = 0;
+		virtual void restore() = 0;
 
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_gonn;
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_gtn;
@@ -292,10 +306,13 @@ namespace solver
 		// base setup - called from constructor
 		void setup_base(setup_t &setup, const net_list_t &nets) noexcept(false);
 
+		bool solve_nr_base();
+		netlist_time newton_loops_exceeded(netlist_time delta);
+
 		void sort_terms(matrix_sort_type_e sort);
 
 		void update_dynamic() noexcept;
-		void step(netlist_time delta) noexcept;
+		void step(timestep_type ts_type, netlist_time delta) noexcept;
 
 		int get_net_idx(const analog_net_t *net) const noexcept;
 		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
@@ -312,6 +329,7 @@ namespace solver
 
 		state_var<std::size_t> m_stat_calculations;
 		state_var<std::size_t> m_stat_newton_raphson;
+		state_var<std::size_t> m_stat_newton_raphson_fail;
 		state_var<std::size_t> m_stat_vsolver_calls;
 
 		state_var<netlist_time_ext> m_last_step;

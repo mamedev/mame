@@ -113,16 +113,12 @@ private:
 	void ppi_portb_w(u8 data);
 	void ppi_portc_w(u8 data);
 
-	u8 m_led_select;
-	u8 m_7seg_data;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 };
 
 void cc1_state::machine_start()
 {
-	// zerofill
-	m_led_select = 0;
-	m_7seg_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_7seg_data));

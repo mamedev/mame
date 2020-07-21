@@ -398,6 +398,14 @@ const drcbe_x64::opcode_table_entry drcbe_x64::s_opcode_table_source[] =
 	{ uml::OP_ICOPYF,  &drcbe_x64::op_icopyf }      // ICOPYF  dst,src
 };
 
+class ThrowableErrorHandler : public ErrorHandler
+{
+public:
+	void handleError(Error err, const char *message, BaseEmitter *origin) override
+	{
+		throw emu_fatalerror("asmjit error %d: %s", err, message);
+	}
+};
 
 
 //**************************************************************************
@@ -854,7 +862,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		a.addValidationOptions(BaseEmitter::kValidationOptionIntermediate);
 
 	// generate code
-	const char *blockname = nullptr;
+	std::string blockname;
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
@@ -873,12 +881,12 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		}
 
 		// extract a blockname
-		if (blockname == nullptr)
+		if (blockname.empty())
 		{
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
 			else if (inst.opcode() == OP_HASH)
-				blockname = string_format("Code: mode=%d PC=%08X", (uint32_t)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
+				blockname = string_format("Code: mode=%d PC=%08X", (uint32_t)inst.param(0).immediate(), (offs_t)inst.param(1).immediate());
 		}
 
 		// generate code
@@ -892,7 +900,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 
 	// log it
 	if (m_log != nullptr)
-		x86log_disasm_code_range(m_log, (blockname == nullptr) ? "Unknown block" : blockname, dst, dst + bytes);
+		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);

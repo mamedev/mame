@@ -92,7 +92,6 @@
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
-#include "schedule.h"
 
 
 /*************************************

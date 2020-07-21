@@ -23,6 +23,7 @@
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
 
+	Old logs shown here from pre-GIT days:
      06-2011: Fixed boneheaded interface glitch that was causing samples to not be cancelled correctly.
               Added the ability to read each segment of an LED display separately, this may be necessary for some
               games that use them as surrogate lamp lines.
@@ -251,9 +252,8 @@ To change between them, follow these instructions:
 TODO: - Distinguish door switches using manual
       - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device emulation)
       - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
-      writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs
-      For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything* and
-      start modelling the individual hysteresis curves of filament lamps.
+      writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs.
+	  Ideally, this needs converting to the PWM device, but that will be a complex job with this many outputs.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
 
@@ -300,7 +300,7 @@ void mpu4_state::lamp_extend_small(int data)
 	if (m_lamp_strobe_ext_persistence == 0)
 	{
 		//One write to reset the drive lines, one with the data, one to clear the lines, so only the 2nd write does anything
-		//Once again, lamp persistences would take care of this, but we can't do that
+		//TODO: PWM
 		for (i = 0; i < 5; i++)
 		{
 			m_lamps[(8*column)+i+128] = BIT(lamp_ext_data, i);
@@ -334,7 +334,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 			if (m_lamp_strobe_ext != column)
 			{
 				for (i = 0; i < 8; i++)
-				{//CHECK, this includes bit 7
+				{//CHECK, this includes bit 7, which seems wrong
 					m_lamps[(8*column)+i+128+lampbase] = BIT(data, i);
 				}
 				m_lamp_strobe_ext = column;
@@ -348,27 +348,25 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 	}
 }
 
-void mpu4_state::led_write_latch(int latch, int data, int column)
+void mpu4_state::led_write_extender(int latch, int data, int starting_column)
 {
-	int diff,i,j;
+	int diff,i,j, ext_strobe;
 
 	diff = (latch ^ m_last_latch) & latch;
-	column = 7 - column; // like main board, these are wired up in reverse
-	data = ~data;//inverted drive lines?
+	ext_strobe = (7 - starting_column) * 8; 
 
+	data = ~data;//invert drive lines
 	for (i=0; i<5; i++)
 	{
-		// FIXME: this doesn't look like it could possibly be correct - it can produce 0..17 but with lots of aliasing
 		if (diff & (1<<i))
 		{
-			column += i;
+			for (j=0; j<8; j++)
+			{
+				m_mpu4leds[(ext_strobe + i) | j], BIT(data, j);
+			}
+			m_digits[(ext_strobe + i)] = data;
 		}
 	}
-	for (j=0; j<8; j++)
-	{
-		m_mpu4leds[(column << 3) | j], BIT(data, j);
-	}
-	m_digits[column << 3] = data; // FIXME should this really be so sparse?
 
 	m_last_latch = diff;
 }
@@ -465,12 +463,10 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 	m_chr_value     = 0;
 
 
-	{
-		if (m_numbanks)
-			m_bank1->set_entry(m_numbanks);
+	if (m_numbanks)
+		m_bank1->set_entry(m_numbanks);
 
-		m_maincpu->reset();
-	}
+	m_maincpu->reset();
 }
 
 
@@ -512,7 +508,6 @@ void mpu4_state::bankswitch_w(uint8_t data)
 {
 //  printf("bankswitch_w %02x\n", data);
 
-	// m_pageset is never even set??
 	m_pageval = (data & 0x03);
 	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 }
@@ -527,8 +522,6 @@ uint8_t mpu4_state::bankswitch_r()
 void mpu4_state::bankset_w(uint8_t data)
 {
 //  printf("bankset_w %02x\n", data);
-
-	// m_pageset is never even set??
 
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
 	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
@@ -605,7 +598,6 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 		{
 			/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines in section 2. */
 			/* These are mostly low-tech machines, where such wiring proved cheaper than an extender card */
-			/* TODO: replace this with 'segment' lamp masks, to make it more generic */
 			uint8_t pled_segs[2] = {0,0};
 
 			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 111 };
@@ -819,7 +811,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic4_ca2_w)
 
 WRITE_LINE_MEMBER(mpu4_state::pia_ic4_cb2_w)
 {
-	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", machine().describe_context(),state));
+	LOG_IC3(("%s: IC4 PIA Write CB (Reel optic flag), %02X\n", machine().describe_context(),state));
 	m_reel_flag=state;
 }
 
@@ -874,7 +866,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 	case NO_EXTENDER:
 		if (m_led_extender == CARD_B)
 		{
-			led_write_latch(data & 0x1f, m_pia4->a_output(),m_input_strobe);
+			led_write_extender(data & 0x1f, m_pia4->a_output(),m_input_strobe);
 		}
 		else if ((m_led_extender != CARD_A) && (m_led_extender != NO_EXTENDER))
 		{
@@ -1029,10 +1021,22 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 	}
 	if (m_led_extender == CARD_A)
 	{
-		led_write_latch(data & 0x07, m_pia4->a_output(),m_input_strobe);
+		led_write_extender(data & 0x07, m_pia4->a_output(),m_input_strobe);
 	}
-
+	else if (m_led_extender == SIMPLE_CARD)
+	{
+		if(m_led_strobe != m_input_strobe)
+		{
+			for(int i=0; i<8; i++)
+			{
+				m_mpu4leds[( ( (7 - m_input_strobe) + 8) << 3) | i] = BIT(m_pia4->a_output(), i);
+			}
+			m_digits[(7 - m_input_strobe) + 8] = m_pia4->a_output();	
+		}
+		m_led_strobe = m_input_strobe;
+	}
 }
+
 uint8_t mpu4_state::pia_ic5_portb_r()
 {
 	if (m_hopper == HOPPER_NONDUART_B)
@@ -1398,6 +1402,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 	if (m_bwb_bank)
 	{
 		//printf("pia_gb_cb2_w %d\n", state);
+		//m_pageset?
 		m_pageval = state;
 		m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 	}
@@ -1583,20 +1588,20 @@ INPUT_PORTS_START( mpu4 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_4")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_6")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1_7")
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) //Lockouts, in same order as below
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) 
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) 
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) 
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -2380,6 +2385,11 @@ void mpu4_state::init_m4_led_c()
 	m_led_extender = CARD_C;
 }
 
+void mpu4_state::init_m4_led_simple()
+{
+	m_led_extender = SIMPLE_CARD;
+}
+
 //TODO: Replace with standard six reels once sets are sorted out - is really six_reel_std
 void mpu4_state::init_m4altreels()
 {
@@ -3130,7 +3140,7 @@ void mpu4_state::mod4oki(machine_config &config)
 	mpu4_common2(config);
 	mpu4_std_6reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -3143,7 +3153,7 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	mpu4_common2(config);
 	mpu4_type2_6reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -3156,7 +3166,7 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 	mpu4_common2(config);
 	mpu4_std_5reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -3168,7 +3178,7 @@ void mpu4_state::bwboki(machine_config &config)
 	mpu4_common2(config);
 	mpu4_bwb_5reel(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

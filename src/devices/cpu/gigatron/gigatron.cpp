@@ -13,7 +13,7 @@
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 
 
 /* FLAGS */
@@ -89,19 +89,6 @@ void gigatron_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	init();
-}
-
-void gigatron_cpu_device::init()
-{
-	m_ac = 0;
-	m_x = 0;
-	m_y = 0;
-	m_pc = 0;
-	m_npc = (m_pc + 1) & m_romMask;
-	m_ppc = 0;
-	m_inReg = 0xFF;
-
 	state_add(GTRON_PC,        "PC",        m_pc);
 	state_add(GTRON_NPC,       "NPC",       m_npc);
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -110,6 +97,8 @@ void gigatron_cpu_device::init()
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
 	state_add(GTRON_IREG,      "IREG",      m_inReg);
+	state_add(GTRON_OUTX,      "OUTX",      m_outx);
+	state_add(GTRON_OUT,       "OUT",       m_out);
 
 	set_icountptr(m_icount);
 
@@ -120,9 +109,27 @@ void gigatron_cpu_device::init()
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_inReg));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_outx));
+	save_item(NAME(m_out));
 
 	m_outx_cb.resolve_safe();
+	m_out_cb.resolve_safe();
 	m_ir_cb.resolve_safe(0);
+	
+	reset_cpu();
+}
+
+void gigatron_cpu_device::reset_cpu()
+{
+	m_ac = 0;
+	m_x = 0;
+	m_y = 0;
+	m_pc = 0;
+	m_npc = (m_pc + 1) & m_romMask;
+	m_ppc = 0;
+	m_inReg = 0xFF;	
+	m_outx = 0;
+	m_out = 0;
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
@@ -220,6 +227,10 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 	case 6:
 	case 7:
 		uint16_t rising = ~(m_out & b);
+		m_out = b;
+		m_out_cb(0, m_out, 0xFF);
+
+		// rising edge of out[6] registers outx from ac
 		if (rising & 0x40)
 		{
 			m_outx = m_ac;
@@ -276,6 +287,9 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 	case 0:
 		b = d;
 		break;
+	case 1:
+		b = 0;
+		break;
 	case 2:
 		b = m_ac;
 		break;
@@ -292,7 +306,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 
 	switch (mode)
 	{
-	case 4:
+	case 4: // XXX not clear whether x++ mode takes priority
 		m_x = b;
 		break;
 	case 5:
@@ -303,6 +317,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 
 void gigatron_cpu_device::device_reset()
 {
+	reset_cpu();
 }
 
 void gigatron_cpu_device::execute_set_input(int irqline, int state)
@@ -323,6 +338,7 @@ gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const ch
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 	, m_outx_cb(*this)
+	, m_out_cb(*this)
 	, m_ir_cb(*this)
 {
 }

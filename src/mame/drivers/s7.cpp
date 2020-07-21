@@ -349,7 +349,7 @@ uint8_t s7_state::dips_r()
 
 uint8_t s7_state::switch_r()
 {
-	char retval = 0xff;
+	uint8_t retval = 0xff;
 	// scan all 8 input columns, since multiple can be selected at once
 	for (int i = 0; i < 7; i++)
 	{

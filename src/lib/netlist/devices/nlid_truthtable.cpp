@@ -78,8 +78,7 @@ namespace devices
 			set_active_outputs(active_outputs);
 		}
 
-		// update is only called during startup here ...
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 #if USE_TT_ALTERNATIVE
 			m_state = 0;
@@ -390,7 +389,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
-			m_I.emplace(i, *this, inout[i]);
+			m_I.emplace(i, *this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
 		}
 #else
 		for (std::size_t i=0; i < m_NI; i++)

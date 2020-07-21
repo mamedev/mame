@@ -42,7 +42,7 @@ namespace devices
 			s->log_stats();
 	}
 
-	NETLIB_UPDATE(solver)
+	NETLIB_HANDLER(solver, fb_step)
 	{
 		if (m_params.m_dynamic_ts)
 			return;

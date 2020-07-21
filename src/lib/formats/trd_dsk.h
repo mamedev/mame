@@ -24,6 +24,7 @@ public:
 
 private:
 	static const format formats[];
+	virtual int find_size(io_generic *io, uint32_t form_factor) override;
 };
 
 extern const floppy_format_type FLOPPY_TRD_FORMAT;

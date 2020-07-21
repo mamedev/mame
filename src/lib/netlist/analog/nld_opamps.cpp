@@ -107,8 +107,8 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(opamp)
 		, m_RP(*this, "RP1")
 		, m_G1(*this, "G1")
-		, m_VCC(*this, "VCC")
-		, m_GND(*this, "GND")
+		, m_VCC(*this, "VCC", NETLIB_DELEGATE(supply))
+		, m_GND(*this, "GND", NETLIB_DELEGATE(supply))
 		, m_model(*this, "MODEL", "LM324")
 		, m_modacc(m_model)
 		, m_VH(*this, "VH")
@@ -183,10 +183,21 @@ namespace netlist
 
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(supply)
+		{
+			const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
+			const nl_fptype cId = m_modacc.m_DAB; // 3 mA
+			const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
+
+			m_VH.push(m_VCC() - m_modacc.m_VLH - cVd);
+			m_VL.push(m_GND() + m_modacc.m_VLL + cVd);
+			m_VREF.push((m_VCC() + m_GND()) / nlconst::two());
+		}
+
 		NETLIB_RESETI()
 		{
 		}
+
 		NETLIB_UPDATE_PARAMI();
 
 	private:
@@ -213,17 +224,6 @@ namespace netlist
 		// state
 		int m_type;
 	};
-
-	NETLIB_UPDATE(opamp)
-	{
-		const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
-		const nl_fptype cId = m_modacc.m_DAB; // 3 mA
-		const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
-
-		m_VH.push(m_VCC() - m_modacc.m_VLH - cVd);
-		m_VL.push(m_GND() + m_modacc.m_VLL + cVd);
-		m_VREF.push((m_VCC() + m_GND()) / nlconst::two());
-	}
 
 	NETLIB_UPDATE_PARAM(opamp)
 	{

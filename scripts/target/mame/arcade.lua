@@ -284,6 +284,7 @@ SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
 SOUNDS["S_DSP"] = true
 SOUNDS["KS0164"] = true
+--SOUNDS["RP2C33_SOUND"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -495,6 +496,7 @@ MACHINES["I8255"] = true
 --MACHINES["I8271"] = true
 MACHINES["I8279"] = true
 MACHINES["I8355"] = true
+MACHINES["IBM21S850"] = true
 MACHINES["IDECTRL"] = true
 MACHINES["IE15"] = true
 MACHINES["IM6402"] = true
@@ -638,6 +640,7 @@ MACHINES["TMS6100"] = true
 MACHINES["TMS9901"] = true
 MACHINES["TMS9902"] = true
 --MACHINES["TPI6525"] = true
+MACHINES["TSB12LV01A"] = true
 --MACHINES["TTL74123"] = true
 --MACHINES["TTL74145"] = true
 --MACHINES["TTL74148"] = true
@@ -1975,6 +1978,7 @@ files {
 	MAME_DIR .. "src/mame/video/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.h",
+	MAME_DIR .. "src/mame/drivers/gaelcof3.cpp",
 	MAME_DIR .. "src/mame/drivers/gaelcopc.cpp",
 	MAME_DIR .. "src/mame/drivers/goldart.cpp",
 	MAME_DIR .. "src/mame/drivers/glass.cpp",
@@ -1985,6 +1989,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rollext.cpp",
 	MAME_DIR .. "src/mame/drivers/splash.cpp",
 	MAME_DIR .. "src/mame/includes/splash.h",
+	MAME_DIR .. "src/mame/drivers/splash_ms.cpp",
 	MAME_DIR .. "src/mame/video/splash.cpp",
 	MAME_DIR .. "src/mame/drivers/targeth.cpp",
 	MAME_DIR .. "src/mame/includes/targeth.h",
@@ -3746,6 +3751,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/nyny.cpp",
 	MAME_DIR .. "src/mame/drivers/r2dtank.cpp",
 	MAME_DIR .. "src/mame/drivers/sigma21.cpp",
+	MAME_DIR .. "src/mame/drivers/sigmab31.cpp",
 	MAME_DIR .. "src/mame/drivers/sigmab52.cpp",
 	MAME_DIR .. "src/mame/drivers/sigmab98.cpp",
 	MAME_DIR .. "src/mame/drivers/spiders.cpp",
@@ -4984,6 +4990,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/smsmcorp.cpp",
 	MAME_DIR .. "src/mame/drivers/sothello.cpp",
 	MAME_DIR .. "src/mame/drivers/special_gambl.cpp",
+	MAME_DIR .. "src/mame/audio/special.cpp",
+	MAME_DIR .. "src/mame/audio/special.h",		
 	MAME_DIR .. "src/mame/drivers/spool99.cpp",
 	MAME_DIR .. "src/mame/drivers/sprcros2.cpp",
 	MAME_DIR .. "src/mame/drivers/sshot.cpp",
@@ -5005,6 +5013,7 @@ files {
 	MAME_DIR .. "src/mame/includes/taxidriv.h",
 	MAME_DIR .. "src/mame/video/taxidriv.cpp",
 	MAME_DIR .. "src/mame/drivers/teamjocs.cpp",
+	MAME_DIR .. "src/mame/drivers/tecnodar.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",
 	MAME_DIR .. "src/mame/drivers/thedeep.cpp",
 	MAME_DIR .. "src/mame/includes/thedeep.h",

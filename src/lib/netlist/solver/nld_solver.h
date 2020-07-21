@@ -27,7 +27,7 @@ namespace devices
 	NETLIB_OBJECT(solver)
 	{
 		NETLIB_CONSTRUCTOR(solver)
-		, m_fb_step(*this, "FB_step")
+		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step))
 		, m_Q_step(*this, "Q_step")
 		, m_params(*this)
 		{
@@ -43,7 +43,6 @@ namespace devices
 
 		solver::static_compile_container create_solver_code(solver::static_compile_target target);
 
-		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		// NETLIB_UPDATE_PARAMI();
 
@@ -52,6 +51,8 @@ namespace devices
 		using net_list_t = solver::matrix_solver_t::net_list_t;
 
 	private:
+		NETLIB_HANDLERI(fb_step);
+
 		logic_input_t m_fb_step;
 		logic_output_t m_Q_step;
 

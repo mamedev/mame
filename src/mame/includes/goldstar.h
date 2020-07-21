@@ -233,6 +233,7 @@ public:
 
 	void init_lucky8a();
 	void init_lucky8f();
+	void init_lucky8l();
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();

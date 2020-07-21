@@ -17,8 +17,8 @@ namespace netlist
 	NETLIB_OBJECT(74393)
 	{
 		NETLIB_CONSTRUCTOR(74393)
-		, m_CP(*this, "CP")
-		, m_MR(*this, "MR")
+		, m_CP(*this, "CP", NETLIB_DELEGATE(inputs))
+		, m_MR(*this, "MR", NETLIB_DELEGATE(inputs))
 		, m_Q(*this, {"Q0", "Q1", "Q2", "Q3"})
 		, m_cnt(*this, "m_cnt", 0)
 		, m_cp(*this, "m_cp", 0)
@@ -33,7 +33,7 @@ namespace netlist
 			m_cnt = 0;
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			netlist_sig_t last_cp = m_cp;
 			netlist_sig_t last_mr = m_mr;
@@ -98,8 +98,7 @@ namespace netlist
 			connect("A.GND", "B.GND");
 			connect("A.VCC", "B.VCC");
 		}
-		NETLIB_UPDATEI() { }
-		NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 
 	private:
 		NETLIB_SUB(74393) m_A;

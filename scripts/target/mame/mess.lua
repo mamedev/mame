@@ -308,6 +308,7 @@ SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
 SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
+SOUNDS["RP2C33_SOUND"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -497,6 +498,7 @@ MACHINES["E05A30"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["ER1400"] = true
 MACHINES["ER2055"] = true
+MACHINES["EXORTERM"] = true
 MACHINES["F3853"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
@@ -522,6 +524,7 @@ MACHINES["I8271"] = true
 MACHINES["I8279"] = true
 MACHINES["I8291A"] = true
 MACHINES["I8355"] = true
+--MACHINES["IBM21S850"] = true
 MACHINES["ICM7170"] = true
 MACHINES["IDECTRL"] = true
 MACHINES["IE15"] = true
@@ -549,6 +552,7 @@ MACHINES["LSI53C810"] = true
 MACHINES["M3002"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
+MACHINES["M68SFDC"] = true
 MACHINES["M6M80011AP"] = true
 MACHINES["MB14241"] = true
 MACHINES["MB3773"] = true
@@ -672,6 +676,7 @@ MACHINES["TMS9914"] = true
 MACHINES["TPI6525"] = true
 MACHINES["TTL7400"] = true
 MACHINES["TTL7404"] = true
+--MACHINES["TSB12LV01A"] = true
 MACHINES["TTL74123"] = true
 MACHINES["TTL74145"] = true
 MACHINES["TTL74148"] = true
@@ -889,6 +894,9 @@ BUSES["QL"] = true
 BUSES["QBUS"] = true
 BUSES["RS232"] = true
 BUSES["S100"] = true
+BUSES["SAMCOUPE_DRIVE_PORT"] = true
+BUSES["SAMCOUPE_EXPANSION"] = true
+BUSES["SAMCOUPE_MOUSE_PORT"] = true
 BUSES["SAT_CTRL"] = true
 BUSES["SATURN"] = true
 BUSES["SBUS"] = true
@@ -1005,6 +1013,7 @@ FORMATS["ESQ8_DSK"] = true
 FORMATS["EXCALI64_DSK"] = true
 FORMATS["FC100_CAS"] = true
 FORMATS["FDD_DSK"] = true
+FORMATS["FL1_DSK"] = true
 FORMATS["FLEX_DSK"] = true
 FORMATS["FM7_CAS"] = true
 FORMATS["FMSX_CAS"] = true
@@ -1035,6 +1044,7 @@ FORMATS["LVIV_LVT"] = true
 FORMATS["M20_DSK"] = true
 FORMATS["M5_DSK"] = true
 FORMATS["MBEE_CAS"] = true
+FORMATS["MDOS_DSK"] = true
 FORMATS["MFM_HD"] = true
 FORMATS["MM_DSK"] = true
 FORMATS["MS0515_DSK"] = true
@@ -1066,6 +1076,7 @@ FORMATS["QL_DSK"] = true
 FORMATS["RK_CAS"] = true
 FORMATS["RX50_DSK"] = true
 FORMATS["SC3000_BIT"] = true
+FORMATS["SDD_DSK"] = true
 FORMATS["SF7000_DSK"] = true
 FORMATS["SMX_DSK"] = true
 FORMATS["SOL_CAS"] = true
@@ -1076,6 +1087,7 @@ FORMATS["SPC1000_CAS"] = true
 FORMATS["ST_DSK"] = true
 FORMATS["SVI_CAS"] = true
 FORMATS["SVI_DSK"] = true
+FORMATS["SWD_DSK"] = true
 FORMATS["TANDY2K_DSK"] = true
 FORMATS["THOM_CAS"] = true
 FORMATS["THOM_DSK"] = true
@@ -1185,6 +1197,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"epson",
 		"ericsson",
 		"exidy",
+		"exorterm",
 		"fairch",
 		"fairlight",
 		"fidelity",
@@ -1256,8 +1269,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ne",
 		"nec",
 		"netronic",
-		"news_68k",
-		"news_r3k",
 		"next",
 		"nintendo",
 		"nokia",
@@ -1308,6 +1319,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"slicer",
 		"snk",
 		"sony",
+		"sony_news",
 		"sord",
 		"special",
 		"stm",
@@ -1877,7 +1889,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/b2m.cpp",
 	MAME_DIR .. "src/mame/includes/b2m.h",
 	MAME_DIR .. "src/mame/machine/b2m.cpp",
-	MAME_DIR .. "src/mame/video/b2m.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "bondwell")
@@ -1984,7 +1995,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ut88.cpp",
 	MAME_DIR .. "src/mame/includes/ut88.h",
 	MAME_DIR .. "src/mame/machine/ut88.cpp",
-	MAME_DIR .. "src/mame/video/ut88.cpp",
 	MAME_DIR .. "src/mame/drivers/vector06.cpp",
 	MAME_DIR .. "src/mame/includes/vector06.h",
 	MAME_DIR .. "src/mame/machine/vector06.cpp",
@@ -2233,6 +2243,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "elektor")
 files {
+	MAME_DIR .. "src/mame/drivers/avrmax.cpp",
 	MAME_DIR .. "src/mame/drivers/ec65.cpp",
 	MAME_DIR .. "src/mame/drivers/elekscmp.cpp",
 	MAME_DIR .. "src/mame/drivers/junior.cpp",
@@ -2247,6 +2258,7 @@ createMESSProjects(_target, _subtarget, "emusys")
 files {
 	MAME_DIR .. "src/mame/drivers/emu2.cpp",
 	MAME_DIR .. "src/mame/drivers/emu3.cpp",
+	MAME_DIR .. "src/mame/drivers/emu68k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ensoniq")
@@ -2316,6 +2328,11 @@ files {
 	MAME_DIR .. "src/mame/includes/sorcerer.h",
 	MAME_DIR .. "src/mame/machine/micropolis.cpp",
 	MAME_DIR .. "src/mame/machine/micropolis.h",
+}
+
+createMESSProjects(_target, _subtarget, "exorterm")
+files {
+	MAME_DIR .. "src/mame/drivers/exorterm.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fairch")
@@ -2483,7 +2500,9 @@ createMESSProjects(_target, _subtarget, "homebrew")
 files {
 	MAME_DIR .. "src/mame/drivers/4004clk.cpp",
 	MAME_DIR .. "src/mame/drivers/68ksbc.cpp",
-	MAME_DIR .. "src/mame/drivers/craft.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_chiptune.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_craft.cpp",
+	MAME_DIR .. "src/mame/drivers/lft_phasor.cpp",
 	MAME_DIR .. "src/mame/drivers/dcebridge.cpp",
 	MAME_DIR .. "src/mame/drivers/homez80.cpp",
 	MAME_DIR .. "src/mame/drivers/p112.cpp",
@@ -2814,7 +2833,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/primo.cpp",
 	MAME_DIR .. "src/mame/includes/primo.h",
 	MAME_DIR .. "src/mame/machine/primo.cpp",
-	MAME_DIR .. "src/mame/video/primo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "microsoft")
@@ -2883,6 +2901,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "motorola")
 files {
+	MAME_DIR .. "src/mame/drivers/exorciser.cpp",
 	MAME_DIR .. "src/mame/drivers/m6805evs.cpp",
 	MAME_DIR .. "src/mame/drivers/m68705prg.cpp",
 	MAME_DIR .. "src/mame/drivers/mekd1.cpp",
@@ -2983,24 +3002,6 @@ files {
 	MAME_DIR .. "src/mame/includes/exp85.h",
 }
 
-createMESSProjects(_target, _subtarget, "news_68k")
-files {
-	MAME_DIR .. "src/mame/drivers/news_68k.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0266.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0266.h",
-	MAME_DIR .. "src/mame/machine/news_hid.cpp",
-	MAME_DIR .. "src/mame/machine/news_hid.h",
-}
-
-createMESSProjects(_target, _subtarget, "news_r3k")
-files {
-	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
-	MAME_DIR .. "src/mame/machine/dmac_0448.h",
-	MAME_DIR .. "src/mame/machine/news_hid.cpp",
-	MAME_DIR .. "src/mame/machine/news_hid.h",
-}
-
 createMESSProjects(_target, _subtarget, "next")
 files {
 	MAME_DIR .. "src/mame/drivers/next.cpp",
@@ -3083,6 +3084,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_const.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_micro.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_micro2.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
@@ -3202,8 +3204,6 @@ files {
 createMESSProjects(_target, _subtarget, "pel")
 files {
 	MAME_DIR .. "src/mame/drivers/galeb.cpp",
-	MAME_DIR .. "src/mame/includes/galeb.h",
-	MAME_DIR .. "src/mame/video/galeb.cpp",
 	MAME_DIR .. "src/mame/drivers/orao.cpp",
 }
 
@@ -3374,10 +3374,12 @@ files {
 
 createMESSProjects(_target, _subtarget, "saitek")
 files {
+	MAME_DIR .. "src/mame/drivers/saitek_ccompan.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_cp2000.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_exchess.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_intchess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_leonardo.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_minichess.cpp",
@@ -3396,9 +3398,6 @@ files {
 createMESSProjects(_target, _subtarget, "samcoupe")
 files {
 	MAME_DIR .. "src/mame/drivers/samcoupe.cpp",
-	MAME_DIR .. "src/mame/includes/samcoupe.h",
-	MAME_DIR .. "src/mame/machine/samcoupe.cpp",
-	MAME_DIR .. "src/mame/video/samcoupe.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samsung")
@@ -3626,6 +3625,19 @@ files {
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "sony_news")
+files {
+	MAME_DIR .. "src/mame/drivers/news_68k.cpp",
+	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
+	MAME_DIR .. "src/mame/drivers/news_38xx.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0448.h",
+	MAME_DIR .. "src/mame/machine/dmac_0266.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0266.h",
+	MAME_DIR .. "src/mame/machine/news_hid.cpp",
+	MAME_DIR .. "src/mame/machine/news_hid.h",
+}
+
 createMESSProjects(_target, _subtarget, "sord")
 files {
 	MAME_DIR .. "src/mame/drivers/m5.cpp",
@@ -3778,7 +3790,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ondra.cpp",
 	MAME_DIR .. "src/mame/includes/ondra.h",
 	MAME_DIR .. "src/mame/machine/ondra.cpp",
-	MAME_DIR .. "src/mame/video/ondra.cpp",
 	MAME_DIR .. "src/mame/drivers/pmd85.cpp",
 	MAME_DIR .. "src/mame/includes/pmd85.h",
 	MAME_DIR .. "src/mame/machine/pmd85.cpp",
@@ -4018,6 +4029,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/actions_atj2279b.cpp",
 	MAME_DIR .. "src/mame/drivers/pubint_storyreader.cpp",
 	MAME_DIR .. "src/mame/drivers/magiceyes_pollux_vr3520f.cpp",
+	MAME_DIR .. "src/mame/drivers/monkey_king_3b.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")

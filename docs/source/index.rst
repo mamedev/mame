@@ -17,6 +17,7 @@ MAME Documentation
     :titlesonly:
 
     whatis
+    healthwarning
     initialsetup/index
 
     usingmame/index

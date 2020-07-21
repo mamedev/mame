@@ -26,18 +26,24 @@
 #include "emu.h"
 #include "k007232.h"
 #include "wavwrite.h"
+#include <algorithm>
 
 #define K007232_LOG_PCM (0)
-#define BASE_SHIFT      (12)
 
 DEFINE_DEVICE_TYPE(K007232, k007232_device, "k007232", "K007232 PCM Controller")
 
-k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, K007232, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 17) // 17 bit address, 8 bit data, can be bankswitched per each voices
 	, m_rom(*this, DEVICE_SELF)
+	, m_pcmlimit(~0)
+	, m_bank(0)
+	, m_stream(nullptr)
 	, m_port_write_handler(*this)
 {
+	std::fill(std::begin(m_wreg), std::end(m_wreg), 0);
 }
 
 //-------------------------------------------------
@@ -46,59 +52,77 @@ k007232_device::k007232_device(const machine_config &mconfig, const char *tag, d
 
 void k007232_device::device_start()
 {
-	/* Set up the chips */
-	m_pcmlimit = m_rom.bytes();
+	m_pcmlimit = 1 << 17;
+	// default mapping (bankswitched ROM)
+	if ((m_rom.target() != nullptr) && (!has_configured_map(0)))
+	{
+		if (m_rom.bytes() > 0x20000)
+			space(0).install_read_handler(0x00000, std::min<offs_t>(0x1ffff, m_rom.bytes() - 1), read8sm_delegate(*this, FUNC(k007232_device::read_rom_default)));
+		else
+		{
+			space(0).install_rom(0x00000, m_rom.mask(), m_rom.target());
+			m_pcmlimit = m_rom.bytes();
+		}
+	}
+	space(0).cache(m_cache);
 
+	/* Set up the chips */
 	m_port_write_handler.resolve_safe();
 
 	for (int i = 0; i < KDAC_A_PCM_MAX; i++)
 	{
-		m_addr[i] = 0;
-		m_start[i] = 0;
-		m_step[i] = 0;
-		m_play[i] = 0;
-		m_bank[i] = 0;
+		m_channel[i].addr = 0;
+		m_channel[i].start = 0;
+		m_channel[i].counter = 0x200;
+		m_channel[i].step = 0;
+		m_channel[i].play = 0;
+		m_channel[i].bank = 0;
 	}
-	m_vol[0][0] = 255;  /* channel A output to output A */
-	m_vol[0][1] = 0;
-	m_vol[1][0] = 0;
-	m_vol[1][1] = 255;  /* channel B output to output B */
+	m_channel[0].vol[0] = 255;  /* channel A output to output A */
+	m_channel[0].vol[1] = 0;
+	m_channel[1].vol[0] = 0;
+	m_channel[1].vol[1] = 255;  /* channel B output to output B */
 
 	for (auto & elem : m_wreg)
 		elem = 0;
 
-	m_stream = machine().sound().stream_alloc(*this, 0 , 2, clock()/128);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/128);
 
-	make_fncodes();
-
-	save_item(NAME(m_vol));
-	save_item(NAME(m_addr));
-	save_item(NAME(m_start));
-	save_item(NAME(m_step));
-	save_item(NAME(m_bank));
-	save_item(NAME(m_play));
+	save_item(STRUCT_MEMBER(m_channel, vol));
+	save_item(STRUCT_MEMBER(m_channel, addr));
+	save_item(STRUCT_MEMBER(m_channel, counter));
+	save_item(STRUCT_MEMBER(m_channel, start));
+	save_item(STRUCT_MEMBER(m_channel, step));
+	save_item(STRUCT_MEMBER(m_channel, bank));
+	save_item(STRUCT_MEMBER(m_channel, play));
 	save_item(NAME(m_wreg));
 }
 
-void k007232_device::make_fncodes()
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void k007232_device::device_clock_changed()
 {
-	for (int i = 0; i < 0x200; i++)
-	{
-		m_fncode[i] = (32 << BASE_SHIFT) / (0x200 - i);
-	}
+	m_stream->set_sample_rate(clock()/128);
 }
 
-uint32_t k007232_device::get_start_address(int channel)
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector k007232_device::memory_space_config() const
 {
-	const uint32_t reg_index = (channel ? 6 : 0);
-	return (BIT(m_wreg[reg_index + 4], 0) << 16) | (m_wreg[reg_index + 3] << 8) | m_wreg[reg_index + 2] | m_bank[channel];
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
 }
 
 /************************************************/
 /*    Konami PCM write register                 */
 /************************************************/
 
-void k007232_device::write(offs_t offset, uint8_t data)
+void k007232_device::write(offs_t offset, u8 data)
 {
 	m_stream->update();
 
@@ -115,7 +139,7 @@ void k007232_device::write(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		int channel = (offset >= 6 ? 1 : 0);
+		channel_t *channel = &m_channel[(offset >= 6 ? 1 : 0)];
 		int reg_index = (offset >= 6 ? 6 : 0);
 		if (offset >= 6)
 			offset -= 6;
@@ -124,19 +148,20 @@ void k007232_device::write(offs_t offset, uint8_t data)
 		{
 		case 0: // address step, LSB
 		case 1: // address step, MSB
-			m_step[channel] = m_fncode[(BIT(m_wreg[reg_index + 1], 0) << 8) | m_wreg[reg_index]];
+			channel->step = (BIT(m_wreg[reg_index + 1], 0) << 8) | m_wreg[reg_index];
 			break;
 		case 2:
 		case 3:
 		case 4:
 			// working data for start address
+			channel->start = (BIT(m_wreg[reg_index + 4], 0) << 16) | (m_wreg[reg_index + 3] << 8) | m_wreg[reg_index + 2];
 			break;
 		case 5: // start address
-			m_start[channel] = get_start_address(channel);
-			if (m_start[channel] < m_pcmlimit)
+			if (channel->start < m_pcmlimit)
 			{
-				m_play[channel] = 1;
-				m_addr[channel] = 0;
+				channel->play = true;
+				channel->addr = channel->start;
+				channel->counter = 0x200;
 			}
 			break;
 		}
@@ -147,18 +172,17 @@ void k007232_device::write(offs_t offset, uint8_t data)
 /*    Konami PCM read register                  */
 /************************************************/
 
-uint8_t k007232_device::read(offs_t offset)
+u8 k007232_device::read(offs_t offset)
 {
 	if (offset == 5 || offset == 11)
 	{
-		int channel = (offset == 11) ? 1 : 0;
+		channel_t *channel = &m_channel[(offset == 11) ? 1 : 0];
 
-		m_start[channel] = get_start_address(channel);
-
-		if (m_start[channel] <  m_pcmlimit)
+		if (channel->start < m_pcmlimit)
 		{
-			m_play[channel] = 1;
-			m_addr[channel] = 0;
+			channel->play = true;
+			channel->addr = channel->start;
+			channel->counter = 0x200;
 		}
 	}
 	return 0;
@@ -168,14 +192,14 @@ uint8_t k007232_device::read(offs_t offset)
 
 void k007232_device::set_volume(int channel, int vol_a, int vol_b)
 {
-	m_vol[channel][0] = vol_a;
-	m_vol[channel][1] = vol_b;
+	m_channel[channel].vol[0] = vol_a;
+	m_channel[channel].vol[1] = vol_b;
 }
 
 void k007232_device::set_bank(int chan_a_bank, int chan_b_bank)
 {
-	m_bank[0] = chan_a_bank << 17;
-	m_bank[1] = chan_b_bank << 17;
+	m_channel[0].bank = chan_a_bank << 17;
+	m_channel[1].bank = chan_b_bank << 17;
 }
 
 /*****************************************************************************/
@@ -194,17 +218,18 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	{
 		for (int i = 0; i < KDAC_A_PCM_MAX; i++)
 		{
-			if (m_play[i])
+			channel_t *channel = &m_channel[i];
+			if (channel->play)
 			{
 				char filebuf[256];
-				snprintf(filebuf, 256, "pcm%08x.wav", m_start[i]);
+				snprintf(filebuf, 256, "pcm%08x.wav", channel->start);
 				wav_file *file = wav_open(filebuf, stream.sample_rate(), 1);
 				if (file != nullptr)
 				{
-					uint32_t addr = m_start[i];
-					while (!BIT(m_rom[addr], 7) && addr < m_pcmlimit)
+					u32 addr = channel->start;
+					while (!BIT(read_sample(i, addr), 7) && addr < m_pcmlimit)
 					{
-						int16_t out = ((m_rom[addr] & 0x7f) - 0x40) << 7;
+						int16_t out = ((read_sample(i, addr) & 0x7f) - 0x40) << 7;
 						wav_add_data_16(file, &out, 1);
 						addr++;
 					}
@@ -214,50 +239,45 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
-	for (int i = 0; i < KDAC_A_PCM_MAX; i++)
+	for (int j = 0; j < samples; j++)
 	{
-		if (m_play[i])
+		for (int i = 0; i < KDAC_A_PCM_MAX; i++)
 		{
-			/**** PCM setup ****/
-			uint32_t addr_lsb = (m_addr[i] >> BASE_SHIFT) & 0x000fffff;
-			uint32_t addr = m_start[i] + addr_lsb;
-			int vol_a = m_vol[i][0] * 2;
-			int vol_b = m_vol[i][1] * 2;
-
-			for (int j = 0; j < samples; j++)
+			channel_t *channel = &m_channel[i];
+			if (channel->play)
 			{
-				uint32_t old_addr = addr;
-				addr_lsb = (m_addr[i] >> BASE_SHIFT) & 0x000fffff;
-				addr = m_start[i] + addr_lsb;
-				while (old_addr <= addr)
+				/**** PCM setup ****/
+				int vol_a = channel->vol[0] * 2;
+				int vol_b = channel->vol[1] * 2;
+
+				u32 addr = channel->addr & 0x1ffff;
+				while (channel->counter <= channel->step) // result : clock / (4 * (512 - frequency))
 				{
-					if (BIT(m_rom[old_addr], 7) || old_addr >= m_pcmlimit)
+					if (BIT(read_sample(i, addr++), 7) || addr >= m_pcmlimit)
 					{
 						// end of sample
 						if (BIT(m_wreg[13], i))
 						{
 							/* loop to the beginning */
-							m_start[i] = get_start_address(i);
-							addr = m_start[i];
-							m_addr[i] = 0;
-							old_addr = addr; /* skip loop */
+							addr = channel->start;
 						}
 						else
 						{
 							/* stop sample */
-							m_play[i] = 0;
+							channel->play = false;
+							break;
 						}
-						break;
 					}
-					old_addr++;
+					channel->counter += (0x200 - channel->step);
 				}
+				channel->addr = addr;
 
-				if (m_play[i] == 0)
+				if (!channel->play)
 					break;
 
-				m_addr[i] += m_step[i];
+				channel->counter -= 32;
 
-				int out = (m_rom[addr] & 0x7f) - 0x40;
+				int out = (read_sample(i, addr) & 0x7f) - 0x40;
 
 				outputs[0][j] += out * vol_a;
 				outputs[1][j] += out * vol_b;

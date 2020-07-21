@@ -197,7 +197,7 @@ INPUT_PORTS_START(disciple)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_PLAYER(2) PORT_NAME("Sinclair P2 Button 1") PORT_CODE(KEYCODE_0_PAD)
 
 	PORT_START("INH")
-	PORT_CONFNAME(0x01, 0x01, "Inhibit Button")
+	PORT_CONFNAME(0x01, 0x01, "Inhibit Button") PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_disciple_device, inhibit_button, 0)
 	PORT_CONFSETTING(0x01, "Off (Disciple enabled)")
 	PORT_CONFSETTING(0x00, "On (Disciple disabled)")
 INPUT_PORTS_END
@@ -351,7 +351,7 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 	, m_joy1(*this, "JOY1")
 	, m_joy2(*this, "JOY2")
 	, m_inhibit(*this, "INH")
-	, m_control(0xff) // check me
+	, m_control(0) // CHECKME: what is 74LS374 power-on state ?
 {
 }
 
@@ -361,6 +361,7 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 
 void spectrum_plusd_device::device_start()
 {
+	m_romcs = 0;
 	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_ram));
@@ -381,12 +382,12 @@ void spectrum_disciple_device::device_start()
 
 void spectrum_plusd_device::device_reset()
 {
-	m_romcs = 0;
+	m_centronics->write_strobe(0);
 }
 
 void spectrum_disciple_device::device_reset()
 {
-	spectrum_plusd_device::device_reset();
+	m_romcs = 0;
 	m_map = false;
 	m_reset_delay = true;
 	timer_set(attotime::from_usec(10), TIMER_RESET); // delay time is a guess
@@ -550,7 +551,7 @@ void spectrum_disciple_device::pre_opcode_fetch(offs_t offset)
 		case 0x0008:
 		case 0x0066:
 		case 0x028e:
-			if (!m_reset_delay && (m_inhibit->read() || !BIT(m_control, 4)))
+			if (!m_reset_delay && (m_inhibit->read() || BIT(m_control, 4)))
 				m_romcs = 1;
 			break;
 		}
@@ -579,7 +580,7 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 			m_map = false;
 		break;
 	case 0xbb: // page in
-		if (!machine().side_effects_disabled() && !m_reset_delay)
+		if (!machine().side_effects_disabled() && !m_reset_delay && (m_inhibit->read() || BIT(m_control, 4)))
 			m_romcs = 1;
 		break;
 	case 0xfe: // sinclair joysticks
@@ -615,6 +616,8 @@ void spectrum_disciple_device::iorq_w(offs_t offset, uint8_t data)
 			m_centronics->write_strobe(BIT(data, 6));
 			// 7: network...
 			m_control = data;
+			if (!m_inhibit->read() && !BIT(m_control, 4))
+				m_romcs = 0;
 		}
 		break;
 	case 0x3b: // wait when net=1

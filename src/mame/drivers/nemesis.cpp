@@ -362,10 +362,15 @@ void nemesis_state::nemesis_filter_w(offs_t offset, uint8_t data)
 	// konamigt also uses bits 0x0018, what are they for?
 }
 
-void nemesis_state::gx400_speech_start_w(uint8_t data)
+void nemesis_state::gx400_speech_w(offs_t offset, uint8_t data)
 {
-	m_vlm->st(1);
-	m_vlm->st(0);
+	m_vlm->rst(BIT(offset, 4));
+	m_vlm->st(BIT(offset, 5));
+	// bits 3, 6 also used (one is OE for VLM data?)
+	// data is irrelevant for most writes
+
+	if (offset == 0)
+		m_vlm->data_w(data);
 }
 
 void nemesis_state::salamand_speech_start_w(uint8_t data)
@@ -586,14 +591,13 @@ void nemesis_state::gx400_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("voiceram");
 	map(0xa000, 0xafff).w(m_k005289, FUNC(k005289_device::ld1_w));
 	map(0xc000, 0xcfff).w(m_k005289, FUNC(k005289_device::ld2_w));
-	map(0xe000, 0xe000).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0xe000, 0xe000).select(0x78).w(FUNC(nemesis_state::gx400_speech_w));
 	map(0xe001, 0xe001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xe003, 0xe003).w(m_k005289, FUNC(k005289_device::tg1_w));
 	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
 	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
 	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
-	map(0xe030, 0xe030).w(FUNC(nemesis_state::gx400_speech_start_w));
 	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
 	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));

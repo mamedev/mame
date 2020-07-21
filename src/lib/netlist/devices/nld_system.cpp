@@ -18,52 +18,12 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 
 
-	// ----------------------------------------------------------------------------------------
-	// extclock
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_RESET(extclock)
-	{
-		m_cnt = 0;
-		m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
-		m_feedback.set_delegate(NETLIB_DELEGATE(update));
-	}
-
-	NETLIB_HANDLER(extclock, clk2)
-	{
-		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
-		if (++m_cnt >= m_size)
-			m_cnt = 0;
-	}
-
-	NETLIB_HANDLER(extclock, clk2_pow2)
-	{
-		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
-		m_cnt = (++m_cnt) & (m_size-1);
-	}
-
-	NETLIB_UPDATE(extclock)
-	{
-		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off());
-		m_off = netlist_time::zero();
-		if (++m_cnt >= m_size)
-			m_cnt = 0;
-
-		// continue with optimized clock handlers ....
-
-		if ((m_size & (m_size-1)) == 0) // power of 2?
-			m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2_pow2, this));
-		else
-			m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2, this));
-	}
-
-
 	NETLIB_DEVICE_IMPL(nc_pin,              "NC_PIN",                 "")
 	NETLIB_DEVICE_IMPL(frontier,            "FRONTIER_DEV",           "+I,+G,+Q")
 	NETLIB_DEVICE_IMPL(function,            "AFUNC",                  "N,FUNC")
 	NETLIB_DEVICE_IMPL(analog_input,        "ANALOG_INPUT",           "IN")
 	NETLIB_DEVICE_IMPL(clock,               "CLOCK",                  "FREQ")
-	NETLIB_DEVICE_IMPL(varclock,            "VARCLOCK",               "FUNC")
+	NETLIB_DEVICE_IMPL(varclock,            "VARCLOCK",               "N,FUNC")
 	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
 	NETLIB_DEVICE_IMPL(sys_dsw1,            "SYS_DSW",                "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(sys_dsw2,            "SYS_DSW2",               "")

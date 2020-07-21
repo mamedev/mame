@@ -34,15 +34,15 @@ DEFINE_DEVICE_TYPE(MM74C923, mm74c923_device, "mm74c923", "MM74C923 20-Key Encod
 
 mm74c922_device::mm74c922_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int max_y) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_write_da(*this),
-	m_read_x(*this),
+	m_write_da(*this), m_read_x(*this), m_tristate_data(*this),
 	m_cap_osc(0), m_cap_debounce(0),
 	m_max_y(max_y),
 	m_inhibit(false),
 	m_x(0),
-	m_y(0), m_data(0),
-	m_da(false),
-	m_next_da(false), m_scan_timer(nullptr)
+	m_y(0),
+	m_data(0), m_next_data(0),
+	m_da(false), m_next_da(false),
+	m_scan_timer(nullptr)
 {
 }
 
@@ -66,6 +66,7 @@ void mm74c922_device::device_start()
 	// resolve callbacks
 	m_write_da.resolve_safe();
 	m_read_x.resolve_all_safe((1 << m_max_y) - 1);
+	m_tristate_data.resolve_safe((1 << m_max_y) - 1);
 
 	// set initial values
 	change_output_lines();
@@ -79,6 +80,7 @@ void mm74c922_device::device_start()
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
 	save_item(NAME(m_data));
+	save_item(NAME(m_next_data));
 	save_item(NAME(m_da));
 	save_item(NAME(m_next_da));
 }
@@ -123,6 +125,12 @@ void mm74c922_device::change_output_lines()
 		// active high output
 		m_write_da(m_da ? 1 : 0);
 	}
+
+	// clock data latches
+	if (m_next_data != m_data)
+	{
+		m_data = m_next_data;
+	}
 }
 
 
@@ -156,7 +164,7 @@ void mm74c922_device::detect_keypress()
 			// key released
 			m_inhibit = false;
 			m_next_da = false;
-			m_data = 0xff; // high-Z
+			m_next_data = m_tristate_data(); // high-Z
 
 			LOG("MM74C922 Key Released\n");
 		}
@@ -172,10 +180,9 @@ void mm74c922_device::detect_keypress()
 				m_next_da = true;
 				m_y = y;
 
-				m_data = (y << 2) | m_x;
+				m_next_data = (y << 2) | m_x;
 
-				LOG("MM74C922 Key Depressed: X %u Y %u = %02x\n", m_x, y, m_data);
-				return;
+				LOG("MM74C922 Key Depressed: X %u Y %u = %02x\n", m_x, y, m_next_data);
 			}
 		}
 	}

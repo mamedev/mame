@@ -33,7 +33,7 @@ public:
 	sys9002_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
+		, m_vram(*this, "videoram")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -42,16 +42,16 @@ public:
 private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void sys9002_io(address_map &map);
-	void sys9002_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<palette_device> m_palette;
 };
 
 
-void sys9002_state::sys9002_mem(address_map &map)
+void sys9002_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom(); // 4 * 4K ROM
@@ -60,7 +60,7 @@ void sys9002_state::sys9002_mem(address_map &map)
 	map(0xc000, 0xc07f).ram(); // ??
 }
 
-void sys9002_state::sys9002_io(address_map &map)
+void sys9002_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -85,7 +85,7 @@ MC6845_UPDATE_ROW( sys9002_state::crtc_update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
+		chr = m_vram[mem];
 
 		/* get pattern of pixels for that character scanline */
 		gfx = chr; //gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
@@ -125,8 +125,8 @@ void sys9002_state::sys9002(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(2'000'000)); // XTAL not visible on images
-	m_maincpu->set_addrmap(AS_PROGRAM, &sys9002_state::sys9002_mem);
-	m_maincpu->set_addrmap(AS_IO, &sys9002_state::sys9002_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sys9002_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sys9002_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -177,7 +177,7 @@ void sys9002_state::sys9002(machine_config &config)
 
 /* ROM definition */
 ROM_START( sys9002 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "55-040.bin", 0x0000, 0x2000, CRC(781eaca9) SHA1(1bdae2bcc43deaef2eb1d6ec302fbadbb779fd48))
 	ROM_LOAD( "55-041.bin", 0x2000, 0x2000, CRC(0f89fe81) SHA1(2dc8de7dabaf11a150cfd34460c5b47612cf5e61))
 	ROM_LOAD( "55-042.bin", 0x4000, 0x2000, CRC(e6fbc837) SHA1(fc11f6a6927709552bedf06b9eb0dc66e9a81264))
@@ -187,4 +187,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME                FLAGS
-COMP( 198?, sys9002, 0,      0,      sys9002, sys9002, sys9002_state, empty_init, "Mannesmann Kienzle", "System 9002 Terminal", MACHINE_IS_SKELETON )
+COMP( 198?, sys9002, 0,      0,      sys9002, sys9002, sys9002_state, empty_init, "Mannesmann Kienzle", "System 9002 Terminal", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

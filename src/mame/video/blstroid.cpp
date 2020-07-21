@@ -7,10 +7,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "includes/blstroid.h"
+#include "cpu/m68000/m68000.h"
 
 
 

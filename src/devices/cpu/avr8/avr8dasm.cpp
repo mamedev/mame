@@ -106,572 +106,539 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 
 	switch(op & 0xf000)
 	{
+	case 0x0000:
+		switch(op & 0x0f00)
+		{
 		case 0x0000:
-			switch(op & 0x0f00)
+			util::stream_format(stream, "NOP");
+			break;
+		case 0x0100:
+			util::stream_format(stream, "MOVW    R%d:R%d, R%d:R%d", (RD4(op) << 1)+1, RD4(op) << 1, (RR4(op) << 1)+1, RR4(op) << 1);
+			break;
+		case 0x0200:
+			util::stream_format(stream, "MULS    R%d, R%d", 16+RD4(op), 16+RR4(op));
+			break;
+		case 0x0300:
+			switch(MULCONST2(op))
 			{
-				case 0x0000:
-					util::stream_format(stream, "NOP");
-					break;
-				case 0x0100:
-					util::stream_format(stream, "MOVW    R%d:R%d, R%d:R%d", (RD4(op) << 1)+1, RD4(op) << 1, (RR4(op) << 1)+1, RR4(op) << 1);
-					break;
-				case 0x0200:
-					util::stream_format(stream, "MULS    R%d, R%d", 16+RD4(op), 16+RR4(op));
-					break;
-				case 0x0300:
-					switch(MULCONST2(op))
-					{
-						case 0:
-							util::stream_format(stream, "MULSU   R%d, R%d", 16+RD3(op), 16+RR3(op));
-							break;
-						case 1:
-							util::stream_format(stream, "FMUL    R%d, R%d", 16+RD3(op), 16+RR3(op));
-							break;
-						case 2:
-							util::stream_format(stream, "FMULS   R%d, R%d", 16+RD3(op), 16+RR3(op));
-							break;
-						case 3:
-							util::stream_format(stream, "FMULSU  R%d, R%d", 16+RD3(op), 16+RR3(op));
-							break;
-					}
-					break;
-				case 0x0400:
-				case 0x0500:
-				case 0x0600:
-				case 0x0700:
-					util::stream_format(stream, "CPC     R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0800:
-				case 0x0900:
-				case 0x0a00:
-				case 0x0b00:
-					util::stream_format(stream, "SBC     R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0c00:
-				case 0x0d00:
-				case 0x0e00:
-				case 0x0f00:
-					util::stream_format(stream, "ADD     R%d, R%d", RD5(op), RR5(op));
-					break;
+			case 0:
+				util::stream_format(stream, "MULSU   R%d, R%d", 16+RD3(op), 16+RR3(op));
+				break;
+			case 1:
+				util::stream_format(stream, "FMUL    R%d, R%d", 16+RD3(op), 16+RR3(op));
+				break;
+			case 2:
+				util::stream_format(stream, "FMULS   R%d, R%d", 16+RD3(op), 16+RR3(op));
+				break;
+			case 3:
+				util::stream_format(stream, "FMULSU  R%d, R%d", 16+RD3(op), 16+RR3(op));
+				break;
 			}
 			break;
-		case 0x1000:
-			switch(op & 0x0c00)
+		case 0x0400:
+		case 0x0500:
+		case 0x0600:
+		case 0x0700:
+			util::stream_format(stream, "CPC     R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0800:
+		case 0x0900:
+		case 0x0a00:
+		case 0x0b00:
+			util::stream_format(stream, "SBC     R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0c00:
+		case 0x0d00:
+		case 0x0e00:
+		case 0x0f00:
+			util::stream_format(stream, "ADD     R%d, R%d", RD5(op), RR5(op));
+			break;
+		}
+		break;
+	case 0x1000:
+		switch(op & 0x0c00)
+		{
+		case 0x0000:
+			util::stream_format(stream, "CPSE    R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0400:
+			util::stream_format(stream, "CP      R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0800:
+			util::stream_format(stream, "SUB     R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0c00:
+			util::stream_format(stream, "ADC     R%d, R%d", RD5(op), RR5(op));
+			break;
+		}
+		break;
+	case 0x2000:
+		switch(op & 0x0c00)
+	{
+		case 0x0000:
+			util::stream_format(stream, "AND     R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0400:
+			util::stream_format(stream, "EOR     R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0800:
+			util::stream_format(stream, "OR      R%d, R%d", RD5(op), RR5(op));
+			break;
+		case 0x0c00:
+			util::stream_format(stream, "MOV     R%d, R%d", RD5(op), RR5(op));
+			break;
+		}
+		break;
+	case 0x3000:
+		util::stream_format(stream, "CPI     R%d, 0x%02x", 16+RD4(op), KCONST8(op));
+		break;
+	case 0x4000:
+		util::stream_format(stream, "SBCI    R%d, 0x%02x", 16+RD4(op), KCONST8(op));
+		break;
+	case 0x5000:
+		util::stream_format(stream, "SUBI    R%d, 0x%02x", 16+RD4(op), KCONST8(op));
+		break;
+	case 0x6000:
+		util::stream_format(stream, "ORI     R%d, 0x%02x", 16+RD4(op), KCONST8(op));
+		break;
+	case 0x7000:
+		util::stream_format(stream, "ANDI    R%d, 0x%02x", 16+RD4(op), KCONST8(op));
+		break;
+	case 0x8000:
+	case 0xa000:
+		switch(op & 0x0208)
+		{
+		case 0x0000:
+			util::stream_format(stream, "LD(D)   R%d, Z+%02x", RD5(op), QCONST6(op));
+			break;
+		case 0x0008:
+			util::stream_format(stream, "LD(D)   R%d, Y+%02x", RD5(op), QCONST6(op));
+			break;
+		case 0x0200:
+			util::stream_format(stream, "ST(D)   Z+%02x, R%d", QCONST6(op), RD5(op));
+			break;
+		case 0x0208:
+			util::stream_format(stream, "ST(D)   Y+%02x, R%d", QCONST6(op), RD5(op));
+			break;
+		}
+		break;
+	case 0x9000:
+		switch(op & 0x0f00)
+		{
+		case 0x0000:
+		case 0x0100:
+			switch(op & 0x000f)
 			{
-				case 0x0000:
-					util::stream_format(stream, "CPSE    R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0400:
-					util::stream_format(stream, "CP      R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0800:
-					util::stream_format(stream, "SUB     R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0c00:
-					util::stream_format(stream, "ADC     R%d, R%d", RD5(op), RR5(op));
-					break;
+			case 0x0000:
+				op <<= 16;
+				op |= opcodes.r16(pc);
+				pc += 2;
+				util::stream_format(stream, "LDS     R%d, (0x%04x)", RD5(op >> 16), op & 0x0000ffff);
+				break;
+			case 0x0001:
+				util::stream_format(stream, "LD      R%d, Z+", RD5(op));
+				break;
+			case 0x0002:
+				util::stream_format(stream, "LD      R%d,-Z", RD5(op));
+				break;
+			case 0x0004:
+				util::stream_format(stream, "LPM     R%d, Z", RD5(op));
+				break;
+			case 0x0005:
+				util::stream_format(stream, "LPM     R%d, Z+", RD5(op));
+				break;
+			case 0x0006:
+				util::stream_format(stream, "ELPM    R%d, Z", RD5(op));
+				break;
+			case 0x0007:
+				util::stream_format(stream, "ELPM    R%d, Z+", RD5(op));
+				break;
+			case 0x0009:
+				util::stream_format(stream, "LD      R%d, Y+", RD5(op));
+				break;
+			case 0x000a:
+				util::stream_format(stream, "LD      R%d,-Y", RD5(op));
+				break;
+			case 0x000c:
+				util::stream_format(stream, "LD      R%d, X", RD5(op));
+				break;
+			case 0x000d:
+				util::stream_format(stream, "LD      R%d, X+", RD5(op));
+				break;
+			case 0x000e:
+				util::stream_format(stream, "LD      R%d,-X", RD5(op));
+				break;
+			case 0x000f:
+				util::stream_format(stream, "POP     R%d", RD5(op));
+				break;
+			default:
+				util::stream_format(stream, "Undefined (%08x)", op);
+				break;
 			}
 			break;
-		case 0x2000:
-			switch(op & 0x0c00)
+		case 0x0200:
+		case 0x0300:
+			switch(op & 0x000f)
 			{
-				case 0x0000:
-					util::stream_format(stream, "AND     R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0400:
-					util::stream_format(stream, "EOR     R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0800:
-					util::stream_format(stream, "OR      R%d, R%d", RD5(op), RR5(op));
-					break;
-				case 0x0c00:
-					util::stream_format(stream, "MOV     R%d, R%d", RD5(op), RR5(op));
-					break;
+			case 0x0000:
+				op <<= 16;
+				op |= opcodes.r16(pc);
+				pc += 2;
+				util::stream_format(stream, "STS     (0x%04x), R%d", op & 0x0000ffff, RD5(op >> 16));
+				break;
+			case 0x0001:
+				util::stream_format(stream, "ST       Z+, R%d", RD5(op));
+				break;
+			case 0x0002:
+				util::stream_format(stream, "ST      -Z , R%d", RD5(op));
+				break;
+			case 0x0009:
+				util::stream_format(stream, "ST       Y+, R%d", RD5(op));
+				break;
+			case 0x000a:
+				util::stream_format(stream, "ST      -Y , R%d", RD5(op));
+				break;
+			case 0x000c:
+				util::stream_format(stream, "ST       X , R%d", RD5(op));
+				break;
+			case 0x000d:
+				util::stream_format(stream, "ST       X+, R%d", RD5(op));
+				break;
+			case 0x000e:
+				util::stream_format(stream, "ST      -X , R%d", RD5(op));
+				break;
+			case 0x000f:
+				util::stream_format(stream, "PUSH    R%d", RD5(op));
+				break;
+			default:
+				util::stream_format(stream, "Undefined (%08x)", op);
+				break;
 			}
 			break;
-		case 0x3000:
-			util::stream_format(stream, "CPI     R%d, 0x%02x", 16+RD4(op), KCONST8(op));
-			break;
-		case 0x4000:
-			util::stream_format(stream, "SBCI    R%d, 0x%02x", 16+RD4(op), KCONST8(op));
-			break;
-		case 0x5000:
-				util::stream_format(stream, "SUBI    R%d, 0x%02x", 16+RD4(op), KCONST8(op));
-			break;
-		case 0x6000:
-				util::stream_format(stream, "ORI     R%d, 0x%02x", 16+RD4(op), KCONST8(op));
-			break;
-		case 0x7000:
-				util::stream_format(stream, "ANDI    R%d, 0x%02x", 16+RD4(op), KCONST8(op));
-			break;
-		case 0x8000:
-		case 0xa000:
-			switch(op & 0x0208)
+		case 0x0400:
+			switch(op & 0x000f)
 			{
+			case 0x0000:
+				util::stream_format(stream, "COM     R%d", RD5(op));
+				break;
+			case 0x0001:
+				util::stream_format(stream, "NEG     R%d", RD5(op));
+				break;
+			case 0x0002:
+				util::stream_format(stream, "SWAP    R%d", RD5(op));
+				break;
+			case 0x0003:
+				util::stream_format(stream, "INC     R%d", RD5(op));
+				break;
+			case 0x0005:
+				util::stream_format(stream, "ASR     R%d", RD5(op));
+				break;
+			case 0x0006:
+				util::stream_format(stream, "LSR     R%d", RD5(op));
+				break;
+			case 0x0007:
+				util::stream_format(stream, "ROR     R%d", RD5(op));
+				break;
+			case 0x0008:
+				switch(op & 0x00f0)
+				{
 				case 0x0000:
-					util::stream_format(stream, "LD(D)   R%d, Z+%02x", RD5(op), QCONST6(op));
+					util::stream_format(stream, "SEC");
 					break;
-				case 0x0008:
-					util::stream_format(stream, "LD(D)   R%d, Y+%02x", RD5(op), QCONST6(op));
+				case 0x0010:
+					util::stream_format(stream, "SEZ");
 					break;
-				case 0x0200:
-					util::stream_format(stream, "ST(D)   Z+%02x, R%d", QCONST6(op), RD5(op));
+				case 0x0020:
+					util::stream_format(stream, "SEN");
 					break;
-				case 0x0208:
-					util::stream_format(stream, "ST(D)   Y+%02x, R%d", QCONST6(op), RD5(op));
+				case 0x0030:
+					util::stream_format(stream, "SEV");
 					break;
+				case 0x0040:
+					util::stream_format(stream, "SES");
+					break;
+				case 0x0050:
+					util::stream_format(stream, "SEH");
+					break;
+				case 0x0060:
+					util::stream_format(stream, "SET");
+					break;
+				case 0x0070:
+					util::stream_format(stream, "SEI");
+					break;
+				case 0x0080:
+					util::stream_format(stream, "CLC");
+					break;
+				case 0x0090:
+					util::stream_format(stream, "CLZ");
+					break;
+				case 0x00a0:
+					util::stream_format(stream, "CLN");
+					break;
+				case 0x00b0:
+					util::stream_format(stream, "CLV");
+					break;
+				case 0x00c0:
+					util::stream_format(stream, "CLS");
+					break;
+				case 0x00d0:
+					util::stream_format(stream, "CLH");
+					break;
+				case 0x00e0:
+					util::stream_format(stream, "CLT");
+					break;
+				case 0x00f0:
+					util::stream_format(stream, "CLI");
+					break;
+				default:
+					util::stream_format(stream, "Undefined (%08x)", op);
+					break;
+				}
+				break;
+			case 0x0009:
+				switch(op & 0x00f0)
+				{
+				case 0x0000:
+					util::stream_format(stream, "IJMP");
+					break;
+				case 0x0010:
+					util::stream_format(stream, "EIJMP");
+					break;
+				default:
+					util::stream_format(stream, "Undefined (%08x)", op);
+					break;
+				}
+				break;
+			case 0x000a:
+				util::stream_format(stream, "DEC     R%d", RD5(op));
+				break;
+			case 0x000c:
+			case 0x000d:
+				addr = KCONST22(op) << 16;
+				addr |= opcodes.r16(pc);
+				pc += 2;
+				util::stream_format(stream, "JMP     0x%06x", addr << 1);
+				break;
+			case 0x000e:
+			case 0x000f:
+				addr = KCONST22(op) << 16;
+				addr |= opcodes.r16(pc);
+				pc += 2;
+				util::stream_format(stream, "CALL    0x%06x", addr << 1);
+				break;
+			default:
+				util::stream_format(stream, "Undefined (%08x)", op);
+				break;
 			}
 			break;
-		case 0x9000:
-			switch(op & 0x0f00)
+		case 0x0500:
+			switch(op & 0x000f)
 			{
+			case 0x0000:
+				util::stream_format(stream, "COM     R%d", RD5(op));
+				break;
+			case 0x0001:
+				util::stream_format(stream, "NEG     R%d", RD5(op));
+				break;
+			case 0x0002:
+				util::stream_format(stream, "SWAP    R%d", RD5(op));
+				break;
+			case 0x0003:
+				util::stream_format(stream, "INC     R%d", RD5(op));
+				break;
+			case 0x0005:
+				util::stream_format(stream, "ASR     R%d", RD5(op));
+				break;
+			case 0x0006:
+				util::stream_format(stream, "LSR     R%d", RD5(op));
+				break;
+			case 0x0007:
+				util::stream_format(stream, "ROR     R%d", RD5(op));
+				break;
+			case 0x0008:
+				switch(op & 0x00f0)
+				{
 				case 0x0000:
-				case 0x0100:
-					switch(op & 0x000f)
-					{
-						case 0x0000:
-							op <<= 16;
-							op |= opcodes.r16(pc);
-							pc += 2;
-							util::stream_format(stream, "LDS     R%d, (0x%04x)", RD5(op >> 16), op & 0x0000ffff);
-							break;
-						case 0x0001:
-							util::stream_format(stream, "LD      R%d, Z+", RD5(op));
-							break;
-						case 0x0002:
-							util::stream_format(stream, "LD      R%d,-Z", RD5(op));
-							break;
-						case 0x0004:
-							util::stream_format(stream, "LPM     R%d, Z", RD5(op));
-							break;
-						case 0x0005:
-							util::stream_format(stream, "LPM     R%d, Z+", RD5(op));
-							break;
-						case 0x0006:
-							util::stream_format(stream, "ELPM    R%d, Z", RD5(op));
-							break;
-						case 0x0007:
-							util::stream_format(stream, "ELPM    R%d, Z+", RD5(op));
-							break;
-						case 0x0009:
-							util::stream_format(stream, "LD      R%d, Y+", RD5(op));
-							break;
-						case 0x000a:
-							util::stream_format(stream, "LD      R%d,-Y", RD5(op));
-							break;
-						case 0x000c:
-							util::stream_format(stream, "LD      R%d, X", RD5(op));
-							break;
-						case 0x000d:
-							util::stream_format(stream, "LD      R%d, X+", RD5(op));
-							break;
-						case 0x000e:
-							util::stream_format(stream, "LD      R%d,-X", RD5(op));
-							break;
-						case 0x000f:
-							util::stream_format(stream, "POP     R%d", RD5(op));
-							break;
-						default:
-							util::stream_format(stream, "Undefined (%08x)", op);
-							break;
-					}
+					util::stream_format(stream, "RET");
 					break;
-				case 0x0200:
-				case 0x0300:
-					switch(op & 0x000f)
-					{
-						case 0x0000:
-							op <<= 16;
-							op |= opcodes.r16(pc);
-							pc += 2;
-							util::stream_format(stream, "STS     (0x%04x), R%d", op & 0x0000ffff, RD5(op >> 16));
-							break;
-						case 0x0001:
-							util::stream_format(stream, "ST       Z+, R%d", RD5(op));
-							break;
-						case 0x0002:
-							util::stream_format(stream, "ST      -Z , R%d", RD5(op));
-							break;
-						case 0x0009:
-							util::stream_format(stream, "ST       Y+, R%d", RD5(op));
-							break;
-						case 0x000a:
-							util::stream_format(stream, "ST      -Y , R%d", RD5(op));
-							break;
-						case 0x000c:
-							util::stream_format(stream, "ST       X , R%d", RD5(op));
-							break;
-						case 0x000d:
-							util::stream_format(stream, "ST       X+, R%d", RD5(op));
-							break;
-						case 0x000e:
-							util::stream_format(stream, "ST      -X , R%d", RD5(op));
-							break;
-						case 0x000f:
-							util::stream_format(stream, "PUSH    R%d", RD5(op));
-							break;
-						default:
-							util::stream_format(stream, "Undefined (%08x)", op);
-							break;
-					}
+				case 0x0010:
+					util::stream_format(stream, "RETI");
 					break;
-				case 0x0400:
-					switch(op & 0x000f)
-					{
-						case 0x0000:
-							util::stream_format(stream, "COM     R%d", RD5(op));
-							break;
-						case 0x0001:
-							util::stream_format(stream, "NEG     R%d", RD5(op));
-							break;
-						case 0x0002:
-							util::stream_format(stream, "SWAP    R%d", RD5(op));
-							break;
-						case 0x0003:
-							util::stream_format(stream, "INC     R%d", RD5(op));
-							break;
-						case 0x0005:
-							util::stream_format(stream, "ASR     R%d", RD5(op));
-							break;
-						case 0x0006:
-							util::stream_format(stream, "LSR     R%d", RD5(op));
-							break;
-						case 0x0007:
-							util::stream_format(stream, "ROR     R%d", RD5(op));
-							break;
-						case 0x0008:
-							switch(op & 0x00f0)
-							{
-								case 0x0000:
-									util::stream_format(stream, "SEC");
-									break;
-								case 0x0010:
-									util::stream_format(stream, "SEZ");
-									break;
-								case 0x0020:
-									util::stream_format(stream, "SEN");
-									break;
-								case 0x0030:
-									util::stream_format(stream, "SEV");
-									break;
-								case 0x0040:
-									util::stream_format(stream, "SES");
-									break;
-								case 0x0050:
-									util::stream_format(stream, "SEH");
-									break;
-								case 0x0060:
-									util::stream_format(stream, "SET");
-									break;
-								case 0x0070:
-									util::stream_format(stream, "SEI");
-									break;
-								case 0x0080:
-									util::stream_format(stream, "CLC");
-									break;
-								case 0x0090:
-									util::stream_format(stream, "CLZ");
-									break;
-								case 0x00a0:
-									util::stream_format(stream, "CLN");
-									break;
-								case 0x00b0:
-									util::stream_format(stream, "CLV");
-									break;
-								case 0x00c0:
-									util::stream_format(stream, "CLS");
-									break;
-								case 0x00d0:
-									util::stream_format(stream, "CLH");
-									break;
-								case 0x00e0:
-									util::stream_format(stream, "CLT");
-									break;
-								case 0x00f0:
-									util::stream_format(stream, "CLI");
-									break;
-								default:
-									util::stream_format(stream, "Undefined (%08x)", op);
-									break;
-							}
-							break;
-						case 0x0009:
-							switch(op & 0x00f0)
-							{
-								case 0x0000:
-									util::stream_format(stream, "IJMP");
-									break;
-								case 0x0010:
-									util::stream_format(stream, "EIJMP");
-									break;
-								default:
-									util::stream_format(stream, "Undefined (%08x)", op);
-									break;
-							}
-							break;
-						case 0x000a:
-							util::stream_format(stream, "DEC     R%d", RD5(op));
-							break;
-						case 0x000c:
-						case 0x000d:
-							addr = KCONST22(op) << 16;
-							addr |= opcodes.r16(pc);
-							pc += 2;
-							util::stream_format(stream, "JMP     0x%06x", addr << 1);
-							break;
-						case 0x000e:
-						case 0x000f:
-							addr = KCONST22(op) << 16;
-							addr |= opcodes.r16(pc);
-							pc += 2;
-							util::stream_format(stream, "CALL    0x%06x", addr << 1);
-							break;
-						default:
-							util::stream_format(stream, "Undefined (%08x)", op);
-							break;
-					}
+				case 0x0080:
+					util::stream_format(stream, "SLEEP");
 					break;
-				case 0x0500:
-					switch(op & 0x000f)
-					{
-						case 0x0000:
-							util::stream_format(stream, "COM     R%d", RD5(op));
-							break;
-						case 0x0001:
-							util::stream_format(stream, "NEG     R%d", RD5(op));
-							break;
-						case 0x0002:
-							util::stream_format(stream, "SWAP    R%d", RD5(op));
-							break;
-						case 0x0003:
-							util::stream_format(stream, "INC     R%d", RD5(op));
-							break;
-						case 0x0005:
-							util::stream_format(stream, "ASR     R%d", RD5(op));
-							break;
-						case 0x0006:
-							util::stream_format(stream, "LSR     R%d", RD5(op));
-							break;
-						case 0x0007:
-							util::stream_format(stream, "ROR     R%d", RD5(op));
-							break;
-						case 0x0008:
-							switch(op & 0x00f0)
-							{
-								case 0x0000:
-									util::stream_format(stream, "RET");
-									break;
-								case 0x0010:
-									util::stream_format(stream, "RETI");
-									break;
-								case 0x0080:
-									util::stream_format(stream, "SLEEP");
-									break;
-								case 0x0090:
-									util::stream_format(stream, "BREAK");
-									break;
-								case 0x00a0:
-									util::stream_format(stream, "WDR");
-									break;
-								case 0x00c0:
-									util::stream_format(stream, "LPM");
-									break;
-								case 0x00d0:
-									util::stream_format(stream, "ELPM");
-									break;
-								case 0x00e0:
-									util::stream_format(stream, "SPM");
-									break;
-								case 0x00f0:
-									util::stream_format(stream, "SPM     Z+");
-									break;
-								default:
-									util::stream_format(stream, "Undefined (%08x)", op);
-									break;
-							}
-							break;
-						case 0x0009:
-							switch(op & 0x00f0)
-							{
-								case 0x0000:
-									util::stream_format(stream, "ICALL");
-									break;
-								case 0x0010:
-									util::stream_format(stream, "EICALL");
-									break;
-								default:
-									util::stream_format(stream, "Undefined (%08x)", op);
-									break;
-							}
-							break;
-						case 0x000a:
-							util::stream_format(stream, "DEC     R%d", RD5(op));
-							break;
-						case 0x000c:
-						case 0x000d:
-							op <<= 16;
-							op |= opcodes.r16(pc);
-							pc += 2;
-							util::stream_format(stream, "JMP     0x%06x", KCONST22(op) << 1);
-							break;
-						case 0x000e:
-						case 0x000f:
-							op <<= 16;
-							op |= opcodes.r16(pc);
-							pc += 2;
-							util::stream_format(stream, "CALL    0x%06x", KCONST22(op) << 1);
-							break;
-					}
+				case 0x0090:
+					util::stream_format(stream, "BREAK");
 					break;
-				case 0x0600:
-					util::stream_format(stream, "ADIW    R%d:R%d, 0x%02x", 24+(RD2(op) << 1)+1, 24+(RD2(op) << 1), KCONST6(op));
+				case 0x00a0:
+					util::stream_format(stream, "WDR");
 					break;
-				case 0x0700:
-					util::stream_format(stream, "SBIW    R%d:R%d, 0x%02x", 24+(RD2(op) << 1)+1, 24+(RD2(op) << 1), KCONST6(op));
+				case 0x00c0:
+					util::stream_format(stream, "LPM");
 					break;
-				case 0x0800:
-			if (ACONST5(op) < 0x20)
+				case 0x00d0:
+					util::stream_format(stream, "ELPM");
+					break;
+				case 0x00e0:
+					util::stream_format(stream, "SPM");
+					break;
+				case 0x00f0:
+					util::stream_format(stream, "SPM     Z+");
+					break;
+				default:
+					util::stream_format(stream, "Undefined (%08x)", op);
+					break;
+				}
+				break;
+			case 0x0009:
+				switch(op & 0x00f0)
+				{
+				case 0x0000:
+					util::stream_format(stream, "ICALL");
+					break;
+				case 0x0010:
+					util::stream_format(stream, "EICALL");
+					break;
+				default:
+					util::stream_format(stream, "Undefined (%08x)", op);
+					break;
+				}
+				break;
+			case 0x000a:
+				util::stream_format(stream, "DEC     R%d", RD5(op));
+				break;
+			case 0x000c:
+			case 0x000d:
+				op <<= 16;
+				op |= opcodes.r16(pc);
+				pc += 2;
+				util::stream_format(stream, "JMP     0x%06x", KCONST22(op) << 1);
+				break;
+			case 0x000e:
+			case 0x000f:
+				op <<= 16;
+				op |= opcodes.r16(pc);
+				pc += 2;
+				util::stream_format(stream, "CALL    0x%06x", KCONST22(op) << 1);
+				break;
+			}
+			break;
+		case 0x0600:
+			util::stream_format(stream, "ADIW    R%d:R%d, 0x%02x", 24+(RD2(op) << 1)+1, 24+(RD2(op) << 1), KCONST6(op));
+			break;
+		case 0x0700:
+			util::stream_format(stream, "SBIW    R%d:R%d, 0x%02x", 24+(RD2(op) << 1)+1, 24+(RD2(op) << 1), KCONST6(op));
+			break;
+		case 0x0800:
 			util::stream_format(stream, "CBI     %s, %s", register_names[ACONST5(op)], register_bit_names[ACONST5(op)][RR3(op)]);
-			else
-			util::stream_format(stream, "CBI     0x%02x, %d", ACONST5(op), RR3(op));
-					break;
-				case 0x0900:
-			if (ACONST5(op) < 0x20)
+			break;
+		case 0x0900:
 			util::stream_format(stream, "SBIC    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)]);
-			else
-			util::stream_format(stream, "SBIC    0x%02x, %d", ACONST5(op), RR3(op));
-					break;
-				case 0x0a00:
-			if (ACONST5(op) < 0x20)
+			break;
+		case 0x0a00:
 			util::stream_format(stream, "SBI     %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)]);
-			else
-			util::stream_format(stream, "SBI     0x%02x, %d", ACONST5(op), RR3(op));
-					break;
-				case 0x0b00:
-			if (ACONST5(op) < 0x20)
+			break;
+		case 0x0b00:
 			util::stream_format(stream, "SBIS    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)]);
-			else
-			util::stream_format(stream, "SBIS    0x%02x, %d", ACONST5(op), RR3(op));
-					break;
-				case 0x0c00:
-				case 0x0d00:
-				case 0x0e00:
-				case 0x0f00:
-					util::stream_format(stream, "MUL     R%d, R%d", RD5(op), RR5(op));
-					break;
-			}
 			break;
-		case 0xb000:
-			if(op & 0x0800)
-			{
-		if (ACONST6(op) < 0x40 ) {
+		case 0x0c00:
+		case 0x0d00:
+		case 0x0e00:
+		case 0x0f00:
+			util::stream_format(stream, "MUL     R%d, R%d", RD5(op), RR5(op));
+			break;
+		}
+		break;
+	case 0xb000:
+		if(op & 0x0800)
 			util::stream_format(stream, "OUT     %s, R%d", register_names[ACONST6(op)], RD5(op));
-		} else {
-			util::stream_format(stream, "OUT     0x%02x, R%d", ACONST6(op), RD5(op));
-		}
-			}
-			else
-			{
-		if (ACONST6(op) < 0x40 ) {
+		else
 			util::stream_format(stream, "IN      R%d, %s", RD5(op), register_names[ACONST6(op)]);
-		} else {
-			util::stream_format(stream, "IN      R%d, 0x%02x", RD5(op), ACONST6(op));
-		}
-			}
-			break;
-		case 0xc000:
-		//I'm not sure if this is correct. why pc + ... : pc + 8 + ... ?
-			util::stream_format(stream, "RJMP    %08x", (((op & 0x0800) ? pc + ((op & 0x0fff) | 0xfffff000) : pc + 8 + (op & 0x0fff)) << 0));
-			break;
-		case 0xd000:
-			util::stream_format(stream, "RCALL   %08x", (((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff)) << 1));
-			break;
-		case 0xe000:
-			util::stream_format(stream, "LDI     R%d, 0x%02x", 16 + RD4(op), KCONST8(op));
-			break;
-		case 0xf000:
-			switch(op & 0x0c00)
+		break;
+	case 0xc000:
+		util::stream_format(stream, "RJMP    %08x", (((op & 0x0800) ? pc + ((op & 0x0fff) | 0xfffff000) : pc + 2 + (op & 0x0fff)) << 0));
+		break;
+	case 0xd000:
+		util::stream_format(stream, "RCALL   %08x", (((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff)) << 1));
+		break;
+	case 0xe000:
+		util::stream_format(stream, "LDI     R%d, 0x%02x", 16 + RD4(op), KCONST8(op));
+		break;
+	case 0xf000:
+		switch(op & 0x0c00)
+		{
+		case 0x0000:
+			switch(op & 0x0007)
 			{
-				case 0x0000:
-					switch(op & 0x0007)
-					{
-						case 0x0000:
-							util::stream_format(stream, "BRLO    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0001:
-							util::stream_format(stream, "BREQ    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0002:
-							util::stream_format(stream, "BRMI    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0003:
-							util::stream_format(stream, "BRVS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0004:
-							util::stream_format(stream, "BRLT    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0005:
-							util::stream_format(stream, "BRHS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0006:
-							util::stream_format(stream, "BRTS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0007:
-							util::stream_format(stream, "BRIE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-					}
-					break;
-				case 0x0400:
-					switch(op & 0x0007)
-					{
-						case 0x0000:
-							util::stream_format(stream, "BRSH    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0001:
-							util::stream_format(stream, "BRNE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0002:
-							util::stream_format(stream, "BRPL    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0003:
-							util::stream_format(stream, "BRVC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0004:
-							util::stream_format(stream, "BRGE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0005:
-							util::stream_format(stream, "BRHC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0006:
-							util::stream_format(stream, "BRTC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-						case 0x0007:
-							util::stream_format(stream, "BRID    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
-							break;
-					}
-					break;
-				case 0x0800:
-					if(op & 0x0200)
-					{
-						util::stream_format(stream, "BST     R%d, %d", RD5(op), RR3(op));
-					}
-					else
-					{
-						util::stream_format(stream, "BLD     R%d, %d", RD5(op), RR3(op));
-					}
-					break;
-				case 0x0c00:
-					if(op & 0x0200)
-					{
-						util::stream_format(stream, "SBRS    R%d, %d", RD5(op), RR3(op));
-					}
-					else
-					{
-						util::stream_format(stream, "SBRC    R%d, %d", RD5(op), RR3(op));
-					}
-					break;
+			case 0x0000:
+				util::stream_format(stream, "BRLO    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0001:
+				util::stream_format(stream, "BREQ    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0002:
+				util::stream_format(stream, "BRMI    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0003:
+				util::stream_format(stream, "BRVS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0004:
+				util::stream_format(stream, "BRLT    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0005:
+				util::stream_format(stream, "BRHS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0006:
+				util::stream_format(stream, "BRTS    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0007:
+				util::stream_format(stream, "BRIE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
 			}
 			break;
+		case 0x0400:
+			switch(op & 0x0007)
+			{
+			case 0x0000:
+				util::stream_format(stream, "BRSH    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0001:
+				util::stream_format(stream, "BRNE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0002:
+				util::stream_format(stream, "BRPL    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0003:
+				util::stream_format(stream, "BRVC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0004:
+				util::stream_format(stream, "BRGE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0005:
+				util::stream_format(stream, "BRHC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0006:
+				util::stream_format(stream, "BRTC    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			case 0x0007:
+				util::stream_format(stream, "BRID    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
+				break;
+			}
+			break;
+		case 0x0800:
+			if(op & 0x0200)
+				util::stream_format(stream, "BST     R%d, %d", RD5(op), RR3(op));
+			else
+				util::stream_format(stream, "BLD     R%d, %d", RD5(op), RR3(op));
+			break;
+		case 0x0c00:
+			if(op & 0x0200)
+				util::stream_format(stream, "SBRS    R%d, %d", RD5(op), RR3(op));
+			else
+				util::stream_format(stream, "SBRC    R%d, %d", RD5(op), RR3(op));
+			break;
+		}
+		break;
 	}
 
 	return (pc - base_pc) | SUPPORTED;

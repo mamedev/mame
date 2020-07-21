@@ -13,7 +13,7 @@
 
 #include "qbus.h"
 
-#include "includes/pdp11.h"
+#include "machine/pdp11.h"
 #include "softlist_dev.h"
 
 

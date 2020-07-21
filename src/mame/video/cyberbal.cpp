@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
 #include "includes/cyberbal.h"
 
 
