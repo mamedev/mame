@@ -109,6 +109,12 @@ ROM_START( jak_dchp )
 	ROM_LOAD( "dcheroportal_mx30lf1g08aa_c2f1.bin", 0x000000, 0x8400000, CRC(576a3005) SHA1(6cd9edc4def707aede3f82a21c87269d2a6bc870) )
 ROM_END
 
+ROM_START( jak_prhp )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mx30lf1g08aa.u2", 0x000000, 0x8400000, CRC(4ccd7e53) SHA1(decbd424f088d180776a817c80b147d6a887e5c1) )
+ROM_END
+
+
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
 	uint8_t* rom = memregion("maincpu")->base();
@@ -154,5 +160,5 @@ void generalplus_gpl32612_game_state::nand_init840()
 CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_IS_SKELETON )
 CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_IS_SKELETON )
 CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_IS_SKELETON )
-// Hero Portal Power Rangers
+CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_IS_SKELETON ) // from a PAL unit (probably not region specific)
 CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_IS_SKELETON )

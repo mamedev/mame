@@ -16,6 +16,7 @@ public:
 
 	void shredmjr(machine_config &config);
 	void taikeegr(machine_config &config);
+	void taikeegrp(machine_config &config);
 
 	void init_taikeegr();
 
@@ -111,6 +112,26 @@ static INPUT_PORTS_START( taikeegr )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( guitarstp )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )   PORT_NAME("Strum Bar Down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Strum Bar Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Whamming Bar")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Green")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Orange")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 void shredmjr_game_state::shredmjr(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -126,16 +147,18 @@ void shredmjr_game_state::taikeegr(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &shredmjr_game_state::mem_map_4m);
-	m_maincpu->set_pal(true);
-
+	
 	spg2xx_base(config);
 
-	m_screen->set_refresh_hz(50);
-//  m_screen->set_size(320, 312);
-
 	m_maincpu->porta_in().set_ioport("P1");
-//  m_maincpu->portb_in().set_ioport("P2");
-//  m_maincpu->portc_in().set_ioport("P3");
+}
+
+void shredmjr_game_state::taikeegrp(machine_config &config)
+{
+	taikeegr(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
 }
 
 
@@ -190,11 +213,23 @@ ROM_START( guitarst )
 	ROM_LOAD16_WORD_SWAP( "guitarstar_s29gl064m11tfir4_0001227e.bin", 0x000000, 0x800000, CRC(feaace47) SHA1(dd426bb4f03a16b1b96b63b4e0d79ea75097bf72) )
 ROM_END
 
+ROM_START( guitarstp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29gl064.u2", 0x000000, 0x800000, CRC(1dbcff73) SHA1(b179e4da6f38e7d5ec796bf846a63492d30eb0f5) )
+ROM_END
+
+
+
 
 // there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)
 // for the UK version the title screen always shows "Guitar Rock", however there are multiple boxes with different titles and song selections.
 // ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
-CONS( 2007, taikeegr,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
-CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+CONS( 2007, taikeegr,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
-CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+// doesn't have a Senario logo ingame, but does on box.
+CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+
+// this one has a different song selection (same as one in the alt undumped Rockstar Guitar / Guitar Rock.  It was sold as a different product, so hasn't been set as a clone.  Unit found in Ireland 
+// ITEM #01109 on instruction sheet, no manufacturer named on either box or instructions
+CONS( 200?, guitarstp,   0,        0,        taikeegrp,    guitarstp,shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^

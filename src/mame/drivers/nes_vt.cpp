@@ -1391,8 +1391,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( duetpp )
 	PORT_START("IO0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1401,28 +1401,28 @@ static INPUT_PORTS_START( duetpp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 
 	PORT_START("IO1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2:0001" )
+	PORT_DIPNAME( 0x0001, 0x0000, "P2:0001" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0001, "0001" )
-	PORT_DIPNAME( 0x0002, 0x0002, "P2:0002" )
+	PORT_DIPNAME( 0x0002, 0x0000, "P2:0002" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0002, "0002" )
-	PORT_DIPNAME( 0x0004, 0x0004, "P2:0004" )
+	PORT_DIPNAME( 0x0004, 0x0000, "P2:0004" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0004, "0004" )
-	PORT_DIPNAME( 0x0008, 0x0008, "P2:0008" )
+	PORT_DIPNAME( 0x0008, 0x0000, "P2:0008" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0008, "0008" )
-	PORT_DIPNAME( 0x0010, 0x0010, "P2:0010" )
+	PORT_DIPNAME( 0x0010, 0x0000, "P2:0010" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0010, "0010" )
-	PORT_DIPNAME( 0x0020, 0x0020, "P2:0020" )
+	PORT_DIPNAME( 0x0020, 0x0000, "P2:0020" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0020, "0020" )
-	PORT_DIPNAME( 0x0040, 0x0040, "P2:0040" )
+	PORT_DIPNAME( 0x0040, 0x0000, "P2:0040" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0040, "0040" )
-	PORT_DIPNAME( 0x0080, 0x0080, "P2:0080" )
+	PORT_DIPNAME( 0x0080, 0x0000, "P2:0080" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0080, "0080" )
 INPUT_PORTS_END
@@ -1983,7 +1983,7 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init
 CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission?
-CONS( 200?, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Game Sporz", "Wireless Duet Play Ping-Pong", MACHINE_NOT_WORKING )
+CONS( 200?, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_NOT_WORKING )
 
 
 
