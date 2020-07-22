@@ -6112,6 +6112,9 @@ ROM_START( jolyjokro )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)	// deinterleaved GFX data will be placed here
 
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_LOAD( "jolyjokro_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
+
 	ROM_REGION( 0x0200, "proms", 0 )	// PLD address the 2nd half
 	ROM_LOAD( "1_impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
 ROM_END
@@ -6122,6 +6125,9 @@ ROM_START( jolyjokrp )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "9c_1ff1.bin", 0x00000, 0x20000, CRC(4b8f0821) SHA1(0821eed07f5e98b66d87a3079756dad72ffe9665) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_LOAD( "jolyjokrp_nvram.bin", 0x0000, 0x0800, CRC(c8706e75) SHA1(421420b1ee82615faf290d1204342cdde776ffaf) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	// PLD address the 2nd half
 	ROM_LOAD( "impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
