@@ -1296,11 +1296,11 @@ void torch_state::torchh(machine_config &config)
 	torchf(config);
 
 	/* fdc */
-	//m_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	//m_fdc->subdevice<floppy_connector>("acorn8271:i8271:1")->set_default_option(nullptr);
 
 	/* 10MB or 21MB HDD */
-	//m_1mhzbus->set_default_option("sasi");
-	//m_1mhzbus->set_fixed(true);
+	m_1mhzbus->set_default_option("torchhd");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1308,12 +1308,17 @@ void torch_state::torch301(machine_config &config)
 {
 	torchf(config);
 
+	/* fdc */
+	//m_fdc->subdevice<floppy_connector>("acorn8271:i8271:1")->set_default_option(nullptr);
+
 	/* Torch Z80 Communicator co-processor */
 	m_tube->set_default_option("zep100");
 	m_tube->set_fixed(true);
 	m_tube->set_insert_rom(false);
 
 	/* 20MB HDD */
+	m_1mhzbus->set_default_option("torchhd");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1321,12 +1326,17 @@ void torch_state::torch725(machine_config &config)
 {
 	torchf(config);
 
+	/* fdc */
+	//m_fdc->subdevice<floppy_connector>("acorn8271:i8271:1")->set_default_option(nullptr);
+
 	/* Torch 68000 Atlas co-processor */
 	//m_tube->set_default_option("atlas");
 	m_tube->set_fixed(true);
 	m_tube->set_insert_rom(false);
 
 	/* 20MB HDD */
+	m_1mhzbus->set_default_option("torchhd");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -2152,7 +2162,24 @@ ROM_START(torchf)
 ROM_END
 
 
-#define rom_torchh rom_torchf
+ROM_START(torchh)
+	ROM_REGION(0x40000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	/* rom page 0 00000 IC52  BASIC */
+	/* rom page 1 04000 IC88  DNFS */
+	/* rom page 2 08000 IC100 CPN (inserted by device) */
+	/* rom page 3 0c000 IC101 SPARE SOCKET */
+	ROM_LOAD("basic2.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+	ROM_LOAD("dnfs120-201666.rom", 0x4000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_LOAD("os12.rom", 0x0000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
+
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
+	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
+
+	DISK_REGION("1mhzbus:torchhd:sasi:0:s1410:image")
+	DISK_IMAGE("torch_utilities", 0, BAD_DUMP SHA1(33a5f169bd91b9c6049e8bd0b237429c091fddd0)) /* NEC D5126 contains Standard and Hard Disc Utilities, not known what was factory installed */
+ROM_END
 
 
 ROM_START(torch301)
@@ -2879,7 +2906,7 @@ ROM_END
 COMP ( 1981, bbcb,     0,      bbca,  bbcb,     bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,   0,     bbca,     bbca,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, torchf,   bbcb,   0,     torchf,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_NOT_WORKING)
+COMP ( 1982, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, bbcb_de,  bbcb,   0,     bbcb_de,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,   0,     bbcb_us,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1984, torch301, bbcb,   0,     torch301, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 301",                    MACHINE_NOT_WORKING)
