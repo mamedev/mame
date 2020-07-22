@@ -37445,4 +37445,40 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mettutr">
+		<description>Metric System Tutor (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2020-07-19"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="metric system tutor (4am crack).dsk" size="143360" crc="743534c6" sha1="47ea8c215580c0ba58d516e38e59d19417933134"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addwn117">
+		<description>Addition: Whole Numbers Steps 1-17 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-20"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition- whole numbers steps 1-17 (4am crack).dsk" size="143360" crc="77fb0cc9" sha1="3423672de66bb6da9c88b058f0dac19a1d72fe7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afrac118">
+		<description>Addition: Fractions Concepts Steps 1-8 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-20"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition- fractions concepts steps 1-8 (4am crack).dsk" size="143360" crc="1f9bf17a" sha1="83edd117e3b093c08718fa42f576082ba303678d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
