@@ -59,20 +59,20 @@ IC10 = Hitachi HD74HC244P
 **************************************************************************
 
 Known machines using this hardware:
-_______________________________________________________________________________________________________________________________________
-|Dumped | Name       | Manufacturer | Notes                                                               | Machine type               |
-|-------|------------|--------------|---------------------------------------------------------------------|----------------------------|
-|  NO   | Sagitario  | CIC Play     | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                      |
-|  YES  | Unknown    | Bifuca       | Added as "microdar". Standard Microdar SPD with Philips REF34VA     | Darts                      |
-|  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
-|  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
-|  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
-|  YES  | Far West   | Compumatic   | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
-|  YES  | Unknown    | Compumatic   | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
-|_______|____________|______________|_____________________________________________________________________|____________________________|
+____________________________________________________________________________________________________________________________________________
+|Dumped | Name        | Manufacturer     | Notes                                                               | Machine type               |
+|-------|-------------|------------------|---------------------------------------------------------------------|----------------------------|
+|  NO   | Sagitario   | CIC Play         | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                      |
+|  YES  | Diana Bifuca| Compumatic/Bifuca| Standard Microdar SPD with Philips REF34VA. "Bifuca" string on ROM  | Darts                      |
+|  NO   | Party Darts | Compumatic       | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
+|  NO   | Diamant     | Unknown          | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
+|  NO   | Tiger Dart  | Unknown          | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
+|  YES  | Far West    | Compumatic       | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
+|  YES  | Unknown     | Compumatic       | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
+|  YES  | Diana Olakoa| Compumatic/Olaoka| Compumatic Microdard-V5 PCV (REF0034 + REF0032 + REF0096)           | Darts                      |
+|_______|_____________|__________________|_____________________________________________________________________|____________________________|
 
-There's a later revision of the Compumatic Microdar PCB (V5), smaller, with a standard Atmel AT89S51
-instead of the REF34 CPU.
+There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 CPU.
 
 */
 
@@ -93,6 +93,7 @@ public:
 
 	void microdar(machine_config &config);
 	void prospdp(machine_config &config);
+	void microdv5(machine_config &config);
 
 private:
 	void prog_map(address_map &map);
@@ -131,6 +132,12 @@ void microdar_state::prospdp(machine_config &config)
 {
 	microdar(config);
 	m_maincpu->set_clock(24_MHz_XTAL);
+}
+
+void microdar_state::microdv5(machine_config &config)
+{
+	microdar(config);
+	m_maincpu->set_clock(16_MHz_XTAL);
 }
 
 #define PHILIPS_REF34VA \
@@ -220,8 +227,8 @@ void microdar_state::prospdp(machine_config &config)
 	ROM_FILL(0x0dca, 1, 0x22) \
 	ROM_FILL(0x0e6a, 1, 0x22)
 
-ROM_START(microdar)
-	// REF34VA K7V5534 9818h
+ROM_START(dibifuca)
+	// Philips REF34VA K7V5534 9818h
 	PHILIPS_REF34VA
 
 	ROM_REGION(0x20000, "program", 0)
@@ -232,7 +239,7 @@ ROM_START(microdar)
 ROM_END
 
 ROM_START(cfarwest)
-	// REF34VA K8V2873 Phr9920 0
+	// Philips REF34VA K8V2873 Phr9920 0
 	PHILIPS_REF34VA
 
 	ROM_REGION(0x20000, "program", 0)
@@ -300,6 +307,22 @@ ROM_START(prospdp)
 	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
 ROM_END
 
-GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, prospdp,  0, prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "ProSPDP",               MACHINE_IS_SKELETON_MECHANICAL)
+// Compumatic Microdard-V5 PCB
+ROM_START(diolakoa)
+	// REF 0034 9515S (without Philips logos)
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x20000, "program", 0)
+	ROM_LOAD("mt_plus_8_27.ic3", 0x00000, 0x20000, CRC(ada2ce10) SHA1(30fd0bd4eae282467dcec2ee1fe2dab47f4ea4d6))
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24c16.ic6", 0x000, 0x800, NO_DUMP) // Atmel 24C16
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("palce16v8h.ic8", 0x000, 0x117, NO_DUMP)
+ROM_END
+
+GAME(199?, dibifuca, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca",                                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, prospdp,  0, prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diolakoa, 0, microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa",                                   MACHINE_IS_SKELETON_MECHANICAL)
