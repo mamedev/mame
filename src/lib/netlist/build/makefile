@@ -311,7 +311,7 @@ clang:
 
 clang-libc:
 	#clang-11 currently broken
-	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native 
+	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native
 	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \

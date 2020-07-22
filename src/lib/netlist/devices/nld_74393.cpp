@@ -17,8 +17,8 @@ namespace netlist
 	NETLIB_OBJECT(74393)
 	{
 		NETLIB_CONSTRUCTOR(74393)
-		, m_CP(*this, "CP", NETLIB_DELEGATE(inputs))
-		, m_MR(*this, "MR", NETLIB_DELEGATE(inputs))
+		, m_CP(*this, "CP", NETLIB_DELEGATE(cp))
+		, m_MR(*this, "MR", NETLIB_DELEGATE(mr))
 		, m_Q(*this, {"Q0", "Q1", "Q2", "Q3"})
 		, m_cnt(*this, "m_cnt", 0)
 		, m_cp(*this, "m_cp", 0)
@@ -30,28 +30,35 @@ namespace netlist
 	private:
 		NETLIB_RESETI()
 		{
+			m_CP.set_state(logic_t::STATE_INP_HL);
 			m_cnt = 0;
 		}
 
-		NETLIB_HANDLERI(inputs)
+		NETLIB_HANDLERI(mr)
 		{
-			netlist_sig_t last_cp = m_cp;
-			netlist_sig_t last_mr = m_mr;
-
-			m_cp = m_CP();
-			m_mr = m_MR();
-
-			if (!last_mr && m_mr)
+			if (!m_MR())
 			{
-				m_cnt = 0;
-				update_outputs_all(0, NLTIME_FROM_NS(24), NLTIME_FROM_NS(24), NLTIME_FROM_NS(24), NLTIME_FROM_NS(24));
+				m_CP.activate_hl();
 			}
-			else if (!m_mr && last_cp && !m_cp)
+			else
 			{
-				auto cnt = (m_cnt + 1) & MAXCNT;
-				update_outputs_all(cnt, NLTIME_FROM_NS(13), NLTIME_FROM_NS(22), NLTIME_FROM_NS(31), NLTIME_FROM_NS(40));
-				m_cnt = cnt;
+				m_CP.inactivate();
+				if (m_cnt != 0)
+				{
+					m_cnt = 0;
+					m_Q.push(0, NLTIME_FROM_NS(24));
+				}
 			}
+		}
+
+		NETLIB_HANDLERI(cp)
+		{
+			auto cnt = (m_cnt + 1) & MAXCNT;
+			m_cnt = cnt;
+			m_Q[0].push((cnt >> 0) & 1, NLTIME_FROM_NS(13));
+			m_Q[1].push((cnt >> 1) & 1, NLTIME_FROM_NS(22));
+			m_Q[2].push((cnt >> 2) & 1, NLTIME_FROM_NS(31));
+			m_Q[3].push((cnt >> 3) & 1, NLTIME_FROM_NS(40));
 		}
 
 		logic_input_t m_CP;
@@ -63,14 +70,6 @@ namespace netlist
 		state_var_sig m_mr;
 
 		nld_power_pins m_power_pins;
-
-		void update_outputs_all(unsigned cnt, netlist_time q0_delay, netlist_time q1_delay, netlist_time q2_delay, netlist_time q3_delay) noexcept
-		{
-			m_Q[0].push((cnt >> 0) & 1, q0_delay);
-			m_Q[1].push((cnt >> 1) & 1, q1_delay);
-			m_Q[2].push((cnt >> 2) & 1, q2_delay);
-			m_Q[3].push((cnt >> 3) & 1, q3_delay);
-		}
 	};
 
 	NETLIB_OBJECT(74393_dip)
