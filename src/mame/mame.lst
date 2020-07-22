@@ -14808,6 +14808,7 @@ jak_swbstrik
 jak_tmnthp
 jak_dchp
 jak_ddhp
+jak_prhp
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -32123,12 +32124,15 @@ senwld
 ii8in1
 ii32in1
 zone7in1
+zone7in1p
+dance555
 miwi2_16
 miwi2_7
 intact89
 intg5410
 exsprt48
 itvg48
+xing48
 wowwg
 110dance
 lxts3
@@ -38044,6 +38048,7 @@ sentx6pd
 taikeegr                        //
 shredmjr                        //
 guitarst
+guitarstp
 
 @source:spg2xx_smarttv.cpp
 smartvad

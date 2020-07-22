@@ -6001,6 +6001,16 @@ ROM_START( zone7in1 )
 	ROM_LOAD( "zone.bin", 0x000000, 0x1000000, CRC(50726ae8) SHA1(bcedcd61728dce7b430784585be14109af542cc2) )
 ROM_END
 
+ROM_START( zone7in1p )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "zone7in1.bin", 0x000000, 0x1000000, CRC(40bbfb80) SHA1(f65a900abea13977713bbe3b5e736e6d4d106f2c) )
+ROM_END
+
+ROM_START( dance555 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "39vf6401.u3", 0x000000, 0x800000, CRC(13b1ccef) SHA1(3eb494816a1781a5e6a45bd0562b2b8326598ef7) )
+ROM_END
+
 ROM_START( miwi2_16 )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "miwi 2 16 arcade games and drum master vt168.bin", 0x00000, 0x1000000, CRC(00c115c5) SHA1(fa5fdb448dd9b963351d71fe94e2072f5c872a18) )
@@ -6032,6 +6042,15 @@ ROM_START( itvg48 )
 	ROM_LOAD( "48in1sports.bin", 0x00000, 0x2000000, CRC(8e490541) SHA1(aeb01b3d7229fc888b36aaa924fe6b10597a7783) )
 ROM_END
 
+ROM_START( xing48 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "xing48in1.bin", 0x00000, 0x0800000, CRC(c601a4ae) SHA1(ec1219ede01a48df6bfd01675e715f6b13d2b43e) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+ROM_END
+
+
 ROM_START( wowwg )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "msp55lv128.bin", 0x00000, 0x1000000, CRC(f607c40c) SHA1(66d3960c3b8fbab06a88cf039419c79a6c8633f0) )
@@ -6058,11 +6077,13 @@ CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, 
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
-CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// UK version of Zone 7-in-1 has different games (Boxing / Tennis / Golf / Fishing / Table Tennis / Bowling / Football) with Fishing replacing Baseball
+CONS( 200?, zone7in1,  0,         0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Ultimate Products Ltd.", "Zone 7-in-1 Sports (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, zone7in1p, zone7in1,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Ultimate Products Ltd.", "Zone 7-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has Fishing instead of Baseball, and Ultimate Products banners in the Football game
 
-CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
-CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
+CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Macro Winners", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
+CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Macro Winners", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // ViMax seems to be identical software to MiWi2
 
 CONS( 200?, intact89,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game - 89-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6091,15 +6112,15 @@ CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state
 // the timing code for MotorStorm differs between these sets (although fails wiht our emulation in both cases, even if the game runs fine in other collections)
 CONS( 200?, exsprt48,   0,         0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
 CONS( 200?, itvg48,     exsprt48,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "TaiKee", "Interactive TV Games 48-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
+
+// This has a different selection of games to the above, Dancing as extra under Music, Doesn't have Poker under Brain, Ball Shoot instead of 'Noshery' under Arcade
+// imported by Cathay Product Sourcing Ltd. (Ireland) no other manufacturer information on box, not sure if Xing is name of manufacturer or product
+CONS( 200?, xing48,     0,         0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "Xing", "Xing Wireless Interactive TV Game 'Wi TV Zone' 48-in-1 (Europe, PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^																																																		
 /*
-There is at least one alt US version of Excite Sports Wireless Interactive TV Game - 48-in-1 also on VT1682
+The above was also released in the US as Excite Sports Wireless Interactive TV Game - 48-in-1 with an almost identical box to exsprt48 unit, but with the different games noted.
 
 It is still advertised as 48-in-1, 8 Interactive Sports Games, 8 Olympic games, 32 Arcade Games
 see https://www.youtube.com/watch?v=tHMX71daHAk
-Changes:
-Dancing as extra under Music
-Doesn't have Poker under Brain
-Ball Shoot instead of 'Noshery' under Arcade
 
 This might be a regional / store thing if some places didn't want to sell a unit with a Poker game in it?
 */
@@ -6109,6 +6130,9 @@ This might be a regional / store thing if some places didn't want to sell a unit
 CONS( 200?, wowwg,  0,  0,  vt1682_wow, exsprt48, vt1682_wow_state, regular_init, "Wow", "Wow Wireless Gaming (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
 
 CONS( 200?, 110dance,  0,  0,  vt1682_dance, 110dance, vt1682_dance_state, regular_init, "<unknown>", "Retro Dance Mat (110 song Super StepMania + 9-in-1 games) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+
+CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "Subor", "Sports and Dance Fit Games Mat D-555 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 
 // NJ Pocket 60-in-1 (NJ-250) is meant to have similar games to the mini-games found in wowwg and 110dance, so almost certainly fits here
 
