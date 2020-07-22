@@ -3,7 +3,7 @@
 /*
  * nld_4316.h
  *
- *  CD4066: Quad Analog Switch with Level Translation
+ *  CD4316: Quad Analog Switch with Level Translation
  *
  *          +--------------+
  *       1Z |1     ++    16| VCC

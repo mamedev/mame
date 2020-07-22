@@ -967,6 +967,43 @@ static NETLIST_START(TTL_74126_DIP)
 NETLIST_END()
 
 /*
+ * DM74139: Dual 1-of-4 Decoder
+ *
+ *      +---+-------+-------------+
+ *      | E | A0 A1 | O0 O1 O2 O3 |
+ *      +===+=======+=============+
+ *      | 1 |  X  X |  1  1  1  1 |
+ *      | 0 |  0  0 |  0  1  1  1 |
+ *      | 0 |  1  0 |  1  0  1  1 |
+ *      | 0 |  0  1 |  1  1  0  1 |
+ *      | 0 |  1  1 |  1  1  1  0 |
+ *      +---+-------+-------------+
+ *
+ * Naming conventions follow TI datasheet
+ *
+ */
+
+static NETLIST_START(TTL_74139_DIP)
+	NET_REGISTER_DEV(TTL_74139_GATE, A)
+	NET_REGISTER_DEV(TTL_74139_GATE, B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*   /Ea |1     ++    16| VCC  */ A.VCC,
+		A.A,  /*   A0a |2           15| /Eb  */ B.E,
+		A.B,  /*   A1a |3           14| A0b  */ B.A,
+		A.0,  /*  /O0a |4   74139   13| A1b  */ B.B,
+		A.1,  /*  /O1a |5           12| /O0b */ B.0,
+		A.2,  /*  /O2a |6           11| /O1b */ B.1,
+		A.3,  /*  /O3a |7           10| /O2b */ B.2,
+		A.GND,/*   GND |8            9| /O3b */ B.3
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
  * DM74155/DM74156: Dual 2-Line to 4-Line Decoders/Demultiplexers
  *
  *      +-----+-------++-----------------+
@@ -1756,6 +1793,16 @@ NETLIST_START(TTL74XX_lib)
 	TRUTHTABLE_END()
 #endif
 
+	TRUTHTABLE_START(TTL_74139_GATE, 3, 4, "")
+		TT_HEAD("E,A,B|0,1,2,3")
+		TT_LINE("1,X,X|1,1,1,1|14")
+		TT_LINE("0,0,0|0,1,1,1|14")
+		TT_LINE("0,0,1|1,0,1,1|14")
+		TT_LINE("0,1,0|1,1,0,1|14")
+		TT_LINE("0,1,1|1,1,1,0|14")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_74155A_GATE, 4, 4, "")
 		TT_HEAD("B,A,G,C|0,1,2,3")
 		TT_LINE("X,X,1,X|1,1,1,1|13,13,13,13")
@@ -1800,7 +1847,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_74157_GATE, 4, 4, "")
+	TRUTHTABLE_START(TTL_74157_GATE, 4, 1, "")
 		TT_HEAD("E,S,I,J|O")
 		TT_LINE("1,X,X,X|0|14")
 		TT_LINE("0,1,X,0|0|14")
@@ -1905,6 +1952,7 @@ NETLIST_START(TTL74XX_lib)
 #if (NL_USE_TRUTHTABLE_74107)
 	LOCAL_LIB_ENTRY(TTL_74107_DIP)
 #endif
+	LOCAL_LIB_ENTRY(TTL_74139_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74157_DIP)

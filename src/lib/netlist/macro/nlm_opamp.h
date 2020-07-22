@@ -27,6 +27,9 @@
 #define TL081_DIP(name)                                                        \
 		NET_REGISTER_DEV(TL081_DIP, name)
 
+#define TL082_DIP(name)                                                        \
+		NET_REGISTER_DEV(TL082_DIP, name)
+
 #define TL084_DIP(name)                                                        \
 		NET_REGISTER_DEV(TL084_DIP, name)
 
