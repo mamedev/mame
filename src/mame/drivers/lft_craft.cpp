@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
- Craft, an ATmega88-based demo by Linus Ãkesson
+ Craft, an ATmega88-based demo by Linus Ã…kesson
 
 **********************************************************************/
 

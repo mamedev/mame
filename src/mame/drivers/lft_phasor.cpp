@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
- Phasor, an ATmega88-based demo by Linus Ãkesson
+ Phasor, an ATmega88-based demo by Linus Åkesson
 
 **********************************************************************/
 
