@@ -190,11 +190,6 @@ uint8_t spectrum_opus_device::iorq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_opus_device::iorq_w(offs_t offset, uint8_t data)
-{
-	m_exp->iorq_w(offset, data);
-}
-
 uint8_t spectrum_opus_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;

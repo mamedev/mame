@@ -323,12 +323,10 @@ void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
-	uint8_t data, edata;
-
-	edata = m_exp->mreq_r(offset);
+	uint8_t data;
 
 	if (m_exp->romcs())
-		data = edata;
+		data = m_exp->mreq_r(offset);
 	else
 		data = memregion("maincpu")->base()[offset];
 

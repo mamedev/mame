@@ -37,6 +37,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
+	virtual void post_opcode_fetch(offs_t offset) override;
+	virtual void pre_data_fetch(offs_t offset) override;
+	virtual void post_data_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;

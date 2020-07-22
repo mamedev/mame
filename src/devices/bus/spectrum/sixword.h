@@ -51,6 +51,12 @@ protected:
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
+	// passthru
+	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); };
+	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); };
+	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); };
+	virtual void iorq_w(offs_t offset, uint8_t data) override { m_exp->iorq_w(offset, data); }
+
 	required_memory_region m_rom;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
