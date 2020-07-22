@@ -48,6 +48,7 @@ void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		/* bit 4 is cs (active low) */
 		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
 		ioport("EEPROMOUT")->write(data, 0xff);
+		m_xmen6p_tilemap_select = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -152,7 +153,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1d0000, 0x1d37ff).readonly();
     map(0x1d0000, 0x1d37ff).writeonly();
 */
-	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
+	map(0x1cc000, 0x1d7fff).ram().share("tilemapleftalt"); /* tilemap ? */
 
 	/* whats the stuff below, buffers? */
 /*
@@ -163,7 +164,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1f4000, 0x1f77ff).readonly();
     map(0x1f4000, 0x1f77ff).writeonly();
 */
-	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
+	map(0x1ec000, 0x1f7fff).ram().share("tilemaprightalt"); /* tilemap ? */
 }
 
 
@@ -270,6 +271,7 @@ void xmen_state::machine_start()
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_vblank_irq_mask));
+	save_item(NAME(m_xmen6p_tilemap_select));
 }
 
 void xmen_state::machine_reset()

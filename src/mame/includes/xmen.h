@@ -24,6 +24,8 @@ public:
 		m_xmen6p_spriteramright(*this, "spriteramright"),
 		m_xmen6p_tilemapleft(*this, "tilemapleft"),
 		m_xmen6p_tilemapright(*this, "tilemapright"),
+		m_xmen6p_tilemapleftalt(*this, "tilemapleftalt"),
+		m_xmen6p_tilemaprightalt(*this, "tilemaprightalt"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k054539(*this, "k054539"),
@@ -53,10 +55,13 @@ private:
 	optional_shared_ptr<uint16_t> m_xmen6p_spriteramright;
 	optional_shared_ptr<uint16_t> m_xmen6p_tilemapleft;
 	optional_shared_ptr<uint16_t> m_xmen6p_tilemapright;
+	optional_shared_ptr<uint16_t> m_xmen6p_tilemapleftalt;
+	optional_shared_ptr<uint16_t> m_xmen6p_tilemaprightalt;
 	uint16_t *   m_k053247_ram;
 
 	/* misc */
 	uint8_t       m_vblank_irq_mask;
+	bool          m_xmen6p_tilemap_select;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -162,9 +162,14 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 			   */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
-				m_k052109->write(offset, m_xmen6p_tilemapright[offset] & 0x00ff);
+				if (offset != 0x1c80 && offset != 0x1e80)
+				{
+					if (m_xmen6p_tilemap_select)
+						m_k052109->write(offset, m_xmen6p_tilemaprightalt[offset] & 0x00ff);
+					else
+						m_k052109->write(offset, m_xmen6p_tilemapright[offset] & 0x00ff);
+				}
 			}
-
 
 			renderbitmap = m_screen_right.get();
 		}
@@ -180,9 +185,16 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 			   */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
-				m_k052109->write(offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
+				{
+					if (m_xmen6p_tilemap_select)
+					{
+						if (offset != 0x1c80 && offset != 0x1e80)
+							m_k052109->write(offset, m_xmen6p_tilemapleftalt[offset] & 0x00ff);
+					}
+					else
+						m_k052109->write(offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
+				}
 			}
-
 
 			renderbitmap = m_screen_left.get();
 		}
