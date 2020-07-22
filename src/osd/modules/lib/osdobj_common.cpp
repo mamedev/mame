@@ -542,6 +542,23 @@ void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_f
 
 
 //-------------------------------------------------
+//  capture_audio_stream - capture input stereo audio
+//  stream
+//-------------------------------------------------
+
+void osd_common_t::capture_audio_stream(const int16_t *buffer, int samples_this_frame)
+{
+  //
+  // This method is called for each audiograph render quantum when there's
+  // an AUDIOIN device attached to the graph. platform implementation fills
+  // 'buffer' with 'samples_this_frame' number of samples, interleaved in stereo
+  // L-R order.
+  //
+  m_sound->capture_audio_stream(m_machine->video().throttled(), buffer, samples_this_frame);
+}
+
+
+//-------------------------------------------------
 //  set_mastervolume - set the system volume
 //-------------------------------------------------
 

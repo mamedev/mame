@@ -23,6 +23,10 @@
 #include <new>
 #include <cstring>
 
+// thread-safe lockfree circular buffer (single producer - single consumer)
+// https://github.com/michaeltyson/TPCircularBuffer
+#include "TPCircularBuffer.h"
+#include <atomic>
 
 #ifdef MAC_OS_X_VERSION_MAX_ALLOWED
 
@@ -52,7 +56,15 @@ public:
 		m_in_underrun(false),
 		m_scale(128),
 		m_overflows(0),
-		m_underflows(0)
+		m_underflows(0),
+		// audio input
+    m_input_unit(nullptr),
+    m_input_device(0),
+    m_input_muted(0),
+    m_input_started(false),
+    m_input_inerror(false),
+    m_input_overflows(0),
+    m_input_underflows(0)
 	{
 	}
 	virtual ~sound_coreaudio()
@@ -65,6 +77,7 @@ public:
 	// sound_module
 
 	virtual void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
+  virtual void capture_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
 
 private:
@@ -183,6 +196,24 @@ private:
 	int32_t       m_scale;
 	unsigned    m_overflows;
 	unsigned    m_underflows;
+	
+	// ----------------------------------------------------------------------------
+	// audio input
+  //
+  AudioUnit m_input_unit;
+  AudioDeviceID m_input_device;
+  AudioBufferList* m_coreaudio_inbuf; // low level coreaudio buffer
+  TPCircularBuffer m_mame_inbuf;      // thread-safe ringbuffer coreaudio -> mame
+  std::atomic<u32>  m_input_muted;
+  std::atomic<bool> m_input_started;
+  std::atomic<bool> m_input_inerror;
+  u32 m_input_overflows;
+  u32 m_input_underflows;
+
+	bool add_input(AudioStreamBasicDescription& streamFormat, u32 buffer_size);
+  static bool check_error (OSStatus err, std::string msg);
+	static OSStatus on_input(void *inRefCon, AudioUnitRenderActionFlags *flags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList *ioData);
+  static OSStatus on_input_mute(AudioObjectID inObjectID, UInt32 inNumberAddresses, const AudioObjectPropertyAddress* inAddresses, void* __nullable inClientData);
 };
 
 
@@ -243,6 +274,8 @@ int sound_coreaudio::init(const osd_options &options)
 	m_scale = 128;
 	m_overflows = m_underflows = 0;
 
+  add_input(format, m_buffer_size);
+	
 	// Initialise and start
 	err = AUGraphInitialize(m_graph);
 	if (noErr != err)
@@ -284,6 +317,9 @@ void sound_coreaudio::exit()
 		m_node_count = 0;
 	}
 	m_buffer.reset();
+	
+  TPCircularBufferCleanup(&m_mame_inbuf);
+	
 	if (m_overflows || m_underflows)
 		osd_printf_verbose("Sound buffer: overflows=%u underflows=%u\n", m_overflows, m_underflows);
 	osd_printf_verbose("Audio: End deinitialization\n");
@@ -1011,6 +1047,183 @@ OSStatus sound_coreaudio::render_callback(
 		AudioBufferList             *data)
 {
 	return ((sound_coreaudio *)refcon)->render(action_flags, timestamp, bus_number, number_frames, data);
+}
+
+
+// ===-------------------------------------------------------------------------
+// audio input
+// ===-------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// mame osd calls this method periodically, once per frame
+//
+void sound_coreaudio::capture_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame)
+{
+  u32 const bytes_this_frame = samples_this_frame * m_sample_bytes;
+	
+  // -- first pull starts the input to sync it with the output
+  // -- buffer has been cleared already in emu core audioin.cpp
+  if (!m_input_started) {
+    if (!m_input_inerror) {
+    	// coreaudio is darn confusing with its input and output concepts
+      OSErr err = AudioOutputUnitStart(m_input_unit);
+      if (noErr != err) {
+        check_error(err, "Failed to start sound input");
+        m_input_inerror = true;
+      }
+    }
+  }
+
+  // -- read samples from TPCircularBuffer into 'buffer'
+  // -- TPCircularBuffer interfaces the coreaudio thread
+  else {
+    u32 bytes_available = 0;
+    u16* inbuf = (u16*)TPCircularBufferTail(&m_mame_inbuf, &bytes_available);
+    u32 nbytes = std::min(bytes_available, bytes_this_frame);
+
+    if (nbytes > 0 && inbuf) {
+      copy_scaled((void*)buffer, inbuf, nbytes);
+      TPCircularBufferConsume(&m_mame_inbuf, nbytes);
+    }
+		
+    if (nbytes < bytes_this_frame)
+      m_input_underflows++;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// called from sound_coreaudio::init()
+// 'streamFormat' and 'buffer_size' match output's settings
+//
+bool sound_coreaudio::add_input(AudioStreamBasicDescription& streamFormat, uint32_t buffer_size)
+{
+	OSStatus err = noErr;
+
+	// -- create AUHAL component instance
+  // -- note: cannot just call add_node() here because there can be only one HALOutput component per AUGraph
+  osd_printf_verbose("Opening default sound input\n");
+  AudioComponentDescription const desc = { kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0 };
+  AudioComponent comp = AudioComponentFindNext(nullptr, &desc);
+  if (!comp) err = 1;
+  else err = AudioComponentInstanceNew(comp, &m_input_unit);
+  if (check_error(err, "Failed to create sound input component")) return false;
+
+  // -- enable AUHAL component's input bus and disable its output bus
+  u32 enableIO = 1;
+  err = AudioUnitSetProperty(m_input_unit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input,  1, &enableIO, sizeof(enableIO));
+  if (check_error(err, "Failed to enable sound input component")) return false;
+  enableIO = 0;
+  err = AudioUnitSetProperty(m_input_unit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(enableIO));
+  if (check_error(err, "Failed to enable sound input component")) return false;
+
+  // -- default audio input device
+  UInt32 propsize = sizeof(AudioDeviceID);
+  AudioObjectPropertyAddress prop = { kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+  AudioObjectGetPropertyData(kAudioObjectSystemObject, &prop, 0, NULL, &propsize, &m_input_device);
+  err = AudioUnitSetProperty(m_input_unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &m_input_device, sizeof(m_input_device));
+  if (check_error(err, "Failed to assign sound input device")) return false;
+
+  // -- set stream format
+  err = AudioUnitSetProperty(m_input_unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, (void*)&streamFormat, sizeof(streamFormat));
+  if (check_error(err, "Could not set audio input stream format")) return false;
+
+  // -- init buffers
+  // -- using an interleaved buffer for consistency with audio output
+  u32 nsamples = buffer_size;
+  u32 nbytes = nsamples * streamFormat.mBytesPerPacket;
+  propsize = offsetof(AudioBufferList, mBuffers[0]) + (sizeof(AudioBuffer) * streamFormat.mChannelsPerFrame);
+  m_coreaudio_inbuf = (AudioBufferList*)new Byte(propsize);
+  m_coreaudio_inbuf->mNumberBuffers = 1; // interleaved
+  m_coreaudio_inbuf->mBuffers[0].mNumberChannels = 2; // stereo
+  m_coreaudio_inbuf->mBuffers[0].mDataByteSize = nbytes;
+  m_coreaudio_inbuf->mBuffers[0].mData = new Byte[nbytes];
+  TPCircularBufferInit(&m_mame_inbuf, buffer_size);
+
+  // -- input callback
+  AURenderCallbackStruct input;
+  input.inputProc = on_input;
+  input.inputProcRefCon = this;
+  err = AudioUnitSetProperty(m_input_unit, kAudioOutputUnitProperty_SetInputCallback, kAudioUnitScope_Global, 0, &input, sizeof(input));
+  if (check_error(err, "Failed to set sound input callback")) return false;
+
+  // -- init audiounit
+  // -- start is postponed to the first pull in capture_audio_stream()
+  err = AudioUnitInitialize(m_input_unit);
+  if (check_error(err, "Failed to initialize input AudioUnit")) return false;
+
+  // -- observe input mute changes from the OS
+  prop = { kAudioDevicePropertyMute, kAudioObjectPropertyScopeInput, kAudioObjectPropertyElementMaster };
+  err = AudioObjectAddPropertyListener(m_input_device, &prop, &on_input_mute, this);
+  if (check_error(err, "Failed to add sound input mute observer")) return false;
+
+	return true;
+}
+
+// ----------------------------------------------------------------------------
+// muted input stream seems to produce dc offset, so observe OS mute state changes here
+// updates m_input_muted with the state
+// m_input_muted is checked in on_input() method below
+//
+OSStatus sound_coreaudio::on_input_mute(AudioObjectID inObjectID, UInt32 inNumberAddresses, const AudioObjectPropertyAddress* inAddresses, void* __nullable inClientData)
+{
+  for (UInt32 i = 0; i < inNumberAddresses; i++) {
+    switch (inAddresses[i].mSelector) {
+      case kAudioDevicePropertyMute:
+        UInt32 propsize = sizeof(UInt32);
+        sound_coreaudio* self = static_cast<sound_coreaudio*>(inClientData);
+        AudioObjectPropertyAddress prop = { kAudioDevicePropertyMute, kAudioObjectPropertyScopeInput, kAudioObjectPropertyElementMaster };
+        OSStatus err = AudioObjectGetPropertyData(self->m_input_device, &prop, 0, NULL, &propsize, &self->m_input_muted);
+        if (err) self->m_input_muted = 1;
+        break;
+    }
+  }
+  return noErr;
+}
+
+// ----------------------------------------------------------------------------
+// coreaudio calls this method periodically
+//
+OSStatus sound_coreaudio::on_input(void *inRefCon, AudioUnitRenderActionFlags *flags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList *ioData)
+{
+	// -- get samples from coreaudio
+	sound_coreaudio* self = static_cast<sound_coreaudio*>(inRefCon);
+  if (!self) return noErr;
+	OSErr err = AudioUnitRender(self->m_input_unit, flags, inTimeStamp, inBusNumber, inNumberFrames, self->m_coreaudio_inbuf);
+
+	// -- and push them to TPCircularBuffer
+	if (err == noErr) {
+    u32 bytesFree;
+    s16* audio = (s16*)TPCircularBufferHead(&self->m_mame_inbuf, &bytesFree);
+    AudioBuffer& inbuf = self->m_coreaudio_inbuf->mBuffers[0];
+
+    if (bytesFree >= inbuf.mDataByteSize) {
+      if (!self->m_input_muted) memcpy(audio, (s16*)inbuf.mData, inbuf.mDataByteSize);
+      else memset(audio, 0, inbuf.mDataByteSize);
+      TPCircularBufferProduce(&self->m_mame_inbuf, inbuf.mDataByteSize);
+      self->m_input_started = true;
+    }
+    else self->m_input_overflows++;
+	}
+	
+  else if (!self->m_input_inerror) {
+    check_error(err, "audio input render error");
+    self->m_input_inerror = true;
+  }
+	
+	return err;
+}
+
+// ----------------------------------------------------------------------------
+// helper
+//
+bool sound_coreaudio::check_error (OSStatus err, std::string msg)
+{
+  if (noErr != err) {
+    msg += " (%ld)\n";
+    osd_printf_error(msg.c_str(), (long)err);
+    return true;
+  }
+  return false;
 }
 
 #else /* SDLMAME_MACOSX */

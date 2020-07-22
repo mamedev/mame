@@ -26,7 +26,14 @@ public:
 
 	virtual void update_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame) = 0;
 	virtual void set_mastervolume(int attenuation) = 0;
-
+	
+  // todo: should really be pure virtual and implemented for all platforms
+  virtual void capture_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame)
+  {
+    if (buffer)
+      memset((void*)buffer, 0, samples_this_frame * sizeof(int16_t));
+  }
+	
 	int sample_rate() const { return m_sample_rate; }
 
 	int m_sample_rate;

@@ -200,6 +200,7 @@ public:
 
 	// audio overridables
 	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) override;
+  virtual void capture_audio_stream(const int16_t *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
 	virtual bool no_sound() override;
 
