@@ -52,8 +52,8 @@ private:
 	struct ics2115_voice {
 		struct {
 			s32 left;
-			u32 acc, start, end;
-			u16 fc;
+			u32 acc, start, end; // address counters (20.9 fixed point)
+			u16 fc;              // frequency (6.9 fixed point)
 			u8 ctl, saddr;
 		} osc;
 
@@ -74,9 +74,9 @@ private:
 				u8 eightbit   : 1;
 				u8 loop       : 1;
 				u8 loop_bidir : 1;
-				u8 irq        : 1;
-				u8 invert     : 1;
-				u8 irq_pending: 1;
+				u8 irq        : 1;   // enable IRQ generation
+				u8 invert     : 1;   // invert direction
+				u8 irq_pending: 1;   // (read only?) IRQ pending
 				//IRQ on variable?
 			} bitflags;
 			u8 value;
@@ -84,14 +84,14 @@ private:
 
 		union {
 			struct {
-				u8 done       : 1;   //indicates ramp has stopped
-				u8 stop       : 1;   //stops the ramp
-				u8 rollover   : 1;   //rollover (TODO)
+				u8 done       : 1;   // indicates ramp has stopped
+				u8 stop       : 1;   // stops the ramp
+				u8 rollover   : 1;   // rollover (TODO)
 				u8 loop       : 1;
 				u8 loop_bidir : 1;
-				u8 irq        : 1;   //enable IRQ generation
-				u8 invert     : 1;   //invert direction
-				u8 irq_pending: 1;   //(read only) IRQ pending
+				u8 irq        : 1;   // enable IRQ generation
+				u8 invert     : 1;   // invert direction
+				u8 irq_pending: 1;   // (read only?) IRQ pending
 				//noenvelope == (done | disable)
 			} bitflags;
 			u8 value;
@@ -99,13 +99,7 @@ private:
 
 		//Possibly redundant state. => improvements of wavetable logic
 		//may lead to its elimination.
-		union {
-			struct {
-				u8 on         : 1;
-				u8 ramp       : 7;       // 100 0000 = 0x40 maximum
-			} bitflags;
-			u8 value;
-		} state;
+		int ramp = 0;
 
 		bool playing();
 		int update_volume_envelope();
