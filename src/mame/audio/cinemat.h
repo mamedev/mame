@@ -10,7 +10,7 @@
 #include "netlist/nl_setup.h"
 
 // log to cinemat.csv for nltool playback/analysis
-#define ENABLE_NETLIST_LOGGING		(1)
+#define ENABLE_NETLIST_LOGGING		(0)
 
 
 class cinemat_audio_device : public device_t
