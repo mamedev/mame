@@ -6042,6 +6042,15 @@ ROM_START( itvg48 )
 	ROM_LOAD( "48in1sports.bin", 0x00000, 0x2000000, CRC(8e490541) SHA1(aeb01b3d7229fc888b36aaa924fe6b10597a7783) )
 ROM_END
 
+ROM_START( xing48 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "xing48in1.bin", 0x00000, 0x0800000, CRC(c601a4ae) SHA1(ec1219ede01a48df6bfd01675e715f6b13d2b43e) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+ROM_END
+
+
 ROM_START( wowwg )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "msp55lv128.bin", 0x00000, 0x1000000, CRC(f607c40c) SHA1(66d3960c3b8fbab06a88cf039419c79a6c8633f0) )
@@ -6103,15 +6112,15 @@ CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state
 // the timing code for MotorStorm differs between these sets (although fails wiht our emulation in both cases, even if the game runs fine in other collections)
 CONS( 200?, exsprt48,   0,         0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
 CONS( 200?, itvg48,     exsprt48,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "TaiKee", "Interactive TV Games 48-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
+
+// This has a different selection of games to the above, Dancing as extra under Music, Doesn't have Poker under Brain, Ball Shoot instead of 'Noshery' under Arcade
+// imported by Cathay Product Sourcing Ltd. (Ireland) no other manufacturer information on box, not sure if Xing is name of manufacturer or product
+CONS( 200?, xing48,     0,         0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "Xing", "Xing Wireless Interactive TV Game 'Wi TV Zone' 48-in-1 (Europe, PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^																																																		
 /*
-There is at least one alt US version of Excite Sports Wireless Interactive TV Game - 48-in-1 also on VT1682
+The above was also released in the US as Excite Sports Wireless Interactive TV Game - 48-in-1 with an almost identical box to exsprt48 unit, but with the different games noted.
 
 It is still advertised as 48-in-1, 8 Interactive Sports Games, 8 Olympic games, 32 Arcade Games
 see https://www.youtube.com/watch?v=tHMX71daHAk
-Changes:
-Dancing as extra under Music
-Doesn't have Poker under Brain
-Ball Shoot instead of 'Noshery' under Arcade
 
 This might be a regional / store thing if some places didn't want to sell a unit with a Poker game in it?
 */
