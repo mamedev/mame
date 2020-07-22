@@ -22652,9 +22652,10 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 dm3270                          //
 
 @source:microdar.cpp
-microdar                        //
+dibifuca                        //
 cfarwest                        // (c) 1997 Compumatic
 prospdp                         // (c) 1997 Compumatic
+diolakoa                        // (c) 1997 Compumatic
 
 @source:microdec.cpp
 md2                             //
