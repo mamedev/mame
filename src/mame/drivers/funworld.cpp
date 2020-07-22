@@ -82,6 +82,8 @@
   * Royal Vegas Joker Card (Fast deal),                         Soft Design,        1993.
   * Royal Vegas Joker Card (Fast deal, english gfx),            Soft Design,        1993.
   * Royal Vegas Joker Card (Fast deal, Mile),                   Mile,               1993.
+  * Jolly Joker (original, interleaved GFX).                    Impera,             198?.
+  * Jolly Joker (original, different encoded GFX).              Impera,             198?.
   * Jolly Joker (98bet, set 1).                                 Impera,             198?.
   * Jolly Joker (98bet, set 2).                                 Impera,             198?.
   * Jolly Joker (40bet, croatian hack),                         Impera,             198?.
@@ -6080,6 +6082,51 @@ ROM_START( jolyjokrc )
 	ROM_LOAD( "jjpal.bin", 0x0000, 0x0117, CRC(3b084c34) SHA1(5d186b70317ef871c9a426eb420b66efcbd918de) )
 ROM_END
 
+/*
+  Jolly Joker
+  Impera.
+
+  The following two sets have the same program
+  but different graphics system.
+  
+  The first one has graphics ROMs data interleaved
+  inside a 16bit 27C210 EPROM. The second one is still unknown.
+
+  The program looks original. The former sets programs
+  have differents offsets patched and moved blocks respect
+  this new program.
+
+  Didn't set as parent due to the fact that seems older.
+  Maybe being more original and less patched should be set
+  as parent.
+
+*/
+ROM_START( jolyjokro )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "impera1.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "impera2.bin", 0x0000, 0x10000, CRC(aa86dba6) SHA1(fe189dde83bd855f4a0b34b20c161a9addc15017) )
+	ROM_CONTINUE(            0x0000, 0x10000)	// discarding 1nd empty half (0000-ffff)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x10000, 0xff)	// deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0200, "proms", 0 )	// PLD address the 2nd half
+	ROM_LOAD( "1_impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+ROM_END
+
+ROM_START( jolyjokrp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "impera1.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "9c_1ff1.bin", 0x00000, 0x20000, CRC(4b8f0821) SHA1(0821eed07f5e98b66d87a3079756dad72ffe9665) )
+
+	ROM_REGION( 0x0200, "proms", 0 )	// PLD address the 2nd half
+	ROM_LOAD( "impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+ROM_END
+
 
 /******************************** Other sets ************************************/
 
@@ -7184,6 +7231,7 @@ ROM_START( jokcrdep )
 ROM_END
 
 
+
 /**************************
 *  Driver Initialization  *
 **************************/
@@ -7840,6 +7888,38 @@ void intergames_state::driver_init()
 }
 
 
+void funworld_state::init_impera16()
+/*****************************************************
+
+  Routines to deinterleave the Impera GFX stored
+  in 16 bit EPROMS, on 8 bit systems.
+
+  Regular GFX ROMs for this system, are interleaved
+  in a big 27C210 ROM.
+
+******************************************************/
+{
+	uint8_t *gfx16rom = memregion("gfxpool")->base();
+	int size = memregion("gfxpool")->bytes();
+
+	uint8_t *gfx8rom = memregion("gfx1")->base();
+	int sizeg = memregion("gfx1")->bytes();
+
+	/*****************************
+	*    Deinterleaving GFX      *
+	*****************************/
+
+	int j = 0;
+	
+	for (int i = 0; i < size; i += 2)
+	{
+		gfx8rom[j] = gfx16rom[i];
+		gfx8rom[j + (sizeg / 2)] = gfx16rom[i + 1];
+		j++;
+	}
+}
+
+
 /**********************************************
 *                Game Drivers                 *
 **********************************************/
@@ -7930,6 +8010,8 @@ GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  funworld_state, empty_ini
 GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
 GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
 GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
+GAMEL( 198?, jolyjokro, jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",          "Jolly Joker (original, interleaved GFX)",         0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokrp, jolyjokr, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (original, different encoded GFX)",   MACHINE_IMPERFECT_GRAPHICS, layout_jollycrd )
 
 // Encrypted games...
 GAME(  1992, multiwin,  0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 0 )
