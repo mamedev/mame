@@ -12,7 +12,9 @@ This is their 1st original product. MK II was licensed from Commodore, and
 MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
 with support from David Levy.
 
-Hardware notes: (main unit)
+Hardware notes:
+
+Master Unit:
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
@@ -25,7 +27,7 @@ Chess Unit:
 - PCB label: Radofin XM-2057-0C
 - Fairchild F6808P CPU @ ?MHz (M6808 compatible)
 - Fairchild F6821P PIA
-- C28A97M 4KB ROM(2332), 128x8 RAM(F6810P)
+- 2KB ROM(2332), 128x8 RAM(F6810P)
 - 2*HLCD0438, chessboard LCD
 
 Printer Unit:

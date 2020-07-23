@@ -518,8 +518,8 @@ void csc_state::csc_map(address_map &map)
 	map(0x1000, 0x1003).mirror(0x47fc).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1800, 0x1803).mirror(0x47fc).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).mirror(0x4000).rom();
-	map(0xa000, 0xafff).rom().region("maincpu", 0xb000);
-	map(0xb000, 0xffff).rom();
+	map(0xa000, 0xafff).mirror(0x1000).rom();
+	map(0xc000, 0xffff).rom();
 }
 
 void csc_state::su9_map(address_map &map)
@@ -722,7 +722,8 @@ void csc_state::rsc(machine_config &config)
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64019",   0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("101-1025a03", 0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
+	ROM_LOAD("101-1025a03", 0xa000, 0x1000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
+	ROM_CONTINUE(           0xa000, 0x1000 ) // 1st half empty
 	ROM_LOAD("101-1025a02", 0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
 	ROM_LOAD("101-1025a01", 0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
 	ROM_LOAD("74s474",      0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
