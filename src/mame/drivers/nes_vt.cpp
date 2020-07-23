@@ -2078,6 +2078,13 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
     Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
+
+	There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
+	Spiderman
+	Frozen
+	(generic)
+	it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
+
 */
 
 // intial code isn't valid? scrambled?
