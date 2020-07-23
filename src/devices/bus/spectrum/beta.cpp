@@ -820,12 +820,6 @@ uint8_t spectrum_gamma_device::mreq_r(offs_t offset)
 	return m_rom->base()[(offset & 0x3fff) + (m_romcs ? 0x4000 : 0)];
 }
 
-void spectrum_betav2_device::mreq_w(offs_t offset, uint8_t data)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
-}
-
 void spectrum_betav2_device::fdc_hld_w(int state)
 {
 	m_fdc->set_force_ready(state); // HLD connected to RDY pin

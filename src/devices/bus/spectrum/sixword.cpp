@@ -365,7 +365,8 @@ void spectrum_swiftdisc_device::mreq_w(offs_t offset, uint8_t data)
 		}
 	}
 
-	m_exp->mreq_w(offset, data);
+	if (m_exp->romcs())
+		m_exp->mreq_w(offset, data);
 }
 
 uint8_t spectrum_swiftdisc_device::iorq_r(offs_t offset)
@@ -373,7 +374,7 @@ uint8_t spectrum_swiftdisc_device::iorq_r(offs_t offset)
 	uint8_t data = m_exp->iorq_r(offset);
 
 	if (!BIT(offset, 5))
-		data = m_joy->read();
+		data &= m_joy->read();
 
 	return data;
 }
@@ -472,7 +473,8 @@ void spectrum_swiftdisc2_device::mreq_w(offs_t offset, uint8_t data)
 		}
 	}
 
-	m_exp->mreq_w(offset, data);
+	if (m_exp->romcs())
+		m_exp->mreq_w(offset, data);
 }
 
 uint8_t spectrum_swiftdisc2_device::iorq_r(offs_t offset)
@@ -483,7 +485,7 @@ uint8_t spectrum_swiftdisc2_device::iorq_r(offs_t offset)
 		data &= control_r();
 
 	if (!BIT(offset, 5) && !BIT(m_control, 3))
-		data = m_joy->read();
+		data &= m_joy->read();
 
 	if (m_conf->read())
 	{

@@ -38,7 +38,7 @@ for:
       - bash -lc "pacman -Syu --noconfirm"
       - bash -lc "pacman -Syu --noconfirm"
     build_script:
-      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=1 IGNORE_GIT=1 -j3"
+      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=3 IGNORE_GIT=1 -j3"
     test_script:
       - \projects\mame\mametiny64.exe -validate
     after_test:

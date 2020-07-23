@@ -241,5 +241,6 @@ void spectrum_speccydos_device::mreq_w(offs_t offset, uint8_t data)
 			}
 		}
 
-	m_exp->mreq_w(offset, data);
+	if (m_exp->romcs())
+		m_exp->mreq_w(offset, data);
 }

@@ -18,9 +18,9 @@ SciSys/Novag's "Chess Champion: Pocket Chess" is assumed to be the same game,
 it has the same MCU serial (SL90387). They added battery low voltage detection
 to it (rightmost digit DP lights up).
 
-Chess Intercontinental Traveler, released after the SciSys/Novag splitup, is nearly
-the same program. Only a few bytes different, not counting changed jump addresses
-due to inserted code.
+Chess Intercontinental Traveler, released after the SciSys/Novag partnership splitup,
+is nearly the same program. Only a few bytes different, not counting changed jump
+addresses due to inserted code.
 
 Chess Intercontinental Traveler hardware notes:
 - Fairchild 3870 MCU, label SL90594, backside label 3870T-0594

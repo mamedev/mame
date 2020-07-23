@@ -151,7 +151,7 @@ void regence_state::main_map(address_map &map)
 static INPUT_PORTS_START( regence )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Changement de Position (Set Up)") // Veränderung
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Retour en Arrière (Take Back)") // Zug Zurück
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME(u8"Retour en Arrière (Take Back)") // Zug Zurück
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Nouvelle Partie (New Game)") // Neues Spiel (press after setup)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
@@ -220,4 +220,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R", "La Regence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R", u8"La Régence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

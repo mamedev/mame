@@ -13520,6 +13520,7 @@ vbrc
 @source:fidel_cc1.cpp
 cc1                             //
 cc3                             //
+cc10c
 
 @source:fidel_cc10.cpp
 cc10                            //
@@ -13869,6 +13870,8 @@ jolyjokr                        // (c) 198? Impera
 jolyjokra                       // (c) 198? Impera
 jolyjokrb                       // (c) 198? Impera
 jolyjokrc                       // (c) 198? Apple Time
+jolyjokro                       // (c) 198? Impera
+jolyjokrp                       // (c) 198? Impera
 lluck3x3                        // (c) 1991 TAB-Austria
 lluck4x1                        // (c) 1991 TAB-Austria
 lunapark                        // 1998 unknown.
@@ -22651,6 +22654,7 @@ dm3270                          //
 @source:microdar.cpp
 microdar                        //
 cfarwest                        // (c) 1997 Compumatic
+prospdp                         // (c) 1997 Compumatic
 
 @source:microdec.cpp
 md2                             //
