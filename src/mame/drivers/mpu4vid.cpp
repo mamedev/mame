@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:James Wallace, Philip Bennett
 /***********************************************************************************************************
 Barcrest MPU4 Extension driver by J.Wallace, Phil Bennett and Anonymous.
@@ -7992,11 +7992,11 @@ GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4
 /* ----------------------------------------------------------------  */
 
 // "payout shelf unplugged", can be bypassed by opening door
-GAME(  1991, v4psi,      0,        bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4psid,     v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 20\" Version 1.1) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi,      0,        bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           u8"Prize Space Invaders (BWB IN2, £20, 50p/30p Play, 20\" Version 1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psid,     v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           u8"Prize Space Invaders (BWB IN2, £20, 50p/30p Play, 20\" Version 1.1) (Datapak) (MPU4 Video)",GAME_FLAGS )
 // the 68k ROMs are bad on these (one missing)
-GAME(  1991, v4psi14,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 14\" Version 1.1, set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4psi14a,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           "Prize Space Invaders (BWB IN2, \u00a320, 50p/30p Play, 14\" Version 1.1, set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi14,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           u8"Prize Space Invaders (BWB IN2, £20, 50p/30p Play, 14\" Version 1.1, set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4psi14a,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           u8"Prize Space Invaders (BWB IN2, £20, 50p/30p Play, 14\" Version 1.1, set 2) (MPU4 Video)",GAME_FLAGS )
 // these show BWB and Barcrest (older game release 'INV1' but higher version of it)
 GAME(  1991, v4psibc,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (MPU4 Video)",GAME_FLAGS_OK )
 GAME(  1991, v4psibcd,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (Datapak) (MPU4 Video)",GAME_FLAGS )
@@ -8259,29 +8259,29 @@ GAME(  199?, v4timebnd,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4timebne,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
 
 // Release D
-GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, \u00a38 All Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4montea,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, \u00a310 All Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4montee,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, Cash and Tokens) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monted,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Fixed, \u00a310 All Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4monteg,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 25p Fixed, \u00a310 All Cash) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4montec,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release D, Arcade Special, 20p Fixed, Cash and Tokens) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, £8 All Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montea,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, £10 All Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montee,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, Cash and Tokens) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monted,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Fixed, £10 All Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4monteg,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 25p Fixed, £10 All Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4montec,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release D, Arcade Special, 20p Fixed, Cash and Tokens) (MPU4 Video)",GAME_FLAGS )
 // Release 9
-GAME(  199?, v4monte9,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, \u00a38 All Cash) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9a,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, \u00a38 All Cash) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9e,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9b,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9f,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, \u00a310 All Cash) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9n,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, \u00a310 All Cash) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9j,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, \u00a310 All Cash) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9k,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, \u00a310 All Cash) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9l,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 25p Fixed, \u00a310 All Cash) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9m,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 25p Fixed, \u00a310 All Cash) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9o,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9i,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9c,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9d,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9h,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4monte9g,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, £8 All Cash) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9a,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, £8 All Cash) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9e,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9b,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9f,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, £10 All Cash) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9n,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Switchable, £10 All Cash) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9j,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, £10 All Cash) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9k,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, £10 All Cash) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9l,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 25p Fixed, £10 All Cash) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9m,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 25p Fixed, £10 All Cash) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9o,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9i,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, S/Site Standard, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9c,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9d,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Switchable, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9h,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4monte9g,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",   "Monte Carlo Or Bust (BWB) (Release 9, Arcade Special, Options 4 Cabinet, 20p Fixed, Cash and Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
 
 // no suitable 68k ROMs for these
 GAME(  199?, v4monteh,   v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 1) (MPU4 Video)",GAME_FLAGS ) 
