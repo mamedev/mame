@@ -3646,6 +3646,13 @@ void mw8080bw_state::tornbase_audio_w(uint8_t data)
  *
  *************************************/
 
+// Sound board volume potentiometer, set to its midpoint value by default.
+
+static INPUT_PORTS_START(zzzap_audio)
+	PORT_START("POT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_master_vol")
+INPUT_PORTS_END
+
 zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, ZZZAP_AUDIO, tag, owner, clock),
 	m_pedal_bit0(*this, "sound_nl:pedal_bit0"),
@@ -3664,42 +3671,56 @@ zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const
 
 void zzzap_audio_device::p1_w(u8 data)
 {
-	/* set ENGINE SOUND FREQ(data & 0x0f)  the value written is
-	                                       the gas pedal position */
+	// **** Output pins from 74174 latch at F5 ****
+
+	// Bits 0-3 (PEDAL_BIT0 to PEDAL_BIT3): accelerator pedal position
+	// Sets the frequency and volume of the engine sound oscillators.
 	m_pedal_bit0->write_line(BIT(data, 0));
 	m_pedal_bit1->write_line(BIT(data, 1));
 	m_pedal_bit2->write_line(BIT(data, 2));
 	m_pedal_bit3->write_line(BIT(data, 3));
 
-	/* if (data & 0x10)  enable HI SHIFT engine sound modifier */
+	// Bit 4 (HI SHIFT): set when gearshift is in high gear
+	// Modifies the engine sound to be lower pitched at a given speed and
+	// to change more slowly.
 	m_hi_shift->write_line(BIT(data, 4));
 
-	/* if (data & 0x20)  enable LO SHIFT engine sound modifier */
+	// Bit 5 (LO SHIFT): set when gearshift is in low gear
+	// Modifies the engine sound to be higher pitched at a given speed and
+	// to change faster.
 	m_lo_shift->write_line(BIT(data, 5));
 
-	/* D6 and D7 are not connected */
+	// Bits 6-7 (D6, D7): not connected.
 }
 
 
 void zzzap_audio_device::p2_w(u8 data)
 {
-	/* if (data & 0x01)  enable BOOM sound */
+	// **** Output pins from 74174 latch at F4 ****
+
+	// Bit 0 (BOOM): Set to activate boom sound for a crash. Cleared to
+	// terminate boom.
 	m_boom->write_line(BIT(data, 0));
 
-	/* if (data & 0x02)  enable ENGINE sound (global) */
+	// Bit 1 (ENGINE SOUND OFF): Set to turn *off* engine sound.
+	// Used in a crash or when game is not running.
 	m_engine_sound_off->write_line(BIT(data, 1));
 
-	/* if (data & 0x04)  enable CR 1 (screeching sound) */
+	// Bit 2 (NOISE CR 1): tire squealing sound
+	// Set to activate "tire squeal" noise from noise generator.
 	m_noise_cr_1->write_line(BIT(data, 2));
 
-	/* if (data & 0x08)  enable NOISE CR 2 (happens only after the car blows up, but
-	                                        before it appears again, not sure what
-	                                        it is supposed to sound like) */
+	// Bit 3 (NOISE CR 2): post-crash noise
+	// Set to activate screeching noise that follows BOOM (the car blowing
+	// up). This sounds like a generic high-pitched screeching hiss, and
+	// it is unclear what it was meant to represent. It's just as
+	// ambiguous in the real game.
 	m_noise_cr_2->write_line(BIT(data, 3));
 
+	// Bit 5 is for the coin counter.
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
-	/* D4, D6 and D7 are not connected */
+	// Bits 4, 6-7 (D4, D6, D7): not connected.
 }
 
 
@@ -3722,9 +3743,26 @@ void zzzap_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 / 2.5, -30000.0);
+	// The audio output is taken from an LM3900 op-amp whose output has a
+	// peak-to-peak range of about 5 volts, centered on 2.5 volts. With
+	// the master volume potentiometer at its default midpoint setting,
+	// this range is cut in half, to 2.5 volts peak to peak. In the real
+	// machine, the audio power amps might clip the highest output peaks,
+	// but I don't model this. Instead, I take the easy way out: assume
+	// the output at midpoint volume will just avoid clipping the extreme
+	// peaks, and scale and offset it so that those peaks will just reach
+	// the clipping limits for signed 16-bit samples. So turning the
+	// volume up much higher than the default will give clipped output.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 1.25, -(32767.0 / 1.25) * 2.50);
+
+	// Netlist volume-potentiometer interface
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");
 }
 
+ioport_constructor zzzap_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(zzzap_audio);
+}
 
 void zzzap_audio_device::device_start()
 {
