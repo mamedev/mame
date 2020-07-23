@@ -711,6 +711,13 @@
 	NET_REGISTER_DEVEXT(CD4020, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_4053.cpp
+// ---------------------------------------------------------------------
+// usage       : CD4053_GATE(name)
+#define CD4053_GATE(...)                                               \
+	NET_REGISTER_DEVEXT(CD4053_GATE, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_4066.cpp
 // ---------------------------------------------------------------------
 // usage       : CD4066_GATE(name)
@@ -1235,6 +1242,10 @@
 #define CD4001_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4001_DIP, __VA_ARGS__)
 
+// usage       : CD4011_DIP(name)
+#define CD4011_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD4011_DIP, __VA_ARGS__)
+
 // usage       : CD4069_DIP(name)
 #define CD4069_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4069_DIP, __VA_ARGS__)
@@ -1250,6 +1261,10 @@
 // usage       : CD4016_DIP(name)
 #define CD4016_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4016_DIP, __VA_ARGS__)
+
+// usage       : CD4053_DIP(name)
+#define CD4053_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD4053_DIP, __VA_ARGS__)
 
 // usage       : CD4066_DIP(name)
 #define CD4066_DIP(...)                                                \
