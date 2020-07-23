@@ -69,7 +69,7 @@ ________________________________________________________________________________
 |  NO   | Tiger Dart  | Unknown          | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
 |  YES  | Far West    | Compumatic       | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
 |  YES  | Unknown     | Compumatic       | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
-|  YES  | Diana Olakoa| Compumatic/Olaoka| Compumatic Microdard-V5 PCV (REF0034 + REF0032 + REF0096)           | Darts                      |
+|  YES  | Diana Olakoa| Compumatic/Olaoka| Compumatic Microdard-V5 PCB (REF0034 + REF0032 + REF0096)           | Darts                      |
 |_______|_____________|__________________|_____________________________________________________________________|____________________________|
 
 There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 CPU.
@@ -307,7 +307,26 @@ ROM_START(prospdp)
 	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
 ROM_END
 
-// Compumatic Microdard-V5 PCB
+/* Compumatic Microdard-V5 PCB
+   _______________________________________________________________________________
+  | ______    _____________________________  _________  TEST  ___  _______     __|
+  ||_CN__|   |__________CN________________| |___CN___| SWITCH|CN| |__CN__|    |CN|
+ _|___                        ________________________   XT1                  ___|_
+|    |   ________________    |REF0034 91515S         | 16.000  BATT           |C  -
+| CN |  |CD4514BE       |    |                       |   MHz                  |N  -
+|    |  |_______________|    |_______________________|                        |____
+|    |   ____________                           ___________________            __|
+|    |  |__UDN2981A_|   _____  _____________   |27C10000C-15      |  ____     |C||
+|    |   ____________  |24C16 |_TD62083AP__|   |__________________| |___|     |N||
+|    |  |__UDN2981A_|   __________  __________  ____________        ________  | ||
+|    |   ____________  |SN74HC00N| |PALCE16V8| |_GM76C88ALK|       |REF0096|  |_||
+|    |  |__UDN2981A_|   _______________________ ____________       |COMPUMA|   __|
+|    |   ____________  |REF0032 9616T         ||_HD74HC373P|       |TIC    |  |C||
+|    |  |__UDN2981A_|  |______________________|   XT3 16.0MHz  XT2 |_______|  |N||
+|____|     _____ __ __ __ __ __ __  __________________________   ____        ::  |
+  |       |_CN_| CN CN CN CN CN CN |________CN_______________|  |_CN|            |
+  |______________________________________________________________________________|
+*/
 ROM_START(diolakoa)
 	// REF 0034 9515S (without Philips logos)
 	PHILIPS_REF34VA
