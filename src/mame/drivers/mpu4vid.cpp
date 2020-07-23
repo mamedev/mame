@@ -8211,22 +8211,23 @@ GAME(  1996, v4reno7,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_pri
 GAME(  1996, v4reno5,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
 // v4big40 sets  black screen after the initial boot, are they complete?
-GAME(  199?, v4big40,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40a,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40b,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40c,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40d,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40e,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 6) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40f,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 7) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40g,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 8) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40h,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 9) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40i,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 10) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40j,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 11) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40k,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (set 12) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40a,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40b,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40c,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40d,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40e,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40g,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40h,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40k,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40i,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40j,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40f,   v4big40,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key + OCDM) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4dbltak,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltaka,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltakb,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
+// v4dbltak sets  black screen after the initial boot, are they complete?
+GAME(  199?, v4dbltak,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (Release 4, Arcade Standard) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltaka,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (Release 4, Arcade Data) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltakb,  v4dbltak, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Double Take (BWB) (Release 4, S_Site Data + %-Key) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4gldrsh,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4gldrsht,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (set 2) (MPU4 Video)",GAME_FLAGS )
@@ -8251,12 +8252,14 @@ GAME(  199?, v4gldrshq,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4gldrshr,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4gldrshs,  v4gldrsh, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, Switchable 20p/10p/5p, Cash+Token) (Showcase) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4timebn,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebna,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebnb,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 3) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebnc,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 4) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebnd,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 5) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4timebne,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebn,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (Release 1, 20p Fixed, Cash + Tokens) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebna,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (Release 1, 20p Fixed, Cash + Tokens) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebnc,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (Release 1, 20p Fixed, Cash + Tokens) (set 3) (MPU4 Video)",GAME_FLAGS ) 
+
+GAME(  199?, v4timebnb,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (Release 1, 20p Fixed, Cash + Tokens) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebnd,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (Release 1, 20p Fixed, Cash + Tokens) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4timebne,  v4timebn, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Time Bandit (BWB) (Release 1, 20p Fixed, Cash + Tokens) (Datapak) (set 3) (MPU4 Video)",GAME_FLAGS ) 
+
 
 // Release D
 GAME(  199?, v4monte,    0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Monte Carlo Or Bust (BWB) (Release D, S/Site Standard, 20p Switchable, £8 All Cash) (MPU4 Video)",GAME_FLAGS )
