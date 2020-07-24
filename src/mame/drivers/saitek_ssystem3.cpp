@@ -27,7 +27,7 @@ Chess Unit:
 - PCB label: Radofin XM-2057-0C
 - Fairchild F6808P CPU @ ?MHz (M6808 compatible)
 - Fairchild F6821P PIA
-- 2KB ROM(2332), 128x8 RAM(F6810P)
+- 2KB ROM(2316), 128x8 RAM(F6810P)
 - 2*HLCD0438, chessboard LCD
 
 Printer Unit:
@@ -54,7 +54,8 @@ TODO:
   Should be doable to add, but 6522 device doesn't support live clock changes.
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
-- dump/add chessboard lcd and printer unit
+- finish chess unit lcd emulation
+- dump/add printer unit
 - dump/add ssystem3 1980 program revision, were the BTANB fixed?
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
 
@@ -69,10 +70,13 @@ BTANB (ssystem3):
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6800/m6800.h"
 #include "machine/6522via.h"
+#include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+//#include "video/hlcd0438.h"
 #include "video/md4330b.h"
 #include "video/pwm.h"
 
@@ -375,22 +379,25 @@ void ssystem3_state::ssystem3(machine_config &config)
 ******************************************************************************/
 
 ROM_START( ssystem3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("c19081e_ss-3-lrom.u4", 0x8000, 0x1000, CRC(9ea46ed3) SHA1(34eef85b356efbea6ddac1d1705b104fc8e2731a) ) // 2332
 	ROM_LOAD("c19082_ss-3-hrom.u5",  0x9000, 0x1000, CRC(52741e0b) SHA1(2a7b950f9810c5a14a1b9d5e6b2bd93da621662e) ) // "
 
 	// HACK! 6522 ACR register setup
 	ROM_FILL(0x946d, 1, 0xe0) // was 0xe3
 
-	ROM_REGION( 0x100, "nvram", 0 ) // default settings
-	ROM_LOAD( "nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
+	ROM_REGION(0x10000, "subcpu", 0)
+	ROM_LOAD("c28a97m_ss-3l-rom", 0x4000, 0x0800, CRC(bf0b2a84) SHA1(286f56aca2e50b78ac1fae4a89413659aceb71d9) ) // 2316
 
-	ROM_REGION( 53552, "screen", 0)
-	ROM_LOAD( "ssystem3.svg", 0, 53552, CRC(6047f88f) SHA1(2ff9cfce01cd3811a3f46f84b47fdc4ea2cf2ba8) )
+	ROM_REGION(0x100, "nvram", 0) // default settings
+	ROM_LOAD("nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
+
+	ROM_REGION(53552, "screen", 0)
+	ROM_LOAD("ssystem3.svg", 0, 53552, CRC(6047f88f) SHA1(2ff9cfce01cd3811a3f46f84b47fdc4ea2cf2ba8) )
 ROM_END
 
 ROM_START( ssystem4 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // roms in a cartridge
+	ROM_REGION(0x10000, "maincpu", 0) // roms in a cartridge
 	ROM_LOAD("c45021_ss4-lrom", 0xd000, 0x1000, CRC(fc86a4fc) SHA1(ee292925165d4bf7b948c60a81d95f7a4064e797) ) // 2332
 	ROM_LOAD("c45022_ss4-mrom", 0xe000, 0x1000, CRC(c6110af1) SHA1(4b63454a23b2fe6b5c8f3fa6718eb49770cb6907) ) // "
 	ROM_LOAD("c45023_ss4-hrom", 0xf000, 0x1000, CRC(ab4a4343) SHA1(6eeee7168e13dc1115cb5833f1938a8ea8c01d69) ) // "
@@ -398,8 +405,8 @@ ROM_START( ssystem4 )
 	// HACK! 6522 ACR register setup
 	ROM_FILL(0xd05b, 1, 0xe0) // was 0xe3
 
-	ROM_REGION( 53552, "screen", 0) // looks same, but different pinout
-	ROM_LOAD( "ssystem4.svg", 0, 53552, CRC(b69b12e3) SHA1(c2e39d015397d403309f1c23619fe8abc3745d87) )
+	ROM_REGION(53552, "screen", 0) // looks same, but different pinout
+	ROM_LOAD("ssystem4.svg", 0, 53552, CRC(b69b12e3) SHA1(c2e39d015397d403309f1c23619fe8abc3745d87) )
 ROM_END
 
 } // anonymous namespace
