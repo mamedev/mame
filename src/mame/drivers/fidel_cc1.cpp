@@ -4,11 +4,9 @@
 /******************************************************************************
 
 Fidelity's 1st generation chess computers:
-- *Chess Challenger
+- Chess Challenger
 - Chess Challenger (upgraded version) - more commonly known as CC3
 - Chess Challenger (model UCC10) - more commonly known as CC10 ver. C
-
-* denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
 
 The first generation of chesscomputers didn't have an electronic chessboard.
 Some of them required a separate chessboard, others had a small chessboard
@@ -40,15 +38,15 @@ CC1 hardware overview:
 - NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
 - Everything goes via a NEC B8228, its special features are unused.
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
-- 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
+- 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad, no sound
 
 Chess Challenger (upgraded version) released a few months later is on the same
 hardware, but with double the ROM size, and they corrected the reversed chess
 notation. It was also offered as an upgrade to CC1. PCB label P179 C-3 9.77.
 
 Chess Challenger (model UCC10) is on nearly the same PCB too, same label as CC3,
-with a small daughterboard for 8KB ROM. Again, it was also offered as an upgrade
-to CC1, or CC3.
+with an 8KB ROM on a small daughterboard(P-410A 4 12 79). Again, it was also
+offered as an upgrade to CC1, or CC3.
 
 Note that although these 2 newer versions are known as "Chess Challenger 3" and
 "Chess Challeger 10 C" nowadays, those are not the official titles. CC3 simply
@@ -197,7 +195,7 @@ void cc1_state::cc10_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x11ff).mirror(0x2e00).ram();
-	map(0x2000, 0x2fff).rom().region("maincpu", 0x1000);
+	map(0x2000, 0x2fff).rom();
 }
 
 
@@ -298,18 +296,19 @@ void cc1_state::cc10(machine_config &config)
 ******************************************************************************/
 
 ROM_START( cc1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("d2316ac_011", 0x0000, 0x0800, BAD_DUMP CRC(e27f9816) SHA1(ad9881b3bf8341829a27e86de27805fc2ccb5f7d) ) // A4 line was broken
 ROM_END
 
 ROM_START( cc3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("d2332c_011", 0x0000, 0x1000, CRC(51cf4682) SHA1(197374c633a0bf1a9b7ea51a72dc2b89a6c9c508) )
 ROM_END
 
 ROM_START( cc10c )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("k95069-922_ucc_10", 0x0000, 0x2000, CRC(2232c1c4) SHA1(fd282ba7ce7ac28834c860cec2cca398aec1b3f3) )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("k95069-922_ucc_10", 0x0000, 0x1000, CRC(2232c1c4) SHA1(fd282ba7ce7ac28834c860cec2cca398aec1b3f3) )
+	ROM_CONTINUE(                 0x2000, 0x1000 )
 ROM_END
 
 } // anonymous namespace

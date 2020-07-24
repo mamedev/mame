@@ -76,7 +76,7 @@ BTANB (ssystem3):
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-//#include "video/hlcd0438.h"
+#include "video/hlcd0438.h"
 #include "video/md4330b.h"
 #include "video/pwm.h"
 
