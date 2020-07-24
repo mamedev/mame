@@ -29355,7 +29355,11 @@ v4turnovc
 v4turnovd
 v4vgpok                         // Vegas Poker (prototype release 2)
 v4wize                          // Wize Move (v1.3d)
-v4wizea                         // Wize Move
+v4wizen
+v4wizeb
+v4wizec
+v4wized
+v4wizeo                         // Wize Move
 
 @source:mpu5sw.cpp
 m55050                          // Fifty Fifty (Bwb)

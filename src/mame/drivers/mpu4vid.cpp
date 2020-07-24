@@ -4042,6 +4042,21 @@ ROM_START( v4wize )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "wms.p1", 0x000000, 0x010000, CRC(712385c1) SHA1(075a98626eba2eae6a31b395c2a74541a31b2582) )
+	ROM_LOAD16_BYTE( "wm.p2",  0x000001, 0x010000, CRC(41b5fb2a) SHA1(e9ee484ec7445d58efa9bbfbd705202ef83656f2) )
+	ROM_LOAD16_BYTE( "wm.p3",  0x020000, 0x010000, CRC(934da7e4) SHA1(9cac87ccadbc871577640ec0bddd5e07aef139f8) )
+	ROM_LOAD16_BYTE( "wm.p4",  0x020001, 0x010000, CRC(463f6c0b) SHA1(ffee4cca73ebe7130e34118031cb16b3c42f03cb) )
+	ROM_LOAD16_BYTE( "wm.p5",  0x040000, 0x010000, CRC(eaea2502) SHA1(adeda7148ee4eee98870f4aa529b5c9f36417e2e) )
+	ROM_LOAD16_BYTE( "wm.p6",  0x040001, 0x010000, CRC(40a5e980) SHA1(e7bd49308b63a94a9ca0b138de0c48d2316d6aa0) )
+
+	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+ROM_END
+
+ROM_START( v4wized )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "wmd.p1", 0x000000, 0x010000, CRC(45d29045) SHA1(37911346753211801f8404d42b275f49764ba5f4) )
 	ROM_LOAD16_BYTE( "wm.p2",  0x000001, 0x010000, CRC(41b5fb2a) SHA1(e9ee484ec7445d58efa9bbfbd705202ef83656f2) )
 	ROM_LOAD16_BYTE( "wm.p3",  0x020000, 0x010000, CRC(934da7e4) SHA1(9cac87ccadbc871577640ec0bddd5e07aef139f8) )
@@ -4050,16 +4065,52 @@ ROM_START( v4wize )
 	ROM_LOAD16_BYTE( "wm.p6",  0x040001, 0x010000, CRC(40a5e980) SHA1(e7bd49308b63a94a9ca0b138de0c48d2316d6aa0) )
 
 	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
-
-
-	ROM_REGION( 0x800000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "w23.p1", 0x000000, 0x010000, CRC(a8d8fb2e) SHA1(cf5462b224a7960ade867cf76079d11084f13e4b) )
-	ROM_LOAD16_BYTE( "wm3.p1", 0x000000, 0x010000, CRC(0752f0f1) SHA1(2b0531312bf1d4b489394401c5d78c7f04e12aea) )
-	ROM_LOAD16_BYTE( "wm3d.p1", 0x000000, 0x010000, CRC(4e3ab877) SHA1(64408d1ac1f626390ffe93e024c672ba5acb42d6) )
-	ROM_LOAD16_BYTE( "wms.p1", 0x000000, 0x010000, CRC(712385c1) SHA1(075a98626eba2eae6a31b395c2a74541a31b2582) )
 ROM_END
 
-ROM_START( v4wizea )
+
+ROM_START( v4wizeb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "wm3.p1", 0x000000, 0x010000, CRC(0752f0f1) SHA1(2b0531312bf1d4b489394401c5d78c7f04e12aea) )
+	ROM_LOAD16_BYTE( "wm.p2",  0x000001, 0x010000, CRC(41b5fb2a) SHA1(e9ee484ec7445d58efa9bbfbd705202ef83656f2) )
+	ROM_LOAD16_BYTE( "wm.p3",  0x020000, 0x010000, CRC(934da7e4) SHA1(9cac87ccadbc871577640ec0bddd5e07aef139f8) )
+	ROM_LOAD16_BYTE( "wm.p4",  0x020001, 0x010000, CRC(463f6c0b) SHA1(ffee4cca73ebe7130e34118031cb16b3c42f03cb) )
+	ROM_LOAD16_BYTE( "wm.p5",  0x040000, 0x010000, CRC(eaea2502) SHA1(adeda7148ee4eee98870f4aa529b5c9f36417e2e) )
+	ROM_LOAD16_BYTE( "wm.p6",  0x040001, 0x010000, CRC(40a5e980) SHA1(e7bd49308b63a94a9ca0b138de0c48d2316d6aa0) )
+
+	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+ROM_END
+
+ROM_START( v4wizec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "wm3d.p1", 0x000000, 0x010000, CRC(4e3ab877) SHA1(64408d1ac1f626390ffe93e024c672ba5acb42d6) )
+	ROM_LOAD16_BYTE( "wm.p2",  0x000001, 0x010000, CRC(41b5fb2a) SHA1(e9ee484ec7445d58efa9bbfbd705202ef83656f2) )
+	ROM_LOAD16_BYTE( "wm.p3",  0x020000, 0x010000, CRC(934da7e4) SHA1(9cac87ccadbc871577640ec0bddd5e07aef139f8) )
+	ROM_LOAD16_BYTE( "wm.p4",  0x020001, 0x010000, CRC(463f6c0b) SHA1(ffee4cca73ebe7130e34118031cb16b3c42f03cb) )
+	ROM_LOAD16_BYTE( "wm.p5",  0x040000, 0x010000, CRC(eaea2502) SHA1(adeda7148ee4eee98870f4aa529b5c9f36417e2e) )
+	ROM_LOAD16_BYTE( "wm.p6",  0x040001, 0x010000, CRC(40a5e980) SHA1(e7bd49308b63a94a9ca0b138de0c48d2316d6aa0) )
+
+	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+ROM_END
+
+ROM_START( v4wizen )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 ) // has WW21 in ROM, vector table appears corrupt, seems to be different revision
+	ROM_LOAD16_BYTE( "w23.p1", 0x000000, 0x010000, BAD_DUMP CRC(a8d8fb2e) SHA1(cf5462b224a7960ade867cf76079d11084f13e4b) )
+	ROM_LOAD16_BYTE( "w23.p2", 0x000001, 0x010000, NO_DUMP )
+	// + other ROMs
+
+	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+ROM_END
+
+ROM_START( v4wizeo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -4072,7 +4123,6 @@ ROM_START( v4wizea )
 	ROM_LOAD16_BYTE( "wzm1+2p6", 0x040001, 0x010000, CRC(3eecbdf8) SHA1(9ecc4fe25e1c1e167aaa413eaf601b55e1a432fb) )
 
 	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
-
 ROM_END
 
 
@@ -8083,7 +8133,7 @@ GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, 
 
 GAMEL(  199?, v4strike,   v4bios,   mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 GAMEL(  199?, v4striked,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS,layout_v4strike )
-GAMEL(  199?, v4strike2,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
+GAMEL(  199?, v4strike2,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike ) // The '3' is likely a machine type, not a 'version', 68k Pair ROM doesn't change
 GAMEL(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS,layout_v4strike )
 
 GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
@@ -8092,7 +8142,7 @@ GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state,
 /* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
 
 GAME(  199?, v4turnov,   v4bios,     mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnova,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 might be a machine type, because much like Strike It Lucky the pairing 68k ROM doesn't change 
+GAME(  199?, v4turnova,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change 
 GAME(  199?, v4turnovc,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4turnovd,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
 
@@ -8120,8 +8170,16 @@ GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_qu
 
 GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid,   barquest,   mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
 
-GAME(  199?, v4wize,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizea,    v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
+// again the 2nd '3' seems to indicate a machine type, not a version
+GAME(  199?, v4wize,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wized,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeb,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizec,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
+// older code, 1x 68k ROM is missing in addition to questions being missing
+GAME(  199?, v4wizeo,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
+// newer? code, only 1x 68k ROM is dumped (and it appears to be slightly corrupt)
+GAME(  199?, v4wizen,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
+
 
 GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
 GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
