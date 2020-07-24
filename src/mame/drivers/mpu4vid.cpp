@@ -5379,26 +5379,6 @@ ROM_START( v4cshinf3a )
 	/* none present */
 ROM_END
 
-ROM_START( v4cshinfunk ) // unknown set, check this is really an MPU4 Video base ROM
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci_20.10", 0x0000, 0x010000, CRC(80a4bfb3) SHA1(b3c11bd621457d190eeab423bc15895b0c7cf6da) )
-
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "ci______.4_1", 0x000000, 0x010000, CRC(bd1adec6) SHA1(7a60adc4b5159e672eb4dc33051192f0cf863aef) )
-	ROM_LOAD16_BYTE( "ci______.4_2", 0x000001, 0x010000, CRC(e46852ff) SHA1(ad6f0a75578041b06120d1d5f3c3779c827b8f2f) )
-	ROM_LOAD16_BYTE( "ci______.4_3", 0x020000, 0x010000, CRC(b63b9edf) SHA1(2a47c97f5ea51bc441fb847da6e81451dde77093) )
-	ROM_LOAD16_BYTE( "ci______.4_4", 0x020001, 0x010000, CRC(7ef4daeb) SHA1(f889f4e68dc4ef736eee44ddedaa94832c6cdbc7) )
-	ROM_LOAD16_BYTE( "ci______.4_5", 0x040000, 0x010000, CRC(381277b7) SHA1(6d934d400468c067809452981577c17cf425ff4f) )
-	ROM_LOAD16_BYTE( "ci______.4_6", 0x040001, 0x010000, CRC(e245c830) SHA1(315b8163731abe5c65bebd94884431e99253740b) )
-	ROM_LOAD16_BYTE( "ci______.4_7", 0x060000, 0x010000, CRC(169d6ac5) SHA1(7d9e63d9ab29fbace754e8c46d4e80b1ab2d422d) )
-	ROM_LOAD16_BYTE( "ci______.4_8", 0x060001, 0x010000, CRC(12de2ae0) SHA1(734207fffd918f3a0890ec6a2d442efb428adbaa) )
-	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
-	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	/* none present */
-ROM_END
-
 
 ROM_START( v4dbltak )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8337,8 +8317,6 @@ GAME(  199?, v4cshinfa,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 // no 68k program is dumped for Release 3
 GAME(  199?, v4cshinf3,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 3) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinf3a, v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 3) (set 2) (MPU4 Video)",GAME_FLAGS )
-// TODO: check this is really an MPU4 Video base ROM
-GAME(  199?, v4cshinfunk,  v4cshinf, bwbvid,    bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (unknown release) (MPU4 Video)",GAME_FLAGS ) // doesn't boot?
 
 
 // the onscreen 'version' display doesn't quite align with the labels, 'DY' seems to be represented as 'B' on the labels, rather than the individual flags?
