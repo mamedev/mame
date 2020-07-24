@@ -4487,7 +4487,7 @@ ROM_START( v4cybcas )
 	/* none present */
 ROM_END
 
-ROM_START( v4miami )
+ROM_START( v4mdiceger )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mdd4_0.bin", 0x0000, 0x010000, CRC(0d868466) SHA1(3cea446f094ae3b4f56163ccf01cd31c15dca03f) )
 
@@ -5543,6 +5543,20 @@ ROM_START( v4gldrshu )
 ROM_END
 
 
+ROM_START( v4mdicee )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "md_22sd_.8_0", 0x0000, 0x010000, CRC(ac8ea8cd) SHA1(31cc328aa803e232a57572fbc9ea6ac90177ad37) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "md______.8_1", 0x000001, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
+	ROM_LOAD16_BYTE( "md______.8_2", 0x000000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
+	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
+	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
+	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
+ROM_END
 
 ROM_START( v4mdice )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5619,20 +5633,7 @@ ROM_START( v4mdiced )
 	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
 ROM_END
 
-ROM_START( v4mdicee )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "md_22sd_.8_0", 0x0000, 0x010000, CRC(ac8ea8cd) SHA1(31cc328aa803e232a57572fbc9ea6ac90177ad37) )
 
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "md______.8_1", 0x000001, 0x080000, CRC(3f3fa0d2) SHA1(bb52111bcea5cd404d1e7adf0f3ebca596a251ac) )
-	ROM_LOAD16_BYTE( "md______.8_2", 0x000000, 0x080000, CRC(14bb6b48) SHA1(97025f0899c325d28ac75c54e81fd425b5002064) )
-	ROM_LOAD16_BYTE( "md______.8_3", 0x100001, 0x080000, CRC(cde34cd1) SHA1(7874fa070e52e6c34b770aee5bfec522eb3d72c9) )
-	ROM_LOAD16_BYTE( "md______.8_4", 0x100000, 0x080000, CRC(39bc1267) SHA1(853e047406fed3c12f55a2e032e8c3d8188da182) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "mdsnda", 0x000000, 0x080000, CRC(18651603) SHA1(c6f7557a82cb49f3f001b43250129d10f4f6ab5a) )
-	ROM_LOAD( "mdsndb", 0x080000, 0x080000, CRC(2233d677) SHA1(a787dc0bafa310df9467e4b8166274288fe94b4c) )
-ROM_END
 
 
 ROM_START( v4mdicef )
@@ -8324,32 +8325,36 @@ GAME(  199?, v4monteao,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 // only have a single loose 68k ROM from this which doesn't match any other set
 GAME(  199?, v4montezz,  v4monte,  bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Monte Carlo Or Bust (BWB) (Release ?, set 35) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicea,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiceb,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicec,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiced,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 5) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicee,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 6) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicef,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 7) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiceg,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 8) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiceh,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 9) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicei,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 10) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicej,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 11) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicek,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 12) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicel,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 13) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicem,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 14) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicen,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 15) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiceo,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 16) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicep,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 17) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiceq,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 18) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicer,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 19) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdices,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 20) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicet,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 21) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdiceu,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 22) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicev,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 23) (MPU4 Video)",GAME_FLAGS )
-GAME(  1995, v4mdicew,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 8) (set 24) (MPU4 Video)",GAME_FLAGS )
 
+GAME(  1995, v4mdice,    0,        bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 25p-£10 Cash - Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicee,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£4 Cash - Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicep,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£10 Cash - Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiceq,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£10 Cash - Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicer,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£10 Cash - Fixed) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiceu,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 25p-£10 Cash - Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicev,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 25p-£10 Cash - Fixed) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicei,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£8 Token - Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicej,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£8 Token - Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicel,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£8 Token - Fixed) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicem,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Standard, 20p-£8 Token - Fixed) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicek,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, S/Site Showcase, 20p-£8 Token - Fixed) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicea,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 5p-£4 Cash - Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiceb,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 10p-£4 Cash - Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiced,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 20p-£4 Cash - Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicew,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 20p-£8 Cash - Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicen,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 20p-£10 Cash - Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiceo,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 20p-£10 Cash - Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdices,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 25p-£10 Cash - Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicet,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 25p-£10 Cash - Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicec,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 10p-£8 Token - Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdicef,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 20p-£8 Token - Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiceh,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Standard, 20p-£8 Token - Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1995, v4mdiceg,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB", u8"Miami Dice (BWB) (Release 8, Arcade Showcase, 20p-£8 Token - Fixed) (set 3) (MPU4 Video)",GAME_FLAGS )
+// no base ROMs, only 68k ROMs dumped for Release 5
 GAME(  1995, v4mdice5,   v4mdice,  bwbvid,     v4mdice,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Miami Dice (BWB) (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
+// this is a German version of v4mdice, produced by Nova
+GAME(  199?, v4mdiceger, v4mdice,  bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Miami Dice (Nova, German) (MPU4 Video)",GAME_FLAGS )
+
 
 // other issues
 
@@ -8385,8 +8390,6 @@ GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwb
 /* All contain BWB video in the BIOS rom tho */
 /* These seem to use the other palette chip (BT471). and use the German BWB bank setup, so may need more work */
 
-// this is a German version of v4mdice, produced by Nova
-GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Miami Dice (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
