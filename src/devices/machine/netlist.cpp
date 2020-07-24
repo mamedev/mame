@@ -881,7 +881,9 @@ void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, n
 		m_buffer.push_back(static_cast<stream_sample_t>(m_cur));
 	}
 
-	/* ignore spikes */
+	// clamp to avoid spikes, but not too hard, as downstream processing, volume
+	// controls, etc may bring values above 32767 back down in range; some clamping
+	// is still useful, however, as the mixing is done with integral values
 	if (plib::abs(val) < 32767.0*256.0)
 		m_cur = val;
 	else if (val > 0.0)
