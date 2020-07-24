@@ -37521,7 +37521,8 @@ tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not 
 opwolf3                         // D74 (c) 1994 Taito Corporation Japan
 opwolf3j                        // D74 (c) 1994 Taito Corporation
 opwolf3u                        // D74 (c) 1994 Taito America Corporation
-slapshot                        // D71 (c) 1994 Taito Corporation (Japan)
+slapshot                        // D71 (c) 1994 Taito Corporation Japan (Ver 3.0 O)
+slapshotj                       // D71 (c) 1994 Taito Corporation (Ver 2.2 J)
 
 @source:slc1.cpp
 slc1                            //
