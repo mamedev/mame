@@ -711,7 +711,7 @@ ROM_START( anakonda )
 	ROM_LOAD( "anakonda.rom",    0x0000, 0x0800, CRC(50ba6462) SHA1(f55a9f8e78a3e97012e343ea35cd787fc45dae35) )
 ROM_END
 
-ROM_START( kharkovsky ) // Made in Kharkov, Ukraine
+ROM_START( kharkovsky ) // Made in Kharkiv, Ukraine
 	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "zagr.bin",        0x0000, 0x0800, CRC(f86ba4db) SHA1(1f48c74ffce88f6e804f776c66d6c03059fca117) )
 	ROM_LOAD( "mon.bin",         0x0800, 0x0800, CRC(2dd1b6d2) SHA1(d5a02a9645f57eb0295d6b8d8cd8c589b47ba591) )
