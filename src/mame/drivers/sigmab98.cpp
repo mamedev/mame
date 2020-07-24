@@ -227,7 +227,6 @@ protected:
 	void sammymdl_eeprom_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(sigmab98);
-	DECLARE_MACHINE_RESET(sammymdl_cart);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
@@ -2003,14 +2002,6 @@ void lufykzku_state::lufykzku(machine_config &config)
                              Sammy Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sammymdl_cart)
-{
-	// MMU init hack (not needed for gocowboy)
-	m_maincpu->set_state_int(kl5c80a12_device::KC82_A1, 0x03f);
-	m_maincpu->set_state_int(kl5c80a12_device::KC82_B1, 0x00);
-	m_maincpu->set_state_int(kl5c80a12_device::KC82_B4, 0x3e);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 {
 	int scanline = param;
@@ -2069,8 +2060,6 @@ void sigmab98_state::animalc(machine_config &config)
 {
 	sammymdl(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl_cart)
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::animalc_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::animalc_io);
 }
@@ -2091,8 +2080,6 @@ void sigmab98_state::haekaka(machine_config &config)
 {
 	sammymdl(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl_cart)
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::haekaka_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::haekaka_io);
 }
@@ -2100,8 +2087,6 @@ void sigmab98_state::haekaka(machine_config &config)
 void sigmab98_state::itazuram(machine_config &config)
 {
 	sammymdl(config);
-
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl_cart)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::itazuram_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::itazuram_io);
@@ -2111,8 +2096,6 @@ void sigmab98_state::pyenaget(machine_config &config)
 {
 	sammymdl(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl_cart)
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::haekaka_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::pyenaget_io);
 }
@@ -2120,8 +2103,6 @@ void sigmab98_state::pyenaget(machine_config &config)
 void sigmab98_state::tdoboon(machine_config &config)
 {
 	sammymdl(config);
-
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl_cart)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::tdoboon_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::tdoboon_io);
@@ -2596,7 +2577,7 @@ ROM_START( sammymdl )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "mainbios", 0x000000, 0x0000, 0x40000 )
+	ROM_COPY( "mainbios", 0x00fc00, 0x0000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -2626,6 +2607,19 @@ ROM_END
 
 void sigmab98_state::init_animalc()
 {
+	uint8_t *rom = memregion("mainbios")->base();
+
+	// video timing loops
+	rom[0x015d9] = 0x00;
+	rom[0x015da] = 0x00;
+	rom[0x01605] = 0x00;
+	rom[0x01606] = 0x00;
+	rom[0x01750] = 0x00;
+	rom[0x01751] = 0x00;
+
+	// force jump out of BIOS loop
+	rom[0x005ac] = 0xc3;
+
 	m_vblank_vector = 0x00; // increment counter
 	m_timer0_vector = 0x1c; // read hopper state
 	m_timer1_vector = 0x1e; // drive hopper motor
@@ -2697,6 +2691,11 @@ ROM_END
 
 void sigmab98_state::init_itazuram()
 {
+	uint8_t *rom = memregion("mainbios")->base();
+
+	// force jump out of BIOS loop
+	rom[0x005ac] = 0xc3;
+
 	m_vblank_vector = 0x00;
 	m_timer0_vector = 0x02;
 	m_timer1_vector = 0x16;
@@ -2798,6 +2797,11 @@ ROM_END
 
 void sigmab98_state::init_haekaka()
 {
+	uint8_t *rom = memregion("mainbios")->base();
+
+	// force jump out of BIOS loop
+	rom[0x005ac] = 0xc3;
+
 	m_vblank_vector = 0x04;
 	m_timer0_vector = 0x1a;
 	m_timer1_vector = 0x1c;
