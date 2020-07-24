@@ -4060,22 +4060,22 @@ ROM_END
 
 ROM_START( racedrivcp ) // This came from a factory RD compact cabinet. There's a "Property of Pepsi-cola" label inside the coin door. Most notable difference is it has selectable multi-screen settings available in the test mode. So you could build your own compact Panorama theoretically.
 	ROM_REGION( 0x100000, "mainpcb:maincpu", 0 )        // 1MB for 68000 code
-	ROM_LOAD16_BYTE( "ms-gsp-test-hi.200r", 0x000000, 0x010000, CRC(57f1b268) SHA1(a32f32819ca31356cd3fa4bd0d048cde853c64db) )
-	ROM_LOAD16_BYTE( "ms-gsp-test-lo.210r", 0x000001, 0x010000, BAD_DUMP CRC(89cdb7fa) SHA1(e30113e88a4cc35bda195bc9a17570d9e717a689) ) // bad according to test mode. Really bad or did they not bother to update the check during development?
-	ROM_LOAD16_BYTE( "ms-drive0-hi.200s",   0x020000, 0x010000, CRC(49dcb1e7) SHA1(ab4d972096c0bfed506536f3591b2950162cd798) )
-	ROM_LOAD16_BYTE( "ms-drive0-lo.210s",   0x020001, 0x010000, CRC(9d9987cf) SHA1(44cba81764d6814af9cc8ead8789ebfe94fd0cde) )
-	ROM_LOAD16_BYTE( "ms-drive1-hi.200t",   0x040000, 0x010000, CRC(7d93ffc2) SHA1(08d424afb8eb7b957c5855c26586492da6dc7ffa) )
-	ROM_LOAD16_BYTE( "ms-drive1-lo.210t",   0x040001, 0x010000, CRC(f8cc3105) SHA1(2d507d1f429c5a9b4b1b0120a6c0b679d1303039) )
-	ROM_LOAD16_BYTE( "ms-pics0-hi.200u",    0x060000, 0x010000, CRC(7932e194) SHA1(610945c56246c2b6172a4810631eddb3d77155e1) )
-	ROM_LOAD16_BYTE( "ms-pics0-lo.210u",    0x060001, 0x010000, CRC(42e017d7) SHA1(806a251d7b762e28fa1c8168d3c6180e21f832f7) )
-	ROM_LOAD16_BYTE( "ms-pics1-hi.200v",    0x080000, 0x010000, CRC(8d3ebb56) SHA1(81e05db3d909f402bd38ccb34c468da41c9dcba5) )
-	ROM_LOAD16_BYTE( "ms-pics1-lo.210v",    0x080001, 0x010000, CRC(1b5a8606) SHA1(cfa67de495c11a1fdc4ffca389930f1e27ba5ff4) )
-	ROM_LOAD16_BYTE( "136077-1012.200w",    0x0a0000, 0x010000, CRC(9a78b952) SHA1(53270d4d8c28579ebda477a63c034f6d1b9e5a58) )
-	ROM_LOAD16_BYTE( "136077-1011.210w",    0x0a0001, 0x010000, CRC(c5cd5491) SHA1(ede5a3bb888342032d6758b0fb149451b6543d8b) )
-	ROM_LOAD16_BYTE( "136077-1014.200x",    0x0c0000, 0x010000, CRC(a872792a) SHA1(9269e397567940013e5f46cadfe2bad2ca1a2bc4) )
-	ROM_LOAD16_BYTE( "136077-1013.210x",    0x0c0001, 0x010000, CRC(ca7b3e53) SHA1(cdb3a6360893fd3dd2947c050dca8a4dfaa9ced9) )
-	ROM_LOAD16_BYTE( "ms-coproc-hi.200y",   0x0e0000, 0x010000, CRC(7188964e) SHA1(55f1fb60e20c9ce618af27197ed1174fee875c5e) )
-	ROM_LOAD16_BYTE( "ms-coproc-lo.210y",   0x0e0001, 0x010000, CRC(19eecfad) SHA1(53c72fe2d868fadeda2066df5067e97382a0750a) )
+	ROM_LOAD16_BYTE( "msync_gsp_tst_hi_1902_9-13-90.200r", 0x000000, 0x010000, CRC(57f1b268) SHA1(a32f32819ca31356cd3fa4bd0d048cde853c64db) ) // all of these had hand written labels
+	ROM_LOAD16_BYTE( "msync_gsp_tst_lo_f201_9-13-90.210r", 0x000001, 0x010000, BAD_DUMP CRC(89cdb7fa) SHA1(e30113e88a4cc35bda195bc9a17570d9e717a689) ) // bad according to test mode. checksum does not match written label
+	ROM_LOAD16_BYTE( "ms_drive_0_hi_8204_10-17-90.200s",   0x020000, 0x010000, CRC(49dcb1e7) SHA1(ab4d972096c0bfed506536f3591b2950162cd798) )
+	ROM_LOAD16_BYTE( "ms_drive_0_lo_a203_10-17-90.210s",   0x020001, 0x010000, CRC(9d9987cf) SHA1(44cba81764d6814af9cc8ead8789ebfe94fd0cde) )
+	ROM_LOAD16_BYTE( "ms_drive_1_hi_9206_10-17-90.200t",   0x040000, 0x010000, CRC(7d93ffc2) SHA1(08d424afb8eb7b957c5855c26586492da6dc7ffa) )
+	ROM_LOAD16_BYTE( "ms_drive_1_lo_0005_10-17-90.210t",   0x040001, 0x010000, CRC(f8cc3105) SHA1(2d507d1f429c5a9b4b1b0120a6c0b679d1303039) )
+	ROM_LOAD16_BYTE( "ms_pics_0_hi_0733_10-3-90.200u",     0x060000, 0x010000, CRC(7932e194) SHA1(610945c56246c2b6172a4810631eddb3d77155e1) )
+	ROM_LOAD16_BYTE( "ms_pics_0_lo_c135_10-3-90.210u",     0x060001, 0x010000, CRC(42e017d7) SHA1(806a251d7b762e28fa1c8168d3c6180e21f832f7) )
+	ROM_LOAD16_BYTE( "ms_pics_1_hi_fd58_10-3-90.200v",     0x080000, 0x010000, CRC(8d3ebb56) SHA1(81e05db3d909f402bd38ccb34c468da41c9dcba5) )
+	ROM_LOAD16_BYTE( "ms_pics_1_lo_6de3_10-3-90.210v",     0x080001, 0x010000, CRC(1b5a8606) SHA1(cfa67de495c11a1fdc4ffca389930f1e27ba5ff4) )
+	ROM_LOAD16_BYTE( "136077-1012.200w",                   0x0a0000, 0x010000, CRC(9a78b952) SHA1(53270d4d8c28579ebda477a63c034f6d1b9e5a58) ) // hand written label stating it's 136077-1012
+	ROM_LOAD16_BYTE( "136077-1011.210w",                   0x0a0001, 0x010000, CRC(c5cd5491) SHA1(ede5a3bb888342032d6758b0fb149451b6543d8b) ) // hand written label stating it's 136077-1011
+	ROM_LOAD16_BYTE( "136077-1014.200x",                   0x0c0000, 0x010000, CRC(a872792a) SHA1(9269e397567940013e5f46cadfe2bad2ca1a2bc4) ) // missing label but == 136077-1014.200x
+	ROM_LOAD16_BYTE( "136077-1013.210x",                   0x0c0001, 0x010000, CRC(ca7b3e53) SHA1(cdb3a6360893fd3dd2947c050dca8a4dfaa9ced9) ) // missing label but == 136077-1013.210x
+	ROM_LOAD16_BYTE( "mscoproc_hi_09dc_9-13-90.200y",      0x0e0000, 0x010000, CRC(7188964e) SHA1(55f1fb60e20c9ce618af27197ed1174fee875c5e) )
+	ROM_LOAD16_BYTE( "mscoproc_lo_9081_9-13-90.210y",      0x0e0001, 0x010000, CRC(19eecfad) SHA1(53c72fe2d868fadeda2066df5067e97382a0750a) )
 
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   // ASIC65 TMS32015 code
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
@@ -4091,8 +4091,8 @@ ROM_START( racedrivcp ) // This came from a factory RD compact cabinet. There's 
 	ROM_LOAD16_BYTE( "136077-1024.10l", 0x020001, 0x010000, CRC(1e2fb25f) SHA1(4940091bbad6144bce091d2737191d266d4b0310) )
 
 	ROM_REGION16_BE( 0x50000, "mainpcb:user3", 0 )  // 256k for DSK ROMs + 64k for RAM
-	ROM_LOAD16_BYTE( "136078-x030.30e", 0x000000, 0x010000, CRC(410582d6) SHA1(769563ae271e47cbee20d796b0b895dd63af3b41) )
-	ROM_LOAD16_BYTE( "136078-x031.10e", 0x000001, 0x010000, CRC(806c82d4) SHA1(75bd650dce52eae3a95d21d904a651582cfe86b6) )
+	ROM_LOAD16_BYTE( "msync_univ_7cd2_dsk_10-3-90_hi_e30.30e", 0x000000, 0x010000, CRC(410582d6) SHA1(769563ae271e47cbee20d796b0b895dd63af3b41) ) // hand written label
+	ROM_LOAD16_BYTE( "msync_univ_2889_dsk_10-3-90_lo_e10.10e", 0x000001, 0x010000, CRC(806c82d4) SHA1(75bd650dce52eae3a95d21d904a651582cfe86b6) ) // hand written label
 	ROM_LOAD16_BYTE( "136077-1028.30f", 0x020000, 0x010000, CRC(4ea8148a) SHA1(19408b0e08f7b4c50d0428e61d1f3d710d4a782c) ) // does this go here?
 	ROM_LOAD16_BYTE( "136077-1029.10f", 0x020001, 0x010000, CRC(f7eeb42d) SHA1(e3127a2c354a80517c6e804f9092f1450ab5c4b3) ) // "
 
