@@ -14,17 +14,15 @@ namespace netlist
 	namespace devices
 	{
 
-	template <unsigned _LiveBitmask>
+	template <unsigned _TotalBits, unsigned _LiveBitmask>
 	NETLIB_OBJECT(CD4020_sub)
 	{
-		static constexpr unsigned MAX_BITS = 14;
-		static constexpr unsigned MAX_BITMASK = (1 << MAX_BITS) - 1;
+		static_assert((_LiveBitmask >> _TotalBits) == 0);
 
 		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
 		, m_IP(*this, "IP", NETLIB_DELEGATE(ip))
 		, m_RESET(*this, "RESET", NETLIB_DELEGATE(reseti))
-		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
-				"Q10", "Q11", "Q12", "Q13", "Q14"})
+		, m_Q(*this, 1, "Q{}")
 		, m_cnt(*this, "m_cnt", 0)
 		, m_supply(*this)
 		{
@@ -49,7 +47,7 @@ namespace netlist
 				m_cnt = 0;
 				m_IP.inactivate();
 				/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-				for (int i = 0; i < MAX_BITS; i++)
+				for (int i = 0; i < _TotalBits; i++)
 					if (((_LiveBitmask >> i) & 1) != 0)
 						m_Q[i].push(0, reset_time);
 			}
@@ -70,13 +68,13 @@ namespace netlist
 					NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 			};
 
-			for (int i = 0; i < MAX_BITS; i++)
+			for (int i = 0; i < _TotalBits; i++)
 				if (((_LiveBitmask >> i) & 1) != 0)
-					m_Q[i].push(cnt & 1, out_delayQn[i]);
+					m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 		}
 		logic_input_t m_IP;
 		logic_input_t m_RESET;
-		object_array_t<logic_output_t, MAX_BITS> m_Q;
+		object_array_t<logic_output_t, _TotalBits> m_Q;
 
 		state_var<unsigned> m_cnt;
 		nld_power_pins m_supply;
@@ -108,7 +106,7 @@ namespace netlist
 		//NETLIB_RESETI() {}
 
 	private:
-		NETLIB_SUB(CD4020_sub)<0x3ff9> m_sub;
+		NETLIB_SUB(CD4020_sub)<14, 0x3ff9> m_sub;
 	};
 
 	NETLIB_OBJECT(CD4024)
@@ -132,7 +130,7 @@ namespace netlist
 		//NETLIB_RESETI() {}
 
 	private:
-		NETLIB_SUB(CD4020_sub)<0x7f> m_sub;
+		NETLIB_SUB(CD4020_sub)<7, 0x7f> m_sub;
 	};
 
 
