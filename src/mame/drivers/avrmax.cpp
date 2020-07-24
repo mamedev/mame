@@ -9,8 +9,8 @@ The chess engine is H.G. Muller's micro-Max 4.8, ATMega88 port and prototype
 hardware design by Andre Adrian. PCB finalization by Elektor, published in
 Elektor magazine in 2009.
 
-Moves are confirmed by pressing GO twice. FN 1 = new game, FN 2 = set level,
-FN 3 = principle variation.
+FN 1 = new game, FN 2 = set level, FN 3 = principle variation.
+Moves are confirmed by pressing GO twice.
 
 Hardware notes:
 - PCB label 081101-1 (c)Elektor v1.4

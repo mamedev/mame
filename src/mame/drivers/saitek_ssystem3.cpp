@@ -25,7 +25,7 @@ Master Unit:
 
 Chess Unit:
 - PCB label: Radofin XM-2057-0C
-- Fairchild F6808P CPU @ ?MHz (M6808 compatible)
+- Fairchild F6808P CPU @ ~6MHz (M6808 compatible)
 - Fairchild F6821P PIA
 - 2KB ROM(2316), 128x8 RAM(F6810P)
 - 2*HLCD0438, chessboard LCD
@@ -69,6 +69,7 @@ BTANB (ssystem3):
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6522via.h"
@@ -97,6 +98,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via"),
+		m_pia(*this, "pia"),
 		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -117,6 +119,7 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	optional_device<pia6821_device> m_pia;
 	required_device<md4332b_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -126,15 +129,23 @@ private:
 	// address maps
 	void ssystem3_map(address_map &map);
 	void ssystem4_map(address_map &map);
+	void chessunit_map(address_map &map);
 
 	// I/O handlers
 	void lcd_q_w(u32 data) { m_lcd_q = data; }
-	void nvram_w(offs_t offset, u8 data);
-	u8 nvram_r(offs_t offset);
 	void input_w(u8 data);
 	u8 input_r();
 	void control_w(u8 data);
 	u8 control_r();
+
+	void nvram_w(offs_t offset, u8 data);
+	u8 nvram_r(offs_t offset);
+
+	void pia_a_w(u8 data);
+	u8 pia_a_r();
+	void pia_b_w(u8 data);
+	u8 pia_b_r();
+	void pia_cb2_w(int state);
 
 	u8 m_inp_mux = 0;
 	u8 m_control = 0;
@@ -158,17 +169,7 @@ void ssystem3_state::machine_start()
     I/O
 ******************************************************************************/
 
-void ssystem3_state::nvram_w(offs_t offset, u8 data)
-{
-	// nvram is only d0-d3
-	if (m_inputs[5]->read() & 1)
-		m_nvram[offset] = data & 0x0f;
-}
-
-u8 ssystem3_state::nvram_r(offs_t offset)
-{
-	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
-}
+// Master Unit
 
 void ssystem3_state::input_w(u8 data)
 {
@@ -225,6 +226,8 @@ void ssystem3_state::control_w(u8 data)
 	}
 
 	// PB3: device serial out
+	if (m_inputs[5]->read() & 2)
+		m_pia->ca1_w(BIT(data, 3));
 
 	// PB7: tied to PB6 (pulse timer 2)
 	m_via->write_pb6(BIT(data, 7));
@@ -234,9 +237,53 @@ void ssystem3_state::control_w(u8 data)
 
 u8 ssystem3_state::control_r()
 {
+	u8 data = 0;
+
 	// PB4: device busy
 	// PB5: device attached?
-	return 0xff;
+	//data ^= 0x30;
+
+	return ~data;
+}
+
+
+// PSU
+
+void ssystem3_state::nvram_w(offs_t offset, u8 data)
+{
+	// nvram is only d0-d3
+	if (m_inputs[5]->read() & 1)
+		m_nvram[offset] = data & 0x0f;
+}
+
+u8 ssystem3_state::nvram_r(offs_t offset)
+{
+	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
+}
+
+
+// Chess Unit
+
+void ssystem3_state::pia_a_w(u8 data)
+{
+}
+
+u8 ssystem3_state::pia_a_r()
+{
+	return 0;
+}
+
+void ssystem3_state::pia_b_w(u8 data)
+{
+}
+
+u8 ssystem3_state::pia_b_r()
+{
+	return 0;
+}
+
+void ssystem3_state::pia_cb2_w(int state)
+{
 }
 
 
@@ -261,18 +308,25 @@ void ssystem3_state::ssystem4_map(address_map &map)
 	map(0xd000, 0xffff).rom();
 }
 
+void ssystem3_state::chessunit_map(address_map &map)
+{
+	map(0x3600, 0x367f).ram();
+	map(0x4000, 0x47ff).mirror(0xb800).rom();
+	map(0xa000, 0xa003).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
+
 
 
 /******************************************************************************
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( ssystem3 )
+static INPUT_PORTS_START( ssystem4 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C SQ")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C.Square")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C Board")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C.Board")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -287,7 +341,7 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A) PORT_NAME("A 1 / White")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Time") // spring-loaded
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_CODE(KEYCODE_T) PORT_NAME("Time")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H 8 / Black")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("C 3 / Queen / #50")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B 2 / King / FP")
@@ -301,24 +355,27 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_START("IN.5") // accessories/diodes
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ssystem3 )
+	PORT_INCLUDE( ssystem4 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C SQ")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C Board")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Time") // spring-loaded
+
+	PORT_MODIFY("IN.5") // accessories/diodes
 	PORT_CONFNAME( 0x01, 0x01, "Memory Unit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x02, "Chess Unit" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ssystem4 )
-	PORT_INCLUDE( ssystem3 )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C.Square")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C.Board")
-
-	PORT_MODIFY("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_CODE(KEYCODE_T) PORT_NAME("Time")
-
-	PORT_MODIFY("IN.5")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -365,6 +422,19 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
+
+	m6808_cpu_device &subcpu(M6808(config, "subcpu", 6000000)); // LC circuit
+	subcpu.set_addrmap(AS_PROGRAM, &ssystem3_state::chessunit_map);
+
+	config.set_perfect_quantum(m_maincpu);
+
+	PIA6821(config, m_pia, 0);
+	m_pia->irqa_handler().set_inputline("subcpu", INPUT_LINE_NMI);
+	m_pia->writepa_handler().set(FUNC(ssystem3_state::pia_a_w));
+	m_pia->readpa_handler().set(FUNC(ssystem3_state::pia_a_r));
+	m_pia->writepb_handler().set(FUNC(ssystem3_state::pia_b_w));
+	m_pia->readpb_handler().set(FUNC(ssystem3_state::pia_b_r));
+	m_pia->cb2_handler().set(FUNC(ssystem3_state::pia_cb2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
