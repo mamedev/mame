@@ -37840,13 +37840,16 @@ spec128                         // 1986 ZX Spectrum 128
 specpls2                        // 1986 ZX Spectrum +2
 
 @source:special.cpp
+anakonda                        //
 erik                            //
+kharkovsky                      //
 lik                             //
 pioner                          //
 special                         //
 specialm                        //
 specialp                        //
 specimx                         //
+unga                            //
 
 @source:special_gambl.cpp
 dindice                         //
