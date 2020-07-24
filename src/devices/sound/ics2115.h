@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Alex Marshall,nimitz,austere
+// copyright-holders:Alex Marshall,nimitz,austere,Jan Klaasen
 #ifndef MAME_SOUND_ICS2115_H
 #define MAME_SOUND_ICS2115_H
 
