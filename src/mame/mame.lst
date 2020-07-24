@@ -23393,6 +23393,7 @@ m4chaseic                       //
 m4chaseid                       //
 m4chaseie                       //
 m4chaseif                       //
+m4chaseig                       //
 m4clbveg                        // Club Vegas (Barcrest)
 m4clbvega                       //
 m4clbvegb                       //
@@ -29024,7 +29025,6 @@ v4cmazedat                      //
 v4cshinf                        // Cash Inferno
 v4cshinfa
 v4cshinfb
-v4cshinfc
 v4cshinfd
 v4cshinfe
 v4cshinff
@@ -29041,9 +29041,9 @@ v4cshinfp
 v4cshinfq
 v4cshinfr
 v4cshinfs
-v4cshinft
+v4cshinf3
 v4cshinfu
-v4cshinfv
+v4cshinf3a
 v4cshinfw
 v4cybcas                        // Cyber Casino
 v4dbltak                        // Double Take
@@ -29114,15 +29114,13 @@ v4megbuk                        // Megabucks Poker
 v4megbuka
 v4megbukb
 v4megbukc
-v4miami                         // Miami Dice
+v4mdiceger                         // Miami Dice
 v4missis                        // Mississippi Lady
 v4monte                         // Monte Carlo Or Bust
 v4montea
-v4monteb
 v4montec
 v4monted
 v4montee
-v4montef
 v4monteg
 v4monteh
 v4montei
@@ -29343,7 +29341,12 @@ v4sunbstt
 v4sunbstu
 v4tetrs                         // BwB Tetris v 2.2
 v4tetrs1                        // BwB Tetris v 1.0
-v4time                          // Time Machine
+v4tmach                         // Time Machine
+v4tmachd
+v4tmach1
+v4tmach1d
+v4tmach2
+v4tmach2d
 v4timebn                        // Time Bandit
 v4timebna
 v4timebnb
@@ -29351,9 +29354,16 @@ v4timebnc
 v4timebnd
 v4timebne
 v4turnov                        // Turnover
+v4turnova
+v4turnovc
+v4turnovd
 v4vgpok                         // Vegas Poker (prototype release 2)
 v4wize                          // Wize Move (v1.3d)
-v4wizea                         // Wize Move
+v4wizen
+v4wizeb
+v4wizec
+v4wized
+v4wizeo                         // Wize Move
 
 @source:mpu5sw.cpp
 m55050                          // Fifty Fifty (Bwb)
@@ -32057,6 +32067,8 @@ lxcmcysw
 lxcmcyfz
 lxcmcydp
 lxcmcysp
+lxccminn
+lxccplan
 rtvgc300
 rtvgc300fz
 red5mam

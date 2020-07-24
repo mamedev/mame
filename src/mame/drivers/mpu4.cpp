@@ -270,6 +270,15 @@ ROM_START( m4chaseif )
 	M4CHASEI_EXTRAS
 ROM_END
 
+ROM_START( m4chaseig )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ci_20.10", 0x0000, 0x010000, CRC(80a4bfb3) SHA1(b3c11bd621457d190eeab423bc15895b0c7cf6da) ) // found in cash inferno set.
+	M4CHASEI_EXTRAS
+ROM_END
+
+
+
+
 
 
 ROM_START( m4c9c )
@@ -2459,11 +2468,14 @@ GAME(199?, m4luckwbf, m4luckwb,   mod4oki,    mpu4,    mpu4_state, init_m4defaul
 
 // won't boot with current reel setup, not even in test mode
 GAME(199?, m4maglin,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
+
 GAME(199?, m4magdrg,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
+
 GAME(199?, m4clbveg,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4clbvegb, m4clbveg,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 GAME(199?, m4clbvegc, m4clbveg,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+
 GAME(199?, m4chasei,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4chaseia, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
@@ -2471,6 +2483,7 @@ GAME(199?, m4chaseic, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altree
 GAME(199?, m4chaseid, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
 GAME(199?, m4chaseie, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
 GAME(199?, m4chaseif, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 7)",GAME_FLAGS )
+GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "hack",    "Chase Invaders (Barcrest) (MPU4) (set 8)",GAME_FLAGS ) // copyright removed
 
 GAME(199?, m4bluedm,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4) (DBD1.0)",GAME_FLAGS )
 GAME(199?, m4amhiwy,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )

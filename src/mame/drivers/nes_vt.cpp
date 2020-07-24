@@ -374,7 +374,7 @@ public:
 		m_ablpinb_in0_val(0),
 		m_plunger(*this, "PLUNGER")
 	{ }
-	
+
 	void nes_vt_waixing_alt_4mb_duetpp(machine_config& config);
 
 protected:
@@ -1620,6 +1620,18 @@ ROM_START( lxcmc250 )
 	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
 ROM_END
 
+ROM_START( lxccminn )
+	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
+	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
+	ROM_IGNORE(0x4000000)
+ROM_END
+
+ROM_START( lxccplan )
+	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
+	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
+	ROM_IGNORE(0x4000000)
+ROM_END
+
 ROM_START( red5mam )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(0c0a0ecd) SHA1(2dfd8437de17fc9975698f1933dd81fbac78466d) )
@@ -2040,6 +2052,10 @@ CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 CONS( 200?, lxcmcysp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
+CONS( 200?, lxccminn,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxccplan,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+
+
 // GB-NO13-Main-VT389-2 on PCBs
 CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
 CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
@@ -2052,12 +2068,9 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
     Lexibook Compact Cyber Arcade - Paw Patrol
     Lexibook Compact Cyber Arcade - Barbie
     Lexibook Compact Cyber Arcade - Finding Dory
-    Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
     Lexibook Compact Cyber Arcade - PJ Masks
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
-    Lexibook Console Colour - Minnie Mouse
-    Lexibook Console Colour - Disney's Planes
     Lexibook Console Colour - Barbie
 
     (units for use with TV)
@@ -2065,6 +2078,13 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
     Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
+
+    There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
+    Spiderman
+    Frozen
+    (generic)
+    it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
+
 */
 
 // intial code isn't valid? scrambled?
