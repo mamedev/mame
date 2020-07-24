@@ -2229,7 +2229,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/bk.cpp",
 	MAME_DIR .. "src/mame/includes/bk.h",
 	MAME_DIR .. "src/mame/machine/bk.cpp",
-	MAME_DIR .. "src/mame/video/bk.cpp",
 	MAME_DIR .. "src/mame/drivers/dvk_kcgd.cpp",
 	MAME_DIR .. "src/mame/drivers/dvk_ksm.cpp",
 	MAME_DIR .. "src/mame/machine/ms7004.cpp",
