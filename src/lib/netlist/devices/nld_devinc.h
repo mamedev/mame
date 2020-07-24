@@ -710,6 +710,10 @@
 #define CD4020(...)                                                    \
 	NET_REGISTER_DEVEXT(CD4020, __VA_ARGS__)
 
+// usage       : CD4024(name)
+#define CD4024(...)                                                    \
+	NET_REGISTER_DEVEXT(CD4024, __VA_ARGS__)
+
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_4053.cpp
 // ---------------------------------------------------------------------
@@ -947,6 +951,10 @@
 #define TTL_7406_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7406_GATE, __VA_ARGS__)
 
+// usage       : TTL_7407_GATE(name)
+#define TTL_7407_GATE(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_7407_GATE, __VA_ARGS__)
+
 // usage       : TTL_7408_GATE(name)
 #define TTL_7408_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7408_GATE, __VA_ARGS__)
@@ -1111,6 +1119,10 @@
 #define TTL_7406_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7406_DIP, __VA_ARGS__)
 
+// usage       : TTL_7407_DIP(name)
+#define TTL_7407_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7407_DIP, __VA_ARGS__)
+
 // usage       : TTL_7408_DIP(name)
 #define TTL_7408_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7408_DIP, __VA_ARGS__)
@@ -1257,6 +1269,10 @@
 // usage       : CD4020_DIP(name)
 #define CD4020_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4020_DIP, __VA_ARGS__)
+
+// usage       : CD4024_DIP(name)
+#define CD4024_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD4024_DIP, __VA_ARGS__)
 
 // usage       : CD4016_DIP(name)
 #define CD4016_DIP(...)                                                \

@@ -117,6 +117,47 @@ static NETLIST_START(CD4020_DIP)
 
 NETLIST_END()
 
+/*  CD4024: 7-Stage Ripple Carry Binary Counters
+ *
+ *          +--------------+
+ *       IP |1     ++    14| VDD
+ *    RESET |2           13| NC
+ *       Q7 |3           12| Q1
+ *       Q6 |4    4024   11| Q2
+ *       Q5 |5           10| NC
+ *       Q4 |6            9| Q3
+ *      VSS |7            8| NC
+ *          +--------------+
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  FIXME: Timing depends on VDD-VSS
+ *         This needs a cmos d-a/a-d proxy implementation.
+ */
+
+static NETLIST_START(CD4024_DIP)
+
+	CD4024(s1)
+	DIPPINS(      /*       +--------------+       */
+		   s1.IP, /*     IP |1     ++    14| VDD  */ s1.VDD,
+		s1.RESET, /*  RESET |2           13| NC   */ NC,
+		   s1.Q7, /*     Q7 |3           12| Q1   */ s1.Q1,
+		   s1.Q6, /*     Q6 |4    4024   11| Q2   */ s1.Q2,
+		   s1.Q5, /*     Q5 |5           10| NC   */ NC,
+		   s1.Q4, /*     Q4 |6            9| Q3   */ s1.Q3,
+		  s1.VSS, /*    VSS |7            8| NC   */ NC
+				  /*       +--------------+       */
+	)
+		/*
+		 * IP = (Input pulses)
+		 */
+
+NETLIST_END()
+
+
+
+
+
 /*  CD4053: Triple 2-Channel Analog Multiplexer/Demultiplexer
  *
  *          +--------------+
@@ -434,6 +475,7 @@ NETLIST_START(CD4XXX_lib)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4020_DIP)
+	LOCAL_LIB_ENTRY(CD4024_DIP)
 	LOCAL_LIB_ENTRY(CD4016_DIP)
 	LOCAL_LIB_ENTRY(CD4053_DIP)
 	LOCAL_LIB_ENTRY(CD4066_DIP)
