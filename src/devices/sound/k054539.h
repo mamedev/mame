@@ -20,7 +20,7 @@ class k054539_device : public device_t,
 					   public device_rom_interface<24>
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; } // effector and/or some registers are't verified/emulated
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // effector and/or some registers aren't verified/emulated
 
 	// control flags, may be set at DRIVER_INIT().
 	enum {
