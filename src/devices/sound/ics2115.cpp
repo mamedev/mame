@@ -82,7 +82,7 @@ void ics2115_device::device_start()
 
 	//u-Law table as per MIL-STD-188-113
 	u16 lut[8];
-	u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
+	const u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
 	for (int i = 0; i < 256; i++)
@@ -318,7 +318,7 @@ int ics2115_device::ics2115_voice::update_oscillator()
 //TODO: proper interpolation for 8-bit samples (looping)
 stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 {
-	u32 curaddr = voice.osc.acc >> 12;
+	const u32 curaddr = voice.osc.acc >> 12;
 	u32 nextaddr;
 
 	if (voice.state.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
@@ -350,14 +350,14 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 
 	//linear interpolation as in US patent 6,246,774 B1, column 2 row 59
 	//LEN=1, BLEN=0, DIR=0, start+end interpolation
-	s32 diff = sample2 - sample1;
-	u16 fract = (voice.osc.acc >> 3) & 0x1ff;
+	const s32 diff = sample2 - sample1;
+	const u16 fract = (voice.osc.acc >> 3) & 0x1ff;
 
 	//no need for interpolation since it's around 1 note a cycle?
 	//if (!fract)
 	//    return sample1;
 
-	s32 sample = (((s32)sample1 << 9) + diff * fract) >> 9;
+	const s32 sample = (((s32)sample1 << 9) + diff * fract) >> 9;
 	//sample = sample1;
 	return sample;
 }
@@ -388,15 +388,15 @@ void ics2115_device::ics2115_voice::update_ramp()
 int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples)
 {
 	bool irq_invalid = false;
-	u16 fine = 1 << (3*(voice.vol.incr >> 6));
+	const u16 fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3f)<< (10 - fine);
 
 	for (int i = 0; i < samples; i++)
 	{
-		u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
-		u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
+		const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
+		const u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
+		const u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
@@ -494,7 +494,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //Helper Function (Reads off current register)
 u16 ics2115_device::reg_read()
 {
-	u16 ret;
+	u16 ret = 0;
 	ics2115_voice& voice = m_voice[m_osc_select];
 
 	switch (m_reg_select)

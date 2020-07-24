@@ -69,36 +69,36 @@ private:
 
 		union {
 			struct {
-				u8 ulaw       : 1;
-				u8 stop       : 1;   //stops wave + vol envelope
-				u8 eightbit   : 1;
-				u8 loop       : 1;
-				u8 loop_bidir : 1;
-				u8 irq        : 1;
-				u8 invert     : 1;
-				u8 irq_pending: 1;
-				//IRQ on variable?
+				u8 ulaw       : 1;   // compressed sample format
+				u8 stop       : 1;   // stops wave + vol envelope
+				u8 eightbit   : 1;   // 8 bit sample format
+				u8 loop       : 1;   // loop enable
+				u8 loop_bidir : 1;   // bi-directional loop enable
+				u8 irq        : 1;   // enable IRQ generation
+				u8 invert     : 1;   // invert direction
+				u8 irq_pending: 1;   // (read only?) IRQ pending
+				// IRQ on variable?
 			} bitflags;
 			u8 value;
 		} osc_conf;
 
 		union {
 			struct {
-				u8 done       : 1;   //indicates ramp has stopped
-				u8 stop       : 1;   //stops the ramp
-				u8 rollover   : 1;   //rollover (TODO)
-				u8 loop       : 1;
-				u8 loop_bidir : 1;
-				u8 irq        : 1;   //enable IRQ generation
-				u8 invert     : 1;   //invert direction
-				u8 irq_pending: 1;   //(read only) IRQ pending
-				//noenvelope == (done | disable)
+				u8 done       : 1;   // indicates ramp has stopped
+				u8 stop       : 1;   // stops the ramp
+				u8 rollover   : 1;   // rollover (TODO)
+				u8 loop       : 1;   // loop enable
+				u8 loop_bidir : 1;   // bi-directional loop enable
+				u8 irq        : 1;   // enable IRQ generation
+				u8 invert     : 1;   // invert direction
+				u8 irq_pending: 1;   // (read only?) IRQ pending
+				// noenvelope == (done | stop)
 			} bitflags;
 			u8 value;
 		} vol_ctrl;
 
-		//Possibly redundant state. => improvements of wavetable logic
-		//may lead to its elimination.
+		// Possibly redundant state. => improvements of wavetable logic
+		// may lead to its elimination.
 		struct {
 			bool on;
 			int ramp;       // 100 0000 = 0x40 maximum
@@ -111,14 +111,14 @@ private:
 		void update_ramp();
 	};
 
-	//internal register helper functions
+	// internal register helper functions
 	u16 reg_read();
 	void reg_write(u16 data, u16 mem_mask);
 	void recalc_timer(int timer);
 	void keyon();
 	void recalc_irq();
 
-	//stream helper functions
+	// stream helper functions
 	int fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples);
 	stream_sample_t get_sample(ics2115_voice& voice);
 	u8 read_sample(ics2115_voice& voice, u32 addr) { return m_cache.read_byte((voice.osc.saddr << 20) | (addr & 0xfffff)); }
