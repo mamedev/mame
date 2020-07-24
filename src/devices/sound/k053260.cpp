@@ -210,7 +210,7 @@ u8 k053260_device::read(offs_t offset)
 
 		case 0x2e: // read ROM
 			if (m_mode & 1)
-				ret = m_voice[0].read_rom();
+				ret = m_voice[0].read_rom(!(machine().side_effects_disabled()));
 			else
 				logerror("%s: Attempting to read K053260 ROM without mode bit set\n", machine().describe_context());
 			break;
@@ -494,11 +494,12 @@ void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
 	outputs[1] += (m_output * m_pan_volume[1]) >> 15;
 }
 
-u8 k053260_device::KDSC_Voice::read_rom()
+u8 k053260_device::KDSC_Voice::read_rom(bool side_effects)
 {
 	u32 offs = m_start + m_position;
 
-	m_position = (m_position + 1) & 0xffff;
+	if (side_effects)
+		m_position = (m_position + 1) & 0xffff;
 
 	return m_device.read_byte(offs);
 }
