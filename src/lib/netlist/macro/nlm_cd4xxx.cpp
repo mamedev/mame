@@ -63,8 +63,8 @@ static NETLIST_START(CD4011_DIP)
 	CD4011_GATE(C)
 	CD4011_GATE(D)
 
-	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
-	NET_C(A.GND, B.GND, C.GND, D.GND)
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*     A |1     ++    14| VDD  */ A.VDD,
@@ -73,7 +73,7 @@ static NETLIST_START(CD4011_DIP)
 		B.Q,  /*     K |4    4011   11| M    */ D.Q,
 		B.A,  /*     C |5           10| L    */ C.Q,
 		B.B,  /*     D |6            9| F    */ C.B,
-		A.GND,/*   VSS |7            8| E    */ C.A
+		A.VSS,/*   VSS |7            8| E    */ C.A
 			  /*       +--------------+      */
 	)
 NETLIST_END()
@@ -138,14 +138,16 @@ NETLIST_END()
 static NETLIST_START(CD4024_DIP)
 
 	CD4024(s1)
+	NC_PIN(NC)
+
 	DIPPINS(      /*       +--------------+       */
 		   s1.IP, /*     IP |1     ++    14| VDD  */ s1.VDD,
-		s1.RESET, /*  RESET |2           13| NC   */ NC,
+		s1.RESET, /*  RESET |2           13| NC   */ NC.I,
 		   s1.Q7, /*     Q7 |3           12| Q1   */ s1.Q1,
 		   s1.Q6, /*     Q6 |4    4024   11| Q2   */ s1.Q2,
-		   s1.Q5, /*     Q5 |5           10| NC   */ NC,
+		   s1.Q5, /*     Q5 |5           10| NC   */ NC.I,
 		   s1.Q4, /*     Q4 |6            9| Q3   */ s1.Q3,
-		  s1.VSS, /*    VSS |7            8| NC   */ NC
+		  s1.VSS, /*    VSS |7            8| NC   */ NC.I
 				  /*       +--------------+       */
 	)
 		/*
@@ -153,10 +155,6 @@ static NETLIST_START(CD4024_DIP)
 		 */
 
 NETLIST_END()
-
-
-
-
 
 /*  CD4053: Triple 2-Channel Analog Multiplexer/Demultiplexer
  *
@@ -297,7 +295,7 @@ static NETLIST_START(CD4069_DIP)
 	CD4069_GATE(E)
 	CD4069_GATE(F)
 
-	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, E.VDD)
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, F.VDD)
 	NET_C(A.VSS, B.VSS, C.VSS, D.VSS, E.VSS, F.VSS)
 
 	DIPPINS(  /*       +--------------+      */

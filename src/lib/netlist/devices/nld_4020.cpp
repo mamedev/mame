@@ -88,6 +88,7 @@ namespace netlist
 		, m_sub(*this, "sub")
 		{
 			register_subalias("IP", m_sub.m_IP);
+			register_subalias("RESET", m_sub.m_RESET);
 			register_subalias("Q1", m_sub.m_Q[0]);
 			register_subalias("Q4", m_sub.m_Q[3]);
 			register_subalias("Q5", m_sub.m_Q[4]);
@@ -116,6 +117,7 @@ namespace netlist
 		, m_sub(*this, "sub")
 		{
 			register_subalias("IP", m_sub.m_IP);
+			register_subalias("RESET", m_sub.m_RESET);
 			register_subalias("Q1", m_sub.m_Q[0]);
 			register_subalias("Q2", m_sub.m_Q[1]);
 			register_subalias("Q3", m_sub.m_Q[2]);
