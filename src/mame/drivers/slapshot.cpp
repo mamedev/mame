@@ -534,7 +534,7 @@ void slapshot_state::opwolf3(machine_config &config)
 
 ROM_START( slapshot )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024K for 68000 code */
-	ROM_LOAD16_BYTE( "pormat.ic3",  0x00000, 0x80000, CRC(58e61833) SHA1(35ee07ab165618686ee98d60444d77070853d09b) ) /* yellow PROMAT label, but should be D71-xx - need to verify number */
+	ROM_LOAD16_BYTE( "promat.ic3",  0x00000, 0x80000, CRC(58e61833) SHA1(35ee07ab165618686ee98d60444d77070853d09b) ) /* yellow PROMAT label, but should be D71-xx - need to verify number */
 	ROM_LOAD16_BYTE( "promat.ic1",  0x00001, 0x80000, CRC(4d404f76) SHA1(d74b9d67e0fd35884526f79aa00f76bf936ab79f) ) /* yellow PROMAT label, but should be D71-yy - need to verify number */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
