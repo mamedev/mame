@@ -11567,7 +11567,8 @@ dblcrown                        // (c) 1994 Excellent System
 
 @source:dblewing.cpp
 dblewing                        // MBE (c) 1993 Mitchell
-dblewinga                       // MBE (c) 1994 Mitchell
+dblewinga                       // MBE (c) 1993 Mitchell
+dblewingb                       // MBE (c) 1994 Mitchell
 
 @source:dbox.cpp
 dbox                            // (c) 1996 Nokia Multimedia
