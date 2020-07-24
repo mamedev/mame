@@ -4992,25 +4992,6 @@ ROM_START( v4cshinfb )
 	/* none present */
 ROM_END
 
-ROM_START( v4cshinfc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci_20.10", 0x0000, 0x010000, CRC(80a4bfb3) SHA1(b3c11bd621457d190eeab423bc15895b0c7cf6da) )
-
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "ci______.4_1", 0x000000, 0x010000, CRC(bd1adec6) SHA1(7a60adc4b5159e672eb4dc33051192f0cf863aef) )
-	ROM_LOAD16_BYTE( "ci______.4_2", 0x000001, 0x010000, CRC(e46852ff) SHA1(ad6f0a75578041b06120d1d5f3c3779c827b8f2f) )
-	ROM_LOAD16_BYTE( "ci______.4_3", 0x020000, 0x010000, CRC(b63b9edf) SHA1(2a47c97f5ea51bc441fb847da6e81451dde77093) )
-	ROM_LOAD16_BYTE( "ci______.4_4", 0x020001, 0x010000, CRC(7ef4daeb) SHA1(f889f4e68dc4ef736eee44ddedaa94832c6cdbc7) )
-	ROM_LOAD16_BYTE( "ci______.4_5", 0x040000, 0x010000, CRC(381277b7) SHA1(6d934d400468c067809452981577c17cf425ff4f) )
-	ROM_LOAD16_BYTE( "ci______.4_6", 0x040001, 0x010000, CRC(e245c830) SHA1(315b8163731abe5c65bebd94884431e99253740b) )
-	ROM_LOAD16_BYTE( "ci______.4_7", 0x060000, 0x010000, CRC(169d6ac5) SHA1(7d9e63d9ab29fbace754e8c46d4e80b1ab2d422d) )
-	ROM_LOAD16_BYTE( "ci______.4_8", 0x060001, 0x010000, CRC(12de2ae0) SHA1(734207fffd918f3a0890ec6a2d442efb428adbaa) )
-	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
-	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	/* none present */
-ROM_END
 
 ROM_START( v4cshinfd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5332,25 +5313,8 @@ ROM_START( v4cshinfs )
 	/* none present */
 ROM_END
 
-ROM_START( v4cshinft )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ciixea__.3_0", 0x0000, 0x010000, CRC(252f43e5) SHA1(5443a53a50fb27c3e98fa4612b4ba476cc946662) )
 
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "ci______.4_1", 0x000000, 0x010000, CRC(bd1adec6) SHA1(7a60adc4b5159e672eb4dc33051192f0cf863aef) )
-	ROM_LOAD16_BYTE( "ci______.4_2", 0x000001, 0x010000, CRC(e46852ff) SHA1(ad6f0a75578041b06120d1d5f3c3779c827b8f2f) )
-	ROM_LOAD16_BYTE( "ci______.4_3", 0x020000, 0x010000, CRC(b63b9edf) SHA1(2a47c97f5ea51bc441fb847da6e81451dde77093) )
-	ROM_LOAD16_BYTE( "ci______.4_4", 0x020001, 0x010000, CRC(7ef4daeb) SHA1(f889f4e68dc4ef736eee44ddedaa94832c6cdbc7) )
-	ROM_LOAD16_BYTE( "ci______.4_5", 0x040000, 0x010000, CRC(381277b7) SHA1(6d934d400468c067809452981577c17cf425ff4f) )
-	ROM_LOAD16_BYTE( "ci______.4_6", 0x040001, 0x010000, CRC(e245c830) SHA1(315b8163731abe5c65bebd94884431e99253740b) )
-	ROM_LOAD16_BYTE( "ci______.4_7", 0x060000, 0x010000, CRC(169d6ac5) SHA1(7d9e63d9ab29fbace754e8c46d4e80b1ab2d422d) )
-	ROM_LOAD16_BYTE( "ci______.4_8", 0x060001, 0x010000, CRC(12de2ae0) SHA1(734207fffd918f3a0890ec6a2d442efb428adbaa) )
-	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
-	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	/* none present */
-ROM_END
 
 ROM_START( v4cshinfu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5372,25 +5336,6 @@ ROM_START( v4cshinfu )
 	/* none present */
 ROM_END
 
-ROM_START( v4cshinfv )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ciixead_.3_0", 0x0000, 0x010000, CRC(6e8aa444) SHA1(63cecb83aa8e4f94b16d6c2ded8dbe8aa98d88a8) )
-
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "ci______.4_1", 0x000000, 0x010000, CRC(bd1adec6) SHA1(7a60adc4b5159e672eb4dc33051192f0cf863aef) )
-	ROM_LOAD16_BYTE( "ci______.4_2", 0x000001, 0x010000, CRC(e46852ff) SHA1(ad6f0a75578041b06120d1d5f3c3779c827b8f2f) )
-	ROM_LOAD16_BYTE( "ci______.4_3", 0x020000, 0x010000, CRC(b63b9edf) SHA1(2a47c97f5ea51bc441fb847da6e81451dde77093) )
-	ROM_LOAD16_BYTE( "ci______.4_4", 0x020001, 0x010000, CRC(7ef4daeb) SHA1(f889f4e68dc4ef736eee44ddedaa94832c6cdbc7) )
-	ROM_LOAD16_BYTE( "ci______.4_5", 0x040000, 0x010000, CRC(381277b7) SHA1(6d934d400468c067809452981577c17cf425ff4f) )
-	ROM_LOAD16_BYTE( "ci______.4_6", 0x040001, 0x010000, CRC(e245c830) SHA1(315b8163731abe5c65bebd94884431e99253740b) )
-	ROM_LOAD16_BYTE( "ci______.4_7", 0x060000, 0x010000, CRC(169d6ac5) SHA1(7d9e63d9ab29fbace754e8c46d4e80b1ab2d422d) )
-	ROM_LOAD16_BYTE( "ci______.4_8", 0x060001, 0x010000, CRC(12de2ae0) SHA1(734207fffd918f3a0890ec6a2d442efb428adbaa) )
-	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
-	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	/* none present */
-ROM_END
 
 ROM_START( v4cshinfw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5412,6 +5357,47 @@ ROM_START( v4cshinfw )
 	/* none present */
 ROM_END
 
+ROM_START( v4cshinf3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ciixea__.3_0", 0x0000, 0x010000, CRC(252f43e5) SHA1(5443a53a50fb27c3e98fa4612b4ba476cc946662) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD( "release3_video_roms", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4cshinf3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ciixead_.3_0", 0x0000, 0x010000, CRC(6e8aa444) SHA1(63cecb83aa8e4f94b16d6c2ded8dbe8aa98d88a8) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD( "release3_video_roms", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4cshinfunk ) // unknown set, check this is really an MPU4 Video base ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ci_20.10", 0x0000, 0x010000, CRC(80a4bfb3) SHA1(b3c11bd621457d190eeab423bc15895b0c7cf6da) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ci______.4_1", 0x000000, 0x010000, CRC(bd1adec6) SHA1(7a60adc4b5159e672eb4dc33051192f0cf863aef) )
+	ROM_LOAD16_BYTE( "ci______.4_2", 0x000001, 0x010000, CRC(e46852ff) SHA1(ad6f0a75578041b06120d1d5f3c3779c827b8f2f) )
+	ROM_LOAD16_BYTE( "ci______.4_3", 0x020000, 0x010000, CRC(b63b9edf) SHA1(2a47c97f5ea51bc441fb847da6e81451dde77093) )
+	ROM_LOAD16_BYTE( "ci______.4_4", 0x020001, 0x010000, CRC(7ef4daeb) SHA1(f889f4e68dc4ef736eee44ddedaa94832c6cdbc7) )
+	ROM_LOAD16_BYTE( "ci______.4_5", 0x040000, 0x010000, CRC(381277b7) SHA1(6d934d400468c067809452981577c17cf425ff4f) )
+	ROM_LOAD16_BYTE( "ci______.4_6", 0x040001, 0x010000, CRC(e245c830) SHA1(315b8163731abe5c65bebd94884431e99253740b) )
+	ROM_LOAD16_BYTE( "ci______.4_7", 0x060000, 0x010000, CRC(169d6ac5) SHA1(7d9e63d9ab29fbace754e8c46d4e80b1ab2d422d) )
+	ROM_LOAD16_BYTE( "ci______.4_8", 0x060001, 0x010000, CRC(12de2ae0) SHA1(734207fffd918f3a0890ec6a2d442efb428adbaa) )
+	ROM_LOAD16_BYTE( "ci______.4_9", 0x080000, 0x010000, CRC(f1f9987f) SHA1(0a4b5fa61e237e1e209301a07af2ad1e9fedcc35) )
+	ROM_LOAD16_BYTE( "ci______.4_a", 0x080001, 0x010000, CRC(4747cb48) SHA1(ac33d318f6fff67c8a2f7d47c0ee0bcddfc2af8e) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
 
 
 ROM_START( v4dbltak )
@@ -8327,30 +8313,33 @@ GAME(  199?, v4sixxk,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4sixxl,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (set 13) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxm,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (set 14) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4cshinf,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfa,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfb,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfc,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfd,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfe,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 6) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinff,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 7) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfg,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 8) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfh,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 9) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfi,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 10) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfj,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 11) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfk,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 12) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfl,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 13) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfm,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 14) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfn,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 15) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfo,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 16) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfp,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 17) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfq,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 18) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfr,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 19) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfs,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 20) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinft,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 21) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfu,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 22) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfv,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 23) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfw,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 24) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinf,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfd,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfg,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfe,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfi,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfk,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfh,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinff,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfj,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfl,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfm,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfr,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfo,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfp,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfs,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfn,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Showcase) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfq,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfu,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, All - Cash) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfw,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, All - Cash, Datapak)  (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfb,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 10p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfa,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 5p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
+// no 68k program is dumped for Release 3
+GAME(  199?, v4cshinf3,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 3) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinf3a, v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 3) (set 2) (MPU4 Video)",GAME_FLAGS )
+// TODO: check this is really an MPU4 Video base ROM
+GAME(  199?, v4cshinfunk,  v4cshinf, bwbvid,    bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (unknown release) (MPU4 Video)",GAME_FLAGS ) // doesn't boot?
+
 
 // the onscreen 'version' display doesn't quite align with the labels, 'DY' seems to be represented as 'B' on the labels, rather than the individual flags?
 // the labels seem closer to the Barcrest standard used on MPU4 fruit machines
