@@ -17,7 +17,7 @@
 
 	Changelog:
 
-	22th july 2020 [cam900]:
+	25th july 2020 [cam900]:
 	- Improve envelope behavior, Improve debugging registers, Fix ramping
 */
 
@@ -800,6 +800,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			{
 				data >>= 8;
 				voice.osc.ctl = data;
+				voice.state.on = !voice.osc.ctl; // some early PGM games need this
 				if (!data)
 					keyon();
 				//guessing here
@@ -814,9 +815,9 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 #endif
 					if (!m_vmode)
 					{
+						//try to key it off as well!
 						voice.osc_conf.bitflags.stop = true;
 						voice.vol_ctrl.bitflags.stop = true;
-						voice.state.on = false;
 					}
 				}
 #ifdef ICS2115_DEBUG
@@ -1015,7 +1016,6 @@ void ics2115_device::keyon()
 		return;
 #endif
 	//set initial condition (may need to invert?) -- does NOT work since these are set to zero even
-	m_voice[m_osc_select].state.on = true;
 	//no ramp up...
 	m_voice[m_osc_select].state.ramp = 0x40;
 
