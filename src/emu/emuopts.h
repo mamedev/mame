@@ -111,6 +111,7 @@
 // core vector options
 #define OPTION_BEAM_WIDTH_MIN       "beam_width_min"
 #define OPTION_BEAM_WIDTH_MAX       "beam_width_max"
+#define OPTION_BEAM_DOT_SIZE        "beam_dot_size"
 #define OPTION_BEAM_INTENSITY_WEIGHT   "beam_intensity_weight"
 #define OPTION_FLICKER              "flicker"
 
@@ -390,6 +391,7 @@ public:
 	// core vector options
 	float beam_width_min() const { return float_value(OPTION_BEAM_WIDTH_MIN); }
 	float beam_width_max() const { return float_value(OPTION_BEAM_WIDTH_MAX); }
+	float beam_dot_size() const { return float_value(OPTION_BEAM_DOT_SIZE); }
 	float beam_intensity_weight() const { return float_value(OPTION_BEAM_INTENSITY_WEIGHT); }
 	float flicker() const { return float_value(OPTION_FLICKER); }
 
