@@ -3429,16 +3429,72 @@ ROM_START( v4turnov )
 	ROM_LOAD16_BYTE( "to.p14",  0x0c0001, 0x010000,  CRC(127ba65d) SHA1(e34dcd19efd31dc712daac940277bb17694ea61a) ) // ISSUE1 Q6
 	ROM_LOAD16_BYTE( "to.p15",  0x0e0000, 0x010000,  CRC(ad787e31) SHA1(314ba312adfc71e4b3b2d52355ec692c192b74eb) ) // ISSUE1 Q7
 	ROM_LOAD16_BYTE( "to.p16",  0x0e0001, 0x010000,  CRC(e635c942) SHA1(08f8b5fdb738647bc0b49938da05533be42a2d60) ) // ISSUE1 Q8
+ROM_END
+
+ROM_START( v4turnova )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "to3.p1",  0x000000, 0x010000, CRC(09751994) SHA1(72d4aa40f14411ef8064822de3f5a13bcc84aea3) )
+	ROM_LOAD16_BYTE( "to.p2",   0x000001, 0x010000,  CRC(4bc4659a) SHA1(0e282134c4fe4e8c1cc7b16957903179e23c7abc) )
+	ROM_LOAD16_BYTE( "to.p3",   0x020000, 0x010000,  CRC(273c7c14) SHA1(71feb555a05a0ff1ec674505cab72d93c9fbdf65) )
+	ROM_LOAD16_BYTE( "to.p4",   0x020001, 0x010000,  CRC(83d29546) SHA1(cef90455b9d8a92424fe1aa10f20fd075d0e3091) )
+	ROM_LOAD16_BYTE( "to.p5",   0x040000, 0x010000,  CRC(dceac511) SHA1(7a6d65464e23d832943f771c4cf580aabc6f0e44) )
+	ROM_LOAD16_BYTE( "to.p6",   0x040001, 0x010000,  CRC(54c6afb7) SHA1(b724b87b6f4e47d220310b38c97be2fa73dcd617) )
+	ROM_LOAD16_BYTE( "to.p7",   0x060000, 0x010000,  CRC(acf19542) SHA1(ad46ffb3c2c078a8e3712eff27aa61f0d1a7c059) )
+	ROM_LOAD16_BYTE( "to.p8",   0x060001, 0x010000,  CRC(a5ca385d) SHA1(8df26a33ea7f5b577761c6f9d2fa4eaed74661f8) )
+	ROM_LOAD16_BYTE( "to.p9",   0x080000, 0x010000,  CRC(6e85fde3) SHA1(14868d58829e13987e66f52e1899c4385987a87b) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "to.p10",  0x080001, 0x010000,  CRC(fadd11a2) SHA1(2b2fbb0769ef6035688d495464f3ea3bc8c7c660) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "to.p11",  0x0a0000, 0x010000,  CRC(2d72a61a) SHA1(ce455ab6fea452f96a3ad365178e0e5a0b437867) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "to.p12",  0x0a0001, 0x010000,  CRC(a14eedb6) SHA1(219b887a334ff28a88ed2e50f0caff4b510cd549) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "to.p13",  0x0c0000, 0x010000,  CRC(3f66ef6b) SHA1(60be6d3f8da1f3084db15ac1bb2470e55c0271de) ) // ISSUE1 Q5 
+	ROM_LOAD16_BYTE( "to.p14",  0x0c0001, 0x010000,  CRC(127ba65d) SHA1(e34dcd19efd31dc712daac940277bb17694ea61a) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "to.p15",  0x0e0000, 0x010000,  CRC(ad787e31) SHA1(314ba312adfc71e4b3b2d52355ec692c192b74eb) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "to.p16",  0x0e0001, 0x010000,  CRC(e635c942) SHA1(08f8b5fdb738647bc0b49938da05533be42a2d60) ) // ISSUE1 Q8
+ROM_END
+
+// this ROM just seems to be a corrupt version of existing ones, bad vector table
+//	ROM_LOAD16_BYTE( "todo.p1", 0x000000, 0x010000, CRC(9111e702) SHA1(fa408e1c8fa56a96ffc3422335f105ef328a6edd) )
+
+ROM_START( v4turnovc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "too.p1",  0x000000, 0x010000,  CRC(919b5207) SHA1(770be6e3b00e666c6f939167d35d43bb2d793e14) )
+	ROM_LOAD16_BYTE( "to.p2",   0x000001, 0x010000,  CRC(4bc4659a) SHA1(0e282134c4fe4e8c1cc7b16957903179e23c7abc) )
+	ROM_LOAD16_BYTE( "to.p3",   0x020000, 0x010000,  CRC(273c7c14) SHA1(71feb555a05a0ff1ec674505cab72d93c9fbdf65) )
+	ROM_LOAD16_BYTE( "to.p4",   0x020001, 0x010000,  CRC(83d29546) SHA1(cef90455b9d8a92424fe1aa10f20fd075d0e3091) )
+	ROM_LOAD16_BYTE( "to.p5",   0x040000, 0x010000,  CRC(dceac511) SHA1(7a6d65464e23d832943f771c4cf580aabc6f0e44) )
+	ROM_LOAD16_BYTE( "to.p6",   0x040001, 0x010000,  CRC(54c6afb7) SHA1(b724b87b6f4e47d220310b38c97be2fa73dcd617) )
+	ROM_LOAD16_BYTE( "to.p7",   0x060000, 0x010000,  CRC(acf19542) SHA1(ad46ffb3c2c078a8e3712eff27aa61f0d1a7c059) )
+	ROM_LOAD16_BYTE( "to.p8",   0x060001, 0x010000,  CRC(a5ca385d) SHA1(8df26a33ea7f5b577761c6f9d2fa4eaed74661f8) )
+	ROM_LOAD16_BYTE( "to.p9",   0x080000, 0x010000,  CRC(6e85fde3) SHA1(14868d58829e13987e66f52e1899c4385987a87b) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "to.p10",  0x080001, 0x010000,  CRC(fadd11a2) SHA1(2b2fbb0769ef6035688d495464f3ea3bc8c7c660) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "to.p11",  0x0a0000, 0x010000,  CRC(2d72a61a) SHA1(ce455ab6fea452f96a3ad365178e0e5a0b437867) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "to.p12",  0x0a0001, 0x010000,  CRC(a14eedb6) SHA1(219b887a334ff28a88ed2e50f0caff4b510cd549) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "to.p13",  0x0c0000, 0x010000,  CRC(3f66ef6b) SHA1(60be6d3f8da1f3084db15ac1bb2470e55c0271de) ) // ISSUE1 Q5 
+	ROM_LOAD16_BYTE( "to.p14",  0x0c0001, 0x010000,  CRC(127ba65d) SHA1(e34dcd19efd31dc712daac940277bb17694ea61a) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "to.p15",  0x0e0000, 0x010000,  CRC(ad787e31) SHA1(314ba312adfc71e4b3b2d52355ec692c192b74eb) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "to.p16",  0x0e0001, 0x010000,  CRC(e635c942) SHA1(08f8b5fdb738647bc0b49938da05533be42a2d60) ) // ISSUE1 Q8
 
 	ROM_REGION( 0x800000, "altvideo", 0 )
 	// seems to be an unmatched 2.2 revision rom
 	ROM_LOAD16_BYTE( "tov2.2p1", 0x0000, 0x010000, CRC(460a5dd0) SHA1(42bc54b0ca206606b980dd80ccf0cbfb3210769d) )
-
-	ROM_LOAD16_BYTE( "to3.p1", 0x0000, 0x010000, CRC(09751994) SHA1(72d4aa40f14411ef8064822de3f5a13bcc84aea3) )
-	ROM_LOAD16_BYTE( "todo.p1", 0x0000, 0x010000, CRC(9111e702) SHA1(fa408e1c8fa56a96ffc3422335f105ef328a6edd) )
-	ROM_LOAD16_BYTE( "too.p1", 0x0000, 0x010000, CRC(919b5207) SHA1(770be6e3b00e666c6f939167d35d43bb2d793e14) )
-
 ROM_END
+
+ROM_START( v4turnovd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "tov2.2p1",0x000000, 0x010000, CRC(460a5dd0) SHA1(42bc54b0ca206606b980dd80ccf0cbfb3210769d) )
+	ROM_LOAD16_BYTE( "tov2.2p2",0x000000, 0x010000, NO_DUMP )
+	// + unkonwn additional ROMs
+ROM_END
+
+
 
 ROM_START( v4skltrk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8039,7 +8095,10 @@ GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state,
 
 /* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
 
-GAME(  199?, v4turnov,   v4bios,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnov,   v4bios,     mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnova,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 might be a machine type, because much like Strike It Lucky the pairing 68k ROM doesn't change 
+GAME(  199?, v4turnovc,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnovd,  v4turnov,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
 
 GAME(  1990, v4skltrk,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
 GAME(  1990, v4skltrka,  v4skltrk, mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
