@@ -882,12 +882,12 @@ void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, n
 	}
 
 	/* ignore spikes */
-	if (plib::abs(val) < 32767.0)
+	if (plib::abs(val) < 32767.0*256.0)
 		m_cur = val;
 	else if (val > 0.0)
-		m_cur = 32767.0;
+		m_cur = 32767.0*256.0;
 	else
-		m_cur = -32767.0;
+		m_cur = -32767.0*256.0;
 
 }
 
