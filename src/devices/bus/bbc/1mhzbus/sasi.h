@@ -54,8 +54,6 @@ private:
 class bbc_torchhd_device : public bbc_sasi_device
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::DISK; }
-
 	// construction/destruction
 	bbc_torchhd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
