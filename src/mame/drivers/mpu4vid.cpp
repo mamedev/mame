@@ -8155,28 +8155,30 @@ GAME(  199?, v4cshinfu,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4cshinfv,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 23) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfw,  v4cshinf, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (set 24) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4sunbst,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbsta,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstb,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 3) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstc,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 4) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstd,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 5) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbste,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 6) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstf,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 7) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstg,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 8) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbsth,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 9) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbsti,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 10) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstj,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 11) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstk,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 12) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstl,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 13) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstm,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 14) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstn,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 15) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbsto,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 16) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstp,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 17) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstq,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 18) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstr,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 19) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbsts,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 20) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstt,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 21) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4sunbstu,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (set 22) (MPU4 Video)",GAME_FLAGS ) 
+// the onscreen 'version' display doesn't quite align with the labels, 'DY' seems to be represented as 'B' on the labels, rather than the individual flags?
+// the labels seem closer to the Barcrest standard used on MPU4 fruit machines
+GAME(  199?, v4sunbst,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbsta,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstb,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash + Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstc,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstd,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sunbstk,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Fixed) (set 2) (MPU4 Video)",GAME_FLAGS ) // BT
+GAME(  199?, v4sunbste,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )  // B
+GAME(  199?, v4sunbstf,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )  // BL
+GAME(  199?, v4sunbstg,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed) (set 1) (MPU4 Video)",GAME_FLAGS ) // D
+GAME(  199?, v4sunbsth,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed) (set 2) (MPU4 Video)",GAME_FLAGS ) // DL
+GAME(  199?, v4sunbsti,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 20p Fixed, % Key) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstj,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sunbstl,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Switchable to 10p) (set 1) (MPU4 Video)",GAME_FLAGS ) // XC
+GAME(  199?, v4sunbstm,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Switchable to 10p) (set 2) (MPU4 Video)",GAME_FLAGS ) // XC L
+GAME(  199?, v4sunbstn,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbsto,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Switchable to 10p (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstp,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstq,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 20p Switchable to 10p, % Key) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstr,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 C, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbsts,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 C, 1993 Awards, 20p Fixed) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstt,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 C, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4sunbstu,  v4sunbst, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 IC, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS ) 
 
 GAME(  199?, v4bigfrt,   0,        bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bigfrta,  v4bigfrt, bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 2) (MPU4 Video)",GAME_FLAGS )
