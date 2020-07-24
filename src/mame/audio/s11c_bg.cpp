@@ -5,7 +5,8 @@
  * (M68B09E + YM2151 + HC555xx + DAC)
  *
  * Used by Williams System 11A (F-14), all System 11B (except Jokerz) and all System 11C pinballs
- * Used by Midway Y-Unit Arcade Hardware (for Smash TV only; see below for High Impact Football)
+ * Used by Midway Y-Unit Arcade Hardware (for Smash TV, Trog, and Strike Force; see below
+ * for [Super] High Impact Football)
  *
  * The interface connector for this board is a 20 pin header J4 with the following pinout:
  *
@@ -42,12 +43,14 @@
  *
  *
  * The mixing resistors before the MC1458 differ between the D-11581, D-11581-20xx (System 11C), and D-1129x board schematics:
- *                 D-1129x    D-11581        D-11581-20xx (and A-13971-500xx)
+ * (All resistors are 5% unless otherwise noted)
+ * newstyle P/N                              A-13971-43313 (and A-13971-500xx)
+ * oldstyle P/N    D-1129x    D-11581        D-11581-20xx or D-11581-400xx
  * CPU_SOUND       R32 2.2k   R12 2.2k       R12 4.7k
  * YM2151 CH1      R33 10k    R14 10k        R14 20k
  * YM2151 CH2      R34 10k    R15 10k        R15 20k
  * MC1408 DAC      R35 10k    R16 6.3k       R16 13k
- * CVSD           [R30 10k]  [R13 4.99k 2%]  R13 4.99k 2%
+ * CVSD           [R30 10k]  [R13 4.99k 1%]  R13 4.99k 1%
  * MC1458 Feedback R38 10k    R17 10k        R17 10k
  * MC1458 +-to-gnd R36 4.7k   R11 4.7k       R11 4.7k
  * [] - if CVSD section present
@@ -76,21 +79,29 @@
  * W11 - linked w/W2+W3    : EPROM U20 is a 2764, 27128 or 27256 (where pin 1 must be high)
 
 
- * NOTE: A board called A-13971-50003 is used on Midway Y-Unit Arcade Hardware High Impact Football,
- * and on the first 500 or so Funhouse Pinball machines. (Later Funhouse pinballs use the A-12738-50003
- * WPC Sound board, mentioned in the CVSD filtering section below. Despite its earlier part number, the
- * A-12738-50003 WPC Sound Board is a newer design, with the A-13971-50003 mentioned here seemingly produced
- * later as a stopgap due to development or production issues with the WPC Sound Board.)
- * The A-13971-50003 board is ALMOST the same as the D-11581-20xx System 11C version, except it has 32 pin
- * sockets for 27c010 chips, instead of 28 pin sockets. Despite this, the board is fully backwards compatible
- * with the D-11581-20xx, including the mixing resistors.
- * The highest ROM address bit for all 3 roms (as shown in the High Impact Football schematics,
- * but omitted from the prototype FunHouse Schematics) is driven by the rom banking register 0x7800 bit 3, which
- * is unused/unconnected on all other board revisions.
- * The 32 pin EPROM socket pins 1(VPP), 31(/PGM), 32(VCC) and 30(NC) are all tied to VCC.
- * Jumpers W2, W3, W10 and W11 act the same as they do on D-11581-20xx, just offset down in the socket by 2 pins.
+ * NOTE: A board called A-13971-50003 is used on Midway Y-Unit Arcade Hardware
+ * High Impact Football and Super High Impact Football, and on the first 500 or
+ * so Funhouse Pinball machines. (Later Funhouse pinballs use the A-12738-50003
+ * WPC Sound board, mentioned in the CVSD filtering section below. Despite its
+ * earlier part number, the A-12738-50003 WPC Sound Board is a newer design,
+ * with the A-13971-50003 mentioned here seemingly produced later as a stopgap
+ * due to development or production issues with the WPC Sound Board.)
+ * The A-13971-50003 board is ALMOST the same as the D-11581-20xx System 11C
+ * version, except it has 32 pin sockets for 27c010 chips, instead of 28 pin
+ * sockets for smaller chips. Despite this, the board is fully backwards
+ * compatible with the D-11581-20xx, including the mixing resistors.
+ * The highest address bit (A16, pin 2) for all 3 EPROMs (as shown in the
+ * High Impact Football schematics, is driven by the ROM banking register
+ * 0x7800 bit 3, which is unused/unconnected on all older board revisions.
+ * The 32 pin EPROM socket pins 1(VPP), 31(/PGM), 32(VCC) and 30(NC) are all
+ * tied to VCC.
+ * Jumpers W2, W3, W10 and W11 act the same as they do on D-11581-20xx, just
+ * offset down in the socket by 2 pins.
  * This means this board is fully backwards compatible with D-11581-20xx.
-
+ * (Note that the prototype Funhouse Schematics and the Super High Impact
+ * Footall Kit Service manual both incorrectly have schematics for the
+ * D-11581-20xx System 11C version of the board, and do not show the extra
+ * banking bit and larger sockets that the A-13971-50003 board has.)
 
 
  * Williams D-11297/D-11298 "BG Music & Speech Board":
@@ -341,6 +352,7 @@ void s11c_bg_device::device_start()
 	/* resolve lines */
 	m_cb2_cb.resolve();
 	m_pb_cb.resolve();
+	save_item(NAME(m_old_resetq_state));
 }
 
 void s11c_bg_device::common_reset()
