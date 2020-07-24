@@ -91,7 +91,7 @@
  * sockets for smaller chips. Despite this, the board is fully backwards
  * compatible with the D-11581-20xx, including the mixing resistors.
  * The highest address bit (A16, pin 2) for all 3 EPROMs (as shown in the
- * High Impact Football schematics, is driven by the ROM banking register
+ * High Impact Football schematics) is driven by the ROM banking register
  * 0x7800 bit 3, which is unused/unconnected on all older board revisions.
  * The 32 pin EPROM socket pins 1(VPP), 31(/PGM), 32(VCC) and 30(NC) are all
  * tied to VCC.
