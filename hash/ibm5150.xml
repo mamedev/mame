@@ -476,7 +476,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="arkstenn">
 		<description>La Collection Amstrad PC - Arkanoid / Super Tennis</description>
 		<year>1987</year>
-		<publisher>US Gold</publisher>
+		<publisher>U.S. Gold</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "2851051">
@@ -675,8 +675,9 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<!-- Game cracked - Missing copy protection track -->
 	<software name="digger">
-		<description>Digger</description>
+		<description>Digger (cracked)</description>
 		<year>1983</year>
 		<publisher>Windwill Software</publisher>
 		<info name="usage" value="PC Booter" />
@@ -812,8 +813,9 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<!-- Game cracked - Missing copy protection track -->
 	<software name="dkong">
-		<description>Donkey Kong</description>
+		<description>Donkey Kong (cracked)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
@@ -8235,8 +8237,9 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Game cracked - Missing copy protection track on disk 1 -->
 	<software name="bublbobl">
-		<description>Bubble Bobble (5.25")</description>
+		<description>Bubble Bobble (5.25") (cracked)</description>
 		<year>1989</year>
 		<publisher>Taito Software</publisher>
 		<info name="developer" value="Taito Software" />
@@ -8269,20 +8272,38 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="budokan">
-		<description>Budokan - The Martial Spirit</description>
+		<description>Budokan - The Martial Spirit (5.25")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Budokan - The Martial Spirit [Electronic Arts] [1989] [3.5] [1 of 1].img" size="737280" crc="fea46e33" sha1="bf874ea08695344cc9c3db8bc1b2db2e0b62ca9f"/>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Budokan [Electronic Art] [1989] [5.25DD] [Disk 1 of 2] [Dojo Disk].img" size="368640" crc="4c90178f" sha1="84aa44e77320f72e5c4e65dae559750e1617f82e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Budokan [Electronic Art] [1989] [5.25DD] [Disk 2 of 2] [Tournament Disk].img" size="368640" crc="a4c61ea5" sha1="1dfd6726779fd63c7a9db63064476b79c3f02d27"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="budokana" cloneof="budokan">
-		<description>Budokan - The Martial Spirit (Big Games release)</description>
+	<software name="budokan35" cloneof="budokan">
+		<description>Budokan - The Martial Spirit (3.5")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Budokan - The Martial Spirit [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="fea46e33" sha1="bf874ea08695344cc9c3db8bc1b2db2e0b62ca9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budokan35a" cloneof="budokan">
+		<description>Budokan - The Martial Spirit (3.5", Big Games release)</description>
+		<year>1996</year>
+		<publisher>Big Games</publisher>
 		<info name="developer" value="Electronic Arts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -9251,6 +9272,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="f29retal">
+		<description>F29 Retaliator</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Digital Image Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="F29 Retaliator [Ocean] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="206489fc" sha1="fc8cd80ca5d3288ffbcb797e72e187bdc9113fcf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fta1">
 		<description>The Faery Tale Adventure: Book I</description>
 		<year>1989</year>
@@ -10091,13 +10124,31 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="lakecelt">
-		<description>Lakers vs Celtics and the NBA Playoffs</description>
+		<description>Lakers vs Celtics and the NBA Playoffs (5.25")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Lakers vs Celtics [Electronic Arts] [1989] [5.25DD] [Disk 1 of 2] [Game Disk].img" size="368640" crc="cd206aeb" sha1="c9227ca97f0266951402034db3722eac8f5aabe3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Lakers vs Celtics [Electronic Arts] [1989] [5.25DD] [Disk 2 of 2] [Team Data Disk].img" size="368640" crc="d85973dd" sha1="e19c68028487987ea6bd98cc82782a3740135c15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lakecelt35" cloneof="lakecelt">
+		<description>Lakers vs Celtics and the NBA Playoffs (3.5")</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_serial" value="361302" />
 			<dataarea name="flop" size = "737280">
-				<rom name="Lakers Versus Celtics [Electronic Arts] [1989] [3.5].img" size="737280" crc="250b9754" sha1="ddabfc228055d876ba249407235ac7fe3b2b5d1c"/>
+				<rom name="Lakers vs Celtics [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="250b9754" sha1="ddabfc228055d876ba249407235ac7fe3b2b5d1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12478,17 +12529,30 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="spdball2">
-		<description>Speedball 2 - Brutal Deluxe</description>
-		<year>1990</year>
-		<publisher>Imageworks</publisher>
+		<description>Speedball 2 - Brutal Deluxe (USA, 5.25")</description>
+		<year>1991</year>
+		<publisher>Konami / Mirrorsoft</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Speedball 2 - Brutal Deluxe (1990)(Imageworks)(Disk 1 of 2).dsk" size="368640" crc="7076b522" sha1="80e4d60ebe4c948f13897fb74c403b22a2acfceb"/>
+				<rom name="Speedball 2 (USA) [Konami] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="3be3b716" sha1="aa948d9c1c940e4aa93b6107a537483cbc6e65c6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Speedball 2 - Brutal Deluxe (1990)(Imageworks)(Disk 2 of 2).dsk" size="368640" crc="09fc221a" sha1="a71468919cb0d32706de00dae2cc14ca0b471a62"/>
+				<rom name="Speedball 2 (USA) [Konami] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="09fc221a" sha1="a71468919cb0d32706de00dae2cc14ca0b471a62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdball2_35" cloneof="spdball2">
+		<description>Speedball 2 - Brutal Deluxe (Euro, 3.5")</description>
+		<year>1991</year>
+		<publisher>ImageWorks</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Speedball 2 [ImageWorks] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d2c66d2b" sha1="6a931ef4b2001948f1fea10e0d1b9e9652238908"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12685,7 +12749,8 @@ has been replaced with an all-zero block. -->
 	<software name="sf">
 		<description>Street Fighter</description>
 		<year>1988</year>
-		<publisher>Capcom Co., Ltd.</publisher>
+		<publisher>Capcom</publisher>
+		<info name="developer" value="Capcom" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="street fighter.img" size="737280" crc="838baa9e" sha1="ef14c9638208e04fcc819ebc7908c7611a929624"/>
