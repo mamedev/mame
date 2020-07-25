@@ -232,9 +232,9 @@ namespace solver
 
 			update_inputs();
 
-			if (m_params.m_dynamic_ts && (timestep_device_count() != 0))
+			if (timestep_device_count() > 0)
 			{
-				this->reschedule(netlist_time::from_fp(m_params.m_min_timestep));
+				this->reschedule(netlist_time::from_fp(m_params.m_dynamic_ts ? m_params.m_min_timestep : m_params.m_max_timestep));
 			}
 		}
 

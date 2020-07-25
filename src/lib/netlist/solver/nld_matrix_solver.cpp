@@ -515,7 +515,7 @@ namespace solver
 		if (delta < netlist_time_ext::quantum())
 		{
 			//printf("solve return %s at %f\n", source, now.as_double());
-			return netlist_time::zero();
+			return timestep_device_count() > 0 ? netlist_time::from_fp(m_params.m_min_timestep) : netlist_time::zero();
 		}
 
 		backup(); // save voltages for backup and timestep calculation
