@@ -9007,13 +9007,42 @@ license:CC0
 	</software>
 
 	<software name="anotherw">
-		<description>Another World</description>
-		<year>1991</year>
+		<description>Another World (Euro) (KIXX XL release)</description>
+		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Delphine Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Another World [U.S. Gold] [1991] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4eb64a42" sha1="b04f581b6c14c4b592b89f1875e645f7c03a90d6"/>
+				<rom name="Another World [U.S. Gold] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4eb64a42" sha1="b04f581b6c14c4b592b89f1875e645f7c03a90d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ootw_525" cloneof="anotherw">
+		<description>Out of this World (USA, 5.25" HD)</description>
+		<year>1992</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Out of this World [Interplay] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="25a14c8e" sha1="31556fda8c25d39d2c29cba54f9e8d49e33355d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ootw_35dd" cloneof="anotherw">
+		<description>Out of this World (USA, 3.5" DD)</description>
+		<year>1992</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Out of this World [Interplay] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="121ceb6f" sha1="1e04092ec17c671688b53ef392ba3e514b4bbd8e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Out of this World [Interplay] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="4e6eb05c" sha1="1a2084a9fc15141404eecfb31127a0d209567624"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9669,6 +9698,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="corridr7d" cloneof="corridr7">
+		<description>Corridor 7: Alien Invasion (demo)</description>
+		<year>1994</year>
+		<publisher>Capstone Software</publisher>
+		<info name="developer" value="Capstone Software" />
+		<info name="version" value="2.0D" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 (demo) [Capstone] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="7337a21d" sha1="dd2c1752ba51c8a7e2fa520bf1e4900229a714c2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmo">
 		<description>Cosmo's Cosmic Adventure - Forbidden Planet</description>
 		<year>1992</year>
@@ -9830,7 +9872,7 @@ license:CC0
 		<year>1992</year>
 		<publisher>Dro Soft</publisher>
 		<info name="version" value="1.5" />
-		<info name="developer" value="Cyberdreams, Inc." />
+		<info name="developer" value="Cyberdreams" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Dark Seed [Dro Soft] [1992] [3.5DD] [Disk 1 of 5].img" size="737280" crc="06f697be" sha1="11e8b1fdc50916bc81f25e925b4050408b7031a3"/>
@@ -9912,8 +9954,8 @@ license:CC0
 	<software name="aladdin">
 		<description>Disney's Aladdin</description>
 		<year>1994</year>
-		<publisher>Virgin Interactive Entertainment, Inc.</publisher>
-		<info name="developer" value="Virgin Interactive Entertainment, Inc." />
+		<publisher>Virgin Interactive Entertainment</publisher>
+		<info name="developer" value="Virgin Interactive Entertainment" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ceaca4d7" sha1="068e75e0e5432eb337b468e647135f085ff3166e"/>
@@ -9929,7 +9971,7 @@ license:CC0
 	<software name="lionking">
 		<description>Disney's The Lion King</description>
 		<year>1994</year>
-		<publisher>Virgin Interactive Entertainment, Inc.</publisher>
+		<publisher>Virgin Interactive Entertainment</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disney's The Lion King (USA) (Disk 1).img" size="1474560" crc="732d455a" sha1="20e85e8c381263363250c5b509fbc24415ed2e5d"/>
@@ -12026,6 +12068,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tentaclef" cloneof="tentacle">
+		<description>Maniac Mansion: Day of the Tentacle (France)</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="1.1" />
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="464e52a1" sha1="83bb837a82de1b6fa09203b031b314b8ba2767f5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="1348cbe3" sha1="96a64a0f05107a847c113e60388977adeb76828a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="10423ec3" sha1="3d441d826f6e6e6d1176a8f85f9986c2e7073abb"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="faa8882d" sha1="86ec9822d43ff604aff8770b2e94c02c2e64f6f5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="61e009df" sha1="3e50985dedb2aade936e7c83f5812c14a2885a45"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="65f3107d" sha1="9677d0310d9a1c904c8161a5d8a936894a133824"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="4e21650b" sha1="8be9b2ffb1d7dd012ea51349ca5171fb1975f5eb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moo">
 		<description>Master of Orion</description>
 		<year>1993</year>
@@ -12871,6 +12956,49 @@ license:CC0
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Sam &amp; Max Hit the Road [LucasArts] [1993] [3.5DD] [Disk 7 of 7].img" size="737280" crc="4ad1f8fb" sha1="449d050f61df116c281021910f0e4671014bc95b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samnmaxg" cloneof="samnmax">
+		<description>Sam &amp; Max Hit the Road (Germany)</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="version" value="Version 1.3, 17-12-93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="7f386e72" sha1="fe7eb3f23b82795f671fa4ecbe5a20ca50f7b511"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="9b31c820" sha1="37a6e7607ef3d193f8cc1f43ac234031e9c44a4d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="b64a17f8" sha1="83c25f3a4a4c63d495cf814376106d5509fb80dc"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="c12d9f16" sha1="2e39a8f50ca75eaf70692aa3e64d3fb6315349cc"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="21f48f4d" sha1="5174ca8f11cff9eda6ae117a295ad4baacbe4b4e"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="9a350d54" sha1="a743ab7d561090608af8ff2788ef38af69c54a75"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Sam &amp; Max Hit the Road (Germany) [LucasArts] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="e00ff1bb" sha1="8eeb456808445eb5c17fdc682a613473aad59c86"/>
 			</dataarea>
 		</part>
 	</software>
