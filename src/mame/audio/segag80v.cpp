@@ -8,137 +8,149 @@
 
 #include "emu.h"
 #include "includes/segag80v.h"
+
+#include "audio/nl_elim.h"
 #include "sound/samples.h"
 
-/* History:
 
 
-
- * 4/25/99 Tac-Scan now makes Credit Noises with $2c                    (Jim Hernandez)
- * 4/9/99 Zektor Discrete Sound Support mixed with voice samples.       (Jim Hernandez)
-          Zektor uses some Eliminator sounds.
-
- * 2/5/99 Extra Life sound constant found $1C after fixing main driver. (Jim Hernandez)
- * 1/29/99 Supports Tac Scan new 44.1 kHz sample set.                    (Jim Hernandez)
-
- * -Stuff to do -
- * Find hex bit for warp.wav sound calls.
+/*************************************
  *
- * 2/05/98 now using the new sample_*() functions. BW
+ *  Base class
  *
- */
+ *************************************/
 
-/*
-    Tac/Scan sound constants
+segag80_audio_device::segag80_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &), double output_scale)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_lo_input(*this, "sound_nl:lo_%u", 0)
+	, m_hi_input(*this, "sound_nl:hi_%u", 0)
+	, m_netlist(netlist)
+	, m_output_scale(output_scale)
+{
+}
 
-    There are some sounds that are unknown:
-    $09 Tunnel Warp Sound?
-    $0a
-    $0b Formation Change
-        $0c
-        $0e
-        $0f
-        $1c 1up (Extra Life)
-        $2c Credit
-        $30 - $3f  Hex numbers for ship position flight sounds
-    $41
+void segag80_audio_device::device_add_mconfig(machine_config &config)
+{
+	if (m_netlist != nullptr)
+	{
+		NETLIST_SOUND(config, "sound_nl", 48000)
+			.set_source(m_netlist)
+			.add_route(ALL_OUTPUTS, *this, 1.0);
 
-    Some sound samples are missing:
-    - I use the one bullet and one explosion sound for all 3 for example.
+		NETLIST_LOGIC_INPUT(config, m_lo_input[1], "I_LO_D1.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_lo_input[2], "I_LO_D2.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_lo_input[3], "I_LO_D3.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_lo_input[4], "I_LO_D4.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_lo_input[5], "I_LO_D5.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_lo_input[6], "I_LO_D6.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_lo_input[7], "I_LO_D7.IN", 0);
 
-Star Trk Sounds (USB Loaded from 5400 in main EPROMs)
+		NETLIST_LOGIC_INPUT(config, m_hi_input[0], "I_HI_D0.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[1], "I_HI_D1.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[2], "I_HI_D2.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[3], "I_HI_D3.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[4], "I_HI_D4.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[5], "I_HI_D5.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[6], "I_HI_D6.IN", 0);
+		NETLIST_LOGIC_INPUT(config, m_hi_input[7], "I_HI_D7.IN", 0);
 
-8     PHASER
-a     PHOTON
-e     TARGETING
-10    DENY
-12    SHEILD HIT
-14    ENTERPRISE HIT
-16    ENT EXPLOSION
-1a    KLINGON EXPLOSION
-1c    DOCK
-1e    STARBASE HIT
-11    STARBASE RED
-22    STARBASE EXPLOSION
-24    SMALL BONUS
-25    LARGE BONUS
-26    STARBASE INTRO
-27    KLINGON INTRO
-28    ENTERPRISE INTRO
-29    PLAYER CHANGE
-2e    KLINGON FIRE
-4,5   IMPULSE
-6,7   WARP
-c,d   RED ALERT
-18,2f WARP SUCK
-19,2f SAUCER EXIT
-2c,21 NOMAD MOTION
-2d,21 NOMAD STOPPED
-2b    COIN DROP MUSIC
-2a    HIGH SCORE MUSIC
+		NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(m_output_scale, 0.0);
+	}
+}
+
+void segag80_audio_device::device_start()
+{
+#if ENABLE_NETLIST_LOGGING
+	m_logfile = fopen("netlist.csv", "w");
+#endif
+}
+
+void segag80_audio_device::device_stop()
+{
+#if ENABLE_NETLIST_LOGGING
+	if (m_logfile != nullptr)
+		fclose(m_logfile);
+#endif
+}
+
+void segag80_audio_device::write(offs_t addr, uint8_t data)
+{
+	addr &= 1;
+
+	auto &inputs = (addr == 0) ? m_lo_input : m_hi_input;
+	auto &oldvals = (addr == 0) ? m_lo_vals : m_hi_vals;
+
+	for (int bit = (addr == 0) ? 1 : 0; bit < 8; bit++)
+	{
+		inputs[bit]->write_line(BIT(data, bit));
+#if ENABLE_NETLIST_LOGGING
+		if (BIT((data ^ oldvals), bit) != 0)
+		{
+			attotime time = machine().scheduler().time();
+			fprintf(m_logfile, "%s,I_%s_%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
+			printf("%s,I_%s_%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
+		}
+#endif
+	}
+	oldvals = data;
+}
 
 
-Eliminator Sound Board (800-3174)
----------------------------------
 
-inputs
-0x3c-0x3f
+/*************************************
+ *
+ *  Eliminator
+ *
+ *************************************/
 
-d0 speech ready
+DEFINE_DEVICE_TYPE(ELIMINATOR_AUDIO, elim_audio_device, "elim_audio", "Eliminator Sound Board")
 
-outputs ( 0 = ON)
+elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: segag80_audio_device(mconfig, ELIMINATOR_AUDIO, tag, owner, clock, NETLIST_NAME(elim), 5000.0)
+{
+}
 
-0x3e (076)
 
-d7      torpedo 2
-d6      torpedo 1
-d5      bounce
-d4      explosion 3
-d3      explosion 2
-d2      explosion 1
-d1      fireball
-d0      -
 
-0x3f (077)
+/*************************************
+ *
+ *  Zektor
+ *
+ *************************************/
 
-d7      background msb
-d6      background lsb
-d5      enemy ship
-d4      skitter
-d3      thrust msb
-d2      thrust lsb
-d1      thrust hi
-d0      thrust lo
+DEFINE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device, "zektor_audio", "Zektor Sound Board")
 
-Space Fury Sound Board (800-0241)
----------------------------------
+zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: segag80_audio_device(mconfig, ZEKTOR_AUDIO, tag, owner, clock, NETLIST_NAME(elim), 5000.0)
+{
+}
 
-0x3e (076) (0 = ON)
 
-d7      partial warship, low frequency oscillation
-d6      star spin
-d5      -
-d4      -
-d3      -
-d2      thrust, low frequency noise
-d1      fire, metalic buzz
-d0      craft scale, rising tone
 
-0x3f (077)
+/*************************************
+ *
+ *  Space Fury
+ *
+ *************************************/
 
-d7      -
-d6      -
-d5      docking bang
-d4      large explosion
-d3      small explosion, low frequency noise
-d2      fireball
-d1      shot
-d0      crafts joining
+DEFINE_DEVICE_TYPE(SPACE_FURY_AUDIO, spcfury_audio_device, "spcfury_audio", "Space Fury Sound Board")
 
-*/
+spcfury_audio_device::spcfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: segag80_audio_device(mconfig, SPACE_FURY_AUDIO, tag, owner, clock, nullptr, 5000.0)
+{
+}
+
+
+
+
+#if 0
 
 void segag80v_state::elim1_sh_w(uint8_t data)
 {
+#if 0
+	write_log(machine(), 35, data);
+
 	data ^= 0xff;
 
 	/* Play fireball sample */
@@ -168,10 +180,14 @@ void segag80v_state::elim1_sh_w(uint8_t data)
 			m_samples->stop(3);
 		m_samples->start(3, 5);
 	}
+#endif
 }
 
 void segag80v_state::elim2_sh_w(uint8_t data)
 {
+#if 0
+	write_log(machine(), 34, data);
+
 	data ^= 0xff;
 
 	/* Play thrust sample */
@@ -193,11 +209,13 @@ void segag80v_state::elim2_sh_w(uint8_t data)
 		m_samples->start(7, 7);
 	if (data & 0x80)
 		m_samples->start(7, 4);
+#endif
 }
 
 
 void segag80v_state::zektor1_sh_w(uint8_t data)
 {
+#if 0
 	data ^= 0xff;
 
 	/* Play fireball sample */
@@ -227,10 +245,12 @@ void segag80v_state::zektor1_sh_w(uint8_t data)
 			m_samples->stop(3);
 				m_samples->start(3, 5);
 	}
+#endif
 }
 
 void segag80v_state::zektor2_sh_w(uint8_t data)
 {
+#if 0
 	data ^= 0xff;
 
 	/* Play thrust sample */
@@ -252,6 +272,7 @@ void segag80v_state::zektor2_sh_w(uint8_t data)
 				m_samples->start(7, 40);
 	if (data & 0x80)
 				m_samples->start(7, 41);
+#endif
 }
 
 
@@ -325,3 +346,4 @@ void segag80v_state::spacfury2_sh_w(uint8_t data)
 		m_samples->start(0, 7);
 
 }
+#endif

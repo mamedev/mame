@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "audio/segasnd.h"
+#include "audio/segag80v.h"
 #include "machine/segag80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -25,6 +26,7 @@ public:
 		m_samples(*this, "samples"),
 		m_speech(*this, "segaspeech"),
 		m_usb(*this, "usbsnd"),
+		m_g80_audio(*this, "soundboard"),
 		m_aysnd(*this, "aysnd"),
 		m_vector(*this, "vector"),
 		m_screen(*this, "screen")
@@ -55,6 +57,7 @@ private:
 	optional_device<samples_device> m_samples;
 	optional_device<speech_sound_device> m_speech;
 	optional_device<usb_sound_device> m_usb;
+	optional_device<segag80_audio_device> m_g80_audio;
 	optional_device<ay8912_device> m_aysnd;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
@@ -80,13 +83,6 @@ private:
 	uint8_t multiply_r();
 	void coin_count_w(uint8_t data);
 	void unknown_w(uint8_t data);
-
-	void elim1_sh_w(uint8_t data);
-	void elim2_sh_w(uint8_t data);
-	void zektor1_sh_w(uint8_t data);
-	void zektor2_sh_w(uint8_t data);
-	void spacfury1_sh_w(uint8_t data);
-	void spacfury2_sh_w(uint8_t data);
 
 	void usb_ram_w(offs_t offset, uint8_t data);
 

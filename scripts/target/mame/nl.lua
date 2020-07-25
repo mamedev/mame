@@ -262,6 +262,14 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
 
+	MAME_DIR .. "src/mame/drivers/sega80v.cpp",
+	MAME_DIR .. "src/mame/includes/sega80v.h",
+	MAME_DIR .. "src/mame/audio/sega80v.cpp",
+	MAME_DIR .. "src/mame/audio/sega80v.h",
+	MAME_DIR .. "src/mame/video/sega80v.cpp",
+	MAME_DIR .. "src/mame/audio/nl_elim.cpp",
+	MAME_DIR .. "src/mame/audio/nl_elim.h",
+
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",
 	MAME_DIR .. "src/mame/video/segas16b.cpp",

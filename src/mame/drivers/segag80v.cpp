@@ -135,6 +135,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/segag80v.h"
 #include "includes/segag80v.h"
 #include "machine/segag80.h"
 
@@ -816,78 +817,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Eliminator sound interfaces
- *
- *************************************/
-
-static const char *const elim_sample_names[] =
-{
-	"*elim2",
-	"elim1",
-	"elim2",
-	"elim3",
-	"elim4",
-	"elim5",
-	"elim6",
-	"elim7",
-	"elim8",
-	"elim9",
-	"elim10",
-	"elim11",
-	"elim12",
-	nullptr   /* end of array */
-};
-
-
-/*************************************
- *
- *  Space Fury sound interfaces
- *
- *************************************/
-
-static const char *const spacfury_sample_names[] =
-{
-	"*spacfury",
-	/* Sound samples */
-	"sfury1",
-	"sfury2",
-	"sfury3",
-	"sfury4",
-	"sfury5",
-	"sfury6",
-	"sfury7",
-	"sfury8",
-	"sfury9",
-	"sfury10",
-	nullptr   /* end of array */
-};
-
-/*************************************
- *
- *  Zektor sound interfaces
- *
- *************************************/
-
-static const char *const zektor_sample_names[] =
-{
-	"*zektor",
-	"elim1",  /*  0 fireball */
-	"elim2",  /*  1 bounce */
-	"elim3",  /*  2 Skitter */
-	"elim4",  /*  3 Eliminator */
-	"elim5",  /*  4 Electron */
-	"elim6",  /*  5 fire */
-	"elim7",  /*  6 thrust */
-	"elim8",  /*  7 Electron */
-	"elim9",  /*  8 small explosion */
-	"elim10", /*  9 med explosion */
-	"elim11", /* 10 big explosion */
-	nullptr
-};
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -919,10 +848,7 @@ void segag80v_state::elim2(machine_config &config)
 	g80v_base(config);
 
 	/* custom sound board */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(elim_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ELIMINATOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::spacfury(machine_config &config)
@@ -930,10 +856,7 @@ void segag80v_state::spacfury(machine_config &config)
 	g80v_base(config);
 
 	/* custom sound board */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(spacfury_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
+	SPACE_FURY_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	/* speech board */
 	sega_speech_board(config);
@@ -944,10 +867,7 @@ void segag80v_state::zektor(machine_config &config)
 	g80v_base(config);
 
 	/* custom sound board */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(zektor_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
+	ZEKTOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	AY8912(config, m_aysnd, VIDEO_CLOCK/4/2).add_route(ALL_OUTPUTS, "speaker", 0.33);
 
@@ -1303,8 +1223,7 @@ void segag80v_state::init_elim2()
 	m_decrypt = segag80_security(70);
 
 	/* configure sound */
-	iospace.install_write_handler(0x3e, 0x3e, write8smo_delegate(*this, FUNC(segag80v_state::elim1_sh_w)));
-	iospace.install_write_handler(0x3f, 0x3f, write8smo_delegate(*this, FUNC(segag80v_state::elim2_sh_w)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 }
 
 
@@ -1316,8 +1235,7 @@ void segag80v_state::init_elim4()
 	m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	iospace.install_write_handler(0x3e, 0x3e, write8smo_delegate(*this, FUNC(segag80v_state::elim1_sh_w)));
-	iospace.install_write_handler(0x3f, 0x3f, write8smo_delegate(*this, FUNC(segag80v_state::elim2_sh_w)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
 	/* configure inputs */
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
@@ -1335,8 +1253,7 @@ void segag80v_state::init_spacfury()
 	/* configure sound */
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
-	iospace.install_write_handler(0x3e, 0x3e, write8smo_delegate(*this, FUNC(segag80v_state::spacfury1_sh_w)));
-	iospace.install_write_handler(0x3f, 0x3f, write8smo_delegate(*this, FUNC(segag80v_state::spacfury2_sh_w)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 }
 
 
@@ -1351,8 +1268,7 @@ void segag80v_state::init_zektor()
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_aysnd, FUNC(ay8912_device::address_data_w)));
-	iospace.install_write_handler(0x3e, 0x3e, write8smo_delegate(*this, FUNC(segag80v_state::zektor1_sh_w)));
-	iospace.install_write_handler(0x3f, 0x3f, write8smo_delegate(*this, FUNC(segag80v_state::zektor2_sh_w)));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
 	/* configure inputs */
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
