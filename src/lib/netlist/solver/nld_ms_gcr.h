@@ -141,6 +141,9 @@ namespace solver
 		pstring fptype(fp_constants<FT>::name());
 		pstring fpsuffix(fp_constants<FT>::suffix());
 
+		// avoid unused variable warnings
+		strm("\tplib::unused_var({1});\n", "cnV");
+
 		for (std::size_t i = 0; i < mat.nz_num; i++)
 			strm("\t{1} m_A{2}(0.0);\n", fptype, i, i);
 
