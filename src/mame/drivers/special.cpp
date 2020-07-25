@@ -8,13 +8,25 @@ Specialist driver by Miodrag Milanovic
 2008-03-20 Cassette support
 
 Notes:
+- Scrolling is noticeably slow.
+- Hit Alt to switch between normal and Russian characters.
+
 - Special, specialp, lik, erik: At the first prompt, press Enter for the Monitor. All other keys just beep.
+
 - Specimx: Press Enter to go into a ramdisk File Manager. Press F3 to load a tape (which errors).
 - Specimx -bios 1 and 2 don't set a colour, so a default has been chosen instead of a black screen.
 - Specimx -bios 1 lists a number of programs on the ramdisk, but most of them don't work.
-- Hit Alt to switch between normal and Russian characters.
+
 - Lik: B to enter Basic. Haven't found an official way to exit, but you can enter MLOAD and hit Enter twice.
-- Scrolling is noticeably slow.
+
+- Unga: It can load and run a tape, like Special. Or, press Y and you're taken to BASIC. You might find that the
+  keyboard is stuck in lowercase, so hit Left-Alt to switch to upper. Now it will work. If you enter SYSTEM to
+  exit, it corrupts itself and runs into the weeds. At the initial prompt, if you hit Enter it jumps to 0000 and
+  thence into the weeds.
+
+- Anakonda: It complains of a disk problem (not emulated), before falling into a cassette loader. If you had
+  loaded a tape from the command line, hit enter 3 times quickly before the tape starts to play. It will load
+  and run.
 
 Important tape notes:
 - If you press any key (including F2 to start the tape), the tape either will not load, or the machine hangs.
@@ -24,7 +36,6 @@ Important tape notes:
 - Tapes from the swlist only work with "special"; they may load on others but unlikely to run.
 
 ToDo:
-- No pictures, schematics or manuals to be found.
 - Much mystery surrounds the usage of cassette.
 - Keyboard is a bit strange, especially with Enter key
 - What does or does not get changed by Shift key is all over the place
@@ -674,8 +685,11 @@ ROM_START( specimx )
 ROM_END
 
 ROM_START( erik )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // This looks like a hacked-up memory dump
-	ROM_LOAD( "erik.bin",         0x0000, 0x10000, CRC(6f3208f4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_SYSTEM_BIOS(0, "0", "0")
+	ROMX_LOAD( "erik.bin",        0x0000, 0x10000, CRC(6f3208f4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "1", "1")
+	ROMX_LOAD( "ericrom2.bin",    0x0000, 0x10000, CRC(712e1f1b) SHA1(6b44db4fe6b0834e5ff8a2091e71610f77f81b5e), ROM_BIOS(1))
 ROM_END
 
 ROM_START( pioner )
@@ -683,18 +697,37 @@ ROM_START( pioner )
 	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pioner.rf2",       0x0000, 0x0800, CRC(d6250ab2) SHA1(b953517d883c64857e63139fed52436f77d371cb))
 	// monitor roms missing from this set. Using ones from 'special'.
-	ROM_LOAD( "monitor2_2.rom",  0x0800, 0x0800, BAD_DUMP CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492))
-	ROM_LOAD( "monitor2_3.rom",  0x1000, 0x0800, BAD_DUMP CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb))
+	ROM_LOAD( "monitor2_2.rom",   0x0800, 0x0800, BAD_DUMP CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492))
+	ROM_LOAD( "monitor2_3.rom",   0x1000, 0x0800, BAD_DUMP CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb))
+ROM_END
+
+ROM_START( unga )
+	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "unga.rom",        0x0000, 0x3000, CRC(b45f2971) SHA1(561b907ee0a305bc5e963ecd70ecb2b132f936f3) )
+ROM_END
+
+ROM_START( anakonda )
+	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "anakonda.rom",    0x0000, 0x0800, CRC(50ba6462) SHA1(f55a9f8e78a3e97012e343ea35cd787fc45dae35) )
+ROM_END
+
+ROM_START( kharkovsky ) // Made in Kharkiv, Ukraine
+	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "zagr.bin",        0x0000, 0x0800, CRC(f86ba4db) SHA1(1f48c74ffce88f6e804f776c66d6c03059fca117) )
+	ROM_LOAD( "mon.bin",         0x0800, 0x0800, CRC(2dd1b6d2) SHA1(d5a02a9645f57eb0295d6b8d8cd8c589b47ba591) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY      FULLNAME                    FLAGS
-COMP( 1985, special,  0,       0,      special,  special,  special_state, init_special, "<unknown>", "Specialist",               MACHINE_SUPPORTS_SAVE )
-COMP( 1985, specialm, special, 0,      specialm, special,  special_state, init_special, "<unknown>", "Specialist M",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pioner,   special, 0,      special,  pioner,   special_state, init_special, "<unknown>", "Pioner",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, specialp, special, 0,      specialp, specialp, special_state, init_special, "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, lik,      special, 0,      special,  lik,      special_state, init_special, "<unknown>", "Lik",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, specimx,  special, 0,      specimx,  specimx,  special_state, empty_init,   "<unknown>", "Specialist MX",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1994, erik,     special, 0,      erik,     special,  special_state, init_erik,    "<unknown>", "Erik",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, special,    0,       0,    special,  special,  special_state, init_special, "<unknown>", "Specialist",               MACHINE_SUPPORTS_SAVE )
+COMP( 1985, specialm,   special, 0,    specialm, special,  special_state, init_special, "<unknown>", "Specialist M",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1993, pioner,     special, 0,    special,  pioner,   special_state, init_special, "<unknown>", "Pioner",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, specialp,   special, 0,    specialp, specialp, special_state, init_special, "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, lik,        special, 0,    special,  lik,      special_state, init_special, "<unknown>", "Lik",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, specimx,    special, 0,    specimx,  specimx,  special_state, empty_init,   "<unknown>", "Specialist MX",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1994, erik,       special, 0,    erik,     special,  special_state, init_erik,    "<unknown>", "Erik",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, unga,       special, 0,    special,  special,  special_state, init_special, "<unknown>", "Unga",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1989, anakonda,   special, 0,    special,  special,  special_state, init_special, "<unknown>", "Anakonda",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, kharkovsky, special, 0,    special,  special,  special_state, init_special, "<unknown>", "Kharkovsky",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

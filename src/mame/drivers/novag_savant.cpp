@@ -231,7 +231,6 @@ void savant_state::control_w(u8 data)
 	m_lcd1->lcd_w(BIT(~data, 4));
 
 	// d5-d7: keypad mux
-
 	m_control = data;
 }
 

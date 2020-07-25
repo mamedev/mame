@@ -349,6 +349,7 @@ VIDEOS["HD61603"] = true
 VIDEOS["HD61830"] = true
 --VIDEOS["HD63484"] = true
 VIDEOS["HD66421"] = true
+VIDEOS["HLCD0438"] = true
 VIDEOS["HLCD0488"] = true
 VIDEOS["HLCD0515"] = true
 VIDEOS["HLCD0538"] = true
@@ -2229,7 +2230,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/bk.cpp",
 	MAME_DIR .. "src/mame/includes/bk.h",
 	MAME_DIR .. "src/mame/machine/bk.cpp",
-	MAME_DIR .. "src/mame/video/bk.cpp",
 	MAME_DIR .. "src/mame/drivers/dvk_kcgd.cpp",
 	MAME_DIR .. "src/mame/drivers/dvk_ksm.cpp",
 	MAME_DIR .. "src/mame/machine/ms7004.cpp",

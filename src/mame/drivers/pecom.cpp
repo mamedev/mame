@@ -2,37 +2,54 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Pecom driver by Miodrag Milanovic
+Pecom driver by Miodrag Milanovic
 
-        08/11/2008 Preliminary driver.
+2008-11-08 Preliminary driver.
 
-        Need to press capslock twice to get caps to engage - bug?
+- All commands to be in UPPERCASE.
+- Change background colour: SCR n
+- Enter monitor: PROB     (B to exit)
+- If Capslock is engaged, then Shift doesn't work.
+- Control hangs the machine while it is pressed. It doesn't work in the
+  expected way.
+- Don't touch the Shift key while loading a tape because it will corrupt
+  the data.
+- The screen will flash in a crazy epileptic fashion while loading a tape.
+  Beware!
+
+TODO:
+- Cassette: can load its own recordings, but not those from software list
+  (software-list tapes are slower & wobbly)
+- Both machines currently have 32k ram.
+- Autorepeat seems a bit fast
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/pecom.h"
-
-#include "softlist.h"
 #include "speaker.h"
 
 
 /* Address maps */
-void pecom_state::pecom64_mem(address_map &map)
+void pecom_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).rom();  // ROM 1
-	map(0xc000, 0xf3ff).rom();  // ROM 2
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x8000, 0xefff).rom().region("maincpu",0);
 	map(0xf000, 0xf7ff).bankrw("bank3"); // CDP1869 / ROM
 	map(0xf800, 0xffff).bankrw("bank4"); // CDP1869 / ROM
 }
 
-void pecom_state::pecom64_io(address_map &map)
+void pecom_state::io_map(address_map &map)
 {
-	map(0x01, 0x01).w(FUNC(pecom_state::pecom_bank_w));
-	map(0x03, 0x03).r(FUNC(pecom_state::pecom_keyboard_r));
-	map(0x03, 0x07).w(FUNC(pecom_state::pecom_cdp1869_w));
+	map(0x01, 0x01).w(FUNC(pecom_state::bank_w));
+	map(0x03, 0x03).r(FUNC(pecom_state::keyboard_r));
+	map(0x03, 0x07).w(FUNC(pecom_state::cdp1869_w));
+}
+
+void pecom_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x3ff).mirror(0x400).ram();
 }
 
 /* Input ports */
@@ -50,12 +67,12 @@ void pecom_state::pecom64_io(address_map &map)
 
 Being keys distributed on four lines, it makes a bit difficult to accurately remap them
 on modern keyboards. Hence, we move by default Up/Down/Left/Right to Cursor Keys and
-use LEft/Right Ctrl/Alt keys for the remaining keys. Due to the unnatural emulated keyboard
+use Left/Right Ctrl/Alt keys for the remaining keys. Due to the unnatural emulated keyboard
 mappings, this is another situation where natural keyboard comes very handy!          */
 
 INPUT_CHANGED_MEMBER(pecom_state::ef_w)
 {
-	m_cdp1802->set_input_line((int)param, newval);
+	m_maincpu->set_input_line((int)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )
@@ -164,8 +181,8 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
 	PORT_START("CNT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF3)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
@@ -174,47 +191,54 @@ INPUT_PORTS_END
 void pecom_state::pecom64(machine_config &config)
 {
 	/* basic machine hardware */
-	CDP1802(config, m_cdp1802, cdp1869_device::DOT_CLK_PAL);
-	m_cdp1802->set_addrmap(AS_PROGRAM, &pecom_state::pecom64_mem);
-	m_cdp1802->set_addrmap(AS_IO, &pecom_state::pecom64_io);
-	m_cdp1802->wait_cb().set_constant(1);
-	m_cdp1802->clear_cb().set(FUNC(pecom_state::clear_r));
-	m_cdp1802->ef2_cb().set(FUNC(pecom_state::ef2_r));
-	m_cdp1802->q_cb().set(FUNC(pecom_state::q_w));
-	m_cdp1802->sc_cb().set(FUNC(pecom_state::sc_w));
+	CDP1802(config, m_maincpu, cdp1869_device::DOT_CLK_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pecom_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pecom_state::io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(pecom_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(pecom_state::ef2_r));
+	m_maincpu->q_cb().set(FUNC(pecom_state::q_w));
+	m_maincpu->sc_cb().set(FUNC(pecom_state::sc_w));
 
-	// sound and video hardware
-	pecom_video(config);
+	SPEAKER(config, "mono").front_center();
+
+	CDP1869(config, m_cdp1869, cdp1869_device::DOT_CLK_PAL, &pecom_state::cdp1869_page_ram);
+	m_cdp1869->add_pal_screen(config, "screen", cdp1869_device::DOT_CLK_PAL);
+	m_cdp1869->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_cdp1869->set_pcb_read_callback(FUNC(pecom_state::pcb_r));
+	m_cdp1869->set_char_ram_read_callback(FUNC(pecom_state::char_ram_r));
+	m_cdp1869->set_char_ram_write_callback(FUNC(pecom_state::char_ram_w));
+	m_cdp1869->pal_ntsc_callback().set_constant(1);
+	m_cdp1869->prd_callback().set(FUNC(pecom_state::prd_w));
+	m_cdp1869->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("pecom_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pecom_cass");
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
 }
 
 /* ROM definition */
 ROM_START( pecom32 )
-	ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "090786.bin", 0x8000, 0x4000, CRC(b3b1ea23) SHA1(de69f22568161ced801973345fa39d6d207b9e8c) )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "090786.bin", 0x0000, 0x4000, CRC(b3b1ea23) SHA1(de69f22568161ced801973345fa39d6d207b9e8c) )
 ROM_END
 
 ROM_START( pecom64 )
-	ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver4", "version 4")
-	ROMX_LOAD( "rom_1_g_24.02.88_l.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(0) )
-	ROMX_LOAD( "rom_2_g_24.02.88_d.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_1_g_24.02.88_l.bin", 0x0000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_2_g_24.02.88_d.bin", 0x4000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ver1", "version 1")
-	ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(1) )
-	ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(1) )
+	ROMX_LOAD( "170887-rom1.bin", 0x0000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(1) )
+	ROMX_LOAD( "170887-rom2.bin", 0x4000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(1) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME     FLAGS */
-COMP( 1986, pecom32, 0,       0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 32",  0)
-COMP( 1987, pecom64, pecom32, 0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 64",  0)
+COMP( 1986, pecom32, 0,       0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis (Elektronska Industrija Nis)", "Pecom 32", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pecom64, pecom32, 0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis (Elektronska Industrija Nis)", "Pecom 64", MACHINE_SUPPORTS_SAVE )

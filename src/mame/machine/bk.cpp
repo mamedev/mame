@@ -10,8 +10,6 @@
 
 
 #include "emu.h"
-#include "imagedev/cassette.h"
-#include "machine/i8255.h"
 #include "includes/bk.h"
 
 
@@ -56,13 +54,20 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 
 void bk_state::machine_start()
 {
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_kbd_state));
+	save_item(NAME(m_key_code));
+	save_item(NAME(m_key_pressed));
+	save_item(NAME(m_key_irq_vector));
+	save_item(NAME(m_drive));
+
 	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
 
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bk_state::keyboard_callback), this));
 	m_kbd_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
 }
 
-uint8_t bk_state::bk0010_irq_callback(offs_t offset)
+uint8_t bk_state::irq_callback(offs_t offset)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return m_key_irq_vector;
@@ -71,25 +76,25 @@ uint8_t bk_state::bk0010_irq_callback(offs_t offset)
 void bk_state::machine_reset()
 {
 	m_kbd_state = 0;
-	m_scrool = 01330;
+	m_scroll = 01330;
 }
 
-uint16_t bk_state::bk_key_state_r()
+uint16_t bk_state::key_state_r()
 {
 	return m_kbd_state;
 }
-uint16_t bk_state::bk_key_code_r()
+uint16_t bk_state::key_code_r()
 {
 	m_kbd_state &= ~0x80; // mark reading done
 	m_key_pressed = 0;
 	return m_key_code;
 }
-uint16_t bk_state::bk_vid_scrool_r()
+uint16_t bk_state::vid_scroll_r()
 {
-	return m_scrool;
+	return m_scroll;
 }
 
-uint16_t bk_state::bk_key_press_r()
+uint16_t bk_state::key_press_r()
 {
 	double level = m_cassette->input();
 	uint16_t cas = (level < 0) ? 0 : 0x20;
@@ -97,27 +102,27 @@ uint16_t bk_state::bk_key_press_r()
 	return 0x8080 | m_key_pressed | cas;
 }
 
-void bk_state::bk_key_state_w(uint16_t data)
+void bk_state::key_state_w(uint16_t data)
 {
 	m_kbd_state = (m_kbd_state & ~0x40) | (data & 0x40);
 }
 
-void bk_state::bk_vid_scrool_w(uint16_t data)
+void bk_state::vid_scroll_w(uint16_t data)
 {
-	m_scrool = data;
+	m_scroll = data;
 }
 
-void bk_state::bk_key_press_w(uint16_t data)
+void bk_state::key_press_w(uint16_t data)
 {
 	m_cassette->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
-uint16_t bk_state::bk_floppy_cmd_r()
+uint16_t bk_state::floppy_cmd_r()
 {
 	return 0;
 }
 
-void bk_state::bk_floppy_cmd_w(uint16_t data)
+void bk_state::floppy_cmd_w(uint16_t data)
 {
 	if (BIT(data, 0))
 		m_drive = 0;
@@ -135,11 +140,27 @@ void bk_state::bk_floppy_cmd_w(uint16_t data)
 		m_drive = -1;
 }
 
-uint16_t bk_state::bk_floppy_data_r()
+uint16_t bk_state::floppy_data_r()
 {
 	return 0;
 }
 
-void bk_state::bk_floppy_data_w(uint16_t data)
+void bk_state::floppy_data_w(uint16_t data)
 {
+}
+
+u32 bk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u16 nOfs = (m_scroll - 728) % 256;
+
+	for (u16 y = 0; y < 256; y++)
+	{
+		for (u16 x = 0; x < 32; x++)
+		{
+			u16 code = m_vram[((y+nOfs) %256)*32 + x];
+			for (u8 b = 0; b < 16; b++)
+				bitmap.pix16(y, x*16 + b) =  BIT(code, b);
+		}
+	}
+	return 0;
 }

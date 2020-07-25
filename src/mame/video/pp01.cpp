@@ -12,10 +12,6 @@
 #include "emu.h"
 #include "includes/pp01.h"
 
-void pp01_state::video_start()
-{
-}
-
 uint32_t pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const ram = m_ram->pointer();
@@ -24,9 +20,10 @@ uint32_t pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bit
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			uint8_t const code_r = ram[0x6000 + ((y+m_video_scroll)&0xff)*32 + x];
-			uint8_t const code_g = ram[0xa000 + ((y+m_video_scroll)&0xff)*32 + x];
-			uint8_t const code_b = ram[0xe000 + ((y+m_video_scroll)&0xff)*32 + x];
+			u16 t = ((y+m_video_scroll)&0xff)*32 + x;
+			uint8_t const code_r = ram[0x6000 + t];
+			uint8_t const code_g = ram[0xa000 + t];
+			uint8_t const code_b = ram[0xe000 + t];
 			for (int b = 0; b < 8; b++)
 			{
 				uint8_t const col = (BIT(code_r, b) << 2) | (BIT(code_g, b) << 1) | (BIT(code_b, b) << 0);

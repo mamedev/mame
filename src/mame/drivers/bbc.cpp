@@ -168,7 +168,7 @@ void bbc_state::bbcb_mem(address_map &map)
 	map(0x0000, 0x7fff).rw(FUNC(bbc_state::bbc_ram_r), FUNC(bbc_state::bbc_ram_w));                                   //    0000-7fff                 Regular RAM
 	map(0x8000, 0xbfff).rw(FUNC(bbc_state::bbc_paged_r), FUNC(bbc_state::bbc_paged_w));                               //    8000-bfff                 Paged ROM/RAM
 	map(0xfe30, 0xfe3f).rw(FUNC(bbc_state::bbc_romsel_r), FUNC(bbc_state::bbc_romsel_w));                             // W: fe30-fe3f  84LS161        Paged ROM selector
-	map(0xfe80, 0xfe9f).rw(m_fdc, FUNC(bbc_fdc_slot_device::read), FUNC(bbc_fdc_slot_device::write));                 //    fe84-fe9f  8271 FDC       Floppy disc controller
+	map(0xfe80, 0xfe9f).rw(m_fdc, FUNC(bbc_fdc_slot_device::read), FUNC(bbc_fdc_slot_device::write));                 //    fe80-fe9f  8271 FDC       Floppy disc controller
 }
 
 
@@ -431,7 +431,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_START("COL8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ ~")                PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ \xC2\xA3")         PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR(0xA3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"_ £")              PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR(0xA3)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(": *")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] }")                PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
@@ -665,7 +665,7 @@ static INPUT_PORTS_START(torchi_keyboard)
 
 	PORT_START("COL5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 \xC2\xA3")         PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR(0xA3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"3 £")              PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR(0xA3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad +")           PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")                  PORT_CODE(KEYCODE_C)            PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
@@ -747,7 +747,7 @@ static INPUT_PORTS_START(torchi_keyboard)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")           PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_UP)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("# \xC2\xA3")         PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('#')      PORT_CHAR(0xA3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"# £")              PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('#')      PORT_CHAR(0xA3)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' @")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR('\'')     PORT_CHAR('@')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[')      PORT_CHAR('{')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)            PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -2905,10 +2905,10 @@ ROM_END
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT   CLASS        INIT       COMPANY            FULLNAME                              FLAGS */
 COMP ( 1981, bbcb,     0,      bbca,  bbcb,     bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,   0,     bbca,     bbca,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchf,   bbcb,   0,     torchf,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, bbcb_de,  bbcb,   0,     bbcb_de,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,   0,     bbcb_us,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1982, torchf,   bbcb,   0,     torchf,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1983, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1984, torch301, bbcb,   0,     torch301, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 301",                    MACHINE_NOT_WORKING)
 COMP ( 1984, torch725, bbcb,   0,     torch725, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 725",                    MACHINE_NOT_WORKING)
 COMP ( 1985, bbcbp,    0,      bbcb,  bbcbp,    bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS)

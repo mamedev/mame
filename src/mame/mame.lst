@@ -9237,6 +9237,7 @@ bingor2                         // (c) 2002 Unknown
 bingor3                         // (c) 2002 Unknown
 bingor4                         // (c) 2002 Unknown
 bingor5                         // (c) 2002 Unknown
+bingor6                         // (c) 1991 AWR Hard & Soft
 vip2000                         // (c) Paloma-Elektronik
 
 @source:bingowav.cpp
@@ -11567,7 +11568,8 @@ dblcrown                        // (c) 1994 Excellent System
 
 @source:dblewing.cpp
 dblewing                        // MBE (c) 1993 Mitchell
-dblewinga                       // MBE (c) 1994 Mitchell
+dblewinga                       // MBE (c) 1993 Mitchell
+dblewingb                       // MBE (c) 1994 Mitchell
 
 @source:dbox.cpp
 dbox                            // (c) 1996 Nokia Multimedia
@@ -14091,6 +14093,7 @@ armorcar                        // (c) 1981 Stern
 armorcar2                       // (c) 1981 Stern
 asideral                        // bootleg
 astrians                        //
+ataqandr                        // bootleg (FAR S.A.)
 atlantis                        // (c) 1981 Comsoft
 atlantis2                       // (c) 1981 Comsoft
 atlantisb                       // bootleg
@@ -14179,8 +14182,6 @@ moonaln                         // [Nichibutsu] (Karateco license) or hack
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
 sirio2                          // bootleg (Calfesa S.L.)
-sirio2a                         // bootleg (Calfesa S.L.)
-ataqandr                        // bootleg (FAR S.A.)
 mooncreg                        // bootleg
 mooncrgx                        // bootleg
 mooncrs2                        // bootleg
@@ -15789,6 +15790,7 @@ racedrivcb                      // 136077           (c) 1990
 racedrivcb4                     // 136077           (c) 1990
 racedrivcg                      // 136077           (c) 1990
 racedrivcg4                     // 136077           (c) 1990
+racedrivcp                      // 136077           (c) 1990
 racedrivg                       // 136077           (c) 1990
 racedrivg1                      // 136077           (c) 1990
 racedrivg4                      // 136077           (c) 1990
@@ -22652,9 +22654,10 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 dm3270                          //
 
 @source:microdar.cpp
-microdar                        //
+dibifuca                        //
 cfarwest                        // (c) 1997 Compumatic
 prospdp                         // (c) 1997 Compumatic
+diolakoa                        // (c) 1997 Compumatic
 
 @source:microdec.cpp
 md2                             //
@@ -23391,6 +23394,7 @@ m4chaseic                       //
 m4chaseid                       //
 m4chaseie                       //
 m4chaseif                       //
+m4chaseig                       //
 m4clbveg                        // Club Vegas (Barcrest)
 m4clbvega                       //
 m4clbvegb                       //
@@ -29022,7 +29026,6 @@ v4cmazedat                      //
 v4cshinf                        // Cash Inferno
 v4cshinfa
 v4cshinfb
-v4cshinfc
 v4cshinfd
 v4cshinfe
 v4cshinff
@@ -29039,9 +29042,9 @@ v4cshinfp
 v4cshinfq
 v4cshinfr
 v4cshinfs
-v4cshinft
+v4cshinf3
 v4cshinfu
-v4cshinfv
+v4cshinf3a
 v4cshinfw
 v4cybcas                        // Cyber Casino
 v4dbltak                        // Double Take
@@ -29112,15 +29115,13 @@ v4megbuk                        // Megabucks Poker
 v4megbuka
 v4megbukb
 v4megbukc
-v4miami                         // Miami Dice
+v4mdiceger                         // Miami Dice
 v4missis                        // Mississippi Lady
 v4monte                         // Monte Carlo Or Bust
 v4montea
-v4monteb
 v4montec
 v4monted
 v4montee
-v4montef
 v4monteg
 v4monteh
 v4montei
@@ -29341,7 +29342,12 @@ v4sunbstt
 v4sunbstu
 v4tetrs                         // BwB Tetris v 2.2
 v4tetrs1                        // BwB Tetris v 1.0
-v4time                          // Time Machine
+v4tmach                         // Time Machine
+v4tmachd
+v4tmach1
+v4tmach1d
+v4tmach2
+v4tmach2d
 v4timebn                        // Time Bandit
 v4timebna
 v4timebnb
@@ -29349,9 +29355,16 @@ v4timebnc
 v4timebnd
 v4timebne
 v4turnov                        // Turnover
+v4turnova
+v4turnovc
+v4turnovd
 v4vgpok                         // Vegas Poker (prototype release 2)
 v4wize                          // Wize Move (v1.3d)
-v4wizea                         // Wize Move
+v4wizen
+v4wizeb
+v4wizec
+v4wized
+v4wizeo                         // Wize Move
 
 @source:mpu5sw.cpp
 m55050                          // Fifty Fifty (Bwb)
@@ -32055,6 +32068,8 @@ lxcmcysw
 lxcmcyfz
 lxcmcydp
 lxcmcysp
+lxccminn
+lxccplan
 rtvgc300
 rtvgc300fz
 red5mam
@@ -32452,6 +32467,7 @@ sfortea1                        //
 sfortea2                        //
 sforteb                         //
 sfortec                         //
+sfortec1                        //
 
 @source:novag_supremo.cpp
 supremo
@@ -37520,7 +37536,8 @@ tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not 
 opwolf3                         // D74 (c) 1994 Taito Corporation Japan
 opwolf3j                        // D74 (c) 1994 Taito Corporation
 opwolf3u                        // D74 (c) 1994 Taito America Corporation
-slapshot                        // D71 (c) 1994 Taito Corporation (Japan)
+slapshot                        // D71 (c) 1994 Taito Corporation Japan (Ver 3.0 O)
+slapshotj                       // D71 (c) 1994 Taito Corporation (Ver 2.2 J)
 
 @source:slc1.cpp
 slc1                            //
@@ -37838,13 +37855,16 @@ spec128                         // 1986 ZX Spectrum 128
 specpls2                        // 1986 ZX Spectrum +2
 
 @source:special.cpp
+anakonda                        //
 erik                            //
+kharkovsky                      //
 lik                             //
 pioner                          //
 special                         //
 specialm                        //
 specialp                        //
 specimx                         //
+unga                            //
 
 @source:special_gambl.cpp
 dindice                         //

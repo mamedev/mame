@@ -27,9 +27,6 @@
         * QB-3
         * Space Ship
 
-    To do:
-        * look into bad sample latency
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -1549,7 +1546,7 @@ GAME(  1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init
 GAME(  1979, starhawk, 0,        starhawk, starhawk, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Hawk", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1979, sundance, 0,        sundance, sundance, cinemat_16level_state, init_sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_SUPPORTS_SAVE, layout_sundance )
 GAMEL( 1979, tailg,    0,        tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_SUPPORTS_SAVE, layout_tailg )
-GAMEL(  1979, warrior,  0,        warrior,  warrior,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", MACHINE_SUPPORTS_SAVE, layout_warrior )
+GAMEL( 1979, warrior,  0,        warrior,  warrior,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", MACHINE_SUPPORTS_SAVE, layout_warrior )
 GAMEL( 1980, armora,   0,        armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", MACHINE_SUPPORTS_SAVE, layout_armora )
 GAMEL( 1980, armorap,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", MACHINE_SUPPORTS_SAVE, layout_armora )
 GAMEL( 1980, armorar,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Rock-Ola license)", "Armor Attack (Rock-Ola)",  MACHINE_SUPPORTS_SAVE, layout_armora )

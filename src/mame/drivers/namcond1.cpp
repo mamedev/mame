@@ -352,7 +352,7 @@ INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 
 /******************************************
   ND-1 Master clock = 49.152MHz
-  - 680000  = 12288000 (CLK/4)
+  - 68000   = 12288000 (CLK/4)
   - H8/3002 = 16384000 (CLK/3)
   - The level 1 interrupt to the 68k has been measured at 60Hz.
 *******************************************/

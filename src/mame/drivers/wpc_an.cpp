@@ -7,15 +7,15 @@
         and pressing the start button, or else you get "PINBALL MISSING":
     W (right ball shooter, c6 r2)
     E (right trough, c6 r3)
-    [ (dummy jaw opto, c5 r1)
-    ] (right outlane, c5 r2)
-    \ (right slingshot kicker, c5 r3)
+    DEL (dummy jaw opto, c5 r1)
+    HOME (right outlane, c5 r2)
+    END (right slingshot kicker, c5 r3)
     It's possible not all of these are strictly necessary to make it work.
 
     TODO: replace the 8x8 pinball input matrix keymap by some sort of common
-    interface for the williams system 6, 9, 10, 11 and wpc_an;
+    interface for the Williams system 6, 9, 10, 11/a/b/c and WPC;
     while the actual purpose of the switches differ per machine (and some
-    machines like wpc_an have one switch permanently closed as a test switch),
+    machines like WPC have one switch permanently closed as a test switch),
     the entire matrix should be mapped to keyboard keys, there are more than
     enough keys on a 104 key keyboard to do it, even avoiding MAME's reserved
     keys.
@@ -23,7 +23,7 @@
     The A-13502 System11 BG sound adapter board (used by Dr. Dude WPC, and by
     the 200 or so prototype Funhouse machines):
     See https://www.ipdb.org/files/966/Williams_1990_Funhouse_Prototype_Manual_Addendum.pdf
-    The funhouse prototype manual addendum shows the A-13502 board connets to
+    The Funhouse prototype manual addendum shows the A-13502 board connects to
     the HDR 17X2 "I/O SOUND" connector as such:
      A4 A3 A2 A1 A0 WDEN R/W
       0  x  x  x  x    x   x   open bus
@@ -105,7 +105,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<s11c_bg_device> m_bg;  // only used with Dr. Dude
+	optional_device<s11c_bg_device> m_bg;  // only used w/ Dr. Dude and Funhouse Proto
 	optional_device<wpcsnd_device> m_wpcsnd;
 	required_memory_bank m_cpubank;
 	required_device<wpc_device> m_wpc;

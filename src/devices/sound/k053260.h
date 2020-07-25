@@ -81,7 +81,7 @@ private:
 		inline void key_off();
 		inline void play(stream_sample_t *outputs);
 		inline bool playing() { return m_playing; }
-		inline u8 read_rom();
+		inline u8 read_rom(bool side_effects);
 
 	private:
 		// pointer to owning device

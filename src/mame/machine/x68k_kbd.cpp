@@ -112,149 +112,149 @@ static INPUT_PORTS_START( x68k_keyboard )
 
 	PORT_START("LINE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED) // unused
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("ESC")                              PORT_CODE(KEYCODE_ESC)         PORT_CHAR(27)                     // Escape
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("1  !  \xE3\x81\xAC")               PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')     // 1 ! ぬ (nu)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("2  \"  \xE3\x81\xB5")              PORT_CODE(KEYCODE_2)           PORT_CHAR('2') PORT_CHAR('\"')    // 2 " ふ (fu)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("3  #  \xE3\x81\x82  \xE3\x81\x81") PORT_CODE(KEYCODE_3)           PORT_CHAR('3') PORT_CHAR('#')     // 3 # あ ぁ (a)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("4  $  \xE3\x81\x86  \xE3\x81\x85") PORT_CODE(KEYCODE_4)           PORT_CHAR('4') PORT_CHAR('$')     // 4 $ う ぅ (u)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("5  %  \xE3\x81\x88  \xE3\x81\x87") PORT_CODE(KEYCODE_5)           PORT_CHAR('5') PORT_CHAR('%')     // 5 % え ぇ (e)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("6  &  \xE3\x81\x8A  \xE3\x81\x89") PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('&')     // 6 & お ぉ (o)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"ESC")                   PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)                       // Escape
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"1  !  \u306c")          PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')       // 1 ! ぬ (nu)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"2  \"  \u3075")         PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('\"')      // 2 " ふ (fu)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"3  #  \u3042  \u3041")  PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')       // 3 # あ ぁ (a)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"4  $  \u3046  \u3045")  PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')       // 4 $ う ぅ (u)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"5  %  \u3048  \u3047")  PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')       // 5 % え ぇ (e)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"6  &  \u304a  \u3049")  PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')       // 6 & お ぉ (o)
 
 	PORT_START("LINE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("7  \'  \xE3\x82\x84  \xE3\x82\x83") PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')    // 7 ' や ゃ (ya)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("8  (  \xE3\x82\x86  \xE3\x82\x85")  PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')     // 8 ( ゆ ゅ (yu)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("9  )  \xE3\x82\x88  \xE3\x82\x87")  PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')     // 9 ) よ ょ (yo)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("0  \xE3\x82\x8F  \xE3\x82\x92")     PORT_CODE(KEYCODE_0)          PORT_CHAR('0')                    // 0 わ を (wa wo)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("-  =  \xE3\x81\xBB")                PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')     // - = ほ (ho)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("^  \xE3\x81\xB8")                   PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^')                    // ^ へ (he)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xC2\xA5  |  \xE3\x83\xBC")         PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\\') PORT_CHAR('|')    // Yen | ー (sound extension)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("BS")                                PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)                      // BS (backspace)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"7  \'  \u3084  \u3083") PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')      // 7 ' や ゃ (ya)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"8  (  \u3086  \u3085")  PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')       // 8 ( ゆ ゅ (yu)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"9  )  \u3088  \u3087")  PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')       // 9 ) よ ょ (yo)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"0  \u308f  \u3092")     PORT_CODE(KEYCODE_0)          PORT_CHAR('0')                      // 0 わ を (wa wo)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"-  =  \u307b")          PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')       // - = ほ (ho)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"^  \u3078")             PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^')                      // ^ へ (he)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"¥  |  \u30fc")          PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\\') PORT_CHAR('|')      // Yen | ー (sound extension)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"BS")                    PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)                        // BS (backspace)
 
 	PORT_START("LINE2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("TAB")                               PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)                      // TAB
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Q  \xE3\x81\x9F")                   PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')     // Q た (ta)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("W  \xE3\x81\xA6")                   PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')     // W て (te)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("E  \xE3\x81\x84  \xE3\x81\x83")     PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')     // E い ぃ (i)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("R  \xE3\x81\x99")                   PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')     // R す (su)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("T  \xE3\x81\x8B")                   PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')     // T か (ka)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Y  \xE3\x82\x93")                   PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')     // Y ん (n)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("U  \xE3\x81\xAA")                   PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')     // U な (na)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"TAB")                   PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)                        // TAB
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Q  \u305f")             PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')       // Q た (ta)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"W  \u3066")             PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')       // W て (te)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"E  \u3044  \u3043")     PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')       // E い ぃ (i)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"R  \u3059")             PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')       // R す (su)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"T  \u304b")             PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')       // T か (ka)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Y  \u3093")             PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')       // Y ん (n)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"U  \u306a")             PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')       // U な (na)
 
 	PORT_START("LINE3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("I  \xE3\x81\xAB")                   PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')     // I に (ni)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("O  \xE3\x82\x89")                   PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')     // O ら (ra)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("P  \xE3\x81\x9B")                   PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')     // P せ (se)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("@  `  \xE3\x82\x9B")                PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR('`')     // @ ` ゛ (dakuten)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("[  {  \xE3\x82\x9C \xE3\x80\x8C")   PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')     // [ { ゜ 「 (handakuten kagikakko)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )                                                 PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                     // Return
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("A  \xE3\x81\xA1")                   PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')     // A ち (chi)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("S  \xE3\x81\xA8")                   PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')     // S と (to)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"I  \u306b")             PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')       // I に (ni)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"O  \u3089")             PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')       // O ら (ra)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"P  \u305b")             PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')       // P せ (se)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"@  `  \u309b")          PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR('`')       // @ ` ゛ (dakuten)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"[  {  \u309c \u300c")   PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')       // [ { ゜ 「 (handakuten kagikakko)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )                                       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                       // Return
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"A  \u3061")             PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')       // A ち (chi)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"S  \u3068")             PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')       // S と (to)
 
 	PORT_START("LINE4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("D  \xE3\x81\x97")                   PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')     // D し (shi)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F  \xE3\x81\xAF")                   PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')     // F は (ha)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("G  \xE3\x81\x8D")                   PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')     // G き (ki)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("H  \xE3\x81\x8F")                   PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')     // H く (ku)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("J  \xE3\x81\xBE")                   PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')     // J ま (ma)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("K  \xE3\x81\xAE")                   PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')     // K の (no)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("L  \xE3\x82\x8A")                   PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')     // L り (ri)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(";  +  \xE3\x82\x8C")                PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')     // ; + れ (re)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"D  \u3057")             PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')       // D し (shi)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F  \u306f")             PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')       // F は (ha)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"G  \u304d")             PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')       // G き (ki)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"H  \u304f")             PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')       // H く (ku)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"J  \u307e")             PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')       // J ま (ma)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"K  \u306e")             PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')       // K の (no)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"L  \u308a")             PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')       // L り (ri)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8";  +  \u308c")          PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')       // ; + れ (re)
 
 	PORT_START("LINE5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(":  *  \xE3\x81\x91")                PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(':') PORT_CHAR('*')     // : *　け (ke)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("]  }  \xE3\x82\x80  \xE3\x80\x8D")  PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('}')     // ] } む 」 (mu kagikakko)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Z  \xE3\x81\xA4  \xE3\x81\xA3")     PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')     // Z つ っ (tsu)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("X  \xE3\x81\x95")                   PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')     // X さ (sa)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("C  \xE3\x81\x9D")                   PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')     // C そ (so)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("V  \xE3\x81\xB2")                   PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')     // V ひ (hi)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("B  \xE3\x81\x93")                   PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')     // B こ (ko)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("N  \xE3\x81\xBF")                   PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')     // N み (mi)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8":  *  \u3051")          PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(':') PORT_CHAR('*')       // : *　け (ke)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"]  }  \u3080  \u300d")  PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('}')       // ] } む 」 (mu kagikakko)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Z  \u3064  \u3063")     PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')       // Z つ っ (tsu)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"X  \u3055")             PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')       // X さ (sa)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"C  \u305d")             PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')       // C そ (so)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"V  \u3072")             PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')       // V ひ (hi)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"B  \u3053")             PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')       // B こ (ko)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"N  \u307f")             PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')       // N み (mi)
 
 	PORT_START("LINE6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("M  \xE3\x82\x82")                   PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')     // M も (mo)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(",  <  \xE3\x81\xAD  \xE3\x80\x81")  PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')     // , < ね 、 (ne comma)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(".  >  \xE3\x82\x8B  \xE3\x80\x82")  PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')     // . > る 。 (ru stop)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("/  ?  \xE3\x82\x81  \xE3\x83\xBB")  PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')     // / ? め ・ (me interpunct)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("_  \xE3\x82\x8D")                                                 PORT_CHAR('_')                    // Underscore (shifted only?) ろ (ro)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Space")                             PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')                    // Space
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("HOME")                              PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))    // HOME
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("DEL")                               PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))     // DEL
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"M  \u3082")             PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')       // M も (mo)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8",  <  \u306d  \u3001")  PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')       // , < ね 、 (ne comma)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8".  >  \u308b  \u3002")  PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')       // . > る 。 (ru stop)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"/  ?  \u3081  \u30fb")  PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')       // / ? め ・ (me interpunct)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"_  \u308d")                                           PORT_CHAR('_')                      // Underscore (shifted only?) ろ (ro)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Space")                 PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')                      // Space
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"HOME")                  PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))      // HOME
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"DEL")                   PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))       // DEL
 
 	PORT_START("LINE7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("ROLL UP")                           PORT_CODE(KEYCODE_PGUP)       PORT_CHAR(UCHAR_MAMEKEY(PGUP))    // ROLL UP
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("ROLL DOWN")                         PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(PGDN))    // ROLL DOWN
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("UNDO")                              PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(END))     // UNDO
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Left")                       PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))    // Left
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Up")                         PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))      // Up
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Right")                      PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))   // Right
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Down")                       PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))    // Down
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey CLR")                        PORT_CODE(KEYCODE_NUMLOCK)    PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) // CLR (clear)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"ROLL UP")               PORT_CODE(KEYCODE_PGUP)       PORT_CHAR(UCHAR_MAMEKEY(PGUP))      // ROLL UP
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"ROLL DOWN")             PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(PGDN))      // ROLL DOWN
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"UNDO")                  PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(END))       // UNDO
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Cursor Left")           PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))      // Left
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Cursor Up")             PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))        // Up
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Cursor Right")          PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))     // Right
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Cursor Down")           PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))      // Down
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey CLR")            PORT_CODE(KEYCODE_NUMLOCK)    PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))   // CLR (clear)
 
 	PORT_START("LINE8")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey /")                          PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // / (numpad)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey *")                          PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // * (numpad)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey -")                          PORT_CODE(KEYCODE_MINUS_PAD)  PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // - (numpad)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 7")                          PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))     // 7 (numpad)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 8")                          PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))     // 8 (numpad)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 9")                          PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))     // 9 (numpad)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey +")                          PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))  // + (numpad)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 4")                          PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))     // 4 (numpad)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey /")              PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // / (numpad)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey *")              PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // * (numpad)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey -")              PORT_CODE(KEYCODE_MINUS_PAD)  PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // - (numpad)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 7")              PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))     // 7 (numpad)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 8")              PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))     // 8 (numpad)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 9")              PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))     // 9 (numpad)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey +")              PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))  // + (numpad)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 4")              PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))     // 4 (numpad)
 
 	PORT_START("LINE9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 5")                          PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))     // 5 (numpad)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 6")                          PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))     // 6 (numpad)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey =")                                                                                            // = (numpad)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 1")                          PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))     // 1 (numpad)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 2")                          PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(2_PAD))     // 2 (numpad)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 3")                          PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))     // 3 (numpad)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey ENTER")                      PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // Enter (numpad)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 0")                          PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))     // 0 (numpad)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 5")              PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))     // 5 (numpad)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 6")              PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))     // 6 (numpad)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey =")                                                                                // = (numpad)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 1")              PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))     // 1 (numpad)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 2")              PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(2_PAD))     // 2 (numpad)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 3")              PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))     // 3 (numpad)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey ENTER")          PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // Enter (numpad)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey 0")              PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))     // 0 (numpad)
 
 	PORT_START("LINEA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey ,")                                                                                            // , (numpad)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey .")                          PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   // . (numpad)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE8\xA8\x98\xE5\x8F\xB7\xE5\x85\xA5\xE5\x8A\x9B (Symbol input)")                                     // 記号入力 (Kigou nyuuryoku - Symbol input)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE7\x99\xBB\xE9\x8C\xB2 (Register)")                                                                 // 登録 (Touroku - Register)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Help")                                                                                                // Help
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF1")                               PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))       // XF1
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF2")                               PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))       // XF2
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF3")                                                                                                 // XF3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey ,")                                                                                // , (numpad)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Tenkey .")              PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   // . (numpad)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u8a18\u53f7\u5165\u529b (Symbol input)")                                                 // 記号入力 (Kigou nyuuryoku - Symbol input)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u767b\u9332 (Register)")                                                                 // 登録 (Touroku - Register)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Help")                                                                                    // Help
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"XF1")                   PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))       // XF1
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"XF2")                   PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))       // XF2
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"XF3")                                                                                     // XF3
 
 	PORT_START("LINEB")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF4")                                                                                                 // XF4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF5")                               PORT_CODE(KEYCODE_RALT)                                           // XF5
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE3\x81\x8B\xE3\x81\xAA (Kana)")                                                                     // かな (Kana)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE3\x83\xAD\xE3\x83\xBC\xE3\x83\x9E\xE5\xAD\x97 (Romaji)")                                           // ローマ字 (Romaji)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE3\x82\xB3\xE3\x83\xBC\xE3\x83\x89\xE5\x85\xA5\xE5\x8A\x9B (Code input)")                           // コード入力 (Code nyuuryoku - Code input)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("CAPS")                              PORT_CODE(KEYCODE_CAPSLOCK)  PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))   // CAPS (Caps lock)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("INS")                               PORT_CODE(KEYCODE_INSERT)    PORT_CHAR(UCHAR_MAMEKEY(INSERT))     // INS (Insert)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE3\x81\xB2\xE3\x82\x89\xE3\x81\x8C\xE3\x81\xAA (Hiragana)") PORT_CODE(KEYCODE_LALT)                 // ひらがな (Hiragana)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"XF4")                                                                                     // XF4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"XF5")                   PORT_CODE(KEYCODE_RALT)                                           // XF5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u304b\u306a (Kana)")                                                                     // かな (Kana)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u30ed\u30fc\u30de\u5b57 (Romaji)")                                                       // ローマ字 (Romaji)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u30b3\u30fc\u30c9\u5165\u529b (Code input)")                                             // コード入力 (Code nyuuryoku - Code input)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"CAPS")                  PORT_CODE(KEYCODE_CAPSLOCK)  PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))   // CAPS (Caps lock)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"INS")                   PORT_CODE(KEYCODE_INSERT)    PORT_CHAR(UCHAR_MAMEKEY(INSERT))     // INS (Insert)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u3072\u3089\u304c\u306a (Hiragana)") PORT_CODE(KEYCODE_LALT)                             // ひらがな (Hiragana)
 
 	PORT_START("LINEC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE5\x85\xA8\xE8\xA7\x92 (Fullwidth)") PORT_CODE(KEYCODE_RCONTROL)                                    // 全角 (Zenkaku - Fullwidth)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Break")  /* Break */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Copy")  /* Copy */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F1")                                PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))        // F1
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F2")                                PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))        // F2
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F3")                                PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F3))        // F3
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F4")                                PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F4))        // F4
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F5")                                PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))        // F5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"\u5168\u89d2 (Fullwidth)") PORT_CODE(KEYCODE_RCONTROL)                                    // 全角 (Zenkaku - Fullwidth)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Break")                                                                                   // Break
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"Copy")                                                                                    // Copy
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F1")                    PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))        // F1
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F2")                    PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))        // F2
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F3")                    PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F3))        // F3
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F4")                    PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F4))        // F4
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F5")                    PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))        // F5
 
 	PORT_START("LINED")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F6")                                PORT_CODE(KEYCODE_F6)         PORT_CHAR(UCHAR_MAMEKEY(F6))        // F6
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F7")                                PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))        // F7
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F8")                                PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))        // F8
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F9")                                PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))        // F9
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F10")                               PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))       // F10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F6")                    PORT_CODE(KEYCODE_F6)         PORT_CHAR(UCHAR_MAMEKEY(F6))        // F6
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F7")                    PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))        // F7
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F8")                    PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))        // F8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F9")                    PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))        // F9
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"F10")                   PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))       // F10
 	// 0x6d reserved
 	// 0x6e reserved
 	// 0x6f reserved
 
 	PORT_START("LINEE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("SHIFT")   PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)            // Shift
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("CTRL")                              PORT_CODE(KEYCODE_LCONTROL)                                       // Control
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("OPT.1")                             PORT_CODE(KEYCODE_PRTSCR)                                         // Opt1
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("OPT.2")                             PORT_CODE(KEYCODE_PAUSE)                                          // Opt2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"SHIFT")  PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)  PORT_CHAR(UCHAR_SHIFT_1)    // Shift
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"CTRL")                  PORT_CODE(KEYCODE_LCONTROL)                                       // Control
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"OPT.1")                 PORT_CODE(KEYCODE_PRTSCR)                                         // Opt1
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(u8"OPT.2")                 PORT_CODE(KEYCODE_PAUSE)                                          // Opt2
 INPUT_PORTS_END
 
 ioport_constructor x68k_keyboard_device::device_input_ports() const

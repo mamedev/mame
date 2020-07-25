@@ -657,7 +657,7 @@ ROM_START( kingyoch )
 	// YATAIMURA
 	// KINGYOSUKUI EX
 	DISK_REGION( "cflash" )
-	DISK_IMAGE( "kingyo", 0, SHA1(f3685a0c6109b78f4812972b71bcec4ef9e9198f) )
+	DISK_IMAGE( "kingyo", 0, SHA1(f3685a0c6109b78f4812972b71bcec4ef9e9198f) ) // free space contain other game leftovers, presumable Issyouni Wan Wan, encrypted, key is 511248c2
 
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 

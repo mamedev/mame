@@ -323,7 +323,7 @@ void special_state::machine_reset()
 	else
 	if (m_bank4) // specimx
 	{
-		m_specimx_color = 0xb1;  // default for -bios 1/2, since they don't have colour
+		m_specimx_color = 0xF0;  // default for -bios 1/2, since they don't have colour
 		specimx_set_bank(2, 0); // Initial load ROM disk
 		timer_set(attotime::zero, TIMER_PIT8253_GATES);
 	}
