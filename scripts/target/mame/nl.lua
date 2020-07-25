@@ -31,6 +31,7 @@ CPUS["M680X0"] = true
 --CPUS["TMS9900"] = true
 --CPUS["COP400"] = true
 CPUS["F8"] = true
+CPUS["CCPU"] = true
 
 --------------------------------------------------
 -- Specify all the sound cores necessary for the
@@ -72,6 +73,7 @@ VIDEOS["PWM_DISPLAY"] = true
 MACHINES["INPUT_MERGER"] = true
 MACHINES["NETLIST"] = true
 MACHINES["Z80DMA"] = true
+MACHINES["Z80CTC"] = true
 MACHINES["Z80DAISY"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["AY31015"] = true
