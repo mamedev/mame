@@ -13,12 +13,10 @@ namespace netlist
 {
 namespace devices
 {
-	// ----------------------------------------------------------------------------------------
-	// netlistparams
-	// ----------------------------------------------------------------------------------------
 
-
+	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 	NETLIB_DEVICE_IMPL(nc_pin,              "NC_PIN",                 "")
+
 	NETLIB_DEVICE_IMPL(frontier,            "FRONTIER_DEV",           "+I,+G,+Q")
 	NETLIB_DEVICE_IMPL(function,            "AFUNC",                  "N,FUNC")
 	NETLIB_DEVICE_IMPL(analog_input,        "ANALOG_INPUT",           "IN")
@@ -39,7 +37,6 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")
 	NETLIB_DEVICE_IMPL(gnd,                 "GNDA",                   "")
-	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 
 	using NETLIB_NAME(logic_input8) = NETLIB_NAME(logic_inputN)<8>;
 	NETLIB_DEVICE_IMPL(logic_input8,         "LOGIC_INPUT8",            "IN,MODEL")

@@ -12,7 +12,7 @@
 
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
-#include "devices/nlid_system.h"
+#include "devices/nlid_system.h" // netlist_params
 #include "macro/nlm_base.h"
 #include "nl_base.h"
 

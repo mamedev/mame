@@ -42,7 +42,6 @@ namespace solver
 		const net_list_t &nets,
 		const solver_parameters_t *params)
 		: device_t(static_cast<device_t &>(main_solver), name)
-		, m_next_exec(*this, "m_next_exec", netlist_time_ext::zero())
 		, m_params(*params)
 		, m_iterative_fail(*this, "m_iterative_fail", 0)
 		, m_iterative_total(*this, "m_iterative_total", 0)

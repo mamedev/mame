@@ -271,8 +271,6 @@ namespace solver
 		// return number of floating point operations for solve
 		constexpr std::size_t ops() const { return m_ops; }
 
-		state_var<netlist_time_ext> m_next_exec;
-		std::size_t id = 0; // FIXME - testing
 	protected:
 		matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 			const net_list_t &nets,
