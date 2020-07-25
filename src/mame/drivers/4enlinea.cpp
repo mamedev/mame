@@ -679,11 +679,25 @@ ROM_START( 4enlinea )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cuatro_en_linea_27c256__cicplay-1.ic19", 0x0000, 0x8000, CRC(307a57a3) SHA1(241329d919ec43d0eeb1dad0a4db6cf6de06e7e1) )
 
-	ROM_REGION( 0x0800, "eeprom", 0 )   // default serial EEPROM
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default serial EEPROM
 	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x0000, 0x0800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x0000, 0x0117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
+ROM_END
+
+ROM_START( 4enlineb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cuatro_en_linea_2_a06.ic6",  0x0000, 0x8000, CRC(f8f14bf8) SHA1(e48fbedbd1b9be6fb56a0f65db80eddbedb487c7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "cuatro_en_linea_1_a06.ic19", 0x0000, 0x8000, CRC(993d0581) SHA1(d6e366dd827543508037d2071c4b6e638c2cf87b) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 ) // From an operated PCB, a clean one for default need to be created...
+	ROM_LOAD( "cuatro_en_linea_24c16.ic17", 0x0000, 0x0800, CRC(56722dd4) SHA1(f818d882b3070f9b1fac486987a044ab1d418985) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "cuatro_en_linea_gal16v8a.ic04", 0x0000, 0x0117, CRC(1edaf06c) SHA1(51e44c2e6b54991330d6ef945e98fa2c8a49408d) )
 ROM_END
 
 /* Kursaal K7 Olympic Darts PCB
@@ -747,7 +761,8 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-//    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY                                      FULLNAME              FLAGS
-GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic",                                "Cuatro en Linea",    MACHINE_NOT_WORKING )
-GAME( 1994, k7_olym,  0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal",                                "Olympic Darts (K7)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1993, sprtdart, 0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS            INIT        ROT   COMPANY                                      FULLNAME                       FLAGS
+GAME( 1991, 4enlinea, 0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)", MACHINE_NOT_WORKING )
+GAME( 1991, 4enlineb, 4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
+GAME( 1994, k7_olym,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal",                                "Olympic Darts (K7)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1993, sprtdart, 0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
