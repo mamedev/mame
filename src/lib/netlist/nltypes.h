@@ -14,10 +14,11 @@
 
 #include "nl_config.h"
 
-//#include "plib/pchrono.h"
 #include "plib/pstring.h"
 #include "plib/ptime.h"
 #include "plib/ptypes.h"
+#include "plib/ppmf.h"
+#include "plib/pmempool.h"
 
 #include <memory>
 
@@ -80,6 +81,7 @@ namespace netlist
 		struct abstract_t;
 		class core_terminal_t;
 		class net_t;
+		class device_object_t;
 	} // namespace detail
 
 	namespace factory
@@ -195,6 +197,22 @@ namespace netlist
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
+
+	/// \brief Timestep type.
+	///
+	/// May be either FORWARD or RESTORE
+	///
+	enum class timestep_type
+	{
+		FORWARD,  ///< forward time
+		RESTORE   ///< restore state before last forward
+	};
+
+	/// \brief Delegate type for device notification.
+	///
+	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	namespace detail {
 

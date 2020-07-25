@@ -38,7 +38,7 @@ Dumped games:                           ROMs:    Video:
 
 Sammy Kids Medal Series
 
-CPU     :   Kawasaki KL5C80A120FP (Z80 Compatible High Speed Microcontroller)
+CPU     :   Kawasaki KL5C80A12CFP (Z80 Compatible High Speed Microcontroller)
 Video   :   TAXAN KY-3211
 Sound   :   OKI M9810B
 NVRAM   :   93C46 and battery backed RAM
@@ -1362,7 +1362,6 @@ void sigmab98_state::animalc_map(address_map &map)
 	map(0x73000, 0x73021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
 	map(0x73011, 0x73011).nopw();  // IRQ Enable? Screen disable?
 	map(0x73013, 0x73013).rw(FUNC(sigmab98_state::vblank_r), FUNC(sigmab98_state::vblank_w));    // IRQ Ack?
-	map(0xffe00, 0xfffff).ram();   // High speed internal RAM
 }
 
 void sigmab98_state::animalc_io(address_map &map)
@@ -1393,7 +1392,6 @@ void sigmab98_state::gocowboy_map(address_map &map)
 	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x72800, 0x7287f).ram().share("vtable");
 	map(0x73000, 0x73021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
-	map(0xffe00, 0xfffff).ram();   // High speed internal RAM
 }
 
 
@@ -1474,7 +1472,6 @@ void sigmab98_state::haekaka_map(address_map &map)
 	map(0x72800, 0x7287f).ram().share("vtable");
 	map(0x73000, 0x73021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
 	map(0x73013, 0x73013).r(FUNC(sigmab98_state::haekaka_vblank_r));
-	map(0xffe00, 0xfffff).ram();   // High speed internal RAM
 }
 
 void sigmab98_state::haekaka_io(address_map &map)
@@ -1507,7 +1504,6 @@ void sigmab98_state::itazuram_map(address_map &map)
 	map(0x73000, 0x73021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
 	map(0x73011, 0x73011).nopw();  // IRQ Enable? Screen disable?
 	map(0x73013, 0x73013).r(FUNC(sigmab98_state::haekaka_vblank_r)).nopw();  // IRQ Ack?
-	map(0xffe00, 0xfffff).ram();   // High speed internal RAM
 }
 
 void sigmab98_state::itazuram_io(address_map &map)
@@ -1549,7 +1545,6 @@ void sigmab98_state::tdoboon_map(address_map &map)
 	map(0x72800, 0x7287f).ram().share("vtable");
 	map(0x73000, 0x73021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
 	map(0x73013, 0x73013).r(FUNC(sigmab98_state::haekaka_vblank_r));
-	map(0xffe00, 0xfffff).ram();   // High speed internal RAM
 }
 
 void sigmab98_state::tdoboon_io(address_map &map)
@@ -2018,7 +2013,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 
 void sigmab98_state::sammymdl(machine_config &config)
 {
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2);    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000));    // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::animalc_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::animalc_io);
 
@@ -2535,15 +2530,16 @@ void lufykzku_state::init_lufykzku()
 
   CPU:
 
-    KAWASAKI KL5C80A120FP (@U1) - Z80 Compatible High Speed Microcontroller
+    KAWASAKI KL5C80A12CFP (@U1) - Z80 Compatible High Speed Microcontroller
     XTAL 20 MHz  (@X1)
     MX29F040TC-12 VM1211L01 (@U2) - 4M-bit [512kx8] CMOS Equal Sector Flash Memory
     BSI BS62LV256SC-70      (@U4) - Very Low Power/Voltage CMOS SRAM 32K X 8 bit
+    (or Toshiba TC55257DFL-70L)
 
   Video:
 
-    TAXAN KY-3211 ? (@U17)
-    M548262-60 (@U18) - 262144-Word x 8-Bit Multiport DRAM
+    TAXAN KY-3211 (@U17)
+    OKI M548262-60 (@U18) - 262144-Word x 8-Bit Multiport DRAM
     XTAL 27 MHz (@X3)
 
   Sound:
@@ -2556,13 +2552,18 @@ void lufykzku_state::init_lufykzku()
   Other:
 
     Xilinx XC9536 VM1212F01 (@U5) - In-System Programmable CPLD
-    MX29F0??C (@U3) - Empty 32 Pin ROM Socket
+    MX29F0?TC (@U3) - Empty 32 Pin DIP Socket
     M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
-    M93C46MN6T (@U11?) - Serial EEPROM
+    M93C46MN6T (@U6) - Serial EEPROM
+    RTC8564 (@U7) - not populated
+    SN75C1168 (@U10) - Dual RS-422 Transceiver
     Cell Battery (@BAT)
     25 Pin Edge Connector
     56 Pin Cartridge Connector
-    6 Pin Connector
+    6 Pin Connector - +5V (1), GND (2), TCLK (3), TDO (4), TDI (5), TMS (6)
+
+  On Go Go Cowboy, U2 and U10 are unpopulated, but U3 is occupied by a
+  ST M27C4001-10F1 EPROM.
 
 ***************************************************************************/
 

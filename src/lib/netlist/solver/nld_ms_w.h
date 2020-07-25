@@ -60,10 +60,10 @@ namespace solver
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = 100;
 
-		matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
+		matrix_solver_w_t(devices::nld_solver &main_solver, const pstring &name,
 			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
+		: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params, size)
 		, m_cnt(0)
 		{
 			this->build_mat_ptr(m_A);

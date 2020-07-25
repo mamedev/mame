@@ -209,7 +209,8 @@ void kbdc8042_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	if (id == TIMER_UPDATE)
 	{
 		at_8042_check_keyboard();
-		at_8042_check_mouse();
+		if (m_mouse.on)
+			at_8042_check_mouse();
 	}
 }
 
@@ -277,7 +278,8 @@ uint8_t kbdc8042_device::data_r(offs_t offset)
 
 	case 4:
 		at_8042_check_keyboard();
-		at_8042_check_mouse();
+		if (m_mouse.on)
+			at_8042_check_mouse();
 
 		if (m_keyboard.received || m_mouse.received)
 			data |= 1;
@@ -321,7 +323,7 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 		switch (m_operation_write_state) {
 		case 0:
 			m_data = data;
-			m_sending=1;
+			m_sending = 1;
 			m_keyboard_dev->write(data);
 			break;
 

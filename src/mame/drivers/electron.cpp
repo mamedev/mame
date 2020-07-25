@@ -342,32 +342,27 @@ void electronsp_state::electronsp(machine_config &config)
 
 
 ROM_START(electron)
-	ROM_REGION( 0x4000, "mos", 0 )
-	ROM_LOAD( "b02_acornos-1.rom", 0x0000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) )
-	ROM_REGION( 0x4000, "basic", 0 )
-	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+	ROM_REGION( 0x8000, "mos", 0 )
+	ROM_LOAD( "os_basic.ic2", 0x0000, 0x8000, CRC(b997f9cb) SHA1(4a66c83aba07d0a8e76ed8a5545af04e11c19fdc) )
 ROM_END
 
 ROM_START(electront)
-	ROM_REGION( 0x4000, "mos",  0 )
+	ROM_REGION( 0x8000, "mos",  0 )
 	/* Serial 06-ALA01-0000087 from Centre for Computing History */
-	ROM_LOAD( "elk_036.rom", 0x0000, 0x4000, CRC(dd1a99c3) SHA1(87ee1b14895e476909dd002d5ca2346a3a5f3f57) )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+	ROM_LOAD( "elk_036.rom", 0x4000, 0x4000, CRC(dd1a99c3) SHA1(87ee1b14895e476909dd002d5ca2346a3a5f3f57) )
 ROM_END
 
 ROM_START(electron64)
-	ROM_REGION( 0x4000, "mos", 0 )
-	ROM_LOAD( "os_300.rom", 0x0000, 0x4000, CRC(f80a0cea) SHA1(165e42ff4164a842e56f08ebd420d5027af99fdd) )
-	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_REGION( 0x8000, "mos", 0 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+	ROM_LOAD( "os_300.rom", 0x4000, 0x4000, CRC(f80a0cea) SHA1(165e42ff4164a842e56f08ebd420d5027af99fdd) )
 ROM_END
 
 ROM_START(electronsp)
-	ROM_REGION( 0x4000, "mos", 0 )
-	ROM_LOAD( "os_310.rom", 0x0000, 0x4000, CRC(8b7a9003) SHA1(6d4e2f8ddc1d829b14206d2747749c4c24789568) )
-	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_REGION( 0x8000, "mos", 0 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+	ROM_LOAD( "os_310.rom", 0x4000, 0x4000, CRC(8b7a9003) SHA1(6d4e2f8ddc1d829b14206d2747749c4c24789568) )
 	ROM_REGION( 0x8000, "sp64", 0 )
 	ROM_SYSTEM_BIOS( 0, "101_2", "v1.01 (2x16K)" )
 	ROMX_LOAD( "sp64_101_1.rom", 0x0000, 0x4000, CRC(07e2c5d6) SHA1(837e3382c376e3cc1ae42f1ca51158657ef2fd73), ROM_BIOS(0) )

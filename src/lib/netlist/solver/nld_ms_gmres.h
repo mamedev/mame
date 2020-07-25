@@ -34,11 +34,11 @@ namespace solver
 		// maximize the efficiency of the incomplete LUT.
 		// This is already preconditioning.
 
-		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name,
+		matrix_solver_GMRES_t(devices::nld_solver &main_solver, const pstring &name,
 			matrix_solver_t::net_list_t &nets,
-			const solver_parameters_t *params,
+			const solver::solver_parameters_t *params,
 			const std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
+			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params, size)
 			, m_ops(size, 0)
 			, m_gmres(size)
 			{

@@ -1553,16 +1553,6 @@ void setup_t::prepare_to_run()
 	}
 
 	int errcnt(0);
-	log().debug("Looking for unknown parameters ...\n");
-	for (auto &p : m_abstract.m_param_values)
-	{
-		auto f = m_params.find(p.first);
-		if (f == m_params.end())
-		{
-			log().error(ME_UNKNOWN_PARAMETER(p.first));
-			errcnt++;
-		}
-	}
 
 	const bool use_deactivate = m_netlist_params->m_use_deactivate();
 
@@ -1626,6 +1616,23 @@ void setup_t::prepare_to_run()
 	}
 	else
 		solver->post_start();
+
+	errcnt = 0;
+	log().debug("Looking for unknown parameters ...\n");
+	for (auto &p : m_abstract.m_param_values)
+	{
+		auto f = m_params.find(p.first);
+		if (f == m_params.end())
+		{
+			log().error(ME_UNKNOWN_PARAMETER(p.first));
+			errcnt++;
+		}
+	}
+	if (errcnt > 0)
+	{
+		log().fatal(MF_ERRORS_FOUND(errcnt));
+		throw nl_exception(MF_ERRORS_FOUND(errcnt));
+	}
 
 	for (auto &n : m_nlstate.nets())
 		for (auto & term : n->core_terms())

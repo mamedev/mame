@@ -46,6 +46,8 @@ namespace netlist
 			m_sem_r.acquire();
 		}
 
+		PCOPYASSIGNMOVE(NETLIB_NAME(log), delete)
+
 		NETLIB_DESTRUCTOR(log)
 		{
 			if (m_reset)

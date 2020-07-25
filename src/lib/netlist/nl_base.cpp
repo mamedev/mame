@@ -12,7 +12,7 @@
 
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
-#include "devices/nlid_system.h"
+#include "devices/nlid_system.h" // netlist_params
 #include "macro/nlm_base.h"
 #include "nl_base.h"
 
@@ -35,45 +35,6 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 	// queue_t
 	// ----------------------------------------------------------------------------------------
-
-	detail::queue_t::queue_t(netlist_t &nl, const pstring &name)
-		: timed_queue<plib::pqentry_t<netlist_time_ext, net_t *>, false>(config::MAX_QUEUE_SIZE::value)
-		, netlist_object_t(nl, name)
-		, m_qsize(0)
-		, m_times(config::MAX_QUEUE_SIZE::value)
-		, m_net_ids(config::MAX_QUEUE_SIZE::value)
-	{
-	}
-
-	void detail::queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
-	{
-		//state().log().debug("register_state\n");
-		manager.save_item(this, m_qsize, module + "." + "qsize");
-		manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
-		manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
-	}
-
-	void detail::queue_t::on_pre_save(plib::state_manager_t &manager)
-	{
-		plib::unused_var(manager);
-		m_qsize = this->size();
-		for (std::size_t i = 0; i < m_qsize; i++ )
-		{
-			m_times[i] =  this->listptr()[i].exec_time().as_raw();
-			m_net_ids[i] = state().find_net_id(this->listptr()[i].object());
-		}
-	}
-
-	void detail::queue_t::on_post_load(plib::state_manager_t &manager)
-	{
-		plib::unused_var(manager);
-		this->clear();
-		for (std::size_t i = 0; i < m_qsize; i++ )
-		{
-			detail::net_t *n = state().nets()[m_net_ids[i]].get();
-			this->push<false>(queue_t::entry_t(netlist_time_ext::from_raw(m_times[i]),n));
-		}
-	}
 
 	// ----------------------------------------------------------------------------------------
 	// device_object_t
@@ -101,6 +62,30 @@ namespace netlist
 		//return terminal_type::TERMINAL; // please compiler
 	}
 
+	netlist_state_t &detail::device_object_t::state() noexcept
+	{
+		return m_device->state();
+	}
+
+	const netlist_state_t &detail::device_object_t::state() const noexcept
+	{
+		return m_device->state();
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// netlist_object_t
+	// ----------------------------------------------------------------------------------------
+
+	netlist_state_t & detail::netlist_object_t::state() noexcept
+	{
+		return m_netlist.nlstate();
+	}
+
+	const netlist_state_t & detail::netlist_object_t::state() const noexcept
+	{
+		return m_netlist.nlstate();
+	}
+
 	// ----------------------------------------------------------------------------------------
 	// netlist_t
 	// ----------------------------------------------------------------------------------------
@@ -110,7 +95,9 @@ namespace netlist
 		, m_solver(nullptr)
 		, m_time(netlist_time_ext::zero())
 		, m_mainclock(nullptr)
-		, m_queue(*this, aname + "." + "m_queue")
+		, m_queue(config::MAX_QUEUE_SIZE::value,
+			detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
+			detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
 		, m_use_stats(false)
 	{
 		state.save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), aname, "m_queue");
@@ -174,6 +161,10 @@ namespace netlist
 			if (m_nets[i].get() == net)
 				return i;
 		return std::numeric_limits<std::size_t>::max();
+	}
+	detail::net_t *netlist_state_t::net_by_id(std::size_t id) const
+	{
+		return m_nets[id].get();
 	}
 
 	void netlist_state_t::rebuild_lists()
@@ -700,14 +691,6 @@ namespace netlist
 	, m_gt(nullptr)
 	{
 		state().setup().register_term(*this, *otherterm);
-	}
-
-	void terminal_t::solve_now() const
-	{
-		const auto *solv(solver());
-		// Nets may belong to railnets which do not have a solver attached
-		if (solv != nullptr)
-				solver()->solve_now();
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)

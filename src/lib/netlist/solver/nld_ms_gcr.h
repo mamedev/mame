@@ -35,10 +35,10 @@ namespace solver
 		using base_type = matrix_solver_ext_t<FT, SIZE>;
 		using fptype = typename base_type::fptype;
 
-		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
+		matrix_solver_GCR_t(devices::nld_solver &main_solver, const pstring &name,
 			const matrix_solver_t::net_list_t &nets,
-			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
+			const solver::solver_parameters_t *params, const std::size_t size)
+		: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params, size)
 		, mat(static_cast<typename mat_type::index_type>(size))
 		, m_proc()
 		{
@@ -86,10 +86,10 @@ namespace solver
 				this->m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
 			}
 
-			anetlist.log().verbose("maximum fill: {1}", gr.first);
-			anetlist.log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
+			this->state().log().verbose("maximum fill: {1}", gr.first);
+			this->state().log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
 					static_cast<fptype>(mat.nz_num) / static_cast<fptype>(iN * iN));
-			anetlist.log().verbose(" Pre elimination occupancy ratio: {2}",
+			this->state().log().verbose(" Pre elimination occupancy ratio: {1}",
 					static_cast<fptype>(raw_elements) / static_cast<fptype>(iN * iN));
 
 			// FIXME: Move me
@@ -98,17 +98,17 @@ namespace solver
 			// During extended validation there is no reason to check for
 			// differences in the generated code since during
 			// extended validation this will be different (and non-functional)
-			if (!anetlist.is_extended_validation() && anetlist.lib().isLoaded())
+			if (!this->state().is_extended_validation() && this->state().lib().isLoaded())
 			{
 				pstring symname = static_compile_name();
-				m_proc.load(anetlist.lib(), symname);
+				m_proc.load(this->state().lib(), symname);
 				if (m_proc.resolved())
 				{
-					anetlist.log().info("External static solver {1} found ...", symname);
+					this->state().log().info("External static solver {1} found ...", symname);
 				}
 				else
 				{
-					anetlist.log().warning("External static solver {1} not found ...", symname);
+					this->state().log().warning("External static solver {1} not found ...", symname);
 				}
 			}
 		}
@@ -140,6 +140,9 @@ namespace solver
 		const std::size_t iN = this->size();
 		pstring fptype(fp_constants<FT>::name());
 		pstring fpsuffix(fp_constants<FT>::suffix());
+
+		// avoid unused variable warnings
+		strm("\tplib::unused_var({1});\n", "cnV");
 
 		for (std::size_t i = 0; i < mat.nz_num; i++)
 			strm("\t{1} m_A{2}(0.0);\n", fptype, i, i);

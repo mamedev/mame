@@ -96,11 +96,11 @@ namespace analog
 		void solve_now() const;
 
 		template <typename F>
-		void change_state(F f, netlist_time delay = netlist_time::quantum()) const
+		void change_state(F f) const
 		{
 			auto *solv(solver());
 			if (solv)
-				solv->change_state(f, delay);
+				solv->change_state(f);
 		}
 
 		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept

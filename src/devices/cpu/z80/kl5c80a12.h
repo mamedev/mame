@@ -1,15 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,AJR
+// copyright-holders:AJR
 /***************************************************************************
 
-    Kawasaki LSI
-    KL5C80A12 CPU (KL5C80A12CFP on hng64.c)
-
-    Binary compatible with Z80, significantly faster opcode timings, operating at up to 10Mhz
-    Timers / Counters, Parallel / Serial ports/ MMU, Interrupt Controller
-
-    (is this different enough to need it's own core?)
-    (todo: everything, some code currently lives in machine/hng64_net.c but not much)
+    Kawasaki Steel (Kawatetsu) KL5C80A12 CPU
 
 ***************************************************************************/
 
@@ -19,17 +12,11 @@
 #pragma once
 
 #include "z80.h"
-#include "machine/z80ctc.h"
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class kl5c80a12_device : public z80_device
 {
@@ -49,6 +36,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
+	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
+
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
@@ -61,7 +52,9 @@ protected:
 	virtual u16 arg16() override;
 
 private:
+	void internal_ram(address_map &map);
 	void internal_io(address_map &map);
+
 	void mmu_remap_pages();
 	u8 mmu_r(offs_t offset);
 	void mmu_w(offs_t offset, u8 data);

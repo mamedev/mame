@@ -37,8 +37,7 @@ namespace netlist { namespace devices {
 						m_R.set_R(m_base_r());
 					else
 						m_R.set_R(plib::reciprocal(exec().gmin()));
-				}
-				, NLTIME_FROM_NS(1));
+				});
 		}
 
 	private:
