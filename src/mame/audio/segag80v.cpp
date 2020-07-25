@@ -88,8 +88,8 @@ void segag80_audio_device::write(offs_t addr, uint8_t data)
 		if (BIT((data ^ oldvals), bit) != 0)
 		{
 			attotime time = machine().scheduler().time();
-			fprintf(m_logfile, "%s,I_%s_%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
-			printf("%s,I_%s_%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
+			fprintf(m_logfile, "%s,I_%s_D%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
+			printf("%s,I_%s_D%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
 		}
 #endif
 	}
