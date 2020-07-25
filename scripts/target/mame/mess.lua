@@ -860,6 +860,7 @@ BUSES["ISBX"] = true
 BUSES["JAKKS_GAMEKEY"] = true
 BUSES["HP80_IO"] = true
 BUSES["HP9845_IO"] = true
+BUSES["HP_IPC_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
 BUSES["M5"] = true
