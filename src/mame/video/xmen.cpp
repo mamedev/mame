@@ -95,7 +95,7 @@ uint32_t xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bit
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
+	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 	return 0;
@@ -104,14 +104,12 @@ uint32_t xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bit
 
 uint32_t xmen_state::screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for(y = 0; y < 32 * 8; y++)
+	for(int y = 0; y < 32 * 8; y++)
 	{
 		uint16_t* line_dest = &bitmap.pix16(y);
 		uint16_t* line_src = &m_screen_left->pix16(y);
 
-		for (x = 12 * 8; x < 52 * 8; x++)
+		for (int x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];
 	}
 
@@ -120,14 +118,12 @@ uint32_t xmen_state::screen_update_xmen6p_left(screen_device &screen, bitmap_ind
 
 uint32_t xmen_state::screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for(y = 0; y < 32 * 8; y++)
+	for(int y = 0; y < 32 * 8; y++)
 	{
 		uint16_t* line_dest = &bitmap.pix16(y);
 		uint16_t* line_src = &m_screen_right->pix16(y);
 
-		for (x = 12 * 8; x < 52 * 8; x++)
+		for (int x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];
 	}
 
@@ -143,62 +139,27 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 		int layer[3], bg_colorbase;
 		bitmap_ind16 * renderbitmap;
 		rectangle cliprect;
-		int offset;
 
-	//  const rectangle *visarea = m_screen->visible_area();
-	//  cliprect = *visarea;
-
+		// const rectangle *visarea = m_screen->visible_area();
+		// cliprect = *visarea;
 		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
+		int index = m_screen->frame_number() & 1;
+		renderbitmap = index ? m_screen_right.get() : m_screen_left.get();
 
-		if (m_screen->frame_number() & 0x01)
+		/* copy the desired spritelist to the chip */
+		memcpy(m_k053247_ram, m_xmen6p_spriteram[index], 0x1000);
+
+		/* we write the entire content of the tileram to the chip to ensure
+		   everything gets marked as dirty and the desired tilemap is rendered
+		   this is not very efficient!
+		*/
+		index += m_xmen6p_tilemap_select ? 2 : 0;
+		for (int offset = 0; offset < (0xc000 / 2); offset++)
 		{
-			/* copy the desired spritelist to the chip */
-			memcpy(m_k053247_ram, m_xmen6p_spriteramright, 0x1000);
-
-			/* we write the entire content of the tileram to the chip to ensure
-			   everything gets marked as dirty and the desired tilemap is rendered
-			   this is not very efficient!
-			   */
-			for (offset = 0; offset < (0xc000 / 2); offset++)
-			{
-				if (offset != 0x1c80 && offset != 0x1e80)
-				{
-					if (m_xmen6p_tilemap_select)
-						m_k052109->write(offset, m_xmen6p_tilemaprightalt[offset] & 0x00ff);
-					else
-						m_k052109->write(offset, m_xmen6p_tilemapright[offset] & 0x00ff);
-				}
-			}
-
-			renderbitmap = m_screen_right.get();
+			if (index == 0 || (offset != 0x1c80 && offset != 0x1e80))
+				m_k052109->write(offset, m_xmen6p_tilemap[index][offset] & 0x00ff);
 		}
-		else
-		{
-			/* copy the desired spritelist to the chip */
-			memcpy(m_k053247_ram, m_xmen6p_spriteramleft, 0x1000);
-
-			/* we write the entire content of the tileram to the chip to ensure
-			   everything gets marked as dirty and the desired tilemap is rendered
-
-			   this is not very efficient!
-			   */
-			for (offset = 0; offset < (0xc000 / 2); offset++)
-			{
-				{
-					if (m_xmen6p_tilemap_select)
-					{
-						if (offset != 0x1c80 && offset != 0x1e80)
-							m_k052109->write(offset, m_xmen6p_tilemapleftalt[offset] & 0x00ff);
-					}
-					else
-						m_k052109->write(offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
-				}
-			}
-
-			renderbitmap = m_screen_left.get();
-		}
-
 
 		bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
 		m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
@@ -224,8 +185,8 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[1], 0, 2);
 		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[2], 0, 4);
 
-	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
+		/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
 	    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-		m_k053246->k053247_sprites_draw( *renderbitmap, cliprect);
+		m_k053246->k053247_sprites_draw(*renderbitmap, cliprect);
 	}
 }
