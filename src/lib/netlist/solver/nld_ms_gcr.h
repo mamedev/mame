@@ -89,7 +89,7 @@ namespace solver
 			this->state().log().verbose("maximum fill: {1}", gr.first);
 			this->state().log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
 					static_cast<fptype>(mat.nz_num) / static_cast<fptype>(iN * iN));
-			this->state().log().verbose(" Pre elimination occupancy ratio: {2}",
+			this->state().log().verbose(" Pre elimination occupancy ratio: {1}",
 					static_cast<fptype>(raw_elements) / static_cast<fptype>(iN * iN));
 
 			// FIXME: Move me
