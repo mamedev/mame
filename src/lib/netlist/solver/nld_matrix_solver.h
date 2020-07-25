@@ -197,7 +197,7 @@ namespace solver
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.
 
-		netlist_time solve(netlist_time_ext now);
+		netlist_time solve(netlist_time_ext now, const char *source);
 		void update_inputs();
 
 		/// \brief Checks if solver may alter a net
@@ -211,6 +211,12 @@ namespace solver
 		std::size_t dynamic_device_count() const noexcept { return m_dynamic_funcs.size(); }
 		std::size_t timestep_device_count() const noexcept { return m_step_funcs.size(); }
 
+		/// \brief reschedule solver execution
+		///
+		/// Calls reschedule on main solver
+		///
+		void reschedule(netlist_time ts);
+
 		/// \brief Immediately solve system at current time
 		///
 		/// This should only be called from update and update_param events.
@@ -221,47 +227,35 @@ namespace solver
 			// this should only occur outside of execution and thus
 			// using time should be safe.
 
-			const netlist_time new_timestep = solve(exec().time());
+			const netlist_time new_timestep = solve(exec().time(), "solve_now");
 			plib::unused_var(new_timestep);
 
 			update_inputs();
 
 			if (m_params.m_dynamic_ts && (timestep_device_count() != 0))
 			{
-				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_timestep));
+				this->reschedule(netlist_time::from_fp(m_params.m_min_timestep));
 			}
 		}
 
 		template <typename F>
-		void change_state(F f, netlist_time delay = netlist_time::quantum())
+		void change_state(F f)
 		{
 			// We only need to update the net first if this is a time stepping net
 			if (timestep_device_count() > 0)
 			{
-				const netlist_time new_timestep = solve(exec().time());
+				const netlist_time new_timestep = solve(exec().time(), "change_state");
 				plib::unused_var(new_timestep);
 				update_inputs();
 			}
 			f();
-			if ((delay == netlist_time::quantum()) && (timestep_device_count() > 0))
+			if (timestep_device_count() > 0)
 			{
 				PFDEBUG(printf("here2\n");)
-				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_ts_ts()));
+				this->reschedule(netlist_time::from_fp(m_params.m_min_ts_ts()));
 			}
 			else
-				m_Q_sync.net().toggle_and_push_to_queue(delay);
-		}
-
-		NETLIB_HANDLERI(fb_sync)
-		{
-			PFDEBUG(printf("update\n");)
-			const netlist_time new_timestep = solve(exec().time());
-			update_inputs();
-
-			if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
-			{
-				m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
-			}
+				this->reschedule(netlist_time::quantum());
 		}
 
 		NETLIB_RESETI();
@@ -277,6 +271,8 @@ namespace solver
 		// return number of floating point operations for solve
 		constexpr std::size_t ops() const { return m_ops; }
 
+		state_var<netlist_time_ext> m_next_exec;
+		std::size_t id = 0; // FIXME - testing
 	protected:
 		matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 			const net_list_t &nets,
@@ -288,6 +284,14 @@ namespace solver
 		virtual void store() = 0;
 		virtual void backup() = 0;
 		virtual void restore() = 0;
+
+		std::size_t max_railstart() const noexcept
+		{
+			std::size_t max_rail = 0;
+			for (std::size_t k = 0; k < m_terms.size(); k++)
+				max_rail = std::max(max_rail, m_terms[k].railstart());
+			return max_rail;
+		}
 
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_gonn;
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_gtn;
@@ -338,9 +342,6 @@ namespace solver
 		plib::aligned_vector<nldelegate_ts> m_step_funcs;
 		plib::aligned_vector<nldelegate_dyn> m_dynamic_funcs;
 		plib::aligned_vector<device_arena::unique_ptr<proxied_analog_output_t>> m_inps;
-
-		logic_input_t m_fb_sync;
-		logic_output_t m_Q_sync;
 
 		std::size_t m_ops;
 

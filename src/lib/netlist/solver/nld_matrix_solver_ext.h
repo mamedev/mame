@@ -56,15 +56,6 @@ namespace solver
 		//PALIGNAS_VECTOROPT() parrays define alignment already
 		plib::pmatrix2d<float_type *> m_mat_ptr;
 
-		std::size_t max_railstart() const noexcept
-		{
-			std::size_t max_rail = 0;
-			for (std::size_t k = 0; k < m_terms.size(); k++)
-				max_rail = std::max(max_rail, m_terms[k].railstart());
-			return max_rail;
-		}
-
-
 		template <typename T, typename M>
 		void log_fill(const T &fill, M &mat)
 		{

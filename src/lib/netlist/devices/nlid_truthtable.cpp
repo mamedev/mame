@@ -193,8 +193,8 @@ namespace devices
 		}
 
 
-		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
-		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
+		plib::static_vector<logic_input_t, m_NI> m_I;
+		plib::static_vector<logic_output_t, m_NO> m_Q;
 
 #if USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
@@ -389,7 +389,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
-			m_I.emplace(i, *this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
+			m_I.emplace_back(*this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
 		}
 #else
 		for (std::size_t i=0; i < m_NI; i++)
@@ -412,7 +412,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NO; i++)
 		{
 			outputs[i] = plib::trim(outputs[i]);
-			m_Q.emplace(i, *this, outputs[i]);
+			m_Q.emplace_back(*this, outputs[i]);
 			// Connect output "Q" to input "_Q" if this exists
 			// This enables timed state without having explicit state ....
 			pstring tmp = "_" + outputs[i];

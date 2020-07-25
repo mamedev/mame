@@ -17,6 +17,7 @@
 #include "nld_ms_w.h"
 #include "nld_solver.h"
 #include "plib/pomp.h"
+#include "plib/ptimed_queue.h"
 
 #include <algorithm>
 #include <type_traits>
@@ -32,8 +33,12 @@ namespace devices
 
 	NETLIB_RESET(solver)
 	{
+		if (exec().use_stats())
+			m_fb_step.set_delegate(NETLIB_DELEGATE(fb_step<true>));
 		for (auto &s : m_mat_solvers)
 			s->reset();
+		for (auto &s : m_mat_solvers)
+			m_queue.push<false>({netlist_time_ext::zero(), s.get()});
 	}
 
 	void NETLIB_NAME(solver)::stop()
@@ -42,6 +47,91 @@ namespace devices
 			s->log_stats();
 	}
 
+#if 1
+
+	template<bool KEEP_STATS>
+	NETLIB_HANDLER(solver, fb_step)
+	{
+		const netlist_time_ext now(exec().time());
+		const std::size_t nthreads = m_params.m_parallel() < 2 ? 1 : std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
+		const netlist_time_ext sched(now + (nthreads <= 1 ? netlist_time_ext::zero() : netlist_time_ext::from_usec(100)));
+		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp;
+		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt;
+		std::size_t p=0;
+
+		while (m_queue.size() > 0)
+		{
+			auto t = m_queue.top().exec_time();
+			auto o = m_queue.top().object();
+			if (t != now)
+				if (t > sched)
+					break;
+			tmp[p++] = o;
+			m_queue.pop();
+		}
+
+		// FIXME: Disabled for now since parallel processing will decrease performance
+		//        for tested applications. More testing required here
+		if (1 || nthreads < 2)
+		{
+			if (!KEEP_STATS)
+			{
+				for (std::size_t i = 0; i < p; i++)
+						nt[i] = tmp[i]->solve(now, "no-parallel");
+			}
+			else
+			{
+				stats()->m_stat_total_time.pause();
+				for (std::size_t i = 0; i < p; i++)
+				{
+					tmp[i]->stats()->m_stat_call_count.inc();
+					auto g(tmp[i]->stats()->m_stat_total_time.guard());
+					nt[i] = tmp[i]->solve(now, "no-parallel");
+				}
+				stats()->m_stat_total_time.cont();
+			}
+
+			for (std::size_t i = 0; i < p; i++)
+			{
+				if (nt[i] != netlist_time::zero())
+					m_queue.push<false>({now + nt[i], tmp[i]});
+				tmp[i]->update_inputs();
+			}
+		}
+		else
+		{
+			plib::omp::set_num_threads(nthreads);
+			plib::omp::for_static(static_cast<std::size_t>(0), p, [&tmp, &nt,now](std::size_t i)
+				{
+					nt[i] = tmp[i]->solve(now, "parallel");
+				});
+			for (std::size_t i = 0; i < p; i++)
+			{
+				if (nt[i] != netlist_time::zero())
+					m_queue.push<false>({now + nt[i], tmp[i]});
+				tmp[i]->update_inputs();
+			}
+		}
+		if (m_queue.size() > 0)
+			m_Q_step.net().toggle_and_push_to_queue(m_queue.top().exec_time() - now);
+	}
+
+	void NETLIB_NAME(solver) :: reschedule(solver::matrix_solver_t *solv, netlist_time ts)
+	{
+		const netlist_time_ext now(exec().time());
+		const netlist_time_ext sched(now + ts);
+		m_queue.remove<false>(solv);
+		m_queue.push<false>({sched, solv});
+
+		if (m_Q_step.net().is_queued())
+		{
+			if (m_Q_step.net().next_scheduled_time() > sched)
+				m_Q_step.net().toggle_and_push_to_queue(ts);
+		}
+		else
+			m_Q_step.net().toggle_and_push_to_queue(ts);
+	}
+#else
 	NETLIB_HANDLER(solver, fb_step)
 	{
 		if (m_params.m_dynamic_ts)
@@ -54,26 +144,26 @@ namespace devices
 
 		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 
-		std::vector<solver::matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
+		std::vector<solver_entry *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
 
 		if (nthreads > 1 && solvers.size() > 1)
 		{
 			plib::omp::set_num_threads(nthreads);
 			plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [&solvers, now](std::size_t i)
 				{
-					const netlist_time ts = solvers[i]->solve(now);
+					const netlist_time ts = solvers[i]->ptr->solve(now);
 					plib::unused_var(ts);
 				});
 		}
 		else
 			for (auto & solver : solvers)
 			{
-				const netlist_time ts = solver->solve(now);
+				const netlist_time ts = solver->ptr->solve(now);
 				plib::unused_var(ts);
 			}
 
 		for (auto & solver : solvers)
-			solver->update_inputs();
+			solver->ptr->update_inputs();
 
 		// step circuit
 		if (!m_Q_step.net().is_queued())
@@ -81,8 +171,7 @@ namespace devices
 			m_Q_step.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_max_timestep));
 		}
 	}
-
-	//using solver_ptr = host_arena::unique_ptr<solver::matrix_solver_t>;
+#endif
 
 	// FIXME: should be created in device space
 	template <class C>
@@ -90,8 +179,7 @@ namespace devices
 		NETLIB_NAME(solver)::net_list_t &nets,
 		solver::solver_parameters_t &params, std::size_t size)
 	{
-		return plib::make_unique<C, host_arena>(main_solver, name, nets, &params, size);
-		//return nl.make_pool_object<C>(nl, name, nets, &params, size);
+		return plib::make_unique<C, device_arena>(main_solver, name, nets, &params, size);
 	}
 
 	template <typename FT, int SIZE>
@@ -140,10 +228,10 @@ namespace devices
 		switch (net_count)
 		{
 			case 1:
-				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, host_arena>(*this, sname, nets, &m_params);
+				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, device_arena>(*this, sname, nets, &m_params);
 				//return state().make_pool_object<solver::matrix_solver_direct1_t<FT>>(state(), sname, nets, &m_params);
 			case 2:
-				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, host_arena>(*this, sname, nets, &m_params);
+				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, device_arena>(*this, sname, nets, &m_params);
 				//return state().make_pool_object<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
 			case 3:
 				return create_solver<FT, 3>(3, sname, nets);
@@ -338,12 +426,9 @@ namespace devices
 				}
 			}
 
-			m_mat_solvers_all.push_back(ms.get());
-			if (ms->timestep_device_count() != 0)
-				m_mat_solvers_timestepping.push_back(ms.get());
-
-			m_mat_solvers.emplace_back(std::move(ms));
+			m_mat_solvers.push_back(std::move(ms));
 		}
+
 	}
 
 	solver::static_compile_container NETLIB_NAME(solver)::create_solver_code(solver::static_compile_target target)
@@ -357,6 +442,20 @@ namespace devices
 		}
 		return mp;
 	}
+
+	std::size_t NETLIB_NAME(solver)::get_solver_id(const solver::matrix_solver_t *net) const
+	{
+		for (std::size_t i=0; i < m_mat_solvers.size(); i++)
+			if (m_mat_solvers[i].get() == net)
+				return i;
+		return std::numeric_limits<std::size_t>::max();
+	}
+
+	solver::matrix_solver_t * NETLIB_NAME(solver)::solver_by_id(std::size_t id) const
+	{
+		return m_mat_solvers[id].get();
+	}
+
 
 	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")
 

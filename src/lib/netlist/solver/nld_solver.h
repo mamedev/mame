@@ -26,12 +26,19 @@ namespace devices
 {
 	NETLIB_OBJECT(solver)
 	{
+	public:
+		using queue_type = detail::queue_base<solver::matrix_solver_t, false>;
+
 		NETLIB_CONSTRUCTOR(solver)
-		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step))
+		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
 		, m_Q_step(*this, "Q_step")
 		, m_params(*this)
+		, m_queue(config::MAX_SOLVER_QUEUE_SIZE::value,
+			queue_type::id_delegate(&NETLIB_NAME(solver) :: get_solver_id, this),
+			queue_type::obj_delegate(&NETLIB_NAME(solver) :: solver_by_id, this))
 		{
-			// internal staff
+			// internal stuff
+			state().save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), this->name(), "m_queue");
 
 			connect(m_fb_step, m_Q_step);
 		}
@@ -46,11 +53,14 @@ namespace devices
 		NETLIB_RESETI();
 		// NETLIB_UPDATE_PARAMI();
 
-		//using solver_ptr = device_arena::unique_ptr<solver::matrix_solver_t>;
-		using solver_ptr = host_arena::unique_ptr<solver::matrix_solver_t>;
+		using solver_ptr = device_arena::unique_ptr<solver::matrix_solver_t>;
+		//using solver_ptr = host_arena::unique_ptr<solver::matrix_solver_t>;
 		using net_list_t = solver::matrix_solver_t::net_list_t;
 
+		void reschedule(solver::matrix_solver_t *solv, netlist_time ts);
+
 	private:
+		template<bool KEEP_STATS>
 		NETLIB_HANDLERI(fb_step);
 
 		logic_input_t m_fb_step;
@@ -58,18 +68,20 @@ namespace devices
 
 		// FIXME: these should be created in device space
 		std::vector<solver_ptr> m_mat_solvers;
-		std::vector<solver::matrix_solver_t *> m_mat_solvers_all;
-		std::vector<solver::matrix_solver_t *> m_mat_solvers_timestepping;
 
 		solver::solver_parameters_t m_params;
+		queue_type m_queue;
 
 		template <typename FT, int SIZE>
 		solver_ptr create_solver(std::size_t size,
 			const pstring &solvername, net_list_t &nets);
 
 		template <typename FT>
-		solver_ptr create_solvers(
-			const pstring &sname, net_list_t &nets);
+		solver_ptr create_solvers(const pstring &sname, net_list_t &nets);
+
+		std::size_t get_solver_id(const solver::matrix_solver_t *net) const;
+		solver::matrix_solver_t *solver_by_id(std::size_t id) const;
+
 	};
 
 } // namespace devices

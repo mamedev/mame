@@ -42,6 +42,7 @@ namespace solver
 		const net_list_t &nets,
 		const solver_parameters_t *params)
 		: device_t(static_cast<device_t &>(main_solver), name)
+		, m_next_exec(*this, "m_next_exec", netlist_time_ext::zero())
 		, m_params(*params)
 		, m_iterative_fail(*this, "m_iterative_fail", 0)
 		, m_iterative_total(*this, "m_iterative_total", 0)
@@ -51,16 +52,8 @@ namespace solver
 		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
 		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
-		, m_fb_sync(*this, "FB_sync", nldelegate(&matrix_solver_t::fb_sync, this))
-		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{
-		if (!this->state().setup().connect(m_fb_sync, m_Q_sync))
-		{
-			// FIXME: avoid clang warning for now
-			m_main_solver.state().log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
-			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
-		}
 		setup_base(this->state().setup(), nets);
 
 		// now setup the matrix
@@ -70,6 +63,11 @@ namespace solver
 	analog_net_t *matrix_solver_t::get_connected_net(terminal_t *term)
 	{
 		return &state().setup().get_connected_terminal(*term)->net();
+	}
+
+	void matrix_solver_t::reschedule(netlist_time ts)
+	{
+		m_main_solver.reschedule(this, ts);
 	}
 
 	void matrix_solver_t::setup_base(setup_t &setup, const net_list_t &nets)
@@ -495,18 +493,11 @@ namespace solver
 		if (m_stat_newton_raphson % 100 == 0)
 			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3(100, this->name(), exec().time().as_double() * 1e6));
 
-		if (resched && !m_Q_sync.net().is_queued())
+		if (resched)
 		{
 			// reschedule ....
 			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2(this->name(), exec().time().as_double() * 1e6));
-			// FIXME: test and enable - this is working better, though not optimal yet
-#if 0
-			// Don't store, the result can not be used
 			return netlist_time::from_fp(m_params.m_nr_recalc_delay());
-#else
-			//restore(); // restore old voltages
-			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
-#endif
 		}
 		if (m_params.m_dynamic_ts)
 			return next_time_step;
@@ -514,16 +505,17 @@ namespace solver
 		return netlist_time::from_fp(m_params.m_max_timestep);
 	}
 
-	netlist_time matrix_solver_t::solve(netlist_time_ext now)
+	netlist_time matrix_solver_t::solve(netlist_time_ext now, const char *source)
 	{
 		netlist_time_ext delta = now - m_last_step();
 		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
+		plib::unused_var(source);
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!
 		if (delta < netlist_time_ext::quantum())
 		{
-			PFDEBUG(printf("solve return\n");)
+			//printf("solve return %s at %f\n", source, now.as_double());
 			return netlist_time::zero();
 		}
 
@@ -549,9 +541,16 @@ namespace solver
 		}
 
 		if (m_params.m_dynamic_ts)
-			return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_min_timestep, m_params.m_max_timestep);
+		{
+			if (timestep_device_count() > 0)
+				return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_min_timestep, m_params.m_max_timestep);
+		}
 
-		return netlist_time::from_fp(m_params.m_max_timestep);
+		if (timestep_device_count() > 0)
+			return netlist_time::from_fp(m_params.m_max_timestep);
+
+		return netlist_time::zero();
+
 	}
 
 	int matrix_solver_t::get_net_idx(const analog_net_t *net) const noexcept

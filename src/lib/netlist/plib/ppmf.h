@@ -233,6 +233,9 @@ namespace plib {
 		template <class C>
 		using specific_member_function = R (C::*)(Targs...);
 
+		template <class C>
+		using const_specific_member_function = R (C::*)(Targs...) const;
+
 		using generic_member_function = specific_member_function<generic_class>;
 
 		template <class C>
@@ -320,6 +323,9 @@ namespace plib {
 		template <class C>
 		using specific_member_function = typename helper::template specific_member_function<C>;
 
+		template <class C>
+		using const_specific_member_function = typename helper::template const_specific_member_function<C>;
+
 		using generic_class = typename helper::generic_class;
 		using generic_member_function = typename helper::generic_member_function;
 
@@ -343,7 +349,17 @@ namespace plib {
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
 			std::fill(s, s + sizeof(m_resolved), 0);
-			bind(object, &mftp);
+			bind<specific_member_function<O>>(object, &mftp);
+		}
+
+		template<typename O>
+		pmfp_base(const_specific_member_function<O> mftp, O *object)
+		: m_obj(nullptr)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+			std::fill(s, s + sizeof(m_resolved), 0);
+			bind<const_specific_member_function<O>>(object, &mftp);
 		}
 
 		bool is_set() const noexcept { return m_resolved != nullptr; }
@@ -354,7 +370,7 @@ namespace plib {
 		template<typename O>
 		void set(specific_member_function<O> mftp, O *object)
 		{
-			bind(object, &mftp);
+			bind<specific_member_function<O>>(object, &mftp);
 		}
 
 		inline R operator()(Targs... args) const noexcept(true)
@@ -363,11 +379,10 @@ namespace plib {
 		}
 
 	private:
-		template<typename O, typename MF>
+		template<typename SPC, typename O, typename MF>
 		void bind(O * object, MF *fraw)
 		{
-			//auto pFunc = *reinterpret_cast<specific_member_function<O> *>(fraw); // mftp;
-			specific_member_function<O> pFunc;
+			SPC pFunc;
 			static_assert(sizeof(pFunc) >= sizeof(MF), "size error");
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			*reinterpret_cast<MF *>(&pFunc) = *fraw;

@@ -356,7 +356,12 @@ namespace netlist
 		//! Copy Constructor removed.
 		constexpr state_var(const state_var &rhs) = delete;
 		//! Assignment operator to assign value of a state var.
-		constexpr state_var &operator=(const state_var &rhs) noexcept { m_value = rhs.m_value; return *this; } // OSX doesn't like noexcept
+		constexpr state_var &operator=(const state_var &rhs) noexcept
+		{
+			if (this != &rhs)
+				m_value = rhs.m_value;
+			return *this;
+		} // OSX doesn't like noexcept
 		//! Assignment operator to assign value of type T.
 		constexpr state_var &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
 		//! Assignment move operator to assign value of type T.
@@ -869,11 +874,6 @@ namespace netlist
 				*m_gt = GT;
 			}
 		}
-
-		/// @brief Solve the system this terminal is connected to.
-		///
-		/// \note deprecated - will be removed
-		void solve_now() const; // FIXME: remove this
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
@@ -1498,34 +1498,72 @@ namespace netlist
 		// We don't need a thread-safe queue currently. Parallel processing of
 		// solvers will update inputs after parallel processing.
 
-		class queue_t :
-				//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
-				public timed_queue<plib::pqentry_t<netlist_time_ext, net_t *>, false>,
-				public netlist_object_t,
+		template <typename O, bool TS>
+		class queue_base :
+				public timed_queue<plib::pqentry_t<netlist_time_ext, O *>, false>,
 				public plib::state_manager_t::callback_t
 		{
 		public:
-			using entry_t = plib::pqentry_t<netlist_time_ext, net_t *>;
+			using entry_t = plib::pqentry_t<netlist_time_ext, O *>;
 			using base_queue = timed_queue<entry_t, false>;
-			explicit queue_t(netlist_t &nl, const pstring &name);
-			~queue_t() noexcept override = default;
+			using id_delegate = plib::pmfp<std::size_t, const O *>;
+			using obj_delegate = plib::pmfp<O *, std::size_t>;
 
-			queue_t(const queue_t &) = delete;
-			queue_t(queue_t &&) = delete;
-			queue_t &operator=(const queue_t &) = delete;
-			queue_t &operator=(queue_t &&) = delete;
+			explicit queue_base(std::size_t size, id_delegate get_id, obj_delegate get_obj)
+			: timed_queue<plib::pqentry_t<netlist_time_ext, O *>, false>(size)
+			, m_qsize(0)
+			, m_times(size)
+			, m_net_ids(size)
+			, m_get_id(get_id)
+			, m_obj_by_id(get_obj)
+			{
+			}
+
+			~queue_base() noexcept override = default;
+
+			queue_base(const queue_base &) = delete;
+			queue_base(queue_base &&) = delete;
+			queue_base &operator=(const queue_base &) = delete;
+			queue_base &operator=(queue_base &&) = delete;
 
 		protected:
 
-			void register_state(plib::state_manager_t &manager, const pstring &module) override;
-			void on_pre_save(plib::state_manager_t &manager) override;
-			void on_post_load(plib::state_manager_t &manager) override;
+			void register_state(plib::state_manager_t &manager, const pstring &module) override
+			{
+				manager.save_item(this, m_qsize, module + "." + "qsize");
+				manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
+				manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
+			}
+			void on_pre_save(plib::state_manager_t &manager) override
+			{
+				plib::unused_var(manager);
+				m_qsize = this->size();
+				for (std::size_t i = 0; i < m_qsize; i++ )
+				{
+					m_times[i] =  this->listptr()[i].exec_time().as_raw();
+					m_net_ids[i] = m_get_id(this->listptr()[i].object());
+				}
+			}
+			void on_post_load(plib::state_manager_t &manager) override
+			{
+				plib::unused_var(manager);
+				this->clear();
+				for (std::size_t i = 0; i < m_qsize; i++ )
+				{
+					O *n = m_obj_by_id(m_net_ids[i]);
+					this->template push<false>(entry_t(netlist_time_ext::from_raw(m_times[i]),n));
+				}
+			}
 
 		private:
 			std::size_t m_qsize;
 			std::vector<netlist_time_ext::internal_type> m_times;
 			std::vector<std::size_t> m_net_ids;
+			id_delegate m_get_id;
+			obj_delegate m_obj_by_id;
 		};
+
+		using queue_t = queue_base<net_t, false>;
 
 	} // namespace detail
 
@@ -1620,6 +1658,7 @@ namespace netlist
 
 		// FIXME: only used by queue_t save state
 		std::size_t find_net_id(const detail::net_t *net) const;
+		detail::net_t *net_by_id(std::size_t id) const;
 
 		template <typename T>
 		void register_net(device_arena::owned_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
@@ -1883,6 +1922,7 @@ namespace netlist
 		const log_type &log() const noexcept { return m_state.log(); }
 
 		void print_stats() const;
+		bool use_stats() const { return m_use_stats; }
 
 		bool stats_enabled() const noexcept { return m_use_stats; }
 		void enable_stats(bool val) noexcept { m_use_stats = val; }
@@ -1914,7 +1954,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	template<class C, std::size_t N>
-	class object_array_base_t : public plib::uninitialised_array_t<C, N>
+	class object_array_base_t : public plib::static_vector<C, N>
 	{
 	public:
 		template<class D, typename... Args>
@@ -1922,28 +1962,28 @@ namespace netlist
 		object_array_base_t(D &dev, std::array<const char *, N> &&names, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, pstring(names[i]), std::forward<Args>(args)...);
+				this->emplace_back(dev, pstring(names[i]), std::forward<Args>(args)...);
 		}
 
 		template<class D>
 		object_array_base_t(D &dev, const pstring &fmt)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i));
+				this->emplace_back(dev, formatted(fmt, i));
 		}
 
 		template<class D, typename... Args>
 		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i+offset), std::forward<Args>(args)...);
+				this->emplace_back(dev, formatted(fmt, i+offset), std::forward<Args>(args)...);
 		}
 
 		template<class D>
 		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nldelegate delegate)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i+offset), delegate);
+				this->emplace_back(dev, formatted(fmt, i+offset), delegate);
 		}
 
 		template<class D>
@@ -1988,7 +2028,7 @@ namespace netlist
 		object_array_t(D &dev, std::size_t offset, std::size_t qmask,
 			const pstring &fmt, std::array<nldelegate, ND> &&delegates)
 		{
-			passert_always_msg(delegates.size() >= N, "initializer_list size mismatch");
+			static_assert(N <= ND, "initializer_list size mismatch");
 			std::size_t i = 0;
 			for (auto &e : delegates)
 			{
@@ -1997,7 +2037,7 @@ namespace netlist
 					pstring name(this->formatted(fmt, i+offset));
 					if ((qmask >> i) & 1)
 						name += "Q";
-					this->emplace(i, dev, name, e);
+					this->emplace_back(dev, name, e);
 				}
 				i++;
 			}
@@ -2437,16 +2477,6 @@ namespace netlist
 	// inline implementations - cold
 	// -----------------------------------------------------------------------------
 
-	inline netlist_state_t & detail::netlist_object_t::state() noexcept
-	{
-		return m_netlist.nlstate();
-	}
-
-	inline const netlist_state_t & detail::netlist_object_t::state() const noexcept
-	{
-		return m_netlist.nlstate();
-	}
-
 	template<typename T, typename... Args>
 	inline device_arena::unique_ptr<T> detail::netlist_object_t::make_pool_object(Args&&... args)
 	{
@@ -2519,16 +2549,6 @@ namespace netlist
 	void base_device_t::create_and_register_subdevice(O &owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args)
 	{
 		dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);
-	}
-
-	inline netlist_state_t &detail::device_object_t::state() noexcept
-	{
-		return m_device->state();
-	}
-
-	inline const netlist_state_t &detail::device_object_t::state() const noexcept
-	{
-		return m_device->state();
 	}
 
 	inline solver::matrix_solver_t *analog_t::solver() const noexcept

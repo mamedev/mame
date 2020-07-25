@@ -385,7 +385,7 @@ NETLIST_START(kidniki)
 #endif
 
 #if (USE_FRONTIERS)
-	PARAM(Solver.PARALLEL, 2) // More does not help
+	PARAM(Solver.PARALLEL, 3) // More does not help
 #else
 	PARAM(Solver.PARALLEL, 0)
 #endif
