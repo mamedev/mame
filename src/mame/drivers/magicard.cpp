@@ -22,6 +22,10 @@
   * Quingo Export (5.00),                       Impera, 1999.
   * Bel Slots Export (5.01),                    Impera, 1999.
   * Big Deal Belgien (5.04),                    Impera, 2001.
+  * Puzzle Me!,                                 Impera, 199?.
+  * unknown 'TE06',                             Impera, 199?.
+  * Lucky 7 (Impera),                           Impera, 199?.
+  
 
 *******************************************************************************
 
@@ -1101,6 +1105,31 @@ ROM_START( puzzleme )
 ROM_END
 
 
+/*
+
+  Unknown TE06
+
+*/
+ROM_START( unkte06 )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "m27c4002.bin", 0x00000, 0x80000, CRC(229a504f) SHA1(8033e9b4cb55f2364bf4606375ef9ac05fc715fe) )
+
+	ROM_REGION( 0x0200, "pic16c54", 0 )	// protected
+	ROM_LOAD("pic16c54.bin",   0x0000, 0x0200, NO_DUMP )
+ROM_END
+
+/*
+  Lucky 7
+  Impera
+  
+*/
+ROM_START( lucky7i )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
+	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+ROM_END
+
+
 /*************************
 *      Driver Init       *
 *************************/
@@ -1129,4 +1158,6 @@ GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magica
 GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, puzzleme,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, puzzleme,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown 'TE06'",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
