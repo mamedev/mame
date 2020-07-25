@@ -11,14 +11,7 @@
 //
 // Known problems/issues:
 //
-//    * The core noise source is supposed to be created via a
-//       pair of transistors, one with an open base. Because this
-//       does not model correctly, this part of the circuit is
-//       replaced with a generic noise device. The characteristics
-//       of this noise are pretty different compared to recordings
-//       of the original, and affects all the sounds.
-//
-//    * Poor performance when the explosion is triggered.
+//    * None.
 //
 
 #include "netlist/devices/net_lib.h"

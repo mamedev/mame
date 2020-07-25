@@ -9,14 +9,7 @@
 //
 // Known problems/issues:
 //
-//    * The core noise source is supposed to be created via a
-//       pair of transistors, one with an open base. Because this
-//       does not model correctly, this part of the circuit is
-//       replaced with a generic noise device. The characteristics
-//       of this noise are pretty different compared to recordings
-//       of the original, and affects all the sounds.
-//
-//    * The schematics show a connection betwee U8.6 and
+//    * The schematics show a connection between U8.6 and
 //       R37.2; however, implementing this leads to a direct input
 //       from the noise source at all times to the summing amp.
 //       Suspecting this is a typo in the schematics.
@@ -182,7 +175,7 @@ NETLIST_START(barrier)
 	NET_C(NOISE_CLOCK.GND, GND)
 	NET_C(NOISE_CLOCK.VCC, I_V5)
 
-	SYS_NOISE_MT_U(NOISE, 0.0001)
+	SYS_NOISE_MT_N(NOISE, 0.0001)
 	NET_C(NOISE.I, NOISE_CLOCK.Q)
 	NET_C(NOISE.1, GND)
 	NET_C(NOISE.2, C1.1)
