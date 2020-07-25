@@ -24,10 +24,10 @@ namespace solver
 
 		using float_type = FT;
 
-		matrix_solver_ext_t(netlist_state_t &anetlist, const pstring &name,
+		matrix_solver_ext_t(devices::nld_solver &main_solver, const pstring &name,
 			const net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_t(anetlist, name, nets, params)
+		: matrix_solver_t(main_solver, name, nets, params)
 		, m_new_V(size)
 		, m_RHS(size)
 		, m_mat_ptr(size, this->max_railstart() + 1)
@@ -168,7 +168,7 @@ namespace solver
 		{
 			const std::size_t iN = size();
 			for (std::size_t i = 0; i < iN; i++)
-				m_last_V[i] = static_cast<float_type>(this->m_terms[i].getV());
+				m_last_V[i] = gsl::narrow_cast<fptype>(this->m_terms[i].getV());
 		}
 
 		void restore() override

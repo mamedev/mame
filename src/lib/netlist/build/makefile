@@ -92,7 +92,7 @@ DEPENDCC=$(CC)
 
 
 ifndef FAST
-FAST=1
+FAST=0
 endif
 
 ifeq ($(FAST),1)
@@ -307,7 +307,7 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wunreachable-code"
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
 
 clang-libc:
 	#clang-11 currently broken

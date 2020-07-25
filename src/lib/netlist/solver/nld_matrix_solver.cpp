@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
+#include "nld_solver.h"
 #include "nld_matrix_solver.h"
 #include "core/setup.h"
 #include "nl_setup.h"
@@ -37,13 +38,14 @@ namespace solver
 	// matrix_solver
 	// ----------------------------------------------------------------------------------------
 
-	matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
+	matrix_solver_t::matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 		const net_list_t &nets,
 		const solver_parameters_t *params)
-		: device_t(anetlist, name)
+		: device_t(static_cast<device_t &>(main_solver), name)
 		, m_params(*params)
 		, m_iterative_fail(*this, "m_iterative_fail", 0)
 		, m_iterative_total(*this, "m_iterative_total", 0)
+		, m_main_solver(main_solver)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
 		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
 		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
@@ -53,12 +55,13 @@ namespace solver
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{
-		if (!anetlist.setup().connect(m_fb_sync, m_Q_sync))
+		if (!this->state().setup().connect(m_fb_sync, m_Q_sync))
 		{
-			log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+			// FIXME: avoid clang warning for now
+			m_main_solver.state().log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
 			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
 		}
-		setup_base(anetlist.setup(), nets);
+		setup_base(this->state().setup(), nets);
 
 		// now setup the matrix
 		setup_matrix();

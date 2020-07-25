@@ -278,7 +278,7 @@ namespace solver
 		constexpr std::size_t ops() const { return m_ops; }
 
 	protected:
-		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
+		matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 			const net_list_t &nets,
 			const solver_parameters_t *params);
 
@@ -326,6 +326,8 @@ namespace solver
 		void set_pointers();
 
 		analog_net_t *get_connected_net(terminal_t *term);
+
+		devices::nld_solver &m_main_solver;
 
 		state_var<std::size_t> m_stat_calculations;
 		state_var<std::size_t> m_stat_newton_raphson;
