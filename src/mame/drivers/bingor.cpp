@@ -132,7 +132,7 @@
   |                      |  M  | |  M  |             |
   |                      +-----+ +-----+             |
   |                    +-----------------+           |
-  |                    | P825GAH         |           |
+  |                    | P8256AH         |           |
   |                    | L4203043        |           |
   |                    | INTEL 1975      |           |
   |                    +-----------------+           |
@@ -211,7 +211,7 @@
   |                      |  M  | |  M  |             |
   |                      +-----+ +-----+             |
   |                    +-----------------+           |
-  |                    | P825GAH         |           |
+  |                    | P8256AH         |           |
   |                    | L4203043        |           |
   |                    | INTEL 1975      |           |
   |                    +-----------------+           |
@@ -291,7 +291,7 @@
   |                      |  M  | |  M  |             |
   |                      +-----+ +-----+             |
   |                    +-----------------+           |
-  |                    | P825GAH         |           |
+  |                    | P8256AH         |           |
   |                    | L4203043        |           |
   |                    | INTEL 1975      |           |
   |                    +-----------------+           |
@@ -370,7 +370,7 @@
   |                      |  M  | |  M  |             |
   |                      +-----+ +-----+             |
   |                    +-----------------+           |
-  |                    | P825GAH         |           |
+  |                    | P8256AH         |           |
   |                    | L4203043        |           |
   |                    | INTEL 1975      |           |
   |                    +-----------------+           |
@@ -568,33 +568,33 @@ uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = (0x2000/2);
+	count = (0x2000 / 2);
 
-	for(y=0;y<256;y++)
+	for(y = 0; y < 256; y++)
 	{
-		for(x=0;x<286;x+=4)
+		for(x = 0; x < 286; x += 4)
 		{
 			uint32_t color;
 
-			color = (m_blit_ram[count] & 0xf000)>>12;
+			color = (m_blit_ram[count] & 0xf000) >> 12;
 
-			if(cliprect.contains(x+3, y))
-				bitmap.pix32(y, x+3) = m_palette->pen(color);
+			if(cliprect.contains(x + 3, y))
+				bitmap.pix32(y, x + 3) = m_palette->pen(color);
 
-			color = (m_blit_ram[count] & 0x0f00)>>8;
+			color = (m_blit_ram[count] & 0x0f00) >> 8;
 
-			if(cliprect.contains(x+2, y))
-				bitmap.pix32(y, x+2) = m_palette->pen(color);
+			if(cliprect.contains(x + 2, y))
+				bitmap.pix32(y, x + 2) = m_palette->pen(color);
 
-			color = (m_blit_ram[count] & 0x00f0)>>4;
+			color = (m_blit_ram[count] & 0x00f0) >> 4;
 
-			if(cliprect.contains(x+1, y))
-				bitmap.pix32(y, x+1) = m_palette->pen(color);
+			if(cliprect.contains(x + 1, y))
+				bitmap.pix32(y, x + 1) = m_palette->pen(color);
 
-			color = (m_blit_ram[count] & 0x000f)>>0;
+			color = (m_blit_ram[count] & 0x000f) >> 0;
 
-			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = m_palette->pen(color);
+			if(cliprect.contains(x + 0, y))
+				bitmap.pix32(y, x + 0) = m_palette->pen(color);
 
 			count++;
 		}
@@ -680,17 +680,17 @@ INPUT_PORTS_END
 
 static const gfx_layout bingor_layout =
 {
-	8,8,
-	RGN_FRAC(1,1),
+	8, 8,
+	RGN_FRAC(1, 1),
 	4,
-	{ 0,1,2,3 },
-	{ 0,4,8,12,16,20,24,28 },
+	{ 0, 1, 2, 3 },
+	{ 0, 4, 8, 12, 16, 20, 24, 28 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
+	8 * 32
 };
 
 static GFXDECODE_START( gfx_bingor )
-	GFXDECODE_ENTRY( "gfx", 0, bingor_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "gfx", 0, bingor_layout, 0, 2  )
 GFXDECODE_END
 
 
@@ -761,6 +761,7 @@ void bingor_state::slave_io(address_map &map)
 	map(0xc000, 0xcfff).ram();
 }
 
+
 void bingor_state::vip2000(machine_config &config)
 {
 	I80186(config, m_maincpu, XTAL(10'000'000));
@@ -795,73 +796,74 @@ void bingor_state::vip2000(machine_config &config)
 	ymz.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+
 // I doubt we need to load the EEPROMs
 
-ROM_START( bingor1 )
-	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+ROM_START( bingor1 )	// Strings: Big Roll / Bingo Roll / 1991 AWR / 1992 Rosenauer Electronic Austria. 
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
 	ROM_LOAD16_BYTE( "bingo v 29.4.99 l.bin", 0x00000, 0x08000, CRC(b6773bff) SHA1(74e375662730e002e05186bd77098fa0d8e43ade) )
 	ROM_LOAD16_BYTE( "bingo v 29.4.99 h.bin", 0x00001, 0x08000, CRC(0e18f90a) SHA1(0743302e675f01f8ad42ac2e67ecb1c1bf870ae7) )
 
 	// gfx roms on this one are twice the size of the others
-	ROM_REGION16_LE( 0x20000, "gfx", 0 ) /* blitter data? */
+	ROM_REGION16_LE( 0x20000, "gfx", 0 )	// blitter data?
 	ROM_LOAD16_BYTE( "bingo turbo l.bin", 0x000000, 0x10000, CRC(86b10566) SHA1(5f74b250ced3574feffdc40b6ed013ec5a0c2c97) )
 	ROM_LOAD16_BYTE( "bingo turbo h.bin", 0x000001, 0x10000, CRC(7e18f9d7) SHA1(519b65d6812a3762e3215f4918c834d5a444b28a) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
+	ROM_REGION( 0x20000, "pic", 0 )	// protection?
 	ROM_LOAD( "pic16c54b.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
 
-	ROM_REGION( 0x20000, "eeprom", 0 ) /* eeprom */
+	ROM_REGION( 0x20000, "eeprom", 0 )	// eeprom
 	ROM_LOAD( "bingor1_24c04a.bin", 0x000000, 0x200, CRC(b169df46) SHA1(ebafc81c6918aae9daa6b90df16161751cfd2590) )
 ROM_END
 
-ROM_START( bingor2 )
-	ROM_REGION16_LE( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+ROM_START( bingor2 )	// Strings: Euro Bingo / 1988-1992 Rosenauer Electronic Austria.
+	ROM_REGION16_LE( 0x20000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
 	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_l.bin", 0x00000, 0x10000, CRC(40df6ee8) SHA1(1e90ef906e47f95ebde85b6dd32fdfe50c0564fc) )
 	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_h.bin", 0x00001, 0x10000, CRC(9154c183) SHA1(a4060294295a9b8df07ce9fcfeefcf009e129817) )
 
-	ROM_REGION16_LE( 0x20000, "gfx", 0 ) /* blitter data? */
+	ROM_REGION16_LE( 0x20000, "gfx", 0 )	// blitter data?
 	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
 	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x10000, CRC(4eec39ad) SHA1(4201d5ec207d30dcac9813dd6866d2b61c168e75) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
+	ROM_REGION( 0x20000, "pic", 0 )	// protection
 	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
 
-	ROM_REGION( 0x20000, "eeprom", 0 ) /* eeprom */
+	ROM_REGION( 0x20000, "eeprom", 0 )	// eeprom
 	ROM_LOAD( "bingor2_24c04a.bin", 0x000000, 0x200, CRC(a7c87036) SHA1(f7d6161bbfdcdc50212f6b71eb2cbbbb18548cc6) )
 ROM_END
 
-ROM_START( bingor3 )
-	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+ROM_START( bingor3 )	// Strings: 1995-1997 Paloma Elektronik / 2002 Paloma Elektronik / Play Star Austria 0316/821193.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
 	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_1.bin", 0x00000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
 	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_2.bin", 0x00001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
 
-	ROM_REGION16_LE( 0x20000, "gfx", ROMREGION_ERASE00 ) /* blitter data? */
+	ROM_REGION16_LE( 0x20000, "gfx", ROMREGION_ERASE00 )	// blitter data?
 	ROM_LOAD16_BYTE( "bsg-11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
 	ROM_LOAD16_BYTE( "bsg-11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
+	ROM_REGION( 0x20000, "pic", 0 )	// protection
 	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) )
 
-	ROM_REGION( 0x20000, "eeprom", 0 ) /* eeprom */
-	ROM_LOAD( "bingor3_24c04a.bin", 0x000000, 0x200,  CRC(7a5eb172) SHA1(12d2fc96049427ef1a8acf47242b41b2095d28b6) )
-	ROM_LOAD( "bingor3_24c04a_alt.bin", 0x000000, 0x200,  CRC(fcff2d26) SHA1(aec1ddd38149404741a057c74bf84bfb4a8e4aa1) )
+	ROM_REGION( 0x20000, "eeprom", 0 )	// eeprom
+	ROM_LOAD( "bingor3_24c04a.bin",     0x000000, 0x200, CRC(7a5eb172) SHA1(12d2fc96049427ef1a8acf47242b41b2095d28b6) )
+	ROM_LOAD( "bingor3_24c04a_alt.bin", 0x000000, 0x200, CRC(fcff2d26) SHA1(aec1ddd38149404741a057c74bf84bfb4a8e4aa1) )
 ROM_END
 
 // this is a mix of 2 of the other sets.. I don't know if it's correct
-ROM_START( bingor4 )
-	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+ROM_START( bingor4 )	// Strings: 1995-1997 Paloma Elektronik / 2002 Paloma Elektronik / Play Star Austria 0316/821193 / CBA Design, Lyon France.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
 	ROM_LOAD16_BYTE( "01.bin", 0x00000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
 	ROM_LOAD16_BYTE( "02.bin", 0x00001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
 
-	ROM_REGION16_LE( 0x20000, "gfx", 0 ) /* blitter data? */
+	ROM_REGION16_LE( 0x20000, "gfx", 0 )	// blitter data?
 	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
 	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x10000, CRC(4eec39ad) SHA1(4201d5ec207d30dcac9813dd6866d2b61c168e75) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
+	ROM_REGION( 0x20000, "pic", 0 )	// protection?
 	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
 
-	ROM_REGION( 0x20000, "eeprom", 0 ) /* eeprom */
-	ROM_LOAD( "bingor4_24c04a.bin", 0x000000, 0x200,  CRC(38cf70a9) SHA1(ba9a1640200963e2d58d761edc13a24fa5ef44c2) )
+	ROM_REGION( 0x20000, "eeprom", 0 )	// eeprom
+	ROM_LOAD( "bingor4_24c04a.bin", 0x000000, 0x200, CRC(38cf70a9) SHA1(ba9a1640200963e2d58d761edc13a24fa5ef44c2) )
 ROM_END
 
 /*
@@ -871,25 +873,55 @@ ROM_END
 
 */
 
-ROM_START( bingor5 )    /* BellStar V3 */
-	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+ROM_START( bingor5 )	// BellStar V3.  Strings: 1995-1997 Paloma Elektronik / 2002 Paloma Elektronik / Play Star Austria 0316/821193 / CBA Design, Lyon France.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
 	ROM_LOAD16_BYTE( "bellstar_v3_v.3.6.02_l.bin", 0x00000, 0x08000, CRC(56b84a5d) SHA1(1bda4fb972b4f0f0575089b545bf15dfea859948) )
 	ROM_LOAD16_BYTE( "bellstar_v3_v.3.6.02_h.bin", 0x00001, 0x08000, CRC(d6945bb8) SHA1(b620f1b547be03c4609bff8d06111d0ea425bae8) )
 
-	ROM_REGION16_LE( 0x20000, "gfx", ROMREGION_ERASE00 ) /* blitter data? */
+	ROM_REGION16_LE( 0x20000, "gfx", ROMREGION_ERASE00 )	// blitter data?
 	ROM_LOAD16_BYTE( "b.s.grafik_11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
 	ROM_LOAD16_BYTE( "b.s.grafik_11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
+	ROM_REGION( 0x20000, "pic", 0 )	// protection?
 	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) )
 
-	ROM_REGION( 0x20000, "eeprom", 0 ) /* eeprom */
-	ROM_LOAD( "bingor5_24c04a.bin", 0x000000, 0x200,  CRC(fcff2d26) SHA1(aec1ddd38149404741a057c74bf84bfb4a8e4aa1) )
+	ROM_REGION( 0x20000, "eeprom", 0 )	// eeprom
+	ROM_LOAD( "bingor5_24c04a.bin", 0x000000, 0x200, CRC(fcff2d26) SHA1(aec1ddd38149404741a057c74bf84bfb4a8e4aa1) )
+ROM_END
+
+/* Bingo Roll / Turbo Bingo?
+   1991,
+   AWR Hard & Soft
+   Austria.
+
+   Same PCB layout as bingor3,
+   but 2x crystals:
+   
+   1x 16 MHz. (sub board)
+   1x 10 MHz. (main board)
+
+   1x MP690P
+ 
+*/
+ROM_START( bingor6 )	// Strings: 1988-1992 AWR Hard & Soft Austria.
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
+	ROM_LOAD16_BYTE( "bingo_l.bin", 0x00000, 0x08000, CRC(78df905d) SHA1(197c5a795bdda964db780dd3b9c0f9b76197a610) )
+	ROM_LOAD16_BYTE( "bingo_h.bin", 0x00001, 0x08000, CRC(f25958fd) SHA1(8a8c061accc4c2fa8475188a1281518e63fb456d) )
+
+	ROM_REGION16_LE( 0x20000, "gfx", ROMREGION_ERASE00 )	// blitter data?
+	ROM_LOAD16_BYTE( "turbo_l.bin", 0x000000, 0x10000, CRC(86b10566) SHA1(5f74b250ced3574feffdc40b6ed013ec5a0c2c97) )
+	ROM_LOAD16_BYTE( "turbo_h.bin", 0x000001, 0x10000, CRC(7e18f9d7) SHA1(519b65d6812a3762e3215f4918c834d5a444b28a) )
+
+	ROM_REGION( 0x20000, "pic", 0 )	// protection?
+	ROM_LOAD( "pic16c54rc.bin", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )	// eeprom
+	ROM_LOAD( "bingor6_24c04a.bin", 0x000000, 0x200, CRC(9d271c5f) SHA1(8ac5c4848fb8d9a156ba760324022839fefcbb72) )
 ROM_END
 
 
 ROM_START( vip2000 )
-	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x10000, "boot_prg", ROMREGION_ERASE00 )	// i186 code
 	ROM_LOAD16_BYTE( "vipbios8l.bin", 0x00000, 0x08000, CRC(a4c2b351) SHA1(bb718584bfe32b9ed27fadfd89b4094d4bbd6d7f) )
 	ROM_LOAD16_BYTE( "vipbios8h.bin", 0x00001, 0x08000, CRC(7c42c5ee) SHA1(c419a834ddb245363bacfe70d31cff7c2d4a2d03) )
 
@@ -910,11 +942,12 @@ ROM_START( vip2000 )
 ROM_END
 
 
+//    YEAR  NAME     PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY                          FULLNAME                             FLAGS
+GAME( 1992, bingor1, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1992, bingor2, 0,       bingor2,  bingor, bingor_state, empty_init, ROT0, "Rosenauer Electronic Austria?", "Bingo Roll / Bell Star? (set 2)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor3, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 3)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor4, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star? (set 4)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor5, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "Bingo Roll / Bell Star V3? (set 5)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, bingor6, 0,       bingor,   bingor, bingor_state, empty_init, ROT0, "AWR Hard & Soft Austria?",      "Bingo Roll / Turbo Bingo?",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2002, bingor1, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor2, 0, bingor2,  bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor3, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 3)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor4, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor5, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
-GAME( 2001, vip2000, 0, vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?", "unknown 'VIP 2000' game",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, vip2000, 0,       vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?",            "unknown 'VIP 2000' game",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
