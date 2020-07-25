@@ -15,6 +15,32 @@
 #include "nl_elim.h"
 
 
+//
+// Optimizations
+//
+
+#define HLE_BACKGROUND_VCO (1)
+#define HLE_TORPEDO1_VCO (1)
+#define HLE_TORPEDO2_VCO (1)
+#define ENABLE_FRONTIERS (0)
+
+
+
+//
+// Hacks
+//
+
+#define DISABLE_TORPEDO2_NOISE (1)
+
+
+
+//
+// Initial compilation includes this section.
+//
+
+#ifndef SOUND_VARIANT
+
+
 #define D_1N914(name) DIODE(name, "1N914")
 #define D_1N4002(name) DIODE(name, "D(IS=65.4p RS=42.2m BV=100 IBV=5.00u CJO=14.8p M=0.333 N=1.36 TT=2.88u)")
 
@@ -24,7 +50,6 @@
 #define LM566_DIP NE566_DIP
 
 #define TTL_74LS00_DIP TTL_7400_DIP
-#define TTL_74LS125_DIP TTL_74125_DIP
 
 //
 // DIP mappings use the submodels below for CA3080
@@ -55,29 +80,33 @@ NETLIST_END()
 
 
 //
-// Optimizations
+// Now include ourselves twice, once for Eliminator and
+// once for Zektor
 //
 
-#define HLE_BACKGROUND_VCO (1)
-#define HLE_TORPEDO1_VCO (1)
-#define HLE_TORPEDO2_VCO (1)
-#define ENABLE_FRONTIERS (0)
+#define VARIANT_ELIMINATOR 	0
+#define VARIANT_ZEKTOR		1
+
+#define SOUND_VARIANT		(VARIANT_ELIMINATOR)
+#include "nl_elim.cpp"
+
+#undef SOUND_VARIANT
+#define SOUND_VARIANT 		(VARIANT_ZEKTOR)
+#include "nl_elim.cpp"
 
 
-
-//
-// Hacks
-//
-
-#define DISABLE_TORPEDO2_NOISE (1)
-
+#else
 
 
 //
 // Main netlist
 //
 
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
 NETLIST_START(elim)
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+NETLIST_START(zektor)
+#endif
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -130,15 +159,37 @@ NETLIST_START(elim)
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_VM12, -12)
 
+	//
+	// Part differences between Eliminator and Zektor
+	//
+	//  Ref Des         ELIMINATOR      ZEKTOR
+	//  R5              10K             4.7K
+	//  R9              33K             12K
+	//  R71             270K            100K
+	//  R79             2 MEG           unused
+	//  R122            220K            390K
+	//  R132            220K            100K
+	//  C9              0.01uF          0.0047uF
+	//  C46             0.022uF         0.047uF
+	//
+
 //	RES(R1, RES_K(100))		-- part of final amp (not emulated)
 //	RES(R2, RES_M(1))		-- part of final amp (not emulated)
 //	RES(R3, RES_K(22))		-- part of final amp (not emulated)
 //	RES(R4, RES_K(2.2))		-- part of final amp (not emulated)
-//	RES(R5, RES_K(10)) // RES_K(4.7)) -- part of final amp (not emulated)
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
+//	RES(R5, RES_K(10)) 		-- part of final amp (not emulated)
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+//	RES(R5, RES_K(4.7)) 	-- part of final amp (not emulated)
+#endif
 	RES(R6, RES_K(220))
 	RES(R7, RES_K(220))
 	RES(R8, RES_K(10))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
 	RES(R9, RES_K(33))
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+	RES(R9, RES_K(12))
+#endif
 	RES(R10, RES_K(10))
 //	RES(R11, RES_K(2.2))	-- part of final amp (not emulated)
 //	RES(R12, RES_M(1))		-- part of final amp (not emulated)
@@ -200,7 +251,11 @@ NETLIST_START(elim)
 	RES(R68, RES_K(100))
 	RES(R69, RES_K(1))
 	RES(R70, RES_K(470))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
 	RES(R71, RES_K(270))
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+	RES(R71, RES_K(100))
+#endif
 	RES(R72, RES_K(1))
 	RES(R73, RES_K(680))
 	RES(R74, RES_K(390))
@@ -208,7 +263,9 @@ NETLIST_START(elim)
 	RES(R76, RES_K(10))
 	RES(R77, RES_K(10))
 	RES(R78, RES_K(10))
-//	RES(R79, RES_M(2))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
+	RES(R79, RES_M(2))
+#endif
 	RES(R80, RES_K(1))
 	RES(R81, RES_M(1.5))
 	RES(R82, 470)
@@ -217,7 +274,7 @@ NETLIST_START(elim)
 	RES(R85, RES_K(2.2))
 	RES(R86, RES_K(2.2))
 	RES(R87, RES_K(2.2))
-//	RES(R88, RES_K(2.2))
+	RES(R88, RES_K(2.2))
 	RES(R89, RES_K(2.2))
 	RES(R90, RES_K(15))
 	RES(R91, RES_M(1))
@@ -251,7 +308,11 @@ NETLIST_START(elim)
 	RES(R119, RES_K(100))
 	RES(R120, RES_K(100))
 	RES(R121, RES_M(2.2))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
 	RES(R122, RES_K(220))
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+	RES(R122, RES_K(390))
+#endif
 	RES(R123, RES_K(100))
 	RES(R124, RES_M(2.2))
 	RES(R125, RES_K(100))
@@ -261,7 +322,11 @@ NETLIST_START(elim)
 	RES(R129, RES_K(82))
 	RES(R130, RES_K(22))
 	RES(R131, RES_K(1))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
 	RES(R132, RES_K(220))
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+	RES(R132, RES_K(100))
+#endif
 //	RES(R133, 680)
 	RES(R134, RES_K(10))
 	RES(R135, RES_K(10))
@@ -286,7 +351,11 @@ NETLIST_START(elim)
 	CAP(C6, CAP_U(0.1))
 	CAP(C7, CAP_U(0.001))
 	CAP(C8, CAP_U(10))
-	CAP(C9, CAP_U(0.01)) // CAP_U(0.0047))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
+	CAP(C9, CAP_U(0.01))
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+	CAP(C9, CAP_U(0.0047))
+#endif
 	CAP(C10, CAP_U(0.068))
 	CAP(C11, CAP_U(0.068))
 	CAP(C12, CAP_U(0.1))
@@ -322,8 +391,12 @@ NETLIST_START(elim)
 // C42??
 	CAP(C43, CAP_U(0.033))
 	CAP(C44, CAP_U(0.1))
-//	CAP(C45, CAP_U(0.1))
-	CAP(C46, CAP_U(0.022)) // CAP_U(0.047))
+	CAP(C45, CAP_U(0.1))
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
+	CAP(C46, CAP_U(0.022))
+#else // (SOUND_VARIANT == VARIANT_ZEKTOR)
+	CAP(C46, CAP_U(0.047))
+#endif
 	CAP(C47, CAP_U(0.047))
 	CAP(C48, CAP_U(0.05))
 	CAP(C49, CAP_U(0.1))
@@ -831,8 +904,8 @@ NETLIST_START(elim)
 	NET_C(U19.9, R117.1, C52.1)
 	NET_C(R117.2, I_V12)
 	NET_C(C52.2, U19.11)
-	NET_C(U19.10, U19.12, U19.13, R85.1)
-	NET_C(R85.2, Q10.E)
+	NET_C(U19.10, U19.12, U19.13, R88.1)
+	NET_C(R88.2, Q10.E)
 	NET_C(Q10.B, GND)
 	NET_C(Q10.C, C38.1, R68.1)
 	NET_C(C38.2, I_VM12)
@@ -896,9 +969,13 @@ NETLIST_START(elim)
 	// Sheet 8, bottom-ish middle (Bounce)
 	//
 
-	NET_C(_50HZ, C43.1)
-	NET_C(C43.2, R81.1)
+	NET_C(_50HZ, C45.1)
+	NET_C(C45.2, R81.1)
 	NET_C(R81.2, R80.2, U14.2)
+#if (SOUND_VARIANT == VARIANT_ELIMINATOR)
+	NET_C(WBN, R79.1)
+	NET_C(R79.2, R80.2)
+#endif
 	NET_C(R80.1, GND)
 	NET_C(U14.3, R63.2)
 	NET_C(R63.1, GND)
@@ -928,12 +1005,6 @@ NETLIST_START(elim)
 	NET_C(R124.2, I_V12)
 	NET_C(C55.2, U22.11, U23.2)
 	NET_C(U22.10, U22.12, U22.13, D4.K)
-/*AFUNC(T1TRIG, 1, "if(A0>6,0,12)")
-NET_C(T1TRIG.A0, U27.8)
-NET_C(T1TRIG.Q, D4.K)
-AFUNC(T1TRIGQ, 1, "if(A0>6,12,0)")
-NET_C(T1TRIGQ.A0, U27.8)
-NET_C(T1TRIGQ.Q, U23.2)*/
 	NET_C(D4.A, R89.1)
 	NET_C(R89.2, C39.2, D2.K)
 	NET_C(C39.1, GND)
@@ -1022,12 +1093,6 @@ NET_C(T1TRIGQ.Q, U23.2)*/
 	NET_C(U22.5, R121.1, C54.1)
 	NET_C(R121.2, I_V12)
 	NET_C(C54.2, U22.3, U21.2)
-/*AFUNC(T2TRIG, 1, "if(A0>6,0,12)")
-NET_C(T2TRIG.A0, U27.10)
-NET_C(T2TRIG.Q, D5.K)
-AFUNC(T2TRIGQ, 1, "if(A0>6,12,0)")
-NET_C(T2TRIGQ.A0, U27.10)
-NET_C(T2TRIGQ.Q, U21.2)*/
 	NET_C(U21.12, R98.1)
 	NET_C(U21.11, R97.1)
 	NET_C(U21.9, R95.1)
@@ -1076,3 +1141,5 @@ NET_C(T2TRIGQ.Q, U21.2)*/
 #endif
 
 NETLIST_END()
+
+#endif

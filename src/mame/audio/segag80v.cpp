@@ -122,7 +122,7 @@ elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *
 DEFINE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device, "zektor_audio", "Zektor Sound Board")
 
 zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: segag80_audio_device(mconfig, ZEKTOR_AUDIO, tag, owner, clock, NETLIST_NAME(elim), 5000.0)
+	: segag80_audio_device(mconfig, ZEKTOR_AUDIO, tag, owner, clock, NETLIST_NAME(zektor), 5000.0)
 {
 }
 
