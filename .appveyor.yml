@@ -40,6 +40,7 @@ for:
       - bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
       - bash -lc "pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
       - bash -lc "pacman -Syu --noconfirm"
+      - taskkill /f /fi "MODULES eq msys-2.0.dll"
       - bash -lc "pacman -Syu --noconfirm"
     build_script:
       - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=3 IGNORE_GIT=1 -j3"
