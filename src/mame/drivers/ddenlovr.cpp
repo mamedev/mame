@@ -10023,7 +10023,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 void ddenlovr_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, 8000000); // KL5C80A12
+	KL5C80A12(config, m_maincpu, 20'000'000); // KL5C80A12
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hanakanz_portmap);
 
@@ -10068,7 +10068,7 @@ void ddenlovr_state::hkagerou(machine_config &config)
 void ddenlovr_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinyo_portmap);
 
@@ -10471,7 +10471,7 @@ void ddenlovr_state::hparadis(machine_config &config)
 void ddenlovr_state::jongtei(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2); // KL5C80A12
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // KL5C80A12
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::jongtei_portmap);
 
@@ -10685,7 +10685,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 void ddenlovr_state::daimyojn(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2);
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::daimyojn_portmap);
 

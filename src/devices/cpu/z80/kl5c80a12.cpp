@@ -1,33 +1,50 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,AJR
+// copyright-holders:AJR
 /***************************************************************************
 
-    Kawasaki LSI
-    KL5C80A12 CPU (KL5C80A12CFP on hng64.c)
+    Kawasaki Steel (Kawatetsu) KL5C80A12 CPU
 
-    Binary compatible with Z80, significantly faster opcode timings, operating at up to 10Mhz
-    Timers / Counters, Parallel / Serial ports/ MMU, Interrupt Controller
+    This is based on KC82, an MMU-enhanced version of KC80 (KL5C8400),
+    Kawasaki's Z80-compatible core with an internal 16-bit architecture
+    and significantly faster opcode timings, operating at up to 10 MHz
+    (CLK = XIN/2).
 
-    (is this different enough to need it's own core?)
-    (todo: everything except MMU)
+    Important functional blocks:
+    — MMU
+    — USART (KP51) (unemulated)
+    — 16-bit timer/counters (KP64, KP63) (unemulated)
+    — 16-level interrupt controller (KP69) (unemulated)
+    — Parallel ports (KP65, KP66) (unemulated)
+    — 512-byte high-speed RAM
+    — External bus interface unit (unemulated)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "kl5c80a12.h"
 
-DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "Kawasaki LSI KL5C80A12")
+DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "Kawasaki Steel KL5C80A12")
 
 
 kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, KL5C80A12, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10)
-	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10, address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this))
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10, address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(kl5c80a12_device::internal_io), this))
 {
 	std::fill_n(&m_mmu_a[0], 4, 0);
 	std::fill_n(&m_mmu_b[0], 5, 0);
 	std::fill_n(&m_mmu_base[0], 0x40, 0);
+}
+
+
+//-------------------------------------------------
+//  internal_ram - map for high-speed internal RAM
+//-------------------------------------------------
+
+void kl5c80a12_device::internal_ram(address_map &map)
+{
+	map(0xffe00, 0xfffff).ram().share("ram");
 }
 
 
@@ -138,7 +155,7 @@ void kl5c80a12_device::mmu_remap_pages()
 {
 	int n = 4;
 	u32 base = 0xf0000; // A4 is fixed
-	for (int i = 0x3f; i >= 0; --i)
+	for (u8 i = 0x3f; i != 0; --i)
 	{
 		while (n != 0 && m_mmu_b[n] >= i)
 		{
