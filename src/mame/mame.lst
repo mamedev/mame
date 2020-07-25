@@ -101,7 +101,8 @@ undoukai                        // A17 (c) 1984 Taito
 4d35                            // IP12: Personal Iris 4D/35, R3000A @36MHz
 
 @source:4enlinea.cpp
-4enlinea                        // (c) 1991 System Compumatic
+4enlinea                        // (c) 1991 Compumatic / CIC Play
+4enlineb                        // (c) 1991 Compumatic / CIC Play
 k7_olym                         // (c) 1994 K7 Kursaal
 sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios S.L.
 
