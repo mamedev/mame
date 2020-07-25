@@ -69,7 +69,14 @@ namespace testing
 	class Test
 	{
 	public:
-		virtual ~Test() {}
+		Test() = default;
+		virtual ~Test() = default;
+
+		Test(const Test &) = delete;
+		Test &operator=(const Test &) = delete;
+		Test(Test &&) noexcept = delete;
+		Test &operator=(Test &&) noexcept = delete;
+
 		virtual void run() {}
 		virtual void SetUp() {}
 		virtual void TearDown() {}
@@ -83,7 +90,14 @@ namespace testing
 		{
 			registry().push_back(this);
 		}
+
+		reg_entry_base(const reg_entry_base &) = delete;
+		reg_entry_base &operator=(const reg_entry_base &) = delete;
+		reg_entry_base(reg_entry_base &&) noexcept = delete;
+		reg_entry_base &operator=(reg_entry_base &&) noexcept = delete;
+
 		virtual ~reg_entry_base() = default;
+
 		virtual Test *create() const { return nullptr; }
 
 		std::string name;

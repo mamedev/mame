@@ -32,6 +32,7 @@ namespace plib {
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "istream_read sizeof issue");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		return is.read(reinterpret_cast<ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
 
@@ -42,6 +43,7 @@ namespace plib {
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "ostream_write sizeof issue");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		return os.write(reinterpret_cast<const ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
 
@@ -108,6 +110,7 @@ public:
 		m_strm->read(&b[0], 1);
 		if (m_strm->eof())
 			return false;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const std::size_t l = putf8string::traits_type::codelen(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		for (std::size_t i = 1; i < l; i++)
 		{
@@ -115,6 +118,7 @@ public:
 			if (m_strm->eof())
 				return false;
 		}
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		c = putf8string::traits_type::code(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		return true;
 	}
@@ -212,7 +216,7 @@ public:
 
 	void write(const pstring &s)
 	{
-		auto *sm = s.c_str();
+		const auto *sm = s.c_str();
 		const auto sl(std::char_traits<pstring::mem_t>::length(sm));
 		write(sl);
 		ostream_write(m_strm, sm, sl);

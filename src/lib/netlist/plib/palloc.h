@@ -12,6 +12,7 @@
 #include "pgsl.h"
 #include "pmath.h"  // FIXME: only uses lcm ... move to ptypes.
 #include "ptypes.h"
+#include "pgsl.h"
 
 #include <algorithm>
 #include <cstddef>      // for std::max_align_t (usually long long)
@@ -253,7 +254,7 @@ namespace plib {
 		: m_a(arena_type::instance())
 		{ }
 
-		//~arena_allocator() noexcept = default;
+		~arena_allocator() noexcept = default;
 
 		PCOPYASSIGNMOVE(arena_allocator, default)
 
@@ -626,9 +627,7 @@ namespace plib {
 	class paged_arena : public arena_base<paged_arena<BASEARENA, PAGESIZE>, true, true>
 	{
 	public:
-		paged_arena()
-		{
-		}
+		paged_arena() = default;
 
 		PCOPYASSIGNMOVE(paged_arena, delete)
 
