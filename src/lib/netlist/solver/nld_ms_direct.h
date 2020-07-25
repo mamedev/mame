@@ -31,7 +31,7 @@ namespace solver
 
 		matrix_solver_direct_t(devices::nld_solver &main_solver, const pstring &name,
 			const matrix_solver_t::net_list_t &nets,
-			const solver_parameters_t *params, std::size_t size);
+			const solver::solver_parameters_t *params, std::size_t size);
 
 		void reset() override { matrix_solver_t::reset(); }
 
@@ -190,7 +190,7 @@ namespace solver
 	template <typename FT, int SIZE>
 	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(devices::nld_solver &main_solver, const pstring &name,
 		const matrix_solver_t::net_list_t &nets,
-		const solver_parameters_t *params,
+		const solver::solver_parameters_t *params,
 		std::size_t size)
 	: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params, size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((size + 0) + 7) / 8) * 8)

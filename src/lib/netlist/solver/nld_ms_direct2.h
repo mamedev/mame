@@ -30,7 +30,7 @@ namespace solver
 
 		matrix_solver_direct2_t(devices::nld_solver &main_solver, const pstring &name,
 			const matrix_solver_t::net_list_t &nets,
-			const solver_parameters_t *params)
+			const solver::solver_parameters_t *params)
 		: matrix_solver_direct_t<FT, 2>(main_solver, name, nets, params, 2)
 		{}
 		void vsolve_non_dynamic() override

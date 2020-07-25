@@ -37,7 +37,7 @@ namespace solver
 
 		matrix_solver_GCR_t(devices::nld_solver &main_solver, const pstring &name,
 			const matrix_solver_t::net_list_t &nets,
-			const solver_parameters_t *params, const std::size_t size)
+			const solver::solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params, size)
 		, mat(static_cast<typename mat_type::index_type>(size))
 		, m_proc()

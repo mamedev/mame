@@ -62,39 +62,78 @@ namespace solver
 
 	using static_compile_container = std::vector<std::pair<pstring, pstring>>;
 
-	struct solver_parameters_t
+	struct solver_parameter_defaults
 	{
-		solver_parameters_t(device_t &parent)
-		: m_freq(parent, "FREQ", nlconst::magic(48000.0))
+		constexpr nl_fptype          m_freq() { return nlconst::magic(48000.0); }
 
 		// iteration parameters
-		, m_gs_sor(parent,   "SOR_FACTOR", nlconst::magic(1.059))
-		, m_method(parent,   "METHOD", matrix_type_e::MAT_CR)
-		, m_fp_type(parent,  "FPTYPE", matrix_fp_type_e::DOUBLE)
-		, m_reltol(parent,   "RELTOL", nlconst::magic(1e-3))            ///< SPICE RELTOL parameter
-		, m_vntol(parent,    "VNTOL",  nlconst::magic(1e-7))            ///< SPICE VNTOL parameter
-		, m_accuracy(parent, "ACCURACY", nlconst::magic(1e-7))          ///< Iterative solver accuracy
-		, m_nr_loops(parent, "NR_LOOPS", 250)           ///< Maximum number of Newton-Raphson loops
-		, m_gs_loops(parent, "GS_LOOPS", 9)             ///< Maximum number of Gauss-Seidel loops
+		constexpr nl_fptype          m_gs_sor() { return nlconst::magic(1.059); }
+		constexpr matrix_type_e      m_method() { return matrix_type_e::MAT_CR; }
+		constexpr matrix_fp_type_e   m_fp_type() { return matrix_fp_type_e::DOUBLE; }
+		constexpr nl_fptype          m_reltol() { return nlconst::magic(1e-3); }
+		constexpr nl_fptype          m_vntol() { return nlconst::magic(1e-7); }
+		constexpr nl_fptype          m_accuracy() { return nlconst::magic(1e-7); }
+		constexpr std::size_t        m_nr_loops() { return 250; }
+		constexpr std::size_t        m_gs_loops() { return 9; }
 
 		// general parameters
-		, m_gmin(parent, "GMIN", nlconst::magic(1e-9))
-		, m_pivot(parent, "PIVOT", false)               ///< use pivoting on supported solvers
-		, m_nr_recalc_delay(parent, "NR_RECALC_DELAY",
-			netlist_time::quantum().as_fp<nl_fptype>()) ///< Delay to next solve attempt if nr loops exceeded
-		, m_parallel(parent, "PARALLEL", 0)
+		constexpr nl_fptype          m_gmin() { return nlconst::magic(1e-9); }
+		constexpr bool               m_pivot() { return false; }
+		constexpr nl_fptype          m_nr_recalc_delay(){ return netlist_time::quantum().as_fp<nl_fptype>(); }
+		constexpr std::size_t        m_parallel() { return 0; }
 
-		, m_min_ts_ts(parent, "MIN_TS_TS", nlconst::magic(1e-9)) ///< The minimum times step for solvers with time stepping devices.
+		constexpr nl_fptype          m_min_ts_ts() { return nlconst::magic(1e-9); }
 		// automatic time step
-		, m_dynamic_ts(parent, "DYNAMIC_TS", false)     ///< Use dynamic time stepping
-		, m_dynamic_lte(parent, "DYNAMIC_LTE", nlconst::magic(1e-5))    ///< dynamic time stepping slope
-		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", nlconst::magic(1e-6)) ///< smallest time step allowed
+		constexpr bool               m_dynamic_ts() { return false; }
+		constexpr nl_fptype          m_dynamic_lte() { return nlconst::magic(1e-5); }
+		constexpr nl_fptype          m_dynamic_min_ts() { return nlconst::magic(1e-6); }
 
 		// matrix sorting
-		, m_sort_type(parent, "SORT_TYPE", matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT)
+		constexpr matrix_sort_type_e m_sort_type() { return matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT; }
 
 		// special
-		, m_use_gabs(parent, "USE_GABS", true)
+		constexpr bool               m_use_gabs() { return true; }
+
+		static solver_parameter_defaults &get_instance()
+		{
+			static solver_parameter_defaults s;
+			return s;
+		}
+	};
+
+	struct solver_parameters_t
+	{
+		template <typename D>
+		solver_parameters_t(device_t &parent, const pstring &prefix, D &defaults)
+		: m_freq(parent, prefix + "FREQ", defaults.m_freq())
+
+		// iteration parameters
+		, m_gs_sor(parent,   prefix + "SOR_FACTOR", defaults.m_gs_sor())
+		, m_method(parent,   prefix + "METHOD", defaults.m_method())
+		, m_fp_type(parent,  prefix + "FPTYPE", defaults.m_fp_type())
+		, m_reltol(parent,   prefix + "RELTOL", defaults.m_reltol())            ///< SPICE RELTOL parameter
+		, m_vntol(parent,    prefix + "VNTOL",  defaults.m_vntol())            ///< SPICE VNTOL parameter
+		, m_accuracy(parent, prefix + "ACCURACY", defaults.m_accuracy())          ///< Iterative solver accuracy
+		, m_nr_loops(parent, prefix + "NR_LOOPS", defaults.m_nr_loops())           ///< Maximum number of Newton-Raphson loops
+		, m_gs_loops(parent, prefix + "GS_LOOPS", defaults.m_gs_loops())             ///< Maximum number of Gauss-Seidel loops
+
+		// general parameters
+		, m_gmin(parent, prefix + "GMIN", defaults.m_gmin())
+		, m_pivot(parent, prefix + "PIVOT", defaults.m_pivot())               ///< use pivoting on supported solvers
+		, m_nr_recalc_delay(parent, prefix + "NR_RECALC_DELAY", defaults.m_nr_recalc_delay()) ///< Delay to next solve attempt if nr loops exceeded
+		, m_parallel(parent, prefix + "PARALLEL", defaults.m_parallel())
+		, m_min_ts_ts(parent, prefix + "MIN_TS_TS", defaults.m_min_ts_ts()) ///< The minimum time step for solvers with time stepping devices.
+
+		// automatic time step
+		, m_dynamic_ts(parent, prefix + "DYNAMIC_TS", defaults.m_dynamic_ts())     ///< Use dynamic time stepping
+		, m_dynamic_lte(parent, prefix + "DYNAMIC_LTE", defaults.m_dynamic_lte())    ///< dynamic time stepping slope
+		, m_dynamic_min_ts(parent, prefix + "DYNAMIC_MIN_TIMESTEP", defaults.m_dynamic_min_ts()) ///< smallest time step allowed
+
+		// matrix sorting
+		, m_sort_type(parent, prefix + "SORT_TYPE", defaults.m_sort_type())
+
+		// special
+		, m_use_gabs(parent, prefix + "USE_GABS", defaults.m_use_gabs())
 
 		{
 			m_min_timestep = m_dynamic_min_ts();
@@ -291,12 +330,12 @@ namespace solver
 			return max_rail;
 		}
 
+		const solver_parameters_t &m_params;
+
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_gonn;
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_gtn;
 		plib::pmatrix2d_vrl<fptype, arena_type>    m_Idrn;
 		plib::pmatrix2d_vrl<fptype *, arena_type>  m_connected_net_Vn;
-
-		const solver_parameters_t &m_params;
 
 		state_var<std::size_t> m_iterative_fail;
 		state_var<std::size_t> m_iterative_total;
@@ -344,7 +383,6 @@ namespace solver
 		std::size_t m_ops;
 
 		plib::aligned_vector<terms_for_net_t> m_rails_temp; // setup only
-
 	};
 
 } // namespace solver

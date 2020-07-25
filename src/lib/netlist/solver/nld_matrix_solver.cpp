@@ -40,7 +40,7 @@ namespace solver
 
 	matrix_solver_t::matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 		const net_list_t &nets,
-		const solver_parameters_t *params)
+		const solver::solver_parameters_t *params)
 		: device_t(static_cast<device_t &>(main_solver), name)
 		, m_params(*params)
 		, m_iterative_fail(*this, "m_iterative_fail", 0)
@@ -57,6 +57,7 @@ namespace solver
 
 		// now setup the matrix
 		setup_matrix();
+		//printf("Freq: %f\n", m_params.m_freq());
 	}
 
 	analog_net_t *matrix_solver_t::get_connected_net(terminal_t *term)

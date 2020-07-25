@@ -26,7 +26,7 @@ namespace solver
 
 		matrix_solver_ext_t(devices::nld_solver &main_solver, const pstring &name,
 			const net_list_t &nets,
-			const solver_parameters_t *params, const std::size_t size)
+			const solver::solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_t(main_solver, name, nets, params)
 		, m_new_V(size)
 		, m_RHS(size)

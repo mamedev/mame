@@ -177,43 +177,43 @@ namespace devices
 	template <class C>
 	NETLIB_NAME(solver)::solver_ptr create_it(NETLIB_NAME(solver) &main_solver, pstring name,
 		NETLIB_NAME(solver)::net_list_t &nets,
-		solver::solver_parameters_t &params, std::size_t size)
+		const solver::solver_parameters_t *params, std::size_t size)
 	{
-		return plib::make_unique<C, device_arena>(main_solver, name, nets, &params, size);
+		return plib::make_unique<C, device_arena>(main_solver, name, nets, params, size);
 	}
 
 	template <typename FT, int SIZE>
 	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solver(std::size_t size,
-		const pstring &solvername,
+		const pstring &solvername, const solver::solver_parameters_t *params,
 		NETLIB_NAME(solver)::net_list_t &nets)
 	{
-		switch (m_params.m_method())
+		switch (params->m_method())
 		{
 			case solver::matrix_type_e::MAT_CR:
-				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(*this, solvername, nets, params, size);
 			case solver::matrix_type_e::MAT:
-				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(*this, solvername, nets, params, size);
 			case solver::matrix_type_e::GMRES:
-				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(*this, solvername, nets, params, size);
 #if (NL_USE_ACADEMIC_SOLVERS)
 			case solver::matrix_type_e::SOR:
-				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(*this, solvername, nets, params, size);
 			case solver::matrix_type_e::SOR_MAT:
-				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(*this, solvername, nets, params, size);
 			case solver::matrix_type_e::SM:
 				// Sherman-Morrison Formula
-				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(*this, solvername, nets, params, size);
 			case solver::matrix_type_e::W:
 				// Woodbury Formula
-				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(*this, solvername, nets, params, size);
 #else
 			//case solver::matrix_type_e::GMRES:
 			case solver::matrix_type_e::SOR:
 			case solver::matrix_type_e::SOR_MAT:
 			case solver::matrix_type_e::SM:
 			case solver::matrix_type_e::W:
-				state().log().warning(MW_SOLVER_METHOD_NOT_SUPPORTED(m_params.m_method().name(), "MAT_CR"));
-				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(*this, solvername, nets, m_params, size);
+				state().log().warning(MW_SOLVER_METHOD_NOT_SUPPORTED(params->m_method().name(), "MAT_CR"));
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(*this, solvername, nets, params, size);
 #endif
 		}
 		return solver_ptr();
@@ -221,57 +221,55 @@ namespace devices
 
 	template <typename FT>
 	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solvers(
-		const pstring &sname,
+		const pstring &sname, const solver::solver_parameters_t *params,
 		net_list_t &nets)
 	{
 		std::size_t net_count = nets.size();
 		switch (net_count)
 		{
 			case 1:
-				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, device_arena>(*this, sname, nets, &m_params);
-				//return state().make_pool_object<solver::matrix_solver_direct1_t<FT>>(state(), sname, nets, &m_params);
+				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, device_arena>(*this, sname, nets, params);
 			case 2:
-				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, device_arena>(*this, sname, nets, &m_params);
-				//return state().make_pool_object<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
+				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, device_arena>(*this, sname, nets, params);
 			case 3:
-				return create_solver<FT, 3>(3, sname, nets);
+				return create_solver<FT, 3>(3, sname, params, nets);
 			case 4:
-				return create_solver<FT, 4>(4, sname, nets);
+				return create_solver<FT, 4>(4, sname, params, nets);
 			case 5:
-				return create_solver<FT, 5>(5, sname, nets);
+				return create_solver<FT, 5>(5, sname, params, nets);
 			case 6:
-				return create_solver<FT, 6>(6, sname, nets);
+				return create_solver<FT, 6>(6, sname, params, nets);
 			case 7:
-				return create_solver<FT, 7>(7, sname, nets);
+				return create_solver<FT, 7>(7, sname, params, nets);
 			case 8:
-				return create_solver<FT, 8>(8, sname, nets);
+				return create_solver<FT, 8>(8, sname, params, nets);
 			default:
 				log().info(MI_NO_SPECIFIC_SOLVER(net_count));
 				if (net_count <= 16)
 				{
-					return create_solver<FT, -16>(net_count, sname, nets);
+					return create_solver<FT, -16>(net_count, sname, params, nets);
 				}
 				if (net_count <= 32)
 				{
-					return create_solver<FT, -32>(net_count, sname, nets);
+					return create_solver<FT, -32>(net_count, sname, params, nets);
 				}
 				if (net_count <= 64)
 				{
-					return create_solver<FT, -64>(net_count, sname, nets);
+					return create_solver<FT, -64>(net_count, sname, params, nets);
 				}
 				if (net_count <= 128)
 				{
-					return create_solver<FT, -128>(net_count, sname, nets);
+					return create_solver<FT, -128>(net_count, sname, params, nets);
 				}
 				if (net_count <= 256)
 				{
-					return create_solver<FT, -256>(net_count, sname, nets);
+					return create_solver<FT, -256>(net_count, sname, params, nets);
 				}
 				if (net_count <= 512)
 				{
-					return create_solver<FT, -512>(net_count, sname, nets);
+					return create_solver<FT, -512>(net_count, sname, params, nets);
 				}
-				return create_solver<FT, 0>(net_count, sname, nets);
+				return create_solver<FT, 0>(net_count, sname, params, nets);
 		}
 	}
 
@@ -387,28 +385,29 @@ namespace devices
 		{
 			solver_ptr ms;
 			pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
+			params_uptr params = plib::make_unique<solver::solver_parameters_t, solver_arena>(*this, sname + ".", m_params);
 
-			switch (m_params.m_fp_type())
+			switch (params->m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
 					if (!config::use_float_matrix())
-						log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
-					ms = create_solvers<std::conditional_t<config::use_float_matrix::value, float, double>>(sname, grp);
+						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
+					ms = create_solvers<std::conditional_t<config::use_float_matrix::value, float, double>>(sname, params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::DOUBLE:
-					ms = create_solvers<double>(sname, grp);
+					ms = create_solvers<double>(sname, params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
 					if (!config::use_long_double_matrix())
-						log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
-					ms = create_solvers<std::conditional_t<config::use_long_double_matrix::value, long double, double>>(sname, grp);
+						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
+					ms = create_solvers<std::conditional_t<config::use_long_double_matrix::value, long double, double>>(sname, params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::FLOATQ128:
 #if (NL_USE_FLOAT128)
-					ms = create_solvers<FLOAT128>(sname, grp);
+					ms = create_solvers<FLOAT128>(sname, params.get(), grp);
 #else
-					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
-					ms = create_solvers<double>(sname, grp);
+					log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
+					ms = create_solvers<double>(sname, params.get(), grp);
 #endif
 					break;
 			}
@@ -426,6 +425,7 @@ namespace devices
 				}
 			}
 
+			m_mat_params.push_back(std::move(params));
 			m_mat_solvers.push_back(std::move(ms));
 		}
 
