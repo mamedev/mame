@@ -229,6 +229,7 @@ protected:
 	void otdr();
 	void ei();
 
+	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
 
@@ -299,9 +300,9 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
-	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	virtual void check_interrupts() override;
 	void take_interrupt_nsc800();
 	uint8_t m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
 };

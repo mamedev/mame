@@ -11,9 +11,6 @@
  *      was set before this instruction (implemented, but not enabled: we need
  *      document Z80 types first, see below)
  *    - WAIT only stalls between instructions now, it should stall immediately.
- *    - HALT state should not exit if HALT opcode was overwritten by external device,
- *      while in this state CPU should repeatedly dummy fetch *next after HALT* address.
- *      source: http://www.primrosebank.net/computers/z80/z80_special_reset.htm ('Halt and the special reset' part)
  *    - Ideally, the tiny differences between Z80 types should be supported,
  *      currently known differences:
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
@@ -128,7 +125,7 @@
 
 /****************************************************************************/
 /* The Z80 registers. halt is set to 1 when the CPU is halted, the refresh  */
-/* register is calculated as follows: refresh=(r&127)|(r2&128)    */
+/* register is calculated as follows: refresh=(r&127)|(r2&128)              */
 /****************************************************************************/
 
 #define CF      0x01
@@ -403,7 +400,6 @@ static const uint8_t cc_ex[0x100] = {
  ***************************************************************/
 inline void z80_device::halt()
 {
-	PC--;
 	if (!m_halt)
 	{
 		m_halt = 1;
@@ -416,11 +412,10 @@ inline void z80_device::halt()
  ***************************************************************/
 inline void z80_device::leave_halt()
 {
-	if( m_halt )
+	if (m_halt)
 	{
 		m_halt = 0;
 		m_halt_cb(0);
-		PC++;
 	}
 }
 
@@ -2847,7 +2842,7 @@ OP(ed,ff) { illegal_2();                                     } /* DB   ED       
  **********************************************************/
 OP(op,00) {                                                                       } /* NOP              */
 OP(op,01) { BC = arg16();                                                         } /* LD   BC,w        */
-OP(op,02) { wm(BC,A); WZ_L = (BC + 1) & 0xFF;  WZ_H = A;                          } /* LD (BC),A */
+OP(op,02) { wm(BC,A); WZ_L = (BC + 1) & 0xFF;  WZ_H = A;                          } /* LD (BC),A        */
 OP(op,03) { BC++;                                                                 } /* INC  BC          */
 OP(op,04) { B = inc(B);                                                           } /* INC  B           */
 OP(op,05) { B = dec(B);                                                           } /* DEC  B           */
@@ -2865,7 +2860,7 @@ OP(op,0f) { rrca();                                                             
 
 OP(op,10) { B--; jr_cond(B, 0x10);                                                } /* DJNZ o           */
 OP(op,11) { DE = arg16();                                                         } /* LD   DE,w        */
-OP(op,12) { wm(DE,A); WZ_L = (DE + 1) & 0xFF;  WZ_H = A;                          } /* LD (DE),A */
+OP(op,12) { wm(DE,A); WZ_L = (DE + 1) & 0xFF;  WZ_H = A;                          } /* LD (DE),A        */
 OP(op,13) { DE++;                                                                 } /* INC  DE          */
 OP(op,14) { D = inc(D);                                                           } /* INC  D           */
 OP(op,15) { D = dec(D);                                                           } /* DEC  D           */
@@ -2915,7 +2910,7 @@ OP(op,3b) { SP--;                                                               
 OP(op,3c) { A = inc(A);                                                           } /* INC  A           */
 OP(op,3d) { A = dec(A);                                                           } /* DEC  A           */
 OP(op,3e) { A = arg();                                                            } /* LD   A,n         */
-OP(op,3f) { F = ((F&(SF|ZF|YF|XF|PF|CF))|((F&CF)<<4)|(A&(YF|XF)))^CF;             } /* CCF        */
+OP(op,3f) { F = ((F&(SF|ZF|YF|XF|PF|CF))|((F&CF)<<4)|(A&(YF|XF)))^CF;             } /* CCF              */
 
 OP(op,40) {                                                                       } /* LD   B,B         */
 OP(op,41) { B = C;                                                                } /* LD   B,C         */
@@ -2977,7 +2972,7 @@ OP(op,72) { wm(HL, D);                                                          
 OP(op,73) { wm(HL, E);                                                            } /* LD   (HL),E      */
 OP(op,74) { wm(HL, H);                                                            } /* LD   (HL),H      */
 OP(op,75) { wm(HL, L);                                                            } /* LD   (HL),L      */
-OP(op,76) { halt();                                                               } /* halt             */
+OP(op,76) { halt();                                                               } /* HALT             */
 OP(op,77) { wm(HL, A);                                                            } /* LD   (HL),A      */
 
 OP(op,78) { A = B;                                                                } /* LD   A,B         */
@@ -3091,7 +3086,7 @@ OP(op,d7) { rst(0x10);                                                          
 OP(op,d8) { ret_cond(F & CF, 0xd8);                                               } /* RET  C           */
 OP(op,d9) { exx();                                                                } /* EXX              */
 OP(op,da) { jp_cond(F & CF);                                                      } /* JP   C,a         */
-OP(op,db) { unsigned n = arg() | (A << 8); A = in(n); WZ = n + 1;                 } /* IN   A,(n)  */
+OP(op,db) { unsigned n = arg() | (A << 8); A = in(n); WZ = n + 1;                 } /* IN   A,(n)       */
 OP(op,dc) { call_cond(F & CF, 0xdc);                                              } /* CALL C,a         */
 OP(op,dd) { m_r++; EXEC(dd,rop());                                                } /* **** DD xx       */
 OP(op,de) { sbc_a(arg());                                                         } /* SBC  A,n         */
@@ -3499,6 +3494,7 @@ void nsc800_device::device_reset()
 /****************************************************************************
  * Execute 'cycles' T-states.
  ****************************************************************************/
+
 void z80_device::execute_run()
 {
 	do
@@ -3511,48 +3507,33 @@ void z80_device::execute_run()
 		}
 
 		// check for interrupts before each instruction
-		if (m_nmi_pending)
-			take_nmi();
-		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
-			take_interrupt();
+		check_interrupts();
 
 		m_after_ei = false;
 		m_after_ldair = false;
 
 		PRVPC = PCD;
 		debugger_instruction_hook(PCD);
+
 		m_r++;
-		EXEC(op,rop());
+		uint8_t opcode = rop();
+
+		// when in HALT state, the fetched opcode is not executed (aka a NOP)
+		if (m_halt)
+		{
+			PC--;
+			opcode = 0;
+		}
+		EXEC(op,opcode);
 	} while (m_icount > 0);
 }
 
-void nsc800_device::execute_run()
+void z80_device::check_interrupts()
 {
-	do
-	{
-		if (m_wait_state)
-		{
-			// stalled
-			m_icount = 0;
-			return;
-		}
-
-		// check for interrupts before each instruction
-		if (m_nmi_pending)
-			take_nmi();
-		else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei)
-			take_interrupt_nsc800();
-		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
-			take_interrupt();
-
-		m_after_ei = false;
-		m_after_ldair = false;
-
-		PRVPC = PCD;
-		debugger_instruction_hook(PCD);
-		m_r++;
-		EXEC(op,rop());
-	} while (m_icount > 0);
+	if (m_nmi_pending)
+		take_nmi();
+	else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
+		take_interrupt();
 }
 
 void z80_device::execute_set_input(int inputnum, int state)
@@ -3586,6 +3567,16 @@ void z80_device::execute_set_input(int inputnum, int state)
 	default:
 		break;
 	}
+}
+
+void nsc800_device::check_interrupts()
+{
+	if (m_nmi_pending)
+		take_nmi();
+	else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei)
+		take_interrupt_nsc800();
+	else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
+		take_interrupt();
 }
 
 void nsc800_device::execute_set_input(int inputnum, int state)
