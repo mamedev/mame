@@ -96,7 +96,7 @@ uint32_t xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bit
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
+	pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 	return 0;
 }
@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[2], 0, 4);
 
 		/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-	    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
+		pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 		m_k053246->k053247_sprites_draw(*renderbitmap, cliprect);
 	}
 }

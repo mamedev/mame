@@ -1012,8 +1012,8 @@ Language:
 				<rom name="vmotion80-084300.bin" size="0x0800000" crc="4d0dd939" sha1="b5411b036fa91daf56f654be4ce71b4ac15541ca" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="soccerchmg" cloneof="soccerchm">
 		<description>Fußball Meisterschaft (Germany)</description>
 		<year>20??</year>
@@ -1333,5 +1333,5 @@ Language:
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

@@ -150,7 +150,7 @@ void spectrum_swiftdisc_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", swiftdisc_floppies, "35dd",  spectrum_swiftdisc_device::floppy_formats).enable_sound(true);	
+	FLOPPY_CONNECTOR(config, "fdc:0", swiftdisc_floppies, "35dd",  spectrum_swiftdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", swiftdisc_floppies, "35dd",  spectrum_swiftdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", swiftdisc_floppies, nullptr, spectrum_swiftdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", swiftdisc_floppies, nullptr, spectrum_swiftdisc_device::floppy_formats).enable_sound(true);

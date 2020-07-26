@@ -1671,7 +1671,7 @@ ROM_END
 Some Off Road Challenge PCBs were all EPROMs, most seemed to have mask ROMs for the data ROMs
 
 Mask ROMs have been seen in two formats:
---------------------------------   -------------------------------- 
+--------------------------------   --------------------------------
 |    MIDWAY GAMES INC          |   |    MIDWAY GAMES INC          |
 |    OFFROAD CHALLENGE         |   |    OFFROAD CHALLENGE         |
 )    5341-15511-01             |   )    5341-15510-01             |

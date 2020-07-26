@@ -204,9 +204,9 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL(12'000'000)	// confirmed
-#define CPU_CLOCK       (MASTER_CLOCK/16)	// guess
-#define CRTC_CLOCK      (MASTER_CLOCK/8)	// guess
+#define MASTER_CLOCK    XTAL(12'000'000)    // confirmed
+#define CPU_CLOCK       (MASTER_CLOCK/16)   // guess
+#define CRTC_CLOCK      (MASTER_CLOCK/8)    // guess
 
 
 /*******************************************
@@ -233,7 +233,7 @@ WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
 
 void truco_state::portb_w(uint8_t data)
 {
-	m_dac->write(BIT(data, 7));	// Isolated the bit for Delta-Sigma DAC
+	m_dac->write(BIT(data, 7)); // Isolated the bit for Delta-Sigma DAC
 
 	if (data & 0x7f)
 		logerror("Port B writes: %2x\n", data);
@@ -256,9 +256,9 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 
 void truco_state::main_map(address_map &map)
 {
-	map(0x0000, 0x17ff).ram();							// General purpose RAM
-	map(0x1800, 0x7bff).ram().share("videoram");		// Video RAM
-	map(0x7c00, 0x7fff).ram().share("battery_ram");		// Battery backed RAM
+	map(0x0000, 0x17ff).ram();                          // General purpose RAM
+	map(0x1800, 0x7bff).ram().share("videoram");        // Video RAM
+	map(0x7c00, 0x7fff).ram().share("battery_ram");     // Battery backed RAM
 	map(0x8000, 0x8003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8004, 0x8004).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x8005, 0x8005).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -266,7 +266,7 @@ void truco_state::main_map(address_map &map)
 }
 /*
   CRTC MC6845 initialization routine at $a506 only set the first 14 registers (data at $a4e2)
-  
+
   Register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13
   Value:     0x5f  0x40  0x4d  0x06  0x0f  0x04  0x0c  0x0e  0x00  0x0f  0x00  0x00  0x00  0xc0
 
@@ -278,17 +278,17 @@ void truco_state::main_map(address_map &map)
 *******************************************/
 
 static INPUT_PORTS_START( truco )
-	PORT_START("P1")	// IN0
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S17 (P2 START)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S14 (SERVICE SW)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA C26 (P2 SELECT)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S16 (COIN2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )		// Connected to JAMMA S15 (TILT SW)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )		// Connected to JAMMA C22 (P1 BUTTON1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	// Connected to JAMMA C18/21 (JOY UP & JOY RIGHT)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	// Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT)
+	PORT_START("P1")    // IN0
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // Connected to JAMMA S17 (P2 START)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // Connected to JAMMA S14 (SERVICE SW)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // Connected to JAMMA C26 (P2 SELECT)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // Connected to JAMMA S16 (COIN2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        // Connected to JAMMA S15 (TILT SW)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )        // Connected to JAMMA C22 (P1 BUTTON1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    // Connected to JAMMA C18/21 (JOY UP & JOY RIGHT)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  // Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT)
 
-	PORT_START("COIN")	// IN1
+	PORT_START("COIN")  // IN1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -298,7 +298,7 @@ static INPUT_PORTS_START( truco )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("JMPRS")	// JP1-2
+	PORT_START("JMPRS") // JP1-2
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
@@ -397,7 +397,7 @@ void truco_state::truco(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &truco_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(truco_state::interrupt));
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));	// 1.6 seconds
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600)); // 1.6 seconds
 
 	pia6821_device &pia(PIA6821(config, "pia0", 0));
 	pia.readpa_handler().set_ioport("P1");
@@ -411,14 +411,14 @@ void truco_state::truco(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));	// not accurate
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
 	screen.set_size(256, 192);
 	screen.set_visarea(0, 256-1, 0, 192-1);
 	screen.set_screen_update(FUNC(truco_state::screen_update));
 
 	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
 
-	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));	// identified as UM6845
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    // identified as UM6845
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);

@@ -333,10 +333,10 @@ ROM_START( vsmilem )
 
 	/* This ROM doesn't show the 'Motion' logo at all, but was dumped from a Motion unit
 
-		Console says "Vtech V.Smile V-motion Active Learning System"
-		"FCC ID 62R-0788, IC 1135D-0788" "53-36600-056-080"
-		melted into plastic "VT8281"
-		The PCB has the code 35-078800-001-103_708979-2.
+	    Console says "Vtech V.Smile V-motion Active Learning System"
+	    "FCC ID 62R-0788, IC 1135D-0788" "53-36600-056-080"
+	    melted into plastic "VT8281"
+	    The PCB has the code 35-078800-001-103_708979-2.
 	*/
 	ROM_SYSTEM_BIOS( 1, "bios1", "bios1" )
 	ROMX_LOAD( "vmotionbios.bin", 0x000000, 0x200000, CRC(427087ea) SHA1(dc9eaa55f4a0047b6069ef73beea86d26f0f5394), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // from a US unit

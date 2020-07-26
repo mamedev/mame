@@ -8,7 +8,7 @@
     FD1791-based floppy drive and printer interface with 4K RAM and 8K ROM
     Was mainly designed as tape replacement, and sort of emulate how tapes works,
     which allows to copy and use most of existing software and (not protected) games with no modification.
-    
+
     Doube-side drives considered as 2 separate floppies (0 and 4, 1 and 5 etc) probably to mimic tape sides A/B,
     disks is password protected.
 
@@ -20,7 +20,7 @@
      SAVE "name" - save program
      !FORMAT "diskname";"password";tracks - format disk, if disk was already formatted you'll be prompted for password.
      !6=n - set text mode, 0 - regular 32-column, 3 - 64-column
-	 !B=rs232delay, 0=use parallel printer (default)
+     !B=rs232delay, 0=use parallel printer (default)
     There is more of special "!x=n" commands, but theirs functions is not known, manual is missing.
     Some information about this device https://worldofspectrum.org/forums/discussion/42944/rocky-gush-floppy-drive-interface/p1
 
@@ -114,7 +114,7 @@ void spectrum_flpone_device::device_add_mconfig(machine_config &config)
 {
 	FD1791(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", flpone_floppies, "525qd", spectrum_flpone_device::floppy_formats).enable_sound(true);	
+	FLOPPY_CONNECTOR(config, "fdc:0", flpone_floppies, "525qd", spectrum_flpone_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", flpone_floppies, "525qd", spectrum_flpone_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", flpone_floppies, nullptr, spectrum_flpone_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", flpone_floppies, nullptr, spectrum_flpone_device::floppy_formats).enable_sound(true);

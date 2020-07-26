@@ -4,16 +4,16 @@
 
     SAM Coupe Mouse Port
 
-	8-pin connector
+    8-pin connector
 
-	1  K3
-	2  K2
-	3  K1
-	4  K5
-	5  K4
-	6  MSEINT
-	7  RDMSEL
-	8  5V
+    1  K3
+    2  K2
+    3  K1
+    4  K5
+    5  K4
+    6  MSEINT
+    7  RDMSEL
+    8  5V
 
 ***************************************************************************/
 

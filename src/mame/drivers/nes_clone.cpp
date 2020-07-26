@@ -416,11 +416,11 @@ void nes_clone_vtvppong_state::init_vtvppong()
 	{
 		for (int i = 0; i < len; i++)
 		{
-			int newaddr = bitswap<18>(i, 17, 16, 15, 13, 14, 12, 	
-				11, 10, 9, 8, 
-				7, 6, 5, 4, 		
+			int newaddr = bitswap<18>(i, 17, 16, 15, 13, 14, 12,
+				11, 10, 9, 8,
+				7, 6, 5, 4,
 				3, 2, 1, 0);
-		
+
 			buffer[i] = src[newaddr];
 		}
 		std::copy(buffer.begin(), buffer.end(), &src[0]);

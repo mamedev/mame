@@ -103,7 +103,7 @@ void spectrum_speccydos_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", speccydos_floppies, "525dsqd", spectrum_speccydos_device::floppy_formats).enable_sound(true);	
+	FLOPPY_CONNECTOR(config, "fdc:0", speccydos_floppies, "525dsqd", spectrum_speccydos_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", speccydos_floppies, "525dsqd", spectrum_speccydos_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", speccydos_floppies, nullptr, spectrum_speccydos_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", speccydos_floppies, nullptr, spectrum_speccydos_device::floppy_formats).enable_sound(true);

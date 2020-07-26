@@ -4,24 +4,24 @@
 
     SAM Coupe Drive Slot
 
-	32-pin slot
+    32-pin slot
 
-	 1A 0 VOLTS     1B WR
-	 2A 0 VOLTS     2B A0
-	 3A 0 VOLTS     3B A1
-	 4A 0 VOLTS     4B D0
-	 5A 0 VOLTS     5B D1
-	 6A 0 VOLTS     6B D2
-	 7A 0 VOLTS     7B D3
-	 8A 0 VOLTS     8B D4
-	 9A 0 VOLTS     9B D5
-	10A 0 VOLTS    10B D6
-	11A 0 VOLTS    11B D7
-	12A 0 VOLTS    12B 8 MHz
-	13A 0 VOLTS    13B RST
-	14A 0 VOLTS    14B N/C
-	15A 0 VOLTS    15B A2
-	16A 0 VOLTS    16B DISK 1 OR DISK 2
+     1A 0 VOLTS     1B WR
+     2A 0 VOLTS     2B A0
+     3A 0 VOLTS     3B A1
+     4A 0 VOLTS     4B D0
+     5A 0 VOLTS     5B D1
+     6A 0 VOLTS     6B D2
+     7A 0 VOLTS     7B D3
+     8A 0 VOLTS     8B D4
+     9A 0 VOLTS     9B D5
+    10A 0 VOLTS    10B D6
+    11A 0 VOLTS    11B D7
+    12A 0 VOLTS    12B 8 MHz
+    13A 0 VOLTS    13B RST
+    14A 0 VOLTS    14B N/C
+    15A 0 VOLTS    15B A2
+    16A 0 VOLTS    16B DISK 1 OR DISK 2
 
 ***************************************************************************/
 

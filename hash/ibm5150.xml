@@ -8175,7 +8175,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bloodwyca" cloneof="bloodwyc">
 		<description>Bloodwych (Quest &amp; Glory Compilation) (Euro)</description>
 		<year>1991</year>
@@ -8187,7 +8187,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bluesbro">
 		<!-- Dumped via Kryoflux -->
 		<description>The Blues Brothers</description>
@@ -8679,7 +8679,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="laurabw35" cloneof="laurabow">
 		<description>The Colonel's Bequest (3.5")</description>
 		<year>1989</year>
@@ -8707,7 +8707,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="colossus4">
 		<description>Colossus Bridge 4</description>
 		<year>1988</year>
@@ -10193,7 +10193,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lsl2">
 		<description>Leisure Suit Larry Goes Looking for Love (in Several Wrong Places) (5.25")</description>
 		<year>1989</year>
@@ -10865,7 +10865,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="martmemo">
 		<description>Martian Memorandum</description>
 		<year>1991</year>
@@ -13108,7 +13108,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ums2pe">
 		<description>UMS II: Nations at War - Planet Editor</description>
 		<year>1992</year>

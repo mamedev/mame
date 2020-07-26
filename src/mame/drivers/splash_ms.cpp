@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 /*
-	Splash (Modular System)
+    Splash (Modular System)
 */
 
 
@@ -103,7 +103,7 @@ private:
 
 	void subrambank_map(address_map& map);
 	void subrombank_map(address_map& map);
-	
+
 	void descramble_16x16tiles(uint8_t* src, int len);
 
 };
@@ -118,13 +118,13 @@ uint16_t splashms_state::unknown_0x40000c_r()
 
 void splashms_state::sub_rambankselect_w(uint8_t data)
 {
-//	logerror("sub_rambankselect_w %02x\n", data);
+//  logerror("sub_rambankselect_w %02x\n", data);
 	m_subram->set_bank(data&0x7);
 }
 
 void splashms_state::sub_rombankselect_w(uint8_t data)
 {
-//	logerror("sub_rombankselect_w %02x\n", data);
+//  logerror("sub_rombankselect_w %02x\n", data);
 	m_subrom->set_bank(data & 0x7f);
 }
 
@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(splashms_state::get_tile_info_tilemap2)
 
 uint32_t splashms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	bitmap.fill(0, cliprect);
+//  bitmap.fill(0, cliprect);
 
 	for (int y = 0; y < 256; y++)
 	{
@@ -305,7 +305,7 @@ void splashms_state::sound_map(address_map &map)
 	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void splashms_state::machine_start()
@@ -468,7 +468,7 @@ void splashms_state::splashms(machine_config &config)
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &splashms_state::sound_map);
-	m_soundcpu->set_periodic_int(FUNC(splashms_state::nmi_line_pulse), attotime::from_hz(60*64));  
+	m_soundcpu->set_periodic_int(FUNC(splashms_state::nmi_line_pulse), attotime::from_hz(60*64));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -540,8 +540,8 @@ ROM_START( splashms )
 	ROM_LOAD32_BYTE( "8_sp_837.ic37", 0x000000, 0x010000, CRC(3b544131) SHA1(e7fd97cb24b84739f2481efb1d232f86df4a3d8d) ) // 1xxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD32_BYTE( "8_sp_830.ic30", 0x000001, 0x010000, CRC(09bb675b) SHA1(49c41ccfce1b0077c430c6bb38bc858aeaf87fb8) ) // has some garbage in the blank space of the paired ROMs
 	ROM_LOAD32_BYTE( "8_sp_822.ic22", 0x000002, 0x010000, CRC(621fcf26) SHA1(a7ff6b12fbbea1bba7c4a397a82ac2fb5c09558a) ) // 1xxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "8_sp_815.ic15", 0x000003, 0x010000, CRC(5641b621) SHA1(e71df1ab5c9b2254495d99657477b52e8843d128) ) // 1xxxxxxxxxxxxxxx = 0xFF                          
-                                   
+	ROM_LOAD32_BYTE( "8_sp_815.ic15", 0x000003, 0x010000, CRC(5641b621) SHA1(e71df1ab5c9b2254495d99657477b52e8843d128) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
 	ROM_REGION( 0x080000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "5-1_sp_524.ic24", 0x000000, 0x010000, CRC(841c24c1) SHA1(70cb26033999f8184c51849e00bfcb2270f646e8) )
 	ROM_LOAD32_BYTE( "5-1_sp_518.ic18", 0x000001, 0x010000, CRC(499cb813) SHA1(4d22e58530ff8a85b7ffc8ae1ab5986215986b49) )

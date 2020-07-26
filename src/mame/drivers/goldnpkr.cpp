@@ -1497,8 +1497,8 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 
 	int attr = m_colorram[tile_index];
 	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;		// bit 1 switch the gfx banks
-	int color = (attr & 0x3c) >> 2;		// bits 2-3-4-5 for color
+	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -1515,8 +1515,8 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
 
 	int attr = m_colorram[tile_index];
 	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);	// bits 0, 1, 6 & 7 switch the gfx banks
-	int color = (attr & 0x3c) >> 2;						// bits 2-3-4-5 for color
+	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);    // bits 0, 1, 6 & 7 switch the gfx banks
+	int color = (attr & 0x3c) >> 2;                     // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -1747,7 +1747,7 @@ void goldnpkr_state::super21p_palette(palette_device &palette) const
 */
 uint8_t goldnpkr_state::goldnpkr_mux_port_r()
 {
-	switch( m_mux_data & 0xf0 )		// bits 4-7
+	switch( m_mux_data & 0xf0 )     // bits 4-7
 	{
 		// normal selector writes 7F-BF-DF-EF
 		case 0x10: return ioport("IN0-0")->read();
@@ -1767,9 +1767,9 @@ uint8_t goldnpkr_state::goldnpkr_mux_port_r()
 
 uint8_t goldnpkr_state::pottnpkr_mux_port_r()
 {
-	uint8_t pa_0_4 = 0xff, pa_7;	// temporary placeholder for bits 0 to 4 & 7
+	uint8_t pa_0_4 = 0xff, pa_7;    // temporary placeholder for bits 0 to 4 & 7
 
-	switch( m_mux_data & 0xf0 )		// bits 4-7
+	switch( m_mux_data & 0xf0 )     // bits 4-7
 	{
 		case 0x10: return ioport("IN0-0")->read();
 		case 0x20: return ioport("IN0-1")->read();
@@ -1777,7 +1777,7 @@ uint8_t goldnpkr_state::pottnpkr_mux_port_r()
 		case 0x80: return ioport("IN0-3")->read();
 	}
 
-	pa_7 = (m_pia0_PA_data >> 7) & 1;	// to do: bit PA5 to pin CB1
+	pa_7 = (m_pia0_PA_data >> 7) & 1;   // to do: bit PA5 to pin CB1
 
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
@@ -1785,7 +1785,7 @@ uint8_t goldnpkr_state::pottnpkr_mux_port_r()
 void goldnpkr_state::mux_w(uint8_t data)
 {
 	//logerror("mux_w: %2x\n",data);
-	m_mux_data = data ^ 0xff;	// inverted
+	m_mux_data = data ^ 0xff;   // inverted
 }
 
 void goldnpkr_state::mux_port_w(uint8_t data)
@@ -1881,11 +1881,11 @@ void goldnpkr_state::lamps_a_w(uint8_t data)
 */
 	data = data ^ 0xff;
 
-	m_lamps[0] = BIT(data, 0);	// lamp 0
-	m_lamps[1] = BIT(data, 1);	// lamp 1
-	m_lamps[2] = BIT(data, 2);	// lamp 2
-	m_lamps[3] = BIT(data, 3);	// lamp 3
-	m_lamps[4] = BIT(data, 4);	// lamp 4
+	m_lamps[0] = BIT(data, 0);  // lamp 0
+	m_lamps[1] = BIT(data, 1);  // lamp 1
+	m_lamps[2] = BIT(data, 2);  // lamp 2
+	m_lamps[3] = BIT(data, 3);  // lamp 3
+	m_lamps[4] = BIT(data, 4);  // lamp 4
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  // counter 1
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);  // counter 2
@@ -1958,7 +1958,7 @@ void goldnpkr_state::goldnpkr_map(address_map &map)
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
-	map(0x2000, 0x7fff).rom();	// superdbl uses 0x2000..0x3fff address space
+	map(0x2000, 0x7fff).rom();  // superdbl uses 0x2000..0x3fff address space
 }
 
 void goldnpkr_state::witchcdj_map(address_map &map)
@@ -2033,9 +2033,9 @@ void goldnpkr_state::wildcard_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
-	map(0x2200, 0x27ff).rom();	// for VK set
-	map(0x2800, 0x2fff).ram();	// for VK set
-	map(0x3000, 0xffff).rom();	// for VK set. bootleg starts from 4000
+	map(0x2200, 0x27ff).rom();  // for VK set
+	map(0x2800, 0x2fff).ram();  // for VK set
+	map(0x3000, 0xffff).rom();  // for VK set. bootleg starts from 4000
 }
 
 /*
@@ -2052,9 +2052,9 @@ void goldnpkr_state::wcrdxtnd_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
-	map(0x2200, 0x27ff).rom();	// for VK hardware
+	map(0x2200, 0x27ff).rom();  // for VK hardware
 	map(0x2800, 0x2fff).ram().share("nvram");   // Dallas ds1210 + battery backed RAM
-	map(0x3000, 0xffff).rom();	// for VK hardware. bootleg starts from 4000
+	map(0x3000, 0xffff).rom();  // for VK hardware. bootleg starts from 4000
 }
 
 /*
@@ -2206,7 +2206,7 @@ static INPUT_PORTS_START( goldnpkr )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("D-31") PORT_CODE(KEYCODE_E)		// O.A.R? (D-31 in schematics)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("D-31") PORT_CODE(KEYCODE_E)     // O.A.R? (D-31 in schematics)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
@@ -2490,16 +2490,16 @@ static INPUT_PORTS_START( animpkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x00, "High Pair (11-13)" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "High Pair (11-13)" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )         	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )             PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "50hz" )
 	PORT_DIPSETTING(    0x00, "60hz" )
-	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )           PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x40, "Manual" )
 	PORT_DIPSETTING(    0x00, "Auto" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2573,7 +2573,7 @@ static INPUT_PORTS_START( ngold)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )  	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Pair of Aces" )
 	PORT_DIPSETTING(    0x10, "Double Pair" )
 	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
@@ -2644,7 +2644,7 @@ static INPUT_PORTS_START( ngoldb)   // only coinage changes against ngold...
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )  	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Pair of Aces" )
 	PORT_DIPSETTING(    0x10, "Double Pair" )
 	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
@@ -2738,10 +2738,10 @@ SW4  OFF  ON   OFF  ON
     switches 1+2+5+6 = OFF
     switches 7+8 = ON
 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")	// OFF by default
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")   // OFF by default
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")	// OFF by default
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")   // OFF by default
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x04, "Percentage" )        PORT_DIPLOCATION("SW1:3,4")
@@ -2749,16 +2749,16 @@ SW4  OFF  ON   OFF  ON
 	PORT_DIPSETTING(    0x04, "50%" )
 	PORT_DIPSETTING(    0x08, "60%" )
 	PORT_DIPSETTING(    0x00, "70%" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")	// OFF by default
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")   // OFF by default
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")	// OFF by default
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")   // OFF by default
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")	// ON by default
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")   // ON by default
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")	// ON by default
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")   // ON by default
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -4559,7 +4559,7 @@ static const discrete_555_desc goldnpkr_555_vco_desc =
 static const discrete_dac_r1_ladder dac_goldnpkr_ladder =
 {
 	3,                                  // size of ladder
-	{RES_K(30), RES_K(15), RES_K(7.5)},	// elements
+	{RES_K(30), RES_K(15), RES_K(7.5)}, // elements
 
 /*  external vBias doesn't seems to be accurate.
     using the 555 internal values sound better.
@@ -4703,7 +4703,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); // From MC6845 init, registers 01 & 06.
 	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
-	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));	// 68B45 or 6845s @ CPU clock
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -5109,7 +5109,7 @@ void blitz_state::megadpkr(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
 
-	M68705P5(config, m_mcu, CPU_CLOCK);	// unknown
+	M68705P5(config, m_mcu, CPU_CLOCK); // unknown
 	m_mcu->portb_w().set(FUNC(blitz_state::mcu_portb_w));
 	m_mcu->portc_w().set(FUNC(blitz_state::mcu_portc_w));
 
@@ -5302,7 +5302,7 @@ ROM_END
 
     RB confirmed the dump. There are other games with double sized roms and identical halves.
 */
-ROM_START( pottnpkr )   // golden poker style game. code is intended to start at $6000. is potten's poker the real name? 
+ROM_START( pottnpkr )   // golden poker style game. code is intended to start at $6000. is potten's poker the real name?
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic13_3.bin", 0x2000, 0x1000, CRC(23c975cd) SHA1(1d32a9ba3aa996287a823558b9d610ab879a29e8) )
 	ROM_LOAD( "ic14_4.bin", 0x3000, 0x1000, CRC(86a03aab) SHA1(0c4e8699b9fc9943de1fa0a364e043b3878636dc) )
@@ -6416,8 +6416,8 @@ ROM_START( witchcdg )
 	ROM_LOAD( "1.b1",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )    // cards deck gfx, bitplane3
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0x00000 )	// filling the R-G bitplanes
-	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )	// srctag, srcoffs, offset, length
+	ROM_FILL(           0x0000, 0x2000, 0x00000 )   // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
 
 	ROM_REGION( 0x0100, "proms", 0 )
 //  ROM_LOAD( "82s129.7d",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // original PCB PROM
@@ -6519,7 +6519,7 @@ ROM_START( witchgme )
 	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(           0x0000, 0x2000, 0x0000 )	// filling the R-G bitplanes
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
 	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -11455,7 +11455,7 @@ ROM_START( pokermon )
 ROM_END
 
 ROM_START( pokersis )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// seems  to contains 4 selectable programs, but vectors lack of sense
+	ROM_REGION( 0x10000, "maincpu", 0 ) // seems  to contains 4 selectable programs, but vectors lack of sense
 	ROM_LOAD( "gsub1.bin",      0x0000, 0x10000, CRC(d585dd64) SHA1(acc371aa8c6c9d1ae784e62eae9c90fd05fad0fc) )
 
 	ROM_REGION( 0x18000, "gfx", 0 )
@@ -11507,12 +11507,12 @@ ROM_END
   The game looks like a poker game using rockets instead of cards.
 
   But the game also has graphics tiles for 4 characters:
-  
+
   - pig
   - duck
   - donkey
   - mouse
-  
+
   Duck and mouse are very close to Disney's characters Donald Duck
   and Mickey Mouse.
 

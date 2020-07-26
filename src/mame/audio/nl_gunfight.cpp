@@ -284,8 +284,8 @@ static NETLIST_START(gunfight_schematics)
 	// These all go to TTL ground at pin 7 of 7404 IC H6, rather than the
 	// ground used for the other sound circuits.
 	NET_C(GND,
-	      R133.2, R233.2, R120.2, R220.2,
-	      Q108.E, Q208.E, Q105.E, Q205.E)
+		  R133.2, R233.2, R120.2, R220.2,
+		  Q108.E, Q208.E, Q105.E, Q205.E)
 
 	NET_C(R134.2, R133.1, Q108.B)
 	NET_C(R234.2, R233.1, Q208.B)
@@ -320,8 +320,8 @@ static NETLIST_START(gunfight_schematics)
 
 	// All connected to 16-volt power.
 	NET_C(I_V16.Q,
-	      R132.1, R232.1, R119.1, R219.1,
-	      Q107.E, Q207.E, Q104.E, Q204.E)
+		  R132.1, R232.1, R119.1, R219.1,
+		  Q107.E, Q207.E, Q104.E, Q204.E)
 
 	NET_C(R131.2, R132.2, Q107.B)
 	NET_C(R231.2, R232.2, Q207.B)
@@ -796,11 +796,11 @@ NETLIST_START(gunfight)
 
 	// Power and ground connections for logic input devices:
 	NET_C(I_V5.Q,
-	      I_LEFT_SHOT.VCC, I_RIGHT_SHOT.VCC,
-	      I_LEFT_HIT.VCC, I_RIGHT_HIT.VCC)
+		  I_LEFT_SHOT.VCC, I_RIGHT_SHOT.VCC,
+		  I_LEFT_HIT.VCC, I_RIGHT_HIT.VCC)
 	NET_C(GND,
-	      I_LEFT_SHOT.GND, I_RIGHT_SHOT.GND,
-	      I_LEFT_HIT.GND, I_RIGHT_HIT.GND)
+		  I_LEFT_SHOT.GND, I_RIGHT_SHOT.GND,
+		  I_LEFT_HIT.GND, I_RIGHT_HIT.GND)
 
 	ALIAS(IN_LS, I_LEFT_SHOT.Q)
 	ALIAS(IN_RS, I_RIGHT_SHOT.Q)

@@ -5393,7 +5393,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_DIPSETTING(    0x0c, "Level 5" )
 	PORT_DIPSETTING(    0x04, "Level 6" )
 	PORT_DIPSETTING(    0x00, "unknown Level (00)" )
-	PORT_DIPSETTING(    0x10, "unknown Level (10)" ) 
+	PORT_DIPSETTING(    0x10, "unknown Level (10)" )
 	PORT_DIPNAME( 0xe0, 0xe0, "Game Hit Probability" ) PORT_DIPLOCATION("DSWA:6,7,8") // manual lists 6 valid settings
 	PORT_DIPSETTING(    0x40, "1/15" )
 	PORT_DIPSETTING(    0x60, "1/10" )
@@ -5430,16 +5430,16 @@ static INPUT_PORTS_START( animaljr )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown A-9 (debug?)" )	PORT_DIPLOCATION("DSWA:9") // manual lists 'unused, MUST remain OFF'
+	PORT_DIPNAME( 0x01, 0x01, "Unknown A-9 (debug?)" )  PORT_DIPLOCATION("DSWA:9") // manual lists 'unused, MUST remain OFF'
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Tickets" )	PORT_DIPLOCATION("DSWA:10")
+	PORT_DIPNAME( 0x02, 0x02, "Tickets" )   PORT_DIPLOCATION("DSWA:10")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown B-9 (debug?)" )	PORT_DIPLOCATION("DSWB:9")  // manual lists 'unused, should remain OFF'
+	PORT_DIPNAME( 0x04, 0x04, "Unknown B-9 (debug?)" )  PORT_DIPLOCATION("DSWB:9")  // manual lists 'unused, should remain OFF'
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )				PORT_DIPLOCATION("DSWB:10")
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )             PORT_DIPLOCATION("DSWB:10")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 

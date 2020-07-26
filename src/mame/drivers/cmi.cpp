@@ -1685,7 +1685,7 @@ void cmi_state::cmi02_w(offs_t offset, uint8_t data)
 				m_hp_int = 0;
 				m_maincpu1_irq_merger->in_w<1>(0);
 				//if (m_lp_int == 0)
-				//	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+				//  m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 				m_i8214[2]->b_sgs_w(~(data & 0xf));
 				break;
 
@@ -1723,7 +1723,7 @@ void cmi_state::i8214_cpu1_w(uint8_t data)
 	m_maincpu1_irq_merger->in_w<0>(0);
 	m_lp_int = 0;
 	//if (m_hp_int == 0)
-	//	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	//  m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_i8214[0]->b_sgs_w(~(data & 0xf));
 }
 

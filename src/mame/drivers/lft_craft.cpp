@@ -14,7 +14,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK		20000000
+#define MASTER_CLOCK        20000000
 
 #define VISIBLE_CYCLES      480
 #define HSYNC_CYCLES        155

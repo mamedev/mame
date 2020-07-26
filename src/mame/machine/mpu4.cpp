@@ -23,7 +23,7 @@
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
 
-	Old logs shown here from pre-GIT days:
+    Old logs shown here from pre-GIT days:
      06-2011: Fixed boneheaded interface glitch that was causing samples to not be cancelled correctly.
               Added the ability to read each segment of an LED display separately, this may be necessary for some
               games that use them as surrogate lamp lines.
@@ -253,7 +253,7 @@ TODO: - Distinguish door switches using manual
       - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device emulation)
       - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
       writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs.
-	  Ideally, this needs converting to the PWM device, but that will be a complex job with this many outputs.
+      Ideally, this needs converting to the PWM device, but that will be a complex job with this many outputs.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
 
@@ -353,7 +353,7 @@ void mpu4_state::led_write_extender(int latch, int data, int starting_column)
 	int diff,i,j, ext_strobe;
 
 	diff = (latch ^ m_last_latch) & latch;
-	ext_strobe = (7 - starting_column) * 8; 
+	ext_strobe = (7 - starting_column) * 8;
 
 	data = ~data;//invert drive lines
 	for (i=0; i<5; i++)
@@ -1031,7 +1031,7 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 			{
 				m_mpu4leds[( ( (7 - m_input_strobe) + 8) << 3) | i] = BIT(m_pia4->a_output(), i);
 			}
-			m_digits[(7 - m_input_strobe) + 8] = m_pia4->a_output();	
+			m_digits[(7 - m_input_strobe) + 8] = m_pia4->a_output();
 		}
 		m_led_strobe = m_input_strobe;
 	}
@@ -1599,9 +1599,9 @@ INPUT_PORTS_START( mpu4 )
 
 	PORT_START("AUX2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) //Lockouts, in same order as below
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) 
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) 
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) 
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)

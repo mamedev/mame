@@ -535,7 +535,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- these have downloaded games on them, they do however appear to be tied to the machine that downloaded them, on other units they appear as blank -->
 	<software name="user1" supported="no">
 		<description>NAND User Cartridge (unknown data, set 1)</description>
@@ -546,7 +546,7 @@ license:CC0
 				<rom name="80-201401.bin" size="0x8400000" crc="ea99f4d7" sha1="a9f8a7f05de21d971895e3385621112461a0a339"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="user2" supported="no">
 		<description>NAND User Cartridge (unknown data, set 2)</description>
@@ -558,6 +558,6 @@ license:CC0
 				<rom name="80-201404_Console.bin" size="0x8400000" crc="ed3388f5" sha1="583d7eab0bf2a0e9bb90a28d1fdda701f0a7f32b"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

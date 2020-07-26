@@ -49,12 +49,12 @@ NETLIST_START(starhawk)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
-	TTL_INPUT(I_OUT_0, 0)				// active high
-	TTL_INPUT(I_OUT_1, 0)				// active high
-	TTL_INPUT(I_OUT_2, 0)				// active high
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
-	TTL_INPUT(I_OUT_7, 0)				// active high
+	TTL_INPUT(I_OUT_0, 0)               // active high
+	TTL_INPUT(I_OUT_1, 0)               // active high
+	TTL_INPUT(I_OUT_2, 0)               // active high
+	TTL_INPUT(I_OUT_3, 0)               // active high
+	TTL_INPUT(I_OUT_4, 0)               // active high
+	TTL_INPUT(I_OUT_7, 0)               // active high
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
@@ -84,19 +84,19 @@ NETLIST_START(starhawk)
 	RES(R17, RES_K(510))
 	RES(R18, RES_K(10))
 	RES(R19, RES_K(33))
-//	RES(R20, 150)		-- part of final amp (not emulated)
-//	RES(R21, RES_K(22))	-- part of final amp (not emulated)
+//  RES(R20, 150)       -- part of final amp (not emulated)
+//  RES(R21, RES_K(22)) -- part of final amp (not emulated)
 	RES(R22, RES_K(1))
-//	RES(R23, RES_K(10))	-- part of final amp (not emulated)
-//	RES(R24, 150)		-- part of final amp (not emulated)
-//	POT(R25, RES_K(100))-- part of final amp (not emulated)
+//  RES(R23, RES_K(10)) -- part of final amp (not emulated)
+//  RES(R24, 150)       -- part of final amp (not emulated)
+//  POT(R25, RES_K(100))-- part of final amp (not emulated)
 	RES(R26, RES_K(1))
 	RES(R27, RES_K(1))
 	RES(R28, RES_K(510))
-	RES(R29, RES_K(10))		// PCB verified
-//	RES(R30, ???)
-	RES(R31, RES_K(47))		// PCB verified
-	RES(R32, RES_M(3.3))	// PCB verified
+	RES(R29, RES_K(10))     // PCB verified
+//  RES(R30, ???)
+	RES(R31, RES_K(47))     // PCB verified
+	RES(R32, RES_M(3.3))    // PCB verified
 	RES(R33, RES_M(1))
 	RES(R34, RES_K(47))
 	RES(R35, RES_M(1))
@@ -126,30 +126,30 @@ NETLIST_START(starhawk)
 	RES(R59, RES_K(39))
 	RES(R60, RES_K(82))
 
-//	CAP(C1, CAP_U(2.2))
-//	CAP(C2, CAP_U(2.2))
-//	CAP(C3, CAP_U(3.3))
-//	CAP(C4, CAP_U(3.3))
+//  CAP(C1, CAP_U(2.2))
+//  CAP(C2, CAP_U(2.2))
+//  CAP(C3, CAP_U(3.3))
+//  CAP(C4, CAP_U(3.3))
 	CAP(C5, CAP_P(100))
 	CAP(C6, CAP_U(3.3))
 	CAP(C7, CAP_U(0.01))
 	CAP(C8, CAP_U(1))
 	CAP(C9, CAP_U(0.022))
-	CAP(C10, CAP_U(0.15))		// 15?
+	CAP(C10, CAP_U(0.15))       // 15?
 	CAP(C11, CAP_U(0.15))
 	CAP(C12, CAP_U(15))
 	CAP(C13, CAP_U(0.0033))
 	CAP(C14, CAP_U(0.0047))
 	CAP(C15, CAP_U(1))
-//	CAP(C16, CAP_P(470))	-- part of final amp (not emulated)
+//  CAP(C16, CAP_P(470))    -- part of final amp (not emulated)
 	CAP(C17, CAP_U(22))
-//	CAP(C18, CAP_P(470))	-- part of final amp (not emulated)
-//	CAP(C19, CAP_P(470))	-- part of final amp (not emulated)
+//  CAP(C18, CAP_P(470))    -- part of final amp (not emulated)
+//  CAP(C19, CAP_P(470))    -- part of final amp (not emulated)
 	CAP(C20, CAP_U(1))
 #if (SLOW_SHIP_WOBBLE)
-	CAP(C21, CAP_U(22)) 	// discovered by accident, makes HLE analysis easier
+	CAP(C21, CAP_U(22))     // discovered by accident, makes HLE analysis easier
 #else
-	CAP(C21, CAP_U(0.22)) 	// PCB verified
+	CAP(C21, CAP_U(0.22))   // PCB verified
 #endif
 	CAP(C22, CAP_U(0.1))
 	CAP(C23, CAP_U(0.0027))
@@ -157,8 +157,8 @@ NETLIST_START(starhawk)
 	CAP(C25, CAP_U(0.0027))
 	CAP(C26, CAP_U(1))
 	CAP(C27, CAP_U(0.1))
-//	CAP(C39, CAP_U(1))
-//	CAP(C40, CAP_U(1))
+//  CAP(C39, CAP_U(1))
+//  CAP(C40, CAP_U(1))
 
 	D_1N914(CR1)
 	D_1N914(CR2)
@@ -171,118 +171,118 @@ NETLIST_START(starhawk)
 	D_1N914(CR9)
 	D_1N914(CR10)
 
-	Q_2N3906(Q1)			// PNP
-//	Q_2N6292(Q2)			// NPN -- part of final amp (not emulated)
-//	Q_2N6107(Q3)			// PNP -- part of final amp (not emulated)
+	Q_2N3906(Q1)            // PNP
+//  Q_2N6292(Q2)            // NPN -- part of final amp (not emulated)
+//  Q_2N6107(Q3)            // PNP -- part of final amp (not emulated)
 #if (!HLE_LAZER_VCOS)
-	Q_2N3904(Q4)			// NPN
-	Q_2N3904(Q5)			// NPN
+	Q_2N3904(Q4)            // NPN
+	Q_2N3904(Q5)            // NPN
 #endif
 
-	TL182_DIP(IC3A)			// Analog switch
+	TL182_DIP(IC3A)         // Analog switch
 	NET_C(IC3A.6, I_V15)
 	NET_C(IC3A.7, I_V5)
 	NET_C(IC3A.8, GND)
 	NET_C(IC3A.9, I_VM15)
 
-//	TTL_7815_DIP(IC2D)		// +15V Regulator -- not needed
-//	TTL_7915_DIP(IC2C)		// -15V Regulator -- not needed
+//  TTL_7815_DIP(IC2D)      // +15V Regulator -- not needed
+//  TTL_7915_DIP(IC2C)      // -15V Regulator -- not needed
 
-	TL081_DIP(IC4A)			// Op. Amp.
+	TL081_DIP(IC4A)         // Op. Amp.
 	NET_C(IC4A.4, I_VM15)
 	NET_C(IC4A.7, I_V15)
 
-	TL081_DIP(IC4B)			// Op. Amp.
+	TL081_DIP(IC4B)         // Op. Amp.
 	NET_C(IC4B.4, I_VM15)
 	NET_C(IC4B.7, I_V15)
 
-//	TL081_DIP(IC4C)			// Op. Amp. -- part of final amp (not emulated)
-//	NET_C(IC4C.4, I_VM15)
-//	NET_C(IC4C.7, I_V15)
+//  TL081_DIP(IC4C)         // Op. Amp. -- part of final amp (not emulated)
+//  NET_C(IC4C.4, I_VM15)
+//  NET_C(IC4C.7, I_V15)
 
-	TTL_74LS393_DIP(IC4E)	// Dual 4-Stage Binary Counter
+	TTL_74LS393_DIP(IC4E)   // Dual 4-Stage Binary Counter
 	NET_C(IC4E.7, GND)
 	NET_C(IC4E.14, I_V5)
 
-	TL081_DIP(IC5A)			// Op. Amp.
+	TL081_DIP(IC5A)         // Op. Amp.
 	NET_C(IC5A.4, I_VM15)
 	NET_C(IC5A.7, I_V15)
 
-	TL081_DIP(IC5B)			// Op. Amp.
+	TL081_DIP(IC5B)         // Op. Amp.
 	NET_C(IC5B.4, I_VM15)
 	NET_C(IC5B.7, I_V15)
 
 	LM556_DIP(IC5D)
 
-	PROM_74S287_DIP(IC5E)	// 1024-bit PROM -- dump needed
+	PROM_74S287_DIP(IC5E)   // 1024-bit PROM -- dump needed
 	PARAM(IC5E.A.ROM, "2085.5e8e")
 	NET_C(IC5E.8, GND)
 	NET_C(IC5E.16, I_V5)
 
-	CA3080_DIP(IC6A)		// Trnscndt. Op. Amp.
+	CA3080_DIP(IC6A)        // Trnscndt. Op. Amp.
 	NET_C(IC6A.7, I_V15)
 	NET_C(IC6A.4, I_VM15)
 
-	TL081_DIP(IC6B)			// Op. Amp.
+	TL081_DIP(IC6B)         // Op. Amp.
 	NET_C(IC6B.4, I_VM15)
 	NET_C(IC6B.7, I_V15)
 
-	TTL_74LS04_DIP(IC6C)	// Hex Inverting Gates
+	TTL_74LS04_DIP(IC6C)    // Hex Inverting Gates
 	NET_C(IC6C.7, GND)
 	NET_C(IC6C.14, I_V5)
 
 	LM556_DIP(IC6D)
 
-	TL081_DIP(IC6E)			// Op. Amp.
+	TL081_DIP(IC6E)         // Op. Amp.
 	NET_C(IC6E.4, I_VM15)
 	NET_C(IC6E.7, I_V15)
 
-	TL081_DIP(IC6F)			// Op. Amp.
+	TL081_DIP(IC6F)         // Op. Amp.
 	NET_C(IC6F.4, I_VM15)
 	NET_C(IC6F.7, I_V15)
 
-	TTL_7406_DIP(IC7C)		// Hex inverter -- currently using a clone of 7416, no open collector behavior
+	TTL_7406_DIP(IC7C)      // Hex inverter -- currently using a clone of 7416, no open collector behavior
 	NET_C(IC7C.7, GND)
 	NET_C(IC7C.14, I_V5)
 
-	TTL_74LS393_DIP(IC7E)	// Dual 4-Stage Binary Counter
+	TTL_74LS393_DIP(IC7E)   // Dual 4-Stage Binary Counter
 	NET_C(IC7E.7, GND)
 	NET_C(IC7E.14, I_V5)
 
-	TTL_74LS164_DIP(IC8C)	// 8-bit Shift Reg.
+	TTL_74LS164_DIP(IC8C)   // 8-bit Shift Reg.
 	NET_C(IC8C.7, GND)
 	NET_C(IC8C.14, I_V5)
 
-	TTL_74LS164_DIP(IC8D)	// 8-bit Shift Reg.
+	TTL_74LS164_DIP(IC8D)   // 8-bit Shift Reg.
 	NET_C(IC8D.7, GND)
 	NET_C(IC8D.14, I_V5)
 
-	PROM_74S287_DIP(IC8E)	// 1024-bit PROM -- dump needed
+	PROM_74S287_DIP(IC8E)   // 1024-bit PROM -- dump needed
 	PARAM(IC8E.A.ROM, "2085.5e8e")
 	NET_C(IC8E.8, GND)
 	NET_C(IC8E.16, I_V5)
 
-	TTL_74LS164_DIP(IC9C)	// 8-bit Shift Reg.
+	TTL_74LS164_DIP(IC9C)   // 8-bit Shift Reg.
 	NET_C(IC9C.7, GND)
 	NET_C(IC9C.14, I_V5)
 
-	TTL_74LS164_DIP(IC9D)	// 8-bit Shift Reg.
+	TTL_74LS164_DIP(IC9D)   // 8-bit Shift Reg.
 	NET_C(IC9D.7, GND)
 	NET_C(IC9D.14, I_V5)
 
-	TTL_74LS163_DIP(IC9E)	// Binary Counter (schems say can sub a 74161)
+	TTL_74LS163_DIP(IC9E)   // Binary Counter (schems say can sub a 74161)
 	NET_C(IC9E.8, GND)
 	NET_C(IC9E.16, I_V5)
 
-	TTL_74LS86_DIP(IC10C)	// Quad 2-Input XOR Gates
+	TTL_74LS86_DIP(IC10C)   // Quad 2-Input XOR Gates
 	NET_C(IC10C.7, GND)
 	NET_C(IC10C.14, I_V5)
 
-	TTL_74LS21_DIP(IC10D)	// Dual 4-Input AND Gates
+	TTL_74LS21_DIP(IC10D)   // Dual 4-Input AND Gates
 	NET_C(IC10D.7, GND)
 	NET_C(IC10D.14, I_V5)
 
-	TTL_74LS393_DIP(IC10E)	// Dual 4-Stage Binary Counter
+	TTL_74LS393_DIP(IC10E)  // Dual 4-Stage Binary Counter
 	NET_C(IC10E.7, GND)
 	NET_C(IC10E.14, I_V5)
 
@@ -603,38 +603,38 @@ NETLIST_START(starhawk)
 	// Unconnected outputs
 	//
 
-	HINT(IC4E.9, NC)	// Q3
+	HINT(IC4E.9, NC)    // Q3
 #if (HLE_LAZER_VCOS)
-	HINT(IC6C.8, NC)	// QD
-	HINT(IC6C.12, NC)	// QF
+	HINT(IC6C.8, NC)    // QD
+	HINT(IC6C.12, NC)   // QF
 #endif
-	HINT(IC7C.4, NC)	// QB
-	HINT(IC7C.6, NC)	// QC
-	HINT(IC7E.9, NC)	// Q3
-	HINT(IC8C.4, NC)	// Q1
-	HINT(IC8C.5, NC)	// Q2
-	HINT(IC8C.6, NC)	// Q3
-	HINT(IC8C.10, NC)	// Q4
-	HINT(IC8C.11, NC)	// Q5
-	HINT(IC8C.12, NC)	// Q6
-	HINT(IC8D.5, NC)	// Q2
-	HINT(IC8D.6, NC)	// Q3
-	HINT(IC8D.10, NC)	// Q4
-	HINT(IC8D.11, NC)	// Q5
-	HINT(IC8D.12, NC)	// Q6
-	HINT(IC9C.3, NC)	// Q0
-	HINT(IC9C.4, NC)	// Q1
-	HINT(IC9C.5, NC)	// Q2
-	HINT(IC9C.6, NC)	// Q3
-	HINT(IC9C.11, NC)	// Q5
-	HINT(IC9D.3, NC)	// Q0
-	HINT(IC9D.4, NC)	// Q1
-	HINT(IC9D.5, NC)	// Q2
-	HINT(IC9D.6, NC)	// Q3
-	HINT(IC9D.11, NC)	// Q5
-	HINT(IC9E.11, NC)	// Q3
-	HINT(IC9E.12, NC)	// Q2
-	HINT(IC9E.13, NC)	// Q1
-	HINT(IC9E.14, NC)	// Q0
+	HINT(IC7C.4, NC)    // QB
+	HINT(IC7C.6, NC)    // QC
+	HINT(IC7E.9, NC)    // Q3
+	HINT(IC8C.4, NC)    // Q1
+	HINT(IC8C.5, NC)    // Q2
+	HINT(IC8C.6, NC)    // Q3
+	HINT(IC8C.10, NC)   // Q4
+	HINT(IC8C.11, NC)   // Q5
+	HINT(IC8C.12, NC)   // Q6
+	HINT(IC8D.5, NC)    // Q2
+	HINT(IC8D.6, NC)    // Q3
+	HINT(IC8D.10, NC)   // Q4
+	HINT(IC8D.11, NC)   // Q5
+	HINT(IC8D.12, NC)   // Q6
+	HINT(IC9C.3, NC)    // Q0
+	HINT(IC9C.4, NC)    // Q1
+	HINT(IC9C.5, NC)    // Q2
+	HINT(IC9C.6, NC)    // Q3
+	HINT(IC9C.11, NC)   // Q5
+	HINT(IC9D.3, NC)    // Q0
+	HINT(IC9D.4, NC)    // Q1
+	HINT(IC9D.5, NC)    // Q2
+	HINT(IC9D.6, NC)    // Q3
+	HINT(IC9D.11, NC)   // Q5
+	HINT(IC9E.11, NC)   // Q3
+	HINT(IC9E.12, NC)   // Q2
+	HINT(IC9E.13, NC)   // Q1
+	HINT(IC9E.14, NC)   // Q0
 
 NETLIST_END()

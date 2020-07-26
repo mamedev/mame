@@ -346,7 +346,7 @@ private:
 	void bigkarnkm_map(address_map &map);
 	void sound_map(address_map &map);
 	void soundrom_map(address_map &map);
-	
+
 	uint16_t vram1_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram3_r(offs_t offset, uint16_t mem_mask);
@@ -358,7 +358,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap3);
-	
+
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	tilemap_t *m_bg_tilemap3;
@@ -382,7 +382,7 @@ TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
 {
 	int tile = m_videoram1[tile_index*2];
 	int attr = m_videoram1[(tile_index*2)+1] & 0x1f;
-//	int fx = (m_videoram1[(tile_index*2)+1] & 0xc0)>>6;
+//  int fx = (m_videoram1[(tile_index*2)+1] & 0xc0)>>6;
 
 	// we rearranged the tile order for the 16x16 deode, so have to swap back here
 	tile = ((tile & 0x300) >> 8) | ((tile & 0xff) << 2) | (tile & 0xfc00);
@@ -492,7 +492,7 @@ void bigkarnk_ms_state::bigkarnkm_map(address_map &map)
 	map(0x400002, 0x400003).portr("IN1");
 	map(0x400006, 0x400007).portr("IN2");
 	map(0x400008, 0x400009).portr("IN3");
-	
+
 	map(0x40000c, 0x40000d).noprw();
 	map(0x40000e, 0x40000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
@@ -514,7 +514,7 @@ uint32_t bigkarnk_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	m_bg_tilemap2->set_scrollx(0, 112-(m_scrollregs[0]-0x2));
 	m_bg_tilemap2->set_scrolly(0, -m_scrollregs[1]);
-	
+
 	m_bg_tilemap1->set_scrollx(0, 112-(m_scrollregs[2]));
 	m_bg_tilemap1->set_scrolly(0, -m_scrollregs[3]);
 
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( bigkarnkm )
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, "Free Play (if Coin A too)" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-		
+
 	PORT_START("IN3")
 	PORT_DIPNAME( 0x0007, 0x0006, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:8,7,6")
 	PORT_DIPSETTING(      0x0007, "0" )
@@ -691,7 +691,7 @@ WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
 void bigkarnk_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	
+
 	map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xe000).w(FUNC(bigkarnk_ms_state::splash_adpcm_control_w));
@@ -700,7 +700,7 @@ void bigkarnk_ms_state::sound_map(address_map &map)
 	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); 
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void bigkarnk_ms_state::soundrom_map(address_map &map)
@@ -718,7 +718,7 @@ void bigkarnk_ms_state::bigkarnkm(machine_config &config)
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &bigkarnk_ms_state::sound_map);
-	m_soundcpu->set_periodic_int(FUNC(bigkarnk_ms_state::nmi_line_pulse), attotime::from_hz(60*64));  
+	m_soundcpu->set_periodic_int(FUNC(bigkarnk_ms_state::nmi_line_pulse), attotime::from_hz(60*64));
 
 	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&bigkarnk_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 

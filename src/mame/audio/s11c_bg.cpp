@@ -380,13 +380,13 @@ void s11c_bg_device::bg_cvsd_digit_clock_clear_w(uint8_t data)
 }
 
 /*
-	Rom mapping for the 4 banking bits:
-	3 2 1 0
-	r q 0 0 -  U4, A15 q, A16 r
-	r q 0 1 - U19, A15 q, A16 r
-	r q 1 0 - U20, A15 q, A16 r
-	x x 1 1 - open bus
-	for ease of loading the roms, we swap the bits to the order '1 0 3 2'
+    Rom mapping for the 4 banking bits:
+    3 2 1 0
+    r q 0 0 -  U4, A15 q, A16 r
+    r q 0 1 - U19, A15 q, A16 r
+    r q 1 0 - U20, A15 q, A16 r
+    x x 1 1 - open bus
+    for ease of loading the roms, we swap the bits to the order '1 0 3 2'
 */
 void s11c_bg_device::bgbank_w(uint8_t data)
 {

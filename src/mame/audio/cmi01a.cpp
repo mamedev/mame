@@ -477,11 +477,11 @@ void cmi01a_device::set_eclk(bool eclk)
 		tick_ediv();
 	}
 
-	//	A	B	!(A && B)	!A || !B
-	//	0	0	1			1
-	//	0	1	1			1
-	//	1	0	1			1
-	//	1	1	0			0
+	//  A   B   !(A && B)   !A || !B
+	//  0   0   1           1
+	//  0   1   1           1
+	//  1   0   1           1
+	//  1   1   0           0
 
 	const bool a = !m_load || !eclk;
 	const bool b =  m_load || !m_ediv_out;

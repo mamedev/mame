@@ -8,89 +8,89 @@
 
     Serial Real Time Clock
 
-	- Reference: https://www.emmicroelectronic.com/product/real-time-clocks-ic/v3021
+    - Reference: https://www.emmicroelectronic.com/product/real-time-clocks-ic/v3021
 
-	Pin assignment (SO8)
+    Pin assignment (SO8)
 
-	      |-------------------------|
-	     _|o                        |_
-	 XI |_|                         |_| Vdd
-	      |                         |
-	     _|                         |_
-	 XO |_|                         |_| WR
-	      |          V3021          |
-	     _|                         |_
-	 CS |_|                         |_| RD
-	      |                         |
-	     _|                         |_
-	Vss |_|                         |_| I/O
-	      |-------------------------|
+          |-------------------------|
+         _|o                        |_
+     XI |_|                         |_| Vdd
+          |                         |
+         _|                         |_
+     XO |_|                         |_| WR
+          |          V3021          |
+         _|                         |_
+     CS |_|                         |_| RD
+          |                         |
+         _|                         |_
+    Vss |_|                         |_| I/O
+          |-------------------------|
 
-	Pin description
+    Pin description
 
-	|-----|------|-----------------------------------------|
-	| Pin | Name | Description                             |
-	|-----|------|-----------------------------------------|
-	1  1  |  XI  | 32 kHz Crystal input                    |
-	|-----|------|-----------------------------------------|
-	1  2  |  XO  | 32 kHz Crystal output                   |
-	|-----|------|-----------------------------------------|
-	1  3  |  CS  | Chip select input                       |
-	|-----|------|-----------------------------------------|
-	1  4  | Vss  | Ground supply                           |
-	|-----|------|-----------------------------------------|
-	1  5  | I/O  | Data input and output                   |
-	|-----|------|-----------------------------------------|
-	1  6  |  RD  | Intel RD, Motorola DS (or tie to CS)    |
-	|-----|------|-----------------------------------------|
-	1  7  |  WR  | Intel WR, Motorola R/W                  |
-	|-----|------|-----------------------------------------|
-	1  8  | Vdd  | Positive supply                         |
-	|-----|------|-----------------------------------------|
+    |-----|------|-----------------------------------------|
+    | Pin | Name | Description                             |
+    |-----|------|-----------------------------------------|
+    1  1  |  XI  | 32 kHz Crystal input                    |
+    |-----|------|-----------------------------------------|
+    1  2  |  XO  | 32 kHz Crystal output                   |
+    |-----|------|-----------------------------------------|
+    1  3  |  CS  | Chip select input                       |
+    |-----|------|-----------------------------------------|
+    1  4  | Vss  | Ground supply                           |
+    |-----|------|-----------------------------------------|
+    1  5  | I/O  | Data input and output                   |
+    |-----|------|-----------------------------------------|
+    1  6  |  RD  | Intel RD, Motorola DS (or tie to CS)    |
+    |-----|------|-----------------------------------------|
+    1  7  |  WR  | Intel WR, Motorola R/W                  |
+    |-----|------|-----------------------------------------|
+    1  8  | Vdd  | Positive supply                         |
+    |-----|------|-----------------------------------------|
 
-	Register map (Unused bits are reserved)
+    Register map (Unused bits are reserved)
 
-	Address Bits     Description
-	        76543210
-	Data space
-	0       ---x---- Time set lock
-	        ---0---- Enable copy RAM to clock
-	        ---1---- Disable copy RAM to clock
-	        ----xx-- Test mode
-	        ----00-- Normal operation
-	        ----01-- All time keeping accelerated by 32
-	        ----10-- Parallel increment of all time data
+    Address Bits     Description
+            76543210
+    Data space
+    0       ---x---- Time set lock
+            ---0---- Enable copy RAM to clock
+            ---1---- Disable copy RAM to clock
+            ----xx-- Test mode
+            ----00-- Normal operation
+            ----01-- All time keeping accelerated by 32
+            ----10-- Parallel increment of all time data
                      at 1 Hz with no carry over
-	        ----11-- Parallel increment of all time data
+            ----11-- Parallel increment of all time data
                      at 32 Hz with no carry over
-	        -------x Frequency measurement mode
+            -------x Frequency measurement mode
 
-	1       (Read only)
-	        x------- Week number is changed
-	        -x------ Weekday is changed
-	        --x----- Year is changed
-	        ---x---- Month is changed
-	        ----x--- Day of month is changed
-	        -----x-- Hours is changed
-	        ------x- Minutes is changed
-	        -------x Seconds is changed
+    1       (Read only)
+            x------- Week number is changed
+            -x------ Weekday is changed
+            --x----- Year is changed
+            ---x---- Month is changed
+            ----x--- Day of month is changed
+            -----x-- Hours is changed
+            ------x- Minutes is changed
+            -------x Seconds is changed
 
-	2       -xxxxxxx Seconds (BCD 00-59)
-	3       -xxxxxxx Minutes (BCD 00-59)
-	4       --xxxxxx Hours (BCD 00-23)
-	5       --xxxxxx Day of month (BCD 1-31)
-	6       ---xxxxx Month (BCD 01-12)
-	7       xxxxxxxx Year (BCD 00-99)
-	8       ----xxxx Week day (BCD 01-07)
-	9       -xxxxxxx Week number (BCD 00-52)
+    2       -xxxxxxx Seconds (BCD 00-59)
+    3       -xxxxxxx Minutes (BCD 00-59)
+    4       --xxxxxx Hours (BCD 00-23)
+    5       --xxxxxx Day of month (BCD 1-31)
+    6       ---xxxxx Month (BCD 01-12)
+    7       xxxxxxxx Year (BCD 00-99)
+    8       ----xxxx Week day (BCD 01-07)
+    9       -xxxxxxx Week number (BCD 00-52)
 
-	Address command space
-	e       Copy RAM to clock
-	f       Copy clock to RAM
+    Address command space
+    e       Copy RAM to clock
+    f       Copy clock to RAM
 
-	TODO:
-	- verify status bit (RAM 0x00)
-	- Support Week number correctly
+    TODO:
+    - verify status bit (RAM 0x00)
+    - Support Week number correctly
 
 ***************************************************************************/
 

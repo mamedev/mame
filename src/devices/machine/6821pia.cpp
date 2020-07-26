@@ -229,7 +229,7 @@ uint8_t pia6821_device::get_in_a_value()
 			port_a_data = 0xff;
 
 			if (!m_logged_port_a_not_connected && (m_ddr_a != 0xff) &&
-			    !machine().side_effects_disabled())
+				!machine().side_effects_disabled())
 			{
 				logerror("Warning! No port A read handler. Assuming pins 0x%02X not connected\n", m_ddr_a ^ 0xff);
 				m_logged_port_a_not_connected = true;
@@ -279,7 +279,7 @@ uint8_t pia6821_device::get_in_b_value()
 			else
 			{
 				if (!m_logged_port_b_not_connected && (m_ddr_b != 0xff)
-				    && !machine().side_effects_disabled())
+					&& !machine().side_effects_disabled())
 				{
 					logerror("Error! No port B read handler. Three-state pins 0x%02X are undefined\n", m_ddr_b ^ 0xff);
 					m_logged_port_b_not_connected = true;

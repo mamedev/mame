@@ -1067,7 +1067,7 @@ ROM_START( astroff )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "im5610-82s123.2f",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
-	   
+
 
 ROM_START( abattle )
 	ROM_REGION( 0x10000, "maincpu", 0 )

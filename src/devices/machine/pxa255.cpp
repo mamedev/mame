@@ -23,9 +23,9 @@
 #define LOG_GPIO        (1 << 6)
 #define LOG_LCD_DMA     (1 << 7)
 #define LOG_LCD         (1 << 8)
-#define LOG_POWER		(1 << 9)
-#define LOG_RTC			(1 << 10)
-#define LOG_CLOCKS		(1 << 11)
+#define LOG_POWER       (1 << 9)
+#define LOG_RTC         (1 << 10)
+#define LOG_CLOCKS      (1 << 11)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_I2S | LOG_DMA | LOG_OSTIMER | LOG_INTC | LOG_GPIO | LOG_LCD_DMA | LOG_LCD | LOG_POWER | LOG_RTC | LOG_CLOCKS)
 
 #define VERBOSE         (LOG_ALL)

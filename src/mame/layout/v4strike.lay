@@ -201,7 +201,7 @@ license:CC0
 			<bounds x="0" y="0" width="16" height="8" />
 		</text>
 	</element>
-	
+
 	<element name="COLLECT" defstate="0">
 		<rect state ="0">
 			<bounds x="0" y="0" width="16" height="10" />
@@ -452,14 +452,14 @@ license:CC0
 		<bezel name="lamp51" element="FREEZE" inputtag="ORANGE1" inputmask="0x10">
 			<bounds x="250" y="560" width="50" height="50" />
 		</bezel>
-		
+
 		<bezel name="lamp35" element="GO" inputtag="ORANGE1" inputmask="0x40">
 			<bounds x="300" y="560" width="50" height="50" />
 		</bezel>
-		
+
 		<screen index="0">
 			<bounds x="50" y="260" width="504" height="296" />
 		</screen>
-		
+
 	</view>
 </mamelayout>

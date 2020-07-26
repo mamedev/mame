@@ -115,7 +115,7 @@ void gigatron_cpu_device::device_start()
 	m_outx_cb.resolve_safe();
 	m_out_cb.resolve_safe();
 	m_ir_cb.resolve_safe(0);
-	
+
 	reset_cpu();
 }
 
@@ -127,7 +127,7 @@ void gigatron_cpu_device::reset_cpu()
 	m_pc = 0;
 	m_npc = (m_pc + 1) & m_romMask;
 	m_ppc = 0;
-	m_inReg = 0xFF;	
+	m_inReg = 0xFF;
 	m_outx = 0;
 	m_out = 0;
 }

@@ -26,7 +26,7 @@ public:
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
-	
+
 	void set_floppies_4(floppy_connector*, floppy_connector*, floppy_connector*, floppy_connector*);
 
 private:
@@ -39,7 +39,7 @@ private:
 	devcb_write_line m_nmi_handler;
 	DECLARE_WRITE_LINE_MEMBER(handle_irq);
 	DECLARE_WRITE_LINE_MEMBER(handle_nmi);
-	
+
 	uint8_t flip_bits(uint8_t data);
 	uint8_t pia_pa_r();
 	void pia_pa_w(u8 data);

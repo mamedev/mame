@@ -534,7 +534,7 @@ bool debugger_commands::validate_cpu_space_parameter(const char *param, int spac
 /*-------------------------------------------------
     validate_memory_region_parameter - validates
     a parameter as a memory region name and
-	retrieves the given memory region
+    retrieves the given memory region
 -------------------------------------------------*/
 
 bool debugger_commands::validate_memory_region_parameter(const std::string &param, memory_region *&result)

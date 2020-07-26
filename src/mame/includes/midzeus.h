@@ -149,20 +149,20 @@ protected:
 	optional_ioport m_io_keypad;
 	output_finder<7> m_digits;
 
-	emu_timer *		m_display_irq_off_timer;
-	uint8_t			m_crusnexo_leds_select;
-	uint32_t		m_disk_asic_jr[0x10];
+	emu_timer *     m_display_irq_off_timer;
+	uint8_t         m_crusnexo_leds_select;
+	uint32_t        m_disk_asic_jr[0x10];
 
-	uint8_t			m_cmos_protected;
+	uint8_t         m_cmos_protected;
 
-	emu_timer *		m_timer[2];
+	emu_timer *     m_timer[2];
 
 private:
-	uint32_t		m_gun_control;
-	uint8_t			m_gun_irq_state;
-	emu_timer *		m_gun_timer[2];
-	int32_t			m_gun_x[2], m_gun_y[2];
-	uint8_t			m_keypad_select;
+	uint32_t        m_gun_control;
+	uint8_t         m_gun_irq_state;
+	emu_timer *     m_gun_timer[2];
+	int32_t         m_gun_x[2], m_gun_y[2];
+	uint8_t         m_keypad_select;
 
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
@@ -186,22 +186,22 @@ private:
 	void waveram_plot_check_depth_nowrite(int y, int x, uint16_t color, uint16_t depth);
 
 	std::unique_ptr<midzeus_renderer> m_poly;
-	uint8_t		m_log_fifo;
+	uint8_t     m_log_fifo;
 
-	uint32_t	m_zeus_fifo[20];
-	uint8_t		m_zeus_fifo_words;
-	int16_t		m_zeus_matrix[3][3];
-	int32_t		m_zeus_point[3];
-	int16_t		m_zeus_light[3];
-	void *		m_zeus_renderbase;
-	uint32_t	m_zeus_palbase;
-	uint32_t	m_zeus_unkbase;
-	int			m_zeus_enable_logging;
-	uint32_t	m_zeus_objdata;
-	rectangle	m_zeus_cliprect;
+	uint32_t    m_zeus_fifo[20];
+	uint8_t     m_zeus_fifo_words;
+	int16_t     m_zeus_matrix[3][3];
+	int32_t     m_zeus_point[3];
+	int16_t     m_zeus_light[3];
+	void *      m_zeus_renderbase;
+	uint32_t    m_zeus_palbase;
+	uint32_t    m_zeus_unkbase;
+	int         m_zeus_enable_logging;
+	uint32_t    m_zeus_objdata;
+	rectangle   m_zeus_cliprect;
 
 	std::unique_ptr<uint32_t[]> m_waveram[2];
-	int			m_yoffs;
-	int			m_texel_width;
-	int			m_is_mk4b;
+	int         m_yoffs;
+	int         m_texel_width;
+	int         m_is_mk4b;
 };

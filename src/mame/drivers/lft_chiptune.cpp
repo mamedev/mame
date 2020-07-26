@@ -12,7 +12,7 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK	8000000
+#define MASTER_CLOCK    8000000
 
 class lft_chiptune_state : public driver_device
 {

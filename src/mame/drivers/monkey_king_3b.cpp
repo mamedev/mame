@@ -28,39 +28,39 @@ built-in games, and a SD card for additional games.
 The RS-70 is notable for having a debug UART on the USB port
 (serial TX on D+, 115200). It prints the following messages on boot:
 
-	EXEC: Executing 'boot' with 0 args (ZLib ON)...
-	EXEC: Loading 'boot' at 0x18000000...
-	EXEC: Loaded 372272 bytes of 2097152 available.
+    EXEC: Executing 'boot' with 0 args (ZLib ON)...
+    EXEC: Loading 'boot' at 0x18000000...
+    EXEC: Loaded 372272 bytes of 2097152 available.
 
 This is different from the serial output that this emulation model
 currently produces. Perhaps one of the unimplemented IO is causing
 it to go into some kind of debug mode. The log output produced by
 this machine is:
 
-	Modes:0x00000000
-	PUT: Setting joystick to mode 0x0, timer to 250us
+    Modes:0x00000000
+    PUT: Setting joystick to mode 0x0, timer to 250us
 
-	******************************************************
-	 MK FIRMWARE INFORMATION
-	 Mode:       0xB4
-	 Build Time: May  8 2019 14:09:21
-	 CPU Clock:  240MHz
-	 TFS Start:  0x8070000
-	 Video Buf:  0x6000000
-	 Stack Top:  0x3001EE8
-	 IWRAM Size: 32kB
-	 EVRAM Size: 16384kB
-	 Heap Size:  6144kB at 0x18200000
-	 Video Mode: 0
-	 Video Size: 1280x720x16bpp
-	******************************************************
+    ******************************************************
+     MK FIRMWARE INFORMATION
+     Mode:       0xB4
+     Build Time: May  8 2019 14:09:21
+     CPU Clock:  240MHz
+     TFS Start:  0x8070000
+     Video Buf:  0x6000000
+     Stack Top:  0x3001EE8
+     IWRAM Size: 32kB
+     EVRAM Size: 16384kB
+     Heap Size:  6144kB at 0x18200000
+     Video Mode: 0
+     Video Size: 1280x720x16bpp
+    ******************************************************
 
 There are other strings in the ROM that imply there may be more serial
 debug possibilities.
 
 TODO:
-	implement everything
-	add dumps of more Monkey King systems
+    implement everything
+    add dumps of more Monkey King systems
 */
 
 #include "emu.h"

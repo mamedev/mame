@@ -482,7 +482,7 @@ void raiden_ms_state::raidenm(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x400);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_raiden_ms);
-	
+
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */

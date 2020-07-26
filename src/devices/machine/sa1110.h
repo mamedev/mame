@@ -44,23 +44,23 @@ protected:
 
 	enum
 	{
-		INTC_BASE_ADDR	= 0x90050000,
-		REG_ICIP		= (0x00000000 >> 2),
-		REG_ICMR		= (0x00000004 >> 2),
-		REG_ICLR		= (0x00000008 >> 2),
-		REG_ICCR		= (0x0000000c >> 2),
-		REG_ICFP		= (0x00000010 >> 2),
-		REG_ICPR		= (0x00000020 >> 2),
+		INTC_BASE_ADDR  = 0x90050000,
+		REG_ICIP        = (0x00000000 >> 2),
+		REG_ICMR        = (0x00000004 >> 2),
+		REG_ICLR        = (0x00000008 >> 2),
+		REG_ICCR        = (0x0000000c >> 2),
+		REG_ICFP        = (0x00000010 >> 2),
+		REG_ICPR        = (0x00000020 >> 2),
 
 		POWER_BASE_ADDR = 0x90020000,
-		REG_PMCR		= (0x00000000 >> 2),
-		REG_PSSR		= (0x00000004 >> 2),
-		REG_PSPR		= (0x00000008 >> 2),
-		REG_PWER		= (0x0000000c >> 2),
-		REG_PCFR		= (0x00000010 >> 2),
-		REG_PPCR		= (0x00000014 >> 2),
-		REG_PGSR		= (0x00000018 >> 2),
-		REG_POSR		= (0x0000001c >> 2)
+		REG_PMCR        = (0x00000000 >> 2),
+		REG_PSSR        = (0x00000004 >> 2),
+		REG_PSPR        = (0x00000008 >> 2),
+		REG_PWER        = (0x0000000c >> 2),
+		REG_PCFR        = (0x00000010 >> 2),
+		REG_PPCR        = (0x00000014 >> 2),
+		REG_PGSR        = (0x00000018 >> 2),
+		REG_POSR        = (0x0000001c >> 2)
 	};
 
 	struct intc_regs

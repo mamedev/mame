@@ -39,11 +39,11 @@ NETLIST_START(warrior)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
-	TTL_INPUT(I_OUT_0, 0)				// active high
-	TTL_INPUT(I_OUT_1, 0)				// active high
-	TTL_INPUT(I_OUT_2, 0)				// active high
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
+	TTL_INPUT(I_OUT_0, 0)               // active high
+	TTL_INPUT(I_OUT_1, 0)               // active high
+	TTL_INPUT(I_OUT_2, 0)               // active high
+	TTL_INPUT(I_OUT_3, 0)               // active high
+	TTL_INPUT(I_OUT_4, 0)               // active high
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC)
@@ -112,11 +112,11 @@ NETLIST_START(warrior)
 	RES(R56, RES_K(2.7))
 	RES(R57, RES_K(820))
 	RES(R58, 470)
-//	RES(R59, 150)        -- part of final amp (not emulated)
-//	RES(R60, RES_K(2.2)) -- part of final amp (not emulated)
-//	RES(R61, 150)        -- part of final amp (not emulated)
-//	RES(R62, RES_K(47))  -- part of final amp (not emulated)
-//	POT(R63, RES_K(100)) -- part of final amp (not emulated)
+//  RES(R59, 150)        -- part of final amp (not emulated)
+//  RES(R60, RES_K(2.2)) -- part of final amp (not emulated)
+//  RES(R61, 150)        -- part of final amp (not emulated)
+//  RES(R62, RES_K(47))  -- part of final amp (not emulated)
+//  POT(R63, RES_K(100)) -- part of final amp (not emulated)
 
 	CAP(C1, CAP_U(0.1))
 	CAP(C2, CAP_U(0.1))
@@ -136,14 +136,14 @@ NETLIST_START(warrior)
 	CAP(C16, CAP_U(0.01))
 	CAP(C17, CAP_U(15))
 	CAP(C18, CAP_U(4.7))
-	CAP(C19, CAP_U(0.22))	// 22?
+	CAP(C19, CAP_U(0.22))   // 22?
 	CAP(C20, CAP_U(0.1))
 	CAP(C21, CAP_U(0.1))
-//	CAP(C22, CAP_U(3.3)) -- part of voltage converter (not emulated)
-//	CAP(C23, CAP_U(3.3)) -- part of voltage converter (not emulated)
-//	CAP(C24, CAP_U(3.3)) -- part of voltage converter (not emulated)
-//	CAP(C25, CAP_U(3.3)) -- part of voltage converter (not emulated)
-//	CAP(C26, CAP_U(3.3)) -- part of voltage converter (not emulated)
+//  CAP(C22, CAP_U(3.3)) -- part of voltage converter (not emulated)
+//  CAP(C23, CAP_U(3.3)) -- part of voltage converter (not emulated)
+//  CAP(C24, CAP_U(3.3)) -- part of voltage converter (not emulated)
+//  CAP(C25, CAP_U(3.3)) -- part of voltage converter (not emulated)
+//  CAP(C26, CAP_U(3.3)) -- part of voltage converter (not emulated)
 	CAP(C27, CAP_U(0.047))
 	CAP(C28, CAP_U(0.01))
 	CAP(C29, CAP_U(0.47))
@@ -155,9 +155,9 @@ NETLIST_START(warrior)
 	CAP(C35, CAP_U(0.05))
 	CAP(C36, CAP_U(0.01))
 	CAP(C37, CAP_U(0.1))
-//	CAP(C38, CAP_P(470)) -- part of final amp (not emulated)
-//	CAP(C39, CAP_P(470)) -- part of final amp (not emulated)
-//	CAP(C40, CAP_P(470)) -- part of final amp (not emulated)
+//  CAP(C38, CAP_P(470)) -- part of final amp (not emulated)
+//  CAP(C39, CAP_P(470)) -- part of final amp (not emulated)
+//  CAP(C40, CAP_P(470)) -- part of final amp (not emulated)
 
 	D_1N5240(D1)
 	D_1N914(D2)
@@ -165,76 +165,76 @@ NETLIST_START(warrior)
 	D_1N914(D4)
 	D_1N914(D5)
 
-	Q_2N3906(Q1)			// PNP
-	Q_2N3906(Q2)			// PNP
-	Q_2N3906(Q3)			// PNP
-	Q_2N3906(Q4)			// PNP
-	Q_2N3904(Q5)			// NPN
-//	Q_2N5878(Q6)			// NPN -- part of final amp (not emulated)
-//	Q_2N5876(Q7)			// PNP -- part of final amp (not emulated)
+	Q_2N3906(Q1)            // PNP
+	Q_2N3906(Q2)            // PNP
+	Q_2N3906(Q3)            // PNP
+	Q_2N3906(Q4)            // PNP
+	Q_2N3904(Q5)            // NPN
+//  Q_2N5878(Q6)            // NPN -- part of final amp (not emulated)
+//  Q_2N5876(Q7)            // PNP -- part of final amp (not emulated)
 
-	TL081_DIP(IC1)			// Op. Amp.
+	TL081_DIP(IC1)          // Op. Amp.
 	NET_C(IC1.7, I_V15)
 	NET_C(IC1.4, I_VM15)
 
-	CA3080_DIP(IC2)			// Op. Amp.
+	CA3080_DIP(IC2)         // Op. Amp.
 	NET_C(IC2.4, I_VM15)
 	NET_C(IC2.7, I_V15)
 
-	CA3080_DIP(IC3)			// Op. Amp.
+	CA3080_DIP(IC3)         // Op. Amp.
 	NET_C(IC3.4, I_VM15)
 	NET_C(IC3.7, I_V15)
 
 	LM555_DIP(IC4)
 
-	TL081_DIP(IC5)			// Op. Amp.
-//	NET_C(IC5.7, I_V15)		// (indirectly via R15)
+	TL081_DIP(IC5)          // Op. Amp.
+//  NET_C(IC5.7, I_V15)     // (indirectly via R15)
 	NET_C(IC5.4, I_VM15)
 
-	TL081_DIP(IC6)			// Op. Amp.
+	TL081_DIP(IC6)          // Op. Amp.
 	NET_C(IC6.4, I_VM15)
 	NET_C(IC6.7, I_V15)
 
-	TL081_DIP(IC7)			// Op. Amp.
+	TL081_DIP(IC7)          // Op. Amp.
 	NET_C(IC7.4, I_VM15)
 	NET_C(IC7.7, I_V15)
 
-	TTL_74LS125_DIP(IC8)	// Quad 3-state Buffers
+	TTL_74LS125_DIP(IC8)    // Quad 3-state Buffers
 	NET_C(IC8.7, GND)
 	NET_C(IC8.14, I_V5)
 
 	LM555_DIP(IC9)
 
-//	TTL_7815_DIP(IC10)		// +15V Regulator -- not emulated
-//	TTL_7915_DIP(IC11)		// -15V Regulator -- not emulated
+//  TTL_7815_DIP(IC10)      // +15V Regulator -- not emulated
+//  TTL_7915_DIP(IC11)      // -15V Regulator -- not emulated
 
 	LM555_DIP(IC12)
 
-	CA3080_DIP(IC13)		// Op. Amp.
+	CA3080_DIP(IC13)        // Op. Amp.
 	NET_C(IC13.4, I_VM15)
 	NET_C(IC13.7, I_V15)
 
-	TTL_74121_DIP(IC14)		// Monostable multivibrators with Schmitt-trigger inputs
+	TTL_74121_DIP(IC14)     // Monostable multivibrators with Schmitt-trigger inputs
 	NET_C(IC14.7, GND)
 	NET_C(IC14.14, I_V5)
 
-	TTL_7406_DIP(IC15)		// Hex inverter -- currently using a clone of 7416, no open collector behavior
+	TTL_7406_DIP(IC15)      // Hex inverter -- currently using a clone of 7416, no open collector behavior
 	NET_C(IC15.7, GND)
 	NET_C(IC15.14, I_V5)
 
-	TL081_DIP(IC16)			// Op. Amp.
+	TL081_DIP(IC16)         // Op. Amp.
 	NET_C(IC16.4, I_VM15)
 	NET_C(IC16.7, I_V15)
 
 	LM555_DIP(IC17)
 
-	CA3080_DIP(IC18)		// Op. Amp.
+	CA3080_DIP(IC18)        // Op. Amp.
 	NET_C(IC18.4, I_VM15)
 	NET_C(IC18.7, I_V15)
 
-//	TL081_DIP(IC19)			// Op. Amp. -- part of final amp (not emulated)
-//	NET_C(IC19.4, I_VM15)
-//	NET_C(IC19.7, I_V15)
+//  TL081_DIP(IC19)         // Op. Amp. -- part of final amp (not emulated)
+//  NET_C(IC19.4, I_VM15)
+//  NET_C(IC19.7, I_V15)
 
 #if (HLE_NOISE_GEN)
 	//
@@ -285,7 +285,7 @@ NETLIST_START(warrior)
 	//
 
 	NET_C(I_OUT_2, R11.1, IC4.2)
-	NET_C(R11.2, R12.2, IC4.8, IC4.4, I_V5)	// IC4.4 not listed
+	NET_C(R11.2, R12.2, IC4.8, IC4.4, I_V5) // IC4.4 not listed
 	NET_C(R12.1, IC4.6, IC4.7, C7.1)
 	NET_C(C7.2, GND)
 	NET_C(IC4.1, GND)
@@ -480,11 +480,11 @@ NETLIST_START(warrior)
 	//
 
 /*
-	HINT(IC5.4, NC)		// Q1
-	HINT(IC5.6, NC)		// Q2
-	HINT(IC5.8, NC)		// Q3
-	HINT(IC5.10, NC)	// Q4
-	HINT(IC5.12, NC)	// Q5
+    HINT(IC5.4, NC)     // Q1
+    HINT(IC5.6, NC)     // Q2
+    HINT(IC5.8, NC)     // Q3
+    HINT(IC5.10, NC)    // Q4
+    HINT(IC5.12, NC)    // Q5
 */
 
 NETLIST_END()

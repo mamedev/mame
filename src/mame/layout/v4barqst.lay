@@ -304,7 +304,7 @@ license:CC0
 			<bounds x="2" y="2" width="16" height="8" />
 		</text>
 	</element>
-	
+
 	<element name="START" defstate="0">
 		<rect state ="0">
 			<bounds x="0" y="0" width="20" height="10" />

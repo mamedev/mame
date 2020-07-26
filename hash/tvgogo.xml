@@ -115,7 +115,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="basketbalu" cloneof="basketbal" supported="no">
 		<description>Basketball (US)</description>
 		<year>2005</year>

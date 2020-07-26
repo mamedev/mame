@@ -14,7 +14,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK		17734470
+#define MASTER_CLOCK        17734470
 
 #define SAMPLES_PER_FRAME    (355255)
 

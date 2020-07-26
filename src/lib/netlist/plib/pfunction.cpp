@@ -312,7 +312,7 @@ namespace plib {
 			opstk.pop();
 		}
 		//for (auto &e : postfix)
-		//	printf("\t%s\n", e.c_str());
+		//  printf("\t%s\n", e.c_str());
 		compile_postfix(inputs, postfix, expr);
 	}
 

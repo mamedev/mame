@@ -39,12 +39,12 @@ NETLIST_START(speedfrk)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
-	TTL_INPUT(I_OUT_0, 1)	// active low
-	TTL_INPUT(I_OUT_1, 1)	// active low
-	TTL_INPUT(I_OUT_2, 1)	// active low
-	TTL_INPUT(I_OUT_3, 1)	// active low
-	TTL_INPUT(I_OUT_4, 1)	// active low
-	TTL_INPUT(I_OUT_7, 1)	// active low
+	TTL_INPUT(I_OUT_0, 1)   // active low
+	TTL_INPUT(I_OUT_1, 1)   // active low
+	TTL_INPUT(I_OUT_2, 1)   // active low
+	TTL_INPUT(I_OUT_3, 1)   // active low
+	TTL_INPUT(I_OUT_4, 1)   // active low
+	TTL_INPUT(I_OUT_7, 1)   // active low
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
@@ -53,162 +53,162 @@ NETLIST_START(speedfrk)
 
 	ANALOG_INPUT(I_V5, 5)
 
-//	RES(R1, 2.7)
-//	RES(R2, 2.7)
-//	RES(R3, 2.7)
-//	RES(R4, 2.7)
-//	RES(R5, 150)			// PCB verified
-//	RES(R6, 150)
-//	RES(R7, RES_K(10))		// PCB verified
-//	RES(R8, RES_K(68))		// PCB verified
-//	RES(R9, RES_K(2.2))		// PCB verified
-//	RES(R10, 820)			// PCB verified
-//	RES(R11, RES_K(47))		// PCB verified
-//	RES(R12, RES_K(1))	 ??
+//  RES(R1, 2.7)
+//  RES(R2, 2.7)
+//  RES(R3, 2.7)
+//  RES(R4, 2.7)
+//  RES(R5, 150)            // PCB verified
+//  RES(R6, 150)
+//  RES(R7, RES_K(10))      // PCB verified
+//  RES(R8, RES_K(68))      // PCB verified
+//  RES(R9, RES_K(2.2))     // PCB verified
+//  RES(R10, 820)           // PCB verified
+//  RES(R11, RES_K(47))     // PCB verified
+//  RES(R12, RES_K(1))   ??
 	RES(R13, 150)
-	RES(R14, RES_K(2.2))	// PCB verified
-	RES(R15, RES_K(10))		// PCB verified
-	RES(R16, RES_K(2.2))	// PCB verified
-	RES(R17, RES_K(1))		// PCB verified
-	RES(R18, RES_K(8.2))	// PCB verified
-	RES(R19, RES_K(3.9))	// PCB verified
-	RES(R20, RES_K(4.7))	// PCB verified
-	RES(R21, RES_K(3.3))	// PCB verified
-	RES(R22, RES_K(10))		// PCB verified
-	RES(R23, RES_K(4.7))	// PCB verified
+	RES(R14, RES_K(2.2))    // PCB verified
+	RES(R15, RES_K(10))     // PCB verified
+	RES(R16, RES_K(2.2))    // PCB verified
+	RES(R17, RES_K(1))      // PCB verified
+	RES(R18, RES_K(8.2))    // PCB verified
+	RES(R19, RES_K(3.9))    // PCB verified
+	RES(R20, RES_K(4.7))    // PCB verified
+	RES(R21, RES_K(3.3))    // PCB verified
+	RES(R22, RES_K(10))     // PCB verified
+	RES(R23, RES_K(4.7))    // PCB verified
 	RES(R24, RES_K(10))
-	RES(R25, RES_K(18))		// PCB verified
-	RES(R26, RES_K(18))		// PCB verified
-	RES(R27, RES_K(6.8))	// PCB verified
-	RES(R28, RES_K(10))		// PCB verified
-	RES(R29, RES_K(2.2))	// PCB verified
-	RES(R30, 330)			// PCB verified
-	RES(R31, 330)			// PCB verified
-	RES(R32, RES_K(1))		// PCB verified
-	RES(R33, RES_K(1))		// PCB verified
-	RES(R34, RES_K(1))		// PCB verified
-//	RES(R35, 0)				// PCB verified: not populated
-	RES(R36, RES_K(1))		// PCB verified
-	RES(R37, RES_K(1))		// PCB verified
-	RES(R38, RES_K(1))		// PCB verified
-	RES(R39, RES_K(1))		// PCB verified
-	RES(R40, RES_K(1))		// PCB verified
-	RES(R41, RES_K(1))		// PCB verified
-	RES(R42, RES_K(1))		// PCB verified
-	RES(R43, RES_K(1))		// PCB verified
-	RES(R44, RES_K(30))		// PCB verified
-	RES(R45, RES_K(4.7))	// PCB verified
-	RES(R46, RES_K(10))		// PCB verified
+	RES(R25, RES_K(18))     // PCB verified
+	RES(R26, RES_K(18))     // PCB verified
+	RES(R27, RES_K(6.8))    // PCB verified
+	RES(R28, RES_K(10))     // PCB verified
+	RES(R29, RES_K(2.2))    // PCB verified
+	RES(R30, 330)           // PCB verified
+	RES(R31, 330)           // PCB verified
+	RES(R32, RES_K(1))      // PCB verified
+	RES(R33, RES_K(1))      // PCB verified
+	RES(R34, RES_K(1))      // PCB verified
+//  RES(R35, 0)             // PCB verified: not populated
+	RES(R36, RES_K(1))      // PCB verified
+	RES(R37, RES_K(1))      // PCB verified
+	RES(R38, RES_K(1))      // PCB verified
+	RES(R39, RES_K(1))      // PCB verified
+	RES(R40, RES_K(1))      // PCB verified
+	RES(R41, RES_K(1))      // PCB verified
+	RES(R42, RES_K(1))      // PCB verified
+	RES(R43, RES_K(1))      // PCB verified
+	RES(R44, RES_K(30))     // PCB verified
+	RES(R45, RES_K(4.7))    // PCB verified
+	RES(R46, RES_K(10))     // PCB verified
 
-//	CAP(C4, CAP_U(4.7))
-//	CAP(C5, CAP_U(4.7))
+//  CAP(C4, CAP_U(4.7))
+//  CAP(C5, CAP_U(4.7))
 	CAP(C12, CAP_U(0.001))
 	CAP(C13, CAP_U(0.001))
 	CAP(C17, CAP_U(0.02))
 	CAP(C20, CAP_U(0.1))
 	CAP(C23, CAP_U(0.1))
 
-//	CAP(C1, CAP_U(50))
-//	CAP(C2, CAP_U(50))
-//	CAP(C3, CAP_U(4.7))
-//	CAP(C6, CAP_U(0.002))
-//	CAP(C7, CAP_U(0.002))
-//	CAP(C8, CAP_U(0.01))
-//	CAP(C9, CAP_U(0.1))
-//	CAP(C10, CAP_U(0.1))
-//	CAP(C11, CAP_U(0.02))
+//  CAP(C1, CAP_U(50))
+//  CAP(C2, CAP_U(50))
+//  CAP(C3, CAP_U(4.7))
+//  CAP(C6, CAP_U(0.002))
+//  CAP(C7, CAP_U(0.002))
+//  CAP(C8, CAP_U(0.01))
+//  CAP(C9, CAP_U(0.1))
+//  CAP(C10, CAP_U(0.1))
+//  CAP(C11, CAP_U(0.02))
 
-//  D_1N914B(CR1)	// OK
-//  D_1N914B(CR2)	// OK
-    D_1N914B(CR3)	// OK
+//  D_1N914B(CR1)   // OK
+//  D_1N914B(CR2)   // OK
+	D_1N914B(CR3)   // OK
 
-//	Q_2N6292(Q1)	// NPN
-//	Q_2N6107(Q2)	// PNP
-	Q_2N3904(Q3)	// NPN
-//	Q_2N3904(Q3)	// NPN -- unknown type
+//  Q_2N6292(Q1)    // NPN
+//  Q_2N6107(Q2)    // PNP
+	Q_2N3904(Q3)    // NPN
+//  Q_2N3904(Q3)    // NPN -- unknown type
 
-	TTL_74LS04_DIP(U2)		// Hex Inverting Gates
+	TTL_74LS04_DIP(U2)      // Hex Inverting Gates
 	NET_C(U2.7, GND)
 	NET_C(U2.14, I_V5)
 
-	TL081_DIP(U3)			// Op. Amp.
+	TL081_DIP(U3)           // Op. Amp.
 	NET_C(U3.4, GND)
 	NET_C(U3.7, I_V5)
 
-	TTL_74LS163_DIP(U4)		// Synchronous 4-Bit Counters
+	TTL_74LS163_DIP(U4)     // Synchronous 4-Bit Counters
 	NET_C(U4.8, GND)
 	NET_C(U4.16, I_V5)
 
-	TTL_74LS107_DIP(U5)		// DUAL J-K FLIP-FLOPS WITH CLEAR
+	TTL_74LS107_DIP(U5)     // DUAL J-K FLIP-FLOPS WITH CLEAR
 	NET_C(U5.7, GND)
 	NET_C(U5.14, I_V5)
 
-	TTL_74LS08_DIP(U6)		// Quad 2-Input AND Gates
+	TTL_74LS08_DIP(U6)      // Quad 2-Input AND Gates
 	NET_C(U6.7, GND)
 	NET_C(U6.14, I_V5)
 
-	TTL_74LS163_DIP(U7)		// Synchronous 4-Bit Counters
+	TTL_74LS163_DIP(U7)     // Synchronous 4-Bit Counters
 	NET_C(U7.8, GND)
 	NET_C(U7.16, I_V5)
 
-	TTL_74LS163_DIP(U8)		// Synchronous 4-Bit Counters
+	TTL_74LS163_DIP(U8)     // Synchronous 4-Bit Counters
 	NET_C(U8.8, GND)
 	NET_C(U8.16, I_V5)
 
-	TTL_74LS163_DIP(U9)		// Synchronous 4-Bit Counters
+	TTL_74LS163_DIP(U9)     // Synchronous 4-Bit Counters
 	NET_C(U9.8, GND)
 	NET_C(U9.16, I_V5)
 
-//	TTL_7915_DIP(U8)		// -15V Regulator -- not needed
-//	TTL_7815_DIP(U9)		// +15V Regulator -- not needed
+//  TTL_7915_DIP(U8)        // -15V Regulator -- not needed
+//  TTL_7815_DIP(U9)        // +15V Regulator -- not needed
 
-	TTL_74LS04_DIP(U10)		// Hex Inverting Gates
+	TTL_74LS04_DIP(U10)     // Hex Inverting Gates
 	NET_C(U10.7, GND)
 	NET_C(U10.14, I_V5)
 
-	TTL_74LS08_DIP(U11)		// Quad 2-Input AND Gates
+	TTL_74LS08_DIP(U11)     // Quad 2-Input AND Gates
 	NET_C(U11.7, GND)
 	NET_C(U11.14, I_V5)
 
-	TTL_74LS75_DIP(U12)		// 4-Bit Bistable Latches with Complementary Outputs
+	TTL_74LS75_DIP(U12)     // 4-Bit Bistable Latches with Complementary Outputs
 	NET_C(U12.12, GND)
 	NET_C(U12.5, I_V5)
 
-	TTL_74LS164_DIP(U13)	// 8-bit parallel-out serial shift registers
+	TTL_74LS164_DIP(U13)    // 8-bit parallel-out serial shift registers
 	NET_C(U13.7, GND)
 	NET_C(U13.14, I_V5)
 
-	TTL_74LS164_DIP(U14)	// 8-bit parallel-out serial shift registers
+	TTL_74LS164_DIP(U14)    // 8-bit parallel-out serial shift registers
 	NET_C(U14.7, GND)
 	NET_C(U14.14, I_V5)
 
-	TTL_74LS163_DIP(U15)	// Synchronous 4-Bit Counters
+	TTL_74LS163_DIP(U15)    // Synchronous 4-Bit Counters
 	NET_C(U15.8, GND)
 	NET_C(U15.16, I_V5)
 
-	TTL_74LS107_DIP(U17)	// DUAL J-K FLIP-FLOPS WITH CLEAR
+	TTL_74LS107_DIP(U17)    // DUAL J-K FLIP-FLOPS WITH CLEAR
 	NET_C(U17.7, GND)
 	NET_C(U17.14, I_V5)
 
-	TTL_74LS393_DIP(U18)	// Dual 4-Stage Binary Counter
+	TTL_74LS393_DIP(U18)    // Dual 4-Stage Binary Counter
 	NET_C(U18.7, GND)
 	NET_C(U18.14, I_V5)
 
-	TTL_74LS86_DIP(U19)		// Quad 2-Input XOR Gates
+	TTL_74LS86_DIP(U19)     // Quad 2-Input XOR Gates
 	NET_C(U19.7, GND)
 	NET_C(U19.14, I_V5)
 
-	TTL_74LS164_DIP(U20)	// 8-bit parallel-out serial shift registers
+	TTL_74LS164_DIP(U20)    // 8-bit parallel-out serial shift registers
 	NET_C(U20.7, GND)
 	NET_C(U20.14, I_V5)
 
-	LM555_DIP(U22)			// 5-5-5 Timer
+	LM555_DIP(U22)          // 5-5-5 Timer
 
-	TTL_74LS163_DIP(U23)	// Dual 4-Stage Binary Counter
+	TTL_74LS163_DIP(U23)    // Dual 4-Stage Binary Counter
 	NET_C(U23.8, GND)
 	NET_C(U23.16, I_V5)
 
-	TTL_74LS164_DIP(U24)	// 8-bit parallel-out serial shift registers
+	TTL_74LS164_DIP(U24)    // 8-bit parallel-out serial shift registers
 	NET_C(U24.7, GND)
 	NET_C(U24.14, I_V5)
 
@@ -267,7 +267,7 @@ NETLIST_START(speedfrk)
 	NET_C(U4.6, R36.1)
 	NET_C(U4.4, U4.5, GND)
 	NET_C(U4.14, U18.1, U6.13, U7.2)
-	NET_C(U4.10, I_V5)			// need to verify
+	NET_C(U4.10, I_V5)          // need to verify
 
 	NET_C(U18.6, U18.13)
 	NET_C(U18.2, U18.12, GND)
@@ -296,7 +296,7 @@ NETLIST_START(speedfrk)
 
 	NET_C(U19.11, U20.1)
 	NET_C(U20.9, R42.1)
-//	NET_C(R42.2, I_V5)
+//  NET_C(R42.2, I_V5)
 	NET_C(U20.2, U19.3)
 	NET_C(U20.12, U19.1)
 	NET_C(U20.13, U19.4)
@@ -308,7 +308,7 @@ NETLIST_START(speedfrk)
 	NET_C(U24.13, R44.1, U11.12, U11.9, U11.5, U11.2)
 
 	NET_C(U23.1, U23.3, U23.5, U23.7, R40.2)
-	NET_C(U23.10, R40.2)		// need to verify
+	NET_C(U23.10, R40.2)        // need to verify
 	NET_C(R40.1, I_V5)
 	NET_C(U23.4, U23.6, GND)
 	NET_C(U23.9, U19.8, U17.9)
@@ -401,51 +401,51 @@ NETLIST_START(speedfrk)
 	// Unconnected outputs
 	//
 
-	HINT(U4.11, NC)		// Q3
-	HINT(U4.12, NC)		// Q2
-	HINT(U4.13, NC)		// Q1
-	HINT(U5.5, NC)		// Q2
-	HINT(U7.14, NC)		// Q0
-	HINT(U8.11, NC)		// Q3
-	HINT(U8.12, NC)		// Q2
-	HINT(U8.13, NC)		// Q1
-	HINT(U8.14, NC)		// Q0
-	HINT(U9.11, NC)		// Q3
-	HINT(U9.12, NC)		// Q2
-	HINT(U9.13, NC)		// Q1
-	HINT(U9.14, NC)		// Q0
-	HINT(U10.2, NC)		// QQ1 -- part of 2MHz clock gen
-	HINT(U10.4, NC)		// QQ2 -- part of 2MHz clock gen
-	HINT(U10.6, NC)		// QQ3 -- part of 2MHz clock gen
-	HINT(U12.1, NC)		// QQ0
-	HINT(U12.8, NC)		// QQ3
-	HINT(U12.11, NC)	// QQ2
-	HINT(U12.14, NC)	// QQ1
-	HINT(U15.11, NC)	// Q3
-	HINT(U15.12, NC)	// Q2
-	HINT(U15.13, NC)	// Q1
-	HINT(U15.14, NC)	// Q0
-	HINT(U17.2, NC)		// QQ1
-	HINT(U17.6, NC)		// QQ2
-	HINT(U18.3, NC)		// Q0
-	HINT(U18.4, NC)		// Q1
-	HINT(U18.5, NC)		// Q2
-	HINT(U18.9, NC)		// Q2
-	HINT(U20.3, NC)		// Q0
-	HINT(U20.4, NC)		// Q1
-	HINT(U20.5, NC)		// Q2
-	HINT(U20.6, NC)		// Q3
-	HINT(U20.10, NC)	// Q4
-	HINT(U20.11, NC)	// Q5
-	HINT(U23.11, NC)	// Q3
-	HINT(U23.12, NC)	// Q2
-	HINT(U23.13, NC)	// Q1
-	HINT(U23.14, NC)	// Q0
-	HINT(U24.3, NC)		// Q0
-	HINT(U24.4, NC)		// Q1
-	HINT(U24.5, NC)		// Q2
-	HINT(U24.6, NC)		// Q3
-	HINT(U24.10, NC)	// Q4
-	HINT(U24.11, NC)	// Q5
+	HINT(U4.11, NC)     // Q3
+	HINT(U4.12, NC)     // Q2
+	HINT(U4.13, NC)     // Q1
+	HINT(U5.5, NC)      // Q2
+	HINT(U7.14, NC)     // Q0
+	HINT(U8.11, NC)     // Q3
+	HINT(U8.12, NC)     // Q2
+	HINT(U8.13, NC)     // Q1
+	HINT(U8.14, NC)     // Q0
+	HINT(U9.11, NC)     // Q3
+	HINT(U9.12, NC)     // Q2
+	HINT(U9.13, NC)     // Q1
+	HINT(U9.14, NC)     // Q0
+	HINT(U10.2, NC)     // QQ1 -- part of 2MHz clock gen
+	HINT(U10.4, NC)     // QQ2 -- part of 2MHz clock gen
+	HINT(U10.6, NC)     // QQ3 -- part of 2MHz clock gen
+	HINT(U12.1, NC)     // QQ0
+	HINT(U12.8, NC)     // QQ3
+	HINT(U12.11, NC)    // QQ2
+	HINT(U12.14, NC)    // QQ1
+	HINT(U15.11, NC)    // Q3
+	HINT(U15.12, NC)    // Q2
+	HINT(U15.13, NC)    // Q1
+	HINT(U15.14, NC)    // Q0
+	HINT(U17.2, NC)     // QQ1
+	HINT(U17.6, NC)     // QQ2
+	HINT(U18.3, NC)     // Q0
+	HINT(U18.4, NC)     // Q1
+	HINT(U18.5, NC)     // Q2
+	HINT(U18.9, NC)     // Q2
+	HINT(U20.3, NC)     // Q0
+	HINT(U20.4, NC)     // Q1
+	HINT(U20.5, NC)     // Q2
+	HINT(U20.6, NC)     // Q3
+	HINT(U20.10, NC)    // Q4
+	HINT(U20.11, NC)    // Q5
+	HINT(U23.11, NC)    // Q3
+	HINT(U23.12, NC)    // Q2
+	HINT(U23.13, NC)    // Q1
+	HINT(U23.14, NC)    // Q0
+	HINT(U24.3, NC)     // Q0
+	HINT(U24.4, NC)     // Q1
+	HINT(U24.5, NC)     // Q2
+	HINT(U24.6, NC)     // Q3
+	HINT(U24.10, NC)    // Q4
+	HINT(U24.11, NC)    // Q5
 
 NETLIST_END()

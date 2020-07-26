@@ -56,7 +56,7 @@ protected:
 	required_device<spectrum_expansion_slot_device> m_exp;
 
 	int m_romcs;
-//	u8 m_control;
+//  u8 m_control;
 };
 
 
