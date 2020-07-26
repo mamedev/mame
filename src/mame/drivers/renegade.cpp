@@ -192,14 +192,6 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	}
 }
 
-uint8_t renegade_state::soundlatch_r()
-{
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	
-	return m_soundlatch->read();
-}
-
-
 void renegade_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
@@ -255,8 +247,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 	if (scanline == 265)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	
-	// irq  16 clks per frame
-	if ((scanline % 18) == 0)
+	// irq  16 clks per frame: once every 16 lines, but increases to 24 lines during vblank
+	// (lines 16,40,56,72,88,104,120,136,152,168,184,200,216,232,248,264)
+	if (scanline == 0x10 || (scanline > 0x20 && (scanline & 0xf) == 8))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -302,7 +295,7 @@ void renegade_state::renegade_map(address_map &map)
 void renegade_state::renegade_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).r(FUNC(renegade_state::soundlatch_r));
+	map(0x1000, 0x17ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1800, 0x1fff).w(FUNC(renegade_state::adpcm_start_w));
 	map(0x2000, 0x27ff).w(FUNC(renegade_state::adpcm_addr_w));
 	map(0x2800, 0x2fff).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
@@ -540,7 +533,7 @@ void renegade_state::renegade(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE, ASSERT_LINE);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
 	ym3526_device &ymsnd(YM3526(config, "ymsnd", 12000000/4)); /* 3 MHz (measured) */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);

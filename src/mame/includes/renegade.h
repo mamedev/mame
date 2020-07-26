@@ -81,7 +81,6 @@ private:
 	void adpcm_start_w(uint8_t data);
 	void adpcm_addr_w(uint8_t data);
 	void adpcm_stop_w(uint8_t data);
-	uint8_t soundlatch_r();
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_info);
