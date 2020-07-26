@@ -54,6 +54,7 @@ namespace netlist
 		, m_enableq(*this, "m_enableq", 1)
 		, m_out(*this, "m_out", 0)
 		, m_inc(*this, "m_inc", netlist_time::zero())
+		, m_power_pins(*this)
 		{
 			connect(m_FB, m_Y);
 		}
@@ -72,6 +73,8 @@ namespace netlist
 		state_var<netlist_sig_t> m_enableq;
 		state_var<netlist_sig_t> m_out;
 		state_var<netlist_time> m_inc;
+		nld_power_pins m_power_pins;
+
 	private:
 		NETLIB_HANDLERI(fb)
 		{
@@ -98,8 +101,9 @@ namespace netlist
 		, m_RNG(*this, "RNG", NETLIB_DELEGATE(inputs))
 		, m_FC(*this, "FC", NETLIB_DELEGATE(inputs))
 		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
+		, m_power_pins(*this)
 		{
-			register_subalias("GND",    m_R_FC.N());
+			connect(m_power_pins.GND(), m_R_FC.N());
 
 			connect(m_FC, m_R_FC.P());
 			connect(m_RNG, m_R_RNG.P());
@@ -130,6 +134,7 @@ namespace netlist
 		analog_input_t m_FC;
 
 		param_fp_t m_CAP;
+		nld_power_pins m_power_pins;
 
 	private:
 		NETLIB_HANDLERI(inputs)
@@ -194,43 +199,7 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT(SN74LS629_dip)
-	{
-		NETLIB_CONSTRUCTOR(SN74LS629_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1",  m_B.m_FC);
-			register_subalias("2",  m_A.m_FC);
-			register_subalias("3",  m_A.m_RNG);
-
-			register_subalias("6",  m_A.m_ENQ);
-			register_subalias("7",  m_A.m_clock.m_Y);
-
-			register_subalias("8",  m_A.m_R_FC.N());
-			register_subalias("9",  m_A.m_R_FC.N());
-			connect(m_A.m_R_FC.N(), m_B.m_R_FC.N());
-
-			register_subalias("10",  m_B.m_clock.m_Y);
-
-			register_subalias("11",  m_B.m_ENQ);
-			register_subalias("14",  m_B.m_RNG);
-		}
-
-
-		NETLIB_RESETI()
-		{
-			m_A.reset();
-			m_B.reset();
-		}
-
-	private:
-		NETLIB_SUB(SN74LS629) m_A;
-		NETLIB_SUB(SN74LS629) m_B;
-	};
-
 	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
-	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")
 
 	} //namespace devices
 } // namespace netlist

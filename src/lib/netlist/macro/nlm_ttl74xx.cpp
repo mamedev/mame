@@ -1312,6 +1312,42 @@ static NETLIST_START(TTL_74379_DIP)
 NETLIST_END()
 
 /*
+ *  SN74LS629: VOLTAGE-CONTROLLED OSCILLATORS
+ *
+ *          +--------------+
+ *      2FC |1     ++    16| VCC
+ *      1FC |2           15| QSC VCC
+ *     1RNG |3           14| 2RNG
+ *     1CX1 |4  74LS629  13| 2CX1
+ *     1CX2 |5           12| 2CX2
+ *     1ENQ |6           11| 2ENQ
+ *       1Y |7           10| 2Y
+ *  OSC GND |8            9| GND
+ *          +--------------+
+ */
+
+static NETLIST_START(SN74LS629_DIP)
+	SN74LS629(A, CAP_U(1))
+	SN74LS629(B, CAP_U(1))
+
+	NET_C(A.GND, B.GND)
+	NET_C(A.VCC, B.VCC)
+	NC_PIN(NC)
+
+	DIPPINS(   /*          +--------------+         */
+		 B.FC, /*      2FC |1     ++    16| VCC     */ NC.I,
+		 A.FC, /*      1FC |2           15| OSC VCC */ A.VCC,
+		A.RNG, /*     1RNG |3           14| 2RNG    */ B.RNG,
+		 NC.I, /*     1CX1 |4  74LS629  13| 2CX1    */ NC.I,
+		 NC.I, /*     1CX2 |5           12| 2CX2    */ NC.I,
+		A.ENQ, /*     1ENQ |6           11| 2ENQ    */ B.ENQ,
+		  B.Y, /*       1Y |7           10| 2Y      */ B.Y,
+		A.GND, /*  OSC GND |8            9| GND     */ NC.I
+			   /*          +--------------+         */
+	)
+NETLIST_END()
+
+/*
  *  DM9312: One of Eight Line Data Selectors/Multiplexers
  *
  *          +--------------+
@@ -1961,5 +1997,6 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
+	LOCAL_LIB_ENTRY(SN74LS629_DIP)
 	LOCAL_LIB_ENTRY(DM9312_DIP)
 NETLIST_END()

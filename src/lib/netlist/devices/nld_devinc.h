@@ -909,13 +909,6 @@
 	NET_REGISTER_DEVEXT(TTL_AM2847_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_74ls629.cpp
-// ---------------------------------------------------------------------
-// usage       : SN74LS629_DIP(name, p1_CAP1, p2_CAP2)
-#define SN74LS629_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(SN74LS629_DIP, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_mm5837.cpp
 // ---------------------------------------------------------------------
 // usage       : MM5837_DIP(name)
@@ -1242,6 +1235,10 @@
 // usage       : TTL_74379_DIP(name)
 #define TTL_74379_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74379_DIP, __VA_ARGS__)
+
+// usage       : SN74LS629_DIP(name, p1_CAP1, p2_CAP2)
+#define SN74LS629_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(SN74LS629_DIP, __VA_ARGS__)
 
 // usage       : DM9312_DIP(name)
 #define DM9312_DIP(...)                                                \

@@ -186,7 +186,6 @@ namespace devices
 		LIB_ENTRY(9322_dip)
 		LIB_ENTRY(9334_dip)
 		LIB_ENTRY(AM2847_dip)
-		LIB_ENTRY(SN74LS629_dip)
 		LIB_ENTRY(MM5837_dip)
 	}
 
