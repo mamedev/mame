@@ -16,6 +16,7 @@
     - split driver into several files?
     - megaiv/smondial leds are tri-color
     - why are megaiv/smondial2 beeps noisy?
+    - what is montec 0x2000? (it can't be nmi ack)
     - add Monte Carlo IV (non-LE)
 
 **************************************************************************************************/
@@ -65,8 +66,6 @@ public:
 
 protected:
 	uint8_t montec_input_r();
-	uint8_t montec_nmi_ack_r();
-	void montec_nmi_ack_w(uint8_t data);
 	void montec_led_w(uint8_t data);
 	template<int N> void montec_lcd_s_w(uint32_t data);
 
@@ -154,18 +153,6 @@ uint8_t mephisto_montec_state::montec_input_r()
 	return m_board->input_r() ^ 0xff;
 }
 
-uint8_t mephisto_montec_state::montec_nmi_ack_r()
-{
-	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return 0;
-}
-
-void mephisto_montec_state::montec_nmi_ack_w(uint8_t data)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
 void mephisto_montec_state::megaiv_led_w(uint8_t data)
 {
 	if (m_leds_mux != m_board->mux_r())
@@ -199,7 +186,7 @@ uint8_t mephisto_montec_state::megaiv_input_r(offs_t offset)
 void mephisto_montec_state::montec_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).rw(FUNC(mephisto_montec_state::montec_nmi_ack_r), FUNC(mephisto_montec_state::montec_nmi_ack_w));
+	map(0x2000, 0x2000).noprw(); // ?
 	map(0x2400, 0x2400).r(FUNC(mephisto_montec_state::montec_input_r));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c00).w(m_board, FUNC(mephisto_board_device::led_w));
@@ -336,7 +323,7 @@ void mephisto_montec_state::montec(machine_config &config)
 {
 	M65C02(config, m_maincpu, XTAL(8'000'000) / 2); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::montec_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(8'000'000) / (1 << 14)));
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(8'000'000) / (1 << 14)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
