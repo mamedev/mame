@@ -9213,7 +9213,44 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="steelskyf">
+	<software name="steelsky">
+		<description>Beneath a Steel Sky (Euro)</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Revolution Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="fdcdb506" sha1="78b12fa1c43bc0f94ec55091c4a60905962235b7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="93971d52" sha1="233cb0275fff27296f474fbff7874f1ada1b9957"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="b624464b" sha1="08c638de7259836a472f2d7173312399be369588"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="d1802f9e" sha1="36cd78784c013e3614ce3aae9591e2c2aa886ab0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="72680d7a" sha1="ca773d61aef0a3d5eee4fc51f62305645b879ce1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="68c95e68" sha1="788c850c5976560f129e91f49ea4c82750904b1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steelskyf" cloneof="steelsky">
 		<description>Beneath a Steel Sky (France)</description>
 		<year>1994</year>
 		<publisher>Virgin</publisher>
@@ -10946,6 +10983,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="goblins3g" cloneof="goblins3">
+		<description>Goblins Quest 3 (Germany)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="version" value="0.50" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 (Germany) [Sierra] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="debef2d0" sha1="aac7f973e3cd6645bf75a42baff4526459ca6c12"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 (Germany) [Sierra] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="06fd5e22" sha1="5983857f151513af6be873bb4fb3d24f18e4bade"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 (Germany) [Sierra] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="6241a908" sha1="71a2ba8183c6acb2211ef16ece4ee3ee5cc13516"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 (Germany) [Sierra] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="6f96ad1c" sha1="18ec37853726f72994b2cb3ca386f180b5510c56"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 (Germany) [Sierra] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="9c5f6d67" sha1="e0f87c8dcc57a07e6c653aef3bc671f06da791d3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gods">
 		<description>Gods</description>
 		<year>1991</year>
@@ -11542,6 +11612,28 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Jill of the Jungle - The Complete Trilogy (USA) (5.25'').img" size="1228800" crc="323b0332" sha1="dd3dc2df11745e4858dfee1025f42d98e6970b4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jstrike">
+		<description>Jungle Strike</description>
+		<year>1995</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Jungle Strike [Gremlin Interactive] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="ec72dfd3" sha1="bac732abff714d93fa3058d07df3bbe7138ef4d1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Jungle Strike [Gremlin Interactive] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="dfd5bbd2" sha1="3bdde79c20439b2e7853a456a7c8db356c759161"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Jungle Strike [Gremlin Interactive] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="20691385" sha1="a15ad8005da8a4ed7470be8c40bcd8af85e047c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12853,8 +12945,7 @@ license:CC0
 		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<!-- has a saved configuration file -->
-				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="feba710f" sha1="4692dda4267b4b4b0791c837e9bdb27a45e48240" status="baddump"/>
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="434e737c" sha1="bccd718c8c2a3a26c1f8624e7f85b7eec7648b91"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
