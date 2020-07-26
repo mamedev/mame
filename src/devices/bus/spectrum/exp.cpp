@@ -200,6 +200,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("fuller", SPECTRUM_FULLER);
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
 	device.option_add("kempdisc", SPECTRUM_KEMPDISC);
+	device.option_add("kempcentrs", SPECTRUM_KEMPCENTRS);
 	device.option_add("kempcentref", SPECTRUM_KEMPCENTREF);
 	device.option_add("kempcentreu", SPECTRUM_KEMPCENTREU);
 	device.option_add("lprint", SPECTRUM_LPRINT);
