@@ -6184,6 +6184,15 @@ ROM_END
   It's just a theory, but the main battery is routed to the daughterboard
   connectors, when this module has not suicide program inside a RAM.
 
+  Module contents:
+
+  1x Rockwell R65C02P2 Mexico.
+  1x 27c512 EPROM stickered 'IMPERA1'.
+  1x PAL16L8A2NC.
+  1x 74HC241N.
+  1x 74LS245N.
+  1x 74LS139N.
+
 */
 ROM_START( jolyjokrm )	// Jolly Joker (Solid State module in suicide board)
 	ROM_REGION( 0x10000, "maincpu", 0 )
