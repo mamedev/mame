@@ -146,17 +146,6 @@
 
 /*************************************
  *
- *  Constants
- *
- *************************************/
-
-#define CPU_CLOCK           8000000     /* not used when video boards are connected */
-#define VIDEO_CLOCK         15468480
-
-
-
-/*************************************
- *
  *  Machine setup and config
  *
  *************************************/
@@ -867,9 +856,7 @@ void segag80v_state::zektor(machine_config &config)
 	g80v_base(config);
 
 	/* custom sound board */
-	ZEKTOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-
-	AY8912(config, m_aysnd, VIDEO_CLOCK/4/2).add_route(ALL_OUTPUTS, "speaker", 0.33);
+	ZEKTOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	/* speech board */
 	sega_speech_board(config);
@@ -1267,7 +1254,7 @@ void segag80v_state::init_zektor()
 	/* configure sound */
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
-	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_aysnd, FUNC(ay8912_device::address_data_w)));
+	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write_ay)));
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
 	/* configure inputs */

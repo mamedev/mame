@@ -7,6 +7,7 @@
 
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
+#include "sound/ay8910.h"
 
 // log to netlist.csv for nltool playback/analysis
 #define ENABLE_NETLIST_LOGGING		(1)
@@ -18,6 +19,7 @@ public:
 	segag80_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &), double output_scale);
 
 	void write(offs_t addr, uint8_t data);
+	void write_ay(offs_t addr, uint8_t data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -26,6 +28,7 @@ protected:
 
 	optional_device_array<netlist_mame_logic_input_device, 8> m_lo_input;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_hi_input;
+	optional_device<ay8912_device> m_psg;
 
 private:
 	u8 m_lo_vals = 0xff;
@@ -51,6 +54,9 @@ class zektor_audio_device : public segag80_audio_device
 {
 public:
 	zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	void device_add_mconfig(machine_config &config) override;
 };
 
 

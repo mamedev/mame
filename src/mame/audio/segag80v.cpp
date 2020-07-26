@@ -25,6 +25,7 @@ segag80_audio_device::segag80_audio_device(const machine_config &mconfig, device
 	, device_mixer_interface(mconfig, *this)
 	, m_lo_input(*this, "sound_nl:lo_%u", 0)
 	, m_hi_input(*this, "sound_nl:hi_%u", 0)
+	, m_psg(*this, "psg")
 	, m_netlist(netlist)
 	, m_output_scale(output_scale)
 {
@@ -96,6 +97,11 @@ void segag80_audio_device::write(offs_t addr, uint8_t data)
 	oldvals = data;
 }
 
+void segag80_audio_device::write_ay(offs_t addr, uint8_t data)
+{
+	m_psg->address_data_w(addr, data);
+}
+
 
 
 /*************************************
@@ -124,6 +130,22 @@ DEFINE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device, "zektor_audio", "Zektor So
 zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: segag80_audio_device(mconfig, ZEKTOR_AUDIO, tag, owner, clock, NETLIST_NAME(zektor), 5000.0)
 {
+}
+
+void zektor_audio_device::device_add_mconfig(machine_config &config)
+{
+	segag80_audio_device::device_add_mconfig(config);
+
+	AY8912(config, m_psg, VIDEO_CLOCK/4/2);
+	m_psg->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_psg->set_resistors_load(10000.0, 10000.0, 10000.0);
+	m_psg->add_route(0, "sound_nl", 1.0, 0);
+	m_psg->add_route(1, "sound_nl", 1.0, 1);
+	m_psg->add_route(2, "sound_nl", 1.0, 2);
+
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "R_PSG_1.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin1", 1, "R_PSG_2.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin2", 2, "R_PSG_3.R");
 }
 
 

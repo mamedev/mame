@@ -8,7 +8,16 @@
 //
 // Known problems/issues:
 //
-//    * WIP.
+//    * The noise signal (WBN) is connected into the TORPEDO_2 sound
+//       but seems to make no audible difference, either in the
+//       simulation or in recordings. Disabling it gives a nice speedup.
+//
+//    * The "flutter" on the SKITTER sound is either not as pronounced
+//       or simply faster than the recordings.
+//
+//    * Torpedo sounds don't retrigger until they're complete. This means
+//       you can fire several times before the next firing sound triggers.
+//       In recordings of games this doesn't appear to be the case.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -44,7 +53,8 @@
 #define D_1N914(name) DIODE(name, "1N914")
 #define D_1N4002(name) DIODE(name, "D(IS=65.4p RS=42.2m BV=100 IBV=5.00u CJO=14.8p M=0.333 N=1.36 TT=2.88u)")
 
-#define Q_2N4403(name) QBJT_EB(name, "PNP")
+// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N4403
+#define Q_2N4403(name) QBJT_EB(name, "PNP(Is=650.6E-18 Xti=3 Eg=1.11 Vaf=115.7 Bf=216.2 Ne=1.829 Ise=58.72f Ikf=1.079 Xtb=1.5 Br=3.578 Nc=2 Isc=0 Ikr=0 Rc=.715 Cjc=14.76p Mjc=.5383 Vjc=.75 Fc=.5 Cje=19.82p Mje=.3357 Vje=.75 Tr=111.6n Tf=603.7p Itf=.65 Vtf=5 Xtf=1.7 Rb=10)")
 
 #define LM555_DIP NE555_DIP
 #define LM566_DIP NE566_DIP
@@ -153,7 +163,10 @@ NETLIST_START(zektor)
 	NET_C(GND, I_HI_D0.GND, I_HI_D1.GND, I_HI_D2.GND, I_HI_D3.GND, I_HI_D4.GND, I_HI_D5.GND, I_HI_D6.GND, I_HI_D7.GND)
 	NET_C(I_V5, I_HI_D0.VCC, I_HI_D1.VCC, I_HI_D2.VCC, I_HI_D3.VCC, I_HI_D4.VCC, I_HI_D5.VCC, I_HI_D6.VCC, I_HI_D7.VCC)
 
-	ANALOG_INPUT(I_PSG, 0)
+	RES(R_PSG_1, 1000)
+	RES(R_PSG_2, 1000)
+	RES(R_PSG_3, 1000)
+	NET_C(I_V5, R_PSG_1.1, R_PSG_2.1, R_PSG_3.1)
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V12, 12)
@@ -206,7 +219,7 @@ NETLIST_START(zektor)
 	RES(R23, RES_K(4.7))
 // R24??
 	RES(R25, RES_K(220))
-	RES(R26, RES_K(470)) // RES_K(4.7))
+	RES(R26, RES_K(470))
 	RES(R27, RES_K(470))
 	RES(R28, RES_K(33))
 	RES(R29, RES_K(68))
@@ -327,7 +340,7 @@ NETLIST_START(zektor)
 #else // (SOUND_VARIANT == VARIANT_ZEKTOR)
 	RES(R132, RES_K(100))
 #endif
-//	RES(R133, 680)
+	RES(R133, 680)
 	RES(R134, RES_K(10))
 	RES(R135, RES_K(10))
 	RES(R136, RES_K(680))
@@ -606,7 +619,6 @@ NETLIST_START(zektor)
 //	NET_C(U41.7, GND)
 //	NET_C(U41.14, I_V5)
 
-
 	//
 	// Sheet 7, top-left/middle (Thrust)
 	//
@@ -675,14 +687,14 @@ NETLIST_START(zektor)
 	//
 
 	NET_C(I_SKITTER, U24.9)
-	NET_C(U24.8, R25.2, D1.K, R17.1, U5.4)
+	NET_C(U24.8, R25.2, D1.K, R17.1)
 	NET_C(R17.2, I_V12)
 	NET_C(D1.A, C21.1, R26.2, R25.1, Q3.B)
 	NET_C(C21.2, GND)
 	NET_C(R26.1, GND)
 	NET_C(Q3.C, GND, Q2.C)
 	NET_C(Q3.E, R23.1)
-	NET_C(R23.2, R22.2, U5.5)
+	NET_C(R23.2, R22.2)
 	NET_C(R22.1, Q2.E)
 	NET_C(Q2.B, R19.1)
 	NET_C(R19.2, C5.1)
@@ -691,12 +703,17 @@ NETLIST_START(zektor)
 	NET_C(U1.3, R15.1, R14.2)
 	NET_C(R14.1, GND)
 	NET_C(R15.2, U1.6, R16.2)
-	NET_C(U5.2, U5.6, C9.2, R21.1)
+	NET_C(C9.2, R21.1)
 	NET_C(C9.1, GND)
-	NET_C(R21.2, U5.7, R18.1)
+	NET_C(R21.2, R18.1)
 	NET_C(R18.2, I_V12)
-	NET_C(U5.8, I_V12, C8.1)
+	NET_C(I_V12, C8.1)
 	NET_C(C8.2, GND)
+	NET_C(U5.7, R18.1)
+	NET_C(U5.5, R23.2)
+	NET_C(U5.4, U24.8)
+	NET_C(U5.2, U5.6, R21.1)
+	NET_C(U5.8, I_V12)
 	NET_C(U5.1, GND)
 	NET_C(U5.3, R20.1)
 	NET_C(R20.2, C7.2, C6.1)
@@ -775,9 +792,9 @@ NETLIST_START(zektor)
 	NET_C(BGCLK.VCC, I_V5)
     NET_C(BGCLK.A0, U16.1)
     NET_C(BGCLK.Q, BGENV.A0)
-    NET_C(GND, C58.1, C58.2)
-	AFUNC(BGENV, 1, "if(A0>2.5,10,5)")
-	NET_C(BGENV.Q, C57.1)
+    NET_C(GND, C57.1, C57.2, C58.1, C58.2)
+	AFUNC(BGENV, 1, "if(A0>2.5,2.5,-2.5)")
+	NET_C(BGENV.Q, R106.1)
 #else
 	NET_C(U16.1, U25.5)
 	NET_C(C60.2, U25.6)
@@ -786,14 +803,15 @@ NETLIST_START(zektor)
 	NET_C(C58.1, GND)
 	NET_C(U25.1, GND)
 	NET_C(U25.3, C57.1)
-#endif
 	NET_C(C57.2, R106.1)
+#endif
 
 	//
 	// Sheet 7, PSG input
 	//
 
-	NET_C(I_PSG, C64.1)
+	NET_C(R_PSG_1.2, R_PSG_2.2, R_PSG_3.2, R133.2, C64.1)
+	NET_C(R133.1, GND)
 	NET_C(C64.2, R132.1)
 	NET_C(R132.2, U29.2, R122.1, C63.1)
 	NET_C(U29.3, GND)
@@ -815,7 +833,7 @@ NETLIST_START(zektor)
 	//
 
 	CLOCK(_200HZACLK, 218.01)
-	NET_C(_200HZACLK.VCC, I_V5)
+	NET_C(_200HZACLK.VCC, I_V12)
 	NET_C(_200HZACLK.GND, GND)
 	NET_C(_200HZA, _200HZACLK.Q)
 	NET_C(R142.1, R142.2, C68.1, C68.2, U32.5, U32.9, GND)
@@ -823,7 +841,7 @@ NETLIST_START(zektor)
 	HINT(U32.8, NC)
 
 	CLOCK(_200HZBCLK, 217.98)	// tweak frequency so this is out of phase
-	NET_C(_200HZBCLK.VCC, I_V5)
+	NET_C(_200HZBCLK.VCC, I_V12)
 	NET_C(_200HZBCLK.GND, GND)
 	NET_C(_200HZB, _200HZBCLK.Q)
 	NET_C(R139.1, R139.2, C65.1, C65.2, U32.13, U32.11, GND)
@@ -831,7 +849,7 @@ NETLIST_START(zektor)
 	HINT(U32.10, NC)
 
 	CLOCK(_10HZCLK, 10.58)
-	NET_C(_10HZCLK.VCC, I_V5)
+	NET_C(_10HZCLK.VCC, I_V12)
 	NET_C(_10HZCLK.GND, GND)
 	NET_C(_10HZ, _10HZCLK.Q)
 	NET_C(R143.1, R143.2, C69.1, C69.2, U32.1, U32.3, GND)
@@ -839,7 +857,7 @@ NETLIST_START(zektor)
 	HINT(U32.4, NC)
 
 	CLOCK(_50HZCLK, 69.58)
-	NET_C(_50HZCLK.VCC, I_V5)
+	NET_C(_50HZCLK.VCC, I_V12)
 	NET_C(_50HZCLK.GND, GND)
 	NET_C(_50HZ, _50HZCLK.Q)
 	NET_C(R141.1, R141.2, C67.1, C67.2, U31.1, U31.3, GND)
@@ -848,7 +866,7 @@ NETLIST_START(zektor)
 
 	// Note this oscillator is on Sheet 7, in the right-middle section
 	CLOCK(_100HZCLK, 121.12)
-	NET_C(_100HZCLK.VCC, I_V5)
+	NET_C(_100HZCLK.VCC, I_V12)
 	NET_C(_100HZCLK.GND, GND)
 	NET_C(_100HZ, _100HZCLK.Q)
 	NET_C(R140.1, R140.2, C66.1, C66.2, U31.5, U31.9, GND)
@@ -1126,18 +1144,6 @@ NETLIST_START(zektor)
 
 
 #if (ENABLE_FRONTIERS)
-    OPTIMIZE_FRONTIER(U3.6, RES_M(1), 50)
-/*
-    OPTIMIZE_FRONTIER(R10.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R7.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R6.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R8.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R9.1, RES_M(1), 50)
-
-    OPTIMIZE_FRONTIER(U8.6, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(U9.6, RES_M(1), 50)
-
-//    OPTIMIZE_FRONTIER(R106.1, RES_M(1), 50)*/
 #endif
 
 NETLIST_END()
