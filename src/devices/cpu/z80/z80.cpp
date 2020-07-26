@@ -11,6 +11,9 @@
  *      was set before this instruction (implemented, but not enabled: we need
  *      document Z80 types first, see below)
  *    - WAIT only stalls between instructions now, it should stall immediately.
+ *    - HALT state should not exit if HALT opcode was overwritten by external device,
+ *      while in this state CPU should repeatedly dummy fetch *next after HALT* address.
+ *      source: http://www.primrosebank.net/computers/z80/z80_special_reset.htm ('Halt and the special reset' part)
  *    - Ideally, the tiny differences between Z80 types should be supported,
  *      currently known differences:
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
