@@ -2002,9 +2002,9 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init
 CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission? (same happens on hardware?)
-CONS( 200?, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, sporzbx,   0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzbx,   0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
