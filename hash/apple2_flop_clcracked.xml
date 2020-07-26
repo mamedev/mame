@@ -37036,4 +37036,449 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="agalxsc">
+		<description>Apple Galaxian (StarCraft) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>StarCraft</publisher>
+		<info name="release" value="2020-06-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple galaxian (starcraft) (4am crack).dsk" size="143360" crc="f2015816" sha1="d7f2e879638238bf909eceb194a7f4a1c66c7754"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcjourn">
+		<description>Space Journey (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2020-06-28"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space journey (4am crack).dsk" size="143360" crc="963043ba" sha1="9d2b4f9caeef9b02df9f1bda17a42763c642e98a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xpmapsgl">
+		<description>Exploring Maps and Globes (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2020-06-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="exploring maps and globes (4am crack).dsk" size="143360" crc="b0dfae9b" sha1="29c79f3a45528e71db21639f2eed24af65a3f62b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="st1gpr2">
+		<description>Snooper Troops 1: The Case of the Granite Point Ghost (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2020-06-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="snooper troops and the case of the granite point ghost rev. 2 (4am crack).dsk" size="143360" crc="0d66db3e" sha1="0b922e12625060e7f272192241ab44cc4800195f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwawit">
+		<description>Newbery Winners: A Wrinkle in Time (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- a wrinkle in time (4am crack).dsk" size="143360" crc="d4637c5a" sha1="b12f12ea6de8898a8f7552527ba882b21c1e40ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwbtt">
+		<description>Newbery Winners: Bridge to Terabithia (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- bridge to terabithia (4am crack).dsk" size="143360" crc="f86a002a" sha1="5340a51606f2a963f413b032ac8ee198382e97c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwsndr">
+		<description>Newbery Winners: Sounder (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- sounder (4am crack).dsk" size="143360" crc="cb639f8e" sha1="64b3f80208f36df0cf24e2cc51f4419b3c2e26e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwtwg">
+		<description>Newbery Winners: The Westing Game (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="newbery winners- the westing game (4am crack).dsk" size="143360" crc="7479173c" sha1="88143a8b920f809a40854bff1f3207298cdaad4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomap">
+		<description>Geometry: Area and Perimeter (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-07-14"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry- area and perimeter (4am crack).dsk" size="143360" crc="9eda9409" sha1="a9574f8535a86e7cc0b0cd57c51c4fddaca0e631"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harvprim">
+		<description>Harvey by Primes (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2020-07-14"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="harvey by primes (4am crack).dsk" size="143360" crc="53b86cdc" sha1="ff3465d702503a32d55a3e45106f9bdee99bfba0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capalgr2">
+		<description>Computer Assisted Problem Solving for Intermediate Algebra (Revision 2) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>UNKNOWN</publisher>
+		<info name="release" value="2020-07-16"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="computer assisted problem solving for intermediate algebra rev. 2 (4am crack) side a.dsk" size="143360" crc="a88d9c03" sha1="abded6498ca7e3b15add02cb45b7f1bba24e7e88"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="computer assisted problem solving for intermediate algebra rev. 2 (4am crack) side b.dsk" size="143360" crc="3db24779" sha1="9955585a49e74348a4659d8bf404109fb1c9721b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="georectr">
+		<description>Geometry: Rectilinear Regions (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-07-16"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry- rectilinear regions (4am crack).dsk" size="143360" crc="9a216e06" sha1="8bd6c17f48143de83be75c52b23fc90aa4c9a279"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psialge">
+		<description>Problem Solving in Algebra (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-07-16"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="problem solving in algebra (4am crack) disk 1.dsk" size="143360" crc="03cc98f1" sha1="5128aaffc6d85ed1597bf4efe9c520aef9cf25c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="problem solving in algebra (4am crack) disk 2.dsk" size="143360" crc="dd40b065" sha1="ab1ced8fcfeea82e6186375bc328c7a6166bfc54"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="problem solving in algebra (4am crack) disk 3.dsk" size="143360" crc="d642c5b6" sha1="275fd1d0045fd79ac63965207f7c12d4d825ca90"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="problem solving in algebra (4am crack) disk 4.dsk" size="143360" crc="bd7bf5e3" sha1="9580a8a274b919060dcec49aa56182b4ca8a396a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="problem solving in algebra (4am crack) disk 5.dsk" size="143360" crc="16dba183" sha1="8f7da0dd662480d7a57dfb593aa83c82d1f0c98c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intacont">
+		<description>Integers (A Contest) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2020-07-17"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="integers (a contest) (4am crack).dsk" size="143360" crc="48a99981" sha1="3dfa6a108ed203886ab55063b7638343cee797b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seaiv2">
+		<description>Solving Equations and Inequalities (Version 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-17"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="solving equations and inequalities v2 (4am crack).dsk" size="143360" crc="0fb9deac" sha1="3a240343ee2ad54fcfa62b8894b9928818539f0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estbe">
+		<description>Estimation: Bull's Eye (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-07-17"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="estimation- bull's eye (4am crack).dsk" size="143360" crc="b76acaf6" sha1="befd753d3d74e341b503dd8776cb1cfd1dcc3c38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtrredpn">
+		<description>Return to Reading: The Red Pony (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Media Basics</publisher>
+		<info name="release" value="2020-07-12"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="return to reading- the red pony (4am crack).dsk" size="143360" crc="0f7f8479" sha1="ef2e06e2246f68d085e221519b632e296c38903b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtrjtrem">
+		<description>Return to Reading: Johnny Tremain (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Media Basics</publisher>
+		<info name="release" value="2020-07-12"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="return to reading- johnny tremain (4am crack).dsk" size="143360" crc="030ce1fb" sha1="49aceb3171a577a1e41c66bf5f1d9d546bca7383"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tbmaths1">
+		<description>Testing Basic Math Skills 1 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2020-07-17"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="testing basic math skills 1 (4am crack).dsk" size="143360" crc="c7ff3a8b" sha1="7874eaf88be46761727b75ec4e57aab46dfe19d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geopool">
+		<description>Geometry Pool and Billiards (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2020-07-12"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry pool and billiards (4am crack).dsk" size="143360" crc="795f6bd3" sha1="d4a86b14d7c6196f520ba60b599ba86c8d42810f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casamist">
+		<description>Casa Del Misterio (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Language Study Software</publisher>
+		<info name="release" value="2020-07-12"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="casa del misterio (4am crack).dsk" size="143360" crc="e8380ab5" sha1="01118aca84ac9b1cca5a0fd7ed4bf1e5be523ff7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlapdll">
+		<description>M-ss-ng L-nks: Al Pie De La Letra (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-07-12"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="m-ss-ng l-nks- al pie de la letra (4am crack).dsk" size="143360" crc="890c379e" sha1="09e341e5f183e85c9c050d8dafef35513bbe1e30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fracwprb">
+		<description>Fraction Word Problems (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2020-07-13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fraction word problems (4am crack).dsk" size="143360" crc="388b1049" sha1="dada3c8f63e043e52c06c97632d1fc900e18eb3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spncont">
+		<description>The Spanish Contest (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Lingo Fun</publisher>
+		<info name="release" value="2020-07-13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spanish contest (4am crack) side a.dsk" size="143360" crc="982ccc90" sha1="64cabfcc297cda11f51b8044c4dd3457a108237b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spanish contest (4am crack) side b.dsk" size="143360" crc="d62739f9" sha1="8374efc8d7cc621e55044177f502efd17d866c5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="analresn">
+		<description>Analytical Reasoning (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2020-07-13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analytical reasoning (4am crack) disk 1.dsk" size="143360" crc="15f4d7e8" sha1="46484e258bf6a0fcddaaa7bddf0b39708d0dd502"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analytical reasoning (4am crack) disk 2.dsk" size="143360" crc="58d30651" sha1="bb6755e3ea303d9832f879c63d145e554ae3bba6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="endestim">
+		<description>Rounding and Estimation (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2020-07-13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rounding and estimation (4am crack).dsk" size="143360" crc="8e40827e" sha1="7f61b9a5e84d2799055469e945b91fc438d161af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paiffdp2">
+		<description>Proper and Improper Fractions: Fractions, Decimals, and Percent (2nd Edition) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2020-07-13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="proper and improper fractions- fractions, decimals, and percent 2nd edition (4am crack).dsk" size="143360" crc="d93d9d2b" sha1="c6cd5be98d598c382847349d4eef0ef4054b65c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qaverg">
+		<description>Averages (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2020-07-13"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="averages (4am crack).dsk" size="143360" crc="1cac50dc" sha1="5bf1029c9880c24a69cc568a91761e2f43191255"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="np0886">
+		<description>Nouns/Pronouns (08.31.86 Version) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2020-07-14"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="nouns-pronouns v08.31.86 (4am crack) disk 1.dsk" size="143360" crc="2daf72ad" sha1="eaf0972a9efe036414325b1f95eaf6c26860c6d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="nouns-pronouns v08.31.86 (4am crack) disk 2.dsk" size="143360" crc="89f49f07" sha1="48066e68e141c94c1b6fa6debfd94fe5c6d89de5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mettutr">
+		<description>Metric System Tutor (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2020-07-19"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="metric system tutor (4am crack).dsk" size="143360" crc="743534c6" sha1="47ea8c215580c0ba58d516e38e59d19417933134"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addwn117">
+		<description>Addition: Whole Numbers Steps 1-17 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-20"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition- whole numbers steps 1-17 (4am crack).dsk" size="143360" crc="77fb0cc9" sha1="3423672de66bb6da9c88b058f0dac19a1d72fe7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afrac118">
+		<description>Addition: Fractions Concepts Steps 1-8 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-20"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition- fractions concepts steps 1-8 (4am crack).dsk" size="143360" crc="1f9bf17a" sha1="83edd117e3b093c08718fa42f576082ba303678d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
