@@ -190,9 +190,9 @@ public:
 	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sigmab98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_hopper(*this, "hopper")
 		, m_nvramdev(*this, "nvram")
 		, m_eeprom(*this, "eeprom")
-		, m_hopper(*this, "hopper")
 		, m_nvram(*this, "nvram")
 		, m_leds(*this, "led%u", 0U)
 	{ }
@@ -211,6 +211,8 @@ public:
 	void init_ucytokyu();
 
 protected:
+	virtual void machine_reset() override;
+
 	void gegege_regs_w(offs_t offset, uint8_t data);
 	uint8_t gegege_regs_r(offs_t offset);
 	void gegege_regs2_w(offs_t offset, uint8_t data);
@@ -231,8 +233,6 @@ protected:
 	void show_outputs();
 	void eeprom_w(uint8_t data);
 
-	DECLARE_MACHINE_RESET(sigmab98);
-
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 
 	void dashhero_io_map(address_map &map);
@@ -245,11 +245,11 @@ protected:
 
 	// Required devices
 	required_device<cpu_device> m_maincpu;
+	required_device<ticket_dispenser_device> m_hopper;
 
 	// Optional devices
 	optional_device<nvram_device> m_nvramdev; // battery backed RAM (should be required, but dashhero breaks with it)
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<ticket_dispenser_device> m_hopper;
 
 	// Shared pointers
 	required_shared_ptr<uint8_t> m_nvram;
@@ -287,6 +287,9 @@ public:
 	void init_lufykzku();
 	void lufykzku(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	required_device<mb3773_device> m_watchdog;
 	required_device_array<ttl165_device, 2> m_dsw_shifter;
@@ -301,8 +304,6 @@ private:
 	uint8_t lufykzku_c8_r();
 	void lufykzku_c8_w(uint8_t data);
 	void lufykzku_watchdog_w(uint8_t data);
-
-	DECLARE_MACHINE_RESET(lufykzku);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
 
@@ -343,7 +344,6 @@ protected:
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
 
-	uint8_t unk_34_r();
 	uint8_t coin_counter_r();
 	void coin_counter_w(uint8_t data);
 	uint8_t leds_r();
@@ -1323,12 +1323,6 @@ void sammymdl_state::eeprom_w(uint8_t data)
 		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);
 }
 
-uint8_t sammymdl_state::unk_34_r()
-{
-	// mask 0x01?
-	return 0x01;
-}
-
 uint8_t sigmab98_base_state::vblank_r()
 {
 	// mask 0x04 must be set before writing sprite list
@@ -1433,7 +1427,6 @@ void sammymdl_state::animalc_io(address_map &map)
 	map(0x30, 0x30).portr("BUTTON");
 	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::coin_counter_w));
 	map(0x32, 0x32).rw(FUNC(sammymdl_state::leds_r), FUNC(sammymdl_state::leds_w));
-	map(0x34, 0x34).r(FUNC(sammymdl_state::unk_34_r));
 	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
 	map(0x91, 0x91).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
@@ -1905,7 +1898,7 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
+void sigmab98_state::machine_reset()
 {
 	m_rombank = 0;
 	membank("rombank")->set_entry(0);
@@ -1925,8 +1918,6 @@ void sigmab98_state::sigmab98(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sigmab98_state::sigmab98_vblank_interrupt));
-
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -1988,7 +1979,7 @@ void sigmab98_state::dashhero(machine_config &config)
                            Banpresto Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(lufykzku_state,lufykzku)
+void lufykzku_state::machine_reset()
 {
 	m_rombank = 0;
 	membank("romrambank")->set_entry(0);
@@ -2012,8 +2003,6 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lufykzku_state::lufykzku_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lufykzku_state::lufykzku_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lufykzku_state::lufykzku_irq), "screen", 0, 1);
-
-	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	// No EEPROM
@@ -2061,15 +2050,20 @@ void lufykzku_state::lufykzku(machine_config &config)
 TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_state::sammymdl_irq)
 {
 	int scanline = param;
+	uint16_t irqs = 0;
 
 	if (scanline == 240)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
+		irqs |= 1 << ((m_vblank_vector & 0x1e) >> 1);
 
 	if (scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
+		irqs |= 1 << ((m_timer0_vector & 0x1e) >> 1);
 
 	if (scanline == 32)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80
+		irqs |= 1 << ((m_timer1_vector & 0x1e) >> 1);
+
+	// FIXME: this is not much less of a hack than HOLD_LINE
+	if (irqs != 0)
+		m_maincpu->set_state_int(kl5c80a12_device::KP69_IRR, m_maincpu->state_int(kl5c80a12_device::KP69_IRR) | irqs);
 }
 
 void sammymdl_state::sammymdl(machine_config &config)

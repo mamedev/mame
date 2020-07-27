@@ -2616,6 +2616,8 @@ if (CPUS["Z80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.h",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.h",
+		MAME_DIR .. "src/devices/cpu/z80/kp69.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kp69.h",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
 	}

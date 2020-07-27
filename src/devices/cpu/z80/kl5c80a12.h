@@ -12,6 +12,7 @@
 #pragma once
 
 #include "z80.h"
+#include "kp69.h"
 
 
 //**************************************************************************
@@ -24,7 +25,8 @@ public:
 	enum
 	{
 		KC82_B1 = Z80_WZ + 1, KC82_B2, KC82_B3, KC82_B4,
-		KC82_A1, KC82_A2, KC82_A3
+		KC82_A1, KC82_A2, KC82_A3,
+		KP69_IRR, KP69_ISR, KP69_IVR, KP69_LER, KP69_PGR, KP69_IMR
 	};
 
 	kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -32,6 +34,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
@@ -68,6 +71,8 @@ private:
 	u16 m_mmu_a[4];
 	u8 m_mmu_b[5];
 	u32 m_mmu_base[0x40];
+
+	required_device<kp69_device> m_kp69;
 };
 
 

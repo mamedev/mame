@@ -13,7 +13,7 @@
     — MMU
     — USART (KP51) (unemulated)
     — 16-bit timer/counters (KP64, KP63) (unemulated)
-    — 16-level interrupt controller (KP69) (unemulated)
+    — 16-level interrupt controller (KP69)
     — Parallel ports (KP65, KP66) (unemulated)
     — 512-byte high-speed RAM
     — External bus interface unit (unemulated)
@@ -25,12 +25,19 @@
 
 DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "Kawasaki Steel KL5C80A12")
 
+static const z80_daisy_config fake_daisy_config[] = { { "kp69" }, { nullptr } };
+
+
+//-------------------------------------------------
+//  kl5c80a12 - device type constructor
+//-------------------------------------------------
 
 kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, KL5C80A12, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10, address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this))
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10, address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(kl5c80a12_device::internal_io), this))
+	, m_kp69(*this, "kp69")
 {
 	std::fill_n(&m_mmu_a[0], 4, 0);
 	std::fill_n(&m_mmu_b[0], 5, 0);
@@ -55,6 +62,10 @@ void kl5c80a12_device::internal_ram(address_map &map)
 void kl5c80a12_device::internal_io(address_map &map)
 {
 	map(0x00, 0x07).mirror(0xff00).rw(FUNC(kl5c80a12_device::mmu_r), FUNC(kl5c80a12_device::mmu_w));
+	map(0x34, 0x34).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrl_r), FUNC(kp69_device::lerl_pgrl_w));
+	map(0x35, 0x35).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrh_r), FUNC(kp69_device::lerh_pgrh_w));
+	map(0x36, 0x36).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrl_r), FUNC(kp69_device::imrl_w));
+	map(0x37, 0x37).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrh_r), FUNC(kp69_device::ivr_imrh_w));
 }
 
 
@@ -104,6 +115,8 @@ void kl5c80a12_device::device_start()
 			).mask(0x3ff);
 	}
 
+	m_kp69->add_to_state(*this, KP69_IRR);
+
 	save_item(NAME(m_mmu_a));
 	save_item(NAME(m_mmu_b));
 }
@@ -136,9 +149,27 @@ void kl5c80a12_device::device_post_load()
 }
 
 
-/* CPU interface */
+//-------------------------------------------------
+//  device_add_mconfig - add device-specific
+//  machine configuration
+//-------------------------------------------------
+
 void kl5c80a12_device::device_add_mconfig(machine_config &config)
 {
+	KP69(config, m_kp69);
+	m_kp69->int_callback().set_inputline(*this, INPUT_LINE_IRQ0);
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void kl5c80a12_device::device_config_complete()
+{
+	set_daisy_config(fake_daisy_config);
 }
 
 
