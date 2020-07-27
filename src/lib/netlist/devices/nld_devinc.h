@@ -248,22 +248,6 @@
 #define TTL_7448(...)                                                  \
 	NET_REGISTER_DEVEXT(TTL_7448, __VA_ARGS__)
 
-// usage       : TTL_7448_DIP(name)
-#define TTL_7448_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_7448_DIP, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_7442.cpp
-// ---------------------------------------------------------------------
-// usage       : TTL_7442(name, pA, pB, pC, pD)
-// auto connect: VCC, GND
-#define TTL_7442(...)                                                  \
-	NET_REGISTER_DEVEXT(TTL_7442, __VA_ARGS__)
-
-// usage       : TTL_7442_DIP(name)
-#define TTL_7442_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_7442_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_7450.cpp
 // ---------------------------------------------------------------------
@@ -1046,6 +1030,10 @@
 #define TTL_7437_NAND(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7437_NAND, __VA_ARGS__)
 
+// usage       : TTL_7448_DIP(name)
+#define TTL_7448_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7448_DIP, __VA_ARGS__)
+
 // usage       : TTL_7486_GATE(name)
 #define TTL_7486_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7486_GATE, __VA_ARGS__)
@@ -1179,6 +1167,14 @@
 // usage       : TTL_7437_DIP(name)
 #define TTL_7437_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7437_DIP, __VA_ARGS__)
+
+// usage       : TTL_7442(name, cA, cB, cC, cD)
+#define TTL_7442(...)                                                  \
+	NET_REGISTER_DEVEXT(TTL_7442, __VA_ARGS__)
+
+// usage       : TTL_7442_DIP(name)
+#define TTL_7442_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7442_DIP, __VA_ARGS__)
 
 // usage       : TTL_7486_DIP(name)
 #define TTL_7486_DIP(...)                                              \
