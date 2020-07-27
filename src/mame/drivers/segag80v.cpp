@@ -150,10 +150,10 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
+WRITE_LINE_MEMBER(segag80v_state::service_switch_w)
 {
-	/* pressing the service switch sends an NMI */
-	if (newval)
+	// pressing the service switch sends an NMI
+	if (state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -162,13 +162,15 @@ void segag80v_state::machine_start()
 {
 	m_scrambled_write_pc = 0xffff;
 
-	/* register for save states */
 	save_item(NAME(m_mult_data));
 	save_item(NAME(m_mult_result));
 	save_item(NAME(m_spinner_select));
 	save_item(NAME(m_spinner_sign));
 	save_item(NAME(m_spinner_count));
 	save_item(NAME(m_scrambled_write_pc));
+	save_item(NAME(m_coin_ff_state));
+	save_item(NAME(m_coin_last_state));
+	save_item(NAME(m_edgint_ff_state));
 }
 
 
@@ -179,10 +181,10 @@ void segag80v_state::machine_start()
  *
  *************************************/
 
-uint8_t segag80v_state::g80v_opcode_r(offs_t offset)
+u8 segag80v_state::g80v_opcode_r(offs_t offset)
 {
 	// opcodes themselves are not scrambled
-	uint8_t op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	u8 op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
 	// writes via opcode $32 (LD $(XXYY),A) get scrambled
 	if (!machine().side_effects_disabled())
@@ -199,17 +201,21 @@ offs_t segag80v_state::decrypt_offset(offs_t offset)
 	offs_t pc = m_scrambled_write_pc;
 	m_scrambled_write_pc = 0xffff;
 
-	/* munge the low byte of the address */
+	// munge the low byte of the address
 	return (offset & 0xff00) | (*m_decrypt)(pc, offset & 0xff);
 }
 
-void segag80v_state::mainram_w(offs_t offset, uint8_t data)
+void segag80v_state::mainram_w(offs_t offset, u8 data)
 {
 	m_mainram[decrypt_offset(offset)] = data;
 }
 
-void segag80v_state::usb_ram_w(offs_t offset, uint8_t data){ m_usb->ram_w(decrypt_offset(offset), data); }
-void segag80v_state::vectorram_w(offs_t offset, uint8_t data)
+void segag80v_state::usb_ram_w(offs_t offset, u8 data)
+{
+	m_usb->ram_w(decrypt_offset(offset), data);
+}
+
+void segag80v_state::vectorram_w(offs_t offset, u8 data)
 {
 	m_vectorram[decrypt_offset(offset)] = data;
 }
@@ -222,7 +228,7 @@ void segag80v_state::vectorram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-inline uint8_t segag80v_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0)
+inline u8 segag80v_state::demangle(u8 d7d6, u8 d5d4, u8 d3d2, u8 d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
 			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
@@ -231,19 +237,22 @@ inline uint8_t segag80v_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2
 }
 
 
-uint8_t segag80v_state::mangled_ports_r(offs_t offset)
+u8 segag80v_state::mangled_ports_r(offs_t offset)
 {
-	/* The input ports are odd. Neighboring lines are read via a mux chip  */
-	/* one bit at a time. This means that one bank of DIP switches will be */
-	/* read as two bits from each of 4 ports. For this reason, the input   */
-	/* ports have been organized logically, and are demangled at runtime.  */
-	/* 4 input ports each provide 8 bits of information. */
-	uint8_t d7d6 = ioport("D7D6")->read();
-	uint8_t d5d4 = ioport("D5D4")->read();
-	uint8_t d3d2 = ioport("D3D2")->read();
-	uint8_t d1d0 = ioport("D1D0")->read();
+	// The input ports are odd. Neighboring lines are read via a mux chip
+	// one bit at a time. This means that one bank of DIP switches will be
+	// read as two bits from each of 4 ports. For this reason, the input
+	// ports have been organized logically, and are demangled at runtime.
+	// 4 input ports each provide 8 bits of information.
+	u8 d7d6 = m_d7d6->read();
+	u8 d5d4 = m_d5d4->read();
+	u8 d3d2 = m_d3d2->read();
+	u8 d1d0 = m_d1d0->read();
 	int shift = offset & 3;
-	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
+	u8 result = demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
+static u8 last;
+if (shift == 3 && ((last ^ result) & 0x20)) { last = result; printf("%s: read = %02X\n", machine().scheduler().time().as_string(), result); }
+	return result;
 }
 
 
@@ -254,28 +263,24 @@ uint8_t segag80v_state::mangled_ports_r(offs_t offset)
  *
  *************************************/
 
-void segag80v_state::spinner_select_w(uint8_t data)
+void segag80v_state::spinner_select_w(u8 data)
 {
 	m_spinner_select = data;
 }
 
 
-uint8_t segag80v_state::spinner_input_r()
+u8 segag80v_state::spinner_input_r()
 {
-	int8_t delta;
-
 	if (m_spinner_select & 1)
-		return ioport("FC")->read();
+		return m_fc->read();
 
-/*
- * The values returned are always increasing.  That is, regardless of whether
- * you turn the spinner left or right, the self-test should always show the
- * number as increasing. The direction is only reflected in the least
- * significant bit.
- */
-
-	/* I'm sure this can be further simplified ;-) BW */
-	delta = ioport("SPINNER")->read();
+	//
+	// The values returned are always increasing.  That is, regardless of whether
+	// you turn the spinner left or right, the self-test should always show the
+	// number as increasing. The direction is only reflected in the least
+	// significant bit.
+	//
+	s8 delta = m_spinner->read();
 	if (delta != 0)
 	{
 		m_spinner_sign = (delta >> 7) & 1;
@@ -294,32 +299,33 @@ uint8_t segag80v_state::spinner_input_r()
 
 READ_LINE_MEMBER(segag80v_state::elim4_joint_coin_r)
 {
-	return (ioport("COINS")->read() & 0xf) != 0xf;
+	return (m_coins->read() & 0xf) != 0xf;
 }
 
 
-uint8_t segag80v_state::elim4_input_r()
+u8 segag80v_state::elim4_input_r()
 {
-	uint8_t result = 0;
+	u8 result = 0;
 
-	/* bit 3 enables demux */
-	if (m_spinner_select & 8)
+	// bit 3 enables demux
+	if (BIT(m_spinner_select, 3) != 0)
 	{
-		/* Demux bit 0-2. Only 6 and 7 are connected */
+		// Demux bit 0-2. Only 6 and 7 are connected
 		switch (m_spinner_select & 7)
 		{
 			case 6:
-				/* player 3 & 4 controls */
-				result = ioport("FC")->read();
+				// player 3 & 4 controls
+				result = m_fc->read();
 				break;
+
 			case 7:
-				/* the 4 coin inputs */
-				result = ioport("COINS")->read();
+				// the 4 coin inputs
+				result = m_coins->read();
 				break;
 		}
 	}
 
-	/* LS240 has inverting outputs */
+	// LS240 has inverting outputs
 	return (result ^ 0xff);
 }
 
@@ -331,7 +337,7 @@ uint8_t segag80v_state::elim4_input_r()
  *
  *************************************/
 
-void segag80v_state::multiply_w(offs_t offset, uint8_t data)
+void segag80v_state::multiply_w(offs_t offset, u8 data)
 {
 	m_mult_data[offset] = data;
 	if (offset == 1)
@@ -339,9 +345,9 @@ void segag80v_state::multiply_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t segag80v_state::multiply_r()
+u8 segag80v_state::multiply_r()
 {
-	uint8_t result = m_mult_result;
+	u8 result = m_mult_result;
 	m_mult_result >>= 8;
 	return result;
 }
@@ -354,19 +360,69 @@ uint8_t segag80v_state::multiply_r()
  *
  *************************************/
 
-void segag80v_state::coin_count_w(uint8_t data)
+void segag80v_state::coin_count_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 6) & 1);
 }
 
 
-void segag80v_state::unknown_w(uint8_t data)
+void segag80v_state::unknown_w(u8 data)
 {
-	/* writing an 0x04 here enables interrupts */
-	/* some games write 0x00/0x01 here as well */
+	// writing an 0x04 here enables interrupts
+	// some games write 0x00/0x01 here as well
 	if (data != 0x00 && data != 0x01 && data != 0x04)
 		osd_printf_debug("%04X:unknown_w = %02X\n", m_maincpu->pc(), data);
+}
+
+
+
+/*************************************
+ *
+ *  Main CPU interrupts
+ *
+ *************************************/
+
+void segag80v_state::vblank_callback(screen_device &screen, bool state)
+{
+	if (!state)
+	{
+		m_edgint_ff_state = 1;
+		update_int();
+	}
+}
+
+void segag80v_state::update_int()
+{
+	//
+	// IRQ signal comes from multiple sources:
+	//    * XINT signal, which is a combination of:
+	//        - COINA impulse, clocks an LS74, cleared by INTCL signal
+	//        - COINB impulse, clocks an LS74, cleared by INTCL signal
+	//        - SERVICE impulse
+	//    * /EDGINT signal from vector board, clocks an LS74, cleared by INTCL signal
+	//        - signal comes from 15468480 crystal, divided by 6, and then by 63368
+	//    * /INT signal from ???
+	//
+
+	if (m_coin_ff_state != 0 || m_edgint_ff_state != 0)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+
+	// SERVICE coin doesn't have a flip-flop; it's instantaneous
+	m_coin_ff_state &= ~0x04;
+}
+
+WRITE_LINE_MEMBER(segag80v_state::irq_ack_w)
+{
+	if (state)
+	{
+		// INTCL signal clears both coin flip-flops and EDGINT flip-flop
+		m_coin_ff_state = 0;
+		m_edgint_ff_state = 0;
+		update_int();
+	}
 }
 
 
@@ -377,11 +433,11 @@ void segag80v_state::unknown_w(uint8_t data)
  *
  *************************************/
 
-/* complete memory map derived from schematics */
+// complete memory map derived from schematics
 void segag80v_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
-	map(0x0800, 0xbfff).rom();     /* PROM board ROM area */
+	map(0x0000, 0x07ff).rom();     // CPU board ROM
+	map(0x0800, 0xbfff).rom();     // PROM board ROM area
 	map(0xc800, 0xcfff).ram().w(FUNC(segag80v_state::mainram_w)).share("mainram");
 	map(0xe000, 0xefff).ram().w(FUNC(segag80v_state::vectorram_w)).share("vectorram");
 }
@@ -392,11 +448,11 @@ void segag80v_state::opcodes_map(address_map &map)
 }
 
 
-/* complete memory map derived from schematics */
+// complete memory map derived from schematics
 void segag80v_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xbc, 0xbc); /* .r(FUNC(segag80v_state::)); ??? */
+	map(0xbc, 0xbc); // .r(FUNC(segag80v_state::)); ???
 	map(0xbd, 0xbe).w(FUNC(segag80v_state::multiply_w));
 	map(0xbe, 0xbe).r(FUNC(segag80v_state::multiply_r));
 	map(0xbf, 0xbf).w(FUNC(segag80v_state::unknown_w));
@@ -416,24 +472,24 @@ void segag80v_state::main_portmap(address_map &map)
 
 static INPUT_PORTS_START( g80v_generic )
 	PORT_START("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)  /* P1.5 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)  /* P1.8 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.13 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.14 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<0>)  // P1.5
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<1>)  // P1.8
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.13
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.14
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 
 	PORT_START("D5D4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )               /* P1.10 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                 /* P1.15 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.16 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.17 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.18 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                 /* P1.19 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.20 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.21 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<2>) // P1.10
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                 // P1.15
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.16
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.17
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.18
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                 // P1.19
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.20
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.21
 
 	PORT_START("D3D2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )
@@ -482,17 +538,17 @@ static INPUT_PORTS_START( g80v_generic )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_6C ))
 
 	PORT_START("FC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.23 */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.24 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.25 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.26 */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.27 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.28 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.29 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.30 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.23
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.24
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.25
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.26
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.27
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.28
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.29
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.30
 
 	PORT_START("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, segag80v_state,service_switch, 0)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_WRITE_LINE_MEMBER(segag80v_state, service_switch_w)
 INPUT_PORTS_END
 
 
@@ -704,8 +760,8 @@ static INPUT_PORTS_START( zektor )
 	PORT_DIPSETTING(    0x40, "30000" )
 
 	PORT_MODIFY("D5D4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.15 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.19 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.15
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.19
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -745,8 +801,8 @@ static INPUT_PORTS_START( tacscan )
 	PORT_DIPSETTING(    0x40, "30000" )
 
 	PORT_MODIFY("D5D4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.15 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.19 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.15
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.19
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -786,8 +842,8 @@ static INPUT_PORTS_START( startrek )
 	PORT_DIPSETTING(    0xc0, "40000" )
 
 	PORT_MODIFY("D5D4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.15 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.19 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.15
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.19
 
 
 	PORT_MODIFY("FC")
@@ -812,71 +868,57 @@ INPUT_PORTS_END
 
 void segag80v_state::g80v_base(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, VIDEO_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segag80v_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segag80v_state::opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &segag80v_state::main_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
+	m_maincpu->irqack_cb().set(FUNC(segag80v_state::irq_ack_w));
+//	m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
+	m_screen->set_refresh_hz(double(VIDEO_CLOCK)/6/63368);
 	m_screen->set_size(400, 300);
 	m_screen->set_visarea(512, 1536, 640-32, 1408+32);
 	m_screen->set_screen_update(FUNC(segag80v_state::screen_update_segag80v));
+	m_screen->register_vblank_callback(vblank_state_delegate(&segag80v_state::vblank_callback, this));
 
 	VECTOR(config, m_vector);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 }
 
 void segag80v_state::elim2(machine_config &config)
 {
 	g80v_base(config);
-
-	/* custom sound board */
 	ELIMINATOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::spacfury(machine_config &config)
 {
 	g80v_base(config);
-
-	/* custom sound board */
 	SPACE_FURY_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-
-	/* speech board */
 	sega_speech_board(config);
 }
 
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
-
-	/* custom sound board */
 	ZEKTOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-
-	/* speech board */
 	sega_speech_board(config);
 }
-
 
 void segag80v_state::tacscan(machine_config &config)
 {
 	g80v_base(config);
-
-	/* universal sound board */
 	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
-
 
 void segag80v_state::startrek(machine_config &config)
 {
 	tacscan(config);
-
-	/* speech board */
 	sega_speech_board(config);
 }
 
@@ -906,8 +948,8 @@ ROM_START( elim2 )
 	ROM_LOAD( "1345.prom-u13", 0x6800, 0x0800, CRC(40597a92) SHA1(ee1ae2b424c38b40d2cbeda4aba3328e6d3f9c81) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   // sine table
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   // CPU board addressing
 ROM_END
 
 ROM_START( elim2a )
@@ -928,8 +970,8 @@ ROM_START( elim2a )
 	ROM_LOAD( "1170a.prom-u13", 0x6800, 0x0800, CRC(8cdacd35) SHA1(f24f8a74cb4b8452ddbd42e61d3b0366bbee7f98) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )  /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )  /* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )  // sine table
+	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )  // CPU board addressing
 ROM_END
 
 ROM_START( elim2c )
@@ -950,8 +992,8 @@ ROM_START( elim2c )
 	ROM_LOAD( "1212.prom-u13", 0x6800, 0x0800, CRC(152cf376) SHA1(56c3141598b8bac81e85b1fc7052fdd19cd95609) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   // sine table
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   // CPU board addressing
 ROM_END
 
 ROM_START( elim4 )
@@ -973,8 +1015,8 @@ ROM_START( elim4 )
 	ROM_LOAD( "1360.prom-u14", 0x7000, 0x0800, CRC(96d48238) SHA1(76a7b49081cd2d0dd1976077aa66b6d5ae5b2b43) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   // sine table
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   // CPU board addressing
 ROM_END
 
 ROM_START( elim4p )
@@ -996,12 +1038,12 @@ ROM_START( elim4p )
 	ROM_LOAD( "swe.prom-u14",  0x7000, 0x0800, CRC(ec4cc343) SHA1(00e107eaf530ce6bec2afffd7d7bedd7763cfb17) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   // sine table
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   // CPU board addressing
 ROM_END
 
 
-ROM_START( spacfury ) /* Revision C */
+ROM_START( spacfury ) // Revision C
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969c.cpu-u25",    0x0000, 0x0800, CRC(411207f2) SHA1(2a082be4052b5d8f365abd0a51ea805d270d1189) )
 	ROM_LOAD( "960c.prom-u1",    0x0800, 0x0800, CRC(d071ab7e) SHA1(c7d2429e4fa77988d7ac62bc68f876ffb7467838) )
@@ -1023,12 +1065,12 @@ ROM_START( spacfury ) /* Revision C */
 	ROM_LOAD( "972c.speech-u4",  0x2000, 0x1000, CRC(fad9346d) SHA1(784e5ab0fb00235cfd733c502baf23960923504f) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
-ROM_START( spacfurya ) /* Revision A */
+ROM_START( spacfurya ) // Revision A
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969a.cpu-u25",    0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "960a.prom-u1",    0x0800, 0x0800, CRC(e1ea7964) SHA1(9c84c525973fcf1437b062d98195272723249d02) )
@@ -1050,12 +1092,12 @@ ROM_START( spacfurya ) /* Revision A */
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
-ROM_START( spacfuryb ) /* Revision B */
+ROM_START( spacfuryb ) // Revision B
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969a.cpu-u25",    0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "960b.prom-u1",    0x0800, 0x0800, CRC(8a99b63f) SHA1(4b9ec152e0fad50afeea11f5d61331f3211da606) )
@@ -1077,9 +1119,9 @@ ROM_START( spacfuryb ) /* Revision B */
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 
@@ -1117,9 +1159,9 @@ ROM_START( zektor )
 	ROM_LOAD( "1610.speech-u4",  0x2000, 0x1000, CRC(2915c7bd) SHA1(3ed98747b5237aa1b3bab6866292370dc2c7655a) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 
@@ -1149,8 +1191,8 @@ ROM_START( tacscan )
 	ROM_LOAD( "1710a.prom-u21", 0xa800, 0x0800, CRC(6203be22) SHA1(89731c7c88d0125a11368d707f566eb53c783266) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )  /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )  /* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )  // sine table
+	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )  // CPU board addressing
 ROM_END
 
 
@@ -1189,9 +1231,9 @@ ROM_START( startrek )
 	ROM_LOAD( "1872.speech-u5",  0x1000, 0x1000, CRC(ebb5c3a9) SHA1(533b6f0499b311f561cf7aba14a7f48ca7c47321) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 
@@ -1206,10 +1248,10 @@ void segag80v_state::init_elim2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	/* configure security */
+	// configure security
 	m_decrypt = segag80_security(70);
 
-	/* configure sound */
+	// configure sound
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 }
 
@@ -1218,13 +1260,13 @@ void segag80v_state::init_elim4()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	/* configure security */
+	// configure security
 	m_decrypt = segag80_security(76);
 
-	/* configure sound */
+	// configure sound
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
-	/* configure inputs */
+	// configure inputs
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
 	iospace.install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(segag80v_state::elim4_input_r)));
 }
@@ -1234,10 +1276,10 @@ void segag80v_state::init_spacfury()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	/* configure security */
+	// configure security
 	m_decrypt = segag80_security(64);
 
-	/* configure sound */
+	// configure sound
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
@@ -1248,16 +1290,16 @@ void segag80v_state::init_zektor()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	/* configure security */
+	// configure security
 	m_decrypt = segag80_security(82);
 
-	/* configure sound */
+	// configure sound
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write_ay)));
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
-	/* configure inputs */
+	// configure inputs
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
 	iospace.install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(segag80v_state::spinner_input_r)));
 }
@@ -1268,15 +1310,15 @@ void segag80v_state::init_tacscan()
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	/* configure security */
+	// configure security
 	m_decrypt = segag80_security(76);
 
-	/* configure sound */
+	// configure sound
 	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
 	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
 	pgmspace.install_write_handler(0xd000, 0xdfff, write8sm_delegate(*this, FUNC(segag80v_state::usb_ram_w)));
 
-	/* configure inputs */
+	// configure inputs
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
 	iospace.install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(segag80v_state::spinner_input_r)));
 }
@@ -1287,10 +1329,10 @@ void segag80v_state::init_startrek()
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	/* configure security */
+	// configure security
 	m_decrypt = segag80_security(64);
 
-	/* configure sound */
+	// configure sound
 	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 
@@ -1298,7 +1340,7 @@ void segag80v_state::init_startrek()
 	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
 	pgmspace.install_write_handler(0xd000, 0xdfff, write8sm_delegate(*this, FUNC(segag80v_state::usb_ram_w)));
 
-	/* configure inputs */
+	// configure inputs
 	iospace.install_write_handler(0xf8, 0xf8, write8smo_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
 	iospace.install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(segag80v_state::spinner_input_r)));
 }
