@@ -426,19 +426,17 @@ void nes_clone_vtvppong_state::init_vtvppong()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
-	if (1)
+#if 0
+	FILE *fp;
+	char filename[256];
+	sprintf(filename,"decrypted_%s", machine().system().name);
+	fp=fopen(filename, "w+b");
+	if (fp)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(&src[0], len, 1, fp);
-			fclose(fp);
-		}
+		fwrite(&src[0], len, 1, fp);
+		fclose(fp);
 	}
-
+#endif
 }
 
 
