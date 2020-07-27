@@ -116,20 +116,14 @@ private:
 	void shift_clock_w(int state);
 	void shift_data_w(int state);
 
-	u8 m_select;
-	u8 m_led_data;
-	u8 m_shift_data;
-	u8 m_shift_clock;
+	u8 m_select = 0;
+	u8 m_led_data = 0;
+	u8 m_shift_data = 0;
+	u8 m_shift_clock = 0;
 };
 
 void prodigy_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_led_data = 0;
-	m_shift_data = 0;
-	m_shift_clock = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_led_data));

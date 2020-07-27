@@ -3518,7 +3518,7 @@ void z80_device::execute_run()
 		m_r++;
 		uint8_t opcode = rop();
 
-		// when in HALT state, the fetched opcode is not executed (aka a NOP)
+		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
 		if (m_halt)
 		{
 			PC--;
