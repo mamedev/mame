@@ -11247,20 +11247,32 @@ ROM_END
 
   The EPROMS devices only hold the second half of the needed program and regular tiles data.
   EPROMS are NMC27CP128Q that are sized 0x4000, when the real data should be 0x8000 for each position.
-
-  Compare the set against cmasterb to see the lack of data.
   
-  So... These aren't bad dumps, but should be marked as them due to the above mentioned.
+  *EDIT*
+  Even when the NMC27CP128Q datasheet says that these devices are 128 Kbits (16k x8), we redumped
+  them as 27c256, and got perfect complete 32k x8 dumps.
+
+  This is very weird, since the datasheet diagram clearly shows that this device lacks of A14 line.
+
+  So... The National NMC27CP128Q devices could hold twice the specified size, or these on the board
+  are just fake devices for protection purposes.
 
 */
 ROM_START( cmasteri )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// seems underdumped, but is coming from a real NMC27CP128Q
-	ROM_LOAD( "9.u81",  0x0000,  0x4000, BAD_DUMP CRC(ed295d09) SHA1(05381cb76a73751f40e1860969049b5145857fd9) )	// 1st half is missing
+	ROM_REGION( 0x10000, "maincpu", 0 )	// 32k x 8 data coming from a real NMC27CP128Q
+	ROM_LOAD( "9.u81",  0x0000,  0x1000, CRC(2738eb55) SHA1(95e420544f36e4ce6358f14fee7a6b7ecd4cc568) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
 
-	ROM_REGION( 0x18000, "gfx1", 0 )	// seems underdumped, but they are coming from real NMC27CP128Q
-	ROM_LOAD( "7.u16", 0x00000,  0x4000, BAD_DUMP CRC(a9f06056) SHA1(39f6827527ba905fe9c12b8b9e1d4a4be9b605c3) )	// 1st half is missing
-	ROM_LOAD( "6.u11", 0x08000,  0x4000, BAD_DUMP CRC(2e8f4bf6) SHA1(11b992b045dd4fa1d6c95307aa9de2669c0a2404) )	// 1st half is missing
-	ROM_LOAD( "5.u4",  0x10000,  0x4000, BAD_DUMP CRC(5a0a4b73) SHA1(8dd8b511b35de19afb9c459ac88c15799a07f717) )	// 1st half is missing
+	ROM_REGION( 0x18000, "gfx1", 0 )	// 32k x 8 data coming from real NMC27CP128Q devices
+	ROM_LOAD( "7.u16", 0x00000,  0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "6.u11", 0x08000,  0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "5.u4",  0x10000,  0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
@@ -19246,7 +19258,7 @@ GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
 GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
-GAMEL( 1991, cmasteri,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 9)",           MACHINE_NOT_WORKING, layout_cmasterb ) // program and regular tiles roms lack of the 1st half of data.
+GAMEL( 1991, cmasteri,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 9)",           0,                 layout_cmasterb ) // NMC27CP128Q being 32k x8 instead of 16k x8...
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 
