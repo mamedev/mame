@@ -95,7 +95,7 @@ uint16_t vsmile_state::portb_r()
 void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("%s: portb_w: %04x & %04x (bit 1: %d & %d)\n", machine().describe_context(), data, mem_mask, BIT(data, 1), BIT(mem_mask, 1));
-	if (BIT(mem_mask, 1))
+	if (BIT(mem_mask, 1) && m_cart)
 		m_cart->set_cs2(BIT(~data, 1));
 }
 
