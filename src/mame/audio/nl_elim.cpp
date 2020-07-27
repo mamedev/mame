@@ -1020,6 +1020,13 @@ NETLIST_START(zektor)
 	NET_C(U27.8, R125.1, U22.8)
 	NET_C(R125.2, I_V12)
 	NET_C(U22.9, R124.1, C55.1)
+
+	// Torpedo retriggering relies on clipping diodes which
+	// aren't implemented by default for speed
+	D_1N914(DT1)
+	NET_C(DT1.A, U22.9)
+	NET_C(DT1.K, I_V12)
+
 	NET_C(R124.2, I_V12)
 	NET_C(C55.2, U22.11, U23.2)
 	NET_C(U22.10, U22.12, U22.13, D4.K)
@@ -1109,6 +1116,13 @@ NETLIST_START(zektor)
 	NET_C(U27.10, R123.1, U22.6)
 	NET_C(R123.2, I_V12)
 	NET_C(U22.5, R121.1, C54.1)
+
+	// Torpedo retriggering relies on clipping diodes which
+	// aren't implemented by default for speed
+	D_1N914(DT2)
+	NET_C(DT2.A, U22.5)
+	NET_C(DT2.K, I_V12)
+
 	NET_C(R121.2, I_V12)
 	NET_C(C54.2, U22.3, U21.2)
 	NET_C(U21.12, R98.1)
