@@ -96,7 +96,7 @@ http://www.tsc-acnet.com/index.php?sort=8&action=cataloglist&s=1&mode=3&genre_id
 
 To Do:
 
-- KL5C80 emulation is needed to consolidate the sammymdl games in one memory map and to run the BIOS
+- Consolidate the sammymdl games in one memory map and run the BIOS without ROM patches
 - Remove ROM patches: gegege checks the EEPROM output after reset, and wants a timed 0->1 transition or locks up while
   saving setting in service mode. Using a reset_delay of 7 works, unless when "play style" is set
   to "coin" (it probably changes the number of reads from port $C0).
@@ -105,6 +105,7 @@ To Do:
   with no visible gaps. It currently leaves the screen empty instead, for several seconds.
 - tdoboon: no smoke from hit planes as shown in the video? Tiles are present (f60-125f) and used in demo mode.
 - dashhero does not acknowledge the button bashing correctly, it's very hard to win (a slower pace works better!)
+- dodghero and sushimar often write zeroes to 81XX1 and 00XX1 for some reason (maybe just sloppy coding?)
 
 Notes:
 
@@ -114,7 +115,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/kl5c80a12.h"
-#include "cpu/z80/z80.h"
+#include "cpu/z80/ky80.h"
 #include "machine/74165.h"
 #include "machine/eepromser.h"
 #include "machine/mb3773.h"
@@ -191,18 +192,13 @@ public:
 		: sigmab98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_hopper(*this, "hopper")
-		, m_nvramdev(*this, "nvram")
 		, m_eeprom(*this, "eeprom")
-		, m_nvram(*this, "nvram")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void sigmab98(machine_config &config);
 	void dodghero(machine_config &config);
-	void dashhero(machine_config &config);
-	void gegege(machine_config &config);
 
-	void init_dodghero();
 	void init_b3rinsya();
 	void init_tbeastw2();
 	void init_dashhero();
@@ -211,21 +207,6 @@ public:
 	void init_ucytokyu();
 
 protected:
-	virtual void machine_reset() override;
-
-	void gegege_regs_w(offs_t offset, uint8_t data);
-	uint8_t gegege_regs_r(offs_t offset);
-	void gegege_regs2_w(offs_t offset, uint8_t data);
-	uint8_t gegege_regs2_r(offs_t offset);
-
-	void dodghero_regs_w(offs_t offset, uint8_t data);
-	uint8_t dodghero_regs_r(offs_t offset);
-	void dodghero_regs2_w(offs_t offset, uint8_t data);
-	uint8_t dodghero_regs2_r(offs_t offset);
-
-	void dashhero_regs2_w(offs_t offset, uint8_t data);
-	uint8_t dashhero_regs2_r(offs_t offset);
-
 	void c4_w(uint8_t data);
 	void c6_w(uint8_t data);
 	void c8_w(uint8_t data);
@@ -235,8 +216,6 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 
-	void dashhero_io_map(address_map &map);
-	void dodghero_io_map(address_map &map);
 	void dodghero_mem_map(address_map &map);
 	void gegege_io_map(address_map &map);
 	void gegege_mem_map(address_map &map);
@@ -244,26 +223,13 @@ protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 
 	// Required devices
-	required_device<cpu_device> m_maincpu;
+	required_device<ky80_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 
 	// Optional devices
-	optional_device<nvram_device> m_nvramdev; // battery backed RAM (should be required, but dashhero breaks with it)
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	// Shared pointers
-	required_shared_ptr<uint8_t> m_nvram;
-
 	output_finder<4> m_leds;
-
-	uint8_t m_reg;
-	uint8_t m_rombank;
-	uint8_t m_reg2;
-	uint8_t m_rambank;
-
-	uint8_t m_vblank_vector;
-	uint8_t m_timer0_vector;
-	uint8_t m_timer1_vector;
 
 	uint8_t m_c0;
 	uint8_t m_c4;
@@ -287,9 +253,6 @@ public:
 	void init_lufykzku();
 	void lufykzku(machine_config &config);
 
-protected:
-	virtual void machine_reset() override;
-
 private:
 	required_device<mb3773_device> m_watchdog;
 	required_device_array<ttl165_device, 2> m_dsw_shifter;
@@ -297,8 +260,6 @@ private:
 	int m_dsw_bit;
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
-	void lufykzku_regs_w(offs_t offset, uint8_t data);
-	uint8_t lufykzku_regs_r(offs_t offset);
 	void lufykzku_c4_w(uint8_t data);
 	void lufykzku_c6_w(uint8_t data);
 	uint8_t lufykzku_c8_r();
@@ -309,6 +270,10 @@ private:
 
 	void lufykzku_io_map(address_map &map);
 	void lufykzku_mem_map(address_map &map);
+
+	uint8_t m_vblank_vector;
+	uint8_t m_timer0_vector;
+	uint8_t m_timer1_vector;
 };
 
 
@@ -739,228 +704,26 @@ uint8_t sigmab98_base_state::d021_r()
                           Minna Atsumare! Dodge Hero
 ***************************************************************************/
 
-// rombank
-void sigmab98_state::dodghero_regs_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	switch ( m_reg )
-	{
-		case 0x1f:
-			m_rombank = data;
-			if (data >= 0x18)
-				logerror("%s: unknown rom bank = %02x\n", machine().describe_context(), data);
-			else
-				membank("rombank")->set_entry(data * 2);
-			break;
-
-		case 0x9f:
-			m_rombank = data;
-			if (data >= 0x18)
-				logerror("%s: unknown rom bank2 = %02x\n", machine().describe_context(), data);
-			else
-				membank("rombank")->set_entry(data * 2 + 1);
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-uint8_t sigmab98_state::dodghero_regs_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x1f:
-		case 0x9f:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
-}
-
-// rambank
-void sigmab98_state::dodghero_regs2_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0x37:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x32:
-					membank("rambank")->set_entry(0);
-					break;
-				case 0x36:
-					membank("rambank")->set_entry(1);
-					break;
-				default:
-					logerror("%s: unknown ram bank = %02x\n", machine().describe_context(), data);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-uint8_t sigmab98_state::dodghero_regs2_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x37:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
 void sigmab98_state::dodghero_mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xa7ff).bankr("rombank");
+	map(0x00000, 0x1ffff).rom().nopw();
 
-	map(0xa800, 0xb7ff).ram().share("spriteram");
+	map(0x40000, 0x41fff).ram().share("nvram"); // battery backed RAM
 
-	map(0xc800, 0xc9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x80000, 0x80fff).ram().share("spriteram");
+	map(0x81000, 0x811ff).nopw();
+	map(0x82000, 0x821ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0xd001, 0xd07f).ram().share("vtable");
+	map(0x82800, 0x8287f).ram().share("vtable");
 
-	map(0xd800, 0xdfff).bankrw("rambank");    // not used, where is it mapped?
-
-	map(0xd800, 0xd821).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
-	map(0xd813, 0xd813).r(FUNC(sigmab98_state::d013_r));
-	map(0xd821, 0xd821).r(FUNC(sigmab98_state::d021_r));
-
-	map(0xe000, 0xefff).ram().share("nvram"); // battery backed RAM
-
-	map(0xf000, 0xffff).ram();
-}
-
-void sigmab98_state::dodghero_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-
-	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
-
-	map(0xa0, 0xa1).rw(FUNC(sigmab98_state::dodghero_regs_r), FUNC(sigmab98_state::dodghero_regs_w));
-//  map(0xa2, 0xa3)
-	map(0xa4, 0xa5).rw(FUNC(sigmab98_state::dodghero_regs2_r), FUNC(sigmab98_state::dodghero_regs2_w));
-
-	map(0xc0, 0xc0).portr("EEPROM").w(FUNC(sigmab98_state::eeprom_w));
-	map(0xc2, 0xc2).portr("BUTTON");
-	map(0xc4, 0xc4).portr("PAYOUT").w(FUNC(sigmab98_state::c4_w));
-	map(0xc6, 0xc6).w(FUNC(sigmab98_state::c6_w));
-	map(0xc8, 0xc8).w(FUNC(sigmab98_state::c8_w));
+	map(0x83000, 0x83021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
+	map(0x83013, 0x83013).r(FUNC(sigmab98_state::d013_r));
+	map(0x83021, 0x83021).r(FUNC(sigmab98_state::d021_r));
 }
 
 /***************************************************************************
                         GeGeGe no Kitarou Youkai Slot
 ***************************************************************************/
-
-// rombank
-void sigmab98_state::gegege_regs_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	switch ( m_reg )
-	{
-		case 0x1f:
-			m_rombank = data;
-			if (data >= 0x18)
-				logerror("%s: unknown rom bank = %02x\n", machine().describe_context(), data);
-			else
-				membank("rombank")->set_entry(data);
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-uint8_t sigmab98_state::gegege_regs_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x1f:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
-}
-
-// rambank
-void sigmab98_state::gegege_regs2_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0xb5:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x32:
-					membank("rambank")->set_entry(0);
-					break;
-				case 0x36:
-					membank("rambank")->set_entry(1);
-					break;
-				default:
-					logerror("%s: unknown ram bank = %02x\n", machine().describe_context(), data);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-uint8_t sigmab98_state::gegege_regs2_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0xb5:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
 
 // Outputs
 
@@ -1033,24 +796,19 @@ void sigmab98_state::c8_w(uint8_t data)
 
 void sigmab98_state::gegege_mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("rombank");
+	map(0x00000, 0x1ffff).rom();
 
-	map(0xa000, 0xafff).ram().share("spriteram");
+	map(0x40000, 0x47fff).ram().share("nvram"); // battery backed RAM
 
-	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x80000, 0x80fff).ram().share("spriteram");
 
-	map(0xc800, 0xc87f).ram().share("vtable");
+	map(0x82000, 0x821ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0xd000, 0xd021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
-	map(0xd013, 0xd013).r(FUNC(sigmab98_state::d013_r));
-	map(0xd021, 0xd021).r(FUNC(sigmab98_state::d021_r));
+	map(0x82800, 0x8287f).ram().share("vtable");
 
-	map(0xd800, 0xdfff).bankrw("rambank");
-
-	map(0xe000, 0xefff).ram().share("nvram"); // battery backed RAM
-
-	map(0xf000, 0xffff).ram();
+	map(0x83000, 0x83021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
+	map(0x83013, 0x83013).r(FUNC(sigmab98_state::d013_r));
+	map(0x83021, 0x83021).r(FUNC(sigmab98_state::d021_r));
 }
 
 void sigmab98_state::gegege_io_map(address_map &map)
@@ -1058,89 +816,6 @@ void sigmab98_state::gegege_io_map(address_map &map)
 	map.global_mask(0xff);
 
 	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
-
-	map(0xa0, 0xa1).rw(FUNC(sigmab98_state::gegege_regs_r), FUNC(sigmab98_state::gegege_regs_w));
-//  map(0xa2, 0xa3)
-	map(0xa4, 0xa5).rw(FUNC(sigmab98_state::gegege_regs2_r), FUNC(sigmab98_state::gegege_regs2_w));
-
-	map(0xc0, 0xc0).portr("EEPROM").w(FUNC(sigmab98_state::eeprom_w));
-	map(0xc2, 0xc2).portr("BUTTON");
-	map(0xc4, 0xc4).portr("PAYOUT").w(FUNC(sigmab98_state::c4_w));
-	map(0xc6, 0xc6).w(FUNC(sigmab98_state::c6_w));
-	map(0xc8, 0xc8).w(FUNC(sigmab98_state::c8_w));
-
-	map(0xe5, 0xe5).nopr();   // during irq
-}
-
-/***************************************************************************
-                           Minna Ganbare! Dash Hero
-***************************************************************************/
-
-// rambank
-void sigmab98_state::dashhero_regs2_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0x75:
-		case 0xb5:
-		case 0xf5:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x32:
-					membank("rambank")->set_entry(0);
-					break;
-				case 0x34:
-					membank("rambank")->set_entry(1);
-					break;
-				case 0x36:
-					membank("rambank")->set_entry(2);
-					break;
-				case 0x39:
-					membank("rambank")->set_entry(3);
-					break;
-				default:
-					logerror("%s: unknown ram bank = %02x\n", machine().describe_context(), data);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-uint8_t sigmab98_state::dashhero_regs2_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x75:
-		case 0xb5:
-		case 0xf5:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
-void sigmab98_state::dashhero_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-
-	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
-
-	map(0xa0, 0xa1).rw(FUNC(sigmab98_state::gegege_regs_r), FUNC(sigmab98_state::gegege_regs_w));
-//  map(0xa2, 0xa3)
-	map(0xa4, 0xa5).rw(FUNC(sigmab98_state::dashhero_regs2_r), FUNC(sigmab98_state::dashhero_regs2_w));
 
 	map(0xc0, 0xc0).portr("EEPROM").w(FUNC(sigmab98_state::eeprom_w));
 	map(0xc2, 0xc2).portr("BUTTON");
@@ -1155,56 +830,6 @@ void sigmab98_state::dashhero_io_map(address_map &map)
 /***************************************************************************
                        Otakara Itadaki Luffy Kaizoku-Dan!
 ***************************************************************************/
-
-// romrambank
-void lufykzku_state::lufykzku_regs_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	switch ( m_reg )
-	{
-		case 0x1f: // 8000
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x00: // (8000) ROM
-					membank("romrambank")->set_entry(0);
-					break;
-
-				case 0x78: // (80000) NVRAM
-					membank("romrambank")->set_entry(1);
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-
-uint8_t lufykzku_state::lufykzku_regs_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x00:
-		case 0x78:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
-}
 
 WRITE_LINE_MEMBER(lufykzku_state::dsw_w)
 {
@@ -1267,20 +892,16 @@ void lufykzku_state::lufykzku_c8_w(uint8_t data)
 
 void lufykzku_state::lufykzku_mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankrw("romrambank").share("nvram"); // ROM | NVRAM
+	map(0x00000, 0x1ffff).rom();
+	map(0x80000, 0x83fff).ram().share("nvram");
 
-	map(0xc000, 0xcfff).ram().share("spriteram");
+	map(0xc0000, 0xc0fff).ram().share("spriteram");
+	map(0xc1000, 0xc2fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // more palette entries
+	map(0xc3000, 0xc3021).rw(FUNC(lufykzku_state::vregs_r), FUNC(lufykzku_state::vregs_w)).share("vregs");
+	map(0xc3013, 0xc3013).r(FUNC(lufykzku_state::d013_r));
+	map(0xc3021, 0xc3021).r(FUNC(lufykzku_state::d021_r));
 
-	map(0xd000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // more palette entries
-
-	map(0xf000, 0xf021).rw(FUNC(lufykzku_state::vregs_r), FUNC(lufykzku_state::vregs_w)).share("vregs");
-	map(0xf013, 0xf013).r(FUNC(lufykzku_state::d013_r));
-	map(0xf021, 0xf021).r(FUNC(lufykzku_state::d021_r));
-
-	map(0xf400, 0xf47f).ram().share("vtable");
-
-	map(0xfc00, 0xffff).ram();
+	map(0xc3400, 0xc347f).ram().share("vtable");
 }
 
 void lufykzku_state::lufykzku_io_map(address_map &map)
@@ -1288,8 +909,6 @@ void lufykzku_state::lufykzku_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("oki", FUNC(okim9810_device::write));
 	map(0x01, 0x01).w("oki", FUNC(okim9810_device::tmp_register_w));
-
-	map(0xa2, 0xa3).rw(FUNC(lufykzku_state::lufykzku_regs_r), FUNC(lufykzku_state::lufykzku_regs_w));
 
 	map(0xc0, 0xc0).portr("COIN").w(FUNC(lufykzku_state::lufykzku_watchdog_w)); // bit 7 -> watchdog
 	map(0xc2, 0xc2).portr("BUTTON");
@@ -1440,7 +1059,7 @@ void sammymdl_state::animalc_io(address_map &map)
 
 void sammymdl_state::gocowboy_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rom().region("mainbios", 0);
+	map(0x00000, 0x5ffff).rom().region("mainbios", 0);
 	map(0x60000, 0x67fff).ram().share("nvram");
 	map(0x70000, 0x70fff).ram().share("spriteram");
 	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -1898,15 +1517,6 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-void sigmab98_state::machine_reset()
-{
-	m_rombank = 0;
-	membank("rombank")->set_entry(0);
-
-	m_rambank = 0;
-	membank("rambank")->set_entry(0);
-}
-
 INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a); // Z80
@@ -1914,7 +1524,7 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 
 void sigmab98_state::sigmab98(machine_config &config)
 {
-	Z80(config, m_maincpu, 10000000);  // !! TAXAN KY-80, clock @X1? !!
+	KY80(config, m_maincpu, 20000000);  // !! TAXAN KY-80, clock @X1? !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sigmab98_state::sigmab98_vblank_interrupt));
@@ -1953,37 +1563,12 @@ void sigmab98_state::dodghero(machine_config &config)
 	sigmab98(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::dodghero_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::dodghero_io_map);
-}
-
-void sigmab98_state::gegege(machine_config &config)
-{
-	sigmab98(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
-}
-
-void sigmab98_state::dashhero(machine_config &config)
-{
-	sigmab98(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::dashhero_io_map);
-
-	config.device_remove("nvram"); // FIXME: does not survive between sessions otherwise
 }
 
 
 /***************************************************************************
                            Banpresto Medal Games
 ***************************************************************************/
-
-void lufykzku_state::machine_reset()
-{
-	m_rombank = 0;
-	membank("romrambank")->set_entry(0);
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 {
@@ -1999,7 +1584,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 
 void lufykzku_state::lufykzku(machine_config &config)
 {
-	Z80(config, m_maincpu, XTAL(20'000'000) / 2);  // !! TAXAN KY-80, clock @X1? !!
+	KY80(config, m_maincpu, XTAL(20'000'000));  // !! TAXAN KY-80, clock @X1? !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &lufykzku_state::lufykzku_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lufykzku_state::lufykzku_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lufykzku_state::lufykzku_irq), "screen", 0, 1);
@@ -2186,17 +1771,6 @@ ROM_START( dodghero )
 	ROM_LOAD( "b9802-6.ic26", 0x80000, 0x80000, CRC(d83d8537) SHA1(9a5afdc68417db828a09188d653552452930b136) )
 ROM_END
 
-void sigmab98_state::init_dodghero()
-{
-	// ROM banks
-	uint8_t *rom = memregion("maincpu")->base();
-	membank("rombank")->configure_entries(0, 0x18*2, rom + 0x8000, 0x800);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
-	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-}
-
 /***************************************************************************
 
   Itazura Daisuki! Sushimaru Kun
@@ -2281,15 +1855,6 @@ void sigmab98_state::init_gegege()
 
 	rom[0x8164] = 0x00;
 	rom[0x8165] = 0x00;
-
-	// ROM banks
-	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	membank("rombank")->set_entry(0);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
-	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	membank("rambank")->set_entry(0);
 }
 
 /***************************************************************************
@@ -2320,15 +1885,6 @@ void sigmab98_state::init_b3rinsya()
 
 	rom[0x8164] = 0x00;
 	rom[0x8165] = 0x00;
-
-	// ROM banks
-	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	membank("rombank")->set_entry(0);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
-	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	membank("rambank")->set_entry(0);
 }
 
 /***************************************************************************
@@ -2367,15 +1923,6 @@ void sigmab98_state::init_pepsiman()
 
 	rom[0x8164] = 0x00;
 	rom[0x8165] = 0x00;
-
-	// ROM banks
-	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	membank("rombank")->set_entry(0);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
-	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	membank("rambank")->set_entry(0);
 }
 
 /***************************************************************************
@@ -2408,15 +1955,6 @@ void sigmab98_state::init_tbeastw2()
 
 	rom[0x8164] = 0x00;
 	rom[0x8165] = 0x00;
-
-	// ROM banks
-	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	membank("rombank")->set_entry(0);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
-	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	membank("rambank")->set_entry(0);
 }
 
 /***************************************************************************
@@ -2457,15 +1995,6 @@ void sigmab98_state::init_ucytokyu()
 
 	rom[0x8164] = 0x00;
 	rom[0x8165] = 0x00;
-
-	// ROM banks
-	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	membank("rombank")->set_entry(0);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 2);
-	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	membank("rambank")->set_entry(0);
 }
 
 /***************************************************************************
@@ -2497,15 +2026,6 @@ void sigmab98_state::init_dashhero()
 
 	rom[0x8162] = 0x00;
 	rom[0x8163] = 0x00;
-
-	// ROM banks
-	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	membank("rombank")->set_entry(0);
-
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x800 * 4);
-	membank("rambank")->configure_entries(0, 4, bankedram, 0x800);
-	membank("rambank")->set_entry(0);
 }
 
 
@@ -2555,17 +2075,6 @@ ROM_END
 
 void lufykzku_state::init_lufykzku()
 {
-	m_nvram.allocate(0x4000);
-	memset(m_nvram, 0, 0x4000);
-	m_nvramdev->set_base(m_nvram, 0x4000);
-
-	// ROM/RAM banks
-	uint8_t *rom = memregion("maincpu")->base();
-
-	membank("romrambank")->configure_entry(0, rom + 0x8000);
-	membank("romrambank")->configure_entry(1, m_nvram);
-	membank("romrambank")->set_entry(0);
-
 	m_vblank_vector = 0xfa; // nop
 	m_timer0_vector = 0xfc; // write coin counters/lockout, drive hopper
 	m_timer1_vector = 0xfe; // read inputs and hopper sensor, handle coin in
@@ -2870,14 +2379,14 @@ void sammymdl_state::init_haekaka()
 ***************************************************************************/
 
 // Sigma Medal Games
-GAME( 1997, dodghero, 0,        dodghero, sigma_1b, sigmab98_state, init_dodghero, ROT0, "Sigma",             "Minna Atsumare! Dodge Hero",           0 )
-GAME( 1997, sushimar, 0,        dodghero, sigma_3b, sigmab98_state, init_dodghero, ROT0, "Sigma",             "Itazura Daisuki! Sushimaru Kun",       0 )
-GAME( 1997, gegege,   0,        gegege,   sigma_1b, sigmab98_state, init_gegege,   ROT0, "Sigma / Banpresto", "GeGeGe no Kitarou Youkai Slot",        0 )
-GAME( 1997, b3rinsya, 0,        gegege,   sigma_5b, sigmab98_state, init_b3rinsya, ROT0, "Sigma",             "Burning Sanrinsya - Burning Tricycle", 0 ) // 1997 in the rom
-GAME( 1997, pepsiman, 0,        gegege,   sigma_3b, sigmab98_state, init_pepsiman, ROT0, "Sigma",             "PEPSI Man",                            0 )
-GAME( 1998, tbeastw2, 0,        gegege,   sigma_3b, sigmab98_state, init_tbeastw2, ROT0, "Sigma / Transformer Production Company / Takara", "Transformers Beast Wars II", 0 ) // 1997 in the rom
-GAME( 1997, ucytokyu, 0,        gegege,   sigma_js, sigmab98_state, init_ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",               0 ) // Banpresto + others in the ROM
-GAME( 2000, dashhero, 0,        dashhero, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the rom
+GAME( 1997, dodghero, 0,        dodghero, sigma_1b, sigmab98_state, empty_init,    ROT0, "Sigma",             "Minna Atsumare! Dodge Hero",           0 )
+GAME( 1997, sushimar, 0,        dodghero, sigma_3b, sigmab98_state, empty_init,    ROT0, "Sigma",             "Itazura Daisuki! Sushimaru Kun",       0 )
+GAME( 1997, gegege,   0,        sigmab98, sigma_1b, sigmab98_state, init_gegege,   ROT0, "Sigma / Banpresto", "GeGeGe no Kitarou Youkai Slot",        0 )
+GAME( 1997, b3rinsya, 0,        sigmab98, sigma_5b, sigmab98_state, init_b3rinsya, ROT0, "Sigma",             "Burning Sanrinsya - Burning Tricycle", 0 ) // 1997 in the rom
+GAME( 1997, pepsiman, 0,        sigmab98, sigma_3b, sigmab98_state, init_pepsiman, ROT0, "Sigma",             "PEPSI Man",                            0 )
+GAME( 1998, tbeastw2, 0,        sigmab98, sigma_3b, sigmab98_state, init_tbeastw2, ROT0, "Sigma / Transformer Production Company / Takara", "Transformers Beast Wars II", 0 ) // 1997 in the rom
+GAME( 1997, ucytokyu, 0,        sigmab98, sigma_js, sigmab98_state, init_ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",               0 ) // Banpresto + others in the ROM
+GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the rom
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
 // Sammy Medal Games:

@@ -2,53 +2,39 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Kawasaki Steel (Kawatetsu) KL5C80A12 CPU
-
-    This is based on KC82, an MMU-enhanced version of KC80 (KL5C8400),
-    Kawasaki's Z80-compatible core with an internal 16-bit architecture
-    and significantly faster opcode timings, operating at up to 10 MHz
-    (CLK = XIN/2).
+    Kawasaki Steel (Kawatetsu) KL5C80A16 CPU
 
     Important functional blocks:
     — MMU
-    — USART (KP51) (unemulated)
-    — 16-bit timer/counters (KP64, KP63) (unemulated)
+    — DMA controller (KP27) (unemulated)
+    — UART (KP61) (unemulated)
+    — Synchronous serial port (KP62) (unemulated)
+    — 16-bit timer/counters (KP63A) (unemulated)
     — 16-level interrupt controller (KP69)
-    — Parallel ports (KP65, KP66) (unemulated)
-    — 512-byte high-speed RAM
-    — External bus interface unit (unemulated)
+    — Parallel ports (KP67) (unemulated)
+    — External bus/DRAM interface unit (unemulated)
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "kl5c80a12.h"
+#include "kl5c80a16.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "Kawasaki Steel KL5C80A12")
+DEFINE_DEVICE_TYPE(KL5C80A16, kl5c80a16_device, "kl5c80a16", "Kawasaki Steel KL5C80A16")
 
 static const z80_daisy_config pseudo_daisy_config[] = { { "kp69" }, { nullptr } };
 
 
 //-------------------------------------------------
-//  kl5c80a12_device - constructor
+//  kl5c80a16_device - constructor
 //-------------------------------------------------
 
-kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: kc82_device(mconfig, KL5C80A12, tag, owner, clock,
-					address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this),
-					address_map_constructor(FUNC(kl5c80a12_device::internal_io), this))
+kl5c80a16_device::kl5c80a16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: kc82_device(mconfig, KL5C80A16, tag, owner, clock,
+					address_map_constructor(),
+					address_map_constructor(FUNC(kl5c80a16_device::internal_io), this))
 	, m_kp69(*this, "kp69")
 {
-}
-
-
-//-------------------------------------------------
-//  internal_ram - map for high-speed internal RAM
-//-------------------------------------------------
-
-void kl5c80a12_device::internal_ram(address_map &map)
-{
-	map(0xffe00, 0xfffff).ram().share("ram");
 }
 
 
@@ -56,9 +42,9 @@ void kl5c80a12_device::internal_ram(address_map &map)
 //  internal_io - map for internal I/O registers
 //-------------------------------------------------
 
-void kl5c80a12_device::internal_io(address_map &map)
+void kl5c80a16_device::internal_io(address_map &map)
 {
-	map(0x00, 0x07).mirror(0xff00).rw(FUNC(kl5c80a12_device::mmu_r), FUNC(kl5c80a12_device::mmu_w));
+	map(0x00, 0x07).mirror(0xff00).rw(FUNC(kl5c80a16_device::mmu_r), FUNC(kl5c80a16_device::mmu_w));
 	map(0x34, 0x34).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrl_r), FUNC(kp69_device::lerl_pgrl_w));
 	map(0x35, 0x35).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrh_r), FUNC(kp69_device::lerh_pgrh_w));
 	map(0x36, 0x36).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrl_r), FUNC(kp69_device::imrl_w));
@@ -70,7 +56,7 @@ void kl5c80a12_device::internal_io(address_map &map)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void kl5c80a12_device::device_start()
+void kl5c80a16_device::device_start()
 {
 	kc82_device::device_start();
 
@@ -82,7 +68,7 @@ void kl5c80a12_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void kl5c80a12_device::device_reset()
+void kl5c80a16_device::device_reset()
 {
 	kc82_device::device_reset();
 }
@@ -93,7 +79,7 @@ void kl5c80a12_device::device_reset()
 //  machine configuration
 //-------------------------------------------------
 
-void kl5c80a12_device::device_add_mconfig(machine_config &config)
+void kl5c80a16_device::device_add_mconfig(machine_config &config)
 {
 	KP69(config, m_kp69);
 	m_kp69->int_callback().set_inputline(*this, INPUT_LINE_IRQ0);
@@ -106,7 +92,7 @@ void kl5c80a12_device::device_add_mconfig(machine_config &config)
 //  complete
 //-------------------------------------------------
 
-void kl5c80a12_device::device_config_complete()
+void kl5c80a16_device::device_config_complete()
 {
 	set_daisy_config(pseudo_daisy_config);
 }

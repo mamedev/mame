@@ -2,12 +2,12 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Kawasaki Steel (Kawatetsu) KL5C80A12 CPU
+    Kawasaki Steel (Kawatetsu) KL5C80A16 CPU
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_Z80_KL5C80A12_H
-#define MAME_CPU_Z80_KL5C80A12_H
+#ifndef MAME_CPU_Z80_KL5C80A16_H
+#define MAME_CPU_Z80_KL5C80A16_H
 
 #pragma once
 
@@ -19,7 +19,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class kl5c80a12_device : public kc82_device
+class kl5c80a16_device : public kc82_device
 {
 public:
 	enum
@@ -28,7 +28,7 @@ public:
 	};
 
 	// device type constructor
-	kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kl5c80a16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -42,8 +42,7 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
 private:
-	// internal address maps
-	void internal_ram(address_map &map);
+	// internal address map
 	void internal_io(address_map &map);
 
 	// subdevice finders
@@ -52,6 +51,6 @@ private:
 
 
 // device type declaration
-DECLARE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device)
+DECLARE_DEVICE_TYPE(KL5C80A16, kl5c80a16_device)
 
-#endif // MAME_CPU_Z80_KL5C80A12_H
+#endif // MAME_CPU_Z80_KL5C80A16_H
