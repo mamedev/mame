@@ -16,7 +16,7 @@
 class segag80_audio_device : public device_t, public device_mixer_interface
 {
 public:
-	segag80_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &), double output_scale);
+	segag80_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 lomask, u8 himask, bool haspsg, void (*netlist)(netlist::nlparse_t &), double output_scale);
 
 	void write(offs_t addr, uint8_t data);
 	void write_ay(offs_t addr, uint8_t data);
@@ -31,8 +31,11 @@ protected:
 	optional_device<ay8912_device> m_psg;
 
 private:
-	u8 m_lo_vals = 0xff;
-	u8 m_hi_vals = 0xff;
+	u8 m_lo_vals;
+	u8 m_hi_vals;
+	u8 m_lo_mask;
+	u8 m_hi_mask;
+	bool m_has_psg;
 	void (*m_netlist)(netlist::nlparse_t &) = nullptr;
 	double m_output_scale = 0;
 
@@ -54,22 +57,19 @@ class zektor_audio_device : public segag80_audio_device
 {
 public:
 	zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	void device_add_mconfig(machine_config &config) override;
 };
 
 
-class spcfury_audio_device : public segag80_audio_device
+class spacfury_audio_device : public segag80_audio_device
 {
 public:
-	spcfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 
 DECLARE_DEVICE_TYPE(ELIMINATOR_AUDIO, elim_audio_device)
 DECLARE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device)
-DECLARE_DEVICE_TYPE(SPACE_FURY_AUDIO, spcfury_audio_device)
+DECLARE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device)
 
 #endif // MAME_AUDIO_SEGAG80V_H

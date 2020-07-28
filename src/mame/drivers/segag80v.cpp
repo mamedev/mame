@@ -899,7 +899,7 @@ void segag80v_state::elim2(machine_config &config)
 void segag80v_state::spacfury(machine_config &config)
 {
 	g80v_base(config);
-	SPACE_FURY_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	SPACE_FURY_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	sega_speech_board(config);
 }
 

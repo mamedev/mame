@@ -271,6 +271,8 @@ files{
 	MAME_DIR .. "src/mame/video/sega80v.cpp",
 	MAME_DIR .. "src/mame/audio/nl_elim.cpp",
 	MAME_DIR .. "src/mame/audio/nl_elim.h",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.cpp",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.h",
 
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",

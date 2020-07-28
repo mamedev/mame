@@ -3512,6 +3512,8 @@ files {
 	MAME_DIR .. "src/mame/audio/segag80v.h",
 	MAME_DIR .. "src/mame/audio/nl_elim.cpp",
 	MAME_DIR .. "src/mame/audio/nl_elim.h",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.cpp",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.h",
 	MAME_DIR .. "src/mame/video/segag80v.cpp",
 	MAME_DIR .. "src/mame/drivers/segahang.cpp",
 	MAME_DIR .. "src/mame/includes/segahang.h",
