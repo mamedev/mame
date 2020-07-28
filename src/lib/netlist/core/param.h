@@ -28,6 +28,7 @@
 #include "../plib/palloc.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
+#include "../plib/putil.h" // psource_t
 
 #include <memory>
 
@@ -241,7 +242,7 @@ namespace netlist
 		{
 		}
 
-		std::unique_ptr<std::istream> stream();
+		plib::psource_t::stream_ptr stream();
 	protected:
 		void changed() noexcept override { }
 	};
@@ -261,7 +262,7 @@ namespace netlist
 	protected:
 		void changed() noexcept override
 		{
-			plib::istream_read(*stream(), m_data.data(), 1<<AW);
+			plib::istream_read(stream().stream(), m_data.data(), 1<<AW);
 		}
 
 	private:

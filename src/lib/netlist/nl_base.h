@@ -735,10 +735,10 @@ namespace netlist
 	param_rom_t<ST, AW, DW>::param_rom_t(core_device_t &device, const pstring &name)
 	: param_data_t(device, name)
 	{
-		auto f = stream();
-		if (f != nullptr)
+		auto f = this->stream();
+		if (!f.empty())
 		{
-			plib::istream_read(*f, m_data.data(), 1<<AW);
+			plib::istream_read(f.stream(), m_data.data(), 1<<AW);
 			// FIXME: check for failbit if not in validation.
 		}
 		else

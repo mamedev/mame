@@ -261,8 +261,8 @@ netlist_source_memregion_t::stream_ptr netlist_source_memregion_t::stream(const 
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(m_name.c_str());
-		stream_ptr ret(std::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
-		ret->imbue(std::locale::classic());
+		stream_ptr ret(std::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())), name);
+		ret.stream().imbue(std::locale::classic());
 		return ret;
 	}
 	else
@@ -302,12 +302,12 @@ netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const ps
 		memory_region *mem = m_dev.memregion(name.c_str());
 		if (mem != nullptr)
 		{
-			stream_ptr ret(std::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
-			ret->imbue(std::locale::classic());
+			stream_ptr ret(std::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary), name);
+			ret.stream().imbue(std::locale::classic());
 			return ret;
 		}
 		else
-			return stream_ptr(nullptr);
+			return stream_ptr();
 	}
 	else
 	{
@@ -315,12 +315,12 @@ netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const ps
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
 		{
 			// Create an empty stream.
-			stream_ptr ret(std::make_unique<std::istringstream>(std::ios_base::binary));
-			ret->imbue(std::locale::classic());
+			stream_ptr ret(std::make_unique<std::istringstream>(std::ios_base::binary), name);
+			ret.stream().imbue(std::locale::classic());
 			return ret;
 		}
 		else
-			return stream_ptr(nullptr);
+			return stream_ptr();
 	}
 }
 
@@ -978,6 +978,8 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 {
 	try
 	{
+		//plib::chrono::timer<plib::chrono::system_ticks> t;
+		//t.start();
 		auto lnetlist = std::make_unique<netlist::netlist_state_t>("netlist",
 			plib::make_unique<netlist_validate_callbacks_t, netlist::host_arena>());
 		// enable validation mode
@@ -995,6 +997,8 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 			}
 		}
 
+		//t.stop();
+		//printf("time %s %f\n", this->mconfig().gamedrv().name, t.as_seconds<double>());
 		return lnetlist;
 	}
 	catch (memregion_not_set &err)
@@ -1015,6 +1019,7 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 
 void netlist_mame_device::device_validity_check(validity_checker &valid) const
 {
+
 	base_validity_check(valid);
 	//rom_exists(mconfig().root_device());
 	LOGDEVCALLS("device_validity_check %s\n", this->mconfig().gamedrv().name);
@@ -1024,7 +1029,6 @@ void netlist_mame_device::device_validity_check(validity_checker &valid) const
 void netlist_mame_device::device_start()
 {
 	LOGDEVCALLS("device_start entry\n");
-
 	m_attotime_per_clock = attotime(0, m_attoseconds_per_clock);
 
 	//netlist().save(*this, m_cur_time, pstring(this->name()), "m_cur_time");

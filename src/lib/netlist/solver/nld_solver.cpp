@@ -81,14 +81,14 @@ namespace devices
 			}
 			else
 			{
-				stats()->m_stat_total_time.pause();
+				stats()->m_stat_total_time.stop();
 				for (std::size_t i = 0; i < p; i++)
 				{
 					tmp[i]->stats()->m_stat_call_count.inc();
 					auto g(tmp[i]->stats()->m_stat_total_time.guard());
 					nt[i] = tmp[i]->solve(now, "no-parallel");
 				}
-				stats()->m_stat_total_time.cont();
+				stats()->m_stat_total_time.start();
 			}
 
 			for (std::size_t i = 0; i < p; i++)

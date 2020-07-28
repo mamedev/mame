@@ -78,7 +78,7 @@ namespace plib {
 		template <typename T>
 		ppreprocessor & process(T &&istrm, const pstring &filename)
 		{
-			m_stack.emplace_back(input_context(std::forward<T>(istrm),plib::util::path(filename), filename));
+			m_stack.emplace_back(input_context(istrm.release_stream(),plib::util::path(filename), filename));
 			process_stack();
 			return *this;
 		}

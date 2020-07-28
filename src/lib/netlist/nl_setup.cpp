@@ -422,10 +422,10 @@ namespace netlist
 	plib::psource_t::stream_ptr nlparse_t::get_data_stream(const pstring &name)
 	{
 		auto strm = m_sources.get_stream<source_data_t>(name);
-		if (strm)
+		if (!strm.empty())
 			return strm;
 		log().warning(MW_DATA_1_NOT_FOUND(name));
-		return plib::psource_t::stream_ptr(nullptr);
+		return plib::psource_t::stream_ptr();
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -1650,30 +1650,35 @@ void setup_t::prepare_to_run()
 bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 {
 	auto strm(stream(name));
-	return (strm) ? setup.parse_stream(std::move(strm), name) : false;
+	return (!strm.empty()) ? setup.parse_stream(std::move(strm), name) : false;
 }
 
 source_string_t::stream_ptr source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	source_string_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str));
-	ret->imbue(std::locale::classic());
+	source_string_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str), name);
+	ret.stream().imbue(std::locale::classic());
 	return ret;
 }
 
 source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	source_mem_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary));
-	ret->imbue(std::locale::classic());
+	source_mem_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
+	ret.stream().imbue(std::locale::classic());
 	return ret;
 }
 
 source_file_t::stream_ptr source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	auto ret(std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename)));
-	return (ret->is_open()) ? std::move(ret) : stream_ptr(nullptr);
+	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
+	if (f->is_open())
+	{
+		return stream_ptr(std::move(f), m_filename);
+	}
+	else
+		return stream_ptr();
 }
 
 bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
@@ -1690,8 +1695,7 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 source_proc_t::stream_ptr source_proc_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	stream_ptr p(nullptr);
-	return p;
+	return stream_ptr();
 }
 
 } // namespace netlist

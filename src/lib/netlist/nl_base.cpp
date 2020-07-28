@@ -903,7 +903,7 @@ namespace netlist
 	}
 
 
-	std::unique_ptr<std::istream> param_data_t::stream()
+	plib::psource_t::stream_ptr param_data_t::stream()
 	{
 		return device().state().parser().get_data_stream(str());
 	}
