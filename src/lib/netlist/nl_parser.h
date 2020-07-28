@@ -23,7 +23,7 @@ namespace netlist
 		{
 		}
 
-		bool parse(const pstring &nlname = "");
+		bool parse(const pstring &nlname);
 
 	protected:
 		void parse_netlist(const pstring &nlname);
@@ -40,6 +40,7 @@ namespace netlist
 		void net_submodel();
 		void net_include();
 		void net_local_source();
+		void net_register_dev();
 		void net_truthtable_start(const pstring &nlname);
 
 		void verror(const pstring &msg) override;
@@ -56,6 +57,7 @@ namespace netlist
 		token_id_t m_tok_DEFPARAM;
 		token_id_t m_tok_HINT;
 		token_id_t m_tok_NET_MODEL;
+		token_id_t m_tok_NET_REGISTER_DEV;
 		token_id_t m_tok_NETLIST_START;
 		token_id_t m_tok_NETLIST_END;
 		token_id_t m_tok_SUBMODEL;
