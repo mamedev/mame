@@ -8,47 +8,21 @@
 #ifndef NL_CORE_BASE_OBJECTS_H_
 #define NL_CORE_BASE_OBJECTS_H_
 
+#include "netlist_state.h"
 #include "state_var.h"
 
 #include "../nltypes.h"
 
 #include "../plib/palloc.h"
-#include "../plib/pmempool.h"
 #include "../plib/pchrono.h"
 #include "../plib/pexception.h"
 #include "../plib/plists.h"
+#include "../plib/pmempool.h"
 
 #include <unordered_map>
 
 namespace netlist
 {
-
-	//============================================================
-	//  Exceptions
-	//============================================================
-
-	/// \brief Generic netlist exception.
-	///  The exception is used in all events which are considered fatal.
-
-	class nl_exception : public plib::pexception
-	{
-	public:
-		/// \brief Constructor.
-		///  Allows a descriptive text to be passed to the exception
-
-		explicit nl_exception(const pstring &text //!< text to be passed
-				)
-		: plib::pexception(text) { }
-
-		/// \brief Constructor.
-		///  Allows to use \ref plib::pfmt logic to be used in exception
-
-		template<typename... Args>
-		explicit nl_exception(const pstring &fmt //!< format to be used
-			, Args&&... args //!< arguments to be passed
-			)
-		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
-	};
 
 	namespace detail {
 
@@ -142,6 +116,7 @@ namespace netlist
 		/// The object provides adds \ref netlist_state_t and \ref netlist_t
 		/// accessors.
 		///
+
 		class netlist_object_t : public object_t
 		{
 		public:
@@ -162,7 +137,10 @@ namespace netlist
 
 			// to ease template design
 			template<typename T, typename... Args>
-			device_arena::unique_ptr<T> make_pool_object(Args&&... args);
+			device_arena::unique_ptr<T> make_pool_object(Args&&... args)
+			{
+				return state().make_pool_object<T>(std::forward<Args>(args)...);
+			}
 
 		private:
 			netlist_t & m_netlist;
@@ -304,83 +282,6 @@ namespace netlist
 
 
 	} // namespace detail
-
-	// -----------------------------------------------------------------------------
-	// core_device_t
-	// -----------------------------------------------------------------------------
-	// FIXME: belongs into detail namespace
-	class core_device_t : public detail::netlist_object_t
-	{
-	public:
-		core_device_t(netlist_state_t &owner, const pstring &name);
-		core_device_t(core_device_t &owner, const pstring &name);
-
-		PCOPYASSIGNMOVE(core_device_t, delete)
-
-		virtual ~core_device_t() noexcept = default;
-
-		void do_inc_active() noexcept
-		{
-			if (m_hint_deactivate)
-			{
-				if (++m_active_outputs == 1)
-				{
-					if (m_stats)
-						m_stats->m_stat_inc_active.inc();
-					inc_active();
-				}
-			}
-		}
-
-		void do_dec_active() noexcept
-		{
-			if (m_hint_deactivate)
-				if (--m_active_outputs == 0)
-				{
-					dec_active();
-				}
-		}
-
-		void set_hint_deactivate(bool v) noexcept { m_hint_deactivate = v; }
-		bool get_hint_deactivate() const noexcept { return m_hint_deactivate; }
-		// Has to be set in device reset
-		void set_active_outputs(int n) noexcept { m_active_outputs = n; }
-
-		// stats
-		struct stats_t
-		{
-			// NL_KEEP_STATISTICS
-			plib::pperftime_t<true>  m_stat_total_time;
-			plib::pperfcount_t<true> m_stat_call_count;
-			plib::pperfcount_t<true> m_stat_inc_active;
-		};
-
-		stats_t * stats() const noexcept { return m_stats.get(); }
-#if 0
-		virtual void update() noexcept { }
-#endif
-		virtual void reset() { }
-
-	protected:
-
-		virtual void inc_active() noexcept {  }
-		virtual void dec_active() noexcept {  }
-
-		log_type & log();
-
-	public:
-		virtual void timestep(timestep_type ts_type, nl_fptype st) noexcept { plib::unused_var(ts_type, st); }
-		virtual void update_terminals() noexcept { }
-
-		virtual void update_param() noexcept {}
-		virtual bool is_dynamic() const noexcept { return false; }
-		virtual bool is_timestep() const noexcept { return false; }
-
-	private:
-		bool            m_hint_deactivate;
-		state_var_s32   m_active_outputs;
-		device_arena::unique_ptr<stats_t> m_stats;
-	};
 
 } // namespace netlist
 

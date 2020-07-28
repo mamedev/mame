@@ -10,11 +10,11 @@
 /// google tests compatible (hopefully) test macros. This is work in progress!
 ///
 
+#include <exception>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <functional>
-#include <exception>
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -115,7 +115,7 @@ namespace testing
 	{
 		using reg_entry_base::reg_entry_base;
 
-		virtual Test *create() const override { return new T(); }
+		Test *create() const override { return new T(); }
 	};
 
 	template <typename C, typename T1, typename T2>

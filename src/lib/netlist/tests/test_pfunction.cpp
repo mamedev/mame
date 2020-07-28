@@ -9,8 +9,8 @@
 
 #include "plib/ptests.h"
 
-#include "plib/pfunction.h"
 #include "plib/pexception.h"
+#include "plib/pfunction.h"
 
 #define PFUNCEXPECT(formula, val) \
 	PEXPECT_EQ(val, plib::pfunction<double>(formula)())

@@ -759,6 +759,16 @@ namespace netlist
 			net().initial(val);
 	}
 
+	// -----------------------------------------------------------------------------
+	// tristate_output_t
+	// -----------------------------------------------------------------------------
+	tristate_output_t::tristate_output_t(device_t &dev, const pstring &aname, bool force_logic)
+	: logic_output_t(dev, aname)
+	, m_last_logic(dev, name() + "." + "m_last_logic", 1) // force change
+	, m_tristate(dev, name() + "." + "m_tristate", force_logic ? 0 : 2) // force change
+	, m_force_logic(force_logic)
+	{}
+
 	// ----------------------------------------------------------------------------------------
 	// analog_input_t
 	// ----------------------------------------------------------------------------------------
@@ -938,6 +948,17 @@ namespace netlist
 
 	nlparse_t &netlist_state_t::parser() { return m_setup->parser(); }
 	const nlparse_t &netlist_state_t::parser() const { return m_setup->parser(); }
+
+	void netlist_state_t::remove_device(core_device_t *dev)
+	{
+		for (auto it = m_devices.begin(); it != m_devices.end(); it++)
+			if (it->second.get() == dev)
+			{
+				m_state.remove_save_items(dev);
+				m_devices.erase(it);
+				return;
+			}
+	}
 
 	template struct state_var<std::uint8_t>;
 	template struct state_var<std::uint16_t>;
