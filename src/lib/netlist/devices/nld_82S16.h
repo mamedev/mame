@@ -28,7 +28,5 @@
 
 #define TTL_82S16(name)                                     \
 		NET_REGISTER_DEV(TTL_82S16, name)
-#define TTL_82S16_DIP(name)                                 \
-		NET_REGISTER_DEV(TTL_82S16_DIP, name)
 
 #endif /* NLD_82S16_H_ */

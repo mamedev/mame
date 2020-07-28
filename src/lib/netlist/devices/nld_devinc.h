@@ -228,10 +228,6 @@
 #define RAM_2102A(...)                                                 \
 	NET_REGISTER_DEVEXT(RAM_2102A, __VA_ARGS__)
 
-// usage       : RAM_2102A_DIP(name)
-#define RAM_2102A_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(RAM_2102A_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_roms.cpp
 // ---------------------------------------------------------------------
@@ -830,20 +826,6 @@
 	NET_REGISTER_DEVEXT(TTL_74365_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_82S16.cpp
-// ---------------------------------------------------------------------
-// usage       : TTL_82S16_DIP(name)
-#define TTL_82S16_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_82S16_DIP, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_82S115.cpp
-// ---------------------------------------------------------------------
-// usage       : PROM_82S115_DIP(name)
-#define PROM_82S115_DIP(...)                                           \
-	NET_REGISTER_DEVEXT(PROM_82S115_DIP, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74123.cpp
 // ---------------------------------------------------------------------
 // usage       : TTL_9602(name)
@@ -1421,6 +1403,19 @@
 // usage       : EPROM_2716_DIP(name)
 #define EPROM_2716_DIP(...)                                            \
 	NET_REGISTER_DEVEXT(EPROM_2716_DIP, __VA_ARGS__)
+
+// usage       : TTL_82S16_DIP(name)
+#define TTL_82S16_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_82S16_DIP, __VA_ARGS__)
+
+// usage       : PROM_82S115_DIP(name)
+#define PROM_82S115_DIP(...)                                           \
+	NET_REGISTER_DEVEXT(PROM_82S115_DIP, __VA_ARGS__)
+
+// usage       : RAM_2102A_DIP(name)
+#define RAM_2102A_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(RAM_2102A_DIP, __VA_ARGS__)
+
 
 #endif // __PLIB_PREPROCESSOR__
 #endif

@@ -38,7 +38,7 @@ namespace netlist
 			m_addr = 0;
 			m_enq = 0;
 		}
-		friend class NETLIB_NAME(82S16_dip);
+
 	private:
 		// FIXME: timing!
 		// FIXME: optimize device (separate address decoder!)
@@ -105,39 +105,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(82S16_dip)
-	{
-		NETLIB_CONSTRUCTOR(82S16_dip)
-		, A(*this, "A")
-		{
-			register_subalias("2",     A.m_A[0]);
-			register_subalias("1",     A.m_A[1]);
-			register_subalias("15",    A.m_A[2]);
-			register_subalias("14",    A.m_A[3]);
-			register_subalias("7",     A.m_A[4]);
-			register_subalias("9",     A.m_A[5]);
-			register_subalias("10",    A.m_A[6]);
-			register_subalias("11",    A.m_A[7]);
-
-			register_subalias("3",     A.m_CE1Q);
-			register_subalias("4",     A.m_CE2Q);
-			register_subalias("5",     A.m_CE3Q);
-
-			register_subalias("12",    A.m_WEQ);
-			register_subalias("13",    A.m_DIN);
-
-			register_subalias("6",     A.m_DOUTQ);
-
-			register_subalias("8",     "A.GND");
-			register_subalias("16",    "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(82S16) A;
-	};
-
 	NETLIB_DEVICE_IMPL(82S16,     "TTL_82S16",     "")
-	NETLIB_DEVICE_IMPL(82S16_dip, "TTL_82S16_DIP", "")
 
 	} //namespace devices
 } // namespace netlist
