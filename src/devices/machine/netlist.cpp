@@ -1086,7 +1086,8 @@ void netlist_mame_device::device_reset()
 void netlist_mame_device::device_stop()
 {
 	LOGDEVCALLS("device_stop\n");
-	netlist().exec().stop();
+	if (m_netlist)
+		m_netlist->exec().stop();
 }
 
 void netlist_mame_device::device_post_load()
