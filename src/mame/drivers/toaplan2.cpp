@@ -55,7 +55,7 @@ Supported games:
     kingdmgp    RA-MA9402-03  Raizing/8ing  Kingdom Grandprix
     shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen (Japan)
     bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
-    bgareggap   RA9503        Raizing/8ing  Battle Garegga (Prototype - Wed Jan 17 1996)
+    bgareggat   RA9503        Raizing/8ing  Battle Garegga (location test - Wed Jan 17 1996)
     bgareggahk  RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
     bgareggatw  RA9503        Raizing/8ing  Battle Garegga (Taiwan (and Germany?) - Thu Feb 1 1996)
     bgaregganv  RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
@@ -5025,7 +5025,7 @@ ROM_START( shippumd )
 	ROM_LOAD( "ma02rom6.bin", 0x00000, 0x80000, CRC(199e7cae) SHA1(0f5e13cc8ec42c80bb4bbff90aba29cdb15213d4) )
 ROM_END
 
-ROM_START( bgareggap )
+ROM_START( bgareggat )
 	/* Dumped from a location test board, with some minor changes compared to the final.
 	* All ROMs are socketed
 	* All PAL/GALs are socketed
@@ -5740,7 +5740,7 @@ GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   toaplan2_state, empty
 GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   toaplan2_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggap,   bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Prototype) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
