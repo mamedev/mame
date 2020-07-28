@@ -1138,8 +1138,8 @@ CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p12_r)
 	}
 	else {
 		// 49 way joysticks
-		return	(translate49[m_io_49way_x[1]->read() >> 4] << 12) | (translate49[m_io_49way_y[1]->read() >> 4] << 8) |
-				(translate49[m_io_49way_x[0]->read() >> 4] << 4) |	(translate49[m_io_49way_y[0]->read() >> 4] << 0);
+		return  (translate49[m_io_49way_x[1]->read() >> 4] << 12) | (translate49[m_io_49way_y[1]->read() >> 4] << 8) |
+				(translate49[m_io_49way_x[0]->read() >> 4] << 4) |  (translate49[m_io_49way_y[0]->read() >> 4] << 0);
 	}
 }
 
@@ -1154,8 +1154,8 @@ CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p34_r)
 	}
 	else {
 		// 49 way joysticks
-		return	(translate49[m_io_49way_x[3]->read() >> 4] << 12) | (translate49[m_io_49way_y[3]->read() >> 4] << 8) |
-				(translate49[m_io_49way_x[2]->read() >> 4] << 4) |	(translate49[m_io_49way_y[2]->read() >> 4] << 0);
+		return  (translate49[m_io_49way_x[3]->read() >> 4] << 12) | (translate49[m_io_49way_y[3]->read() >> 4] << 8) |
+				(translate49[m_io_49way_x[2]->read() >> 4] << 4) |  (translate49[m_io_49way_y[2]->read() >> 4] << 0);
 	}
 }
 

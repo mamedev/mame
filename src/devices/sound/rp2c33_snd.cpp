@@ -2,17 +2,17 @@
 // copyright-holders:cam900, Brad Smith, Brezza
 /***************************************************************************
 
-	Ricoh RP2C33 Sound emulation
+    Ricoh RP2C33 Sound emulation
 
-	Based on:
-	- NSFplay github code by Brad Smith/Brezza
-	- Information from NESDev wiki
-	  (https://wiki.nesdev.com/w/index.php/FDS_audio)
+    Based on:
+    - NSFplay github code by Brad Smith/Brezza
+    - Information from NESDev wiki
+      (https://wiki.nesdev.com/w/index.php/FDS_audio)
 
-	TODO:
-	- verify register behaviors
-	- verify unknown read, writes
-	- Lowpass filter?
+    TODO:
+    - verify register behaviors
+    - verify unknown read, writes
+    - Lowpass filter?
 
 ***************************************************************************/
 

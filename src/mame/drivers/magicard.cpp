@@ -25,7 +25,7 @@
   * Puzzle Me!,                                 Impera, 199?.
   * unknown 'TE06',                             Impera, 199?.
   * Lucky 7 (Impera),                           Impera, 199?.
-  
+
 
 *******************************************************************************
 
@@ -987,7 +987,7 @@ ROM_START( magicardw )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "am27c4096.bin", 0x00000, 0x80000, CRC(d9e2a4ec) SHA1(b3000ded242fa25709c90b9b2541c9d1d5cabebb) )
 
-	ROM_REGION( 0x0200, "pic16c54", 0 )	// protected
+	ROM_REGION( 0x0200, "pic16c54", 0 ) // protected
 	ROM_LOAD("pic16c54a.bin",   0x0000, 0x0200, NO_DUMP )
 ROM_END
 
@@ -1114,14 +1114,14 @@ ROM_START( unkte06 )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "m27c4002.bin", 0x00000, 0x80000, CRC(229a504f) SHA1(8033e9b4cb55f2364bf4606375ef9ac05fc715fe) )
 
-	ROM_REGION( 0x0200, "pic16c54", 0 )	// protected
+	ROM_REGION( 0x0200, "pic16c54", 0 ) // protected
 	ROM_LOAD("pic16c54.bin",   0x0000, 0x0200, NO_DUMP )
 ROM_END
 
 /*
   Lucky 7
   Impera
-  
+
 */
 ROM_START( lucky7i )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX

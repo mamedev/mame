@@ -755,7 +755,7 @@ const uint8_t seattle_state::translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x
 *************************************/
 CUSTOM_INPUT_MEMBER(seattle_state::blitz_49way_r)
 {
-	return	(translate49[m_io_49way_y[1]->read() >> 4] << 12) | (translate49[m_io_49way_x[1]->read() >> 4] << 8) |
+	return  (translate49[m_io_49way_y[1]->read() >> 4] << 12) | (translate49[m_io_49way_x[1]->read() >> 4] << 8) |
 		(translate49[m_io_49way_y[0]->read() >> 4] << 4) | (translate49[m_io_49way_x[0]->read() >> 4] << 0);
 }
 

@@ -4,7 +4,7 @@
 
     formats/swd_dsk.c
 
-	Swift Disc disk images
+    Swift Disc disk images
 
 *********************************************************************/
 

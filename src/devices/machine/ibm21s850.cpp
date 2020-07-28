@@ -12,12 +12,12 @@
 #include "emu.h"
 #include "ibm21s850.h"
 
-#define LOG_READS		(1 << 1)
-#define LOG_WRITES		(1 << 2)
-#define LOG_UNKNOWNS	(1 << 3)
-#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
+#define LOG_READS       (1 << 1)
+#define LOG_WRITES      (1 << 2)
+#define LOG_UNKNOWNS    (1 << 3)
+#define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
 
-#define VERBOSE			(LOG_ALL)
+#define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(IBM21S850, ibm21s850_device, "ibm21s850", "IBM 21S850 IEEE-1394 1-Port PHY")
@@ -52,12 +52,12 @@ void ibm21s85x_base_device::device_reset()
 {
 	memset(m_regs, 0, 0x10);
 
-	m_regs[ROOT_OFFS] |= ROOT_MASK;						// Root node
-	m_regs[GAP_COUNT_OFFS] |= 0x3f;						// Initial reset value
-	m_regs[SPEED_OFFS] |= SPEED_400MBIT << SPEED_SHIFT;	// 21S850 and 21S851 both indicate maximum 400Mb/s rate
-	m_regs[ENHANCED_REGS_OFFS] |= ENHANCED_REGS_MASK;	// 21S850 and 21S851 both have an enhanced register map
-	m_regs[CABLE_PWR_OFFS] |= CABLE_PWR_MASK;			// Cable is powered
-	m_regs[CONNECTION1_OFFS] |= CONNECTION1_MASK;		// Port 1 connected
+	m_regs[ROOT_OFFS] |= ROOT_MASK;                     // Root node
+	m_regs[GAP_COUNT_OFFS] |= 0x3f;                     // Initial reset value
+	m_regs[SPEED_OFFS] |= SPEED_400MBIT << SPEED_SHIFT; // 21S850 and 21S851 both indicate maximum 400Mb/s rate
+	m_regs[ENHANCED_REGS_OFFS] |= ENHANCED_REGS_MASK;   // 21S850 and 21S851 both have an enhanced register map
+	m_regs[CABLE_PWR_OFFS] |= CABLE_PWR_MASK;           // Cable is powered
+	m_regs[CONNECTION1_OFFS] |= CONNECTION1_MASK;       // Port 1 connected
 	m_regs[ARB_PHASE_OFFS] |= PHASE_BUS_RESET << ARB_PHASE_OFFS; // Power up in Bus Reset phase
 
 	power_on_reset();
@@ -67,18 +67,18 @@ void ibm21s850_device::device_reset()
 {
 	ibm21s85x_base_device::device_reset();
 
-	m_regs[NUM_PORTS_OFFS] |= 0x01;		// 1 port available
-	m_regs[ENV_OFFS] |= 1 << ENV_SHIFT;	// Cable PHY environment
-	m_regs[REG_COUNT_OFFS] |= 0x09;		// 9 registers following the standard block on 21S850
+	m_regs[NUM_PORTS_OFFS] |= 0x01;     // 1 port available
+	m_regs[ENV_OFFS] |= 1 << ENV_SHIFT; // Cable PHY environment
+	m_regs[REG_COUNT_OFFS] |= 0x09;     // 9 registers following the standard block on 21S850
 }
 
 void ibm21s851_device::device_reset()
 {
 	ibm21s85x_base_device::device_reset();
 
-	m_regs[NUM_PORTS_OFFS] |= 0x03;		// 3 port available
-	m_regs[ENV_OFFS] |= 1 << ENV_SHIFT;	// Cable PHY environment
-	m_regs[REG_COUNT_OFFS] |= 0x0b;		// 11 registers following the standard block on 21S851
+	m_regs[NUM_PORTS_OFFS] |= 0x03;     // 3 port available
+	m_regs[ENV_OFFS] |= 1 << ENV_SHIFT; // Cable PHY environment
+	m_regs[REG_COUNT_OFFS] |= 0x0b;     // 11 registers following the standard block on 21S851
 }
 
 void ibm21s85x_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

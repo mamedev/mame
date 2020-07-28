@@ -76,7 +76,7 @@ WRITE_LINE_MEMBER( centronics_samdac_device::input_strobe )
 	// raising edge, write to left channel
 	if (m_strobe == 0 && state == 1)
 		m_dac[0]->data_w(m_data[0]);
-	
+
 	// failing edge, write to right channel
 	if (m_strobe == 1 && state == 0)
 		m_dac[1]->data_w(m_data[1]);

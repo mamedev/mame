@@ -191,7 +191,7 @@ private:
 	u8 main_r(offs_t offset);
 	void main_w(offs_t offset, u8 data);
 	u8 prom_r(offs_t offset);
-	
+
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<input_merger_device> m_mainirq;
@@ -258,7 +258,7 @@ void exorciser_state::mem_map(address_map &map)
 
 	// Disk driver code.
 	map(0xe800, 0xebff).rom().region("68fdc2", 0);
-	
+
 	// Disk driver unit
 	map(0xec00, 0xec07).rw(m_fdc, FUNC(m68sfdc_device::read), FUNC(m68sfdc_device::write));
 
@@ -270,7 +270,7 @@ void exorciser_state::mem_map(address_map &map)
 
 	// EXBUG
 	map(0xf000, 0xfbff).rom().region("exbug", 0);
-	
+
 	map(0xfcf4, 0xfcf5).mirror(0x0002).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xfcf8, 0xfcfb).rw(m_pia_dbg, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
@@ -403,7 +403,7 @@ WRITE_LINE_MEMBER(exorciser_state::write_f13_clock)
 u8 exorciser_state::main_r(offs_t offset)
 {
 	if (offset == m_stop_address && m_stop_enabled &&
-	    !machine().side_effects_disabled())
+		!machine().side_effects_disabled())
 	{
 		m_pia_dbg->cb1_w(CLEAR_LINE);
 		m_pia_dbg->cb1_w(ASSERT_LINE);

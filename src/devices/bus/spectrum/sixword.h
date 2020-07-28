@@ -2,7 +2,7 @@
 // copyright-holders:MetalliC
 /*********************************************************************
 
-	SIXWORD Swift Disc Interface
+    SIXWORD Swift Disc Interface
 
 *********************************************************************/
 #ifndef MAME_BUS_SPECTRUM_SIXWORD_H

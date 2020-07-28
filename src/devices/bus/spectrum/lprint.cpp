@@ -11,8 +11,9 @@
     (c) 1984 Euroelectronics (UK)
     Centronics and RS232 interface, most common printer interface for ZX-Spectrum.
 
-    (TODO) Kempston Centronics S Interface
-    (c) 1983 Kempston Micro Electronics Ltd (UK)
+    Hilderbay Interface (c) 1983 Hilderbay Ltd (UK)
+    AKA
+    Kempston Centronics S Interface (c) 1983 Kempston Micro Electronics Ltd (UK)
     ROM-less device, require printer driver to be loaded from tape.
 
     Kempston Centronics E Interface
@@ -34,6 +35,7 @@
 
 DEFINE_DEVICE_TYPE(SPECTRUM_LPRINT, spectrum_lprint_device, "spectrum_lprint", "ZX Lprint")
 DEFINE_DEVICE_TYPE(SPECTRUM_LPRINT3, spectrum_lprint3_device, "spectrum_lprint3", "ZX Lprint III")
+DEFINE_DEVICE_TYPE(SPECTRUM_KEMPCENTRS, spectrum_kempcentrs_device, "spectrum_kempcentrs", "Hilderbay / Kempston Centronics S")
 DEFINE_DEVICE_TYPE(SPECTRUM_KEMPCENTREF, spectrum_kempcentre_device, "spectrum_kempcentref", "Kempston Centronics E (flat)")
 DEFINE_DEVICE_TYPE(SPECTRUM_KEMPCENTREU, spectrum_kempcentreu_device, "spectrum_kempcentreu", "Kempston Centronics E (upright)")
 
@@ -98,6 +100,12 @@ void spectrum_lprint3_device::device_add_mconfig(machine_config &config)
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
 }
 
+void spectrum_kempcentrs_device::device_add_mconfig(machine_config &config)
+{
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(spectrum_kempcentrs_device::busy_w));
+}
+
 void spectrum_kempcentre_device::device_add_mconfig(machine_config &config)
 {
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -151,6 +159,13 @@ spectrum_lprint3_device::spectrum_lprint3_device(const machine_config &mconfig, 
 {
 }
 
+spectrum_kempcentrs_device::spectrum_kempcentrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SPECTRUM_KEMPCENTRS, tag, owner, clock)
+	, device_spectrum_expansion_interface(mconfig, *this)
+	, m_centronics(*this, "centronics")
+{
+}
+
 spectrum_kempcentre_device::spectrum_kempcentre_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
@@ -188,6 +203,12 @@ void spectrum_lprint3_device::device_start()
 	save_item(NAME(m_busy));
 }
 
+void spectrum_kempcentrs_device::device_start()
+{
+	m_busy = 0;
+	save_item(NAME(m_busy));
+}
+
 void spectrum_kempcentre_device::device_start()
 {
 	m_busy = 0;
@@ -209,6 +230,11 @@ void spectrum_lprint_device::device_reset()
 void spectrum_lprint3_device::device_reset()
 {
 	m_romcs = 0;
+	m_centronics->write_strobe(1);
+}
+
+void spectrum_kempcentrs_device::device_reset()
+{
 	m_centronics->write_strobe(1);
 }
 
@@ -339,6 +365,47 @@ uint8_t spectrum_lprint3_device::mreq_r(offs_t offset)
 		data &= m_exp->mreq_r(offset);
 
 	return data;
+}
+
+
+//**************************************************************************
+//  IMPLEMENTATION (kempcentrs)
+//**************************************************************************
+
+uint8_t spectrum_kempcentrs_device::iorq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	switch (offset)
+	{
+	case 0xe2bf:
+		data &= ~1;
+		data |= m_busy << 0;
+		break;
+	}
+
+	return data;
+}
+
+void spectrum_kempcentrs_device::iorq_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0xe0bf:
+		m_centronics->write_data0(BIT(data, 0));
+		m_centronics->write_data1(BIT(data, 1));
+		m_centronics->write_data2(BIT(data, 2));
+		m_centronics->write_data3(BIT(data, 3));
+		m_centronics->write_data4(BIT(data, 4));
+		m_centronics->write_data5(BIT(data, 5));
+		m_centronics->write_data6(BIT(data, 6));
+		m_centronics->write_data7(BIT(data, 7));
+		break;
+	case 0xe3bf:
+		// bit 0 is /STROBE, other bits not known, upon init driver writes to this port 0x81 then 0x0f
+		m_centronics->write_strobe(BIT(data, 0));
+		break;
+	}
 }
 
 

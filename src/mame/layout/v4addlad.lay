@@ -496,7 +496,7 @@ license:CC0
 		</bezel>
 		<bezel name="LADDER" element="LADDER">
 			<bounds x="127" y="142" width="16" height="16" />
-		</bezel>		
+		</bezel>
 		<bezel name="lamp126" element="matrixlamp" state="0">
 			<bounds x="145" y="140" width="20" height="20"/>
 		</bezel>

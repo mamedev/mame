@@ -50,7 +50,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	
+
 	void reset_cpu();
 
 	void branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);

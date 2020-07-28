@@ -210,7 +210,7 @@ u8 m68sfdc_device::read(offs_t offset)
 		data = (data & 0b11001100) >> 2 | (data & 0b00110011) << 2;
 		data = (data & 0b10101010) >> 1 | (data & 0b01010101) << 1;
 		return data;
-		
+
 	}
 
 	// The 6821 address lines are swapped.
@@ -251,7 +251,7 @@ void m68sfdc_device::write(offs_t offset, u8 data)
 			m_ssda_reg[(m_ssda_reg[0] >> 6) + 1] = data;
 
 		if (offset == 1 && (m_ssda_reg[0] & C1_AC_MASK) == C1_AC_C2 &&
-		    (data & C2_PC_MASK) == C2_PC1 && m_enable_read)
+			(data & C2_PC_MASK) == C2_PC1 && m_enable_read)
 		{
 			// This a write to the 6852 CR2 register which enables
 			// the SM output (PC2 = 0, PC1 = 1), while the read
@@ -267,7 +267,7 @@ void m68sfdc_device::write(offs_t offset, u8 data)
 		{
 			live_abort();
 		}
-		
+
 		return;
 	}
 
@@ -377,7 +377,7 @@ void m68sfdc_device::pia_pa_w(u8 data)
 	m_direction = direction;
 
 	update_floppy_selection();
-	
+
 	u8 head_load = m_head_load1 && m_head_load2;
 	if (head_load != m_head_load)
 	{
@@ -419,7 +419,7 @@ uint8_t m68sfdc_device::pia_pb_r()
 
 	if (m_write_protect_mode->read())
 		wpt = !wpt;
-	
+
 	return (wpt << 4) | (m_crc << 7);
 }
 
@@ -448,7 +448,7 @@ void m68sfdc_device::pia_pb_w(u8 data)
 
 	if (m_floppy)
 		m_floppy->ss_w(m_select3_mode->read() ? m_select_3 : 0);
-	
+
 	update_floppy_selection();
 
 	if (shift_crc_edge)
@@ -669,7 +669,7 @@ void m68sfdc_device::live_run(attotime limit)
 			// 0xaa prefix check is an emulator hack for now to
 			// improve detection reliability.
 			if ((cur_live.shift_reg & 0xff) == sync &&
-			    (cur_live.shift_reg >> 8) == 0xaa)
+				(cur_live.shift_reg >> 8) == 0xaa)
 			{
 				// Initialize the CRC. The hardware has an 8
 				// bit shift register to delay the bit stream
@@ -713,7 +713,7 @@ void m68sfdc_device::live_run(attotime limit)
 		}
 		case SYNC_BYTE2:
 			m_ssda->receive_byte(flip_bits(cur_live.shift_reg & 0xff));
-			cur_live.bit_counter = 0;				
+			cur_live.bit_counter = 0;
 			cur_live.state = READ;
 			checkpoint();
 			break;
@@ -744,8 +744,8 @@ void m68sfdc_device::live_run(attotime limit)
 			// expected CRC end positions: address marks, and 128
 			// and 256 byte data sectors.
 			if (cur_live.bit_counter == (4 + 2) * 16 ||
-			    cur_live.bit_counter == (128 + 2) * 16 ||
-			    cur_live.bit_counter == (256 + 2) * 16)
+				cur_live.bit_counter == (128 + 2) * 16 ||
+				cur_live.bit_counter == (256 + 2) * 16)
 			{
 				m_crc = m_last_crc;
 			}

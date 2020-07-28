@@ -4,7 +4,7 @@
 
     formats/fl1_dsk.h
 
-	FloppyOne DOS disk images
+    FloppyOne DOS disk images
 
 *********************************************************************/
 #ifndef MAME_FORMATS_FL1_DSK_H

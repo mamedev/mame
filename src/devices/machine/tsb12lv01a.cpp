@@ -12,13 +12,13 @@
 #include "emu.h"
 #include "tsb12lv01a.h"
 
-#define LOG_READS		(1 << 1)
-#define LOG_WRITES		(1 << 2)
-#define LOG_UNKNOWNS	(1 << 3)
-#define LOG_IRQS		(1 << 4)
-#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_IRQS)
+#define LOG_READS       (1 << 1)
+#define LOG_WRITES      (1 << 2)
+#define LOG_UNKNOWNS    (1 << 3)
+#define LOG_IRQS        (1 << 4)
+#define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_IRQS)
 
-#define VERBOSE			(LOG_ALL)
+#define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TSB12LV01A, tsb12lv01a_device, "tsb12lv01a", "TSB12LV01A IEEE 1394 Link Controller")

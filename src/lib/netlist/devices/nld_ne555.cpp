@@ -160,7 +160,7 @@ namespace netlist
 #endif
 				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
 				//if (this->name() == "IC6_2")
-				//	printf("%f %s %f %f %f\n", exec().time().as_double(), this->name().c_str(), m_overshoot(), m_R2.P()(), m_THRES());
+				//  printf("%f %s %f %f %f\n", exec().time().as_double(), this->name().c_str(), m_overshoot(), m_R2.P()(), m_THRES());
 				m_RDIS.change_state([this]()
 					{
 						m_RDIS.set_R(nlconst::magic(R_ON));

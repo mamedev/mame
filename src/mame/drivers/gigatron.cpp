@@ -51,7 +51,7 @@ private:
 	void data_map(address_map &map);
 
 	uint16_t m_lc; //Lights Changed
-	
+
 	//Video Generation stuff
 	uint8_t m_out;
 	uint8_t m_row;
@@ -62,10 +62,10 @@ private:
 	void video_draw(u8 data);
 	uint8_t inputs();
 	void port_outx(uint8_t data);
-	
+
 	std::unique_ptr<bitmap_ind16> m_bitmap_render;
 	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
-	
+
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 	required_ioport m_io_inputs;
@@ -85,26 +85,26 @@ void gigatron_state::video_draw(u8 data)
 {
 	uint8_t out = data;
 	uint8_t falling = m_out & ~out;
-	
+
 	if (falling & VSYNC)
 	{
 		m_row = 0;
 		m_pixel = 0;
 	}
-	
+
 	if (falling & HSYNC)
 	{
 		m_col = 0;
 		m_row++;
 	}
-	
+
 	m_out = out;
-	
+
 	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
 	{
 		return;
 	}
-	
+
 	if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
 	{
 		//uint16_t *dest;

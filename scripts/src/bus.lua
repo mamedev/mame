@@ -4105,6 +4105,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/hp_ipc_io/hp_ipc_io.h,BUSES["HP_IPC_IO"] = true
+---------------------------------------------------
+
+if (BUSES["HP_IPC_IO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_ipc_io/hp_ipc_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp_ipc_io/hp_ipc_io.h",
+		MAME_DIR .. "src/devices/bus/hp_ipc_io/82919.cpp",
+		MAME_DIR .. "src/devices/bus/hp_ipc_io/829919.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/compis/graphics.h,BUSES["COMPIS_GRAPHICS"] = true
 ---------------------------------------------------
 

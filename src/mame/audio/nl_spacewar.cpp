@@ -36,13 +36,13 @@ NETLIST_START(spacewar)
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
-//	PARAM(Solver.MIN_TS_TS, 2e-5)
+//  PARAM(Solver.MIN_TS_TS, 2e-5)
 
-	TTL_INPUT(I_OUT_0, 0)				// active high
-	TTL_INPUT(I_OUT_1, 0)				// active high
-	TTL_INPUT(I_OUT_2, 0)				// active high
-	TTL_INPUT(I_OUT_3, 0)				// active high
-	TTL_INPUT(I_OUT_4, 0)				// active high
+	TTL_INPUT(I_OUT_0, 0)               // active high
+	TTL_INPUT(I_OUT_1, 0)               // active high
+	TTL_INPUT(I_OUT_2, 0)               // active high
+	TTL_INPUT(I_OUT_3, 0)               // active high
+	TTL_INPUT(I_OUT_4, 0)               // active high
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC)
@@ -64,7 +64,7 @@ NETLIST_START(spacewar)
 	RES(R9, RES_K(39))
 	RES(R10, RES_K(2.2))
 	RES(R11, 470)
-//	RES(R12, 0)				-- not present on Space Wars
+//  RES(R12, 0)             -- not present on Space Wars
 	RES(R13, RES_K(8.2))
 	RES(R14, RES_K(120))
 	RES(R15, RES_K(20))
@@ -72,17 +72,17 @@ NETLIST_START(spacewar)
 	RES(R17, RES_K(10))
 	RES(R18, RES_K(47))
 	RES(R19, 820)
-//	POT(R20, RES_K(10))		-- part of final amp (not emulated)
-//	RES(R21, 150)			-- part of final amp (not emulated), not present on Space Wars
-//	RES(R22, 2.7)			-- part of final amp (not emulated), not present on Space Wars
-//	RES(R23, 2.7)			-- part of final amp (not emulated), not present on Space Wars
+//  POT(R20, RES_K(10))     -- part of final amp (not emulated)
+//  RES(R21, 150)           -- part of final amp (not emulated), not present on Space Wars
+//  RES(R22, 2.7)           -- part of final amp (not emulated), not present on Space Wars
+//  RES(R23, 2.7)           -- part of final amp (not emulated), not present on Space Wars
 	RES(R24, RES_K(47))
 	RES(R25, 150)
 	RES(R26, RES_K(160))
 	RES(R27, 750)
-//	RES(R28, RES_K(68))		-- part of final amp (not emulated), illegible on Space Wars
-//	POT(R29, RES_K(10))		-- part of final amp (not emulated)
-//	RES(R30, 750)			-- part of final amp (not emulated)
+//  RES(R28, RES_K(68))     -- part of final amp (not emulated), illegible on Space Wars
+//  POT(R29, RES_K(10))     -- part of final amp (not emulated)
+//  RES(R30, 750)           -- part of final amp (not emulated)
 	RES(R31, 470)
 	RES(R32, RES_K(1))
 	RES(R33, RES_K(39))
@@ -91,7 +91,7 @@ NETLIST_START(spacewar)
 	RES(R36, RES_M(1))
 	RES(R37, RES_K(10))
 	RES(R38, RES_K(10))
-//	RES(R39, RES_K(120))
+//  RES(R39, RES_K(120))
 	RES(R40, RES_K(120))
 	RES(R41, RES_K(20))
 	RES(R42, RES_K(1))
@@ -102,21 +102,21 @@ NETLIST_START(spacewar)
 	CAP(C3, CAP_U(0.01))
 	CAP(C4, CAP_U(0.01))
 	CAP(C5, CAP_U(0.1))
-//	CAP(C6, CAP_U(4.7))		// not needed
-//	CAP(C7, 0)				// not present
+//  CAP(C6, CAP_U(4.7))     // not needed
+//  CAP(C7, 0)              // not present
 	CAP(C8, CAP_U(1))
 	CAP(C9, CAP_U(0.1))
 	CAP(C10, CAP_P(220))
 	CAP(C11, CAP_U(0.1))
-//	CAP(C12, CAP_U(0.01))	-- part of final amp (not emulated)
-//	CAP(C13, CAP_P(470))	-- part of final amp (not emulated)
-//	CAP(C14, CAP_P(470))	-- part of final amp (not emulated)
-//	CAP(C15, CAP_U(50))		-- not needed
-//	CAP(C16, CAP_U(2.2))	-- not needed
+//  CAP(C12, CAP_U(0.01))   -- part of final amp (not emulated)
+//  CAP(C13, CAP_P(470))    -- part of final amp (not emulated)
+//  CAP(C14, CAP_P(470))    -- part of final amp (not emulated)
+//  CAP(C15, CAP_U(50))     -- not needed
+//  CAP(C16, CAP_U(2.2))    -- not needed
 	CAP(C17, CAP_U(0.01))
 	CAP(C18, CAP_U(33))
-//	CAP(C19, CAP_U(50))		-- not needed
-//	CAP(C20, CAP_U(2.2))	-- not needed
+//  CAP(C19, CAP_U(50))     -- not needed
+//  CAP(C20, CAP_U(2.2))    -- not needed
 	CAP(C21, CAP_U(0.02))
 	CAP(C22, CAP_U(0.1))
 	CAP(C23, CAP_U(0.1))
@@ -129,49 +129,49 @@ NETLIST_START(spacewar)
 	D_1N914(CR5)
 	D_1N914(CR6)
 
-	Q_2N3906(Q1)	// PNP
-	Q_2N3904(Q2)	// NPN
-	Q_2N6426(Q3)	// NPN Darlington
-	Q_2N6292(Q4)	// NPN
-	Q_2N6107(Q5)	// PNP
-	Q_2N6426(Q6)	// NPN Darlington
-	Q_2N3904(Q7)	// NPN
+	Q_2N3906(Q1)    // PNP
+	Q_2N3904(Q2)    // NPN
+	Q_2N6426(Q3)    // NPN Darlington
+	Q_2N6292(Q4)    // NPN
+	Q_2N6107(Q5)    // PNP
+	Q_2N6426(Q6)    // NPN Darlington
+	Q_2N3904(Q7)    // NPN
 
-	TL081_DIP(U1)			// Op. Amp.
+	TL081_DIP(U1)           // Op. Amp.
 	NET_C(U1.4, I_VM15)
 	NET_C(U1.7, I_V15)
 
-	TTL_7406_DIP(U2)		// Hex inverter -- currently using a clone of 7416, no open collector behavior
+	TTL_7406_DIP(U2)        // Hex inverter -- currently using a clone of 7416, no open collector behavior
 	NET_C(U2.7, GND)
 	NET_C(U2.14, I_V5)
 
-	TL081_DIP(U3)			// Op. Amp.
+	TL081_DIP(U3)           // Op. Amp.
 	NET_C(U3.4, I_VM15)
 	NET_C(U3.7, I_V15)
 
-//	TTL_7815_DIP(U4)		// +15V Regulator -- not needed
+//  TTL_7815_DIP(U4)        // +15V Regulator -- not needed
 
-	TL182_DIP(U5)			// Analog switch
+	TL182_DIP(U5)           // Analog switch
 	NET_C(U5.6, I_V15)
 	NET_C(U5.7, I_V5)
 	NET_C(U5.8, GND)
 	NET_C(U5.9, I_VM15)
 
-//	TL081_DIP(U6)			// Op. Amp. -- part of final amp (not emulated)
-//	NET_C(U6.4, I_VM15)
-//	NET_C(U6.7, I_V15)
+//  TL081_DIP(U6)           // Op. Amp. -- part of final amp (not emulated)
+//  NET_C(U6.4, I_VM15)
+//  NET_C(U6.7, I_V15)
 
-//	TTL_7915_DIP(U7)		// -15V Regulator -- not needed
+//  TTL_7915_DIP(U7)        // -15V Regulator -- not needed
 
-	TL081_DIP(U8)			// Op. Amp.
+	TL081_DIP(U8)           // Op. Amp.
 	NET_C(U8.4, I_VM15)
 	NET_C(U8.7, I_V15)
 
-	TL081_DIP(U9)			// Op. Amp.
+	TL081_DIP(U9)           // Op. Amp.
 	NET_C(U9.4, I_VM15)
 	NET_C(U9.7, I_V15)
 
-	TL182_DIP(U10)			// Analog switch
+	TL182_DIP(U10)          // Analog switch
 	NET_C(U10.6, I_V15)
 	NET_C(U10.7, I_V5)
 	NET_C(U10.8, GND)
@@ -296,19 +296,19 @@ NETLIST_START(spacewar)
 
 #if (ENABLE_FRONTIERS)
 	// Separate each input into the summing network
-    OPTIMIZE_FRONTIER(R13.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R15.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R41.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R37.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R13.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R15.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R41.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R37.1, RES_M(1), 50)
 
 	// Decouple the Darlington BJTs from the sounds they enable
-    OPTIMIZE_FRONTIER(R27.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R11.2, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R27.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R11.2, RES_M(1), 50)
 
 	// Decouple the noise source from the downstream filters
-    OPTIMIZE_FRONTIER(C3.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R24.1, RES_M(1), 50)
-    OPTIMIZE_FRONTIER(R38.2, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(C3.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R24.1, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(R38.2, RES_M(1), 50)
 #endif
 
 NETLIST_END()

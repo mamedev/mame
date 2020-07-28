@@ -274,7 +274,7 @@ void kas89_state::machine_start()
 	save_item(NAME(m_main_nmi_enable));
 	save_item(NAME(m_leds_mux_selector));
 	save_item(NAME(m_leds_mux_data));
-	save_item(NAME(m_outdata)); 
+	save_item(NAME(m_outdata));
 }
 
 void kas89_state::machine_reset()

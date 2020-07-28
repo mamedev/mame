@@ -22,8 +22,8 @@ These are for ut88 only - not for ut88mini
 	</software>
 
 	<!-- The only way to use this is to start in the debugger and load and run cpm256. Then g f800 to get back to the monitor.
-			Then load this tape in the usual manner, then G 100. It will start and expect to load another tape, but after that it
-			hangs. What is it supposed to do? -->
+	        Then load this tape in the usual manner, then G 100. It will start and expect to load another tape, but after that it
+	        hangs. What is it supposed to do? -->
 	<software name="chscom">
 		<description>Changer (v1.1) (CP/M)</description>
 		<year>19??</year>

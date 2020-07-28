@@ -373,6 +373,8 @@ Software to look for
 #include "speaker.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "machine/input_merger.h"
+#include "bus/hp_ipc_io/hp_ipc_io.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -391,6 +393,12 @@ public:
 		, m_screen(*this, "screen")
 		, m_spkr(*this , "spkr")
 		, m_dac(*this , "dac")
+		, m_irq3_merger(*this , "merge_irq3")
+		, m_irq4_merger(*this , "merge_irq4")
+		, m_irq5_merger(*this , "merge_irq5")
+		, m_irq6_merger(*this , "merge_irq6")
+		, m_io_slot_a(*this , "slot_a")
+		, m_io_slot_b(*this , "slot_b")
 	{ }
 
 	void hp_ipc_base(machine_config &config);
@@ -439,6 +447,12 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<cop452_device> m_spkr;
 	required_device<dac_1bit_device> m_dac;
+	required_device<input_merger_any_high_device> m_irq3_merger;
+	required_device<input_merger_any_high_device> m_irq4_merger;
+	required_device<input_merger_any_high_device> m_irq5_merger;
+	required_device<input_merger_any_high_device> m_irq6_merger;
+	required_device<hp_ipc_io_slot_device> m_io_slot_a;
+	required_device<hp_ipc_io_slot_device> m_io_slot_b;
 
 	uint32_t m_mmu[4], m_lowest_ram_addr;
 	uint16_t *m_internal_ram;
@@ -688,22 +702,22 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_2)
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_3)
 {
-	m_maincpu->set_input_line(M68K_IRQ_3, state);
+	m_irq3_merger->in_w<0>(state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_4)
 {
-	m_maincpu->set_input_line(M68K_IRQ_4, state);
+	m_irq4_merger->in_w<0>(state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_5)
 {
-	m_maincpu->set_input_line(M68K_IRQ_5, state);
+	m_irq5_merger->in_w<0>(state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_6)
 {
-	m_maincpu->set_input_line(M68K_IRQ_6, state);
+	m_irq6_merger->in_w<0>(state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
@@ -720,6 +734,9 @@ void hp_ipc_state::machine_start()
 
 	m_lowest_ram_addr = 0x3c0000 - (m_ram->size() >> 1);
 	m_internal_ram = (uint16_t *)m_ram->pointer();
+
+	m_io_slot_a->install_read_write_handlers(m_bankdev->space());
+	m_io_slot_b->install_read_write_handlers(m_bankdev->space());
 }
 
 void hp_ipc_state::machine_reset()
@@ -808,6 +825,24 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	m_spkr->oa_w().set(m_dac , FUNC(dac_1bit_device::write));
+
+	// IO slots
+	HP_IPC_IO_SLOT(config , m_io_slot_a).set_slot_idx(0);
+	HP_IPC_IO_SLOT(config , m_io_slot_b).set_slot_idx(1);
+
+	// IRQ3/4/5/6 mergers
+	INPUT_MERGER_ANY_HIGH(config , m_irq3_merger).output_handler().set_inputline(m_maincpu , M68K_IRQ_3);
+	INPUT_MERGER_ANY_HIGH(config , m_irq4_merger).output_handler().set_inputline(m_maincpu , M68K_IRQ_4);
+	INPUT_MERGER_ANY_HIGH(config , m_irq5_merger).output_handler().set_inputline(m_maincpu , M68K_IRQ_5);
+	INPUT_MERGER_ANY_HIGH(config , m_irq6_merger).output_handler().set_inputline(m_maincpu , M68K_IRQ_6);
+	m_io_slot_a->irq3_cb().set(m_irq3_merger , FUNC(input_merger_any_high_device::in_w<1>));
+	m_io_slot_a->irq4_cb().set(m_irq4_merger , FUNC(input_merger_any_high_device::in_w<1>));
+	m_io_slot_a->irq5_cb().set(m_irq5_merger , FUNC(input_merger_any_high_device::in_w<1>));
+	m_io_slot_a->irq6_cb().set(m_irq6_merger , FUNC(input_merger_any_high_device::in_w<1>));
+	m_io_slot_b->irq3_cb().set(m_irq3_merger , FUNC(input_merger_any_high_device::in_w<2>));
+	m_io_slot_b->irq4_cb().set(m_irq4_merger , FUNC(input_merger_any_high_device::in_w<2>));
+	m_io_slot_b->irq5_cb().set(m_irq5_merger , FUNC(input_merger_any_high_device::in_w<2>));
+	m_io_slot_b->irq6_cb().set(m_irq6_merger , FUNC(input_merger_any_high_device::in_w<2>));
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
 }

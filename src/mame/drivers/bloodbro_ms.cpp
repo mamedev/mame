@@ -120,7 +120,7 @@ uint32_t bloodbro_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 		int ypos = attr0 & 0x00ff;
 		int xpos = (attr1 & 0xff00)>>8;
-		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000; 
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
 		ypos = (0xff - ypos);
 
@@ -152,13 +152,13 @@ static const gfx_layout tiles16x16x4_layout =
 /*
 static const gfx_layout tiles8x8x4_layout =
 {
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ STEP8(0,32) },
-	16 * 16
+    8,8,
+    RGN_FRAC(1,1),
+    4,
+    { 0,8,16,24 },
+    { 0,1,2,3,4,5,6,7 },
+    { STEP8(0,32) },
+    16 * 16
 };
 */
 
@@ -256,7 +256,7 @@ ROM_START( bloodbrom )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b2.ic16",  0x00002, 0x20000, CRC(f25dd182) SHA1(eff29970c7b898744b08a151f9e17b68ce77e78d) )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b3.ic15",  0x00001, 0x20000, CRC(3efcb6aa) SHA1(0a162285d08e171e946147e0725db879643ae113) )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b4.ic14",  0x00000, 0x20000, CRC(6b5254fa) SHA1(1e9e3096e5f29554fb8f8cb0df0e5157f940f8c9) )
-	
+
 	// ROMs for frontmost tile layer (text) are missing?
 	ROM_REGION( 0x80000, "gfx3", 0 ) // on another MOD 4/3 board
 	ROM_LOAD32_BYTE( "text.ic17",  0x00003, 0x20000, NO_DUMP )

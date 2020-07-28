@@ -489,28 +489,28 @@ void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &clipre
 }
 
 /*
-		Sprite list format (10 bytes per sprites, 256 entries)
+        Sprite list format (10 bytes per sprites, 256 entries)
 
-	Offset Bits
-	       fedcba98 76543210
-	00     x------- -------- Horizontal Zoom/Shrink mode select
-	       -xxxx--- -------- Horizontal Zoom/Shrink table select
-	       -----xxx xxxxxxxx X position (11 bit signed)
+    Offset Bits
+           fedcba98 76543210
+    00     x------- -------- Horizontal Zoom/Shrink mode select
+           -xxxx--- -------- Horizontal Zoom/Shrink table select
+           -----xxx xxxxxxxx X position (11 bit signed)
 
-	02     x------- -------- Vertical Zoom/Shrink mode select
-	       -xxxx--- -------- Vertical Zoom/Shrink table select
-	       -----xxx xxxxxxxx Y position (10 bit signed)
+    02     x------- -------- Vertical Zoom/Shrink mode select
+           -xxxx--- -------- Vertical Zoom/Shrink table select
+           -----xxx xxxxxxxx Y position (10 bit signed)
 
-	04     -x------ -------- Flip Y
-	       --x----- -------- Flip X
-	       ---xxxxx -------- Palette select (32 color each)
-	       -------- x------- Priority (Over(0) or Under(1) background)
-	       -------- -xxxxxxx Sprite mask ROM address MSB
-	06     xxxxxxxx xxxxxxxx Sprite mask ROM address LSB
+    04     -x------ -------- Flip Y
+           --x----- -------- Flip X
+           ---xxxxx -------- Palette select (32 color each)
+           -------- x------- Priority (Over(0) or Under(1) background)
+           -------- -xxxxxxx Sprite mask ROM address MSB
+    06     xxxxxxxx xxxxxxxx Sprite mask ROM address LSB
 
-	08     x------- -------- Another sprite width bit?
-	       -xxxxxx- -------- Sprite width (16 pixel each)
-	       -------x xxxxxxxx Sprite height (1 pixel each)
+    08     x------- -------- Another sprite width bit?
+           -xxxxxx- -------- Sprite width (16 pixel each)
+           -------x xxxxxxxx Sprite height (1 pixel each)
 
 */
 void pgm_state::get_sprites()

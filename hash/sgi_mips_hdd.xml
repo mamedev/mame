@@ -9,9 +9,9 @@ license:CC0
 	IRIX requires a valid eaddr and high resolution mode. Before first boot,
 	enter the PROM command monitor and check printenv. If required settings are
 	missing, run
-		setenv -f eaddr 08:00:69:12:34:56
+	    setenv -f eaddr 08:00:69:12:34:56
 	to set the Ethernet interface address, and
-		setenv monitor h
+	    setenv monitor h
 	to enable high resolution mode (1280x1024), then power cycle.
 
 	Unless otherwise specified, all images are based on default installs of the

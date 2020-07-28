@@ -148,7 +148,7 @@ void spg2xx_game_marc250_state::machine_start()
 	m_pulse_timer2->adjust(attotime::never);
 
 	// hack, makes x-racer3 and some others more stable, TODO: find out what is really wrong
-	m_maincpu->set_clock_scale(2.0000f); 
+	m_maincpu->set_clock_scale(2.0000f);
 
 }
 
@@ -288,7 +288,7 @@ void spg2xx_game_marc101_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 	// 00 - wait a while
 	// 01 - set 0x0400 in port a high
 	// 02 - clear 0x0400 in port a
-	// 07 - measure number of times 0x2000 on port a changes, with min/max acceptable values and a timeout 
+	// 07 - measure number of times 0x2000 on port a changes, with min/max acceptable values and a timeout
 	// ff - failure (causes blank screen / shutdown + inf loop)
 	if ((data & 0x0400) != (m_prev_porta & 0x0400))
 	{
@@ -307,7 +307,7 @@ uint16_t spg2xx_game_marc250_state::porta_r()
 	uint16_t ret = m_io_p1->read() &~ 0x6000;
 	ret |= m_toggle ? 0x2000 : 0x0000;
 	ret |= m_toggle2 ? 0x4000 : 0x0000;
-//	printf("porta %04x\n", ret);
+//  printf("porta %04x\n", ret);
 
 	return ret;
 }
@@ -681,7 +681,7 @@ void spg2xx_game_marc101_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 	}
 
-	
+
 	if (m_maincpu->pc() < 0x2000)
 	{
 		// bit 0x1000 isn't set as an output, but clearly needs to be treated as one
@@ -728,14 +728,14 @@ void spg2xx_game_marc250_state::init_m527()
 		}
 	}
 
-	
+
 	// pass maze road
 	//rom[((12 * 0x800000) / 2) | 0x0284b5] = 0x0003;
 	// learn numbers
 	//rom[((13 * 0x800000) / 2) | 0x00c055] = 0x0003;
 	// bowling
 	//rom[((17 * 0x800000) / 2) | 0x015e58] = 0x0003;
-	// cliff overhang / gym dancing 
+	// cliff overhang / gym dancing
 	//rom[((18 * 0x800000) / 2) | 0x01cab4] = 0x0003;
 	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff; // secondary 'turn off'
 	// jump chess
@@ -792,8 +792,8 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 	// bank 12 = (used) (doesn't boot)
 	// bank 13 = (used) (doesn't boot)
 	// bank 14 = (used) 'ROM 18 64M'
-	// bank 15 = (unused) 'ROM 18 64M' (dupe) 
-	
+	// bank 15 = (unused) 'ROM 18 64M' (dupe)
+
 	// bank 16 = (used) 'ROM 16 64M' (error)
 	// bank 17 = (used) (plays music)
 	// bank 18 = (used) (doesn't boot)
@@ -802,7 +802,7 @@ void spg2xx_game_marc250_state::portb_w(offs_t offset, uint16_t data, uint16_t m
 	// bank 21 = (used)
 	// bank 22 = (used)
 	// bank 23 = (used)
-	
+
 	// bank 24 = (used)
 	// bank 25 = (used)
 	// bank 26 = (used)
@@ -886,7 +886,7 @@ ROM_END
 ROM_START( marc250 )
 	ROM_REGION( 0x10000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "m527.u6", 0x0000000, 0x10000000, CRC(4b856cab) SHA1(41c66bbdb0bb1442d7e11da18e9e6b20048445ba) )
-ROM_END    
+ROM_END
 
 ROM_START( guitrbus )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )

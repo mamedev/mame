@@ -14,7 +14,7 @@
      COPY - tape to disc transfer utility
      FORMAT "discname": PRINT drive#, tracks#, sides#, steprate - format disc
 
-	Manual https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/hardware-info/k/KempstonDiscInterface_Manual.pdf
+    Manual https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/hardware-info/k/KempstonDiscInterface_Manual.pdf
 
     Notes/TODO:
      - schematics is missing, actual I/O ports decode might be not right
@@ -79,7 +79,7 @@ void spectrum_kempdisc_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", kempdisc_floppies, "525qd", spectrum_kempdisc_device::floppy_formats).enable_sound(true);	
+	FLOPPY_CONNECTOR(config, "fdc:0", kempdisc_floppies, "525qd", spectrum_kempdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kempdisc_floppies, "525qd", spectrum_kempdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", kempdisc_floppies, nullptr, spectrum_kempdisc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", kempdisc_floppies, nullptr, spectrum_kempdisc_device::floppy_formats).enable_sound(true);
@@ -111,7 +111,7 @@ spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_exp(*this, "exp")
-//	, m_control(0)
+//  , m_control(0)
 {
 }
 
@@ -122,7 +122,7 @@ spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig
 void spectrum_kempdisc_device::device_start()
 {
 	save_item(NAME(m_romcs));
-//	save_item(NAME(m_control));
+//  save_item(NAME(m_control));
 }
 
 //-------------------------------------------------
@@ -175,7 +175,7 @@ void spectrum_kempdisc_device::iorq_w(offs_t offset, uint8_t data)
 				break;
 			}
 
-//		m_control = data;
+//      m_control = data;
 		m_fdc->set_floppy(floppy);
 		if (floppy) floppy->ss_w(BIT(data, 0));
 		if (data & 0xe0)

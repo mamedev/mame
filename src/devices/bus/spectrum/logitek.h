@@ -2,8 +2,8 @@
 // copyright-holders:MetalliC
 /*********************************************************************
 
-	Proceed 1 Interface
-	(c) 1984 Logitek
+    Proceed 1 Interface
+    (c) 1984 Logitek
 
 *********************************************************************/
 #ifndef MAME_BUS_SPECTRUM_LOGITEK_H

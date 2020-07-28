@@ -147,7 +147,7 @@ void shredmjr_game_state::taikeegr(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &shredmjr_game_state::mem_map_4m);
-	
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set_ioport("P1");
@@ -230,7 +230,7 @@ CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_ga
 // doesn't have a Senario logo ingame, but does on box.
 CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
-// this one has a different song selection (same as one in the alt undumped Rockstar Guitar / Guitar Rock.  It was sold as a different product, so hasn't been set as a clone.  
+// this one has a different song selection (same as one in the alt undumped Rockstar Guitar / Guitar Rock.  It was sold as a different product, so hasn't been set as a clone.
 // Unit found in Ireland "imported by Cathay Product Sourcing Ltd." on the box, with address in Ireland
 // ITEM #01109 on instruction sheet, no manufacturer named on either box or instructions
 CONS( 200?, guitarstp,   0,        0,        taikeegrp,    guitarstp,shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^

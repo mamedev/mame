@@ -265,6 +265,9 @@ namespace plib {
 		template <class C>
 		using specific_member_function = R (C::*)(Targs...);
 
+		template <class C>
+		using const_specific_member_function = R (C::*)(Targs...) const;
+
 		class generic_class;
 		using generic_member_function = specific_member_function<generic_class>;
 
@@ -292,6 +295,9 @@ namespace plib {
 	{
 		template <class C>
 		using specific_member_function = R (C::*)(Targs...);
+
+		template <class C>
+		using const_specific_member_function = R (C::*)(Targs...) const;
 
 		class generic_class;
 		using generic_member_function = specific_member_function<generic_class>;

@@ -49,14 +49,14 @@
 // once for War of the Worlds
 //
 
-#define VARIANT_STARCASTLE 	0
-#define VARIANT_WOTW		1
+#define VARIANT_STARCASTLE  0
+#define VARIANT_WOTW        1
 
-#define SOUND_VARIANT		(VARIANT_STARCASTLE)
+#define SOUND_VARIANT       (VARIANT_STARCASTLE)
 #include "nl_starcas.cpp"
 
 #undef SOUND_VARIANT
-#define SOUND_VARIANT 		(VARIANT_WOTW)
+#define SOUND_VARIANT       (VARIANT_WOTW)
 #include "nl_starcas.cpp"
 
 
@@ -82,12 +82,12 @@ NETLIST_START(wotw)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
-	TTL_INPUT(I_OUT_0, 0)		// active low
-	TTL_INPUT(I_OUT_1, 1)		// active low
-	TTL_INPUT(I_OUT_2, 1)		// active low
-	TTL_INPUT(I_OUT_3, 1)		// active low
-	TTL_INPUT(I_OUT_4, 0)		// active low
-	TTL_INPUT(I_OUT_7, 0)		// active low
+	TTL_INPUT(I_OUT_0, 0)       // active low
+	TTL_INPUT(I_OUT_1, 1)       // active low
+	TTL_INPUT(I_OUT_2, 1)       // active low
+	TTL_INPUT(I_OUT_3, 1)       // active low
+	TTL_INPUT(I_OUT_4, 0)       // active low
+	TTL_INPUT(I_OUT_7, 0)       // active low
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
@@ -99,31 +99,31 @@ NETLIST_START(wotw)
 	ANALOG_INPUT(I_VM15, -15)
 
 	RES(R1, RES_K(1))
-    RES(R2, 160)
-    RES(R3, RES_K(1))
-    RES(R4, RES_K(1))
-    RES(R5, RES_K(2))
-    RES(R6, RES_K(2))
-    RES(R7, RES_K(4.7))
-    RES(R8, RES_K(3.3))
-    RES(R9, 820)
-    RES(R10, RES_M(3.3))
-    RES(R11, RES_M(3.3))
-    RES(R12, RES_M(5.1))
-    RES(R13, RES_M(1.6))
-    RES(R14, RES_K(2))
-    RES(R15, RES_K(18))
-    RES(R16, RES_K(10))
-    RES(R17, RES_K(10))
-    RES(R18, RES_K(91))
-    RES(R19, RES_K(10))
-    RES(R20, RES_K(1))
-    RES(R21, RES_K(2))
-    RES(R22, RES_K(1))
-    RES(R24, RES_K(200))
-    RES(R25, RES_K(30))
-    RES(R26, RES_K(200))
-    RES(R27, RES_K(51))
+	RES(R2, 160)
+	RES(R3, RES_K(1))
+	RES(R4, RES_K(1))
+	RES(R5, RES_K(2))
+	RES(R6, RES_K(2))
+	RES(R7, RES_K(4.7))
+	RES(R8, RES_K(3.3))
+	RES(R9, 820)
+	RES(R10, RES_M(3.3))
+	RES(R11, RES_M(3.3))
+	RES(R12, RES_M(5.1))
+	RES(R13, RES_M(1.6))
+	RES(R14, RES_K(2))
+	RES(R15, RES_K(18))
+	RES(R16, RES_K(10))
+	RES(R17, RES_K(10))
+	RES(R18, RES_K(91))
+	RES(R19, RES_K(10))
+	RES(R20, RES_K(1))
+	RES(R21, RES_K(2))
+	RES(R22, RES_K(1))
+	RES(R24, RES_K(200))
+	RES(R25, RES_K(30))
+	RES(R26, RES_K(200))
+	RES(R27, RES_K(51))
 	RES(R28, RES_M(1))
 	RES(R29, 430)
 	RES(R30, 560)
@@ -148,61 +148,61 @@ NETLIST_START(wotw)
 	RES(R49, RES_K(20))
 	RES(R50, RES_K(1))
 	RES(R51, RES_K(12))
-    RES(R52, RES_K(4.7))
+	RES(R52, RES_K(4.7))
 	RES(R53, RES_K(1))
 	RES(R54, RES_K(39))
 	RES(R55, RES_K(12))
 	RES(R56, RES_K(1))
 	RES(R57, RES_K(100))
-    RES(R58, RES_K(18))
+	RES(R58, RES_K(18))
 	RES(R59, RES_K(15))
 	RES(R60, RES_K(7.5))
 	RES(R61, 430)
 	RES(R62, 430)
-    RES(R63, RES_K(4.7))
+	RES(R63, RES_K(4.7))
 	RES(R64, RES_K(1))
 	RES(R65, RES_K(39))
 	RES(R66, RES_K(12))
 	RES(R67, RES_K(1))
 	RES(R68, RES_K(100))
 	RES(R69, RES_K(6.8))
-    RES(R70, RES_K(18))
+	RES(R70, RES_K(18))
 	RES(R71, RES_K(47))
 	RES(R72, 390)
 	RES(R73, 390)
-    RES(R74, RES_K(4.7))
+	RES(R74, RES_K(4.7))
 	RES(R75, RES_K(2.7))
-    RES(R76, RES_K(4.7))
+	RES(R76, RES_K(4.7))
 	RES(R77, RES_K(39))
 	RES(R78, RES_K(12))
 	RES(R79, RES_K(1))
-    RES(R80, RES_K(200))
-    RES(R81, RES_K(300))
-    RES(R82, RES_K(240))
+	RES(R80, RES_K(200))
+	RES(R81, RES_K(300))
+	RES(R82, RES_K(240))
 	RES(R83, 200)
 	RES(R84, 200)
-    RES(R85, RES_K(4.7))
+	RES(R85, RES_K(4.7))
 	RES(R86, RES_K(2.7))
-    RES(R87, RES_K(4.7))
+	RES(R87, RES_K(4.7))
 	RES(R88, RES_K(1))
 	RES(R89, RES_K(1.8))
-    RES(R90, RES_K(3.9))
+	RES(R90, RES_K(3.9))
 	RES(R91, RES_K(39))
 	RES(R92, RES_K(12))
 	RES(R93, 620)
-    RES(R94, RES_K(360))
+	RES(R94, RES_K(360))
 	RES(R95, RES_K(27))
-    RES(R96, RES_K(33))
+	RES(R96, RES_K(33))
 	RES(R97, 47)
 	RES(R98, 47)
-    RES(R99, RES_K(4.7))
+	RES(R99, RES_K(4.7))
 	RES(R100, RES_K(2.7))
-    RES(R101, RES_K(4.7))
+	RES(R101, RES_K(4.7))
 	RES(R102, RES_K(39))
 	RES(R103, RES_K(12))
 	RES(R104, RES_K(1))
-    RES(R105, RES_K(36))
-    RES(R106, RES_K(36))
+	RES(R105, RES_K(36))
+	RES(R106, RES_K(36))
 	RES(R107, RES_K(8.2))
 	RES(R108, RES_K(47))
 	RES(R109, RES_K(22))
@@ -217,64 +217,64 @@ NETLIST_START(wotw)
 	RES(R118, RES_K(820))
 	RES(R119, RES_K(100))
 //  RES(R120, RES_K(390)) -- part of final amp (not emulated)
-//	RES(R121, RES_K(15))  -- part of final amp (not emulated)
-//	RES(R122, 150)        -- part of final amp (not emulated)
-//	RES(R123, RES_K(22))  -- part of final amp (not emulated)
-//	RES(R124, 150)        -- part of final amp (not emulated)
+//  RES(R121, RES_K(15))  -- part of final amp (not emulated)
+//  RES(R122, 150)        -- part of final amp (not emulated)
+//  RES(R123, RES_K(22))  -- part of final amp (not emulated)
+//  RES(R124, 150)        -- part of final amp (not emulated)
 	RES(R125, RES_K(8.2))
 	RES(R126, RES_K(20))
-    RES(R127, RES_K(30))
+	RES(R127, RES_K(30))
 	POT(R128, RES_K(10))
 	PARAM(R128.DIAL, 0.500000)
 
-//  CAP(C2, CAP_U(25))		// electrolytic
-//  CAP(C4, CAP_U(25))		// electrolytic
-//  CAP(C5, CAP_U(25))		// electrolytic
-//  CAP(C7, CAP_U(25))		// electrolytic
-//  CAP(C9, CAP_U(25))		// electrolytic
-    CAP(C11, CAP_U(0.68))	// film
-    CAP(C12, CAP_U(0.001))	// disk
-    CAP(C13, CAP_U(0.0022))	// film
-    CAP(C14, CAP_U(0.1))	// film
-    CAP(C15, CAP_U(0.1))	// film
-	CAP(C16, CAP_U(0.1))	// disk*
-	CAP(C17, CAP_U(100))	// electrolytic
-	CAP(C18, CAP_U(0.1))	// film
-	CAP(C19, CAP_U(0.1))	// disk*
-	CAP(C20, CAP_U(0.1))	// film
-	CAP(C21, CAP_U(0.01))	// disk
-	CAP(C22, CAP_U(0.68))	// film
-	CAP(C23, CAP_U(0.001))	// disk
-	CAP(C24, CAP_U(0.0047))	// film
-	CAP(C25, CAP_U(0.1))	// film
-	CAP(C26, CAP_U(0.1))	// film
-	CAP(C27, CAP_U(2.2))	// electrolytic
-    CAP(C28, CAP_U(0.22))	// film
-    CAP(C29, CAP_U(0.1))	// film
-	CAP(C30, CAP_U(4.7))	// electrolytic
-    CAP(C31, CAP_U(0.1))	// film
-	CAP(C32, CAP_U(0.01))	// film
-	CAP(C33, CAP_U(0.68))	// film
-	CAP(C34, CAP_U(3.3))	// electrolytic
-    CAP(C35, CAP_U(0.22))	// film
-    CAP(C36, CAP_U(0.33))	// film
-	CAP(C37, CAP_U(0.47))	// film
-	CAP(C38, CAP_U(0.01))	// disk
-	CAP(C39, CAP_U(0.68))	// film
-	CAP(C40, CAP_U(0.1))	// film
-	CAP(C41, CAP_U(0.01))	// disk
-	CAP(C42, CAP_U(0.1))	// film
-//	CAP(C43, CAP_U(0.68))	// film -- part of final amp (not emulated)
-//	CAP(C44, CAP_P(470))	// disk -- part of final amp (not emulated)
-//	CAP(C45, CAP_P(470))	// disk -- part of final amp (not emulated)
-//	CAP(C46, CAP_P(470))	// disk -- part of final amp (not emulated)
-//	CAP(C47, CAP_U(0.005))	// disk -- part of final amp (not emulated)
-	CAP(C48, CAP_U(0.33))	// film
+//  CAP(C2, CAP_U(25))      // electrolytic
+//  CAP(C4, CAP_U(25))      // electrolytic
+//  CAP(C5, CAP_U(25))      // electrolytic
+//  CAP(C7, CAP_U(25))      // electrolytic
+//  CAP(C9, CAP_U(25))      // electrolytic
+	CAP(C11, CAP_U(0.68))   // film
+	CAP(C12, CAP_U(0.001))  // disk
+	CAP(C13, CAP_U(0.0022)) // film
+	CAP(C14, CAP_U(0.1))    // film
+	CAP(C15, CAP_U(0.1))    // film
+	CAP(C16, CAP_U(0.1))    // disk*
+	CAP(C17, CAP_U(100))    // electrolytic
+	CAP(C18, CAP_U(0.1))    // film
+	CAP(C19, CAP_U(0.1))    // disk*
+	CAP(C20, CAP_U(0.1))    // film
+	CAP(C21, CAP_U(0.01))   // disk
+	CAP(C22, CAP_U(0.68))   // film
+	CAP(C23, CAP_U(0.001))  // disk
+	CAP(C24, CAP_U(0.0047)) // film
+	CAP(C25, CAP_U(0.1))    // film
+	CAP(C26, CAP_U(0.1))    // film
+	CAP(C27, CAP_U(2.2))    // electrolytic
+	CAP(C28, CAP_U(0.22))   // film
+	CAP(C29, CAP_U(0.1))    // film
+	CAP(C30, CAP_U(4.7))    // electrolytic
+	CAP(C31, CAP_U(0.1))    // film
+	CAP(C32, CAP_U(0.01))   // film
+	CAP(C33, CAP_U(0.68))   // film
+	CAP(C34, CAP_U(3.3))    // electrolytic
+	CAP(C35, CAP_U(0.22))   // film
+	CAP(C36, CAP_U(0.33))   // film
+	CAP(C37, CAP_U(0.47))   // film
+	CAP(C38, CAP_U(0.01))   // disk
+	CAP(C39, CAP_U(0.68))   // film
+	CAP(C40, CAP_U(0.1))    // film
+	CAP(C41, CAP_U(0.01))   // disk
+	CAP(C42, CAP_U(0.1))    // film
+//  CAP(C43, CAP_U(0.68))   // film -- part of final amp (not emulated)
+//  CAP(C44, CAP_P(470))    // disk -- part of final amp (not emulated)
+//  CAP(C45, CAP_P(470))    // disk -- part of final amp (not emulated)
+//  CAP(C46, CAP_P(470))    // disk -- part of final amp (not emulated)
+//  CAP(C47, CAP_U(0.005))  // disk -- part of final amp (not emulated)
+	CAP(C48, CAP_U(0.33))   // film
 
-//	D_1N4003(D1)			// not needed
-//	D_1N4003(D2)			// not needed
-//	D_1N4003(D3)			// not needed
-//	D_1N4003(D4)			// not needed
+//  D_1N4003(D1)            // not needed
+//  D_1N4003(D2)            // not needed
+//  D_1N4003(D3)            // not needed
+//  D_1N4003(D4)            // not needed
 	D_1N5240B(D5)
 	D_1N5236B(D6)
 	D_1N914B(D7)
@@ -282,121 +282,121 @@ NETLIST_START(wotw)
 	D_1N914B(D9)
 	D_1N914B(D10)
 
-	Q_2N3904(Q1)			// NPN
-	Q_2N3904(Q2)			// NPN
-	Q_2N3906(Q3)			// PNP
-	Q_2N3904(Q4)			// NPN
-	Q_2N3904(Q5)			// NPN
-	Q_2N3906(Q6)			// PNP
-	Q_2N3906(Q7)			// PNP
-	Q_2N3906(Q8)			// PNP
-	Q_2N3906(Q9)			// PNP
-	Q_2N3906(Q10)			// PNP
-	Q_2N3906(Q11)			// PNP
-	Q_2N3906(Q12)			// PNP
-	Q_2N3906(Q13)			// PNP
-	Q_2N3906(Q14)			// PNP
-	Q_2N3906(Q15)			// PNP
-	Q_2N3906(Q16)			// PNP
-//	Q_2N6107(Q17)			// PNP -- part of final amp (not emulated)
-//	Q_2N6292(Q18)			// NPN -- part of final amp (not emulated)
+	Q_2N3904(Q1)            // NPN
+	Q_2N3904(Q2)            // NPN
+	Q_2N3906(Q3)            // PNP
+	Q_2N3904(Q4)            // NPN
+	Q_2N3904(Q5)            // NPN
+	Q_2N3906(Q6)            // PNP
+	Q_2N3906(Q7)            // PNP
+	Q_2N3906(Q8)            // PNP
+	Q_2N3906(Q9)            // PNP
+	Q_2N3906(Q10)           // PNP
+	Q_2N3906(Q11)           // PNP
+	Q_2N3906(Q12)           // PNP
+	Q_2N3906(Q13)           // PNP
+	Q_2N3906(Q14)           // PNP
+	Q_2N3906(Q15)           // PNP
+	Q_2N3906(Q16)           // PNP
+//  Q_2N6107(Q17)           // PNP -- part of final amp (not emulated)
+//  Q_2N6292(Q18)           // NPN -- part of final amp (not emulated)
 
-	TTL_7414_DIP(IC1)		// Hex Inverter
+	TTL_7414_DIP(IC1)       // Hex Inverter
 	NET_C(IC1.7, GND)
 	NET_C(IC1.14, I_V5)
 
-	TTL_74LS164_DIP(IC2)	// 8-bit Shift Reg.
+	TTL_74LS164_DIP(IC2)    // 8-bit Shift Reg.
 	NET_C(IC2.7, GND)
 	NET_C(IC2.14, I_V5)
 
-	TTL_74LS377_DIP(IC3)	// Octal D Flip Flop
+	TTL_74LS377_DIP(IC3)    // Octal D Flip Flop
 	NET_C(IC3.10, GND)
 	NET_C(IC3.20, I_V5)
 
-//	TTL_7815_DIP(IC4)		// +15V Regulator -- not needed
-//	TTL_7915_DIP(IC5)		// -15V Regulator -- not needed
+//  TTL_7815_DIP(IC4)       // +15V Regulator -- not needed
+//  TTL_7915_DIP(IC5)       // -15V Regulator -- not needed
 
-	TTL_7406_DIP(IC6)		// Hex Inverter -- currently using a clone of 7416, no open collector behavior
+	TTL_7406_DIP(IC6)       // Hex Inverter -- currently using a clone of 7416, no open collector behavior
 	NET_C(IC6.7, GND)
 	NET_C(IC6.14, I_V5)
 
-	TL081_DIP(IC7)			// Op. Amp.
+	TL081_DIP(IC7)          // Op. Amp.
 	NET_C(IC7.7, I_V15)
 	NET_C(IC7.4, I_VM15)
 
-	TL081_DIP(IC8)			// Op. Amp.
+	TL081_DIP(IC8)          // Op. Amp.
 	NET_C(IC8.7, I_V15)
 	NET_C(IC8.4, I_VM15)
 
 #if (!HLE_BACKGROUND_VCO)
-	LM566_DIP(IC9)			// 566 VCO
+	LM566_DIP(IC9)          // 566 VCO
 #endif
 
-	TTL_74LS163_DIP(IC10)	// Binary Counter (schems say can sub a 74161)
+	TTL_74LS163_DIP(IC10)   // Binary Counter (schems say can sub a 74161)
 	NET_C(IC10.8, GND)
 	NET_C(IC10.16, I_V5)
 
-	TTL_74LS163_DIP(IC11)	// Binary Counter (schems say can sub a 74161)
+	TTL_74LS163_DIP(IC11)   // Binary Counter (schems say can sub a 74161)
 	NET_C(IC11.8, GND)
 	NET_C(IC11.16, I_V5)
 
-	TTL_74LS393_DIP(IC12)	// Dual 4 Bit B.C.
+	TTL_74LS393_DIP(IC12)   // Dual 4 Bit B.C.
 	NET_C(IC12.7, GND)
 	NET_C(IC12.14, I_V5)
 
-	TTL_74LS393_DIP(IC13)	// Dual 4 Bit B.C.
+	TTL_74LS393_DIP(IC13)   // Dual 4 Bit B.C.
 	NET_C(IC13.7, GND)
 	NET_C(IC13.14, I_V5)
 
-	AMI_S2688(IC14)			// Noise generator
+	AMI_S2688(IC14)         // Noise generator
 
-	TL081_DIP(IC15)			// Op. Amp.
+	TL081_DIP(IC15)         // Op. Amp.
 	NET_C(IC15.7, I_V15)
 	NET_C(IC15.4, I_VM15)
 
-	LM555_DIP(IC16)			// Timer
+	LM555_DIP(IC16)         // Timer
 
 #if (!HLE_LASER_VCO)
-	LM566_DIP(IC17)			// 566 VCO
+	LM566_DIP(IC17)         // 566 VCO
 #endif
 
-	CA3080_DIP(IC18)		// Trnscndt. Op. Amp.
+	CA3080_DIP(IC18)        // Trnscndt. Op. Amp.
 	NET_C(IC18.7, I_V15)
 	NET_C(IC18.4, I_VM15)
 
-	CA3080_DIP(IC19)		// Trnscndt. Op. Amp.
+	CA3080_DIP(IC19)        // Trnscndt. Op. Amp.
 	NET_C(IC19.7, I_V15)
 	NET_C(IC19.4, I_VM15)
 
-	CA3080_DIP(IC20)		// Trnscndt. Op. Amp.
+	CA3080_DIP(IC20)        // Trnscndt. Op. Amp.
 	NET_C(IC20.7, I_V15)
 	NET_C(IC20.4, I_VM15)
 
-	CA3080_DIP(IC21)		// Trnscndt. Op. Amp.
+	CA3080_DIP(IC21)        // Trnscndt. Op. Amp.
 	NET_C(IC21.7, I_V15)
 	NET_C(IC21.4, I_VM15)
 
-	CA3080_DIP(IC22)		// Trnscndt. Op. Amp.
+	CA3080_DIP(IC22)        // Trnscndt. Op. Amp.
 	NET_C(IC22.7, I_V15)
 	NET_C(IC22.4, I_VM15)
 
-	LM555_DIP(IC23)			// Timer
+	LM555_DIP(IC23)         // Timer
 
-	LM555_DIP(IC24)			// Timer
+	LM555_DIP(IC24)         // Timer
 
-//	TL081_DIP(IC25)			// Op. Amp. -- part of final amp (not emulated)
-//	NET_C(IC25.7, I_V15)
-//	NET_C(IC25.4, I_VM15)
+//  TL081_DIP(IC25)         // Op. Amp. -- part of final amp (not emulated)
+//  NET_C(IC25.7, I_V15)
+//  NET_C(IC25.4, I_VM15)
 
-	TL081_DIP(IC26)			// Op. Amp.
+	TL081_DIP(IC26)         // Op. Amp.
 	NET_C(IC26.7, I_V15)
 	NET_C(IC26.4, I_VM15)
 
-	TL081_DIP(IC27)			// Op. Amp.
+	TL081_DIP(IC27)         // Op. Amp.
 	NET_C(IC27.7, I_V15)
 	NET_C(IC27.4, I_VM15)
 
-	TTL_74LS107_DIP(IC28)	// Dual J-K Flip Flop
+	TTL_74LS107_DIP(IC28)   // Dual J-K Flip Flop
 	NET_C(IC28.7, GND)
 	NET_C(IC28.14, I_V5)
 
@@ -796,12 +796,12 @@ NETLIST_START(wotw)
 	//
 	// Disconnect noise source from consumers
 	//
-    OPTIMIZE_FRONTIER(IC15.3, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(IC15.3, RES_M(1), 50)
 
 	//
 	// Split noise outputs from output outputs before the mixer
 	//
-    OPTIMIZE_FRONTIER(IC26.3, RES_M(1), 50)
+	OPTIMIZE_FRONTIER(IC26.3, RES_M(1), 50)
 #endif
 
 NETLIST_END()

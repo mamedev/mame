@@ -11,7 +11,7 @@
 
 #define LOG_UNKNOWN     (1 << 1)
 #define LOG_INTC        (1 << 2)
-#define LOG_POWER		(1 << 3)
+#define LOG_POWER       (1 << 3)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_INTC | LOG_POWER)
 
 #define VERBOSE         (LOG_ALL)

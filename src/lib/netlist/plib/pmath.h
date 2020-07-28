@@ -442,8 +442,8 @@ namespace plib
 	template<class T>
 	constexpr const T& clamp( const T& v, const T& low, const T& high)
 	{
-	    gsl_Expects(high >= low);
-	    return (v < low) ? low : (high < v) ? high : v;
+		gsl_Expects(high >= low);
+		return (v < low) ? low : (high < v) ? high : v;
 	}
 
 	static_assert(noexcept(constants<double>::one()), "Not evaluated as constexpr");

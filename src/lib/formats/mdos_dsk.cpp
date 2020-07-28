@@ -133,7 +133,7 @@ int mdos_format::find_size(io_generic *io, uint32_t form_factor)
 
 	if (!check_ascii(info.date, sizeof(info.date), "date"))
 		return -1;
-	
+
 	if (!check_ascii(info.username, sizeof(info.username), "username"))
 		return -1;
 

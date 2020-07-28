@@ -44,12 +44,12 @@ NETLIST_START(sundance)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
-	TTL_INPUT(I_OUT_0, 1)		// active low
-	TTL_INPUT(I_OUT_1, 1)		// active low
-	TTL_INPUT(I_OUT_2, 1)		// active low
-	TTL_INPUT(I_OUT_3, 1)		// active low
-	TTL_INPUT(I_OUT_4, 1)		// active low
-	TTL_INPUT(I_OUT_7, 1)		// active low
+	TTL_INPUT(I_OUT_0, 1)       // active low
+	TTL_INPUT(I_OUT_1, 1)       // active low
+	TTL_INPUT(I_OUT_2, 1)       // active low
+	TTL_INPUT(I_OUT_3, 1)       // active low
+	TTL_INPUT(I_OUT_4, 1)       // active low
+	TTL_INPUT(I_OUT_7, 1)       // active low
 
 	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
 	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
@@ -124,9 +124,9 @@ NETLIST_START(sundance)
 	RES(R62, RES_K(2.7))
 	RES(R63, RES_K(2.7))
 	RES(R64, 470)
-//	RES(R65, 150)       -- part of final amp (not emulated)
-//	RES(R66, RES_K(22)) -- part of final amp (not emulated)
-//	RES(R67, 150)       -- part of final amp (not emulated)
+//  RES(R65, 150)       -- part of final amp (not emulated)
+//  RES(R66, RES_K(22)) -- part of final amp (not emulated)
+//  RES(R67, 150)       -- part of final amp (not emulated)
 	RES(R68, 330)
 	RES(R69, RES_K(390))
 	RES(R70, RES_K(15))
@@ -134,9 +134,9 @@ NETLIST_START(sundance)
 	RES(R72, RES_K(68))
 	RES(R73, RES_K(2.7))
 	RES(R74, RES_K(2.7))
-//	RES(R75, RES_K(10)) -- part of final amp (not emulated)
-//	POT(R76, RES_K(100)) -- part of final amp (not emulated)
-//	PARAM(R76.DIAL, 0.500000) -- part of final amp (not emulated)
+//  RES(R75, RES_K(10)) -- part of final amp (not emulated)
+//  POT(R76, RES_K(100)) -- part of final amp (not emulated)
+//  PARAM(R76.DIAL, 0.500000) -- part of final amp (not emulated)
 	RES(R77, 330)
 	RES(R78, RES_K(220))
 
@@ -155,11 +155,11 @@ NETLIST_START(sundance)
 	CAP(C13, CAP_U(0.001))
 	CAP(C14, CAP_U(0.005))
 	CAP(C15, CAP_U(10))
-//	CAP(C16, CAP_U(3.3)) -- not needed
-//	CAP(C17, CAP_U(3.3)) -- not needed
-//	CAP(C18, CAP_U(3.3)) -- not needed
-//	CAP(C19, CAP_U(3.3)) -- not needed
-//	CAP(C20, CAP_U(3.3)) -- not needed
+//  CAP(C16, CAP_U(3.3)) -- not needed
+//  CAP(C17, CAP_U(3.3)) -- not needed
+//  CAP(C18, CAP_U(3.3)) -- not needed
+//  CAP(C19, CAP_U(3.3)) -- not needed
+//  CAP(C20, CAP_U(3.3)) -- not needed
 	CAP(C21, CAP_U(0.1))
 	CAP(C22, CAP_U(0.005))
 	CAP(C23, CAP_U(0.1))
@@ -171,39 +171,39 @@ NETLIST_START(sundance)
 	CAP(C29, CAP_U(0.1))
 	CAP(C30, CAP_U(0.01))
 	CAP(C31, CAP_U(0.1))
-//	CAP(C32, CAP_P(470)) -- part of final amp (not emulated)
-//	CAP(C33, CAP_P(470)) -- part of final amp (not emulated)
-//	CAP(C34, CAP_P(470)) -- part of final amp (not emulated)
+//  CAP(C32, CAP_P(470)) -- part of final amp (not emulated)
+//  CAP(C33, CAP_P(470)) -- part of final amp (not emulated)
+//  CAP(C34, CAP_P(470)) -- part of final amp (not emulated)
 	CAP(C35, CAP_U(0.15))
 	CAP(C36, CAP_U(0.1))
 	CAP(C37, CAP_U(0.01))
 	CAP(C38, CAP_U(0.1))
 	CAP(C39, CAP_U(1))
 
-    D_1N5240(D1)
-    D_1N914(D2)
-    D_1N914(D3)
+	D_1N5240(D1)
+	D_1N914(D2)
+	D_1N914(D3)
 
-	Q_2N3904(Q1)			// NPN
-	Q_2N3904(Q2)			// NPN
-	Q_2N3906(Q3)			// PNP
-	Q_2N3906(Q4)			// PNP
-	Q_2N3906(Q5)			// PNP
-	Q_2N3906(Q6)			// PNP
-//	Q_2N6292(Q7)			// NPN -- part of final amp (not emulated)
-//	Q_2N6107(Q9)			// PNP -- part of final amp (not emulated)
-	Q_2N3906(Q8)			// PNP
-	Q_2N3906(Q10)			// PNP
+	Q_2N3904(Q1)            // NPN
+	Q_2N3904(Q2)            // NPN
+	Q_2N3906(Q3)            // PNP
+	Q_2N3906(Q4)            // PNP
+	Q_2N3906(Q5)            // PNP
+	Q_2N3906(Q6)            // PNP
+//  Q_2N6292(Q7)            // NPN -- part of final amp (not emulated)
+//  Q_2N6107(Q9)            // PNP -- part of final amp (not emulated)
+	Q_2N3906(Q8)            // PNP
+	Q_2N3906(Q10)           // PNP
 
-	TL081_DIP(IC1)			// Op. Amp.
-//	NET_C(IC1.7, I_V15)		// (indirectly via R5)
+	TL081_DIP(IC1)          // Op. Amp.
+//  NET_C(IC1.7, I_V15)     // (indirectly via R5)
 	NET_C(IC1.4, I_VM15)
 
-	TL081_DIP(IC2)			// Op. Amp.
+	TL081_DIP(IC2)          // Op. Amp.
 	NET_C(IC2.7, I_V15)
 	NET_C(IC2.4, I_VM15)
 
-	TL081_DIP(IC3)			// Op. Amp.
+	TL081_DIP(IC3)          // Op. Amp.
 	NET_C(IC3.7, I_V15)
 	NET_C(IC3.4, I_VM15)
 
@@ -211,12 +211,12 @@ NETLIST_START(sundance)
 	NET_C(IC4.7, GND)
 	NET_C(IC4.14, I_V15)
 
-//	TTL_7815_DIP(IC5)		// +15V Regulator -- not needed
-//	TTL_7915_DIP(IC6)		// -15V Regulator -- not needed
+//  TTL_7815_DIP(IC5)       // +15V Regulator -- not needed
+//  TTL_7915_DIP(IC6)       // -15V Regulator -- not needed
 
 	LM555_DIP(IC7)
 
-	TL081_DIP(IC8)			// Op. Amp.
+	TL081_DIP(IC8)          // Op. Amp.
 	NET_C(IC8.7, I_V15)
 	NET_C(IC8.4, I_VM15)
 
@@ -234,7 +234,7 @@ NETLIST_START(sundance)
 	NET_C(IC12.7, I_V15)
 	NET_C(IC12.4, I_VM15)
 
-	TTL_74LS125_DIP(IC13)	// Quad 3-state buffer
+	TTL_74LS125_DIP(IC13)   // Quad 3-state buffer
 	NET_C(IC13.7, GND)
 	NET_C(IC13.14, I_V5)
 
@@ -256,7 +256,7 @@ NETLIST_START(sundance)
 	NET_C(IC19.7, I_V15)
 	NET_C(IC19.4, I_VM15)
 
-	TL081_DIP(IC20)			// Op. Amp.
+	TL081_DIP(IC20)         // Op. Amp.
 	NET_C(IC20.7, I_V15)
 	NET_C(IC20.4, I_VM15)
 
@@ -303,7 +303,7 @@ NETLIST_START(sundance)
 
 	NET_C(I_OUT_1, R2.1, IC11.2)
 	NET_C(R2.2, I_V5)
-	NET_C(IC11.8, IC11.4, I_V5)		// -- IC11.4 not documented
+	NET_C(IC11.8, IC11.4, I_V5)     // -- IC11.4 not documented
 	NET_C(IC11.3, R35.1)
 	NET_C(IC11.1, GND)
 	NET_C(R34.1, I_V5)
@@ -365,7 +365,7 @@ NETLIST_START(sundance)
 	NET_C(R25.1, IC7.6, IC7.7, C7.1)
 	NET_C(C7.2, IC7.1, GND)
 	NET_C(R24.2, I_V5)
-	NET_C(R25.2, IC7.8, IC7.4, I_V5)	// IC7.4 -- not documented
+	NET_C(R25.2, IC7.8, IC7.4, I_V5)    // IC7.4 -- not documented
 	NET_C(IC7.3, Q4.E)
 	NET_C(Q4.B, R26.2)
 	NET_C(R26.1, GND)
@@ -476,8 +476,8 @@ NETLIST_START(sundance)
 	// Unconnected pins
 	//
 
-	NET_C(GND, IC20.2, IC20.3)	// part of final amp
+	NET_C(GND, IC20.2, IC20.3)  // part of final amp
 
-//	NET_C(GND, IC6.3, IC28.8, IC28.9, IC28.10, IC28.11)
+//  NET_C(GND, IC6.3, IC28.8, IC28.9, IC28.10, IC28.11)
 
 NETLIST_END()

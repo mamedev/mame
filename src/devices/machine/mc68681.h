@@ -44,6 +44,9 @@ public:
 	void write_MR1(uint8_t data){ MR1 = data; }
 	void write_MR2(uint8_t data){ MR2 = data; }
 
+	void tx_16x_clock_w(bool state);
+	void rx_16x_clock_w(bool state);
+
 private:
 	/* Registers */
 	uint8_t CR;  /* Command register */
@@ -58,7 +61,7 @@ private:
 
 	/* Receiver */
 	uint8_t rx_enabled;
-	uint16_t rx_fifo[MC68681_RX_FIFO_SIZE];
+	uint16_t rx_fifo[MC68681_RX_FIFO_SIZE + 1];
 	int   rx_fifo_read_ptr;
 	int   rx_fifo_write_ptr;
 	int   rx_fifo_num;
@@ -69,6 +72,10 @@ private:
 	uint8_t tx_enabled;
 	uint8_t tx_data;
 	uint8_t tx_ready;
+	bool m_tx_break;
+
+	/* Rx/Tx clocking */
+	uint8_t m_rx_prescaler , m_tx_prescaler;
 
 	duart_base_device *m_uart;
 

@@ -41,10 +41,10 @@ The Grid         v1.2   10/18/2000
 
 #include "crusnexo.lh"
 
-#define LOG_FIREWIRE	(1 << 1)
-#define LOG_DISK		(1 << 2)
-#define LOG_DISK_JR		(1 << 3)
-#define LOG_UNKNOWN		(1 << 4)
+#define LOG_FIREWIRE    (1 << 1)
+#define LOG_DISK        (1 << 2)
+#define LOG_DISK_JR     (1 << 3)
+#define LOG_UNKNOWN     (1 << 4)
 
 #define VERBOSE (LOG_FIREWIRE)
 #include "logmacro.h"
@@ -114,9 +114,9 @@ private:
 
 	void update_firewire_irq();
 
-	uint32_t	m_disk_asic[0x10];
-	int			m_fw_int_enable;
-	int			m_fw_int;
+	uint32_t    m_disk_asic[0x10];
+	int         m_fw_int_enable;
+	int         m_fw_int;
 
 	required_device<zeus2_device> m_zeus;
 	required_device<tsb12lv01a_device> m_fw_link;

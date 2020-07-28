@@ -4,40 +4,40 @@
 
     SAM Coupe Expansion Slot
 
-	64-pin slot
+    64-pin slot
 
-	 1A DBDIR       1C IORQL
-	 2A RDL         2C MREQL
-	 3A WRL         3C HALTL
-	 4A BUSAKL      4C NMIL
-	 5A WAITL       5C INTL
-	 6A BUSREQL     6C CD1
-	 7A RESETL      7C CD0
-	 8A CM1L        8C CD7
-	 9A REFRESHL    9C CD2
-	10A 0 VOLTS    10C +5 VOLTS
-	11A A0         11C CD6
-	12A A1         12C CD5
-	13A A2         13C CD3
-	14A A3         14C CD4
-	15A A4         15C CPU CLK
-	16A A5         16C A15
-	17A A6         17C A14
-	18A A7         18C A13
-	19A A8         19C A12
-	20A A9         20C A11
-	21A A10        21C DISK 2L
-	22A MSEINTL    22C ROMCSL
-	23A XMEML      23C EARMIC
-	24A 8 MHz      24C DISK 1L
-	25A RED 1      25C PRINTL
-	26A GREEN 1    26C BLUE 1
-	27A C SYNC     27C ROMCSRL
-	28A SPEN       28C AUDIO RIGHT
-	29A BLUE 0     29C AUDIO LEFT
-	30A RED 0      30C COMP VIDEO
-	31A BRIGHT     31C GREEN 0
-	32A +5 VOLTS   32C 0 VOLTS
+     1A DBDIR       1C IORQL
+     2A RDL         2C MREQL
+     3A WRL         3C HALTL
+     4A BUSAKL      4C NMIL
+     5A WAITL       5C INTL
+     6A BUSREQL     6C CD1
+     7A RESETL      7C CD0
+     8A CM1L        8C CD7
+     9A REFRESHL    9C CD2
+    10A 0 VOLTS    10C +5 VOLTS
+    11A A0         11C CD6
+    12A A1         12C CD5
+    13A A2         13C CD3
+    14A A3         14C CD4
+    15A A4         15C CPU CLK
+    16A A5         16C A15
+    17A A6         17C A14
+    18A A7         18C A13
+    19A A8         19C A12
+    20A A9         20C A11
+    21A A10        21C DISK 2L
+    22A MSEINTL    22C ROMCSL
+    23A XMEML      23C EARMIC
+    24A 8 MHz      24C DISK 1L
+    25A RED 1      25C PRINTL
+    26A GREEN 1    26C BLUE 1
+    27A C SYNC     27C ROMCSRL
+    28A SPEN       28C AUDIO RIGHT
+    29A BLUE 0     29C AUDIO LEFT
+    30A RED 0      30C COMP VIDEO
+    31A BRIGHT     31C GREEN 0
+    32A +5 VOLTS   32C 0 VOLTS
 
 ***************************************************************************/
 

@@ -20,7 +20,7 @@
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (CAR-0484/1 SOLD) with no chips, just routing along one edge
 
 
-	-- does the sound board have a MSM5205 or not?
+    -- does the sound board have a MSM5205 or not?
 */
 
 
@@ -237,8 +237,8 @@ void galspanic_ms_state::sound_map(address_map &map)
 
 	//map(0x8000, 0xbfff).m(m_soundrom, FUNC(address_map_bank_device::amap8));
 
-//	map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
-//	map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
+//  map(0xe000, 0xe000).w(FUNC(galspanic_ms_state::splash_adpcm_control_w));
+//  map(0xe400, 0xe400).w(FUNC(galspanic_ms_state::splash_adpcm_data_w));
 
 	map(0xa000, 0xa001).rw(m_ym1, FUNC(ym2203_device::read), FUNC(ym2203_device::write)).mirror(0x0008);
 	map(0xa002, 0xa003).rw(m_ym2, FUNC(ym2203_device::read), FUNC(ym2203_device::write)).mirror(0x0008);
@@ -307,7 +307,7 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	m_bg_tilemap2->set_scrollx(0, 64+m_scrollram[0x400/2]);
 	m_bg_tilemap2->set_scrolly(0, 48-m_scrollram[0x402/2]);
-	
+
 	m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
 	// TODO, convert to device, share between Modualar System games
@@ -326,7 +326,7 @@ uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 		int ypos = attr0 & 0x00ff;
 		int xpos = (attr1 & 0xff00)>>8;
-		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000; 
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
 		ypos = (0xff - ypos);
 
@@ -465,7 +465,7 @@ void galspanic_ms_state::newquiz(machine_config &config)
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &galspanic_ms_state::sound_map);
-//	m_soundcpu->set_periodic_int(FUNC(galspanic_ms_state::nmi_line_pulse), attotime::from_hz(60*64)); // no NMI here, just retn
+//  m_soundcpu->set_periodic_int(FUNC(galspanic_ms_state::nmi_line_pulse), attotime::from_hz(60*64)); // no NMI here, just retn
 
 	ADDRESS_MAP_BANK(config, m_soundrom).set_map(&galspanic_ms_state::soundrom_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 

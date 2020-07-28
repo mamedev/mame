@@ -5,7 +5,7 @@
     SH6578 NES clone hardware
     enhanced NES, different to VT / OneBus systems
 
-	"UMC 1997.2 A35551S" on CPU die (maxx6in1)
+    "UMC 1997.2 A35551S" on CPU die (maxx6in1)
 
     video rendering is changed significantly compared to NES so not using NES PPU device
     has 256x256 pixel pages, attributes are stored next to tile numbers (not in their own table after them) etc.
@@ -643,6 +643,11 @@ ROM_START( ablwikid )
 	ROM_LOAD( "mx29f1610atc.u2", 0x00000, 0x200000, CRC(f16abf79) SHA1(aeccbb40d7fdd451ba8e5cca20464da2cf116461) )
 ROM_END
 
+ROM_START( maxx5in1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vsmaxxcasino5_e28f008sa_89a2.bin", 0x00000, 0x100000, CRC(e3d8f24f) SHA1(121411e72d53eabe6be927d1db2f871d59a9e08e) )
+ROM_END
+
 ROM_START( maxx6in1 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "maxx6in1.bin", 0x00000, 0x100000, CRC(8e582298) SHA1(89892b9095dbd5101cdf2477a66abd2cb11ad8c8) )
@@ -659,4 +664,6 @@ CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, i
 // ROM is banked
 CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
 
-CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 )
+CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
+
+CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)

@@ -15,10 +15,10 @@
     - Verify interrupt, envelope, timer period
     - Verify unemulated registers
 
-	Changelog:
+    Changelog:
 
-	25th july 2020 [cam900]:
-	- Improve envelope behavior, Improve debugging registers, Fix ramping
+    25th july 2020 [cam900]:
+    - Improve envelope behavior, Improve debugging registers, Fix ramping
 */
 
 #include "emu.h"

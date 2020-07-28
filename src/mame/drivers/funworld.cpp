@@ -5,7 +5,7 @@
   Fun World / TAB / Impera
   Series 7000 hardware.
 
-  65C02 + 2x PIAs + M6845 CRTC + AY8910
+  65C02/65SC02 + 2x PIAs + M6845 CRTC + AY8910
 
   Also from Amatic, CMC, Dino4 encrypted, and Leopard 4.
 
@@ -71,7 +71,6 @@
   * Royal Card Professional 2.0,                                Digital Dreams,     1993.
   * Royal Card / Royal Jackpot (with a third draw)(encrypted),  TAB / Video Klein,  1991
   * Witch Royal (Export version 2.1),                           Video Klein,        199?.
-  * Royal Card (Italian, Dino 4 hardware, encrypted),           unknown,            1998.
   * Lucky Lady (3x3 deal),                                      TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                                      TAB Austria,        1991.
   * Magic Card II (Bulgarian),                                  Impera,             1996.
@@ -82,12 +81,13 @@
   * Royal Vegas Joker Card (Fast deal),                         Soft Design,        1993.
   * Royal Vegas Joker Card (Fast deal, english gfx),            Soft Design,        1993.
   * Royal Vegas Joker Card (Fast deal, Mile),                   Mile,               1993.
-  * Jolly Joker (original, interleaved GFX).                    Impera,             198?.
-  * Jolly Joker (original, different encoded GFX).              Impera,             198?.
-  * Jolly Joker (98bet, set 1).                                 Impera,             198?.
-  * Jolly Joker (98bet, set 2).                                 Impera,             198?.
-  * Jolly Joker (40bet, croatian hack),                         Impera,             198?.
-  * Jolly Joker (Apple Time),                                   Apple Time,         198?.
+  * Jolly Joker (original, interleaved GFX).                    Impera,             199?.
+  * Jolly Joker (original, different encoded GFX).              Impera,             199?.
+  * Jolly Joker (Solid State module in suicide board).          Impera,             199?.
+  * Jolly Joker (98bet, set 1).                                 Impera,             199?.
+  * Jolly Joker (98bet, set 2).                                 Impera,             199?.
+  * Jolly Joker (40bet, croatian hack),                         Impera,             199?.
+  * Jolly Joker (Apple Time),                                   Apple Time,         199?.
   * Multi Win (Ver.0167, encrypted),                            Fun World,          1992.
   * Power Card (Ver 0263, encrypted),                           Fun World,          1993.
   * Mega Card (Ver.0210, encrypted),                            Fun World,          1993.
@@ -99,6 +99,7 @@
   * Jolly Card (Italian, encrypted bootleg, set 1),             bootleg,            1990.
   * Jolly Card (Italian, encrypted bootleg, set 2),             bootleg,            1993.
   * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
+  * Royal Card (Italian, Dino 4 hardware, encrypted),           unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                              unknown,            1998.
   * Royal Card (Italian, Dino 4 hardware, encrypted),           TAB Austria,        1998.
   * Mongolfier New (Italian),                                   unknown,            199?.
@@ -112,8 +113,13 @@
   * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
   * Unknown Fun World A0-1 game,                                Fun World,          1991.
   * Joker Card / Multi Card (Epoxy brick CPU),                  Fun World,          1991.
+  * Gratis Poker (V.204, Set 1),                                Mega Soft,          1995.
+  * Gratis Poker (V.204, Set 2),                                Mega Soft,          1995.
   * Royal Card (stealth with NES multigame),                    bootleg,            1991.
   * Royal Card (stealth with MSX multigame),                    bootleg,            1991.
+
+
+  Supported games: 100
 
 
 *****************************************************************************************
@@ -981,6 +987,24 @@ void royalcrdf_state::royalcrdf_map(address_map &map)
 	map(0x6800, 0x6803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xffff).rom();
+}
+
+
+void funworld_state::gratispk_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+//	map(0x2c00, 0x2cff).ram(); /* range for protection */
+//	map(0x3600, 0x36ff).ram(); /* some games use $3603-05 range for protection */
+//	map(0x3c00, 0x3cff).ram(); /* range for protection */
+	map(0x4000, 0x4fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
 }
 
 
@@ -3196,6 +3220,16 @@ void funworld_state::fw_brick_2(machine_config &config)
 
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
 }
+
+
+void funworld_state::gratispk(machine_config &config)
+{
+//	fw1stpal(config);  // card deck wrong colors.
+	fw2ndpal(config);  // correct palette
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::gratispk_map);
+}
+
 
 uint8_t royalcrdf_state::royalcrdf_opcode_r(offs_t offset)
 {
@@ -6094,7 +6128,7 @@ ROM_END
   The second set has some 8bits data in the first half.
   Not clear if it's for obfuscation or just are the missing
   logo graphics tiles.
-  
+
   The program looks original. The former sets programs
   have differents offsets patched and moved blocks respect
   this new program.
@@ -6105,7 +6139,7 @@ ROM_END
 
 */
 ROM_START( jolyjokro )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera1.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
@@ -6128,16 +6162,51 @@ ROM_START( jolyjokrp )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "9c_1ff1.bin", 0x00000, 0x10000, CRC(4b8f0821) SHA1(0821eed07f5e98b66d87a3079756dad72ffe9665) )
-	ROM_CONTINUE(            0x00000, 0x10000)	// discarding 1nd half (0000-ffff), but has some data. maybe the missing impera logo?
+	ROM_CONTINUE(            0x00000, 0x10000)  // discarding 1nd half (0000-ffff), but has some data. leftover?
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_FILL(              0x0000, 0x10000, 0xff)	// deinterleaved GFX data will be placed here
+	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
 
-	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrp_nvram.bin", 0x0000, 0x0800, CRC(c8706e75) SHA1(421420b1ee82615faf290d1204342cdde776ffaf) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	// PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
 	ROM_LOAD( "impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+ROM_END
+
+/*
+  Jolly Joker
+  Impera.
+
+  This hardware has a daughterboard that seems a solid state replacement
+  for the suicide modules of funworld boards.
+
+  It's just a theory, but the main battery is routed to the daughterboard
+  connectors, when this module has not suicide program inside a RAM.
+
+  Module contents:
+
+  1x Rockwell R65C02P2 Mexico.
+  1x 27c512 EPROM stickered 'IMPERA1'.
+  1x PAL16L8A2NC.
+  1x 74HC241N.
+  1x 74LS245N.
+  1x 74LS139N.
+
+*/
+ROM_START( jolyjokrm )	// Jolly Joker (Solid State module in suicide board)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "impera1.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "02.bin", 0x0000, 0x8000, CRC(f0fa5941) SHA1(1fcade31ed6893ffcfd4efe97dfaaa31d24283ec) )
+	ROM_LOAD( "01.bin", 0x8000, 0x8000, CRC(c3ab44dd) SHA1(e46c0fd94da561f57033647f1703fa135777ece5) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_LOAD( "jolyjokrm_nvram.bin", 0x0000, 0x0800, CRC(f33e66ed) SHA1(7a4b9a1b2f976d5d26f54915a213d5ac5eca0a42) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "63s481.bin", 0x0000, 0x0200, CRC(1f974802) SHA1(c9d4d72edef3c03b0c6e1a0ffc0b82f6d213d29c) )
 ROM_END
 
 
@@ -7244,6 +7313,45 @@ ROM_START( jokcrdep )
 ROM_END
 
 
+/*
+  Gratis Poker
+  Stmk
+  Version: 004
+  29. Sept.  95 
+
+*/
+ROM_START( gratispk )	// Gratis Poker (V.204, Set 1)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gratis_poker_club_ver_204.bin", 0x8000, 0x8000, CRC(e53da78e) SHA1(6b87af4d66082f1a18e9e00a41df2484f5373cc7) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(daec20c7) SHA1(340bdb7749a7d898e96db5a470821cfe7216ea57) )
+	ROM_IGNORE(                 0x8000 )	// Identical halves. Discarding 2nd half
+	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(112c5f33) SHA1(fffaa247a97f9bde7374cc80ab0bb9fb71bcc4b6) )
+	ROM_IGNORE(                 0x8000 )	// Identical halves. Discarding 2nd half
+
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_LOAD( "gratispk_nvram.bin", 0x0000, 0x0800, CRC(8fcad62f) SHA1(85def713ed5b9bbdbf0d077a38f779d6f4329a1c) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp28s42n.bin", 0x0000, 0x0200, CRC(e92f74e0) SHA1(dfc4a9d140d21b990f769c10802c4d2c33dd4132) )
+ROM_END
+
+ROM_START( gratispka )	// Gratis Poker (V.204, Set 2)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "35g_ver_204.bin", 0x8000, 0x8000, CRC(e53da78e) SHA1(6b87af4d66082f1a18e9e00a41df2484f5373cc7) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(4f077fa3) SHA1(d65005b7111b77ac7c3707bd12bc376506d9477b) )
+	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(0f3711b0) SHA1(ce874dbfc2d7171cff2be41d4a44fe8194526ef7) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_LOAD( "gratispk_nvram.bin", 0x0000, 0x0800, CRC(8fcad62f) SHA1(85def713ed5b9bbdbf0d077a38f779d6f4329a1c) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp28s42n.bin", 0x0000, 0x0200, CRC(e92f74e0) SHA1(dfc4a9d140d21b990f769c10802c4d2c33dd4132) )
+ROM_END
+
 
 /**************************
 *  Driver Initialization  *
@@ -7923,7 +8031,7 @@ void funworld_state::init_impera16()
 	*****************************/
 
 	int j = 0;
-	
+
 	for (int i = 0; i < size; i += 2)
 	{
 		gfx8rom[j] = gfx16rom[i];
@@ -8019,12 +8127,13 @@ GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  funworld_state, empty_ini
 GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  funworld_state, empty_init,    ROT0, "Mile",            "Royal Vegas Joker Card (fast deal, Mile)",        0,                       layout_jollycrd )
 
 // Jolly Joker based...
-GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd )  // bad program ROM...
-GAMEL( 198?, jolyjokro, jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",          "Jolly Joker (original program, interleaved GFX, Impera logo)",  0,         layout_jollycrd )
-GAMEL( 198?, jolyjokrp, jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",          "Jolly Joker (original program, interleaved GFX, no logo)",      0,         layout_jollycrd )
+GAMEL( 199?, jolyjokr,  0,        fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
+GAMEL( 199?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
+GAMEL( 199?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
+GAMEL( 199?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd )  // bad program ROM...
+GAMEL( 199?, jolyjokro, jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",          "Jolly Joker (original program, interleaved GFX, Impera logo)",  0,         layout_jollycrd )
+GAMEL( 199?, jolyjokrp, jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",          "Jolly Joker (original program, interleaved GFX, no logo)",      0,         layout_jollycrd )
+GAMEL( 199?, jolyjokrm, jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",          "Jolly Joker (Solid State module in suicide board)", 0,                     layout_jollycrd )
 
 // Encrypted games...
 GAME(  1992, multiwin,  0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 0 )
@@ -8055,12 +8164,14 @@ GAME(  1990, funquiza,  0,        funquiz,  funquiza,  funworld_state, empty_ini
 GAME(  1990, funquizb,  0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",       "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
-GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,    funworld_state, empty_init,   ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes, intrgmes,    intergames_state, empty_init, ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
-GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                 MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                 MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A0-1 game",                    MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, jokcrdep,  0,        fw_brick_2, fw_brick1, funworld_state, empty_init,   ROT0, "Fun World",       "Joker Card / Multi Card (Epoxy brick CPU)",      MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1986, novoplay,  0,        fw2ndpal,   novoplay,  funworld_state,   empty_init, ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
+GAME(  1991, intrgmes,  0,        intrgmes,   intrgmes,  intergames_state, empty_init, ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
+GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                 MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                 MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "unknown Fun World A0-1 game",                    MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, jokcrdep,  0,        fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "Joker Card / Multi Card (Epoxy brick CPU)",      MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 199?, gratispk,  0,        gratispk,   funworld,  funworld_state,   empty_init, ROT0, "Mega Soft",       "Gratis Poker (V.204, Set 1)",                    0,                       layout_jollycrd )
+GAMEL( 199?, gratispka, gratispk, gratispk,   funworld,  funworld_state,   empty_init, ROT0, "Mega Soft",       "Gratis Poker (V.204, Set 2)",                    0,                       layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )

@@ -2,8 +2,8 @@
 // copyright-holders:MetalliC
 /*********************************************************************
 
-	FloppyOne DOS Interface
-	(c) 1984/5 R.P.Gush
+    FloppyOne DOS Interface
+    (c) 1984/5 R.P.Gush
 
 *********************************************************************/
 #ifndef MAME_BUS_SPECTRUM_FLPONE_H
@@ -31,7 +31,7 @@ public:
 	spectrum_flpone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button) {	m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); };
+	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button) { m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); };
 
 protected:
 	// device-level overrides

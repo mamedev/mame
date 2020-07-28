@@ -16,8 +16,8 @@
 #define ENV_DIR_UP              0
 #define ENV_DIR_DOWN            1
 
-#define CHANNEL_STATUS_LOAD		1
-#define CHANNEL_STATUS_RUN		2
+#define CHANNEL_STATUS_LOAD     1
+#define CHANNEL_STATUS_RUN      2
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
@@ -92,11 +92,11 @@ private:
 	uint8_t   m_new_addr;     // Flag
 	uint8_t   m_vol_latch;
 	uint8_t   m_flt_latch;
-	uint8_t	  m_rp;
-	uint8_t	  m_ws;
+	uint8_t   m_rp;
+	uint8_t   m_ws;
 	int       m_dir;
 	int       m_env_dir;
-	uint8_t	  m_env;
+	uint8_t   m_env;
 	int       m_pia0_cb2_state;
 
 	uint8_t   m_bcas_q1_ticks;
@@ -117,11 +117,11 @@ private:
 	bool      m_tri;
 	bool      m_pia1_ca2;
 
-	bool 	  m_eclk;
+	bool      m_eclk;
 	bool      m_env_clk;
-	bool	  m_ediv_out;
+	bool      m_ediv_out;
 	uint8_t   m_ediv_rate;
-	uint8_t	  m_ediv_count;
+	uint8_t   m_ediv_count;
 
 	uint16_t  m_pitch;
 	uint8_t   m_octave;

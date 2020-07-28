@@ -439,28 +439,25 @@ TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 		}
 
 		// timer driving any serial channels?
-		if (BIT(ACR, 7) == 1)
+		uint8_t csr = m_chanA->get_chan_CSR();
+
+		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
 		{
-			uint8_t csr = m_chanA->get_chan_CSR();
+			m_chanA->tx_16x_clock_w(half_period);
+		}
+		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
+		{
+			m_chanA->rx_16x_clock_w(half_period);
+		}
 
-			if ((csr & 0xf0) == 0xd0)   // tx is timer driven
-			{
-				m_chanA->tx_clock_w(half_period);
-			}
-			if ((csr & 0x0f) == 0x0d)   // rx is timer driven
-			{
-				m_chanA->rx_clock_w(half_period);
-			}
-
-			csr = m_chanB->get_chan_CSR();
-			if ((csr & 0xf0) == 0xd0)   // tx is timer driven
-			{
-				m_chanB->tx_clock_w(half_period);
-			}
-			if ((csr & 0x0f) == 0x0d)   // rx is timer driven
-			{
-				m_chanB->rx_clock_w(half_period);
-			}
+		csr = m_chanB->get_chan_CSR();
+		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
+		{
+			m_chanB->tx_16x_clock_w(half_period);
+		}
+		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
+		{
+			m_chanB->rx_16x_clock_w(half_period);
 		}
 
 		if (!half_period)
@@ -1148,8 +1145,9 @@ duart_channel::duart_channel(const machine_config &mconfig, const char *tag, dev
 	, rx_enabled(0)
 	, rx_fifo_num(0)
 	, tx_enabled(0)
+	, m_tx_break(false)
 {
-	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE, 0);
+	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE + 1, 0);
 }
 
 void duart_channel::device_start()
@@ -1173,6 +1171,7 @@ void duart_channel::device_start()
 	save_item(NAME(tx_enabled));
 	save_item(NAME(tx_data));
 	save_item(NAME(tx_ready));
+	save_item(NAME(m_tx_break));
 }
 
 void duart_channel::device_reset()
@@ -1186,6 +1185,7 @@ void duart_channel::device_reset()
 
 	tx_baud_rate = rx_baud_rate = 0;
 	CSR = 0;
+	m_tx_break = false;
 }
 
 // serial device virtual overrides
@@ -1208,18 +1208,28 @@ void duart_channel::rcv_complete()
 
 void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
 {
-	if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
+	if (rx_fifo_num == (MC68681_RX_FIFO_SIZE + 1))
 	{
 		logerror("68681: FIFO overflow\n");
 		SR |= STATUS_OVERRUN_ERROR;
-		return;
+		// In case of overrun the FIFO tail entry is overwritten
+		// Back rx_fifo_write_ptr up by one position
+		if (rx_fifo_write_ptr)
+			rx_fifo_write_ptr--;
+		else
+			rx_fifo_write_ptr = MC68681_RX_FIFO_SIZE;
 	}
 
 	rx_fifo[rx_fifo_write_ptr++] = data | (errors << 8);
-	if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
+	if (rx_fifo_write_ptr > MC68681_RX_FIFO_SIZE)
 		rx_fifo_write_ptr = 0;
 
-	if (rx_fifo_num++ == 0)
+	if (rx_fifo_num <= MC68681_RX_FIFO_SIZE)
+	{
+		rx_fifo_num++;
+	}
+
+	if (rx_fifo_num == 1)
 	{
 		SR |= STATUS_RECEIVER_READY;
 		if (!(MR1 & MODE_BLOCK_ERROR))
@@ -1238,9 +1248,9 @@ void duart_channel::tra_complete()
 	SR |= STATUS_TRANSMITTER_READY;
 
 	if (m_ch == 0)
-		m_uart->clear_ISR_bits(INT_TXRDYA);
+		m_uart->set_ISR_bits(INT_TXRDYA);
 	else
-		m_uart->clear_ISR_bits(INT_TXRDYB);
+		m_uart->set_ISR_bits(INT_TXRDYB);
 
 	// if local loopback is on, write the transmitted data as if a byte had been received
 	if ((MR2 & 0xc0) == 0x80)
@@ -1363,13 +1373,17 @@ uint8_t duart_channel::read_rx_fifo()
 	}
 
 	rv = rx_fifo[rx_fifo_read_ptr++];
-	if (rx_fifo_read_ptr == MC68681_RX_FIFO_SIZE)
+	if (rx_fifo_read_ptr > MC68681_RX_FIFO_SIZE)
 	{
 		rx_fifo_read_ptr = 0;
 	}
 
 	rx_fifo_num--;
-	SR &= ~STATUS_FIFO_FULL;
+	if (rx_fifo_num == (MC68681_RX_FIFO_SIZE - 1))
+	{
+		SR &= ~STATUS_FIFO_FULL;
+	}
+
 	if (!(MR1 & MODE_BLOCK_ERROR))
 		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
 	if (rx_fifo_num == 0)
@@ -1549,7 +1563,36 @@ void duart_channel::write_CR(uint8_t data)
 		else
 			m_uart->clear_ISR_bits(INT_DELTA_BREAK_B);
 		break;
-	/* TODO: case 6 and case 7 are start break and stop break respectively, which start or stop holding the TxDA or TxDB line low (space) after whatever data is in the buffer finishes transmitting (following the stop bit?), or after two bit-times if no data is being transmitted  */
+	case 6: /* Start Tx break */
+		if (!m_tx_break)
+		{
+			m_tx_break = true;
+			if ((MR2 & 0xc0) == 0x80)
+			{
+				// Local loopback mode: set delta break in ISR, simulate break rx
+				if (m_ch == 0)
+					m_uart->set_ISR_bits(INT_DELTA_BREAK_A);
+				else
+					m_uart->set_ISR_bits(INT_DELTA_BREAK_B);
+				rx_fifo_push(0 , STATUS_RECEIVED_BREAK);
+			}
+			// TODO: Actually send break signal
+		}
+		break;
+	case 7: /* Stop tx break */
+		if (m_tx_break)
+		{
+			m_tx_break = false;
+			if ((MR2 & 0xc0) == 0x80)
+			{
+				// Local loopback mode: set delta break in ISR
+				if (m_ch == 0)
+					m_uart->set_ISR_bits(INT_DELTA_BREAK_A);
+				else
+					m_uart->set_ISR_bits(INT_DELTA_BREAK_B);
+			}
+		}
+		break;
 	default:
 		LOG("68681: Unhandled command (%x) in CR%d\n", (data >> 4) & 0x07, m_ch);
 		break;
@@ -1622,4 +1665,44 @@ void duart_channel::baud_updated()
 uint8_t duart_channel::get_chan_CSR()
 {
 	return CSR;
+}
+
+void duart_channel::tx_16x_clock_w(bool state)
+{
+	if (state)
+	{
+		m_tx_prescaler--;
+		if (m_tx_prescaler == 8)
+		{
+			tx_clock_w(true);
+		}
+		else if (m_tx_prescaler == 0)
+		{
+			m_tx_prescaler = 16;
+			tx_clock_w(false);
+		}
+	}
+}
+
+void duart_channel::rx_16x_clock_w(bool state)
+{
+	if (!is_receive_register_synchronized())
+	{
+		// Skip over the start bit once synchonization is achieved
+		m_rx_prescaler = 32;
+		rx_clock_w(true);
+	}
+	else if (state)
+	{
+		m_rx_prescaler--;
+		if (m_rx_prescaler == 8)
+		{
+			rx_clock_w(false);
+		}
+		else if (m_rx_prescaler == 0)
+		{
+			m_rx_prescaler = 16;
+			rx_clock_w(true);
+		}
+	}
 }
