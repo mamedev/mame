@@ -1281,7 +1281,7 @@ Also had V4.4 printed sideways at front of the label.
 */
 ROM_START( crusnusa ) /* Version 4.4, Wed Mar 15 1995 - 10:52:28 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1323,7 +1323,7 @@ ROM_END
 
 ROM_START( crusnusa41 ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1366,7 +1366,7 @@ ROM_END
 
 ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1409,7 +1409,7 @@ ROM_END
 
 ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
