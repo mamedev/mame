@@ -22128,6 +22128,7 @@ megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
+barek2mb                        // MegaDrive-based hack
 barek3mb                        // MegaDrive-based hack
 jparkmb                         // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
@@ -34906,6 +34907,7 @@ slithera                        // (c) 1982 Century II
 zookeep                         // ZA  (c) 1982 Taito America Corporation
 zookeep2                        // ZA  (c) 1982 Taito America Corporation
 zookeep3                        // ZA  (c) 1982 Taito America Corporation
+zookeepbl                       // bootleg
 
 @source:ql.cpp
 ql                              // 1984 Sinclair QL (UK)

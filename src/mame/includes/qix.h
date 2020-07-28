@@ -168,6 +168,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	optional_device<m68705p_device> m_mcu;
+
 private:
 	uint8_t coin_r();
 	void coin_w(uint8_t data);
@@ -177,8 +179,6 @@ private:
 	uint8_t mcu_portc_r();
 	void mcu_porta_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
-
-	required_device<m68705p_device> m_mcu;
 
 	/* machine state */
 	uint8_t  m_68705_porta_out;
@@ -194,6 +194,7 @@ public:
 	{ }
 
 	void zookeep(machine_config &config);
+	void zookeepbl(machine_config &config);
 	void video(machine_config &config);
 
 protected:
