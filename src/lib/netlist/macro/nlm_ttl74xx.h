@@ -333,22 +333,8 @@
 #define TTL_74379_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74379_DIP, name)
 
-#define DM9312(name, cA, cB, cC, cSTROBE, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7)     \
-		NET_REGISTER_DEV(DM9312, name)                                         \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, A,  cA)                                              \
-		NET_CONNECT(name, B,  cB)                                              \
-		NET_CONNECT(name, C,  cC)                                              \
-		NET_CONNECT(name, G,  cSTROBE)                                         \
-		NET_CONNECT(name, D0, cD0)                                             \
-		NET_CONNECT(name, D1, cD1)                                             \
-		NET_CONNECT(name, D2, cD2)                                             \
-		NET_CONNECT(name, D3, cD3)                                             \
-		NET_CONNECT(name, D4, cD4)                                             \
-		NET_CONNECT(name, D5, cD5)                                             \
-		NET_CONNECT(name, D6, cD6)                                             \
-		NET_CONNECT(name, D7, cD7)
+#define DM9312(...)                                                            \
+		NET_REGISTER_DEVEXT(DM9312, __VA_ARGS__)
 
 #define DM9312_DIP(name)                                                       \
 		NET_REGISTER_DEV(DM9312_DIP, name)
@@ -359,7 +345,7 @@
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(TTL74XX_lib)
+// moved to net_lib.h
 
 #endif // __PLIB_PREPROCESSOR__
 

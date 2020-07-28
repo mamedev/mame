@@ -110,7 +110,7 @@ namespace netlist
 						//break;
 					}
 					pstring output_name = *ptok;
-					log().debug("Link: {1} {2}\n", tp, output_name);
+					log().debug("Link: {1} {2}", tp, output_name);
 
 					register_link(name + "." + tp.substr(1), output_name);
 					++ptok;
@@ -118,7 +118,7 @@ namespace netlist
 				else if (plib::startsWith(tp, "@"))
 				{
 					pstring term = tp.substr(1);
-					log().debug("Link: {1} {2}\n", tp, term);
+					log().debug("Link: {1} {2}", tp, term);
 
 					register_link(name + "." + term, term);
 				}
@@ -353,7 +353,7 @@ namespace netlist
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
 		auto y = std::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
-		y->process(std::move(istrm));
+		y->process(std::move(istrm), "<stream>");
 		return parser_t(std::move(y), *this).parse(name);
 		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
 	}

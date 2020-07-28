@@ -37,7 +37,7 @@
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(ROMS_lib)
+// moved to net_lib.h
 
 #endif // __PLIB_PREPROCESSOR__
 

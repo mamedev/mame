@@ -68,10 +68,17 @@ namespace plib {
 			delete rdbuf();
 		}
 
+		/// \brief process stream
+		///
+		/// \param filename a filename or identifier identifying the stream.
+		///
+		/// FIXME: this is sub-optimal. Refactor input_context into pinput_context
+		/// and pass this to ppreprocessor.
+		///
 		template <typename T>
-		ppreprocessor & process(T &&istrm)
+		ppreprocessor & process(T &&istrm, const pstring &filename)
 		{
-			m_stack.emplace_back(input_context(std::forward<T>(istrm),"","<stream>"));
+			m_stack.emplace_back(input_context(std::forward<T>(istrm),plib::util::path(filename), filename));
 			process_stack();
 			return *this;
 		}

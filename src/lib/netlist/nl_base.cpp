@@ -142,7 +142,19 @@ namespace netlist
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
 		m_setup->parser().add_include<a>("netlist/devices/net_lib.h", content);
+#if 1
 		NETLIST_NAME(base)(m_setup->parser());
+#else
+		// FIXME: This is very slow - need optimized parsing scanning
+		pstring dir = "src/lib/netlist/macro/";
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_base.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_opamp.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_roms.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_cd4xxx.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_other.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_ttl74xx.cpp");
+		m_setup->parser().include("base");
+#endif
 	}
 
 

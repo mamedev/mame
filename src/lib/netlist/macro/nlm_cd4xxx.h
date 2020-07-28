@@ -64,13 +64,14 @@
 #define CD4538_DIP(name)                                                        \
 		NET_REGISTER_DEV(CD4538_DIP, name)
 
-#endif
+#endif // !NL_AUTO_DEVICES
+
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(CD4XXX_lib)
+// moved to net_lib.h
 
 #endif
 
-#endif
+#endif // NLD_CD4XXX_H_

@@ -3,6 +3,20 @@
 
 #include "netlist/devices/net_lib.h"
 
+#ifndef NL_USE_TRUTHTABLE_74107
+#define NL_USE_TRUTHTABLE_74107 0
+#endif
+
+#ifndef NL_USE_TRUTHTABLE_7448
+#define NL_USE_TRUTHTABLE_7448 0
+#endif
+
+#if 1
+//
+#elif %&/()
+//
+#endif
+
 /*
  *  DM7400: Quad 2-Input NAND Gates
  *
@@ -1139,9 +1153,8 @@ NETLIST_END()
  *  Naming conventions follow Fairchild Semiconductor datasheet
  *
  */
-
-#if !NL_AUTO_DEVICES
 #ifndef __PLIB_PREPROCESSOR__
+#if !NL_AUTO_DEVICES
 #define TTL_74279A(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279A, name)
 #define TTL_74279B(name)                                                         \
@@ -1299,13 +1312,8 @@ NETLIST_END()
  *
  */
 
-#ifndef __PLIB_PREPROCESSOR__
-#define DM9312_TT(name)     \
-		NET_REGISTER_DEV(DM9312, name)
-#endif
-
 static NETLIST_START(DM9312_DIP)
-	DM9312_TT(s)
+	DM9312(s)
 
 	DIPPINS(    /*     +--------------+     */
 		s.D0,   /*  D0 |1     ++    16| VCC */ s.VCC,
