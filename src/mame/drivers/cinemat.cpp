@@ -37,6 +37,7 @@
 #include "demon.lh"
 #include "starcas.lh"
 #include "solarq.lh"
+#include "speedfrk.lh"
 #include "sundance.lh"
 #include "tailg.lh"
 #include "warrior.lh"
@@ -82,15 +83,15 @@ void cinemat_state::machine_reset()
  *
  *************************************/
 
-uint8_t cinemat_state::inputs_r(offs_t offset)
+u8 cinemat_state::inputs_r(offs_t offset)
 {
 	return (m_inputs->read() >> offset) & 1;
 }
 
 
-uint8_t cinemat_state::switches_r(offs_t offset)
+u8 cinemat_state::switches_r(offs_t offset)
 {
-	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
+	static const u8 switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
 	return (m_switches->read() >> switch_shuffle[offset]) & 1;
 }
 
@@ -110,7 +111,7 @@ INPUT_CHANGED_MEMBER(cinemat_state::coin_inserted)
 }
 
 
-uint8_t cinemat_state::coin_input_r()
+u8 cinemat_state::coin_input_r()
 {
 	return !m_coin_detected;
 }
@@ -144,13 +145,13 @@ WRITE_LINE_MEMBER(cinemat_state::mux_select_w)
  *
  *************************************/
 
-uint8_t cinemat_state::joystick_read()
+u8 cinemat_state::joystick_read()
 {
 	if (machine().phase() != machine_phase::RUNNING)
 		return 0;
 	else
 	{
-		int const xval = int16_t(m_maincpu->state_int(ccpu_cpu_device::CCPU_X) << 4) >> 4;
+		int const xval = s16(m_maincpu->state_int(ccpu_cpu_device::CCPU_X) << 4) >> 4;
 		return ((m_mux_select ? m_analog_x : m_analog_y).read_safe(0) - xval) < 0x800;
 	}
 }
@@ -163,13 +164,13 @@ uint8_t cinemat_state::joystick_read()
  *
  *************************************/
 
-uint8_t cinemat_state::speedfrk_wheel_r(offs_t offset)
+u8 cinemat_state::speedfrk_wheel_r(offs_t offset)
 {
-	static const uint8_t speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
+	static const u8 speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = int8_t(m_wheel->read()) / 8;
+	delta_wheel = s8(m_wheel->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)
@@ -179,20 +180,11 @@ uint8_t cinemat_state::speedfrk_wheel_r(offs_t offset)
 }
 
 
-uint8_t cinemat_state::speedfrk_gear_r(offs_t offset)
+u8 cinemat_state::speedfrk_gear_r(offs_t offset)
 {
-	int gearval = m_gear_input->read();
-
-	/* check the fake gear input port and determine the bit settings for the gear */
-	if ((gearval & 0x0f) != 0x0f)
-		m_gear = gearval & 0x0f;
-
-	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(m_inputs->read() & 0x80))
-		m_gear &= ~0x08;
-
-	return (m_gear >> offset) & 1;
+	return (m_gear != offset);
 }
+
 
 
 
@@ -205,7 +197,7 @@ uint8_t cinemat_state::speedfrk_gear_r(offs_t offset)
 static const struct
 {
 	const char *portname;
-	uint16_t bitmask;
+	u16 bitmask;
 } sundance_port_map[16] =
 {
 	{ "PAD1", 0x155 },  /* bit  0 is set if P1 1,3,5,7,9 is pressed */
@@ -230,7 +222,7 @@ static const struct
 };
 
 
-uint8_t cinemat_16level_state::sundance_inputs_r(offs_t offset)
+u8 cinemat_16level_state::sundance_inputs_r(offs_t offset)
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
@@ -247,7 +239,7 @@ uint8_t cinemat_16level_state::sundance_inputs_r(offs_t offset)
  *
  *************************************/
 
-uint8_t cinemat_color_state::boxingb_dial_r(offs_t offset)
+u8 cinemat_color_state::boxingb_dial_r(offs_t offset)
 {
 	int value = ioport("DIAL")->read();
 	if (!m_mux_select) offset += 4;
@@ -262,7 +254,7 @@ uint8_t cinemat_color_state::boxingb_dial_r(offs_t offset)
  *
  *************************************/
 
-uint8_t qb3_state::qb3_frame_r()
+u8 qb3_state::qb3_frame_r()
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
@@ -273,7 +265,7 @@ uint8_t qb3_state::qb3_frame_r()
 }
 
 
-void qb3_state::qb3_ram_bank_w(uint8_t data)
+void qb3_state::qb3_ram_bank_w(u8 data)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(ccpu_cpu_device::CCPU_P) & 3);
 }
@@ -480,10 +472,13 @@ static INPUT_PORTS_START( speedfrk )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("1st gear") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("2nd gear") PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("3rd gear") PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("4th gear") PORT_PLAYER(2)
+	PORT_BIT (0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cinemat_state, speedfrk_gear_number_r)
+
+	PORT_START("GEARRAW")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("1st gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("2nd gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("3rd gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<2>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("4th gear") PORT_PLAYER(2) PORT_WRITE_LINE_MEMBER(cinemat_state, speedfrk_gear_change_w<3>)
 INPUT_PORTS_END
 
 
@@ -1504,7 +1499,6 @@ ROM_END
 
 void cinemat_state::init_speedfrk()
 {
-	m_gear = 0xe;
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(cinemat_state::speedfrk_wheel_r)));
 	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8sm_delegate(*this, FUNC(cinemat_state::speedfrk_gear_r)));
 	save_item(NAME(m_gear));
@@ -1542,7 +1536,7 @@ void qb3_state::init_qb3()
 GAME(  1977, spacewar, 0,        spacewar, spacewar, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Space Wars", MACHINE_SUPPORTS_SAVE )
 GAME(  1978, spaceshp, spacewar, spacewar, spaceshp, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Sega license)", "Space Ship", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1979, barrier,  0,        barrier,  barrier,  cinemat_state,         empty_init,    ORIENTATION_FLIP_X ^ ROT270, "Cinematronics (Vectorbeam license)", "Barrier", MACHINE_SUPPORTS_SAVE, layout_barrier ) // developed by Cinematronics, then (when they noticed it wasn't going to be a successful game) sold to Vectorbeam, and ultimately back in the hands of Cinematronics again after they bought the dying company Vectorbeam
-GAME(  1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init_speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_SUPPORTS_SAVE )
+GAMEL(  1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init_speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_SUPPORTS_SAVE, layout_speedfrk )
 GAME(  1979, starhawk, 0,        starhawk, starhawk, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Hawk", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1979, sundance, 0,        sundance, sundance, cinemat_16level_state, init_sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_SUPPORTS_SAVE, layout_sundance )
 GAMEL( 1979, tailg,    0,        tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_SUPPORTS_SAVE, layout_tailg )
