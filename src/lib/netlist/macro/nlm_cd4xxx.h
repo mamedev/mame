@@ -36,7 +36,7 @@
 		NET_REGISTER_DEV(CD4001_DIP, name)
 
 #define CD4011_GATE(name)                                                      \
-		NET_REGISTER_DEV(CD4001_GATE, name)
+		NET_REGISTER_DEV(CD4011_GATE, name)
 
 #define CD4011_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4011_DIP, name)
