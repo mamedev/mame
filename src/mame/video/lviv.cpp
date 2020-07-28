@@ -62,7 +62,7 @@ uint32_t lviv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (int x = 0; x < 256; x += 4)
 		{
-			const uint8_t data = m_video_ram[(y << 6) | (x >> 2)];
+			const uint8_t data = m_vram[(y << 6) | (x >> 2)];
 
 			int pen = m_colortable[0][((data & 0x08) >> 3) | ((data & 0x80) >> (3+3))];
 			bitmap.pix16(y, x + 0) = pen;
