@@ -139,7 +139,9 @@ namespace plib {
 		psource_collection_t<> &m_sources;
 		string_list m_expr_sep;
 
-		std::uint_least64_t m_if_flag; // 31 if levels
+		std::uint_least64_t m_if_flag; // 63 if levels
+		std::uint_least64_t m_if_seen; // 63 if levels
+		std::uint_least64_t m_elif; // 63 if levels - for #elif
 		int m_if_level;
 
 		struct input_context
