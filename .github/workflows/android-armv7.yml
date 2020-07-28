@@ -1,0 +1,40 @@
+name: MAME-libretro Android ARMv7
+
+on:
+  push:
+    branches:
+      - master
+      - libretro/ci
+
+jobs:
+  AndroidARMv7:
+    name: Build for Android ARMv7
+    runs-on: ubuntu-latest
+
+    env:
+      ANDROID_NDK_VERSION: "21.3.6528147"
+      ANDROID_NDK_ROOT:    ${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}
+      ANDROID_NDK_LLVM:    ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64
+      ANDROID_NDK_ARM:     ${ANDROID_NDK_ROOT}/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
+
+    steps:    
+    - name: Install Android NDK
+      run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${ANDROID_NDK_VERSION}"
+    
+    - uses: actions/checkout@v2
+
+    - run: make -f Makefile.libretro platform=android -j8
+
+    - run: strip -s mame_libretro_android.so
+
+    - run: zip -9 mame_libretro.zip mame_libretro_android.so
+
+    - name: Upload MAME core
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mame_libretro.zip
+        tag: Android_ARMv7
+        asset_name: mame_libretro.zip
+        overwrite: true
+
