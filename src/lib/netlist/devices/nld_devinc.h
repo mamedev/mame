@@ -923,7 +923,7 @@
 	NET_REGISTER_DEVEXT(MM5837_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/macro/nlm_ttl74xx.cpp
+// Source: TTL74XX_lib
 // ---------------------------------------------------------------------
 // usage       : TTL_7400_GATE(name)
 #define TTL_7400_GATE(...)                                             \
@@ -1104,6 +1104,9 @@
 #define DM9312(...)                                                    \
 	NET_REGISTER_DEVEXT(DM9312, __VA_ARGS__)
 
+// ---------------------------------------------------------------------
+// Source: parser: TTL74XX_lib
+// ---------------------------------------------------------------------
 // usage       : TTL_7400_DIP(name)
 #define TTL_7400_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7400_DIP, __VA_ARGS__)
@@ -1245,11 +1248,15 @@
 	NET_REGISTER_DEVEXT(DM9312_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/macro/nlm_cd4xxx.cpp
+// Source: CD4XXX_lib
 // ---------------------------------------------------------------------
 // usage       : CD4001_GATE(name)
 #define CD4001_GATE(...)                                               \
 	NET_REGISTER_DEVEXT(CD4001_GATE, __VA_ARGS__)
+
+// usage       : CD4011_GATE(name)
+#define CD4011_GATE(...)                                               \
+	NET_REGISTER_DEVEXT(CD4011_GATE, __VA_ARGS__)
 
 // usage       : CD4069_GATE(name)
 #define CD4069_GATE(...)                                               \
@@ -1259,6 +1266,9 @@
 #define CD4070_GATE(...)                                               \
 	NET_REGISTER_DEVEXT(CD4070_GATE, __VA_ARGS__)
 
+// ---------------------------------------------------------------------
+// Source: parser: CD4XXX_lib
+// ---------------------------------------------------------------------
 // usage       : CD4001_DIP(name)
 #define CD4001_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4001_DIP, __VA_ARGS__)
@@ -1287,10 +1297,6 @@
 #define CD4024_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4024_DIP, __VA_ARGS__)
 
-// usage       : CD4016_DIP(name)
-#define CD4016_DIP(...)                                                \
-	NET_REGISTER_DEVEXT(CD4016_DIP, __VA_ARGS__)
-
 // usage       : CD4053_DIP(name)
 #define CD4053_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4053_DIP, __VA_ARGS__)
@@ -1298,6 +1304,10 @@
 // usage       : CD4066_DIP(name)
 #define CD4066_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4066_DIP, __VA_ARGS__)
+
+// usage       : CD4016_DIP(name)
+#define CD4016_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD4016_DIP, __VA_ARGS__)
 
 // usage       : CD4316_DIP(name)
 #define CD4316_DIP(...)                                                \
@@ -1308,7 +1318,7 @@
 	NET_REGISTER_DEVEXT(CD4538_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/macro/nlm_opamp.cpp
+// Source: parser: OPAMP_lib
 // ---------------------------------------------------------------------
 // usage       : opamp_layout_4_4_11(name)
 #define opamp_layout_4_4_11(...)                                       \
@@ -1383,12 +1393,15 @@
 	NET_REGISTER_DEVEXT(LM3900, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/macro/nlm_other.cpp
+// Source: otheric_lib
 // ---------------------------------------------------------------------
 // usage       : MC14584B_GATE(name)
 #define MC14584B_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(MC14584B_GATE, __VA_ARGS__)
 
+// ---------------------------------------------------------------------
+// Source: parser: otheric_lib
+// ---------------------------------------------------------------------
 // usage       : MC14584B_DIP(name)
 #define MC14584B_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(MC14584B_DIP, __VA_ARGS__)
@@ -1398,7 +1411,7 @@
 	NET_REGISTER_DEVEXT(NE566_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/macro/nlm_roms.cpp
+// Source: parser: ROMS_lib
 // ---------------------------------------------------------------------
 // usage       : PROM_82S123_DIP(name)
 #define PROM_82S123_DIP(...)                                           \

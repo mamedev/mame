@@ -733,9 +733,8 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 		return iter_proxy->second;
 
 	log().debug("connect_terminal_input: connecting proxy\n");
-	pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
-	auto new_proxy = incast.logic_family()->create_a_d_proxy(m_nlstate, x, &incast);
-	//auto new_proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
+	auto new_proxy = incast.logic_family()->create_a_d_proxy(m_nlstate,
+		plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt), &incast);
 
 	auto *ret(new_proxy.get());
 
@@ -748,20 +747,25 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 
 	if (inp.has_net())
 	{
-		for (auto & p : inp.net().core_terms())
+		for (detail::core_terminal_t * p : inp.net().core_terms())
 		{
-			p->clear_net(); // de-link from all nets ...
-			if (!connect(ret->proxy_term(), *p))
+			// inp may already belongs to the logic net. Thus skip it here.
+			// It will be removed by the clear further down.
+			if (p != &inp)
 			{
-				log().fatal(MF_CONNECTING_1_TO_2(
-						ret->proxy_term().name(), (*p).name()));
-				throw nl_exception(MF_CONNECTING_1_TO_2(
-						ret->proxy_term().name(), (*p).name()));
-
+				p->clear_net(); // de-link from all nets ...
+				if (!connect(ret->proxy_term(), *p))
+				{
+					log().fatal(MF_CONNECTING_1_TO_2(
+							ret->proxy_term().name(), (*p).name()));
+					throw nl_exception(MF_CONNECTING_1_TO_2(
+							ret->proxy_term().name(), (*p).name()));
+				}
 			}
 		}
 		inp.net().core_terms().clear(); // clear the list
 	}
+	inp.clear_net();
 	add_terminal(ret->out().net(), inp);
 	m_nlstate.register_device(new_proxy->name(), std::move(new_proxy));
 	return ret;
@@ -1012,7 +1016,9 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 		ret = connect_input_input(t1, t2);
 	}
 	else
+	{
 		ret = false;
+	}
 	return ret;
 }
 
