@@ -31,12 +31,18 @@ public:
 		, m_rambase(*this, "rambase")
 		, m_inputs(*this, "INPUTS")
 		, m_switches(*this, "SWITCHES")
-		, m_gear_input(*this, "GEAR")
 		, m_wheel(*this, "WHEEL")
 		, m_analog_x(*this, "ANALOGX")
 		, m_analog_y(*this, "ANALOGY")
 		, m_led(*this, "led")
 		, m_pressed(*this, "pressed%u", 0U)
+		, m_coin_detected(0)
+		, m_coin_last_reset(0)
+		, m_mux_select(0)
+		, m_gear(0)
+		, m_vector_color(255, 255, 255)
+		, m_lastx(0)
+		, m_lasty(0)
 	{ }
 
 	required_device<ccpu_cpu_device> m_maincpu;
@@ -44,11 +50,10 @@ public:
 	required_device<ls259_device> m_outlatch;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
-	optional_shared_ptr<uint16_t> m_rambase;
+	optional_shared_ptr<s16> m_rambase;
 
 	required_ioport m_inputs;
 	required_ioport m_switches;
-	optional_ioport m_gear_input;
 	optional_ioport m_wheel;
 	optional_ioport m_analog_x;
 	optional_ioport m_analog_y;
@@ -56,27 +61,27 @@ public:
 	output_finder<> m_led;
 	output_finder<10> m_pressed;
 
-	uint8_t m_coin_detected;
-	uint8_t m_coin_last_reset;
-	uint8_t m_mux_select;
-	int m_gear;
+	u8 m_coin_detected;
+	u8 m_coin_last_reset;
+	u8 m_mux_select;
+	u8 m_gear;
 	rgb_t m_vector_color;
-	int16_t m_lastx;
-	int16_t m_lasty;
-	uint8_t inputs_r(offs_t offset);
-	uint8_t switches_r(offs_t offset);
-	uint8_t coin_input_r();
+	s16 m_lastx;
+	s16 m_lasty;
+	u8 inputs_r(offs_t offset);
+	u8 switches_r(offs_t offset);
+	u8 coin_input_r();
 	WRITE_LINE_MEMBER(coin_reset_w);
 	WRITE_LINE_MEMBER(mux_select_w);
-	uint8_t speedfrk_wheel_r(offs_t offset);
-	uint8_t speedfrk_gear_r(offs_t offset);
+	u8 speedfrk_wheel_r(offs_t offset);
+	u8 speedfrk_gear_r(offs_t offset);
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
-	uint8_t joystick_read();
+	u8 joystick_read();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
-	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
+	u32 screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void cinemat_vector_callback(s16 sx, s16 sy, s16 ex, s16 ey, u8 shift);
 	void ripoff(machine_config &config);
 	void wotw(machine_config &config);
 	void speedfrk(machine_config &config);
@@ -87,6 +92,18 @@ public:
 	void starhawk(machine_config &config);
 	void barrier(machine_config &config);
 	void armora(machine_config &config);
+
+	template<int _N>
+	DECLARE_WRITE_LINE_MEMBER(speedfrk_gear_change_w)
+	{
+		if (state)
+			m_gear = _N;
+	}
+
+	ioport_value speedfrk_gear_number_r()
+	{
+		return m_gear;
+	}
 
 protected:
 	virtual void machine_start() override;
@@ -121,7 +138,7 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	uint8_t sundance_inputs_r(offs_t offset);
+	u8 sundance_inputs_r(offs_t offset);
 };
 
 
@@ -151,7 +168,7 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	uint8_t boxingb_dial_r(offs_t offset);
+	u8 boxingb_dial_r(offs_t offset);
 };
 
 
@@ -165,10 +182,10 @@ public:
 protected:
 	TIMER_CALLBACK_MEMBER(synced_sound_w);
 	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
-	uint8_t sound_porta_r();
-	uint8_t sound_portb_r();
-	void sound_portb_w(uint8_t data);
-	void sound_output_w(uint8_t data);
+	u8 sound_porta_r();
+	u8 sound_portb_r();
+	void sound_portb_w(u8 data);
+	void sound_output_w(u8 data);
 
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
@@ -179,10 +196,10 @@ protected:
 	void demon_sound_ports(address_map &map);
 
 private:
-	uint8_t m_sound_fifo[16];
-	uint8_t m_sound_fifo_in;
-	uint8_t m_sound_fifo_out;
-	uint8_t m_last_portb_write;
+	u8 m_sound_fifo[16];
+	u8 m_sound_fifo_in;
+	u8 m_sound_fifo_out;
+	u8 m_last_portb_write;
 };
 
 
@@ -197,9 +214,9 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	uint8_t qb3_frame_r();
-	void qb3_ram_bank_w(uint8_t data);
-	void qb3_sound_fifo_w(uint8_t data);
+	u8 qb3_frame_r();
+	void qb3_ram_bank_w(u8 data);
+	void qb3_sound_fifo_w(u8 data);
 
 	virtual void sound_reset() override;
 
