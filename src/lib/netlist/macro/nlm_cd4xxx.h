@@ -13,6 +13,7 @@
  *
  * CD4001_NOR : single gate
  * CD4001_DIP : dip package
+ * CD4013_DIP : dip package (device model in core)
  * CD4020_DIP : dip package (device model in core)
  * CD4024_DIP : dip package (device model in core)
  * CD4016_DIP : dip package (device model in core)
@@ -56,6 +57,9 @@
 /* ----------------------------------------------------------------------------
  *  DIP only macros
  * ---------------------------------------------------------------------------*/
+
+#define CD4013_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4013_DIP, name)
 
 #define CD4020_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4020_DIP, name)
