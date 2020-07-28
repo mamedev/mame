@@ -55,6 +55,7 @@ Supported games:
     kingdmgp    RA-MA9402-03  Raizing/8ing  Kingdom Grandprix
     shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen (Japan)
     bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
+    bgareggap   RA9503        Raizing/8ing  Battle Garegga (Prototype - Wed Jan 17 1996)
     bgareggahk  RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
     bgareggatw  RA9503        Raizing/8ing  Battle Garegga (Taiwan (and Germany?) - Thu Feb 1 1996)
     bgaregganv  RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
@@ -4004,7 +4005,7 @@ void toaplan2_state::bgaregga(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.68);
+	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH);
 	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
@@ -4071,7 +4072,7 @@ void toaplan2_state::batrider(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch3");
 	GENERIC_LATCH_8(config, "soundlatch4");
 
-	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.68); // 4MHz, 32MHz Oscillator (verified)
+	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5); // 4MHz, 32MHz Oscillator (verified)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
 	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
@@ -5024,6 +5025,54 @@ ROM_START( shippumd )
 	ROM_LOAD( "ma02rom6.bin", 0x00000, 0x80000, CRC(199e7cae) SHA1(0f5e13cc8ec42c80bb4bbff90aba29cdb15213d4) )
 ROM_END
 
+ROM_START( bgareggap )
+	/* Dumped from a location test board, with some minor changes compared to the final.
+	* All ROMs are socketed
+	* All PAL/GALs are socketed
+	* PLDs at U33, U125 are PALCE16V8H/4 instead of GAL16V8B as usual (no functional impact)
+	* JP4 features four DIP switches, instead of two DIPs + two jumpers as in the final.
+
+	The date codes are written referencing Heisei year 8 (1996).
+
+	The program ROMs feature hand-written labels formatted like this:
+	BATTLE GAREGGA
+	     PRG 0
+	    8.1.17.
+	*/
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_BYTE( "battlegaregga-prg0-8-1-17.bin", 0x000000, 0x080000, CRC(c032176f) SHA1(799ba0424489361dd2f814afaf841326bc23300c) )
+	ROM_LOAD16_BYTE( "battlegaregga-prg1-8-1-17.bin", 0x000001, 0x080000, CRC(3822f375) SHA1(a5a84cf48c86d8ac97f401280667658d7f451896) )
+
+	/* Hand-written label that reads
+	BATTLE GAREGGA
+	      SND
+	8.1.18. ロケVer.
+	*/
+	ROM_REGION( 0x20000, "audiocpu", 0 )            /* Sound Z80 code + bank */
+	ROM_LOAD( "battlegaregga-snd-8-1-18-loke-ver.bin", 0x00000, 0x20000, CRC(f5ea56f7) SHA1(9db04069b378dbad6626fd29d3762e3361b9aa0d) )
+
+	/* Stored on NEC ES23C16000W Mask ROMs with no Raizing/8ing custom markings.*/
+	ROM_REGION( 0x800000, "gp9001_0", 0 )
+	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
+	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
+	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
+	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
+
+	/* Hand-written label that reads
+	BATTLE GAREGGA
+	     TEXT
+	8.1.17. 8AA6
+
+	8AA6 is the checksum of the text ROM, which matches release.
+	*/
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	/* Stored on an NEC ES23C8001EJ Mask ROM with no Raizing/8ing custom markings.*/
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+
+ROM_END
 
 ROM_START( bgaregga )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* Main 68K code */
@@ -5691,6 +5740,7 @@ GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   toaplan2_state, empty
 GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   toaplan2_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggap,   bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Prototype) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
