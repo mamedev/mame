@@ -18,6 +18,7 @@ Language:
 ********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
 ********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
 ********7 = Spain             (Green labels on back)
+********8 = China
 *******13 = Denmark           Distributed by the company 'Top Toy A/S'
 *******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
@@ -34,6 +35,7 @@ Language:
 |   XX   | 80-084005(FR)     | Sporti'Folies                                                                             |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                                              |
 |   XX   | 80-084007(SP)     | Action Manía                                                                              |
+|        | 80-084008(CN)     | 英语运动园                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   **   | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version, same ROM as 80-084020(US))    |
@@ -90,6 +92,7 @@ Language:
 |   XX   | 80-084185-005(FR) | La Maison de Mickey                                                                       |
 |        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
 |   XX   | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
+|        | 80-084188(CN)     | 米奇妙妙屋                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar                                                       |
 +========+===================+===========================================================================================+
@@ -121,6 +124,7 @@ Language:
 |   XX   | 80-084305(FR)     | Football Challenge                                                                        |
 |        | 80-084306(PT)     | Football Challenge  (cart#??)                                                             |
 |        | 80-084307(SP)     | Campeonato de Fútbol                                                                      |
+|        | 80-084308(CN)     | 欢乐足球                                                                                   |
 +========+===================+===========================================================================================+
 |        | 80-084320(US)     | Disney Fairies: TinkerBell                                                                |
 |        | 80-084321(US)     | Disney Fairies: TinkerBell (pocket version)                                               |
