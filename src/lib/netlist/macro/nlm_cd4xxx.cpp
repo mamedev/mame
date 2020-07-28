@@ -39,6 +39,45 @@ static NETLIST_START(CD4001_DIP)
 
 NETLIST_END()
 
+/*  CD4011: Quad 2-Input NAND Gates
+ *
+ *        +--------------+
+ *      A |1     ++    14| VDD
+ *      B |2           13| H
+ *      J |3           12| G
+ *      K |4    4011   11| M
+ *      C |5           10| L
+ *      D |6            9| F
+ *    VSS |7            8| E
+ *        +--------------+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ *  FIXME: Timing depends on VDD-VSS
+ *         This needs a cmos d-a/a-d proxy implementation.
+ */
+
+static NETLIST_START(CD4011_DIP)
+	CD4011_GATE(A)
+	CD4011_GATE(B)
+	CD4011_GATE(C)
+	CD4011_GATE(D)
+
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*     A |1     ++    14| VDD  */ A.VDD,
+		A.B,  /*     B |2           13| H    */ D.B,
+		A.Q,  /*     J |3           12| G    */ D.A,
+		B.Q,  /*     K |4    4011   11| M    */ D.Q,
+		B.A,  /*     C |5           10| L    */ C.Q,
+		B.B,  /*     D |6            9| F    */ C.B,
+		A.VSS,/*   VSS |7            8| E    */ C.A
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
 /*  CD4020: 14-Stage Ripple Carry Binary Counters
  *
  *          +--------------+
@@ -76,6 +115,91 @@ static NETLIST_START(CD4020_DIP)
 		 * IP = (Input pulses)
 		 */
 
+NETLIST_END()
+
+/*  CD4024: 7-Stage Ripple Carry Binary Counters
+ *
+ *          +--------------+
+ *       IP |1     ++    14| VDD
+ *    RESET |2           13| NC
+ *       Q7 |3           12| Q1
+ *       Q6 |4    4024   11| Q2
+ *       Q5 |5           10| NC
+ *       Q4 |6            9| Q3
+ *      VSS |7            8| NC
+ *          +--------------+
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  FIXME: Timing depends on VDD-VSS
+ *         This needs a cmos d-a/a-d proxy implementation.
+ */
+
+static NETLIST_START(CD4024_DIP)
+
+	CD4024(s1)
+	NC_PIN(NC)
+
+	DIPPINS(      /*       +--------------+       */
+		   s1.IP, /*     IP |1     ++    14| VDD  */ s1.VDD,
+		s1.RESET, /*  RESET |2           13| NC   */ NC.I,
+		   s1.Q7, /*     Q7 |3           12| Q1   */ s1.Q1,
+		   s1.Q6, /*     Q6 |4    4024   11| Q2   */ s1.Q2,
+		   s1.Q5, /*     Q5 |5           10| NC   */ NC.I,
+		   s1.Q4, /*     Q4 |6            9| Q3   */ s1.Q3,
+		  s1.VSS, /*    VSS |7            8| NC   */ NC.I
+				  /*       +--------------+       */
+	)
+		/*
+		 * IP = (Input pulses)
+		 */
+
+NETLIST_END()
+
+/*  CD4053: Triple 2-Channel Analog Multiplexer/Demultiplexer
+ *
+ *          +--------------+
+ *  INOUTBY |1     ++    16| VDD
+ *  INOUTBX |2           15| OUTINB
+ *  INOUTCY |3           14| OUTINA
+ *   OUTINC |4    4053   13| INOUTAY
+ *  INOUTCX |5           12| INOUTAX
+ *      INH |6           11| A
+ *      VEE |7           10| B
+ *      VSS |8            9| C
+ *          +--------------+
+ *
+ *  FIXME: These devices are slow (~125 ns). THis is currently not reflected
+ *
+ *  Naming conventions follow National semiconductor datasheet
+ *
+ */
+
+static NETLIST_START(CD4053_DIP)
+	CD4053_GATE(A)
+	CD4053_GATE(B)
+	CD4053_GATE(C)
+
+	NET_C(A.VEE, B.VEE, C.VEE)
+	NET_C(A.VDD, B.VDD, C.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS)
+	NET_C(A.INH, B.INH, C.INH)
+
+	PARAM(A.BASER, 270.0)
+	PARAM(B.BASER, 270.0)
+	PARAM(C.BASER, 270.0)
+
+	DIPPINS(    /*          +--------------+          */
+		B.Y,    /*  INOUTBY |1     ++    16| VDD      */ A.VDD,
+		B.X,    /*  INOUTBX |2           15| OUTINB   */ B.XY,
+		C.Y,    /*  INOUTCY |3           14| OUTINA   */ A.XY,
+		C.XY,   /*   OUTINC |4    4053   13| INOUTAY  */ A.Y,
+		C.X,    /*  INOUTCX |5           12| INOUTAX  */ A.X,
+		A.INH,  /*      INH |6           11| A        */ A.S,
+		A.VEE,  /*      VEE |7           10| B        */ B.S,
+		A.VSS,  /*      VSS |8            9| C        */ C.S
+				/*          +--------------+          */
+	)
 NETLIST_END()
 
 /*  CD4066: Quad Bilateral Switch
@@ -171,7 +295,7 @@ static NETLIST_START(CD4069_DIP)
 	CD4069_GATE(E)
 	CD4069_GATE(F)
 
-	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, E.VDD)
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, F.VDD)
 	NET_C(A.VSS, B.VSS, C.VSS, D.VSS, E.VSS, F.VSS)
 
 	DIPPINS(  /*       +--------------+      */
@@ -318,6 +442,14 @@ NETLIST_START(CD4XXX_lib)
 		TT_FAMILY("CD4XXX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(CD4011_GATE, 2, 1, "")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,X|1|100")
+		TT_LINE("X,0|1|100")
+		TT_LINE("1,1|0|100")
+		TT_FAMILY("CDXXXX")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(CD4069_GATE, 1, 1, "")
 		TT_HEAD("A|Q ")
 		TT_LINE("0|1|55")
@@ -335,12 +467,15 @@ NETLIST_START(CD4XXX_lib)
 	TRUTHTABLE_END()
 
 	LOCAL_LIB_ENTRY(CD4001_DIP)
+	LOCAL_LIB_ENTRY(CD4011_DIP)
 	LOCAL_LIB_ENTRY(CD4069_DIP)
 	LOCAL_LIB_ENTRY(CD4070_DIP)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4020_DIP)
+	LOCAL_LIB_ENTRY(CD4024_DIP)
 	LOCAL_LIB_ENTRY(CD4016_DIP)
+	LOCAL_LIB_ENTRY(CD4053_DIP)
 	LOCAL_LIB_ENTRY(CD4066_DIP)
 	LOCAL_LIB_ENTRY(CD4316_DIP)
 	LOCAL_LIB_ENTRY(CD4538_DIP)

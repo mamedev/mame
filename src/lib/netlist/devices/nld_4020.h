@@ -17,6 +17,19 @@
  *          +--------------+
  *
  *
+ *  CD4024: 7-Stage Ripple Carry Binary Counters
+ *
+ *          +--------------+
+ *       IP |1     ++    14| VDD
+ *    RESET |2           13| NC
+ *       Q7 |3           12| Q1
+ *       Q6 |4    4024   11| Q2
+ *       Q5 |5           10| NC
+ *       Q4 |6            9| Q3
+ *      VSS |7            8| NC
+ *          +--------------+
+ *
+ *
  *  Naming conventions follow Texas Instruments datasheet
  *
  *  FIXME: Timing depends on VDD-VSS
@@ -39,5 +52,8 @@
 
 #define CD4020(name)                                                            \
 		NET_REGISTER_DEV(CD4020, name)
+
+#define CD4024(name)                                                            \
+		NET_REGISTER_DEV(CD4024, name)
 
 #endif /* NLD_4020_H_ */
