@@ -1588,7 +1588,7 @@ ROM_END
 ROM_START( lxcmcypp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
-	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(116e8847) SHA1(0012df193c52fd48595d85886fd431619c5d5e3e) )	
+	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )	
 ROM_END
 
 ROM_START( lxcmc250 )
