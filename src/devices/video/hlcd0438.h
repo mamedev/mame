@@ -24,7 +24,7 @@
     SEG 28  7 |           | 34 DATA IN
     SEG 27  8 |           | 33 SEG 4
     SEG 26  9 |           | 32 SEG 5
-    SEG 25 10 | HLCD 0438 | 31 LCD phi
+    SEG 25 10 | HLCD 0438 | 31 LCD
     SEG 24 11 |           | 30 BP
     SEG 23 12 |           | 29 SEG 6
     SEG 22 13 |           | 28 SEG 7
@@ -45,29 +45,33 @@ public:
 	hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	auto write_segs() { return m_write_segs.bind(); } // SEG pins
+	auto write_segs() { return m_write_segs.bind(); } // BP pin in offset, SEG pins in data
 	auto write_data() { return m_write_data.bind(); } // DATA OUT pin
 	hlcd0438_device &set_load(int state) { m_load = state ? 1 : 0; return *this; } // if hardwired, can just set LOAD pin state here
 
 	void data_w(int state) { m_data_in = state ? 1 : 0; }
 	int data_r() { return m_data_out; }
-	void load_w(int state) { m_load = state ? 1 : 0; update_output(); }
 	void clock_w(int state);
+	void load_w(int state);
+	void lcd_w(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override { lcd_w(!m_lcd); }
 
 private:
+	emu_timer *m_lcd_timer;
+
 	// pin state
 	int m_data_in = 0;
 	int m_data_out = 0;
 	int m_clk = 0;
 	int m_load = 0;
+	int m_lcd = 0;
 
 	u32 m_shift = 0;
-
-	void update_output();
+	u32 m_latch = 0;
 
 	devcb_write32 m_write_segs;
 	devcb_write_line m_write_data;

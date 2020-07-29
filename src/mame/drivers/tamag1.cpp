@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:digshadow, segher
 /***************************************************************************
 
   Bandai Tamagotchi generation 1 hardware
