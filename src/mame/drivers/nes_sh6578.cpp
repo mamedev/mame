@@ -35,9 +35,9 @@ class nes_sh6578_state : public driver_device
 public:
 	nes_sh6578_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
+		m_bank(*this, "cartbank"),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu"),
-		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
 		m_screen(*this, "screen"),
 		m_apu(*this, "nesapu"),
@@ -57,10 +57,14 @@ protected:
 
 	void sprite_dma_w(address_space &space, uint8_t data);
 
+	virtual void io_w(uint8_t data);
+	virtual void extio_w(uint8_t data);
+	bool m_isbanked;
+	required_memory_bank m_bank;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu_sh6578_device> m_ppu;
-	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<screen_device> m_screen;
 	required_device<nesapu_device> m_apu;
@@ -101,7 +105,6 @@ private:
 
 	uint8_t io0_r();
 	uint8_t io1_r();
-	void io_w(uint8_t data);
 
 	uint8_t psg1_4014_r();
 	uint8_t psg1_4015_r();
@@ -138,11 +141,31 @@ private:
 	// this might be game specific
 	uint8_t m_previo;
 	uint8_t m_iolatch[2];
-	bool m_isbanked;
 	required_ioport_array<2> m_in;
 };
 
+class nes_sh6578_abl_wikid_state : public nes_sh6578_state
+{
+public:
+	nes_sh6578_abl_wikid_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_sh6578_state(mconfig, type, tag)
+	{ }
 
+protected:
+	virtual void io_w(uint8_t data) override;
+};
+
+class nes_sh6578_max10in1_state : public nes_sh6578_state
+{
+public:
+	nes_sh6578_max10in1_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_sh6578_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void extio_w(uint8_t data) override;
+	virtual void machine_reset() override;
+};
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
 {
@@ -400,13 +423,33 @@ void nes_sh6578_state::io_w(uint8_t data)
 		}
 	}
 
+	m_previo = data;
+}
+
+void nes_sh6578_abl_wikid_state::io_w(uint8_t data)
+{
+	nes_sh6578_state::io_w(data);
+	
 	if (m_isbanked)
 	{
 		m_bank->set_entry((data>>1)&1);
 	}
-
-	m_previo = data;
 }
+
+void nes_sh6578_state::extio_w(uint8_t data)
+{
+	logerror("%s: extio_w : %02x\n", machine().describe_context(), data);
+}
+
+void nes_sh6578_max10in1_state::extio_w(uint8_t data)
+{
+	logerror("%s: extio_w : %02x (max10in1)\n", machine().describe_context(), data);
+
+	m_bank->set_entry((data & 0x80) >> 7);
+}
+
+
+
 
 
 uint8_t nes_sh6578_state::psg1_4014_r()
@@ -456,6 +499,13 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	map(0x4017, 0x4017).rw(FUNC(nes_sh6578_state::io1_r), FUNC(nes_sh6578_state::psg1_4017_w));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
+	//4021 write keyboard output port
+	//4022 read/write keyboard data control
+	//4023 read/write joystick,mouse control
+	//4024 read - mouse port / write - mouse baud
+	//4025 write - Printer Port
+	map(0x4026, 0x4026).w(FUNC(nes_sh6578_state::extio_w));
+	//4027 read/write - DAC data register
 
 	map(0x4031, 0x4031).w(FUNC(nes_sh6578_state::initial_startup_w));
 	map(0x4032, 0x4032).w(FUNC(nes_sh6578_state::irq_mask_w));
@@ -510,6 +560,12 @@ void nes_sh6578_state::machine_reset()
 
 	m_irqmask = 0xff;
 	m_timerval = 0x00;
+}
+
+void nes_sh6578_max10in1_state::machine_reset()
+{
+	nes_sh6578_state::machine_reset();
+	m_bank->set_entry(1);
 }
 
 void nes_sh6578_state::machine_start()
@@ -653,6 +709,11 @@ ROM_START( maxx6in1 )
 	ROM_LOAD( "maxx6in1.bin", 0x00000, 0x100000, CRC(8e582298) SHA1(89892b9095dbd5101cdf2477a66abd2cb11ad8c8) )
 ROM_END
 
+ROM_START( max10in1 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "csmaxxcasino10.bin", 0x000000, 0x200000, CRC(2a05e9af) SHA1(fcf591c22ce8773f72e9d0fa0bae545f6a82a063) )
+ROM_END
+
 CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
 CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
@@ -662,8 +723,10 @@ CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
 // ROM is banked
-CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
+CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
 
 CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
 
 CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)
+
+CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,  init_nes_sh6578, "Senario", "Vs Maxx 10-in-1 Casino / Senario Card & Casino Games", 0 )
