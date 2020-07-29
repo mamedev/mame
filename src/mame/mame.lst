@@ -10347,6 +10347,9 @@ wildplt                         // (c) 1992 Jaleco
 @source:cit101.cpp
 cit101                          // (c) 1980 C. Itoh
 
+@source:cit101xl.cpp
+cit101xl                        //
+
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
 vp122                           //

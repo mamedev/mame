@@ -2036,6 +2036,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cit101.cpp",
 	MAME_DIR .. "src/mame/machine/cit101_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/cit101_kbd.h",
+	MAME_DIR .. "src/mame/drivers/cit101xl.cpp",
 	MAME_DIR .. "src/mame/drivers/cit220.cpp",
 	MAME_DIR .. "src/mame/machine/cit220_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/cit220_kbd.h",
