@@ -12,9 +12,7 @@ This is their 1st original product. MK II was licensed from Peter Jennings, and
 MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
 with support from David Levy.
 
-Hardware notes:
-
-Master Unit:
+Hardware notes (Master Unit):
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
@@ -54,8 +52,6 @@ TODO:
   Should be doable to add, but 6522 device doesn't support live clock changes.
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
-- chess unit screen briefly shows glitches when the subcpu receives an NMI in the
-  middle of updating the LCD, BTANB?
 - add chessboard screen to artwork
 - dump/add printer unit
 - dump/add ssystem3 1980 program revision, were the BTANB fixed?
@@ -67,6 +63,8 @@ BTANB (ssystem3):
   lessen the chance by adding a spring to the switch.
 - Similar to the TIME switch bug, pressing 2 buttons simultaneously can cause it
   to malfunction, eg. press A+CE or C+CE and an "8" appears in the display.
+- chess unit screen briefly flickers at power-on and when the subcpu receives an
+  NMI in the middle of updating the LCD, it is mentioned in the manual
 
 ******************************************************************************/
 
@@ -509,7 +507,8 @@ void ssystem3_state::ssystem3(machine_config &config)
 	m_pia->readpa_handler().set(FUNC(ssystem3_state::cu_pia_a_r));
 	m_pia->writepb_handler().set(FUNC(ssystem3_state::cu_pia_b_w));
 	m_pia->readpb_handler().set(FUNC(ssystem3_state::cu_pia_b_r));
-	m_pia->cb2_handler().set(m_pia, FUNC(pia6821_device::ca2_w));
+	m_pia->cb2_handler().set(m_pia, FUNC(pia6821_device::cb1_w));
+	m_pia->cb2_handler().append(m_pia, FUNC(pia6821_device::ca2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -527,7 +526,6 @@ void ssystem3_state::ssystem3(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display[1]).set_size(8, 48);
-	m_display[1]->set_refresh(attotime::from_hz(30));
 	m_display[1]->output_x().set(FUNC(ssystem3_state::lcd2_pwm_w));
 
 	m_display[0]->set_segmask(0xf, 0x7f); // 7segs are at expected positions
