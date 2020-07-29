@@ -14798,6 +14798,7 @@ smartfps
 gormiti
 tkmag220                        //
 myac220
+imgame
 
 @source:generalplus_gpl16250_romram.cpp
 paccon
@@ -32067,6 +32068,7 @@ ts_handy11
 ablwikid
 maxx5in1
 maxx6in1
+max10in1
 
 @source:nes_vt.cpp
 vdogdeme
@@ -37998,6 +38000,8 @@ pballpup
 swclone
 dreamlss
 senspeed
+ordentv
+wfcentro
 
 @source:spg2xx_digimake.cpp
 rad_digi
@@ -38127,6 +38131,7 @@ react
 
 @source:spg2xx_zone_32bit.cpp
 mywicodx                        //
+mywicogt
 zon32bit                        // Zone 32-bit
 oplayer
 dnv200fs

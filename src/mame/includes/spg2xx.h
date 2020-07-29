@@ -275,4 +275,43 @@ private:
 };
 
 
+
+class spg2xx_game_wfcentro_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_wfcentro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void wfcentro(machine_config &config);
+
+protected:
+//	virtual void machine_start() override;
+//	virtual void machine_reset() override;
+
+//	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+private:
+
+	void mem_map_wfcentro(address_map& map);
+};
+
+class spg2xx_game_ordentv_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_ordentv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void ordentv(machine_config &config);
+
+	void init_ordentv();
+
+protected:
+
+	uint16_t ordentv_portc_r(offs_t offset, uint16_t mem_mask = ~0);
+private:
+};
+
+
 #endif // MAME_INCLUDES_SPG2XX_H

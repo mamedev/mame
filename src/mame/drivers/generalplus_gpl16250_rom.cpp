@@ -400,6 +400,14 @@ ROM_START( tkmag220 )
 ROM_END
 
 
+ROM_START( imgame )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // the 2nd half of this ROM required multiple attempts to get a matching dump, so could be suspect, might also be unused as this only has 120 games
+	ROM_LOAD16_WORD_SWAP( "imgame.bin", 0x0000000, 0x8000000, CRC(6fba9021) SHA1(852f4c0aaed682aa8ff5b8cd52313ea2d3d920a1))
+ROM_END
+
 ROM_START( myac220 )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -473,6 +481,10 @@ CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
 CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// 2012 date from manual
+CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
