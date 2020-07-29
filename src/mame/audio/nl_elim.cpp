@@ -39,6 +39,7 @@
 // Hacks
 //
 
+#define ADD_CLIPPING_DIODES (1)
 #define DISABLE_TORPEDO2_NOISE (1)
 
 
@@ -892,6 +893,13 @@ NETLIST_START(zektor)
 	NET_C(U28.10, R120.1, U19.6)
 	NET_C(R120.2, I_V12)
 	NET_C(U19.5, R116.1, C51.1)
+#if (ADD_CLIPPING_DIODES)
+	// fast retriggering relies on clipping diodes which
+	// aren't implemented by default for speed
+	D_1N914(D_EXPLOSION_1)
+	NET_C(D_EXPLOSION_1.A, U19.5)
+	NET_C(D_EXPLOSION_1.K, I_V12)
+#endif
 	NET_C(R116.2, I_V12)
 	NET_C(C51.2, U19.3)
 	NET_C(U19.4, U19.1, U19.2, R87.1)
@@ -920,6 +928,13 @@ NETLIST_START(zektor)
 	NET_C(U28.8, R119.1, U19.8)
 	NET_C(R119.2, I_V12)
 	NET_C(U19.9, R117.1, C52.1)
+#if (ADD_CLIPPING_DIODES)
+	// fast retriggering relies on clipping diodes which
+	// aren't implemented by default for speed
+	D_1N914(D_EXPLOSION_2)
+	NET_C(D_EXPLOSION_2.A, U19.9)
+	NET_C(D_EXPLOSION_2.K, I_V12)
+#endif
 	NET_C(R117.2, I_V12)
 	NET_C(C52.2, U19.11)
 	NET_C(U19.10, U19.12, U19.13, R88.1)
@@ -947,6 +962,13 @@ NETLIST_START(zektor)
 	NET_C(U28.6, R118.1, U18.8)
 	NET_C(R118.2, I_V12)
 	NET_C(U18.9, R115.1, C50.1)
+#if (ADD_CLIPPING_DIODES)
+	// fast retriggering relies on clipping diodes which
+	// aren't implemented by default for speed
+	D_1N914(D_EXPLOSION_3)
+	NET_C(D_EXPLOSION_3.A, U18.9)
+	NET_C(D_EXPLOSION_3.K, I_V12)
+#endif
 	NET_C(R115.2, I_V12)
 	NET_C(C50.2, U18.11)
 	NET_C(U18.10, U18.12, U18.13, R86.1)
@@ -973,6 +995,13 @@ NETLIST_START(zektor)
 	NET_C(U28.12, R111.1, U18.6)
 	NET_C(R111.2, I_V12)
 	NET_C(U18.5, R112.1, C49.1)
+#if (ADD_CLIPPING_DIODES)
+	// fast retriggering relies on clipping diodes which
+	// aren't implemented by default for speed
+	D_1N914(D_FIREBALL)
+	NET_C(D_FIREBALL.A, U18.5)
+	NET_C(D_FIREBALL.K, I_V12)
+#endif
 	NET_C(R112.2, I_V12)
 	NET_C(C49.2, U18.3)
 	NET_C(U18.4, U18.1, U18.2, R85.1)
@@ -1020,13 +1049,13 @@ NETLIST_START(zektor)
 	NET_C(U27.8, R125.1, U22.8)
 	NET_C(R125.2, I_V12)
 	NET_C(U22.9, R124.1, C55.1)
-
-	// Torpedo retriggering relies on clipping diodes which
+#if (ADD_CLIPPING_DIODES)
+	// fast retriggering relies on clipping diodes which
 	// aren't implemented by default for speed
-	D_1N914(DT1)
-	NET_C(DT1.A, U22.9)
-	NET_C(DT1.K, I_V12)
-
+	D_1N914(D_TORPEDO_1)
+	NET_C(D_TORPEDO_1.A, U22.9)
+	NET_C(D_TORPEDO_1.K, I_V12)
+#endif
 	NET_C(R124.2, I_V12)
 	NET_C(C55.2, U22.11, U23.2)
 	NET_C(U22.10, U22.12, U22.13, D4.K)
@@ -1116,13 +1145,13 @@ NETLIST_START(zektor)
 	NET_C(U27.10, R123.1, U22.6)
 	NET_C(R123.2, I_V12)
 	NET_C(U22.5, R121.1, C54.1)
-
-	// Torpedo retriggering relies on clipping diodes which
+#if (ADD_CLIPPING_DIODES)
+	// fast retriggering relies on clipping diodes which
 	// aren't implemented by default for speed
-	D_1N914(DT2)
-	NET_C(DT2.A, U22.5)
-	NET_C(DT2.K, I_V12)
-
+	D_1N914(D_TORPEDO_2)
+	NET_C(D_TORPEDO_2.A, U22.5)
+	NET_C(D_TORPEDO_2.K, I_V12)
+#endif
 	NET_C(R121.2, I_V12)
 	NET_C(C54.2, U22.3, U21.2)
 	NET_C(U21.12, R98.1)
