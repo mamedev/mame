@@ -486,14 +486,31 @@
   2 or 3 deals per hand. It's running in a ICP-1 PCB.
 
   Entering the service mode (key 0), you can enter to a submenu for settings pressing
-  DEAL (key 2). Use HOLD keys (keys ZXCVB) to navigate through the menu and change
+  DEAL (key 2):
+  
+	Win Limit (0-9 the first time, then 3-9)
+	Payout Limit (0-2)
+	Double Odds % (0-9)
+	Payout % (0-9)
+	Hard Setting (0-4)
+	Note Value (fixed in 5)
+
+	Bonus (0 to 10000, step x100)
+	(if you rech 10000, settings exits and go to game. You can't change bonus anymore.
+
+  Use HOLD keys (keys ZXCVB) to navigate through the menu and change
   the values. Press CANCEL to exit the settings menu.
+
+  ** NOTE **
+  2-3 deals, turbo mode, bonus and royal flush could be set through DIP switches.
+
 
   Program is currently not working because seems to fill some zeropage registers and
   check for existent values and changes... Maybe an external device is writting them.
   This is NVRAM zone, so some values could be previously harcoded.
 
-  Also seems to expect some inputs combination entered to boot.
+  Also seems to manipulate the stack pointer expecting different values, and some inputs
+  combination entered to boot.
 
   To run...
   1) Start the game.
@@ -513,6 +530,13 @@
 
   Forcing the first time the comparation at $CF9D --> true, the game boots and is
   fully working.
+
+
+  For now will patch the dead end to get it working.
+  e9f4: jmp $ea56 ---> death
+  e9f7: jmp $cec6 ---> works
+
+  The game needs ~25 seconds to check all the things to start.
 
 
 ************************************************************************************
@@ -1356,6 +1380,7 @@ public:
 	void init_vkdlswwv();
 	void init_bchancep();
 	void init_bonuspkr();
+	void init_super98();
 
 	uint8_t pottnpkr_mux_port_r();
 	void lamps_a_w(uint8_t data);
@@ -4158,10 +4183,10 @@ static INPUT_PORTS_START( super98 )
 	PORT_DIPNAME( 0x20, 0x00, "Turbo" )
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Bonus" )
+	PORT_DIPNAME( 0x40, 0x00, "Bonus" )
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Royal Flush" )
+	PORT_DIPNAME( 0x80, 0x00, "Royal Flush" )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -12143,6 +12168,32 @@ void goldnpkr_state::init_bonuspkr()
 }
 
 
+/*
+  Super 98 protection.
+
+  Code checks for different things on NVRAM space.
+  There are involved zeropage registers, inputs
+  combinations, and stack pointer handling.
+
+  The game takes 25 seconds to do all the checks.
+
+  E9F4: jmp $EA56	; infinite loop / dead end.
+  E9F7: jmp $CEC6	; the game continue executing...
+
+*/
+
+void goldnpkr_state::init_super98()
+{
+//  NOPing the deadly call for now.
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x69f4] = 0xea;
+	ROM[0x69f5] = 0xea;
+	ROM[0x69f6] = 0xea;
+}
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -12299,8 +12350,8 @@ GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 2)", MACHINE_NOT_WORKING, layout_goldnpkr )
 
-GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                    // banked selectable program
-GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               MACHINE_NOT_WORKING )  // program checks zeropage registers for changes...
+GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )  // banked selectable program.
+GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.
 
 GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
 
