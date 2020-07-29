@@ -248,8 +248,8 @@ void buddha_device::ide_interrupt_enable_w(offs_t offset, uint16_t data, uint16_
 
 uint16_t buddha_device::ide_0_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t data = m_ata_0->cs0_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
-	data = (data << 8) | (data >> 8);
+	uint16_t data = m_ata_0->cs0_r((offset >> 1) & 0x07, swapendian_int16(mem_mask));
+	data = swapendian_int16(data);
 
 	LOG("ide_0_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
@@ -260,16 +260,16 @@ void buddha_device::ide_0_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("ide_0_cs0_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = (data << 8) | (data >> 8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 
 	m_ata_0->cs0_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 uint16_t buddha_device::ide_0_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t data = m_ata_0->cs1_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
-	data = (data << 8) | (data >> 8);
+	uint16_t data = m_ata_0->cs1_r((offset >> 1) & 0x07, swapendian_int16(mem_mask));
+	data = swapendian_int16(data);
 
 	LOG("ide_0_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
@@ -280,16 +280,16 @@ void buddha_device::ide_0_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("ide_0_cs1_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = (data << 8) | (data >> 8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 
 	m_ata_0->cs1_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 uint16_t buddha_device::ide_1_cs0_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t data = m_ata_1->cs0_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
-	data = (data << 8) | (data >> 8);
+	uint16_t data = m_ata_1->cs0_r((offset >> 1) & 0x07, swapendian_int16(mem_mask));
+	data = swapendian_int16(data);
 
 	LOG("ide_1_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
@@ -300,16 +300,16 @@ void buddha_device::ide_1_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("ide_1_cs0_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = (data << 8) | (data >> 8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 
 	m_ata_1->cs0_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 uint16_t buddha_device::ide_1_cs1_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t data = m_ata_1->cs1_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
-	data = (data << 8) | (data >> 8);
+	uint16_t data = m_ata_1->cs1_r((offset >> 1) & 0x07, swapendian_int16(mem_mask));
+	data = swapendian_int16(data);
 
 	LOG("ide_1_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
@@ -320,8 +320,8 @@ void buddha_device::ide_1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("ide_1_cs1_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = (data << 8) | (data >> 8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 
 	m_ata_1->cs1_w((offset >> 1) & 0x07, data, mem_mask);
 }
