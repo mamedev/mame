@@ -1,0 +1,24 @@
+name: MAME-libretro macOS x86_64
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  MacOS:
+    name: Build for macOS
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - run: make -f Makefile.libretro -j8
+    - run: zip -9 mame_libretro.zip mame_libretro.dylib
+    - name: Upload MAME core
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mame_libretro.zip
+        tag: macOS-x86_64
+        asset_name: mame_libretro.zip
+        overwrite: true

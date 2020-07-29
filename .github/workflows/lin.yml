@@ -1,0 +1,26 @@
+name: MAME-libretro Linux x86_64
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Linux:
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - run: sudo apt install build-essential mesa-common-dev binutils
+    - run: make -f Makefile.libretro -j8
+    - run: strip -s mame_libretro.so
+    - run: zip -9 mame_libretro.zip mame_libretro.so
+    - name: Upload MAME core
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mame_libretro.zip
+        tag: Linux_64-bit
+        asset_name: mame_libretro.zip
+        overwrite: true
