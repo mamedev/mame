@@ -274,6 +274,8 @@ public:
 		m_latch1_bit(0)
 	{ }
 
+	void init_lxcmcypp();
+
 protected:
 	virtual uint8_t in0_r() override;
 	virtual uint8_t in1_r() override;
