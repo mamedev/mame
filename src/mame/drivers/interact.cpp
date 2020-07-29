@@ -92,7 +92,7 @@ void interact_state::interact_mem(address_map &map)
 //  map(0x1000,0x3fff).ram();
 
 	/* Hardware address mapping*/
-//  map(0x0800,0x0808).w(FUNC(interact_state::switch_bank_w)); // Bank management not udsed in BR machine*/
+//  map(0x0800, 0x0808).w(FUNC(interact_state::switch_bank_w)); // Bank management not used in BR machine*/
 	map(0x1000, 0x1000).w(FUNC(interact_state::color_a_w));  /* Color c0/c1*/
 	map(0x1800, 0x1800).w(FUNC(interact_state::color_b_w));  /* Color c2/c3*/
 	map(0x2000, 0x2003).w(FUNC(interact_state::sn_2000_w));  /* Sound*/
@@ -192,6 +192,8 @@ void interact_state::hector1(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("interact_cass");
 
+	SOFTWARE_LIST(config, "cass_list").set_original("interact");
+
 	/* printer */
 	PRINTER(config, m_printer, 0);
 }
@@ -289,17 +291,17 @@ INPUT_PORTS_END
 
 /* ROM definition */
 ROM_START( interact )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "interact.rom", 0x0000, 0x0800, CRC(1aa50444) SHA1(405806c97378abcf7c7b0d549430c78c7fc60ba2))
 ROM_END
 
 ROM_START( hector1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "hector1.rom",  0x0000, 0x1000, CRC(3be6628b) SHA1(1c106d6732bed743d8283d39e5b8248271f18c42))
 ROM_END
 
 /* Driver */
 
 /*   YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME       FLAGS */
-COMP(1979, interact, 0,        0,      interact, interact, interact_state, empty_init, "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
+COMP(1979, interact, 0,        0,      interact, interact, interact_state, empty_init, "Interact Electronics",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
 COMP(1983, hector1,  interact, 0,      hector1,  interact, interact_state, empty_init, "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)

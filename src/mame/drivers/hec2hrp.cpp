@@ -14,17 +14,16 @@
     These machines can load and run cassettes for the interact / hector1.
     hec2hr - press 2 then 1
     hec2hrp - press 2 then 1
-    hec2hrx - press 5 then 1
-    hec2mx40 - press 5 then 1
-    hec2mx80 - not compatible
     victor - press R then L
 
-        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-        31/06/2009 Video - Robbbert
+    These machines will load the cassette but the keys don't work
+    hec2hrx, hec2mx40, hec2mdhrx - press 5 then 1
 
-        29/10/2009 Update skeleton to functional machine
-                    by yo_fr            (jj.stac @ aliceadsl.fr)
+    This machine not compatible
+    hec2mx80
 
+    2009-05-12 Skeleton driver - Micko : mmicko@gmail.com
+    2009-10-29 Update skeleton to functional machine by yo_fr (jj.stac @ aliceadsl.fr)
                 => add Keyboard,
                 => add color,
                 => add cassette,
@@ -33,13 +32,13 @@
                 => add BR/HR switching
                 => add bank switch for HRX
                 => add device MX80c and bank switching for the ROM
-    Importante note : Keyboard emulation code obtained from
+    Important note : Keyboard emulation code obtained from
                     DChector project : http://dchector.free.fr/ made by DanielCoulom
                     (thanks Daniel)
-        03/01/2010 Update and cleanup  by yo_fr       (jj.stac@aliceadsl.fr)
+    2010-01-03 Update and cleanup  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
-        11/11/2011 : add minidisk (3.5") support  JJStacino
+    2010-11-20 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
+    2011-11-11 : add minidisk (3.5") support  JJStacino
 
         for more information about these machines, see the DChector project : http://dchector.free.fr/ made by DanielCoulom
         (thanks to Daniel) and Yves site : http://hectorvictor.free.fr/ (thanks too Yves!)
@@ -169,7 +168,7 @@ void hec2hrp_state::hec2hrx_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x0f0, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0xf0, 0xff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2mdhrx_io(address_map &map)
@@ -180,23 +179,23 @@ void hec2hrp_state::hec2mdhrx_io(address_map &map)
 	// Minidisc commands and changing the rom page */
 	map(0x04, 0x07).rw(m_minidisc_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x08, 0x08).w(FUNC(hec2hrp_state::minidisc_control_w));
-	map(0x0f0, 0x0ff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0xf0, 0xff).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2mx40_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x000, 0x0ef).w(FUNC(hec2hrp_state::mx40_io_port_w));
-	map(0x0f0, 0x0f3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x00, 0xef).w(FUNC(hec2hrp_state::mx40_io_port_w));
+	map(0xf0, 0xf3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 }
 
 void hec2hrp_state::hec2mx80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x000, 0x0ef).w(FUNC(hec2hrp_state::mx80_io_port_w));
-	map(0x0f0, 0x0f3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
+	map(0x00, 0xef).w(FUNC(hec2hrp_state::mx80_io_port_w));
+	map(0xf0, 0xf3).rw(FUNC(hec2hrp_state::io_8255_r), FUNC(hec2hrp_state::io_8255_w));
 
 
 }
@@ -310,7 +309,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode
 
 	// Memory install for bank switching
-	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   );
+	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]);
 	membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video RAM
 
 	// Set bank HECTOR_BANK_PROG as basic bank
@@ -419,38 +418,11 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("interact_cass");
 
 	PRINTER(config, m_printer, 0);
-}
 
-void hec2hrp_state::hec2hrp(machine_config &config)
-{
-	Z80(config, m_maincpu, 5_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hec2hrp_mem);
-	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2hrp_io);
-	m_maincpu->set_periodic_int(FUNC(hec2hrp_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the Z80 irq in Hz*/
-
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
-	screen.set_size(512, 230);
-	screen.set_visarea(0, 243, 0, 227);
-	screen.set_screen_update(FUNC(hec2hrp_state::screen_update_hec2hrp));
-	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_entries(16);
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
-
-	hector_audio(config);
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(hector_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-
-	PRINTER(config, m_printer, 0);
+	SOFTWARE_LIST(config, "cass_list").set_original("interact");
 }
 
 static void hector_floppies(device_slot_interface &device)
@@ -618,21 +590,21 @@ void hec2hrp_state::hec2mx80(machine_config &config)
 }
 
 ROM_START( hec2hr )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2hr.bin", 0x0000, 0x1000, CRC(84b9e672) SHA1(8c8b089166122eee565addaed10f84c5ce6d849b))
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( victor )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "victor.rom",  0x0000, 0x1000, CRC(d1e9508f) SHA1(d0f1bdcd39917fafc8859223ab38eee2a7dc85ff))
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( hec2hrp )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "hector2hrp.rom", 0x0000, 0x4000, CRC(983f52e4) SHA1(71695941d689827356042ee52ffe55ce7e6b8ecd))
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
@@ -695,8 +667,8 @@ ROM_END
 /* Driver */
 
 /*  YEAR   NAME       PARENT   COMPAT    MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME                  FLAGS */
-COMP(1983, hec2hrp,   0,       interact, hec2hrp,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
-COMP(1980, victor,    hec2hrp, 0,        hec2hrp,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Victor",                 MACHINE_IMPERFECT_SOUND)
+COMP(1983, hec2hrp,   0,       interact, hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
+COMP(1980, victor,    hec2hrp, 0,        hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Victor",                 MACHINE_IMPERFECT_SOUND)
 COMP(1983, hec2hr,    hec2hrp, 0,        hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
 COMP(1984, hec2hrx,   hec2hrp, 0,        hec2hrx,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
 COMP(1985, hec2mdhrx, hec2hrp, 0,        hec2mdhrx, hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
