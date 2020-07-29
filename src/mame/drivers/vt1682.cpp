@@ -6106,6 +6106,10 @@ ROM_START( wowwg )
 ROM_END
 
 ROM_START( unk1682 )
+	ROM_REGION( 0x1000, "internal", 0 )
+	// this appears to use the internal ROM on startup, so mark it as missing
+	ROM_LOAD( "101in1.internal.rom", 0x00000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "vt1682_101in1.bin", 0x00000, 0x0800000, CRC(82879200) SHA1(c1977d1733f8849326286102c0755629d0406ec4) )
 	ROM_CONTINUE(0x0800000, 0x0800000)
