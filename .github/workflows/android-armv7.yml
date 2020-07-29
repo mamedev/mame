@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - libretro/ci
 
 jobs:
   AndroidARMv7:
@@ -20,15 +19,10 @@ jobs:
     steps:    
     - name: Install Android NDK
       run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${ANDROID_NDK_VERSION}"
-    
     - uses: actions/checkout@v2
-
     - run: make -f Makefile.libretro platform=android -j8
-
-    - run: strip -s mame_libretro_android.so
-
+    # - run: strip -s mame_libretro_android.so
     - run: zip -9 mame_libretro.zip mame_libretro_android.so
-
     - name: Upload MAME core
       uses: svenstaro/upload-release-action@v2
       with:
@@ -37,4 +31,3 @@ jobs:
         tag: Android_ARMv7
         asset_name: mame_libretro.zip
         overwrite: true
-
