@@ -16,7 +16,7 @@
 #include "../../lib/netlist/nltypes.h"
 
 #ifndef NETLIST_CREATE_CSV
-#define NETLIST_CREATE_CSV (1)
+#define NETLIST_CREATE_CSV (0)
 #endif
 
 class netlist_mame_stream_output_device;
