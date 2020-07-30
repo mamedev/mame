@@ -74,17 +74,35 @@
 #include "includes/hec2hrp.h"
 
 #include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "imagedev/printer.h"
-#include "sound/discrete.h"  /* for 1 Bit sound*/
-
+#include "cpu/i8085/i8085.h"
 #include "screen.h"
 #include "speaker.h"
-
 #include "formats/hect_dsk.h"
 #include "formats/hect_tap.h"
 #include "formats/hector_minidisc.h"
 
+
+void interact_state::interact_mem(address_map &map)
+{
+	map.unmap_value_high();
+	/* Main ROM page*/
+	map(0x0000, 0x3fff).rom();  /*BANK(2)*/
+//  map(0x1000,0x3fff).ram();
+
+	/* Hardware address mapping*/
+//  map(0x0800, 0x0808).w(FUNC(interact_state::switch_bank_w)); // Bank management not used in BR machine*/
+	map(0x1000, 0x1000).w(FUNC(interact_state::color_a_w));  /* Color c0/c1*/
+	map(0x1800, 0x1800).w(FUNC(interact_state::color_b_w));  /* Color c2/c3*/
+	map(0x2000, 0x2003).w(FUNC(interact_state::sn_2000_w));  /* Sound*/
+	map(0x2800, 0x2803).w(FUNC(interact_state::sn_2800_w));  /* Sound*/
+	map(0x3000, 0x3000).rw(FUNC(interact_state::cassette_r), FUNC(interact_state::sn_3000_w));/* Write necessary*/
+	map(0x3800, 0x3807).rw(FUNC(interact_state::keyboard_r), FUNC(interact_state::keyboard_w));  /* Keyboard*/
+
+	/* Video br mapping*/
+	map(0x4000, 0x49ff).ram().share("videoram");
+	/* continous RAM*/
+	map(0x4A00, 0xffff).ram();
+}
 
 void hec2hrp_state::hecdisc2_mem(address_map &map)
 {
@@ -291,6 +309,16 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+MACHINE_RESET_MEMBER(interact_state,interact)
+{
+	hector_reset(0, 0);
+}
+
+MACHINE_START_MEMBER(interact_state,interact)
+{
+	hector_init();
+}
+
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrp)
 {
 	hector_init();
@@ -327,7 +355,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// As video HR ram is in bank, use external memory
-	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
+	m_hector_vram.set_target(m_hector_videoram_hrx,m_hector_vram.bytes());
 
 	hector_init();
 }
@@ -352,7 +380,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 	membank("bank2")->set_entry(HECTOR_BANK_BASE);
 
 	// As video HR ram is in bank, use external memory
-	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
+	m_hector_vram.set_target(m_hector_videoram_hrx,m_hector_vram.bytes());
 
 	hector_init();
 }
@@ -379,6 +407,59 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 
 	hector_reset(1, 0);
 }
+
+void interact_state::interact_common(machine_config &config)
+{
+	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
+	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 79);
+	screen.set_visarea(0, 112, 0, 77);
+	screen.set_screen_update(FUNC(interact_state::screen_update_interact));
+	screen.set_palette(m_palette);
+
+	PALETTE(config, m_palette).set_entries(16);             /* 8 colours, but only 4 at a time*/
+
+	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
+
+	hector_audio(config);
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(hector_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("interact_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("interact");
+
+	/* printer */
+	PRINTER(config, m_printer, 0);
+}
+
+void interact_state::interact(machine_config &config)
+{
+	/* basic machine hardware */
+	I8080(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &interact_state::interact_mem);
+	m_maincpu->set_periodic_int(FUNC(interact_state::irq0_line_hold), attotime::from_hz(50));
+
+	interact_common(config);
+}
+
+void interact_state::hector1(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(1'750'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &interact_state::interact_mem);
+	m_maincpu->set_periodic_int(FUNC(interact_state::irq0_line_hold), attotime::from_hz(50));
+
+	interact_common(config);
+}
+
 
 // mini disk interface
 
@@ -418,6 +499,7 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("interact_cass");
 
 	PRINTER(config, m_printer, 0);
@@ -445,8 +527,8 @@ void hec2hrp_state::hec2mx40(machine_config &config)
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 
-	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
@@ -467,10 +549,10 @@ void hec2hrp_state::hec2mx40(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	PRINTER(config, m_printer, 0);
 }
-
 
 void hec2hrp_state::hec2hrx(machine_config &config)
 {
@@ -490,8 +572,8 @@ void hec2hrp_state::hec2hrx(machine_config &config)
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 
-	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -509,6 +591,7 @@ void hec2hrp_state::hec2hrx(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	PRINTER(config, m_printer, 0);
 }
@@ -525,7 +608,7 @@ void hec2hrp_state::hec2mdhrx(machine_config &config)
 
 	/* 3.5" ("mini") disc */
 	FD1793(config, m_minidisc_fdc, 1_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, "wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats);
+	FLOPPY_CONNECTOR(config, "wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats).enable_sound(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -543,6 +626,7 @@ void hec2hrp_state::hec2mdhrx(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	PRINTER(config, m_printer, 0);
 }
@@ -566,8 +650,8 @@ void hec2hrp_state::hec2mx80(machine_config &config)
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 
-	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -585,9 +669,20 @@ void hec2hrp_state::hec2mx80(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	PRINTER(config, m_printer, 0);
 }
+
+ROM_START( interact )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "interact.rom", 0x0000, 0x0800, CRC(1aa50444) SHA1(405806c97378abcf7c7b0d549430c78c7fc60ba2))
+ROM_END
+
+ROM_START( hector1 )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "hector1.rom",  0x0000, 0x1000, CRC(3be6628b) SHA1(1c106d6732bed743d8283d39e5b8248271f18c42))
+ROM_END
 
 ROM_START( hec2hr )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
@@ -666,11 +761,13 @@ ROM_END
 
 /* Driver */
 
-/*  YEAR   NAME       PARENT   COMPAT    MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME                  FLAGS */
-COMP(1983, hec2hrp,   0,       interact, hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
-COMP(1980, victor,    hec2hrp, 0,        hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Victor",                 MACHINE_IMPERFECT_SOUND)
-COMP(1983, hec2hr,    hec2hrp, 0,        hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
-COMP(1984, hec2hrx,   hec2hrp, 0,        hec2hrx,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
-COMP(1985, hec2mdhrx, hec2hrp, 0,        hec2mdhrx, hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
-COMP(1985, hec2mx80,  hec2hrp, 0,        hec2mx80,  hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
-COMP(1985, hec2mx40,  hec2hrp, 0,        hec2mx40,  hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)
+/*  YEAR   NAME       PARENT   COMPAT     MACHINE    INPUT    CLASS           INIT        COMPANY        FULLNAME                  FLAGS */
+COMP(1979, interact,  0,        0,        interact,  hec2hrp, interact_state, empty_init, "Interact Electronics",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
+COMP(1983, hector1,   interact, 0,        hector1,   hec2hrp, interact_state, empty_init, "Micronique", "Hector 1",               MACHINE_IMPERFECT_SOUND)
+COMP(1983, hec2hrp,   0,        interact, hec2hr,    hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
+COMP(1980, victor,    hec2hrp,  0,        hec2hr,    hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Victor",                 MACHINE_IMPERFECT_SOUND)
+COMP(1983, hec2hr,    hec2hrp,  0,        hec2hr,    hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
+COMP(1984, hec2hrx,   hec2hrp,  0,        hec2hrx,   hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mdhrx, hec2hrp,  0,        hec2mdhrx, hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mx80,  hec2hrp,  0,        hec2mx80,  hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mx40,  hec2hrp,  0,        hec2mx40,  hec2hrp, hec2hrp_state,  empty_init, "Micronique", "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)

@@ -90,8 +90,8 @@ public:
 		m_disc2cpu(*this, "disc2cpu"),
 		m_discrete(*this, "discrete"),
 		m_sn(*this, "sn76477"),
-		m_videoram(*this,"videoram"),
-		m_hector_videoram(*this,"hector_videoram") ,
+		m_vram(*this,"videoram"),
+		m_hector_vram(*this,"hector_videoram") ,
 		m_keyboard(*this, "KEY.%u", 0),
 		m_minidisc_fdc(*this, "wd179x"),
 		m_floppy0(*this, "wd179x:0"),
@@ -154,8 +154,8 @@ private:
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<discrete_device> m_discrete;
 	required_device<sn76477_device> m_sn;
-	optional_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_hector_videoram;
+	optional_shared_ptr<uint8_t> m_vram;
+	optional_shared_ptr<uint8_t> m_hector_vram;
 	required_ioport_array<9> m_keyboard;
 
 	optional_device<fd1793_device> m_minidisc_fdc;
@@ -235,6 +235,27 @@ private:
 	void hec2mx80_io(address_map &map);
 	void hecdisc2_io(address_map &map);
 	void hecdisc2_mem(address_map &map);
+};
+
+class interact_state : public hec2hrp_state
+{
+public:
+	interact_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hec2hrp_state(mconfig, type, tag)
+		, m_vram(*this, "videoram")
+	{ }
+
+	void hector1(machine_config &config);
+	void interact(machine_config &config);
+	void interact_common(machine_config &config);
+
+private:
+
+	required_shared_ptr<uint8_t> m_vram;
+	DECLARE_MACHINE_START(interact);
+	DECLARE_MACHINE_RESET(interact);
+	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void interact_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_HEC2HRP_H

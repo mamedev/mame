@@ -87,6 +87,14 @@ void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int
 	}
 }
 
+uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *videoram = m_vram;
+	screen.set_visible_area(0, 113, 0, 75);
+	hector_hr(bitmap, videoram,  77, 32);
+	return 0;
+}
+
 void hec2hrp_state::hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram)
 {
 	int sy = 0;
@@ -118,8 +126,8 @@ VIDEO_START_MEMBER(hec2hrp_state,hec2hrp)
 
 uint32_t hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	uint8_t *videoram_HR = m_hector_videoram;
+	uint8_t *videoram = m_vram;
+	uint8_t *videoram_HR = m_hector_vram;
 	if (m_hector_flag_hr==1)
 	{
 		if (m_hector_flag_80c==0)
@@ -140,3 +148,4 @@ uint32_t hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind1
 	}
 	return 0;
 }
+

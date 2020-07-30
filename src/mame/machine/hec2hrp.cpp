@@ -44,7 +44,6 @@
 #include "includes/hec2hrp.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"      /* for K7 sound */
 
 #include "speaker.h"
 
@@ -530,63 +529,63 @@ switch(Adresse )
 {
 	case 0x2000:
 	{
-		m_au[ 0] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[ 8] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 0] =  BIT(Value, 7);
+		m_au[ 8] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x2001:
 	{
-		m_au[ 1] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[ 9] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 1] =  BIT(Value, 7);
+		m_au[ 9] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x2002:
 	{
-		m_au[ 2] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[10] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 2] =  BIT(Value, 7);
+		m_au[10] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x2003:
 	{
-		m_au[ 3] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[11] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 3] =  BIT(Value, 7);
+		m_au[11] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x2800:
 	{
-		m_au[ 4] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[12] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 4] =  BIT(Value, 7);
+		m_au[12] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x2801:
 	{
-		m_au[ 5] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[13] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 5] =  BIT(Value, 7);
+		m_au[13] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x2802:
 	{
-		m_au[ 6] = ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[14] = ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 6] = BIT(Value, 7);
+		m_au[14] = BIT(Value, 6);
 		break;
 	}
 
 	case 0x2803:
 	{
-		m_au[ 7] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[15] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+		m_au[ 7] =  BIT(Value, 7);
+		m_au[15] =  BIT(Value, 6);
 		break;
 	}
 
 	case 0x3000:
 	{
-		m_val_mixer = (Value & 7) ;
+		m_val_mixer = Value & 7;
 		break;
 	}
 	default: break;
@@ -706,9 +705,9 @@ void hec2hrp_state::init_sn76477()
 void hec2hrp_state::update_sound(uint8_t data)
 {
 	/* MIXER */
-	m_sn->mixer_a_w(((m_val_mixer & 0x04)==4) ? 1 : 0);
-	m_sn->mixer_b_w(((m_val_mixer & 0x01)==1) ? 1 : 0);
-	m_sn->mixer_c_w(((m_val_mixer & 0x02)==2) ? 1 : 0); /* Measured on HRX*/
+	m_sn->mixer_a_w(BIT(m_val_mixer, 2));
+	m_sn->mixer_b_w(BIT(m_val_mixer, 0));
+	m_sn->mixer_c_w(BIT(m_val_mixer, 1)); /* Measured on HRX*/
 
 	/* VCO oscillator */
 	if (m_au[12]==1)
@@ -716,17 +715,17 @@ void hec2hrp_state::update_sound(uint8_t data)
 	else
 		m_sn->vco_res_w(m_pin_value[18][m_au[10]]); /* no AU11 */
 
-	m_sn->vco_cap_w(m_pin_value[17][m_au[2 ]]);
+	m_sn->vco_cap_w(m_pin_value[17][m_au[2]]);
 	m_sn->pitch_voltage_w(m_pin_value[19][m_au[15]]);
 	m_sn->vco_voltage_w(m_pin_value[16][m_au[15]]);
 	m_sn->vco_w(m_pin_value[22][m_au[12]]); /* VCO Select Ext/SLF */
 
 	/* SLF */
-	m_sn->slf_res_w(m_pin_value[20][m_au[ 9]]); /* AU10 */
-	m_sn->slf_cap_w(m_pin_value[21][m_au[1 ]]);
+	m_sn->slf_res_w(m_pin_value[20][m_au[9]]); /* AU10 */
+	m_sn->slf_cap_w(m_pin_value[21][m_au[1]]);
 
 	/* One Shot */
-	m_sn->one_shot_res_w(m_pin_value[24][     0]); /* NC */
+	m_sn->one_shot_res_w(m_pin_value[24][0]); /* NC */
 	m_sn->one_shot_cap_w(m_pin_value[23][m_au[13]]);
 
 	/* amplitude value*/
@@ -734,7 +733,7 @@ void hec2hrp_state::update_sound(uint8_t data)
 
 	/* attack/decay */
 	m_sn->attack_res_w(m_pin_value[10][m_au[ 8]]);
-	m_sn->decay_res_w(m_pin_value[7 ][m_au[11]]);
+	m_sn->decay_res_w(m_pin_value[7][m_au[11]]);
 	m_sn->attack_decay_cap_w(m_pin_value[8][m_au[0]]);
 
 	/* filter */
@@ -746,7 +745,7 @@ void hec2hrp_state::update_sound(uint8_t data)
 	m_sn->feedback_res_w(m_pin_value[12][0]);
 
 	/* envelope */
-	m_sn->envelope_1_w(m_pin_value[1 ][m_au[6]]);
+	m_sn->envelope_1_w(m_pin_value[1] [m_au[6]]);
 	m_sn->envelope_2_w(m_pin_value[28][m_au[7]]);
 
 	/* finally, enable */
@@ -791,7 +790,6 @@ DISCRETE_SOUND_END
 void hec2hrp_state::hector_audio(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);  /* Sound level for cassette, as it is in mono => output channel=0*/
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(47), RES_K(330), CAP_P(390));

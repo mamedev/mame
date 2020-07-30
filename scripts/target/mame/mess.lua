@@ -2569,7 +2569,6 @@ files {
 	MAME_DIR .. "src/mame/includes/hec2hrp.h",
 	MAME_DIR .. "src/mame/machine/hec2hrp.cpp",
 	MAME_DIR .. "src/mame/video/hec2hrp.cpp",
-	MAME_DIR .. "src/mame/drivers/interact.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "heurikon")
