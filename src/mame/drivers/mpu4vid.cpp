@@ -1912,7 +1912,6 @@ void mpu4vid_state::bwbvidoki_68k_map(address_map &map)
 	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0xff00);  // 6840PTM on sampled sound board
-	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff); //  CHR ?
 }
 
 /* TODO: Fix up MPU4 map*/
