@@ -279,7 +279,7 @@ namespace analog
 
 			m_vto = m_modacc.m_VTO;
 			// FIXME zero conversion
-			if(m_vto != nlconst::zero())
+			if(m_vto == nlconst::zero())
 				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
 
 			// FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
