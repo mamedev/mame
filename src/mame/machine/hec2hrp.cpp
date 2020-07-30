@@ -36,8 +36,6 @@
     - http://dchector.free.fr/
     - http://hectorvictor.free.fr/
 
-    TODO :  Add cartridge functionality,
-            Adjust the one shot and A/D timing (sn76477)
 */
 
 #include "emu.h"
@@ -66,35 +64,47 @@ hec2mx80
 hec2mx40
 */
 
-/* Helper function*/
-int hec2hrp_state::has_disc2()
+
+void hec2hrp_state::init_mx40()
 {
-	return ((strncmp(machine().system().name , "hec2hrx"  , 7)==0) ||
-			(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
-			(strncmp(machine().system().name , "hec2mx80" , 8)==0));
+	m_has_disc2 = true;
+	m_has_minidisc = false;
+	m_is_hr = true;
+	m_is_extended = true;
 }
 
-int hec2hrp_state::has_minidisc()
+void hec2hrp_state::init_mdhrx()
 {
-	return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0));
+	m_has_disc2 = false;
+	m_has_minidisc = true;
+	m_is_hr = true;
+	m_is_extended = true;
 }
 
-int hec2hrp_state::is_hr()
+void hec2hrp_state::init_victor()
 {
-	return ((strncmp(machine().system().name , "hec2hr"   , 6)==0) ||  //Aviable for hr & hrp
-			(strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
-			(strncmp(machine().system().name , "victor"   , 6)==0) ||
-			(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
-			(strncmp(machine().system().name , "hec2mx80" , 8)==0));
+	m_has_disc2 = false;
+	m_has_minidisc = false;
+	m_is_hr = true;
+	m_is_extended = false;
 }
 
-int hec2hrp_state::is_extended()
+void hec2hrp_state::init_hrx()
 {
-	return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
-			(strncmp(machine().system().name , "hec2hrx"  , 7)==0) ||
-			(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
-			(strncmp(machine().system().name , "hec2mx80" , 8)==0));
+	m_has_disc2 = true;
+	m_has_minidisc = false;
+	m_is_hr = false;
+	m_is_extended = true;
 }
+
+void hec2hrp_state::init_interact()
+{
+	m_has_disc2 = false;
+	m_has_minidisc = false;
+	m_is_hr = false;
+	m_is_extended = false;
+}
+
 
 /* Cassette timer*/
 TIMER_CALLBACK_MEMBER(hec2hrp_state::cassette_clock)
@@ -118,61 +128,57 @@ void hec2hrp_state::minidisc_control_w(uint8_t data)
 		floppy->ss_w(BIT(data, 4));
 	}
 
-	membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC);
+	m_bank[2]->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC);
 }
 
 void hec2hrp_state::switch_bank_w(offs_t offset, uint8_t data)
 {
 	if (offset==0x00)
 	{
-		if (is_extended())
+		if (m_is_extended)
+			m_bank[1]->set_entry(HECTOR_BANK_VIDEO);
+
+		if (m_flag_clk)
 		{
-			membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
-		}
-		if (m_flag_clk == 1)
-		{
-			m_flag_clk = 0;
+			m_flag_clk = false;
 			m_maincpu->set_unscaled_clock(XTAL(5'000'000));
 		}
 	}
 
 	if (offset==0x04)
 	{
-		m_hector_flag_hr = 0;
-		if (is_extended())
+		m_hector_flag_hr = false;
+		if (m_is_extended)
+			m_bank[1]->set_entry(HECTOR_BANK_VIDEO);
+
+		if (!m_flag_clk)
 		{
-			membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
-		}
-		if (m_flag_clk == 0)
-		{
-			m_flag_clk = 1;
+			m_flag_clk = true;
 			m_maincpu->set_unscaled_clock(XTAL(1'750'000));
 		}
 	}
 
 	if (offset==0x08)
 	{
-		if (is_extended())
+		if (m_is_extended)
+			m_bank[1]->set_entry(HECTOR_BANK_PROG);
+
+		if (m_flag_clk)
 		{
-			membank("bank1")->set_entry(HECTOR_BANK_PROG);
-		}
-		if (m_flag_clk == 1)
-		{
-			m_flag_clk = 0;
+			m_flag_clk = false;
 			m_maincpu->set_unscaled_clock(XTAL(5'000'000));
 		}
 	}
 
 	if (offset == 0x0c)
 	{
-		m_hector_flag_hr = 0;
-		if (is_extended())
+		m_hector_flag_hr = false;
+		if (m_is_extended)
+			m_bank[1]->set_entry(HECTOR_BANK_PROG);
+
+		if (!m_flag_clk)
 		{
-			membank("bank1")->set_entry(HECTOR_BANK_PROG);
-		}
-		if (m_flag_clk == 0)
-		{
-			m_flag_clk = 1;
+			m_flag_clk = true;
 			m_maincpu->set_unscaled_clock(XTAL(1'750'000));
 		}
 	}
@@ -195,31 +201,28 @@ uint8_t hec2hrp_state::keyboard_r(offs_t offset)
 		if (data & 0x01) /* Reset machine */
 		{
 			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-			if (is_hr())
+			if (m_is_hr)
 			{
-				m_hector_flag_hr = 1;
-				if (is_extended())
+				m_hector_flag_hr = true;
+				if (m_is_extended)
 				{
-					membank("bank1")->set_entry(HECTOR_BANK_PROG);
-					membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
+					m_bank[1]->set_entry(HECTOR_BANK_PROG);
+					m_bank[2]->set_entry(HECTORMX_BANK_PAGE0);
 				}
 				//RESET DISC II unit
-				if (has_disc2())
+				if (m_has_disc2)
 					hector_disc2_reset();
 
 				/* floppy md master reset */
-				if (has_minidisc())
+				if (m_has_minidisc)
 					m_minidisc_fdc->reset();
 			}
 			else
-			{
-				m_hector_flag_hr=0;
-			}
+				m_hector_flag_hr = false;
 
-
-		/*Common flag*/
-		m_hector_flag_80c = 0;
-		m_flag_clk = 0;
+			/*Common flag*/
+			m_hector_flag_80c = false;
+			m_flag_clk = false;
 		}
 
 		m_actions = 0;
@@ -231,21 +234,27 @@ uint8_t hec2hrp_state::keyboard_r(offs_t offset)
 
 		if (data & 0x08) /* Pot(0)+*/
 			m_pot0 += 1;
-		if (m_pot0>128) m_pot0 = 128;
+
+		if (m_pot0>128)
+			m_pot0 = 128;
 
 		if (data & 0x10) /* Pot(0)-*/
 			m_pot0 -= 1;
 
-		if (m_pot0>250) m_pot0 = 0;
+		if (m_pot0>250)
+			m_pot0 = 0;
 
 		if (data & 0x20) /* Pot(1)+*/
 			m_pot1 += 1;
-		if (m_pot1>128) m_pot1 = 128;
+
+		if (m_pot1>128)
+			m_pot1 = 128;
 
 		if (data & 0x40) /* Pot(1)-*/
 			m_pot1 -= 1;
 
-		if (m_pot1>250) m_pot1 = 0;
+		if (m_pot1>250)
+			m_pot1 = 0;
 	}
 
 	/* in all case return the requested value */
@@ -283,23 +292,19 @@ uint8_t hec2hrp_state::cassette_r()
 	}
 	else
 	{
-		if (m_write_cassette == 0)
+		if (!m_write_cassette)
 		{
 			level = m_cassette->input();
 
 			if  (level < -0.08)
-				m_cassette_bit = 0x00;
+				m_cassette_bit = false;
 			if (level > +0.08)
-				m_cassette_bit = 0x01;
+				m_cassette_bit = true;
 		}
 
-		if ((m_cassette_bit != m_cassette_bit_mem) && (m_cassette_bit !=0))
-		{
-			if (m_data_k7 == 0x00)
-				m_data_k7 =  0x80;
-			else
-				m_data_k7 =  0x00;
-		}
+		if ((m_cassette_bit != m_cassette_bit_mem) && m_cassette_bit)
+			m_data_k7 = m_data_k7 ? 0 : 0x80;
+
 		value = ( m_ck_signal & 0x7F ) + m_data_k7;
 		m_cassette_bit_mem = m_cassette_bit;
 	}
@@ -308,13 +313,14 @@ uint8_t hec2hrp_state::cassette_r()
 void hec2hrp_state::sn_3000_w(uint8_t data)
 {
 	m_state3000 = data & 0xf8; /* except bit 0 to 2*/
-	if ((data & 7) != m_oldstate3000 )
+	data &= 7;
+	if (data != m_oldstate3000 )
 	{
 		/* Update sn76477 only when necessary!*/
-		update_state(0x3000, data & 7 );
-		update_sound(data & 7);
+		update_state(0x3000, data);
+		update_sound(data);
 	}
-	m_oldstate3000 = data & 7;
+	m_oldstate3000 = data;
 }
 
 /* Color Interface */
@@ -323,18 +329,16 @@ void hec2hrp_state::color_a_w(uint8_t data)
 	if (data & 0x40)
 	{
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
-		if (m_write_cassette==0)
+		if (!m_write_cassette)
 		{
-				m_cassette->change_state(
-						CASSETTE_MOTOR_ENABLED,
-						CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 			// m_cassette->set_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 		}
 	}
 	else
 	{   /* stop motor*/
 		m_cassette->set_state(CASSETTE_STOPPED);
-		m_write_cassette=0;
+		m_write_cassette = false;
 		m_counter_write =0;
 	}
 	if (((data & 0x80) != (m_oldstate1000 & 0x80)) && ((m_oldstate1000 & 7)==(data & 7)) ) /* Bit7 had change but not the color statement*/
@@ -344,15 +348,14 @@ void hec2hrp_state::color_a_w(uint8_t data)
 
 		if (m_counter_write > 5)
 		{
-			/* Wait several cycle before lauch the record to prevent somes bugs*/
+			/* Wait several cycles before launch recording to prevent somes bugs*/
 			m_counter_write = 6;
-			if (m_write_cassette==0)
-			{   /* C'est la 1er fois => record*/
-				m_cassette->change_state(
-						CASSETTE_MOTOR_ENABLED,
-						CASSETTE_MASK_MOTOR);
+			if (!m_write_cassette)
+			{
+				// record
+				m_cassette->change_state( CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 				m_cassette->set_state(CASSETTE_RECORD);
-				m_write_cassette=1;
+				m_write_cassette = true;
 			}
 		}
 		/* cassette data */
@@ -360,22 +363,25 @@ void hec2hrp_state::color_a_w(uint8_t data)
 	}
 
 	/* Other bit : color definition*/
-	m_hector_color[0] =  data        & 0x07 ;
-	m_hector_color[2] = ((data >> 3)  & 0x07) | (m_hector_color[2] & 0x40);
+	m_hector_color[0] = data & 0x07 ;
+	m_hector_color[2] = BIT(data, 3, 3) | (m_hector_color[2] & 0x40);
 
 	m_oldstate1000=data; /* For next step*/
 }
 
 void hec2hrp_state::color_b_w(uint8_t data)
 {
-	m_hector_color[1] =  data        & 0x07;
-	m_hector_color[3] = (data >> 3)  & 0x07;
+	m_hector_color[1] = data & 0x07;
+	m_hector_color[3] = BIT(data, 3, 3);
 
 	/* Half light on color 2 only on HR machines:*/
-	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
+	if (data & 0x40)
+		m_hector_color[2] |= 8;
+	else
+		m_hector_color[2] &= 7;
 
 	/* Play bit*/
-	m_discrete->write(NODE_01,  (data & 0x80) ? 0:1 );
+	m_discrete->write(NODE_01, (data & 0x80) ? 0:1 );
 }
 
 
@@ -390,20 +396,20 @@ uint8_t hec2hrp_state::io_8255_r(offs_t offset)
 	uint8_t data =0;
 	uint8_t data_l=0;
 	uint8_t data_h=0;
+	offset &= 3;
 
-
-	if ((offset & 0x3) == 0x0) /* Port A */
+	if (offset == 0) /* Port A */
 		data = m_hector_port_a;
-
-	if ((offset & 0x3) == 0x1) /* Port B */
+	else
+	if (offset == 1) /* Port B */
 	{
 		data = m_hector_port_b;
 		#ifdef DEBUG_TRACE_COM_HECTOR
 			printf("\nLecture data par Hector %x (portB)",data);
 		#endif
 	}
-
-	if ((offset & 0x3) == 0x2) /* Port C */
+	else
+	if (offset == 2) /* Port C */
 	{
 		data_l = (m_hector_port_c_l & 0x0f);
 		data_h = (m_hector_port_c_h & 0xf0);
@@ -413,18 +419,18 @@ uint8_t hec2hrp_state::io_8255_r(offs_t offset)
 
 		if (BIT(m_hector_port_cmd, 3))                  /* Quartet sup en entree ?*/
 		{
-			m_hector_port_c_h = (m_hector_port_c_h & 0x0c0);    /* Clear bits 4 & 5*/
+			m_hector_port_c_h = (m_hector_port_c_h & 0xc0);    /* Clear bits 4 & 5*/
 
 			if (m_hector_disc2_data_w_ready != 0x00)
-				m_hector_port_c_h = m_hector_port_c_h + 0x010;  // PC4 (data write ready from Disc II to Hector)
+				m_hector_port_c_h = m_hector_port_c_h + 0x10;  // PC4 (data write ready from Disc II to Hector)
 
 			if (m_hector_disc2_data_r_ready != 0x00)
-				m_hector_port_c_h = m_hector_port_c_h + 0x020;  // PC5 (data read ready from Hector to Disc2)
+				m_hector_port_c_h = m_hector_port_c_h + 0x20;  // PC5 (data read ready from Hector to Disc2)
 
-			m_hector_port_c_h = m_hector_port_c_h & 0x07F;      // PC7 (printer busy=0)
+			m_hector_port_c_h = m_hector_port_c_h & 0x7F;      // PC7 (printer busy=0)
 			data_h =  m_hector_port_c_h;
 		}
-		data= data_l + data_h;
+		data = data_l + data_h;
 	}
 	return data;  // Return the value!
 }
@@ -433,8 +439,9 @@ uint8_t hec2hrp_state::io_8255_r(offs_t offset)
 
 void hec2hrp_state::io_8255_w(offs_t offset, uint8_t data)
 {
+	offset &= 3;
 	/* 8255 in mode 0 */
-	if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
+	if (offset == 0) /* Port A => to printer or Disc II*/
 	{
 		m_hector_port_a = data;
 		/* Port A => to printer*/
@@ -442,16 +449,13 @@ void hec2hrp_state::io_8255_w(offs_t offset, uint8_t data)
 		So, everything sent to the Disc2 unit will be printed too! */
 
 		if (BIT(m_hector_port_c_l, 0)) // PC0 (bit 0) = strobe printer
-		{
 			m_printer->output(m_hector_port_a);
-		}
 	}
-
-	if ((offset & 0x3) == 0x1) /* Port B */
+	else
+	if (offset == 1) /* Port B */
 		m_hector_port_b = data;
-
-
-	if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
+	else
+	if (offset == 2) /* Port C => depending cmd word */
 	{
 		if (!BIT(m_hector_port_cmd, 0))
 		{
@@ -476,11 +480,8 @@ void hec2hrp_state::io_8255_w(offs_t offset, uint8_t data)
 		if (!BIT(m_hector_port_cmd, 3))
 			m_hector_port_c_h = (data & 0xf0);
 	}
-
-	if ((offset & 0x3) == 0x3) /* command */
-	{
+	else  // offset=3
 		m_hector_port_cmd = data;
-	}
 }
 /* End of 8255 managing */
 
@@ -488,34 +489,44 @@ void hec2hrp_state::io_8255_w(offs_t offset, uint8_t data)
 /*******************  PIO write handler for MX40 *******************/
 void hec2hrp_state::mx40_io_port_w(offs_t offset, uint8_t data)
 {
+	offset &= 0xff;
+
 	/* Bank switching on several address */
-	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
-	if ((offset &0x0ff) == 0x41) /* Port page 1*/
+	if (offset == 0x40) /* Port page 0*/
+		m_bank[2]->set_entry(HECTORMX_BANK_PAGE0);
+	else
+	if (offset == 0x41) /* Port page 1*/
 	{
-		membank("bank2")->set_entry(HECTORMX_BANK_PAGE1);
-		m_hector_flag_80c=0;
+		m_bank[2]->set_entry(HECTORMX_BANK_PAGE1);
+		m_hector_flag_80c = false;
 	}
-	if ((offset &0x0ff) == 0x44) /* Port page 2  => 42 pour MX80*/
-		membank("bank2")->set_entry(HECTORMX_BANK_PAGE2);
-	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
-		m_hector_flag_80c=0;/* No 80c in 40c !*/
+	else
+	if (offset == 0x44) /* Port page 2  => 42 on MX80*/
+		m_bank[2]->set_entry(HECTORMX_BANK_PAGE2);
+	else
+	if (offset == 0x49) /* Port screen resolution*/
+		m_hector_flag_80c = false;/* No 80c in 40c !*/
 }
 
 /*******************  PIO write handlerfor MX80 *******************/
 void hec2hrp_state::mx80_io_port_w(offs_t offset, uint8_t data)
 {
-	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
-	if ((offset &0x0ff) == 0x41) /* Port page 1*/
+	offset &= 0xff;
+
+	if (offset == 0x40) /* Port page 0*/
+		m_bank[2]->set_entry(HECTORMX_BANK_PAGE0);
+	else
+	if (offset == 0x41) /* Port page 1*/
 	{
-		membank("bank2")->set_entry(HECTORMX_BANK_PAGE1);
-		m_hector_flag_80c=0;
+		m_bank[2]->set_entry(HECTORMX_BANK_PAGE1);
+		m_hector_flag_80c = false;
 	}
-	if ((offset &0x0ff) == 0x42) /* Port page 2  => different port on MX40 */
-		membank("bank2")->set_entry(HECTORMX_BANK_PAGE2);
-	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
-		m_hector_flag_80c=1;
+	else
+	if (offset == 0x42) /* Port page 2  => different port on MX40 */
+		m_bank[2]->set_entry(HECTORMX_BANK_PAGE2);
+	else
+	if (offset == 0x49) /* Port screen resolution*/
+		m_hector_flag_80c = true;
 }
 
 /********************************************************************************
@@ -529,43 +540,43 @@ switch(Adresse )
 {
 	case 0x2000:
 	{
-		m_au[ 0] =  BIT(Value, 7);
-		m_au[ 8] =  BIT(Value, 6);
+		m_au[ 0] = BIT(Value, 7);
+		m_au[ 8] = BIT(Value, 6);
 		break;
 	}
 
 	case 0x2001:
 	{
-		m_au[ 1] =  BIT(Value, 7);
-		m_au[ 9] =  BIT(Value, 6);
+		m_au[ 1] = BIT(Value, 7);
+		m_au[ 9] = BIT(Value, 6);
 		break;
 	}
 
 	case 0x2002:
 	{
-		m_au[ 2] =  BIT(Value, 7);
-		m_au[10] =  BIT(Value, 6);
+		m_au[ 2] = BIT(Value, 7);
+		m_au[10] = BIT(Value, 6);
 		break;
 	}
 
 	case 0x2003:
 	{
-		m_au[ 3] =  BIT(Value, 7);
-		m_au[11] =  BIT(Value, 6);
+		m_au[ 3] = BIT(Value, 7);
+		m_au[11] = BIT(Value, 6);
 		break;
 	}
 
 	case 0x2800:
 	{
-		m_au[ 4] =  BIT(Value, 7);
-		m_au[12] =  BIT(Value, 6);
+		m_au[ 4] = BIT(Value, 7);
+		m_au[12] = BIT(Value, 6);
 		break;
 	}
 
 	case 0x2801:
 	{
-		m_au[ 5] =  BIT(Value, 7);
-		m_au[13] =  BIT(Value, 6);
+		m_au[ 5] = BIT(Value, 7);
+		m_au[13] = BIT(Value, 6);
 		break;
 	}
 
@@ -578,8 +589,8 @@ switch(Adresse )
 
 	case 0x2803:
 	{
-		m_au[ 7] =  BIT(Value, 7);
-		m_au[15] =  BIT(Value, 6);
+		m_au[ 7] = BIT(Value, 7);
+		m_au[15] = BIT(Value, 6);
 		break;
 	}
 
@@ -631,8 +642,8 @@ void hec2hrp_state::init_sn76477()
 	m_pin_value[17][0] = CAP_N(47.0) ;  /* measured */
 	m_pin_value[17][1] = CAP_N(580.0) ; /* measured */
 	/* R VCO   Version 3*/
-	m_pin_value[18][1] = RES_K(1400.0   );/* Measured 1300, instead of 1Mohm*/
-	m_pin_value[18][0] = RES_K( 203.548 );/* Measured 223, instead of 193.548 (1000 // 240KOhm)*/
+	m_pin_value[18][1] = RES_K(1400.0); /* Measured 1300, instead of 1Mohm*/
+	m_pin_value[18][0] = RES_K(203.548);/* Measured 223, instead of 193.548 (1000 // 240KOhm)*/
 
 	/* VCO Controle*/
 	m_pin_value[16][0] = 0.0;  /* Volts  */
@@ -666,14 +677,14 @@ void hec2hrp_state::init_sn76477()
 	m_pin_value[6][1] = CAP_U(08.60);    /* 0.48*/
 
 	/* Values from schematic */
-	m_pin_value[5][1] = RES_K(3.30 ) ;   /* 330Kohm*/
-	m_pin_value[5][0] = RES_K(1.76 ) ;   /* 76 Kohm*/
+	m_pin_value[5][1] = RES_K(3.30 );    /* 330Kohm*/
+	m_pin_value[5][0] = RES_K(1.76 );    /* 76 Kohm*/
 
 	/* Noise is not controlled by the audio bus! */
 	/* Only value[0] is documented! */
-	m_pin_value[4][0] = RES_K(47) ;      /* 47 K ohm*/
+	m_pin_value[4][0] = RES_K(47);       /* 47 K ohm*/
 	m_pin_value[12][0] = RES_K(100);     /* 100K ohm*/
-	m_pin_value[3][0] = 0 ;              /* NC*/
+	m_pin_value[3][0] = 0;               /* NC*/
 
 	/* Envelope-related */
 	m_pin_value[ 1][0] = 0;
@@ -683,22 +694,9 @@ void hec2hrp_state::init_sn76477()
 	m_pin_value[28][1] = 1;
 
 	/* SN pins initialized to 0 */
-	m_au[0]=0;
-	m_au[1]=0;
-	m_au[2]=0;
-	m_au[3]=0;
-	m_au[4]=0;
-	m_au[5]=0;
-	m_au[6]=0;
-	m_au[7]=0;
-	m_au[8]=0;
-	m_au[9]=0;
-	m_au[10]=0;
-	m_au[11]=0;
-	m_au[12]=0;
-	m_au[13]=0;
-	m_au[14]=0;
-	m_au[15]=0;
+	for (u8 i = 0; i < 16; i++)
+		m_au[i]=0;
+
 	m_val_mixer = 0;
 }
 
@@ -752,16 +750,16 @@ void hec2hrp_state::update_sound(uint8_t data)
 	m_sn->enable_w(m_pin_value[9][m_au[14]]);
 }
 
-void hec2hrp_state::hector_reset(int hr, int with_d2)
+void hec2hrp_state::hector_reset(bool hr, bool with_d2)
 {
 	// Hector init
 	m_hector_flag_hr = hr;
-	m_flag_clk = 0;
-	m_write_cassette = 0;
+	m_flag_clk = false;
+	m_write_cassette = false;
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// Disc II init
-	if (with_d2 == 1)
+	if (with_d2)
 	{
 		m_disc2cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_upd_fdc->reset();
@@ -855,7 +853,7 @@ void hec2hrp_state::hector_disc2_reset()
 	m_disc2cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_upd_fdc->reset();
 	// Select ROM to cold restart
-	membank("bank3")->set_entry(DISCII_BANK_ROM);
+	m_bank[3]->set_entry(DISCII_BANK_ROM);
 
 	// Clear the Hardware's buffers
 	m_hector_disc2_data_r_ready = 0x0; /* =ff when PC2 = true and data is in read buffer (state->m_hector_disc2_data_read) */
@@ -872,13 +870,13 @@ void hec2hrp_state::hector_disc2_reset()
 uint8_t hec2hrp_state::disc2_io00_port_r()
 {
 	/* Switch Disc 2 to RAM */
-	membank("bank3")->set_entry(DISCII_BANK_RAM);
+	m_bank[3]->set_entry(DISCII_BANK_RAM);
 	return 0;
 }
 void hec2hrp_state::disc2_io00_port_w(uint8_t data)
 {
 	/* Switch Disc 2 to RAM */
-	membank("bank3")->set_entry(DISCII_BANK_RAM);
+	m_bank[3]->set_entry(DISCII_BANK_RAM);
 }
 uint8_t hec2hrp_state::disc2_io20_port_r()
 {
