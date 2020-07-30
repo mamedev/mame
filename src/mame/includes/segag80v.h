@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "audio/segasnd.h"
+#include "audio/segausb.h"
 #include "audio/segag80v.h"
 #include "cpu/z80/z80.h"
 #include "machine/segag80.h"

@@ -12,6 +12,7 @@
 
 #include "audio/segag80r.h"
 #include "audio/segasnd.h"
+#include "audio/segausb.h"
 #include "machine/i8255.h"
 #include "machine/segag80.h"
 #include "sound/samples.h"
