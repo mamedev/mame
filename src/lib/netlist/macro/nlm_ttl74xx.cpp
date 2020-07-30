@@ -838,7 +838,7 @@ static NETLIST_START(TTL_7475_DIP)
 		C.CLK, /*  3C4C |4  7475 13| 1C2C  */ A.CLK,
 		A.VCC, /*   VCC |5       12| GND   */ A.GND,
 		  C.D, /*    3D |6       11| 3QQ   */ C.QQ,
-		  D.D, /*    4D |7       10| 3Q    */ C.Q
+		  D.D, /*    4D |7       10| 3Q    */ C.Q,
 		 D.QQ, /*   4QQ |8        9| 4Q    */ D.Q
 			   /*       +-------------+    */
 	)

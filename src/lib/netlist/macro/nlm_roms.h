@@ -30,6 +30,15 @@
 #define EPROM_2716_DIP(name)                                                   \
 		NET_REGISTER_DEV(EPROM_2716_DIP, name)
 
+#define TTL_82S16_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_82S16_DIP, name)
+
+#define PROM_82S115_DIP(name)                                                  \
+		NET_REGISTER_DEV(PROM_82S115_DIP, name)
+
+#define RAM_2102A_DIP(name)                                                    \
+		NET_REGISTER_DEV(RAM_2102A_DIP, name)
+
 #endif // NL_AUTO_DEVICES
 
 
