@@ -84,7 +84,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_nosensors = false;
 	m_magnets = false;
 	m_inductive = false;
-	m_ui_enabled = 3;
+	m_ui_enabled = 7;
 	set_delay(attotime::never);
 
 	// set defaults for most common use case (aka chess)
@@ -789,16 +789,25 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("SS_CHECK", 1<<15, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_spawn, 16) PORT_NAME("Spawn Piece 16")
 
 	PORT_START("UI")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Modifier 2 / Force Sensor") // hold while clicking to force sensor (ignore piece)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Modifier 1 / Force Piece") // hold while clicking to force piece (ignore sensor)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<0, NOTEQUALS, 0) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Modifier 2 / Force Sensor") // hold while clicking to force sensor (ignore piece)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<0, NOTEQUALS, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Modifier 1 / Force Piece") // hold while clicking to force piece (ignore sensor)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sensorboard_device, check_sensor_busy) // check if any sensor is busy / pressed (read-only)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_hand, 0) PORT_NAME("Remove Piece")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 0) PORT_NAME("Undo Buffer First")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 1) PORT_NAME("Undo Buffer Previous")
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 2) PORT_NAME("Undo Buffer Next")
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 3) PORT_NAME("Undo Buffer Last")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 0) PORT_NAME("Board Clear")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 1) PORT_NAME("Board Reset")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_hand, 0) PORT_NAME("Remove Piece")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 0) PORT_NAME("Undo Buffer First")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 1) PORT_NAME("Undo Buffer Previous")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 2) PORT_NAME("Undo Buffer Next")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 3) PORT_NAME("Undo Buffer Last")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 0) PORT_NAME("Board Clear")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1<<1, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 1) PORT_NAME("Board Reset")
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x03, 0x00, "Remember Position" ) PORT_CONDITION("UI_CHECK", 1<<2, NOTEQUALS, 0)
+	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x00, "Auto" )
+	PORT_CONFNAME( 0x04, 0x00, "Show Pieces" ) PORT_CONDITION("UI_CHECK", 1<<2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_refresh, 0)
+	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("BS_CHECK") // board size (internal use)
 	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sensorboard_device, check_bs_mask)
@@ -807,16 +816,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sensorboard_device, check_ss_mask)
 
 	PORT_START("UI_CHECK") // UI enabled (internal use)
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sensorboard_device, check_ui_enabled)
-
-	PORT_START("CONF")
-	PORT_CONFNAME( 0x03, 0x00, "Remember Position" )
-	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x00, "Auto" )
-	PORT_CONFNAME( 0x04, 0x00, "Show Pieces" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_refresh, 0)
-	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(sensorboard_device, check_ui_enabled)
 INPUT_PORTS_END
 
 ioport_constructor sensorboard_device::device_input_ports() const

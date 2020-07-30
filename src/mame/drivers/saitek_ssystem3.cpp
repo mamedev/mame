@@ -52,7 +52,6 @@ TODO:
   Should be doable to add, but 6522 device doesn't support live clock changes.
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
-- add chessboard screen to artwork
 - dump/add printer unit
 - dump/add ssystem3 1980 program revision, were the BTANB fixed?
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
