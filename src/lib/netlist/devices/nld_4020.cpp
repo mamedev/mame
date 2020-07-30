@@ -17,7 +17,7 @@ namespace netlist
 	template <unsigned _TotalBits, unsigned _LiveBitmask>
 	NETLIB_OBJECT(CD4020_sub)
 	{
-		static_assert((_LiveBitmask >> _TotalBits) == 0);
+		static_assert((_LiveBitmask >> _TotalBits) == 0, "Live bitmask too large");
 
 		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
 		, m_IP(*this, "IP", NETLIB_DELEGATE(ip))
