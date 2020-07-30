@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -24,8 +25,6 @@ public:
 
 	void tankbatt(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
@@ -35,24 +34,22 @@ private:
 	required_shared_ptr<uint8_t> m_bulletsram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_nmi_enable;
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
 
 	uint8_t in0_r(offs_t offset);
 	uint8_t in1_r(offs_t offset);
 	uint8_t dsw_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(interrupt_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(demo_interrupt_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_off_w);
 	DECLARE_WRITE_LINE_MEMBER(sh_expl_w);
 	DECLARE_WRITE_LINE_MEMBER(sh_engine_w);
 	DECLARE_WRITE_LINE_MEMBER(sh_fire_w);
-	void irq_ack_w(uint8_t data);
+	void intack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coincounter_w);
 	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
 	void videoram_w(offs_t offset, uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
