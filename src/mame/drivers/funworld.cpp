@@ -98,6 +98,7 @@
   * Jolly Card (Italian, blue TAB board, encrypted),            bootleg,            199?.
   * Jolly Card (Italian, encrypted bootleg, set 1),             bootleg,            1990.
   * Jolly Card (Italian, encrypted bootleg, set 2),             bootleg,            1993.
+  * Jolly Card (Italian, encrypted bootleg, set 3),             bootleg,            1993.
   * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
   * Royal Card (Italian, Dino 4 hardware, encrypted),           unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                              unknown,            1998.
@@ -4097,7 +4098,7 @@ ROM_END
 
 
 /*
-    Jolly Card (italian encrypted bootleg)
+    Jolly Card (Italian encrypted bootleg)
     --------------------------------------
 
     - 1x UM6845P
@@ -4127,7 +4128,7 @@ ROM_END
     Only remote credits, as can be seen in test mode.
 */
 
-ROM_START( jolycdib )   /* bootleg PCB, encrypted graphics */
+ROM_START( jolycdib )	// bootleg PCB, encrypted graphics
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(c76fdc79) SHA1(fc75c274d64fa9c99a546d424f38e79f1acf2576) )
 
@@ -4135,7 +4136,7 @@ ROM_START( jolycdib )   /* bootleg PCB, encrypted graphics */
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) ) // sldh
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) ) // sldh
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
 	ROM_LOAD( "jolycdib_nvram.bin", 0x0000, 0x0800, CRC(038a71fe) SHA1(99d3befbee8f9f86ce7f074de7f16fb25053c077) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -4147,7 +4148,7 @@ ROM_END
 
 
 /*
-    Jolly Card (italian encrypted bootleg, set 2)
+    Jolly Card (Italian encrypted bootleg, set 2)
     ---------------------------------------------
 
     This program works in both 'normal' and 'remote' modes,
@@ -4180,6 +4181,44 @@ ROM_START( jolycdic )   /* another bootleg PCB, encrypted graphics */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8b.bin", 0x0000, 0x0117, NO_DUMP ) // sldh
+ROM_END
+
+/*
+  Jolly Card (Italian encrypted bootleg, set 3)
+  ---------------------------------------------
+
+  Running in a Cleco bootleg board.
+  Encrypted GFX.
+
+  Differences: 1 byte.
+  
+         jolycdib     jolycdic
+
+  C1D6:    0x60         0x10
+
+  C1E5:  lda #$60     lda #$10
+  C1E7:  sta $0000    sta $0000
+  C1EA:  sta $0003    sta $0003
+  C1ED:  sta $07f8    sta $07f8
+ 
+*/
+ROM_START( jolycdii )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "145-3.bin", 0x8000, 0x8000, CRC(812f88f1) SHA1(d387b7e4818dc6f5f2b6161a623c6e4f1eeedf2a) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "145-2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
+	ROM_LOAD( "145-1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )	// Default NVRAM
+	ROM_LOAD( "jolycdii_nvram.bin", 0x0000, 0x0800, CRC(c2a138ad) SHA1(463fed8b495fa5286513f52fa09cf97f29e5f40e) )
+
+	ROM_REGION( 0x0800, "proms", 0 )	// Not a bipolar PROM. Just a replacement.
+	ROM_LOAD( "ws57c291_d27hc65d.bin", 0x0000, 0x0200, CRC(d96f3760) SHA1(07e80baf9c6c08171195b7810261e043197a9c3c) )
+	ROM_IGNORE(                                0x0600 )	// empty
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal16v8b.bin", 0x0000, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -8148,6 +8187,7 @@ GAME(  198?, nevadafw,  0,        saloon,   saloon,    funworld_state, init_salo
 GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, init_tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg, set 1)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, init_tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg, set 2)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
+GAMEL( 1993, jolycdii,  jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "Cleco bootleg",   "Jolly Card (Italian, encrypted bootleg, set 3)",  0,                       layout_jollycrd ) // Cleco bootleg PCB
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, init_dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
