@@ -6,10 +6,12 @@ Libretro MAME core build status:
 
 | OS/Compiler           | Status        |
 | --------------------- |:-------------:|
-| Linux GCC / OSX Clang | [![Build Status](https://travis-ci.org/libretro/mame.svg?branch=master)](https://travis-ci.org/libretro/mame) |
+| Linux x86_64 | ![MAME-libretro Linux x86_64](https://github.com/libretro/mame/workflows/MAME-libretro%20Linux%20x86_64/badge.svg) |
+| Windows x86_64 | ![MAME-libretro Windows x86_64](https://github.com/libretro/mame/workflows/MAME-libretro%20Windows%20x86_64/badge.svg) |
+| macOS x86_64 | ![MAME-libretro macOS x86_64](https://github.com/libretro/mame/workflows/MAME-libretro%20macOS%20x86_64/badge.svg) |
+| Android ARMv7 | ![MAME-libretro Android ARMv7](https://github.com/libretro/mame/workflows/MAME-libretro%20Android%20ARMv7/badge.svg) |
 
-To build libretro MAME core from source you need to use `Makefile.libretro` make
-file:
+To build libretro MAME core from source you need to use `Makefile.libretro` make file:
 
 ```
 make -f Makefile.libretro
