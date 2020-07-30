@@ -73,7 +73,7 @@ protected:
 	template<int _PIT, int _CH>
 	DECLARE_WRITE_LINE_MEMBER(pit_write_line)
 	{
-		attotime time = machine().scheduler().time();
+//		attotime time = machine().scheduler().time();
 		if (_PIT == 0)
 			m_nl_pit0_out[_CH]->write_line(state);
 		else if (_PIT == 1)
