@@ -82,41 +82,7 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(7474_dip)
-	{
-		NETLIB_CONSTRUCTOR(7474_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", "A.CLRQ");
-			register_subalias("2", "A.D");
-			register_subalias("3", "A.CLK");
-			register_subalias("4", "A.PREQ");
-			register_subalias("5", "A.Q");
-			register_subalias("6", "A.QQ");
-			register_subalias("7", "A.GND");
-
-			register_subalias("8", "B.QQ");
-			register_subalias("9", "B.Q");
-			register_subalias("10", "B.PREQ");
-			register_subalias("11", "B.CLK");
-			register_subalias("12", "B.D");
-			register_subalias("13", "B.CLRQ");
-			register_subalias("14", "A.VCC");
-
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
-		}
-		//NETLIB_UPDATEI();
-		//NETLIB_RESETI();
-
-	private:
-		NETLIB_SUB(7474) m_A;
-		NETLIB_SUB(7474) m_B;
-	};
-
 	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7474_dip, "TTL_7474_DIP", "")
 
 	} //namespace devices
 } // namespace netlist
