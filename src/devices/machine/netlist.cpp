@@ -364,6 +364,9 @@ void netlist_mame_analog_input_device::write(const double val)
 void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
+#if NETLIST_CREATE_CSV
+	nl_owner().log_value_double(m_param_name, *((double *) ptr));
+#endif
 	m_param->set(*((double *) ptr));
 }
 
@@ -390,12 +393,18 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
+#if NETLIST_CREATE_CSV
+	nl_owner().log_value_int(m_param_name, param);
+#endif
 	m_param->set(param);
 }
 
 void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
+#if NETLIST_CREATE_CSV
+	nl_owner().log_value_int(m_param_name, param);
+#endif
 	m_param->set(param);
 }
 
@@ -432,6 +441,26 @@ void netlist_mame_sub_interface::set_mult_offset(const double mult, const double
 	m_mult = mult;
 	m_offset = offset;
 }
+
+#if NETLIST_CREATE_CSV
+void netlist_mame_device::log_value_int(char const* param, int value)
+{
+	if (m_csv_file != nullptr)
+	{
+		attotime time = machine().scheduler().time();
+		fprintf(m_csv_file, "%s,%s,%d\n", time.as_string(), param, value);
+	}
+}
+
+void netlist_mame_device::log_value_double(char const* param, double value)
+{
+	if (m_csv_file != nullptr)
+	{
+		attotime time = machine().scheduler().time();
+		fprintf(m_csv_file, "%s,%s,%f\n", time.as_string(), param, value);
+	}
+}
+#endif
 
 netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *param_name)
 	: device_t(mconfig, NETLIST_ANALOG_INPUT, tag, owner, 0)
@@ -1054,6 +1083,12 @@ void netlist_mame_device::device_start()
 
 	m_device_reset_called = false;
 
+#if NETLIST_CREATE_CSV
+	std::string name = machine().system().name;
+	name += ".csv";
+	m_csv_file = fopen(name.c_str(), "wb");
+#endif
+
 	LOGDEVCALLS("device_start exit\n");
 }
 
@@ -1087,6 +1122,10 @@ void netlist_mame_device::device_stop()
 {
 	LOGDEVCALLS("device_stop\n");
 	netlist().exec().stop();
+#if NETLIST_CREATE_CSV
+	if (m_csv_file != nullptr)
+		fclose(m_csv_file);
+#endif
 }
 
 void netlist_mame_device::device_post_load()

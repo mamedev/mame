@@ -15,6 +15,10 @@
 
 #include "../../lib/netlist/nltypes.h"
 
+#ifndef NETLIST_CREATE_CSV
+#define NETLIST_CREATE_CSV (0)
+#endif
+
 class netlist_mame_stream_output_device;
 class nld_sound_in;
 
@@ -128,6 +132,15 @@ private:
 
 	func_type m_setup_func;
 	bool m_device_reset_called;
+
+#if NETLIST_CREATE_CSV
+public:
+	void log_value_int(char const* param, int value);
+	void log_value_double(char const* param, double value);
+
+private:
+	FILE* m_csv_file = nullptr;
+#endif
 };
 
 // ----------------------------------------------------------------------------------------
