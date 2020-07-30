@@ -29,5 +29,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mame_libretro.zip
         tag: Android_ARMv7
+        release_name: Android ARMv7
         asset_name: mame_libretro.zip
         overwrite: true
