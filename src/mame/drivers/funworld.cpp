@@ -7386,6 +7386,30 @@ ROM_START( gratispka )	// Gratis Poker (V.204, Set 2)
 ROM_END
 
 
+/*
+  Γκόyλιτ
+  Nkoúlit
+  Gullit
+  
+  Greek hack of Royal Card.
+
+*/
+ROM_START( nkoulit )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c256-3.bin", 0x8000, 0x8000, CRC(3f4f671d) SHA1(0aa87f813567f7a537315bf3d452343e5a449e13) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "27c256-2.bin", 0x0000, 0x8000, CRC(4a9ea5ad) SHA1(50504544265646e12ce769a1fd40d7afeae8b8d3) )
+	ROM_LOAD( "27c256-1.bin", 0x8000, 0x8000, CRC(7b3a6d1a) SHA1(b7f2e534ad4467cd0a9d86019be8110caf45c024) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
+	ROM_LOAD( "nkoulit_nvram.bin", 0x0000, 0x0800, CRC(73584f67) SHA1(4aab0d4fe846592e1cbc8b3c2411ddc1bf79fd95) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29pc.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+ROM_END
+
+ 
 /**************************
 *  Driver Initialization  *
 **************************/
@@ -8198,14 +8222,15 @@ GAME(  1990, funquiza,  0,        funquiz,  funquiza,  funworld_state, empty_ini
 GAME(  1990, funquizb,  0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",       "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
-GAMEL( 1986, novoplay,  0,        fw2ndpal,   novoplay,  funworld_state,   empty_init, ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes,   intrgmes,  intergames_state, empty_init, ROT0, "Inter Games",     "Joker Card (Inter Games)",                       0 )
-GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                 MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                 MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "unknown Fun World A0-1 game",                    MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, jokcrdep,  0,        fw_brick_2, fw_brick1, funworld_state,   empty_init, ROT0, "Fun World",       "Joker Card / Multi Card (Epoxy brick CPU)",      MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 199?, gratispk,  0,        gratispk,   funworld,  funworld_state,   empty_init, ROT0, "Mega Soft",       "Gratis Poker (V.204, Set 1)",                    0,                       layout_jollycrd )
-GAMEL( 199?, gratispka, gratispk, gratispk,   funworld,  funworld_state,   empty_init, ROT0, "Mega Soft",       "Gratis Poker (V.204, Set 2)",                    0,                       layout_jollycrd )
+GAMEL( 1986, novoplay,  0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",           0,                       layout_novoplay )
+GAME(  1991, intrgmes,  0,        intrgmes,   intrgmes,  intergames_state, empty_init,   ROT0, "Inter Games",       "Joker Card (Inter Games)",                   0 )
+GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A0-1 game",                MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, jokcrdep,  0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "Joker Card / Multi Card (Epoxy brick CPU)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 199?, gratispk,  0,        gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, Set 1)",                0,                       layout_jollycrd )
+GAMEL( 199?, gratispka, gratispk, gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, Set 2)",                0,                       layout_jollycrd )
+GAMEL( 1995, nkoulit,   0,        royalcd1,   royalcrd,  funworld_state,   init_tabblue, ROT0, "JK Amusement",      "Nkoulit (Gullit) (encrypted GFX)",           0,                       layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
