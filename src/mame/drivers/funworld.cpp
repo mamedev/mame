@@ -119,7 +119,7 @@
   * Gratis Poker (V.204, Set 1),                                Mega Soft,          1995.
   * Gratis Poker (V.204, Set 2),                                Mega Soft,          1995.
   * Nkoulit (Gullit) (encrypted GFX),                           JK Amusement,       1995.
-  * Reflex Card (English, serial protected),                    TAB Austria,        1999.
+  * Reflex Cards (English, serial protected),                   TAB Austria,        1999.
   * Royal Card (stealth with NES multigame),                    bootleg,            1991.
   * Royal Card (stealth with MSX multigame),                    bootleg,            1991.
 
@@ -7463,7 +7463,7 @@ ROM_END
 
  
 /*
-  Reflex Card (English)
+  Reflex Cards (English)
   Need special NVRAM to boot.
 
   Without the factory NVRAM, you can generate one.
@@ -8324,7 +8324,7 @@ GAMEL( 1991, jokcrdep,   0,        fw_brick_2, fw_brick1, funworld_state,   empt
 GAMEL( 199?, gratispk,   0,        gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, Set 1)",                  0,                       layout_jollycrd )
 GAMEL( 199?, gratispka,  gratispk, gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, Set 2)",                  0,                       layout_jollycrd )
 GAMEL( 1995, nkoulit,    royalcrd, royalcd1,   royalcrd,  funworld_state,   init_tabblue, ROT0, "JK Amusement",      "Nkoulit (Gullit) (encrypted GFX)",             0,                       layout_jollycrd )
-GAMEL( 1999, reflexcrd,  royalcrd, royalcd1,   royalcrd,  funworld_state,   empty_init,   ROT0, "TAB Austria",       "Reflex Card (English, serial protected)",      0,                       layout_jollycrd )
+GAMEL( 1999, reflexcrd,  royalcrd, royalcd1,   royalcrd,  funworld_state,   empty_init,   ROT0, "TAB Austria",       "Reflex Cards (English, serial protected)",     0,                       layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
