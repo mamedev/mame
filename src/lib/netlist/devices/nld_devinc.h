@@ -1279,7 +1279,7 @@
 
 // usage       : CD4017_DIP(name)
 #define CD4017_DIP(...)                                                \
-	NET_REGISTER_DEVEXT(CD40171_DIP, __VA_ARGS__)
+	NET_REGISTER_DEVEXT(CD4017_DIP, __VA_ARGS__)
 
 // usage       : CD4022_DIP(name)
 #define CD4022_DIP(...)                                                \

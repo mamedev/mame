@@ -17,12 +17,12 @@ namespace netlist
 	template <unsigned _MaxCount>
 	NETLIB_OBJECT(CD4017_base)
 	{
-		NETLIB_CONSTRUCTOR(CD4017_base)
-		, m_CLK(*this, "IP", NETLIB_DELEGATE(clk))
+		NETLIB_CONSTRUCTOR_MODEL(CD4017_base, "CD4XXX")
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_CLKEN(*this, "CLKEN", NETLIB_DELEGATE(inputs))
 		, m_RESET(*this, "RESET", NETLIB_DELEGATE(inputs))
 		, m_CO(*this, "CO")
-		, m_Q(*this, 1, "Q{}")
+		, m_Q(*this, 0, "Q{}")
 		, m_cnt(*this, "m_cnt", 0)
 		, m_supply(*this)
 		{
