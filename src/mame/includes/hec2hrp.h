@@ -3,41 +3,7 @@
 /////////////////////////////////////////////////////////////////////
 //////   HECTOR HEADER FILE /////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-/*
-        Hector 2HR+
-        Victor
-        Hector 2HR
-        Hector HRX
-        Hector MX40c
-        Hector MX80c
-        Hector 1
-        Interact
 
-        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-        31/06/2009 Video - Robbbert
-
-        29/10/2009 Update skeleton to functional machine
-                    by yo_fr            (jj.stac @ aliceadsl.fr)
-
-                => add Keyboard,
-                => add color,
-                => add cassette,
-                => add sn76477 sound and 1bit sound,
-                => add joysticks (stick, pot, fire)
-                => add BR/HR switching
-                => add bank switch for HRX
-                => add device MX80c and bank switching for the ROM
-        03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-                => add the port mapping for keyboard
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
-        11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
-
-            don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-            (and thank's to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
-
-    TODO :  Add the cartridge function,
-            Adjust the one shot and A/D timing (sn76477)
-*/
 #ifndef MAME_INCLUDES_HEC2HRP_H
 #define MAME_INCLUDES_HEC2HRP_H
 
@@ -120,10 +86,10 @@ public:
 	void interact(machine_config &config);
 	void interact_common(machine_config &config);
 
-protected:
+private:
 	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	void hector_reset(bool hr, bool with_d2);
-
+	void video_start() override;
 	void keyboard_w(uint8_t data);
 	uint8_t keyboard_r(offs_t offset);
 	void sn_2000_w(offs_t offset, uint8_t data);
@@ -138,19 +104,7 @@ protected:
 	bool m_is_extended;
 	void init_palette(palette_device &);
 	void hector_init();
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
-	optional_device<printer_image_device> m_printer;
-	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_vram;
-	optional_memory_bank_array<4> m_bank;
-	required_region_ptr<u8> m_rom;
-	optional_device<ram_device> m_ram;
-
-private:
 	void minidisc_control_w(uint8_t data);
-
 	void switch_bank_w(offs_t offset, uint8_t data);
 	uint8_t io_8255_r(offs_t offset);
 	void io_8255_w(offs_t offset, uint8_t data);
@@ -222,8 +176,6 @@ private:
 	void init_sn76477();
 	void update_sound(uint8_t data);
 	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
-	/*----------- defined in machine/hecdisk2.c -----------*/
-
 	void hector_disc2_reset();
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void interact_mem(address_map &map);
@@ -238,6 +190,14 @@ private:
 	void hecdisc2_io(address_map &map);
 	void hecdisc2_mem(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<printer_image_device> m_printer;
+	required_device<palette_device> m_palette;
+	optional_shared_ptr<uint8_t> m_vram;
+	optional_memory_bank_array<4> m_bank;
+	required_region_ptr<u8> m_rom;
+	optional_device<ram_device> m_ram;
 	optional_shared_ptr<uint8_t> m_hector_vram;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<discrete_device> m_discrete;

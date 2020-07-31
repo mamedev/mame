@@ -529,6 +529,47 @@ void hec2hrp_state::mx80_io_port_w(offs_t offset, uint8_t data)
 		m_hector_flag_80c = true;
 }
 
+void hec2hrp_state::video_start()
+{
+	save_item(NAME(m_has_disc2));
+	save_item(NAME(m_has_minidisc));
+	save_item(NAME(m_is_hr));
+	save_item(NAME(m_is_extended));
+	save_item(NAME(m_hector_flag_hr));
+	save_item(NAME(m_hector_flag_80c));
+	save_item(NAME(m_hector_color));
+	save_item(NAME(m_hector_disc2_data_r_ready));
+	save_item(NAME(m_hector_disc2_data_w_ready));
+	save_item(NAME(m_hector_disc2_data_read));
+	save_item(NAME(m_hector_disc2_data_write));
+	save_item(NAME(m_hector_disc2_rnmi));
+	save_item(NAME(m_state3000));
+	save_item(NAME(m_write_cassette));
+	save_item(NAME(m_ck_signal));
+	save_item(NAME(m_flag_clk));
+	save_item(NAME(m_pin_value));
+	save_item(NAME(m_au));
+	save_item(NAME(m_val_mixer));
+	save_item(NAME(m_oldstate3000));
+	save_item(NAME(m_oldstate1000));
+	save_item(NAME(m_pot0));
+	save_item(NAME(m_pot1));
+	save_item(NAME(m_actions));
+	save_item(NAME(m_hector_port_a));
+	save_item(NAME(m_hector_port_b));
+	save_item(NAME(m_hector_port_c_h));
+	save_item(NAME(m_hector_port_c_l));
+	save_item(NAME(m_hector_port_cmd));
+	save_item(NAME(m_cassette_bit));
+	save_item(NAME(m_cassette_bit_mem));
+	save_item(NAME(m_data_k7));
+	save_item(NAME(m_counter_write));
+	save_item(NAME(m_irq_current_state));
+	save_item(NAME(m_nmi_current_state));
+	save_item(NAME(m_hector_videoram_hrx));
+}
+
+
 /********************************************************************************
  sound management
 ********************************************************************************/
