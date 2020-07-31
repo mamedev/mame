@@ -700,6 +700,17 @@
 	NET_REGISTER_DEVEXT(CD4006_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_4017.cpp
+// ---------------------------------------------------------------------
+// usage       : CD4017(name)
+#define CD4017(...)                                                    \
+	NET_REGISTER_DEVEXT(CD4017, __VA_ARGS__)
+
+// usage       : CD4022(name)
+#define CD4022(...)                                                    \
+	NET_REGISTER_DEVEXT(CD4022, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_4020.cpp
 // ---------------------------------------------------------------------
 // usage       : CD4020_WI(name, pIP, pRESET, pVDD, pVSS)
@@ -1265,6 +1276,14 @@
 // usage       : CD4070_DIP(name)
 #define CD4070_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4070_DIP, __VA_ARGS__)
+
+// usage       : CD4017_DIP(name)
+#define CD4017_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD40171_DIP, __VA_ARGS__)
+
+// usage       : CD4022_DIP(name)
+#define CD4022_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD4022_DIP, __VA_ARGS__)
 
 // usage       : CD4020_DIP(name)
 #define CD4020_DIP(...)                                                \
