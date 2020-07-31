@@ -322,6 +322,35 @@ popeyej
 popeyejo
 popeyehs
 
+@source:segag80r.cpp
+005                             // (c) 1981
+astrob                          // (c) 1981
+astrob1                         // (c) 1981
+astrob2                         // (c) 1981
+astrob2a                        // (c) 1981
+astrob2b                        // (c) 1981
+astrobg                         // (c) 1981
+monsterb                        // (c) 1982
+monsterb2                       // (c) 1982
+pignewt                         // (c) 1983
+pignewta                        // (c) 1983
+sindbadm                        // 834-5244 (c) 1983 Sega
+spaceod                         // (c) 1981
+spaceod2                        // (c) 1981
+
+@source:segag80v.cpp
+elim2                           // (c) 1981 Gremlin
+elim2a                          // (c) 1981 Gremlin
+elim2c                          // (c) 1981 Gremlin
+elim4                           // (c) 1981 Gremlin
+elim4p                          // (c) 1981 Gremlin
+spacfury                        // (c) 1981
+spacfurya                       // no copyright notice
+spacfuryb                       // no copyright notice
+startrek                        // (c) 1982
+tacscan                         // (c) 1982
+zektor                          // (c) 1982
+
 @source:segas16b.cpp
 aceattac                        // (c) 1988 (FD1094)
 //afightere

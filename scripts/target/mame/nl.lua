@@ -58,6 +58,9 @@ SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
 SOUNDS["SN76477"] = true
+SOUNDS["SN76496"] = true
+SOUNDS["SP0250"] = true
+SOUNDS["TMS36XX"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -86,6 +89,7 @@ MACHINES["6522VIA"] = true
 
 MACHINES["6821PIA"] = true
 MACHINES["I8255"] = true
+MACHINES["I8243"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["UPD4701"] = true
@@ -94,7 +98,7 @@ MACHINES["CXD1095"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
 --MACHINES["RIOT6532"] = true
---MACHINES["PIT8253"] = true
+MACHINES["PIT8253"] = true
 --MACHINES["Z80CTC"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
@@ -264,6 +268,8 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
 
+	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
+	MAME_DIR .. "src/mame/machine/segacrpt_device.h",
 	MAME_DIR .. "src/mame/drivers/segag80r.cpp",
 	MAME_DIR .. "src/mame/includes/segag80r.h",
 	MAME_DIR .. "src/mame/machine/segag80.cpp",
