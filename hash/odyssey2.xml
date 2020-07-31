@@ -524,7 +524,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 
 	<software name="chess" supported="no"><!-- needs chess module emulation -->
 		<description>Chess (Euro)</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="G7010"/>
 		<part name="cart" interface="odyssey_cart">

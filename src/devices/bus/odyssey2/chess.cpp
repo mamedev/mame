@@ -1,15 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-/***********************************************************************************************************
+/******************************************************************************
 
+Videopac C7010 Chess Module emulation
+The chess engine is "Gambiet", written by Wim Rens
 
- Videopac Chess Module emulation
+Hardware notes:
+- NSC800 (Z80-compatible) @ 4.43MHz
+- 8KB ROM, 2KB RAM
 
- TODO:
-   - this code is just a stub... hence, almost everything is still to do!
+Service manual with schematics is available.
 
- ***********************************************************************************************************/
+TODO:
+- this code is just a stub... hence, almost everything is still to do!
+  most importantly, missing 8KB ROM dump
 
+******************************************************************************/
 
 #include "emu.h"
 #include "chess.h"
@@ -47,7 +53,7 @@ void o2_chess_device::chess_io(address_map &map)
 
 void o2_chess_device::device_add_mconfig(machine_config &config)
 {
-	NSC800(config, m_cpu, XTAL(4'000'000));
+	NSC800(config, m_cpu, 4.433619_MHz_XTAL);
 	m_cpu->set_addrmap(AS_PROGRAM, &o2_chess_device::chess_mem);
 	m_cpu->set_addrmap(AS_IO, &o2_chess_device::chess_io);
 }
