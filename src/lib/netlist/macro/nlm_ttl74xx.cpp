@@ -1332,17 +1332,19 @@ static NETLIST_START(SN74LS629_DIP)
 
 	NET_C(A.GND, B.GND)
 	NET_C(A.VCC, B.VCC)
+	NET_C(A.OSCGND, B.OSCGND)
+	NET_C(A.OSCVCC, B.OSCVCC)
 	NC_PIN(NC)
 
 	DIPPINS(   /*          +--------------+         */
-		 B.FC, /*      2FC |1     ++    16| VCC     */ NC.I,
-		 A.FC, /*      1FC |2           15| OSC VCC */ A.VCC,
+		 B.FC, /*      2FC |1     ++    16| VCC     */ A.VCC,
+		 A.FC, /*      1FC |2           15| OSC VCC */ A.OSCVCC,
 		A.RNG, /*     1RNG |3           14| 2RNG    */ B.RNG,
 		 NC.I, /*     1CX1 |4  74LS629  13| 2CX1    */ NC.I,
 		 NC.I, /*     1CX2 |5           12| 2CX2    */ NC.I,
 		A.ENQ, /*     1ENQ |6           11| 2ENQ    */ B.ENQ,
 		  B.Y, /*       1Y |7           10| 2Y      */ B.Y,
-		A.GND, /*  OSC GND |8            9| GND     */ NC.I
+	 A.OSCGND, /*  OSC GND |8            9| GND     */ A.GND
 			   /*          +--------------+         */
 	)
 NETLIST_END()

@@ -46,24 +46,17 @@ namespace netlist
 {
 	namespace devices
 	{
-	NETLIB_OBJECT(SN74LS629clk)
-	{
-		NETLIB_CONSTRUCTOR(SN74LS629clk)
-		, m_FB(*this, "FB", NETLIB_DELEGATE(fb))
-		, m_Y(*this, "Y")
-		, m_enableq(*this, "m_enableq", 1)
-		, m_out(*this, "m_out", 0)
-		, m_inc(*this, "m_inc", netlist_time::zero())
-		, m_power_pins(*this)
-		{
-			connect(m_FB, m_Y);
-		}
 
-		NETLIB_RESETI()
+	struct SN74LS629clk
+	{
+		SN74LS629clk(device_t &owner)
+		: m_FB(owner, "FB", nldelegate(&SN74LS629clk::fb, this))
+		, m_Y(owner, "Y")
+		, m_enableq(owner, "m_enableq", 0)
+		, m_out(owner, "m_out", 0)
+		, m_inc(owner, "m_inc", netlist_time::zero())
 		{
-			m_enableq = 0;
-			m_out = 0;
-			m_inc = netlist_time::zero();
+			owner.connect(m_FB, m_Y);
 		}
 
 	public:
@@ -73,7 +66,6 @@ namespace netlist
 		state_var<netlist_sig_t> m_enableq;
 		state_var<netlist_sig_t> m_out;
 		state_var<netlist_time> m_inc;
-		nld_power_pins m_power_pins;
 
 	private:
 		NETLIB_HANDLERI(fb)
@@ -94,7 +86,7 @@ namespace netlist
 	NETLIB_OBJECT(SN74LS629)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629)
-		, m_clock(*this, "OSC")
+		, m_clock(*this)
 		, m_R_FC(*this, "R_FC")
 		, m_R_RNG(*this, "R_RNG")
 		, m_ENQ(*this, "ENQ", NETLIB_DELEGATE(inputs))
@@ -102,8 +94,9 @@ namespace netlist
 		, m_FC(*this, "FC", NETLIB_DELEGATE(inputs))
 		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
 		, m_power_pins(*this)
+		, m_power_pins_osc(*this, "OSCVCC", "OSCGND")
 		{
-			connect(m_power_pins.GND(), m_R_FC.N());
+			connect(m_power_pins_osc.GND(), m_R_FC.N());
 
 			connect(m_FC, m_R_FC.P());
 			connect(m_RNG, m_R_RNG.P());
@@ -116,7 +109,6 @@ namespace netlist
 		{
 			m_R_FC.set_R( nlconst::magic(90000.0));
 			m_R_RNG.set_R(nlconst::magic(90000.0));
-			m_clock.reset();
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -125,7 +117,7 @@ namespace netlist
 		}
 
 	public:
-		NETLIB_SUB(SN74LS629clk) m_clock;
+		SN74LS629clk m_clock;
 		analog::NETLIB_SUB(R_base) m_R_FC;
 		analog::NETLIB_SUB(R_base) m_R_RNG;
 
@@ -135,6 +127,7 @@ namespace netlist
 
 		param_fp_t m_CAP;
 		nld_power_pins m_power_pins;
+		nld_power_pins m_power_pins_osc;
 
 	private:
 		NETLIB_HANDLERI(inputs)
@@ -179,8 +172,6 @@ namespace netlist
 				// FIXME: we need a possibility to remove entries from queue ...
 				//        or an exact model ...
 				m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
-
-				//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
 			}
 
 			if (!m_clock.m_enableq && m_ENQ())
@@ -199,7 +190,7 @@ namespace netlist
 
 	};
 
-	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
+	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

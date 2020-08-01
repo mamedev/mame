@@ -28,8 +28,10 @@
 
 #if !NL_AUTO_DEVICES
 #if !(NL_USE_TRUTHTABLE_7448)
-#define TTL_7448(name)                      \
-		NET_REGISTER_DEV(TTL_7448, name)    \
+// usage       : TTL_7448(name, pA, pB, pC, pD, pLTQ, pBIQ, pRBIQ)
+// auto connect: VCC, GND
+#define TTL_7448(...)                                                  \
+	NET_REGISTER_DEVEXT(TTL_7448, __VA_ARGS__)
 
 #endif
 #endif

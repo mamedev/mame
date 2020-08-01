@@ -369,6 +369,14 @@ namespace netlist
 		{
 		}
 
+		// Some devices like the 74LS629 have two pairs of supply pins.
+		explicit nld_power_pins(device_t &owner,
+			const pstring &vcc, const pstring &gnd)
+		: m_VCC(owner, vcc, NETLIB_DELEGATE(noop))
+		, m_GND(owner, gnd, NETLIB_DELEGATE(noop))
+		{
+		}
+
 		const analog_input_t &VCC() const noexcept
 		{
 			return m_VCC;
