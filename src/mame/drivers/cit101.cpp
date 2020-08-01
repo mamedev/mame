@@ -357,10 +357,10 @@ void cit101_state::cit101(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "uartint").output_handler().set_inputline("maincpu", I8085_RST55_LINE);
 
 	I8251(config, m_kbduart, 6.144_MHz_XTAL / 2);
-	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_hle_keyboard_device::write_rxd));
+	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_keyboard_device::write_rxd));
 	m_kbduart->rxrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
 
-	CIT101_HLE_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
+	CIT101_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 
 	pit8253_device &pit0(PIT8253(config, "pit0", 0));
 	pit0.set_clk<0>(6.144_MHz_XTAL / 4);
@@ -399,6 +399,8 @@ void cit101_state::cit101e(machine_config &config)
 
 	//m_screen->set_raw(19.6608_MHz_XTAL, 1000, 0, 800, 300, 0, 240); // 65.3 Hz nominal vertical frequency
 	m_screen->set_raw(27.956_MHz_XTAL, 1476, 0, 1188, 300, 0, 240); // 63.2 Hz nominal vertical frequency
+
+	CIT101E_KEYBOARD(config.replace(), "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 }
 
 
