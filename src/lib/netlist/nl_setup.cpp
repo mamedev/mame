@@ -1593,9 +1593,12 @@ void setup_t::prepare_to_run()
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
 				t->name(), t->N().net().name(), t->P().net().name()));
+			// The following would remove internal devices in e.g. MOSFETs as well.
+#if 0
 			remove_terminal(t->setup_N().net(), t->setup_N());
 			remove_terminal(t->setup_P().net(), t->setup_P());
 			m_nlstate.remove_device(t);
+#endif
 		}
 	}
 
