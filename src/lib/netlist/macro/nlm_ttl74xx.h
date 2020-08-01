@@ -266,6 +266,24 @@
 #define TTL_7448_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7448_DIP, name)
 
+#define TTL_7450_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7450_DIP, name)
+
+#define TTL_7473_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7473_DIP, name)
+
+#define TTL_7473A_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7473A_DIP, name)
+
+#define TTL_7474_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7474_DIP, name)
+
+#define TTL_7475_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7475_DIP, name)
+
+#define TTL_7477_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7477_DIP, name)
+
 #define TTL_7486_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7486_GATE, name)
 

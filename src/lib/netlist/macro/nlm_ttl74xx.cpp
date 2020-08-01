@@ -683,6 +683,194 @@ static NETLIST_START(TTL_7437_DIP)
 NETLIST_END()
 
 /*
+ *  DM7450: DUAL 2-WIDE 2-INPUT AND-OR-INVERT GATES (ONE GATE EXPANDABLE)
+ *
+ *          +--------------+
+ *       1A |1     ++    14| VCC
+ *       2A |2           13| 1B
+ *       2B |3           12| 1XQ
+ *       2C |4    7450   11| 1X
+ *       2D |5           10| 1D
+ *       2Y |6            9| 1C
+ *      GND |7            8| 1Y
+ *          +--------------+
+*/
+
+static NETLIST_START(TTL_7450_DIP)
+	TTL_7450_ANDORINVERT(A)
+	TTL_7450_ANDORINVERT(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+	NC_PIN(NC)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    1A |1     ++    14| VCC  */ A.VCC,
+		B.A,  /*    2A |2           13| 1B   */ A.B,
+		B.B,  /*    2B |3           12| 1XQ  */ NC.I,
+		B.C,  /*    2C |4    7450   11| 1X   */ NC.I,
+		B.D,  /*    2D |5           10| 1D   */ A.D,
+		B.Q,  /*    2Y |6            9| 1C   */ A.C,
+		A.GND,/*   GND |7            8| 1Y   */ A.Q
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *  7473: Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+ *  7473A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+ *
+ *          +----------+
+ *     1CLK |1   ++  14| 1J
+ *    1CLRQ |2       13| 1QQ
+ *       1K |3       12| 1Q
+ *      VCC |4  7473 11| GND
+ *     2CLK |5       10| 2K
+ *    2CLRQ |6        9| 2Q
+ *       2J |7        8| 2QQ
+ *          +----------+
+ */
+
+static NETLIST_START(TTL_7473_DIP)
+	TTL_7473(A)
+	TTL_7473(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(    /*       +----------+     */
+		 A.CLK, /*  1CLK |1   ++  14| 1J  */ A.J,
+		A.CLRQ, /* 1CLRQ |2       13| 1QQ */ A.QQ,
+		   A.K, /*    1K |3       12| 1Q  */ A.Q,
+		 A.VCC, /*   VCC |4  7473 11| GND */ A.GND,
+		 B.CLK, /*  2CLK |5       10| 2K  */ B.K,
+		B.CLRQ, /* 2CLRQ |6        9| 2Q  */ B.Q,
+		   B.J, /*    2J |7        8| 2QQ */ B.QQ
+			    /*       +----------+     */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_7473A_DIP)
+	TTL_7473A(A)
+	TTL_7473A(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(    /*       +----------+     */
+		 A.CLK, /*  1CLK |1   ++  14| 1J  */ A.J,
+		A.CLRQ, /* 1CLRQ |2       13| 1QQ */ A.QQ,
+		   A.K, /*    1K |3       12| 1Q  */ A.Q,
+		 A.VCC, /*   VCC |4 7473A 11| GND */ A.GND,
+		 B.CLK, /*  2CLK |5       10| 2K  */ B.K,
+		B.CLRQ, /* 2CLRQ |6        9| 2Q  */ B.Q,
+		   B.J, /*    2J |7        8| 2QQ */ B.QQ
+			    /*       +----------+     */
+	)
+NETLIST_END()
+
+/*
+ *  DM7474: Dual Positive-Edge-Triggered D Flip-Flops
+ *          with Preset, Clear and Complementary Outputs
+ *
+ *          +--------------+
+ *     CLR1 |1     ++    14| VCC
+ *       D1 |2           13| CLR2
+ *     CLK1 |3           12| D2
+ *      PR1 |4    7474   11| CLK2
+ *       Q1 |5           10| PR2
+ *      Q1Q |6            9| Q2
+ *      GND |7            8| Q2Q
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_7474_DIP)
+	TTL_7474(A)
+	TTL_7474(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(    /*       +--------------+       */
+		A.CLRQ, /*  CLR1 |1     ++    14| VCC   */ A.VCC,
+		   A.D, /*    D1 |2           13| CLR2  */ B.CLRQ,
+		 A.CLK, /*  CLK1 |3           12| D2    */ B.D,
+		A.PREQ, /*   PR1 |4    7474   11| CLK2  */ B.CLK,
+		   A.Q, /*    Q1 |5           10| PR2   */ B.PREQ,
+		  A.QQ, /*   Q1Q |6            9| Q2    */ B.Q,
+		 A.GND, /*   GND |7            8| Q2Q   */ B.QQ
+			    /*       +-------------+        */
+	)
+NETLIST_END()
+
+/*
+ *  7475: 4-Bit Bistable Latches with Complementary Outputs
+ *  7477: 4-Bit Bistable Latches
+ *
+ *          +----------+               +----------+
+ *      1QQ |1   ++  16| 1Q         1D |1   ++  14| 1Q
+ *       1D |2       15| 2Q         2D |2       13| 2Q
+ *       2D |3       14| 2QQ      3C4C |3       12| 1C2C
+ *     3C4C |4  7475 13| 1C2C      VCC |4  7477 11| GND
+ *      VCC |5       12| GND        3D |5       10| NC
+ *       3D |6       11| 3QQ        4D |6        9| 3Q
+ *       4D |7       10| 3Q         NC |7        8| 4Q
+ *      4QQ |8        9| 4Q            +----------+
+ *          +----------+
+ */
+
+static NETLIST_START(TTL_7475_DIP)
+	TTL_7475_GATE(A)
+	TTL_7475_GATE(B)
+	TTL_7475_GATE(C)
+	TTL_7475_GATE(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	NET_C(A.CLK, B.CLK)
+	NET_C(C.CLK, D.CLK)
+
+	DIPPINS(   /*       +----------+       */
+		 A.QQ, /*   1QQ |1   ++  16| 1Q    */ A.Q,
+		  A.D, /*    1D |2       15| 2Q    */ B.Q,
+		  B.D, /*    2D |3       14| 2QQ   */ B.QQ,
+		C.CLK, /*  3C4C |4  7475 13| 1C2C  */ A.CLK,
+		A.VCC, /*   VCC |5       12| GND   */ A.GND,
+		  C.D, /*    3D |6       11| 3QQ   */ C.QQ,
+		  D.D, /*    4D |7       10| 3Q    */ C.Q,
+		 D.QQ, /*   4QQ |8        9| 4Q    */ D.Q
+			   /*       +----------+       */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_7477_DIP)
+	TTL_7477_GATE(A)
+	TTL_7477_GATE(B)
+	TTL_7477_GATE(C)
+	TTL_7477_GATE(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	NET_C(A.CLK, B.CLK)
+	NET_C(C.CLK, D.CLK)
+
+	NC_PIN(NC)
+
+	DIPPINS(   /*       +----------+       */
+		  A.D, /*    1D |1   ++  14| 1Q    */ A.Q,
+		  B.D, /*    2D |2       13| 2Q    */ B.Q,
+		C.CLK, /*  3C4C |3       12| 1C2C  */ A.CLK,
+		A.VCC, /*   VCC |4  7477 11| GND   */ A.GND,
+		  C.D, /*    3D |5       10| NC    */ NC.I,
+		  D.D, /*    4D |6        9| 3Q    */ C.Q,
+		 NC.I, /*    NC |7        8| 4Q    */ D.Q
+			   /*       +----------+       */
+	)
+NETLIST_END()
+
+/*
  *  DM7486: Quad 2-Input Exclusive-OR Gates
  *
  *             Y = A+B
@@ -2025,6 +2213,12 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
 	LOCAL_LIB_ENTRY(TTL_7442_DIP)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
+	LOCAL_LIB_ENTRY(TTL_7450_DIP)
+	LOCAL_LIB_ENTRY(TTL_7473_DIP)
+	LOCAL_LIB_ENTRY(TTL_7473A_DIP)
+	LOCAL_LIB_ENTRY(TTL_7474_DIP)
+	LOCAL_LIB_ENTRY(TTL_7475_DIP)
+	LOCAL_LIB_ENTRY(TTL_7477_DIP)
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)

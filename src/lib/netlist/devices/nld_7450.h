@@ -26,16 +26,8 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_7450_ANDORINVERT(name, cI1, cI2, cI3, cI4)                         \
-		NET_REGISTER_DEV(TTL_7450_ANDORINVERT, name)                           \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, A, cI1)                                              \
-		NET_CONNECT(name, B, cI2)                                              \
-		NET_CONNECT(name, C, cI3)                                              \
-		NET_CONNECT(name, D, cI4)
-
-#define TTL_7450_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_7450_DIP, name)
+// usage: TTL_7450_ANDORINVERT(name, cI1, cI2, cI3, cI4)
+#define TTL_7450_ANDORINVERT(...)                                              \
+		NET_REGISTER_DEVEXT(TTL_7450_ANDORINVERT, __VA_ARGS__)
 
 #endif /* NLD_7450_H_ */
