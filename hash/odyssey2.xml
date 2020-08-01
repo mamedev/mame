@@ -46,14 +46,17 @@ Fathom (Imagic)
 
 NOTE:
 PAL colours leave a lot to be desired
-Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS microprocessor, which gave the G7000 extra CPU and memory.
-The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.574 MHz,
-adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
+The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
+The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.5468 MHz,
+adds 16K RAM and 16K ROM, that plugs into the G7000.
 -->
+
 <softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
+
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
 
 <!-- Applications -->
+
 	<software name="compprog">
 		<description>Computer Programmer (Euro)</description>
 		<year>1980</year>
@@ -76,6 +79,20 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="computer intro (usa).bin" size="2048" crc="95efa98b" sha1="f93c448243db428a4c9e2354596844ed07bb7530" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homecomp" supported="no"><!-- needs home computer module emulation, wrong romtype right now, just a placeholder -->
+		<description>Home Computer Module (Euro)</description><!-- aka Basic -->
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="C7420"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x4800">
+				<rom name="z80_c7420.bin" size="0x4000" crc="939f0e4c" sha1="24c334ba4321f3dd30ac659d35e43f74283ad93b" offset="0" />
+				<rom name="vp_c7420.bin" size="0x800" crc="8e824b98" sha1="60dfc1eea93c25f30d25e549f32f837e22735224" offset="0x800" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,7 +150,10 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+
 <!-- Educational -->
+
 	<software name="number">
 		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
 		<year>1980</year>
@@ -263,7 +283,10 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+
 <!-- Games -->
+
 	<software name="4in1">
 		<description>4 in 1 Row (Euro)</description>
 		<year>1982</year>
@@ -523,10 +546,10 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 	</software>
 
 	<software name="chess" supported="no"><!-- needs chess module emulation -->
-		<description>Chess (Euro)</description>
+		<description>Chess Module (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="G7010"/>
+		<info name="serial" value="C7010"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
 			<dataarea name="rom" size="2048">
@@ -1794,7 +1817,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-<!-- NTSC Cartidge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
+	<!-- NTSC Cartridge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
 	<software name="deathrac">
 		<description>Death Race (USA)</description>
 		<year>2014</year>
@@ -1899,4 +1922,5 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

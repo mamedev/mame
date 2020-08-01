@@ -90,6 +90,7 @@ const double XTAL::known_xtals[] = {
 	  3'120'000, /* 3.12_MHz_XTAL          SP0250 clock on Gottlieb games */
 	  3'276'800, /* 3.2768_MHz_XTAL        SP0256 clock in Speech Synthesis for Dragon 32 */
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
+	  3'546'800, /* 3.5468_MHz_XTAL        Atari 400 PAL, Philips G7200 */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */
 	  3'579'000, /* 3.579_MHz_XTAL         BeebOPL */
