@@ -113,6 +113,68 @@ static NETLIST_START(CD4013_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  CD4017: Decade Counter/Divider with 10 Decoded Outputs
+ *
+ *          +--------------+
+ *       Q5 |1     ++    16| VDD
+ *       Q1 |2           15| RESET
+ *       Q0 |3           14| CLOCK
+ *       Q2 |4    4017   13| CLOCK ENABLE
+ *       Q6 |5           12| CARRY OUT
+ *       Q7 |6           11| Q9
+ *       Q3 |7           10| Q4
+ *      VSS |8            9| Q8
+ *          +--------------+
+ *
+ *
+ *  CD4022: Divide-by-8 Counter/Divider with 8 Decoded Outputs
+ *
+ *          +--------------+
+ *       Q1 |1     ++    16| VDD
+ *       Q0 |2           15| RESET
+ *       Q2 |3           14| CLOCK
+ *       Q5 |4    4022   13| CLOCK ENABLE
+ *       Q6 |5           12| CARRY OUT
+ *       NC |6           11| Q4
+ *       Q3 |7           10| Q7
+ *      VSS |8            9| NC
+ *          +--------------+
+ */
+
+static NETLIST_START(CD4017_DIP)
+	CD4017(A)
+
+	DIPPINS(  /*        +--------------+              */
+		 A.Q5, /*    Q5 |1     ++    16| VDD          */ A.VDD,
+		 A.Q1, /*    Q1 |2           15| RESET        */ A.RESET,
+		 A.Q0, /*    Q0 |3           14| CLOCK        */ A.CLK,
+		 A.Q2, /*    Q2 |4    4017   13| CLOCK ENABLE */ A.CLKEN,
+		 A.Q6, /*    Q6 |5           12| CARRY OUT    */ A.CO,
+		 A.Q7, /*    Q7 |6           11| Q9           */ A.Q9,
+		 A.Q3, /*    Q3 |7           10| Q4           */ A.Q4,
+		A.VSS, /*   VSS |8            9| Q8           */ A.Q8
+			   /*       +--------------+              */
+	)
+NETLIST_END()
+
+static NETLIST_START(CD4022_DIP)
+	CD4022(A)
+	NC_PIN(NC)
+
+	DIPPINS(  /*        +--------------+              */
+		 A.Q1, /*    Q1 |1     ++    16| VDD          */ A.VDD,
+		 A.Q0, /*    Q0 |2           15| RESET        */ A.RESET,
+		 A.Q2, /*    Q2 |3           14| CLOCK        */ A.CLK,
+		 A.Q5, /*    Q5 |4    4022   13| CLOCK ENABLE */ A.CLKEN,
+		 A.Q6, /*    Q6 |5           12| CARRY OUT    */ A.CO,
+		 NC.I, /*    NC |6           11| Q4           */ A.Q4,
+		 A.Q3, /*    Q3 |7           10| Q7           */ A.Q7,
+		A.VSS, /*   VSS |8            9| NC           */ NC.I
+			   /*       +--------------+              */
+	)
+NETLIST_END()
+
 /*  CD4020: 14-Stage Ripple Carry Binary Counters
  *
  *          +--------------+
@@ -508,6 +570,8 @@ NETLIST_START(CD4XXX_lib)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4013_DIP)
+	LOCAL_LIB_ENTRY(CD4017_DIP)
+	LOCAL_LIB_ENTRY(CD4022_DIP)
 	LOCAL_LIB_ENTRY(CD4020_DIP)
 	LOCAL_LIB_ENTRY(CD4024_DIP)
 	LOCAL_LIB_ENTRY(CD4053_DIP)

@@ -61,6 +61,12 @@
 #define CD4013_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4013_DIP, name)
 
+#define CD4017_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4017_DIP, name)
+
+#define CD4022_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4022_DIP, name)
+
 #define CD4020_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4020_DIP, name)
 
