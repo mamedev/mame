@@ -157,6 +157,7 @@ bits(7:4) and bit(24)), X, and Y:
 
 #define DEBUG_DEPTH         (0)
 #define DEBUG_BACKBUF       (0)
+#define DEBUG_STATS         (0)
 
 #define LOG_VBLANK_SWAP     (0)
 #define LOG_FIFO            (0)
@@ -824,7 +825,6 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 {
 	int changed = fbi.video_changed;
 	int drawbuf = fbi.frontbuf;
-	int statskey;
 	int x, y;
 
 	/* reset the video changed flag */
@@ -924,25 +924,31 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		}
 
 	/* update stats display */
-	statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH) != 0);
-	if (statskey && statskey != stats.lastkey)
-		stats.display = !stats.display;
-	stats.lastkey = statskey;
+	if (DEBUG_STATS)
+	{
+		int statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH));
+		if (statskey && statskey != stats.lastkey)
+			stats.display = !stats.display;
+		stats.lastkey = statskey;
 
-	/* display stats */
-	if (stats.display)
-		popmessage(stats.buffer, 0, 0);
+		/* display stats */
+		if (stats.display)
+			popmessage(stats.buffer, 0, 0);
+	}
 
 	/* update render override */
-	stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
-	if (DEBUG_DEPTH && stats.render_override)
+	if (DEBUG_DEPTH)
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
+		if (stats.render_override)
 		{
-			uint16_t *src = (uint16_t *)(fbi.ram + fbi.auxoffs) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
-			uint32_t *dst = &bitmap.pix32(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
+			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+			{
+				uint16_t* src = (uint16_t*)(fbi.ram + fbi.auxoffs) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
+				uint32_t* dst = &bitmap.pix32(y);
+				for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
+			}
 		}
 	}
 	return changed;

@@ -174,7 +174,7 @@ image_init_result o2_cart_slot_device::call_load()
 				m_type = o2_get_pcb_id(pcb_name);
 		}
 
-		//printf("Type: %s\n", o2_get_slot(m_type));
+		m_cart->cart_init();
 
 		return image_init_result::PASS;
 	}
@@ -231,13 +231,21 @@ uint8_t o2_cart_slot_device::read_rom0c(offs_t offset)
 }
 
 /*-------------------------------------------------
- io_write
+ io
  -------------------------------------------------*/
 
 void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->io_write(offset, data);
+}
+
+uint8_t o2_cart_slot_device::io_read(offs_t offset)
+{
+	if (m_cart)
+		return m_cart->io_read(offset);
+	else
+		return 0xff;
 }
 
 

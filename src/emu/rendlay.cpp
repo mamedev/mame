@@ -2244,7 +2244,7 @@ protected:
 
 			int endpos = basey+ourheight/num_shown;
 
-			// only render the symbol / text if it's atually in view because the code is SLOW
+			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.top()) && (basey <= bounds.bottom()))
 			{
 				while (1)
@@ -2403,7 +2403,7 @@ private:
 
 			int endpos = basex+(ourwidth/num_shown);
 
-			// only render the symbol / text if it's atually in view because the code is SLOW
+			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.left()) && (basex <= bounds.right()))
 			{
 				while (1)

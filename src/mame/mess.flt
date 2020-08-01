@@ -162,6 +162,7 @@ chaos.cpp
 chessmate.cpp
 chessmst.cpp
 cit101.cpp
+cit101xl.cpp
 cit1500.cpp
 cit220.cpp
 cking_master.cpp
@@ -423,7 +424,6 @@ instruct.cpp
 inteladv.cpp
 intellec4.cpp
 intellect02.cpp
-interact.cpp
 interpro.cpp
 intv.cpp
 ipc.cpp

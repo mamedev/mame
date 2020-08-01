@@ -48,7 +48,4 @@
 #define CD4013(...)                                                            \
 		NET_REGISTER_DEVEXT(CD4013, __VA_ARGS__)
 
-#define CD4013_DIP(name)                                                       \
-		NET_REGISTER_DEV(CD4013_DIP, name)
-
 #endif /* NLD_4013_H_ */

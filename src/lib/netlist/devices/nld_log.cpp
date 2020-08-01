@@ -8,8 +8,8 @@
 #include "netlist/nl_base.h"
 #include "nld_log.h"
 #include "plib/pfmtlog.h"
-#include "plib/pstream.h"
 #include "plib/pmulti_threading.h"
+#include "plib/pstream.h"
 //#include "sound/wavwrite.h"
 
 #include <array>

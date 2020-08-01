@@ -12,8 +12,8 @@
 #include "state_var.h"
 
 #include "../nltypes.h"
-#include "../plib/pstring.h"
 #include "../plib/plists.h"
+#include "../plib/pstring.h"
 
 namespace netlist
 {

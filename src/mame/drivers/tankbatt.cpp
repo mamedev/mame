@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver
 /***************************************************************************
 
-Tank Battalion memory map (preliminary)
+Tank Battalion memory map (verified)
 
 driver by Brad Oliver
 
@@ -30,27 +30,20 @@ Write:
     $0c03       : ?? written to during IRQ if grid test is on
     $0c08       : ?? written to during IRQ if grid test is on
     $0c09       : Sound - coin ding
-    $0c0a       : NMI enable (active low) ?? game only ??
+    $0c0a       : Sound enable (active low) ?? game only ??
     $0c0b       : Sound - background noise, 0 - low rumble, 1 - high rumble
     $0c0c       : Sound - player fire
     $0c0d       : Sound - explosion
     $0c0f       : NMI enable (active high) ?? demo only ??
 
-    $0c10       : IRQ ack ??
-    $0c18       : Watchdog ?? Not written to while game screen is up
+    $0c10       : IRQ ack (written at the end of the irq routine)
+    $0c18       : Watchdog
 
-$2000-$3fff : ROM
+$2000-$3fff : ROM (A14, A15 not decoded)
 
 TODO:
     . Needs proper discrete emulation
-    . Resistor values on the color prom need to be verified
-
-Changes:
-    28 Feb 98 LBO
-        . Fixed the coin interrupts
-        . Fixed the color issues, should be 100% if I guessed at the resistor values properly
-        . Fixed the 2nd player cocktail joystick, had the polarity reversed
-        . Hacked the sound sample triggers so they work better
+    . Resistor values on the color prom need to be corrected
 
 Known issues:
     . The 'moving' tank rumble noise seems to keep playing a second too long
@@ -63,6 +56,8 @@ Known issues:
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
+#include "machine/input_merger.h"
+#include "machine/watchdog.h"
 #include "sound/samples.h"
 #include "screen.h"
 #include "speaker.h"
@@ -70,7 +65,6 @@ Known issues:
 
 void tankbatt_state::machine_start()
 {
-	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_sound_enable));
 }
 
@@ -98,18 +92,12 @@ uint8_t tankbatt_state::dsw_r(offs_t offset)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-WRITE_LINE_MEMBER(tankbatt_state::interrupt_enable_w)
+WRITE_LINE_MEMBER(tankbatt_state::sound_off_w)
 {
-	m_nmi_enable = !state;
 	m_sound_enable = !state;
 
-	/* hack - turn off the engine noise if the normal game nmi's are disabled */
+	// turn off the engine noise
 	if (state) m_samples->stop(2);
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::demo_interrupt_enable_w)
-{
-	m_nmi_enable = state;
 }
 
 WRITE_LINE_MEMBER(tankbatt_state::sh_expl_w)
@@ -140,10 +128,9 @@ WRITE_LINE_MEMBER(tankbatt_state::sh_fire_w)
 	}
 }
 
-void tankbatt_state::irq_ack_w(uint8_t data)
+void tankbatt_state::intack_w(uint8_t data)
 {
-	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(tankbatt_state::coincounter_w)
@@ -159,29 +146,21 @@ WRITE_LINE_MEMBER(tankbatt_state::coinlockout_w)
 
 void tankbatt_state::main_map(address_map &map)
 {
-	map(0x0000, 0x000f).ram().share("bulletsram");
-	map(0x0010, 0x01ff).ram();
-	map(0x0200, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(FUNC(tankbatt_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0c07).r(FUNC(tankbatt_state::in0_r)).w("outlatch", FUNC(cd4099_device::write_d0));
-	map(0x0c08, 0x0c0f).r(FUNC(tankbatt_state::in1_r)).w("mainlatch", FUNC(cd4099_device::write_d0));
-	map(0x0c10, 0x0c10).w(FUNC(tankbatt_state::irq_ack_w));
-	map(0x0c18, 0x0c1f).r(FUNC(tankbatt_state::dsw_r));
-	map(0x0c18, 0x0c18).nopw();    /* watchdog ?? */
-	map(0x6000, 0x7fff).rom().region("maincpu", 0);
-	map(0xe000, 0xffff).rom().region("maincpu", 0); //mirror for the reset/irq vectors
-	map(0x2000, 0x5fff).nopr(); //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
-	map(0x8000, 0xdfff).nopr();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x000f).mirror(0x1000).ram().share("bulletsram");
+	map(0x0010, 0x07ff).mirror(0x1000).ram();
+	map(0x0800, 0x0bff).mirror(0x1000).ram().w(FUNC(tankbatt_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0c07).mirror(0x13e0).r(FUNC(tankbatt_state::in0_r)).w("outlatch0", FUNC(cd4099_device::write_d0));
+	map(0x0c08, 0x0c0f).mirror(0x13e0).r(FUNC(tankbatt_state::in1_r)).w("outlatch1", FUNC(cd4099_device::write_d0));
+	map(0x0c10, 0x0c10).mirror(0x13e7).w(FUNC(tankbatt_state::intack_w));
+	map(0x0c18, 0x0c1f).mirror(0x13e0).r(FUNC(tankbatt_state::dsw_r));
+	map(0x0c18, 0x0c18).mirror(0x13e7).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2000, 0x3fff).rom().region("maincpu", 0);
 }
 
-INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(tankbatt_state::scanline_interrupt)
 {
-	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
-{
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )
@@ -191,8 +170,8 @@ static INPUT_PORTS_START( tankbatt )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tankbatt_state,coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tankbatt_state,coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("P2")    /* IN1 */
@@ -272,33 +251,38 @@ static const char *const tankbatt_sample_names[] =
 void tankbatt_state::tankbatt(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000); /* 1 MHz ???? */
+	M6502(config, m_maincpu, 18.432_MHz_XTAL / 24); // ϕ0 = 4H
 	m_maincpu->set_addrmap(AS_PROGRAM, &tankbatt_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tankbatt_state::interrupt));
 
-	cd4099_device &mainlatch(CD4099(config, "mainlatch")); // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
-	mainlatch.q_out_cb<0>().set_nop(); //coin counter mirror?
-	mainlatch.q_out_cb<2>().set(FUNC(tankbatt_state::interrupt_enable_w));
-	mainlatch.q_out_cb<3>().set(FUNC(tankbatt_state::sh_engine_w));
-	mainlatch.q_out_cb<4>().set(FUNC(tankbatt_state::sh_fire_w));
-	mainlatch.q_out_cb<5>().set(FUNC(tankbatt_state::sh_expl_w)); // bit 7 also set by ASL instruction
-	mainlatch.q_out_cb<6>().set_nop(); // bit 7 also set by ASL instruction
-	mainlatch.q_out_cb<7>().set(FUNC(tankbatt_state::demo_interrupt_enable_w));
+	INPUT_MERGER_ALL_HIGH(config, "nmigate").output_handler().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 
-	cd4099_device &outlatch(CD4099(config, "outlatch"));
-	outlatch.q_out_cb<0>().set_output("led0");
-	outlatch.q_out_cb<1>().set_output("led1");
-	outlatch.q_out_cb<2>().set(FUNC(tankbatt_state::coincounter_w));
-	outlatch.q_out_cb<3>().set(FUNC(tankbatt_state::coinlockout_w));
+	TIMER(config, "16v").configure_scanline(FUNC(tankbatt_state::scanline_interrupt), "screen", 16, 32);
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16); // system reset pulse is ripple carry output of 74LS161 at 7C
+
+	cd4099_device &outlatch0(CD4099(config, "outlatch0")); // 4099 at 5H or 259 at 5J
+	outlatch0.q_out_cb<0>().set_output("led0");
+	outlatch0.q_out_cb<1>().set_output("led1");
+	outlatch0.q_out_cb<2>().set(FUNC(tankbatt_state::coincounter_w));
+	outlatch0.q_out_cb<3>().set(FUNC(tankbatt_state::coinlockout_w));
+	// Q4 through Q7 are not connected
+
+	cd4099_device &outlatch1(CD4099(config, "outlatch1")); // 4099 at 4H or 259 at 4J
+	outlatch1.q_out_cb<0>().set_nop(); // TODO: S1 tone
+	outlatch1.q_out_cb<1>().set_nop(); // TODO: S2 tone
+	outlatch1.q_out_cb<2>().set(FUNC(tankbatt_state::sound_off_w));
+	outlatch1.q_out_cb<3>().set(FUNC(tankbatt_state::sh_engine_w));
+	outlatch1.q_out_cb<4>().set(FUNC(tankbatt_state::sh_fire_w));
+	outlatch1.q_out_cb<5>().set(FUNC(tankbatt_state::sh_expl_w)); // bit 7 also set by ASL instruction
+	// Q6 is not connected
+	outlatch1.q_out_cb<7>().set("nmigate", FUNC(input_merger_device::in_w<1>));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // timing chain is same as in Galaxian
 	screen.set_screen_update(FUNC(tankbatt_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set("nmigate", FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tankbatt);
 	PALETTE(config, m_palette, FUNC(tankbatt_state::tankbatt_palette), 256*2, 256);
@@ -348,5 +332,5 @@ ROM_START( tankbattb ) /* board with "NAMCO" removed from gfx1 rom, otherwise id
 	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) ) // dm74s287n.3l
 ROM_END
 
-GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, tankbatt_state, empty_init, ROT90, "Namco",   "Tank Battalion", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, tankbatt_state, empty_init, ROT90, "bootleg", "Tank Battalion (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, tankbatt_state, empty_init, ROT90, "Namco",   "Tank Battalion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS |MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, tankbatt_state, empty_init, ROT90, "bootleg", "Tank Battalion (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

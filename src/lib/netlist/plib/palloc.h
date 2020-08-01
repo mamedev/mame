@@ -10,9 +10,9 @@
 
 #include "pconfig.h"
 #include "pgsl.h"
+#include "pgsl.h"
 #include "pmath.h"  // FIXME: only uses lcm ... move to ptypes.
 #include "ptypes.h"
-#include "pgsl.h"
 
 #include <algorithm>
 #include <cstddef>      // for std::max_align_t (usually long long)

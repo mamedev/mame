@@ -102,7 +102,7 @@ namespace devices
 				for (int i=0; i < m_N(); i++)
 				{
 					pstring inpname = plib::pfmt("A{1}")(i);
-					m_I.push_back(state().make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(fb)));
+					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(fb)));
 					inps.push_back(inpname);
 					m_vals.push_back(nlconst::zero());
 				}
@@ -460,7 +460,7 @@ namespace devices
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring inpname = plib::pfmt("A{1}")(i);
-				m_I.push_back(state().make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(inputs)));
+				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(inputs)));
 				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}

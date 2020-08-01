@@ -317,6 +317,14 @@ void spg2xx_game_gssytts_state::mem_map_upperbank(address_map &map)
 	map(0x200000, 0x3fffff).bankr("upperbank");
 }
 
+
+void spg2xx_game_wfcentro_state::mem_map_wfcentro(address_map &map)
+{
+	map(0x000000, 0x37ffff).bankr("cartbank");
+	map(0x380000, 0x3fffff).ram();
+}
+
+
 static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
 	PORT_START("P1")
 	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
@@ -627,6 +635,19 @@ static INPUT_PORTS_START( abltenni )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_MODIFY("P3")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ordentv )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fordrace )
@@ -1482,6 +1503,20 @@ void spg2xx_game_gssytts_state::gssytts(machine_config &config)
 }
 
 
+void spg2xx_game_wfcentro_state::wfcentro(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_wfcentro_state::mem_map_wfcentro);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_wfcentro_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_wfcentro_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_wfcentro_state::base_portc_r));
+}
+
+
+
 void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
@@ -1559,6 +1594,26 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_maincpu->i2c_w().set(FUNC(spg2xx_game_state::i2c_w));
 	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
+
+uint16_t spg2xx_game_ordentv_state::ordentv_portc_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = m_io_p3->read() ^ (machine().rand() & 1);
+	logerror("%s: Port C Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void spg2xx_game_ordentv_state::ordentv(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_ordentv_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_ordentv_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_ordentv_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_ordentv_state::ordentv_portc_r));
+}
+
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -1716,6 +1771,17 @@ ROM_START( senspeed )
 	ROM_LOAD16_WORD_SWAP( "speedracer.bin", 0x000000, 0x800000, CRC(4efbcd39) SHA1(2edffbaa9ea309ad308fa60f32d8b7a98ee313c7) )
 ROM_END
 
+ROM_START( ordentv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "taikeeordenadortv.bin", 0x000000, 0x800000, CRC(ba15895a) SHA1(0a18076cbc3264c91473b8518dfb10d679321b47) )
+ROM_END
+
+ROM_START( wfcentro )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
+ROM_END
+
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -1762,6 +1828,13 @@ void spg2xx_game_albkickb_state::init_ablkickb()
 	int size = memregion("maincpu")->bytes();
 
 	decrypt_ac_ff(ROM, size);
+}
+
+void spg2xx_game_ordentv_state::init_ordentv()
+{
+	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x4fef8] = 0xee07;
 }
 
 
@@ -1825,6 +1898,9 @@ CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_
 CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars - The Clone Wars",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
-CONS( 2005, mattelcs,   0,        0, rad_skat, mattelcs,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// Both the WiWi and Fox Sports units seem to be related to the 'Virtual Interactive' (aka 'Vi') console
+CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
+
+CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+

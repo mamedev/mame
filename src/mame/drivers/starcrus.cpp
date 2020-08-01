@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Frank Palazzolo
+// copyright-holders:Frank Palazzolo, Ryan Holtz
 /***************************************************************************
 
-Ramtek Star Cruiser Driver
+	Ramtek Star Cruiser Driver
 
-(no known issues)
+	(no known issues)
 
-Frank Palazzolo
-palazzol@home.com
+	Frank Palazzolo
+	palazzol@home.com
+
+	Netlist Audio by Ryan Holtz
 
 ***************************************************************************/
 
@@ -15,7 +17,6 @@ palazzol@home.com
 #include "includes/starcrus.h"
 
 #include "cpu/i8085/i8085.h"
-#include "sound/samples.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,6 +85,12 @@ static INPUT_PORTS_START( starcrus )
 	PORT_DIPSETTING(    0x00, DEF_STR( Alternate ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("POT_1")
+	PORT_ADJUSTER( 50, "Pot: Noise Level" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "noise_volume")
+
+	PORT_START("POT_2")
+	PORT_ADJUSTER( 50, "Pot: Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "volume")
 INPUT_PORTS_END
 
 
@@ -129,17 +136,6 @@ static GFXDECODE_START( gfx_starcrus )
 GFXDECODE_END
 
 
-static const char *const starcrus_sample_names[] =
-{
-	"*starcrus",
-	"engine",   /* engine sound, channel 0 */
-	"explos1",  /* explosion sound, first part, channel 1 */
-	"explos2",  /* explosion sound, second part, channel 1 */
-	"launch",   /* launch sound, channels 2 and 3 */
-	nullptr
-};
-
-
 void starcrus_state::starcrus(machine_config &config)
 {
 	/* basic machine hardware */
@@ -163,10 +159,20 @@ void starcrus_state::starcrus(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(4);
-	m_samples->set_samples_names(starcrus_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(starcrus))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:explode1", "EXPLODE_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:explode2", "EXPLODE_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:launch1", "LAUNCH_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:launch2", "LAUNCH_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine1", "ENGINE_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine2", "ENGINE_2.IN", 0);
+	NETLIST_ANALOG_INPUT(config, "sound_nl:noise_volume", "R23.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:volume", "R75.DIAL");
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "R77.2").set_mult_offset(100000.0, 0.0);
 }
 
 /***************************************************************************

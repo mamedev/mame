@@ -2036,6 +2036,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cit101.cpp",
 	MAME_DIR .. "src/mame/machine/cit101_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/cit101_kbd.h",
+	MAME_DIR .. "src/mame/drivers/cit101xl.cpp",
 	MAME_DIR .. "src/mame/drivers/cit220.cpp",
 	MAME_DIR .. "src/mame/machine/cit220_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/cit220_kbd.h",
@@ -2568,7 +2569,6 @@ files {
 	MAME_DIR .. "src/mame/includes/hec2hrp.h",
 	MAME_DIR .. "src/mame/machine/hec2hrp.cpp",
 	MAME_DIR .. "src/mame/video/hec2hrp.cpp",
-	MAME_DIR .. "src/mame/drivers/interact.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "heurikon")

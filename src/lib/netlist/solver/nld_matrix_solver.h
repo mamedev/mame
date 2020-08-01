@@ -80,7 +80,7 @@ namespace solver
 		constexpr nl_fptype          m_gmin() { return nlconst::magic(1e-9); }
 		constexpr bool               m_pivot() { return false; }
 		constexpr nl_fptype          m_nr_recalc_delay(){ return netlist_time::quantum().as_fp<nl_fptype>(); }
-		constexpr std::size_t        m_parallel() { return 0; }
+		constexpr int                m_parallel() { return 0; }
 
 		constexpr nl_fptype          m_min_ts_ts() { return nlconst::magic(1e-9); }
 		// automatic time step

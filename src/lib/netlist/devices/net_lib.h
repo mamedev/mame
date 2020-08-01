@@ -28,16 +28,15 @@
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
 
+NETLIST_EXTERNAL(base)
+NETLIST_EXTERNAL(CD4XXX_lib)
+NETLIST_EXTERNAL(OPAMP_lib)
+NETLIST_EXTERNAL(otheric_lib)
+NETLIST_EXTERNAL(TTL74XX_lib)
+NETLIST_EXTERNAL(ROMS_lib)
+
 #if NL_AUTO_DEVICES
 #include "nld_devinc.h"
-
-#include "netlist/macro/nlm_cd4xxx.h"
-#include "netlist/macro/nlm_opamp.h"
-#include "netlist/macro/nlm_other.h"
-#include "netlist/macro/nlm_ttl74xx.h"
-#include "netlist/macro/nlm_roms.h"
-
-#include "nld_7448.h"
 
 #else
 

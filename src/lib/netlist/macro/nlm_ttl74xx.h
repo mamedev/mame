@@ -245,6 +245,10 @@
 		NET_REGISTER_DEV(TTL_7437_DIP, name)
 
 
+#define TTL_7442_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7442_DIP, name)
+
+
 #if (NL_USE_TRUTHTABLE_7448)
 #define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                  \
 		NET_REGISTER_DEV(TTL_7448, name)                                       \
@@ -257,11 +261,28 @@
 		NET_CONNECT(name, LTQ, cLTQ)                                           \
 		NET_CONNECT(name, BIQ, cBIQ)                                           \
 		NET_CONNECT(name, RBIQ, cRBIQ)
+#endif
 
 #define TTL_7448_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7448_DIP, name)
 
-#endif
+#define TTL_7450_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7450_DIP, name)
+
+#define TTL_7473_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7473_DIP, name)
+
+#define TTL_7473A_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7473A_DIP, name)
+
+#define TTL_7474_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7474_DIP, name)
+
+#define TTL_7475_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7475_DIP, name)
+
+#define TTL_7477_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7477_DIP, name)
 
 #define TTL_7486_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7486_GATE, name)
@@ -343,22 +364,8 @@
 #define TTL_74379_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74379_DIP, name)
 
-#define DM9312(name, cA, cB, cC, cSTROBE, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7)     \
-		NET_REGISTER_DEV(DM9312, name)                                         \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, A,  cA)                                              \
-		NET_CONNECT(name, B,  cB)                                              \
-		NET_CONNECT(name, C,  cC)                                              \
-		NET_CONNECT(name, G,  cSTROBE)                                         \
-		NET_CONNECT(name, D0, cD0)                                             \
-		NET_CONNECT(name, D1, cD1)                                             \
-		NET_CONNECT(name, D2, cD2)                                             \
-		NET_CONNECT(name, D3, cD3)                                             \
-		NET_CONNECT(name, D4, cD4)                                             \
-		NET_CONNECT(name, D5, cD5)                                             \
-		NET_CONNECT(name, D6, cD6)                                             \
-		NET_CONNECT(name, D7, cD7)
+#define DM9312(...)                                                            \
+		NET_REGISTER_DEVEXT(DM9312, __VA_ARGS__)
 
 #define DM9312_DIP(name)                                                       \
 		NET_REGISTER_DEV(DM9312_DIP, name)
@@ -369,7 +376,7 @@
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(TTL74XX_lib)
+// moved to net_lib.h
 
 #endif // __PLIB_PREPROCESSOR__
 

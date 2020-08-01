@@ -38,7 +38,10 @@ public:
 	virtual void write_bank(int bank) { }
 
 	virtual void io_write(offs_t offset, uint8_t data) { }
+	virtual uint8_t io_read(offs_t offset) { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
+
+	virtual void cart_init() { } // called after loading ROM
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -100,9 +103,10 @@ public:
 	uint8_t read_rom04(offs_t offset);
 	uint8_t read_rom0c(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
+	uint8_t io_read(offs_t offset);
 	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
 
-	void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }
+	void write_bank(int bank) { if (m_cart) m_cart->write_bank(bank); }
 
 protected:
 	// device-level overrides

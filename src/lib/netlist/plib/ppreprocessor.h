@@ -68,10 +68,17 @@ namespace plib {
 			delete rdbuf();
 		}
 
+		/// \brief process stream
+		///
+		/// \param filename a filename or identifier identifying the stream.
+		///
+		/// FIXME: this is sub-optimal. Refactor input_context into pinput_context
+		/// and pass this to ppreprocessor.
+		///
 		template <typename T>
-		ppreprocessor & process(T &&istrm)
+		ppreprocessor & process(T &&istrm, const pstring &filename)
 		{
-			m_stack.emplace_back(input_context(std::forward<T>(istrm),"","<stream>"));
+			m_stack.emplace_back(input_context(istrm.release_stream(),plib::util::path(filename), filename));
 			process_stack();
 			return *this;
 		}
@@ -139,7 +146,9 @@ namespace plib {
 		psource_collection_t<> &m_sources;
 		string_list m_expr_sep;
 
-		std::uint_least64_t m_if_flag; // 31 if levels
+		std::uint_least64_t m_if_flag; // 63 if levels
+		std::uint_least64_t m_if_seen; // 63 if levels
+		std::uint_least64_t m_elif; // 63 if levels - for #elif
 		int m_if_level;
 
 		struct input_context

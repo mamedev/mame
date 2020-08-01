@@ -12,22 +12,6 @@
 
 namespace netlist
 {
-	template <typename T>
-	struct uptr : public device_arena::unique_ptr<T>
-	{
-		uptr() = default;
-
-		using base_type = device_arena::unique_ptr<T>;
-
-		template<typename O, typename... Args>
-		uptr(O &owner, const pstring &name, Args&&... args)
-		: device_arena::unique_ptr<T>(owner.template make_pool_object<T>(owner, name, std::forward<Args>(args)...))
-		{ }
-
-		constexpr auto operator ()() noexcept -> decltype((*device_arena::unique_ptr<T>::get())()) { return (*this->get())(); }
-		constexpr auto operator ()() const noexcept -> const decltype((*device_arena::unique_ptr<T>::get())()) { return (*this->get())(); }
-	};
-
 	namespace devices
 	{
 
@@ -69,7 +53,7 @@ namespace netlist
 
 		param_logic_t      m_TE;
 		logic_input_t      m_A;
-		uptr<logic_input_t>      m_G;
+		logic_input_t      m_G;
 		tristate_output_t  m_Y;
 		nld_power_pins     m_power_pins;
 	};

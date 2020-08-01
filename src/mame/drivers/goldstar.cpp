@@ -11292,6 +11292,88 @@ ROM_START( cmasteri )
 ROM_END
 
 
+/*
+  Cherry Master.
+  CM-1 v1.01
+
+  These sets were modified to use different inputs to stop all reels.
+
+  cmasterj uses BET to stop all.
+  (this set needs to press stop as soon as the spin starts)
+
+  cmasterk uses TAKE to stop all.
+
+  Should be other changes since there are program blocks moved/modded,
+  but these are unknown.
+
+*/
+ROM_START( cmasterj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mb1_hold__bet_all_stop.bin", 0x0000, 0x1000, CRC(5f168417) SHA1(7ba7fed94ce7211fa8cf6c2abe8dea4b44a22aee) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u58",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( cmasterk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mb1_hold__take_all_stop.bin", 0x0000, 0x1000, CRC(4ffc137f) SHA1(0f080241fa9ded561324b0c602f80159f4683387) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u58",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
 ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cm99-041-8.u81", 0x0000, 0x1000, CRC(5fb0800e) SHA1(14d316b7b89340c5b5c9fdd0b43d5810513b74d6) )
@@ -19259,6 +19341,8 @@ GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
 GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
 GAMEL( 1991, cmasteri,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 9)",           0,                 layout_cmasterb ) // NMC27CP128Q being 32k x8 instead of 16k x8...
+GAMEL( 1991, cmasterj,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 10, BET stops all)",  0,          layout_cmasterb )
+GAMEL( 1991, cmasterk,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 

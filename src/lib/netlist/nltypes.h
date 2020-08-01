@@ -14,11 +14,11 @@
 
 #include "nl_config.h"
 
+#include "plib/pmempool.h"
+#include "plib/ppmf.h"
 #include "plib/pstring.h"
 #include "plib/ptime.h"
 #include "plib/ptypes.h"
-#include "plib/ppmf.h"
-#include "plib/pmempool.h"
 
 #include <memory>
 
@@ -45,6 +45,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	class logic_output_t;
+	class tristate_output_t;
 	class logic_input_t;
 	class analog_net_t;
 	class logic_net_t;
@@ -294,6 +295,32 @@ namespace netlist
 		using desc_const_t =  std::integral_constant<const T, V>;
 	};
 
+	//============================================================
+	//  Exceptions
+	//============================================================
+
+	/// \brief Generic netlist exception.
+	///  The exception is used in all events which are considered fatal.
+
+	class nl_exception : public plib::pexception
+	{
+	public:
+		/// \brief Constructor.
+		///  Allows a descriptive text to be passed to the exception
+
+		explicit nl_exception(const pstring &text //!< text to be passed
+				)
+		: plib::pexception(text) { }
+
+		/// \brief Constructor.
+		///  Allows to use \ref plib::pfmt logic to be used in exception
+
+		template<typename... Args>
+		explicit nl_exception(const pstring &fmt //!< format to be used
+			, Args&&... args //!< arguments to be passed
+			)
+		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
+	};
 
 } // namespace netlist
 

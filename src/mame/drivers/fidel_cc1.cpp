@@ -90,7 +90,7 @@ public:
 	// machine configs
 	void cc1(machine_config &config);
 	void cc3(machine_config &config);
-	void cc10(machine_config &config);
+	void cc10c(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -106,7 +106,7 @@ private:
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
-	void cc10_map(address_map &map);
+	void cc10c_map(address_map &map);
 
 	// I/O handlers
 	void update_display();
@@ -190,7 +190,7 @@ void cc1_state::main_io(address_map &map)
 	map(0x00, 0x03).mirror(0x04).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void cc1_state::cc10_map(address_map &map)
+void cc1_state::cc10c_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).rom();
@@ -238,7 +238,7 @@ static INPUT_PORTS_START( cc3 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cc10 )
+static INPUT_PORTS_START( cc10c )
 	PORT_INCLUDE( cc3 )
 
 	PORT_MODIFY("IN.1")
@@ -279,12 +279,12 @@ void cc1_state::cc3(machine_config &config)
 	config.set_default_layout(layout_fidel_cc3);
 }
 
-void cc1_state::cc10(machine_config &config)
+void cc1_state::cc10c(machine_config &config)
 {
 	cc1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cc1_state::cc10_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc1_state::cc10c_map);
 
 	config.set_default_layout(layout_fidel_cc10c);
 }
@@ -297,7 +297,7 @@ void cc1_state::cc10(machine_config &config)
 
 ROM_START( cc1 )
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("d2316ac_011", 0x0000, 0x0800, BAD_DUMP CRC(e27f9816) SHA1(ad9881b3bf8341829a27e86de27805fc2ccb5f7d) ) // A4 line was broken
+	ROM_LOAD("d2316ac_011", 0x0000, 0x0800, CRC(4af38ed6) SHA1(3f07691266196f3aa5c440a40bfe4802303e7c07) )
 ROM_END
 
 ROM_START( cc3 )
@@ -320,6 +320,6 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1977, cc1,   0,      0, cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+CONS( 1977, cc1,   0,      0, cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 CONS( 1977, cc3,   0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
-CONS( 1979, cc10c, 0,      0, cc10,    cc10,  cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C
+CONS( 1979, cc10c, 0,      0, cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C

@@ -9,9 +9,9 @@
 #define NL_CORE_SETUP_H_
 
 #include "../nl_config.h"
-#include "../nltypes.h"
 #include "../nl_factory.h"
 #include "../nl_setup.h"
+#include "../nltypes.h"
 
 #include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"

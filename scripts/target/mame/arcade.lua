@@ -3355,6 +3355,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
 	MAME_DIR .. "src/mame/includes/starcrus.h",
 	MAME_DIR .. "src/mame/video/starcrus.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starcrus.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starcrus.h",
 }
 
 createMAMEProjects(_target, _subtarget, "rare")

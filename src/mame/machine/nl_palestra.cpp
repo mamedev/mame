@@ -26,10 +26,12 @@
 
 #define SLOW_BUT_ACCURATE 0
 
+#ifndef __PLIB_PREPROCESSOR__
 #if defined(__GNUC__) && !defined(__clang__)
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 10) || ((__GNUC__ == 10) && (__GNUC_MINOR__ >= 0)))
 		#pragma GCC optimize ("O1")
 	#endif
+#endif
 #endif
 
 NETLIST_START(palestra)

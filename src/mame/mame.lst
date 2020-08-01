@@ -10346,6 +10346,10 @@ wildplt                         // (c) 1992 Jaleco
 
 @source:cit101.cpp
 cit101                          // (c) 1980 C. Itoh
+cit101e                         // (c) 1983 C. Itoh
+
+@source:cit101xl.cpp
+cit101xl                        //
 
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
@@ -13868,12 +13872,14 @@ jolycdie                        // 1990 bootleg
 jolycdif                        // 1990 bootleg
 jolycdig                        // 1993 bootleg
 jolycdih                        // 1990 bootleg
+jolycdii                        // 1993 bootleg
 jolycdit                        // 199? bootleg
 jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
 jolyjokr                        // (c) 198? Impera
 jolyjokra                       // (c) 198? Impera
-jolyjokrb                       // (c) 198? Impera
+jolyjokrb1                      // (c) 1985 Impera
+jolyjokrb2                      // (c) 1985 Impera
 jolyjokrc                       // (c) 198? Apple Time
 jolyjokrm                       // (c) 198? Impera
 jolyjokro                       // (c) 198? Impera
@@ -13891,6 +13897,7 @@ megacard                        // (c) 1993 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
 nevadafw                        // 199? unknown
+nkoulit                         // 1995 JK Amusement
 novoplay                        // (c) 1986 Novomatic
 pool10                          // (c) 1996 C.M.C.
 pool10b                         // (c) 1996 C.M.C.
@@ -13906,6 +13913,7 @@ biliard                         // 1998 bootleg.
 potgame                         // (c) 1996 C.M.C.
 powercrd                        // (c) 1993 Fun World
 rcdino4                         // 1998 unknown
+reflexcrd                       // (c) 1999 TAB-Austria
 royal                           // 2001, hack.
 royalcdfr                       // (c) 1991 TAB-Austria
 royalcrd                        // (c) 1991 TAB-Austria
@@ -14795,6 +14803,7 @@ smartfps
 gormiti
 tkmag220                        //
 myac220
+imgame
 
 @source:generalplus_gpl16250_romram.cpp
 paccon
@@ -15180,6 +15189,8 @@ cmasterf                        // (c) 1991 Dyna Electronics
 cmasterg                        // (c) 1991 Dyna Electronics
 cmasterh                        // (c) 1991 Dyna Electronics
 cmasteri                        // (c) 1991 Dyna Electronics
+cmasterj                        // (c) 1991 Dyna Electronics
+cmasterk                        // (c) 1991 Dyna Electronics
 cmezspin                        // (c) 1991 Dyna Electronics
 cmfun                           // (c) 1995 Dyna Electronics
 cmpacman                        //
@@ -22128,6 +22139,7 @@ megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
+barek2mb                        // MegaDrive-based hack
 barek3mb                        // MegaDrive-based hack
 jparkmb                         // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
@@ -32061,6 +32073,7 @@ ts_handy11
 ablwikid
 maxx5in1
 maxx6in1
+max10in1
 
 @source:nes_vt.cpp
 vdogdeme
@@ -32079,6 +32092,8 @@ lxcmcysw
 lxcmcyfz
 lxcmcydp
 lxcmcysp
+lxcmcypp
+lxcmcycr
 lxccminn
 lxccplan
 rtvgc300
@@ -32168,6 +32183,8 @@ xing48
 wowwg
 110dance
 lxts3
+unk1682
+njp60in1
 
 @source:newbrain.cpp
 newbrain                        //
@@ -34906,6 +34923,7 @@ slithera                        // (c) 1982 Century II
 zookeep                         // ZA  (c) 1982 Taito America Corporation
 zookeep2                        // ZA  (c) 1982 Taito America Corporation
 zookeep3                        // ZA  (c) 1982 Taito America Corporation
+zookeepbl                       // bootleg
 
 @source:ql.cpp
 ql                              // 1984 Sinclair QL (UK)
@@ -37626,6 +37644,7 @@ snespal                         // Nintendo Super Nintendo PAL
 @source:snesb51.cpp
 mk3snes
 snes4sl
+snes4sln
 
 @source:snesb.cpp
 denseib                         // bootleg
@@ -37991,6 +38010,8 @@ pballpup
 swclone
 dreamlss
 senspeed
+ordentv
+wfcentro
 
 @source:spg2xx_digimake.cpp
 rad_digi
@@ -38120,6 +38141,7 @@ react
 
 @source:spg2xx_zone_32bit.cpp
 mywicodx                        //
+mywicogt
 zon32bit                        // Zone 32-bit
 oplayer
 dnv200fs

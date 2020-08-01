@@ -80,6 +80,7 @@ const double XTAL::known_xtals[] = {
 	  2'000'000, /* 2_MHz_XTAL             - */
 	  2'012'160, /* 2.01216_MHz_XTAL       Cidelsa Draco sound board */
 	  2'097'152, /* 2.097152_MHz_XTAL      Icatel 1995 - Brazilian public payphone */
+	  2'376'000, /* 2.376_MHz_XTAL         CIT-101 keyboard */
 	  2'457'600, /* 2.4576_MHz_XTAL        Atari ST MFP */
 	  2'500'000, /* 2.5_MHz_XTAL           Janken Man units */
 	  2'600'000, /* 2.6_MHz_XTAL           Sharp PC-1500 */
@@ -89,6 +90,7 @@ const double XTAL::known_xtals[] = {
 	  3'120'000, /* 3.12_MHz_XTAL          SP0250 clock on Gottlieb games */
 	  3'276'800, /* 3.2768_MHz_XTAL        SP0256 clock in Speech Synthesis for Dragon 32 */
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
+	  3'546'800, /* 3.5468_MHz_XTAL        Atari 400 PAL, Philips G7200 */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */
 	  3'579'000, /* 3.579_MHz_XTAL         BeebOPL */
@@ -296,7 +298,7 @@ const double XTAL::known_xtals[] = {
 	 21'300'000, /* 21.3_MHz_XTAL          - */
 	 21'328'100, /* 21.3281_MHz_XTAL       Philips NMS8245 */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
-	 21'667'500, /* 21.6675_MHz_XTAL       AT&T 610 (80-column display clock) */
+	 21'667'500, /* 21.6675_MHz_XTAL       AT&T 610 80-column display clock */
 	 22'000'000, /* 22_MHz_XTAL            - */
 	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
@@ -312,6 +314,7 @@ const double XTAL::known_xtals[] = {
 	 23'961'600, /* 23.9616_MHz_XTAL       Osborne 4 (Vixen) */
 	 24'000'000, /* 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games */
 	 24'073'400, /* 24.0734_MHz_XTAL       DEC Rainbow 100 */
+	 24'270'000, /* 24.27_MHz_XTAL         CIT-101XL */
 	 24'300'000, /* 24.3_MHz_XTAL          ADM 36 132-column display clock */
 	 24'576'000, /* 24.576_MHz_XTAL        Pole Position h/w, Model 3 CPU board */
 	 24'883'200, /* 24.8832_MHz_XTAL       DEC VT100 */
@@ -339,7 +342,8 @@ const double XTAL::known_xtals[] = {
 	 27'164'000, /* 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
 	 27'210'900, /* 27.2109_MHz_XTAL       LA Girl */
 	 27'562'000, /* 27.562_MHz_XTAL        Visual 220 */
-	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 (132-column display clock) */
+	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 132-column display clock */
+	 27'956'000, /* 27.956_MHz_XTAL        CIT-101e 132-column display clock */
 	 28'000'000, /* 28_MHz_XTAL            - */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */

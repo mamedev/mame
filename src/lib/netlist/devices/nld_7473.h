@@ -62,23 +62,11 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_7473(name, cCLK, cJ, cK, cCLRQ)                                    \
-		NET_REGISTER_DEV(TTL_7473, name)                                       \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, CLK, cCLK)                                           \
-		NET_CONNECT(name, J, cJ)                                               \
-		NET_CONNECT(name, K, cK)                                               \
-		NET_CONNECT(name, CLRQ, cCLRQ)
+// usage: TTL_7473(name, cCLK, cJ, cK, cCLRQ)
+#define TTL_7473(...)                                                          \
+		NET_REGISTER_DEVEXT(TTL_7473, __VA_ARGS__)
 
-#define TTL_7473A(name, cCLK, cJ, cK, cCLRQ)                                   \
-		TTL_7473(name, cCLK, cJ, cK, cCLRQ)
-
-#define TTL_7473_DIP(name)                      \
-		NET_REGISTER_DEV(TTL_7473_DIP, name)
-
-
-#define TTL_7473A_DIP(name)                     \
-		NET_REGISTER_DEV(TTL_7473A_DIP, name)
+#define TTL_7473A(...)                                                         \
+		TTL_7473(__VA_ARGS__)
 
 #endif /* NLD_7473_H_ */

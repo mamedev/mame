@@ -8,10 +8,10 @@
 /// \file ptimed_queue.h
 ///
 
+#include "palloc.h" // FIXME: for aligned_vector
 #include "pchrono.h"
 #include "pmulti_threading.h"
 #include "ptypes.h"
-#include "palloc.h" // FIXME: for aligned_vector
 
 #include <algorithm>
 #include <mutex>

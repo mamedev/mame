@@ -63,7 +63,7 @@
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(OPAMP_lib)
+// moved to net_lib.h
 
 #endif // __PLIB_PREPROCESSOR__
 

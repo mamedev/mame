@@ -14,7 +14,7 @@ namespace netlist
 	namespace devices
 	{
 
-	template <unsigned _MaxCount>
+	template <std::size_t _MaxCount>
 	NETLIB_OBJECT(CD4017_base)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4017_base, "CD4XXX")
@@ -61,7 +61,7 @@ namespace netlist
 	public:
 		void update_outputs(const unsigned cnt) noexcept
 		{
-			for (int i = 0; i < _MaxCount; i++)
+			for (std::size_t i = 0; i < _MaxCount; i++)
 				m_Q[i].push(i == cnt, NLTIME_FROM_NS(200));
 			m_CO.push(cnt < _MaxCount / 2, NLTIME_FROM_NS(160));
 		}

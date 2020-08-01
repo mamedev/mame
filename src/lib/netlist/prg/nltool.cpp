@@ -216,11 +216,11 @@ public:
 	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		stream_ptr strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)));
-		if (strm->fail())
-			return stream_ptr(nullptr);
+		stream_ptr strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)), plib::filesystem::u8path(name));
+		if (strm.stream().fail())
+			return stream_ptr();
 
-		strm->imbue(std::locale::classic());
+		strm.stream().imbue(std::locale::classic());
 		return strm;
 	}
 
@@ -459,32 +459,28 @@ void tool_app_t::run()
 	if (!plib::util::exists(opt_files()[0]))
 		throw netlist::nl_exception("nltool: file doesn't exists: {}", opt_files()[0]);
 
+	t.start();
+
 	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
-	{
-		auto t_guard(t.guard());
-		//plib::perftime_t<plib::exact_ticks> t;
+	nt.exec().enable_stats(opt_stats());
 
-		nt.exec().enable_stats(opt_stats());
+	if (!opt_verb())
+		nt.log().verbose.set_enabled(false);
+	if (opt_quiet())
+		nt.log().info.set_enabled(false);
 
-		if (!opt_verb())
-			nt.log().verbose.set_enabled(false);
-		if (opt_quiet())
-			nt.log().info.set_enabled(false);
+	nt.read_netlist(opt_files()[0], opt_name(),
+			opt_logs(),
+			m_defines, opt_rfolders(), opt_includes());
 
-		nt.read_netlist(opt_files()[0], opt_name(),
-				opt_logs(),
-				m_defines, opt_rfolders(), opt_includes());
+	// Inputs must be read before reset -> will clear setup and parser
+	inps = read_input(nt.setup(), opt_inp());
+	nt.free_setup_resources();
+	nt.exec().reset();
 
-		// Inputs must be read before reset -> will clear setup and parser
-		inps = read_input(nt.setup(), opt_inp());
-		nt.free_setup_resources();
-		nt.exec().reset();
-
-		ttr = netlist::netlist_time_ext::from_fp(opt_ttr());
-	}
-
-
+	ttr = netlist::netlist_time_ext::from_fp(opt_ttr());
+	t.stop();
 	pout("startup time ==> {1:5.3f}\n", t.as_seconds<netlist::nl_fptype>() );
 
 	// FIXME: error handling

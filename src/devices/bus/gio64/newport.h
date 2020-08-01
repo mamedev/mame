@@ -476,8 +476,6 @@ protected:
 	uint32_t convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
 	uint32_t convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in);
 
-	uint32_t do_endian_swap(uint32_t color);
-
 	struct bresenham_octant_info_t
 	{
 		int16_t incrx1;

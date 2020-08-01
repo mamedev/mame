@@ -677,7 +677,8 @@ namespace factory
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 						ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
-						ENTRYY(n, 7, s); ENTRYY(n, 8, s)
+						ENTRYY(n, 7, s); ENTRYY(n, 8, s); ENTRYY(n, 9, s); \
+						ENTRYY(n, 10, s)
 
 	host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, properties &&props)
 	{

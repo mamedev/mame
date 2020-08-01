@@ -85,72 +85,8 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT(7473_dip)
-	{
-		NETLIB_CONSTRUCTOR(7473_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", m_A.m_CLK);
-			register_subalias("2", m_A.m_CLRQ);
-			register_subalias("3", m_A.m_K);
-			register_subalias("4", "A.VCC");
-			register_subalias("5", m_B.m_CLK);
-			register_subalias("6", m_B.m_CLRQ);
-			register_subalias("7", m_B.m_J);
-
-			register_subalias("8", m_B.m_QQ);
-			register_subalias("9", m_B.m_Q);
-			register_subalias("10", m_B.m_K);
-			register_subalias("11", "A.GND");
-			register_subalias("12", m_B.m_Q);
-			register_subalias("13", m_A.m_QQ);
-			register_subalias("14", m_A.m_J);
-
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
-		}
-
-	private:
-		NETLIB_SUB(7473) m_A;
-		NETLIB_SUB(7473) m_B;
-	};
-
-	NETLIB_OBJECT(7473A_dip)
-	{
-		NETLIB_CONSTRUCTOR(7473A_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", m_A.m_CLK);
-			register_subalias("2", m_A.m_CLRQ);
-			register_subalias("3", m_A.m_K);
-			register_subalias("4", "A.VCC");
-			register_subalias("5", m_B.m_CLK);
-			register_subalias("6", m_B.m_CLRQ);
-			register_subalias("7", m_B.m_J);
-
-			register_subalias("8", m_B.m_QQ);
-			register_subalias("9", m_B.m_Q);
-			register_subalias("10", m_B.m_K);
-			register_subalias("11", "A.GND");
-			register_subalias("12", m_B.m_Q);
-			register_subalias("13", m_A.m_QQ);
-			register_subalias("14", m_A.m_J);
-
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
-		}
-
-	private:
-		NETLIB_SUB(7473A) m_A;
-		NETLIB_SUB(7473A) m_B;
-	};
-
 	NETLIB_DEVICE_IMPL(7473, "TTL_7473", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7473A, "TTL_7473A", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7473_dip, "TTL_7473_DIP", "")
-	NETLIB_DEVICE_IMPL(7473A_dip, "TTL_7473A_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

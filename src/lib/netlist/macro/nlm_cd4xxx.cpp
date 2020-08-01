@@ -78,6 +78,41 @@ static NETLIST_START(CD4011_DIP)
 	)
 NETLIST_END()
 
+/*  CD4013: Dual Positive-Edge-Triggered D Flip-Flops
+ *          with Set, Reset and Complementary Outputs
+ *
+ *          +--------------+
+ *       Q1 |1     ++    14| VDD
+ *      Q1Q |2           13| Q2
+ *   CLOCK1 |3           12| Q2Q
+ *   RESET1 |4    4013   11| CLOCK2
+ *    DATA1 |5           10| RESET2
+ *     SET1 |6            9| DATA2
+ *      VSS |7            8| SET2
+ *          +--------------+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ */
+
+static NETLIST_START(CD4013_DIP)
+	CD4013(A)
+	CD4013(B)
+
+	NET_C(A.VDD, B.VDD)
+	NET_C(A.VSS, B.VSS)
+
+	DIPPINS(     /*         +--------------+        */
+		    A.Q, /*      Q1 |1     ++    14| VDD    */ A.VDD,
+		   A.QQ, /*     Q1Q |2           13| Q2     */ B.Q,
+		A.CLOCK, /*  CLOCK1 |3           12| Q2Q    */ B.QQ,
+		A.RESET, /*  RESET1 |4    4013   11| CLOCK2 */ B.CLOCK,
+		 A.DATA, /*   DATA1 |5           10| RESET2 */ B.RESET,
+		  A.SET, /*    SET1 |6            9| DATA2  */ B.DATA,
+		  A.VSS, /*     VSS |7            8| SET2   */ B.SET
+			     /*         +--------------+        */
+	)
+NETLIST_END()
+
 /*
  *  CD4017: Decade Counter/Divider with 10 Decoded Outputs
  *
@@ -171,7 +206,7 @@ static NETLIST_START(CD4020_DIP)
 		s1.Q7,   /*    Q7 |6           11| RESET */ s1.RESET,
 		s1.Q4,   /*    Q4 |7           10| IP    */ s1.IP,
 		s1.VSS,  /*   VSS |8            9| Q1    */ s1.Q1
-					/*       +--------------+       */
+				 /*       +--------------+       */
 	)
 		/*
 		 * IP = (Input pulses)
@@ -534,13 +569,14 @@ NETLIST_START(CD4XXX_lib)
 	LOCAL_LIB_ENTRY(CD4070_DIP)
 
 	/* DIP ONLY */
+	LOCAL_LIB_ENTRY(CD4013_DIP)
 	LOCAL_LIB_ENTRY(CD4017_DIP)
 	LOCAL_LIB_ENTRY(CD4022_DIP)
 	LOCAL_LIB_ENTRY(CD4020_DIP)
 	LOCAL_LIB_ENTRY(CD4024_DIP)
-	LOCAL_LIB_ENTRY(CD4016_DIP)
 	LOCAL_LIB_ENTRY(CD4053_DIP)
 	LOCAL_LIB_ENTRY(CD4066_DIP)
+	LOCAL_LIB_ENTRY(CD4016_DIP)
 	LOCAL_LIB_ENTRY(CD4316_DIP)
 	LOCAL_LIB_ENTRY(CD4538_DIP)
 

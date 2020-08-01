@@ -36,6 +36,7 @@ bool parser_t::parse(const pstring &nlname)
 	m_tok_DEFPARAM = register_token("DEFPARAM");
 	m_tok_HINT = register_token("HINT");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
+	m_tok_NET_REGISTER_DEV = register_token("NET_REGISTER_DEV");
 	m_tok_INCLUDE = register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
 	m_tok_LOCAL_LIB_ENTRY = register_token("LOCAL_LIB_ENTRY");
@@ -136,6 +137,10 @@ void parser_t::parse_netlist(const pstring &nlname)
 			m_setup.register_lib_entry(get_identifier(), "", plib::source_location("parser: " + nlname, 1));
 			require_token(m_tok_paren_right);
 		}
+		else if (token.is(m_tok_NET_REGISTER_DEV))
+		{
+			net_register_dev();
+		}
 		else if (token.is(m_tok_NETLIST_END))
 		{
 			netdev_netlist_end();
@@ -199,7 +204,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truthtable_create(desc, "+" + def_param, plib::source_location(nlname, 1));
+			m_setup.truthtable_create(desc, def_param, plib::source_location(nlname, 1));
 			return;
 		}
 	}
@@ -380,6 +385,17 @@ void parser_t::netdev_hint()
 	pstring hint(get_identifier());
 	m_setup.register_hint(id, ".HINT_" + hint);
 	require_token(m_tok_paren_right);
+}
+
+void parser_t::net_register_dev()
+{
+	require_token(m_tok_paren_left);
+	pstring type(get_identifier());
+	require_token(m_tok_comma);
+	pstring name(get_identifier());
+	require_token(m_tok_paren_right);
+
+	m_setup.register_dev(type, name);
 }
 
 void parser_t::device(const pstring &dev_type)

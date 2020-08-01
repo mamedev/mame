@@ -16,7 +16,7 @@
 #include "logmacro.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(HP_IPC_IO_SLOT, hp_ipc_io_slot_device, "hp ipc io slot", "HP IPC I/O Slot")
+DEFINE_DEVICE_TYPE(HP_IPC_IO_SLOT, hp_ipc_io_slot_device, "hp_ipc_io_slot", "HP IPC I/O Slot")
 
 // +---------------------+
 // |hp_ipc_io_slot_device|
