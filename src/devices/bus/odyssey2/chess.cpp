@@ -54,8 +54,8 @@ void o2_chess_device::chess_mem(address_map &map)
 
 void o2_chess_device::chess_io(address_map &map)
 {
-	map.global_mask(0x01);
-	map(0x00, 0x01).r(m_latch[1], FUNC(generic_latch_8_device::read)).w(m_latch[0], FUNC(generic_latch_8_device::write));
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xff).r(m_latch[1], FUNC(generic_latch_8_device::read)).w(m_latch[0], FUNC(generic_latch_8_device::write));
 }
 
 
