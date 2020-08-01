@@ -5,6 +5,8 @@
 Driver file to handle emulation of the Odyssey2.
 
 TODO:
+- 4in1(4 in a row)/musician needs a new mappertype to work: 3KB program ROM
+  and 1KB bankswitched data ROM
 - backgam does not work, it only shows the background graphics
 - chess has graphics issues near the screen borders: missing A-H at bottom,
   rightmost column is not erased properly, wrongly places chars at top

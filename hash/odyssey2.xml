@@ -107,7 +107,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="musician">
+	<software name="musician" supported="no">
 		<description>Musician (Euro)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
@@ -271,7 +271,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 
 <!-- Games -->
 
-	<software name="4in1">
+	<software name="4in1" supported="no">
 		<description>4 in 1 Row (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
@@ -284,7 +284,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="4en1" cloneof="4in1">
+	<software name="4en1" cloneof="4in1" supported="no">
 		<description>4 en 1 Ligne (Fra)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
