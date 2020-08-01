@@ -603,6 +603,23 @@ static const help_item static_help_list[] =
 		"followed by the string \"BEN\", followed by a word-sized 0.\n"
 	},
 	{
+		"fill",
+		"\n"
+		"  fill[{d|i}] <address>,<length>[,<data>[,...]]\n"
+		"\n"
+		"The fill/filld/filli commands overwrite a block of memory with copies of the specified "
+		"sequence of data. 'fill' will fill program space memory, while 'filld' will fill data space "
+		"memory and 'filli' will fill I/O space memory. <address> indicates the address to begin "
+		"writing, and <length> indicates how much memory to fill. <data> can either be a quoted "
+		"string or a numeric value or expression. Non-string data is written by default in the "
+		"native word size of the CPU. To override the data size for non-strings, you can prefix "
+		"the value with b. to force byte-sized fill, w. for word-sized fill, d. for dword-sized, "
+		"and q. for qword-sized. Overrides are remembered, so if you want to fill with a series of "
+		"words, you need only to prefix the first value with a w. Note also that you can intermix "
+		"sizes in order to perform more complex fills. The fill operation may be truncated if a page "
+		"fault occurs or if part of the sequence or string would fall beyond <address>+<length>-1.\n"
+	},
+	{
 		"dump",
 		"\n"
 		"  dump[{d|i}] <filename>,<address>,<length>[,<size>[,<ascii>[,<CPU>]]]\n"

@@ -152,6 +152,7 @@ private:
 	void execute_cheatundo(int ref, const std::vector<std::string> &params);
 	void execute_dasm(int ref, const std::vector<std::string> &params);
 	void execute_find(int ref, const std::vector<std::string> &params);
+	void execute_fill(int ref, const std::vector<std::string> &params);
 	void execute_trace(int ref, const std::vector<std::string> &params);
 	void execute_traceover(int ref, const std::vector<std::string> &params);
 	void execute_traceflush(int ref, const std::vector<std::string> &params);
