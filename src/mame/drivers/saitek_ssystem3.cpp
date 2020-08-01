@@ -521,7 +521,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "chessunit", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1060, 1080);
+	screen.set_size(1060/1.5, 1080/1.5);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display[1]).set_size(8, 48);

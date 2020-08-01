@@ -9,7 +9,6 @@ SciSys/Saitek Stratos chesscomputer family (1987-1990)
 - Stratos
 - Turbo King
 - Corona --> saitek_corona.cpp
-- Simultano --> saitek_simultano.cpp
 
 IMPORTANT: The user is expected to press the STOP button to turn off the computer.
 When not using -autosave, press that button before exiting MAME, or NVRAM can get corrupt.
@@ -38,7 +37,6 @@ Hardware notes:
 
 Stratos/Turbo King are identical.
 Corona has magnet sensors and two HELIOS chips.
-Simultano has an extra LCD screen representing the chessboard state.
 
 There is no official Saitek program versioning for these. The D/D+ versions are known since
 they're the same chess engine as later Saitek modules, such as the Analyst module.

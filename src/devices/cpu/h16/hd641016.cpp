@@ -42,7 +42,7 @@ void hd641016_device::ram_map(address_map &map)
 
 void hd641016_device::io_map(address_map &map)
 {
-	map.unmap_value(0);
+	map.unmap_value_low();
 	//map(0x128, 0x129).rw(FUNC(hd641016_device::abr0_r), FUNC(hd641016_device::abr0_w));
 	//map(0x12a, 0x12b).rw(FUNC(hd641016_device::arr0_r), FUNC(hd641016_device::arr0_w));
 	//map(0x12c, 0x12d).rw(FUNC(hd641016_device::awcr0_r), FUNC(hd641016_device::awcr0_w));

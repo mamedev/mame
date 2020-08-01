@@ -21,6 +21,7 @@ namespace netlist
 		, m_RY(*this, "RY")
 		, m_select(*this, "S", NETLIB_DELEGATE(controls))
 		, m_inhibit(*this, "INH", NETLIB_DELEGATE(controls))
+		, m_VEE(*this, "VEE", NETLIB_DELEGATE(controls))
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
 		, m_lastx(*this, "m_lastx", false)
 		, m_lasty(*this, "m_lasty", false)
@@ -59,15 +60,33 @@ namespace netlist
 					newy = true;
 				}
 			}
-			if (newx != m_lastx)
+
+			if (newx != m_lastx || newy != m_lasty)
 			{
-				update_state(m_RX, newx);
-				m_lastx = newx;
-			}
-			if (newy != m_lasty)
-			{
-				update_state(m_RY, newy);
-				m_lasty = newy;
+				const nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
+				const nl_fptype Ron = m_base_r() * nlconst::magic(5.0) / sup;
+				const nl_fptype Roff = plib::reciprocal(exec().gmin());
+				const nl_fptype RX = (newx != 0) ? Ron : Roff;
+				const nl_fptype RY = (newy != 0) ? Ron : Roff;
+				if (m_RX.solver() == m_RY.solver())
+				{
+					m_RX.change_state([this, &RX, &RY]()
+					{
+						m_RX.set_R(RX);
+						m_RY.set_R(RY);
+					});
+				}
+				else
+				{
+					m_RX.change_state([this, &RX]()
+					{
+						m_RX.set_R(RX);
+					});
+					m_RY.change_state([this, &RY]()
+					{
+						m_RY.set_R(RY);
+					});
+				}
 			}
 		}
 
@@ -88,21 +107,11 @@ namespace netlist
 			return state;
 		}
 
-		void update_state(analog::NETLIB_SUB(R_base) &R, bool state)
-		{
-			nl_fptype Rval = plib::reciprocal(exec().gmin());
-			if (state)
-			{
-				nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
-				Rval = m_base_r() * nlconst::magic(5.0) / sup;
-			}
-			R.change_state([this, Rval]() -> void { this->m_RX.set_R(Rval);});
-		}
-
 		analog::NETLIB_SUB(R_base) m_RX;
 		analog::NETLIB_SUB(R_base) m_RY;
 		analog_input_t             m_select;
 		analog_input_t             m_inhibit;
+		analog_input_t             m_VEE;
 		param_fp_t                 m_base_r;
 		state_var<bool>            m_lastx;
 		state_var<bool>            m_lasty;

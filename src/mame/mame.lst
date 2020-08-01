@@ -10346,6 +10346,7 @@ wildplt                         // (c) 1992 Jaleco
 
 @source:cit101.cpp
 cit101                          // (c) 1980 C. Itoh
+cit101e                         // (c) 1983 C. Itoh
 
 @source:cit101xl.cpp
 cit101xl                        //
@@ -13877,7 +13878,8 @@ jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
 jolyjokr                        // (c) 198? Impera
 jolyjokra                       // (c) 198? Impera
-jolyjokrb                       // (c) 198? Impera
+jolyjokrb1                      // (c) 1985 Impera
+jolyjokrb2                      // (c) 1985 Impera
 jolyjokrc                       // (c) 198? Apple Time
 jolyjokrm                       // (c) 198? Impera
 jolyjokro                       // (c) 198? Impera
@@ -13895,6 +13897,7 @@ megacard                        // (c) 1993 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
 nevadafw                        // 199? unknown
+nkoulit                         // 1995 JK Amusement
 novoplay                        // (c) 1986 Novomatic
 pool10                          // (c) 1996 C.M.C.
 pool10b                         // (c) 1996 C.M.C.
@@ -13910,6 +13913,7 @@ biliard                         // 1998 bootleg.
 potgame                         // (c) 1996 C.M.C.
 powercrd                        // (c) 1993 Fun World
 rcdino4                         // 1998 unknown
+reflexcrd                       // (c) 1999 TAB-Austria
 royal                           // 2001, hack.
 royalcdfr                       // (c) 1991 TAB-Austria
 royalcrd                        // (c) 1991 TAB-Austria
@@ -32089,6 +32093,7 @@ lxcmcyfz
 lxcmcydp
 lxcmcysp
 lxcmcypp
+lxcmcycr
 lxccminn
 lxccplan
 rtvgc300
@@ -32179,6 +32184,7 @@ wowwg
 110dance
 lxts3
 unk1682
+njp60in1
 
 @source:newbrain.cpp
 newbrain                        //

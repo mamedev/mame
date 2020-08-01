@@ -31,6 +31,9 @@ Syracuse (France)
 Robot City (USA)
 Interpol (USA)
 
+NOTE:
+The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.5468 MHz,
+adds 16K RAM and 16K ROM, that plugs into the G7000.
 -->
 
 <softwarelist name="g7400" description="Philips Videopac Plus G7400 cartridges">
@@ -208,6 +211,20 @@ Interpol (USA)
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="guerre de l'espace (france).bin" size="8192" crc="105231f8" sha1="9220dc32d3bb9225292f3e709d1320b9b1052140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homecomp" supported="no"><!-- needs home computer module emulation, wrong romtype right now -->
+		<description>Home Computer Module (Euro)</description><!-- aka Basic -->
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="C7420"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x4800">
+				<rom name="z80_c7420.bin" size="0x4000" crc="939f0e4c" sha1="24c334ba4321f3dd30ac659d35e43f74283ad93b" offset="0" />
+				<rom name="vp_c7420.bin" size="0x800" crc="8e824b98" sha1="60dfc1eea93c25f30d25e549f32f837e22735224" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>

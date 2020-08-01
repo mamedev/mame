@@ -49,7 +49,7 @@ namespace netlist
 				m_cnt = 0;
 				m_IP.inactivate();
 				/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-				for (int i = 0; i < MAX_BITS; i++)
+				for (unsigned i = 0; i < MAX_BITS; i++)
 					if (((_LiveBitmask >> i) & 1) != 0)
 						m_Q[i].push(0, reset_time);
 			}
@@ -70,7 +70,7 @@ namespace netlist
 					NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 			};
 
-			for (int i = 0; i < MAX_BITS; i++)
+			for (unsigned i = 0; i < MAX_BITS; i++)
 				if (((_LiveBitmask >> i) & 1) != 0)
 					m_Q[i].push(cnt & 1, out_delayQn[i]);
 		}

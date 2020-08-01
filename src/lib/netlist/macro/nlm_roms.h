@@ -30,8 +30,8 @@
 #define EPROM_2716_DIP(name)                                                   \
 		NET_REGISTER_DEV(EPROM_2716_DIP, name)
 
-#define TTL_82S16_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_82S16_DIP, name)
+#define TTL_82S16_DIP(...)                                                     \
+		NET_REGISTER_DEVEXT(TTL_82S16_DIP, __VA_ARGS__)
 
 #define PROM_82S115_DIP(name)                                                  \
 		NET_REGISTER_DEV(PROM_82S115_DIP, name)

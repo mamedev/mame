@@ -48,6 +48,7 @@ NETLIST_EXTERNAL(ROMS_lib)
 #include "nld_2102A.h"
 #include "nld_4006.h"
 #include "nld_4013.h"
+#include "nld_4017.h"
 #include "nld_4020.h"
 #include "nld_4053.h"
 #include "nld_4066.h"

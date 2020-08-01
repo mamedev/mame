@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***********************************************************************************************************************************
 
-Preliminary driver for first-generation C. Itoh video terminals.
+Preliminary driver for first-generation C. Itoh/CIE video terminals.
 
 CIT-101 (released December 1980)
     C. Itoh's first terminal, based on DEC VT100. ANSI X3.64 and V52 compatible.
@@ -63,7 +63,6 @@ Special SET-UP control codes:
 
 #include "machine/cit101_kbd.h"
 
-
 class cit101_state : public driver_device
 {
 public:
@@ -76,11 +75,15 @@ public:
 		, m_chargen(*this, "chargen")
 		, m_mainram(*this, "mainram")
 		, m_extraram(*this, "extraram")
-	{ }
+	{
+	}
 
 	void cit101(machine_config &config);
+	void cit101e(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
+
 private:
 	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -354,10 +357,10 @@ void cit101_state::cit101(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "uartint").output_handler().set_inputline("maincpu", I8085_RST55_LINE);
 
 	I8251(config, m_kbduart, 6.144_MHz_XTAL / 2);
-	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_hle_keyboard_device::write_rxd));
+	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_keyboard_device::write_rxd));
 	m_kbduart->rxrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
 
-	CIT101_HLE_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
+	CIT101_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 
 	pit8253_device &pit0(PIT8253(config, "pit0", 0));
 	pit0.set_clk<0>(6.144_MHz_XTAL / 4);
@@ -390,29 +393,64 @@ void cit101_state::cit101(machine_config &config)
 	ER2055(config, m_nvr);
 }
 
+void cit101_state::cit101e(machine_config &config)
+{
+	cit101(config);
+
+	//m_screen->set_raw(19.6608_MHz_XTAL, 1000, 0, 800, 300, 0, 240); // 65.3 Hz nominal vertical frequency
+	m_screen->set_raw(27.956_MHz_XTAL, 1476, 0, 1188, 300, 0, 240); // 63.2 Hz nominal vertical frequency
+
+	CIT101E_KEYBOARD(config.replace(), "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
+}
+
 
 // PCB ID: HAV-2P005B / CIT-101 / C. ITOH
 // CPU: NEC D8085AC
 // RAM: 12x NEC D416C-2 (16 positions labeled 8116E, including 4 unpopulated ones)
 // Peripherals: 3x M5L8251AP-5 (2M, 7J, 7K); 2x NEC D8253C-2 (7I, 7L); NEC D8255AC-2 (7N); GI ER-2055 (8P)
 // Oscillators: 6.144 (XTAL1), 14.976 (XTAL2), 22.464 (XTAL3)
-ROM_START( cit101 )
+ROM_START(cit101)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "ic1_=3g04=_v10a.bin", 0x0000, 0x1000, CRC(5601fcac) SHA1(cad0d0335d133dd43993bc718ff72d12b8445cd1) ) // TMM2732D-45
-	ROM_LOAD( "ic2_=3h04=_v10a.bin", 0x1000, 0x1000, CRC(23d263e0) SHA1(586e8185f9804987e0a4081724c060e74769d41d) ) // TMM2732D-45
-	ROM_LOAD( "ic3_=3i04=_v10a.bin", 0x2000, 0x1000, CRC(15994b1d) SHA1(6d125db4ef5e1dd4d5a4d2f4d6f6bdf574e5bad8) ) // TMM2732D-45
-	ROM_LOAD( "ic4_=3j04=_v10a.bin", 0x3000, 0x0800, CRC(d786995f) SHA1(943b521dcc7abc0662d6e136169b7db480ae1e5c) ) // MB8516
+	ROM_LOAD("ic1_=3g04=_v10a.bin", 0x0000, 0x1000, CRC(5601fcac) SHA1(cad0d0335d133dd43993bc718ff72d12b8445cd1)) // TMM2732D-45
+	ROM_LOAD("ic2_=3h04=_v10a.bin", 0x1000, 0x1000, CRC(23d263e0) SHA1(586e8185f9804987e0a4081724c060e74769d41d)) // TMM2732D-45
+	ROM_LOAD("ic3_=3i04=_v10a.bin", 0x2000, 0x1000, CRC(15994b1d) SHA1(6d125db4ef5e1dd4d5a4d2f4d6f6bdf574e5bad8)) // TMM2732D-45
+	ROM_LOAD("ic4_=3j04=_v10a.bin", 0x3000, 0x0800, CRC(d786995f) SHA1(943b521dcc7abc0662d6e136169b7db480ae1e5c)) // MB8516
 	ROM_RELOAD(0x3800, 0x0800)
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "1h =5h 1 02= char rom.bin", 0x0000, 0x1000, CRC(ee0ff889) SHA1(a74ada19d19041b29e1b49aaf57ba7d9d54575e1) ) // TMM2332P
+	ROM_LOAD("1h =5h 1 02= char rom.bin", 0x0000, 0x1000, CRC(ee0ff889) SHA1(a74ada19d19041b29e1b49aaf57ba7d9d54575e1)) // TMM2332P
 
 	ROM_REGION(0x180, "proms", 0)
-	ROM_LOAD( "2i_=3a00=.bin", 0x000, 0x100, NO_DUMP ) // position labeled (MB)7052
-	ROM_LOAD( "2f_=6g00=.bin", 0x100, 0x020, NO_DUMP ) // position labeled TBP18S030
-	ROM_LOAD( "2e_=7i00=.bin", 0x120, 0x020, NO_DUMP ) // position labeled TBP18S030
-	ROM_LOAD( "5d_=4l00=.bin", 0x140, 0x020, NO_DUMP ) // position labeled TBP18S030
-	ROM_LOAD( "5g_=7f00=.bin", 0x160, 0x020, NO_DUMP ) // position labeled TBP18S030
+	ROM_LOAD("2i_=3a00=.bin", 0x000, 0x100, NO_DUMP) // position labeled (MB)7052
+	ROM_LOAD("2f_=6g00=.bin", 0x100, 0x020, NO_DUMP) // position labeled TBP18S030
+	ROM_LOAD("2e_=7i00=.bin", 0x120, 0x020, NO_DUMP) // position labeled TBP18S030
+	ROM_LOAD("5d_=4l00=.bin", 0x140, 0x020, NO_DUMP) // position labeled TBP18S030
+	ROM_LOAD("5g_=7f00=.bin", 0x160, 0x020, NO_DUMP) // position labeled TBP18S030
 ROM_END
 
-COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101", MACHINE_NOT_WORKING )
+// PCB ID: C.ITOH CIT-101e HBG-2P002
+// CPU: NEC D8085AHC
+// RAM: 14x Fujitsu MB8118-12 (16 positions labeled 8118, including 2 unpopulated ones)
+// Peripherals: 3x NEC D8251AFC (7M, 7N, 7R); 2x NEC D8253C-2 (7J, 7K); NEC D8255AC-2 (6N); GI ER-2055 (5R)
+// Oscillators: 19.6608 (XTAL1), 27.956 (XTAL2), 6.144 (XTAL3)
+ROM_START(cit101e)
+	ROM_REGION(0x5000, "maincpu", 0)
+	ROM_LOAD("101e_v12c__12.7a", 0x0000, 0x2000, CRC(bc71ad27) SHA1(e61481752e20b115531b76688242691d265853e7))
+	ROM_LOAD("101e_v12c__3.7c", 0x2000, 0x1000, CRC(b4c63dd1) SHA1(aff9bd8e79e83c176c882fa3251a1419a283e753))
+	ROM_LOAD("101e_v12c__ab.7f", 0x3000, 0x2000, CRC(6d6bc1ee) SHA1(f42596b379bfda0468045d9e3810a1f0990f76f6))
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("cit-101e_char_gen.3g", 0x0000, 0x1000, CRC(ccf259b4) SHA1(d918f16ce148c813a865280a43a766983673464a)) // position labeled 2732/2332
+
+	ROM_REGION(0x1c0, "proms", 0)
+	ROM_LOAD("2c=atr=__.bin", 0x000, 0x100, NO_DUMP) // position labeled MB7052
+	ROM_LOAD("6j=adr=00.bin", 0x100, 0x020, NO_DUMP) // position labeled (TBP)18S030
+	ROM_LOAD("1n=hs=00.bin", 0x120, 0x020, NO_DUMP) // position labeled (TBP)18S030
+	ROM_LOAD("2n=hl=__.bin", 0x140, 0x020, NO_DUMP) // position labeled (TBP)18S030
+	ROM_LOAD("1s=vs=__.bin", 0x160, 0x020, NO_DUMP) // position labeled (TBP)18S030
+	ROM_LOAD("4s=it1=__.bin", 0x180, 0x020, NO_DUMP) // position labeled (TBP)18S030
+	ROM_LOAD("4t=it2=06.bin", 0x1a0, 0x020, NO_DUMP) // position labeled (TBP)18S030
+ROM_END
+
+COMP(1980, cit101,  0, 0, cit101,  cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101 Video Terminal", MACHINE_NOT_WORKING)
+COMP(1983, cit101e, 0, 0, cit101e, cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101e Video Terminal", MACHINE_NOT_WORKING)

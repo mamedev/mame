@@ -111,7 +111,7 @@ namespace netlist
 		"but has been forced to act as a logic output. Parameter "
 		" FORCE_TRISTATE_LOGIC for device {2} needs to be disabled!.")
 
-	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Will be removed")
+	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Please consider commenting those out.")
 
 	PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in sources collection")
 
