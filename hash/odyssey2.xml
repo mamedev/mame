@@ -374,6 +374,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="backgam" supported="no">
+		<description>Backgammon</description>
+		<year>1984</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="48"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="vp_48.bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baseball">
 		<description>Baseball (Euro) ~ Baseball! (USA)</description>
 		<year>1980</year>
@@ -529,7 +542,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="chess">
+	<software name="chess" supported="partial">
 		<description>Chess Module (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>

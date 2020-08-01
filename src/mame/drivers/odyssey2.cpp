@@ -5,6 +5,7 @@
 Driver file to handle emulation of the Odyssey2.
 
 TODO:
+- backgam does not work, it only shows the background graphics
 - chess has graphics issues near the screen borders: missing A-H at bottom,
   rightmost column is not erased properly, wrongly places chars at top
 - homecomp does not work, needs new slot device
