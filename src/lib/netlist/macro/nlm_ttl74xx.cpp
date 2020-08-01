@@ -1312,6 +1312,42 @@ static NETLIST_START(TTL_74379_DIP)
 NETLIST_END()
 
 /*
+ *  SN74LS629: VOLTAGE-CONTROLLED OSCILLATORS
+ *
+ *          +--------------+
+ *      2FC |1     ++    16| VCC
+ *      1FC |2           15| QSC VCC
+ *     1RNG |3           14| 2RNG
+ *     1CX1 |4  74LS629  13| 2CX1
+ *     1CX2 |5           12| 2CX2
+ *     1ENQ |6           11| 2ENQ
+ *       1Y |7           10| 2Y
+ *  OSC GND |8            9| GND
+ *          +--------------+
+ */
+
+static NETLIST_START(SN74LS629_DIP)
+	SN74LS629(A, CAP_U(1))
+	SN74LS629(B, CAP_U(1))
+
+	NET_C(A.GND, B.GND)
+	NET_C(A.VCC, B.VCC)
+	NC_PIN(NC)
+
+	DIPPINS(   /*          +--------------+         */
+		 B.FC, /*      2FC |1     ++    16| VCC     */ NC.I,
+		 A.FC, /*      1FC |2           15| OSC VCC */ A.VCC,
+		A.RNG, /*     1RNG |3           14| 2RNG    */ B.RNG,
+		 NC.I, /*     1CX1 |4  74LS629  13| 2CX1    */ NC.I,
+		 NC.I, /*     1CX2 |5           12| 2CX2    */ NC.I,
+		A.ENQ, /*     1ENQ |6           11| 2ENQ    */ B.ENQ,
+		  B.Y, /*       1Y |7           10| 2Y      */ B.Y,
+		A.GND, /*  OSC GND |8            9| GND     */ NC.I
+			   /*          +--------------+         */
+	)
+NETLIST_END()
+
+/*
  *  DM9312: One of Eight Line Data Selectors/Multiplexers
  *
  *          +--------------+
@@ -1359,7 +1395,36 @@ static NETLIST_START(DM9312_DIP)
 	)
 NETLIST_END()
 
-#if (NL_USE_TRUTHTABLE_7448)
+/*  SN7442: 4-Line BCD to 10-Line Decimal Decoder
+ *
+ *          +--------------+
+ *        0 |1     ++    16| VCC
+ *        1 |2           15| A
+ *        2 |3           14| B
+ *        3 |4           13| C
+ *        4 |5    7442   12| D
+ *        5 |6           11| 9
+ *        6 |7           10| 8
+ *      GND |8            9| 7
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_7442_DIP)
+	NET_REGISTER_DEV(TTL_7442, A)
+
+	DIPPINS(    /*      +--------------+     */
+		  A.Q0, /*    0 |1     ++    16| VCC */ A.VCC,
+		  A.Q1, /*    1 |2           15| A   */ A.A,
+		  A.Q2, /*    2 |3           14| B   */ A.B,
+		  A.Q3, /*    3 |4           13| C   */ A.C,
+		  A.Q4, /*    4 |5    7442   12| D   */ A.D,
+		  A.Q5, /*    5 |6           11| 9   */ A.Q9,
+		  A.Q6, /*    6 |7           10| 8   */ A.Q8,
+		 A.GND, /*  GND |8            9| 7   */ A.Q7
+				/*      +--------------+     */
+	)
+NETLIST_END()
+
 
 /*
  *  DM7448: BCD to 7-Segment decoders/drivers
@@ -1375,31 +1440,30 @@ NETLIST_END()
  *       GND |8            9| e
  *           +--------------+
  *
- *
  *  Naming conventions follow National Semiconductor datasheet
  *
  */
-#ifndef __PLIB_PREPROCESSOR__
-#define TTL_7448_TT(name)     \
-		NET_REGISTER_DEV(TTL_7448_TT, name)
-#endif
 
 static NETLIST_START(TTL_7448_DIP)
-	TTL_7448_TT(s)
+
+#if (NL_USE_TRUTHTABLE_7448)
+	NET_REGISTER_DEV(TTL_7448_TT, A)
+#else
+	NET_REGISTER_DEV(TTL_7448, A)
+#endif
 
 	DIPPINS(    /*      +--------------+     */
-		s.B,    /* B    |1     ++    16| VCC */ s.VCC,
-		s.C,    /* C    |2           15| f   */ s.f,
-		s.LTQ,  /* LTQ  |3           14| g   */ s.g,
-		s.BIQ,  /* BIQ  |4    7448   13| a   */ s.a,
-		s.RBIQ, /* RBIQ |5           12| b   */ s.b,
-		s.D,    /* D    |6           11| c   */ s.c,
-		s.A,    /* A    |7           10| d   */ s.d,
-		s.GND,  /* GND  |8            9| e   */ s.e
+		A.B,    /* B    |1     ++    16| VCC */ A.VCC,
+		A.C,    /* C    |2           15| f   */ A.f,
+		A.LTQ,  /* LTQ  |3           14| g   */ A.g,
+		A.BIQ,  /* BIQ  |4    7448   13| a   */ A.a,
+		A.RBIQ, /* RBIQ |5           12| b   */ A.b,
+		A.D,    /* D    |6           11| c   */ A.c,
+		A.A,    /* A    |7           10| d   */ A.d,
+		A.GND,  /* GND  |8            9| e   */ A.e
 				/*      +--------------+     */
 	)
 NETLIST_END()
-#endif
 
 NETLIST_START(TTL74XX_lib)
 	NET_MODEL("DM7414         SCHMITT_TRIGGER(VTP=1.7 VTM=0.9 VI=4.35 RI=6.15k VOH=3.5 ROH=120 VOL=0.1 ROL=37.5 TPLH=15 TPHL=15)")
@@ -1662,6 +1726,22 @@ NETLIST_START(TTL74XX_lib)
 		TT_LINE("X,0|1|22")
 		TT_LINE("1,1|0|15")
 		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7442, 4, 10, "")
+		TT_HEAD("D,C,B,A|0,1,2,3,4,5,6,7,8,9")
+		TT_LINE("0,0,0,0|0,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,0,0,1|1,0,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,0,1,0|1,1,0,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,0,1,1|1,1,1,0,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,1,0,0|1,1,1,1,0,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,1,0,1|1,1,1,1,1,0,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,1,1,0|1,1,1,1,1,1,0,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("0,1,1,1|1,1,1,1,1,1,1,0,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("1,0,0,0|1,1,1,1,1,1,1,1,0,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("1,0,0,1|1,1,1,1,1,1,1,1,1,0|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("1,0,1,X|1,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
+		TT_LINE("1,1,X,X|1,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
 	TRUTHTABLE_END()
 
 #if (NL_USE_TRUTHTABLE_7448)
@@ -1941,9 +2021,8 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7430_DIP)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
-#if (NL_USE_TRUTHTABLE_7448)
+	LOCAL_LIB_ENTRY(TTL_7442_DIP)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
-#endif
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)
@@ -1961,5 +2040,6 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
+	LOCAL_LIB_ENTRY(SN74LS629_DIP)
 	LOCAL_LIB_ENTRY(DM9312_DIP)
 NETLIST_END()

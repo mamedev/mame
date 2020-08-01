@@ -69,14 +69,10 @@ namespace devices
 		LIB_ENTRY(nicRSFF)
 		LIB_ENTRY(nicDelay)
 		LIB_ENTRY(2102A)
-		LIB_ENTRY(2102A_dip)
 		LIB_ENTRY(2716)
 #if !(NL_USE_TRUTHTABLE_7448)
 		LIB_ENTRY(7448)
-		LIB_ENTRY(7448_dip)
 #endif
-		LIB_ENTRY(7442)
-		LIB_ENTRY(7442_dip)
 		LIB_ENTRY(7450)
 		LIB_ENTRY(7450_dip)
 		LIB_ENTRY(7473)
@@ -177,8 +173,6 @@ namespace devices
 		LIB_ENTRY(74193_dip)
 		LIB_ENTRY(74194_dip)
 		LIB_ENTRY(74365_dip)
-		LIB_ENTRY(82S16_dip)
-		LIB_ENTRY(82S115_dip)
 		LIB_ENTRY(9602)
 		LIB_ENTRY(9310_dip)
 		LIB_ENTRY(9314_dip)
@@ -186,7 +180,6 @@ namespace devices
 		LIB_ENTRY(9322_dip)
 		LIB_ENTRY(9334_dip)
 		LIB_ENTRY(AM2847_dip)
-		LIB_ENTRY(SN74LS629_dip)
 		LIB_ENTRY(MM5837_dip)
 	}
 

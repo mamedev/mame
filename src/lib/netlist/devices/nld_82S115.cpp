@@ -31,7 +31,6 @@ namespace netlist
 			m_last_O = 0;
 		}
 
-		friend class NETLIB_NAME(82S115_dip);
 	private:
 		// FIXME: timing!
 		NETLIB_HANDLERI(inputs)
@@ -73,49 +72,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(82S115_dip)
-	{
-		NETLIB_CONSTRUCTOR(82S115_dip)
-		, A(*this, "A")
-		{
-			register_subalias("21",    A.m_A[0]);
-			register_subalias("22",    A.m_A[1]);
-			register_subalias("23",    A.m_A[2]);
-			register_subalias("1",     A.m_A[3]);
-			register_subalias("2",     A.m_A[4]);
-			register_subalias("3",     A.m_A[5]);
-			register_subalias("4",     A.m_A[6]);
-			register_subalias("5",     A.m_A[7]);
-			register_subalias("6",     A.m_A[8]);
-
-			register_subalias("20",    A.m_CE1Q);
-			register_subalias("19",    A.m_CE2);
-
-			// FIXME: implement FE1, FE2
-			// register_subalias("13",    m_FE1);
-			// register_subalias("11",    m_FE2);
-
-			register_subalias("18",    A.m_STROBE);
-
-			register_subalias("7",     A.m_O[0]);
-			register_subalias("8",     A.m_O[1]);
-			register_subalias("9",     A.m_O[2]);
-			register_subalias("10",    A.m_O[3]);
-			register_subalias("14",    A.m_O[4]);
-			register_subalias("15",    A.m_O[5]);
-			register_subalias("16",    A.m_O[6]);
-			register_subalias("17",    A.m_O[7]);
-
-			register_subalias("12", "A.GND");
-			register_subalias("24", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(82S115) A;
-	};
-
 	NETLIB_DEVICE_IMPL(82S115,     "PROM_82S115",     "+CE1Q,+CE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+STROBE,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(82S115_dip, "PROM_82S115_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

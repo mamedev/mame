@@ -33,7 +33,4 @@
 #define SN74LS629(name, p_cap)                                                  \
 		NET_REGISTER_DEVEXT(SN74LS629, name, p_cap)
 
-#define SN74LS629_DIP(name, p_cap1, p_cap2)                                     \
-		NET_REGISTER_DEVEXT(SN74LS629_DIP, name, p_cap1, p_cap2)
-
 #endif /* NLD_74LS629_H_ */
