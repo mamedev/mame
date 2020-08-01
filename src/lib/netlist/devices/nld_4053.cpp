@@ -96,7 +96,7 @@ namespace netlist
 				nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
 				Rval = m_base_r() * nlconst::magic(5.0) / sup;
 			}
-			R.change_state([this, Rval]() -> void { this->m_RX.set_R(Rval);});
+			R.change_state([&R, Rval]() -> void { R.set_R(Rval);});
 		}
 
 		analog::NETLIB_SUB(R_base) m_RX;
