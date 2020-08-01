@@ -88,8 +88,11 @@ WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
 
 void o2_voice_device::io_write(offs_t offset, uint8_t data)
 {
-	if (data & 0x20)
-		m_speech->ald_w(offset & 0x7f);
-	else
-		m_speech->reset();
+	if (offset & 0x80)
+	{
+		if (data & 0x20)
+			m_speech->ald_w(offset & 0x7f);
+		else
+			m_speech->reset();
+	}
 }

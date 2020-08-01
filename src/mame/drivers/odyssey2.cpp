@@ -2,12 +2,14 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-  /drivers/odyssey2.c
+Driver file to handle emulation of the Odyssey2.
 
-  Driver file to handle emulation of the Odyssey2.
-
-  Minor update to "the voice" rom names, and add comment about
-  the older revision of "the voice" - LN, 10/03/08
+TODO:
+- chess has graphics issues near the screen borders: missing A-H at bottom,
+  rightmost column is not erased properly, wrongly places chars at top
+- homecomp does not work, needs new slot device
+- a lot more issues, probably, this TODO list was written by someone with
+  no knowledge on odyssey2
 
 ***************************************************************************/
 
@@ -52,7 +54,7 @@ protected:
 	required_device<i8244_device> m_i8244;
 	required_device<o2_cart_slot_device> m_cart;
 
-	uint8_t m_ram[256];
+	uint8_t m_ram[0x80];
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_lum;
@@ -290,19 +292,17 @@ void g7400_state::g7400_palette(palette_device &palette) const
 
 void odyssey2_state::init_odyssey2()
 {
-	uint8_t *gfx = memregion("gfx1")->base();
+	memset(m_ram, 0, 0x80);
 
+	uint8_t *gfx = memregion("gfx1")->base();
 	for (int i = 0; i < 256; i++)
-	{
-		gfx[i] = i;     /* TODO: Why i and not 0? */
-		m_ram[i] = 0;
-	}
+		gfx[i] = i; /* TODO: Why i and not 0? */
 }
 
 
 void odyssey2_state::machine_start()
 {
-	save_pointer(NAME(m_ram),256);
+	save_item(NAME(m_ram));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 	save_item(NAME(m_lum));
@@ -344,16 +344,20 @@ void g7400_state::machine_reset()
 
 uint8_t odyssey2_state::io_read(offs_t offset)
 {
+	u8 data = 0;
+
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return m_i8244->read(offset);
+		data = m_i8244->read(offset);
 	}
-	if (!(m_p1 & P1_EXT_RAM_ENABLE))
+	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
-		return m_ram[offset];
+		data = m_cart->io_read(offset);
+		if (~offset & 0x80)
+			data &= m_ram[offset];
 	}
 
-	return 0;
+	return data;
 }
 
 
@@ -361,12 +365,9 @@ void odyssey2_state::io_write(offs_t offset, uint8_t data)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
-		m_ram[offset] = data;
-		if (offset & 0x80)
-		{
-			logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1);
-			m_cart->io_write(offset, data);
-		}
+		if (~offset & 0x80)
+			m_ram[offset] = data;
+		m_cart->io_write(offset, data);
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
@@ -377,20 +378,24 @@ void odyssey2_state::io_write(offs_t offset, uint8_t data)
 
 uint8_t g7400_state::io_read(offs_t offset)
 {
+	u8 data = 0;
+
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return m_i8244->read(offset);
+		data = m_i8244->read(offset);
 	}
 	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
-		return m_ram[offset];
+		data = m_cart->io_read(offset);
+		if (~offset & 0x80)
+			data &= m_ram[offset];
 	}
 	else if (!(m_p1 & P1_VPP_ENABLE))
 	{
-		return m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
+		data = m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
 	}
 
-	return 0;
+	return data;
 }
 
 
@@ -398,12 +403,9 @@ void g7400_state::io_write(offs_t offset, uint8_t data)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
-		m_ram[offset] = data;
-		if (offset & 0x80)
-		{
-			logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1);
-			m_cart->io_write(offset, data);
-		}
+		if (~offset & 0x80)
+			m_ram[offset] = data;
+		m_cart->io_write(offset, data);
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
@@ -892,4 +894,4 @@ COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, init
 COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, init_odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
 COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Brandt",   "Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // USA version of G7400

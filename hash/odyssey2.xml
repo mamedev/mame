@@ -83,7 +83,7 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		</part>
 	</software>
 
-	<software name="homecomp" supported="no"><!-- needs home computer module emulation, wrong romtype right now, just a placeholder -->
+	<software name="homecomp" supported="no"><!-- needs home computer module emulation, wrong romtype right now - move to g7400.xml? -->
 		<description>Home Computer Module (Euro)</description><!-- aka Basic -->
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -92,7 +92,7 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x4800">
 				<rom name="z80_c7420.bin" size="0x4000" crc="939f0e4c" sha1="24c334ba4321f3dd30ac659d35e43f74283ad93b" offset="0" />
-				<rom name="vp_c7420.bin" size="0x800" crc="8e824b98" sha1="60dfc1eea93c25f30d25e549f32f837e22735224" offset="0x800" />
+				<rom name="vp_c7420.bin" size="0x800" crc="8e824b98" sha1="60dfc1eea93c25f30d25e549f32f837e22735224" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -545,15 +545,16 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		</part>
 	</software>
 
-	<software name="chess" supported="no"><!-- needs chess module emulation -->
+	<software name="chess">
 		<description>Chess Module (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="C7010"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
-			<dataarea name="rom" size="2048">
-				<rom name="chess (europe).bin" size="2048" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0" />
+			<dataarea name="rom" size="0x2800">
+				<rom name="z80_c7010.bin" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" offset="0" />
+				<rom name="vp_c7010.bin" size="0x800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
