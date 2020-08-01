@@ -8,7 +8,7 @@
 
 #include "audio/segasnd.h"
 #include "audio/segausb.h"
-#include "audio/segag80v.h"
+#include "audio/segag80.h"
 #include "cpu/z80/z80.h"
 #include "machine/segag80.h"
 #include "sound/ay8910.h"
@@ -31,7 +31,7 @@ public:
 		m_samples(*this, "samples"),
 		m_speech(*this, "segaspeech"),
 		m_usb(*this, "usbsnd"),
-		m_g80_audio(*this, "soundboard"),
+		m_g80_audio(*this, "g80sound"),
 		m_aysnd(*this, "aysnd"),
 		m_vector(*this, "vector"),
 		m_screen(*this, "screen"),

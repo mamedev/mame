@@ -9,9 +9,6 @@
 #include "netlist/nl_setup.h"
 #include "sound/ay8910.h"
 
-// log to netlist.csv for nltool playback/analysis
-#define ENABLE_NETLIST_LOGGING		(1)
-
 
 class segag80_audio_device : public device_t, public device_mixer_interface
 {
@@ -38,11 +35,6 @@ private:
 	bool m_has_psg;
 	void (*m_netlist)(netlist::nlparse_t &) = nullptr;
 	double m_output_scale = 0;
-
-#if ENABLE_NETLIST_LOGGING
-	FILE *m_logfile = nullptr;
-#endif
-
 };
 
 
@@ -67,9 +59,16 @@ public:
 };
 
 
+class astrob_audio_device : public segag80_audio_device
+{
+public:
+	astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 
 DECLARE_DEVICE_TYPE(ELIMINATOR_AUDIO, elim_audio_device)
 DECLARE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device)
 DECLARE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device)
+DECLARE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device)
 
 #endif // MAME_AUDIO_SEGAG80V_H

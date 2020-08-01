@@ -135,7 +135,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/segag80v.h"
+#include "audio/segag80.h"
 #include "includes/segag80v.h"
 #include "machine/segag80.h"
 
@@ -893,20 +893,20 @@ void segag80v_state::g80v_base(machine_config &config)
 void segag80v_state::elim2(machine_config &config)
 {
 	g80v_base(config);
-	ELIMINATOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ELIMINATOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::spacfury(machine_config &config)
 {
 	g80v_base(config);
-	SPACE_FURY_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	sega_speech_board(config);
 }
 
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
-	ZEKTOR_AUDIO(config, "soundboard", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	sega_speech_board(config);
 }
 

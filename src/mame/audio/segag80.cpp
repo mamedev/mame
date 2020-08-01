@@ -7,10 +7,12 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/segag80v.h"
 
+#include "audio/segag80.h"
+#include "audio/nl_astrob.h"
 #include "audio/nl_elim.h"
 #include "audio/nl_spacfury.h"
+#include "includes/segag80v.h"
 #include "sound/samples.h"
 
 
@@ -96,17 +98,10 @@ void segag80_audio_device::device_add_mconfig(machine_config &config)
 
 void segag80_audio_device::device_start()
 {
-#if ENABLE_NETLIST_LOGGING
-	m_logfile = fopen("netlist.csv", "w");
-#endif
 }
 
 void segag80_audio_device::device_stop()
 {
-#if ENABLE_NETLIST_LOGGING
-	if (m_logfile != nullptr)
-		fclose(m_logfile);
-#endif
 }
 
 void segag80_audio_device::write(offs_t addr, uint8_t data)
@@ -119,17 +114,7 @@ void segag80_audio_device::write(offs_t addr, uint8_t data)
 
 	for (int bit = 0; bit < 8; bit++)
 		if (BIT(mask, bit))
-		{
 			inputs[bit]->write_line(BIT(data, bit));
-#if ENABLE_NETLIST_LOGGING
-			if (BIT((data ^ oldvals), bit) != 0)
-			{
-				attotime time = machine().scheduler().time();
-				fprintf(m_logfile, "%s,I_%s_D%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
-				printf("%s,I_%s_D%u.IN,%d\n", time.as_string(), (addr == 0) ? "LO" : "HI", bit, BIT(data, bit));
-			}
-#endif
-		}
 	oldvals = data;
 }
 
@@ -186,207 +171,15 @@ spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, cons
 
 
 
+/*************************************
+ *
+ *  Astro Blaster
+ *
+ *************************************/
 
-#if 0
+DEFINE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device, "astrob_audio", "Astro Blaster Sound Board")
 
-void segag80v_state::elim1_sh_w(uint8_t data)
+astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: segag80_audio_device(mconfig, ASTRO_BLASTER_AUDIO, tag, owner, clock, 0xff, 0xff, false, NETLIST_NAME(astrob), 20000.0)
 {
-#if 0
-	write_log(machine(), 35, data);
-
-	data ^= 0xff;
-
-	/* Play fireball sample */
-	if (data & 0x02)
-		m_samples->start(0, 0);
-
-	/* Play explosion samples */
-	if (data & 0x04)
-		m_samples->start(1, 10);
-	if (data & 0x08)
-		m_samples->start(1, 9);
-	if (data & 0x10)
-		m_samples->start(1, 8);
-
-	/* Play bounce sample */
-	if (data & 0x20)
-	{
-		if (m_samples->playing(2))
-			m_samples->stop(2);
-		m_samples->start(2, 1);
-	}
-
-	/* Play lazer sample */
-	if (data & 0xc0)
-	{
-		if (m_samples->playing(3))
-			m_samples->stop(3);
-		m_samples->start(3, 5);
-	}
-#endif
 }
-
-void segag80v_state::elim2_sh_w(uint8_t data)
-{
-#if 0
-	write_log(machine(), 34, data);
-
-	data ^= 0xff;
-
-	/* Play thrust sample */
-	if (data & 0x0f)
-		m_samples->start(4, 6);
-	else
-		m_samples->stop(4);
-
-	/* Play skitter sample */
-	if (data & 0x10)
-		m_samples->start(5, 2);
-
-	/* Play eliminator sample */
-	if (data & 0x20)
-		m_samples->start(6, 3);
-
-	/* Play electron samples */
-	if (data & 0x40)
-		m_samples->start(7, 7);
-	if (data & 0x80)
-		m_samples->start(7, 4);
-#endif
-}
-
-
-void segag80v_state::zektor1_sh_w(uint8_t data)
-{
-#if 0
-	data ^= 0xff;
-
-	/* Play fireball sample */
-	if (data & 0x02)
-				m_samples->start(0, 0);
-
-	/* Play explosion samples */
-	if (data & 0x04)
-				m_samples->start(1, 10);
-	if (data & 0x08)
-					m_samples->start(1, 9);
-	if (data & 0x10)
-					m_samples->start(1, 8);
-
-	/* Play bounce sample */
-	if (data & 0x20)
-	{
-				if (m_samples->playing(2))
-						m_samples->stop(2);
-				m_samples->start(2, 1);
-	}
-
-	/* Play lazer sample */
-	if (data & 0xc0)
-	{
-		if (m_samples->playing(3))
-			m_samples->stop(3);
-				m_samples->start(3, 5);
-	}
-#endif
-}
-
-void segag80v_state::zektor2_sh_w(uint8_t data)
-{
-#if 0
-	data ^= 0xff;
-
-	/* Play thrust sample */
-	if (data & 0x0f)
-			m_samples->start(4, 6);
-	else
-		m_samples->stop(4);
-
-	/* Play skitter sample */
-	if (data & 0x10)
-				m_samples->start(5, 2);
-
-	/* Play eliminator sample */
-	if (data & 0x20)
-				m_samples->start(6, 3);
-
-	/* Play electron samples */
-	if (data & 0x40)
-				m_samples->start(7, 40);
-	if (data & 0x80)
-				m_samples->start(7, 41);
-#endif
-}
-
-
-
-void segag80v_state::spacfury1_sh_w(uint8_t data)
-{
-	data ^= 0xff;
-
-	/* craft growing */
-	if (data & 0x01)
-		m_samples->start(1, 0);
-
-	/* craft moving */
-	if (data & 0x02)
-	{
-		if (!m_samples->playing(2))
-			m_samples->start(2, 1, true);
-	}
-	else
-		m_samples->stop(2);
-
-	/* Thrust */
-	if (data & 0x04)
-	{
-		if (!m_samples->playing(3))
-			m_samples->start(3, 4, true);
-	}
-	else
-		m_samples->stop(3);
-
-	/* star spin */
-	if (data & 0x40)
-		m_samples->start(4, 8);
-
-	/* partial warship? */
-	if (data & 0x80)
-		m_samples->start(4, 9);
-
-}
-
-void segag80v_state::spacfury2_sh_w(uint8_t data)
-{
-	data ^= 0xff;
-
-	/* craft joining */
-	if (data & 0x01)
-		m_samples->start(5, 2);
-
-	/* ship firing */
-	if (data & 0x02)
-	{
-		if (m_samples->playing(6))
-			m_samples->stop(6);
-		m_samples->start(6, 3);
-
-	}
-
-	/* fireball */
-	if (data & 0x04)
-		m_samples->start(7, 6);
-
-	/* small explosion */
-	if (data & 0x08)
-		m_samples->start(7, 6);
-	/* large explosion */
-	if (data & 0x10)
-		m_samples->start(7, 5);
-
-	/* docking bang */
-	if (data & 0x20)
-		m_samples->start(0, 7);
-
-}
-#endif

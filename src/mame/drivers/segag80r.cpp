@@ -856,7 +856,7 @@ void segag80r_state::astrob(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	astrob_sound_board(config);
+	ASTRO_BLASTER_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	sega_speech_board(config);
 }
 
@@ -1541,10 +1541,7 @@ void segag80r_state::init_astrob()
 	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 
 	/* install Astro Blaster sound board */
-	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*this, FUNC(segag80r_state::astrob_sound_w)));
-
-	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_rate));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 }
 
 
