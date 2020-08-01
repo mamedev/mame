@@ -102,9 +102,6 @@ namespace netlist
 			connect(m_RNG, m_R_RNG.P());
 			connect(m_R_FC.N(), m_R_RNG.N());
 
-			connect(m_power_pins.GND(), m_clock.m_power_pins.GND());
-			connect(m_power_pins.VCC(), m_clock.m_power_pins.VCC());
-
 			register_subalias("Y", m_clock.m_Y);
 		}
 
