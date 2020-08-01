@@ -7495,7 +7495,7 @@ ROM_START( reflexcrd )
 	ROM_LOAD( "27c256-3.bin", 0x8000, 0x8000, CRC(1617ed13) SHA1(312065406ce1d1d7c4ad566e2b13268f7eb524bb) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )	// default NVRAM
-	ROM_LOAD( "reflexcrd_nvram.bin", 0x0000, 0x0800, CRC(00004f67) SHA1(4aab0d4fe846592e1cbc8b3c2411ddc1bf79fd95) )
+	ROM_LOAD( "reflexcrd_nvram.bin", 0x0000, 0x0800, CRC(c2c69e5b) SHA1(e4abbf09abc044ba17e542cc8e1cfa16ee7cf776) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "bipolar_prom.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
