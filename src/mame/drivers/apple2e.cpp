@@ -3100,7 +3100,7 @@ void apple2e_state::apple2c_map(address_map &map)
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0a8, 0xc0ab).rw(IIC_ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
@@ -3119,7 +3119,7 @@ void apple2e_state::apple2c_memexp_map(address_map &map)
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0a8, 0xc0ab).rw(IIC_ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0c0, 0xc0c3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
@@ -3352,11 +3352,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::ay3600_repeat)
 
 static INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFNAME(0x07, 0x00, "Monitor type")
 	PORT_CONFSETTING(0x00, "Color")
 	PORT_CONFSETTING(0x01, "B&W")
 	PORT_CONFSETTING(0x02, "Green")
 	PORT_CONFSETTING(0x03, "Amber")
+	PORT_CONFSETTING(0x04, "Video-7 RGB")
 
 	PORT_CONFNAME(0x10, 0x00, "CPU type")
 	PORT_CONFSETTING(0x00, "Standard")
@@ -4691,10 +4692,12 @@ void apple2e_state::apple2c(machine_config &config)
 	MOS6551(config, m_acia1, 0);
 	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
 	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 
 	MOS6551(config, m_acia2, 0);
-	m_acia2->set_xtal(XTAL(1'843'200));   // matches SSC so modem software is compatible
+	m_acia2->set_xtal(1.8432_MHz_XTAL);   // matches SSC so modem software is compatible
 	m_acia2->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	m_acia2->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 
 	rs232_port_device &printer(RS232_PORT(config, PRINTER_PORT_TAG, default_rs232_devices, nullptr));
 	printer.rxd_handler().set(m_acia1, FUNC(mos6551_device::write_rxd));
