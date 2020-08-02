@@ -14,7 +14,7 @@
     modifiers encoded in the next two bits):
 
         80       (No key pressed)
-	82       Set-Up
+        82       Set-Up
         83       Return (host may interpret this as CR or CR+LF)
         84       Up
         85       Down

@@ -68,10 +68,12 @@ class cit101_state : public driver_device
 public:
 	cit101_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
 		, m_comuart(*this, "comuart")
 		, m_kbduart(*this, "kbduart")
+		, m_rombank(*this, "rombank")
 		, m_chargen(*this, "chargen")
 		, m_mainram(*this, "mainram")
 		, m_extraram(*this, "extraram")
@@ -88,6 +90,8 @@ private:
 	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	u8 bank_switch_r(offs_t offset);
+
 	u8 c000_ram_r(offs_t offset);
 	void c000_ram_w(offs_t offset, u8 data);
 	u8 e0_latch_r();
@@ -101,6 +105,7 @@ private:
 	void nvr_control_w(u8 data);
 
 	void mem_map(address_map &map);
+	void mem_map_101e(address_map &map);
 	void io_map(address_map &map);
 
 	u8 m_e0_latch;
@@ -108,10 +113,12 @@ private:
 	bool m_blink;
 	u8 m_brightness;
 
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
 	required_device<i8251_device> m_comuart;
 	required_device<i8251_device> m_kbduart;
+	optional_memory_bank m_rombank;
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_extraram;
@@ -120,6 +127,12 @@ private:
 
 void cit101_state::machine_start()
 {
+	if (m_rombank.found())
+	{
+		m_rombank->configure_entries(0, 8, memregion("banked")->base(), 0x1000);
+		m_rombank->set_entry(0);
+	}
+
 	m_comuart->write_cts(0);
 	m_kbduart->write_cts(0);
 
@@ -220,6 +233,14 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 }
 
 
+u8 cit101_state::bank_switch_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_rombank->set_entry(offset);
+
+	return 0xc9; // RET
+}
+
 u8 cit101_state::c000_ram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
@@ -303,6 +324,23 @@ void cit101_state::mem_map(address_map &map)
 	map(0xfcc0, 0xfcc3).w("pit1", FUNC(pit8253_device::write));
 }
 
+void cit101_state::mem_map_101e(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("maincpu", 0);
+	map(0x3000, 0x3ff7).bankr("rombank");
+	map(0x3ff8, 0x3fff).r(FUNC(cit101_state::bank_switch_r));
+	map(0x4000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0xbfff).ram().share("extraram"); // 6 bits wide here?
+	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_w));
+	map(0xc000, 0xdfff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
+	map(0xfc00, 0xfc01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc20, 0xfc21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc40, 0xfc41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc60, 0xfc63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfc80, 0xfc83).w("pit0", FUNC(pit8253_device::write));
+	map(0xfcc0, 0xfcc3).w("pit1", FUNC(pit8253_device::write));
+}
+
 void cit101_state::io_map(address_map &map)
 {
 	map(0x00, 0x01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -314,17 +352,17 @@ void cit101_state::io_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( cit101 )
+static INPUT_PORTS_START(cit101)
 INPUT_PORTS_END
 
 
 void cit101_state::cit101(machine_config &config)
 {
-	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6.144_MHz_XTAL));
-	maincpu.set_addrmap(AS_PROGRAM, &cit101_state::mem_map);
-	maincpu.set_addrmap(AS_IO, &cit101_state::io_map);
-	maincpu.in_sid_func().set_constant(0); // used to time NVR reads
-	maincpu.out_sod_func().set(FUNC(cit101_state::blink_w));
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cit101_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cit101_state::io_map);
+	m_maincpu->in_sid_func().set_constant(0); // used to time NVR reads
+	m_maincpu->out_sod_func().set(FUNC(cit101_state::blink_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240);
@@ -397,6 +435,8 @@ void cit101_state::cit101e(machine_config &config)
 {
 	cit101(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &cit101_state::mem_map_101e);
+
 	//m_screen->set_raw(19.6608_MHz_XTAL, 1000, 0, 800, 300, 0, 240); // 65.3 Hz nominal vertical frequency
 	m_screen->set_raw(27.956_MHz_XTAL, 1476, 0, 1188, 300, 0, 240); // 63.2 Hz nominal vertical frequency
 
@@ -434,10 +474,12 @@ ROM_END
 // Peripherals: 3x NEC D8251AFC (7M, 7N, 7R); 2x NEC D8253C-2 (7J, 7K); NEC D8255AC-2 (6N); GI ER-2055 (5R)
 // Oscillators: 19.6608 (XTAL1), 27.956 (XTAL2), 6.144 (XTAL3)
 ROM_START(cit101e)
-	ROM_REGION(0x5000, "maincpu", 0)
+	ROM_REGION(0x3000, "maincpu", 0)
 	ROM_LOAD("101e_v12c__12.7a", 0x0000, 0x2000, CRC(bc71ad27) SHA1(e61481752e20b115531b76688242691d265853e7))
 	ROM_LOAD("101e_v12c__3.7c", 0x2000, 0x1000, CRC(b4c63dd1) SHA1(aff9bd8e79e83c176c882fa3251a1419a283e753))
-	ROM_LOAD("101e_v12c__ab.7f", 0x3000, 0x2000, CRC(6d6bc1ee) SHA1(f42596b379bfda0468045d9e3810a1f0990f76f6))
+
+	ROM_REGION(0x8000, "banked", ROMREGION_ERASEFF)
+	ROM_LOAD("101e_v12c__ab.7f", 0x0000, 0x2000, CRC(6d6bc1ee) SHA1(f42596b379bfda0468045d9e3810a1f0990f76f6))
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("cit-101e_char_gen.3g", 0x0000, 0x1000, CRC(ccf259b4) SHA1(d918f16ce148c813a865280a43a766983673464a)) // position labeled 2732/2332
