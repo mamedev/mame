@@ -1470,6 +1470,45 @@ static NETLIST_START(TTL_74126_DIP)
 NETLIST_END()
 
 /*
+ *  DM74153: Dual 4-Line to 1-Line Data Selectors Multiplexers
+ *
+ *          +--------------+
+ *       G1 |1     ++    16| VCC
+ *        B |2           15| G2
+ *      1C3 |3           14| A
+ *      1C2 |4   74153   13| 2C3
+ *      1C1 |5           12| 2C2
+ *      1C0 |6           11| 2C1
+ *       Y1 |7           10| 2C0
+ *      GND |8            9| Y2
+ *          +--------------+
+ *
+ */
+
+static NETLIST_START(TTL_74153_DIP)
+	NET_REGISTER_DEV(TTL_74153, A)
+	NET_REGISTER_DEV(TTL_74153, B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	NET_C(A.A, B.A)
+	NET_C(A.B, B.B)
+
+	DIPPINS(   /*     +--------------+     */
+		  A.G, /*  G1 |1     ++    16| VCC */ A.VCC,
+		  A.B, /*   B |2           15| G2  */ B.G,
+		 A.C3, /* 1C3 |3           14| A   */ A.A,
+		 A.C2, /* 1C2 |4   74153   13| 2C3 */ B.C3,
+		 A.C1, /* 1C1 |5           12| 2C2 */ B.C2,
+		 A.C0, /* 1C0 |6           11| 2C1 */ B.C1,
+		 A.AY, /*  Y1 |7           10| 2C0 */ B.C0,
+		A.GND, /* GND |8            9| Y2  */ B.AY
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
+/*
  * DM74155/DM74156: Dual 2-Line to 4-Line Decoders/Demultiplexers
  *
  *      +-----+-------++-----------------+
@@ -2638,6 +2677,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_9602_DIP)
 	LOCAL_LIB_ENTRY(TTL_74125_DIP)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
+	LOCAL_LIB_ENTRY(TTL_74153_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74157_DIP)

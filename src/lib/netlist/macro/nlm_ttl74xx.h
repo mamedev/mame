@@ -345,6 +345,9 @@
 #define TTL_74125_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74125_DIP, name)
 
+#define TTL_74153_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74153_DIP, name)
+
 #define TTL_74155_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74155_DIP, name)
 
