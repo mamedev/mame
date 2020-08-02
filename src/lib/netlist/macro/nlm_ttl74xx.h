@@ -287,6 +287,9 @@
 #define TTL_7483_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7483_DIP, name)
 
+#define TTL_7485_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7485_DIP, name)
+
 #define TTL_7486_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7486_GATE, name)
 

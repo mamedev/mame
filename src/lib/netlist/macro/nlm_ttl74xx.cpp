@@ -897,7 +897,40 @@ static NETLIST_START(TTL_7483_DIP)
 		 A.S2, /*   S2 |6           11| B1  */ A.B1,
 		 A.B2, /*   B2 |7           10| A1  */ A.A1,
 		 A.A2, /*   A2 |8            9| S1  */ A.S1
-			   /*      +--------------+       */
+			   /*      +--------------+     */
+	)
+NETLIST_END()
+
+/*
+ *  DM7485: 4-bit Magnitude Comparators
+ *
+ *          +------------+
+ *       B3 |1    ++   16| VCC
+ *     LTIN |2         15| A3
+ *     EQIN |3         14| B2
+ *     GTIN |4   7485  13| A2
+ *    GTOUT |5         12| A1
+ *    EQOUT |6         11| B1
+ *    LTOUT |7         10| A0
+ *      GND |8          9| B0
+ *          +------------+
+ *
+ *  Naming convention attempts to follow Texas Instruments datasheet
+ */
+
+static NETLIST_START(TTL_7485_DIP)
+	TTL_7485(A)
+
+	DIPPINS(     /*       +------------+      */
+		   A.B3, /*    B3 |1    ++   16| VCC  */ A.VCC,
+		 A.LTIN, /*  LTIN |2         15| A3   */ A.A3,
+		 A.EQIN, /*  EQIN |3         14| B2   */ A.B2,
+		 A.GTIN, /*  GTIN |4   7485  13| A2   */ A.A2,
+		A.GTOUT, /* GTOUT |5         12| A1   */ A.A1,
+		A.EQOUT, /* EQOUT |6         11| B1   */ A.B1,
+		A.LTOUT, /* LTOUT |7         10| A0   */ A.A0,
+		  A.GND, /*   GND |8          9| B0   */ A.B0
+			     /*       +------------+      */
 	)
 NETLIST_END()
 
@@ -2251,6 +2284,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7475_DIP)
 	LOCAL_LIB_ENTRY(TTL_7477_DIP)
 	LOCAL_LIB_ENTRY(TTL_7483_DIP)
+	LOCAL_LIB_ENTRY(TTL_7485_DIP)
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)
