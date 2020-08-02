@@ -1,28 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/*
- * nld_74194.h
- *
- *  74194: Parallel-Load 8-Bit Shift Register
- *
- *          +--------------+
- *     CLRQ |1     ++    16| VCC
- *     SRIN |2           15| QA
- *        A |3           14| QB
- *        B |4    74194  13| QC
- *        C |5           12| QD
- *        D |6           11| CLK
- *     SLIN |7           10| S1
- *      GND |8            9| S0
- *          +--------------+
- *
- * CLR: Clear
- * SRIN: Shift Right Serial Input
- * SLIN: Shift Left Serial Input
- * CLK: Clock
- *
- */
-
 #ifndef NLD_74194_H_
 #define NLD_74194_H_
 

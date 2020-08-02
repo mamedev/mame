@@ -3,7 +3,26 @@
 /*
  * nld_74194.cpp
  *
+ *  74194: Parallel-Load 8-Bit Shift Register
+ *
+ *          +--------------+
+ *     CLRQ |1     ++    16| VCC
+ *     SRIN |2           15| QA
+ *        A |3           14| QB
+ *        B |4    74194  13| QC
+ *        C |5           12| QD
+ *        D |6           11| CLK
+ *     SLIN |7           10| S1
+ *      GND |8            9| S0
+ *          +--------------+
+ *
+ * CLR: Clear
+ * SRIN: Shift Right Serial Input
+ * SLIN: Shift Left Serial Input
+ * CLK: Clock
+ *
  */
+
 
 #include "nld_74194.h"
 #include "netlist/nl_base.h"

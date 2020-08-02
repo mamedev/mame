@@ -3,6 +3,34 @@
 /*
  * nld_74174.cpp
  *
+ *  DM74174: Hex D Flip-Flops with Clear
+ *
+ *          +--------------+
+ *      CLR |1     ++    16| VCC
+ *       Q1 |2           15| Q6
+ *       D1 |3           14| D6
+ *       D2 |4   74174   13| D5
+ *       Q2 |5           12| Q5
+ *       D3 |6           11| D4
+ *       Q3 |7           10| Q4
+ *      GND |8            9| CLK
+ *          +--------------+
+ *
+ *          +-----+-----+---++---+-----+
+ *          | CLR | CLK | D || Q | QQ  |
+ *          +=====+=====+===++===+=====+
+ *          |  0  |  X  | X || 0 |  1  |
+ *          |  1  |  R  | 1 || 1 |  0  |
+ *          |  1  |  R  | 0 || 0 |  1  |
+ *          |  1  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+---++---+-----+
+ *
+ *   Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -> 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
  */
 
 #include "nld_74174.h"
