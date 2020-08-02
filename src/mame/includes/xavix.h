@@ -691,6 +691,25 @@ private:
 	void write_extended_io2(uint8_t data);
 };
 
+class xavix2002_superpttv_state : public xavix_state
+{
+public:
+	xavix2002_superpttv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix2002_superpctv(machine_config &config);
+
+private:
+	uint8_t read_extended_io0() { return 0x00; };
+	uint8_t read_extended_io1() { return 0x00; };
+	uint8_t read_extended_io2() { return 0x00; };
+	//void write_extended_io0(uint8_t data);
+	//void write_extended_io1(uint8_t data);
+	//void write_extended_io2(uint8_t data);
+};
+
+
 
 class xavix_i2c_lotr_state : public xavix_i2c_state
 {

@@ -1657,6 +1657,18 @@ void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 	m_xavix2002io->write_2_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io2));
 }
 
+void xavix2002_superpttv_state::xavix2002_superpctv(machine_config& config)
+{
+	xavix2002(config);
+
+	m_xavix2002io->read_0_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io0));
+	//m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io1));
+	//m_xavix2002io->write_1_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io2));
+	//m_xavix2002io->write_2_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io2));
+}
+
 
 void xavix_state::xavix2000_nv(machine_config &config)
 {
@@ -2521,6 +2533,22 @@ ROM_START( epo_tfit )
 	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
 ROM_END
 
+ROM_START( suprpctv )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("superpctv.bin", 0x200000, 0x200000, CRC(4a55a81c) SHA1(178b4b595a3aefc6d1c176031b436fc3312009e7) )
+	ROM_CONTINUE(0x000000, 0x200000)
+	ROM_CONTINUE(0x600000, 0x200000)
+	ROM_CONTINUE(0x400000, 0x200000)
+ROM_END
+
+ROM_START( udance )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("udancerom0.bin", 0x000000, 0x800000, CRC(3066580a) SHA1(545257c75a892894faf386f4ab9a31967cdbe8ae) )
+
+	ROM_REGION(0x800000, "biosx", ROMREGION_ERASE00)
+	ROM_LOAD("udancerom1.bin", 0x000000, 0x800000, CRC(7dbaabde) SHA1(38c523dcdf8185465fc550fb9b0e8c7909f839be) )
+ROM_END
+
 
 CONS( 2004, xavtenni, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2559,3 +2587,10 @@ CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state,
 
 // TODO: does it have an SEEPROM? why does it hang? full title?
 CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// has HT24LC16
+CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// this has RAM in the usual ROM space, needs handling, also has Atmel 24LC64.
+CONS( 200?, suprpctv, 0, 0, xavix2002_superpctv,    xavix,      xavix2002_superpttv_state, init_xavix, "Epoch / SSD Company LTD", "Super PC TV (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
