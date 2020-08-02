@@ -972,6 +972,36 @@ static NETLIST_START(TTL_7486_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  DM7490: Decade Counters
+ *
+ *          +--------------+
+ *        B |1     ++    14| A
+ *      R01 |2           13| NC
+ *      R02 |3           12| QA
+ *       NC |4    7490   11| QD
+ *      VCC |5           10| GND
+ *      R91 |6            9| QB
+ *      R92 |7            8| QC
+ *          +--------------+
+ */
+
+ static NETLIST_START(TTL_7490_DIP)
+	TTL_7490(A)
+	NC_PIN(NC)
+
+	DIPPINS(   /*     +--------------+     */
+		  A.B, /*   B |1     ++    14| A   */ A.A,
+		 A.R1, /*  R1 |2           13| NC  */ NC.I,
+		 A.R2, /*  R2 |3           12| QA  */ A.QA,
+		 NC.I, /*  NC |4    7490   11| QD  */ A.QD,
+		A.VCC, /* VCC |5           10| GND */ A.GND,
+		A.R91, /* R91 |6            9| QB  */ A.QB,
+		A.R92, /* R92 |7            8| QC  */ A.QC
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
 #if (NL_USE_TRUTHTABLE_74107)
 #ifndef __PLIB_PREPROCESSOR__
 #define TTL_74107_TT(name)                                                         \
@@ -2286,6 +2316,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7483_DIP)
 	LOCAL_LIB_ENTRY(TTL_7485_DIP)
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
+	LOCAL_LIB_ENTRY(TTL_7490_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)
 	LOCAL_LIB_ENTRY(TTL_9602_DIP)

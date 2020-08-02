@@ -95,35 +95,7 @@ namespace devices
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(7490_dip)
-	{
-		NETLIB_CONSTRUCTOR(7490_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", "A.B");
-			register_subalias("2", "A.R1");
-			register_subalias("3", "A.R2");
-
-			// register_subalias("4", ); --> NC
-			register_subalias("5", "A.VCC");
-			register_subalias("6", "A.R91");
-			register_subalias("7", "A.R92");
-
-			register_subalias("8", "A.QC");
-			register_subalias("9", "A.QB");
-			register_subalias("10", "A.GND");
-			register_subalias("11", "A.QD");
-			register_subalias("12", "A.QA");
-			// register_subalias("13", ); --> NC
-			register_subalias("14", "A.A");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(7490) A;
-	};
-
 	NETLIB_DEVICE_IMPL(7490,     "TTL_7490",        "+A,+B,+R1,+R2,+R91,+R92,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7490_dip, "TTL_7490_DIP",    "")
 
 } // namespace devices
 } // namespace netlist
