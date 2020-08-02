@@ -1150,6 +1150,61 @@ static NETLIST_START(TTL_74107A_DIP)
 	)
 NETLIST_END()
 
+/*
+ * nld_74113.h
+ *
+ *  74113: Dual Master-Slave J-K Flip-Flops with Set and Complementary Outputs
+ *  74113A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Set and Complementary Outputs
+ *
+ *          +----------+
+ *     1CLK |1   ++  14| VCC
+ *       1K |2       13| 2CLK
+ *       1J |3       12| 2K
+ *    1SETQ |4 74113 11| 2J
+ *       1Q |5       10| 2SETQ
+ *      1QQ |6        9| 2Q
+ *      GND |7        8| 2QQ
+ *          +----------+
+ */
+
+static NETLIST_START(TTL_74113_DIP)
+	TTL_74113(A)
+	TTL_74113(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(    /*       +----------+       */
+		 A.CLK, /*  1CLK |1   ++  14| VCC   */ A.VCC,
+		   A.K, /*    1K |2       13| 2CLK  */ B.CLK,
+		   A.J, /*    1J |3       12| 2K    */ B.K,
+		A.SETQ, /* 1SETQ |4 74113 11| 2J    */ B.J,
+		   A.Q, /*    1Q |5       10| 2SETQ */ B.SETQ,
+		  A.QQ, /*   1QQ |6        9| 2Q    */ B.Q,
+		 A.GND, /*   GND |7        8| 2QQ   */ B.QQ
+			    /*       +----------+       */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74113A_DIP)
+	TTL_74113A(A)
+	TTL_74113A(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(    /*       +----------+       */
+		 A.CLK, /*  1CLK |1   ++  14| VCC   */ A.VCC,
+		   A.K, /*    1K |2       13| 2CLK  */ B.CLK,
+		   A.J, /*    1J |3       12| 2K    */ B.K,
+		A.SETQ, /* 1SETQ |4 74113 11| 2J    */ B.J,
+		   A.Q, /*    1Q |5       10| 2SETQ */ B.SETQ,
+		  A.QQ, /*   1QQ |6        9| 2Q    */ B.Q,
+		 A.GND, /*   GND |7        8| 2QQ   */ B.QQ
+			    /*       +----------+       */
+	)
+NETLIST_END()
+
 //- Identifier:  TTL_74121_DIP
 //- Title: DM74121 One-Shot with Clear and Complementary Outputs
 //- Description: The DM74121 is a monostable multivibrator featuring both
@@ -2576,6 +2631,8 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7497_DIP)
 	LOCAL_LIB_ENTRY(TTL_74107_DIP)
 	LOCAL_LIB_ENTRY(TTL_74107A_DIP)
+	LOCAL_LIB_ENTRY(TTL_74113_DIP)
+	LOCAL_LIB_ENTRY(TTL_74113A_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)
 	LOCAL_LIB_ENTRY(TTL_9602_DIP)
