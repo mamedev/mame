@@ -102,8 +102,6 @@ namespace netlist
 			clk_strb();
 		}
 
-		friend class NETLIB_NAME(7497_dip);
-
 		object_array_t<logic_input_t, 6> m_B;
 		logic_input_t m_CLK;
 		logic_input_t m_STRBQ;
@@ -141,37 +139,7 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(7497_dip)
-	{
-		NETLIB_CONSTRUCTOR(7497_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_B[4]);  // B0
-			register_subalias("2", A.m_B[1]);  // B4
-			register_subalias("3", A.m_B[0]);  // B5
-			register_subalias("4", A.m_B[5]);  // B0
-			register_subalias("5", A.m_ZQ);
-			register_subalias("6", A.m_Y);
-			register_subalias("7", A.m_ENOUTQ);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9", A.m_CLK);
-			register_subalias("10", A.m_STRBQ);
-			register_subalias("11", A.m_UNITYQ);
-			register_subalias("12", A.m_ENQ);
-			register_subalias("13", A.m_CLR);
-			register_subalias("14", A.m_B[3]); // B2
-			register_subalias("15", A.m_B[2]); // B3
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(7497) A;
-	};
-
-
 	NETLIB_DEVICE_IMPL(7497,      "TTL_7497", "+CLK,+STRBQ,+ENQ,+UNITYQ,+CLR,+B0,+B1,+B2,+B3,+B4,+B5,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7497_dip,  "TTL_7497_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

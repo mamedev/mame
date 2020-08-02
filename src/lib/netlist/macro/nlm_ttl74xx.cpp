@@ -1032,6 +1032,67 @@ NETLIST_END()
 	)
 NETLIST_END()
 
+/*
+ *  DM7493: Binary Counters
+ *
+ *          +--------------+
+ *     CLKB |1     ++    14| CLKA
+ *      R01 |2           13| NC
+ *      R02 |3           12| QA
+ *       NC |4    7493   11| QD
+ *      VCC |5           10| GND
+ *       NC |6            9| QB
+ *       NC |7            8| QC
+ *          +--------------+
+ */
+
+ static NETLIST_START(TTL_7493_DIP)
+	TTL_7493(A)
+	NC_PIN(NC)
+
+	DIPPINS(    /*      +--------------+      */
+		A.CLKB, /* CLKB |1     ++    14| CLKA */ A.CLKA,
+		  A.R1, /*  R01 |2           13| NC   */ NC.I,
+		  A.R2, /*  R02 |3           12| QA   */ A.QA,
+		  NC.I, /*   NC |4    7493   11| QD   */ A.QD,
+		 A.VCC, /*  VCC |5           10| GND  */ A.GND,
+		  NC.I, /*   NC |6            9| QB   */ A.QB,
+		  NC.I, /*   NC |7            8| QC   */ A.QC
+		 	    /*      +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *  SN7497: Synchronous 6-Bit Binary Rate Multiplier
+ *
+ *          +--------------+
+ *       B1 |1           16| VCC
+ *       B4 |2           15| B3
+ *       B5 |3           14| B2
+ *       B0 |4    7497   13| CLR
+ *        Z |5           12| UNITY/CAS
+ *        Y |6           11| ENin (EN)
+ *    ENout |7           10| STRB
+ *      GND |8            9| CLK
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_7497_DIP)
+	TTL_7497(A)
+
+	DIPPINS(     /*       +--------------+ */
+		    A.B1, /*    B1 |1           16| VCC       */ A.VCC,
+		    A.B4, /*    B4 |2           15| B3        */ A.B3,
+		    A.B5, /*    B5 |3           14| B2        */ A.B2,
+		    A.B0, /*    B0 |4    7497   13| CLR       */ A.CLR,
+		    A.ZQ, /*     Z |5           12| UNITY/CAS */ A.UNITYQ,
+		     A.Y, /*     Y |6           11| ENin (EN) */ A.ENQ,
+		A.ENOUTQ, /* ENout |7           10| STRB      */ A.STRBQ,
+		   A.GND, /*   GND |8            9| CLK       */ A.CLK
+			      /*       +--------------+           */
+	)
+NETLIST_END()
+
 #if (NL_USE_TRUTHTABLE_74107)
 #ifndef __PLIB_PREPROCESSOR__
 #define TTL_74107_TT(name)                                                         \
@@ -2348,6 +2409,8 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
 	LOCAL_LIB_ENTRY(TTL_7490_DIP)
 	LOCAL_LIB_ENTRY(TTL_7492_DIP)
+	LOCAL_LIB_ENTRY(TTL_7493_DIP)
+	LOCAL_LIB_ENTRY(TTL_7497_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)
 	LOCAL_LIB_ENTRY(TTL_9602_DIP)

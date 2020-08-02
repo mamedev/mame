@@ -59,16 +59,8 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_7493(name, cCLKA, cCLKB, cR1, cR2)                                 \
-		NET_REGISTER_DEV(TTL_7493, name)                                       \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, CLKA, cCLKA)                                         \
-		NET_CONNECT(name, CLKB, cCLKB)                                         \
-		NET_CONNECT(name, R1,  cR1)                                            \
-		NET_CONNECT(name, R2,  cR2)
-
-#define TTL_7493_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_7493_DIP, name)
+// usage: TTL_7493(name, cCLKA, cCLKB, cR1, cR2)
+#define TTL_7493(...)                                                     \
+		NET_REGISTER_DEVEXT(TTL_7493, __VA_ARGS__)
 
 #endif /* NLD_7493_H_ */
