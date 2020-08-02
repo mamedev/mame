@@ -292,6 +292,10 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_spacfury.cpp",
 	MAME_DIR .. "src/mame/audio/nl_spacfury.h",
 	MAME_DIR .. "src/mame/video/segag80v.cpp",
+	MAME_DIR .. "src/mame/drivers/zaxxon.cpp",
+	MAME_DIR .. "src/mame/includes/zaxxon.h",
+	MAME_DIR .. "src/mame/audio/zaxxon.cpp",
+	MAME_DIR .. "src/mame/video/zaxxon.cpp",
 
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",

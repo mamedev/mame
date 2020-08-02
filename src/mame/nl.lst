@@ -351,6 +351,20 @@ startrek                        // (c) 1982
 tacscan                         // (c) 1982
 zektor                          // (c) 1982
 
+@source:zaxxon.cpp
+congo                           // 605-5167 (c) 1983 (2 board stack)
+congoa                          // 605-5167 (c) 1983 (3 board stack)
+futspy                          // (c) 1984
+ixion                           // (c) 1983
+razmataz                        // modified 834-0213, 834-0214 (c) 1983
+szaxxon                         // (c) 1982
+tiptop                          // 605-5167 (c) 1983 (3 board stack)
+zaxxon                          // (c) 1982
+zaxxon2                         // (c) 1982
+zaxxon3                         // (c) 1982
+zaxxonb                         // bootleg
+zaxxonj                         // (c) 1982
+
 @source:segas16b.cpp
 aceattac                        // (c) 1988 (FD1094)
 //afightere
