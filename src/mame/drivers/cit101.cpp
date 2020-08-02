@@ -89,6 +89,7 @@ protected:
 private:
 	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_reconfigure(const XTAL &xtal, int visible_width, int total_width, int visible_height, int total_height);
 
 	u8 bank_switch_r(offs_t offset);
 
@@ -99,7 +100,9 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(blink_w);
 	void screen_control_w(u8 data);
+	void screen_control_101e_w(u8 data);
 	void brightness_w(u8 data);
+	void brightness_101e_w(u8 data);
 
 	void nvr_address_w(u8 data);
 	void nvr_control_w(u8 data);
@@ -107,6 +110,7 @@ private:
 	void mem_map(address_map &map);
 	void mem_map_101e(address_map &map);
 	void io_map(address_map &map);
+	void io_map_101e(address_map &map);
 
 	u8 m_e0_latch;
 
@@ -233,6 +237,16 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 }
 
 
+void cit101_state::screen_reconfigure(const XTAL &xtal, int visible_width, int total_width, int visible_height, int total_height)
+{
+	const rectangle visarea(0, visible_width - 1, 0, visible_height - 1);
+	const attoseconds_t frame_period = attotime::from_ticks(total_width * total_height, xtal).as_attoseconds();
+
+	m_screen->set_unscaled_clock(xtal);
+	m_screen->configure(total_width, total_height, visarea, frame_period);
+}
+
+
 u8 cit101_state::bank_switch_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
@@ -274,19 +288,24 @@ void cit101_state::screen_control_w(u8 data)
 	if ((m_extraram[0] & 0x06) != (data & 0x06))
 	{
 		const int height = BIT(data, 2) ? 312 : 260;
-		const attoseconds_t frame_period = HZ_TO_ATTOSECONDS(BIT(data, 2) ? 50 : 60);
 		if (BIT(data, 1))
-		{
-			const rectangle visarea(0, 799, 0, 239);
-			m_screen->set_unscaled_clock(14.976_MHz_XTAL);
-			m_screen->configure(960, height, visarea, frame_period);
-		}
+			screen_reconfigure(14.976_MHz_XTAL, 800, 960, 240, height);
 		else
-		{
-			const rectangle visarea(0, 1187, 0, 239);
-			m_screen->set_unscaled_clock(22.464_MHz_XTAL);
-			m_screen->configure(1440, height, visarea, frame_period);
-		}
+			screen_reconfigure(22.464_MHz_XTAL, 1188, 1440, 240, height);
+	}
+
+	m_extraram[0] = data;
+}
+
+void cit101_state::screen_control_101e_w(u8 data)
+{
+	if ((m_extraram[0] & 0x06) != (data & 0x06))
+	{
+		const int height = 300;
+		if (BIT(data, 1))
+			screen_reconfigure(19.6608_MHz_XTAL, 800, 1000, 288, height);
+		else
+			screen_reconfigure(27.956_MHz_XTAL, 1188, 1476, 288, height);
 	}
 
 	m_extraram[0] = data;
@@ -296,6 +315,12 @@ void cit101_state::brightness_w(u8 data)
 {
 	// Function of upper 3 bits is unknown
 	m_brightness = pal5bit(~data & 0x1f);
+}
+
+void cit101_state::brightness_101e_w(u8 data)
+{
+	// Function of most significant bit is unknown
+	m_brightness = pal7bit(~data & 0x7f);
 }
 
 void cit101_state::nvr_address_w(u8 data)
@@ -331,8 +356,8 @@ void cit101_state::mem_map_101e(address_map &map)
 	map(0x3ff8, 0x3fff).r(FUNC(cit101_state::bank_switch_r));
 	map(0x4000, 0x7fff).ram().share("mainram");
 	map(0x8000, 0xbfff).ram().share("extraram"); // 6 bits wide here?
-	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_w));
-	map(0xc000, 0xdfff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
+	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_101e_w));
+	map(0xc000, 0xfbff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
 	map(0xfc00, 0xfc01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfc20, 0xfc21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfc40, 0xfc41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -349,6 +374,12 @@ void cit101_state::io_map(address_map &map)
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).w(FUNC(cit101_state::brightness_w));
 	map(0xe0, 0xe0).rw(FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
+}
+
+void cit101_state::io_map_101e(address_map &map)
+{
+	io_map(map);
+	map(0xa0, 0xa0).w(FUNC(cit101_state::brightness_101e_w));
 }
 
 
@@ -436,9 +467,10 @@ void cit101_state::cit101e(machine_config &config)
 	cit101(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cit101_state::mem_map_101e);
+	m_maincpu->set_addrmap(AS_IO, &cit101_state::io_map_101e);
 
-	//m_screen->set_raw(19.6608_MHz_XTAL, 1000, 0, 800, 300, 0, 240); // 65.3 Hz nominal vertical frequency
-	m_screen->set_raw(27.956_MHz_XTAL, 1476, 0, 1188, 300, 0, 240); // 63.2 Hz nominal vertical frequency
+	//m_screen->set_raw(19.6608_MHz_XTAL, 1000, 0, 800, 300, 0, 288); // 65.3 Hz nominal vertical frequency
+	m_screen->set_raw(27.956_MHz_XTAL, 1476, 0, 1188, 300, 0, 288); // 63.2 Hz nominal vertical frequency
 
 	CIT101E_KEYBOARD(config.replace(), "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 }
