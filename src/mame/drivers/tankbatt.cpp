@@ -6,48 +6,70 @@ Tank Battalion memory map (verified)
 
 driver by Brad Oliver
 
-$0000-$000f : bullet ram, first entry is player's bullet
-$0010-$01ff : zero page & stack
-$0200-$07ff : RAM
-$0800-$0bff : videoram
-$0c00-$0c1f : I/O
+Memory Map:
+  $0000-$03ff : Work RAM 0
+  $0400-$07ff : Work RAM 1
+  $0800-$0bff : VRAM
+  $0c00-$0fff : I/O
+  $2000-$3fff : ROM
 
-Read:
-    $0c00-$0c03 : p1 joystick
-    $0c04
-    $0c07       : stop at grid self-test if bit 7 is low
-    $0c0f       : stop at first self-test if bit 7 is low
+A 4-bit BCD value is created from the following four bits:
+  Bit 0: A3
+  Bit 1: A4
+  Bit 2: Read
+  Bit 3: !(A10 & A11)
 
-    $0c18       : Cabinet, 0 = table, 1 = upright
-    $0c19-$0c1a : Coinage, 00 = free play, 01 = 2 coin 1 credit, 10 = 1 coin 2 credits, 11 = 1 coin 1 credit
-    $0c1b-$0c1c : Bonus, 00 = 10000, 01 = 15000, 10 = 20000, 11 = none
-    $0c1d       : Tanks, 0 = 3, 1 = 2
-    $0c1e-$0c1f : ??
+For writes, the following upper ranges are decoded:
+  xxxx 11xx xxx0 0xxx: OUT0
+  xxxx 11xx xxx0 1xxx: OUT1
+  xxxx 11xx xxx1 0xxx: INTACK
+  xxxx 11xx xxx1 1xxx: Watchdog
 
-Write:
-    $0c00-$0c01 : p1/p2 start leds
-    $0c02       : ?? written to at end of IRQ, either 0 or 1 - coin counter?
-    $0c03       : ?? written to during IRQ if grid test is on
-    $0c08       : ?? written to during IRQ if grid test is on
-    $0c09       : Sound - coin ding
-    $0c0a       : Sound enable (active low) ?? game only ??
-    $0c0b       : Sound - background noise, 0 - low rumble, 1 - high rumble
-    $0c0c       : Sound - player fire
-    $0c0d       : Sound - explosion
-    $0c0f       : NMI enable (active high) ?? demo only ??
+For reads, the following upper ranges are decoded:
+  xxxx 11xx xxx0 0xxx: IN0
+  xxxx 11xx xxx0 1xxx: IN1
+  xxxx 11xx xxx1 0xxx: -
+  xxxx 11xx xxx1 1xxx: DIP switches
 
-    $0c10       : IRQ ack (written at the end of the irq routine)
-    $0c18       : Watchdog
+OUT0:
+  000: Edge Pin F  P1 LED (schematic states Unused)
+  001: Edge Pin 6  P2 LED (schematic states Unused)
+  010: Edge Pin H  Coin Counter (schematic states Unused)
+  011: Edge Pin 7  Coin Lockout (schematic states Coin Counter)
+  1xx: Unused
 
-$2000-$3fff : ROM (A14, A15 not decoded)
+OUT1:
+  000: S1 (Square Wave 1, connected to 2V)
+  001: S2 (Square Wave 2, connected to 4V)
+  010: Sound off (1), on (0)
+  011: Rumble hi (1), rumble low (0)
+  100: Shoot sound effect
+  101: Hit sound effect
+  110: Unused
+  111: NMI Enable
+
+IN0:
+  000: Edge Pin Y  Joystick Up
+  001: Edge Pin M  Joystick Left
+  010: Edge Pin 14 Joystick Down
+  011: Edge Pin 11 Joystick Right
+  100: Edge Pin N  Shoot
+  101: Edge Pin J  Coin 1
+  110: Edge Pin 8  Coin 2
+  111: Edge Pin 9  Service Switch
+
+IN1:
+  000: Edge Pin 21 Joystick Up (Cocktail)
+  001: Edge Pin P  Joystick Left (Cocktail)
+  010: Edge Pin V  Joystick Down (Cocktail)
+  011: Edge Pin 13 Joystick Right (Cocktail)
+  100: Edge Pin 12 Shoot (Cocktail)
+  101: Edge Pin L  P1 Start
+  110: Edge Pin 10 P2 Start
+  111: Edge Pin K  Test DIP Switch
 
 TODO:
-    . Needs proper discrete emulation
     . Resistor values on the color prom need to be corrected
-
-Known issues:
-    . The 'moving' tank rumble noise seems to keep playing a second too long
-    . Sample support is all a crapshoot. I have no idea how it really works
 
 ***************************************************************************/
 
@@ -58,7 +80,6 @@ Known issues:
 #include "machine/74259.h"
 #include "machine/input_merger.h"
 #include "machine/watchdog.h"
-#include "sound/samples.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -70,62 +91,17 @@ void tankbatt_state::machine_start()
 
 uint8_t tankbatt_state::in0_r(offs_t offset)
 {
-	int val;
-
-	val = ioport("P1")->read();
-	return ((val << (7 - offset)) & 0x80);
+	return BIT(m_player_input[0]->read(), offset) << 7;
 }
 
 uint8_t tankbatt_state::in1_r(offs_t offset)
 {
-	int val;
-
-	val = ioport("P2")->read();
-	return ((val << (7 - offset)) & 0x80);
+	return BIT(m_player_input[1]->read(), offset) << 7;
 }
 
 uint8_t tankbatt_state::dsw_r(offs_t offset)
 {
-	int val;
-
-	val = ioport("DSW")->read();
-	return ((val << (7 - offset)) & 0x80);
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::sound_off_w)
-{
-	m_sound_enable = !state;
-
-	// turn off the engine noise
-	if (state) m_samples->stop(2);
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::sh_expl_w)
-{
-	if (state) // rising edge
-	{
-		m_samples->start(1, 3);
-	}
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::sh_engine_w)
-{
-	if (m_sound_enable)
-	{
-		if (state)
-			m_samples->start(2, 2, true);
-		else
-			m_samples->start(2, 1, true);
-	}
-	else m_samples->stop(2);
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::sh_fire_w)
-{
-	if (state) // rising edge
-	{
-		m_samples->start(0, 0);
-	}
+	return BIT(m_dips->read(), offset) << 7;
 }
 
 void tankbatt_state::intack_w(uint8_t data)
@@ -172,7 +148,7 @@ static INPUT_PORTS_START( tankbatt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 
 	PORT_START("P2")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -237,17 +213,6 @@ GFXDECODE_END
 
 
 
-static const char *const tankbatt_sample_names[] =
-{
-	"*tankbatt",
-	"fire",
-	"engine1",
-	"engine2",
-	"explode1",
-	nullptr   /* end of array */
-};
-
-
 void tankbatt_state::tankbatt(machine_config &config)
 {
 	/* basic machine hardware */
@@ -268,12 +233,12 @@ void tankbatt_state::tankbatt(machine_config &config)
 	// Q4 through Q7 are not connected
 
 	cd4099_device &outlatch1(CD4099(config, "outlatch1")); // 4099 at 4H or 259 at 4J
-	outlatch1.q_out_cb<0>().set_nop(); // TODO: S1 tone
-	outlatch1.q_out_cb<1>().set_nop(); // TODO: S2 tone
-	outlatch1.q_out_cb<2>().set(FUNC(tankbatt_state::sound_off_w));
-	outlatch1.q_out_cb<3>().set(FUNC(tankbatt_state::sh_engine_w));
-	outlatch1.q_out_cb<4>().set(FUNC(tankbatt_state::sh_fire_w));
-	outlatch1.q_out_cb<5>().set(FUNC(tankbatt_state::sh_expl_w)); // bit 7 also set by ASL instruction
+	outlatch1.q_out_cb<0>().set(m_sound_s1, FUNC(netlist_mame_logic_input_device::write_line));
+	outlatch1.q_out_cb<1>().set(m_sound_s2, FUNC(netlist_mame_logic_input_device::write_line));
+	outlatch1.q_out_cb<2>().set(m_sound_off, FUNC(netlist_mame_logic_input_device::write_line));
+	outlatch1.q_out_cb<3>().set(m_sound_engine_hi, FUNC(netlist_mame_logic_input_device::write_line));
+	outlatch1.q_out_cb<4>().set(m_sound_shoot, FUNC(netlist_mame_logic_input_device::write_line));
+	outlatch1.q_out_cb<5>().set(m_sound_hit, FUNC(netlist_mame_logic_input_device::write_line));
 	// Q6 is not connected
 	outlatch1.q_out_cb<7>().set("nmigate", FUNC(input_merger_device::in_w<1>));
 
@@ -290,10 +255,18 @@ void tankbatt_state::tankbatt(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(3);
-	m_samples->set_samples_names(tankbatt_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(tankbatt))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:s1", "S1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:s2", "S2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:off", "OFF.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_hi", "ENGINE_HI.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shoot", "SHOOT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:hit", "HIT.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "R35.2").set_mult_offset(10000.0, 0.0);
 }
 
 

@@ -1,11 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/*
- * nld_tristate.h
- *
- *  tristate: Hack to merge two tri-stated outputs together
- *
- */
 
 #ifndef NLD_TRISTATE_H_
 #define NLD_TRISTATE_H_

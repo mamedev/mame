@@ -1450,6 +1450,19 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 ROM_END
 
 
+/*
+Some Cruis'n World PCBs have mask ROMs for the data ROMs
+
+Mask ROMs are in the following format:
+--------------------------------   --------------------------------
+|    MIDWAY GAMES INC          |   |    MIDWAY GAMES INC          |
+|    CRUISN WORLD              |   |    CRUISN WORLD              |
+)    5341-15282-01             |   )    5341-15287-01             |
+|    U3 SOUND                  |   |    U14 VIDEO IMAGE           |
+|   (C)1996 MIDWAY GAMES       |   |   (C)1996 MIDWAY GAMES       |
+--------------------------------   --------------------------------
+
+*/
 ROM_START( crusnwld ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "1.0_cruisn_world_u2_sound.u2", 0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )

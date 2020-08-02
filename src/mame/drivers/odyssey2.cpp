@@ -5,9 +5,14 @@
 Driver file to handle emulation of the Odyssey2.
 
 TODO:
+- odyssey3 cpu/video should have different clocks
+- 4in1(4 in a row)/musician needs a new mappertype to work: 3KB program ROM
+  and 1KB bankswitched data ROM
 - backgam does not work, it only shows the background graphics
 - chess has graphics issues near the screen borders: missing A-H at bottom,
   rightmost column is not erased properly, wrongly places chars at top
+- qbert has major graphics problems, similar to chess?
+- missing questionmark graphics in turtles
 - homecomp does not work, needs new slot device
 - a lot more issues, probably, this TODO list was written by someone with
   no knowledge on odyssey2
@@ -41,9 +46,9 @@ public:
 		m_joysticks(*this, "JOY.%u", 0)
 	{ }
 
-	void odyssey2_cartslot(machine_config &config);
-	void videopac(machine_config &config);
 	void odyssey2(machine_config &config);
+	void videopac(machine_config &config);
+	void videopacf(machine_config &config);
 
 	void init_odyssey2();
 
@@ -676,18 +681,10 @@ GFXDECODE_END
 
 
 
-void odyssey2_state::odyssey2_cartslot(machine_config &config)
-{
-	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-
-	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
-}
-
-
 void odyssey2_state::odyssey2(machine_config &config)
 {
 	/* basic machine hardware */
-	I8048(config, m_maincpu, ((XTAL(7'159'090) * 3) / 4));
+	I8048(config, m_maincpu, (XTAL(7'159'090) * 3) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
 	m_maincpu->p1_in_cb().set(FUNC(odyssey2_state::p1_read));
@@ -698,45 +695,6 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_maincpu->bus_out_cb().set(FUNC(odyssey2_state::bus_write));
 	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
-
-	config.set_maximum_quantum(attotime::from_hz(60));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(odyssey2_state::screen_update_odyssey2));
-	screen.set_palette("palette");
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
-	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 32);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	I8244(config, m_i8244, XTAL(7'159'090)/2 * 2);
-	m_i8244->set_screen("screen");
-	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->postprocess_cb().set(FUNC(odyssey2_state::scanline_postprocess));
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
-
-	odyssey2_cartslot(config);
-}
-
-
-void odyssey2_state::videopac(machine_config &config)
-{
-	/* basic machine hardware */
-	I8048(config, m_maincpu, (XTAL(17'734'470) / 3));
-	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
-	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
-	m_maincpu->p1_in_cb().set(FUNC(odyssey2_state::p1_read));
-	m_maincpu->p1_out_cb().set(FUNC(odyssey2_state::p1_write));
-	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
-	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
-	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
-	m_maincpu->bus_out_cb().set(FUNC(odyssey2_state::bus_write));
-	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
-	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
-
-	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -746,15 +704,40 @@ void odyssey2_state::videopac(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
 	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	I8245(config, m_i8244, XTAL(17'734'470)/5 * 2);
+	I8244(config, m_i8244, XTAL(7'159'090) / 2);
 	m_i8244->set_screen("screen");
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->postprocess_cb().set(FUNC(odyssey2_state::scanline_postprocess));
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	odyssey2_cartslot(config);
+	/* cartridge */
+	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
+}
+
+void odyssey2_state::videopac(machine_config &config)
+{
+	odyssey2(config);
+
+	// different master XTAL
+	m_maincpu->set_clock(XTAL(17'734'470) / 3);
+
+	// PAL video chip
+	I8245(config.replace(), m_i8244, XTAL(17'734'470) / 5);
+	m_i8244->set_screen("screen");
+	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_i8244->postprocess_cb().set(FUNC(odyssey2_state::scanline_postprocess));
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+}
+
+void odyssey2_state::videopacf(machine_config &config)
+{
+	videopac(config);
+
+	// different master XTAL
+	m_maincpu->set_clock(XTAL(17'812'000) / 3);
+	m_i8244->set_clock(XTAL(17'812'000) / 5);
 }
 
 
@@ -774,8 +757,6 @@ void g7400_state::g7400(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
-	config.set_maximum_quantum(attotime::from_hz(60));
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(odyssey2_state::screen_update_odyssey2));
@@ -790,109 +771,77 @@ void g7400_state::g7400(machine_config &config)
 	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
 	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	EF9340_1(config, m_ef9340_1, 3540000, "screen");
+	EF9340_1(config, m_ef9340_1, XTAL(8'867'000)/5 * 2, "screen");
 
 	SPEAKER(config, "mono").front_center();
-	I8245(config, m_i8244, 3540000 * 2);
+	I8245(config, m_i8244, XTAL(8'867'000)/5 * 2);
 	m_i8244->set_screen("screen");
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->postprocess_cb().set(FUNC(g7400_state::scanline_postprocess));
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	odyssey2_cartslot(config);
-	SOFTWARE_LIST(config.replace(), "cart_list").set_original("g7400");
+	/* cartridge */
+	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("g7400");
 	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2");
 }
 
-
 void g7400_state::odyssey3(machine_config &config)
 {
-	/* basic machine hardware */
-	I8048(config, m_maincpu, XTAL(5'911'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
-	m_maincpu->set_addrmap(AS_IO, &g7400_state::g7400_io);
-	m_maincpu->p1_in_cb().set(FUNC(g7400_state::p1_read));
-	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
-	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
-	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
-	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
-	m_maincpu->bus_out_cb().set(FUNC(g7400_state::bus_write));
-	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
-	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
-	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+	g7400(config);
 
-	config.set_maximum_quantum(attotime::from_hz(60));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(odyssey2_state::screen_update_odyssey2));
-	screen.set_palette("palette");
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
-	PALETTE(config, "palette", FUNC(g7400_state::g7400_palette), 16);
-
-	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
-	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_p5_w));
-	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
-	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
-
-	EF9340_1(config, m_ef9340_1, 3540000, "screen");
-
-	SPEAKER(config, "mono").front_center();
-	I8244(config, m_i8244, 3540000 * 2);
+	// NTSC video chip
+	I8244(config.replace(), m_i8244, XTAL(8'867'000)/5 * 2);
 	m_i8244->set_screen("screen");
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->postprocess_cb().set(FUNC(g7400_state::scanline_postprocess));
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
-
-	odyssey2_cartslot(config);
-	SOFTWARE_LIST(config.replace(), "cart_list").set_original("g7400");
-	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2");
 }
 
 
 ROM_START (odyssey2)
-	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
+	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-
 ROM_START (videopac)
-	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
-	ROM_SYSTEM_BIOS( 0, "g7000", "g7000" )
-	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "c52", "c52" )
-	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(1))
+	ROM_REGION(0x0400,"maincpu",0)
+	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
+	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START (videopacf)
+	ROM_REGION(0x0400,"maincpu",0)
+	ROM_LOAD ("c52.rom", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 
 ROM_START (g7400)
-	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
+	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-
 ROM_START (jopac)
-	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
+	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-
 ROM_START (odyssey3)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD ("odyssey3.bin", 0x0000, 0x0400, CRC(e2b23324) SHA1(0a38c5f2cea929d2fe0a23e5e1a60de9155815dc))
-
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY     FULLNAME                                FLAGS */
-COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, init_odyssey2, "Magnavox", "Odyssey 2",                            0 )
-COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, init_odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
-COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Brandt",   "Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // USA version of G7400
+
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS */
+COMP( 1978, odyssey2,  0,        0,      odyssey2,  odyssey2, odyssey2_state, init_odyssey2, "Magnavox", "Odyssey 2 (US)", 0 )
+COMP( 1979, videopac,  odyssey2, 0,      videopac,  odyssey2, odyssey2_state, init_odyssey2, "Philips", "Videopac G7000 (Europe)", 0 )
+COMP( 1979, videopacf, odyssey2, 0,      videopacf, odyssey2, odyssey2_state, init_odyssey2, "Philips", "Videopac C52 (France)", 0 )
+
+COMP( 1983, g7400,     0,        0,      g7400,     odyssey2, g7400_state,    init_odyssey2, "Philips", "Videopac Plus G7400 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac,     g7400,    0,      g7400,     odyssey2, g7400_state,    init_odyssey2, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3,  g7400,    0,      odyssey3,  odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (US, prototype)", MACHINE_IMPERFECT_GRAPHICS )

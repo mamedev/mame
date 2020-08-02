@@ -3,6 +3,34 @@
 /*
  * nld_74174.cpp
  *
+ *  DM74174: Hex D Flip-Flops with Clear
+ *
+ *          +--------------+
+ *      CLR |1     ++    16| VCC
+ *       Q1 |2           15| Q6
+ *       D1 |3           14| D6
+ *       D2 |4   74174   13| D5
+ *       Q2 |5           12| Q5
+ *       D3 |6           11| D4
+ *       Q3 |7           10| Q4
+ *      GND |8            9| CLK
+ *          +--------------+
+ *
+ *          +-----+-----+---++---+-----+
+ *          | CLR | CLK | D || Q | QQ  |
+ *          +=====+=====+===++===+=====+
+ *          |  0  |  X  | X || 0 |  1  |
+ *          |  1  |  R  | 1 || 1 |  0  |
+ *          |  1  |  R  | 0 || 0 |  1  |
+ *          |  1  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+---++---+-----+
+ *
+ *   Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -> 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
  */
 
 #include "nld_74174.h"
@@ -34,7 +62,7 @@ namespace devices
 
 		NETLIB_HANDLERI(other)
 		{
-			uint_fast8_t d = m_D();
+			netlist_sig_t d = m_D();
 			m_clrq = m_CLRQ();
 			if (!m_clrq)
 			{
@@ -47,6 +75,7 @@ namespace devices
 			}
 		}
 
+	private:
 		NETLIB_HANDLERI(clk)
 		{
 			if (m_clrq)
@@ -56,13 +85,11 @@ namespace devices
 			}
 		}
 
-		friend class NETLIB_NAME(74174);
-	private:
 		logic_input_t m_CLK;
 		logic_output_t m_Q;
 
 		state_var<netlist_sig_t> m_clrq;
-		state_var<unsigned>      m_data;
+		state_var<netlist_sig_t> m_data;
 
 		logic_input_t m_D;
 		logic_input_t m_CLRQ;
@@ -79,37 +106,37 @@ namespace devices
 		, E(*this, "E")
 		, F(*this, "F")
 		{
-			register_subalias("CLRQ", A.m_CLRQ);
+			register_subalias("CLRQ", "A.CLRQ");
 			connect("A.CLRQ", "B.CLRQ");
 			connect("A.CLRQ", "C.CLRQ");
 			connect("A.CLRQ", "D.CLRQ");
 			connect("A.CLRQ", "E.CLRQ");
 			connect("A.CLRQ", "F.CLRQ");
 
-			register_subalias("CLK",  A.m_CLK);
+			register_subalias("CLK", "A.CLK");
 			connect("A.CLK", "B.CLK");
 			connect("A.CLK", "C.CLK");
 			connect("A.CLK", "D.CLK");
 			connect("A.CLK", "E.CLK");
 			connect("A.CLK", "F.CLK");
 
-			register_subalias("D1", A.m_D);
-			register_subalias("Q1", A.m_Q);
+			register_subalias("D1", "A.D");
+			register_subalias("Q1", "A.Q");
 
-			register_subalias("D2", B.m_D);
-			register_subalias("Q2", B.m_Q);
+			register_subalias("D2", "B.D");
+			register_subalias("Q2", "B.Q");
 
-			register_subalias("D3", C.m_D);
-			register_subalias("Q3", C.m_Q);
+			register_subalias("D3", "C.D");
+			register_subalias("Q3", "C.Q");
 
-			register_subalias("D4", D.m_D);
-			register_subalias("Q4", D.m_Q);
+			register_subalias("D4", "D.D");
+			register_subalias("Q4", "D.Q");
 
-			register_subalias("D5", E.m_D);
-			register_subalias("Q5", E.m_Q);
+			register_subalias("D5", "E.D");
+			register_subalias("Q5", "E.Q");
 
-			register_subalias("D6", F.m_D);
-			register_subalias("Q6", F.m_Q);
+			register_subalias("D6", "F.D");
+			register_subalias("Q6", "F.Q");
 
 			register_subalias("GND", "A.GND");
 			connect("A.GND", "B.GND");

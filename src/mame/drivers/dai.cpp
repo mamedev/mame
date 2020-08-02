@@ -63,26 +63,21 @@ Timings:
 #include "emu.h"
 #include "includes/dai.h"
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
-/* I/O ports */
-void dai_state::dai_io(address_map &map)
-{
-}
 
 /* memory w/r functions */
-void dai_state::dai_mem(address_map &map)
+void dai_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xbfff).bankrw("bank1");
-	map(0xc000, 0xdfff).rom();
+	map(0x0000, 0xbfff).ram().share("mainram");
+	map(0xc000, 0xdfff).rom().region("maincpu",0);
 	map(0xe000, 0xefff).bankr("bank2");
-	map(0xf000, 0xf7ff).w(FUNC(dai_state::dai_stack_interrupt_circuit_w));
+	map(0xf000, 0xf7ff).w(FUNC(dai_state::stack_interrupt_circuit_w));
 	map(0xf800, 0xf8ff).ram();
-	map(0xfb00, 0xfbff).rw(FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
-	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // .rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xfd00, 0xfdff).rw(FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
-	map(0xfe00, 0xfeff).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfb00, 0xfbff).rw(FUNC(dai_state::amd9511_r), FUNC(dai_state::amd9511_w));
+	map(0xfc00, 0xfcff).rw(FUNC(dai_state::pit_r), FUNC(dai_state::pit_w)); // .rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xfd00, 0xfdff).rw(FUNC(dai_state::io_discrete_devices_r), FUNC(dai_state::io_discrete_devices_w));
+	map(0xfe00, 0xfeff).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xff00, 0xff0f).mirror(0xf0).m(m_tms5501, FUNC(tms5501_device::io_map));
 }
 
@@ -183,7 +178,7 @@ static const gfx_layout dai_charlayout =
 };
 
 static GFXDECODE_START( gfx_dai )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, dai_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, dai_charlayout, 0, 8 )
 GFXDECODE_END
 
 /* machine definition */
@@ -191,8 +186,7 @@ void dai_state::dai(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::dai_mem);
-	m_maincpu->set_addrmap(AS_IO, &dai_state::dai_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::mem_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -204,7 +198,7 @@ void dai_state::dai(machine_config &config)
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(m_sound, FUNC(dai_sound_device::set_input_ch2));
 
-	I8255(config, "ppi8255");
+	I8255(config, "ppi");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -212,7 +206,7 @@ void dai_state::dai(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1056, 542);
 	screen.set_visarea(0, 1056-1, 0, 302-1);
-	screen.set_screen_update(FUNC(dai_state::screen_update_dai));
+	screen.set_screen_update(FUNC(dai_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
@@ -234,11 +228,8 @@ void dai_state::dai(machine_config &config)
 	/* tms5501 */
 	TMS5501(config, m_tms5501, 2000000);
 	m_tms5501->int_callback().set_inputline("maincpu", I8085_INTR_LINE);
-	m_tms5501->xi_callback().set(FUNC(dai_state::dai_keyboard_r));
-	m_tms5501->xo_callback().set(FUNC(dai_state::dai_keyboard_w));
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("48K");
+	m_tms5501->xi_callback().set(FUNC(dai_state::keyboard_r));
+	m_tms5501->xo_callback().set(FUNC(dai_state::keyboard_w));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");
@@ -246,15 +237,16 @@ void dai_state::dai(machine_config &config)
 
 
 ROM_START(dai)
-	ROM_REGION(0x14000,"maincpu",0)
-	ROM_LOAD("dai.bin", 0xc000, 0x2000, CRC(ca71a7d5) SHA1(6bbe2336c717354beab2ae201debeb4fd055bdcb))
-	ROM_LOAD("dai00.bin", 0x10000, 0x1000, CRC(fa7d39ac) SHA1(3d1824a1f273882f934249ef3cb1b38ef99de7b9))
-	ROM_LOAD("dai01.bin", 0x11000, 0x1000, CRC(cb5809f2) SHA1(523656f0a9d98888cd3e2bd66886c589e9ae75b4))
-	ROM_LOAD("dai02.bin", 0x12000, 0x1000, CRC(03f72d4a) SHA1(573d65dc82321970dcaf81d7638a02252ea18a7a))
-	ROM_LOAD("dai03.bin", 0x13000, 0x1000, CRC(c475c96f) SHA1(96fc3cc4b8a2873f0d044bd8033d1e7b7197dd97))
-	ROM_REGION(0x2000, "gfx1",0)
+	ROM_REGION(0x6000,"maincpu",0)
+	ROM_LOAD("dai.bin",   0x0000, 0x2000, CRC(ca71a7d5) SHA1(6bbe2336c717354beab2ae201debeb4fd055bdcb))
+	ROM_LOAD("dai00.bin", 0x2000, 0x1000, CRC(fa7d39ac) SHA1(3d1824a1f273882f934249ef3cb1b38ef99de7b9))
+	ROM_LOAD("dai01.bin", 0x3000, 0x1000, CRC(cb5809f2) SHA1(523656f0a9d98888cd3e2bd66886c589e9ae75b4))
+	ROM_LOAD("dai02.bin", 0x4000, 0x1000, CRC(03f72d4a) SHA1(573d65dc82321970dcaf81d7638a02252ea18a7a))
+	ROM_LOAD("dai03.bin", 0x5000, 0x1000, CRC(c475c96f) SHA1(96fc3cc4b8a2873f0d044bd8033d1e7b7197dd97))
+
+	ROM_REGION(0x2000, "chargen",0)
 	ROM_LOAD ("nch.bin", 0x0000, 0x1000, CRC(a9f5b30b) SHA1(24119b2984ab4e50dc0dabae1065ff6d6c1f237d))
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                            FULLNAME */
-COMP( 1978, dai,  0,      0,      dai,     dai,   dai_state, empty_init, "Data Applications International", "DAI Personal Computer", 0)
+COMP( 1978, dai,  0,      0,      dai,     dai,   dai_state, empty_init, "Data Applications International", "DAI Personal Computer", MACHINE_SUPPORTS_SAVE )

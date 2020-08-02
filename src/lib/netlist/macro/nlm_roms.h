@@ -18,6 +18,9 @@
 
 #if !NL_AUTO_DEVICES
 
+#define PROM_82S115_DIP(name)                                                  \
+		NET_REGISTER_DEV(PROM_82S115_DIP, name)
+
 #define PROM_82S126_DIP(name)                                                  \
 		NET_REGISTER_DEV(PROM_82S126_DIP, name)
 
@@ -35,6 +38,9 @@
 
 #define PROM_82S115_DIP(name)                                                  \
 		NET_REGISTER_DEV(PROM_82S115_DIP, name)
+
+#define RAM_2102A_DIP(name)                                                    \
+		NET_REGISTER_DEV(RAM_2102A_DIP, name)
 
 #define RAM_2102A_DIP(name)                                                    \
 		NET_REGISTER_DEV(RAM_2102A_DIP, name)

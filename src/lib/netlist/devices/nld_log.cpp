@@ -1,7 +1,17 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_log.c
+ * nld_log.cpp
+ *
+ *  Devices supporting analysis and logging
+ *
+ *  nld_log:
+ *
+ *          +---------+
+ *          |    ++   |
+ *        I |         | ==> Log to file "netlist_" + name() + ".log"
+ *          |         |
+ *          +---------+
  *
  */
 

@@ -595,7 +595,7 @@
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_4006.cpp
 // ---------------------------------------------------------------------
-// usage       : CD4006(name, pCLOCK, pD1, pD2, pD3, pD4, pD1P4, pD1P4S, pD2P4, pD2P5, pD3P4, pD4P4, pD3P5)
+// usage       : CD4006(name, pCLOCK, pD1, pD2, pD3, pD4, pD1P4, pD1P4S, pD2P4, pD2P5, pD3P4, pD4P4, pD4P5)
 // auto connect: VCC, GND
 #define CD4006(...)                                                    \
 	NET_REGISTER_DEVEXT(CD4006, __VA_ARGS__)

@@ -2022,17 +2022,61 @@ NETLIST_END()
  *  SN74LS629: VOLTAGE-CONTROLLED OSCILLATORS
  *
  *          +--------------+
- *      2FC |1     ++    16| VCC
- *      1FC |2           15| QSC VCC
- *     1RNG |3           14| 2RNG
- *     1CX1 |4  74LS629  13| 2CX1
- *     1CX2 |5           12| 2CX2
- *     1ENQ |6           11| 2ENQ
- *       1Y |7           10| 2Y
- *  OSC GND |8            9| GND
+ *      /CP |1     ++    14| VCC
+ *       MR |2           13| /CP
+ *       Q0 |3           12| MR
+ *       Q1 |4    74393  11| Q0
+ *       Q2 |5           10| Q1
+ *       Q3 |6            9| Q2
+ *      GND |7            8| Q3
  *          +--------------+
+ *
+ *  Naming conventions follow Motorola datasheet
  */
 
+static NETLIST_START(TTL_74393_DIP)
+	TTL_74393(A)
+	TTL_74393(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(   /*     +------------+     */
+		 A.CP, /* /CP |1   ++    14| VCC */ A.VCC,
+		 A.MR, /*  MR |2         13| /CP */ B.CP,
+		 A.Q0, /*  Q0 |3         12| MR  */ B.MR,
+		 A.Q1, /*  Q1 |4  74393  11| Q0  */ B.Q0,
+		 A.Q2, /*  Q2 |5         10| Q1  */ B.Q1,
+		 A.Q3, /*  Q3 |6          9| Q2  */ B.Q2,
+		A.GND, /* GND |7          8| Q3  */ B.Q3
+			   /*     +------------+     */
+	)
+NETLIST_END()
+
+//- Identifier: SN74LS629_DIP
+//- Title: SN74LS629 VOLTAGE-CONTROLLED OSCILLATORS
+//- Description: Please add a detailed description
+//-    FIXME: Missing description
+//-
+//- Pinalias: 2FC,1FC,1RNG,1CX1,1CX2,1ENQ,1Y,OSC_GND,GND,2Y,2ENQ,2CX2,2CX1,2RNG,OSC_VCC,VCC
+//- Package: DIP
+//- Param: A.CAP
+//-    Capacitor value of capacitor connected to 1CX1 and 1CX2 pins
+//- Param: B.CAP
+//-    Capacitor value of capacitor connected to 2CX1 and 2CX2 pins
+//- Limitations:
+//-    The capacitor inputs are NC. Capacitor values need to be specified as
+//-    ```
+//-    SN74LS629_DIP(X)
+//-    PARAM(X.A.CAP, CAP_U(1))
+//-    PARAM(X.B.CAP, CAP_U(2))
+//-    ```
+//-
+//- Example: 74ls629.cpp,74ls629_example
+//-
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheets/400/335051_DS.pdf
+//-
 static NETLIST_START(SN74LS629_DIP)
 	SN74LS629(A, CAP_U(1))
 	SN74LS629(B, CAP_U(1))

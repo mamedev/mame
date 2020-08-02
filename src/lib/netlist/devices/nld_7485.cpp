@@ -3,6 +3,23 @@
 /*
  * nld_7485.cpp
  *
+ * FIXME: Truthtable candidate
+ *
+ *  DM7485: 4-bit Magnitude Comparators
+ *
+ *          +------------+
+ *       B3 |1    ++   16| VCC
+ *     LTIN |2         15| A3
+ *     EQIN |3         14| B2
+ *     GTIN |4   7485  13| A2
+ *    GTOUT |5         12| A1
+ *    EQOUT |6         11| B1
+ *    LTOUT |7         10| A0
+ *      GND |8          9| B0
+ *          +------------+
+ *
+ *  Naming convention attempts to follow Texas Instruments datasheet
+ *
  */
 
 #include "nld_7485.h"
