@@ -53,20 +53,6 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		</part>
 	</software>
 
-	<software name="backgamm" supported="no">
-		<description>Backgammon (Euro)</description>
-		<year>1982</year>
-		<publisher>GST Video</publisher>
-		<info name="programmer" value="Mick Rouse"/>
-		<info name="serial" value="48"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="billard" supported="no">
 		<description>Billard+ (Fra)</description>
 		<year>1983</year>
