@@ -1,22 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Felipe Sanches
-/*
- * nld_DM9314.h
- *
- *  DM9314: 4-Bit Latches
- *
- *          +--------------+
- *       /E |1     ++    16| VCC
- *      /S0 |2           15| Q0
- *       D0 |3           14| /S1
- *       D1 |4   DM9314  13| Q1
- *      /S2 |5           12| Q2
- *       D2 |6           11| /S3
- *       D3 |7           10| Q3
- *      GND |8            9| /MR
- *          +--------------+
- *
- */
 
 #ifndef NLD_DM9314_H_
 #define NLD_DM9314_H_
