@@ -9,6 +9,9 @@
 
 #if BX_COMPILER_MSVC
 #	if BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && !BX_CPU_X86)
+#		ifndef WIN32_LEAN_AND_MEAN
+#			define WIN32_LEAN_AND_MEAN
+#		endif // WIN32_LEAN_AND_MEAN
 #		include <windows.h>
 #	endif // BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && !BX_CPU_X86)
 
