@@ -87,9 +87,8 @@ namespace devices
 		LIB_ENTRY(7497)
 #if (!NL_USE_TRUTHTABLE_74107)
 		LIB_ENTRY(74107)
-		LIB_ENTRY(74107_dip)
 #endif
-		LIB_ENTRY(74107A)    // FIXME: implement missing DIP
+		LIB_ENTRY(74107A)
 		LIB_ENTRY(74113)
 		LIB_ENTRY(74113_dip)
 		LIB_ENTRY(74113A)

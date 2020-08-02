@@ -101,47 +101,8 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(74107_dip)
-	{
-		NETLIB_CONSTRUCTOR(74107_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", m_A.m_J);
-			register_subalias("2", m_A.m_QQ);
-			register_subalias("3", m_A.m_Q);
-
-			register_subalias("4", m_A.m_K);
-			register_subalias("5", m_B.m_Q);
-			register_subalias("6", m_B.m_QQ);
-
-			register_subalias("7", "A.GND");
-
-			register_subalias("8", m_B.m_J);
-			register_subalias("9", m_B.m_clk);
-			register_subalias("10", m_B.m_clrQ);
-
-			register_subalias("11", m_B.m_K);
-			register_subalias("12", m_A.m_clk);
-			register_subalias("13", m_A.m_clrQ);
-
-			 register_subalias("14", "A.VCC" );
-
-			 connect("A.GND", "B.GND");
-			 connect("A.VCC", "B.VCC");
-
-		}
-		//NETLIB_RESETI();
-		//NETLIB_UPDATEI();
-
-	private:
-		NETLIB_SUB(74107) m_A;
-		NETLIB_SUB(74107) m_B;
-	};
-
 #if (!NL_USE_TRUTHTABLE_74107)
 	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74107_dip,   "TTL_74107_DIP", "")
 #endif
 	NETLIB_DEVICE_IMPL(74107A,      "TTL_74107A",   "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 
