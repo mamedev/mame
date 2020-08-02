@@ -1673,6 +1673,35 @@ static NETLIST_START(TTL_74163_DIP)
 NETLIST_END()
 
 /*
+ *  DM74164: 8-bit parallel-out serial shift registers
+ *
+ *      +------------+
+ *    A |1    ++   14| VCC
+ *    B |2         13| QH
+ *   QA |3         12| QG
+ *   QB |4  74164  11| QF
+ *   QC |5         10| QE
+ *   QD |6          9| CLRQ
+ *  GND |7          8| CLK
+ *      +------------+
+ */
+
+static NETLIST_START(TTL_74164_DIP)
+	TTL_74164(A)
+
+	DIPPINS(    /*     +------------+      */
+		   A.A, /*   A |1    ++   14| VCC  */ A.VCC,
+		   A.B, /*   B |2         13| QH   */ A.QH,
+		  A.QA, /*  QA |3         12| QG   */ A.QG,
+		  A.QB, /*  QB |4  74164  11| QF   */ A.QF,
+		  A.QC, /*  QC |5         10| QE   */ A.QE,
+		  A.QD, /*  QD |6          9| CLRQ */ A.CLRQ,
+		 A.GND, /* GND |7          8| CLK  */ A.CLK
+			    /*     +------------+      */
+	)
+NETLIST_END()
+
+/*
  *  DM74260: Dual 5-Input NOR Gates
  *                 _________
  *             Y = A+B+C+D+E
@@ -2683,6 +2712,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74157_DIP)
 	LOCAL_LIB_ENTRY(TTL_74161_DIP)
 	LOCAL_LIB_ENTRY(TTL_74163_DIP)
+	LOCAL_LIB_ENTRY(TTL_74164_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)

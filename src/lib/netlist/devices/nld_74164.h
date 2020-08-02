@@ -44,16 +44,8 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_74164(name, cA, cB, cCLRQ, cCLK)                                   \
-		NET_REGISTER_DEV(TTL_74164, name)                                      \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, A,       cA)                                         \
-		NET_CONNECT(name, B,       cB)                                         \
-		NET_CONNECT(name, CLRQ,   cCLRQ)                                       \
-		NET_CONNECT(name, CLK,     cCLK)
-
-#define TTL_74164_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74164_DIP, name)
+// usage: TTL_74164(name, cA, cB, cCLRQ, cCLK)
+#define TTL_74164(...)                                                        \
+		NET_REGISTER_DEVEXT(TTL_74164, __VA_ARGS__)
 
 #endif /* NLD_74164_H_ */
