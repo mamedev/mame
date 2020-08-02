@@ -500,10 +500,6 @@
 #define TTL_74393(...)                                                 \
 	NET_REGISTER_DEVEXT(TTL_74393, __VA_ARGS__)
 
-// usage       : TTL_74393_DIP(name)
-#define TTL_74393_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_74393_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74ls629.cpp
 // ---------------------------------------------------------------------
@@ -1207,6 +1203,10 @@
 // usage       : TTL_74379_DIP(name)
 #define TTL_74379_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74379_DIP, __VA_ARGS__)
+
+// usage       : TTL_74393_DIP(name)
+#define TTL_74393_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74393_DIP, __VA_ARGS__)
 
 // usage       : SN74LS629_DIP(name, p1_CAP1, p2_CAP2)
 #define SN74LS629_DIP(...)                                             \

@@ -400,6 +400,9 @@
 #define TTL_74379_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74379_DIP, name)
 
+#define TTL_74393_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74393_DIP, name)
+
 #define DM9312(...)                                                            \
 		NET_REGISTER_DEVEXT(DM9312, __VA_ARGS__)
 
