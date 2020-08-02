@@ -871,6 +871,37 @@ static NETLIST_START(TTL_7477_DIP)
 NETLIST_END()
 
 /*
+ *  DM7483: 4-Bit Binary Adder with Fast Carry
+ *
+ *          +--------------+
+ *       A4 |1     ++    16| B4
+ *       S3 |2           15| S4
+ *       A3 |3           14| C4
+ *       B3 |4    7483   13| C0
+ *      VCC |5           12| GND
+ *       S2 |6           11| B1
+ *       B2 |7           10| A1
+ *       A2 |8            9| S1
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_7483_DIP)
+	TTL_7483(A)
+
+	DIPPINS(   /*      +--------------+     */
+		 A.A4, /*   A4 |1     ++    16| B4  */ A.B4,
+		 A.S3, /*   S3 |2           15| S4  */ A.S4,
+		 A.A3, /*   A3 |3           14| C4  */ A.C4,
+		 A.B3, /*   B3 |4    7483   13| C0  */ A.C0,
+		A.VCC, /*  VCC |5           12| GND */ A.GND,
+		 A.S2, /*   S2 |6           11| B1  */ A.B1,
+		 A.B2, /*   B2 |7           10| A1  */ A.A1,
+		 A.A2, /*   A2 |8            9| S1  */ A.S1
+			   /*      +--------------+       */
+	)
+NETLIST_END()
+
+/*
  *  DM7486: Quad 2-Input Exclusive-OR Gates
  *
  *             Y = A+B
@@ -2219,6 +2250,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7474_DIP)
 	LOCAL_LIB_ENTRY(TTL_7475_DIP)
 	LOCAL_LIB_ENTRY(TTL_7477_DIP)
+	LOCAL_LIB_ENTRY(TTL_7483_DIP)
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)

@@ -29,21 +29,8 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_7483(name, cA1, cA2, cA3, cA4, cB1, cB2, cB3, cB4, cCI)            \
-		NET_REGISTER_DEV(TTL_7483, name)                                       \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, A1, cA1)                                             \
-		NET_CONNECT(name, A2, cA2)                                             \
-		NET_CONNECT(name, A3, cA3)                                             \
-		NET_CONNECT(name, A4, cA4)                                             \
-		NET_CONNECT(name, B1, cB1)                                             \
-		NET_CONNECT(name, B2, cB2)                                             \
-		NET_CONNECT(name, B3, cB3)                                             \
-		NET_CONNECT(name, B4, cB4)                                             \
-		NET_CONNECT(name, C0, cCI)
-
-#define TTL_7483_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_7483_DIP, name)
+// usage: TTL_7483(name, cA1, cA2, cA3, cA4, cB1, cB2, cB3, cB4, cCI)
+#define TTL_7483(...)                                                     \
+		NET_REGISTER_DEVEXT(TTL_7483, __VA_ARGS__)
 
 #endif /* NLD_7483_H_ */
