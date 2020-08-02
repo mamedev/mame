@@ -1864,6 +1864,45 @@ static NETLIST_START(TTL_9316_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  9322: Quad 2-Line to 1-Line Data Selectors/Multiplexers
+ *
+ *          +------------+
+ *   SELECT |1    ++   16| VCC
+ *       A1 |2         15| STROBE
+ *       B1 |3         14| A4
+ *       Y1 |4   9322  13| B4
+ *       A2 |5         12| Y4
+ *       B2 |6         11| A3
+ *       Y2 |7         10| B3
+ *      GND |8          9| Y3
+ *          +------------+
+ */
+
+static NETLIST_START(TTL_9322_DIP)
+	TTL_9322_GATE(A)
+	TTL_9322_GATE(B)
+	TTL_9322_GATE(C)
+	TTL_9322_GATE(D)
+
+	NET_C(A.SELECT, B.SELECT, C.SELECT, D.SELECT)
+	NET_C(A.STROBE, B.STROBE, C.STROBE, D.STROBE)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	DIPPINS(      /*        +------------+        */
+		A.SELECT, /* SELECT |1    ++   16| VCC    */ A.VCC,
+		     A.A, /*     A1 |2         15| STROBE */ A.STROBE,
+		     A.B, /*     B1 |3         14| A4     */ D.A,
+		     A.Y, /*     Y1 |4   9322  13| B4     */ D.B,
+		     B.A, /*     A2 |5         12| Y4     */ D.Y,
+		     B.B, /*     B2 |6         11| A3     */ C.A,
+		     B.Y, /*     Y2 |7         10| B3     */ C.B,
+		   A.GND, /*    GND |8          9| Y3     */ C.Y
+			      /*        +------------+        */
+	)
+NETLIST_END()
+
 /*  SN7442: 4-Line BCD to 10-Line Decimal Decoder
  *
  *          +--------------+
@@ -2527,4 +2566,5 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(DM9312_DIP)
 	LOCAL_LIB_ENTRY(TTL_9310_DIP)
 	LOCAL_LIB_ENTRY(TTL_9316_DIP)
+	LOCAL_LIB_ENTRY(TTL_9322_DIP)
 NETLIST_END()
