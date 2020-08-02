@@ -24,14 +24,8 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_74393(name, cCP, cMR)                                \
-		NET_REGISTER_DEV(TTL_74393, name)                        \
-		NET_CONNECT(name, GND, GND)                              \
-		NET_CONNECT(name, VCC, VCC)                              \
-		NET_CONNECT(name, CP, cCP)                               \
-		NET_CONNECT(name, MR, cMR)
-
-#define TTL_74393_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74393_DIP, name)
+// usage: TTL_74393(name, cCP, cMR)
+#define TTL_74393(...)                                                        \
+		NET_REGISTER_DEVEXT(TTL_74393, __VA_ARGS__)
 
 #endif /* NLD_74193_H_ */
