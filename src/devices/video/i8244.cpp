@@ -2,10 +2,14 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    i8244.c
+Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
 
-    Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
-
+TODO:
+- make the character rom external, but first verify it is correct (the table
+  below has 0x3f characters, it is missing 8 bytes)
+- NTSC has 263 scanlines, PAL has 313 scanlines, a quick fix will probably
+  cause small regressions here and there
+- PAL has 228 clocks per line (so, 456 half clocks)
 
 ***************************************************************************/
 
@@ -141,7 +145,7 @@ void i8244_device::device_config_complete()
 		return;
 
 	if (!screen().refresh_attoseconds())
-		screen().set_raw(clock(), LINE_CLOCKS, START_ACTIVE_SCAN, END_ACTIVE_SCAN, m_screen_lines, START_Y, START_Y + SCREEN_HEIGHT);
+		screen().set_raw(clock()*2, LINE_CLOCKS, START_ACTIVE_SCAN, END_ACTIVE_SCAN, m_screen_lines, START_Y, START_Y + SCREEN_HEIGHT);
 }
 
 
@@ -164,7 +168,7 @@ void i8244_device::device_start()
 	m_postprocess_func.resolve_safe();
 
 	// allocate a stream
-	m_stream = stream_alloc( 0, 1, clock()/(LINE_CLOCKS*4) );
+	m_stream = stream_alloc( 0, 1, (clock()*2)/(LINE_CLOCKS*4) );
 
 	// register our state
 	save_pointer(NAME(m_vdc.reg), 0x100);
