@@ -1101,6 +1101,8 @@ x1.cpp
 x1twin.cpp
 x68k.cpp
 xavix.cpp
+xavix_2000.cpp
+xavix_2002.cpp
 xavix2.cpp
 xbase09.cpp
 xbox.cpp
