@@ -77,6 +77,7 @@ NETLIST_EXTERNAL(ROMS_lib)
 #include "nld_7483.h"
 #include "nld_7485.h"
 #include "nld_7490.h"
+#include "nld_7492.h"
 #include "nld_7493.h"
 #include "nld_7497.h"
 #include "nld_74ls629.h"

@@ -18,6 +18,9 @@
 
 #if !NL_AUTO_DEVICES
 
+#define PROM_82S115_DIP(name)                                                  \
+		NET_REGISTER_DEV(PROM_82S115_DIP, name)
+
 #define PROM_82S126_DIP(name)                                                  \
 		NET_REGISTER_DEV(PROM_82S126_DIP, name)
 
@@ -33,6 +36,9 @@
 // usage       : TTL_82S16_DIP(name)
 #define TTL_82S16_DIP(...)                                                     \
 	NET_REGISTER_DEVEXT(TTL_82S16_DIP, __VA_ARGS__)
+
+#define RAM_2102A_DIP(name)                                                    \
+		NET_REGISTER_DEV(RAM_2102A_DIP, name)
 
 #endif // NL_AUTO_DEVICES
 
