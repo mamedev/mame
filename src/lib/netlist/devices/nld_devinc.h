@@ -328,10 +328,6 @@
 #define TTL_7493(...)                                                  \
 	NET_REGISTER_DEVEXT(TTL_7493, __VA_ARGS__)
 
-// usage       : TTL_7493_DIP(name)
-#define TTL_7493_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_7493_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_7497.cpp
 // ---------------------------------------------------------------------
@@ -339,10 +335,6 @@
 // auto connect: VCC, GND
 #define TTL_7497(...)                                                  \
 	NET_REGISTER_DEVEXT(TTL_7497, __VA_ARGS__)
-
-// usage       : TTL_7497_DIP(name)
-#define TTL_7497_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_7497_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74107.cpp
@@ -1023,6 +1015,11 @@
 #define TTL_7486_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7486_GATE, __VA_ARGS__)
 
+// usage       : TTL_7486_XOR(name, pA, pB)
+// auto connect: VCC, GND
+#define TTL_7486_XOR(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7486_XOR, __VA_ARGS__)
+
 // usage       : TTL_7490_DIP(name)
 #define TTL_7490_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7490_DIP, __VA_ARGS__)
@@ -1031,10 +1028,13 @@
 #define TTL_7492_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7492_DIP, __VA_ARGS__)
 
-// usage       : TTL_7486_XOR(name, pA, pB)
-// auto connect: VCC, GND
-#define TTL_7486_XOR(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_7486_XOR, __VA_ARGS__)
+// usage       : TTL_7493_DIP(name)
+#define TTL_7493_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7493_DIP, __VA_ARGS__)
+
+// usage       : TTL_7497_DIP(name)
+#define TTL_7497_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7497_DIP, __VA_ARGS__)
 
 // usage       : TTL_74155A_GATE(name)
 #define TTL_74155A_GATE(...)                                           \
