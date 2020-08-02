@@ -316,19 +316,16 @@
 		NET_REGISTER_DEV(TTL_7497_DIP, name)
 
 #if (NL_USE_TRUTHTABLE_74107)
-#define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                   \
-		NET_REGISTER_DEV(TTL_74107, name)                                      \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, CLK, cCLK)                                           \
-		NET_CONNECT(name, J, cJ)                                               \
-		NET_CONNECT(name, K, cK)                                               \
-		NET_CONNECT(name, CLRQ, cCLRQ)
+// usage: TTL_74107(name, cCLK, cJ, cK, cCLRQ)
+#define TTL_74107(...)                                                         \
+		NET_REGISTER_DEVEXT(TTL_74107_TT, __VA_ARGS__)
+#endif
 
 #define TTL_74107_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74107_DIP, name)
 
-#endif
+#define TTL_74107A_DIP(name)                                                   \
+		NET_REGISTER_DEV(TTL_74107A_DIP, name)
 
 #define TTL_74121_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74121_DIP, name)

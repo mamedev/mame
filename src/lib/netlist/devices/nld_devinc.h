@@ -344,10 +344,6 @@
 #define TTL_74107(...)                                                 \
 	NET_REGISTER_DEVEXT(TTL_74107, __VA_ARGS__)
 
-// usage       : TTL_74107_DIP(name)
-#define TTL_74107_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_74107_DIP, __VA_ARGS__)
-
 // usage       : TTL_74107A(name, pCLK, pJ, pK, pCLRQ)
 // auto connect: VCC, GND
 #define TTL_74107A(...)                                                \
@@ -1006,6 +1002,14 @@
 // usage       : TTL_7497_DIP(name)
 #define TTL_7497_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7497_DIP, __VA_ARGS__)
+
+// usage       : TTL_74107_DIP(name)
+#define TTL_74107_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74107_DIP, __VA_ARGS__)
+
+// usage       : TTL_74107_DIP(name)
+#define TTL_74107A_DIP(...)                                            \
+	NET_REGISTER_DEVEXT(TTL_74107A_DIP, __VA_ARGS__)
 
 // usage       : TTL_74155A_GATE(name)
 #define TTL_74155A_GATE(...)                                           \

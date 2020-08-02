@@ -1093,32 +1093,62 @@ static NETLIST_START(TTL_7497_DIP)
 	)
 NETLIST_END()
 
-#if (NL_USE_TRUTHTABLE_74107)
-#ifndef __PLIB_PREPROCESSOR__
-#define TTL_74107_TT(name)                                                         \
-		NET_REGISTER_DEV(TTL_74107, name)
-#endif
+/*
+ *  DM74107: DUAL J-K FLIP-FLOPS WITH CLEAR
+ *
+ *          +--------------+
+ *       1J |1     ++    14| VCC
+ *      1QQ |2           13| 1CLRQ
+ *       1Q |3           12| 1CLK
+ *       1K |4    74107  11| 2K
+ *       2Q |5           10| 2CLRQ
+ *      2QQ |6            9| 2CLK
+ *      GND |7            8| 2J
+ *          +--------------+
+ */
 
 static NETLIST_START(TTL_74107_DIP)
+#if (NL_USE_TRUTHTABLE_74107)
 	TTL_74107_TT(A)
 	TTL_74107_TT(B)
+#else
+	TTL_74107(A)
+	TTL_74107(B)
+#endif
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(    /*          +--------------+        */
-		A.J,    /*       1J |1     ++    14| VCC    */ A.VCC,
-		A.QQ,   /*      1QQ |2           13| 1CLRQ  */ A.CLRQ,
-		A.Q,    /*       1Q |3           12| 1CLK   */ A.CLK,
-		A.K,    /*       1K |4    74107  11| 2K     */ B.K,
-		B.Q,    /*       2Q |5           10| 2CLRQ  */ B.CLRQ,
-		B.QQ,   /*      2QQ |6            9| 2CLK   */ B.CLK,
-		B.GND,  /*      GND |7            8| 2J     */ B.J
-				/*          +--------------+        */
+	DIPPINS(   /*     +--------------+       */
+		  A.J, /*  1J |1     ++    14| VCC   */ A.VCC,
+		 A.QQ, /* 1QQ |2           13| 1CLRQ */ A.CLRQ,
+		  A.Q, /*  1Q |3           12| 1CLK  */ A.CLK,
+		  A.K, /*  1K |4    74107  11| 2K    */ B.K,
+		  B.Q, /*  2Q |5           10| 2CLRQ */ B.CLRQ,
+		 B.QQ, /* 2QQ |6            9| 2CLK  */ B.CLK,
+		B.GND, /* GND |7            8| 2J    */ B.J
+			   /*     +--------------+       */
 	)
-
 NETLIST_END()
-#endif
+
+static NETLIST_START(TTL_74107A_DIP)
+	TTL_74107A(A)
+	TTL_74107A(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(   /*     +--------------+       */
+		  A.J, /*  1J |1     ++    14| VCC   */ A.VCC,
+		 A.QQ, /* 1QQ |2           13| 1CLRQ */ A.CLRQ,
+		  A.Q, /*  1Q |3           12| 1CLK  */ A.CLK,
+		  A.K, /*  1K |4    74107  11| 2K    */ B.K,
+		  B.Q, /*  2Q |5           10| 2CLRQ */ B.CLRQ,
+		 B.QQ, /* 2QQ |6            9| 2CLK  */ B.CLK,
+		B.GND, /* GND |7            8| 2J    */ B.J
+			   /*     +--------------+       */
+	)
+NETLIST_END()
 
 //- Identifier:  TTL_74121_DIP
 //- Title: DM74121 One-Shot with Clear and Complementary Outputs
@@ -2356,7 +2386,7 @@ NETLIST_START(TTL74XX_lib)
 	 *          |  1  |  *  |  1  | 1 || TOGGLE  |
 	 *          +-----+-----+-----+---++---+-----+
 	 */
-	TRUTHTABLE_START(TTL_74107, 6, 4, "+CLK,+J,+K,+CLRQ,@VCC,@GND")
+	TRUTHTABLE_START(TTL_74107_TT, 6, 4, "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 		TT_HEAD("CLRQ, CLK, _CO,  J, K,_QX | Q, QQ, CO, QX")
 		TT_LINE("  0,   0,    X,  X, X,  X | 0,  1,  0,  0 | 16, 25, 1, 1")
 		TT_LINE("  0,   1,    X,  X, X,  X | 0,  1,  1,  0 | 16, 25, 1, 1")
@@ -2544,14 +2574,13 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7492_DIP)
 	LOCAL_LIB_ENTRY(TTL_7493_DIP)
 	LOCAL_LIB_ENTRY(TTL_7497_DIP)
+	LOCAL_LIB_ENTRY(TTL_74107_DIP)
+	LOCAL_LIB_ENTRY(TTL_74107A_DIP)
 	LOCAL_LIB_ENTRY(TTL_74121_DIP)
 	LOCAL_LIB_ENTRY(TTL_74123_DIP)
 	LOCAL_LIB_ENTRY(TTL_9602_DIP)
 	LOCAL_LIB_ENTRY(TTL_74125_DIP)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
-#if (NL_USE_TRUTHTABLE_74107)
-	LOCAL_LIB_ENTRY(TTL_74107_DIP)
-#endif
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74157_DIP)
