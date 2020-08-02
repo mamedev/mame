@@ -1,7 +1,26 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_7483.c
+ * nld_7483.cpp
+ *
+ *  DM7483: 4-Bit Binary Adder with Fast Carry
+ *
+ *          +--------------+
+ *       A4 |1     ++    16| B4
+ *       S3 |2           15| S4
+ *       A3 |3           14| C4
+ *       B3 |4    7483   13| C0
+ *      VCC |5           12| GND
+ *       S2 |6           11| B1
+ *       B2 |7           10| A1
+ *       A2 |8            9| S1
+ *          +--------------+
+ *
+ *          S = (A + B + C0) & 0x0f
+ *
+ *          C4 = (A + B + C) > 15 ? 1 : 0
+ *
+ *  Naming conventions follow Fairchild Semiconductor datasheet
  *
  */
 
