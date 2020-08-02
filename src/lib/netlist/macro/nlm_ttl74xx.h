@@ -306,6 +306,9 @@
 #define TTL_7490_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7490_DIP, name)
 
+#define TTL_7492_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7492_DIP, name)
+
 #if (NL_USE_TRUTHTABLE_74107)
 #define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                   \
 		NET_REGISTER_DEV(TTL_74107, name)                                      \
