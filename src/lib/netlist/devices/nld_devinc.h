@@ -437,10 +437,6 @@
 #define TTL_74166(...)                                                 \
 	NET_REGISTER_DEVEXT(TTL_74166, __VA_ARGS__)
 
-// usage       : TTL_74166_DIP(name)
-#define TTL_74166_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_74166_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74174.cpp
 // ---------------------------------------------------------------------
@@ -1034,6 +1030,10 @@
 // usage       : TTL_74165_DIP(name)
 #define TTL_74165_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74165_DIP, __VA_ARGS__)
+
+// usage       : TTL_74165_DIP(name)
+#define TTL_74166_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74166_DIP, __VA_ARGS__)
 
 // usage       : TTL_74260_GATE(name)
 #define TTL_74260_GATE(...)                                            \
