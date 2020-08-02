@@ -60,7 +60,6 @@ private:
 
 	void blinkenlights(uint8_t data);
 	void video_draw(u8 data);
-	uint8_t inputs();
 	void port_outx(uint8_t data);
 
 	std::unique_ptr<bitmap_ind16> m_bitmap_render;
@@ -176,11 +175,6 @@ void gigatron_state::blinkenlights(uint8_t data)
 	m_lc ^= light;
 }
 
-uint8_t gigatron_state::inputs()
-{
-	return m_io_inputs->read() ^ 0xFF;
-}
-
 void gigatron_state::gigatron(machine_config &config)
 {
 	GTRON(config, m_maincpu, MAIN_CLOCK);
@@ -188,7 +182,7 @@ void gigatron_state::gigatron(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
 	m_maincpu->outx_cb().set(FUNC(gigatron_state::port_outx));
 	m_maincpu->out_cb().set(FUNC(gigatron_state::video_draw));
-	m_maincpu->ir_cb().set(FUNC(gigatron_state::inputs));
+	m_maincpu->ir_cb().set_ioport("GAMEPAD").invert();
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
