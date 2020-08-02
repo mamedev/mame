@@ -40,49 +40,6 @@ void gigatron_cpu_device::gigatron_illegal()
 	m_icount -= 1;
 }
 
-/* Execute cycles */
-void gigatron_cpu_device::execute_run()
-{
-	uint16_t opcode;
-
-	do
-	{
-		m_ppc = m_pc;
-		debugger_instruction_hook(m_pc);
-
-		opcode = gigatron_readop(m_pc);
-		m_pc = m_npc;
-		m_npc = (m_pc + 1) & m_romMask;
-
-		uint8_t op = (opcode >> 13) & 0x0007;
-		uint8_t mode = (opcode >> 10) & 0x0007;
-		uint8_t bus = (opcode >> 8) & 0x0003;
-		uint8_t d = (opcode >> 0) & 0x00ff;
-
-		switch (op)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			aluOp(op, mode, bus, d);
-			break;
-		case 6:
-			storeOp(op, mode, bus, d);
-			break;
-		case 7:
-			branchOp(op, mode, bus, d);
-			break;
-		default:
-			gigatron_illegal();
-			break;
-		}
-		m_icount--;
-	} while (m_icount > 0);
-}
-
 
 void gigatron_cpu_device::device_start()
 {
@@ -132,11 +89,53 @@ void gigatron_cpu_device::reset_cpu()
 	m_out = 0;
 }
 
+/* Execute cycles */
+void gigatron_cpu_device::execute_run()
+{
+	uint16_t opcode;
+	do
+	{
+		m_ppc = m_pc;
+		debugger_instruction_hook(m_pc);
+
+		opcode = gigatron_readop(m_pc);
+		m_pc = m_npc;
+		m_npc = (m_pc + 1) & m_romMask;
+
+		uint8_t op = (opcode >> 13) & 0x0007;
+		uint8_t mode = (opcode >> 10) & 0x0007;
+		uint8_t bus = (opcode >> 8) & 0x0003;
+		uint8_t d = (opcode >> 0) & 0x00ff;
+
+		switch (op)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			aluOp(op, mode, bus, d);
+			break;
+		case 6:
+			storeOp(op, mode, bus, d);
+			break;
+		case 7:
+			branchOp(op, mode, bus, d);
+			break;
+		default:
+			gigatron_illegal();
+			break;
+		}
+		m_icount--;
+	} while (m_icount > 0);
+}
+
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 	const uint8_t ZERO = 0x80;
 	bool c = false;
-	uint8_t ac2 = m_ac ^ ZERO;
+	uint8_t ac = m_ac ^ ZERO;
 	uint16_t base = m_pc & 0xff00;
 	switch (mode)
 	{
@@ -145,22 +144,22 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 		base = m_y << 8;
 		break;
 	case 1: //bgt
-		c = (ac2 > ZERO);
+		c = (ac > ZERO);
 		break;
 	case 2: //blt
-		c = (ac2 < ZERO);
+		c = (ac < ZERO);
 		break;
 	case 3: //bne
-		c = (ac2 != ZERO);
+		c = (ac != ZERO);
 		break;
 	case 4: //beq
-		c = (ac2 == ZERO);
+		c = (ac == ZERO);
 		break;
 	case 5: //bge
-		c = (ac2 >= ZERO);
+		c = (ac >= ZERO);
 		break;
 	case 6: //ble
-		c = (ac2 <= ZERO);
+		c = (ac <= ZERO);
 		break;
 	case 7: //bra
 		c = true;
