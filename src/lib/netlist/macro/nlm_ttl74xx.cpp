@@ -992,8 +992,8 @@ NETLIST_END()
 
 	DIPPINS(   /*     +--------------+     */
 		  A.B, /*   B |1     ++    14| A   */ A.A,
-		A.R01, /* R01 |2           13| NC  */ NC.I,
-		A.R02, /* R02 |3           12| QA  */ A.QA,
+		 A.R1, /*  R1 |2           13| NC  */ NC.I,
+		 A.R2, /*  R2 |3           12| QA  */ A.QA,
 		 NC.I, /*  NC |4    7490   11| QD  */ A.QD,
 		A.VCC, /* VCC |5           10| GND */ A.GND,
 		A.R91, /* R91 |6            9| QB  */ A.QB,
