@@ -421,10 +421,6 @@
 #define TTL_74161_FIXME(...)                                           \
 	NET_REGISTER_DEVEXT(TTL_74161_FIXME, __VA_ARGS__)
 
-// usage       : TTL_74161_DIP(name)
-#define TTL_74161_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_74161_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74163.cpp
 // ---------------------------------------------------------------------
@@ -432,10 +428,6 @@
 // auto connect: VCC, GND
 #define TTL_74163(...)                                                 \
 	NET_REGISTER_DEVEXT(TTL_74163, __VA_ARGS__)
-
-// usage       : TTL_74163_DIP(name)
-#define TTL_74163_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_74163_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74164.cpp
@@ -800,25 +792,11 @@
 	NET_REGISTER_DEVEXT(TTL_9602, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_9310.cpp
-// ---------------------------------------------------------------------
-// usage       : TTL_9310_DIP(name)
-#define TTL_9310_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_9310_DIP, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_dm9314.cpp
 // ---------------------------------------------------------------------
 // usage       : TTL_9314_DIP(name)
 #define TTL_9314_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_9314_DIP, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_9316.cpp
-// ---------------------------------------------------------------------
-// usage       : TTL_9316_DIP(name)
-#define TTL_9316_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_9316_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_9322.cpp
@@ -1056,6 +1034,14 @@
 #define TTL_74157_GATE(...)                                            \
 	NET_REGISTER_DEVEXT(TTL_74157_GATE, __VA_ARGS__)
 
+// usage       : TTL_74161_DIP(name)
+#define TTL_74161_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74161_DIP, __VA_ARGS__)
+
+// usage       : TTL_74163_DIP(name)
+#define TTL_74163_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74163_DIP, __VA_ARGS__)
+
 // usage       : TTL_74260_GATE(name)
 #define TTL_74260_GATE(...)                                            \
 	NET_REGISTER_DEVEXT(TTL_74260_GATE, __VA_ARGS__)
@@ -1232,6 +1218,14 @@
 // usage       : DM9312_DIP(name)
 #define DM9312_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(DM9312_DIP, __VA_ARGS__)
+
+// usage       : TTL_9310_DIP(name)
+#define TTL_9310_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_9310_DIP, __VA_ARGS__)
+
+// usage       : TTL_9316_DIP(name)
+#define TTL_9316_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_9316_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: CD4XXX_lib

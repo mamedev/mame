@@ -112,35 +112,6 @@ namespace netlist
 			nld_power_pins m_power_pins;
 
 		};
-
-		template <typename D>
-		NETLIB_OBJECT(9316_dip_base)
-		{
-			NETLIB_CONSTRUCTOR(9316_dip_base)
-			, A(*this, "A")
-			{
-				this->register_subalias("1", "A.CLRQ");
-				this->register_subalias("2", "A.CLK");
-				this->register_subalias("3", "A.A");
-				this->register_subalias("4", "A.B");
-				this->register_subalias("5", "A.C");
-				this->register_subalias("6", "A.D");
-				this->register_subalias("7", "A.ENP");
-				this->register_subalias("8", "A.GND");
-
-				this->register_subalias("9", "A.LOADQ");
-				this->register_subalias("10", "A.ENT");
-				this->register_subalias("11", "A.QD");
-				this->register_subalias("12", "A.QC");
-				this->register_subalias("13", "A.QB");
-				this->register_subalias("14", "A.QA");
-				this->register_subalias("15", "A.RC");
-				this->register_subalias("16", "A.VCC");
-			}
-		private:
-			NETLIB_SUB(9316_base)<D> A;
-		};
-
 		struct desc_9316 : public desc_base
 		{
 			using ASYNC  = desc_const_t<bool, true>;
@@ -182,11 +153,6 @@ namespace netlist
 		using NETLIB_NAME(74161) = NETLIB_NAME(9316_base)<desc_74161>;
 		using NETLIB_NAME(74161_fixme) = NETLIB_NAME(9316_base)<desc_74161>;
 		using NETLIB_NAME(74163) = NETLIB_NAME(9316_base)<desc_74163>;
-
-		using NETLIB_NAME(9310_dip) = NETLIB_NAME(9316_dip_base)<desc_9310>;
-		using NETLIB_NAME(9316_dip) = NETLIB_NAME(9316_dip_base)<desc_9316>;
-		using NETLIB_NAME(74161_dip) = NETLIB_NAME(9316_dip_base)<desc_74161>;
-		using NETLIB_NAME(74163_dip) = NETLIB_NAME(9316_dip_base)<desc_74163>;
 
 	} //namespace devices
 } // namespace netlist

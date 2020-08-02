@@ -1238,7 +1238,7 @@ NETLIST_END()
 //-   independent of input transition times. When input conditions for triggering are met, a new cycle starts and the
 //-   external capacitor is allowed to rapidly discharge and then
 //-   charge again. The retriggerable feature permits output
-//-   pulse widths to be extended. In fact a continuous true output can be maintained by having an input cycle time which
+//-   pulse widths to be extended. In fact a continuous true output can be maintained by having an input cycle time whih
 //-   is shorter than the output cycle time. The output pulse may
 //-   then be terminated at any time by applying a LOW logic
 //-   level to the RESET pin. Retriggering may be inhibited by
@@ -1498,6 +1498,53 @@ static NETLIST_START(TTL_74157_DIP)
 		B.O,  /*    Zb |7           10| I1d  */ D.J,
 		A.GND,/*   GND |8            9| Zd   */ D.O
 			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *  DM74161/74163: Synchronous 4-Bit Counters
+ *
+ *          +--------------+
+ *    CLEAR |1     ++    16| VCC
+ *    CLOCK |2           15| RC (Ripple Carry)
+ *        A |3           14| QA
+ *        B |4   74161   13| QB
+ *        C |5   74163   12| QC
+ *        D |6           11| QD
+ * Enable P |7           10| Enable T
+ *      GND |8            9| LOAD
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_74161_DIP)
+	TTL_74161(A)
+
+	DIPPINS(    /*          +--------------+          */
+		A.CLRQ, /*   /CLEAR |1     ++    16| VCC      */ A.VCC,
+		 A.CLK, /*    CLOCK |2           15| RC       */ A.RC,
+		   A.A, /*        A |3           14| QA       */ A.QA,
+		   A.B, /*        B |4   74161   13| QB       */ A.QB,
+		   A.C, /*        C |5           12| QC       */ A.QC,
+		   A.D, /*        D |6           11| QD       */ A.QD,
+		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
+		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
+			    /*          +--------------+          */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74163_DIP)
+	TTL_74163(A)
+
+	DIPPINS(    /*          +--------------+          */
+		A.CLRQ, /*   /CLEAR |1     ++    16| VCC      */ A.VCC,
+		 A.CLK, /*    CLOCK |2           15| RC       */ A.RC,
+		   A.A, /*        A |3           14| QA       */ A.QA,
+		   A.B, /*        B |4   74163   13| QB       */ A.QB,
+		   A.C, /*        C |5           12| QC       */ A.QC,
+		   A.D, /*        D |6           11| QD       */ A.QD,
+		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
+		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
+			    /*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -1767,6 +1814,53 @@ static NETLIST_START(DM9312_DIP)
 		s.D6,   /*  D6 |7           10| G   */ s.G, //Strobe
 		s.GND,  /* GND |8            9| D7  */ s.D7
 				/*     +--------------+     */
+	)
+NETLIST_END()
+
+/*
+ *  DM9310/9316: Synchronous 4-Bit Counters
+ *
+ *          +--------------+
+ *    CLEAR |1     ++    16| VCC
+ *    CLOCK |2           15| RC (Ripple Carry)
+ *        A |3           14| QA
+ *        B |4    9310   13| QB
+ *        C |5    9316   12| QC
+ *        D |6           11| QD
+ * Enable P |7           10| Enable T
+ *      GND |8            9| LOAD
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_9310_DIP)
+	TTL_9310(A)
+
+	DIPPINS(    /*          +--------------+          */
+		A.CLRQ, /*   /CLEAR |1     ++    16| VCC      */ A.VCC,
+		 A.CLK, /*    CLOCK |2           15| RC       */ A.RC,
+		   A.A, /*        A |3           14| QA       */ A.QA,
+		   A.B, /*        B |4    9310   13| QB       */ A.QB,
+		   A.C, /*        C |5           12| QC       */ A.QC,
+		   A.D, /*        D |6           11| QD       */ A.QD,
+		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
+		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
+			    /*          +--------------+          */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_9316_DIP)
+	TTL_9316(A)
+
+	DIPPINS(    /*          +--------------+          */
+		A.CLRQ, /*   /CLEAR |1     ++    16| VCC      */ A.VCC,
+		 A.CLK, /*    CLOCK |2           15| RC       */ A.RC,
+		   A.A, /*        A |3           14| QA       */ A.QA,
+		   A.B, /*        B |4    9316   13| QB       */ A.QB,
+		   A.C, /*        C |5           12| QC       */ A.QC,
+		   A.D, /*        D |6           11| QD       */ A.QD,
+		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
+		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
+			    /*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -2422,6 +2516,8 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74157_DIP)
+	LOCAL_LIB_ENTRY(TTL_74161_DIP)
+	LOCAL_LIB_ENTRY(TTL_74163_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
@@ -2429,4 +2525,6 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
 	LOCAL_LIB_ENTRY(SN74LS629_DIP)
 	LOCAL_LIB_ENTRY(DM9312_DIP)
+	LOCAL_LIB_ENTRY(TTL_9310_DIP)
+	LOCAL_LIB_ENTRY(TTL_9316_DIP)
 NETLIST_END()
