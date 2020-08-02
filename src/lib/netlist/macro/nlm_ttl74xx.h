@@ -351,6 +351,12 @@
 #define TTL_74157_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74157_DIP, name)
 
+#define TTL_74161_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74161_DIP, name)
+
+#define TTL_74163_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74163_DIP, name)
+
 #define TTL_74260_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_74260_GATE, name)
 
@@ -384,6 +390,12 @@
 
 #define DM9312_DIP(name)                                                       \
 		NET_REGISTER_DEV(DM9312_DIP, name)
+
+#define TTL_9310_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_9310_DIP, name)
+
+#define TTL_9316_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_9316_DIP, name)
 
 #endif // NL_AUTO_DEVICES
 

@@ -86,19 +86,9 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)        \
-		NET_REGISTER_DEV(TTL_9316, name)                                       \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, CLK, cCLK)                                           \
-		NET_CONNECT(name, ENP,  cENP)                                          \
-		NET_CONNECT(name, ENT,  cENT)                                          \
-		NET_CONNECT(name, CLRQ, cCLRQ)                                         \
-		NET_CONNECT(name, LOADQ, cLOADQ)                                       \
-		NET_CONNECT(name, A,    cA)                                            \
-		NET_CONNECT(name, B,    cB)                                            \
-		NET_CONNECT(name, C,    cC)                                            \
-		NET_CONNECT(name, D,    cD)
+// usage: TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)
+#define TTL_9316(...)                                                          \
+		NET_REGISTER_DEVEXT(TTL_74161, __VA_ARGS__)
 
 #define TTL_74161(...)                                                         \
 		NET_REGISTER_DEVEXT(TTL_74161, __VA_ARGS__)
@@ -111,17 +101,5 @@
 
 #define TTL_9310(...)                                                          \
 		NET_REGISTER_DEVEXT(TTL_9310, __VA_ARGS__)
-
-#define TTL_9310_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_9310_DIP, name)
-
-#define TTL_9316_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_9316_DIP, name)
-
-#define TTL_74161_DIP(name)                                                  \
-		NET_REGISTER_DEV(TTL_74161_DIP, name)
-
-#define TTL_74163_DIP(name)                                                  \
-		NET_REGISTER_DEV(TTL_74163_DIP, name)
 
 #endif /* NLD_9316_H_ */
