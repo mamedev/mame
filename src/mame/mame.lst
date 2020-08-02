@@ -15862,6 +15862,8 @@ hec2hrx                         //
 hec2mdhrx                       //
 hec2mx40                        //
 hec2mx80                        //
+hector1                         //
+interact                        //
 victor                          //
 
 @source:hektor.cpp
@@ -16704,10 +16706,6 @@ intlc440                        //
 
 @source:intellect02.cpp
 intel02                         //
-
-@source:interact.cpp
-hector1                         //
-interact                        //
 
 @source:interpro.cpp
 ip2000                          // Intergraph InterPro/InterServe 20x0
