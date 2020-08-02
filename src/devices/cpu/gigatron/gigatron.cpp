@@ -93,6 +93,7 @@ void gigatron_cpu_device::reset_cpu()
 void gigatron_cpu_device::execute_run()
 {
 	uint16_t opcode;
+	m_inReg = m_ir_cb();
 	do
 	{
 		m_ppc = m_pc;
