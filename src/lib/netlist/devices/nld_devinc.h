@@ -440,6 +440,10 @@
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74174.cpp
 // ---------------------------------------------------------------------
+// usage       : TTL_74174_GATE(name)
+#define TTL_74174_GATE(...)                                                 \
+	NET_REGISTER_DEVEXT(TTL_74174, __VA_ARGS__)
+
 // usage       : TTL_74174(name, pCLK, pD1, pD2, pD3, pD4, pD5, pD6, pCLRQ)
 // auto connect: VCC, GND
 #define TTL_74174(...)                                                 \
@@ -705,13 +709,6 @@
 // usage       : TTL_TRISTATE3(name)
 #define TTL_TRISTATE3(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_TRISTATE3, __VA_ARGS__)
-
-// ---------------------------------------------------------------------
-// Source: src/lib/netlist/devices/nld_74174.cpp
-// ---------------------------------------------------------------------
-// usage       : TTL_74174_DIP(name)
-#define TTL_74174_DIP(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_74174_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74175.cpp
@@ -1026,6 +1023,10 @@
 // usage       : TTL_74165_DIP(name)
 #define TTL_74166_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74166_DIP, __VA_ARGS__)
+
+// usage       : TTL_74174_DIP(name)
+#define TTL_74174_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74174_DIP, __VA_ARGS__)
 
 // usage       : TTL_74260_GATE(name)
 #define TTL_74260_GATE(...)                                            \

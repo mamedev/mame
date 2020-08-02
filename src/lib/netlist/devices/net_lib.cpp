@@ -147,7 +147,6 @@ namespace devices
 		LIB_ENTRY(r2r_dac)
 		LIB_ENTRY(tristate)
 		LIB_ENTRY(tristate3)
-		LIB_ENTRY(74174_dip)
 		LIB_ENTRY(74175_dip)
 		LIB_ENTRY(74192_dip)
 		LIB_ENTRY(74193_dip)

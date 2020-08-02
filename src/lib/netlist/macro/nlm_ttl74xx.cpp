@@ -1764,6 +1764,42 @@ static NETLIST_START(TTL_74166_DIP)
 NETLIST_END()
 
 /*
+ *  DM74174: Hex D Flip-Flops with Clear
+ *
+ *          +--------------+
+ *      CLR |1     ++    16| VCC
+ *       Q1 |2           15| Q6
+ *       D1 |3           14| D6
+ *       D2 |4   74174   13| D5
+ *       Q2 |5           12| Q5
+ *       D3 |6           11| D4
+ *       Q3 |7           10| Q4
+ *      GND |8            9| CLK
+ *          +--------------+
+ */
+
+static NETLIST_START(TTL_74174_DIP)
+	TTL_74174_GATE(A)
+	TTL_74174_GATE(B)
+	TTL_74174_GATE(C)
+	TTL_74174_GATE(D)
+	TTL_74174_GATE(E)
+	TTL_74174_GATE(F)
+
+	DIPPINS(    /*     +--------------+     */
+		A.CLRQ, /* CLR |1     ++    16| VCC */ A.VCC,
+		   A.Q, /*  Q1 |2           15| Q6  */ F.Q,
+		   A.D, /*  D1 |3           14| D6  */ F.D,
+		   B.D, /*  D2 |4   74174   13| D5  */ E.D,
+		   B.Q, /*  Q2 |5           12| Q5  */ E.Q,
+		   C.D, /*  D3 |6           11| D4  */ D.D,
+		   C.Q, /*  Q3 |7           10| Q4  */ D.Q,
+		 A.GND, /* GND |8            9| CLK */ A.CLK
+			    /*     +--------------+     */
+	)
+NETLIST_END()
+
+/*
  *  DM74260: Dual 5-Input NOR Gates
  *                 _________
  *             Y = A+B+C+D+E
@@ -2813,6 +2849,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74164_DIP)
 	LOCAL_LIB_ENTRY(TTL_74165_DIP)
 	LOCAL_LIB_ENTRY(TTL_74166_DIP)
+	LOCAL_LIB_ENTRY(TTL_74174_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)

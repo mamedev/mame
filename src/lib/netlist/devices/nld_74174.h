@@ -38,21 +38,12 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_74174(name, cCLK, cD1, cD2, cD3, cD4, cD5, cD6, cCLRQ)             \
-		NET_REGISTER_DEV(TTL_74174, name)                                      \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, CLK,  cCLK)                                          \
-		NET_CONNECT(name, D1,   cD1)                                           \
-		NET_CONNECT(name, D2,   cD2)                                           \
-		NET_CONNECT(name, D3,   cD3)                                           \
-		NET_CONNECT(name, D4,   cD4)                                           \
-		NET_CONNECT(name, D5,   cD5)                                           \
-		NET_CONNECT(name, D6,   cD6)                                           \
-		NET_CONNECT(name, CLRQ, cCLRQ)
+// usage: TTL_74174_GATE(name)
+#define TTL_74174_GATE(...)                                                   \
+		NET_REGISTER_DEVEXT(TTL_74174_GATE, __VA_ARGS__)
 
-#define TTL_74174_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74174_DIP, name)
-
+// usage: TTL_74174(name, cCLK, cD1, cD2, cD3, cD4, cD5, cD6, cCLRQ)
+#define TTL_74174(...)                                                        \
+		NET_REGISTER_DEVEXT(TTL_74174, __VA_ARGS__)
 
 #endif /* NLD_74174_H_ */
