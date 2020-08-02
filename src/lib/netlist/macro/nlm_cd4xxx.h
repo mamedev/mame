@@ -58,6 +58,9 @@
  *  DIP only macros
  * ---------------------------------------------------------------------------*/
 
+#define CD4006_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4006_DIP, name)
+
 #define CD4013_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4013_DIP, name)
 

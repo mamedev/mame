@@ -39,6 +39,35 @@ static NETLIST_START(CD4001_DIP)
 
 NETLIST_END()
 
+/*
+ *  CD4006: CMOS 18-Stage Static Register
+ *
+ *            +--------------+
+ *         D1 |1     ++    14| VDD
+ *      D1+4' |2           13| D1+4
+ *      CLOCK |3           12| D2+5
+ *         D2 |4    4006   11| D2+4
+ *         D3 |5           10| D3+4
+ *         D4 |6            9| D4+5
+ *        VSS |7            8| D4+4
+ *            +--------------+
+ */
+
+static NETLIST_START(CD4006_DIP)
+	CD4006(A)
+
+	DIPPINS(     /*       +--------------+      */
+		   A.D1, /*    D1 |1     ++    14| VDD  */ A.VDD,
+		A.D1P4S, /* D1+4' |2           13| D1+4 */ A.D1P4,
+		A.CLOCK, /* CLOCK |3           12| D2+5 */ A.D2P5,
+		   A.D2, /*    D2 |4    4006   11| D2+4 */ A.D2P4,
+		   A.D3, /*    D3 |5           10| D3+4 */ A.D3P4,
+		   A.D4, /*    D4 |6            9| D4+5 */ A.D4P5,
+		  A.VSS, /*   VSS |7            8| D4+4 */ A.D4P4
+			     /*       +--------------+      */
+	)
+NETLIST_END()
+
 /*  CD4011: Quad 2-Input NAND Gates
  *
  *        +--------------+
@@ -51,31 +80,28 @@ NETLIST_END()
  *    VSS |7            8| E
  *        +--------------+
  *
- *  Naming conventions follow National Semiconductor datasheet
- *
- *  FIXME: Timing depends on VDD-VSS
- *         This needs a cmos d-a/a-d proxy implementation.
+ *  Naming conventions follow National Semiconductor datashee
  */
 
 static NETLIST_START(CD4011_DIP)
-	CD4011_GATE(A)
-	CD4011_GATE(B)
-	CD4011_GATE(C)
-	CD4011_GATE(D)
+       CD4011_GATE(A)
+       CD4011_GATE(B)
+       CD4011_GATE(C)
+       CD4011_GATE(D)
 
-	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
-	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
+       NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+       NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*     A |1     ++    14| VDD  */ A.VDD,
-		A.B,  /*     B |2           13| H    */ D.B,
-		A.Q,  /*     J |3           12| G    */ D.A,
-		B.Q,  /*     K |4    4011   11| M    */ D.Q,
-		B.A,  /*     C |5           10| L    */ C.Q,
-		B.B,  /*     D |6            9| F    */ C.B,
-		A.VSS,/*   VSS |7            8| E    */ C.A
-			  /*       +--------------+      */
-	)
+       DIPPINS(    /*       +--------------+      */
+			  A.A, /*     A |1     ++    14| VDD  */ A.VDD,
+			  A.B, /*     B |2           13| H    */ D.B,
+			  A.Q, /*     J |3           12| G    */ D.A,
+			  B.Q, /*     K |4    4011   11| M    */ D.Q,
+			  B.A, /*     C |5           10| L    */ C.Q,
+			  B.B, /*     D |6            9| F    */ C.B,
+			A.VSS, /*   VSS |7            8| E    */ C.A
+				   /*       +--------------+      */
+	   )
 NETLIST_END()
 
 /*  CD4013: Dual Positive-Edge-Triggered D Flip-Flops
@@ -569,6 +595,7 @@ NETLIST_START(CD4XXX_lib)
 	LOCAL_LIB_ENTRY(CD4070_DIP)
 
 	/* DIP ONLY */
+	LOCAL_LIB_ENTRY(CD4006_DIP)
 	LOCAL_LIB_ENTRY(CD4013_DIP)
 	LOCAL_LIB_ENTRY(CD4017_DIP)
 	LOCAL_LIB_ENTRY(CD4022_DIP)

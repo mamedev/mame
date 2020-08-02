@@ -596,10 +596,6 @@
 #define CD4006(...)                                                    \
 	NET_REGISTER_DEVEXT(CD4006, __VA_ARGS__)
 
-// usage       : CD4006_DIP(name)
-#define CD4006_DIP(...)                                                \
-	NET_REGISTER_DEVEXT(CD4006_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_4017.cpp
 // ---------------------------------------------------------------------
@@ -1253,6 +1249,10 @@
 // usage       : CD4001_DIP(name)
 #define CD4001_DIP(...)                                                \
 	NET_REGISTER_DEVEXT(CD4001_DIP, __VA_ARGS__)
+
+// usage       : CD4006_DIP(name)
+#define CD4006_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(CD4006_DIP, __VA_ARGS__)
 
 // usage       : CD4011_DIP(name)
 #define CD4011_DIP(...)                                                \
