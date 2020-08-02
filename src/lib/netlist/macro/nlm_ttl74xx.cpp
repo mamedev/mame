@@ -2017,42 +2017,6 @@ static NETLIST_START(TTL_74393_DIP)
 	)
 NETLIST_END()
 
-
-/*
- *  SN74LS629: VOLTAGE-CONTROLLED OSCILLATORS
- *
- *          +--------------+
- *      /CP |1     ++    14| VCC
- *       MR |2           13| /CP
- *       Q0 |3           12| MR
- *       Q1 |4    74393  11| Q0
- *       Q2 |5           10| Q1
- *       Q3 |6            9| Q2
- *      GND |7            8| Q3
- *          +--------------+
- *
- *  Naming conventions follow Motorola datasheet
- */
-
-static NETLIST_START(TTL_74393_DIP)
-	TTL_74393(A)
-	TTL_74393(B)
-
-	NET_C(A.VCC, B.VCC)
-	NET_C(A.GND, B.GND)
-
-	DIPPINS(   /*     +------------+     */
-		 A.CP, /* /CP |1   ++    14| VCC */ A.VCC,
-		 A.MR, /*  MR |2         13| /CP */ B.CP,
-		 A.Q0, /*  Q0 |3         12| MR  */ B.MR,
-		 A.Q1, /*  Q1 |4  74393  11| Q0  */ B.Q0,
-		 A.Q2, /*  Q2 |5         10| Q1  */ B.Q1,
-		 A.Q3, /*  Q3 |6          9| Q2  */ B.Q2,
-		A.GND, /* GND |7          8| Q3  */ B.Q3
-			   /*     +------------+     */
-	)
-NETLIST_END()
-
 //- Identifier: SN74LS629_DIP
 //- Title: SN74LS629 VOLTAGE-CONTROLLED OSCILLATORS
 //- Description: Please add a detailed description
