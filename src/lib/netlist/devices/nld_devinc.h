@@ -320,10 +320,6 @@
 #define TTL_7492(...)                                                  \
 	NET_REGISTER_DEVEXT(TTL_7492, __VA_ARGS__)
 
-// usage       : TTL_7492_DIP(name)
-#define TTL_7492_DIP(...)                                              \
-	NET_REGISTER_DEVEXT(TTL_7492_DIP, __VA_ARGS__)
-
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_7493.cpp
 // ---------------------------------------------------------------------
@@ -1030,6 +1026,10 @@
 // usage       : TTL_7490_DIP(name)
 #define TTL_7490_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7490_DIP, __VA_ARGS__)
+
+// usage       : TTL_7492_DIP(name)
+#define TTL_7492_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7492_DIP, __VA_ARGS__)
 
 // usage       : TTL_7486_XOR(name, pA, pB)
 // auto connect: VCC, GND
