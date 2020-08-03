@@ -395,7 +395,7 @@ void i8244_device::render_scanline(int vpos)
 			int    height = 24;
 			int    w = ( m_vdc.s.control & 0x80 ) ? width : 2;
 
-			/* Draw horizontal part of grid */
+			/* Draw horizontal part of the grid */
 			for ( int j = 1, y = 0; y < 9; y++, j <<= 1 )
 			{
 				if ( y_grid_offset + y * height <= scanline && scanline < y_grid_offset + y * height + 3 )
@@ -420,7 +420,7 @@ void i8244_device::render_scanline(int vpos)
 				}
 			}
 
-			/* Draw vertical part of grid */
+			/* Draw vertical part of the grid */
 			for( int j = 1, y = 0; y < 8; y++, j <<= 1 )
 			{
 				if ( y_grid_offset + y * height <= scanline && scanline < y_grid_offset + ( y + 1 ) * height )
@@ -435,16 +435,6 @@ void i8244_device::render_scanline(int vpos)
 
 								if ( px < 160 )
 								{
-									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ px ] & m_vdc.s.collision )
-									{
-										m_collision_status |= COLLISION_VERTICAL_GRID;
-									}
-									/* Check if an already drawn object would collide with us */
-									if ( COLLISION_VERTICAL_GRID & m_vdc.s.collision && collision_map[ px ] )
-									{
-										m_collision_status |= collision_map[ px ];
-									}
 									collision_map[ px ] |= COLLISION_VERTICAL_GRID;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
@@ -470,16 +460,6 @@ void i8244_device::render_scanline(int vpos)
 
 								if ( px < 160 )
 								{
-									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ px ] & m_vdc.s.collision )
-									{
-										m_collision_status |= COLLISION_HORIZ_GRID_DOTS;
-									}
-									/* Check if an already drawn object would collide with us */
-									if ( COLLISION_HORIZ_GRID_DOTS & m_vdc.s.collision && collision_map[ px ] )
-									{
-										m_collision_status |= collision_map[ px ];
-									}
 									collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
