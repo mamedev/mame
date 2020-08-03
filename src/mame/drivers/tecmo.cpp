@@ -1105,6 +1105,12 @@ ROM_END
  sound cpu: sharp LH0080A  Z80A @ 4MHz  8705
  this set shows "GF" (revision?) on title screen
  this seems to be a bootleg of a prototype, not sure if it's the other proto set hacked or another rev proto
+ some of the tile roms are half size but the original has a lot of unused data so nothing is missing in game.
+ the various Mitsubishi custom chips present on original board are implemented with standard ttl chips:
+   MN50005XTA on the main board is 11 ttl chips
+   M60002-0118P on the video board is 27 ttl chips
+   MA7053 sil module on the main board is 4 ttl chips
+   these are all properly integrated into the design of the boards, not plug-in sub/daughter boards.
 */
 ROM_START( silkwormb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
