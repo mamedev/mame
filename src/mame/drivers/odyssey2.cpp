@@ -301,12 +301,6 @@ void odyssey2_state::machine_start()
 
 void odyssey2_state::machine_reset()
 {
-	m_lum = 0;
-
-	/* jump to "last" bank, will work for all sizes due to being mirrored */
-	m_p1 = 0xff;
-	m_p2 = 0xff;
-	m_cart->write_p1(m_p1 & 0x13);
 }
 
 
@@ -741,7 +735,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-COMP( 1978, odyssey2,  0,        0,      odyssey2,  odyssey2, odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", 0 )
+COMP( 1979, odyssey2,  0,        0,      odyssey2,  odyssey2, odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", 0 )
 COMP( 1979, videopac,  odyssey2, 0,      videopac,  odyssey2, odyssey2_state, empty_init, "Philips", "Videopac G7000 (Europe)", 0 )
 COMP( 1979, videopacf, odyssey2, 0,      videopacf, odyssey2, odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", 0 )
 

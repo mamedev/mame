@@ -54,10 +54,6 @@ void o2_rom_device::device_start()
 	save_item(NAME(m_bank_base));
 }
 
-void o2_rom_device::device_reset()
-{
-	m_bank_base = 0;
-}
 
 /*-------------------------------------------------
  mapper specific handlers

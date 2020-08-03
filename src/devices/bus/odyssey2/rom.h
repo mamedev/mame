@@ -28,7 +28,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	int m_bank_base;
 };
