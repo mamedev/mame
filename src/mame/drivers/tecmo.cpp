@@ -1133,7 +1133,7 @@ ROM_START( silkwormb )
 	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* bg tiles TMM24512 */
 	ROM_LOAD( "e14.15",       0x10000, 0x08000, CRC(b02acdb6) SHA1(6be74bb89680b79b3a5d13af638ed5a0bb077dad) )  /* bg tiles 27C256   */
 	ROM_LOAD( "e15.16",       0x20000, 0x08000, CRC(caf7b25e) SHA1(2c348af9d03efd801cbbc06deb02869bd6449518) )  /* bg tiles 27C256   */
-	ROM_LOAD( "e16.17",       0x30000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )  /* bg tiles 27C256   */
+	ROM_LOAD( "e16.17",       0x38000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )  /* bg tiles 27C256   */
 ROM_END
 
 /*
