@@ -8,6 +8,7 @@ TODO:
 - NTSC has 263 scanlines, PAL has 313 scanlines, a quick fix will probably
   cause small regressions here and there
 - PAL has 228 clocks per line (so, 456 half clocks)
+- are the 'reserved' registers like RAM, or does writing have no effect?
 
 ***************************************************************************/
 
@@ -273,7 +274,6 @@ uint8_t i8244_device::read(offs_t offset)
 			data = m_y_beam_pos;
 			break;
 
-
 		case 0xa5:
 			if ((m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
@@ -282,9 +282,10 @@ uint8_t i8244_device::read(offs_t offset)
 			data = m_x_beam_pos;
 			break;
 
-		case 0xa7: case 0xa8: case 0xa9:
-			m_stream->update(); // updates sound shift registers
-			data = m_vdc.reg[offset];
+		case 0x02: case 0x06: case 0x0a: case 0x0e:
+		case 0xa3: case 0xa7: case 0xa8: case 0xa9:
+			// write-only registers
+			data = 0;
 			break;
 
 		default:

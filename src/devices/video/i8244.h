@@ -57,7 +57,7 @@ protected:
 		uint8_t reg[0x100];
 		struct {
 			struct {
-				uint8_t y,x,color,res;
+				uint8_t y,x,color,reserved;
 			} sprites[4];
 			struct {
 				uint8_t y,x,ptr,color;
@@ -74,12 +74,12 @@ protected:
 			uint8_t color;
 			uint8_t y;
 			uint8_t x;
-			uint8_t res;
+			uint8_t reserved;
 			uint8_t shift1;
 			uint8_t shift2;
 			uint8_t shift3;
 			uint8_t sound;
-			uint8_t res2[5+0x10];
+			uint8_t reserved2[5+0x10];
 			uint8_t hgrid[2][0x10];
 			uint8_t vgrid[0x10];
 		} s;
