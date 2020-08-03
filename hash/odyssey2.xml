@@ -543,7 +543,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="chess" supported="partial">
+	<software name="chess">
 		<description>Chess Module (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
@@ -710,7 +710,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="2dpthmrk" supported="partial">
+	<software name="2dpthmrk">
 		<description>Depth Charge/Marksman (Euro)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
@@ -1707,7 +1707,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="turtles" supported="partial">
+	<software name="turtles">
 		<description>Turtles (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
@@ -1721,7 +1721,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="turtlesu" cloneof="turtles" supported="partial">
+	<software name="turtlesu" cloneof="turtles">
 		<description>Turtles (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>

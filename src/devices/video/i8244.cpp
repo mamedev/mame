@@ -365,26 +365,25 @@ void i8244_device::render_scanline(int vpos)
 	//static const uint8_t COLLISION_EXTERNAL_UNUSED = 0x40;
 	static const uint8_t COLLISION_CHARACTERS      = 0x80;
 
-	uint8_t   collision_map[160];
-
 	if ( vpos == m_start_vpos )
 	{
 		m_control_status &= ~0x08;
 	}
 
+	/* Clear collision map */
+	uint8_t collision_map[160];
+	memset( collision_map, 0, sizeof( collision_map ) );
+
+	/* Draw background color */
+	rectangle rect(START_ACTIVE_SCAN, END_ACTIVE_SCAN - 1, vpos, vpos);
+	rect &= screen().visible_area();
+	m_tmp_bitmap.fill( (m_vdc.s.color >> 3) & 0x7, rect );
+
 	if ( m_start_vpos < vpos && vpos < m_start_vblank )
 	{
-		rectangle rect;
 		int scanline = vpos - m_start_vpos;
 
 		m_control_status &= ~ 0x01;
-
-		/* Draw a line */
-		rect.set(START_ACTIVE_SCAN, END_ACTIVE_SCAN - 1, vpos, vpos);
-		m_tmp_bitmap.fill( (m_vdc.s.color >> 3) & 0x7, rect );
-
-		/* Clear collision map */
-		memset( collision_map, 0, sizeof( collision_map ) );
 
 		/* Display grid if enabled */
 		if ( m_vdc.s.control & 0x08 )
@@ -455,18 +454,54 @@ void i8244_device::render_scanline(int vpos)
 					}
 				}
 			}
+
+			/* Draw dots part of the grid */
+			if ( m_vdc.s.control & 0x40 )
+			{
+				for ( int y = 0; y < 9; y++ )
+				{
+					if ( y_grid_offset + y * height <= scanline && scanline < y_grid_offset + y * height + 3 )
+					{
+						for ( int i = 0; i < 10; i++ )
+						{
+							for ( int k = 0; k < 2; k++ )
+							{
+								int px = x_grid_offset + i * width + k;
+
+								if ( px < 160 )
+								{
+									/* Check if we collide with an already drawn source object */
+									if ( collision_map[ px ] & m_vdc.s.collision )
+									{
+										m_collision_status |= COLLISION_HORIZ_GRID_DOTS;
+									}
+									/* Check if an already drawn object would collide with us */
+									if ( COLLISION_HORIZ_GRID_DOTS & m_vdc.s.collision && collision_map[ px ] )
+									{
+										m_collision_status |= collision_map[ px ];
+									}
+									collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		/* Display objects if enabled */
 		if ( m_vdc.s.control & 0x20 )
 		{
 			/* Regular foreground objects */
-			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.foreground ); i++ )
+			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
 			{
 				int y = m_vdc.s.foreground[i].y & 0xFE;
-				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr + 1 ) & 7 );
+				if (height == 1) height = 8;
 
-				if ( y >= 0x0E && y <= scanline && scanline < y + height * 2 )
+				if ( y <= scanline && scanline < y + height * 2 )
 				{
 					uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 ) ];
 					int    offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
@@ -499,59 +534,52 @@ void i8244_device::render_scanline(int vpos)
 			}
 
 			/* Quad objects */
-			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.quad ); i++ )
+			for ( int i = ARRAY_LENGTH( m_vdc.s.quad ) - 1; i >= 0; i-- )
 			{
 				int y = m_vdc.s.quad[i].single[0].y & 0xFE;
-				int height = 8;
+
+				// Character height is always determined by the height of the 4th character
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );
+				if (height == 1) height = 8;
 
 				if ( y <= scanline && scanline < y + height * 2 )
 				{
 					int x = m_vdc.s.quad[i].single[0].x;
 
-					// Character height is always determined by the height of the 4th character
-					int char_height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );
-
 					for ( int j = 0; j < ARRAY_LENGTH( m_vdc.s.quad[0].single ); j++, x += 8 )
 					{
-						if ( y <= scanline && scanline < y + char_height * 2 )
-						{
-							uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
-							int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-							uint8_t chr = m_charset[ offset & 0x1FF ];
+						uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
+						int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
+						uint8_t chr = m_charset[ offset & 0x1FF ];
 
-							for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
+						for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
+						{
+							if ( chr & m )
 							{
-								if ( chr & m )
+								if ( x >= 0 && x < 160 )
 								{
-									if ( x >= 0 && x < 160 )
+									/* Check if we collide with an already drawn source object */
+									if ( collision_map[ x ] & m_vdc.s.collision )
 									{
-										/* Check if we collide with an already drawn source object */
-										if ( collision_map[ x ] & m_vdc.s.collision )
-										{
-											m_collision_status |= COLLISION_CHARACTERS;
-										}
-										/* Check if an already drawn object would collide with us */
-										if ( COLLISION_CHARACTERS & m_vdc.s.collision && collision_map[ x ] )
-										{
-											m_collision_status |= collision_map[ x ];
-										}
-										collision_map[ x ] |= COLLISION_CHARACTERS;
-										m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x ) = color;
-										m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x + 1 ) = color;
+										m_collision_status |= COLLISION_CHARACTERS;
 									}
+									/* Check if an already drawn object would collide with us */
+									if ( COLLISION_CHARACTERS & m_vdc.s.collision && collision_map[ x ] )
+									{
+										m_collision_status |= collision_map[ x ];
+									}
+									collision_map[ x ] |= COLLISION_CHARACTERS;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x ) = color;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x + 1 ) = color;
 								}
 							}
-						}
-						else
-						{
-							x += 8;
 						}
 					}
 				}
 			}
 
 			/* Sprites */
-			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.sprites ); i++ )
+			for ( int i = ARRAY_LENGTH( m_vdc.s.sprites ) - 1; i >= 0; i-- )
 			{
 				int y = m_vdc.s.sprites[i].y;
 				int height = 8;

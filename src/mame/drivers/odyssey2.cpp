@@ -5,15 +5,12 @@
 Driver file to handle emulation of the Odyssey2.
 
 TODO:
-- odyssey3 cpu/video should have different clocks
+- odyssey3 cpu/video should probably have a different XTAL
 - backgamm does not work, it only shows the background graphics
-- chess is missing some graphics: half of the statusbar chars at the top,
-  and the A-H row at the bottom
-- missing questionmark graphics in turtles
 - homecomp does not work, needs new slot device
 - g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
 - a lot more issues, probably, this TODO list was written by someone with
-  no knowledge on odyssey2
+  not much knowledge on odyssey2
 
 ***************************************************************************/
 
@@ -48,12 +45,9 @@ public:
 	void videopac(machine_config &config);
 	void videopacf(machine_config &config);
 
-	void init_odyssey2();
-
 	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-
 	required_device<i8048_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<o2_cart_slot_device> m_cart;
@@ -62,7 +56,6 @@ protected:
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_lum;
-
 
 	DECLARE_READ_LINE_MEMBER(t1_read);
 	void odyssey2_palette(palette_device &palette) const;
@@ -294,18 +287,11 @@ void g7400_state::g7400_palette(palette_device &palette) const
 	palette.set_pen_colors(0, g7400_colors);
 }
 
-void odyssey2_state::init_odyssey2()
-{
-	memset(m_ram, 0, 0x80);
-
-	uint8_t *gfx = memregion("gfx1")->base();
-	for (int i = 0; i < 256; i++)
-		gfx[i] = i; /* TODO: Why i and not 0? */
-}
-
 
 void odyssey2_state::machine_start()
 {
+	memset(m_ram, 0, 0x80);
+
 	save_item(NAME(m_ram));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
@@ -605,51 +591,6 @@ void g7400_state::i8243_p7_w(uint8_t data)
 }
 
 
-static const gfx_layout odyssey2_graphicslayout =
-{
-	8,1,
-	256,                                    /* 256 characters */
-	1,                      /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{
-	0,
-	1,
-	2,
-	3,
-	4,
-	5,
-	6,
-	7,
-	},
-	/* y offsets */
-	{ 0 },
-	1*8
-};
-
-
-static const gfx_layout odyssey2_spritelayout =
-{
-	8,1,
-	256,                                    /* 256 characters */
-	1,                      /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{
-	7,6,5,4,3,2,1,0
-	},
-	/* y offsets */
-	{ 0 },
-	1*8
-};
-
-
-static GFXDECODE_START( gfx_odyssey2 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_graphicslayout, 0, 2 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
-GFXDECODE_END
-
-
 
 void odyssey2_state::odyssey2(machine_config &config)
 {
@@ -671,7 +612,6 @@ void odyssey2_state::odyssey2(machine_config &config)
 	screen.set_screen_update(FUNC(odyssey2_state::screen_update_odyssey2));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
 	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	SPEAKER(config, "mono").front_center();
@@ -732,7 +672,6 @@ void g7400_state::g7400(machine_config &config)
 	screen.set_screen_update(FUNC(odyssey2_state::screen_update_odyssey2));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
 	PALETTE(config, "palette", FUNC(g7400_state::g7400_palette), 16);
 
 	I8243(config, m_i8243);
@@ -772,46 +711,40 @@ void g7400_state::odyssey3(machine_config &config)
 ROM_START (odyssey2)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
-	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START (videopac)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
-	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START (videopacf)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("c52.rom", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e))
-	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 
 ROM_START (g7400)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
-	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START (jopac)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
-	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START (odyssey3)
 	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD ("odyssey3.bin", 0x0000, 0x0400, CRC(e2b23324) SHA1(0a38c5f2cea929d2fe0a23e5e1a60de9155815dc))
-	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS */
-COMP( 1978, odyssey2,  0,        0,      odyssey2,  odyssey2, odyssey2_state, init_odyssey2, "Magnavox", "Odyssey 2 (US)", 0 )
-COMP( 1979, videopac,  odyssey2, 0,      videopac,  odyssey2, odyssey2_state, init_odyssey2, "Philips", "Videopac G7000 (Europe)", 0 )
-COMP( 1979, videopacf, odyssey2, 0,      videopacf, odyssey2, odyssey2_state, init_odyssey2, "Philips", "Videopac C52 (France)", 0 )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
+COMP( 1978, odyssey2,  0,        0,      odyssey2,  odyssey2, odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", 0 )
+COMP( 1979, videopac,  odyssey2, 0,      videopac,  odyssey2, odyssey2_state, empty_init, "Philips", "Videopac G7000 (Europe)", 0 )
+COMP( 1979, videopacf, odyssey2, 0,      videopacf, odyssey2, odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", 0 )
 
-COMP( 1983, g7400,     0,        0,      g7400,     odyssey2, g7400_state,    init_odyssey2, "Philips", "Videopac Plus G7400 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, jopac,     g7400,    0,      g7400,     odyssey2, g7400_state,    init_odyssey2, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3,  g7400,    0,      odyssey3,  odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (US, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, g7400,     0,        0,      g7400,     odyssey2, g7400_state,    empty_init, "Philips", "Videopac Plus G7400 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac,     g7400,    0,      g7400,     odyssey2, g7400_state,    empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3,  g7400,    0,      odyssey3,  odyssey2, g7400_state,    empty_init, "Magnavox", "Odyssey 3 Command Center (US, prototype)", MACHINE_IMPERFECT_GRAPHICS )
