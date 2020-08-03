@@ -15,10 +15,11 @@ jobs:
     - run: make -f Makefile.libretro -j8
     - run: zip -9 mame_libretro.zip mame_libretro.dylib
     - name: Upload MAME core
-      uses: svenstaro/upload-release-action@v2
+      uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mame_libretro.zip
-        tag: macOS-x86_64
-        asset_name: mame_libretro.zip
-        overwrite: true
+        automatic_release_tag: macOS-x86_64
+        prerelease: false
+        title: macOS x86_64
+        files: |
+          mame_libretro.zip

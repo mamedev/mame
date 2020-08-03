@@ -20,10 +20,12 @@ jobs:
     - run: strip.exe -s mame_libretro.dll
     - run: msys2do zip -9 mame_libretro.zip mame_libretro.dll
     - name: Upload MAME core
-      uses: svenstaro/upload-release-action@v2
+      uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mame_libretro.zip
-        tag: Windows_64-bit
-        asset_name: mame_libretro.zip
-        overwrite: true
+        automatic_release_tag: Windows_64-bit
+        prerelease: false
+        title: Windows x86_64
+        files: |
+          mame_libretro.zip
+

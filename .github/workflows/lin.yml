@@ -17,10 +17,12 @@ jobs:
     - run: strip -s mame_libretro.so
     - run: zip -9 mame_libretro.zip mame_libretro.so
     - name: Upload MAME core
-      uses: svenstaro/upload-release-action@v2
+      uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mame_libretro.zip
-        tag: Linux_64-bit
-        asset_name: mame_libretro.zip
-        overwrite: true
+        automatic_release_tag: Linux_64-bit
+        prerelease: false
+        title: Linux x86_64
+        files: |
+          mame_libretro.zip
+
