@@ -92,6 +92,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -111,6 +112,8 @@ protected:
 	// callbacks
 	devcb_write_line m_irq_func;
 	devcb_write16 m_postprocess_func;
+
+	required_region_ptr<uint8_t> m_charset;
 
 	bitmap_ind16 m_tmp_bitmap;
 	emu_timer *m_line_timer;
