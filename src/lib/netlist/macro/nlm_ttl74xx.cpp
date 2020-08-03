@@ -141,6 +141,7 @@ NETLIST_END()
 //- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations: Open collector behavior currently not simulated.
 //- FunctionTable:
 //-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006496.PDF
 //-
@@ -181,6 +182,7 @@ NETLIST_END()
 //- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations: Open collector behavior currently not simulated.
 //- FunctionTable:
 //-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006497.PDF
 //-
@@ -206,7 +208,7 @@ static NETLIST_START(TTL_7407_DIP)
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.Y,  /*    Y1 |2           13| A6   */ F.A,
 		B.A,  /*    A2 |3           12| Y6   */ F.Y,
-		B.Y,  /*    Y2 |4    7406   11| A5   */ E.A,
+		B.Y,  /*    Y2 |4    7407   11| A5   */ E.A,
 		C.A,  /*    A3 |5           10| Y5   */ E.Y,
 		C.Y,  /*    Y3 |6            9| A4   */ D.A,
 		A.GND,/*   GND |7            8| Y4   */ D.Y
@@ -245,7 +247,7 @@ static NETLIST_START(TTL_7408_DIP)
 		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
 		  A.B, /*    B1 |2           13| B4   */ D.B,
 		  A.Q, /*    Y1 |3           12| A4   */ D.A,
-		  B.A, /*    A2 |4    7400   11| Y4   */ D.Q,
+		  B.A, /*    A2 |4    7408   11| Y4   */ D.Q,
 		  B.B, /*    B2 |5           10| B3   */ C.B,
 		  B.Q, /*    Y2 |6            9| A3   */ C.A,
 		A.GND, /*   GND |7            8| Y3   */ C.Q
@@ -253,23 +255,24 @@ static NETLIST_START(TTL_7408_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM7410: Triple 3-Input NAND Gates
- *                  __
- *              Y = ABC
- *          +---+---+---++---+
- *          | A | B | C || Y |
- *          +===+===+===++===+
- *          | X | X | 0 || 1 |
- *          | X | 0 | X || 1 |
- *          | 0 | X | X || 1 |
- *          | 1 | 1 | 1 || 0 |
- *          +---+---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5410/DM5410/DM7410
+//- Title: Triple 3-Input NAND Gates
+//- Description: This device contains three independent gates each of which performs the logic NAND function.
+//- Pinalias: A1,B1,A2,B2,C2,Y2,GND,Y3,A3,B3,C3,Y1,C1,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006500.PDF
+//-
+//-         +---+---+---++---+
+//-         | A | B | C || Y |
+//-         +===+===+===++===+
+//-         | X | X | 0 || 1 |
+//-         | X | 0 | X || 1 |
+//-         | 0 | X | X || 1 |
+//-         | 1 | 1 | 1 || 0 |
+//-         +---+---+---++---+
+//-
 static NETLIST_START(TTL_7410_DIP)
 	TTL_7410_GATE(A)
 	TTL_7410_GATE(B)
@@ -278,35 +281,36 @@ static NETLIST_START(TTL_7410_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC)
 	NET_C(A.GND, B.GND, C.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| C1   */ A.C,
-		B.A,  /*    A2 |3           12| Y1   */ A.Q,
-		B.B,  /*    B2 |4    7410   11| C3   */ C.C,
-		B.C,  /*    C2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| C1   */ A.C,
+		  B.A, /*    A2 |3           12| Y1   */ A.Q,
+		  B.B, /*    B2 |4    7410   11| C3   */ C.C,
+		  B.C, /*    C2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7411: Triple 3-Input AND Gates
- *
- *              Y = ABC
- *          +---+---+---++---+
- *          | A | B | C || Y |
- *          +===+===+===++===+
- *          | X | X | 0 || 0 |
- *          | X | 0 | X || 0 |
- *          | 0 | X | X || 0 |
- *          | 1 | 1 | 1 || 1 |
- *          +---+---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: DM7411
+//- Title: Triple 3-Input AND Gate
+//- Description: This device contains three independent gates with three data inputs each which perform the logic AND function.
+//- Pinalias: A1,B1,A2,B2,C2,Y2,GND,Y3,A3,B3,C3,Y1,C1,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009774.PDF
+//-
+//-         +---+---+---++---+
+//-         | A | B | C || Y |
+//-         +===+===+===++===+
+//-         | X | X | 0 || 0 |
+//-         | X | 0 | X || 0 |
+//-         | 0 | X | X || 0 |
+//-         | 1 | 1 | 1 || 1 |
+//-         +---+---+---++---+
+//-
 static NETLIST_START(TTL_7411_DIP)
 	TTL_7411_GATE(A)
 	TTL_7411_GATE(B)
@@ -315,24 +319,36 @@ static NETLIST_START(TTL_7411_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC)
 	NET_C(A.GND, B.GND, C.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| C1   */ A.C,
-		B.A,  /*    A2 |3           12| Y1   */ A.Q,
-		B.B,  /*    B2 |4    7411   11| C3   */ C.C,
-		B.C,  /*    C2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| C1   */ A.C,
+		  B.A, /*    A2 |3           12| Y1   */ A.Q,
+		  B.B, /*    B2 |4    7411   11| C3   */ C.C,
+		  B.C, /*    C2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *   DM7414/DM74LS14: Hex Inverter with
- *                    Schmitt Trigger Inputs
- *
- */
-
+//- Identifier: DM5414/DM7414
+//- Title: Hex Inverter withSchmitt Trigger Inputs
+//- Description: This device contains six independent gates each of whichperforms the logic INVERT function.
+//-   Each input has hysteresis which increases the noise immunity and transforms a slowly changing input
+//-   signal to a fast changing, jitter free output.
+//- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006503.PDF
+//-
+//-         +---++---+
+//-         | A || Y |
+//-         +===++===+
+//-         | 0 || 1 |
+//-         | 1 || 0 |
+//-         +---++---+
+//-
 static NETLIST_START(TTL_7414_GATE)
 	SCHMITT_TRIGGER(X, "DM7414")
 	ALIAS(A, X.A)
@@ -361,12 +377,12 @@ static NETLIST_START(TTL_7414_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
-		A.A,   /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.Q,   /*    Y1 |2           13| A6   */ F.A,
-		B.A,   /*    A2 |3           12| Y6   */ F.Q,
-		B.Q,   /*    Y2 |4    7414   11| A5   */ E.A,
-		C.A,   /*    A3 |5           10| Y5   */ E.Q,
-		C.Q,   /*    Y3 |6            9| A4   */ D.A,
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.Q, /*    Y1 |2           13| A6   */ F.A,
+		  B.A, /*    A2 |3           12| Y6   */ F.Q,
+		  B.Q, /*    Y2 |4    7414   11| A5   */ E.A,
+		  C.A, /*    A3 |5           10| Y5   */ E.Q,
+		  C.Q, /*    Y3 |6            9| A4   */ D.A,
 		A.GND, /*   GND |7            8| Y4   */ D.Q
 			   /*       +--------------+      */
 	)
@@ -384,23 +400,34 @@ static NETLIST_START(TTL_74LS14_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
-		A.A,   /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.Q,   /*    Y1 |2           13| A6   */ F.A,
-		B.A,   /*    A2 |3           12| Y6   */ F.Q,
-		B.Q,   /*    Y2 |4   74LS14  11| A5   */ E.A,
-		C.A,   /*    A3 |5           10| Y5   */ E.Q,
-		C.Q,   /*    Y3 |6            9| A4   */ D.A,
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.Q, /*    Y1 |2           13| A6   */ F.A,
+		  B.A, /*    A2 |3           12| Y6   */ F.Q,
+		  B.Q, /*    Y2 |4   74LS14  11| A5   */ E.A,
+		  C.A, /*    A3 |5           10| Y5   */ E.Q,
+		  C.Q, /*    Y3 |6            9| A4   */ D.A,
 		A.GND, /*   GND |7            8| Y4   */ D.Q
 			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *   DM7416: Hex Inverting Buffers with
- *           High Voltage Open-Collector Outputs
- *
- */
-
+//- Identifier: DM5416/DM7416
+//- Title: Hex Inverting Buffers with High Voltage Open-Collector Outputs
+//- Description: This device contains six independent gates each of which performs the logic INVERT function.
+//-   The open-collector outputs require external pull-up resistors for proper logical operation.
+//- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006504.PDF
+//-
+//-         +---++---+
+//-         | A || Y |
+//-         +===++===+
+//-         | 0 || 1 |
+//-         | 1 || 0 |
+//-         +---++---+
+//-
 static NETLIST_START(TTL_7416_DIP)
 	TTL_7416_GATE(A)
 	TTL_7416_GATE(B)
@@ -412,36 +439,37 @@ static NETLIST_START(TTL_7416_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.Q,  /*    Y1 |2           13| A6   */ F.A,
-		B.A,  /*    A2 |3           12| Y6   */ F.Q,
-		B.Q,  /*    Y2 |4    7416   11| A5   */ E.A,
-		C.A,  /*    A3 |5           10| Y5   */ E.Q,
-		C.Q,  /*    Y3 |6            9| A4   */ D.A,
-		A.GND,/*   GND |7            8| Y4   */ D.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.Q, /*    Y1 |2           13| A6   */ F.A,
+		  B.A, /*    A2 |3           12| Y6   */ F.Q,
+		  B.Q, /*    Y2 |4    7416   11| A5   */ E.A,
+		  C.A, /*    A3 |5           10| Y5   */ E.Q,
+		  C.Q, /*    Y3 |6            9| A4   */ D.A,
+		A.GND, /*   GND |7            8| Y4   */ D.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7420: Dual 4-Input NAND Gates
- *
- *                  ___
- *              Y = ABCD
- *          +---+---+---+---++---+
- *          | A | B | C | D || Y |
- *          +===+===+===+===++===+
- *          | X | X | X | 0 || 1 |
- *          | X | X | 0 | X || 1 |
- *          | X | 0 | X | X || 1 |
- *          | 0 | X | X | X || 1 |
- *          | 1 | 1 | 1 | 1 || 0 |
- *          +---+---+---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet *
- */
-
+//- Identifier: 5420/DM5420/DM7420
+//- Title: Dual 4-Input NAND Gates
+//- Description: This device contains two independent gates each of which performs the logic NAND function.
+//- Pinalias: A1,B1,NC,C1,D1,Y1,GND,Y2,A2,B2,NC,C2,D2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006506.PDF
+//-
+//-         +---+---+---+---++---+
+//-         | A | B | C | D || Y |
+//-         +===+===+===+===++===+
+//-         | X | X | X | 0 || 1 |
+//-         | X | X | 0 | X || 1 |
+//-         | X | 0 | X | X || 1 |
+//-         | 0 | X | X | X || 1 |
+//-         | 1 | 1 | 1 | 1 || 0 |
+//-         +---+---+---+---++---+
+//-
 static NETLIST_START(TTL_7420_DIP)
 	TTL_7420_GATE(A)
 	TTL_7420_GATE(B)
@@ -450,36 +478,37 @@ static NETLIST_START(TTL_7420_DIP)
 	NET_C(A.GND, B.GND)
 	NC_PIN(NC)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| D2   */ B.D,
-		NC.I, /*    NC |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7420   11| NC   */ NC.I,
-		A.D,  /*    D1 |5           10| B2   */ B.B,
-		A.Q,  /*    Y1 |6            9| A2   */ B.A,
-		A.GND,/*   GND |7            8| Y2   */ B.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| D2   */ B.D,
+		 NC.I, /*    NC |3           12| C2   */ B.C,
+		  A.C, /*    C1 |4    7420   11| NC   */ NC.I,
+		  A.D, /*    D1 |5           10| B2   */ B.B,
+		  A.Q, /*    Y1 |6            9| A2   */ B.A,
+		A.GND, /*   GND |7            8| Y2   */ B.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7421: Dual 4-Input AND Gates
- *
- *                  ___
- *              Y = ABCD
- *          +---+---+---+---++---+
- *          | A | B | C | D || Y |
- *          +===+===+===+===++===+
- *          | X | X | X | 0 || 0 |
- *          | X | X | 0 | X || 0 |
- *          | X | 0 | X | X || 0 |
- *          | 0 | X | X | X || 0 |
- *          | 1 | 1 | 1 | 1 || 1 |
- *          +---+---+---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet *
- */
-
+//- Identifier: 54/7421
+//- Title: Dual 4-Input Positive AND Gate
+//- Description: This device contains two independent 4-input gates each of which performs the logic AND function.
+//- Pinalias: A1,B1,NC,C1,D1,Y1,GND,Y2,A2,B2,NC,C2,D2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor style
+//- FunctionTable:
+//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/124906/ETC1/7421.html
+//-
+//-         +---+---+---+---++---+
+//-         | A | B | C | D || Y |
+//-         +===+===+===+===++===+
+//-         | X | X | X | 0 || 1 |
+//-         | X | X | 0 | X || 1 |
+//-         | X | 0 | X | X || 1 |
+//-         | 0 | X | X | X || 1 |
+//-         | 1 | 1 | 1 | 1 || 0 |
+//-         +---+---+---+---++---+
+//-
 static NETLIST_START(TTL_7421_DIP)
 	TTL_7421_GATE(A)
 	TTL_7421_GATE(B)
@@ -488,40 +517,40 @@ static NETLIST_START(TTL_7421_DIP)
 	NET_C(A.GND, B.GND)
 	NC_PIN(NC)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| D2   */ B.D,
-		NC.I, /*    NC |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7420   11| NC   */ NC.I,
-		A.D,  /*    D1 |5           10| B2   */ B.B,
-		A.Q,  /*    Y1 |6            9| A2   */ B.A,
-		A.GND,/*   GND |7            8| Y2   */ B.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| D2   */ B.D,
+		 NC.I, /*    NC |3           12| C2   */ B.C,
+		  A.C, /*    C1 |4    7421   11| NC   */ NC.I,
+		  A.D, /*    D1 |5           10| B2   */ B.B,
+		  A.Q, /*    Y1 |6            9| A2   */ B.A,
+		A.GND, /*   GND |7            8| Y2   */ B.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7425: Dual 4-Input NOR Gates
- *
- *                  ______
- *              Y = A+B+C+D
- *          +---+---+---+---+---++---+
- *          | A | B | C | D | X || Y |
- *          +===+===+===+===+===++===+
- *          | X | X | X | X | 0 || Z |
- *          | 0 | 0 | 0 | 0 | 1 || 1 |
- *          | X | X | X | 1 | 1 || 0 |
- *          | X | X | 1 | X | 1 || 0 |
- *          | X | 1 | X | X | 1 || 0 |
- *          | 1 | X | X | X | 1 || 0 |
- *          +---+---+---+---+---++---+
- *
- *  FIXME: The "X" input and high impedance output are currently not simulated.
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5425/DM7425
+//- Title: Dual 4-Input NOR Gate (with Strobe)
+//- Description: This device contains 2, 4-input gates that perform the logical NOR function.
+//-   The output of each NOR gate is gated (strobed) by pin 3 and 11 by positive true logic, i.e., logic "1" equals output on.
+//- Pinalias: A1,B1,X1,C1,D1,Y1,GND,Y2,A2,B2,X2,C2,D2
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations: The "X" input and high impedance output are currently not simulated.
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet_pdf/national-semiconductor/5425DMQB_to_DM7425N.pdf
+//-
+//-         +---+---+---+---+---++---+
+//-         | A | B | C | D | X || Y |
+//-         +===+===+===+===+===++===+
+//-         | X | X | X | X | 0 || Z |
+//-         | 0 | 0 | 0 | 0 | 1 || 1 |
+//-         | X | X | X | 1 | 1 || 0 |
+//-         | X | X | 1 | X | 1 || 0 |
+//-         | X | 1 | X | X | 1 || 0 |
+//-         | 1 | X | X | X | 1 || 0 |
+//-         +---+---+---+---+---++---+
+//-
 static NETLIST_START(TTL_7425_DIP)
 	TTL_7425_GATE(A)
 	TTL_7425_GATE(B)
@@ -531,36 +560,36 @@ static NETLIST_START(TTL_7425_DIP)
 	NC_PIN(XA) // FIXME: Functionality needs to be implemented
 	NC_PIN(XB) // FIXME: Functionality needs to be implemented
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| D2   */ B.D,
-		XA.I, /*    X1 |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7425   11| X2   */ XB.I,
-		A.D,  /*    D1 |5           10| B2   */ B.B,
-		A.Q,  /*    Y1 |6            9| A2   */ B.A,
-		A.GND,/*   GND |7            8| Y2   */ B.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| D2   */ B.D,
+		 XA.I, /*    X1 |3           12| C2   */ B.C,
+		  A.C, /*    C1 |4    7425   11| X2   */ XB.I,
+		  A.D, /*    D1 |5           10| B2   */ B.B,
+		  A.Q, /*    Y1 |6            9| A2   */ B.A,
+		A.GND, /*   GND |7            8| Y2   */ B.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7427: Triple 3-Input NOR Gates
- *
- *                  ____
- *              Y = A+B+C
- *          +---+---+---++---+
- *          | A | B | C || Y |
- *          +===+===+===++===+
- *          | X | X | 1 || 0 |
- *          | X | 1 | X || 0 |
- *          | 1 | X | X || 0 |
- *          | 0 | 0 | 0 || 1 |
- *          +---+---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: DM7427
+//- Title: Triple 3-Input NOR Gates
+//- Description: This device contains three independent gates each of which performs the logic NOR function.
+//- Pinalias: A1,B1,A2,B2,C2,Y2,GND,Y3,A3,B3,C3,Y1,C1,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006509.PDF
+//-
+//-         +---+---+---++---+
+//-         | A | B | C || Y |
+//-         +===+===+===++===+
+//-         | X | X | 1 || 0 |
+//-         | X | 1 | X || 0 |
+//-         | 1 | X | X || 0 |
+//-         | 0 | 0 | 0 || 1 |
+//-         +---+---+---++---+
+//-
 static NETLIST_START(TTL_7427_DIP)
 	TTL_7427_GATE(A)
 	TTL_7427_GATE(B)
@@ -569,15 +598,15 @@ static NETLIST_START(TTL_7427_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC)
 	NET_C(A.GND, B.GND, C.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| C1   */ A.C,
-		B.A,  /*    A2 |3           12| Y1   */ A.Q,
-		B.B,  /*    B2 |4    7427   11| C3   */ C.C,
-		B.C,  /*    C2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| C1   */ A.C,
+		  B.A, /*    A2 |3           12| Y1   */ A.Q,
+		  B.B, /*    B2 |4    7427   11| C3   */ C.C,
+		  B.C, /*    C2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
