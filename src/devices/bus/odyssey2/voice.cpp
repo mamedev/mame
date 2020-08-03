@@ -49,7 +49,7 @@ void o2_voice_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SP0256(config, m_speech, 3120000);
+	SP0256(config, m_speech, 3.12_MHz_XTAL);
 	m_speech->data_request_callback().set(FUNC(o2_voice_device::lrq_callback));
 	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
 	m_speech->add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -83,9 +83,21 @@ const tiny_rom_entry *o2_voice_device::device_rom_region() const
 	return ROM_NAME( o2voice );
 }
 
+
+//-------------------------------------------------
+//  mapper specific handlers
+//-------------------------------------------------
+
 WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
 {
 	m_lrq_state = state;
+}
+
+READ_LINE_MEMBER(o2_voice_device::t0_read)
+{
+	// conflict with subslot T0
+	int state = (m_subslot->exists()) ? m_subslot->t0_read() : 0;
+	return state | (m_speech->lrq_r() ? 0 : 1);
 }
 
 void o2_voice_device::io_write(offs_t offset, uint8_t data)
@@ -97,4 +109,8 @@ void o2_voice_device::io_write(offs_t offset, uint8_t data)
 		else
 			m_speech->reset();
 	}
+
+	// possible conflict with subslot IO (work ok with 4in1, not with chess)
+	if (m_subslot->exists())
+		m_subslot->io_write(offset, data);
 }
