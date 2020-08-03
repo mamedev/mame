@@ -1692,6 +1692,8 @@ if (BUSES["O2"]~=null) then
 		MAME_DIR .. "src/devices/bus/odyssey2/slot.h",
 		MAME_DIR .. "src/devices/bus/odyssey2/rom.cpp",
 		MAME_DIR .. "src/devices/bus/odyssey2/rom.h",
+		MAME_DIR .. "src/devices/bus/odyssey2/4in1.cpp",
+		MAME_DIR .. "src/devices/bus/odyssey2/4in1.h",
 		MAME_DIR .. "src/devices/bus/odyssey2/chess.cpp",
 		MAME_DIR .. "src/devices/bus/odyssey2/chess.h",
 		MAME_DIR .. "src/devices/bus/odyssey2/voice.cpp",

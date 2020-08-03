@@ -6,14 +6,13 @@ Driver file to handle emulation of the Odyssey2.
 
 TODO:
 - odyssey3 cpu/video should have different clocks
-- 4in1(4 in a row)/musician needs a new mappertype to work: 3KB program ROM
-  and 1KB bankswitched data ROM
-- backgam does not work, it only shows the background graphics
+- backgamm does not work, it only shows the background graphics
 - chess has graphics issues near the screen borders: missing A-H at bottom,
   rightmost column is not erased properly, wrongly places chars at top
 - qbert has major graphics problems, similar to chess?
 - missing questionmark graphics in turtles
 - homecomp does not work, needs new slot device
+- g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
 - a lot more issues, probably, this TODO list was written by someone with
   no knowledge on odyssey2
 
@@ -322,7 +321,7 @@ void odyssey2_state::machine_reset()
 	/* jump to "last" bank, will work for all sizes due to being mirrored */
 	m_p1 = 0xff;
 	m_p2 = 0xff;
-	m_cart->write_bank(m_p1);
+	m_cart->write_p1(m_p1 & 0x13);
 }
 
 
@@ -350,18 +349,12 @@ void g7400_state::machine_reset()
 
 uint8_t odyssey2_state::io_read(offs_t offset)
 {
-	u8 data = 0;
+	u8 data = m_cart->io_read(offset);
+	if (!(m_p1 & P1_EXT_RAM_ENABLE) && ~offset & 0x80)
+		data &= m_ram[offset];
 
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
-	{
-		data = m_i8244->read(offset);
-	}
-	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
-	{
-		data = m_cart->io_read(offset);
-		if (~offset & 0x80)
-			data &= m_ram[offset];
-	}
+		data &= m_i8244->read(offset);
 
 	return data;
 }
@@ -369,37 +362,24 @@ uint8_t odyssey2_state::io_read(offs_t offset)
 
 void odyssey2_state::io_write(offs_t offset, uint8_t data)
 {
-	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
+	if (!(m_p1 & P1_VDC_COPY_MODE_ENABLE))
 	{
-		if (~offset & 0x80)
-			m_ram[offset] = data;
 		m_cart->io_write(offset, data);
+		if (!(m_p1 & P1_EXT_RAM_ENABLE) && ~offset & 0x80)
+			m_ram[offset] = data;
 	}
-	else if (!(m_p1 & P1_VDC_ENABLE))
-	{
+
+	if (!(m_p1 & P1_VDC_ENABLE))
 		m_i8244->write(offset, data);
-	}
 }
 
 
 uint8_t g7400_state::io_read(offs_t offset)
 {
-	u8 data = 0;
+	u8 data = odyssey2_state::io_read(offset);
 
-	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
-	{
-		data = m_i8244->read(offset);
-	}
-	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
-	{
-		data = m_cart->io_read(offset);
-		if (~offset & 0x80)
-			data &= m_ram[offset];
-	}
-	else if (!(m_p1 & P1_VPP_ENABLE))
-	{
-		data = m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
-	}
+	if (!(m_p1 & P1_VPP_ENABLE) && offset & 4)
+		data &= m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
 
 	return data;
 }
@@ -407,20 +387,10 @@ uint8_t g7400_state::io_read(offs_t offset)
 
 void g7400_state::io_write(offs_t offset, uint8_t data)
 {
-	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
-	{
-		if (~offset & 0x80)
-			m_ram[offset] = data;
-		m_cart->io_write(offset, data);
-	}
-	else if (!(m_p1 & P1_VDC_ENABLE))
-	{
-		m_i8244->write(offset, data);
-	}
-	else if (!(m_p1 & P1_VPP_ENABLE))
-	{
+	odyssey2_state::io_write(offset, data);
+
+	if (!(m_p1 & P1_VPP_ENABLE) && ~offset & 4)
 		m_ef9340_1->ef9341_write( offset & 0x02, offset & 0x01, data );
-	}
 }
 
 
@@ -509,7 +479,7 @@ void odyssey2_state::p1_write(uint8_t data)
 {
 	m_p1 = data;
 	m_lum = ( data & 0x80 ) >> 4;
-	m_cart->write_bank(m_p1);
+	m_cart->write_p1(m_p1 & 0x13);
 }
 
 
@@ -553,12 +523,13 @@ uint8_t odyssey2_state::p2_read()
 void odyssey2_state::p2_write(uint8_t data)
 {
 	m_p2 = data;
+	m_cart->write_p2(m_p2 & 0x0f);
 }
 
 
 void g7400_state::p2_write(uint8_t data)
 {
-	m_p2 = data;
+	odyssey2_state::p2_write(data);
 	m_i8243->p2_w(m_p2 & 0x0f);
 }
 

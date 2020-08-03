@@ -21,7 +21,7 @@ Service manual with schematics is available.
 //  o2_chess_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac Chess Module")
+DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac C7010")
 
 
 o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -78,18 +78,18 @@ void o2_chess_device::device_add_mconfig(machine_config &config)
 //  mapper specific handlers
 //-------------------------------------------------
 
-void o2_chess_device::write_bank(int bank)
+void o2_chess_device::write_p1(u8 data)
 {
-	// P10: must be low to access latches
+	// P10,P14: must be low to access latches
 	// P11: reset
-	m_cpu->set_input_line(INPUT_LINE_RESET, (bank & 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_cpu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
-	m_control = bank;
+	m_control = data;
 }
 
 u8 o2_chess_device::io_read(offs_t offset)
 {
-	if (offset & 0x80 && offset & 0x20 && ~m_control & 1)
+	if ((offset & 0xa0) == 0xa0 && (m_control & 0x11) == 0)
 		return m_latch[0]->read();
 	else
 		return 0xff;
@@ -97,6 +97,6 @@ u8 o2_chess_device::io_read(offs_t offset)
 
 void o2_chess_device::io_write(offs_t offset, u8 data)
 {
-	if (offset & 0x80 && ~m_control & 1)
+	if (offset & 0x80 && (m_control & 0x11) == 0)
 		m_latch[1]->write(data);
 }

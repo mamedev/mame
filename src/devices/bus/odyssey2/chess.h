@@ -35,7 +35,7 @@ protected:
 	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset + 0x2000]; }
 	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset + 0x2000]; }
 
-	virtual void write_bank(int bank) override;
+	virtual void write_p1(u8 data) override;
 	virtual void io_write(offs_t offset, u8 data) override;
 	virtual u8 io_read(offs_t offset) override;
 

@@ -107,13 +107,13 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="musician" supported="no">
+	<software name="musician">
 		<description>Musician (Euro)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="31"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="musician (europe).bin" size="4096" crc="afb23f89" sha1="7445f4df9017c4d2ea94542d0db335dc18c9d7ed" offset="0" />
 			</dataarea>
@@ -271,25 +271,25 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 
 <!-- Games -->
 
-	<software name="4in1" supported="no">
+	<software name="4in1">
 		<description>4 in 1 Row (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="40"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="4 in 1 row (europe).bin" size="4096" crc="3bfef56b" sha1="e9a8996c4fb87120d8620ab8876b90ddb48335db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="4en1" cloneof="4in1" supported="no">
+	<software name="4en1" cloneof="4in1">
 		<description>4 en 1 Ligne (Fra)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="4 en 1 ligne (france).bin" size="4096" crc="9b5e9356" sha1="0831c3212a9e0a588a242dcd2b136e350aaceac9" offset="0" />
 			</dataarea>

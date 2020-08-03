@@ -63,11 +63,6 @@ void o2_rom_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-void o2_rom_device::write_bank(int bank)
-{
-	m_bank_base = bank;
-}
-
 uint8_t o2_rom_device::read_rom04(offs_t offset)
 {
 	return m_rom[(offset + (m_bank_base & 0x03) * 0x800) & (m_rom_size - 1)];

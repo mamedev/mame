@@ -22,7 +22,8 @@ public:
 	virtual uint8_t read_rom04(offs_t offset) override { if (m_subslot->exists()) return m_subslot->read_rom04(offset); else return 0xff; }
 	virtual uint8_t read_rom0c(offs_t offset) override { if (m_subslot->exists()) return m_subslot->read_rom0c(offset); else return 0xff; }
 
-	virtual void write_bank(int bank) override   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
+	virtual void write_p1(uint8_t data) override { m_control = data; if (m_subslot->exists()) m_subslot->write_p1(data); }
+	virtual void write_p2(uint8_t data) override { if (m_subslot->exists()) m_subslot->write_p2(data); }
 
 	virtual void io_write(offs_t offset, uint8_t data) override;
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) override { return m_speech->lrq_r() ? 0 : 1; }
@@ -42,6 +43,7 @@ private:
 	required_device<o2_cart_slot_device> m_subslot;
 
 	int m_lrq_state;
+	uint8_t m_control;
 };
 
 

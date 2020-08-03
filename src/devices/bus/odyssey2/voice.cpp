@@ -29,6 +29,7 @@ o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag,
 	, m_speech(*this, "sp0256_speech")
 	, m_subslot(*this, "subslot")
 	, m_lrq_state(0)
+	, m_control(0)
 {
 }
 
@@ -36,6 +37,7 @@ o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag,
 void o2_voice_device::device_start()
 {
 	save_item(NAME(m_lrq_state));
+	save_item(NAME(m_control));
 }
 
 
@@ -88,7 +90,7 @@ WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
 
 void o2_voice_device::io_write(offs_t offset, uint8_t data)
 {
-	if (offset & 0x80)
+	if (offset & 0x80 && ~m_control & 0x10)
 	{
 		if (data & 0x20)
 			m_speech->ald_w(offset & 0x7f);
