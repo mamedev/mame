@@ -24,11 +24,12 @@ jobs:
     # - run: strip -s mame_libretro_android.so
     - run: zip -9 mame_libretro.zip mame_libretro_android.so
     - name: Upload MAME core
-      uses: svenstaro/upload-release-action@v2
+      uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mame_libretro.zip
-        tag: Android_ARMv7
-        release_name: Android ARMv7
-        asset_name: mame_libretro.zip
-        overwrite: true
+        automatic_release_tag: Android_ARMv7
+        prerelease: false
+        title: Android ARMv7
+        files: |
+          mame_libretro.zip
+
