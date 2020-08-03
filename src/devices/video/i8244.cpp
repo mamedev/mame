@@ -498,7 +498,7 @@ void i8244_device::render_scanline(int vpos)
 			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
 			{
 				int y = m_vdc.s.foreground[i].y & 0xFE;
-				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr + 1 ) & 7 );
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
 				if (height == 1) height = 8;
 
 				if ( y <= scanline && scanline < y + height * 2 )
