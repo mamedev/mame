@@ -7,9 +7,8 @@ Driver file to handle emulation of the Odyssey2.
 TODO:
 - odyssey3 cpu/video should have different clocks
 - backgamm does not work, it only shows the background graphics
-- chess has graphics issues near the screen borders: missing A-H at bottom,
-  rightmost column is not erased properly, wrongly places chars at top
-- qbert has major graphics problems, similar to chess?
+- chess is missing some graphics: half of the statusbar chars at the top,
+  and the A-H row at the bottom
 - missing questionmark graphics in turtles
 - homecomp does not work, needs new slot device
 - g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?

@@ -1356,7 +1356,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="qbert" supported="partial">
+	<software name="qbert">
 		<description>Q*bert (Euro)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
@@ -1707,7 +1707,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="turtles">
+	<software name="turtles" supported="partial">
 		<description>Turtles (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
@@ -1721,7 +1721,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="turtlesu" cloneof="turtles">
+	<software name="turtlesu" cloneof="turtles" supported="partial">
 		<description>Turtles (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>

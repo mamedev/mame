@@ -280,14 +280,14 @@ int i8244_device::get_x_beam()
 
 offs_t i8244_device::fix_register_mirrors( offs_t offset )
 {
-	// registers $40,$41 are mirrored at $44,$45, $48,$49, and $4C,$4D
-	if ( ( offset & 0xF2 ) == 0x40 )
+	// quad x/y registers are mirrored for each quad
+	if ( ( offset & 0xC2 ) == 0x40 )
 	{
 		offset &= ~0x0C;
 	}
 
 	// registers $A0-$AF are mirrored at $B0-$BF
-	if ( ( offset & 0xF0 ) == 0xB0 )
+	if ( ( offset & 0xE0 ) == 0xA0 )
 	{
 		offset &= ~0x10;
 	}
@@ -556,14 +556,14 @@ void i8244_device::render_scanline(int vpos)
 			/* Quad objects */
 			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.quad ); i++ )
 			{
-				int y = m_vdc.s.quad[i].single[0].y;
+				int y = m_vdc.s.quad[i].single[0].y & 0xFE;
 				int height = 8;
 
 				if ( y <= scanline && scanline < y + height * 2 )
 				{
 					int x = m_vdc.s.quad[i].single[0].x;
 
-					// Charaecter height is always determined by the height of the 4th character
+					// Character height is always determined by the height of the 4th character
 					int char_height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );
 
 					for ( int j = 0; j < ARRAY_LENGTH( m_vdc.s.quad[0].single ); j++, x += 8 )
