@@ -89,11 +89,13 @@ static NETLIST_START(mc3340)
 	// amplify properly, generating only a very weak output signal.
 
 	// The 1990s schematics also omit a couple of diodes which are present
-	// in the 1970s schematics. One of these omitted diodes noticeably
-	// raises the minimum control voltage at which signal attenuation
-	// starts; that diode has been included here, to get the netlist's
-	// profile of attenuation vs. control voltage to better match
-	// Motorola's charts for the device.
+	// in the 1970s schematics. Both of these diodes have been included
+	// here. One raises the minimum control voltage at which signal
+	// attenuation starts, so it makes the netlist's profile of
+	// attenuation vs. control voltage better match Motorola's charts for
+	// the device. The other affects the level of the input "midpoint",
+	// and including it makes the engine sound closer to that on real
+	// 280-ZZZAP machines.
 
 	// The Motorola schematics do not label components, so I've created my
 	// own labeling scheme based on numbering components on the schematics
@@ -134,9 +136,8 @@ static NETLIST_START(mc3340)
 	RES(R7_5K1, RES_K(5.1))
 	RES(R8_20K, RES_K(20))
 
-	// 1970s Motorola schematics have another diode just above what I call
-	// "R9_510"; this diode doesn't seem to affect normal operation much,
-	// so I've left it out.
+	DIODE(D2_MC3340, "D(IS=1e-15 N=1)")
+
 	RES(R9_510, RES_R(510))
 
 	QBJT_EB(Q3, "NPN1")
@@ -171,7 +172,7 @@ static NETLIST_START(mc3340)
 
 	RES(R17_5K1, RES_K(5.1))
 
-	DIODE(D2_MC3340, "D(IS=1e-15 N=1)")
+	DIODE(D3_MC3340, "D(IS=1e-15 N=1)")
 
 	RES(R18_510, RES_R(510))
 
@@ -195,9 +196,11 @@ static NETLIST_START(mc3340)
 	ALIAS(MC3340_INPUT, Q5.B)
 
 	NET_C(MC3340_INPUT, R8_20K.1)
-	NET_C(R7_5K1.2, R8_20K.2, R9_510.1)
-	// (This is approximately where the other omitted diode, which I've
-	// left out, would go.)
+	// Location of second diode present on 1970s schematics but omitted on
+	// 1990s ones. Including it is critical to making the tone of the
+	// output engine sound match that of real 280-ZZZAP machines.
+	NET_C(R7_5K1.2, R8_20K.2, D2_MC3340.A)
+	NET_C(D2_MC3340.K, R9_510.1)
 	NET_C(R9_510.2, GND)
 
 	NET_C(Q4.E, Q6.E, Q5.C)
@@ -226,8 +229,8 @@ static NETLIST_START(mc3340)
 	NET_C(R15_5K1.2, GND)
 	ALIAS(MC3340_OUTPUT, R16_200.2)
 
-	NET_C(R17_5K1.2, D2_MC3340.A, Q8.B)
-	NET_C(D2_MC3340.K, R18_510.1)
+	NET_C(R17_5K1.2, D3_MC3340.A, Q8.B)
+	NET_C(D3_MC3340.K, R18_510.1)
 	NET_C(R18_510.2, GND)
 
 NETLIST_END()
