@@ -17,24 +17,24 @@
 //
 #endif
 
-/*
- *  DM7400: Quad 2-Input NAND Gates
- *
- *                  _
- *              Y = AB
- *          +---+---++---+
- *          | A | B || Y |
- *          +===+===++===+
- *          | 0 | 0 || 1 |
- *          | 0 | 1 || 1 |
- *          | 1 | 0 || 1 |
- *          | 1 | 1 || 0 |
- *          +---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5400/DM5400/DM7400
+//- Title: Quad 2-Input NAND Gates
+//- Description: This device contains four independent gates each of which performs the logic NAND function.
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006613.PDF
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 1 |
+//-         | 0 | 1 || 1 |
+//-         | 1 | 0 || 1 |
+//-         | 1 | 1 || 0 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7400_DIP)
 	TTL_7400_GATE(A)
 	TTL_7400_GATE(B)
@@ -44,35 +44,36 @@ static NETLIST_START(TTL_7400_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| B4   */ D.B,
-		A.Q,  /*    Y1 |3           12| A4   */ D.A,
-		B.A,  /*    A2 |4    7400   11| Y4   */ D.Q,
-		B.B,  /*    B2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| B4   */ D.B,
+		  A.Q, /*    Y1 |3           12| A4   */ D.A,
+		  B.A, /*    A2 |4    7400   11| Y4   */ D.Q,
+		  B.B, /*    B2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7402: Quad 2-Input NOR Gates
- *
- *              Y = A+B
- *          +---+---++---+
- *          | A | B || Y |
- *          +===+===++===+
- *          | 0 | 0 || 1 |
- *          | 0 | 1 || 0 |
- *          | 1 | 0 || 0 |
- *          | 1 | 1 || 0 |
- *          +---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5402/DM5402/DM7402
+//- Title: Quad 2-Input NOR Gates
+//- Description: This device contains four independent gates each of which performs the logic NOR function.
+//- Pinalias: Y1,A1,B1,Y2,A2,B2,GND,A3,B3,Y3,A4,B4,Y4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006492.PDF
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 1 |
+//-         | 0 | 1 || 0 |
+//-         | 1 | 0 || 0 |
+//-         | 1 | 1 || 0 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7402_DIP)
 	TTL_7402_GATE(A)
 	TTL_7402_GATE(B)
@@ -82,33 +83,34 @@ static NETLIST_START(TTL_7402_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.Q,  /*    Y1 |1     ++    14| VCC  */ A.VCC,
-		A.A,  /*    A1 |2           13| Y4   */ D.Q,
-		A.B,  /*    B1 |3           12| B4   */ D.B,
-		B.Q,  /*    Y2 |4    7402   11| A4   */ D.A,
-		B.A,  /*    A2 |5           10| Y3   */ C.Q,
-		B.B,  /*    B2 |6            9| B3   */ C.B,
-		A.GND,/*   GND |7            8| A3   */ C.A
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.Q, /*    Y1 |1     ++    14| VCC  */ A.VCC,
+		  A.A, /*    A1 |2           13| Y4   */ D.Q,
+		  A.B, /*    B1 |3           12| B4   */ D.B,
+		  B.Q, /*    Y2 |4    7402   11| A4   */ D.A,
+		  B.A, /*    A2 |5           10| Y3   */ C.Q,
+		  B.B, /*    B2 |6            9| B3   */ C.B,
+		A.GND, /*   GND |7            8| A3   */ C.A
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *   DM7404: Hex Inverting Gates
- *
- *             Y = A
- *          +---++---+
- *          | A || Y |
- *          +===++===+
- *          | 0 || 1 |
- *          | 1 || 0 |
- *          +---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5404/DM5404/DM7404
+//- Title: Hex Inverting Gates
+//- Description: This device contains six independent gates each of which performs the logic INVERT function.
+//- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006494.PDF
+//-
+//-         +---++---+
+//-         | A || Y |
+//-         +===++===+
+//-         | 0 || 1 |
+//-         | 1 || 0 |
+//-         +---++---+
+//-
 static NETLIST_START(TTL_7404_DIP)
 	TTL_7404_GATE(A)
 	TTL_7404_GATE(B)
@@ -120,26 +122,35 @@ static NETLIST_START(TTL_7404_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.Q,  /*    Y1 |2           13| A6   */ F.A,
-		B.A,  /*    A2 |3           12| Y6   */ F.Q,
-		B.Q,  /*    Y2 |4    7404   11| A5   */ E.A,
-		C.A,  /*    A3 |5           10| Y5   */ E.Q,
-		C.Q,  /*    Y3 |6            9| A4   */ D.A,
-		A.GND,/*   GND |7            8| Y4   */ D.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.Q, /*    Y1 |2           13| A6   */ F.A,
+		  B.A, /*    A2 |3           12| Y6   */ F.Q,
+		  B.Q, /*    Y2 |4    7404   11| A5   */ E.A,
+		  C.A, /*    A3 |5           10| Y5   */ E.Q,
+		  C.Q, /*    Y3 |6            9| A4   */ D.A,
+		A.GND, /*   GND |7            8| Y4   */ D.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *   DM7406: Hex Inverting Buffers with
- *           High Voltage Open-Collector Outputs
- *
- *  Naming conventions follow Fairchild Semiconductor datasheet
- *
- */
-
+//- Identifier: DM5406/DM7406
+//- Title: Hex Inverting Buffers with High Voltage Open-Collector Outputs
+//- Description: This device contains six independent buffers each of which performs the logic INVERT function.
+//-   The open-collector outputs require external pull-up resistors for proper logical operation.
+//- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006496.PDF
+//-
+//-         +---++---+
+//-         | A || Y |
+//-         +===++===+
+//-         | 0 || 1 |
+//-         | 1 || 0 |
+//-         +---++---+
+//-
 static NETLIST_START(TTL_7406_DIP)
 	TTL_7406_GATE(A)
 	TTL_7406_GATE(B)
@@ -151,26 +162,35 @@ static NETLIST_START(TTL_7406_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.Y,  /*    Y1 |2           13| A6   */ F.A,
-		B.A,  /*    A2 |3           12| Y6   */ F.Y,
-		B.Y,  /*    Y2 |4    7406   11| A5   */ E.A,
-		C.A,  /*    A3 |5           10| Y5   */ E.Y,
-		C.Y,  /*    Y3 |6            9| A4   */ D.A,
-		A.GND,/*   GND |7            8| Y4   */ D.Y
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.Y, /*    Y1 |2           13| A6   */ F.A,
+		  B.A, /*    A2 |3           12| Y6   */ F.Y,
+		  B.Y, /*    Y2 |4    7406   11| A5   */ E.A,
+		  C.A, /*    A3 |5           10| Y5   */ E.Y,
+		  C.Y, /*    Y3 |6            9| A4   */ D.A,
+		A.GND, /*   GND |7            8| Y4   */ D.Y
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *   DM7407: Hex Buffers with
- *           High Voltage Open-Collector Outputs
- *
- *  Naming conventions follow Fairchild Semiconductor datasheet
- *
- */
-
+//- Identifier: DM5407/DM7407
+//- Title: Hex Buffers with High Voltage Open-Collector Outputs
+//- Description: This device contains six independent gates each of which performs a buffer function.
+//-   The open-collector outputs re-quire external pull-up resistors for proper logical operation.
+//- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006497.PDF
+//-
+//-         +---++---+
+//-         | A || Y |
+//-         +===++===+
+//-         | 0 || 0 |
+//-         | 1 || 1 |
+//-         +---++---+
+//-
 static NETLIST_START(TTL_7407_DIP)
 	TTL_7407_GATE(A)
 	TTL_7407_GATE(B)
@@ -194,24 +214,24 @@ static NETLIST_START(TTL_7407_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM7408: Quad 2-Input AND Gates
- *
- *
- *              Y = AB
- *          +---+---++---+
- *          | A | B || Y |
- *          +===+===++===+
- *          | 0 | 0 || 0 |
- *          | 0 | 1 || 0 |
- *          | 1 | 0 || 0 |
- *          | 1 | 1 || 1 |
- *          +---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5408/DM5408/DM7408
+//- Title: Quad 2-Input AND Gates
+//- Description: This device contains four independent gates each of which performs the logic AND function.
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006498.PDF
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 0 |
+//-         | 0 | 1 || 0 |
+//-         | 1 | 0 || 0 |
+//-         | 1 | 1 || 1 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7408_DIP)
 	TTL_7408_GATE(A)
 	TTL_7408_GATE(B)
@@ -221,15 +241,15 @@ static NETLIST_START(TTL_7408_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| B4   */ D.B,
-		A.Q,  /*    Y1 |3           12| A4   */ D.A,
-		B.A,  /*    A2 |4    7400   11| Y4   */ D.Q,
-		B.B,  /*    B2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| B4   */ D.B,
+		  A.Q, /*    Y1 |3           12| A4   */ D.A,
+		  B.A, /*    A2 |4    7400   11| Y4   */ D.Q,
+		  B.B, /*    B2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
