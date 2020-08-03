@@ -374,7 +374,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="backgamm" supported="no">
+	<software name="backgamm" supported="partial">
 		<description>Backgammon (Euro)</description>
 		<year>1983</year>
 		<publisher>GST Video</publisher>

@@ -237,7 +237,7 @@ offs_t i8244_device::fix_register_mirrors( offs_t offset )
 		offset &= ~0x10;
 	}
 
-	return offset;
+	return offset & 0xFF;
 }
 
 
@@ -282,6 +282,11 @@ uint8_t i8244_device::read(offs_t offset)
 			data = m_x_beam_pos;
 			break;
 
+		case 0xa7: case 0xa8: case 0xa9:
+			m_stream->update(); // updates sound shift registers
+			data = m_vdc.reg[offset];
+			break;
+
 		default:
 			data = m_vdc.reg[offset];
 			break;
@@ -295,8 +300,12 @@ void i8244_device::write(offs_t offset, uint8_t data)
 {
 	offset = fix_register_mirrors( offset );
 
+	/* Major systems Y CAM d0 is not connected! */
+	if (offset >= 0x10 && !(offset & 0x83))
+		data &= ~0x01;
+
 	/* Update the sound */
-	if( offset >= 0xa7 && offset <= 0xaa )
+	if (offset >= 0xa7 && offset <= 0xaa)
 	{
 		m_stream->update();
 	}
@@ -477,7 +486,7 @@ void i8244_device::render_scanline(int vpos)
 			/* Regular foreground objects */
 			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
 			{
-				int y = m_vdc.s.foreground[i].y & 0xFE;
+				int y = m_vdc.s.foreground[i].y;
 				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
 				if (height == 1) height = 8;
 
@@ -516,7 +525,7 @@ void i8244_device::render_scanline(int vpos)
 			/* Quad objects */
 			for ( int i = ARRAY_LENGTH( m_vdc.s.quad ) - 1; i >= 0; i-- )
 			{
-				int y = m_vdc.s.quad[i].single[0].y & 0xFE;
+				int y = m_vdc.s.quad[i].single[0].y;
 
 				// Character height is always determined by the height of the 4th character
 				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );

@@ -6,7 +6,7 @@ Driver file to handle emulation of the Odyssey2.
 
 TODO:
 - odyssey3 cpu/video should probably have a different XTAL
-- backgamm does not work, it only shows the background graphics
+- backgamm has display timing problems (it does a lot of partial screen updates)
 - homecomp does not work, needs new slot device
 - g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
 - a lot more issues, probably, this TODO list was written by someone with
