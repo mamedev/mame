@@ -379,15 +379,6 @@ void xavix_state::dispctrl_posirq_y_w(uint8_t data)
 /* Per Game IO port callbacks */
 
 
-READ_LINE_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
-{
-	return machine().rand();
-}
-
-READ_LINE_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
-{
-	return machine().rand();
-}
 
 READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
 {
@@ -510,48 +501,6 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 {
 	uint8_t extraiowrite = data & direction;
 	m_extraiowrite = extraiowrite;
-}
-
-/* SuperXavix IO port handliner (per game) */
-
-uint8_t xavix_i2c_jmat_state::read_extended_io0()
-{
-	LOG("%s: read_extended_io0\n", machine().describe_context());
-	return 0x00;
-}
-
-uint8_t xavix_i2c_jmat_state::read_extended_io1()
-{
-	LOG("%s: read_extended_io1\n", machine().describe_context());
-
-	// reads this by reading the byte, then shifting right 4 times to place value into carry flag
-	return m_i2cmem->read_sda() << 3;
-	//return 0x00;
-}
-
-uint8_t xavix_i2c_jmat_state::read_extended_io2()
-{
-	LOG("%s: read_extended_io2\n", machine().describe_context());
-	return 0x00;
-}
-
-void xavix_i2c_jmat_state::write_extended_io0(uint8_t data)
-{
-	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
-}
-
-void xavix_i2c_jmat_state::write_extended_io1(uint8_t data)
-{
-	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
-
-	m_i2cmem->write_sda((data & 0x08) >> 3);
-	m_i2cmem->write_scl((data & 0x10) >> 4);
-
-}
-
-void xavix_i2c_jmat_state::write_extended_io2(uint8_t data)
-{
-	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
 
 // the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems

@@ -38011,6 +38011,7 @@ dreamlss
 senspeed
 ordentv
 wfcentro
+tiktokmm
 
 @source:spg2xx_digimake.cpp
 rad_digi
@@ -42261,15 +42262,11 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 rad_socr                        //
-epo_bowl                        //
 epo_esdx                        //
 epo_epp                         //
 epo_eppk                        //
 epo_epp3                        //
 epo_efdx                        //
-epo_tfit
-epo_ebox                        //
-epo_sdb                         //
 epo_guru                        //
 epo_dmon                        //
 rad_rh                          //
@@ -42284,8 +42281,6 @@ jarajal                         //
 tcarnavi                        //
 tomcpin
 tomplc
-mrangbat
-ban_onep                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
@@ -42301,10 +42296,22 @@ taikodp                         //
 jpopira                         //
 evio                            //
 gcslottv                        //
+
+@source:xavix_2000.cpp
+epo_ebox                        //
+epo_bowl                        //
+epo_sdb                         //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
 drgqst                          //
+ban_onep                        //
+
+@source:xavix_2002.cpp
+suprpctv
+udance
+mrangbat
+epo_tfit
 tmy_thom                        //
 xavtenni                        //
 xavbaseb                        //
