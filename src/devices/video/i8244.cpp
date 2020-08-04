@@ -8,7 +8,6 @@ TODO:
 - NTSC has 263 scanlines, PAL has 313 scanlines, a quick fix will probably
   cause small regressions here and there
 - PAL has 228 clocks per line (so, 456 half clocks)
-- are the 'reserved' registers like RAM, or does writing have no effect?
 
 ***************************************************************************/
 
@@ -241,12 +240,47 @@ offs_t i8244_device::fix_register_mirrors( offs_t offset )
 	return offset & 0xFF;
 }
 
+bool i8244_device::unused_register( offs_t offset )
+{
+	bool unused = false;
+
+	u8 low = offset & 0xf;
+
+	// these registers are inaccessible
+	switch (offset & 0xf0)
+	{
+		case 0x00:
+			unused = ((low & 0x3) == 0x3);
+			break;
+		case 0xa0:
+			unused = (low == 0x6 || low >= 0xb);
+			break;
+		case 0xc0: case 0xd0:
+			unused = (low >= 0x9);
+			break;
+		case 0xe0:
+			unused = (low >= 0xa);
+			break;
+		case 0xf0:
+			unused = true;
+			break;
+
+		default:
+			break;
+	}
+
+	return unused;
+}
+
 
 uint8_t i8244_device::read(offs_t offset)
 {
 	uint8_t data;
 
-	offset = fix_register_mirrors( offset );
+	offset = fix_register_mirrors(offset);
+
+	if (unused_register(offset))
+		return 0;
 
 	switch (offset)
 	{
@@ -299,15 +333,32 @@ uint8_t i8244_device::read(offs_t offset)
 
 void i8244_device::write(offs_t offset, uint8_t data)
 {
-	offset = fix_register_mirrors( offset );
+	offset = fix_register_mirrors(offset);
 
-	/* Major systems Y CAM d0 is not connected! */
-	if (offset >= 0x10 && !(offset & 0x83))
+	if (unused_register(offset))
+		return;
+
+	// read-only registers
+	if (offset == 0xa1 || offset == 0xa4 || offset == 0xa5)
+		return;
+
+	// Color registers d4-d7 are not connected
+	if ((offset & 0x83) == 0x03)
+		data &= 0x0f;
+
+	// Major systems Y CAM d0 is not connected!
+	if (offset >= 0x10 && (offset & 0x83) == 0x00)
 		data &= ~0x01;
 
-	/* Update the sound */
+	// Horizontal grid high byte only d0 is connected
+	if ((offset & 0xf0) == 0xd0)
+		data &= 0x01;
+
+	// Update the sound
 	if (offset >= 0xa7 && offset <= 0xaa)
 	{
+		if (offset == 0xaa)
+			data &= 0xbf;
 		m_stream->update();
 	}
 
@@ -316,7 +367,7 @@ void i8244_device::write(offs_t offset, uint8_t data)
 		if ( ( m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY )
 			&& !(data & VDC_CONTROL_REG_STROBE_XY))
 		{
-			/* Toggling strobe bit, tuck away values */
+			// Toggling strobe bit, tuck away values
 			m_x_beam_pos = get_x_beam();
 			m_y_beam_pos = get_y_beam();
 		}
