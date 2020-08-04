@@ -112,7 +112,7 @@ void gigatron_state::port_out(uint8_t data)
         uint8_t r = (out << 6) & 0xC0;
         uint8_t g = (out << 4) & 0xC0;
         uint8_t b = (out << 2) & 0xC0;
-        u32 *dest = &m_bitmap_render->pix32(m_row, m_col);
+        uint32_t *dest = &m_bitmap_render->pix32(m_row, m_col);
         for(uint8_t i = 0; i < 4; i++)
             *dest++ = r|g<<8|b<<16;
     }
@@ -222,4 +222,4 @@ ROM_START( gigatron )
 	ROMX_LOAD( "gigrom1.rom",  0x0000, 0x20000, CRC(8ea5a2af) SHA1(e5758d5cc467c3476bd8f992fd45dfcdf06d0430),ROM_BIOS(4))
 ROM_END
 
-COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_NOT_WORKING)
+COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
