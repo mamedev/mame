@@ -165,12 +165,10 @@ void gigatron_state::machine_reset()
 
 void gigatron_state::port_outx(uint8_t data)
 {
-	blinkenlights(data & 0x0F);
+	//Write sound to DAC
 	m_dac->write((data & 0xF0) >> 4);
-}
-
-void gigatron_state::blinkenlights(uint8_t data)
-{
+	
+	//Blinkenlights
 	uint16_t light = data & 0xF;
 	m_lc ^= light;
 }
