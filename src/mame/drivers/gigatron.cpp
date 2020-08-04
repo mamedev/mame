@@ -38,7 +38,6 @@ public:
 
 	void gigatron(machine_config &config);
 
-
 private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -46,6 +45,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
@@ -78,6 +78,13 @@ private:
 void gigatron_state::video_start()
 {
     m_bitmap_render = std::make_unique<bitmap_rgb32>(640, 480);
+}
+
+void gigatron_state::video_reset()
+{
+	uint32_t *dest = &m_bitmap_render->pix32(0, 0);
+	for(uint32_t i = 0; i < 640*480; i++)
+		*dest++ = 0;
 }
 
 void gigatron_state::port_out(uint8_t data)
@@ -116,7 +123,6 @@ void gigatron_state::port_out(uint8_t data)
     }
     m_col += 4;
 }
-
 
 //6-bit color, VGA
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -169,6 +175,11 @@ void gigatron_state::machine_reset()
 {
 	m_dacoutput = 0;
 	m_dac->write(0);
+	m_lc = 0;
+	m_out = 0;
+	m_row = 0;
+	m_col = 0;
+	m_pixel = 0;
 }
 
 void gigatron_state::port_outx(uint8_t data)

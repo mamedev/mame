@@ -89,6 +89,9 @@ void gigatron_cpu_device::reset_cpu()
 	m_inReg = 0xFF;
 	m_outx = 0;
 	m_out = 0;
+	
+	m_out_cb(0, 0);
+	m_outx_cb(0, 0);
 }
 
 /* Execute cycles */
