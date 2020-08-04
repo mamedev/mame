@@ -106,7 +106,7 @@ void o2_voice_device::io_write(offs_t offset, u8 data)
 			m_speech->reset();
 	}
 
-	// possible conflict with subslot IO (work ok with 4in1, not with chess)
+	// possible conflict with subslot IO (works ok with 4in1, not with chess)
 	if (m_subslot->exists())
 		m_subslot->io_write(offset, data);
 }
