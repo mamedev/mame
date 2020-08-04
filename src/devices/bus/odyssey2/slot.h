@@ -91,7 +91,7 @@ public:
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "odyssey_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
