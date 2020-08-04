@@ -26,10 +26,22 @@ ToDo:
 
 #include "s11.lh"
 
-
+/*
+15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00 RW MEMPROT
+0  0  0  0  0  x  x  x  0  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  x  x  0  x  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  x  0  x  x  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  0  x  x  x  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  1  1  1  1  *  *  *  *  *  *  *  *  0 battery backed RAM RW in protected area, but protection switch is off
+0  0  0  0  0  1  1  1  1  *  *  *  *  *  *  *  R  1 battery backed RAM Read in protected area, but protection switch is on, read is allowed
+0  0  0  0  0  1  1  1  1  *  *  *  *  *  *  *  W  1 battery backed RAM Write in protected area, but protection switch is on, write is BLOCKED
+*/
 void s11_state::s11_main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
+	// TODO:
+	//map(0x0000, 0x077f).ram().share("nvram"); // unprotected ram area
+	//map(0x0780, 0x07ff).rw(FUNC(prot_ram_r), FUNC(prot_ram_w)); // protected ram area
 	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
 	map(0x2200, 0x2200).w(FUNC(s11_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
@@ -47,14 +59,6 @@ void s11_state::s11_audio_map(address_map &map)
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xbfff).bankr("bank0");
 	map(0xc000, 0xffff).bankr("bank1");
-}
-
-void s11_state::s11_bg_map(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x8000, 0xffff).rom();
 }
 
 static INPUT_PORTS_START( s11 )
@@ -238,8 +242,6 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 // sound ns
 	if(m_pias)
 		m_pias->ca1_w(state);
-	if(m_pia40)
-		m_pia40->cb2_w(state);
 }
 
 void s11_state::lamp0_w(uint8_t data)
@@ -336,18 +338,14 @@ void s11_state::pia34_pa_w(uint8_t data)
 
 void s11_state::pia34_pb_w(uint8_t data)
 {
-	if(m_pia40)
-		m_pia40->portb_w(data);
-	else
+	if(m_bg)
 		m_bg->data_w(data);
 }
 
 WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
 {
-	if(m_pia40)
-		m_pia40->cb1_w(state);  // MCB2 through CPU interface
-	else
-		m_bg->ctrl_w(state);
+	if(m_bg)
+		m_bg->ctrl_w(state); // MCB2 through CPU interface
 }
 
 void s11_state::bank_w(uint8_t data)
@@ -373,27 +371,6 @@ WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
 uint8_t s11_state::sound_r()
 {
 	return m_sound_data;
-}
-
-WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
-{
-	if(m_pia40)
-	{
-		if(state == CLEAR_LINE)
-			m_pia40->ca1_w(1);
-		else
-			m_pia40->ca1_w(0);
-	}
-}
-
-WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
-{
-	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
-}
-
-void s11_state::pia40_pb_w(uint8_t data)
-{
-	m_pia34->portb_w(data);
 }
 
 void s11_state::init_s11()
@@ -482,13 +459,12 @@ void s11_state::s11(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 1.00);
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.5);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
@@ -499,24 +475,30 @@ void s11_state::s11(machine_config &config)
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
 	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
+}
 
+void s11_state::s11_bgs(machine_config &config)
+{
+	s11(config);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
+	/* Add the background sound card */
+	SPEAKER(config, "bgspk").front_center();
+	S11_BGS(config, m_bg);
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 0.5);
+}
+
+void s11_state::s11_bgm(machine_config &config)
+{
+	s11(config);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	/* Add the background music card */
-	MC6809E(config, m_bgcpu, 8000000 / 4); // MC68B09E
-	m_bgcpu->set_addrmap(AS_PROGRAM, &s11_state::s11_bg_map);
-
-	SPEAKER(config, "bg").front_center();
-	YM2151(config, m_ym2151, 3580000);
-	m_ym2151->irq_handler().set(FUNC(s11_state::ym2151_irq_w));
-	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
-
-	MC1408(config, "dac1", 0).add_route(ALL_OUTPUTS, "bg", 0.25);
-
-	PIA6821(config, m_pia40, 0);
-	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
-	m_pia40->writepb_handler().set(FUNC(s11_state::pia40_pb_w));
-	m_pia40->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
-	m_pia40->irqa_handler().set_inputline(m_bgcpu, M6809_FIRQ_LINE);
-	m_pia40->irqb_handler().set_inputline(m_bgcpu, INPUT_LINE_NMI);
+	SPEAKER(config, "bgspk").front_center();
+	S11_BGM(config, m_bg);
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
 }
 
 
@@ -537,8 +519,8 @@ ROM_START(grand_l4)
 	ROM_LOAD("lzrd_u22.l1", 0x14000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
 	ROM_RELOAD( 0x10000, 0x4000)
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("lzrd_u4.l1", 0x8000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
 ROM_END
 
 ROM_START(grand_l3)
@@ -555,8 +537,8 @@ ROM_START(grand_l3)
 	ROM_LOAD("lzrd_u22.l1", 0x14000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
 	ROM_RELOAD( 0x10000, 0x4000)
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("lzrd_u4.l1", 0x8000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
 ROM_END
 
 /*-------------------------
@@ -572,8 +554,8 @@ ROM_START(hs_l4)
 	ROM_LOAD("hs_u21.l2", 0x18000, 0x8000, CRC(c0580037) SHA1(675ca65a6a20f8607232c532b4d127641f77d837))
 	ROM_LOAD("hs_u22.l2", 0x10000, 0x8000, CRC(c03be631) SHA1(53823e0f55377a45aa181882c310dd307cf368f5))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("hs_u4.l1", 0x8000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("hs_u4.l1", 0x0000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
 ROM_END
 
 ROM_START(hs_l3)
@@ -586,8 +568,8 @@ ROM_START(hs_l3)
 	ROM_LOAD("hs_u21.l2", 0x18000, 0x8000, CRC(c0580037) SHA1(675ca65a6a20f8607232c532b4d127641f77d837))
 	ROM_LOAD("hs_u22.l2", 0x10000, 0x8000, CRC(c03be631) SHA1(53823e0f55377a45aa181882c310dd307cf368f5))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("hs_u4.l1", 0x8000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("hs_u4.l1", 0x0000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
 ROM_END
 
 /*-------------------------
@@ -603,8 +585,8 @@ ROM_START(rdkng_l1)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 ROM_START(rdkng_l2)
@@ -616,8 +598,8 @@ ROM_START(rdkng_l2)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 ROM_START(rdkng_l3)
@@ -629,8 +611,8 @@ ROM_START(rdkng_l3)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 ROM_START(rdkng_l4)
@@ -642,8 +624,8 @@ ROM_START(rdkng_l4)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 /************************ From here, not pinball machines **************************************/
@@ -659,8 +641,6 @@ ROM_START(tts_l2)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
 	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(tts_l1)
@@ -671,8 +651,6 @@ ROM_START(tts_l1)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
 	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*-------------------------------
@@ -686,8 +664,6 @@ ROM_START(gmine_l2)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u21.256", 0x18000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
 	ROM_LOAD("u22.256", 0x10000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*-------------------------
@@ -701,8 +677,6 @@ ROM_START(tdawg_l1)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tdsu21r1.256", 0x18000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
 	ROM_LOAD("tdsu22r1.256", 0x10000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*----------------------------
@@ -716,18 +690,16 @@ ROM_START(shfin_l1)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u21snd-2.rv1", 0x18000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
 	ROM_LOAD("u22snd-2.rv1", 0x10000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
-GAME( 1986, grand_l4, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l4,    0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l4, 0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l3, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l4,    0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l3,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l4, 0,        s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 GAME( 1986, tts_l2,   0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

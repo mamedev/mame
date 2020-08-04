@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, Jonathan Gevaryahu
 /*
  * s11c_bg.cpp - Williams D-11581 "Audio Board" PCB trace part number: 5766-12130-00 REV A.
  * (M68B09E + YM2151 + HC555xx + DAC)
@@ -25,7 +25,8 @@
  *
  * Technically:
  * CB1 Pin 13 is 'strobe in' and is asserted low to write to the sound board
- * CB2 Pin 12 is 'strobe out' and is asserted low to indicate the sound board has written and needs the mainboard to read its bus
+ * CB2 Pin 12 is 'strobe out' and is asserted low to indicate the sound board
+ * has written and needs the mainboard to read its bus
  *
  * The actual full pinout of the connector, from the System 11 end is:
  *        +--------+
@@ -42,7 +43,8 @@
  *        +--------+
  *
  *
- * The mixing resistors before the MC1458 differ between the D-11581, D-11581-20xx (System 11C), and D-1129x board schematics:
+ * The mixing resistors before the MC1458 differ between the D-11581,
+ * D-11581-20xx (System 11C), and D-1129x board schematics:
  * (All resistors are 5% unless otherwise noted)
  * newstyle P/N                              A-13971-43313 (and A-13971-500xx)
  * oldstyle P/N    D-1129x    D-11581        D-11581-20xx or D-11581-400xx
@@ -55,14 +57,16 @@
  * MC1458 +-to-gnd R36 4.7k   R11 4.7k       R11 4.7k
  * [] - if CVSD section present
 
- * Note that some D-11581 boards have the D-11297/8 mixing resistors in place, possibly those
- * originally intended for use as replacement parts for D-1129x boards
- * See https://pinwiki.com/wiki/images/f/fc/System_11_Sound_Board.JPG for an example, which
- * may have originally been a D-11298 replacement, as the CVSD section is unpopulated.
+ * Note that some D-11581 boards have the D-11297/8 mixing resistors in place,
+ * i.e. those intended for use as replacement parts for D-1129x boards.
+ * See https://pinwiki.com/wiki/images/f/fc/System_11_Sound_Board.JPG for an
+ * example, which may have originally been a D-11298 replacement, as the CVSD
+ * section is unpopulated.
 
- * Note that the System11C D-11581-20xx boards have the mixing resistors changed to make the CVSD sound twice
- * as loud as it typically would be, by doubling the resistor values for the other mixer inputs, see
- * https://pinwiki.com/wiki/images/7/7e/System11CSoundBoard.jpg
+ * Note that the System11C D-11581-20xx/400xx boards have the mixing resistors
+ * changed to make the CVSD sound roughly twice as loud as it typically
+ * would be, by doubling the resistor values for the other mixer inputs,
+ * see https://pinwiki.com/wiki/images/7/7e/System11CSoundBoard.jpg
 
  * D-11581 Jumpers:
  * W1 - exclusive w/W4, W6 : YM2151 reset comes from Board PIA CA2
@@ -74,7 +78,9 @@
  * W7                      : if present, the VCC/+5v rail is shorted to the +12v rail. (This is used in the case where the board is only run on +5v and -12v instead of +5v, +12v, and -12v)
  * W8 - exclusive w/W9     : U5 is a 6164 SRAM (pin 23/A11 is grounded)
  * W9 - exclusive w/W8     : U5 is a 6116 SRAM (pin 21, footprint pin 23, is /WE)
- These two jumpers are only on the D-11581-20xx (System 11C) version, and W2 and W3 do not affect U20 on this PCB version:
+
+ * These two jumpers are only on the D-11581-20xx/400xx (System 11C) version,
+ *   and W2 and W3 do not affect U20 on this PCB version:
  * W10 - linked w/W2+W3    : (only if W2 is also set) EPROM U20 is a 27512
  * W11 - linked w/W2+W3    : EPROM U20 is a 2764, 27128 or 27256 (where pin 1 must be high)
 
@@ -96,7 +102,7 @@
  * The 32 pin EPROM socket pins 1(VPP), 31(/PGM), 32(VCC) and 30(NC) are all
  * tied to VCC.
  * Jumpers W2, W3, W10 and W11 act the same as they do on D-11581-20xx, just
- * offset down in the socket by 2 pins.
+ * the pins they control are offset down in the socket by 2 pins.
  * This means this board is fully backwards compatible with D-11581-20xx.
  * (Note that the prototype Funhouse Schematics and the Super High Impact
  * Footall Kit Service manual both incorrectly have schematics for the
@@ -104,12 +110,14 @@
  * banking bit and larger sockets that the A-13971-50003 board has.)
 
 
+
  * Williams D-11297/D-11298 "BG Music & Speech Board":
  * D-11297/D-11298 is the predecessor to D-11581, and is fully compatible with it.
  * It is a larger board, physically.
  * It is used on the following Williams System 11A games:
- * D-11297 (CVSD populated)  : PIN*BOT
+ * D-11297 (CVSD populated)  : PIN*BOT (and prototype F-14 Tomcat)
  * D-11298 (CVSD unpopulated): Millionaire!
+ * It has different mixing resistors to the D-11581.
 
  * Unlike the later D-11581 board which has mono output only, the D-11297/8 board
  * has provisions for stereo output from the YM2151, but it is unclear if these were
@@ -125,6 +133,8 @@
  * W7 - exclusive w/W5, W6 : YM2151 reset comes from Board PIA CA2
 
 
+
+ * CVSD filter:
  * The CVSD filter on all of these boards has the same components:
  *
  *                                     .--------+---------.                      .--------+---------.
@@ -147,7 +157,7 @@
  *     but this was omitted on the D-11297 board, possibly in error, and this
  *     omission carried over to future sound boards including all versions of the D-11581.
  *     The later WPC Sound board, A-12738-500xx, fixed this by completely redesigning the filters
- *     for both the YM2151 and CVSD.
+ *     for the YM2151, DAC and CVSD.
  *
  * This circuit would be a 4th order (cascaded 2nd order) op-amp multifeedback lowpass filter,
  *  but because of the capacitor omitted, it is actually a first order-with-gain lowpass,
@@ -203,22 +213,24 @@
 
 #include "emu.h"
 #include "s11c_bg.h"
-#include "sound/dac.h"
 #include "sound/volt_reg.h"
 
 
-DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Music Board")
-DEFINE_DEVICE_TYPE(S11_BG, s11_bg_device, "s11_bg", "Williams System 11 Background Music Board")
+DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Audio Board") // D-11581-20xx or D-11581-400xx or A-13971-50003
+DEFINE_DEVICE_TYPE(S11_BG, s11_bg_device, "s11_bg", "Williams System 11 Background Audio Board") // D-11581 (without the W10/W11 jumpers)
+DEFINE_DEVICE_TYPE(S11_OBG, s11_obg_device, "s11_obg", "Williams System 11 (Older) Background Audio Board") // D-11297 or D-11298
+DEFINE_DEVICE_TYPE(S11_BGM, s11_bgm_device, "s11_bgm", "Williams System 11 Background Sound/Music Board") // D-11197
+DEFINE_DEVICE_TYPE(S11_BGS, s11_bgs_device, "s11_bgs", "Williams System 11 Background Sound Board") // C-11029 or C-11030
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,S11C_BG,tag,owner,clock)
 	, device_mixer_interface(mconfig, *this)
-	, m_cpu(*this, "bgcpu")
+	, m_cpu(*this, "cpu")
+	, m_dac(*this, "dac")
 	, m_ym2151(*this, "ym2151")
-	, m_hc55516(*this, "hc55516_bg")
+	, m_cvsd(*this, "hc55516")
 	, m_pia40(*this, "pia40")
 	, m_cpubank(*this, "bgbank")
-	, m_rom(*this, finder_base::DUMMY_TAG)
 	, m_cb2_cb(*this)
 	, m_pb_cb(*this)
 	, m_old_resetq_state(ASSERT_LINE)
@@ -229,21 +241,36 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,type,tag,owner,clock)
 	, device_mixer_interface(mconfig, *this)
-	, m_cpu(*this, "bgcpu")
+	, m_cpu(*this, "cpu")
+	, m_dac(*this, "dac")
 	, m_ym2151(*this, "ym2151")
-	, m_hc55516(*this, "hc55516_bg")
+	, m_cvsd(*this, "hc55516")
 	, m_pia40(*this, "pia40")
 	, m_cpubank(*this, "bgbank")
-	, m_rom(*this, finder_base::DUMMY_TAG)
 	, m_cb2_cb(*this)
 	, m_pb_cb(*this)
 	, m_old_resetq_state(ASSERT_LINE)
 {
 }
 
-// subclass definition
+// subclass definitions
 s11_bg_device::s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s11c_bg_device(mconfig,S11_BG,tag,owner,clock)
+{
+}
+
+s11_obg_device::s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s11c_bg_device(mconfig,S11_OBG,tag,owner,clock)
+{
+}
+
+s11_bgm_device::s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s11c_bg_device(mconfig,S11_BGM,tag,owner,clock)
+{
+}
+
+s11_bgs_device::s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s11c_bg_device(mconfig,S11_BGS,tag,owner,clock)
 {
 }
 
@@ -255,6 +282,21 @@ void s11c_bg_device::s11c_bg_map(address_map &map)
 	map(0x6000, 0x6000).mirror(0x07ff).w(FUNC(s11c_bg_device::bg_cvsd_clock_set_w));
 	map(0x6800, 0x6800).mirror(0x07ff).w(FUNC(s11c_bg_device::bg_cvsd_digit_clock_clear_w));
 	map(0x7800, 0x7800).mirror(0x07ff).w(FUNC(s11c_bg_device::bgbank_w));
+	map(0x8000, 0xffff).bankr("bgbank");
+}
+
+void s11c_bg_device::s11c_bgm_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).bankr("bgbank");
+}
+
+void s11c_bg_device::s11c_bgs_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xffff).bankr("bgbank");
 }
 
@@ -311,17 +353,15 @@ WRITE_LINE_MEMBER( s11c_bg_device::resetq_w )
 	m_old_resetq_state = state;
 }
 
-void s11c_bg_device::s11_bg_core(machine_config &config)
+
+// just the 6809, the DAC and the PIA
+void s11c_bg_device::s11_bg_base(machine_config &config)
 {
 	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
-	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map); // override this as needed
 	config.set_maximum_quantum(attotime::from_hz(50));
 
-	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
-	m_ym2151->irq_handler().set(m_pia40, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
-	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.1);
-
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
+	MC1408(config, m_dac, 0);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
@@ -329,26 +369,116 @@ void s11c_bg_device::s11_bg_core(machine_config &config)
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
-	m_pia40->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
+	// ca2 handler is set in the s11_bg_ym function
 	m_pia40->cb2_handler().set(FUNC(s11c_bg_device::pia40_cb2_w));
 	m_pia40->irqa_handler().set_inputline(m_cpu, M6809_FIRQ_LINE);
 	m_pia40->irqb_handler().set_inputline(m_cpu, INPUT_LINE_NMI);
 }
 
-void s11c_bg_device::device_add_mconfig(machine_config &config)
+// add a YM2151 for boards which have it
+void s11c_bg_device::s11_bg_ym(machine_config &config)
 {
-	s11_bg_core(config);
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.6); // cvsd is twice as loud on the sys11c version
+	m_pia40->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
+
+	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
+	m_ym2151->irq_handler().set(m_pia40, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
 }
 
+// add a CVSD chip for boards which have it
+void s11c_bg_device::s11_bg_cvsd(machine_config &config)
+{
+	HC55516(config, m_cvsd, 0);
+}
+
+
+// D-11581-20xx or D-11581-400xx or A-13971-50003
+void s11c_bg_device::device_add_mconfig(machine_config &config)
+{
+	s11_bg_base(config);
+	s11_bg_ym(config);
+	s11_bg_cvsd(config);
+	// volume mixer stuff
+	// the sum of all resistances is 13k + 20k + 20k + 4.99k = 57990
+	// 1/resistance * 57990 is 4.460769, 2.8895, 2.8895, 11.62124
+	// the sum of the previous 4 values is 21.88101; 100/21.88101 = 4.570173
+	// the 4 (1/r)*rtotal numbers * 4.570173 are 20.38649, 13.25122, 13.25122 and 53.11108 respectively
+	// NOTE: audio passthrough from the mainboard is 4.7kohm
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.2038); // 13Kohm
+	m_ym2151->add_route(1, *this, 0.1325); // 20kohm
+	m_ym2151->add_route(0, *this, 0.1325); // 20kohm
+	m_cvsd->add_route(ALL_OUTPUTS, *this, 0.5311); // 4.99kohm
+}
+
+// D-11581 (without the W10/W11 jumpers)
 void s11_bg_device::device_add_mconfig(machine_config &config)
 {
-	s11_bg_core(config);
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.3);
+	s11_bg_base(config);
+	s11_bg_ym(config);
+	s11_bg_cvsd(config);
+	// volume mixer stuff
+	// the sum of all resistances is 6.3k + 10k + 10k + 4.99k = 31290
+	// 1/resistance * 57990 is 4.9666, 3.129, 3.129, 6.2705
+	// the sum of the previous 4 values is 17.49521; 100/17.49521 = 5.715851
+	// the 4 (1/r)*rtotal numbers * 5.715851 are 28.38873, 17.8849, 17.8849, and 35.84148 respectively
+	// NOTE: audio passthrough from the mainboard is 2.2kohm
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.2839); // 6.3Kohm
+	m_ym2151->add_route(1, *this, 0.1788); // 10kohm
+	m_ym2151->add_route(0, *this, 0.1788); // 10kohm
+	m_cvsd->add_route(ALL_OUTPUTS, *this, 0.3584); // 4.99kohm
+}
+
+// D-11297 or D-11298
+void s11_obg_device::device_add_mconfig(machine_config &config)
+{
+	s11_bg_base(config);
+	s11_bg_ym(config);
+	s11_bg_cvsd(config);
+	// volume mixer stuff
+	// the sum of all resistances is 10k + 10k + 10k + 10k = 40000
+	// 1/resistance * 40000 is 4.0, 4.0, 4.0, 4.0
+	// the sum of the previous 4 values is 16.0; 100/16 = 6.25
+	// the 4 (1/r)*rtotal numbers * 6.25 are 25.0, 25.0, 25.0, 25.0 respectively
+	// NOTE: audio passthrough from the mainboard is 2.2kohm
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.25); // 10Kohm
+	m_ym2151->add_route(1, *this, 0.25); // 10kohm
+	m_ym2151->add_route(0, *this, 0.25); // 10kohm
+	m_cvsd->add_route(ALL_OUTPUTS, *this, 0.25); // 10kohm
+}
+
+// D-11197
+void s11_bgm_device::device_add_mconfig(machine_config &config)
+{
+	s11_bg_base(config);
+	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bgm_map);
+	s11_bg_ym(config);
+	// volume mixer stuff
+	// the sum of all resistances is 10k + 10k + 10k + 10k = 40000
+	// 1/resistance * 40000 is 4.0, 4.0, 4.0, 4.0
+	// the sum of the previous 4 values is 16.0; 100/16 = 6.25
+	// the 4 (1/r)*rtotal numbers * 6.25 are 25.0, 25.0, 25.0, 25.0 respectively
+	// NOTE: audio passthrough from the mainboard is 2.2kohm
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.25); // 10Kohm
+	m_ym2151->add_route(1, *this, 0.25); // 10kohm
+	m_ym2151->add_route(0, *this, 0.25); // 10kohm
+	// interestingly, there is no cvsd, but a fourth 10k resistor here, but it is tied to ground. this makes the board quieter than it would otherwise be, presumably.
+}
+
+// C-11029 or C-11030
+void s11_bgs_device::device_add_mconfig(machine_config &config)
+{
+	s11_bg_base(config);
+	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bgs_map);
+	// volume mixer stuff
+	// the sum of all resistances is 10k + 10k = 20k
+	// NOTE: audio passthrough from the mainboard is 10k
+	m_dac->add_route(ALL_OUTPUTS, *this, 1.00); // 10Kohm
 }
 
 void s11c_bg_device::device_start()
 {
+	u8 *rom = memregion("cpu")->base();
+	m_cpubank->configure_entries(0, 16, &rom[0x0], 0x8000);
+	m_cpubank->set_entry(0);
 	/* resolve lines */
 	m_cb2_cb.resolve();
 	m_pb_cb.resolve();
@@ -357,7 +487,6 @@ void s11c_bg_device::device_start()
 
 void s11c_bg_device::common_reset()
 {
-	m_cpubank->configure_entries(0, 16, &m_rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
 	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -370,13 +499,17 @@ void s11c_bg_device::device_reset()
 
 void s11c_bg_device::bg_cvsd_clock_set_w(uint8_t data)
 {
-	m_hc55516->clock_w(1);
+	if (m_cvsd)
+		m_cvsd->clock_w(1);
 }
 
 void s11c_bg_device::bg_cvsd_digit_clock_clear_w(uint8_t data)
 {
-	m_hc55516->clock_w(0);
-	m_hc55516->digit_w(data&1);
+	if (m_cvsd)
+	{
+		m_cvsd->clock_w(0);
+		m_cvsd->digit_w(data&1);
+	}
 }
 
 /*

@@ -166,7 +166,7 @@ void s11a_state::init_s11a()
 	s11_state::init_s11();
 }
 
-void s11a_state::s11a(machine_config &config)
+void s11a_state::s11a_common(machine_config &config)
 {
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
@@ -256,14 +256,28 @@ void s11a_state::s11a(machine_config &config)
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
 	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
+}
 
+void s11a_state::s11a(machine_config &config)
+{
+	s11a_common(config);
 	/* Add the background music card */
-	SPEAKER(config, "bg").front_center();
+	SPEAKER(config, "bgspk").front_center();
 	S11_BG(config, m_bg);
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
-	m_bg->set_romregion(m_bgcpu);
-	m_bg->add_route(ALL_OUTPUTS, "bg", 1.0);
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
+}
+
+void s11a_state::s11a_obg(machine_config &config)
+{
+	s11a_common(config);
+	/* Add the older-style background music card */
+	SPEAKER(config, "bgspk").front_center();
+	S11_OBG(config, m_bg);
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
 }
 
 /*------------------------
@@ -279,7 +293,7 @@ ROM_START(f14_p3)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -299,7 +313,7 @@ ROM_START(f14_p4)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -319,7 +333,7 @@ ROM_START(f14_p5)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -339,7 +353,7 @@ ROM_START(f14_l1)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -362,7 +376,7 @@ ROM_START(fire_l3)
 	ROM_LOAD("fire_u21.l2", 0x18000, 0x8000, CRC(2edde0a4) SHA1(de292a340a3a06b0b996fc69fee73eb7bbfbbe64))
 	ROM_LOAD("fire_u22.l2", 0x10000, 0x8000, CRC(16145c97) SHA1(523e99df3907a2c843c6e27df4d16799c4136a46))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("fire_u4.l1", 0x00000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -378,7 +392,7 @@ ROM_START(fire_l2)
 	ROM_LOAD("fire_u21.l2", 0x18000, 0x8000, CRC(2edde0a4) SHA1(de292a340a3a06b0b996fc69fee73eb7bbfbbe64))
 	ROM_LOAD("fire_u22.l2", 0x10000, 0x8000, CRC(16145c97) SHA1(523e99df3907a2c843c6e27df4d16799c4136a46))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("fire_u4.l1", 0x00000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -401,7 +415,7 @@ ROM_START(milln_l3)
 	ROM_LOAD("mill_u21.l1", 0x18000, 0x8000, CRC(4cd1ee90) SHA1(4e24b96138ced16eff9036303ca6347e3423dbfc))
 	ROM_LOAD("mill_u22.l1", 0x10000, 0x8000, CRC(73735cfc) SHA1(f74c873a20990263e0d6b35609fc51c08c9f8e31))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("mill_u4.l1", 0x00000, 0x8000, CRC(cf766506) SHA1(a6e4df19a513102abbce2653d4f72245f54407b1))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -424,7 +438,7 @@ ROM_START(pb_l5)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -444,7 +458,7 @@ ROM_START(pb_l1)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -464,7 +478,7 @@ ROM_START(pb_l2)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -484,7 +498,7 @@ ROM_START(pb_l3)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -504,7 +518,7 @@ ROM_START(pb_p4)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -521,9 +535,9 @@ GAME(1987, f14_p4,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams
 GAME(1987, f14_p5,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, fire_l3,  0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, fire_l2,  fire_l3, s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, milln_l3, 0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l5,    0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l1,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l2,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l3,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_p4,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, milln_l3, 0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l5,    0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l1,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l2,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l3,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_p4,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)
