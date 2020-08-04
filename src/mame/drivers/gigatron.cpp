@@ -2,13 +2,12 @@
 // copyright-holders:Sterophonick, Phil Thomas
 /***************************************************************************
 
-   Skeleton driver for Gigatron TTL Microcomputer
-   Driver by Sterophonick
+	Driver for Gigatron TTL Microcomputer by Sterophonick
+	
+	Based on Gigatron.js by Phil Thomas
+	https://github.com/PhilThomas/gigatron
 
 ***************************************************************************/
-
-//There is a pre-existing emulator here https://github.com/PhilThomas/gigatron
-//It's just a matter of translating it to MAME.
 
 #include "emu.h"
 #include "cpu/gigatron/gigatron.h"
@@ -77,6 +76,11 @@ private:
 
 void gigatron_state::video_start()
 {
+}
+
+void gigatron_state::port_out(uint8_t data)
+{
+	m_pixel = data;
 }
 
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -169,11 +173,6 @@ void gigatron_state::port_outx(uint8_t data)
 	//Blinkenlights
 	uint16_t light = data & 0xF;
 	m_lc ^= light;
-}
-
-void gigatron_state::port_out(uint8_t data)
-{
-	m_pixel = data;
 }
 
 void gigatron_state::gigatron(machine_config &config)
