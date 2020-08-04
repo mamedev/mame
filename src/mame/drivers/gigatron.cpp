@@ -60,7 +60,6 @@ private:
 	
 	uint8_t m_dacoutput;
 
-	void blinkenlights(uint8_t data);
 	void port_outx(uint8_t data);
 	void port_out(uint8_t data);
 
