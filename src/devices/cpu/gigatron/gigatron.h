@@ -2,11 +2,14 @@
 // copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
- * Skeleton device for Gigatron CPU Core
+ * Gigatron CPU Core
+ *
+ * Based on Gigatron.js by Phil Thomas
+ * https://github.com/PhilThomas/gigatron
+ *
+ * Ported to MAME framework by Sterophonick
  *
  *****************************************************************************/
-
- //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #ifndef MAME_CPU_GTRON_H
 #define MAME_CPU_GTRON_H
