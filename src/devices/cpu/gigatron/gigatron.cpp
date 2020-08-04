@@ -231,15 +231,15 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 		break;
 	case 6:
 	case 7:
-		uint16_t rising = ~(m_out & b);
+		uint8_t rising = (~m_out) & b;
 		m_out = b;
-		m_out_cb(0, m_out, 0xFF);
+		m_out_cb(0, m_out);
 
 		// rising edge of out[6] registers outx from ac
 		if (rising & 0x40)
 		{
 			m_outx = m_ac;
-			m_outx_cb(0, m_outx, 0xFF);
+			m_outx_cb(0, m_outx);
 		}
 		break;
 	}
