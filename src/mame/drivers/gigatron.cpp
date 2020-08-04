@@ -58,8 +58,6 @@ private:
 	uint8_t m_col;
 	uint8_t m_pixel;
 	
-	uint32_t m_pixels[640*480];
-	
 	uint8_t m_dacoutput;
 
 	void port_outx(uint8_t data);
