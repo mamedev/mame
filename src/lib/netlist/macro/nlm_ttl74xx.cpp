@@ -1773,22 +1773,30 @@ static NETLIST_START(TTL_74126_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM74153: Dual 4-Line to 1-Line Data Selectors Multiplexers
- *
- *          +--------------+
- *       G1 |1     ++    16| VCC
- *        B |2           15| G2
- *      1C3 |3           14| A
- *      1C2 |4   74153   13| 2C3
- *      1C1 |5           12| 2C2
- *      1C0 |6           11| 2C1
- *       Y1 |7           10| 2C0
- *      GND |8            9| Y2
- *          +--------------+
- *
- */
-
+//- Identifier: 54153/DM54153/DM74153
+//- Title: Dual 4-Line to 1-LineData Selectors/Multiplexers
+//- Description: Each of these data selectors/multiplexers contains inverters and drivers to supply fully complementary, on-chip, binary decoding data selection to the AND-OR-invert gates.
+//-   Separate strobe inputs are provided for each of the two four-line sections.
+//- Pinalias: G1,B,1C3,1C2,1C1,1C0,Y1,GND,Y2,2C0,2C1,2C2,2C3,A,G2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006547.PDF
+//-
+//-         +---+---+----+----+----+----+---++---+
+//-         | B | A | C0 | C1 | C2 | C3 | G || Y |
+//-         +===+===+====+====+====+====+===++===+
+//-         | X | X |  X |  X |  X |  X | 1 || 0 |
+//-         | 0 | 0 |  0 |  X |  X |  X | 0 || 0 |
+//-         | 0 | 0 |  1 |  X |  X |  X | 0 || 1 |
+//-         | 0 | 1 |  X |  0 |  X |  X | 0 || 0 |
+//-         | 0 | 1 |  X |  1 |  X |  X | 0 || 1 |
+//-         | 1 | 0 |  X |  X |  0 |  X | 0 || 0 |
+//-         | 1 | 0 |  X |  X |  1 |  X | 0 || 1 |
+//-         | 1 | 1 |  X |  X |  X |  0 | 0 || 0 |
+//-         | 1 | 1 |  X |  X |  X |  1 | 0 || 1 |
+//-         +---+---+----+----+----+----+---++---+
+//-
 static NETLIST_START(TTL_74153_DIP)
 	NET_REGISTER_DEV(TTL_74153, A)
 	NET_REGISTER_DEV(TTL_74153, B)
@@ -1812,35 +1820,47 @@ static NETLIST_START(TTL_74153_DIP)
 	)
 NETLIST_END()
 
-/*
- * DM74155/DM74156: Dual 2-Line to 4-Line Decoders/Demultiplexers
- *
- *      +-----+-------++-----------------+
- *      | B A | G1 C1 || 1Y0 1Y1 1Y2 1Y3 |
- *      +=====+=======++=================+
- *      | X X | 1  X  ||  1   1   1   1  |
- *      | 0 0 | 0  1  ||  0   1   1   1  |
- *      | 0 1 | 0  1  ||  1   0   1   1  |
- *      | 1 0 | 0  1  ||  1   1   0   1  |
- *      | 1 1 | 0  1  ||  1   1   1   0  |
- *      | X X | X  0  ||  1   1   1   1  |
- *      +-----+-------++-----------------+
- *
- *      +-----+-------++-----------------+
- *      | B A | G2 C2 || 2Y0 2Y1 2Y2 2Y3 |
- *      +=====+=======++=================+
- *      | X X | 1  X  ||  1   1   1   1  |
- *      | 0 0 | 0  0  ||  0   1   1   1  |
- *      | 0 1 | 0  0  ||  1   0   1   1  |
- *      | 1 0 | 0  0  ||  1   1   0   1  |
- *      | 1 1 | 0  0  ||  1   1   1   0  |
- *      | X X | X  1  ||  1   1   1   1  |
- *      +-----+-------++-----------------+
- *
- * Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 54LS155/DM54LS155/DM74LS155
+//- Title: Dual 2-Line to 4-Line Decoders/Demultiplexers
+//- Description: These TTL circuits feature dual 1-line-to-4-line demultiplexers with individual strobes and common binary-address inputs in a single 16-pin package.
+//-   When both sections are enabled by the strobes, the common address inputs sequentially select and route associated input data to the appropriate output of each section.
+//-   The individual strobes permit activating or inhibiting each of the 4-bit sections as desired.
+//-   Data applied to input C1 is inverted at its outputs anddata applied at C2 is true through its outputs.
+//-   The inverter following the C1 data input permits use as a 3-to-8-line decoder, or 1-to-8-line demultiplexer, without external gating.
+//-   Input clamping diodes are provided on these circuits to minimize transmission-line effects and simplify system design.
+//- Pinalias: C1,G1,B,1Y3,1Y2,1Y1,1Y0,GND,2Y0,2Y1,2Y2,2Y3,A,G2,C2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006395.PDF
+//-
+//-              2-line-to-4-line decoder                        2-line-to-4-line decoder
+//-     +---+---+----+----++-----+-----+-----+-----+    +---+---+----+----++-----+-----+-----+-----+
+//-     | B | A | G1 | C1 || 1Y0 | 1Y1 | 1Y2 | 1Y3 |    | B | A | G2 | C2 || 2Y0 | 2Y1 | 2Y2 | 2Y3 |
+//-     +===+===+====+====++=====+=====+=====+=====+    +===+===+====+====++=====+=====+=====+=====+
+//-     | X | X |  1 |  X ||  1  |  1  |  1  |  1  |    | X | X |  1 |  X ||  1  |  1  |  1  |  1  |
+//-     | 0 | 0 |  0 |  1 ||  0  |  1  |  1  |  1  |    | 0 | 0 |  0 |  0 ||  0  |  1  |  1  |  1  |
+//-     | 0 | 1 |  0 |  1 ||  1  |  0  |  1  |  1  |    | 0 | 1 |  0 |  0 ||  1  |  0  |  1  |  1  |
+//-     | 1 | 0 |  0 |  1 ||  1  |  1  |  0  |  1  |    | 1 | 0 |  0 |  0 ||  1  |  1  |  0  |  1  |
+//-     | 1 | 1 |  0 |  1 ||  1  |  1  |  1  |  0  |    | 1 | 1 |  0 |  0 ||  1  |  1  |  1  |  0  |
+//-     | X | X |  X |  0 ||  1  |  1  |  1  |  1  |    | X | X |  X |  1 ||  1  |  1  |  1  |  1  |
+//-     +---+---+----+----++-----+-----+-----+-----+    +---+---+----+----++-----+-----+-----+-----+
+//-
+//-                          3-line-to-8-line decoder
+//-     +---+---+---+---++-----+-----+-----+-----+-----+-----+-----+-----+
+//-     | C | B | A | G || 2Y0 | 2Y1 | 2Y2 | 2Y3 | 1Y0 | 1Y1 | 1Y2 | 1Y3 |
+//-     +===+===+===+===++=====+=====+=====+=====+=====+=====+=====+=====+
+//-     | X | X | X | 1 ||  1  |  1  |  1  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 0 | 0 | 0 ||  0  |  1  |  1  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 0 | 1 | 0 ||  1  |  0  |  1  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 1 | 0 | 0 ||  1  |  1  |  0  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 1 | 1 | 0 ||  1  |  1  |  1  |  0  |  1  |  1  |  1  |  1  |
+//-     | 1 | 0 | 0 | 0 ||  1  |  1  |  1  |  1  |  0  |  1  |  1  |  1  |
+//-     | 1 | 0 | 1 | 0 ||  1  |  1  |  1  |  1  |  1  |  0  |  1  |  1  |
+//-     | 1 | 1 | 0 | 0 ||  1  |  1  |  1  |  1  |  1  |  1  |  0  |  1  |
+//-     | 1 | 1 | 1 | 0 ||  1  |  1  |  1  |  1  |  1  |  1  |  1  |  0  |
+//-     +---+---+---+---++-----+-----+-----+-----+-----+-----+-----+-----+
+//-
 static NETLIST_START(TTL_74155_DIP)
 	NET_REGISTER_DEV(TTL_74155A_GATE, A)
 	NET_REGISTER_DEV(TTL_74155B_GATE, B)
@@ -1851,19 +1871,60 @@ static NETLIST_START(TTL_74155_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.C,  /*    C1 |1     ++    16| VCC  */ A.VCC,
-		A.G,  /*    G1 |2           15| B4   */ B.C,
-		A.B,  /*     B |3           14| B4   */ B.G,
-		A.3,  /*   1Y3 |4   74155   13| A4   */ B.A,
-		B.2,  /*   1Y2 |5           12| Y4   */ B.3,
-		B.1,  /*   1Y1 |6           11| B3   */ B.2,
-		B.0,  /*   1Y0 |7           10| A3   */ B.1,
-		A.GND,/*   GND |8            9| Y3   */ B.0
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.C, /*    C1 |1     ++    16| VCC  */ A.VCC,
+		  A.G, /*    G1 |2           15| B4   */ B.C,
+		  A.B, /*     B |3           14| B4   */ B.G,
+		  A.3, /*   1Y3 |4   74155   13| A4   */ B.A,
+		  B.2, /*   1Y2 |5           12| Y4   */ B.3,
+		  B.1, /*   1Y1 |6           11| B3   */ B.2,
+		  B.0, /*   1Y0 |7           10| A3   */ B.1,
+		A.GND, /*   GND |8            9| Y3   */ B.0
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
+//- Identifier: 54LS156/DM54LS156/DM74LS156
+//- Title: Dual 2-Line to 4-Line Decoders/Demultiplexers with Open-Collector Outputs
+//- Description: These TTL circuits feature dual 1-line-to-4-line demultiplexers with individual strobes and common binary-address inputs in a single 16-pin package.
+//-   When both sections are enabled by the strobes, the common address inputs sequentially select and route associated input data to the appropriate output of each section.
+//-   The individual strobes permit activating or inhibiting each of the 4-bit sections as desired.
+//-   Data applied to input C1 is inverted at its outputs anddata applied at C2 is true through its outputs.
+//-   The inverter following the C1 data input permits use as a 3-to-8-line decoder, or 1-to-8-line demultiplexer, without external gating.
+//-   Input clamping diodes are provided on these circuits to minimize transmission-line effects and simplify system design.
+//- Pinalias: C1,G1,B,1Y3,1Y2,1Y1,1Y0,GND,2Y0,2Y1,2Y2,2Y3,A,G2,C2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006395.PDF
+//-
+//-              2-line-to-4-line decoder                        2-line-to-4-line decoder
+//-     +---+---+----+----++-----+-----+-----+-----+    +---+---+----+----++-----+-----+-----+-----+
+//-     | B | A | G1 | C1 || 1Y0 | 1Y1 | 1Y2 | 1Y3 |    | B | A | G2 | C2 || 2Y0 | 2Y1 | 2Y2 | 2Y3 |
+//-     +===+===+====+====++=====+=====+=====+=====+    +===+===+====+====++=====+=====+=====+=====+
+//-     | X | X |  1 |  X ||  1  |  1  |  1  |  1  |    | X | X |  1 |  X ||  1  |  1  |  1  |  1  |
+//-     | 0 | 0 |  0 |  1 ||  0  |  1  |  1  |  1  |    | 0 | 0 |  0 |  0 ||  0  |  1  |  1  |  1  |
+//-     | 0 | 1 |  0 |  1 ||  1  |  0  |  1  |  1  |    | 0 | 1 |  0 |  0 ||  1  |  0  |  1  |  1  |
+//-     | 1 | 0 |  0 |  1 ||  1  |  1  |  0  |  1  |    | 1 | 0 |  0 |  0 ||  1  |  1  |  0  |  1  |
+//-     | 1 | 1 |  0 |  1 ||  1  |  1  |  1  |  0  |    | 1 | 1 |  0 |  0 ||  1  |  1  |  1  |  0  |
+//-     | X | X |  X |  0 ||  1  |  1  |  1  |  1  |    | X | X |  X |  1 ||  1  |  1  |  1  |  1  |
+//-     +---+---+----+----++-----+-----+-----+-----+    +---+---+----+----++-----+-----+-----+-----+
+//-
+//-                          3-line-to-8-line decoder
+//-     +---+---+---+---++-----+-----+-----+-----+-----+-----+-----+-----+
+//-     | C | B | A | G || 2Y0 | 2Y1 | 2Y2 | 2Y3 | 1Y0 | 1Y1 | 1Y2 | 1Y3 |
+//-     +===+===+===+===++=====+=====+=====+=====+=====+=====+=====+=====+
+//-     | X | X | X | 1 ||  1  |  1  |  1  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 0 | 0 | 0 ||  0  |  1  |  1  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 0 | 1 | 0 ||  1  |  0  |  1  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 1 | 0 | 0 ||  1  |  1  |  0  |  1  |  1  |  1  |  1  |  1  |
+//-     | 0 | 1 | 1 | 0 ||  1  |  1  |  1  |  0  |  1  |  1  |  1  |  1  |
+//-     | 1 | 0 | 0 | 0 ||  1  |  1  |  1  |  1  |  0  |  1  |  1  |  1  |
+//-     | 1 | 0 | 1 | 0 ||  1  |  1  |  1  |  1  |  1  |  0  |  1  |  1  |
+//-     | 1 | 1 | 0 | 0 ||  1  |  1  |  1  |  1  |  1  |  1  |  0  |  1  |
+//-     | 1 | 1 | 1 | 0 ||  1  |  1  |  1  |  1  |  1  |  1  |  1  |  0  |
+//-     +---+---+---+---++-----+-----+-----+-----+-----+-----+-----+-----+
+//-
 static NETLIST_START(TTL_74156_DIP)
 	NET_REGISTER_DEV(TTL_74156A_GATE, A)
 	NET_REGISTER_DEV(TTL_74156B_GATE, B)
@@ -1874,36 +1935,40 @@ static NETLIST_START(TTL_74156_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.C,  /*    C1 |1     ++    16| VCC  */ A.VCC,
-		A.G,  /*    G1 |2           15| B4   */ B.C,
-		A.B,  /*     B |3           14| B4   */ B.G,
-		A.3,  /*   1Y3 |4   74156   13| A4   */ B.A,
-		B.2,  /*   1Y2 |5           12| Y4   */ B.3,
-		B.1,  /*   1Y1 |6           11| B3   */ B.2,
-		B.0,  /*   1Y0 |7           10| A3   */ B.1,
-		A.GND,/*   GND |8            9| Y3   */ B.0
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.C, /*    C1 |1     ++    16| VCC  */ A.VCC,
+		  A.G, /*    G1 |2           15| B4   */ B.C,
+		  A.B, /*     B |3           14| B4   */ B.G,
+		  A.3, /*   1Y3 |4   74156   13| A4   */ B.A,
+		  B.2, /*   1Y2 |5           12| Y4   */ B.3,
+		  B.1, /*   1Y1 |6           11| B3   */ B.2,
+		  B.0, /*   1Y0 |7           10| A3   */ B.1,
+		A.GND, /*   GND |8            9| Y3   */ B.0
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- * DM74157: Quad 2-Input Multiplexor
- *
- *      +---+---+-------+---+
- *      | E | S | I0 I1 | Z |
- *      +===+===+=======+===+
- *      | 1 | X |  X  X | 0 |
- *      | 0 | 1 |  X  0 | 0 |
- *      | 0 | 1 |  X  1 | 1 |
- *      | 0 | 0 |  0  X | 0 |
- *      | 0 | 0 |  1  X | 1 |
- *      +---+---+-------+---+
- *
- * Naming conventions follow TI datasheet
- *
- */
-
+//- Identifier: 54157/DM54157/DM74157
+//- Title: Quad 2-Line to 1-Line Data Selectors/Multiplexers
+//- Description: These data selectors/multiplexers contain inverters and drivers to supply full on-chip data selection to the four output gates.
+//-   A separate strobe input is provided.
+//-   A 4-bit word is selected from one of two sources and is routed to the four outputs.
+//- Pinalias: S,A1,B1,Y1,A2,B2,Y2,GND,Y3,B3,A3,Y4,B4,A4,G,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheets/120/236599_DS.pdf
+//-
+//-     +---+---+---+---++---+
+//-     | G | S | A | B || Y |
+//-     +===+===+===+===++===+
+//-     | 1 | X | X | X || 0 |
+//-     | 0 | 0 | 0 | X || 0 |
+//-     | 0 | 0 | 1 | X || 1 |
+//-     | 0 | 1 | X | 0 || 0 |
+//-     | 0 | 1 | X | 1 || 1 |
+//-     +---+---+---+---++---+
+//-
 static NETLIST_START(TTL_74157_DIP)
 	NET_REGISTER_DEV(TTL_74157_GATE, A)
 	NET_REGISTER_DEV(TTL_74157_GATE, B)
@@ -1916,34 +1981,42 @@ static NETLIST_START(TTL_74157_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.S,  /*     S |1     ++    16| VCC  */ A.VCC,
-		A.I,  /*   I0a |2           15| /E   */ A.E,
-		A.J,  /*   I1a |3           14| I0c  */ C.I,
-		A.O,  /*    Za |4   74157   13| I1c  */ C.J,
-		B.I,  /*   I0b |5           12| Zc   */ C.O,
-		B.J,  /*   I1b |6           11| I0d  */ D.I,
-		B.O,  /*    Zb |7           10| I1d  */ D.J,
-		A.GND,/*   GND |8            9| Zd   */ D.O
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.S, /*     S |1     ++    16| VCC  */ A.VCC,
+		  A.I, /*    A1 |2           15| G    */ A.E,
+		  A.J, /*    B1 |3           14| A4   */ D.I,
+		  A.O, /*    Y1 |4   74157   13| B4   */ D.J,
+		  B.I, /*    A2 |5           12| Y4   */ D.O,
+		  B.J, /*    B2 |6           11| A3   */ C.I,
+		  B.O, /*    Y2 |7           10| B3   */ C.J,
+		A.GND, /*   GND |8            9| Y3   */ C.O
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM74161/74163: Synchronous 4-Bit Counters
- *
- *          +--------------+
- *    CLEAR |1     ++    16| VCC
- *    CLOCK |2           15| RC (Ripple Carry)
- *        A |3           14| QA
- *        B |4   74161   13| QB
- *        C |5   74163   12| QC
- *        D |6           11| QD
- * Enable P |7           10| Enable T
- *      GND |8            9| LOAD
- *          +--------------+
- */
-
+//- Identifier: DM54161/DM74161
+//- Title: Synchronous 4-Bit Counter
+//- Description: These synchronous, presettable counters feature an internal carry look-ahead for application in high-speed counting designs.
+//-   The 161 is a 4-bit binary counter.
+//-   The carry output is decoded by means of a NOR gate, thus preventing spikes during the normal counting mode of operation.
+//-   Synchronous operation is provided by having all flip-flops clocked simultaneously so that the outputs change co-incident with each other when so instructed by the count-enable inputs and internal gating.
+//-   This mode of operation eliminates the output counting spikes which are normally associated with asynchronous (ripple clock) counters.
+//-   A buffered clock input triggers the four flip-flops on the rising (positive-going) edge of the clock input waveform.
+//-   These counters are fully programmable; that is, the outputs may be preset to either level.
+//-   As presetting is synchronous, setting up a low level at the load input disables the counter and causes the outputs to agree with the setup data after the next clock pulse, regardless of the levels of the enable input.
+//-   The clear function for the 161 is asynchronous; and a low level at the clear input sets all four of the flip-flop outputs low, regardless of the levels of clock, load, or enable inputs.
+//-   The carry look-ahead circuitry provides for cascading counters for n-bit synchronous applications without additional gating.
+//-   Instrumental in accomplishing this function are two count-enable inputs and a ripple carry output.
+//-   Both count-enable inputs (P and T) must be high to count, and input T is fed forward to enable the ripple carry output.
+//-   The ripple carry output thus enabled will produce a high-level output pulse with a duration approximately equal to the high-level portion of the QA output.
+//-   This high-level overflow ripple carry pulse can be used to enable successive cascaded stages.
+//-   High-to-low-level transitions at the enable P or T inputs of the 161 may occur, regardless of the logic level on the clock.
+//- Pinalias: CLRQ,CLK,A,B,C,D,ENP,GND,LOADQ,ENT,QD,QC,QB,QA,RC,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006551.PDF
+//-
 static NETLIST_START(TTL_74161_DIP)
 	TTL_74161(A)
 
@@ -1960,6 +2033,32 @@ static NETLIST_START(TTL_74161_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: DM74163
+//- Title: Synchronous 4-Bit Counter
+//- Description: These synchronous, presettable counters feature an internal carry look-ahead for application in high-speed counting designs.
+//-   The 163 is a 4-bit binary counter.
+//-   The carry output is decoded by means of a NOR gate, thus preventing spikes during the normal counting mode of operation.
+//-   Synchronous operation is provided by having all flip-flops clocked simultaneously so that the outputs change co-incident with each other when so instructed by the count-enable inputs and internal gating.
+//-   This mode of operation eliminates the output counting spikes which are normally associated with asynchronous (ripple clock) counters.
+//-   A buffered clock input triggers the four flip-flops on the rising (positive-going) edge of the clock input waveform.
+//-   These counters are fully programmable; that is, the outputs may be preset to either level.
+//-   As presetting is synchronous, setting up a low level at the load input disables the counter and causes the outputs to agree with the setup data after the next clock pulse, regardless of the levels of the enable input.
+//-   The clear function for the 163 is synchronous; and a low level at the clear input sets all four of the flip-flop outputs low after the next clock pulse, regardless of the levels of the enable inputs.
+//-   This synchronous clear allows the count length to be modified easily, as decoding the maximum count desired can be  accomplished with one external NAND gate.
+//-   The gate output is connected to the clear input to synchronously clear the counter to all low outputs.
+//-   Low-to-high transitions at the clear input of the 163 are also permissible, regardless of the logic levels on the clock,enable, or load inputs.
+//-   The carry look-ahead circuitry provides for cascading counters for n-bit synchronous applications without additional gating.
+//-   Instrumental in accomplishing this function are two count-enable inputs and a ripple carry output.
+//-   Both count-enable inputs (P and T) must be high to count, and input T is fed forward to enable the ripple carry output.
+//-   The ripple carry output thus enabled will produce a high-level output pulse with a duration approximately equal to the high-level portion of the QA output.
+//-   This high-level overflow ripple carry pulse can be used to enable successive cascaded stages.
+//-   High-to-low-level transitions at the enable P or T inputs of the 163 may occur, regardless of the logic level on the clock.
+//- Pinalias: CLRQ,CLK,A,B,C,D,ENP,GND,LOADQ,ENT,QD,QC,QB,QA,RC,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006551.PDF
+//-
 static NETLIST_START(TTL_74163_DIP)
 	TTL_74163(A)
 
@@ -1976,20 +2075,30 @@ static NETLIST_START(TTL_74163_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM74164: 8-bit parallel-out serial shift registers
- *
- *      +------------+
- *    A |1    ++   14| VCC
- *    B |2         13| QH
- *   QA |3         12| QG
- *   QB |4  74164  11| QF
- *   QC |5         10| QE
- *   QD |6          9| CLRQ
- *  GND |7          8| CLK
- *      +------------+
- */
-
+//- Identifier: DM74164
+//- Title: 8-Bit Serial In/Parallel Out Shift Registers
+//- Description: These 8-bit shift registers feature gated serial inputs and an asynchronous clear.
+//-   A LOW logic level at either serial input inhibits entry of the new data, and resets the first flip-flop to the LOW level at the next clock pulse, thus providing complete control over incoming data.
+//-   A HIGH logic level on either input enables the other input, which will then determine the state of the first flip-flop.
+//-   Data at the serial inputs may be changed while the clock is HIGH or LOW, but only information meeting the setup and hold time requirements will be entered.
+//-   Clocking occurs on the LOW-to-HIGH level transition of the clock input.
+//-   All inputs are diode-clamped to minimize transmission-line effects
+//- Pinalias: A,B,QA,QB,QC,QD,GND,CLOCK,CLEAR,QE,QF,QG,QH,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/fairchild/DM74164.pdf
+//-
+//-     +-------+-------+---+---++----+----+-----+----+
+//-     | CLEAR | CLOCK | A | B || QA | QB | ... | QH |
+//-     +=======+=======+===+===++====+====+=====+====+
+//-     |   0   |   X   | X | X ||  0 |  0 | ... |  0 |
+//-     |   1   |   0   | X | X || QA | QB | ... | QH |
+//-     |   1   |  0-1  | 1 | 1 ||  1 | QA | ... | QG |
+//-     |   1   |  0-1  | 0 | X ||  0 | QA | ... | QG |
+//-     |   1   |  0-1  | X | 0 ||  0 | QA | ... | QG |
+//-     +-------+-------+---+---++----+----+-----+----+
+//-
 static NETLIST_START(TTL_74164_DIP)
 	TTL_74164(A)
 
@@ -2005,52 +2114,74 @@ static NETLIST_START(TTL_74164_DIP)
 	)
 NETLIST_END()
 
-/*
- *  74165: Parallel-Load 8-Bit Shift Register
- *
- *          +--------------+
- *   SH/LDQ |1     ++    16| VCC
- *      CLK |2           15| CLKINH
- *        E |3           14| D
- *        F |4    74165  13| C
- *        G |5           12| B
- *        H |6           11| A
- *      QHQ |7           10| SER
- *      GND |8            9| QH
- *          +--------------+
- */
-
+//- Identifier: 54165/DM74165
+//- Title: 8-Bit Parallel-to-Serial Converter
+//- Description: The ’165 is an 8-bit parallel load or serial-in register with complementary outputs available from the last stage.
+//-   Parallel inputting occurs asynchronously when the Parallel Load (PL) input is LOW.
+//-   With PL HIGH, serial shifting occurs on the rising edge of the clock; new data enters via the Serial Data (DS) input.
+//-   The 2-input OR clock can be used to combine two independent clock sources, or one input can act as an active LOW clock enable.
+//- Pinalias: PLQ,CP1,P4,P5,P6,P7,QQ7,GND,Q7,DS,P0,P1,P2,P3,CP2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009782.PDF
+//-
+//-     +-----+-----+-----++----+----+----+----+----+----+----+----+
+//-     | PLQ | CP1 | CP2 || Q0 | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 |
+//-     +=====+=====+=====++====+====+====+====+====+====+====+====+
+//-     |  0  |  X  |  X  || P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
+//-     |  1  |  0  | 0-1 || DS | Q0 | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 |
+//-     |  1  |  1  | 0-1 || Q0 | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 |
+//-     |  1  | 0-1 |  0  || DS | Q0 | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 |
+//-     |  1  | 0-1 |  1  || Q0 | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 |
+//-     +-----+-----+-----++----+----+----+----+----+----+----+----+
+//-
 static NETLIST_START(TTL_74165_DIP)
 	TTL_74165(A)
 
-	DIPPINS(      /*        +--------------+        */
-		A.SH_LDQ, /* SH/LDQ |1     ++    16| VCC    */ A.VCC,
-		   A.CLK, /*    CLK |2           15| CLKINH */ A.CLKINH,
-		     A.E, /*      E |3           14| D      */ A.D,
-		     A.F, /*      F |4    74165  13| C      */ A.C,
-		     A.G, /*      G |5           12| B      */ A.B,
-		     A.H, /*      H |6           11| A      */ A.A,
-		   A.QHQ, /*    QHQ |7           10| SER    */ A.SER,
-		   A.GND, /*    GND |8            9| QH     */ A.QH
-			      /*        +--------------+        */
+	DIPPINS(      /*      +--------------+      */
+		A.SH_LDQ, /*  PLQ |1     ++    16| VCC  */ A.VCC,
+		   A.CLK, /*  CP1 |2           15| CP2  */ A.CLKINH,
+		     A.E, /*   P4 |3           14| P3   */ A.D,
+		     A.F, /*   P5 |4    74165  13| P2   */ A.C,
+		     A.G, /*   P6 |5           12| P1   */ A.B,
+		     A.H, /*   P7 |6           11| P0   */ A.A,
+		   A.QHQ, /*  QQ7 |7           10| DS   */ A.SER,
+		   A.GND, /*  GND |8            9| Q7   */ A.QH
+			      /*      +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  74166: Parallel-Load 8-Bit Shift Register
- *
- *          +--------------+
- *      SER |1     ++    16| VCC
- *        A |2           15| SH/LDQ
- *        B |3           14| H
- *        C |4    74166  13| QH
- *        D |5           12| G
- *   CLKINH |6           11| F
- *      CLK |7           10| E
- *      GND |8            9| CLRQ
- *          +--------------+
- */
-
+//- Identifier: DM74LS166
+//- Title: 8-Bit Parallel-In/Serial-Out Shift Registers
+//- Description: These parallel-in or serial-in, serial-out shift registers feature gated clock inputs and an overriding clear input.
+//-   All inputs are buffered to lower the drive requirements to one normalized load, and input clamping diodes minimize switching transients to simplify system design.
+//-   The load mode is established by the shift/load input.
+//-   When high, this input enables the serial data input and couples the eight flip-flops for serial shifting with each clock pulse.
+//-   When low, the parallel (broadside) data inputs are enabled and synchronous loading occurs on the next clock pulse.
+//-   During parallel loading, serial data flow is inhibited.
+//-   Clocking is accomplished on the low-to-high-level edge of the clock pulse through a two-input NOR gate, permitting one input to be used as a clock-enable or clock-inhibit function.
+//-   Holding either of the clock inputs high inhibits clocking; holding either low enables the other clock input.
+//-   This allows the system clock to be free running, and the register can be stopped on command with the other clock input.
+//-   The clock-inhibit input should be changed to the high level only while the clock input is high.
+//-   A buffered, direct clear input overrides all other inputs, including the clock, and sets all flip-flops to zero.
+//- Pinalias: SER,A,B,C,D,CLKINH,CLK,GND,CLRQ,E,F,G,QH,H,SH/LDQ,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006400.PDF
+//-
+//-     +------+--------+--------+-----+-----+------++----+----+-----+----+
+//-     | CLRQ | SH/LDQ | CLKINH | CLK | SER | A..H || QA | QB | ... | QH |
+//-     +======+========+========+=====+=====+======++====+====+=====+====+
+//-     |   0  |    X   |    X   |  X  |  X  |   X  ||  0 |  0 | ... |  0 |
+//-     |   1  |    X   |    0   |  0  |  X  |   X  || QA | QB | ... | QH |
+//-     |   1  |    0   |    0   | 0-1 |  X  | a..h ||  a |  b | ... |  h |
+//-     |   1  |    1   |    0   | 0-1 |  1  |   X  ||  1 | QA | ... | QG |
+//-     |   1  |    1   |    0   | 0-1 |  0  |   X  ||  0 | QA | ... | QG |
+//-     |   1  |    X   |    1   | 0-1 |  X  |   X  || QA | QB | ... | QH |
+//-     +------+--------+--------+-----+-----+------++----+----+-----+----+
+//-
 static NETLIST_START(TTL_74166_DIP)
 	TTL_74166(A)
 
@@ -2067,21 +2198,28 @@ static NETLIST_START(TTL_74166_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM74174: Hex D Flip-Flops with Clear
- *
- *          +--------------+
- *      CLR |1     ++    16| VCC
- *       Q1 |2           15| Q6
- *       D1 |3           14| D6
- *       D2 |4   74174   13| D5
- *       Q2 |5           12| Q5
- *       D3 |6           11| D4
- *       Q3 |7           10| Q4
- *      GND |8            9| CLK
- *          +--------------+
- */
-
+//- Identifier: DM74174
+//- Title: Hex/Quad D-Type Flip-Flop with Clear
+//- Description: These positive-edge triggered flip-flops utilize TTL circuitry to implement D-type flip-flop logic.
+//-   All have a direct clear input.
+//-   Information at the D inputs meeting the setup and hold time requirements is transferred to the Q outputs on the positive-going edge of the clock pulse.
+//-   Clock triggering occurs at a particular voltage level and is not directly related to the transition time of the positive-going pulse.
+//-   When the clock input is at either the HIGH or LOW level, the D input signal has no effect at the output.
+//- Pinalias: CLRQ,Q1,D1,D2,Q2,D3,Q3,GND,CLK,Q4,D4,Q5,D5,Q6,D6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/fairchild/DM74174.pdf
+//-
+//-     +------+-----+---++---+
+//-     | CLRQ | CLK | D || Q |
+//-     +======+=====+===++===+
+//-     |   0  |  X  | X || 0 |
+//-     |   1  | 0-1 | 1 || 1 |
+//-     |   1  | 0-1 | 0 || 0 |
+//-     |   1  |  0  | X || Q |
+//-     +------+-----+---++---+
+//-
 static NETLIST_START(TTL_74174_DIP)
 	TTL_74174_GATE(A)
 	TTL_74174_GATE(B)
@@ -2090,38 +2228,39 @@ static NETLIST_START(TTL_74174_DIP)
 	TTL_74174_GATE(E)
 	TTL_74174_GATE(F)
 
-	DIPPINS(    /*     +--------------+     */
-		A.CLRQ, /* CLR |1     ++    16| VCC */ A.VCC,
-		   A.Q, /*  Q1 |2           15| Q6  */ F.Q,
-		   A.D, /*  D1 |3           14| D6  */ F.D,
-		   B.D, /*  D2 |4   74174   13| D5  */ E.D,
-		   B.Q, /*  Q2 |5           12| Q5  */ E.Q,
-		   C.D, /*  D3 |6           11| D4  */ D.D,
-		   C.Q, /*  Q3 |7           10| Q4  */ D.Q,
-		 A.GND, /* GND |8            9| CLK */ A.CLK
-			    /*     +--------------+     */
+	DIPPINS(    /*      +--------------+      */
+		A.CLRQ, /* CLRQ |1     ++    16| VCC  */ A.VCC,
+		   A.Q, /*   Q1 |2           15| Q6   */ F.Q,
+		   A.D, /*   D1 |3           14| D6   */ F.D,
+		   B.D, /*   D2 |4   74174   13| D5   */ E.D,
+		   B.Q, /*   Q2 |5           12| Q5   */ E.Q,
+		   C.D, /*   D3 |6           11| D4   */ D.D,
+		   C.Q, /*   Q3 |7           10| Q4   */ D.Q,
+		 A.GND, /*  GND |8            9| CLK  */ A.CLK
+			    /*      +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM74260: Dual 5-Input NOR Gates
- *                 _________
- *             Y = A+B+C+D+E
- *          +---+---+---+---+---++---+
- *          | A | B | B | B | B || Y |
- *          +===+===+===+===+===++===+
- *          | 0 | 0 | 0 | 0 | 0 || 1 |
- *          | 0 | 0 | 0 | 0 | 1 || 0 |
- *          | 0 | 0 | 0 | 1 | 0 || 0 |
- *          | 0 | 0 | 1 | 0 | 0 || 0 |
- *          | 0 | 1 | 0 | 0 | 0 || 0 |
- *          | 1 | 0 | 0 | 0 | 0 || 0 |
- *          +---+---+---+---+---++---+
- *
- *  Naming conventions follow Texas Instruments datasheet
- *
- */
-
+//- Identifier: DM54LS260/DM74LS260
+//- Title: Dual 5-Input NOR Gate
+//- Description: This device contains two individual five input gates, each of which perform the logic NOR function.
+//- Pinalias: A1,B1,C1,A2,Q1,Q2,GND,B2,C2,D2,E2,D1,E1,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009824.PDF
+//-
+//-     +---+---+---+---+---++---+
+//-     | A | B | C | D | E || Y |
+//-     +===+===+===+===+===++===+
+//-     | 0 | 0 | 0 | 0 | 0 || 1 |
+//-     | X | X | X | X | 1 || 0 |
+//-     | X | X | X | 1 | X || 0 |
+//-     | X | X | 1 | X | X || 0 |
+//-     | X | 1 | X | X | X || 0 |
+//-     | 1 | X | X | X | X || 0 |
+//-     +---+---+---+---+---++---+
+//-
 static NETLIST_START(TTL_74260_DIP)
 	TTL_74260_GATE(A)
 	TTL_74260_GATE(B)
@@ -2129,36 +2268,37 @@ static NETLIST_START(TTL_74260_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.C,  /*    C1 |1     ++    14| VCC  */ A.VCC,
-		A.D,  /*    D1 |2           13| B1   */ A.B,
-		A.E,  /*    E1 |3           12| A1   */ A.A,
-		B.E,  /*    E2 |4   74260   11| D2   */ B.D,
-		A.Q,  /*    Y1 |5           10| C2   */ B.C,
-		B.Q,  /*    Y2 |6            9| B2   */ B.B,
-		A.GND,/*   GND |7            8| A2   */ B.A
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.C, /*    C1 |1     ++    14| VCC  */ A.VCC,
+		  A.D, /*    D1 |2           13| B1   */ A.B,
+		  A.E, /*    E1 |3           12| A1   */ A.A,
+		  B.E, /*    E2 |4   74260   11| D2   */ B.D,
+		  A.Q, /*    Y1 |5           10| C2   */ B.C,
+		  B.Q, /*    Y2 |6            9| B2   */ B.B,
+		A.GND, /*   GND |7            8| A2   */ B.A
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM74279: Quad S-R Latch
- *
- *          +---+---+---++---+
- *          |S1 |S2 | R || Q |
- *          +===+===+===++===+
- *          | 0 | 0 | 0 || 1 |
- *          | 0 | 1 | 1 || 1 |
- *          | 1 | 0 | 1 || 1 |
- *          | 1 | 1 | 0 || 0 |
- *          | 1 | 1 | 1 ||QP |
- *          +---+---+---++---+
- *
- *  QP: Previous Q
- *
- *  Naming conventions follow Fairchild Semiconductor datasheet
- *
- */
+//- Identifier: 54279/DM74279
+//- Title: Quad Set-Reset Latch
+//- Description: This device contains four independent set-reset type flip-flops with one Q output each.
+//- Pinalias: 1RQ,1S1Q,1S2Q,1Q,2RQ,2SQ,2Q,GND,3Q,3RQ,3S1Q,3S2Q,4Q,4RQ,4SQ,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009785.PDF
+//-
+//-     +-----+-----+----++---+
+//-     | S1Q | S2Q | RQ || Q |
+//-     +=====+=====+====++===+
+//-     |  0  |  0  |  0 || 1 | (as long as SQ1 or SQ2 are low)
+//-     |  0  |  X  |  1 || 1 |
+//-     |  X  |  0  |  1 || 1 |
+//-     |  1  |  1  |  0 || 0 |
+//-     |  1  |  1  |  1 || Q |
+//-     +-----+-----+----++---+
+//-
 #ifndef __PLIB_PREPROCESSOR__
 #if !NL_AUTO_DEVICES
 #define TTL_74279A(name)                                                         \
@@ -2177,26 +2317,38 @@ static NETLIST_START(TTL_74279_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(   /*     +--------------+     */
-		A.R,   /*  1R |1     ++    16| VCC */ A.VCC,
-		A.S1,  /* 1S1 |2           15| 4S  */ D.S,
-		A.S2,  /* 1S2 |3           14| 4R  */ D.R,
-		A.Q,   /*  1Q |4    74279  13| 4Q  */ D.Q,
-		B.R,   /*  2R |5           12| 3S2 */ C.S2,
-		B.S,   /*  2S |6           11| 3S1 */ C.S1,
-		B.Q,   /*  2Q |7           10| 3R  */ C.R,
-		A.GND, /* GND |8            9| 3Q  */ C.Q
-			   /*     +--------------+     */
+	DIPPINS(   /*      +--------------+      */
+		  A.R, /*  1RQ |1     ++    16| VCC  */ A.VCC,
+		 A.S1, /* 1S1Q |2           15| 4SQ  */ D.S,
+		 A.S2, /* 1S2Q |3           14| 4RQ  */ D.R,
+		  A.Q, /*   1Q |4    74279  13| 4Q   */ D.Q,
+		  B.R, /*  2RQ |5           12| 3S2Q */ C.S2,
+		  B.S, /*  2SQ |6           11| 3S1Q */ C.S1,
+		  B.Q, /*   2Q |7           10| 3RQ  */ C.R,
+		A.GND, /*  GND |8            9| 3Q   */ C.Q
+			   /*      +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM74377: Octal D Flip-Flop With Enable
- *  DM74378: Hex D Flip-Flop With Enable
- *  DM74379: 4-bit D Flip-Flop With Enable
- *
- */
-
+//- Identifier: DM54LS377/DM74LS377
+//- Title: Octal D Flip-Flop with Common Enable and Clock
+//- Description: The ’LS377 is an 8-bit register built using advanced low power Schottky technology.
+//-   This register consists of eight D-type flip-flops with a buffered common clock and a buffered common input enable.
+//-   The device is packaged in the space-saving (0.3 inch row spacing) 20-pin package.
+//- Pinalias: EQ,Q0,D0,D1,Q1,Q2,D2,D3,Q3,GND,CP,Q4,D4,D5,Q5,Q6,D6,D7,Q7,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009785.PDF
+//-
+//-     +----+-----+----++----+
+//-     | EQ |  CP | Dn || Qn |
+//-     +====+=====+====++====+
+//-     |  1 |  X  |  X || Qn |
+//-     |  0 | 0-1 |  1 ||  1 |
+//-     |  0 | 0-1 |  0 ||  0 |
+//-     +----+-----+----++----+
+//-
 static NETLIST_START(TTL_74377_DIP)
 	TTL_74377_GATE(A)
 	TTL_74377_GATE(B)
@@ -2221,21 +2373,39 @@ static NETLIST_START(TTL_74377_DIP)
 	HINT(G.QQ, NC)
 	HINT(H.QQ, NC)
 
-	DIPPINS(  /*       +--------------+      */
-		A.E,  /*    /E |1     ++    20| VCC  */ A.VCC,
-		A.Q,  /*    Q0 |2           19| Q7   */ H.Q,
-		A.D,  /*    D0 |3           18| D7   */ H.D,
-		B.D,  /*    D1 |4   74377   17| D6   */ G.D,
-		B.Q,  /*    Q1 |5           16| Q6   */ G.Q,
-		C.Q,  /*    Q2 |6           15| Q5   */ F.Q,
-		C.D,  /*    D2 |7           14| D5   */ F.D,
-		D.D,  /*    D3 |8           13| D4   */ E.D,
-		D.Q,  /*    Q3 |9           12| Q4   */ E.Q,
-		A.GND,/*   GND |10          11| CP   */ A.CP
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.E, /*    EQ |1     ++    20| VCC  */ A.VCC,
+		  A.Q, /*    Q0 |2           19| Q7   */ H.Q,
+		  A.D, /*    D0 |3           18| D7   */ H.D,
+		  B.D, /*    D1 |4   74377   17| D6   */ G.D,
+		  B.Q, /*    Q1 |5           16| Q6   */ G.Q,
+		  C.Q, /*    Q2 |6           15| Q5   */ F.Q,
+		  C.D, /*    D2 |7           14| D5   */ F.D,
+		  D.D, /*    D3 |8           13| D4   */ E.D,
+		  D.Q, /*    Q3 |9           12| Q4   */ E.Q,
+		A.GND, /*   GND |10          11| CP   */ A.CP
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
+//- Identifier: DM54LS378/DM74LS378
+//- Title: Parallel D Register with Enable
+//- Description: The ’LS378 is a 6-bit register with a buffered common enable.
+//-   This device is similar to the ’LS174, but with common Enable rather than common Master Reset.
+//- Pinalias: EQ,Q0,D0,D1,Q1,D2,Q2,GND,CP,Q3,D3,Q4,D4,D5,Q6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009832.PDF
+//-
+//-     +----+-----+----++----+
+//-     | EQ |  CP | Dn || Qn |
+//-     +====+=====+====++====+
+//-     |  1 |  X  |  X || Qn |
+//-     |  0 | 0-1 |  1 ||  1 |
+//-     |  0 | 0-1 |  0 ||  0 |
+//-     +----+-----+----++----+
+//-
 static NETLIST_START(TTL_74378_DIP)
 	TTL_74377_GATE(A)
 	TTL_74377_GATE(B)
@@ -2249,19 +2419,37 @@ static NETLIST_START(TTL_74378_DIP)
 	NET_C(A.CP, B.CP, C.CP, D.CP, E.CP, F.CP)
 	NET_C(A.E, B.E, C.E, D.E, E.E, F.E)
 
-	DIPPINS(  /*       +--------------+      */
-		A.E,  /*    /E |1     ++    16| VCC  */ A.VCC,
-		A.Q,  /*    Q0 |2           15| Q5   */ F.Q,
-		A.D,  /*    D0 |3           14| D5   */ F.D,
-		B.D,  /*    D1 |4   74378   13| D4   */ E.D,
-		B.Q,  /*    Q1 |5           12| Q4   */ E.Q,
-		C.D,  /*    D2 |6           11| D3   */ D.D,
-		C.Q,  /*    Q2 |7           10| Q3   */ D.Q,
-		A.GND,/*   GND |8            9| CP   */ A.CP
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.E, /*    EQ |1     ++    16| VCC  */ A.VCC,
+		  A.Q, /*    Q0 |2           15| Q5   */ F.Q,
+		  A.D, /*    D0 |3           14| D5   */ F.D,
+		  B.D, /*    D1 |4   74378   13| D4   */ E.D,
+		  B.Q, /*    Q1 |5           12| Q4   */ E.Q,
+		  C.D, /*    D2 |6           11| D3   */ D.D,
+		  C.Q, /*    Q2 |7           10| Q3   */ D.Q,
+		A.GND, /*   GND |8            9| CP   */ A.CP
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
+//- Identifier: 54LS379/DM74LS379
+//- Title: Quad Parallel Register with Enable
+//- Description: The LS379 is a 4-bit register with buffered common Enable.
+//-   This device is similar to the LS175 but features the common Enable rather than common Master Reset.
+//- Pinalias: EEQ,Q0,QQ0,D0,QQ1,Q1,GND,CP,Q2,QQ2,D2,D3,QQ3,Q3,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009832.PDF
+//-
+//-     +----+-----+----++----+-----+
+//-     | EQ |  CP | Dn || Qn | QQn |
+//-     +====+=====+====++====+=====+
+//-     |  1 |  X  |  X || Qn | QQn |
+//-     |  0 | 0-1 |  1 ||  1 |  0  |
+//-     |  0 | 0-1 |  0 ||  0 |  1  |
+//-     +----+-----+----++----+-----+
+//-
 static NETLIST_START(TTL_74379_DIP)
 	TTL_74377_GATE(A)
 	TTL_74377_GATE(B)
@@ -2273,35 +2461,31 @@ static NETLIST_START(TTL_74379_DIP)
 	NET_C(A.CP, B.CP, C.CP, D.CP)
 	NET_C(A.E, B.E, C.E, D.E)
 
-	DIPPINS(  /*       +--------------+      */
-		A.E,  /*    /E |1     ++    16| VCC  */ A.VCC,
-		A.Q,  /*    Q0 |2           15| Q3   */ D.Q,
-		A.QQ, /*   /Q0 |3           14| /Q3  */ D.QQ,
-		A.D,  /*    D0 |4   74379   13| D3   */ D.D,
-		B.D,  /*    D1 |5           12| D2   */ C.D,
-		B.QQ, /*   /Q1 |6           11| /Q2  */ C.QQ,
-		B.Q,  /*    Q1 |7           10| Q2   */ C.Q,
-		A.GND,/*   GND |8            9| CP   */ A.CP
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.E, /*    EQ |1     ++    16| VCC  */ A.VCC,
+		  A.Q, /*    Q0 |2           15| Q3   */ D.Q,
+		 A.QQ, /*   QQ0 |3           14| QQ3  */ D.QQ,
+		  A.D, /*    D0 |4   74379   13| D3   */ D.D,
+		  B.D, /*    D1 |5           12| D2   */ C.D,
+		 B.QQ, /*   QQ1 |6           11| QQ2  */ C.QQ,
+		  B.Q, /*    Q1 |7           10| Q2   */ C.Q,
+		A.GND, /*   GND |8            9| CP   */ A.CP
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM74393: Dual 4-Stage Binary Counter
- *
- *          +--------------+
- *      /CP |1     ++    14| VCC
- *       MR |2           13| /CP
- *       Q0 |3           12| MR
- *       Q1 |4    74393  11| Q0
- *       Q2 |5           10| Q1
- *       Q3 |6            9| Q2
- *      GND |7            8| Q3
- *          +--------------+
- *
- *  Naming conventions follow Motorola datasheet
- */
-
+//- Identifier: DM74LS393
+//- Title: Dual 4-Bit Binary Counter
+//- Description: Each of these monolithic circuits contains eight master-slave flip-flops and additional gating to implement two individual four-bit counters in a single package.
+//-   The ’LS393 comprises two independent four-bit binary counters each having a clear and a clock input.
+//-   N-bit binary counters can be implemented with each package providing the capability of divide-by-256.
+//-   The LS393 has parallel outputs from each counter stage so that any submultiple of the input count freqency is available for system-timing signals.
+//- Pinalias: 1A,1CLR,1QA,1QB,1QC,1QD,GND,2QD,2QC,2QB,2QA,2CLR,2A,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006434.PDF
+//-
 static NETLIST_START(TTL_74393_DIP)
 	TTL_74393(A)
 	TTL_74393(B)
@@ -2309,15 +2493,15 @@ static NETLIST_START(TTL_74393_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(   /*     +--------------+     */
-		 A.CP, /* /CP |1    ++     14| VCC */ A.VCC,
-		 A.MR, /*  MR |2           13| /CP */ B.CP,
-		 A.Q0, /*  Q0 |3           12| MR  */ B.MR,
-		 A.Q1, /*  Q1 |4   74393   11| Q0  */ B.Q0,
-		 A.Q2, /*  Q2 |5           10| Q1  */ B.Q1,
-		 A.Q3, /*  Q3 |6            9| Q2  */ B.Q2,
-		A.GND, /* GND |7            8| Q3  */ B.Q3
-			   /*     +--------------+     */
+	DIPPINS(   /*      +--------------+      */
+		 A.CP, /*   1A |1    ++     14| VCC  */ A.VCC,
+		 A.MR, /* 1CLR |2           13| 2A   */ B.CP,
+		 A.Q0, /*  1QA |3           12| 2CLR */ B.MR,
+		 A.Q1, /*  1QB |4   74393   11| 2QA  */ B.Q0,
+		 A.Q2, /*  1QC |5           10| 2QB  */ B.Q1,
+		 A.Q3, /*  1QD |6            9| 2QC  */ B.Q2,
+		A.GND, /*  GND |7            8| 2QD  */ B.Q3
+			   /*      +--------------+      */
 	)
 NETLIST_END()
 
