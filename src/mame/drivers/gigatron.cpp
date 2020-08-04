@@ -32,6 +32,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_screen(*this, "screen")
 		, m_io_inputs(*this, "GAMEPAD")
 	{
 	}
@@ -57,16 +58,16 @@ private:
 	uint8_t m_row;
 	uint8_t m_col;
 	uint8_t m_pixel;
+	
+	uint8_t m_dacoutput;
 
 	void blinkenlights(uint8_t data);
-	void video_draw(u8 data);
 	void port_outx(uint8_t data);
-
-	std::unique_ptr<bitmap_ind16> m_bitmap_render;
-	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
+	void port_out(uint8_t data);
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
+	required_device<screen_device> m_screen;
 	required_ioport m_io_inputs;
 };
 
@@ -76,13 +77,11 @@ private:
 
 void gigatron_state::video_start()
 {
-	m_bitmap_render = std::make_unique<bitmap_ind16>(640, 480);
-	m_bitmap_buffer = std::make_unique<bitmap_ind16>(640, 480);
 }
 
-void gigatron_state::video_draw(u8 data)
+uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t out = data;
+	uint8_t out = m_pixel;
 	uint8_t falling = m_out & ~out;
 
 	if (falling & VSYNC)
@@ -101,21 +100,17 @@ void gigatron_state::video_draw(u8 data)
 
 	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
 	{
-		return;
+		return 0;
 	}
 
 	if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
 	{
-		//uint16_t *dest;
-		//uint8_t tPixel = pixel;
-		//uint8_t r = (out << 6) & 0xC0;
-		//uint8_t g = (out << 4) & 0xC0;
-		//uint8_t b = (out << 2) & 0xC0;
+		uint8_t r = (out << 6) & 0xC0;
+		uint8_t g = (out << 4) & 0xC0;
+		uint8_t b = (out << 2) & 0xC0;
+		u32 *dest = &bitmap.pix32(m_row, m_col);
+		*dest++ = r|g|b;
 	}
-}
-
-uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
 	return 0;
 }
 
@@ -156,21 +151,29 @@ void gigatron_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_col));
 	save_item(NAME(m_pixel));
+	save_item(NAME(m_dacoutput));
 }
 
 void gigatron_state::machine_reset()
 {
+	m_dacoutput = 0;
 	m_dac->write(0);
 }
 
 void gigatron_state::port_outx(uint8_t data)
 {
 	//Write sound to DAC
-	m_dac->write((data & 0xF0) >> 4);
+	m_dacoutput = (data & 0xF0) >> 4;
+	m_dac->write(m_dacoutput);
 	
 	//Blinkenlights
 	uint16_t light = data & 0xF;
 	m_lc ^= light;
+}
+
+void gigatron_state::port_out(uint8_t data)
+{
+	m_pixel = data;
 }
 
 void gigatron_state::gigatron(machine_config &config)
@@ -179,15 +182,15 @@ void gigatron_state::gigatron(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
 	m_maincpu->outx_cb().set(FUNC(gigatron_state::port_outx));
-	m_maincpu->out_cb().set(FUNC(gigatron_state::video_draw));
+	m_maincpu->out_cb().set(FUNC(gigatron_state::port_out));
 	m_maincpu->ir_cb().set_ioport("GAMEPAD").invert();
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.98);
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(gigatron_state::screen_update));
+	screen_device &m_screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	m_screen.set_refresh_hz(59.98);
+	m_screen.set_size(640, 480);
+	m_screen.set_visarea(0, 640-1, 0, 480-1);
+	m_screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
