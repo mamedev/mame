@@ -114,7 +114,7 @@ void gigatron_state::port_out(uint8_t data)
         uint8_t b = (out << 2) & 0xC0;
         uint32_t *dest = &m_bitmap_render->pix32(m_row, m_col);
         for(uint8_t i = 0; i < 4; i++)
-            *dest++ = r|g<<8|b<<16;
+            *dest++ = b|(g<<8)|(r<<16);
     }
     m_col += 4;
 }
