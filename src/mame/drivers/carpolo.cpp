@@ -290,6 +290,18 @@ void carpolo_state::carpolo(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carpolo);
 	PALETTE(config, m_palette, FUNC(carpolo_state::carpolo_palette), 12*2+2*16+4*2);
+
+	/* sound hardware */
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(carpolo))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash1", "PL1_CRASH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash2", "PL2_CRASH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash3", "PL3_CRASH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash4", "PL4_CRASH.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "").set_mult_offset(10000.0, 0.0);
 }
 
 

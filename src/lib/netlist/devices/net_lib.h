@@ -105,6 +105,7 @@ NETLIST_EXTERNAL(ROMS_lib)
 #include "nld_log.h"
 
 #include "netlist/macro/nlm_cd4xxx.h"
+#include "netlist/macro/nlm_mc3340.h"
 #include "netlist/macro/nlm_opamp.h"
 #include "netlist/macro/nlm_other.h"
 #include "netlist/macro/nlm_roms.h"

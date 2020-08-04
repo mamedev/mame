@@ -129,6 +129,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/solver/vector_base.h",
 		MAME_DIR .. "src/lib/netlist/devices/net_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/net_lib.h",
+		MAME_DIR .. "src/lib/netlist/devices/net_devinc.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9316_base.hxx",
 		MAME_DIR .. "src/lib/netlist/devices/nld_2102A.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_2102A.h",

@@ -48,6 +48,9 @@
 #define UA741_DIP14(name)                                                      \
 		NET_REGISTER_DEV(UA741_DIP14, name)
 
+#define MC1558_DIP(name)                                                        \
+		NET_REGISTER_DEV(MC1558_DIP, name)
+
 #define LM747_DIP(name)                                                        \
 		NET_REGISTER_DEV(LM747_DIP, name)
 
