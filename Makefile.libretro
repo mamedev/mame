@@ -187,7 +187,7 @@ clean:
 
 download_github_%:
 	@rm -f mame_libretro.zip
-	@echo "Cheking lastest release for tag $*"
+	@echo "Cheking latest release for tag $*"
 	@curl -s -S -L -O -z mame_libretro* '$(GITHUB_REPO)/releases/download/$*/mame_libretro.zip'
 	@if [ -f mame_libretro.zip ]; then \
 		echo "Extracting"; \
