@@ -335,7 +335,7 @@ gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const ch
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
 	, m_ramMask(0x7FFF)
 	, m_romMask(0xFFFF)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 	, m_outx_cb(*this)
 	, m_out_cb(*this)
