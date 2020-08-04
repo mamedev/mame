@@ -54,8 +54,8 @@ private:
 
 	//Video Generation stuff
 	uint8_t m_out;
-	uint8_t m_row;
-	uint8_t m_col;
+	uint16_t m_row;
+	uint16_t m_col;
 	uint8_t m_pixel;
 	
 	uint8_t m_dacoutput;
