@@ -11,8 +11,6 @@
  *
  *****************************************************************************/
 
- //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
-
 #include "emu.h"
 #include "gigatron.h"
 #include "gigatrondasm.h"
