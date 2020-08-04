@@ -1,16 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
-/***********************************************************************************************************
+// copyright-holders:Wilbert Pol, Fabio Priuli
+/******************************************************************************
 
+Magnavox The Voice emulation
 
- Magnavox The Voice emulation
+TODO:
+- load speech ROM from softlist
+- move external speech rom for S.I.D. the Spellbinder into the softlist entry
 
- TODO:
-   - load speech ROM from softlist
-   - move external speech rom for S.I.D. the Spellbinder into the softlist entry
-
- ***********************************************************************************************************/
-
+******************************************************************************/
 
 #include "emu.h"
 #include "voice.h"
@@ -24,15 +22,11 @@
 DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Passthrough Cart")
 
 
-o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: o2_rom_device(mconfig, O2_ROM_VOICE, tag, owner, clock)
-	, m_speech(*this, "sp0256_speech")
-	, m_subslot(*this, "subslot")
-	, m_lrq_state(0)
-	, m_control(0)
-{
-}
-
+o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	o2_rom_device(mconfig, O2_ROM_VOICE, tag, owner, clock),
+	m_speech(*this, "sp0256_speech"),
+	m_subslot(*this, "subslot")
+{ }
 
 void o2_voice_device::device_start()
 {
@@ -100,10 +94,12 @@ READ_LINE_MEMBER(o2_voice_device::t0_read)
 	return state | (m_speech->lrq_r() ? 0 : 1);
 }
 
-void o2_voice_device::io_write(offs_t offset, uint8_t data)
+void o2_voice_device::io_write(offs_t offset, u8 data)
 {
 	if (offset & 0x80 && ~m_control & 0x10)
 	{
+		// A0-A6: SP0256B A1-A7 (A8 to GND)
+		// D5: 7474 to SP0256B reset
 		if (data & 0x20)
 			m_speech->ald_w(offset & 0x7f);
 		else

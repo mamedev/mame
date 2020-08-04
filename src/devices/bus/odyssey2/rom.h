@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Wilbert Pol, Fabio Priuli
 #ifndef MAME_BUS_ODYSSEY2_ROM_H
 #define MAME_BUS_ODYSSEY2_ROM_H
 
