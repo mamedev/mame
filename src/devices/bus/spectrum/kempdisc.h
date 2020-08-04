@@ -30,6 +30,7 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 protected:
+	spectrum_kempdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -59,9 +60,25 @@ protected:
 //  u8 m_control;
 };
 
+class spectrum_spdos_device :
+	public spectrum_kempdisc_device
+{
+public:
+	// construction/destruction
+	spectrum_spdos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_KEMPDISC, spectrum_kempdisc_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_SPDOS, spectrum_spdos_device)
 
 
 #endif // MAME_BUS_SPECTRUM_KEMPDISC_H

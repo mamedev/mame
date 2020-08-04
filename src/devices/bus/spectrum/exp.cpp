@@ -216,6 +216,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("sdi", SPECTRUM_SDI);
 	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
+	device.option_add("spdos", SPECTRUM_SPDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("swiftdisc", SPECTRUM_SWIFTDISC);
 	device.option_add("swiftdisc2", SPECTRUM_SWIFTDISC2);
