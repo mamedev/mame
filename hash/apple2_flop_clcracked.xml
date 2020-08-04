@@ -37481,4 +37481,148 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mulwn114">
+		<description>Multiplication: Whole Numbers Steps 1-14 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="multiplication- whole numbers steps 1-14 (4am crack).dsk" size="143360" crc="e4ecf98d" sha1="a1c5beb24921793055f8932c8d821ab0f335e001"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laguillo">
+		<description>La Guillotine (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-07-24"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="la guillotine (4am crack).dsk" size="143360" crc="2b389d84" sha1="a11eb5ccaf44997776faf8404b412b87bf9856d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corrtoro">
+		<description>La Corrida de Toros (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-07-24"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="la corrida de toros (4am crack).dsk" size="143360" crc="3a941200" sha1="c9d98bfcc2878a5fd991ab372627deb929e3d3ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdd1sm">
+		<description>Math Demo Disk #1: Secondary Mathematics (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-07-26"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math demo disk #1- secondary mathematics (4am crack).dsk" size="143360" crc="3bd5e0b8" sha1="46141c42ee3c640c7f1d50cfd8f7b2e28f2017bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdd2geig">
+		<description>Math Demo Disk #2: Graphing Equations and Interpreting Graphs (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math demo disk #2- graphing equations and interpreting graphs (4am crack).dsk" size="143360" crc="3670cfab" sha1="5a22a0033cafbc54e6927853b792339a83145a12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdd3psm">
+		<description>Math Demo Disk #3: Postsecondary Mathematics (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math demo disk #3- postsecondary mathematics (4am crack).dsk" size="143360" crc="0a2696bd" sha1="688e8283d2efea83874abe7c6d297b0871ae9b99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mseleml">
+		<description>Math Skills: Elementary Level (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math skills- elementary level (4am crack).dsk" size="143360" crc="8959752d" sha1="89d2e59a23636de848f0abca5fe0fe579ae38973"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msjrhigh">
+		<description>Math Skills: Junior High Level (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math skills- junior high level (4am crack).dsk" size="143360" crc="dadb8d31" sha1="2fb6e5f2aa81885d5193946e44228c46f2964b22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gifpalg">
+		<description>Graphing is Fun: Pie and Line Graphs (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Aquarius People Materials</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="graphing is fun pie and line graphs (4am crack).dsk" size="143360" crc="1f3bed11" sha1="62cb669c99db7bd5d632c86847bd7e22c78a071e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addfs921">
+		<description>Addition: Fractions Steps 9-21 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition- fractions steps 9-21 (4am crack).dsk" size="143360" crc="db4691b9" sha1="0babf87ee4e70dc9b8cd86a98c0c15a0258b3d19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subwn117">
+		<description>Subtraction: Whole Numbers Steps 1-17 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="subtraction- whole numbers steps 1-17 (4am crack).dsk" size="143360" crc="44e5f768" sha1="7feb38fd65b46bdefe3863953209fc82d51a14ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subfs111">
+		<description>Subtraction: Fractions Steps 1-11 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="subtraction- fractions steps 1-11 (4am crack).dsk" size="143360" crc="243c79ee" sha1="83cb304e32b1c53b2ff58302eeba104b92615c95"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
