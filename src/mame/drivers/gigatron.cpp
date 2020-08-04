@@ -58,10 +58,14 @@ private:
 	uint8_t m_col;
 	uint8_t m_pixel;
 	
+	uint32_t m_pixels[640*480];
+	
 	uint8_t m_dacoutput;
 
 	void port_outx(uint8_t data);
 	void port_out(uint8_t data);
+	
+	std::unique_ptr<bitmap_rgb32> m_bitmap_render;
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
@@ -75,46 +79,52 @@ private:
 
 void gigatron_state::video_start()
 {
+    m_bitmap_render = std::make_unique<bitmap_rgb32>(640, 480);
 }
 
 void gigatron_state::port_out(uint8_t data)
 {
-	m_pixel = data;
+    m_pixel = data;
+    uint8_t out = m_pixel;
+    uint8_t falling = m_out & ~out;
+
+    if (falling & VSYNC)
+    {
+        m_row = 0;
+        m_pixel = 0;
+    }
+
+    if (falling & HSYNC)
+    {
+        m_col = 0;
+        m_row++;
+    }
+
+    m_out = out;
+
+    if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
+    {
+        return;
+    }
+
+    if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
+    {
+        uint8_t r = (out << 6) & 0xC0;
+        uint8_t g = (out << 4) & 0xC0;
+        uint8_t b = (out << 2) & 0xC0;
+        u32 *dest = &m_bitmap_render->pix32(m_row, m_col);
+        for(uint8_t i = 0; i < 4; i++)
+            *dest++ = r|g<<8|b<<16;
+    }
+    m_col += 4;
 }
 
+
+//6-bit color, VGA
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t out = m_pixel;
-	uint8_t falling = m_out & ~out;
-
-	if (falling & VSYNC)
-	{
-		m_row = 0;
-		m_pixel = 0;
-	}
-
-	if (falling & HSYNC)
-	{
-		m_col = 0;
-		m_row++;
-	}
-
-	m_out = out;
-
-	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
-	{
-		return 0;
-	}
-
-	if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
-	{
-		uint8_t r = (out << 6) & 0xC0;
-		uint8_t g = (out << 4) & 0xC0;
-		uint8_t b = (out << 2) & 0xC0;
-		u32 *dest = &bitmap.pix32(m_row, m_col);
-		*dest++ = r|g|b;
-	}
-	return 0;
+    copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
+    return 0;
 }
 
 //**************************************************************************

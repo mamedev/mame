@@ -33,7 +33,6 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
 #define gigatron_writemem8(A,B) m_data->write_byte((A),B)
 
-
 /***********************************
  *  illegal opcodes
  ***********************************/

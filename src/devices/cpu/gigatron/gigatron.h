@@ -74,7 +74,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
-	uint16_t  m_pc;   /* registers */
+	uint16_t  m_pc;   /* program counter */
 	uint8_t   m_flags;  /* flags */
 	address_space *m_program;
 	address_space *m_data;
