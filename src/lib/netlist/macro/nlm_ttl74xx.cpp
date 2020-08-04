@@ -490,14 +490,14 @@ static NETLIST_START(TTL_7420_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54/7421
-//- Title: Dual 4-Input Positive AND Gate
+//- Identifier: 54LS21/DM54LS21/DM74LS21
+//- Title: Dual 4-Input AND Gates
 //- Description: This device contains two independent 4-input gates each of which performs the logic AND function.
 //- Pinalias: A1,B1,NC,C1,D1,Y1,GND,Y2,A2,B2,NC,C2,D2,VCC
 //- Package: DIP
-//- NamingConvention: Naming conventions follow National Semiconductor style
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/124906/ETC1/7421.html
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006356.PDF
 //-
 //-         +---+---+---+---++---+
 //-         | A | B | C | D || Y |
@@ -610,64 +610,62 @@ static NETLIST_START(TTL_7427_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM7430: 8-Input NAND Gate
- *
- *                  _______
- *              Y = ABCDEFGH
- *          +---+---+---+---+---+---+---+---++---+
- *          | A | B | C | D | E | F | G | H || Y |
- *          +===+===+===+===+===+===+===+===++===+
- *          | X | X | X | X | X | X | X | 0 || 1 |
- *          | X | X | X | X | X | X | 0 | X || 1 |
- *          | X | X | X | X | X | 0 | X | X || 1 |
- *          | X | X | X | X | 0 | X | X | X || 1 |
- *          | X | X | X | 0 | X | X | X | X || 1 |
- *          | X | X | 0 | X | X | X | X | X || 1 |
- *          | X | 0 | X | X | X | X | X | X || 1 |
- *          | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 || 0 |
- *          +---+---+---+---+---+---+---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- */
-
+//- Identifier: 5430/DM5430/DM7430
+//- Title: 8-Input NAND Gate
+//- Description: This device contains a single gate which performs the logic NAND function.
+//- Pinalias: A,B,C,D,E,F,GND,Y,NC,NC,G,H,NC,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006510.PDF
+//-
+//-         +---+---+---+---+---+---+---+---++---+
+//-         | A | B | C | D | E | F | G | H || Y |
+//-         +===+===+===+===+===+===+===+===++===+
+//-         | X | X | X | X | X | X | X | 0 || 1 |
+//-         | X | X | X | X | X | X | 0 | X || 1 |
+//-         | X | X | X | X | X | 0 | X | X || 1 |
+//-         | X | X | X | X | 0 | X | X | X || 1 |
+//-         | X | X | X | 0 | X | X | X | X || 1 |
+//-         | X | X | 0 | X | X | X | X | X || 1 |
+//-         | X | 0 | X | X | X | X | X | X || 1 |
+//-         | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 || 0 |
+//-         +---+---+---+---+---+---+---+---++---+
+//-
 static NETLIST_START(TTL_7430_DIP)
 	TTL_7430_GATE(A)
+	NC_PIN(NC)
 
-	NC_PIN(NC9)
-	NC_PIN(NC10)
-	NC_PIN(NC13)
-
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*     A |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*     B |2           13| NC   */ NC13.I,
-		A.C,  /*     C |3           12| H    */ A.H,
-		A.D,  /*     D |4    7430   11| G    */ A.G,
-		A.E,  /*     E |5           10| NC   */ NC10.I,
-		A.F,  /*     F |6            9| NC   */ NC9.I,
-		A.GND,/*   GND |7            8| Y    */ A.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*     A |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*     B |2           13| NC   */ NC.I,
+		  A.C, /*     C |3           12| H    */ A.H,
+		  A.D, /*     D |4    7430   11| G    */ A.G,
+		  A.E, /*     E |5           10| NC   */ NC.I,
+		  A.F, /*     F |6            9| NC   */ NC.I,
+		A.GND, /*   GND |7            8| Y    */ A.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7432: Quad 2-Input OR Gates
- *
- *                  __
- *              Y = A+B
- *          +---+---++---+
- *          | A | B || Y |
- *          +===+===++===+
- *          | 0 | 0 || 0 |
- *          | 0 | 1 || 1 |
- *          | 1 | 0 || 1 |
- *          | 1 | 1 || 1 |
- *          +---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5432/DM5432/DM7432
+//- Title: Quad 2-Input OR Gates
+//- Description: This device contains four independent gates each of whichperforms the logic OR function.
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006511.PDF
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 0 |
+//-         | 0 | 1 || 1 |
+//-         | 1 | 0 || 1 |
+//-         | 1 | 1 || 1 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7432_DIP)
 	TTL_7432_GATE(A)
 	TTL_7432_GATE(B)
@@ -677,39 +675,37 @@ static NETLIST_START(TTL_7432_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| B4   */ D.B,
-		A.Q,  /*    Y1 |3           12| A4   */ D.A,
-		B.A,  /*    A2 |4    7400   11| Y4   */ D.Q,
-		B.B,  /*    B2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| B4   */ D.B,
+		  A.Q, /*    Y1 |3           12| A4   */ D.A,
+		  B.A, /*    A2 |4    7432   11| Y4   */ D.Q,
+		  B.B, /*    B2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-
-/*
- *  DM7437: Quad 2-Input NAND Gates
- *
- *                  _
- *              Y = AB
- *          +---+---++---+
- *          | A | B || Y |
- *          +===+===++===+
- *          | 0 | 0 || 1 |
- *          | 0 | 1 || 1 |
- *          | 1 | 0 || 1 |
- *          | 1 | 1 || 0 |
- *          +---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- *  NOTE: Same as 7400, but drains higher output currents.
- *         Netlist currently does not model over currents (should it ever?)
- */
-
+//- Identifier: 5437/DM5437/DM7437
+//- Title: Quad 2-Input NAND Buffers
+//- Description: This device contains four independent gates each of whichperforms the logic OR function.
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations: Same as 7400, but drains higher output currents. Netlist currently does not model over currents (should it ever?)
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheets/105/236976_DS.pdf
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 1 |
+//-         | 0 | 1 || 1 |
+//-         | 1 | 0 || 1 |
+//-         | 1 | 1 || 0 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7437_DIP)
 	TTL_7437_GATE(A)
 	TTL_7437_GATE(B)
@@ -719,32 +715,143 @@ static NETLIST_START(TTL_7437_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| B4   */ D.B,
-		A.Q,  /*    Y1 |3           12| A4   */ D.A,
-		B.A,  /*    A2 |4    7400   11| Y4   */ D.Q,
-		B.B,  /*    B2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| B4   */ D.B,
+		  A.Q, /*    Y1 |3           12| A4   */ D.A,
+		  B.A, /*    A2 |4    7437   11| Y4   */ D.Q,
+		  B.B, /*    B2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7450: DUAL 2-WIDE 2-INPUT AND-OR-INVERT GATES (ONE GATE EXPANDABLE)
- *
- *          +--------------+
- *       1A |1     ++    14| VCC
- *       2A |2           13| 1B
- *       2B |3           12| 1XQ
- *       2C |4    7450   11| 1X
- *       2D |5           10| 1D
- *       2Y |6            9| 1C
- *      GND |7            8| 1Y
- *          +--------------+
-*/
+//- Identifier: 5442A/DM5442A/DM7442A
+//- Title: BCD to Decimal Decoders
+//- Description: These BCD-to-decimal decoders consist of eight inverters and ten, four-input NAND gates.
+//-   The inverters are connected in pairs to make BCD input data available for decoding by the NAND gates.
+//-   Full decoding of input logic ensures that all outputs remain off for all invalid (10–15) input conditions.
+//- Pinalias: 0,1,2,3,4,5,6,GND,7,8,9,D,C,B,A,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006516.PDF
+//-
+//-         +---+---+---+---++---+---+---+---+---+---+---+---+---+---+
+//-         | D | C | B | A || 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+//-         +===+===+===+===++===+===+===+===+===+===+===+===+===+===+
+//-         | 0 | 0 | 0 | 0 || 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 0 | 0 | 0 | 1 || 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 0 | 0 | 1 | 0 || 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 0 | 0 | 1 | 1 || 1 | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 0 | 1 | 0 | 0 || 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 |
+//-         | 0 | 1 | 0 | 1 || 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 1 |
+//-         | 0 | 1 | 1 | 0 || 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 |
+//-         | 0 | 1 | 1 | 1 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 |
+//-         | 1 | 0 | 0 | 0 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+//-         | 1 | 0 | 0 | 1 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 |
+//-         | 1 | 0 | 1 | 0 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 1 | 0 | 1 | 1 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 1 | 1 | 0 | 0 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 1 | 1 | 0 | 1 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 1 | 1 | 1 | 0 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         | 1 | 1 | 1 | 1 || 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         +---+---+---+---++---+---+---+---+---+---+---+---+---+---+
+//-
+static NETLIST_START(TTL_7442_DIP)
+	NET_REGISTER_DEV(TTL_7442, A)
 
+	DIPPINS(    /*      +--------------+     */
+		  A.Q0, /*    0 |1     ++    16| VCC */ A.VCC,
+		  A.Q1, /*    1 |2           15| A   */ A.A,
+		  A.Q2, /*    2 |3           14| B   */ A.B,
+		  A.Q3, /*    3 |4           13| C   */ A.C,
+		  A.Q4, /*    4 |5    7442   12| D   */ A.D,
+		  A.Q5, /*    5 |6           11| 9   */ A.Q9,
+		  A.Q6, /*    6 |7           10| 8   */ A.Q8,
+		 A.GND, /*  GND |8            9| 7   */ A.Q7
+				/*      +--------------+     */
+	)
+NETLIST_END()
+
+//- Identifier: DM74LS48
+//- Title: BCD to 7-Segment Decoder
+//- Description: The ’LS48 translates four lines of BCD (8421) input data into the 7-segment numeral code and provides seven corresponding outputs having pull-up resistors, as opposed to totem pole pull-ups.
+//-   These outputs can serve as logic signals, with a HIGH output corresponding to a lighted lamp segment, or can provide a 1.3 mA base current to npn lamp driver transistors.
+//-   Auxiliary inputs provide lamp test, blanking and cascadable zero-suppression functions.
+//-   The ’LS48 decodes the input data in the pattern indicated in the Truth Table and the segment identification illustration.
+//- Pinalias: A1,A2,LTQ,BIQ,RBIQ,A3,A0,GND,e,d,c,b,a,g,f,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS010172.PDF
+//-
+//-         +-----+------+----+----+----+----++-----+---+---+---+---+---+---+---+
+//-         | LTQ | RBIQ | A3 | A2 | A1 | A0 || BIQ | a | b | c | d | e | f | g |
+//-         +=====+======+====+====+====+====++=====+===+===+===+===+===+===+===+
+//-         |  1  |   1  |  0 |  0 |  0 |  0 ||  1  | 1 | 1 | 1 | 1 | 1 | 1 | 0 |
+//-         |  1  |   X  |  0 |  0 |  0 |  1 ||  1  | 0 | 1 | 1 | 0 | 0 | 0 | 0 |
+//-         |  1  |   X  |  0 |  0 |  1 |  0 ||  1  | 1 | 1 | 0 | 1 | 1 | 0 | 1 |
+//-         |  1  |   X  |  0 |  0 |  1 |  1 ||  1  | 1 | 1 | 1 | 1 | 0 | 0 | 1 |
+//-         |  1  |   X  |  0 |  1 |  0 |  0 ||  1  | 0 | 1 | 1 | 0 | 0 | 1 | 1 |
+//-         |  1  |   X  |  0 |  1 |  0 |  1 ||  1  | 1 | 0 | 1 | 1 | 0 | 1 | 1 |
+//-         |  1  |   X  |  0 |  1 |  1 |  0 ||  1  | 0 | 0 | 1 | 1 | 1 | 1 | 1 |
+//-         |  1  |   X  |  0 |  1 |  1 |  1 ||  1  | 1 | 1 | 1 | 0 | 0 | 0 | 0 |
+//-         |  1  |   X  |  1 |  0 |  0 |  0 ||  1  | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         |  1  |   X  |  1 |  0 |  0 |  1 ||  1  | 1 | 1 | 1 | 0 | 0 | 1 | 1 |
+//-         |  1  |   X  |  1 |  0 |  1 |  0 ||  1  | 0 | 0 | 0 | 1 | 1 | 0 | 1 |
+//-         |  1  |   X  |  1 |  0 |  1 |  1 ||  1  | 0 | 0 | 1 | 1 | 0 | 0 | 1 |
+//-         |  1  |   X  |  1 |  1 |  0 |  0 ||  1  | 0 | 1 | 0 | 0 | 0 | 1 | 1 |
+//-         |  1  |   X  |  1 |  1 |  0 |  1 ||  1  | 1 | 0 | 0 | 1 | 0 | 1 | 1 |
+//-         |  1  |   X  |  1 |  1 |  1 |  0 ||  1  | 0 | 0 | 0 | 1 | 1 | 1 | 1 |
+//-         |  1  |   X  |  1 |  1 |  1 |  1 ||  1  | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+//-         |  X  |   X  |  X |  X |  X |  X ||  0  | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+//-         |  1  |   0  |  0 |  0 |  0 |  0 ||  0  | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+//-         |  0  |   X  |  X |  X |  X |  X ||  1  | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+//-         +-----+------+----+----+----+----++-----+---+---+---+---+---+---+---+
+//-
+static NETLIST_START(TTL_7448_DIP)
+
+#if (NL_USE_TRUTHTABLE_7448)
+	NET_REGISTER_DEV(TTL_7448_TT, A)
+#else
+	NET_REGISTER_DEV(TTL_7448, A)
+#endif
+
+	DIPPINS(    /*      +--------------+     */
+		A.B,    /* B    |1     ++    16| VCC */ A.VCC,
+		A.C,    /* C    |2           15| f   */ A.f,
+		A.LTQ,  /* LTQ  |3           14| g   */ A.g,
+		A.BIQ,  /* BIQ  |4    7448   13| a   */ A.a,
+		A.RBIQ, /* RBIQ |5           12| b   */ A.b,
+		A.D,    /* D    |6           11| c   */ A.c,
+		A.A,    /* A    |7           10| d   */ A.d,
+		A.GND,  /* GND  |8            9| e   */ A.e
+				/*      +--------------+     */
+	)
+NETLIST_END()
+
+//- Identifier: DM7450
+//- Title: Expandable Dual 2-Wide 2-Input AND-OR-INVERT Gate
+//- Description: This device contains two independent combinations of gates, each of which perform the logic AND-OR-INVERT function.
+//-   One set of gates has an expander node.
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations: Expander signal is not implemented
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheets/105/236976_DS.pdf
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 1 |
+//-         | 0 | 1 || 1 |
+//-         | 1 | 0 || 1 |
+//-         | 1 | 1 || 0 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7450_DIP)
 	TTL_7450_ANDORINVERT(A)
 	TTL_7450_ANDORINVERT(B)
@@ -753,33 +860,45 @@ static NETLIST_START(TTL_7450_DIP)
 	NET_C(A.GND, B.GND)
 	NC_PIN(NC)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    1A |1     ++    14| VCC  */ A.VCC,
-		B.A,  /*    2A |2           13| 1B   */ A.B,
-		B.B,  /*    2B |3           12| 1XQ  */ NC.I,
-		B.C,  /*    2C |4    7450   11| 1X   */ NC.I,
-		B.D,  /*    2D |5           10| 1D   */ A.D,
-		B.Q,  /*    2Y |6            9| 1C   */ A.C,
-		A.GND,/*   GND |7            8| 1Y   */ A.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    1A |1     ++    14| VCC  */ A.VCC,
+		  B.A, /*    2A |2           13| 1B   */ A.B,
+		  B.B, /*    2B |3           12| 1XQ  */ NC.I,
+		  B.C, /*    2C |4    7450   11| 1X   */ NC.I,
+		  B.D, /*    2D |5           10| 1D   */ A.D,
+		  B.Q, /*    2Y |6            9| 1C   */ A.C,
+		A.GND, /*   GND |7            8| 1Y   */ A.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  7473: Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
- *  7473A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
- *
- *          +----------+
- *     1CLK |1   ++  14| 1J
- *    1CLRQ |2       13| 1QQ
- *       1K |3       12| 1Q
- *      VCC |4  7473 11| GND
- *     2CLK |5       10| 2K
- *    2CLRQ |6        9| 2Q
- *       2J |7        8| 2QQ
- *          +----------+
- */
-
+//- Identifier: 5473/DM5473/DM7473
+//- Title: Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+//- Description: This device contains two independent positive pulse triggered J-K flip-flops with complementary outputs.
+//-   The J and K data is processed by the flip-flops after a complete clock pulse.
+//-   While the clock is low the slave is isolated from the master.
+//-   On the positive transition of the clock, the data from the J and K inputs is transferred to teh master.
+//-   While the clock is high the J and K inputs are disabled.
+//-   On the negative transition of the clock, the data from the master is transferred to the slave.
+//-   The logic states of the J and K inputs must not be allowed to change while the clock is high.
+//-   Data transfers to the outputs on the falling edge of the clock pulse.
+//-   A low logic level on the clear input will reset the outputs regardless of the logic states of the other inputs.
+//- Pinalias: CLK1,CLR1,K1,VCC,CLK2,CLR2,J2,QQ2,Q2,K2,GND,Q1,QQ1,J1
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet_pdf/national-semiconductor/5473DMQB_to_DM7473N.pdf
+//-
+//-         +-----+-------+---+---++---+----+
+//-         | CLR |  CLK  | J | K || Q | QQ |
+//-         +=====+=======+===+===++===+====+
+//-         |  0  |   X   | X | X || 0 |  1 |
+//-         |  1  | 0-1-0 | 0 | 0 || Q | QQ |
+//-         |  1  | 0-1-0 | 1 | 0 || 1 |  0 |
+//-         |  1  | 0-1-0 | 0 | 1 || 0 |  1 |
+//-         |  1  | 0-1-0 | 1 | 1 || Toggle |
+//-         +-----+-------+---+---++---+----+
+//-
 static NETLIST_START(TTL_7473_DIP)
 	TTL_7473(A)
 	TTL_7473(B)
@@ -787,18 +906,42 @@ static NETLIST_START(TTL_7473_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(    /*       +----------+     */
-		 A.CLK, /*  1CLK |1   ++  14| 1J  */ A.J,
-		A.CLRQ, /* 1CLRQ |2       13| 1QQ */ A.QQ,
-		   A.K, /*    1K |3       12| 1Q  */ A.Q,
-		 A.VCC, /*   VCC |4  7473 11| GND */ A.GND,
-		 B.CLK, /*  2CLK |5       10| 2K  */ B.K,
-		B.CLRQ, /* 2CLRQ |6        9| 2Q  */ B.Q,
-		   B.J, /*    2J |7        8| 2QQ */ B.QQ
-			    /*       +----------+     */
+	DIPPINS(    /*       +--------------+      */
+		 A.CLK, /*  CLK1 |1     ++    14| J1   */ A.J,
+		A.CLRQ, /*  CLR1 |2           13| QQ1  */ A.QQ,
+		   A.K, /*    K1 |3           12| Q1   */ A.Q,
+		 A.VCC, /*   VCC |4    7473   11| GND  */ A.GND,
+		 B.CLK, /*  CLK2 |5           10| K2   */ B.K,
+		B.CLRQ, /*  CLR2 |6            9| Q2   */ B.Q,
+		   B.J, /*    J2 |7            8| QQ2  */ B.QQ
+			    /*       +--------------+      */
 	)
 NETLIST_END()
 
+//- Identifier: DM54LS73A/DM74LS73A
+//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+//- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
+//-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
+//    The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
+//-   The data on the J and K inputs is allowed to change while the clock is high or low without affecting the outputs as long as setup and hold times are not violated.
+//-   A low logic level on the clear input will reset the outputs regardless of the levels of the other inputs.
+//- Pinalias: CLK1,CLR1,K1,VCC,CLK2,CLR2,J2,QQ2,Q2,K2,GND,Q1,QQ1,J1
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semicouductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006372.PDF
+//-
+//-         +-----+-----+---+---++---+----+
+//-         | CLR | CLK | J | K || Q | QQ |
+//-         +=====+=====+===+===++===+====+
+//-         |  0  |  X  | X | X || 0 |  1 |
+//-         |  1  | 1-0 | 0 | 0 || Q | QQ |
+//-         |  1  | 1-0 | 1 | 0 || 1 |  0 |
+//-         |  1  | 1-0 | 0 | 1 || 0 |  1 |
+//-         |  1  | 1-0 | 1 | 1 || Toggle |
+//-         |  1  |  1  | X | X || Q | QQ |
+//-         +-----+-----+---+---++---+----+
+//-
 static NETLIST_START(TTL_7473A_DIP)
 	TTL_7473A(A)
 	TTL_7473A(B)
@@ -806,33 +949,42 @@ static NETLIST_START(TTL_7473A_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(    /*       +----------+     */
-		 A.CLK, /*  1CLK |1   ++  14| 1J  */ A.J,
-		A.CLRQ, /* 1CLRQ |2       13| 1QQ */ A.QQ,
-		   A.K, /*    1K |3       12| 1Q  */ A.Q,
-		 A.VCC, /*   VCC |4 7473A 11| GND */ A.GND,
-		 B.CLK, /*  2CLK |5       10| 2K  */ B.K,
-		B.CLRQ, /* 2CLRQ |6        9| 2Q  */ B.Q,
-		   B.J, /*    2J |7        8| 2QQ */ B.QQ
-			    /*       +----------+     */
+	DIPPINS(    /*       +--------------+      */
+		 A.CLK, /*  CLK1 |1     ++    14| J1   */ A.J,
+		A.CLRQ, /*  CLR1 |2           13| QQ1  */ A.QQ,
+		   A.K, /*    K1 |3           12| Q1   */ A.Q,
+		 A.VCC, /*   VCC |4   7473A   11| GND  */ A.GND,
+		 B.CLK, /*  CLK2 |5           10| K2   */ B.K,
+		B.CLRQ, /*  CLR2 |6            9| Q2   */ B.Q,
+		   B.J, /*    J2 |7            8| QQ2  */ B.QQ
+			    /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7474: Dual Positive-Edge-Triggered D Flip-Flops
- *          with Preset, Clear and Complementary Outputs
- *
- *          +--------------+
- *     CLR1 |1     ++    14| VCC
- *       D1 |2           13| CLR2
- *     CLK1 |3           12| D2
- *      PR1 |4    7474   11| CLK2
- *       Q1 |5           10| PR2
- *      Q1Q |6            9| Q2
- *      GND |7            8| Q2Q
- *          +--------------+
- */
-
+//- Identifier: 5474/DM5474/DM7474
+//- Title: Dual Positive-Edge-Triggered D Flip-Flops with Preset, Clear and Complementary Outputs
+//- Description: This device contains two independent positive-edge-triggered D flip-flops with complementary outputs.
+//-   The information on the D input is accepted by the flip-flops on the positive going edge of the clock pulse.
+//-   The triggering occurs at a voltage level and is not directly related to the transition time of the rising edge of the clock.
+//-   The data on the D input may be changed while the clock is low or high without affecting the outputs as long as the data setup and hold times are not violated.
+//-   A low logic level on the preset or clear inputs will set or reset the outputs regardless of the logic levels of the other inputs.
+//- Pinalias: CLR1,D1,CLK1,PR1,Q1,QQ1,GND,QQ2,Q2,PR2,CLK2,D2,CLR2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006526.PDF
+//-
+//-         +----+-----+-----+---++---+----+
+//-         | PR | CLR | CLK | D || Q | QQ |
+//-         +====+=====+=====+===++===+====+
+//-         |  0 |  1  |  X  | X || 1 |  0 |
+//-         |  1 |  0  |  X  | X || 0 |  1 |
+//-         |  0 |  0  |  X  | X || 1 |  1 | (unstable)
+//-         |  1 |  1  | 0-1 | 1 || 1 |  0 |
+//-         |  1 |  1  | 0-1 | 0 || 0 |  1 |
+//-         |  1 |  1  |  0  | X || Q | QQ |
+//-         +----+-----+-----+---++---+----+
+//-
 static NETLIST_START(TTL_7474_DIP)
 	TTL_7474(A)
 	TTL_7474(B)
@@ -846,28 +998,32 @@ static NETLIST_START(TTL_7474_DIP)
 		 A.CLK, /*  CLK1 |3           12| D2    */ B.D,
 		A.PREQ, /*   PR1 |4    7474   11| CLK2  */ B.CLK,
 		   A.Q, /*    Q1 |5           10| PR2   */ B.PREQ,
-		  A.QQ, /*   Q1Q |6            9| Q2    */ B.Q,
-		 A.GND, /*   GND |7            8| Q2Q   */ B.QQ
+		  A.QQ, /*   QQ1 |6            9| Q2    */ B.Q,
+		 A.GND, /*   GND |7            8| QQ2   */ B.QQ
 			    /*       +-------------+        */
 	)
 NETLIST_END()
 
-/*
- *  7475: 4-Bit Bistable Latches with Complementary Outputs
- *  7477: 4-Bit Bistable Latches
- *
- *          +----------+               +----------+
- *      1QQ |1   ++  16| 1Q         1D |1   ++  14| 1Q
- *       1D |2       15| 2Q         2D |2       13| 2Q
- *       2D |3       14| 2QQ      3C4C |3       12| 1C2C
- *     3C4C |4  7475 13| 1C2C      VCC |4  7477 11| GND
- *      VCC |5       12| GND        3D |5       10| NC
- *       3D |6       11| 3QQ        4D |6        9| 3Q
- *       4D |7       10| 3Q         NC |7        8| 4Q
- *      4QQ |8        9| 4Q            +----------+
- *          +----------+
- */
-
+//- Identifier: SN54/74LS75
+//- Title: 4-bit D Latch
+//- Description: The TTL/MSI SN54/74LS75 latch is used as temporary storage for binary information between processing units and input/output or indicator units.
+//-   Information present at a data (D) input is transferred to the Q output when the Enable is HIGH and the Q output will follow the data input as long as the Enable remains HIGH.
+//-   When the Enable goes LOW, the information (that was present at the data input at the time the transition occurred) is retained at the Q output until the Enable is permitted to go HIGH.
+//-   The SN54/74LS75 features complementary Q and QQ output from a 4-bit latch and is available in the 16-pin packages.
+//- Pinalias: QQ0,D0,D1,E23,VCC,D2,D3,QQ3,Q3,Q2,QQ2,GND,E01,QQ1,Q1,Q0
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Motorola datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/motorola/SN74LS77.pdf
+//-
+//-         +---+---++---+----+
+//-         | D | G || Q | QQ |
+//-         +===+===++===+====+
+//-         | 0 | 1 || 0 |  1 |
+//-         | 1 | 1 || 1 |  0 |
+//-         | X | 0 || Q | QQ |
+//-         +---+---++---+----+
+//-
 static NETLIST_START(TTL_7475_DIP)
 	TTL_7475_GATE(A)
 	TTL_7475_GATE(B)
@@ -880,19 +1036,39 @@ static NETLIST_START(TTL_7475_DIP)
 	NET_C(A.CLK, B.CLK)
 	NET_C(C.CLK, D.CLK)
 
-	DIPPINS(   /*       +----------+       */
-		 A.QQ, /*   1QQ |1   ++  16| 1Q    */ A.Q,
-		  A.D, /*    1D |2       15| 2Q    */ B.Q,
-		  B.D, /*    2D |3       14| 2QQ   */ B.QQ,
-		C.CLK, /*  3C4C |4  7475 13| 1C2C  */ A.CLK,
-		A.VCC, /*   VCC |5       12| GND   */ A.GND,
-		  C.D, /*    3D |6       11| 3QQ   */ C.QQ,
-		  D.D, /*    4D |7       10| 3Q    */ C.Q,
-		 D.QQ, /*   4QQ |8        9| 4Q    */ D.Q
-			   /*       +----------+       */
+	DIPPINS(   /*       +--------------+       */
+		 A.QQ, /*   QQ0 |1     ++    16| Q0    */ A.Q,
+		  A.D, /*    D0 |2           15| Q1    */ B.Q,
+		  B.D, /*    D1 |3           14| QQ1   */ B.QQ,
+		C.CLK, /*   E23 |4    7475   13| E01   */ A.CLK,
+		A.VCC, /*   VCC |5           12| GND   */ A.GND,
+		  C.D, /*    D2 |6           11| QQ2   */ C.QQ,
+		  D.D, /*    D3 |7           10| Q2    */ C.Q,
+		 D.QQ, /*   QQ3 |8            9| Q3    */ D.Q
+			   /*       +--------------+       */
 	)
 NETLIST_END()
 
+//- Identifier: SN54/74LS77
+//- Title: 4-bit D Latch
+//- Description: The TTL/MSI SN54/74LS77 latch is used as temporary storage for binary information between processing units and input/output or indicator units.
+//-   Information present at a data (D) input is transferred to the Q output when the Enable is HIGH and the Q output will follow the data input as long as the Enable remains HIGH.
+//-   When the Enable goes LOW, the information (that was present at the data input at the time the transition occurred) is retained at the Q output until the Enable is permitted to go HIGH.
+//-   For higher component density applications the SN54/74LS77 4-bit latch is available in the 14-pin package with QQ outputs omitted.
+//- Pinalias: D0,D1,E23,VCC,D2,D3,NC,Q3,Q2,NC,GND,E01,Q1,Q0
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Motorola datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/motorola/SN74LS77.pdf
+//-
+//-         +---+---++---+----+
+//-         | D | G || Q | QQ |
+//-         +===+===++===+====+
+//-         | 0 | 1 || 0 |  1 |
+//-         | 1 | 1 || 1 |  0 |
+//-         | X | 0 || Q | QQ |
+//-         +---+---++---+----+
+//-
 static NETLIST_START(TTL_7477_DIP)
 	TTL_7477_GATE(A)
 	TTL_7477_GATE(B)
@@ -907,33 +1083,31 @@ static NETLIST_START(TTL_7477_DIP)
 
 	NC_PIN(NC)
 
-	DIPPINS(   /*       +----------+       */
-		  A.D, /*    1D |1   ++  14| 1Q    */ A.Q,
-		  B.D, /*    2D |2       13| 2Q    */ B.Q,
-		C.CLK, /*  3C4C |3       12| 1C2C  */ A.CLK,
-		A.VCC, /*   VCC |4  7477 11| GND   */ A.GND,
-		  C.D, /*    3D |5       10| NC    */ NC.I,
-		  D.D, /*    4D |6        9| 3Q    */ C.Q,
-		 NC.I, /*    NC |7        8| 4Q    */ D.Q
-			   /*       +----------+       */
+	DIPPINS(   /*       +--------------+       */
+		  A.D, /*    D0 |1     ++    14| Q0    */ A.Q,
+		  B.D, /*    D1 |2           13| Q1    */ B.Q,
+		C.CLK, /*   E23 |3           12| E01   */ A.CLK,
+		A.VCC, /*   VCC |4    7477   11| GND   */ A.GND,
+		  C.D, /*    D2 |5           10| NC    */ NC.I,
+		  D.D, /*    D3 |6            9| Q2    */ C.Q,
+		 NC.I, /*    NC |7            8| Q3    */ D.Q
+			   /*       +--------------+       */
 	)
 NETLIST_END()
 
-/*
- *  DM7483: 4-Bit Binary Adder with Fast Carry
- *
- *          +--------------+
- *       A4 |1     ++    16| B4
- *       S3 |2           15| S4
- *       A3 |3           14| C4
- *       B3 |4    7483   13| C0
- *      VCC |5           12| GND
- *       S2 |6           11| B1
- *       B2 |7           10| A1
- *       A2 |8            9| S1
- *          +--------------+
- */
-
+//- Identifier: 54LS83A/DM54LS83A/DM74LS83A
+//- Title: 4-bit Binary Adders With Fast Carry
+//- Description: These full adders perform the addition of two 4-bit binary numbers.
+//-   The sum (S) outputs are provided for each bit and the resultant carry (C4) is obtained from the fourth bit.
+//-   These adders feature full internal look ahead across all four bits.
+//-   This provides the system designer with partial look-ahead performance at the economy and reduced package count of a ripple-carry implementation.
+//-   The adder logic, including the carry, is implemented in its true form meaning that the end-around carry can be accomplished without the need for logic or level inversion.
+//- Pinalias: A4,S3,A3,B3,VCC,S2,B2,A2,S1,A1,B1,GND,C0,C4,S4,B4
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006378.PDF
+//-
 static NETLIST_START(TTL_7483_DIP)
 	TTL_7483(A)
 
@@ -950,56 +1124,55 @@ static NETLIST_START(TTL_7483_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM7485: 4-bit Magnitude Comparators
- *
- *          +------------+
- *       B3 |1    ++   16| VCC
- *     LTIN |2         15| A3
- *     EQIN |3         14| B2
- *     GTIN |4   7485  13| A2
- *    GTOUT |5         12| A1
- *    EQOUT |6         11| B1
- *    LTOUT |7         10| A0
- *      GND |8          9| B0
- *          +------------+
- *
- *  Naming convention attempts to follow Texas Instruments datasheet
- */
-
+//- Identifier: 54LS85/DM54LS85/DM74LS85
+//- Title: 4-Bit Magnitude Comparators
+//- Description: These 4-bit magnitude comparators perform comparison of straight binary or BCD codes.
+//-   Three fully-decoded decisions about two 4-bit words (A, B) are made and are externally available at three outputs.
+//-   These devices are fully expandable to any number of bits without external gates.
+//-   Words ofgreater length may be compared by connecting comparators in cascade.
+//-   The A>B, A<B, and A=B outputs of a stage handling less-significant bits are connected to the corresponding inputs of the next stage handling more-significant bits.
+//-   The stage handling the least-significant bits must have a high-level voltage applied to the A=B input.
+//-   The cascading paths are implemented with only a two-gate-level delay to reduce overall comparison times for long words.
+//- Pinalias: B3,LTIN,EQIN,GTIN,GTOUT,EQOUT,LTOUT,GND,B0,A0,B1,A1,A2,B2,A3,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006379.PDF
+//-
 static NETLIST_START(TTL_7485_DIP)
 	TTL_7485(A)
 
-	DIPPINS(     /*       +------------+      */
-		   A.B3, /*    B3 |1    ++   16| VCC  */ A.VCC,
-		 A.LTIN, /*  LTIN |2         15| A3   */ A.A3,
-		 A.EQIN, /*  EQIN |3         14| B2   */ A.B2,
-		 A.GTIN, /*  GTIN |4   7485  13| A2   */ A.A2,
-		A.GTOUT, /* GTOUT |5         12| A1   */ A.A1,
-		A.EQOUT, /* EQOUT |6         11| B1   */ A.B1,
-		A.LTOUT, /* LTOUT |7         10| A0   */ A.A0,
-		  A.GND, /*   GND |8          9| B0   */ A.B0
-			     /*       +------------+      */
+	DIPPINS(     /*       +--------------+      */
+		   A.B3, /*    B3 |1     ++    16| VCC  */ A.VCC,
+		 A.LTIN, /*  LTIN |2           15| A3   */ A.A3,
+		 A.EQIN, /*  EQIN |3           14| B2   */ A.B2,
+		 A.GTIN, /*  GTIN |4    7485   13| A2   */ A.A2,
+		A.GTOUT, /* GTOUT |5           12| A1   */ A.A1,
+		A.EQOUT, /* EQOUT |6           11| B1   */ A.B1,
+		A.LTOUT, /* LTOUT |7           10| A0   */ A.A0,
+		  A.GND, /*   GND |8            9| B0   */ A.B0
+			     /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7486: Quad 2-Input Exclusive-OR Gates
- *
- *             Y = A+B
- *          +---+---++---+
- *          | A | B || Y |
- *          +===+===++===+
- *          | 0 | 0 || 0 |
- *          | 0 | 1 || 1 |
- *          | 1 | 0 || 1 |
- *          | 1 | 1 || 0 |
- *          +---+---++---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
+//- Identifier: 5486/DM5486/DM7486
+//- Title: Quad 2-Input Exclusive-OR Gates
+//- Description: This device contains four independent gates each of which performs the logic exclusive-OR function.
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006531.PDF
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 0 |
+//-         | 0 | 1 || 1 |
+//-         | 1 | 0 || 1 |
+//-         | 1 | 1 || 0 |
+//-         +---+---++---+
+//-
 static NETLIST_START(TTL_7486_DIP)
 	TTL_7486_GATE(A)
 	TTL_7486_GATE(B)
@@ -1009,40 +1182,68 @@ static NETLIST_START(TTL_7486_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*    B1 |2           13| B4   */ D.B,
-		A.Q,  /*    Y1 |3           12| A4   */ D.A,
-		B.A,  /*    A2 |4    7486   11| Y4   */ D.Q,
-		B.B,  /*    B2 |5           10| B3   */ C.B,
-		B.Q,  /*    Y2 |6            9| A3   */ C.A,
-		A.GND,/*   GND |7            8| Y3   */ C.Q
-			  /*       +--------------+      */
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| B4   */ D.B,
+		  A.Q, /*    Y1 |3           12| A4   */ D.A,
+		  B.A, /*    A2 |4    7486   11| Y4   */ D.Q,
+		  B.B, /*    B2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7490: Decade Counters
- *
- *          +--------------+
- *        B |1     ++    14| A
- *      R01 |2           13| NC
- *      R02 |3           12| QA
- *       NC |4    7490   11| QD
- *      VCC |5           10| GND
- *      R91 |6            9| QB
- *      R92 |7            8| QC
- *          +--------------+
- */
-
- static NETLIST_START(TTL_7490_DIP)
+//- Identifier: DM5490/DM7490A
+//- Title: Decade Counter
+//- Description: These monolithic counters contain four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-five.
+//-   These counters have a gated zero reset and also gated set-to-nine inputs for use in BCD nine’s complement applications.
+//-   To use their maximum count length, the B input is connected to the QA output.
+//-   The input count pulses are applied to input A and the outputs are as described in the truth table.
+//-   A symmetrical divide-by-ten count can be obtained by connecting the QD output to the A input and applying the input count to the B input which gives a divide-by-ten squarewave at output QA.
+//- Pinalias: B,R01,R02,NC,VCC,R91,R92,QC,QB,GND,QD,QA,NC,A
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
+//-
+//-               BCD Count Sequence                    BCD Bi-Quinary
+//-         +-------++----+----+----+----+      +-------++----+----+----+----+
+//-         | Count || QD | QC | QB | QA |      | Count || QD | QC | QB | QA |
+//-         +=======++====+====+====+====+      +=======++====+====+====+====+
+//-         |   0   ||  0 |  0 |  0 |  0 |      |   0   ||  0 |  0 |  0 |  0 |
+//-         |   1   ||  0 |  0 |  0 |  1 |      |   1   ||  0 |  0 |  0 |  1 |
+//-         |   2   ||  0 |  0 |  1 |  0 |      |   2   ||  0 |  0 |  1 |  0 |
+//-         |   3   ||  0 |  0 |  1 |  1 |      |   3   ||  0 |  0 |  1 |  1 |
+//-         |   4   ||  0 |  1 |  0 |  0 |      |   4   ||  0 |  1 |  0 |  0 |
+//-         |   5   ||  0 |  1 |  0 |  1 |      |   5   ||  1 |  0 |  0 |  0 |
+//-         |   6   ||  0 |  1 |  1 |  0 |      |   6   ||  1 |  0 |  0 |  1 |
+//-         |   7   ||  0 |  1 |  1 |  1 |      |   7   ||  1 |  0 |  1 |  0 |
+//-         |   8   ||  1 |  0 |  0 |  0 |      |   8   ||  1 |  0 |  1 |  1 |
+//-         |   9   ||  1 |  0 |  0 |  1 |      |   9   ||  1 |  1 |  0 |  0 |
+//-         +-------++----+----+----+----+      +-------++----+----+----+----+
+//-
+//-                   Reset/Count Function Table
+//-         +-----+-----+-----+-----++----+----+----+----+
+//-         | R01 | R02 | R91 | R92 || QD | QC | QB | QA |
+//-         +=====+=====+=====+=====++====+====+====+====+
+//-         |  1  |  1  |  0  |  X  ||  0 |  0 |  0 |  0 |
+//-         |  1  |  1  |  X  |  0  ||  0 |  0 |  0 |  0 |
+//-         |  X  |  X  |  1  |  1  ||  1 |  0 |  0 |  1 |
+//-         |  X  |  0  |  X  |  0  ||       COUNT       |
+//-         |  0  |  X  |  0  |  X  ||       COUNT       |
+//-         |  0  |  X  |  X  |  0  ||       COUNT       |
+//-         |  X  |  0  |  0  |  X  ||       COUNT       |
+//-         +-----+-----+-----+-----++----+----+----+----+
+//-
+static NETLIST_START(TTL_7490_DIP)
 	TTL_7490(A)
 	NC_PIN(NC)
 
 	DIPPINS(   /*     +--------------+     */
 		  A.B, /*   B |1     ++    14| A   */ A.A,
-		 A.R1, /*  R1 |2           13| NC  */ NC.I,
-		 A.R2, /*  R2 |3           12| QA  */ A.QA,
+		 A.R1, /* R01 |2           13| NC  */ NC.I,
+		 A.R2, /* R02 |3           12| QA  */ A.QA,
 		 NC.I, /*  NC |4    7490   11| QD  */ A.QD,
 		A.VCC, /* VCC |5           10| GND */ A.GND,
 		A.R91, /* R91 |6            9| QB  */ A.QB,
@@ -1051,50 +1252,104 @@ NETLIST_END()
 	)
 NETLIST_END()
 
-/*
- *  SN7492: Divide-by-12 Counter
- *
- *          +--------------+
- *        B |1     ++    14| A
- *       NC |2           13| NC
- *       NC |3           12| QA
- *       NC |4    7492   11| QD
- *      VCC |5           10| GND
- *      R01 |6            9| QB
- *      R02 |7            8| QC
- *          +--------------+
- */
-
+//- Identifier: SN5492A, SN54LS92, SN7492A, SN74LS92
+//- Title: Divide-By-Twelve Counter
+//- Description: These monolithic counters contain four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-six.
+//-   These counters have a gated zero reset.
+//-   To use their maximum count length, the CKB input is connected to the QA output.
+//-   The input count pulses are applied to input CKA and the outputs are as described in the truth table.
+//- Pinalias: CKB,NC,NC,NC,VCC,R01,R02,QD,QC,GND,QB,QA,NC,CLKA
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/27430/TI/SN7492A.html
+//-
+//-                 Count Sequence
+//-         +-------++----+----+----+----+
+//-         | Count || QD | QC | QB | QA |
+//-         +=======++====+====+====+====+
+//-         |   0   ||  0 |  0 |  0 |  0 |
+//-         |   1   ||  0 |  0 |  0 |  1 |
+//-         |   2   ||  0 |  0 |  1 |  0 |
+//-         |   3   ||  0 |  0 |  1 |  1 |
+//-         |   4   ||  0 |  1 |  0 |  0 |
+//-         |   5   ||  0 |  1 |  0 |  1 |
+//-         |   6   ||  1 |  0 |  0 |  0 |
+//-         |   7   ||  1 |  0 |  0 |  1 |
+//-         |   8   ||  1 |  0 |  1 |  0 |
+//-         |   9   ||  1 |  0 |  1 |  1 |
+//-         |  10   ||  1 |  1 |  0 |  0 |
+//-         |  11   ||  1 |  1 |  0 |  1 |
+//-         +-------++----+----+----+----+
+//-
+//-             Reset/Count Function Table
+//-         +-----+-----++----+----+----+----+
+//-         | R01 | R02 || QD | QC | QB | QA |
+//-         +=====+=====++====+====+====+====+
+//-         |  1  |  1  ||  0 |  0 |  0 |  0 |
+//-         |  0  |  X  ||       COUNT       |
+//-         |  X  |  0  ||       COUNT       |
+//-         +-----+-----++----+----+----+----+
+//-
  static NETLIST_START(TTL_7492_DIP)
 	TTL_7492(A)
 	NC_PIN(NC)
 
-	DIPPINS(   /*     +--------------+     */
-		  A.B, /*   B |1     ++    14| A   */ A.A,
-		 NC.I, /*  NC |2           13| NC  */ NC.I,
-		 NC.I, /*  NC |3           12| QA  */ A.QA,
-		 NC.I, /*  NC |4    7492   11| QD  */ A.QD,
-		A.VCC, /* VCC |5           10| GND */ A.GND,
-		 A.R1, /* R01 |6            9| QB  */ A.QB,
-		 A.R2, /* R02 |7            8| QC  */ A.QC
-			   /*     +--------------+     */
+	DIPPINS(   /*      +--------------+      */
+		  A.B, /* CLKB |1     ++    14| CLKA */ A.A,
+		 NC.I, /*   NC |2           13| NC   */ NC.I,
+		 NC.I, /*   NC |3           12| QA   */ A.QA,
+		 NC.I, /*   NC |4    7492   11| QD   */ A.QD,
+		A.VCC, /*  VCC |5           10| GND  */ A.GND,
+		 A.R1, /*  R01 |6            9| QB   */ A.QB,
+		 A.R2, /*  R02 |7            8| QC   */ A.QC
+			   /*      +--------------+      */
 	)
 NETLIST_END()
 
-/*
- *  DM7493: Binary Counters
- *
- *          +--------------+
- *     CLKB |1     ++    14| CLKA
- *      R01 |2           13| NC
- *      R02 |3           12| QA
- *       NC |4    7493   11| QD
- *      VCC |5           10| GND
- *       NC |6            9| QB
- *       NC |7            8| QC
- *          +--------------+
- */
-
+//- Identifier: DM7493A
+//- Title: Binary Counter
+//- Description: These monolithic counters contain four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-eight.
+//-   These counters have a gated zero reset.
+//-   To use their maximum count length, the B input is connected to the QA output.
+//-   The input count pulses are applied to input A and the outputs are as described in the truth table.
+//- Pinalias: B,R01,R02,NC,VCC,NC,NC,QC,QB,GND,QD,QA,NC,A
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
+//-
+//-                 Count Sequence
+//-         +-------++----+----+----+----+
+//-         | Count || QD | QC | QB | QA |
+//-         +=======++====+====+====+====+
+//-         |   0   ||  0 |  0 |  0 |  0 |
+//-         |   1   ||  0 |  0 |  0 |  1 |
+//-         |   2   ||  0 |  0 |  1 |  0 |
+//-         |   3   ||  0 |  0 |  1 |  1 |
+//-         |   4   ||  0 |  1 |  0 |  0 |
+//-         |   5   ||  0 |  1 |  0 |  1 |
+//-         |   6   ||  0 |  1 |  1 |  0 |
+//-         |   7   ||  0 |  1 |  1 |  1 |
+//-         |   8   ||  1 |  0 |  0 |  0 |
+//-         |   9   ||  1 |  0 |  0 |  1 |
+//-         |  10   ||  1 |  0 |  1 |  0 |
+//-         |  11   ||  1 |  0 |  1 |  1 |
+//-         |  12   ||  1 |  1 |  0 |  0 |
+//-         |  13   ||  1 |  1 |  0 |  1 |
+//-         |  14   ||  1 |  1 |  1 |  0 |
+//-         |  15   ||  1 |  1 |  1 |  1 |
+//-         +-------++----+----+----+----+
+//-
+//-             Reset/Count Function Table
+//-         +-----+-----++----+----+----+----+
+//-         | R01 | R02 || QD | QC | QB | QA |
+//-         +=====+=====++====+====+====+====+
+//-         |  1  |  1  ||  0 |  0 |  0 |  0 |
+//-         |  0  |  X  ||       COUNT       |
+//-         |  X  |  0  ||       COUNT       |
+//-         +-----+-----++----+----+----+----+
+//-
  static NETLIST_START(TTL_7493_DIP)
 	TTL_7493(A)
 	NC_PIN(NC)
@@ -1111,51 +1366,57 @@ NETLIST_END()
 	)
 NETLIST_END()
 
-/*
- *  SN7497: Synchronous 6-Bit Binary Rate Multiplier
- *
- *          +--------------+
- *       B1 |1           16| VCC
- *       B4 |2           15| B3
- *       B5 |3           14| B2
- *       B0 |4    7497   13| CLR
- *        Z |5           12| UNITY/CAS
- *        Y |6           11| ENin (EN)
- *    ENout |7           10| STRB
- *      GND |8            9| CLK
- *          +--------------+
- */
-
+//- Identifier: 5497/DM7497
+//- Title: Synchronous Modulo-64 Bit Rate Multiplier
+//- Description: The ’97 contains a synchronous 6-stage binary counter and six decoding gates that serve to gate the clock through to the output at a sub-multiple of the input frequency.
+//-   The output pulse rate, relative to the clock frequency, is determined by signals applied to the Select (S0–S5) inputs.
+//-   Both true and complement outputs are available, along with an enable input for each.
+//-   A Count Enable input and a Terminal Count output are provided for cascading two or more packages.
+//-   An asynchronous Master Reset input prevents counting and resets the counter.
+//- Pinalias: S1,S4,S5,S0,ZQ,Y,TCQ,GND,CP,EZQ,CEQ,EY,MR,S2,S3,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009780.PDF
+//-
 static NETLIST_START(TTL_7497_DIP)
 	TTL_7497(A)
 
-	DIPPINS(     /*       +--------------+ */
-		    A.B1, /*    B1 |1           16| VCC       */ A.VCC,
-		    A.B4, /*    B4 |2           15| B3        */ A.B3,
-		    A.B5, /*    B5 |3           14| B2        */ A.B2,
-		    A.B0, /*    B0 |4    7497   13| CLR       */ A.CLR,
-		    A.ZQ, /*     Z |5           12| UNITY/CAS */ A.UNITYQ,
-		     A.Y, /*     Y |6           11| ENin (EN) */ A.ENQ,
-		A.ENOUTQ, /* ENout |7           10| STRB      */ A.STRBQ,
-		   A.GND, /*   GND |8            9| CLK       */ A.CLK
-			      /*       +--------------+           */
+	DIPPINS(      /*       +--------------+ */
+		    A.B1, /*    S1 |1     ++    16| VCC   */ A.VCC,
+		    A.B4, /*    S4 |2           15| S3    */ A.B3,
+		    A.B5, /*    S5 |3           14| S2    */ A.B2,
+		    A.B0, /*    S0 |4    7497   13| MR    */ A.CLR,
+		    A.ZQ, /*    ZQ |5           12| EY    */ A.UNITYQ,
+		     A.Y, /*     Y |6           11| CEQ   */ A.ENQ,
+		A.ENOUTQ, /*   TCQ |7           10| EZQ   */ A.STRBQ,
+		   A.GND, /*   GND |8            9| CP    */ A.CLK
+			      /*       +--------------+       */
 	)
 NETLIST_END()
 
-/*
- *  DM74107: DUAL J-K FLIP-FLOPS WITH CLEAR
- *
- *          +--------------+
- *       1J |1     ++    14| VCC
- *      1QQ |2           13| 1CLRQ
- *       1Q |3           12| 1CLK
- *       1K |4    74107  11| 2K
- *       2Q |5           10| 2CLRQ
- *      2QQ |6            9| 2CLK
- *      GND |7            8| 2J
- *          +--------------+
- */
-
+//- Identifier: SN54107, SN74107
+//- Title: Dual J-K Flip-Flops With Clear
+//- Description: The '107 contains two independent J-K flip-flops with individual J-K, clock, and direct clear inputs.
+//-   The '107 is a positive pulse-triggered flip-flop.
+//-   The J-K input data is loaded into the master while the clock is high and transferred to teh slave and the outputs on the high-to-low clock transition.
+//-   For these devices the J and K inputs must be stable while the clock is high.
+//- Pinalias: 1J,1QQ,1Q,1K,2Q,2QQ,GND,2J,2CLK,2CLRQ,2K,1CLK,1CLRQ,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/840452/TI1/SN74107.html
+//-
+//-         +------+-------+---+---++---+----+
+//-         | CLRQ |  CLK  | J | K || Q | QQ |
+//-         +======+=======+===+===++===+====+
+//-         |   0  |   X   | X | X || 0 |  1 |
+//-         |   1  | 0-1-0 | 0 | 0 || Q | QQ |
+//-         |   1  | 0-1-0 | 1 | 0 || 1 |  0 |
+//-         |   1  | 0-1-0 | 0 | 1 || 0 |  1 |
+//-         |   1  | 0-1-0 | 1 | 1 || TOGGLE |
+//-         +------+-------+---+---++---+----+
+//-
 static NETLIST_START(TTL_74107_DIP)
 #if (NL_USE_TRUTHTABLE_74107)
 	TTL_74107_TT(A)
@@ -1172,7 +1433,7 @@ static NETLIST_START(TTL_74107_DIP)
 		  A.J, /*  1J |1     ++    14| VCC   */ A.VCC,
 		 A.QQ, /* 1QQ |2           13| 1CLRQ */ A.CLRQ,
 		  A.Q, /*  1Q |3           12| 1CLK  */ A.CLK,
-		  A.K, /*  1K |4    74107  11| 2K    */ B.K,
+		  A.K, /*  1K |4   74107   11| 2K    */ B.K,
 		  B.Q, /*  2Q |5           10| 2CLRQ */ B.CLRQ,
 		 B.QQ, /* 2QQ |6            9| 2CLK  */ B.CLK,
 		B.GND, /* GND |7            8| 2J    */ B.J
@@ -1180,6 +1441,30 @@ static NETLIST_START(TTL_74107_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: DM54LS107A/DM74LS107A
+//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops withClear and Complementary Outputs
+//- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
+//-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
+//-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
+//-   The data on the J and K inputs may change while the clock is high or low without affecting the outputs as long as setup and hold times are not violated.
+//-   A low logic level on the clear input will reset the outputs regardless of the logic levels of the other inputs.
+//- Pinalias: J1,QQ1,Q1,K1,Q2,QQ2,GND,J2,CLK2,CLRQ2,K2,CLK1,CLRQ1,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006367.PDF
+//-
+//-         +------+-----+---+---++---+----+
+//-         | CLRQ | CLK | J | K || Q | QQ |
+//-         +======+=====+===+===++===+====+
+//-         |   0  |  X  | X | X || 0 |  1 |
+//-         |   1  | 1-0 | 0 | 0 || Q | QQ |
+//-         |   1  | 1-0 | 1 | 0 || 1 |  0 |
+//-         |   1  | 1-0 | 0 | 1 || 0 |  1 |
+//-         |   1  | 1-0 | 1 | 1 || TOGGLE |
+//-         |   1  |  1  | X | X || Q | QQ |
+//-         +------+-----+---+---++---+----+
+//-
 static NETLIST_START(TTL_74107A_DIP)
 	TTL_74107A(A)
 	TTL_74107A(B)
@@ -1188,34 +1473,41 @@ static NETLIST_START(TTL_74107A_DIP)
 	NET_C(A.GND, B.GND)
 
 	DIPPINS(   /*     +--------------+       */
-		  A.J, /*  1J |1     ++    14| VCC   */ A.VCC,
-		 A.QQ, /* 1QQ |2           13| 1CLRQ */ A.CLRQ,
-		  A.Q, /*  1Q |3           12| 1CLK  */ A.CLK,
-		  A.K, /*  1K |4    74107  11| 2K    */ B.K,
-		  B.Q, /*  2Q |5           10| 2CLRQ */ B.CLRQ,
-		 B.QQ, /* 2QQ |6            9| 2CLK  */ B.CLK,
-		B.GND, /* GND |7            8| 2J    */ B.J
+		  A.J, /*  J1 |1     ++    14| VCC   */ A.VCC,
+		 A.QQ, /* QQ1 |2           13| CLRQ1 */ A.CLRQ,
+		  A.Q, /*  Q1 |3           12| CLK1  */ A.CLK,
+		  A.K, /*  K1 |4   74107A  11| K2    */ B.K,
+		  B.Q, /*  Q2 |5           10| CLRQ2 */ B.CLRQ,
+		 B.QQ, /* QQ2 |6            9| CLK2  */ B.CLK,
+		B.GND, /* GND |7            8| J2    */ B.J
 			   /*     +--------------+       */
 	)
 NETLIST_END()
 
-/*
- * nld_74113.h
- *
- *  74113: Dual Master-Slave J-K Flip-Flops with Set and Complementary Outputs
- *  74113A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Set and Complementary Outputs
- *
- *          +----------+
- *     1CLK |1   ++  14| VCC
- *       1K |2       13| 2CLK
- *       1J |3       12| 2K
- *    1SETQ |4 74113 11| 2J
- *       1Q |5       10| 2SETQ
- *      1QQ |6        9| 2Q
- *      GND |7        8| 2QQ
- *          +----------+
- */
-
+//- Identifier: DM54S113/DM74S113
+//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Preset and Complementary Outputs
+//- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
+//-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
+//-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
+//-   Data on the J and K inputs may be changed while the clock is high or low without affecting the outputs as long as setup and hold times are not violated.
+//-   A low logic level on the preset input will set the outputs regardless of the logic levels of the other inputs.
+//- Pinalias: CLK1,K1,J1,PRQ1,Q1,QQ1,GND,QQ2,Q2,PRQ2,J2,K2,CLK2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006460.PDF
+//-
+//-         +-----+-----+---+---++---+----+
+//-         | PRQ | CLK | J | K || Q | QQ |
+//-         +=====+=====+===+===++===+====+
+//-         |  0  |  X  | X | X || 1 |  0 |
+//-         |  1  | 1-0 | 0 | 0 || Q | QQ |
+//-         |  1  | 1-0 | 1 | 0 || 1 |  0 |
+//-         |  1  | 1-0 | 0 | 1 || 0 |  1 |
+//-         |  1  | 1-0 | 1 | 1 || TOGGLE |
+//-         |  1  |  1  | X | X || Q | QQ |
+//-         +-----+-----+---+---++---+----+
+//-
 static NETLIST_START(TTL_74113_DIP)
 	TTL_74113(A)
 	TTL_74113(B)
@@ -1223,18 +1515,42 @@ static NETLIST_START(TTL_74113_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(    /*       +----------+       */
-		 A.CLK, /*  1CLK |1   ++  14| VCC   */ A.VCC,
-		   A.K, /*    1K |2       13| 2CLK  */ B.CLK,
-		   A.J, /*    1J |3       12| 2K    */ B.K,
-		A.SETQ, /* 1SETQ |4 74113 11| 2J    */ B.J,
-		   A.Q, /*    1Q |5       10| 2SETQ */ B.SETQ,
-		  A.QQ, /*   1QQ |6        9| 2Q    */ B.Q,
-		 A.GND, /*   GND |7        8| 2QQ   */ B.QQ
-			    /*       +----------+       */
+	DIPPINS(    /*       +--------------+       */
+		 A.CLK, /*  CLK1 |1     ++    14| VCC   */ A.VCC,
+		   A.K, /*    K1 |2           13| CLK2  */ B.CLK,
+		   A.J, /*    J1 |3           12| K2    */ B.K,
+		A.SETQ, /*  PRQ1 |4   74113   11| J2    */ B.J,
+		   A.Q, /*    Q1 |5           10| PRQ2  */ B.SETQ,
+		  A.QQ, /*   QQ1 |6            9| Q2    */ B.Q,
+		 A.GND, /*   GND |7            8| QQ2   */ B.QQ
+			    /*       +--------------+       */
 	)
 NETLIST_END()
 
+//- Identifier: DM54S113/DM74S113
+//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Preset and Complementary Outputs
+//- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
+//-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
+//-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
+//-   Data on the J and K inputs may be changed while the clock is high or low without affecting the outputs as long as setup and hold times are not violated.
+//-   A low logic level on the preset input will set the outputs regardless of the logic levels of the other inputs.
+//- Pinalias: CLK1,K1,J1,PRQ1,Q1,QQ1,GND,QQ2,Q2,PRQ2,J2,K2,CLK2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/131122/TI/SN74LS113A.html
+//-
+//-         +------+-----+---+---++---+----+
+//-         | PREQ | CLK | J | K || Q | QQ |
+//-         +======+=====+===+===++===+====+
+//-         |   0  |  X  | X | X || 1 |  0 |
+//-         |   1  | 1-0 | 0 | 0 || Q | QQ |
+//-         |   1  | 1-0 | 1 | 0 || 1 |  0 |
+//-         |   1  | 1-0 | 0 | 1 || 0 |  1 |
+//-         |   1  | 1-0 | 1 | 1 || TOGGLE |
+//-         |   1  |  1  | X | X || Q | QQ |
+//-         +------+-----+---+---++---+----+
+//-
 static NETLIST_START(TTL_74113A_DIP)
 	TTL_74113A(A)
 	TTL_74113A(B)
@@ -1242,15 +1558,15 @@ static NETLIST_START(TTL_74113A_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(    /*       +----------+       */
-		 A.CLK, /*  1CLK |1   ++  14| VCC   */ A.VCC,
-		   A.K, /*    1K |2       13| 2CLK  */ B.CLK,
-		   A.J, /*    1J |3       12| 2K    */ B.K,
-		A.SETQ, /* 1SETQ |4 74113 11| 2J    */ B.J,
-		   A.Q, /*    1Q |5       10| 2SETQ */ B.SETQ,
-		  A.QQ, /*   1QQ |6        9| 2Q    */ B.Q,
-		 A.GND, /*   GND |7        8| 2QQ   */ B.QQ
-			    /*       +----------+       */
+	DIPPINS(    /*       +--------------+       */
+		 A.CLK, /*  CLK1 |1     ++    14| VCC   */ A.VCC,
+		   A.K, /*    K1 |2           13| CLK2  */ B.CLK,
+		   A.J, /*    J1 |3           12| K2    */ B.K,
+		A.SETQ, /*  PRQ1 |4   74113A  11| J2    */ B.J,
+		   A.Q, /*    Q1 |5           10| PRQ2  */ B.SETQ,
+		  A.QQ, /*   QQ1 |6            9| Q2    */ B.Q,
+		 A.GND, /*   GND |7            8| QQ2   */ B.QQ
+			    /*       +--------------+       */
 	)
 NETLIST_END()
 
@@ -1280,33 +1596,26 @@ NETLIST_END()
 //-    https://pdf1.alldatasheet.com/datasheet-pdf/view/50894/FAIRCHILD/74121.html
 //-
 static NETLIST_START(TTL_74121_DIP)
-
 	TTL_74121(A)
+	NC_PIN(NC)
 	RES(RINT, RES_K(2))
-	RES(RD,   RES_M(1000))
-
-	ALIAS(1, A.QQ)
-	//ALIAS(2", ); NC
-	ALIAS(3, A.A1)
-	ALIAS(4, A.A2)
-	ALIAS(5, A.B)
-	ALIAS(6, A.Q)
-	ALIAS(7, A.GND)
-
-	//ALIAS(8", ); NC
-	ALIAS(9,  RINT.1) // RINT
-	ALIAS(10, A.C) // CEXT
-	ALIAS(11, A.RC) // REXT
-	//ALIAS(12", ); NC
-	//ALIAS(13", ); NC
-	ALIAS(14, A.VCC)
+	RES(RD, RES_M(1000))
 
 	NET_C(RINT.2, A.RC)
-
 	// Avoid error messages if RINT is not used.
 	NET_C(RINT.1, RD.2)
 	NET_C(RD.1, A.GND)
 
+	DIPPINS(    /*       +--------------+           */
+		  A.QQ, /*    QQ |1     ++    14| VCC       */ A.VCC,
+		  NC.I, /*    NC |2           13| NC        */ NC.I,
+		  A.A1, /*    A1 |3           12| NC        */ NC.I,
+		  A.A2, /*    A2 |4   74121   11| REXT/CEXT */ A.RC,
+		   A.B, /*     B |5           10| CEXT      */ A.C,
+		   A.Q, /*     Q |6            9| RINT      */ RINT.1,
+		 A.GND, /*   GND |7            8| NC        */ NC.I
+			    /*       +--------------+           */
+	)
 NETLIST_END()
 
 //- Identifier:  TTL_74123_DIP
@@ -1337,85 +1646,23 @@ NETLIST_END()
 //-    https://pdf1.alldatasheet.com/datasheet-pdf/view/50893/FAIRCHILD/DM74123.html
 //-
 static NETLIST_START(TTL_74123_DIP)
-
 	TTL_74123(A)
 	TTL_74123(B)
 
-	ALIAS(1, A.A)
-	ALIAS(2, A.B)
-	ALIAS(3, A.CLRQ)
-	ALIAS(4, A.QQ)
-	ALIAS(5, B.Q)
-	ALIAS(6, B.C) // CEXT
-	ALIAS(7, B.RC) // REXT
-	ALIAS(8, A.GND)
-
-	ALIAS(9, B.A)
-	ALIAS(10, B.B)
-	ALIAS(11, B.CLRQ)
-	ALIAS(12, B.QQ)
-	ALIAS(13, A.Q)
-	ALIAS(14, A.C) // CEXT
-	ALIAS(15, A.RC) // REXT
-	ALIAS(16, A.VCC)
-
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
-NETLIST_END()
 
-//- Identifier:  TTL_9602_DIP
-//- Title: DM9602 Dual Retriggerable, Resettable One Shots
-//- Description: These dual resettable, retriggerable one shots have two
-//-   inputs per function; one which is active HIGH, and one
-//-   which is active LOW. This allows the designer to employ
-//-   either leading-edge or trailing-edge triggering, which is
-//-   independent of input transition times. When input conditions for triggering are met, a new cycle starts and the
-//-   external capacitor is allowed to rapidly discharge and then
-//-   charge again. The retriggerable feature permits output
-//-   pulse widths to be extended. In fact a continuous true output can be maintained by having an input cycle time whih
-//-   is shorter than the output cycle time. The output pulse may
-//-   then be terminated at any time by applying a LOW logic
-//-   level to the RESET pin. Retriggering may be inhibited by
-//-   either connecting the Q output to an active HIGH input, or
-//-   the Q output to an active LOW input.
-//-   The DM74123 is a dual retriggerable monostable multivibrator
-//-
-//- Pinalias: C1,RC1,CLRQ1,B1,A1,Q1,QQ1,GND,QQ2,Q2,A2,B2,CLRQ2,RC2,C2,VCC
-//- Package: DIP
-//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
-//- Limitations:
-//-    Timing inaccuracies may occur for capacitances < 1nF. Please consult datasheet
-//-
-//- Example: 74123.cpp,74123_example
-//-
-//- FunctionTable:
-//-    https://pdf1.alldatasheet.com/datasheet-pdf/view/51137/FAIRCHILD/DM9602.html
-//-
-static NETLIST_START(TTL_9602_DIP)
-
-	TTL_9602(A)
-	TTL_9602(B)
-
-	ALIAS(1, A.C) // C1
-	ALIAS(2, A.RC) // RC1
-	ALIAS(3, A.CLRQ)
-	ALIAS(4, A.B)
-	ALIAS(5, A.A)
-	ALIAS(6, A.Q)
-	ALIAS(7, A.QQ)
-	ALIAS(8, A.GND)
-
-	ALIAS(9, B.QQ)
-	ALIAS(10, B.Q)
-	ALIAS(11, B.A)
-	ALIAS(12, B.B)
-	ALIAS(13, B.CLRQ)
-	ALIAS(14, B.RC) // RC2
-	ALIAS(15, B.C) // C2
-	ALIAS(16, A.VCC)
-
-	NET_C(A.VCC, B.VCC)
-	NET_C(A.GND, B.GND)
+	DIPPINS(      /*       +--------------+ */
+		     A.A, /*    A1 |1     ++    16| VCC   */ A.VCC,
+		     A.B, /*    B1 |2           15| RC1   */ A.RC,
+		  A.CLRQ, /* CLRQ1 |3           14| C1    */ A.C,
+		    A.QQ, /*   QQ1 |4   74123   13| Q1    */ A.Q,
+		     B.Q, /*    Q2 |5           12| QQ2   */ B.QQ,
+		     B.C, /*    C2 |6           11| CLRQ  */ B.CLRQ,
+		    B.RC, /*   RC2 |7           10| B2    */ B.B,
+		   A.GND, /*   GND |8            9| A2    */ B.A
+			      /*       +--------------+       */
+	)
 NETLIST_END()
 
 //- Identifier:  TTL_74125_DIP
@@ -1450,72 +1697,80 @@ NETLIST_END()
 //-    |  L  |  H |  H |
 //-    |  H  |  X |  Z |
 //-
-
 static NETLIST_START(TTL_74125_DIP)
+	TTL_74125_GATE(A)
+	TTL_74125_GATE(B)
+	TTL_74125_GATE(C)
+	TTL_74125_GATE(D)
 
-	TTL_74125_GATE(A1)
-	TTL_74125_GATE(A2)
-	TTL_74125_GATE(A3)
-	TTL_74125_GATE(A4)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DEFPARAM(FORCE_TRISTATE_LOGIC, "$(@.A1.FORCE_TRISTATE_LOGIC")
+	DEFPARAM(FORCE_TRISTATE_LOGIC, "$(@.A.FORCE_TRISTATE_LOGIC")
+	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(B.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(C.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(D.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 
-	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-	PARAM(A4.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-
-	ALIAS(1, A1.GQ)
-	ALIAS(2, A1.A)
-	ALIAS(3, A1.Y)
-	ALIAS(4, A2.GQ)
-	ALIAS(5, A2.A)
-	ALIAS(6, A2.Y)
-	ALIAS(7, A1.GND)
-
-	ALIAS(8, A3.Y)
-	ALIAS(9, A3.A)
-	ALIAS(10, A3.GQ)
-	ALIAS(11, A4.Y)
-	ALIAS(12, A4.A)
-	ALIAS(13, A4.GQ)
-	ALIAS(14, A1.VCC)
-
-	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
-	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
+	DIPPINS(   /*      +--------------+      */
+		 A.GQ, /*  1GQ |1     ++    14| VCC  */ A.VCC,
+		  A.A, /*   1A |2           13| 4GQ  */ D.GQ,
+		  A.Y, /*   1Y |3           12| 4A   */ D.A,
+		 B.GQ, /*  2GQ |4   74125   11| 4Y   */ D.Y,
+		  B.A, /*   2A |5           10| 3GQ  */ C.GQ,
+		  B.Y, /*   2Y |6            9| 3A   */ C.A,
+		A.GND, /*  GND |7            8| 3Y   */ C.Y
+			   /*      +--------------+      */
+	)
 NETLIST_END()
 
+//- Identifier: DM74LS126A
+//- Title: Quad 3-STATE Buffer
+//- Description: This device contains four independent gates each of which performs a non-inverting buffer function.
+//-   The outputs have the 3-STATE feature.
+//-   When enabled, the outputs exhibit the low impedance characteristics of a standard LS output with additional drive capability to permit the driving of buslines without external resistors.
+//-   When disabled, both the output transistors are turned OFF presenting a high-impedance state to the bus line.
+//-   Thus the output will act neither as a significant load nor as a driver.
+//-   To minimize the possibility that two outputs will attempt to take a common bus to opposite logic levels, the disable time is shorter than the enable time of the outputs.
+//- Pinalias: C1,A1,Y1,C2,A2,Y2,GND,Y3,A3,C3,Y4,A4,C4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   https://pdf.datasheetcatalog.com/datasheets/50/232293_DS.pdf
+//-
+//-         +---+---++------+
+//-         | A | C ||   Y  |
+//-         +===+===++======+
+//-         | 0 | 1 ||   0  |
+//-         | 1 | 1 ||   1  |
+//-         | X | 0 || Hi-Z |
+//-         +---+---++------+
+//-
 static NETLIST_START(TTL_74126_DIP)
+	TTL_74126_GATE(A)
+	TTL_74126_GATE(B)
+	TTL_74126_GATE(C)
+	TTL_74126_GATE(D)
 
-	TTL_74126_GATE(A1)
-	TTL_74126_GATE(A2)
-	TTL_74126_GATE(A3)
-	TTL_74126_GATE(A4)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
 
 	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
-	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
-	PARAM(A4.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(B.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(C.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(D.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 
-	ALIAS(1, A1.G)
-	ALIAS(2, A1.A)
-	ALIAS(3, A1.Y)
-	ALIAS(4, A2.G)
-	ALIAS(5, A2.A)
-	ALIAS(6, A2.Y)
-	ALIAS(7, A1.GND)
-
-	ALIAS(8, A3.Y)
-	ALIAS(9, A3.A)
-	ALIAS(10, A3.G)
-	ALIAS(11, A4.Y)
-	ALIAS(12, A4.A)
-	ALIAS(13, A4.G)
-	ALIAS(14, A1.VCC)
-
-	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
-	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
+	DIPPINS(   /*      +--------------+      */
+		  A.G, /*   C1 |1     ++    14| VCC  */ A.VCC,
+		  A.A, /*   A1 |2           13| C4   */ D.G,
+		  A.Y, /*   Y1 |3           12| A4   */ D.A,
+		  B.G, /*   C2 |4   74126   11| Y4   */ D.Y,
+		  B.A, /*   A2 |5           10| C3   */ C.G,
+		  B.Y, /*   Y2 |6            9| A3   */ C.A,
+		A.GND, /*  GND |7            8| Y3   */ C.Y
+			   /*      +--------------+      */
+	)
 NETLIST_END()
 
 /*
@@ -1738,15 +1993,15 @@ NETLIST_END()
 static NETLIST_START(TTL_74164_DIP)
 	TTL_74164(A)
 
-	DIPPINS(    /*     +------------+      */
-		   A.A, /*   A |1    ++   14| VCC  */ A.VCC,
-		   A.B, /*   B |2         13| QH   */ A.QH,
-		  A.QA, /*  QA |3         12| QG   */ A.QG,
-		  A.QB, /*  QB |4  74164  11| QF   */ A.QF,
-		  A.QC, /*  QC |5         10| QE   */ A.QE,
-		  A.QD, /*  QD |6          9| CLRQ */ A.CLRQ,
-		 A.GND, /* GND |7          8| CLK  */ A.CLK
-			    /*     +------------+      */
+	DIPPINS(    /*     +--------------+      */
+		   A.A, /*   A |1     ++    14| VCC  */ A.VCC,
+		   A.B, /*   B |2           13| QH   */ A.QH,
+		  A.QA, /*  QA |3           12| QG   */ A.QG,
+		  A.QB, /*  QB |4   74164   11| QF   */ A.QF,
+		  A.QC, /*  QC |5           10| QE   */ A.QE,
+		  A.QD, /*  QD |6            9| CLRQ */ A.CLRQ,
+		 A.GND, /* GND |7            8| CLK  */ A.CLK
+			    /*     +--------------+      */
 	)
 NETLIST_END()
 
@@ -2054,15 +2309,15 @@ static NETLIST_START(TTL_74393_DIP)
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
-	DIPPINS(   /*     +------------+     */
-		 A.CP, /* /CP |1   ++    14| VCC */ A.VCC,
-		 A.MR, /*  MR |2         13| /CP */ B.CP,
-		 A.Q0, /*  Q0 |3         12| MR  */ B.MR,
-		 A.Q1, /*  Q1 |4  74393  11| Q0  */ B.Q0,
-		 A.Q2, /*  Q2 |5         10| Q1  */ B.Q1,
-		 A.Q3, /*  Q3 |6          9| Q2  */ B.Q2,
-		A.GND, /* GND |7          8| Q3  */ B.Q3
-			   /*     +------------+     */
+	DIPPINS(   /*     +--------------+     */
+		 A.CP, /* /CP |1    ++     14| VCC */ A.VCC,
+		 A.MR, /*  MR |2           13| /CP */ B.CP,
+		 A.Q0, /*  Q0 |3           12| MR  */ B.MR,
+		 A.Q1, /*  Q1 |4   74393   11| Q0  */ B.Q0,
+		 A.Q2, /*  Q2 |5           10| Q1  */ B.Q1,
+		 A.Q3, /*  Q3 |6            9| Q2  */ B.Q2,
+		A.GND, /* GND |7            8| Q3  */ B.Q3
+			   /*     +--------------+     */
 	)
 NETLIST_END()
 
@@ -2234,88 +2489,67 @@ static NETLIST_START(TTL_9322_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
 
-	DIPPINS(      /*        +------------+        */
-		A.SELECT, /* SELECT |1    ++   16| VCC    */ A.VCC,
-		     A.A, /*     A1 |2         15| STROBE */ A.STROBE,
-		     A.B, /*     B1 |3         14| A4     */ D.A,
-		     A.Y, /*     Y1 |4   9322  13| B4     */ D.B,
-		     B.A, /*     A2 |5         12| Y4     */ D.Y,
-		     B.B, /*     B2 |6         11| A3     */ C.A,
-		     B.Y, /*     Y2 |7         10| B3     */ C.B,
-		   A.GND, /*    GND |8          9| Y3     */ C.Y
-			      /*        +------------+        */
+	DIPPINS(      /*        +--------------+        */
+		A.SELECT, /* SELECT |1     ++    16| VCC    */ A.VCC,
+		     A.A, /*     A1 |2           15| STROBE */ A.STROBE,
+		     A.B, /*     B1 |3           14| A4     */ D.A,
+		     A.Y, /*     Y1 |4    9322   13| B4     */ D.B,
+		     B.A, /*     A2 |5           12| Y4     */ D.Y,
+		     B.B, /*     B2 |6           11| A3     */ C.A,
+		     B.Y, /*     Y2 |7           10| B3     */ C.B,
+		   A.GND, /*    GND |8            9| Y3     */ C.Y
+			      /*        +--------------+        */
 	)
 NETLIST_END()
 
-/*  SN7442: 4-Line BCD to 10-Line Decimal Decoder
- *
- *          +--------------+
- *        0 |1     ++    16| VCC
- *        1 |2           15| A
- *        2 |3           14| B
- *        3 |4           13| C
- *        4 |5    7442   12| D
- *        5 |6           11| 9
- *        6 |7           10| 8
- *      GND |8            9| 7
- *          +--------------+
- */
+//- Identifier:  TTL_9602_DIP
+//- Title: DM9602 Dual Retriggerable, Resettable One Shots
+//- Description: These dual resettable, retriggerable one shots have two
+//-   inputs per function; one which is active HIGH, and one
+//-   which is active LOW. This allows the designer to employ
+//-   either leading-edge or trailing-edge triggering, which is
+//-   independent of input transition times. When input conditions for triggering are met, a new cycle starts and the
+//-   external capacitor is allowed to rapidly discharge and then
+//-   charge again. The retriggerable feature permits output
+//-   pulse widths to be extended. In fact a continuous true output can be maintained by having an input cycle time whih
+//-   is shorter than the output cycle time. The output pulse may
+//-   then be terminated at any time by applying a LOW logic
+//-   level to the RESET pin. Retriggering may be inhibited by
+//-   either connecting the Q output to an active HIGH input, or
+//-   the Q output to an active LOW input.
+//-   The DM74123 is a dual retriggerable monostable multivibrator
+//-
+//- Pinalias: C1,RC1,CLRQ1,B1,A1,Q1,QQ1,GND,QQ2,Q2,A2,B2,CLRQ2,RC2,C2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- Limitations:
+//-    Timing inaccuracies may occur for capacitances < 1nF. Please consult datasheet
+//-
+//- Example: 74123.cpp,74123_example
+//-
+//- FunctionTable:
+//-    https://pdf1.alldatasheet.com/datasheet-pdf/view/51137/FAIRCHILD/DM9602.html
+//-
+static NETLIST_START(TTL_9602_DIP)
+	TTL_9602(A)
+	TTL_9602(B)
 
-static NETLIST_START(TTL_7442_DIP)
-	NET_REGISTER_DEV(TTL_7442, A)
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
 
-	DIPPINS(    /*      +--------------+     */
-		  A.Q0, /*    0 |1     ++    16| VCC */ A.VCC,
-		  A.Q1, /*    1 |2           15| A   */ A.A,
-		  A.Q2, /*    2 |3           14| B   */ A.B,
-		  A.Q3, /*    3 |4           13| C   */ A.C,
-		  A.Q4, /*    4 |5    7442   12| D   */ A.D,
-		  A.Q5, /*    5 |6           11| 9   */ A.Q9,
-		  A.Q6, /*    6 |7           10| 8   */ A.Q8,
-		 A.GND, /*  GND |8            9| 7   */ A.Q7
-				/*      +--------------+     */
+	DIPPINS(    /*       +--------------+ */
+		   A.C, /*    C1 |1     ++    16| VCC   */ A.VCC,
+		  A.RC, /*   RC1 |2           15| C2    */ B.C,
+		A.CLRQ, /* CLRQ1 |3           14| RC2   */ B.RC,
+		   A.B, /*    B1 |4    9602   13| CLRQ2 */ B.CLRQ,
+		   A.A, /*    A1 |5           12| B2    */ B.B,
+		   A.Q, /*    Q1 |6           11| A2    */ B.A,
+		  A.QQ, /*   QQ1 |7           10| Q2    */ B.Q,
+		 A.GND, /*   GND |8            9| QQ2   */ B.QQ
+			    /*       +--------------+       */
 	)
 NETLIST_END()
 
-
-/*
- *  DM7448: BCD to 7-Segment decoders/drivers
- *
- *           +--------------+
- *         B |1     ++    16| VCC
- *         C |2           15| f
- * LAMP TEST |3           14| g
- *    BI/RBQ |4    7448   13| a
- *       RBI |5           12| b
- *         D |6           11| c
- *         A |7           10| d
- *       GND |8            9| e
- *           +--------------+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
-static NETLIST_START(TTL_7448_DIP)
-
-#if (NL_USE_TRUTHTABLE_7448)
-	NET_REGISTER_DEV(TTL_7448_TT, A)
-#else
-	NET_REGISTER_DEV(TTL_7448, A)
-#endif
-
-	DIPPINS(    /*      +--------------+     */
-		A.B,    /* B    |1     ++    16| VCC */ A.VCC,
-		A.C,    /* C    |2           15| f   */ A.f,
-		A.LTQ,  /* LTQ  |3           14| g   */ A.g,
-		A.BIQ,  /* BIQ  |4    7448   13| a   */ A.a,
-		A.RBIQ, /* RBIQ |5           12| b   */ A.b,
-		A.D,    /* D    |6           11| c   */ A.c,
-		A.A,    /* A    |7           10| d   */ A.d,
-		A.GND,  /* GND  |8            9| e   */ A.e
-				/*      +--------------+     */
-	)
-NETLIST_END()
 
 NETLIST_START(TTL74XX_lib)
 	NET_MODEL("DM7414         SCHMITT_TRIGGER(VTP=1.7 VTM=0.9 VI=4.35 RI=6.15k VOH=3.5 ROH=120 VOL=0.1 ROL=37.5 TPLH=15 TPHL=15)")
