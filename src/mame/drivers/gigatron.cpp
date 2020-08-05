@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:BSD-2-Clause
 // copyright-holders:Sterophonick, Phil Thomas
 /***************************************************************************
 
@@ -26,7 +26,7 @@
 	
 	Hook up a quikload for loading .gt1 files
 	HLE the keyboard and Pluggy McPlugface
-	Fix the video being shifted down and to the left.
+	Fix the video being shifted down.
 
 ***************************************************************************/
 
@@ -61,12 +61,12 @@ private:
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
 
-	uint16_t m_lc; //Lights Changed
+	uint8_t m_lc; //Lights Changed
 
 	//Video Generation stuff
 	uint8_t m_out;
-	uint16_t m_row;
-	uint16_t m_col;
+	int16_t m_row;
+	int16_t m_col;
 	uint8_t m_pixel;
 	
 	uint8_t m_dacoutput;
@@ -154,7 +154,7 @@ void gigatron_state::prog_map(address_map &map)
 
 void gigatron_state::data_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram();
+	map(0x0000, 0xffff).ram();
 }
 
 //**************************************************************************
