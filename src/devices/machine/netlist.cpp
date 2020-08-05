@@ -356,7 +356,6 @@ void netlist_mame_analog_input_device::write(const double val)
 	m_value_for_device_timer = val * m_mult + m_offset;
 	if (m_value_for_device_timer != (*m_param)())
 	{
-		LOGDEBUG("write %s\n", this->tag());
 		synchronize(0, 0, &m_value_for_device_timer);
 }
 }
@@ -382,9 +381,9 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	const uint32_t v = (val >> m_shift) & 1;
 	if (v != (*m_param)())
 	{
-		LOGDEBUG("write %s\n", this->tag());
+		printf("write %s: %d\n", this->tag(), val);
 		synchronize(0, v);
-}
+	}
 }
 
 void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

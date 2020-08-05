@@ -309,6 +309,12 @@ static INPUT_PORTS_START( fireone )
 	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("POT_L")
+	PORT_ADJUSTER( 50, "Mixer Volume (L)" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "volume_l")
+
+	PORT_START("POT_R")
+	PORT_ADJUSTER( 50, "Mixer Volume (R)" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "volume_r")
 INPUT_PORTS_END
 
 
@@ -404,9 +410,11 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:alert", "ALERT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_enable", "SONAR_ENABLE.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_sync", "SONAR_SYNC.IN", 0);
+	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_l", "R64.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_r", "R65.DIAL");
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "MIX_L").set_mult_offset(10000.0, 0.0);
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "MIX_R").set_mult_offset(10000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(500000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(500000.0, 0.0);
 }
 
 void starfire_state::starfire(machine_config &config)
