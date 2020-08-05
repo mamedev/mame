@@ -172,6 +172,7 @@ TODO:
         They appear to hang on the handshake with the MPU4 board
       - Layouts needed for the other working games, and DIP switches need checking/altering (no test mode?)
 	  - BWB Vid5 cabinets seem to have the speakers wired the other way according to test (left/right swapped)
+	  - BWB sampled sound seems to not play despite hookup.
  ***********************************************************************************************************/
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -1909,9 +1910,10 @@ void mpu4vid_state::bwbvidoki_68k_map(address_map &map)
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
+	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe05000, 0xe05001).noprw();
 }
 
 /* TODO: Fix up MPU4 map*/
@@ -1972,7 +1974,6 @@ void mpu4vid_state::ic3ss_vid_w(offs_t offset, uint8_t data)
 
 	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
 	int freq=num*denom2;
-
 	if (freq)
 	{
 		m_msm6376->set_unscaled_clock(freq);
@@ -1995,6 +1996,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
 	mpu4_common(config);
+
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2070,12 +2072,16 @@ void mpu4vid_state::vid_oki(machine_config &config)
 	//m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 	//m_ptm_ic3ss->irq_callback().set(FUNC(mpu4_state::cpu1_ptm_irq));
 
-	pia6821_device &pia_ic4ss(PIA6821(config, "pia_ic4ss", 0));
-	pia_ic4ss.readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
-	pia_ic4ss.writepa_handler().set(FUNC(mpu4vid_state::pia_gb_porta_w));
-	pia_ic4ss.writepb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_w));
-	pia_ic4ss.ca2_handler().set(FUNC(mpu4vid_state::pia_gb_ca2_w));
-	pia_ic4ss.cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
+	PIA6821(config, m_pia_ic4ss, 0);
+	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
+	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4vid_state::pia_gb_porta_w));
+	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_w));
+	m_pia_ic4ss->ca2_handler().set(FUNC(mpu4vid_state::pia_gb_ca2_w));
+	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
+
+	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //Adjusted by IC3 on sound board
+	msm6376.add_route(0, "lspeaker", 0.5);
+	msm6376.add_route(1, "rspeaker", 0.5);
 }
 
 void mpu4vid_state::mating(machine_config &config)
@@ -2083,12 +2089,9 @@ void mpu4vid_state::mating(machine_config &config)
 	crmaze(config);
 	vid_oki(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4oki_68k_map);
-
-
-	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //Adjusted by IC3 on sound board
-	msm6376.add_route(0, "lspeaker", 0.5);
-	msm6376.add_route(1, "rspeaker", 0.5);
 }
+
+
 
 void mpu4vid_state::bwbvid(machine_config &config)
 {
@@ -2098,13 +2101,9 @@ void mpu4vid_state::bwbvid(machine_config &config)
 
 void mpu4vid_state::bwbvid_oki(machine_config &config)
 {
-	bwbvid(config);
-	vid_oki(config);
+	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::bwbvidoki_68k_map);
-
-	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //?
-	msm6376.add_route(0, "lspeaker", 0.5);
-	msm6376.add_route(1, "rspeaker", 0.5);
+	vid_oki(config);
 }
 
 /*

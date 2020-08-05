@@ -14,6 +14,9 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+
+#include "machine/bacta_datalogger.h"
+
 #include "emupal.h"
 
 
@@ -113,6 +116,7 @@ public:
 		, m_pia6(*this, "pia_ic6")
 		, m_pia7(*this, "pia_ic7")
 		, m_pia8(*this, "pia_ic8")
+		, m_pia_ic4ss(*this, "pia_ic4ss")
 		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
 		, m_aux1_port(*this, "AUX1")
 		, m_aux2_port(*this, "AUX2")
@@ -123,6 +127,7 @@ public:
 		, m_meters(*this, "meters")
 		, m_ym2413(*this, "ym2413")
 		, m_ay8913(*this, "ay8913")
+		, m_dataport(*this, "dataport")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
@@ -311,6 +316,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
+	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
@@ -321,6 +328,7 @@ protected:
 	optional_device<pia6821_device> m_pia6;
 	optional_device<pia6821_device> m_pia7;
 	optional_device<pia6821_device> m_pia8;
+	optional_device<pia6821_device> m_pia_ic4ss;
 	required_ioport_array<8> m_port_mux;
 	required_ioport m_aux1_port;
 	required_ioport m_aux2_port;
@@ -331,6 +339,7 @@ protected:
 	required_device<meters_device> m_meters;
 	optional_device<ym2413_device> m_ym2413;
 	optional_device<ay8913_device> m_ay8913;
+	optional_device<bacta_datalogger_device> m_dataport;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 

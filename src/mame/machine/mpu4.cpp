@@ -159,7 +159,7 @@ IRQ line connected to CPU
            |   |                 |
            |   |                 |                    PA0-PA7, INPUT AUX1 connector
            |   |                 |
-           |   |                 |             CA2  OUTPUT, serial port Transmit line
+           |   |                 |             CA2  OUTPUT, serial port Transmit line (Tx)
            |   |                 |             CA1  not connected
            |   |                 |             IRQA connected to IRQ of CPU
            |   |                 |
@@ -705,6 +705,13 @@ void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 }
 
 
+WRITE_LINE_MEMBER(mpu4_state::dataport_rxd)
+{
+	m_serial_data = state;
+	m_pia4->cb1_w(state);
+	LOG_IC3(("Dataport RX %x\n",state));
+}
+
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
 void mpu4_state::pia_ic4_porta_w(uint8_t data)
 {
@@ -743,16 +750,13 @@ void mpu4_state::pia_ic4_portb_w(uint8_t data)
 
 uint8_t mpu4_state::pia_ic4_portb_r()
 {
-	/// TODO: this shouldn't be clocked from a read callback
 	if ( m_serial_data )
 	{
 		m_ic4_input_b |=  0x80;
-		m_pia4->cb1_w(1);
 	}
 	else
 	{
 		m_ic4_input_b &= ~0x80;
-		m_pia4->cb1_w(0);
 	}
 
 	if (!m_reel_mux)
@@ -1072,7 +1076,7 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 WRITE_LINE_MEMBER(mpu4_state::pia_ic5_ca2_w)
 {
 	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",machine().describe_context(),state));
-	m_serial_data = state;
+	m_dataport->write_txd(state);
 }
 
 
@@ -1361,6 +1365,7 @@ void mpu4_state::pia_gb_portb_w(uint8_t data)
 			}
 
 			{
+				LOG_SS(("%s: GAMEBOARD: Volume Set to %2x\n", machine().describe_context(),data));
 				float percent = (32-m_global_volume)/32.0;
 				m_msm6376->set_output_gain(0, percent);
 				m_msm6376->set_output_gain(1, percent);
@@ -1392,7 +1397,6 @@ uint8_t mpu4_state::pia_gb_portb_r()
 WRITE_LINE_MEMBER(mpu4_state::pia_gb_ca2_w)
 {
 	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", machine().describe_context(), state));
-
 //  reset line
 }
 
@@ -3058,6 +3062,9 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia8->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
 	METERS(config, m_meters, 0).set_number(8);
+
+	BACTA_DATALOGGER(config, m_dataport, 0);
+	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
 }
 
 void mpu4_state::mpu4_common2(machine_config &config)
@@ -3069,12 +3076,12 @@ void mpu4_state::mpu4_common2(machine_config &config)
 	//m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 	//m_ptm_ic3ss->irq_callback().set(FUNC(mpu4_state::cpu1_ptm_irq));
 
-	pia6821_device &pia_ic4ss(PIA6821(config, "pia_ic4ss", 0));
-	pia_ic4ss.readpb_handler().set(FUNC(mpu4_state::pia_gb_portb_r));
-	pia_ic4ss.writepa_handler().set(FUNC(mpu4_state::pia_gb_porta_w));
-	pia_ic4ss.writepb_handler().set(FUNC(mpu4_state::pia_gb_portb_w));
-	pia_ic4ss.ca2_handler().set(FUNC(mpu4_state::pia_gb_ca2_w));
-	pia_ic4ss.cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
+	PIA6821(config, m_pia_ic4ss, 0);
+	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4_state::pia_gb_portb_r));
+	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4_state::pia_gb_porta_w));
+	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4_state::pia_gb_portb_w));
+	m_pia_ic4ss->ca2_handler().set(FUNC(mpu4_state::pia_gb_ca2_w));
+	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
 }
 
 /* machine driver for MOD 2 board */

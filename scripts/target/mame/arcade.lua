@@ -1408,6 +1408,8 @@ files {
 
 createMAMEProjects(_target, _subtarget, "barcrest")
 files {
+	MAME_DIR .. "src/mame/machine/bacta_datalogger.h",
+	MAME_DIR .. "src/mame/machine/bacta_datalogger.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu2.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu3.cpp",
 	MAME_DIR .. "src/mame/machine/mpu4.cpp",
