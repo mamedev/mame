@@ -497,7 +497,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006356.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006356.PDF
 //-
 //-         +---+---+---+---++---+
 //-         | A | B | C | D || Y |
@@ -942,7 +942,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semicouductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006372.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006372.PDF
 //-
 //-         +-----+-----+---+---++---+----+
 //-         | CLR | CLK | J | K || Q | QQ |
@@ -985,7 +985,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006526.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006526.PDF
 //-
 //-         +----+-----+-----+---++---+----+
 //-         | PR | CLR | CLK | D || Q | QQ |
@@ -1143,7 +1143,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006378.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006378.PDF
 //-
 static NETLIST_START(TTL_7483_DIP)
 	TTL_7483(A)
@@ -1183,7 +1183,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006379.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006379.PDF
 //-
 static NETLIST_START(TTL_7485_DIP)
 	TTL_7485(A)
@@ -1208,7 +1208,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006531.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006531.PDF
 //-
 //-         +---+---++---+
 //-         | A | B || Y |
@@ -1262,7 +1262,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
 //-
 //-               BCD Count Sequence                    BCD Bi-Quinary
 //-         +-------++----+----+----+----+      +-------++----+----+----+----+
@@ -1389,7 +1389,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
 //-
 //-                 Count Sequence
 //-         +-------++----+----+----+----+
@@ -1449,7 +1449,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009780.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009780.PDF
 //-
 static NETLIST_START(TTL_7497_DIP)
 	TTL_7497(A)
@@ -1567,7 +1567,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Texas Instruments datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006460.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006460.PDF
 //-
 //-         +-----+-----+---+---++---+----+
 //-         | PRQ | CLK | J | K || Q | QQ |
@@ -1808,7 +1808,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheets/50/232293_DS.pdf
+//-   http://pdf.datasheetcatalog.com/datasheets/50/232293_DS.pdf
 //-
 //-         +---+---++------+
 //-         | A | C ||   Y  |
@@ -1853,7 +1853,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006547.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006547.PDF
 //-
 //-         +---+---+----+----+----+----+---++---+
 //-         | B | A | C0 | C1 | C2 | C3 | G || Y |
@@ -1904,7 +1904,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006395.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006395.PDF
 //-
 //-              2-line-to-4-line decoder                        2-line-to-4-line decoder
 //-     +---+---+----+----++-----+-----+-----+-----+    +---+---+----+----++-----+-----+-----+-----+
@@ -1968,7 +1968,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006395.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006395.PDF
 //-
 //-              2-line-to-4-line decoder                        2-line-to-4-line decoder
 //-     +---+---+----+----++-----+-----+-----+-----+    +---+---+----+----++-----+-----+-----+-----+
@@ -2029,7 +2029,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheets/120/236599_DS.pdf
+//-   http://pdf.datasheetcatalog.com/datasheets/120/236599_DS.pdf
 //-
 //-     +---+---+---+---++---+
 //-     | G | S | A | B || Y |
@@ -2087,7 +2087,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006551.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006551.PDF
 //-
 static NETLIST_START(TTL_74161_DIP)
 	TTL_74161(A)
@@ -2129,7 +2129,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006551.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006551.PDF
 //-
 static NETLIST_START(TTL_74163_DIP)
 	TTL_74163(A)
@@ -2159,7 +2159,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/fairchild/DM74164.pdf
+//-   http://pdf.datasheetcatalog.com/datasheet/fairchild/DM74164.pdf
 //-
 //-     +-------+-------+---+---++----+----+-----+----+
 //-     | CLEAR | CLOCK | A | B || QA | QB | ... | QH |
@@ -2196,7 +2196,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009782.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009782.PDF
 //-
 //-     +-----+-----+-----++----+----+----+----+----+----+----+----+
 //-     | PLQ | CP1 | CP2 || Q0 | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 |
@@ -2241,7 +2241,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006400.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006400.PDF
 //-
 //-     +------+--------+--------+-----+-----+------++----+----+-----+----+
 //-     | CLRQ | SH/LDQ | CLKINH | CLK | SER | A..H || QA | QB | ... | QH |
@@ -2281,7 +2281,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/fairchild/DM74174.pdf
+//-   http://pdf.datasheetcatalog.com/datasheet/fairchild/DM74174.pdf
 //-
 //-     +------+-----+---++---+
 //-     | CLRQ | CLK | D || Q |
@@ -2320,7 +2320,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009824.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009824.PDF
 //-
 //-     +---+---+---+---+---++---+
 //-     | A | B | C | D | E || Y |
@@ -2367,7 +2367,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009785.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009785.PDF
 //-
 //-     +-----+-----+----++---+
 //-     | S1Q | S2Q | RQ || Q |
@@ -2419,7 +2419,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009785.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009785.PDF
 //-
 //-     +----+-----+----++----+
 //-     | EQ |  CP | Dn || Qn |
@@ -2476,7 +2476,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009832.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009832.PDF
 //-
 //-     +----+-----+----++----+
 //-     | EQ |  CP | Dn || Qn |
@@ -2520,7 +2520,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009832.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS009832.PDF
 //-
 //-     +----+-----+----++----+-----+
 //-     | EQ |  CP | Dn || Qn | QQn |
@@ -2564,7 +2564,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006434.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006434.PDF
 //-
 static NETLIST_START(TTL_74393_DIP)
 	TTL_74393(A)
