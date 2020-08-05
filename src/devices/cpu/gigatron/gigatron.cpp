@@ -2,11 +2,14 @@
 // copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
- * Skeleton device for Gigatron CPU Core
+ * Gigatron CPU Core
+ *
+ * Based on Gigatron.js by Phil Thomas
+ * https://github.com/PhilThomas/gigatron
+ *
+ * Ported to MAME framework by Sterophonick
  *
  *****************************************************************************/
-
- //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #include "emu.h"
 #include "gigatron.h"
@@ -30,7 +33,6 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
 #define gigatron_writemem8(A,B) m_data->write_byte((A),B)
 
-
 /***********************************
  *  illegal opcodes
  ***********************************/
@@ -38,49 +40,6 @@ void gigatron_cpu_device::gigatron_illegal()
 {
 	logerror("gigatron illegal opcode at 0x%04x\n", m_ppc);
 	m_icount -= 1;
-}
-
-/* Execute cycles */
-void gigatron_cpu_device::execute_run()
-{
-	uint16_t opcode;
-
-	do
-	{
-		m_ppc = m_pc;
-		debugger_instruction_hook(m_pc);
-
-		opcode = gigatron_readop(m_pc);
-		m_pc = m_npc;
-		m_npc = (m_pc + 1) & m_romMask;
-
-		uint8_t op = (opcode >> 13) & 0x0007;
-		uint8_t mode = (opcode >> 10) & 0x0007;
-		uint8_t bus = (opcode >> 8) & 0x0003;
-		uint8_t d = (opcode >> 0) & 0x00ff;
-
-		switch (op)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			aluOp(op, mode, bus, d);
-			break;
-		case 6:
-			storeOp(op, mode, bus, d);
-			break;
-		case 7:
-			branchOp(op, mode, bus, d);
-			break;
-		default:
-			gigatron_illegal();
-			break;
-		}
-		m_icount--;
-	} while (m_icount > 0);
 }
 
 
@@ -130,13 +89,62 @@ void gigatron_cpu_device::reset_cpu()
 	m_inReg = 0xFF;
 	m_outx = 0;
 	m_out = 0;
+	
+	m_out_cb(0, 0);
+	m_outx_cb(0, 0);
+	
+	for(uint16_t i = 0; i < m_ramMask; i++)
+		gigatron_writemem8(i, floor(machine().rand() & 0xff));
+}
+
+/* Execute cycles */
+void gigatron_cpu_device::execute_run()
+{
+	uint16_t opcode;
+	m_inReg = m_ir_cb();
+	do
+	{
+		m_ppc = m_pc;
+		debugger_instruction_hook(m_pc);
+
+		opcode = gigatron_readop(m_pc);
+		m_pc = m_npc;
+		m_npc = (m_pc + 1) & m_romMask;
+
+		uint8_t op = (opcode >> 13) & 0x0007;
+		uint8_t mode = (opcode >> 10) & 0x0007;
+		uint8_t bus = (opcode >> 8) & 0x0003;
+		uint8_t d = (opcode >> 0) & 0x00ff;
+
+		switch (op)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			aluOp(op, mode, bus, d);
+			break;
+		case 6:
+			storeOp(op, mode, bus, d);
+			break;
+		case 7:
+			branchOp(op, mode, bus, d);
+			break;
+		default:
+			gigatron_illegal();
+			break;
+		}
+		m_icount--;
+	} while (m_icount > 0);
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 	const uint8_t ZERO = 0x80;
 	bool c = false;
-	uint8_t ac2 = m_ac ^ ZERO;
+	uint8_t ac = m_ac ^ ZERO;
 	uint16_t base = m_pc & 0xff00;
 	switch (mode)
 	{
@@ -145,22 +153,22 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 		base = m_y << 8;
 		break;
 	case 1: //bgt
-		c = (ac2 > ZERO);
+		c = (ac > ZERO);
 		break;
 	case 2: //blt
-		c = (ac2 < ZERO);
+		c = (ac < ZERO);
 		break;
 	case 3: //bne
-		c = (ac2 != ZERO);
+		c = (ac != ZERO);
 		break;
 	case 4: //beq
-		c = (ac2 == ZERO);
+		c = (ac == ZERO);
 		break;
 	case 5: //bge
-		c = (ac2 >= ZERO);
+		c = (ac >= ZERO);
 		break;
 	case 6: //ble
-		c = (ac2 <= ZERO);
+		c = (ac <= ZERO);
 		break;
 	case 7: //bra
 		c = true;
@@ -226,15 +234,15 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 		break;
 	case 6:
 	case 7:
-		uint16_t rising = ~(m_out & b);
+		uint16_t rising = ~m_out & b;
 		m_out = b;
-		m_out_cb(0, m_out, 0xFF);
+		m_out_cb(0, m_out);
 
 		// rising edge of out[6] registers outx from ac
 		if (rising & 0x40)
 		{
 			m_outx = m_ac;
-			m_outx_cb(0, m_outx, 0xFF);
+			m_outx_cb(0, m_outx);
 		}
 		break;
 	}
@@ -333,10 +341,10 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 
 gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
-	, m_ramMask(0x7FFF)
+	, m_ramMask(0xFFFF)
 	, m_romMask(0xFFFF)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_outx_cb(*this)
 	, m_out_cb(*this)
 	, m_ir_cb(*this)
